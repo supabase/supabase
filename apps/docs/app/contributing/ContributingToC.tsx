@@ -1,6 +1,8 @@
 'use client'
 
-import { Feedback } from '~/components/Feedback'
+import { Feedback } from '~/components/Feedback/Feedback'
+import { FeedbackControl } from '~/components/Feedback/FeedbackControl'
+import { useFeedbackDockVariant } from '~/components/Feedback/useFeedbackDockVariant'
 import { useBreakpoint } from 'common'
 import { Menu } from 'lucide-react'
 import type { HTMLAttributes } from 'react'
@@ -18,9 +20,7 @@ export function ContributingToc({ className }: { className?: string }) {
 
   useEffect(() => {
     const headings = [
-      ...document.querySelectorAll(
-        'article.prose > h2:not(#feedback-title),h3:not(#feedback-title)'
-      ),
+      ...document.querySelectorAll('article.prose > h2, article.prose > h3'),
     ] as Array<HTMLHeadingElement>
     const tocItems = headings
       .filter((heading) => !!heading.id && heading.textContent)
@@ -104,6 +104,8 @@ function MobileToc({ items, className }: { items: Array<TocItem>; className?: st
 }
 
 function TocBase({ items, className }: { items: Array<TocItem>; className?: string }) {
+  const feedbackVariant = useFeedbackDockVariant()
+
   return (
     <nav aria-label="Table of contents" className={cn('text-foreground-lighter', className)}>
       <span className="hidden lg:block font-mono text-xs uppercase text-foreground px-5 mb-6">
@@ -117,7 +119,11 @@ function TocBase({ items, className }: { items: Array<TocItem>; className?: stri
         ))}
       </ul>
       <Separator className="lg:w-[calc(100%-2rem)] lg:ml-5 my-4 lg:my-8" />
-      <Feedback className="pl-0 lg:pl-5" />
+      {feedbackVariant === 'dock' ? (
+        <FeedbackControl className="pl-0 lg:pl-5" />
+      ) : feedbackVariant === 'control' ? (
+        <Feedback className="pl-0 lg:pl-5" />
+      ) : null}
     </nav>
   )
 }

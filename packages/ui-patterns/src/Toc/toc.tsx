@@ -31,7 +31,7 @@ export function Toc(props: HTMLAttributes<HTMLDivElement>) {
         } as object
       }
     >
-      <div className="flex h-fit w-(--toc-width) max-w-full flex-col gap-3 pe-4">
+      <div className="flex h-fit min-h-0 w-(--toc-width) max-w-full flex-col gap-3 pe-4">
         {props.children}
       </div>
     </div>
@@ -45,11 +45,10 @@ export function TOCScrollArea({
   const viewRef = useRef<HTMLDivElement>(null)
 
   return (
-    <ScrollArea {...props} className={cn('flex flex-col ps-px', props.className)}>
+    <ScrollArea {...props} ref={viewRef} className={cn('flex flex-col ps-px', props.className)}>
       <Primitive.ScrollProvider containerRef={viewRef}>
         <ScrollViewport
           className={cn('relative min-h-0 text-sm', isMenu && 'mt-2 mb-4 mx-4 md:mx-6')}
-          ref={viewRef}
         >
           {props.children}
         </ScrollViewport>
