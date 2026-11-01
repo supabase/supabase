@@ -18,23 +18,15 @@ import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  cn,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-  SidePanel,
-} from 'ui'
+import { Button, cn, Form, FormControl, FormField, Input, SidePanel } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { useEnumeratedTypeCreateMutation } from '@/data/enumerated-types/enumerated-type-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { Admonition } from 'ui-patterns/Admonition'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 interface CreateEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -174,10 +166,7 @@ const CreateEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Admonition
-                type="default"
-                title="After creation, values cannot be deleted or sorted"
-              >
+              <Admonition type="default" title="After creation, values cannot be deleted or sorted">
                 <p className="leading-normal! track">
                   You will need to delete and recreate the enumerated type with the updated values
                   instead.

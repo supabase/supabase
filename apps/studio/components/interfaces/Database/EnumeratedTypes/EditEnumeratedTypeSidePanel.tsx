@@ -34,14 +34,14 @@ import {
   Input,
   SidePanel,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import EnumeratedTypeValueRow from './EnumeratedTypeValueRow'
 import { useEnumeratedTypeUpdateMutation } from '@/data/enumerated-types/enumerated-type-update-mutation'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
-import { Admonition } from 'ui-patterns/Admonition'
 
 interface EditEnumeratedTypeSidePanelProps {
   visible: boolean
@@ -216,16 +216,17 @@ const EditEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Admonition
-                type="default"
-                title="Existing values cannot be deleted or sorted"
-              >
+              <Admonition type="default" title="Existing values cannot be deleted or sorted">
                 <p className="leading-normal! track">
                   You will need to delete and recreate the enumerated type with the updated values
                   instead.
                 </p>
                 <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
-                  <Link href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us" target="_blank" rel="noreferrer">
+                  <Link
+                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
                     Learn more
                   </Link>
                 </Button>
