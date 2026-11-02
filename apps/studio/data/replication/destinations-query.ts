@@ -37,7 +37,6 @@ export const useReplicationDestinationsQuery = <TData = ReplicationDestinationsD
     queryKey: replicationKeys.destinations(projectRef),
     queryFn: ({ signal }) => fetchReplicationDestinations({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
     retry: checkReplicationFeatureFlagRetry,
     ...options,

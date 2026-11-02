@@ -43,7 +43,6 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
     queryKey: replicationKeys.pipelines(projectRef),
     queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnMount: false,
     refetchOnWindowFocus: false,
     retry: checkReplicationFeatureFlagRetry,
     ...options,
