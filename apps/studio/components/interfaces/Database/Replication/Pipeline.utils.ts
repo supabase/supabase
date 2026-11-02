@@ -3,24 +3,22 @@ import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/Unifie
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-/** Unified logs filtered to Pipelines, and to one pipeline when `pipelineId` is set. */
-export const getPipelineLogsUrl = ({
-  projectRef,
+export const getPipelineUnifiedLogsUrl = ({
+  projectRef = '_',
   pipelineId,
 }: {
-  projectRef: string
+  projectRef?: string
   pipelineId?: string
 }) =>
   serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
     filter: ['log_type:eq:pipelines', ...(pipelineId ? [`pipeline_id:eq:${pipelineId}`] : [])],
   })
 
-/** Legacy Pipelines logs collection, filtered to one pipeline when `pipelineId` is set. */
-export const getLegacyPipelineLogsUrl = ({
-  projectRef,
+export const getPipelineLegacyLogsUrl = ({
+  projectRef = '_',
   pipelineId,
 }: {
-  projectRef: string
+  projectRef?: string
   pipelineId?: string
 }) => {
   const path = `/project/${projectRef}/logs/pipelines-logs`

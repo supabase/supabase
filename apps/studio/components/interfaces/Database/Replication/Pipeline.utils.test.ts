@@ -1,9 +1,9 @@
 import { describe, expect, test } from 'vitest'
 
 import {
-  getLegacyPipelineLogsUrl,
   getPipelineDisplayState,
-  getPipelineLogsUrl,
+  getPipelineLegacyLogsUrl,
+  getPipelineUnifiedLogsUrl,
   getRestartRequestStatus,
 } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
@@ -38,7 +38,7 @@ describe('Pipelines logs links', () => {
     'filters unified logs to Pipelines and pipeline %s',
     (pipelineId) => {
       const url = new URL(
-        getPipelineLogsUrl({ projectRef: 'project', pipelineId }),
+        getPipelineUnifiedLogsUrl({ projectRef: 'project', pipelineId }),
         'http://localhost'
       )
       expect(url.pathname).toBe('/project/project/logs')
@@ -49,7 +49,7 @@ describe('Pipelines logs links', () => {
   )
 
   test('filters unified logs to Pipelines without a pipeline', () => {
-    const url = new URL(getPipelineLogsUrl({ projectRef: 'project' }), 'http://localhost')
+    const url = new URL(getPipelineUnifiedLogsUrl({ projectRef: 'project' }), 'http://localhost')
     expect(url.searchParams.get('filter')).toBe('log_type:eq:pipelines')
   })
 
@@ -57,7 +57,7 @@ describe('Pipelines logs links', () => {
     'filters the legacy collection to pipeline %s',
     (pipelineId) => {
       const url = new URL(
-        getLegacyPipelineLogsUrl({ projectRef: 'project', pipelineId }),
+        getPipelineLegacyLogsUrl({ projectRef: 'project', pipelineId }),
         'http://localhost'
       )
       expect(url.pathname).toBe('/project/project/logs/pipelines-logs')
@@ -66,7 +66,7 @@ describe('Pipelines logs links', () => {
   )
 
   test('opens the full legacy collection without a pipeline', () => {
-    expect(getLegacyPipelineLogsUrl({ projectRef: 'project' })).toBe(
+    expect(getPipelineLegacyLogsUrl({ projectRef: 'project' })).toBe(
       '/project/project/logs/pipelines-logs'
     )
   })

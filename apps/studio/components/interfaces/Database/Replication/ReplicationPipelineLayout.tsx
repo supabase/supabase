@@ -43,9 +43,9 @@ import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import {
-  getLegacyPipelineLogsUrl,
   getPipelineDisplayState,
-  getPipelineLogsUrl,
+  getPipelineLegacyLogsUrl,
+  getPipelineUnifiedLogsUrl,
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
@@ -209,8 +209,8 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   }
 
   const logsUrl = isUnifiedLogsEnabled
-    ? getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
-    : getLegacyPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+    ? getPipelineUnifiedLogsUrl({ projectRef: projectRef!, pipelineId })
+    : getPipelineLegacyLogsUrl({ projectRef: projectRef!, pipelineId })
 
   return (
     <div className="flex min-h-full w-full flex-col items-stretch">

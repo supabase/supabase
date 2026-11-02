@@ -33,7 +33,11 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
-import { getLegacyPipelineLogsUrl, getPipelineLogsUrl, getStatusName } from '../Pipeline.utils'
+import {
+  getPipelineLegacyLogsUrl,
+  getPipelineUnifiedLogsUrl,
+  getStatusName,
+} from '../Pipeline.utils'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
@@ -215,14 +219,17 @@ export const ReplicationPipelineStatus = () => {
   const hasOptimisticStatus = requestStatus !== PipelineStatusRequestStatus.None
   const isPipelineBusy = hasOptimisticStatus || isRequestPending(pipelineId)
   const isAnyTableResetting = resettingTableIds.size > 0
+
   const showDisabledState = isPipelineBusy || !isPipelineActionable
   const canResetErroredTables = hasErroredTables && !showDisabledState
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
+
   const logsUrl = isUnifiedLogsEnabled
-    ? getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
-    : getLegacyPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+    ? getPipelineUnifiedLogsUrl({ projectRef, pipelineId })
+    : getPipelineLegacyLogsUrl({ projectRef, pipelineId })
+
   const emptyState = getTableStatusEmptyState({
     isDisabled: showDisabledState,
     disabledStateConfig: config,
@@ -362,7 +369,7 @@ export const ReplicationPipelineStatus = () => {
                             variant="default"
                             aria-label="More reset options"
                             icon={<ChevronDownIcon />}
-                            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                            className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                             disabled={showDisabledState || isPipelineError}
                           />
                         </DropdownMenuTrigger>

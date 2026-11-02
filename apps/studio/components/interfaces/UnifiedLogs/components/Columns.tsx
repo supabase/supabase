@@ -221,14 +221,17 @@ export function generateDynamicColumns({
       header: 'Pipeline ID',
       filterFn: () => true,
       enableSorting: false,
-      size: 210,
-      minSize: 120,
+      size: 105,
+      minSize: 105,
       cell: ({ row }) => (
         <span className="font-mono text-xs" title={row.original.pipeline_id ?? undefined}>
           {row.original.pipeline_id}
         </span>
       ),
-      meta: { cellClassName: 'hidden md:table-cell', headerClassName: 'hidden md:table-cell' },
+      meta: {
+        cellClassName: 'w-[105px] hidden md:table-cell',
+        headerClassName: 'w-[105px] hidden md:table-cell',
+      },
     },
     // Event message column - controlled by columnVisibility
     {

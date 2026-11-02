@@ -89,7 +89,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                 />
                 <Label
                   htmlFor={`${value}-${option.value}`}
-                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
+                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-sm min-w-0"
                 >
                   <div className="flex-1 min-w-0 overflow-hidden">
                     {Component ? (

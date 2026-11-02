@@ -10,8 +10,6 @@ import {
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { LOG_TYPES_LABELS } from '../UnifiedLogs.constants'
-
 interface LogTypeIconProps {
   type: string
   size?: number
@@ -45,17 +43,16 @@ export const LogTypeIcon = ({
   className,
 }: LogTypeIconProps) => {
   const Icon = ICON_MAP.get(type) ?? BoxIcon
-  const label = type === 'pipelines' ? LOG_TYPES_LABELS.pipelines : type
 
   return (
     <Tooltip>
       <TooltipTrigger asChild>
-        <span className="inline-flex" role="img" aria-label={label}>
+        <span className="inline-flex" role="img" aria-label={type}>
           <Icon size={size} strokeWidth={strokeWidth} className={className} />
         </span>
       </TooltipTrigger>
       <TooltipContent side="left">
-        <div className="text-xs">{label}</div>
+        <div className="text-xs">{type}</div>
       </TooltipContent>
     </Tooltip>
   )
