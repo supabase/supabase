@@ -7,10 +7,10 @@ import { replicationKeys } from './keys'
 describe('pipeline cache invalidation', () => {
   test.each([
     { key: replicationKeys.pipelines('default'), shouldReplaceRead: true },
-    { key: replicationKeys.pipelineById('default', 1), shouldReplaceRead: true },
-    { key: replicationKeys.pipelinesVersion('default', 1), shouldReplaceRead: true },
-    { key: replicationKeys.pipelinesStatus('default', 1), shouldReplaceRead: false },
-    { key: replicationKeys.pipelinesReplicationStatus('default', 1), shouldReplaceRead: false },
+    { key: replicationKeys.pipelineById('default', '1'), shouldReplaceRead: true },
+    { key: replicationKeys.pipelinesVersion('default', '1'), shouldReplaceRead: true },
+    { key: replicationKeys.pipelinesStatus('default', '1'), shouldReplaceRead: false },
+    { key: replicationKeys.pipelinesReplicationStatus('default', '1'), shouldReplaceRead: false },
   ])('refreshes metadata while sharing polls: $key', async ({ key, shouldReplaceRead }) => {
     const queryClient = new QueryClient()
     queryClient.setQueryData(key, 'cached')

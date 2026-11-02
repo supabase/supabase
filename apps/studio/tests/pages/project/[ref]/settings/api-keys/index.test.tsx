@@ -23,8 +23,9 @@ vi.mock('common', async () => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_READ: 'api_gateway_keys_read' } },
 }))
 
 vi.mock('@/data/api-keys/api-keys-query', () => ({
@@ -101,39 +102,35 @@ describe('/project/[ref]/settings/api-keys', () => {
     expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
   })
 
-  it('renders the CLI admonition above the keys on self-hosted (CLI mode)', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
+  it.each([
+    {
+      mode: 'CLI',
       isCli: true,
       isSelfHosted: false,
-    })
-
-    render(<ApiKeysPage dehydratedState={{}} />)
-
-    expect(screen.getByText(/Local development with the Supabase CLI/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
-    expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
-  })
-
-  it('renders the self-hosted admonition above the keys on self-hosted (Docker mode)', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
+      shown: /Local development with the Supabase CLI/i,
+      hidden: /Self-hosted Supabase/i,
+    },
+    {
+      mode: 'Docker',
       isCli: false,
       isSelfHosted: true,
-    })
+      shown: /Self-hosted Supabase/i,
+      hidden: /Local development with the Supabase CLI/i,
+    },
+  ])(
+    'renders the matching admonition above the keys on self-hosted ($mode mode)',
+    ({ isCli, isSelfHosted, shown, hidden }) => {
+      mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
 
-    render(<ApiKeysPage dehydratedState={{}} />)
+      render(<ApiKeysPage dehydratedState={{}} />)
 
-    expect(screen.getByText(/Self-hosted Supabase/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
-    expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
-  })
+      expect(screen.getByText(shown)).toBeInTheDocument()
+      expect(screen.queryByText(hidden)).not.toBeInTheDocument()
+      expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
+      expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
+      expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
+      expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
+    }
+  )
 })

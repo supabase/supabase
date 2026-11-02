@@ -2,6 +2,7 @@ import { getIndexesSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseIndexesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -33,7 +34,13 @@ export async function getIndexes(
   const sql = getIndexesSQL({ schema })
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['indexes', schema] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['indexes', schema],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

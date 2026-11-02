@@ -73,7 +73,7 @@ export const PipelineValidationAdmonition = forwardRef<
                   : ''}
               </p>
             ) : null}
-            <Markdown className="text-sm text-foreground-light [&>p]:inline [&>p+p]:before:content-[' ']">
+            <Markdown className="text-sm text-foreground-light [&>p]:mb-2 [&>p:last-child]:mb-0">
               {failure.reason}
             </Markdown>
           </div>

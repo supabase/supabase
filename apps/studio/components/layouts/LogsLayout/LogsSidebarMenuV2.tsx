@@ -13,17 +13,16 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
 import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
@@ -70,21 +69,7 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useIsETLPrivateAlpha()
-  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
-    {
-      projectRef: ref,
-    },
-    {
-      enabled: enablePgReplicate,
-      retry: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  )
-
-  // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
-  const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
+  const { showPipelinesLogs } = useShowPipelinesLogs()
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
@@ -174,11 +159,11 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
-    showETLLogs
+    showPipelinesLogs
       ? {
-          name: 'Replication',
-          key: 'replication_logs',
-          url: `/project/${ref}/logs/replication-logs`,
+          name: 'Pipelines',
+          key: 'pipelines-logs',
+          url: `/project/${ref}/logs/pipelines-logs`,
           items: [],
         }
       : null,

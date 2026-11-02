@@ -2,6 +2,11 @@ import { clientSdkIds, REFERENCES } from '~/content/navigation.references'
 import { IconLinkList, IconLinkMenuIcon } from '~/features/ui/IconLink'
 import { LayoutMainContent } from '~/layouts/DefaultLayout'
 import { SidebarSkeleton } from '~/layouts/MainSkeleton'
+import type { Metadata } from 'next'
+
+export const metadata: Metadata = {
+  title: 'Supabase API references',
+}
 
 export default function ReferenceIndexPage() {
   return (

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import Link from 'next/link'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -8,19 +9,24 @@ import { ProjectConnectionPopover } from '@/components/interfaces/ProjectHome/Pr
 import { ProjectPausedState } from '@/components/layouts/ProjectLayout/PausedState/ProjectPausedState'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { ProjectUpgradeFailedBanner } from '@/components/ui/ProjectUpgradeFailedBanner'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL, IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const TopSection = () => {
   const isOrioleDb = useIsOrioleDb()
   const { data: project, isLoading } = useSelectedProjectQuery()
   const { data: parentProject } = useProjectDetailQuery({ ref: project?.parent_project_ref })
 
-  const { data: branches } = useBranchesQuery({
-    projectRef: project?.parent_project_ref ?? project?.ref,
+  const branchesProjectRef = project?.parent_project_ref ?? project?.ref
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: branchesProjectRef,
   })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant })
+  )
 
   const mainBranch = branches?.find((branch) => branch.is_default)
   const currentBranch = branches?.find((branch) => branch.project_ref === project?.ref)

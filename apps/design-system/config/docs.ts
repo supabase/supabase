@@ -128,6 +128,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Code Block',
+          href: '/docs/fragments/code-block',
+          items: [],
+        },
+        {
           title: 'Collapsible Card Section',
           href: '/docs/fragments/collapsible-card-section',
           items: [],
@@ -215,6 +220,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Metric Card',
           href: '/docs/fragments/metric-card',
+          items: [],
+        },
+        {
+          title: 'AI Tools',
+          href: '/docs/fragments/ai-tools',
           items: [],
         },
         {

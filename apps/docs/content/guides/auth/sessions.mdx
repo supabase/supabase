@@ -87,7 +87,7 @@ As your users continue using your app, refresh tokens are being constantly excha
 The general rule is that a refresh token can only be used once. However, strictly enforcing this can cause certain issues to arise. There are two exceptions to this design to prevent the early and unexpected termination of user's sessions:
 
 - A refresh token can be used more than once within a defined reuse interval. By default this is 10 seconds and we do not recommend changing this value. This exception is granted for legitimate situations such as:
-  - Using server-side rendering where the same refresh token needs to be reused on the server and soon after on the client
+  - Using [server-side rendering](/docs/guides/auth/server-side) where the same refresh token needs to be reused on the server and soon after on the client
   - To allow some leeway for bugs or issues with serializing access to the refresh token request
 - If the parent of the currently active refresh token for the user's session is being used, the active token will be returned. This exception solves an important and often common situation:
   - All clients such as browsers, mobile or desktop apps, and even some servers are inherently unreliable due to network issues. A request does not indicate that they received a response or even processed the response they received.

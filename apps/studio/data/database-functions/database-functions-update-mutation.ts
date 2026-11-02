@@ -6,6 +6,7 @@ import { z } from 'zod'
 
 import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -29,6 +30,7 @@ export async function updateDatabaseFunction({
     connectionString,
     sql,
     queryKey: ['functions', 'update', func.id.toString()],
+    grant: unguarded.migrating,
   })
 
   return result as z.infer<typeof zod>

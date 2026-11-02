@@ -6,7 +6,7 @@ import { isFeatureEnabled } from 'common'
 import { usePathname } from 'next/navigation'
 import { cn } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
+import { TocSection } from 'ui-patterns/Toc'
 
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 
@@ -55,16 +55,7 @@ const GuidesSidebar = ({
             showPreferredSource
           />
         </div>
-        {!hideToc && toc.length !== 0 && (
-          <Toc className="-ml-[calc(0.25rem+6px)]">
-            <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
-              On this page
-            </h3>
-            <TOCScrollArea>
-              <TOCItems items={toc} />
-            </TOCScrollArea>
-          </Toc>
-        )}
+        {!hideToc && toc.length !== 0 && <TocSection items={toc} />}
       </div>
     </div>
   )

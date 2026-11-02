@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -18,7 +17,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { UnknownInterface } from '@/components/ui/UnknownInterface'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -27,9 +26,8 @@ const RateLimitsPage: NextPageWithLayout = () => {
   const { ref } = useParams()
   const showRateLimits = useIsFeatureEnabled('authentication:rate_limits')
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
   if (!showRateLimits) {

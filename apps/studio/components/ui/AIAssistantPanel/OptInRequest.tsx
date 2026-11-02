@@ -1,6 +1,5 @@
 import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useState } from 'react'
-import { z } from 'zod'
 
 import { AI_OPT_IN_LEVEL_LABELS } from './AiAssistant.constants'
 import { AIOptInModal } from './AIOptInModal'
@@ -9,12 +8,7 @@ import type { ConfirmFooterApprovalState } from './Confirm.utils'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useOrgAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { optInLevelSchema } from '@/lib/ai/opt-in-level'
-
-const updateOptInLevelOutputSchema = z.object({
-  levelAfterReview: optInLevelSchema,
-  sufficient: z.boolean().optional(),
-})
+import { contract } from '@/lib/ai/tools/update-opt-in-level'
 
 interface OptInRequestProps {
   /** Omitted when the Assistant is only asking the user to review the setting. */
@@ -45,7 +39,7 @@ export const OptInRequest = ({
   )
 
   const requiredLabel = requiredLevel && AI_OPT_IN_LEVEL_LABELS[requiredLevel]
-  const result = updateOptInLevelOutputSchema.safeParse(output).data
+  const result = contract.outputSchema.safeParse(output).data
   // Saving a lower level still approves the call
   const isBelowRequest = confirmState === 'success' && result?.sufficient === false
 

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -35,6 +36,7 @@ export async function toggleQueuesExposurePostgrest({
     connectionString,
     sql,
     queryKey: ['toggle-queues-exposure'],
+    grant: unguarded.migrating,
   })
 
   return result

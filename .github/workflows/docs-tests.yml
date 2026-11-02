@@ -11,6 +11,7 @@ on:
       - 'apps/docs/content/_partials/access-control/**'
       - 'apps/docs/.env.development'
       - 'apps/docs/package.json'
+      - 'packages/docs-search/**'
       - 'packages/shared-data/package.json'
       - 'packages/shared-data/scoped-access-token-permissions.ts'
       - 'e2e/docs/local-smoke/**'

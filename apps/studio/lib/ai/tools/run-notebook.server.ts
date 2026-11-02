@@ -8,6 +8,7 @@ import { approvalGatedToolFromContract } from './tool-from-contract'
 import type { ApprovalGatedToolFactory } from './types'
 import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
 import { getNotebook } from '@/data/content/notebooks/notebook-query'
+import { unguarded } from '@/data/fetchers'
 import { executeLogsSql } from '@/data/logs/execute-logs-sql-mutation'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { getReadReplicas } from '@/data/read-replicas/replicas-query'
@@ -24,7 +25,7 @@ function getErrorMessage(error: unknown): string {
 }
 
 export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
-  const { projectRef, connectionString, aiOptInLevel = 'schema' } = ctx
+  const { projectRef, connectionString, aiOptInLevel } = ctx
   const authHeaders = getAuthHeaders(ctx.authorization)
 
   return approvalGatedToolFromContract(
@@ -119,6 +120,7 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
               connectionString: selectedConnectionString,
               sql: limitedSql.sql,
               isStatementTimeoutDisabled: true,
+              grant: unguarded.migrating,
             },
             abortSignal,
             authHeaders

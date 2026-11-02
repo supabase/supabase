@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { CheckIcon, Loader2Icon } from 'lucide-react'
@@ -29,13 +30,14 @@ import { ConnectToGitHub } from './ConnectToGitHub'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { Branch, useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface EditBranchModalProps {
   branch?: Branch
@@ -77,7 +79,10 @@ export const EditBranchModal = ({ branch, visible, onClose }: EditBranchModalPro
   const isError = isErrorAuthorization || isErrorConnections
   const error = authorizationError || connectionsError
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const { mutate: checkGithubBranchValidity, isPending: isChecking } = useCheckGithubBranchValidity(
     { onError: () => {} }
   )

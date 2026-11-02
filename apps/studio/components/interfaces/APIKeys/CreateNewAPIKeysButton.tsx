@@ -67,11 +67,11 @@ export const CreateNewAPIKeysButton = () => {
           <AlertDialogTitle>Create new API keys</AlertDialogTitle>
           <AlertDialogDescription>
             This will create a default publishable key and a default secret key both named{' '}
-            <code className="break-keep! text-code-inline">default</code>. These keys are required
-            to connect your application to your Supabase project. Your existing legacy API keys (
-            <code className="break-keep! text-code-inline">anon</code> and{' '}
-            <code className="break-keep! text-code-inline">service_role</code>) are not affected and
-            remain valid until you disable them in a separate step.
+            <code className="break-keep!">default</code>. These keys are required to connect your
+            application to your Supabase project. Your existing legacy API keys (
+            <code className="break-keep!">anon</code> and{' '}
+            <code className="break-keep!">service_role</code>) are not affected and remain valid
+            until you disable them in a separate step.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (

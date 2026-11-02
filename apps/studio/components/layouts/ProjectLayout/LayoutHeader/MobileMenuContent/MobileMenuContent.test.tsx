@@ -111,20 +111,7 @@ describe('Mobile product header', () => {
     }
   )
 
-  it('hides the current product header in the top-level menu and other product sections', async () => {
-    const user = userEvent.setup()
-    customRender(<ExplorerMobileMenu initialSection="notebook" />)
-
-    await user.click(screen.getByRole('button', { name: 'Back to menu' }))
-    expect(
-      screen.queryByRole('navigation', { name: 'Explorer navigation' })
-    ).not.toBeInTheDocument()
-    await user.click(screen.getByRole('button', { name: 'Database' }))
-    expect(screen.getByText('Database menu')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'New notebook' })).not.toBeInTheDocument()
-  })
-
-  it('names the project menu dialog across top-level and section navigation', async () => {
+  it('names the project menu dialog and hides the Explorer header outside Explorer', async () => {
     const user = userEvent.setup()
     customRender(<ExplorerMobileMenu initialSection="notebook" />)
 
@@ -132,6 +119,9 @@ describe('Mobile product header', () => {
     expect(screen.getAllByRole('heading', { name: 'Project menu' })).toHaveLength(1)
 
     await user.click(screen.getByRole('button', { name: 'Back to menu' }))
+    expect(
+      screen.queryByRole('navigation', { name: 'Explorer navigation' })
+    ).not.toBeInTheDocument()
     expect(screen.getByRole('navigation', { name: 'Project menu' })).toBeInTheDocument()
     expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
 
@@ -139,5 +129,6 @@ describe('Mobile product header', () => {
     expect(screen.getByText('Database menu')).toBeInTheDocument()
     expect(screen.getByRole('dialog', { name: 'Project menu' })).toBeInTheDocument()
     expect(screen.getAllByRole('heading', { name: 'Project menu' })).toHaveLength(1)
+    expect(screen.queryByRole('button', { name: 'New notebook' })).not.toBeInTheDocument()
   })
 })

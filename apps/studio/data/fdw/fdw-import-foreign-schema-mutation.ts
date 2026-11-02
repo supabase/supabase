@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 
 import { fdwKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -25,7 +26,12 @@ export async function importForeignSchema({
   ...rest
 }: FDWImportForeignSchemaVariables) {
   const sql = wrapWithTransaction(getImportForeignSchemaSql(rest))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 

@@ -5,6 +5,7 @@ import { z } from 'zod'
 
 import { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -26,6 +27,7 @@ export async function deleteDatabaseFunction({
     connectionString,
     sql,
     queryKey: ['functions', 'delete', func.id.toString()],
+    grant: unguarded.migrating,
   })
 
   return result as z.infer<typeof zod>

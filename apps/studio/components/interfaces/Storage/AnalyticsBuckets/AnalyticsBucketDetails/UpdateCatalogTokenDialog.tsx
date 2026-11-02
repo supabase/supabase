@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect, useState } from 'react'
@@ -29,14 +28,17 @@ import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { fdwKeys } from '@/data/fdw/keys'
 import { vaultSecretsKeys } from '@/data/vault/keys'
 import { useVaultSecretUpdateMutation } from '@/data/vault/vault-secret-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: string }) => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const [open, setOpen] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string>()

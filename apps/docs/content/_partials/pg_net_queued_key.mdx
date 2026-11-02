@@ -1,0 +1,5 @@
+<Admonition type="caution">
+
+Any role that can log in to your database can read the secret key while the request waits. `pg_net` [writes the decrypted key to `net.http_request_queue`](/kb/troubleshooting/database-roles-can-read-request-headers-queued-by-pg_net) until it sends the request.
+
+</Admonition>

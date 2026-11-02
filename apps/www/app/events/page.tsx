@@ -4,7 +4,10 @@ import { getMdxEvents, getNotionEvents, getOnDemandMdxEvents } from '~/lib/event
 import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
 import type { Metadata } from 'next'
 
+import { canonicalAlternates } from '@/lib/canonical'
+
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/events'),
   title: 'View all Supabase events and meetups.',
   description:
     'Find all the upcoming events, webinars and meetups hosted by supabase and its community.',

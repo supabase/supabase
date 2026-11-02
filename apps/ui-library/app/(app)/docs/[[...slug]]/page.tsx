@@ -1,4 +1,4 @@
-import '@/styles/code-block-variables.css'
+import 'config/code-block-variables.css'
 import '@/styles/mdx.css'
 import '@/styles/library-doc.css'
 

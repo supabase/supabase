@@ -5,7 +5,11 @@ import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { PageSection } from 'ui-patterns/PageSection'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
@@ -30,6 +34,8 @@ export const CronjobsTab = () => {
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
+  const { isInstalled } = useIntegrationDetail()
+
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
   const [search, setSearch] = useState(searchQuery)
@@ -47,6 +53,7 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     searchQuery,
+    enabled: isInstalled,
   })
 
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -123,6 +130,18 @@ export const CronjobsTab = () => {
       setCronJobForEditing(null)
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
+
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Cron is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
 
   return (
     <>

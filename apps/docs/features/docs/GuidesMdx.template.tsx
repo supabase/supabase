@@ -1,11 +1,13 @@
 import Breadcrumbs from '~/components/Breadcrumbs'
 import GuidesSidebar from '~/components/GuidesSidebar'
-import { TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
+import { GuideTocMenu, TocAnchorsProvider } from '~/features/docs/GuidesMdx.client'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
+import { PageTitleObserver } from '~/layouts/MobileHeaderSlots'
 import type { WithRequired } from '~/features/helpers.types'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
+import { PROD_URL } from '~/lib/constants'
 import { type GuideFrontmatter } from '~/lib/docs'
-import { breadcrumbListSchema, serializeJsonLd } from '~/lib/json-ld'
+import { breadcrumbListSchema, serializeJsonLd, techArticleSchema } from '~/lib/json-ld'
 import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { ExternalLink } from 'lucide-react'
@@ -74,6 +76,15 @@ const GuideTemplate = ({
   const breadcrumbChain = resolveBreadcrumbs(pathname)
   const breadcrumbSchema = breadcrumbListSchema({ pathname, chain: breadcrumbChain })
   const breadcrumbJsonLd = breadcrumbSchema ? serializeJsonLd(breadcrumbSchema) : null
+  const techArticleJsonLd = meta
+    ? serializeJsonLd(
+        techArticleSchema({
+          url: `${PROD_URL}${pathname}`,
+          headline: mdToPlainText(meta.title),
+          description: mdToPlainText(meta.description ?? meta.subtitle ?? '') || undefined,
+        })
+      )
+    : null
 
   return (
     <TocAnchorsProvider>
@@ -86,6 +97,12 @@ const GuideTemplate = ({
             'col-span-12 md:col-span-8'
           )}
         >
+          {techArticleJsonLd && (
+            <script
+              type="application/ld+json"
+              dangerouslySetInnerHTML={{ __html: techArticleJsonLd }}
+            />
+          )}
           {breadcrumbJsonLd && (
             <script
               type="application/ld+json"
@@ -101,6 +118,7 @@ const GuideTemplate = ({
           >
             <header className="mb-8">
               <h1 className="mt-0 mb-0 [&>p]:m-0">
+                <PageTitleObserver title={mdToPlainText(meta?.title || 'Supabase Docs')} />
                 <ReactMarkdown>{meta?.title || 'Supabase Docs'}</ReactMarkdown>
               </h1>
               {meta?.subtitle && (
@@ -109,6 +127,7 @@ const GuideTemplate = ({
                 </div>
               )}
             </header>
+            {hideToc ? null : <GuideTocMenu />}
 
             {content && (
               <MDXRemoteBase source={content} options={mdxOptions} customPreprocess={(x) => x} />

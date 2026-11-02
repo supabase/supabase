@@ -7,7 +7,7 @@ import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type UpdatePipelineVersionParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   versionId: number
   skipStatusInvalidation?: boolean
 }

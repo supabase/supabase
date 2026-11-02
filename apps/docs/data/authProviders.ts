@@ -2,7 +2,7 @@ const authProviders = [
   {
     name: 'Apple',
     logo: '/docs/img/icons/apple-icon',
-    href: '/guides/auth/social-login/auth-apple',
+    href: '/guides/auth/social-sign-in/auth-apple',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -12,7 +12,7 @@ const authProviders = [
   {
     name: 'Azure (Microsoft)',
     logo: '/docs/img/icons/microsoft-icon',
-    href: '/guides/auth/social-login/auth-azure',
+    href: '/guides/auth/social-sign-in/auth-azure',
     official: false,
     supporter: 'TBD',
     platform: true,
@@ -22,7 +22,7 @@ const authProviders = [
   {
     name: 'Bitbucket',
     logo: '/docs/img/icons/bitbucket-icon',
-    href: '/guides/auth/social-login/auth-bitbucket',
+    href: '/guides/auth/social-sign-in/auth-bitbucket',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -32,7 +32,7 @@ const authProviders = [
   {
     name: 'Discord',
     logo: '/docs/img/icons/discord-icon',
-    href: '/guides/auth/social-login/auth-discord',
+    href: '/guides/auth/social-sign-in/auth-discord',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -42,7 +42,7 @@ const authProviders = [
   {
     name: 'Facebook',
     logo: '/docs/img/icons/facebook-icon',
-    href: '/guides/auth/social-login/auth-facebook',
+    href: '/guides/auth/social-sign-in/auth-facebook',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -52,7 +52,7 @@ const authProviders = [
   {
     name: 'Figma',
     logo: '/docs/img/icons/figma-icon',
-    href: '/guides/auth/social-login/auth-figma',
+    href: '/guides/auth/social-sign-in/auth-figma',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -62,7 +62,7 @@ const authProviders = [
   {
     name: 'GitHub',
     logo: '/docs/img/icons/github-icon',
-    href: '/guides/auth/social-login/auth-github',
+    href: '/guides/auth/social-sign-in/auth-github',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -73,7 +73,7 @@ const authProviders = [
   {
     name: 'GitLab',
     logo: '/docs/img/icons/gitlab-icon',
-    href: '/guides/auth/social-login/auth-gitlab',
+    href: '/guides/auth/social-sign-in/auth-gitlab',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -83,7 +83,7 @@ const authProviders = [
   {
     name: 'Google',
     logo: '/docs/img/icons/google-icon',
-    href: '/guides/auth/social-login/auth-google',
+    href: '/guides/auth/social-sign-in/auth-google',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -93,7 +93,7 @@ const authProviders = [
   {
     name: 'Kakao',
     logo: '/docs/img/icons/kakao-icon',
-    href: '/guides/auth/social-login/auth-kakao',
+    href: '/guides/auth/social-sign-in/auth-kakao',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -103,7 +103,7 @@ const authProviders = [
   {
     name: 'Keycloak',
     logo: '/docs/img/icons/keycloak-icon',
-    href: '/guides/auth/social-login/auth-keycloak',
+    href: '/guides/auth/social-sign-in/auth-keycloak',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -113,7 +113,7 @@ const authProviders = [
   {
     name: 'LinkedIn',
     logo: '/docs/img/icons/linkedin-icon',
-    href: '/guides/auth/social-login/auth-linkedin',
+    href: '/guides/auth/social-sign-in/auth-linkedin',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -133,7 +133,7 @@ const authProviders = [
   {
     name: 'Notion',
     logo: '/docs/img/icons/notion-icon',
-    href: '/guides/auth/social-login/auth-notion',
+    href: '/guides/auth/social-sign-in/auth-notion',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -143,7 +143,7 @@ const authProviders = [
   {
     name: 'Slack',
     logo: '/docs/img/icons/slack-icon',
-    href: '/guides/auth/social-login/auth-slack',
+    href: '/guides/auth/social-sign-in/auth-slack',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -153,7 +153,7 @@ const authProviders = [
   {
     name: 'Spotify',
     logo: '/docs/img/icons/spotify-icon',
-    href: '/guides/auth/social-login/auth-spotify',
+    href: '/guides/auth/social-sign-in/auth-spotify',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -163,7 +163,7 @@ const authProviders = [
   {
     name: 'Twitter',
     logo: '/docs/img/icons/twitter-icon',
-    href: '/guides/auth/social-login/auth-twitter',
+    href: '/guides/auth/social-sign-in/auth-twitter',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -174,7 +174,7 @@ const authProviders = [
   {
     name: 'Twitch',
     logo: '/docs/img/icons/twitch-icon',
-    href: '/guides/auth/social-login/auth-twitch',
+    href: '/guides/auth/social-sign-in/auth-twitch',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -184,7 +184,7 @@ const authProviders = [
   {
     name: 'WorkOS',
     logo: '/docs/img/icons/workos-icon',
-    href: '/guides/auth/social-login/auth-workos',
+    href: '/guides/auth/social-sign-in/auth-workos',
     official: true,
     supporter: 'Supabase',
     platform: true,
@@ -194,7 +194,7 @@ const authProviders = [
   {
     name: 'Zoom',
     logo: '/docs/img/icons/zoom-icon',
-    href: '/guides/auth/social-login/auth-zoom',
+    href: '/guides/auth/social-sign-in/auth-zoom',
     official: true,
     supporter: 'Supabase',
     platform: true,

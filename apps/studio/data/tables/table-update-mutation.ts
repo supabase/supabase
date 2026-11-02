@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { CreateTableBody } from './table-create-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -39,6 +40,7 @@ export async function updateTable({
     connectionString,
     sql,
     queryKey: ['table', 'update', id],
+    grant: unguarded.migrating,
   })
 
   return result

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 interface LegacyJWTSigningKeyCreateVariables {
@@ -16,6 +16,7 @@ export async function createLegacyJWTSigningKey(payload: LegacyJWTSigningKeyCrea
     params: {
       path: { ref: payload.projectRef },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

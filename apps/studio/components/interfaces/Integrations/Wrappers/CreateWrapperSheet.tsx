@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useEffect, useMemo } from 'react'
+import { useEffect } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -27,20 +27,17 @@ import { InputField } from './InputField'
 import { WrapperMeta } from './Wrappers.types'
 import {
   FormattedWrapperTable,
-  getRequiredExtensionsToInstall,
   getWrapperCreationFormSchema,
   hasForeignSchemaSupport,
 } from './Wrappers.utils'
 import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
-import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
+import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import {
   FormSection,
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from '@/data/database/schemas-query'
@@ -66,26 +63,23 @@ export const CreateWrapperSheet = ({
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
   const isMarketplaceEnabled = useIsMarketplaceEnabled()
-  const { integration } = useIntegrationDetail()
 
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
 
+  const {
+    requiredExtensionsToInstall,
+    needsExtensions,
+    isExtensionDataLoading,
+    installRequiredExtensions,
+  } = useInstallRequiredExtensions()
   const { data: extensions } = useDatabaseExtensionsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
 
-  // null while the query is in flight — distinct from [] which means "all installed"
-  const requiredExtensionsToInstall = useMemo(
-    () => getRequiredExtensionsToInstall(extensions, integration?.requiredExtensions ?? []),
-    [extensions, integration?.requiredExtensions]
-  )
-
   const wrappersExtension = extensions?.find((ext) => ext.name === 'wrappers')
   const hasRequiredVersionForeignSchema = hasForeignSchemaSupport(wrappersExtension)
-  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
-  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref!,
@@ -123,30 +117,8 @@ export const CreateWrapperSheet = ({
     name: 'tables',
   })
 
-  const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
   const { mutateAsync: createSchema } = useSchemaCreateMutation({ onError: () => {} })
   const { mutateAsync: createFDW } = useFDWCreateMutation({ onError: () => {} })
-
-  const installRequiredExtensions = async () => {
-    if (!project) return
-    const { ref: projectRef, connectionString } = project
-    const results = await Promise.allSettled(
-      (requiredExtensionsToInstall ?? []).map((ext) => {
-        const schema = getExtensionDefaultSchema(ext) ?? 'extensions'
-        return enableExtension({
-          projectRef,
-          connectionString,
-          schema,
-          name: ext.name,
-          version: ext.default_version,
-          cascade: true,
-          createSchema: false,
-        })
-      })
-    )
-    const failure = results.find((r) => r.status === 'rejected')
-    if (failure) throw new Error((failure as PromiseRejectedResult).reason.message)
-  }
 
   const onSubmit: SubmitHandler<FormSchema> = async (values) => {
     const { mode, tables = [], ...wrapperValues } = values

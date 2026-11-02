@@ -2,6 +2,7 @@ import { getDatabaseSizeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -22,6 +23,7 @@ export async function getDatabaseSize(
       connectionString,
       sql,
       queryKey: ['database-size'],
+      grant: unguarded.migrating,
     },
     signal
   )

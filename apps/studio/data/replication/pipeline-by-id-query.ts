@@ -1,11 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import type { components } from 'api-types'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelineByIdParams = { projectRef?: string; pipelineId?: number }
+type ReplicationPipelineByIdParams = { projectRef?: string; pipelineId?: string }
 
 async function fetchReplicationPipelineById(
   { projectRef, pipelineId }: ReplicationPipelineByIdParams,
@@ -21,10 +21,10 @@ async function fetchReplicationPipelineById(
     handleError(error)
   }
 
-  return data
+  return { ...data, id: pipelineIdSchema.parse(data.id) }
 }
 
-export type ReplicationPipelineByIdData = components['schemas']['PipelineResponse_Output']
+export type ReplicationPipelineByIdData = Awaited<ReturnType<typeof fetchReplicationPipelineById>>
 
 export const useReplicationPipelineByIdQuery = <TData = ReplicationPipelineByIdData>(
   { projectRef, pipelineId }: ReplicationPipelineByIdParams,

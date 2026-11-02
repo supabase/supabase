@@ -2,7 +2,7 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
-import { handleError, patch } from '@/data/fetchers'
+import { handleError, patch, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type LinkSupportTicketVariables = {
@@ -30,6 +30,7 @@ export async function linkSupportTicket({
         category,
         allow_support_access,
       },
+      grant: unguarded.migrating,
     }
   )
 
