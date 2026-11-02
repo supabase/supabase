@@ -101,18 +101,7 @@ export const TotalUsage = ({
         return metricUsage && metricUsage.usage > 0
       })
 
-    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
-
     return breakdownMetrics.slice().sort((a, b) => {
-      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
-      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
-
-      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
-        if (pinnedIndexA === -1) return 1
-        if (pinnedIndexB === -1) return -1
-        return pinnedIndexA - pinnedIndexB
-      }
-
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'
