@@ -939,7 +939,7 @@ The `ids` array on incoming `postgres_changes` payloads must match the subscript
 
 ### Broadcast errors
 
-Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped.
+Private channels can return every broadcast error code. Public channels return only `payload_size_exceeded`. When `config.broadcast.ack` is `false` (the default), the server sends no reply for any failed push, such as an oversized payload or an RLS write denial.
 
 When `ack` is `true`, the server replies on error with `response.error` (an atom string), not `response.reason`:
 
