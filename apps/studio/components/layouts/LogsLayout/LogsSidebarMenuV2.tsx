@@ -14,7 +14,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
 import { getPipelineLogsUrl } from '@/components/interfaces/Database/Replication/Pipeline.utils'
-import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
+import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
@@ -71,13 +71,13 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useIsETLPrivateAlpha()
-  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
+  const isPipelinesEnabled = useIsPipelinesEnabled()
+  const { data: pipelineSources, isPending: isLoadingPipelineSources } = useReplicationSourcesQuery(
     {
       projectRef: ref,
     },
     {
-      enabled: enablePgReplicate,
+      enabled: isPipelinesEnabled,
       retry: false,
       refetchOnMount: false,
       refetchOnWindowFocus: false,
@@ -86,7 +86,7 @@ export function LogsSidebarMenuV2() {
 
   // Show Pipelines logs for projects with Pipelines enabled and an existing source.
   const showPipelinesLogs =
-    enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
+    isPipelinesEnabled && (pipelineSources?.sources?.length ?? 0) > 0 && !isLoadingPipelineSources
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
@@ -178,7 +178,7 @@ export function LogsSidebarMenuV2() {
     },
     showPipelinesLogs
       ? {
-          name: 'Pipelines logs',
+          name: 'Pipelines',
           key: 'replication_logs',
           url: getPipelineLogsUrl({ projectRef: ref }),
           items: [],

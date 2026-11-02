@@ -383,7 +383,9 @@ const getSupabaseStorageLogsQuery = (): SafeLogSqlFragment => safeSql`
   `
 
 /** Pipeline process logs, including metadata for the detail panel. */
-const getPipelinesLogsQuery = (): SafeLogSqlFragment => safeSql`
+const getPipelinesLogsQuery = (): SafeLogSqlFragment => {
+  const level = safeSql`lower(coalesce(json_value(to_json_string(pl), '$.level'), json_value(to_json_string(pl), '$.metadata[0].level')))`
+  return safeSql`
     select
       pl.id,
       null as source_id,
@@ -391,8 +393,8 @@ const getPipelinesLogsQuery = (): SafeLogSqlFragment => safeSql`
       'pipelines' as log_type,
       cast(null as string) as status,
       case
-        when lower(coalesce(json_value(to_json_string(pl), '$.level'), json_value(to_json_string(pl), '$.metadata[0].level'))) in ('error', 'fatal', 'panic', 'critical', 'alert', 'emergency') then 'error'
-        when lower(coalesce(json_value(to_json_string(pl), '$.level'), json_value(to_json_string(pl), '$.metadata[0].level'))) in ('warn', 'warning') then 'warning'
+        when ${level} in ('error', 'fatal', 'panic', 'critical', 'alert', 'emergency') then 'error'
+        when ${level} in ('warn', 'warning') then 'warning'
         else 'success'
       end as level,
       cast(null as string) as pathname,
@@ -404,6 +406,7 @@ const getPipelinesLogsQuery = (): SafeLogSqlFragment => safeSql`
       to_json_string(pl) as pipeline_metadata
     from etl_replication_logs as pl
   `
+}
 
 const LOG_TYPE_QUERIES: Record<string, () => SafeLogSqlFragment> = {
   edge: getEdgeLogsQuery,
@@ -551,7 +554,8 @@ level_counts AS (
 
 -- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
-${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })}
+${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
+${getFacetCountCTE({ search, facet: 'pipeline_id', cteName: safeSql`pipeline_id_count` })}
 
 SELECT 'total' AS facet, 'all' AS value, total AS count FROM log_type_counts
 UNION ALL SELECT 'log_type', 'edge', edge_count FROM log_type_counts
@@ -566,6 +570,7 @@ UNION ALL SELECT 'level', 'warning', warning_count FROM level_counts
 UNION ALL SELECT 'level', 'error', error_count FROM level_counts
 UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
+UNION ALL SELECT dimension, value, count FROM pipeline_id_count
 `
 }
 

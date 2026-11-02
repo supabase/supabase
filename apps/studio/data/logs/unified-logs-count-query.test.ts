@@ -39,6 +39,7 @@ it.each([true, false])('reads Pipelines counts from the expected backend %s', as
           { facet: 'total', value: 'all', count: 2 },
           { facet: 'log_type', value: 'pipelines', count: 2 },
           { facet: 'level', value: 'error', count: 1 },
+          { facet: 'pipeline_id', value: '150', count: 2 },
         ],
       }),
   })
@@ -49,4 +50,5 @@ it.each([true, false])('reads Pipelines counts from the expected backend %s', as
   })
   expect(counts.totalRowCount).toBe(2)
   expect(counts.facets.log_type.rows).toEqual([{ value: 'pipelines', total: 2 }])
+  expect(counts.facets.pipeline_id.rows).toEqual([{ value: '150', total: 2 }])
 })

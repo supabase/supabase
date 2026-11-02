@@ -118,8 +118,8 @@ const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'etl_replication_logs', null, if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR}))`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(source = 'etl_replication_logs', null, if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR}))`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'etl_replication_logs', null, ${HTTP_METHOD_EXPR})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'etl_replication_logs', null, ${HTTP_PATH_EXPR})`
 const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map())`
 
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
@@ -588,6 +588,7 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     level: LEVEL_EXPR,
     method: METHOD_EXPR,
     status: STATUS_EXPR,
+    pipeline_id: safeSql`if(source = 'etl_replication_logs', ${PIPELINE_ID_OTEL_SQL}, null)`,
   }
 
   const scanBlock = (
@@ -618,7 +619,7 @@ HAVING value != ''
   // A filtered facet gets its own scan so it can exclude its own filter and
   // still count its other values; the rest share the base scan.
   const baseFacets: (keyof typeof VALUE_EXPR)[] = ['total']
-  for (const facet of ['level', 'method', 'status'] as const) {
+  for (const facet of ['level', 'method', 'status', 'pipeline_id'] as const) {
     if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
     else baseFacets.push(facet)
   }

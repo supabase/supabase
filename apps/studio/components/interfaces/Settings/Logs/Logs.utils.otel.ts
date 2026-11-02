@@ -100,7 +100,7 @@ const SUPAVISOR_FILTERS: Record<string, SqlFilterEntry> = {
   ...COMMON_FILTERS,
   database: (value: string) => safeSql`${attr('project')} LIKE ${lit(value + '%')}`,
 }
-const ETL_FILTERS: Record<string, SqlFilterEntry> = {
+const PIPELINES_FILTERS: Record<string, SqlFilterEntry> = {
   ...COMMON_FILTERS,
   pipeline_id: (value: string | number) => safeSql`${PIPELINE_ID_OTEL_SQL} = ${lit(String(value))}`,
 }
@@ -209,7 +209,7 @@ const OTEL_SOURCES: Record<LogsTableName, OtelSourceDescriptor> = {
     filterTemplates: { ...COMMON_FILTERS, database: databaseFilter },
   },
   [LogsTableName.SUPAVISOR]: { source: 'supavisor_logs', filterTemplates: SUPAVISOR_FILTERS },
-  [LogsTableName.ETL]: { source: 'etl_replication_logs', filterTemplates: ETL_FILTERS },
+  [LogsTableName.PIPELINES]: { source: 'etl_replication_logs', filterTemplates: PIPELINES_FILTERS },
   [LogsTableName.AUTH_AUDIT]: { source: 'auth_audit_logs' },
   [LogsTableName.REALTIME]: { source: 'realtime_logs' },
   [LogsTableName.STORAGE]: { source: 'storage_logs' },

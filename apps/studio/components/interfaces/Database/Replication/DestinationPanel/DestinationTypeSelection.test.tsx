@@ -27,12 +27,12 @@ const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
 const mockClickHouseEnabled = vi.fn()
 
-vi.mock('../useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => mockBigQueryEnabled(),
-  useIsETLIcebergPrivateAlpha: () => mockIcebergEnabled(),
-  useIsETLDucklakePrivateAlpha: () => mockDucklakeEnabled(),
-  useIsETLSnowflakePrivateAlpha: () => mockSnowflakeEnabled(),
-  useIsETLClickHousePrivateAlpha: () => mockClickHouseEnabled(),
+vi.mock('../useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => mockBigQueryEnabled(),
+  useIsPipelinesIcebergEnabled: () => mockIcebergEnabled(),
+  useIsPipelinesDuckLakeEnabled: () => mockDucklakeEnabled(),
+  useIsPipelinesSnowflakeEnabled: () => mockSnowflakeEnabled(),
+  useIsPipelinesClickHouseEnabled: () => mockClickHouseEnabled(),
 }))
 
 // Background queries from useDestinationInformation (sources + pipelines fire

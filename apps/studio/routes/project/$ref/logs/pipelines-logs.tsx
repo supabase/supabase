@@ -4,7 +4,7 @@ import PipelinesLogsPage from '@/pages/project/[ref]/logs/pipelines-logs'
 
 export const Route = createFileRoute('/project/$ref/logs/pipelines-logs')({
   component: PipelinesLogsRoute,
-  staticData: { logsLayoutTitle: 'Pipelines logs' },
+  staticData: { logsLayoutTitle: 'Pipelines Logs' },
 })
 
 function PipelinesLogsRoute() {

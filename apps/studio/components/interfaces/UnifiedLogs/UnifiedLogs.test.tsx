@@ -164,7 +164,7 @@ describe('UnifiedLogs', () => {
       )
       expect((await screen.findAllByText('Table copy failed'))[0]).toBeVisible()
       expect(screen.getAllByText(pipelineId).length).toBeGreaterThan(0)
-      expect(screen.getAllByText('Pipelines logs').length).toBeGreaterThan(0)
+      expect(screen.getAllByText('Pipelines').length).toBeGreaterThan(0)
       expect(await screen.findByRole('tab', { name: 'Overview' })).toBeVisible()
       expect(screen.queryByRole('tab', { name: /Timeline|User/ })).not.toBeInTheDocument()
       expect(screen.getAllByText('Pipeline ID').length).toBeGreaterThan(0)

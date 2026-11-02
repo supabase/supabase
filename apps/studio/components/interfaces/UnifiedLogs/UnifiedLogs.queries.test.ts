@@ -101,10 +101,10 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
       )
       expect(sql).toContain(
         `if(${workerCondition} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()) AS metadata`
@@ -696,6 +696,29 @@ describe('Pipelines logs', () => {
     expect(sql).toContain("source = 'etl_replication_logs'")
     expect(sql).toContain("LIKE '%03dg%'")
     expect(sql).not.toContain("IN ('150')")
+  })
+
+  it('returns pipeline ID choices without restricting them to the selected ID', () => {
+    const sql = getLogsCountQuery(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql
+      .split(/\bUNION ALL\b/)
+      .find((branch) => branch.includes("facet = 'pipeline_id'"))
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
+    )
+    expect(pipelineFacet).toContain("source = 'etl_replication_logs'")
+    expect(pipelineFacet).not.toContain("IN ('150')")
+  })
+
+  it('returns BigQuery pipeline ID choices without their own active filter', () => {
+    const sql = getLogsCountQueryBQ(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql.split('pipeline_id_count AS (')[1]?.split('\n)')[0]
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain("'pipeline_id' as dimension")
+    expect(pipelineFacet).toContain("`log_type` IN ('pipelines')")
+    expect(pipelineFacet).not.toContain("`pipeline_id` IN ('150')")
+    expect(sql).toContain('SELECT dimension, value, count FROM pipeline_id_count')
   })
 
   it('projects the identity and process metadata without HTTP fields', () => {

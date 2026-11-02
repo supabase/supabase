@@ -28,7 +28,7 @@ export const LOG_TYPES_LABELS = {
   supavisor: 'Supavisor',
   pgbouncer: 'PgBouncer',
   multigres: 'Multigres',
-  pipelines: 'Pipelines logs',
+  pipelines: 'Pipelines',
   compute: 'Compute',
 }
 

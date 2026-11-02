@@ -36,9 +36,9 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_THROUGHPUT_GP3,
   PricingMetric.LOG_STORAGE,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
-  PricingMetric.ETL_PIPELINE,
-  PricingMetric.ETL_REPLICATED_DATA,
-  PricingMetric.ETL_COPY_BACKFILL_DATA,
+  PricingMetric.PIPELINES_PIPELINE,
+  PricingMetric.PIPELINES_REPLICATED_DATA,
+  PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
 ]
 
 export const TotalUsage = ({

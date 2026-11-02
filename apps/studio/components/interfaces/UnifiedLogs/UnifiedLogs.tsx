@@ -100,6 +100,8 @@ export const CHART_CONFIG = {
   },
 } satisfies ChartConfig
 
+const PipelineLevelOption = (option: Option) => <span className="text-xs">{option.label}</span>
+
 interface UnifiedLogsProps {
   scope?: UnifiedLogsScope
   hasFilterSideBar?: boolean
@@ -384,7 +386,7 @@ export const UnifiedLogs = ({
             label: PIPELINE_LOG_LEVEL_LABELS[level],
             count: facets?.level?.rows.find((row) => row.value === level)?.total ?? 0,
           })),
-          component: (option: Option) => <span className="text-xs">{option.label}</span>,
+          component: PipelineLevelOption,
         }
       }
       const facetsField = facets?.[field.value]
