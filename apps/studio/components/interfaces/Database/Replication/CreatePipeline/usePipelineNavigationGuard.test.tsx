@@ -56,8 +56,17 @@ describe('usePipelineNavigationGuard', () => {
     const wrapper = ({ children }: { children: ReactNode }) => (
       <RouterContextProvider router={router}>{children}</RouterContextProvider>
     )
-    const { result, unmount } = renderHook(() => usePipelineNavigationGuard(true), { wrapper })
+    let isLocked = true
+    const { result, unmount } = renderHook(() => usePipelineNavigationGuard(true, () => isLocked), {
+      wrapper,
+    })
     try {
+      await act(async () => history.push('/blocked-during-submission'))
+      expect(history.location.pathname).toBe(wizard)
+      expect(result.current.modalProps.visible).toBe(false)
+      await act(async () => history.push(`${wizard}?step=review`))
+      expect(history.location.search).toBe('')
+      isLocked = false
       await act(async () => {
         history.push(`${wizard}?step=connection`)
       })

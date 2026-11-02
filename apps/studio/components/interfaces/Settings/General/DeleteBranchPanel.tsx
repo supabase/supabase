@@ -1,4 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
@@ -14,9 +14,10 @@ import {
 import { DeleteBranchModal } from '../../BranchManagement/DeleteBranchModal'
 import { SwitchToPreviewModal } from '../../BranchManagement/SwitchToPreviewModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useBranchesQuery } from '@/data/branches/branches-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const DeleteBranchPanel = () => {
@@ -30,12 +31,14 @@ export const DeleteBranchPanel = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showSwitchToPreviewModal, setShowSwitchToPreviewModal] = useState(false)
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'preview_branches'
+  const { can: canDeleteBranches } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE
   )
 
-  const { data: branches } = useBranchesQuery({ projectRef })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const { data: branches } = useQuery(
+    branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
+  )
   const branch = branches?.find((b) => b.project_ref === branchRef)
   const isBranchMetadataReady =
     branchRef !== undefined && projectRef !== undefined && branch !== undefined

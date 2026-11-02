@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { StudioPricingSidePanelOpenedEvent } from 'common/telemetry-constants'
@@ -21,7 +20,7 @@ import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infini
 import { useOrgPlansQuery } from '@/data/subscriptions/org-plans-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
 import type { OrgPlan } from '@/data/subscriptions/types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useTrack } from '@/lib/telemetry/track'
@@ -64,8 +63,7 @@ const PartnerManagedPlanNotice = ({
         title="Organization plans are managed through Stripe."
         details={
           <>
-            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
-            project directory.
+            Run <code>{stripeProjectsUpgradeCommand}</code> in your project directory.
           </>
         }
         cta={{
@@ -131,9 +129,8 @@ export const PlanUpdateSidePanel = () => {
     []
   )
 
-  const { can: canUpdateSubscription } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdateSubscription } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
 
   const snap = useOrgSettingsPageStateSnapshot()
@@ -233,6 +230,15 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  // Fail closed until subscription succeeds: unresolved plan ids look eligible.
+  const showAwsMarketplacePurchase =
+    isSuccessSubscription &&
+    canUpdateSubscription &&
+    selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
+    !isPartnerBilledOrganization &&
+    subscription.billing_via_partner === false &&
+    !['enterprise', 'platform'].includes(subscription.plan.id)
+
   const planCards = (
     <PlanCards
       availablePlans={availablePlans}
@@ -244,6 +250,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       entryDelay={contentDelay}
+      showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
   )

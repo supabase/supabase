@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { viewKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -32,6 +33,7 @@ export async function deleteView({
     connectionString,
     sql,
     queryKey: ['view', 'delete', id],
+    grant: unguarded.migrating,
   })
 
   return result

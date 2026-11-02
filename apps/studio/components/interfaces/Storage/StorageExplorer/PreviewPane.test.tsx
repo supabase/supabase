@@ -144,16 +144,19 @@ describe('PreviewPane', () => {
     })
   })
 
-  it('offers Archive and a purge on an enabled bucket', async () => {
+  it('offers Archive, a purge and "Upload new version" on an enabled bucket', async () => {
     selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
-    renderPane()
+    renderPane({ is_versioned: true })
 
     expect(await screen.findByRole('button', { name: 'Archive' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'More delete options' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Delete file' })).not.toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Upload new version' })).toBeInTheDocument()
   })
 
-  it('offers a single Delete on a suspended bucket', async () => {
+  it('offers a single Delete and no version history for a file written while suspended', async () => {
+    // The listing drops unversioned rows, so a file with no history comes back empty.
+    mockVersionListing([])
     selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
     renderPane({ is_versioned: false })
 
@@ -161,81 +164,55 @@ describe('PreviewPane', () => {
     expect(await screen.findByRole('button', { name: 'Delete file' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Archive' })).not.toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'More delete options' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Versions')).not.toBeInTheDocument()
   })
 
-  describe('replace action label', () => {
-    it('reads "Upload new version" on an enabled bucket', async () => {
+  it('reads "Replace file" and shows version history for a versioned file on a suspended bucket', async () => {
+    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+    renderPane({ is_versioned: true })
+
+    // The label names the action, not the retention. The Versions section explains that.
+    expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Upload new version' })).not.toBeInTheDocument()
+    expect(await screen.findByText('Versions')).toBeInTheDocument()
+    expect(await screen.findByText(/retains the current version one last time/)).toBeInTheDocument()
+  })
+
+  it('still shows version history when a retained version sits under an unversioned current', async () => {
+    // Hiding here would strand a version the user can still restore.
+    mockVersionListing(NONCURRENT_UNDER_UNVERSIONED_CURRENT)
+    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+    renderPane({ is_versioned: false })
+
+    expect(await screen.findByText('Versions')).toBeInTheDocument()
+    expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
+  })
+
+  it('reads "Replace file" and hides version history on a disabled bucket', async () => {
+    mockVersionListing([])
+    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
+    renderPane({ is_versioned: false })
+
+    expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Delete file' })).toBeInTheDocument()
+    expect(screen.queryByText('Versions')).not.toBeInTheDocument()
+  })
+
+  it('shows version history for every file on an enabled bucket, even one written before versioning', async () => {
+    mockVersionListing([])
+    selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
+    renderPane({ is_versioned: false })
+
+    // The next write will version it, so the history has to be on offer.
+    expect(await screen.findByText('Versions')).toBeInTheDocument()
+  })
+
+  it.each(['photo.png', 'nested/deep/photo.png'])(
+    'displays the file base name for %s',
+    async (name) => {
       selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
-      renderPane({ is_versioned: true })
-
-      expect(await screen.findByRole('button', { name: 'Upload new version' })).toBeInTheDocument()
-    })
-
-    it('reads "Replace file" on a suspended bucket, even for a file that still retains one', async () => {
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-      renderPane({ is_versioned: true })
-
-      // The label names the action, not the retention. The Versions section explains that.
-      expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Upload new version' })).not.toBeInTheDocument()
-    })
-
-    it('reads "Replace file" on a disabled bucket', async () => {
-      mockVersionListing([])
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
-      renderPane({ is_versioned: false })
-
-      expect(await screen.findByRole('button', { name: 'Replace file' })).toBeInTheDocument()
-    })
-  })
-
-  describe('version history visibility', () => {
-    it('shows it for a versioned file on a suspended bucket', async () => {
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-      renderPane({ is_versioned: true })
-
-      expect(await screen.findByText('Versions')).toBeInTheDocument()
-      expect(
-        await screen.findByText(/retains the current version one last time/)
-      ).toBeInTheDocument()
-    })
-
-    it('hides it for a file written while versioning was suspended', async () => {
-      // The listing drops unversioned rows, so a file with no history comes back empty.
-      mockVersionListing([])
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-      renderPane({ is_versioned: false })
-
-      expect(await screen.findByRole('button', { name: 'Delete file' })).toBeInTheDocument()
-      expect(screen.queryByText('Versions')).not.toBeInTheDocument()
-    })
-
-    it('still shows it when a retained version sits under an unversioned current', async () => {
-      // Hiding here would strand a version the user can still restore.
-      mockVersionListing(NONCURRENT_UNDER_UNVERSIONED_CURRENT)
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-      renderPane({ is_versioned: false })
-
-      expect(await screen.findByText('Versions')).toBeInTheDocument()
-      expect(await screen.findByText(/overwrites it in place/)).toBeInTheDocument()
-    })
-
-    it('hides it on a disabled bucket', async () => {
-      mockVersionListing([])
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'DISABLED' }
-      renderPane({ is_versioned: false })
-
-      expect(await screen.findByRole('button', { name: 'Delete file' })).toBeInTheDocument()
-      expect(screen.queryByText('Versions')).not.toBeInTheDocument()
-    })
-
-    it('shows it for every file on an enabled bucket, even one written before versioning', async () => {
-      mockVersionListing([])
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'ENABLED' }
-      renderPane({ is_versioned: false })
-
-      // The next write will version it, so the history has to be on offer.
-      expect(await screen.findByText('Versions')).toBeInTheDocument()
-    })
-  })
+      renderPane({ name })
+      expect(await screen.findByText('photo.png')).toBeInTheDocument()
+    }
+  )
 })

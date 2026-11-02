@@ -63,7 +63,7 @@ describe('BatchRestartDialog', () => {
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
       response: () =>
         HttpResponse.json<ReplicationPipelineStatusResponse>({
-          pipeline_id: 9,
+          pipeline_id: '9',
           status: { name: 'stopped' },
         }),
     })
@@ -75,7 +75,7 @@ describe('BatchRestartDialog', () => {
       response: async ({ request }) => {
         requests.push(await request.json())
         return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-          pipeline_id: 9,
+          pipeline_id: '9',
           tables: [1, 2, 3].map((table_id) => ({ table_id, new_state: { name: 'queued' } })),
         })
       },
@@ -176,7 +176,7 @@ describe('BatchRestartDialog', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
         response: () =>
           HttpResponse.json<ReplicationPipelineStatusResponse>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             status: { name: backendStatus },
           }),
       })
@@ -187,7 +187,7 @@ describe('BatchRestartDialog', () => {
           requests.push(await request.json())
           await response
           return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             tables: [{ table_id: 1, new_state: { name: 'queued' } }],
           })
         },
@@ -221,7 +221,7 @@ describe('BatchRestartDialog', () => {
       backendStatus = nextStatus
       await act(async () => {
         await queryClient.invalidateQueries(
-          { queryKey: replicationKeys.pipelinesStatus('default', 9) },
+          { queryKey: replicationKeys.pipelinesStatus('default', '9') },
           { cancelRefetch: false }
         )
       })
@@ -253,7 +253,7 @@ describe('BatchRestartDialog', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
         response: () =>
           HttpResponse.json<ReplicationPipelineStatusResponse>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             status: { name: 'started' },
           }),
       })
@@ -308,7 +308,7 @@ const RestartDialogWithStatus = ({
 }) => {
   const { data, error, isPending, isError, isSuccess } = useReplicationPipelineStatusQuery({
     projectRef: 'default',
-    pipelineId: 9,
+    pipelineId: '9',
   })
   const { getRequestStatus } = usePipelineRequestStatus()
   const pipelineStatusName = getStatusName(data?.status)
@@ -320,7 +320,7 @@ const RestartDialogWithStatus = ({
         isLoading={isPending}
         isError={isError}
         isSuccess={isSuccess}
-        requestStatus={getRequestStatus(9)}
+        requestStatus={getRequestStatus('9')}
       />
       {target === 'all' ? (
         <BatchRestartDialog

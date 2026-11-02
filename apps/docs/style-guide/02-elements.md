@@ -216,6 +216,20 @@ The first step establishes the operating context for both readers and agents. Do
 a redundant orientation step to a genuinely atomic instruction. Write `Click **Save**.`
 rather than adding `Locate the **Save** button` as a separate step.
 
+#### Pair Dashboard steps with a terminal option
+
+Agents can't use the Dashboard. For any change a reader makes there, also give a terminal
+path, such as `psql`, the Supabase CLI, or the Management API. Put paths with separate
+steps in [tabs](#tabs).
+
+#### For every "run the following SQL" step
+
+Paste this standard snippet before the SQL block:
+
+```mdx
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+```
+
 ### Code blocks
 
 #### Keep code lines short so the reader doesn't scroll
@@ -422,10 +436,19 @@ Name the thing instead.
 - **Recommended**: `[HTTP/1.1 RFC](https://www.rfc-editor.org/rfc/rfc2616)`
 - **Not recommended**: `[https://www.rfc-editor.org/rfc/rfc2616](https://www.rfc-editor.org/rfc/rfc2616)`
 
-#### Introduce a link with `see`, and say what the reader will find
+#### Introduce a link
 
-Write `For more information about X, see Y` rather than `For more information on X, see
-Y`. The `about` clause is what tells a reader whether the link is worth following.
+Introduce a link so the reader always knows where the link goes and why it's relevant.
+
+| Write                                        | When                                                           |
+| -------------------------------------------- | -------------------------------------------------------------- |
+| `See [Title].`                               | The sentence before already says why the link matters          |
+| `For more information, see [Title].`         | The title says what the reader gets, and `See` reads as abrupt |
+| `For more information about X, see [Title].` | The title alone doesn't say why the link matters here          |
+
+- **Recommended**: ``The `anon` role handles requests from users who aren't signed in. See [Postgres roles](/docs/guides/database/postgres/roles).``
+- **Recommended**: `For more information about policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
+- **Not recommended**: `For more information about Row Level Security, see [Row Level Security](/docs/guides/database/postgres/row-level-security).`
 
 #### Keep sentence punctuation outside the link
 

@@ -51,9 +51,7 @@ export function CommandListItem({
         {includeIcon && item.icon}
         <span className="truncate">{getActionItemLabel(item)}</span>
       </span>
-      {item.count !== undefined && (
-        <code className="text-code-inline text-foreground-light">{item.count}</code>
-      )}
+      {item.count !== undefined && <code className="text-foreground-light">{item.count}</code>}
       {item.operatorSymbol && <OperatorSymbolBadge symbol={item.operatorSymbol} />}
     </div>
   )

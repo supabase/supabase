@@ -4,6 +4,8 @@ export interface IBaseCommand {
   id: string
   name: string
   value?: string
+  /** Extra search terms. Unlike `value`, these only match by substring, not fuzzily. */
+  keywords?: readonly string[]
   className?: string
   forceMount?: boolean
   badge?: () => ReactNode

@@ -3,7 +3,7 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppCreateVariables = {
@@ -14,6 +14,7 @@ export async function createPlatformApp({ slug, ...body }: PlatformAppCreateVari
   const { data, error } = await post('/platform/organizations/{slug}/apps', {
     params: { path: { slug } },
     body,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

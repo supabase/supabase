@@ -45,12 +45,12 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
         <div className="w-full space-y-2">
           <p className="text-xs text-foreground-light">Active custom domain:</p>
           <div className="flex items-center space-x-2">
-            <code className="text-lg mx-0 flex items-center space-x-2">
+            <div className="font-mono text-lg mx-0 flex items-center space-x-2">
               <div className="h-2 w-2 rounded-full bg-primary-bright" />
               <span>
-                <code className="text-code-inline">{customDomain.hostname}</code>
+                <code>{customDomain.hostname}</code>
               </span>
-            </code>
+            </div>
           </div>
           <p className="text-sm text-foreground-light">
             Your custom domain is currently active and is serving traffic
@@ -85,8 +85,8 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
       >
         <p className="text-sm mb-4">
           Are you sure you want to delete the custom domain{' '}
-          <code className="text-code-inline break-normal!">{customDomain.hostname}</code> for your
-          project? You will need to re-verify this domain if you want to use it again.
+          <code className="break-normal!">{customDomain.hostname}</code> for your project? You will
+          need to re-verify this domain if you want to use it again.
         </p>
 
         <FormItemLayout

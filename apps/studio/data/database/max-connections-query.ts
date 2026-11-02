@@ -2,6 +2,7 @@ import { getMaxConnectionsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -19,7 +20,13 @@ export async function getMaxConnections(
   const sql = getMaxConnectionsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['max-connections'] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['max-connections'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

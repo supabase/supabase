@@ -1,7 +1,7 @@
 import { queryOptions } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError } from '@/types'
 
 export type PostgresConfigurationVariables = {
@@ -17,6 +17,7 @@ export async function getPostgresConfiguration(
   const { data, error } = await get('/v1/projects/{ref}/config/database/postgres', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

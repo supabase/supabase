@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UserPlusIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
@@ -44,21 +43,21 @@ import {
   parseEmails,
 } from './InviteMemberButton.utils'
 import { ROLE_DESCRIPTIONS } from './Roles.constants'
-import { useGetRolesManagementPermissions } from './TeamSettings.utils'
+import { getAssignableRoleIds, getOrgRole } from './TeamSettings.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { OrganizationProjectSelector } from '@/components/ui/OrganizationProjectSelector'
+import { OrganizationProjectsMultiSelect } from '@/components/ui/OrganizationProjectsMultiSelect'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreateInvitationMutation } from '@/data/organization-members/organization-invitation-create-mutation'
 import { useOrganizationRolesV2Query } from '@/data/organization-members/organization-roles-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useOrgSSOConfigQuery } from '@/data/sso/sso-config-query'
 import { useHasAccessToProjectLevelPermissions } from '@/data/subscriptions/org-subscription-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { doPermissionsCheck, useGetPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -71,7 +70,7 @@ export const InviteMemberButton = () => {
   const { slug } = useParams()
   const { profile } = useProfile()
   const { data: organization } = useSelectedOrganizationQuery()
-  const { permissions: permissions } = useGetPermissions()
+  const { data: permissionsV2 } = usePermissionsQueryV2()
 
   const { organizationMembersCreate: organizationMembersCreationEnabled } = useIsFeatureEnabled([
     'organization_members:create',
@@ -79,7 +78,6 @@ export const InviteMemberButton = () => {
 
   const [isOpen, setIsOpen] = useState(false)
   const [pendingInvite, setPendingInvite] = useState<z.infer<typeof FormSchema>>()
-  const [projectDropdownOpen, setProjectDropdownOpen] = useState(false)
 
   const { data: members } = useOrganizationMembersQuery({ slug })
   const { data: allRoles, isSuccess } = useOrganizationRolesV2Query({ slug })
@@ -92,7 +90,7 @@ export const InviteMemberButton = () => {
     email: '',
     role: orgScopedRoles.find((role) => role.name === 'Developer')?.id.toString() ?? '',
     applyToOrg: true,
-    projectRef: '',
+    projectRefs: [] as string[],
     requireSso: 'auto' as const,
   }
 
@@ -106,24 +104,10 @@ export const InviteMemberButton = () => {
 
   const isStripeProjectsOrg = organization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
 
-  const { rolesAddable } = useGetRolesManagementPermissions(
-    organization?.slug,
-    orgScopedRoles,
-    permissions ?? []
-  )
+  const orgRole = getOrgRole(permissionsV2, organization?.slug)
+  const rolesAddable = getAssignableRoleIds(orgRole, orgScopedRoles)
 
-  const canInviteMembers =
-    hasOrgRole &&
-    rolesAddable.length > 0 &&
-    orgScopedRoles.some(({ id: role_id }) =>
-      doPermissionsCheck(
-        permissions,
-        PermissionAction.CREATE,
-        'user_invites',
-        { resource: { role_id } },
-        organization?.slug
-      )
-    )
+  const canInviteMembers = hasOrgRole && rolesAddable.length > 0
 
   const inviteDisabledReason = !organizationMembersCreationEnabled
     ? 'Inviting members is currently disabled'
@@ -140,15 +124,15 @@ export const InviteMemberButton = () => {
       email: emailSchema,
       role: z.string().min(1, 'Role is required'),
       applyToOrg: z.boolean(),
-      projectRef: z.string(),
+      projectRefs: z.array(z.string()),
       requireSso: z.enum(['auto', 'sso', 'non-sso']),
     })
     .superRefine((data, ctx) => {
-      if (!data.applyToOrg && !data.projectRef) {
+      if (!data.applyToOrg && data.projectRefs.length === 0) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: 'A project must be selected',
-          path: ['projectRef'],
+          message: 'Select at least one project',
+          path: ['projectRefs'],
         })
       }
     })
@@ -160,9 +144,9 @@ export const InviteMemberButton = () => {
     defaultValues,
   })
 
-  const [applyToOrg, projectRef, email] = useWatch({
+  const [applyToOrg, email] = useWatch({
     control: form.control,
-    name: ['applyToOrg', 'projectRef', 'email'],
+    name: ['applyToOrg', 'email'],
   })
 
   const emailCount = parseEmails(email ?? '').length
@@ -198,7 +182,7 @@ export const InviteMemberButton = () => {
       if (toInvite.length === 0) return
     }
 
-    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRef)
+    const projectPayload = buildProjectPayload(values.applyToOrg, values.projectRefs)
     const ssoPayload = buildSsoPayload(values.requireSso)
 
     let result: BatchInvitationResult
@@ -261,7 +245,6 @@ export const InviteMemberButton = () => {
   const hasUnsavedChanges = form.formState.isDirty
 
   const closeInviteSheet = () => {
-    setProjectDropdownOpen(false)
     setIsOpen(false)
     form.reset(defaultValues)
   }
@@ -446,25 +429,19 @@ export const InviteMemberButton = () => {
               )}
               {!applyToOrg && (
                 <FormField
-                  name="projectRef"
+                  name="projectRefs"
                   control={form.control}
                   render={({ field }) => (
                     <FormItemLayout
                       layout="horizontal"
-                      label="Select a project"
+                      label="Select projects"
                       description="Project access can be adjusted after the user joins"
                     >
                       <FormControl className="col-span-6">
-                        <OrganizationProjectSelector
-                          fetchOnMount
-                          sameWidthAsTrigger
-                          checkPosition="left"
-                          selectedRef={projectRef}
-                          open={projectDropdownOpen}
-                          setOpen={setProjectDropdownOpen}
-                          searchPlaceholder="Search project..."
-                          onSelect={(project) => field.onChange(project.ref)}
-                          onInitialLoad={(projects) => field.onChange(projects[0]?.ref ?? '')}
+                        <OrganizationProjectsMultiSelect
+                          selectedRefs={field.value}
+                          onChange={(refs) => field.onChange(refs)}
+                          triggerLabel="Select projects..."
                         />
                       </FormControl>
                     </FormItemLayout>

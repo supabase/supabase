@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import {
   CopyIcon,
   DownloadIcon,
@@ -31,7 +31,7 @@ import {
 } from 'ui'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useUrlTableFilters } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
@@ -46,7 +46,6 @@ import type {
   TableApiAccessData,
   TableApiAccessMap,
 } from '@/data/privileges/table-api-access-query'
-import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { useTableRowsCountQuery } from '@/data/table-rows/table-rows-count-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -87,7 +86,6 @@ export const EntityListItem = ({
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
   const { selectedSchema } = useQuerySchemaState()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   const tabId = createTabId(entity.type, { id: entity.id })
   const tabs = useTabsStateSnapshot()
@@ -96,7 +94,7 @@ export const EntityListItem = ({
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
-  const { filters } = useTableFilter()
+  const filters = useUrlTableFilters(entity.id)
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const { data: countData } = useTableRowsCountQuery(
     {
@@ -107,7 +105,7 @@ export const EntityListItem = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      enabled: isTableLikeEntityListItem(entity) && isActive,
+      enabled: isTableLikeEntityListItem(entity) && isActive && filters !== undefined,
     }
   )
   const rowCount = countData?.count
@@ -286,7 +284,6 @@ export const EntityListItem = ({
                       id: entity.id,
                       projectRef: project?.ref,
                       connectionString: project?.connectionString,
-                      scoped,
                     }).then((tableDefinition) => {
                       if (!tableDefinition) {
                         throw new Error('Failed to get table schema')

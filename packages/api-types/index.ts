@@ -36,3 +36,6 @@ export interface components {
 }
 
 export type { platformComponents, apiV1Components, apiV2Components }
+
+export { fgaRequirements } from './types/fga-requirements'
+export type { FgaRequirements, FgaGuardedEndpoint } from './types/fga-requirements'

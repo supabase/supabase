@@ -31,7 +31,7 @@ For example, assume you have a `posts` table with the following columns:
 - `created_at`
 - `updated_at`
 
-You can restrict updates to the user who created it using [RLS](/docs/guides/auth#row-level-security), with the following policy:
+You can restrict updates to the user who created it using [RLS](/docs/guides/database/postgres/row-level-security), with the following policy:
 
 ```sql
 create policy "Allow update for owners" on posts for

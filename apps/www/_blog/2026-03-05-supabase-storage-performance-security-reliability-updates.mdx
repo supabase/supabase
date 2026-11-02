@@ -31,7 +31,7 @@ The file backend can no longer read or write files outside the configured storag
 
 ### Preventing accidental deletes via direct SQL
 
-Running `DELETE FROM storage.objects` directly in SQL was the most common cause of orphan objects, where the database row was removed but the file in S3 or the file backend was not. A new statement-level trigger now rejects `DELETE` on Storage schema tables unless the session variable `storage.allow_delete_query` is set to `true`. The Storage API sets this flag automatically, so normal operations are unaffected. Direct SQL deletes are blocked by default. [GitHub](https://github.com/supabase/storage/pull/817)
+Running `DELETE FROM storage.objects` directly in SQL was the most common cause of orphan objects, where the database row was removed but the file in S3 or the file backend was not. A new statement-level trigger now rejects `DELETE` on Storage schema tables. The Storage API sets this flag automatically, so normal operations are unaffected. Direct SQL deletes are blocked by default. [GitHub](https://github.com/supabase/storage/pull/817)
 
 ## Performance
 

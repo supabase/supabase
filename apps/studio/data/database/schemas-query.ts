@@ -3,6 +3,7 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { EMPTY_ARR } from '@/lib/void'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -29,6 +30,7 @@ export async function getSchemas(
       connectionString,
       sql: pgMetaSchemasList.sql,
       queryKey: ['schemas'],
+      grant: unguarded.migrating,
     },
     signal
   )

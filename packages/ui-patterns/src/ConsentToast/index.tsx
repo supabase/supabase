@@ -1,6 +1,6 @@
 'use client'
 
-import { useBreakpoint } from 'common'
+import { useBreakpoint } from 'common/hooks/useBreakpoint'
 import { noop } from 'lodash'
 import { Button } from 'ui'
 

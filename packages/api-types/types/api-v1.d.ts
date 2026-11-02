@@ -4089,6 +4089,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -4253,7 +4257,7 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
-    RegionsInfo_Output: {
+    RegionsInfoV1_Output: {
       all: {
         smartGroup: {
           /** @enum {string} */
@@ -5563,6 +5567,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
     }
@@ -5641,6 +5649,9 @@ export interface components {
           | 'log_auth_error_rate_high'
           | 'log_storage_error_rate_high'
           | 'log_edge_function_error_rate_high'
+          | 'realtime_authorization_timeouts'
+          | 'realtime_postgres_changes_spike'
+          | 'realtime_concurrent_users_near_limit'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
@@ -5860,12 +5871,44 @@ export interface components {
        */
       schedule_for: string
     }
+    /**
+     * Format: binary
+     * @description Raw Brotli-compressed ESZIP binary file.
+     *
+     *     **Validation requirements** - The file must start with the four magic bytes `EZBR` (hex: `45 5A 42 52`).
+     *     - The `ezbr_sha256` query parameter must contain the SHA-256 hash of the uploaded ESZIP payload.
+     *
+     *     **Example**
+     *     ```javascript
+     *     import { readFile } from 'node:fs/promises';
+     *     import { brotliCompress } from 'node:zlib';
+     *     import { promisify } from 'node:util';
+     *     import { createHash } from 'node:crypto';
+     *
+     *     const compress = promisify(brotliCompress);
+     *     const marker = Buffer.from('EZBR', 'ascii');
+     *
+     *     const file = await readFile('./function.eszip');
+     *     const compressed = await compress(file);
+     *
+     *     const payload = Buffer.concat([marker, compressed]);
+     *
+     *     const ezbr_sha256 = createHash('sha256')
+     *       .update(payload)
+     *       .digest('hex');
+     *
+     *     console.log(ezbr_sha256);
+     *     ```
+     *
+     *
+     */
+    V1UpdateFunctionBodyEszip: string
     /** @example {
      *       "name": "Hello World",
      *       "body": "Deno.serve(() => new Response('Hello again!'))",
      *       "verify_jwt": true
      *     } */
-    V1UpdateFunctionBody: {
+    V1UpdateFunctionBodyJson: {
       body?: string
       name?: string
       verify_jwt?: boolean
@@ -5888,6 +5931,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -7975,6 +8020,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description API key not found for project */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -8020,6 +8072,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8075,6 +8134,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -12342,8 +12408,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': string
+        'application/json': components['schemas']['V1UpdateFunctionBodyJson']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBodyEszip']
       }
     }
     responses: {
@@ -14425,7 +14491,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoV1_Output']
         }
       }
     }
