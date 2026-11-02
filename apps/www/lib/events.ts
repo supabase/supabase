@@ -240,6 +240,8 @@ export async function fetchLumaCalendar(
     }))
 }
 
+// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
+// for case-insensitive matching against the tag names returned by Luma.
 const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
   hackathons: 'hackathon',
   meetups: 'meetup',
@@ -281,6 +283,7 @@ export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
         location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
           [event.city, event.country].filter(Boolean)
         ),
+        // All Luma events are Supabase-hosted regardless of which calendar they're from.
         hosts: [SUPABASE_HOST],
         source: 'luma',
         disable_page_build: true,
