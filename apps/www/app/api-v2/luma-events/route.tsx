@@ -1,5 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_META_DESCRIPTION } from '~/lib/constants'
+import { fetchLumaCalendar } from '~/lib/events'
 import { NextRequest, NextResponse } from 'next/server'
 
 export interface LumaGeoAddressJson {
@@ -55,51 +56,6 @@ export interface LumaHost {
 export interface LumaTag {
   api_id?: string
   name: string
-}
-
-interface LumaResponse {
-  entries: { event: LumaPayloadEvent; tags?: (string | LumaTag)[] }[]
-  has_more: boolean
-  next_cursor?: string
-}
-
-async function fetchLumaCalendar(apiKey: string, after: string | null, before: string | null) {
-  const lumaUrl = new URL('https://public-api.lu.ma/public/v1/calendar/list-events')
-  if (after) lumaUrl.searchParams.append('after', after)
-  if (before) lumaUrl.searchParams.append('before', before)
-
-  const response = await fetch(lumaUrl.toString(), {
-    method: 'GET',
-    headers: {
-      accept: 'application/json',
-      'x-luma-api-key': apiKey,
-    },
-  })
-
-  if (!response.ok) {
-    throw new Error(`Luma API error: ${response.status} ${response.statusText}`)
-  }
-
-  const data: LumaResponse = await response.json()
-
-  return data.entries
-    .filter(({ event }) => event.visibility === 'public')
-    .map(({ event, tags }) => ({
-      id: event.api_id,
-      tags: (tags ?? [])
-        .map((tag) => (typeof tag === 'string' ? tag : tag?.name))
-        .filter((name): name is string => Boolean(name)),
-      start_at: event.start_at,
-      end_at: event.end_at,
-      name: event.name,
-      city: event.geo_address_json?.city,
-      country: event.geo_address_json?.country,
-      url: event.url,
-      timezone: event.timezone,
-      cover_url: event.cover_url,
-      description: event.description,
-      hosts: event.hosts || [],
-    }))
 }
 
 export async function GET(request: NextRequest) {
