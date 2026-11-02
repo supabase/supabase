@@ -1,7 +1,9 @@
-import { useParams } from 'common'
+import { useFeatureFlags, useParams } from 'common'
 
 import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 /**
  * Whether to surface Pipelines logs (legacy logs sidebar and the unified logs filter). Only
@@ -9,8 +11,15 @@ import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
  */
 export const useShowPipelinesLogs = () => {
   const { ref: projectRef } = useParams()
+  const { hasLoaded: hasLoadedFlags, isConfigCatStale } = useFeatureFlags()
+  const { isLoading: isLoadingProject } = useProjectDetailQuery({ ref: projectRef })
+  const { isLoading: isLoadingOrganization } = useSelectedOrganizationQuery()
+
   const isPipelinesEnabled = useIsPipelinesEnabled()
-  const { data, isLoading } = useReplicationSourcesQuery(
+  const isLoadingAccess =
+    !hasLoadedFlags || !!isConfigCatStale || isLoadingProject || isLoadingOrganization
+
+  const { data, isLoading: isLoadingSources } = useReplicationSourcesQuery(
     { projectRef },
     {
       enabled: isPipelinesEnabled,
@@ -22,6 +31,6 @@ export const useShowPipelinesLogs = () => {
 
   return {
     showPipelinesLogs: isPipelinesEnabled && (data?.sources?.length ?? 0) > 0,
-    isLoading: isPipelinesEnabled && isLoading,
+    isLoading: isLoadingAccess || (isPipelinesEnabled && isLoadingSources),
   }
 }
