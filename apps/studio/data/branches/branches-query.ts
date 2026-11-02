@@ -43,7 +43,6 @@ export type BranchesError = ResponseError
 
 export const branchesQueryOptions = ({ projectRef, grant }: BranchesVariables) =>
   queryOptions<BranchesData, BranchesError>({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- grants stay out of query keys so permission refetches don't split the cache
     queryKey: branchKeys.list(projectRef),
     queryFn:
       IS_PLATFORM && projectRef && grant
