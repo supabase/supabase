@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import { OPT_IN_LEVELS } from '../opt-in-level'
 import { getLegacyToolContract, LEGACY_TOOL_CONTRACTS } from './legacy-tools'
-import { sanitizeContractPart } from './registry'
+import { REMOTE_TOOL_CONTRACTS, sanitizeContractPart, TOOL_CONTRACTS } from './registry'
 import { sanitizeMessagePart } from './tool-sanitizer'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
@@ -33,9 +33,13 @@ describe('legacy tool contracts', () => {
     expect(getLegacyToolContract('execute_sql')).toBeUndefined()
   })
 
+  it('never shares a name with a registry tool', () => {
+    const live = new Set([...Object.keys(TOOL_CONTRACTS), ...Object.keys(REMOTE_TOOL_CONTRACTS)])
+    expect(Object.keys(LEGACY_TOOL_CONTRACTS).filter((name) => live.has(name))).toEqual([])
+  })
+
   const gated: [string, unknown[]][] = [
     ['getSchemaTables', [[SCHEMA_ROW], [], 'Failed to fetch schema: boom']],
-    ['getRlsKnowledge', ['Row Level Security guidance']],
     ['getFunctions', ['Function: add\nReturn Type: int', '', 'Failed to fetch functions: boom']],
   ]
 
@@ -66,8 +70,54 @@ describe('legacy tool contracts', () => {
     }
   )
 
-  it.each(OPT_IN_LEVELS)('shows getEdgeFunctionKnowledge at %s', (level) => {
-    expect(outputOf('getEdgeFunctionKnowledge', 'Edge guidance', level)).toBe('Edge guidance')
+  describe('getRlsKnowledge', () => {
+    const SAVED_OUTPUT = `You're a Supabase Postgres expert in writing row level security policies.
+
+          Here are my existing policies:
+          Policy Name: "Read own rows"
+          Action: PERMISSIVE
+          `
+
+    it.each(OPT_IN_LEVELS)('replays only the saved policies at %s', (level) => {
+      const replayed = outputOf('getRlsKnowledge', SAVED_OUTPUT, level)
+      if (level === 'disabled') {
+        expect(replayed).toBe(hiddenAt('getRlsKnowledge', 'disabled'))
+        return
+      }
+      expect(replayed).toBe('Policy Name: "Read own rows"\n          Action: PERMISSIVE')
+    })
+
+    it('replaces an invalid output', () => {
+      expect(outputOf('getRlsKnowledge', 42, 'schema')).toBe(
+        LEGACY_TOOL_CONTRACTS.getRlsKnowledge.outputOnInvalid
+      )
+    })
+
+    it.each([
+      ['has no marker', SAVED_OUTPUT.slice(0, SAVED_OUTPUT.indexOf('Here are my existing'))],
+      [
+        'has an empty policy list',
+        `${SAVED_OUTPUT.slice(0, SAVED_OUTPUT.indexOf('Here are my existing'))}Here are my existing policies:   `,
+      ],
+    ])('replays a note when the output %s', (_label, output) => {
+      expect(outputOf('getRlsKnowledge', output, 'schema')).toBe(
+        'No existing policies were found when this tool ran.'
+      )
+    })
+
+    it('is safe to run on its own result', () => {
+      const once = outputOf('getRlsKnowledge', SAVED_OUTPUT, 'schema')
+      expect(outputOf('getRlsKnowledge', once, 'schema')).toBe(once)
+      const note = 'No existing policies were found when this tool ran.'
+      expect(outputOf('getRlsKnowledge', note, 'schema')).toBe(note)
+    })
+  })
+
+  it.each(OPT_IN_LEVELS)('points getEdgeFunctionKnowledge at load_knowledge at %s', (level) => {
+    const replayed = outputOf('getEdgeFunctionKnowledge', 'Stale Edge guidance', level)
+    expect(replayed).toContain('`load_knowledge`')
+    expect(replayed).toContain('`edge_functions`')
+    expect(replayed).not.toContain('Stale Edge guidance')
   })
 
   it('replaces an invalid getEdgeFunctionKnowledge output', () => {

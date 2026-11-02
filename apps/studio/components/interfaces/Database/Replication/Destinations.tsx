@@ -34,11 +34,11 @@ import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from './useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from './useIsPipelinesEnabled'
 import { useRedirectLegacyReadReplicaDestination } from './useRedirectLegacyReadReplicaDestination'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
@@ -54,7 +54,7 @@ import {
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -102,10 +102,10 @@ export const Destinations = () => {
   const router = useTanStackRouter({ warn: false })
   const nextRouter = useNextRouter()
   const { isEnabled: isWizardEnabled, isLoading: isPreviewLoading } = usePipelineCreationPreview()
-  const bigQuery = useIsETLBigQueryPrivateAlpha()
-  const duckLake = useIsETLDucklakePrivateAlpha()
-  const snowflake = useIsETLSnowflakePrivateAlpha()
-  const clickHouse = useIsETLClickHousePrivateAlpha()
+  const bigQuery = useIsPipelinesBigQueryEnabled()
+  const duckLake = useIsPipelinesDuckLakeEnabled()
+  const snowflake = useIsPipelinesSnowflakeEnabled()
+  const clickHouse = useIsPipelinesClickHouseEnabled()
   const hasWizardDestination = bigQuery || duckLake || snowflake || clickHouse
   const { hasLoaded: hasFlagsLoaded } = useFeatureFlags()
   const isCreationGateLoading = isPreviewLoading || (IS_PLATFORM && !hasFlagsLoaded)
@@ -230,12 +230,12 @@ export const Destinations = () => {
     destinations.length === 0 &&
     pipelines.length === 0
 
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
-  const hasErrorsFetchingData = !isLocalETLNotSetUp && isDestinationsError
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
+  const hasErrorsFetchingData = !isLocalPipelinesNotSetUp && isDestinationsError
 
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
-  const sourceErrorTitle = checkLocalETLNotSetUp(sourcesError)
+  const sourceErrorTitle = checkLocalPipelinesNotSetUp(sourcesError)
     ? 'Replication unavailable locally'
     : 'Failed to retrieve pipeline enablement status'
 
@@ -423,9 +423,9 @@ export const Destinations = () => {
             projectRef={projectRef}
             error={sourcesError}
             subject={sourceErrorTitle}
-            hideContactSupport={checkLocalETLNotSetUp(sourcesError)}
+            hideContactSupport={checkLocalPipelinesNotSetUp(sourcesError)}
             description={
-              checkLocalETLNotSetUp(sourcesError)
+              checkLocalPipelinesNotSetUp(sourcesError)
                 ? 'Configure the replication API to manage pipelines in local development.'
                 : undefined
             }

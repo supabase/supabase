@@ -42,6 +42,7 @@ const LOG_FIELDS: BlockFieldConfig[] = [
     wrap: true,
   },
   { id: 'level', label: 'Level', getValue: (data) => data.level },
+  { id: 'pipeline_id', label: 'Pipeline ID', getValue: (data) => data.pipeline_id },
   { id: 'status', label: 'Status', getValue: (data) => data.status },
   { id: 'method', label: 'Method', getValue: (data) => data.method },
   { id: 'pathname', label: 'Path', getValue: (data) => data.pathname },

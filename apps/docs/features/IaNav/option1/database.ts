@@ -138,7 +138,7 @@ export const database: NavMenuConstant = {
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
         {
           name: 'Test RLS policies with pgTAP',
-          url: '/guides/local-development/testing/overview#database-unit-testing-with-pgtap',
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },

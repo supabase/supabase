@@ -11,6 +11,7 @@
     "build:federated-content": "tsx --conditions=react-server ./scripts/federated-content/fetch-federated-content.ts",
     "prebuild:reference-markdown": "pnpm run codegen:references",
     "build:reference-markdown": "tsx ./internals/generate-reference-markdown.ts",
+    "check:removed-anchors": "tsx ./scripts/check-removed-anchors.ts",
     "build:markdown": "pnpm build:guides-markdown && pnpm build:reference-markdown",
     "build:gz-archive": "tsx ./internals/generate-gz-archive.ts",
     "build:sitemap": "tsx ./internals/generate-sitemap.ts",

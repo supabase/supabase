@@ -332,7 +332,7 @@ describe('PipelineCreationFlow', () => {
             )
           : HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>({
               destination_id: 7,
-              pipeline_id: 8,
+              pipeline_id: '8',
             })
       },
     })
@@ -354,7 +354,7 @@ describe('PipelineCreationFlow', () => {
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
       response: () =>
         HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
-          pipeline_id: 8,
+          pipeline_id: '8',
           status: { name: 'stopped' },
         }),
     })

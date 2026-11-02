@@ -79,7 +79,10 @@ describe('404 SearchButton', () => {
 
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sendTelemetryEvent).toHaveBeenCalledWith({ action: 'docs_search_v2_closed' })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_closed',
+      properties: { closeReason: 'dismissed' },
+    })
   })
 })
 

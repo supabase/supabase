@@ -25,6 +25,21 @@ describe('next.config.mjs', () => {
     )
   })
 
+  it('serves the published CLI schemas with CORS and a short cache', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+
+    const schemasHeaders = headers.find((header) => header.source === '/schemas/:path*')
+
+    expect(schemasHeaders?.headers).toEqual(
+      expect.arrayContaining([
+        { key: 'access-control-allow-origin', value: '*' },
+        { key: 'cache-control', value: 'public, max-age=3600' },
+      ])
+    )
+    expect(getPathMatch(schemasHeaders!.source)('/schemas/config/v1.json')).toBeTruthy()
+  })
+
   it('routes the library and permanently redirects the legacy UI URLs', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
     const rewrites = await config.rewrites?.()

@@ -35,7 +35,8 @@ const BASE_PARAMS = {
 }
 
 const SHARED = ['execute_sql', 'load_knowledge', 'rename_chat']
-const FALLBACK = ['getEdgeFunctionKnowledge', 'getFunctions', 'getRlsKnowledge', 'getSchemaTables']
+const SELF_HOSTED = ['list_functions', 'list_policies', 'list_tables']
+const REMOVED = ['getEdgeFunctionKnowledge', 'getFunctions', 'getRlsKnowledge', 'getSchemaTables']
 const SUPPORT = ['escalate_to_human', 'resolve_support_conversation']
 const PLATFORM = [
   'deploy_edge_function',
@@ -71,14 +72,14 @@ describe('ai/tools getTools availability', () => {
 
   const cases = [
     // [isPlatform, isExplorerEnabled, supportMode, hasBaseUrl, expected]
-    [false, false, false, false, sorted(SHARED, FALLBACK)],
-    [false, false, false, true, sorted(SHARED, FALLBACK)],
-    [false, false, true, false, sorted(SHARED, FALLBACK)],
-    [false, false, true, true, sorted(SHARED, FALLBACK)],
-    [false, true, false, false, sorted(SHARED, FALLBACK)],
-    [false, true, false, true, sorted(SHARED, FALLBACK)],
-    [false, true, true, false, sorted(SHARED, FALLBACK)],
-    [false, true, true, true, sorted(SHARED, FALLBACK)],
+    [false, false, false, false, sorted(SHARED, SELF_HOSTED)],
+    [false, false, false, true, sorted(SHARED, SELF_HOSTED)],
+    [false, false, true, false, sorted(SHARED, SELF_HOSTED)],
+    [false, false, true, true, sorted(SHARED, SELF_HOSTED)],
+    [false, true, false, false, sorted(SHARED, SELF_HOSTED)],
+    [false, true, false, true, sorted(SHARED, SELF_HOSTED)],
+    [false, true, true, false, sorted(SHARED, SELF_HOSTED)],
+    [false, true, true, true, sorted(SHARED, SELF_HOSTED)],
     [true, false, false, false, sorted(SHARED, PLATFORM, MCP_TOOL_NAMES)],
     [true, false, false, true, sorted(SHARED, PLATFORM, MCP_TOOL_NAMES, INCIDENTS)],
     [true, false, true, false, sorted(SHARED, PLATFORM, MCP_TOOL_NAMES, SUPPORT)],
@@ -108,6 +109,7 @@ describe('ai/tools getTools availability', () => {
       })
 
       expect(Object.keys(tools).sort()).toEqual(expected)
+      for (const name of REMOVED) expect(tools).not.toHaveProperty(name)
     }
   )
 })

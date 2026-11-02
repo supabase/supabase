@@ -101,7 +101,7 @@ const destinationData: DestinationResponse = {
 }
 let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
-  id: 8,
+  id: '8',
   tenant_id: 'tenant',
   source_id: 42,
   source_name: 'postgres',
@@ -222,12 +222,12 @@ vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
   FormItemLayout: ({ children }: PropsWithChildren) => <div>{children}</div>,
 }))
 
-vi.mock('../../useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => true,
-  useIsETLClickHousePrivateAlpha: () => false,
-  useIsETLDucklakePrivateAlpha: () => true,
-  useIsETLIcebergPrivateAlpha: () => false,
-  useIsETLSnowflakePrivateAlpha: () => false,
+vi.mock('../../useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => true,
+  useIsPipelinesClickHouseEnabled: () => false,
+  useIsPipelinesDuckLakeEnabled: () => true,
+  useIsPipelinesIcebergEnabled: () => false,
+  useIsPipelinesSnowflakeEnabled: () => false,
 }))
 
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
