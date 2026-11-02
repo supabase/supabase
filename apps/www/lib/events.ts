@@ -23,7 +23,6 @@ import * as Sentry from '@sentry/nextjs'
 import type { LumaPayloadEvent, LumaTag } from '~/app/api-v2/luma-events/route'
 import matter from 'gray-matter'
 import { queryDatabase } from 'lib/notion'
-import { PHASE_PRODUCTION_BUILD } from 'next/constants'
 
 import { EventHost, SUPABASE_HOST, SupabaseEvent } from './eventsTypes'
 
@@ -293,9 +292,7 @@ export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
   } catch (error) {
     Sentry.captureException(error)
     console.error('Error fetching Luma events:', error)
-    // Throwing at runtime makes ISR keep serving the last good page instead of caching one without Luma events.
-    if (process.env.NEXT_PHASE === PHASE_PRODUCTION_BUILD) return []
-    throw error
+    return []
   }
 }
 

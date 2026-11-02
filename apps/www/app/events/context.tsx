@@ -14,7 +14,7 @@ interface EventsContextValue {
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
-  displayTimeZone: 'UTC' | undefined
+  isHydrated: boolean
   searchQuery: string
   setSearchQuery: (query: string) => void
   selectedCategories: string[]
@@ -141,8 +141,7 @@ export function EventsProvider({
     allEvents,
     filteredEvents,
     featuredEvent,
-    // UTC until hydration so server and first client render match; then the visitor's zone.
-    displayTimeZone: isHydrated ? undefined : 'UTC',
+    isHydrated,
     searchQuery,
     setSearchQuery,
     selectedCategories,

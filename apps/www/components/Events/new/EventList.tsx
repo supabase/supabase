@@ -1,7 +1,7 @@
 'use client'
 
 import { useEvents } from '~/app/events/context'
-import { formatHosts } from '~/lib/eventsUtils'
+import { formatHosts, getEventTimeZone } from '~/lib/eventsUtils'
 import { MapPinIcon, Rows3Icon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
@@ -17,7 +17,7 @@ const CATEGORIES_FILTERS = [
 ]
 
 export function EventList() {
-  const { filteredEvents, selectedCategories, displayTimeZone } = useEvents()
+  const { filteredEvents, selectedCategories, isHydrated } = useEvents()
   const isOnDemandView = selectedCategories.includes('on-demand')
 
   const getCategoryLabel = (value: string) => {
@@ -28,13 +28,12 @@ export function EventList() {
   // Group events by date
   const eventsByDate = filteredEvents.reduce(
     (acc, event) => {
-      const isDateOnly = event.date.endsWith('T12:00:00Z')
       const eventDate = new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        timeZone: isDateOnly ? 'UTC' : displayTimeZone,
+        timeZone: getEventTimeZone(event.date, event.timezone, isHydrated),
       })
 
       if (!acc[eventDate]) {
@@ -91,14 +90,14 @@ export function EventList() {
                         {new Date(event.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
-                          timeZone: displayTimeZone,
+                          timeZone: getEventTimeZone(event.date, event.timezone, isHydrated),
                         })}
                         {' - '}
                         {new Date(event.end_date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
-                          timeZone: displayTimeZone,
+                          timeZone: getEventTimeZone(event.end_date, event.timezone, isHydrated),
                         })}
                       </p>
                     )}

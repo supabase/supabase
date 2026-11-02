@@ -1,13 +1,13 @@
 'use client'
 
 import { useEvents } from '~/app/events/context'
-import { formatHosts } from '~/lib/eventsUtils'
+import { formatHosts, getEventTimeZone } from '~/lib/eventsUtils'
 import { ArrowRightIcon, CalendarIcon, MapPinIcon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
 export function EventBanner() {
-  const { featuredEvent, displayTimeZone } = useEvents()
+  const { featuredEvent, isHydrated } = useEvents()
 
   if (!featuredEvent) return null
 
@@ -44,7 +44,8 @@ export function EventBanner() {
             <DateWidget
               date={featuredEvent.date}
               endDate={featuredEvent.end_date}
-              displayTimeZone={displayTimeZone}
+              eventTimeZone={featuredEvent.timezone}
+              isHydrated={isHydrated}
             />
             <LocationWidget
               location={featuredEvent.location}
@@ -86,42 +87,39 @@ export function EventBanner() {
 const DateWidget = ({
   date,
   endDate,
-  displayTimeZone,
+  eventTimeZone,
+  isHydrated,
 }: {
   date: string
   endDate?: string
-  displayTimeZone: 'UTC' | undefined
+  eventTimeZone: string
+  isHydrated: boolean
 }) => {
   const eventDate = new Date(date)
   // Date-only Notion events are normalized to noon UTC (T12:00:00Z); detect them
   // so we can display in UTC and suppress the fabricated time component.
   const isDateOnly = date.endsWith('T12:00:00Z')
-  const eventTimeZone = isDateOnly ? 'UTC' : displayTimeZone
+  const timeZone = getEventTimeZone(date, eventTimeZone, isHydrated)
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
-    timeZone: eventTimeZone,
+    timeZone,
   })
 
-  const currentYear = new Date().toLocaleDateString('en-US', {
-    year: 'numeric',
-    timeZone: displayTimeZone,
-  })
-  const eventYear = eventDate.toLocaleDateString('en-US', {
-    year: 'numeric',
-    timeZone: eventTimeZone,
-  })
+  const currentYear = new Date().toLocaleDateString('en-US', { year: 'numeric' })
+  const eventYear = eventDate.toLocaleDateString('en-US', { year: 'numeric', timeZone })
+  // Always show the year until hydration: the server's clock can't decide the visitor's current year.
   const formattedDateWithYear =
-    eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
+    !isHydrated || eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
 
   const timeFormat = {
     hour: 'numeric',
     minute: '2-digit',
     hour12: true,
-    timeZone: displayTimeZone,
-    timeZoneName: displayTimeZone ? 'short' : undefined,
+    timeZone,
+    timeZoneName: isHydrated ? undefined : 'short',
   } as const
 
   // Only show time for events that have a real time component
