@@ -1220,8 +1220,8 @@ export const database: NavMenuConstant = {
           url: '/guides/observability/inspect' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Supavisor',
@@ -1684,8 +1684,8 @@ export const api: NavMenuConstant = {
           url: '/guides/database/full-text-search' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Using custom schemas',
