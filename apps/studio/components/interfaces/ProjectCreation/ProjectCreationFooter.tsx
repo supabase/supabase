@@ -59,12 +59,19 @@ export const ProjectCreationFooter = ({
   const projectCreationDisabled = useFlag('disableProjectCreationAndUpdate')
 
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+  const monthlyPriceValue = monthlyInstancePrice(instanceSize)
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : monthlyInstancePrice(instanceSize) - availableComputeCredits
+    : monthlyPriceValue
+      ? monthlyPriceValue - availableComputeCredits
+      : null // price is unknown at this point
 
   const showAdditionalCosts =
-    !isFreePlan && !projectCreationDisabled && canCreateProject && additionalMonthlySpend > 0
+    !isFreePlan &&
+    !projectCreationDisabled &&
+    canCreateProject &&
+    additionalMonthlySpend != null &&
+    additionalMonthlySpend > 0
 
   // High availability is free during Alpha, so the new project costs $0 and is excluded from
   // the totals below — the tooltip table still shows the usual compute price struck through.
@@ -73,19 +80,23 @@ export const ProjectCreationFooter = ({
 
   // [kevin] This will eventually all be provided by a new API endpoint to preview and validate project creation, this is just for kaizen now
   // Clamped since a free HA project can leave the compute credits larger than the costs
-  const monthlyComputeCosts = Math.max(
-    0,
-    // current project costs
-    organizationProjects.reduce((prev, acc) => {
-      const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
-      const cost = !!primaryDatabase ? monthlyInstancePrice(primaryDatabase.infra_compute_size) : 0
-      return prev + cost
-    }, 0) +
-      // selected compute size
-      newProjectComputeCosts -
-      // compute credits
-      10
-  )
+  const monthlyComputeCosts = newProjectComputeCosts
+    ? Math.max(
+        0,
+        // current project costs
+        organizationProjects.reduce((prev, acc) => {
+          const primaryDatabase = acc.databases.find((db) => db.identifier === acc.ref)
+          const cost = !!primaryDatabase
+            ? monthlyInstancePrice(primaryDatabase.infra_compute_size)
+            : 0
+          return prev + (cost ?? 0)
+        }, 0) +
+          // selected compute size
+          newProjectComputeCosts -
+          // compute credits
+          10
+      )
+    : null
 
   const onCancel = () => {
     if (cancelAction === 'close') {
@@ -124,7 +135,7 @@ export const ProjectCreationFooter = ({
                   {highAvailability && (
                     <p>High availability projects are free during Alpha for up to 2 projects.</p>
                   )}
-                  {monthlyComputeCosts > 0 && (
+                  {monthlyComputeCosts != null && monthlyComputeCosts > 0 && (
                     <p>Compute costs are applied on top of your subscription plan costs.</p>
                   )}
                 </div>

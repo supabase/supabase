@@ -284,9 +284,12 @@ export const ProjectCreationForm = ({
   const organizationProjects =
     allProjects?.filter((project) => project.status !== PROJECT_STATUS.INACTIVE) ?? []
   const availableComputeCredits = organizationProjects.length === 0 ? 10 : 0
+  const monthlyInstancePriceValue = monthlyInstancePrice(instanceSize)
   const additionalMonthlySpend = isFreePlan
     ? 0
-    : monthlyInstancePrice(instanceSize) - availableComputeCredits
+    : monthlyInstancePriceValue != null
+      ? monthlyInstancePriceValue - availableComputeCredits
+      : null // price is unknown at this point
 
   const selectedCloudProvider = cloudProvider as CloudProvider
   const { data: autoDefaultRegion, error: defaultRegionError } = useDefaultRegionQuery(
@@ -454,6 +457,7 @@ export const ProjectCreationForm = ({
     // doesn't incur the usual compute costs.
     const requiresCostConfirmation =
       !values.highAvailability &&
+      additionalMonthlySpend != null &&
       additionalMonthlySpend > 0 &&
       (hasOAuthApps || launchingLargerInstance)
 
@@ -724,11 +728,10 @@ export const ProjectCreationForm = ({
   // The valid sizes depend on plan, cloud provider, HA and entitlements, so the form starts
   // without a size and picks the first valid option once those have resolved.
   useEffect(() => {
-    if (!canChooseInstanceSize) {
+    if (!canChooseInstanceSize || sizeOptions.length === 0) {
       if (instanceSize !== undefined) setValue('instanceSize', undefined)
       return
     }
-    if (sizeOptions.length === 0) return
     if (instanceSize === undefined || !sizeOptions.includes(instanceSize as DesiredInstanceSize)) {
       setValue('instanceSize', sizeOptions[0])
     }
