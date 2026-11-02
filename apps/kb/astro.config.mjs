@@ -9,6 +9,8 @@ import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
 import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
 
+import './scripts/utils/dotenv.js'
+
 import { BASE_PATH } from './src/lib/constants.ts'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import { sharedCodeBlock } from './src/lib/mdx/shiki-code-block.ts'
