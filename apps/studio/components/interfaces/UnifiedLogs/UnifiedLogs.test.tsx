@@ -290,7 +290,11 @@ describe('UnifiedLogs', () => {
       },
     })
     customRender(
-      <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />,
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs scope={FUNCTION_SCOPE} hasFilterSideBar={false} {...EDGE_FUNCTION_LOGS_VIEW} />
+      </FeatureFlagContext.Provider>,
       {
         nuqs: {
           hasMemory: true,
@@ -330,10 +334,17 @@ describe('UnifiedLogs', () => {
         })
       },
     })
-    customRender(<UnifiedLogs hasFilterSideBar={false} />, {
-      queryClient,
-      nuqs: { hasMemory: true, onUrlUpdate },
-    })
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs hasFilterSideBar={false} />
+      </FeatureFlagContext.Provider>,
+      {
+        queryClient,
+        nuqs: { hasMemory: true, onUrlUpdate },
+      }
+    )
     expect(await screen.findByText('No results found')).toBeInTheDocument()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
     expect(queries.some((sql) => sql.includes('arrayJoin(mapKeys'))).toBe(false)
@@ -442,14 +453,21 @@ describe('UnifiedLogs', () => {
       },
     })
     const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
-    const view = customRender(<UnifiedLogs />, {
-      queryClient,
-      nuqs: {
-        hasMemory: true,
-        onUrlUpdate,
-        searchParams: '?filter=attribute.status:neq:failure,request_id:eq:req-1',
-      },
-    })
+    const view = customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      {
+        queryClient,
+        nuqs: {
+          hasMemory: true,
+          onUrlUpdate,
+          searchParams: '?filter=attribute.status:neq:failure,request_id:eq:req-1',
+        },
+      }
+    )
     expect(await screen.findByText('No results found')).toBeInTheDocument()
     expect(screen.getByTestId('filter-value-attribute.status')).toHaveValue('failure')
     expect(screen.getByTestId('filter-value-request_id')).toHaveValue('req-1')
