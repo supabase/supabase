@@ -134,13 +134,29 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
   )
 }
 
-function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
+function ContentListingGroupHeading({
+  group,
+  headingId,
+}: {
+  group: ContentListingGroup
+  headingId?: string
+}) {
   if (!group.heading) return null
 
-  return <Heading tag={group.headingLevel ?? 'h2'}>{group.heading}</Heading>
+  return (
+    <Heading tag={group.headingLevel ?? 'h2'} customAnchor={headingId}>
+      {group.heading}
+    </Heading>
+  )
 }
 
-function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
+function ContentListingsGroup({
+  group,
+  headingId,
+}: {
+  group: ContentListingGroup
+  headingId?: string
+}) {
   const { trackClick } = useContentListingClickHandler(group)
   const items = useMemo(() => filterContentListingItems(group.items), [group.items])
   const isGrid = group.type === 'grid'
@@ -153,7 +169,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
   // typography. The list itself opts out so its explicit Tailwind layout wins.
   return (
     <section className="space-y-4">
-      <ContentListingGroupHeading group={group} />
+      <ContentListingGroupHeading group={group} headingId={headingId} />
       <div className="not-prose space-y-4">
         {group.description && (
           <div className="text-foreground-light [&_a]:text-foreground [&_a]:underline [&_p]:m-0">
@@ -238,7 +254,7 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
   )
 }
 
-export function ContentListings({ id }: { id: string }) {
+export function ContentListings({ id, headingId }: { id: string; headingId?: string }) {
   const group = getContentListingById(id)
   if (!group || !filterContentListingItems(group.items).length) return null
   if (group.type === 'progression') {
@@ -251,7 +267,7 @@ export function ContentListings({ id }: { id: string }) {
 
   return (
     <div className="my-10 space-y-10">
-      <ContentListingsGroup group={group} />
+      <ContentListingsGroup group={group} headingId={headingId} />
     </div>
   )
 }
