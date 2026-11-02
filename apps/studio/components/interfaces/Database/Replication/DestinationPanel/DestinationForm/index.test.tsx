@@ -101,7 +101,7 @@ const destinationData: DestinationResponse = {
 }
 let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
-  id: 8,
+  id: '8',
   tenant_id: 'tenant',
   source_id: 42,
   source_name: 'postgres',
