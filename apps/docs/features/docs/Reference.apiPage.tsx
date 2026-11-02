@@ -83,7 +83,7 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
             </TocAnchorsProvider>
           ) : (
             <article className="@container/article">
-              <SectionSwitch libraryId="api" version="latest" section={section} />
+              <SectionSwitch libraryId="api" version="latest" section={section} tag="h1" />
             </article>
           )}
         </LayoutMainContent>

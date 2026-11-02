@@ -105,8 +105,12 @@ const footerData = [
         url: '/kb',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'FAQs',
+        url: '/kb/topics/faqs',
+      },
+      {
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',

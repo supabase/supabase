@@ -367,7 +367,7 @@ export function getCreateFDWSql({
 
   const encryptedOptionsSqlArray = encryptedOptions
     .filter((option) => formState[option.name])
-    .map((option) => safeSql`${ident(option.name)} ''%s''`)
+    .map((option) => safeSql`${ident(option.name)} %L`)
   // Unencrypted option values are passed as format() %L arguments (below) so
   // Postgres escapes them once for the inner create-server literal. Pre-escaping
   // here and embedding in the outer E'...' string would decode backslashes twice,

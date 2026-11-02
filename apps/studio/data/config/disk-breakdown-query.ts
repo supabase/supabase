@@ -2,6 +2,7 @@ import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -39,6 +40,7 @@ export async function getDiskBreakdown(
     FROM
       pg_ls_waldir()
   ) AS wal_size_bytes`,
+      grant: unguarded.migrating,
     },
     signal
   )

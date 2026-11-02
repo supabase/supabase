@@ -4,6 +4,7 @@ import { describe, expect, it } from 'vitest'
 
 import type { SearchState } from './types'
 import {
+  canSubmitQuery,
   formatHeadingPath,
   getHighlightQuery,
   getIsSearching,
@@ -146,5 +147,28 @@ describe('getIsSearching', () => {
 
   it('is off for an empty query', () => {
     expect(getIsSearching({ searchState: { status: 'initial', key: 0 }, query: '  ' })).toBe(false)
+  })
+
+  it('is off while the query is still within minCharacters, since no search is on its way', () => {
+    const state: SearchState = { status: 'initial', key: 0 }
+    expect(getIsSearching({ searchState: state, query: 'au', minCharacters: 2 })).toBe(false)
+    expect(getIsSearching({ searchState: state, query: ' au ', minCharacters: 2 })).toBe(false)
+  })
+
+  it('starts on the first character past minCharacters', () => {
+    const state: SearchState = { status: 'initial', key: 0 }
+    expect(getIsSearching({ searchState: state, query: 'aut', minCharacters: 2 })).toBe(true)
+  })
+})
+
+describe('canSubmitQuery', () => {
+  it('needs the query to be longer than minCharacters', () => {
+    expect(canSubmitQuery('ab', 2)).toBe(false)
+    expect(canSubmitQuery('abc', 2)).toBe(true)
+  })
+
+  it('submits any non-empty query by default', () => {
+    expect(canSubmitQuery('', 0)).toBe(false)
+    expect(canSubmitQuery('a', 0)).toBe(true)
   })
 })

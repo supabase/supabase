@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { customDomainKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainActivateVariables = {
@@ -12,6 +12,7 @@ export type CustomDomainActivateVariables = {
 export async function activateCustomDomain({ projectRef }: CustomDomainActivateVariables) {
   const { data, error } = await post(`/v1/projects/{ref}/custom-hostname/activate`, {
     params: { path: { ref: projectRef } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

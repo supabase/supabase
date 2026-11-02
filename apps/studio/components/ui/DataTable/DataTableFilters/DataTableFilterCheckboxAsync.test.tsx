@@ -11,6 +11,7 @@ import { describe, expect, it } from 'vitest'
 import { DataTableFilterControls } from './DataTableFilterControls'
 import { buildDefaultColumnFilters } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { createUnifiedLogsSearch } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { DataTableCheckboxFilterField } from '@/components/ui/DataTable/DataTable.types'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
 import { useUnifiedLogsFacetCountQuery } from '@/data/logs/unified-logs-facet-count-query'
@@ -40,27 +41,10 @@ const columns = [
   { accessorKey: 'method', header: 'Method' },
 ]
 const initialDate = [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')]
-const defaultPathnameSearch: QuerySearchParamsType = {
-  filter: null,
-  latency: null,
-  'timing.dns': null,
-  'timing.connection': null,
-  'timing.tls': null,
-  'timing.ttfb': null,
-  'timing.transfer': null,
+const defaultPathnameSearch = createUnifiedLogsSearch({
   date: initialDate,
-  sort: null,
-  size: 40,
-  start: 0,
-  direction: 'next',
   cursor: new Date('2026-05-08T10:00:00Z'),
-  id: null,
-  show_connection_logs: true,
-  edge_auth: true,
-  edge_storage: true,
-  edge_postgrest: true,
-  user: null,
-}
+})
 const pathnameSearch = (overrides: Partial<QuerySearchParamsType> = {}): QuerySearchParamsType => ({
   ...defaultPathnameSearch,
   ...overrides,
@@ -219,7 +203,7 @@ describe('pathname facet filter', () => {
     expect(requests).toBe(2)
   })
 
-  it('clears search on Escape before blurring the input', () => {
+  it('clears search on Escape before blurring the input', async () => {
     addAPIMock({
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all',
@@ -238,6 +222,7 @@ describe('pathname facet filter', () => {
 
     fireEvent.keyDown(searchInput, { key: 'Escape' })
     expect(searchInput).not.toHaveFocus()
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
   })
 
   it('replaces options on URL time-range and filter changes without syncing local filters', async () => {
@@ -311,6 +296,7 @@ describe('pathname facet filter', () => {
     expect(selectedCheckbox).toHaveAttribute('data-state', 'checked')
     fireEvent.click(selectedCheckbox)
     await waitFor(() => expect(screen.queryByRole('checkbox', { name: /\/selected/ })).toBeNull())
+    expect(await screen.findByText('No results found')).toBeInTheDocument()
   })
 
   it('validates and orders option rows from the response', async () => {

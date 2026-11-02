@@ -12,11 +12,12 @@ import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import type { PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CreateProjectResponse = components['schemas']['CreateProjectResponse_Output']
 type RegionsInfo = components['schemas']['RegionsInfoPlatform_Output']
@@ -215,12 +216,7 @@ function mockWizardEndpoints(
       has_oriole_project: false,
     },
   })
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: () =>
-      HttpResponse.json<PermissionsV2Response>(overrides.permissions ?? ADMIN_PERMISSIONS),
-  })
+  mockPermissions(overrides.permissions ?? ADMIN_PERMISSIONS)
   addAPIMock({
     method: 'get',
     path: '/platform/organizations/:slug/members/reached-free-project-limit',

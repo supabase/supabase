@@ -71,6 +71,68 @@ export function TocSection({ items, className }: { items: TOCItemType[]; classNa
   )
 }
 
+export function TocTree({
+  items,
+  activeUrl,
+  className,
+}: {
+  items: TOCItemType[]
+  activeUrl?: string
+  className?: string
+}) {
+  return (
+    <ul className={cn('m-0 list-none text-sm leading-6', '[&>li>a:has(+ul)]:pb-0', className)}>
+      {toTocTree(items).map(({ item, children }) => (
+        <li key={item.url}>
+          <TocTreeLink item={item} isActive={item.url === activeUrl} />
+          {children.length > 0 ? (
+            <ul
+              className={cn(
+                'relative m-0 list-none p-0 pl-5 [&>li]:relative',
+                '[--toc-line:color-mix(in_oklab,oklch(from_var(--border-muted)_l_c_h/1)_8%,var(--background-surface-100))]',
+                "[&>li]:before:absolute [&>li]:before:-left-4.5 [&>li]:before:top-0 [&>li]:before:h-5 [&>li]:before:w-3.5 [&>li]:before:rounded-bl-md [&>li]:before:border-b [&>li]:before:border-l [&>li]:before:border-(--toc-line) [&>li]:before:content-['']",
+                "[&>li:not(:last-child)]:after:absolute [&>li:not(:last-child)]:after:-left-4.5 [&>li:not(:last-child)]:after:top-3.5 [&>li:not(:last-child)]:after:bottom-0 [&>li:not(:last-child)]:after:w-px [&>li:not(:last-child)]:after:bg-(--toc-line) [&>li:not(:last-child)]:after:content-['']"
+              )}
+            >
+              {children.map((child) => (
+                <li key={child.url}>
+                  <TocTreeLink item={child} isActive={child.url === activeUrl} />
+                </li>
+              ))}
+            </ul>
+          ) : null}
+        </li>
+      ))}
+    </ul>
+  )
+}
+
+function TocTreeLink({ item, isActive }: { item: TOCItemType; isActive: boolean }) {
+  return (
+    <a
+      href={`#${formatSlug(item.url)}`}
+      aria-current={isActive ? 'location' : undefined}
+      className="block rounded-sm py-2 text-foreground-lighter wrap-anywhere hover:text-foreground aria-[current=location]:text-foreground focus-ring"
+    >
+      <TOCTitle title={item.title} />
+    </a>
+  )
+}
+
+interface TocTreeNode {
+  item: TOCItemType
+  children: TOCItemType[]
+}
+
+// a level 3 heading goes under the level 2 heading before it. a level 3 heading with no level 2 before it stays at the top level
+const toTocTree = (items: TOCItemType[]) =>
+  items.reduce<TocTreeNode[]>((tree, item) => {
+    const parent = tree.at(-1)
+    if (item.depth === 3 && parent?.item.depth === 2) parent.children.push(item)
+    else tree.push({ item, children: [] })
+    return tree
+  }, [])
+
 export function TOCItems({
   items,
   showTrack = false,
@@ -150,9 +212,13 @@ function TOCItem({ item }: { item: TOCItemType }) {
         item.depth >= 4 && 'ps-8'
       )}
     >
-      {formatTOCHeader(removeAnchor(item.title)).map((x, index) => (
-        <Fragment key={index}>{x.type === 'code' ? <code>{x.value}</code> : x.value}</Fragment>
-      ))}
+      <TOCTitle title={item.title} />
     </Primitive.TOCItem>
   )
+}
+
+function TOCTitle({ title }: { title: TOCItemType['title'] }) {
+  return formatTOCHeader(removeAnchor(title)).map((x, index) => (
+    <Fragment key={index}>{x.type === 'code' ? <code>{x.value}</code> : x.value}</Fragment>
+  ))
 }

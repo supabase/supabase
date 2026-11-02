@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { jwtSigningKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type JWTSigningKey = components['schemas']['SigningKeyResponse_Output']
@@ -19,6 +19,7 @@ async function getJWTSigningKeys({ projectRef }: JWTSigningKeysVariables, signal
   const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) {

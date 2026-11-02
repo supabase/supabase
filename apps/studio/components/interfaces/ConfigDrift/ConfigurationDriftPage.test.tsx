@@ -8,6 +8,8 @@ import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 
 type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
 type OrganizationResponse = platformComponents['schemas']['OrganizationResponse_Output']
@@ -120,6 +122,8 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
           db_extra_search_path: 'public,extensions',
           db_pool: null,
           db_pool_acquisition_timeout: 10,
+          db_pool_max_idletime: 10,
+          db_pool_max_lifetime: 30,
           db_schema: 'public,graphql_public',
           max_rows: 1000,
         },
@@ -179,6 +183,8 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
   }
 }
 
+const ORGANIZATION_SLUG = 'acme'
+
 function mockProject() {
   addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   addAPIMock({
@@ -186,9 +192,10 @@ function mockProject() {
     path: '/platform/organizations',
     response: () =>
       HttpResponse.json<OrganizationResponse[]>([
-        createMockOrganizationResponse({ id: ORGANIZATION_ID }),
+        createMockOrganizationResponse({ id: ORGANIZATION_ID, slug: ORGANIZATION_SLUG }),
       ]),
   })
+  mockPermissions(allPermissionsFor([ORGANIZATION_SLUG]))
 }
 
 function mockConnectedProject() {

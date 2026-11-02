@@ -19,6 +19,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
+import { CardBrandIcon } from '@/components/interfaces/Billing/Payment/PaymentMethods/CreditCard'
 import {
   NewPaymentMethodElement,
   type PaymentMethodElementRef,
@@ -31,7 +32,7 @@ import { useOrganizationTaxIdQuery } from '@/data/organizations/organization-tax
 import type { CustomerAddress, CustomerTaxId } from '@/data/organizations/types'
 import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { BASE_PATH, STRIPE_PUBLIC_KEY } from '@/lib/constants'
+import { STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
 
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
@@ -344,13 +345,7 @@ const PaymentMethodSelection = forwardRef(function PaymentMethodSelection(
                   return (
                     <SelectItem key={method.id} value={method.id}>
                       <div className="flex gap-2">
-                        <img
-                          alt="Credit Card Brand"
-                          src={`${BASE_PATH}/img/payment-methods/${method.card?.brand
-                            .replace(' ', '-')
-                            .toLowerCase()}.png`}
-                          width="32"
-                        />
+                        <CardBrandIcon brand={method.card?.brand} />
                         {label}
                       </div>
                     </SelectItem>

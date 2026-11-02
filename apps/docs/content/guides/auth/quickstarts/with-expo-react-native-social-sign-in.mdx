@@ -5,7 +5,7 @@ description: 'Learn how to implement social sign-in in an app with Expo React Na
 
 This tutorial demonstrates how to build a React Native app with [Expo](https://expo.dev) that implements social sign-in. The app showcases a complete authentication flow with protected navigation using:
 
-- [Supabase Database](/docs/guides/database/overview) - a Postgres database for storing your user data with [Row Level Security](/docs/guides/auth#row-level-security) to ensure data is protected and users can only access their own information.
+- [Supabase Database](/docs/guides/database/overview) - a Postgres database for storing your user data with [Row Level Security](/docs/guides/database/postgres/row-level-security) to ensure data is protected and users can only access their own information.
 - [Supabase Auth](/docs/guides/auth) - enables users to sign in through social sign-in providers (Apple and Google).
 
 ![The app's login screen in a web browser, an Android emulator, and an iPhone simulator. Each screen shows the Supabase logo, a Login heading, and buttons to sign in with Apple and Google.](/docs/img/supabase-expo-social-auth-login.png)
@@ -84,7 +84,7 @@ Now, create a helper file to initialize the Supabase client for both web and Rea
 
 ### Set up environment variables
 
-You need the API URL and the `publishable` key copied [earlier](#get-the-api-keys).
+You need the API URL and the `publishable` key copied [earlier](#get-api-details).
 These variables are safe to expose in your Expo app since Supabase has [Row Level Security](/docs/guides/database/postgres/row-level-security) enabled on your database.
 
 Create a `.env` file containing these variables:
@@ -225,7 +225,7 @@ For Apple authentication, you can choose between:
 - [react-apple-signin-auth](https://react-apple-signin-auth.ahmedtokyo.com/) - that supports Web, also suggested by Invertase
 - [Expo's AppleAuthentication library](https://docs.expo.dev/versions/latest/sdk/apple-authentication/) - that supports iOS only
 
-For either option, you need to obtain a Service ID from the [Apple Developer Console](/docs/guides/auth/social-sign-in/auth-apple?queryGroups=framework&framework=nextjs&queryGroups=platform&platform=web#configuration-web).
+For either option, you need to obtain a Service ID from the [Apple Developer Console](/docs/guides/auth/social-sign-in/auth-apple?queryGroups=framework&framework=nextjs&queryGroups=platform&platform=web#configuration-web-oauth).
 
 <Admonition type="note">
 
@@ -503,7 +503,7 @@ The [GN Google Sign In Free](https://react-native-google-signin.github.io/docs/i
 
 </Admonition>
 
-For either option, you need to obtain a Web Client ID from the Google Cloud Engine, as explained in the [Google Sign In](/docs/guides/auth/social-sign-in/auth-google?queryGroups=platform&platform=react-native#react-native) guide.
+For either option, you need to obtain a Web Client ID from the Google Cloud Engine, as explained in the [Google Sign In](/docs/guides/auth/social-sign-in/auth-google?queryGroups=platform&platform=react-native) guide.
 
 This guide only uses the [@react-oauth/google@latest](https://github.com/MomenSherif/react-oauth#googlelogin) option for the Web, and the [`signInWithOAuth`](/docs/reference/javascript/auth-signinwithoauth) for the mobile platforms.
 

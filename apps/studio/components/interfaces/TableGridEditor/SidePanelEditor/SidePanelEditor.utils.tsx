@@ -32,6 +32,7 @@ import { deleteDatabaseColumn } from '@/data/database-columns/database-column-de
 import { updateDatabaseColumn } from '@/data/database-columns/database-column-update-mutation'
 import type { Constraint } from '@/data/database/constraints-query'
 import { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
+import { unguarded } from '@/data/fetchers'
 import { prefetchEditorTablePage } from '@/data/prefetchers/project.$ref.editor.$id'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -98,6 +99,7 @@ const addPrimaryKey = async (
     connectionString: connectionString,
     sql: query,
     queryKey: ['primary-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -114,6 +116,7 @@ const dropConstraint = async (
     connectionString: connectionString,
     sql: query,
     queryKey: ['drop-constraint'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -134,6 +137,7 @@ const addForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -154,6 +158,7 @@ const removeForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -174,6 +179,7 @@ const updateForeignKey = async ({
     connectionString: connectionString,
     sql: query,
     queryKey: ['foreign-keys'],
+    grant: unguarded.migrating,
   })
 }
 
@@ -366,6 +372,7 @@ export const duplicateTable = async (
       duplicatedTableName,
       comment: payload.comment,
     }),
+    grant: unguarded.migrating,
   })
   await queryClient.invalidateQueries({ queryKey: tableKeys.list(projectRef, sourceTableSchema) })
 
@@ -389,6 +396,7 @@ export const duplicateTable = async (
         sourceTableSchema,
         duplicatedTableName,
       }),
+      grant: unguarded.migrating,
     })
 
     // Insert into does not copy over auto increment sequences, so we manually do it next if any
@@ -404,6 +412,7 @@ export const duplicateTable = async (
           duplicatedTableName,
           columnName: column.name,
         }),
+        grant: unguarded.migrating,
       })
     })
   }
@@ -533,6 +542,7 @@ export const createTable = async ({
         connectionString,
         sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
+        grant: unguarded.migrating,
       })
     }
   )
@@ -658,6 +668,7 @@ export const createTable = async ({
             connectionString,
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
+            grant: unguarded.migrating,
           })
         }
       }
@@ -973,6 +984,7 @@ export async function insertRowsViaSpreadsheet({
               connectionString,
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+              grant: unguarded.migrating,
             })
           )
         } catch (error) {
@@ -1021,6 +1033,7 @@ export async function insertRowsViaSpreadsheet({
             connectionString,
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
+            grant: unguarded.migrating,
           })
             .then(() => resolve({ error: insertError }))
             .catch((error) => resolve({ error }))
@@ -1077,6 +1090,7 @@ export async function insertTableRows({
               connectionString,
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+              grant: unguarded.migrating,
             })
           } catch (error) {
             insertError = error
@@ -1133,6 +1147,7 @@ export async function insertTableRows({
       connectionString,
       sql: updateSequenceSQL,
       queryKey: ['sequences', 'update-batch'],
+      grant: unguarded.migrating,
     })
     return { error: insertError }
   } catch (error) {

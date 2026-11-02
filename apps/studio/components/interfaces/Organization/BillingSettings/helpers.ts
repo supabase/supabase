@@ -7,8 +7,8 @@ const pricingMetricBytes = [
   PricingMetric.STORAGE_SIZE,
   PricingMetric.LOG_INGESTION,
   PricingMetric.LOG_QUERYING,
-  PricingMetric.ETL_COPY_BACKFILL_DATA,
-  PricingMetric.ETL_REPLICATED_DATA,
+  PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
+  PricingMetric.PIPELINES_REPLICATED_DATA,
 ]
 
 const pricingMetricNotHrs = [
@@ -63,7 +63,7 @@ export const billingMetricUnit = (pricingMetric: PricingMetric) => {
       PricingMetric.PITR_14,
       PricingMetric.PITR_28,
       PricingMetric.LOG_DRAIN,
-      PricingMetric.ETL_PIPELINE,
+      PricingMetric.PIPELINES_PIPELINE,
       PricingMetric.AUTH_MFA_PHONE,
       PricingMetric.AUTH_MFA_WEB_AUTHN,
     ].includes(pricingMetric)

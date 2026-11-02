@@ -1,24 +1,44 @@
 import { describe, expect, it } from 'vitest'
 
+import { logAttributeFilterId, logsFiltersToUrlParams } from './UnifiedLogs.filters'
 import {
   getFacetCountQuery,
   getLogsChartQuery,
   getLogsCountQuery,
+  getRequestCorrelationIds,
+  getRequestTimelineQuery,
   getUnifiedLogsQuery,
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
-import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
+import {
+  getLogsChartQuery as getLogsChartQueryBQ,
+  getLogsCountQuery as getLogsCountQueryBQ,
+  getUnifiedLogsQuery as getUnifiedLogsQueryBQ,
+} from './UnifiedLogs.queries.bq'
+import type { UnifiedLogsScope } from './UnifiedLogs.types'
+import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
 
-const baseSearch = {
+const baseSearch = createUnifiedLogsSearch({
   date: [new Date('2026-05-08T09:00:00Z'), new Date('2026-05-08T10:00:00Z')],
-} as any
+})
 
-// Helper: build a search with extra `filter` URL entries on top of the base.
-const withFilters = (...entries: string[]) => ({ ...baseSearch, filter: entries }) as any
+const withFilters = (...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries })
 
-// Helper: build a search with the cross-cutting `user` filter set, plus optional `filter` entries.
+const FUNCTION_SCOPE: UnifiedLogsScope = {
+  filters: [
+    { column: 'log_type', operator: '=', value: 'edge function' },
+    { column: 'log_type', operator: '=', value: 'edge function runtime' },
+    { column: 'function_id', operator: '=', value: 'fn-123' },
+  ],
+}
+
+const withScope = (scope: UnifiedLogsScope, ...entries: string[]) =>
+  createUnifiedLogsSearch({ ...baseSearch, filter: entries }, scope)
+const withFunctionScope = (...entries: string[]) => withScope(FUNCTION_SCOPE, ...entries)
+
 const withUser = (user: string, ...entries: string[]) =>
-  ({ ...baseSearch, user, filter: entries }) as any
+  createUnifiedLogsSearch({ ...baseSearch, user, filter: entries })
 
 describe('UnifiedLogs.queries (OTEL flat)', () => {
   describe('getUnifiedLogsQuery', () => {
@@ -68,6 +88,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
       )
     })
 
+    it('keeps edge function runtime output out of the list when a log type is excluded', () => {
+      const sql = getUnifiedLogsQuery(withFilters('log_type:neq:postgres'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'postgres_logs')`)
+      expect(where).toContain(`NOT (source = 'function_logs')`)
+    })
+
     it('projects only Compute fields that exist on worker logs', () => {
       const sql = getUnifiedLogsQuery(withFilters('log_type:eq:compute'))
       const workerCondition =
@@ -75,12 +102,14 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
       )
-      expect(sql).toContain(`if(${workerCondition}, log_attributes, map()) AS metadata`)
+      expect(sql).toContain(
+        `if(${workerCondition} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()) AS metadata`
+      )
     })
 
     it('escapes single quotes in filter values to prevent SQL injection', () => {
@@ -434,4 +463,381 @@ describe('UnifiedLogs.queries.bq', () => {
     expect(sql).toContain(expected)
     expect(sql).not.toMatch(/\bILIKE\b/)
   })
+})
+
+describe('resource-scoped logs', () => {
+  const FUNCTION_SCOPE_CONDITION = `((source = 'function_edge_logs') OR (source = 'function_logs')) AND log_attributes['function_id'] IN ('fn-123')`
+
+  describe('ClickHouse', () => {
+    it("restricts rows to the function's invocations and runtime logs instead of the default log types", () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope())
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+      expect(where).not.toContain(`source = 'postgres_logs'`)
+      expect(where).not.toContain(`source = 'edge_logs'`)
+    })
+
+    it('keeps the scope when the user narrows to one of its log types', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:eq:edge function runtime'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`((source = 'function_logs'))`)
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('still lists runtime output when the user excludes invocations from a function scope', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:neq:edge function'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`NOT (source = 'function_edge_logs')`)
+      expect(where).not.toContain(`NOT (source = 'function_logs')`)
+    })
+
+    it('keeps rows outside the scope out even when an out-of-scope log type is requested', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope('log_type:eq:postgres'))
+      const where = sql.split(/\bWHERE\b/)[1] ?? ''
+      expect(where).toContain(`((source = 'postgres_logs'))`)
+      expect(where).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('keeps every log count within the selected function', () => {
+      const scans = getLogsCountQuery(withFunctionScope()).split(/\bUNION ALL\b/)
+      expect(scans.length).toBeGreaterThan(1)
+      for (const scan of scans) expect(scan).toContain(FUNCTION_SCOPE_CONDITION)
+    })
+
+    it('keeps chart and filter counts within the selected function', () => {
+      expect(getLogsChartQuery(withFunctionScope())).toContain(FUNCTION_SCOPE_CONDITION)
+      expect(getFacetCountQuery({ search: withFunctionScope(), facet: 'status' })).toContain(
+        FUNCTION_SCOPE_CONDITION
+      )
+    })
+
+    it('labels runtime logs and preserves error and warning severity', () => {
+      const sql = getUnifiedLogsQuery(withFunctionScope())
+      expect(sql).toContain(`WHEN source = 'function_logs' THEN 'edge function runtime'`)
+      expect(sql).toContain(
+        `WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'`
+      )
+      expect(sql).toContain(
+        `WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'`
+      )
+    })
+
+    it('does not restrict project-wide searches to a resource', () => {
+      expect(getUnifiedLogsQuery(baseSearch)).not.toContain(`log_attributes['function_id']`)
+    })
+
+    it('requires logs to match both bucket inclusion and exclusion filters', () => {
+      const sql = getUnifiedLogsQuery(
+        withScope({
+          filters: [
+            { column: 'log_type', operator: '=', value: 'storage' },
+            { column: 'bucket_id', operator: '=', value: 'avatars' },
+            { column: 'bucket_id', operator: '<>', value: 'private' },
+          ],
+        })
+      )
+      expect(sql).toContain(
+        `(((source = 'storage_logs')) AND log_attributes['bucket_id'] IN ('avatars') AND log_attributes['bucket_id'] NOT IN ('private'))`
+      )
+    })
+
+    it('matches no rows when the fixed scope has no filters', () => {
+      const where = getUnifiedLogsQuery(withScope({ filters: [] })).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
+
+    it('matches no rows when an unvalidated scope filter omits its value', () => {
+      const scope = JSON.parse('{"filters":[{"column":"function_id","operator":"="}]}')
+      const where = getUnifiedLogsQuery({ ...baseSearch, scope }).split(/\bWHERE\b/)[1] ?? ''
+      expect(where.trim()).toBe('0')
+    })
+
+    it.each([
+      { operator: '~~*', label: 'substring inclusion' },
+      { operator: '!~~*', label: 'substring exclusion' },
+    ] as const)('matches no rows for unsupported function filters using $label', ({ operator }) => {
+      const where =
+        getUnifiedLogsQuery(
+          withScope({
+            filters: [{ column: 'function_id', operator, value: 'fn-%' }],
+          })
+        ).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where.trim()).toBe('0')
+    })
+
+    it.each([
+      {
+        scenario: 'includes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '~~*', value: 'permission denied' },
+        expectedCondition: "event_message ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'excludes logs whose messages contain text',
+        filter: { column: 'event_message', operator: '!~~*', value: 'permission denied' },
+        expectedCondition: "event_message NOT ILIKE '%permission denied%'",
+      },
+      {
+        scenario: 'includes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '~~*', value: '/functions/v1/example' },
+        expectedCondition: ") ILIKE '%/functions/v1/example%'",
+      },
+      {
+        scenario: 'excludes requests whose paths contain text',
+        filter: { column: 'pathname', operator: '!~~*', value: '/functions/v1/example' },
+        expectedCondition: ") NOT ILIKE '%/functions/v1/example%'",
+      },
+    ] as const)('$scenario', ({ filter, expectedCondition }) => {
+      const where =
+        getUnifiedLogsQuery(withScope({ filters: [filter] })).split(/\bWHERE\b/)[1] ?? ''
+
+      expect(where).toContain(expectedCondition)
+    })
+  })
+
+  describe('BigQuery', () => {
+    it('refuses scoped searches rather than return rows from outside the scope', () => {
+      expect(() => getUnifiedLogsQueryBQ(withFunctionScope())).toThrow(
+        'Scoped unified logs queries are only supported on ClickHouse'
+      )
+    })
+
+    it('leaves unscoped queries on the default log types', () => {
+      const sql = getUnifiedLogsQueryBQ(baseSearch)
+      expect(sql).toContain('from postgres_logs')
+      expect(sql).toContain('from edge_logs')
+      expect(sql).not.toContain('function_id')
+    })
+  })
+})
+
+describe('request timeline', () => {
+  it('reads request and execution IDs from the keys each source sets', () => {
+    expect(
+      getRequestCorrelationIds([
+        { source: 'edge_logs', attributes: { 'request.headers.cf_ray': '8f00aa-IAD' } },
+        { source: 'auth_logs', attributes: { request_id: '8f00aa-IAD' } },
+        {
+          source: 'function_edge_logs',
+          attributes: { execution_id: 'exec-1', 'request.headers.cf_ray': '8f00bb-IAD' },
+        },
+
+        { source: 'postgres_logs', attributes: { request_id: 'ignored' } },
+      ])
+    ).toEqual({
+      requestIds: ['8f00aa-IAD', '8f00bb-IAD'],
+      executionIds: ['exec-1'],
+      nativeRequestIds: [],
+      traceIds: [],
+    })
+  })
+
+  it('ignores IDs that are not plain identifiers', () => {
+    expect(
+      getRequestCorrelationIds([
+        { source: 'edge_logs', attributes: { 'request.headers.cf_ray': "x' OR 1=1 --" } },
+        { source: 'auth_logs', attributes: { request_id: 42 } },
+        { source: 'storage_logs', attributes: null },
+      ])
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
+  })
+
+  it('keeps native request IDs, traces, and legacy IDs in separate namespaces', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            'request.headers.cf_ray': '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            trace_id: '69110a42ebc24cb5a63d00fc2e8017a4',
+            span_id: '467867d205824e7d',
+          },
+        },
+        {
+          source: 'auth_logs',
+          attributes: { request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad' },
+        },
+        { source: 'unknown_logs', attributes: { trace_id: 'a'.repeat(32) } },
+      ])
+    ).toEqual({
+      requestIds: [],
+      executionIds: [],
+      nativeRequestIds: ['01a1880e-a158-7005-9fdf-e9ee66e4b6ad'],
+      traceIds: ['69110a42ebc24cb5a63d00fc2e8017a4'],
+    })
+  })
+
+  it('ignores malformed traces, standalone spans, and zero placeholders', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: '0'.repeat(32),
+            'request.headers.cf_ray': '0000',
+          },
+        },
+        {
+          source: 'function_logs',
+          attributes: {
+            execution_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: 'bad-trace',
+            span_id: '467867d205824e7d',
+            parent_span_id: 'f3addadfe21d5055',
+          },
+        },
+      ])
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
+  })
+
+  it('matches each source on its own key and orders oldest first', () => {
+    const sql = getRequestTimelineQuery({ requestIds: ['8f00aa-IAD'], executionIds: ['exec-1'] })
+    expect(sql).toContain(
+      `(source = 'edge_logs' AND (log_attributes['request.headers.cf_ray'] IN ('8f00aa-IAD') OR log_attributes['response.headers.cf_ray'] IN ('8f00aa-IAD')))`
+    )
+    expect(sql).toContain(
+      `(source = 'auth_logs' AND (log_attributes['request_id'] IN ('8f00aa-IAD')))`
+    )
+    expect(sql).toContain(
+      `(source = 'function_logs' AND (log_attributes['execution_id'] IN ('exec-1')))`
+    )
+    expect(sql).toContain('log_attributes AS metadata')
+    expect(sql).toContain('ORDER BY timestamp ASC')
+    expect(sql).toMatch(/LIMIT 200\s*$/)
+  })
+
+  it('skips execution ID conditions when there are none', () => {
+    const sql = getRequestTimelineQuery({ requestIds: ['8f00aa-IAD'], executionIds: [] })
+    expect(sql).not.toContain('execution_id')
+  })
+
+  it('refuses to build an unbounded query', () => {
+    expect(() =>
+      getRequestTimelineQuery({
+        requestIds: [],
+        executionIds: [],
+        nativeRequestIds: [],
+        traceIds: [],
+      })
+    ).toThrow()
+  })
+})
+
+describe('explicit attribute filters', () => {
+  it.each(['status', 'user', 'date', 'request:header', "key' OR 1=1 --", 'attribute.status'])(
+    'uses the stored %s key in every query surface',
+    (key) => {
+      const filter = logsFiltersToUrlParams([
+        { column: logAttributeFilterId(key), operator: '<>', value: "quoted'value" },
+      ])
+      const search = createUnifiedLogsSearch({ ...baseSearch, filter })
+      const escapedKey = key.replaceAll("'", "''")
+      for (const sql of [
+        getUnifiedLogsQuery(search),
+        getLogsCountQuery(search),
+        getLogsChartQuery(search),
+        getFacetCountQuery({ search, facet: 'pathname' }),
+      ]) {
+        expect(sql).toContain(`log_attributes['${escapedKey}'] NOT IN ('quoted''value')`)
+      }
+      expect(() => getUnifiedLogsQueryBQ(search)).toThrow(
+        'Log attribute filters are only supported on ClickHouse'
+      )
+    }
+  )
+})
+
+describe('Pipelines logs', () => {
+  const pipelineId = '03dg2o5teb2eucxr9ggh3uie6'
+
+  it.each([
+    ['list', getUnifiedLogsQuery],
+    ['counts', getLogsCountQuery],
+    ['chart', getLogsChartQuery],
+  ])('uses the same source and string identity fallback for the %s', (_, buildQuery) => {
+    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+    expect(sql).toContain("source = 'etl_replication_logs'")
+    expect(sql).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id']) IN ('03dg2o5teb2eucxr9ggh3uie6')"
+    )
+  })
+
+  it('limits an identity-only filter to Pipelines logs', () => {
+    const where = getUnifiedLogsQuery(withFilters('pipeline_id:eq:150')).split('WHERE')[1]
+    expect(where).toContain("source = 'etl_replication_logs'")
+    expect(where).not.toContain("source = 'postgres_logs'")
+    expect(where).not.toContain("source = 'edge_logs'")
+  })
+
+  it('searches pipeline ID options using the canonical identity without its own active filter', () => {
+    const sql = getFacetCountQuery({
+      search: withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'),
+      facet: 'pipeline_id',
+      facetSearch: '03dg',
+    })
+    expect(sql).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
+    )
+    expect(sql).toContain("source = 'etl_replication_logs'")
+    expect(sql).toContain("LIKE '%03dg%'")
+    expect(sql).not.toContain("IN ('150')")
+  })
+
+  it('returns pipeline ID choices without restricting them to the selected ID', () => {
+    const sql = getLogsCountQuery(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql
+      .split(/\bUNION ALL\b/)
+      .find((branch) => branch.includes("facet = 'pipeline_id'"))
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
+    )
+    expect(pipelineFacet).toContain("source = 'etl_replication_logs'")
+    expect(pipelineFacet).not.toContain("IN ('150')")
+  })
+
+  it('returns BigQuery pipeline ID choices without their own active filter', () => {
+    const sql = getLogsCountQueryBQ(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql.split('pipeline_id_count AS (')[1]?.split('\n)')[0]
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain("'pipeline_id' as dimension")
+    expect(pipelineFacet).toContain("`log_type` IN ('pipelines')")
+    expect(pipelineFacet).not.toContain("`pipeline_id` IN ('150')")
+    expect(sql).toContain('SELECT dimension, value, count FROM pipeline_id_count')
+  })
+
+  it('projects the identity and process metadata without HTTP fields', () => {
+    const sql = getUnifiedLogsQuery(withFilters('log_type:eq:pipelines'))
+    expect(sql).toContain("WHEN source = 'etl_replication_logs' THEN 'pipelines'")
+    expect(sql).toContain('AS pipeline_id')
+    expect(sql).toContain("WHEN source = 'etl_replication_logs' THEN null")
+    expect(sql).toContain("upper(coalesce(nullIf(log_attributes['level'], ''), severity_text))")
+    expect(sql).toContain(
+      "source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()"
+    )
+  })
+
+  it.each([
+    ['list', getUnifiedLogsQueryBQ],
+    ['counts', getLogsCountQueryBQ],
+    ['chart', getLogsChartQueryBQ],
+  ])('keeps the BigQuery %s compatible with an endpoint without the v2 column', (_, buildQuery) => {
+    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+    expect(sql).toContain('from etl_replication_logs as pl')
+    expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
+    expect(sql).toContain('cast(pl.pipeline_id as string)')
+    expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
+    expect(sql).not.toContain('pl.pipeline_id_v2')
+  })
+
+  it.each([getUnifiedLogsQuery, getUnifiedLogsQueryBQ])(
+    'quotes an opaque identity safely',
+    (buildQuery) => {
+      expect(buildQuery(withFilters("pipeline_id:eq:opaque' OR '1'='1"))).toContain(
+        "'opaque'' OR ''1''=''1'"
+      )
+    }
+  )
 })

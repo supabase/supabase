@@ -1,9 +1,8 @@
-import { ClockIcon } from 'lucide-react'
+import { BracesIcon } from 'lucide-react'
 import type { ComponentType, ReactNode } from 'react'
 
-import { LogFields } from '../components/LogFields'
 import type { ColumnSchema } from '../UnifiedLogs.schema'
-import { getRowTimestampMs } from '../UnifiedLogs.utils'
+import { GenericLogOverview, LogAttributes } from './components/GenericLogOverview'
 import { PostgresFlowDetail } from './components/PostgresFlowDetail'
 import {
   MemoizedEdgeFunctionBlock,
@@ -12,29 +11,26 @@ import {
   MemoizedPostgresBlock,
   MemoizedPostgRESTBlock,
   MemoizedStorageBlock,
+  MemoizedSupavisorBlock,
 } from './components/ServiceBlocks'
 import type { ServiceFlowBlockProps } from './types'
-import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
+import { CollapsibleDetailSection } from '@/components/ui/DataTable/CollapsibleDetailSection'
 
 type LogOverviewProps = Omit<ServiceFlowBlockProps, 'data'> & {
   data: ColumnSchema
-  rawData: unknown
 }
 
 function RequestOverview({ children, ...props }: LogOverviewProps & { children: ReactNode }) {
-  const timestamp = getRowTimestampMs(props.data)
   return (
     <>
-      <DetailSectionHeader
-        title="Request started"
-        className="border-b"
-        icon={ClockIcon}
-        summary={timestamp === null ? undefined : new Date(timestamp).toLocaleString()}
-      />
-      <MemoizedNetworkBlock {...props} />
+      <MemoizedNetworkBlock {...props} defaultOpen />
       {children}
     </>
   )
+}
+
+function SupavisorOverview(props: LogOverviewProps) {
+  return <MemoizedSupavisorBlock {...props} defaultOpen />
 }
 
 function PostgrestOverview(props: LogOverviewProps) {
@@ -79,11 +75,42 @@ const LOG_OVERVIEW_RENDERERS: Partial<
   auth: AuthOverview,
   storage: StorageOverview,
   'edge function': EdgeFunctionOverview,
+  supavisor: SupavisorOverview,
 }
 
-export function LogOverview(props: LogOverviewProps) {
+export function LogOverview({
+  header,
+  attributes,
+  onAddAttributeFilter,
+  ...props
+}: LogOverviewProps & {
+  header?: ReactNode
+  attributes?: ColumnSchema['metadata']
+  onAddAttributeFilter?: (key: string, value: string) => void
+}) {
   const Renderer = LOG_OVERVIEW_RENDERERS[props.data.log_type]
-  if (Renderer) return <Renderer {...props} />
 
-  return <LogFields data={props.rawData} table={props.table} filterFields={props.filterFields} />
+  return (
+    <>
+      {header}
+      {Renderer ? (
+        <>
+          <Renderer {...props} />
+          {attributes && Object.keys(attributes).length > 0 && (
+            <CollapsibleDetailSection title="Attributes" icon={BracesIcon} className="border-b">
+              <LogAttributes attributes={attributes} onAddFilter={onAddAttributeFilter} />
+            </CollapsibleDetailSection>
+          )}
+        </>
+      ) : (
+        <GenericLogOverview
+          data={props.data}
+          attributes={attributes}
+          onAddAttributeFilter={onAddAttributeFilter}
+          filterFields={props.filterFields}
+          table={props.table}
+        />
+      )}
+    </>
+  )
 }

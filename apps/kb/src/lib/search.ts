@@ -8,6 +8,9 @@ import { BASE_PATH } from './constants'
 export const KB_SEARCH_URL =
   (import.meta.env.DEV && import.meta.env.PUBLIC_KB_SEARCH_URL) || `${BASE_PATH}/api/search`
 
+// a query has to be longer than this to be searched, so nothing is submitted until the third character
+export const KB_SEARCH_MIN_CHARACTERS = 2
+
 /**
  * Reshapes one row of `api/search`'s response (`KbSearchResult`) into what the search
  * components render. `path` keeps the base path, since links are plain anchors with no router

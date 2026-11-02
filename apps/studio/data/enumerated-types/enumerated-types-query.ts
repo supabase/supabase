@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { enumeratedTypesKeys } from './keys'
 import type { components } from '@/data/api'
+import { unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type EnumeratedTypesVariables = {
@@ -27,6 +28,7 @@ export async function getEnumeratedTypes(
       connectionString,
       sql,
       queryKey: ['types'],
+      grant: unguarded.migrating,
     },
     signal
   )

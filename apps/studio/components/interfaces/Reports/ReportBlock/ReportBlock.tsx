@@ -16,6 +16,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useContentIdQuery } from '@/data/content/content-id-query'
+import { unguarded } from '@/data/fetchers'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
@@ -127,6 +128,7 @@ export const ReportBlock = ({
         projectRef,
         connectionString,
         sql: formattedSql,
+        grant: unguarded.migrating,
       })
     },
     enabled: !isLoadingContent && contentError == null && !isLogsSnippet,

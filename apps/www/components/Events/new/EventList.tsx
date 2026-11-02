@@ -1,7 +1,7 @@
 'use client'
 
 import { useEvents } from '~/app/events/context'
-import { formatHosts } from '~/lib/eventsUtils'
+import { formatHosts, getEventTimeZone } from '~/lib/eventsUtils'
 import { MapPinIcon, Rows3Icon, VideoIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button, cn } from 'ui'
@@ -17,7 +17,7 @@ const CATEGORIES_FILTERS = [
 ]
 
 export function EventList() {
-  const { isLoading, filteredEvents, selectedCategories } = useEvents()
+  const { filteredEvents, selectedCategories, isHydrated } = useEvents()
   const isOnDemandView = selectedCategories.includes('on-demand')
 
   const getCategoryLabel = (value: string) => {
@@ -25,20 +25,15 @@ export function EventList() {
     return category?.name || value
   }
 
-  if (isLoading) {
-    return <EventListSkeleton />
-  }
-
   // Group events by date
   const eventsByDate = filteredEvents.reduce(
     (acc, event) => {
-      const isDateOnly = event.date.endsWith('T12:00:00Z')
       const eventDate = new Date(event.date).toLocaleDateString('en-US', {
         weekday: 'long',
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        ...(isDateOnly ? { timeZone: 'UTC' } : {}),
+        timeZone: getEventTimeZone(event.date, event.timezone, isHydrated),
       })
 
       if (!acc[eventDate]) {
@@ -95,12 +90,14 @@ export function EventList() {
                         {new Date(event.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
+                          timeZone: getEventTimeZone(event.date, event.timezone, isHydrated),
                         })}
                         {' - '}
                         {new Date(event.end_date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
+                          timeZone: getEventTimeZone(event.end_date, event.timezone, isHydrated),
                         })}
                       </p>
                     )}
@@ -165,40 +162,6 @@ export function EventList() {
           </p>
         </div>
       )}
-    </div>
-  )
-}
-
-const EventListSkeleton = () => {
-  return (
-    <div className="flex flex-col gap-y-8">
-      {[1, 2, 3].map((groupIdx) => (
-        <div key={`skeleton-group-${groupIdx}`} className="flex flex-col gap-y-2 relative">
-          <div className="absolute top-2 left-[-59px] rounded-full size-1.5 bg-foreground-muted" />
-
-          <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-64" />
-
-          <div className="flex flex-col gap-y-4">
-            {[1, 2, 3, 4].map((eventIdx) => (
-              <div
-                key={`skeleton-event-${groupIdx}-${eventIdx}`}
-                className="bg-surface-100 border rounded-md p-3 flex justify-between items-start"
-              >
-                <div className="flex flex-col gap-2 flex-1">
-                  <div className="h-6 bg-surface-200 rounded-sm animate-pulse w-3/4" />
-
-                  <div className="flex gap-2 items-center">
-                    <div className="size-5 rounded-full bg-surface-200 animate-pulse" />
-                    <div className="h-4 bg-surface-200 rounded-sm animate-pulse w-32" />
-                  </div>
-                </div>
-
-                <div className="h-6 w-16 bg-surface-200 rounded-full animate-pulse" />
-              </div>
-            ))}
-          </div>
-        </div>
-      ))}
     </div>
   )
 }

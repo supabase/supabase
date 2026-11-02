@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -26,6 +27,7 @@ export async function createDatabaseFunction({
     connectionString,
     sql,
     queryKey: ['functions', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result as z.infer<typeof zod>

@@ -3,7 +3,7 @@ import type { SearchLabels } from './types'
 export const DEFAULT_SEARCH_LABELS: SearchLabels = {
   dialogTitle: 'Search docs',
   dialogDescription: 'Search the Supabase documentation',
-  inputPlaceholder: 'Search docs...',
+  inputPlaceholder: 'Search docs',
   inputLabel: 'Search the Supabase documentation',
   resultsLabel: 'Search results',
   clear: 'Clear',

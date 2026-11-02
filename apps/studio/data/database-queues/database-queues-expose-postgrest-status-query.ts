@@ -2,6 +2,7 @@ import { getQueuesExposePostgrestStatusSQL } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseQueuesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -22,6 +23,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     connectionString,
     sql,
     queryKey: ['queues-postgrest-expose'],
+    grant: unguarded.migrating,
   })
   return result[0].exists as boolean
 }

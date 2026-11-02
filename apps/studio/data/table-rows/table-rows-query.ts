@@ -11,7 +11,7 @@ import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { handleError } from '@/data/fetchers'
+import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
@@ -256,7 +256,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -288,7 +288,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -379,6 +379,7 @@ async function getTableRows(
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
         preflightCheck,
+        grant: unguarded.migrating,
       },
       signal
     )
