@@ -7,7 +7,7 @@ import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
 export function EventBanner() {
-  const { featuredEvent } = useEvents()
+  const { featuredEvent, displayTimeZone } = useEvents()
 
   if (!featuredEvent) return null
 
@@ -41,7 +41,11 @@ export function EventBanner() {
 
         <div className="flex flex-col justify-between gap-8">
           <div className="flex flex-row gap-6">
-            <DateWidget date={featuredEvent.date} endDate={featuredEvent.end_date} />
+            <DateWidget
+              date={featuredEvent.date}
+              endDate={featuredEvent.end_date}
+              displayTimeZone={displayTimeZone}
+            />
             <LocationWidget
               location={featuredEvent.location}
               categories={featuredEvent.categories}
@@ -79,41 +83,55 @@ export function EventBanner() {
   )
 }
 
-const DateWidget = ({ date, endDate }: { date: string; endDate?: string }) => {
+const DateWidget = ({
+  date,
+  endDate,
+  displayTimeZone,
+}: {
+  date: string
+  endDate?: string
+  displayTimeZone: 'UTC' | undefined
+}) => {
   const eventDate = new Date(date)
   // Date-only Notion events are normalized to noon UTC (T12:00:00Z); detect them
   // so we can display in UTC and suppress the fabricated time component.
   const isDateOnly = date.endsWith('T12:00:00Z')
-  const tzOption = isDateOnly ? ({ timeZone: 'UTC' } as const) : {}
+  const eventTimeZone = isDateOnly ? 'UTC' : displayTimeZone
 
   const formattedDate = eventDate.toLocaleDateString('en-US', {
     weekday: 'long',
     month: 'short',
     day: 'numeric',
-    ...tzOption,
+    timeZone: eventTimeZone,
   })
 
-  const currentYear = new Date().getFullYear()
-  const eventYear = isDateOnly ? parseInt(date.slice(0, 4), 10) : eventDate.getFullYear()
+  const currentYear = new Date().toLocaleDateString('en-US', {
+    year: 'numeric',
+    timeZone: displayTimeZone,
+  })
+  const eventYear = eventDate.toLocaleDateString('en-US', {
+    year: 'numeric',
+    timeZone: eventTimeZone,
+  })
   const formattedDateWithYear =
     eventYear !== currentYear ? `${formattedDate}, ${eventYear}` : formattedDate
+
+  const timeFormat = {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+    timeZone: displayTimeZone,
+    timeZoneName: displayTimeZone ? 'short' : undefined,
+  } as const
 
   // Only show time for events that have a real time component
   let timeDisplay: string | null = null
   if (!isDateOnly) {
-    const startTime = eventDate.toLocaleTimeString('en-US', {
-      hour: 'numeric',
-      minute: '2-digit',
-      hour12: true,
-    })
+    const startTime = eventDate.toLocaleTimeString('en-US', timeFormat)
 
     if (endDate && !endDate.endsWith('T12:00:00Z')) {
       const endEventDate = new Date(endDate)
-      const endTime = endEventDate.toLocaleTimeString('en-US', {
-        hour: 'numeric',
-        minute: '2-digit',
-        hour12: true,
-      })
+      const endTime = endEventDate.toLocaleTimeString('en-US', timeFormat)
       timeDisplay = `${startTime} - ${endTime}`
     } else {
       timeDisplay = startTime

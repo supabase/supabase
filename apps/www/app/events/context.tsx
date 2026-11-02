@@ -1,12 +1,20 @@
 'use client'
 
 import { SupabaseEvent } from '~/lib/eventsTypes'
-import { createContext, ReactNode, useContext, useMemo, useState } from 'react'
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
+  displayTimeZone: 'UTC' | undefined
   searchQuery: string
   setSearchQuery: (query: string) => void
   selectedCategories: string[]
@@ -15,6 +23,8 @@ interface EventsContextValue {
 }
 
 const EventsContext = createContext<EventsContextValue | undefined>(undefined)
+
+const subscribeToNothing = () => () => {}
 
 interface EventsProviderProps {
   children: ReactNode
@@ -33,6 +43,11 @@ export function EventsProvider({
 }: EventsProviderProps) {
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all'])
+  const isHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  )
 
   // Merge Notion + mdx + Luma events, showing only today and future.
   const allEvents = useMemo(() => {
@@ -126,6 +141,8 @@ export function EventsProvider({
     allEvents,
     filteredEvents,
     featuredEvent,
+    // UTC until hydration so server and first client render match; then the visitor's zone.
+    displayTimeZone: isHydrated ? undefined : 'UTC',
     searchQuery,
     setSearchQuery,
     selectedCategories,

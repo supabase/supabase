@@ -17,7 +17,7 @@ const CATEGORIES_FILTERS = [
 ]
 
 export function EventList() {
-  const { filteredEvents, selectedCategories } = useEvents()
+  const { filteredEvents, selectedCategories, displayTimeZone } = useEvents()
   const isOnDemandView = selectedCategories.includes('on-demand')
 
   const getCategoryLabel = (value: string) => {
@@ -34,7 +34,7 @@ export function EventList() {
         year: 'numeric',
         month: 'long',
         day: 'numeric',
-        ...(isDateOnly ? { timeZone: 'UTC' } : {}),
+        timeZone: isDateOnly ? 'UTC' : displayTimeZone,
       })
 
       if (!acc[eventDate]) {
@@ -91,12 +91,14 @@ export function EventList() {
                         {new Date(event.date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
+                          timeZone: displayTimeZone,
                         })}
                         {' - '}
                         {new Date(event.end_date).toLocaleDateString('en-US', {
                           month: 'short',
                           day: 'numeric',
                           year: 'numeric',
+                          timeZone: displayTimeZone,
                         })}
                       </p>
                     )}
