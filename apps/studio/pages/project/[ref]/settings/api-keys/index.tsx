@@ -24,7 +24,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
-  const { data: apiKeysData = [] } = useAPIKeysQuery(
+  const { data: apiKeysData = [], isSuccess: isSuccessAPIKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,
@@ -37,6 +37,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
     [apiKeysData]
   )
   const hasNewApiKeys = newApiKeys.length > 0
+  const shouldShowCreateCallout = canReadAPIKeys && isSuccessAPIKeys && !hasNewApiKeys
 
   if (!IS_PLATFORM) {
     return (
@@ -76,7 +77,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {canReadAPIKeys && !hasNewApiKeys && <ApiKeysCreateCallout />}
+      {shouldShowCreateCallout && <ApiKeysCreateCallout />}
       <LegacyAPIKeysRetirementNotice />
       <DisableInteraction disabled={!hasNewApiKeys} className="flex flex-col gap-8">
         <PublishableAPIKeys />

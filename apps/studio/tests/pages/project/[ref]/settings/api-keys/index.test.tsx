@@ -82,6 +82,7 @@ describe('/project/[ref]/settings/api-keys', () => {
     })
     mockUseAPIKeysQuery.mockReturnValue({
       data: [{ type: 'publishable' }, { type: 'secret' }],
+      isSuccess: true,
     })
   })
 
@@ -97,11 +98,20 @@ describe('/project/[ref]/settings/api-keys', () => {
   })
 
   it('renders the create callout on platform when no new keys exist', () => {
-    mockUseAPIKeysQuery.mockReturnValue({ data: [] })
+    mockUseAPIKeysQuery.mockReturnValue({ data: [], isSuccess: true })
 
     render(<ApiKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('ApiKeysCreateCallout')).toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
+  })
+
+  it('does not render the create callout while keys are loading', () => {
+    mockUseAPIKeysQuery.mockReturnValue({ data: undefined, isSuccess: false })
+
+    render(<ApiKeysPage dehydratedState={{}} />)
+
+    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
     expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
   })
 
