@@ -6,7 +6,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
   const keyName = projectKeys?.publishableKey
     ? 'SUPABASE_PUBLISHABLE_KEY'
     : 'SUPABASE_ANON_KEY'
-  const keyValue = projectKeys?.publishableKey ?? projectKeys?.anonKey ?? 'your-anon-key'
+  const keyValue = projectKeys?.publishableKey || projectKeys?.anonKey || 'your-anon-key'
 
   const files = [
     {
