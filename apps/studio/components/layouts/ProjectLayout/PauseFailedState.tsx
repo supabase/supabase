@@ -55,7 +55,10 @@ export const PauseFailedState = () => {
     if (!ref) return console.error('Project ref is required')
     if (backups.length === 0 || data?.status === 'physical-backups-enabled')
       return setShowCliBackup(true)
-    downloadBackup({ ref, backup: backups[0] })
+    downloadBackup({
+      ref,
+      backup: { id: backups[0].id, data: { id: backups[0].id, type: 'project_backup_file_url' } },
+    })
   }
 
   const downloadBackupTooltipText = isLoadingBackups

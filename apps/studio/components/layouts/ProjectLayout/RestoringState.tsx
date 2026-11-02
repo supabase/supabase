@@ -90,7 +90,13 @@ export const RestoringState = () => {
     if (!ref) return console.error('Project ref is required')
     if (logicalBackups.length === 0) return console.error('No available backups to download')
 
-    downloadBackup({ ref, backup: logicalBackups[0] })
+    downloadBackup({
+      ref,
+      backup: {
+        id: logicalBackups[0].id,
+        data: { id: logicalBackups[0].id, type: 'project_backup_file_url' },
+      },
+    })
   }
 
   const onConfirm = async () => {

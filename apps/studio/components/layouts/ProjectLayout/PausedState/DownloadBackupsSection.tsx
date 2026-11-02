@@ -87,6 +87,7 @@ export const DownloadBackupsSection = () => {
         ref,
         backup: {
           id: latestBackup,
+          data: { id: latestBackup, type: 'project_backup_file_url' },
         },
       },
       {
