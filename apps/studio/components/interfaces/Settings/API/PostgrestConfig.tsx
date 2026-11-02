@@ -62,6 +62,37 @@ import type { ResponseError } from '@/types'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
+const poolSecondsSchema = z.coerce
+  .number()
+  .int('Must be a whole number')
+  .min(1, 'Must be at least 1 second')
+  .optional()
+  .nullable()
+
+const POOL_SECONDS_FIELDS = [
+  {
+    name: 'dbPoolAcquisitionTimeout',
+    label: 'Pool acquisition timeout',
+    description:
+      "Time to wait for a connection from the Data API server's database pool before the request fails.",
+    defaultSeconds: 10,
+  },
+  {
+    name: 'dbPoolMaxLifetime',
+    label: 'Pool max lifetime',
+    description:
+      "Maximum time a connection in the Data API server's database pool is kept open before it is replaced.",
+    defaultSeconds: 1800,
+  },
+  {
+    name: 'dbPoolMaxIdletime',
+    label: 'Pool max idle time',
+    description:
+      "Time an unused connection in the Data API server's database pool stays open before it is closed.",
+    defaultSeconds: 30,
+  },
+] as const
+
 const formSchema = z.object({
   // Fields for updatePostgrestConfig
   dbSchema: z.array(z.string()),
@@ -79,6 +110,9 @@ const formSchema = z.object({
     .max(1000, "Can't be more than 1000")
     .optional()
     .nullable(),
+  dbPoolAcquisitionTimeout: poolSecondsSchema,
+  dbPoolMaxLifetime: poolSecondsSchema,
+  dbPoolMaxIdletime: poolSecondsSchema,
 
   // Default privileges toggle
   defaultPrivilegesGranted: z.boolean(),
@@ -182,6 +216,9 @@ export const PostgrestConfig = () => {
         .map((x) => x.trim())
         .filter(Boolean),
       dbPool: config?.db_pool,
+      dbPoolAcquisitionTimeout: config?.db_pool_acquisition_timeout ?? null,
+      dbPoolMaxLifetime: config?.db_pool_max_lifetime ?? null,
+      dbPoolMaxIdletime: config?.db_pool_max_idletime ?? null,
       defaultPrivilegesGranted: defaultPrivilegesGranted ?? true,
       tableIdsToAdd: [] as number[],
       tableIdsToRemove: [] as number[],
@@ -235,6 +272,9 @@ export const PostgrestConfig = () => {
             maxRows: values.maxRows,
             dbExtraSearchPath: values.dbExtraSearchPath.join(','),
             dbPool: values.dbPool ? values.dbPool : null,
+            dbPoolAcquisitionTimeout: values.dbPoolAcquisitionTimeout,
+            dbPoolMaxLifetime: values.dbPoolMaxLifetime,
+            dbPoolMaxIdletime: values.dbPoolMaxIdletime,
           },
           { onError: noop }
         )
@@ -267,6 +307,9 @@ export const PostgrestConfig = () => {
         maxRows: values.maxRows,
         dbExtraSearchPath: values.dbExtraSearchPath,
         dbPool: values.dbPool,
+        dbPoolAcquisitionTimeout: values.dbPoolAcquisitionTimeout,
+        dbPoolMaxLifetime: values.dbPoolMaxLifetime,
+        dbPoolMaxIdletime: values.dbPoolMaxIdletime,
         defaultPrivilegesGranted: values.defaultPrivilegesGranted,
         tableIdsToAdd: [],
         tableIdsToRemove: [],
@@ -649,6 +692,44 @@ export const PostgrestConfig = () => {
                       )}
                     />
                   </CardContent>
+                  {POOL_SECONDS_FIELDS.map(({ name, label, description, defaultSeconds }) => (
+                    <CardContent key={name}>
+                      <FormField
+                        control={form.control}
+                        name={name}
+                        render={({ field }) => (
+                          <FormItem>
+                            <FormItemLayout
+                              layout="flex-row-reverse"
+                              label={label}
+                              description={description}
+                            >
+                              <FormControl>
+                                <InputGroup>
+                                  <FormInputGroupInput
+                                    size="small"
+                                    disabled={!canUpdatePostgrestConfig}
+                                    {...field}
+                                    type="number"
+                                    placeholder={`Default: ${defaultSeconds}`}
+                                    onChange={(e) =>
+                                      field.onChange(
+                                        e.target.value === '' ? null : Number(e.target.value)
+                                      )
+                                    }
+                                    value={field.value ?? ''}
+                                  />
+                                  <InputGroupAddon align="inline-end">
+                                    <InputGroupText>seconds</InputGroupText>
+                                  </InputGroupAddon>
+                                </InputGroup>
+                              </FormControl>
+                            </FormItemLayout>
+                          </FormItem>
+                        )}
+                      />
+                    </CardContent>
+                  ))}
                 </>
               )}
             </form>

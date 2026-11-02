@@ -13,6 +13,9 @@ export type ProjectPostgrestConfigUpdateVariables = {
   maxRows: number
   dbExtraSearchPath: string
   dbPool: number | null
+  dbPoolAcquisitionTimeout?: number | null
+  dbPoolMaxLifetime?: number | null
+  dbPoolMaxIdletime?: number | null
 }
 
 type UpdatePostgrestConfigResponse = components['schemas']['UpdatePostgrestConfigBody']
@@ -23,6 +26,9 @@ export async function updateProjectPostgrestConfig({
   maxRows,
   dbExtraSearchPath,
   dbPool,
+  dbPoolAcquisitionTimeout,
+  dbPoolMaxLifetime,
+  dbPoolMaxIdletime,
 }: ProjectPostgrestConfigUpdateVariables) {
   const payload: UpdatePostgrestConfigResponse = {
     db_schema: dbSchema,
@@ -30,6 +36,9 @@ export async function updateProjectPostgrestConfig({
     db_extra_search_path: dbExtraSearchPath,
   }
   if (dbPool) payload.db_pool = dbPool
+  if (dbPoolAcquisitionTimeout) payload.db_pool_acquisition_timeout = dbPoolAcquisitionTimeout
+  if (dbPoolMaxLifetime) payload.db_pool_max_lifetime = dbPoolMaxLifetime
+  if (dbPoolMaxIdletime) payload.db_pool_max_idletime = dbPoolMaxIdletime
 
   const { data, error } = await patch('/platform/projects/{ref}/config/postgrest', {
     params: { path: { ref: projectRef } },
