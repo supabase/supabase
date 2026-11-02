@@ -16,6 +16,13 @@ export function isOptInLevelAtLeast(level: AiOptInLevel, minimum: AiOptInLevel):
   return OPT_IN_LEVELS.indexOf(level) >= OPT_IN_LEVELS.indexOf(minimum)
 }
 
+/** Level a support chat gets when the user ticked "allow support access": schema and logs, never data. */
+export const SUPPORT_ACCESS_OPT_IN_LEVEL: AiOptInLevel = 'schema_and_log'
+
+export function higherOptInLevel(a: AiOptInLevel, b: AiOptInLevel): AiOptInLevel {
+  return isOptInLevelAtLeast(a, b) ? a : b
+}
+
 export function lowerOptInLevel(a: AiOptInLevel, b: AiOptInLevel): AiOptInLevel {
   return isOptInLevelAtLeast(a, b) ? b : a
 }

@@ -20,6 +20,7 @@ import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
+import { higherOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL } from '@/lib/ai/opt-in-level'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   getAssistantModelEntry,
@@ -73,6 +74,7 @@ const requestBodySchema = z.object({
   chatId: z.string().optional(),
   chatName: z.string().optional(),
   supportMode: z.boolean().optional(),
+  allowSupportAccess: z.boolean().optional(),
   orgSlug: z.string().optional(),
   model: z.string().optional(),
 })
@@ -104,6 +106,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     chatName,
     model: rawRequestedModel,
     supportMode,
+    allowSupportAccess,
   } = data
 
   const requestedModel: AssistantModelId | undefined =
@@ -151,6 +154,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
       })
+    }
+
+    // Per-request override only: the org's stored opt-in level is never changed.
+    if (supportMode && allowSupportAccess && orgId !== undefined) {
+      aiOptInLevel = higherOptInLevel(aiOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL)
     }
   }
 
