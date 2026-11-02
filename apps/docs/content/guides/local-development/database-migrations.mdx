@@ -318,10 +318,10 @@ allowed_mime_types = ["image/png", "image/jpeg"]
 objects_path = "./images"
 ```
 
-This will upload files from `supabase/images` directory to a bucket named `images` in your project with one command.
+`supabase start` and `supabase db reset` create these buckets in your local stack. To create the `images` bucket in your hosted project and upload the files from the `supabase/images` directory to it, run:
 
 ```bash
-supabase seed buckets
+supabase seed buckets --remote
 ```
 
 ### Sync any schema with `--schema`

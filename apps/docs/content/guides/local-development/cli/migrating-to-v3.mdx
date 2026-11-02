@@ -221,7 +221,7 @@ env | grep ^SUPABASE_
 grep -h ^SUPABASE_ supabase/.env* .env*
 ```
 
-Set `SUPABASE_ENV` in CI so that `.env.development` doesn't apply.
+Set `SUPABASE_ENV` in CI so that `.env.development` doesn't apply, and keep `.env.local` out of CI, because it still takes precedence over `.env.<SUPABASE_ENV>`.
 
 `supabase config push` now pushes these overrides. For example, a `SUPABASE_AUTH_SITE_URL` in `.env.local` replaces the `site_url` in `[remotes.production]`. Push labels each value that came from the environment, and `supabase config diff` shows the same values, so run `config diff` before your first v3 push. See [Managing config and secrets](/docs/guides/local-development/managing-config).
 

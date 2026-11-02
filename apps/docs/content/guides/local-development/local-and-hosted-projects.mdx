@@ -232,7 +232,7 @@ jobs:
 ```
 
 - Pass credentials through environment variables. `SUPABASE_ACCESS_TOKEN` authenticates the CLI, and `SUPABASE_DB_PASSWORD` is the hosted database password.
-- Set `SUPABASE_ENV` so the CLI reads `.env.production` instead of `.env.development`.
+- Set `SUPABASE_ENV` so the CLI reads `.env.production` instead of `.env.development`. A `.env.local` file still takes precedence over `.env.production`, so keep it out of your repository and your CI workspace.
 - Add `--remote` to every command that should reach your hosted project. If the job starts a local stack, a bare `supabase db push` runs against that stack.
 - Never rely on piped answers. Pass `--yes`.
 
