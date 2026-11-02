@@ -70,6 +70,7 @@ export const TotpMfaForm = ({ authConfig, canUpdateConfig }: TotpMfaFormProps) =
       MFA_MAX_ENROLLED_FACTORS: authConfig.MFA_MAX_ENROLLED_FACTORS ?? 10,
     },
   })
+  const { isDirty } = totpForm.formState
 
   const onSubmitTotpForm: SubmitHandler<TotpFormValues> = (values) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
@@ -173,13 +174,11 @@ export const TotpMfaForm = ({ authConfig, canUpdateConfig }: TotpMfaFormProps) =
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {totpForm.formState.isDirty && (
-                  <Button onClick={() => totpForm.reset()}>Cancel</Button>
-                )}
+                {isDirty && <Button onClick={() => totpForm.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"
-                  disabled={!canUpdateConfig || isUpdatingTotpForm || !totpForm.formState.isDirty}
+                  disabled={!canUpdateConfig || isUpdatingTotpForm || !isDirty}
                   loading={isUpdatingTotpForm}
                 >
                   Save changes
