@@ -32,6 +32,67 @@ describe('buildEdgeFunctionHeaderAddActions', () => {
       { name: 'Authorization', value: 'Bearer legacy-service-role-jwt' },
     ])
   })
+  it('offers no publishable key action unless a publishable key is given', () => {
+    const actions = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_secret_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(actions.map(({ key }) => key)).toEqual(['add-auth-header', 'add-source-header'])
+  })
+
+  it('prepends a publishable key action when one is given', () => {
+    const [publishableAction, ...rest] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_secret_123',
+      publishableKey: 'sb_publishable_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.key).toBe('add-publishable-key-header')
+    expect(publishableAction.label).toBe('Add publishable key')
+    expect(publishableAction.description).toBe(
+      'For functions that accept a publishable key and authorize the request themselves'
+    )
+    expect(publishableAction.createRows()).toEqual([
+      { name: 'apikey', value: 'sb_publishable_123' },
+    ])
+    expect(rest.map(({ key }) => key)).toEqual(['add-auth-header', 'add-source-header'])
+  })
+
+  it('labels a legacy anon key in the publishable slot accordingly', () => {
+    const [publishableAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'legacy-service-role-jwt',
+      publishableKey: 'legacy-anon-jwt',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.label).toBe('Add anon key')
+    expect(publishableAction.description).toBe(
+      'Legacy anon key, for edge functions that enforce JWT verification'
+    )
+    expect(publishableAction.createRows()).toEqual([
+      { name: 'Authorization', value: 'Bearer legacy-anon-jwt' },
+    ])
+  })
+
+  it('labels the auth action after the key it carries', () => {
+    const [authAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'sb_publishable_123',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(authAction.label).toBe('Add publishable key')
+  })
+
+  it('does not mislabel a secret key passed in the publishable slot', () => {
+    const [publishableAction] = buildEdgeFunctionHeaderAddActions({
+      apiKey: 'legacy-service-role-jwt',
+      publishableKey: 'sb_secret_999',
+      createRow: (name, value) => ({ name, value }),
+    })
+
+    expect(publishableAction.label).toBe('Add secret key')
+  })
 })
 
 describe('getEdgeFunctionAuthHeader', () => {

@@ -373,6 +373,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
         projectRef: projectRef!,
         payload: {
           ...query,
+          description: query.description ?? undefined,
           content: {
             ...(query.content as LogSqlSnippets.Content),
             unchecked_sql: untrustedLogSql(currentSql),
@@ -508,6 +509,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
               defaultValue={editorValue}
               onInputChange={(v) => setEditorValue(v || '')}
               actions={{ runQuery: { enabled: true, callback: handleRun } }}
+              options={{ scrollBeyondLastLine: true }}
             />
             {rewriteProposal && (
               <div className="absolute inset-0 z-10 flex flex-col bg-studio">
@@ -516,7 +518,7 @@ export const LogsExplorerPage: NextPageWithLayout = () => {
                     Review the ClickHouse SQL rewrite before accepting it
                   </span>
                   <div className="flex items-center gap-2">
-                    <Button variant="default" size="tiny" onClick={discardRewrite}>
+                    <Button size="tiny" onClick={discardRewrite}>
                       Discard
                     </Button>
                     <Button variant="primary" size="tiny" onClick={acceptRewrite}>

@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -67,13 +67,7 @@ export function OrganizationDropdownCommandContent({
             </Link>
           </Button>
           {organizationCreationEnabled && (
-            <Button
-              variant="default"
-              block
-              size="small"
-              asChild
-              icon={<Plus size={14} strokeWidth={1.5} />}
-            >
+            <Button block size="small" asChild icon={<PlusIcon size={14} strokeWidth={1.5} />}>
               <Link
                 href="/new"
                 className="text-xs text-foreground-light hover:text-foreground"
@@ -126,7 +120,7 @@ export function OrganizationDropdownCommandContent({
                 className="cursor-pointer w-full gap-2"
                 onSelect={onClose}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <PlusIcon size={14} strokeWidth={1.5} />
                 <p>New organization</p>
               </CommandItemLink>
             </CommandGroup>

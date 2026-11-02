@@ -11,7 +11,7 @@ date: '2025-12-02T10:00'
 toc_depth: 2
 ---
 
-Today Supabase is introducing Analytics Buckets, which you can use to store huge sets of data in Supabase Storage. Postgres is great for your app. But Postgres isn't designed for analytical workloads.
+Today Supabase is introducing [Analytics Buckets](https://supabase.com/docs/guides/storage/analytics/introduction), which you can use to store huge sets of data in [Supabase Storage](/docs/guides/storage). Postgres is great for your app. But Postgres isn't designed for analytical workloads.
 
 Analytics Buckets are a specialized storage type in Supabase designed for analytical workloads and built on [Apache Iceberg](https://iceberg.apache.org) and Amazon S3. They store data in columnar Parquet format, which is optimized for scans, aggregations, and time-series queries.
 
@@ -91,7 +91,7 @@ You can create an Analytics Bucket from the Dashboard or using the SDK.
 
 5. Click Create
 
-You can use the Supabase Dashboard to define columns and set data types, including complex types like decimal with precision and scale. The foreign data wrapper schema will automatically be configured for you. Once your table is created, you can manage Analytics Buckets in the same way that you manage your Postgres tables.
+You can use the Supabase Dashboard to define columns and set data types, including complex types like decimal with precision and scale. The [foreign data wrapper](/docs/guides/database/extensions/wrappers/iceberg) schema will automatically be configured for you. Once your table is created, you can manage Analytics Buckets in the same way that you manage your Postgres tables.
 
 ### Using the SDK
 

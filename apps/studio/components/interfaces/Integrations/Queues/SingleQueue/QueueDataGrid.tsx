@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { TextSearch } from 'lucide-react'
+import { TextSearchIcon } from 'lucide-react'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -192,13 +192,13 @@ export const QueueMessagesDataGrid = ({
             </div>
           ) : (
             <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-              <TextSearch className="text-foreground-muted" strokeWidth={1} />
+              <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
               <div className="text-center">
                 <p className="text-foreground">No messages found</p>
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
-                <Button className="mt-2" onClick={() => showMessageModal()}>
+                <Button variant="primary" className="mt-2" onClick={() => showMessageModal()}>
                   Add message
                 </Button>
               </div>

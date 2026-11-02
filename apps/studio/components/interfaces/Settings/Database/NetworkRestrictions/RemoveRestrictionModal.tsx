@@ -75,8 +75,8 @@ const RemoveRestrictionModal = ({
           <AlertDialogDescription>
             <div className="flex flex-col space-y-4">
               <p>
-                The IPv4 address <code className="text-code-inline">{selectedRestriction}</code>{' '}
-                will be removed from your list of network restrictions
+                The IPv4 address <code>{selectedRestriction}</code> will be removed from your list
+                of network restrictions
                 {isRemovingOnlyRestriction
                   ? '.'
                   : ", and no longer have access to your project's database."}

@@ -1,7 +1,13 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
+import {
+  DatabaseBackupIcon,
+  DatabaseIcon,
+  HelpCircleIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
 import { toast } from 'sonner'
@@ -59,7 +65,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
         >
           <div className="flex gap-x-3">
             <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">API Load Balancer</p>
@@ -71,7 +77,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="text" icon={<MoreVertical />} className="px-1" />
+              <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
@@ -111,7 +117,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
         >
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Primary Database</p>
@@ -232,9 +238,9 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             )}
           >
             {isInTransition ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
-              <DatabaseBackup size={16} />
+              <DatabaseBackupIcon size={16} />
             )}
           </div>
           <div className="flex flex-col gap-y-0.5">
@@ -253,7 +259,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                   <Badge variant="destructive">Init failed</Badge>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle size={16} />
+                      <HelpCircleIcon size={16} />
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
@@ -311,7 +317,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
-                      barClass="bg-brand"
+                      barClass="bg-primary-bright"
                     />
                   </div>
                 </TooltipTrigger>
@@ -349,7 +355,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button variant="text" icon={<MoreVertical />} className="px-1" />
+            <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem

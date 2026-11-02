@@ -80,7 +80,7 @@ export default function AuthorClient({ author, authorId, blogs, initialView }: A
                 <Link
                   href={author.author_url}
                   target="_blank"
-                  className="text-brand hover:underline text-sm"
+                  className="text-primary hover:underline text-sm"
                 >
                   {author.author_url.includes('github.com')
                     ? 'GitHub'

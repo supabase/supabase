@@ -1,5 +1,5 @@
 import { formatDistanceToNow } from 'date-fns'
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -44,9 +44,9 @@ function CopyableId({ id, label }: { id: string; label: string }) {
     >
       <span className="truncate">{id}</span>
       {isCopied ? (
-        <Check size={12} strokeWidth={1.25} className="text-brand shrink-0" />
+        <CheckIcon size={12} strokeWidth={1.25} className="text-primary shrink-0" />
       ) : (
-        <Copy
+        <CopyIcon
           size={12}
           strokeWidth={1.25}
           className="opacity-0 group-hover:opacity-100 transition-opacity shrink-0"

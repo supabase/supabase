@@ -6,7 +6,7 @@ import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-type RealtimeConfigResponse = components['schemas']['RealtimeConfigResponse']
+type RealtimeConfigResponse = components['schemas']['RealtimeConfigResponse_Output']
 
 export type RealtimeConfigurationVariables = {
   projectRef?: string
@@ -25,6 +25,7 @@ export const REALTIME_DEFAULT_CONFIG = {
   max_payload_size_in_kb: 100,
   suspend: false,
   presence_enabled: true,
+  admin_suspended_at: null,
 } as const satisfies RealtimeConfigResponse
 
 export async function getRealtimeConfiguration(

@@ -18,7 +18,7 @@ const mocks = vi.hoisted(() => ({
 
 vi.mock('@/components/interfaces/SignIn/SignInWithExternalProvider', () => ({
   SignInWithExternalProvider: ({ provider }: { provider: ExternalIdentityProviderConfig }) => (
-    <Button>Continue with {provider.displayName}</Button>
+    <Button variant="primary">Continue with {provider.displayName}</Button>
   ),
 }))
 
@@ -29,6 +29,7 @@ vi.mock('@/components/interfaces/SignIn/SignUpForm', () => ({
     return (
       <>
         <Button
+          variant="primary"
           onClick={() => {
             setIsSubmitted(true)
             onSuccess?.()

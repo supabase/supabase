@@ -1,5 +1,12 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DatabaseIcon,
+  KeyRoundIcon,
+  Link2Icon,
+  TerminalIcon,
+} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -19,7 +26,7 @@ import { appendHighAvailabilitySslParams } from '@/components/interfaces/Connect
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
@@ -41,9 +48,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
@@ -103,7 +109,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           ? 'Loading project URL...'
           : (projectUrl ?? 'Project URL unavailable'),
         disabled: isLoadingApiUrl || !projectUrl,
-        icon: Link2,
+        icon: Link2Icon,
       },
       ...(showPublishableKey
         ? [
@@ -121,7 +127,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 isLoadingKeys ||
                 !canReadAPIKeys ||
                 !publishableKey?.api_key,
-              icon: KeyRound,
+              icon: KeyRoundIcon,
             },
           ]
         : []),
@@ -134,14 +140,14 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 ? 'Loading connection string...'
                 : directConnectionString || 'Connection string unavailable',
               disabled: isLoadingDatabases || !directConnectionString,
-              icon: Database,
+              icon: DatabaseIcon,
             },
             {
               label: 'CLI setup commands',
               value: cliCommands,
               displayValue: cliCommands.replace(/\n/g, ' - '),
               disabled: !projectRef,
-              icon: Terminal,
+              icon: TerminalIcon,
             },
           ]
         : []),
@@ -182,9 +188,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           <DropdownMenuTrigger asChild>
             <Button
               size="tiny"
-              variant="default"
               iconRight={
-                <ChevronDown
+                <ChevronDownIcon
                   size={14}
                   className={cn('transition-transform', open && 'rotate-180')}
                 />
@@ -226,10 +231,10 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                   <div
                     className={cn(
                       'absolute right-2 top-1/2 -translate-y-1/2 text-foreground-lighter opacity-0 transition-opacity group-hover:opacity-100',
-                      copiedItem === item.label && 'opacity-100 text-brand'
+                      copiedItem === item.label && 'opacity-100 text-primary'
                     )}
                   >
-                    {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
+                    {copiedItem === item.label ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
                   </div>
                 </DropdownMenuItem>
               )
@@ -237,7 +242,6 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             <DropdownMenuSeparator />
             <div className="p-1">
               <Button
-                variant="default"
                 size="tiny"
                 className="w-full"
                 onClick={() => {

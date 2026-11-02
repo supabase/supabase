@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { Home, Plus } from 'lucide-react'
+import { HomeIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Command,
@@ -79,7 +79,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
         return (
           <DropdownMenuSub key={cat.key}>
             <DropdownMenuSubTrigger className="space-x-2">
-              {cat.icon ? cat.icon() : <Home size={14} />}
+              {cat.icon ? cat.icon() : <HomeIcon size={14} />}
               <p>{cat.label}</p>
             </DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -178,7 +178,7 @@ export const MetricOptions = ({ config, handleChartSelection }: MetricOptionsPro
                   }}
                 >
                   <div className="w-full flex items-center gap-2">
-                    <Plus size={14} strokeWidth={1.5} />
+                    <PlusIcon size={14} strokeWidth={1.5} />
                     <p>Create snippet</p>
                   </div>
                 </CommandItem>

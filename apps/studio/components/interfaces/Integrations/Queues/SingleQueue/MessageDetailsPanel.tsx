@@ -2,9 +2,20 @@ import { useEscapeKeydown } from '@radix-ui/react-use-escape-keydown'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { isNil } from 'lodash'
-import { Archive, Clock12, Trash2, X } from 'lucide-react'
+import { ArchiveIcon, Clock12Icon, Trash2Icon, XIcon } from 'lucide-react'
 import { useState } from 'react'
-import { Button, ResizablePanel, Separator, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import {
+  Button,
+  ResizablePanel,
+  Separator,
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
 import { RowAction, RowData } from '@/components/interfaces/Auth/Users/UserOverview'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
@@ -80,12 +91,20 @@ export const MessageDetailsPanel = ({
       }}
       className="bg-studio border-t pointer-events-auto"
     >
-      <Button
-        variant="text"
-        className="absolute top-3 right-3 px-1"
-        icon={<X />}
-        onClick={() => setSelectedMessage(null)}
-      />
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="text"
+            className="absolute top-3 right-3 z-10 px-1"
+            icon={<XIcon />}
+            onClick={() => setSelectedMessage(null)}
+            aria-label="Close panel"
+            // Tooltip repeats the label; screen readers would read it twice
+            aria-describedby={undefined}
+          />
+        </TooltipTrigger>
+        <TooltipContent side="bottom">Close panel</TooltipContent>
+      </Tooltip>
 
       <Tabs
         value={view}
@@ -135,7 +154,7 @@ export const MessageDetailsPanel = ({
                   title="Postpone message"
                   description="The message will be postponed and won't show up in reads for 60 seconds."
                   button={{
-                    icon: <Clock12 />,
+                    icon: <Clock12Icon />,
                     text: 'Postpone',
                     isLoading: isLoadingRead,
                     onClick: () => {
@@ -161,7 +180,7 @@ export const MessageDetailsPanel = ({
                   title="Archive message"
                   description="The message will be marked as archived and hidden from future reads by consumers. You can still access the message later."
                   button={{
-                    icon: <Archive />,
+                    icon: <ArchiveIcon />,
                     text: 'Archive',
                     isLoading: isLoadingArchive,
                     variant: 'warning',
@@ -187,7 +206,7 @@ export const MessageDetailsPanel = ({
                   title="Delete message"
                   description="The message cannot be recovered afterwards."
                   button={{
-                    icon: <Trash2 />,
+                    icon: <Trash2Icon />,
                     text: 'Delete',
                     variant: 'danger',
                     isLoading: isLoadingDelete,

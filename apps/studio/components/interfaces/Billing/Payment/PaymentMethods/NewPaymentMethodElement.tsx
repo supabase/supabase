@@ -11,8 +11,7 @@ import {
   StripeAddressElementOptions,
   type SetupIntent,
 } from '@stripe/stripe-js'
-import { Form } from '@ui/components/shadcn/ui/form'
-import { Check, ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon, HelpCircleIcon } from 'lucide-react'
 import { forwardRef, useEffect, useId, useImperativeHandle, useMemo, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -26,6 +25,7 @@ import {
   CommandInput,
   CommandItem,
   CommandList,
+  Form,
   FormControl,
   FormField,
   FormItem,
@@ -354,7 +354,7 @@ export const NewPaymentMethodElement = forwardRef(
             </label>
             <Tooltip>
               <TooltipTrigger asChild>
-                <HelpCircle
+                <HelpCircleIcon
                   size={14}
                   className="text-foreground-lighter hover:text-foreground transition"
                 />
@@ -399,7 +399,6 @@ export const NewPaymentMethodElement = forwardRef(
                       <PopoverTrigger asChild>
                         <FormControl>
                           <Button
-                            variant="default"
                             role="combobox"
                             size="medium"
                             aria-expanded={showTaxIDsPopover}
@@ -409,7 +408,7 @@ export const NewPaymentMethodElement = forwardRef(
                               !selectedTaxId && 'text-muted'
                             )}
                             iconRight={
-                              <ChevronsUpDown
+                              <ChevronsUpDownIcon
                                 className="ml-2 h-4 w-4 shrink-0 opacity-50"
                                 strokeWidth={1.5}
                               />
@@ -441,7 +440,7 @@ export const NewPaymentMethodElement = forwardRef(
                                     setShowTaxIDsPopover(false)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'mr-2 h-4 w-4',
                                       selectedTaxId?.name === option.name

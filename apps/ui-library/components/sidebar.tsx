@@ -1,32 +1,32 @@
 import { Menu } from 'lucide-react'
-import { Button, ScrollArea, SheetContent, SheetTrigger } from 'ui'
+import { Button, ScrollArea, SheetContent, SheetDescription, SheetTitle, SheetTrigger } from 'ui'
 
 import { MobileMenuSheet } from './mobile-menu-sheet'
-import { ThemeSwitcherDropdown } from './theme-switcher-dropdown'
-import SideNavigation from '@/components/side-navigation'
+import { SideNavigation } from '@/components/side-navigation'
 
 export function Sidebar() {
   return (
-    <>
-      <div className="md:hidden fixed top-0 left-0 right-0 z-50 bg-background justify-between flex items-center px-8 py-3 border-b">
-        <MobileMenuSheet>
-          <SheetTrigger asChild>
-            <Button variant="outline" icon={<Menu />} />
-          </SheetTrigger>
-          <SheetContent side="left" className="p-0 w-80" showClose={false}>
-            <ScrollArea className="h-full">
-              <SideNavigation />
-            </ScrollArea>
-          </SheetContent>
-        </MobileMenuSheet>
-        <ThemeSwitcherDropdown />
-      </div>
-
-      <aside className="fixed z-30 top-0 hidden h-screen w-full shrink-0 md:sticky md:block bg-200 border-r border-muted/50">
-        <ScrollArea className="h-full">
-          <SideNavigation />
-        </ScrollArea>
-      </aside>
-    </>
+    <div className="md:hidden">
+      <MobileMenuSheet>
+        <SheetTrigger asChild>
+          <Button
+            variant="text"
+            size="tiny"
+            className="px-2"
+            icon={<Menu size={18} />}
+            aria-label="Open library navigation"
+          />
+        </SheetTrigger>
+        <SheetContent side="left" className="w-80 max-w-[90vw] p-0">
+          <SheetTitle className="sr-only">Library navigation</SheetTitle>
+          <SheetDescription className="sr-only">
+            Browse guides and blocks by category.
+          </SheetDescription>
+          <ScrollArea className="h-full">
+            <SideNavigation />
+          </ScrollArea>
+        </SheetContent>
+      </MobileMenuSheet>
+    </div>
   )
 }

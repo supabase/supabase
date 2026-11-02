@@ -183,7 +183,7 @@ export const TextEditor = ({
                 performance issues
               </p>
             </div>
-            <Button variant="default" loading={isPending} onClick={loadFullValue}>
+            <Button loading={isPending} onClick={loadFullValue}>
               Load full text data
             </Button>
           </div>

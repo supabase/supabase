@@ -35,9 +35,9 @@ export const RequiredExtensionsSection = ({
   return (
     <>
       {!hideSeparator && <Separator />}
-      <div className={cn('flex flex-col gap-y-4', className)}>
-        <h4>Required extensions</h4>
-        <Card>
+      <div className={cn('md:grid md:grid-cols-12 gap-2', className)}>
+        <h4 className="col-span-4">Required extensions</h4>
+        <Card className="col-span-8">
           <CardContent className="p-0">
             <ul className="text-foreground-light text-sm">
               {requiredExtensions.map((requiredExtension, idx) => {

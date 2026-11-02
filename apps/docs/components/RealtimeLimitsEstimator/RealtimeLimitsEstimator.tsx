@@ -2,7 +2,7 @@ import throughputTable from '~/data/realtime/throughput.json'
 import { ChevronDown } from 'lucide-react'
 import { useState } from 'react'
 import {
-  Button,
+  cn,
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
@@ -12,6 +12,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Table,
 } from 'ui'
 
 import {
@@ -113,7 +114,7 @@ export default function RealtimeLimitsEstimater({}) {
             Current maximum possible throughput
           </span>
 
-          <table className="table-auto">
+          <Table prose className="table-auto">
             <thead>
               <tr>
                 {THROUGHPUT_METRIC_HEADINGS.map((heading) => (
@@ -133,27 +134,22 @@ export default function RealtimeLimitsEstimater({}) {
                 <td className="border px-4 py-2">{limits.p95Latency}ms</td>
               </tr>
             </tbody>
-          </table>
+          </Table>
         </div>
       )}
 
       <Collapsible open={expandPreview} onOpenChange={setExpandPreview}>
-        <CollapsibleTrigger asChild>
-          <div className="py-1 flex items-center">
-            <p className="text-sm">View raw throughput table</p>
-            <Button
-              variant="text"
-              icon={
-                <ChevronDown
-                  size={18}
-                  strokeWidth={2}
-                  className={expandPreview ? 'rotate-180' : undefined}
-                />
-              }
-              className="px-1"
-              onClick={() => setExpandPreview(!expandPreview)}
-            />
-          </div>
+        <CollapsibleTrigger className="group text-base py-1 flex items-center gap-1 cursor-pointer select-none mb-10 text-foreground-light hover:text-foreground transition-colors">
+          View raw throughput table
+          <ChevronDown
+            size={14}
+            strokeWidth={2}
+            aria-hidden
+            className={cn(
+              'text-foreground-lighter group-hover:text-foreground transition-colors',
+              expandPreview && 'rotate-180'
+            )}
+          />
         </CollapsibleTrigger>
         <CollapsibleContent>
           <div>
@@ -165,7 +161,7 @@ export default function RealtimeLimitsEstimater({}) {
                   <span className="block font-heading font-semibold text-lg mt-9 mb-[18px] text-foreground">
                     {COMPUTE_LABELS[computeAddOn]}
                   </span>
-                  <table className="table-auto">
+                  <Table prose className="table-auto">
                     <thead>
                       <tr>
                         {THROUGHPUT_TABLE_HEADINGS.map((heading) => (
@@ -193,7 +189,7 @@ export default function RealtimeLimitsEstimater({}) {
                           </tr>
                         ))}
                     </tbody>
-                  </table>
+                  </Table>
                 </div>
               ))}
           </div>

@@ -286,7 +286,6 @@ export function AdvancedSection({
               actions={
                 canUpdateDiskConfiguration ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('computeSize', 'ci_large', {
                         shouldDirty: true,
@@ -365,11 +364,10 @@ export function AdvancedSection({
               type="default"
               visible={isDiskTooSmallForIopsOrThroughput && canEditDiskConfig}
               title="Increase disk size to adjust IOPS or throughput"
-              description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are limited to 4 within a rolling 24-hour window).`}
+              description={`This disk is too small to update IOPS or throughput, since gp3 volumes are capped at 500 IOPS per GB with a 3,000 IOPS minimum. Resizing to ${suggestedDiskSizeForCustomIops} GB unlocks custom IOPS and throughput, and leaves headroom for further adjustments (disk config changes are locked for 4 hours after each resize).`}
               actions={
                 !disableDiskSizeInput ? (
                   <Button
-                    variant="default"
                     onClick={() => {
                       form.setValue('totalSize', suggestedDiskSizeForCustomIops, {
                         shouldDirty: true,

@@ -1,5 +1,5 @@
 import { includes, noop } from 'lodash'
-import { Edit, Expand, Eye } from 'lucide-react'
+import { EditIcon, ExpandIcon, EyeIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -154,7 +154,7 @@ export const InputField = ({
             {isEditable && (
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <InputGroupButton variant="default" icon={<Edit />} className="px-1.5" />
+                  <InputGroupButton variant="default" icon={<EditIcon />} className="px-1.5" />
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-28">
                   {field.isNullable && (
@@ -217,7 +217,7 @@ export const InputField = ({
                 <InputGroupButton
                   data-testid={`${field.name}-field-actions`}
                   variant="default"
-                  icon={<Edit />}
+                  icon={<EditIcon />}
                   className="ml-auto px-1.5"
                 />
               </DropdownMenuTrigger>
@@ -278,7 +278,7 @@ export const InputField = ({
             <InputGroupButton
               variant="default"
               type="button"
-              icon={isEditable ? <Edit /> : <Expand />}
+              icon={isEditable ? <EditIcon /> : <ExpandIcon />}
               className="px-1.5"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
             />
@@ -408,7 +408,7 @@ export const InputField = ({
               variant="default"
               type="button"
               onClick={() => onEditJson({ column: field.name, value: field.value })}
-              icon={isEditable ? <Edit /> : <Eye />}
+              icon={isEditable ? <EditIcon /> : <EyeIcon />}
             >
               {isEditable ? 'Edit' : 'View'}
             </InputGroupButton>

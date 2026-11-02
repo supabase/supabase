@@ -278,6 +278,29 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 }
 
 /**
+ * Truncated multi-dimensional arrays are cut to their first MAX_ARRAY_SIZE entries, with an extra last entry
+ * filled with the "..." (or {"truncated":true} for json) marker, see getTableRowsSql
+ */
+const isTruncatedMultiDimArray = (value: string) => {
+  if (!value.startsWith('[[')) return false
+  try {
+    const parsed: unknown = JSON.parse(value)
+    if (!Array.isArray(parsed) || !Array.isArray(parsed[0])) return false
+
+    const lastEntry: unknown = parsed[parsed.length - 1]
+    if (!Array.isArray(lastEntry)) return false
+
+    // `every` is vacuously true for empty arrays (e.g. `[[1],[]]`), so require at least one marker
+    const flattened = lastEntry.flat(Infinity)
+    return (
+      flattened.length > 0 && flattened.every((x) => x === '...' || isEqual(x, { truncated: true }))
+    )
+  } catch {
+    return false
+  }
+}
+
+/**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
 export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
@@ -294,7 +317,7 @@ export const isValueTruncated = (value: string | null | undefined, format?: stri
       // If the array have MAX_ARRAY_SIZE elements in it
       // its a large truncated array
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
-    (typeof value === 'string' && isArrayColumn && value.startsWith('[["')) ||
+    (typeof value === 'string' && isArrayColumn && isTruncatedMultiDimArray(value)) ||
     // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
     // for array types, we're adding {"truncated": true} as the last item of the JSON to
     // maintain the JSON array structure

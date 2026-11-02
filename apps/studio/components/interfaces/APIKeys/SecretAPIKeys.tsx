@@ -1,17 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Card } from 'ui'
+import { Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui/src/components/shadcn/ui/table'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
@@ -21,13 +13,12 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
+  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
 
   const {

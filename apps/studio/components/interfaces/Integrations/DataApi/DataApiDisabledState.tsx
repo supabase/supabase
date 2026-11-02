@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle } from 'ui'
 
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -14,7 +14,7 @@ export const DataApiDisabledState = ({ description }: DataApiDisabledStateProps)
   return (
     <div className="flex w-full p-10">
       <Alert className="max-w-md mx-auto">
-        <AlertCircle size={16} />
+        <AlertCircleIcon size={16} />
         <AlertTitle>Data API is disabled</AlertTitle>
         <AlertDescription>
           Enable the Data API in the{' '}

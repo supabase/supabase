@@ -1,16 +1,18 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Archive, Cpu, Database, GitBranch, Github } from 'lucide-react'
+import { ArchiveIcon, CpuIcon, DatabaseIcon, GitBranchIcon } from 'lucide-react'
 import { useMemo } from 'react'
-import { cn, Skeleton } from 'ui'
+import { cn, GithubIcon, Skeleton } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { HighAvailabilityBadge } from './HighAvailabilityBadge'
 import { ServiceStatus } from './ServiceStatus'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { ComputeBadgeWrapper } from '@/components/ui/ComputeBadgeWrapper'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { SingleStat } from '@/components/ui/SingleStat'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useBackupsQuery } from '@/data/database/backups-query'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
@@ -19,6 +21,7 @@ import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { EMPTY_ARR } from '@/lib/void'
 
 interface BranchStatValueProps {
@@ -83,16 +86,20 @@ export const ActivityStats = () => {
   const projectResourceWarnings = resourceWarnings?.find((warning) => warning.project === ref)
   const parentProjectRef = project?.parent_project_ref ?? project?.ref
 
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
   const {
     data: branchesData,
-    isPending: isLoadingBranches,
-    isError: isBranchesError,
-  } = useBranchesQuery(
-    {
-      projectRef: parentProjectRef,
-    },
-    { enabled: !isHighAvailability }
-  )
+    isPending: isPendingBranches,
+    isError: isBranchesQueryError,
+  } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    enabled: !isHighAvailability,
+  })
+  const isLoadingBranches =
+    branchesGrant.status === 'loading' || (branchesGrant.status === 'granted' && isPendingBranches)
+  const isBranchesError = isBranchesQueryError || branchesGrant.status === 'error'
   const isDefaultProject = project?.parent_project_ref === undefined
   const currentBranch = useMemo(
     () => (branchesData ?? []).find((b) => b.project_ref === ref),
@@ -157,8 +164,9 @@ export const ActivityStats = () => {
         <ServiceStatus />
 
         <SingleStat
-          icon={<Cpu size={18} strokeWidth={1.5} className="text-foreground" />}
-          label={<span>Compute</span>}
+          href={getInfrastructurePath(ref)}
+          icon={<CpuIcon size={18} strokeWidth={1.5} className="text-foreground" />}
+          label={<span>Compute size</span>}
           value={
             <div className="flex items-center gap-x-2 gap-y-1 flex-wrap">
               {project?.infra_compute_size ? (
@@ -179,7 +187,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={integrationsPath}
-          icon={<Github size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<GithubIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>GitHub</span>}
           value={
             isLoadingGithubConnections ? (
@@ -198,7 +206,7 @@ export const ActivityStats = () => {
         <DisableInteraction disabled={isHighAvailability} aria-disabled={isHighAvailability}>
           <SingleStat
             href={isHighAvailability ? undefined : `/project/${ref}/branches`}
-            icon={<GitBranch size={18} strokeWidth={1.5} className="text-foreground" />}
+            icon={<GitBranchIcon size={18} strokeWidth={1.5} className="text-foreground" />}
             label={<span>{isDefaultProject ? 'Recent branch' : 'Branch Created'}</span>}
             trackingProperties={{
               stat_type: 'branches',
@@ -219,7 +227,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={`/project/${ref}/database/migrations`}
-          icon={<Database size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<DatabaseIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last migration</span>}
           trackingProperties={{
             stat_type: 'migrations',
@@ -244,7 +252,7 @@ export const ActivityStats = () => {
 
         <SingleStat
           href={`/project/${ref}/database/backups/scheduled`}
-          icon={<Archive size={18} strokeWidth={1.5} className="text-foreground" />}
+          icon={<ArchiveIcon size={18} strokeWidth={1.5} className="text-foreground" />}
           label={<span>Last backup</span>}
           trackingProperties={{
             stat_type: 'backups',

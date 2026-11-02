@@ -28,7 +28,7 @@ For frontend apps, the Data API is the usual choice. You can keep your data secu
 - Turn on [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS) for your tables and properly configure your access policies to grant the least privileges necessary for your app to function
 - Use your Supabase **publishable key** when you create a Supabase client
 
-Your publishable key is safe to expose with RLS enabled, because row access permission is checked against your access policies and the user's [JSON Web Token (JWT)](/docs/learn/auth-deep-dive/auth-deep-dive-jwts). The JWT is automatically sent by the Supabase client libraries if the user is logged in using Supabase Auth.
+Your publishable key is safe to expose with RLS enabled, because row access permission is checked against your access policies and the user's [JSON Web Token (JWT)](/docs/learn/auth-deep-dive/auth-deep-dive-jwts). The JWT is automatically sent by the Supabase client libraries if the user is signed in using Supabase Auth.
 
 Older projects may also show an `anon` key. Treat it like a publishable key: it can identify your project, but it is not a secret and must be paired with RLS and least-privilege grants.
 

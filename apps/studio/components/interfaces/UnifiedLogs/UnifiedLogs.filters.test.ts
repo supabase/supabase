@@ -10,7 +10,7 @@ import {
 } from './UnifiedLogs.filters'
 
 describe('columnFiltersToLogsFilters', () => {
-  it('serializes a bare string[] (sidebar checkbox) using the default `=` operator', () => {
+  it('serializes a bare string[] (defensive fallback for un-wrapped input) using the default `=` operator', () => {
     const filters = columnFiltersToLogsFilters([
       { id: 'log_type', value: ['postgres', 'postgrest'] },
     ])
@@ -58,12 +58,14 @@ describe('columnFiltersToLogsFilters', () => {
 })
 
 describe('logsFiltersToColumnFilters', () => {
-  it('seeds an `=` group as a bare string[] so sidebar checkboxes render ticked', () => {
+  it('seeds an `=` group as { operator, values }, the shape every column filter uses', () => {
     const columnFilters = logsFiltersToColumnFilters([
       { column: 'log_type', operator: '=', value: 'postgres' },
       { column: 'log_type', operator: '=', value: 'postgrest' },
     ])
-    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres', 'postgrest'] }])
+    expect(columnFilters).toEqual([
+      { id: 'log_type', value: { operator: '=', values: ['postgres', 'postgrest'] } },
+    ])
   })
 
   it('keeps non-eq groups wrapped so the operator survives a round-trip', () => {
@@ -75,17 +77,14 @@ describe('logsFiltersToColumnFilters', () => {
     ])
   })
 
-  it('round-trips an eq URL filter back to the same param without flipping the operator', () => {
-    const seeded = logsFiltersToColumnFilters(parseLogsFilterUrlParams(['method:eq:GET']))
-    const update = buildFilterSearchUpdate(seeded, [{ value: 'method', type: 'checkbox' }])
-    expect(update.filter).toEqual(['method:eq:GET'])
-  })
-
-  it('round-trips a neq URL filter without downgrading it to eq', () => {
-    const seeded = logsFiltersToColumnFilters(parseLogsFilterUrlParams(['method:neq:GET']))
-    const update = buildFilterSearchUpdate(seeded, [{ value: 'method', type: 'checkbox' }])
-    expect(update.filter).toEqual(['method:neq:GET'])
-  })
+  it.each(['method:eq:GET', 'method:neq:GET'])(
+    'round-trips the URL filter %s back to the same param without changing the operator',
+    (param) => {
+      const seeded = logsFiltersToColumnFilters(parseLogsFilterUrlParams([param]))
+      const update = buildFilterSearchUpdate(seeded, [{ value: 'method', type: 'checkbox' }])
+      expect(update.filter).toEqual([param])
+    }
+  )
 })
 
 describe('buildFilterSearchUpdate', () => {
@@ -95,7 +94,7 @@ describe('buildFilterSearchUpdate', () => {
     { value: 'method', type: 'checkbox' },
   ]
 
-  it('serializes a bare sidebar checkbox into the `filter` param (the regression)', () => {
+  it('serializes a bare string[] into the `filter` param (defensive fallback for un-wrapped input)', () => {
     const update = buildFilterSearchUpdate([{ id: 'log_type', value: ['postgres'] }], fields)
     expect(update.filter).toEqual(['log_type:eq:postgres'])
   })
@@ -137,7 +136,7 @@ describe('buildDefaultColumnFilters', () => {
       date: range,
     })
     expect(columnFilters).toEqual([
-      { id: 'log_type', value: ['postgres'] },
+      { id: 'log_type', value: { operator: '=', values: ['postgres'] } },
       { id: 'date', value: range },
     ])
 
@@ -146,18 +145,13 @@ describe('buildDefaultColumnFilters', () => {
     expect(update.date).toBe(range)
   })
 
-  it('omits `date` when no range is present, matching the pre-existing no-filter case', () => {
-    expect(buildDefaultColumnFilters({ filter: ['log_type:eq:postgres'], date: null })).toEqual([
-      { id: 'log_type', value: ['postgres'] },
+  it.each([
+    ['no range is present', null],
+    ['the range is a malformed single element', [new Date('2026-05-08T00:00:00Z')]],
+  ])('omits `date` when %s', (_, date) => {
+    expect(buildDefaultColumnFilters({ filter: ['log_type:eq:postgres'], date })).toEqual([
+      { id: 'log_type', value: { operator: '=', values: ['postgres'] } },
     ])
-  })
-
-  it('omits `date` for a malformed single-element range', () => {
-    const columnFilters = buildDefaultColumnFilters({
-      filter: ['log_type:eq:postgres'],
-      date: [new Date('2026-05-08T00:00:00Z')],
-    })
-    expect(columnFilters).toEqual([{ id: 'log_type', value: ['postgres'] }])
   })
 
   it('does not duplicate the `date` id when a hand-crafted `filter` param also targets it', () => {

@@ -35,8 +35,9 @@ vi.mock('@/data/api-keys/api-key-delete-mutation', () => ({
   useAPIKeyDeleteMutation: mockUseAPIKeyDeleteMutation,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_READ: 'api_gateway_keys_read' } },
 }))
 
 vi.mock('./CreatePublishableAPIKeyDialog', () => ({
@@ -76,7 +77,7 @@ describe('PublishableAPIKeys', () => {
     })
   })
 
-  it('renders the table with publishable keys', () => {
+  it('renders the table with publishable keys and the create button on platform', () => {
     mockUseAPIKeysQuery.mockReturnValue({
       data: [publishableKey],
       isPending: false,
@@ -87,6 +88,7 @@ describe('PublishableAPIKeys', () => {
     render(<PublishableAPIKeys />)
 
     expect(screen.getByText('api-key-row:default-publishable')).toBeInTheDocument()
+    expect(screen.getByText('CreatePublishableAPIKeyDialog')).toBeInTheDocument()
     expect(screen.queryByText('No publishable API keys found')).not.toBeInTheDocument()
   })
 
@@ -143,18 +145,5 @@ describe('PublishableAPIKeys', () => {
     render(<PublishableAPIKeys />)
 
     expect(screen.queryByText('CreatePublishableAPIKeyDialog')).not.toBeInTheDocument()
-  })
-
-  it('shows the create button on platform', () => {
-    mockUseAPIKeysQuery.mockReturnValue({
-      data: [publishableKey],
-      isPending: false,
-      isSuccess: true,
-      isError: false,
-    })
-
-    render(<PublishableAPIKeys />)
-
-    expect(screen.getByText('CreatePublishableAPIKeyDialog')).toBeInTheDocument()
   })
 })

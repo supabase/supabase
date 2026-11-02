@@ -7,6 +7,7 @@ import {
   MetaQueryResponse,
   ReportQueryDb,
 } from '@/components/interfaces/Reports/Reports.types'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -77,6 +78,7 @@ const useDbQuery = ({
           projectRef: project?.ref,
           connectionString: effectiveConnectionString,
           sql: resolvedSql,
+          grant: unguarded.migrating,
         },
         signal
       ).then((res) => res.result) as Promise<MetaQueryResponse>

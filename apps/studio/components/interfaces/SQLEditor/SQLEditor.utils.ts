@@ -263,10 +263,9 @@ export function resolveConnectionString(
 
 /**
  * Whether a query run should lazily kick off AI title generation for the
- * snippet: only when the org has AI enabled (not disabled/HIPAA — which would
- * silently forward the query to the AI provider without consent), the
- * snippet still has its placeholder name, and we're running on the hosted
- * platform.
+ * snippet: only when the org has AI enabled (a disabled org would silently
+ * forward the query to the AI provider without consent), the snippet still
+ * has its placeholder name, and we're running on the hosted platform.
  */
 export function shouldAutoGenerateTitle({
   aiOptInLevel,

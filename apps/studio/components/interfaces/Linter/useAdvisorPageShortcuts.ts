@@ -12,8 +12,8 @@ interface UseAdvisorPageShortcutsParams {
 }
 
 /**
- * Registers shortcuts that apply across the Security and Performance Advisor
- * pages:
+ * Registers shortcuts that apply across the Health, Security, and Performance
+ * Advisor pages:
  *   - 1 / 2 / 3: switch to Errors / Warnings / Info tab
  *   - Shift+R: rerun the linter
  *   - Escape: close the lint detail panel (only when a lint is selected)

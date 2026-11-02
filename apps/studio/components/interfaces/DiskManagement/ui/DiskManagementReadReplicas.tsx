@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { Alert, AlertDescription, AlertTitle, InfoIcon } from 'ui'
 
 import { BillingChangeBadge } from './BillingChangeBadge'

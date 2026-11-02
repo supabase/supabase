@@ -9,7 +9,6 @@ const getInitialState = () => {
     showProjectApiDocs: false,
     showCreateBranchModal: false,
     showAiSettingsModal: false,
-    ongoingQueriesPanelOpen: false,
     mobileMenuOpen: false,
     showSidebar: true,
     showEditorPanel: false,
@@ -59,11 +58,6 @@ export const appState = proxy({
   showSidebar: true,
   setShowSidebar: (value: boolean) => {
     appState.showSidebar = value
-  },
-
-  showOngoingQueriesPanelOpen: false,
-  setOnGoingQueriesPanelOpen: (value: boolean) => {
-    appState.ongoingQueriesPanelOpen = value
   },
 
   mobileMenuOpen: false,

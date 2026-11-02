@@ -1,6 +1,6 @@
 import parser from 'cron-parser'
 import dayjs from 'dayjs'
-import { Copy, Edit, Minus, MoreVertical, Play, Trash } from 'lucide-react'
+import { CopyIcon, EditIcon, MinusIcon, MoreVerticalIcon, PlayIcon, TrashIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -153,7 +153,7 @@ export const CronJobTableCell = ({
                   variant="text"
                   loading={isRunning}
                   className="h-6 w-6"
-                  icon={<MoreVertical />}
+                  icon={<MoreVerticalIcon />}
                   onClick={(e) => e.stopPropagation()}
                   aria-label={`${jobname} actions`}
                 />
@@ -171,7 +171,7 @@ export const CronJobTableCell = ({
                     onRunCronJob()
                   }}
                 >
-                  <Play size={12} />
+                  <PlayIcon size={12} />
                   Run command
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -187,7 +187,7 @@ export const CronJobTableCell = ({
                 onSelectEdit(row)
               }}
             >
-              <Edit size={12} />
+              <EditIcon size={12} />
               Edit job
             </DropdownMenuItem>
             <DropdownMenuSeparator />
@@ -198,7 +198,7 @@ export const CronJobTableCell = ({
                 onSelectDelete(row)
               }}
             >
-              <Trash size={12} />
+              <TrashIcon size={12} />
               Delete job
             </DropdownMenuItem>
           </DropdownMenuContent>
@@ -239,9 +239,7 @@ export const CronJobTableCell = ({
               </p>
             </DialogSection>
             <DialogFooter>
-              <Button variant="default" onClick={() => setShowToggleModal(false)}>
-                Cancel
-              </Button>
+              <Button onClick={() => setShowToggleModal(false)}>Cancel</Button>
               <Button
                 variant={active ? 'warning' : 'primary'}
                 loading={isToggling}
@@ -262,7 +260,7 @@ export const CronJobTableCell = ({
         <div className={cn('w-full flex items-center text-xs')}>
           {['latest_run', 'next_run'].includes(col.id) ? (
             !hasValue ? (
-              <Minus size={14} className="text-foreground-lighter" />
+              <MinusIcon size={14} className="text-foreground-lighter" />
             ) : col.id === 'latest_run' && formattedValue === null ? (
               <p className="text-foreground-lighter">Job has not been run yet</p>
             ) : col.id === 'next_run' && !formattedValue ? (
@@ -325,7 +323,7 @@ export const CronJobTableCell = ({
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => copyToClipboard(formattedValue)}
         >
-          <Copy size={12} />
+          <CopyIcon size={12} />
           <span>Copy {col.name.toLowerCase()}</span>
         </ContextMenuItem>
 
@@ -337,7 +335,7 @@ export const CronJobTableCell = ({
           <Tooltip>
             <TooltipTrigger asChild>
               <div className="flex items-center gap-x-2 w-full">
-                <Edit size={12} />
+                <EditIcon size={12} />
                 <span>Edit job</span>
               </div>
             </TooltipTrigger>
@@ -357,7 +355,7 @@ export const CronJobTableCell = ({
           onFocusCapture={(e) => e.stopPropagation()}
           onSelect={() => onSelectDelete(row)}
         >
-          <Trash size={12} />
+          <TrashIcon size={12} />
           <span>Delete job</span>
         </ContextMenuItem>
       </ContextMenuContent>

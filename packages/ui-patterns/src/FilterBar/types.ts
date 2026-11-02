@@ -58,6 +58,12 @@ export type FilterProperty = {
   type: 'string' | 'number' | 'date' | 'boolean'
   options?: FilterOption[] | AsyncOptionsFunction | SyncOptionsFunction | CustomOptionObject
   operators?: FilterOperator[]
+  /** Whether this property can be added or selected when changing a filter. Defaults to true. */
+  isAvailable?: boolean
+  /** Only offer this property in the root group, not inside nested groups. Defaults to false. */
+  topLevelOnly?: boolean
+  /** Display a readable label while preserving the underlying value for editing. */
+  formatValue?: (value: FilterCondition['value']) => string
 }
 
 export type FilterCondition = {
@@ -104,6 +110,7 @@ export type MenuItem = {
   isFreeformSearch?: boolean
   freeformPropertyName?: string
   freeformValue?: string
+  disabled?: boolean
 }
 
 export type GroupedMenuItem = {

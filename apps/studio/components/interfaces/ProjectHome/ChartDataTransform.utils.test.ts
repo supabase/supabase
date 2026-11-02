@@ -7,25 +7,28 @@ import type { LogsBarChartDatum } from './ProjectUsage.metrics'
 describe('normalizeChartBuckets', () => {
   const now = dayjs('2024-01-28T12:00:00.000Z')
 
+  it.each([
+    ['1hr', 30, 2, 'minute'],
+    ['1day', 24, 1, 'hour'],
+    ['7day', 28, 6, 'hour'],
+  ] as const)(
+    'creates %s buckets: %s empty buckets %s %s(s) apart, ending one step before now',
+    (interval, count, step, unit) => {
+      const result = normalizeChartBuckets([], interval, now.toDate())
+
+      expect(result).toHaveLength(count)
+      expect(result[0].timestamp).toBe(now.subtract(count * step, unit).toISOString())
+      expect(result[count - 1].timestamp).toBe(now.subtract(step, unit).toISOString())
+      result.forEach((bucket, i) => {
+        expect(bucket).toMatchObject({ ok_count: 0, warning_count: 0, error_count: 0 })
+        if (i > 0) {
+          expect(dayjs(bucket.timestamp).diff(dayjs(result[i - 1].timestamp), unit)).toBe(step)
+        }
+      })
+    }
+  )
+
   describe('1hr interval', () => {
-    it('should create exactly 30 buckets with 2-minute intervals', () => {
-      const result = normalizeChartBuckets([], '1hr', now.toDate())
-
-      expect(result).toHaveLength(30)
-
-      // Check first bucket
-      expect(result[0].timestamp).toBe(now.subtract(60, 'minute').toISOString())
-
-      // Check last bucket
-      expect(result[29].timestamp).toBe(now.subtract(2, 'minute').toISOString())
-
-      // Check all buckets are 2 minutes apart
-      for (let i = 0; i < result.length - 1; i++) {
-        const diff = dayjs(result[i + 1].timestamp).diff(dayjs(result[i].timestamp), 'minute')
-        expect(diff).toBe(2)
-      }
-    })
-
     it('should aggregate data points into correct 2-minute buckets', () => {
       const data: LogsBarChartDatum[] = [
         {
@@ -63,38 +66,9 @@ describe('normalizeChartBuckets', () => {
       expect(bucket15.warning_count).toBe(2)
       expect(bucket15.error_count).toBe(0)
     })
-
-    it('should return empty buckets when no data provided', () => {
-      const result = normalizeChartBuckets([], '1hr', now.toDate())
-
-      expect(result).toHaveLength(30)
-      result.forEach((bucket) => {
-        expect(bucket.ok_count).toBe(0)
-        expect(bucket.warning_count).toBe(0)
-        expect(bucket.error_count).toBe(0)
-      })
-    })
   })
 
   describe('1day interval', () => {
-    it('should create exactly 24 buckets with 1-hour intervals', () => {
-      const result = normalizeChartBuckets([], '1day', now.toDate())
-
-      expect(result).toHaveLength(24)
-
-      // Check first bucket
-      expect(result[0].timestamp).toBe(now.subtract(24, 'hour').toISOString())
-
-      // Check last bucket
-      expect(result[23].timestamp).toBe(now.subtract(1, 'hour').toISOString())
-
-      // Check all buckets are 1 hour apart
-      for (let i = 0; i < result.length - 1; i++) {
-        const diff = dayjs(result[i + 1].timestamp).diff(dayjs(result[i].timestamp), 'hour')
-        expect(diff).toBe(1)
-      }
-    })
-
     it('should aggregate multiple data points into hourly buckets', () => {
       const data: LogsBarChartDatum[] = [
         {
@@ -121,24 +95,6 @@ describe('normalizeChartBuckets', () => {
   })
 
   describe('7day interval', () => {
-    it('should create exactly 28 buckets with 6-hour intervals', () => {
-      const result = normalizeChartBuckets([], '7day', now.toDate())
-
-      expect(result).toHaveLength(28)
-
-      // Check first bucket (7 days = 168 hours ago)
-      expect(result[0].timestamp).toBe(now.subtract(168, 'hour').toISOString())
-
-      // Check last bucket
-      expect(result[27].timestamp).toBe(now.subtract(6, 'hour').toISOString())
-
-      // Check all buckets are 6 hours apart
-      for (let i = 0; i < result.length - 1; i++) {
-        const diff = dayjs(result[i + 1].timestamp).diff(dayjs(result[i].timestamp), 'hour')
-        expect(diff).toBe(6)
-      }
-    })
-
     it('should aggregate data points into 6-hour buckets', () => {
       const data: LogsBarChartDatum[] = [
         {

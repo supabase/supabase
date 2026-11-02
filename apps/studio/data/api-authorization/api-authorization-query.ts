@@ -2,7 +2,7 @@ import type { OAuthScope } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 
 import { resourceKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { UseCustomQueryOptions } from '@/types'
 
 export type ApiAuthorizationVariables = {
@@ -31,6 +31,7 @@ export async function getApiAuthorizationDetails(
   const { data, error } = await get('/platform/oauth/authorizations/{id}', {
     params: { path: { id } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

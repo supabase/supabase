@@ -16,7 +16,7 @@ import { THRESHOLD_COUNT } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { ChevronDown, List } from 'lucide-react'
+import { ChevronDownIcon, ListIcon } from 'lucide-react'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Button, Popover, PopoverContent, PopoverSeparator, PopoverTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -236,7 +236,7 @@ export const SortPopoverPrimitive = ({
     <>
       <Popover modal={false} open={open} onOpenChange={setOpen}>
         <PopoverTrigger asChild>
-          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<List />}>
+          <Button variant={localSorts.length > 0 ? 'link' : 'text'} icon={<ListIcon />}>
             {displayButtonText}
           </Button>
         </PopoverTrigger>
@@ -292,7 +292,7 @@ export const SortPopoverPrimitive = ({
                   <Button
                     asChild
                     variant="dashed"
-                    iconRight={<ChevronDown size="14" className="text-foreground-light" />}
+                    iconRight={<ChevronDownIcon size="14" className="text-foreground-light" />}
                     className="my-1"
                     data-testid="table-editor-pick-column-to-sort-button"
                   >

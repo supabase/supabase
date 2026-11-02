@@ -12,7 +12,7 @@ date: 2025-09-16T08:00
 toc_depth: 2
 ---
 
-Over the past few months, there’s been renewed discussion around the risks of connecting MCP servers to databases containing private data. A recent blog post by the team at General Analysis ran the headline “Supabase MCP can leak your entire SQL database.” They went on to show that if you spin up a Supabase instance with Row Level Security and a default MCP server accessed through Cursor you could create a scenario where a Stored Prompt Injection attack could be launched. They put instructions into data fields that would direct the MCP server to pull private data from the database and write it back to the text field the attacker was able to see when a developer used an AI agent to connect and read those fields. (full post [here](https://www.generalanalysis.com/blog/supabase-mcp-blog)).
+Over the past few months, there’s been renewed discussion around the risks of connecting MCP servers to databases containing private data. A recent blog post by the team at General Analysis ran the headline “Supabase MCP can leak your entire SQL database.” They went on to show that if you spin up a Supabase instance with [Row Level Security](/docs/guides/database/postgres/row-level-security) and a default [MCP server](/features/mcp-server) accessed through Cursor you could create a scenario where a Stored Prompt Injection attack could be launched. They put instructions into data fields that would direct the MCP server to pull private data from the database and write it back to the text field the attacker was able to see when a developer used an AI agent to connect and read those fields. (full post [here](https://www.generalanalysis.com/blog/supabase-mcp-blog)).
 
 My initial reaction was to debate the MCP server setup but I realized that this is the new reality. Vibe coders are not creating separate Production and Staging environments, they are developing on production databases.
 
@@ -89,7 +89,7 @@ If you’re running the full stack including the LLM, strongly consider using Ca
 
 ## Our MCP Recommendations
 
-From our [MCP security guide](/docs/guides/getting-started/mcp#recommendations):
+From our [MCP security guide](/docs/guides/ai-tools/mcp#recommendations):
 
 1. Use MCP with non-production data.
 2. Keep manual approval enabled in your MCP client and Beware the “”Always Approve”
@@ -102,7 +102,7 @@ We’re prioritizing a set of security-focused improvements:
 
 - **Self-hosted MCP support** — making it easier to run MCP against a safe, isolated environment.
 - **Production mode** — a project setting that locks down riskier behaviors when real customer data is involved.
-- **Branching** — enabling safer experimentation on isolated branches before merging changes.
+- **[Branching](/features/branching)** — enabling safer experimentation on isolated branches before merging changes.
 - **PostgREST MCP** — leveraging your existing PostgREST permissions and RLS policies.
 - **Access token scopes** — fine-grained API tokens with explicit tool-level and data-level permissions.
 

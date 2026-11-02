@@ -27,6 +27,8 @@ To mock API requests, we use the `msw` library.
 
 Global mocks can be found in `tests/lib/msw-global-api-mocks.ts`.
 
+To mock the current user's FGA permissions, use `mockPermissions` (with `allPermissionsFor` or `NO_PERMISSIONS` from `tests/lib/permissions-fixtures.ts`) or `mockPermissionsError` from `tests/lib/msw-permissions.ts`.
+
 To mock an endpoint you can use the `addAPIMock` function. Make sure to add the mock in the `beforeEach` hook. It won't work with `beforeAll` if you have many tests.
 
 ```ts

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type APIKeyCreateVariables = {
@@ -35,6 +35,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
       name: payload.name,
       description: payload.description || null,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

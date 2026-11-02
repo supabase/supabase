@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -31,6 +32,7 @@ export async function deleteDatabaseQueueMessage({
     connectionString,
     sql: safeSql`SELECT * FROM pgmq.delete(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result

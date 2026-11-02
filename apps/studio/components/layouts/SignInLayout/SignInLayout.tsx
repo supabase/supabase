@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { getAccessToken, useFlag } from 'common'
+import { getAccessToken } from 'common'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -7,6 +7,7 @@ import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { cn } from 'ui'
 
+import { useStatusBanner } from '@/components/layouts/AppLayout/useStatusBanner'
 import {
   DestinationLogo,
   InterstitialLayout,
@@ -41,6 +42,12 @@ type SignInLayoutProps = {
    * ("Sign in" vs "Sign up").
    */
   inboundFlow?: 'sign-in' | 'sign-up'
+  /**
+   * Set only on pages wrapped in `AuthenticationLayout`, which is the only place that actually
+   * mounts the status banner above this layout. Elsewhere there's nothing rendered to reserve
+   * space for, so the nav shouldn't shift down even if an incident is ongoing.
+   */
+  hasStatusBanner?: boolean
 }
 
 const TermsText = () => (
@@ -58,12 +65,14 @@ export const SignInLayout = ({
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
   inboundFlow,
+  hasStatusBanner = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
   const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
-  const ongoingIncident = useFlag('ongoingIncident')
+  const statusBanner = useStatusBanner({ signedOut: true })
+  const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
 
   const { destination, focusProvider } = useInboundBranding(inboundFlow)
   const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
@@ -105,6 +114,10 @@ export const SignInLayout = ({
           }
 
           if (data) {
+            // we're already where we need to be
+            if (router.pathname === '/sign-in-recovery-code') {
+              return
+            }
             // we're already where we need to be
             if (router.pathname === '/sign-in-mfa') {
               return
@@ -201,7 +214,7 @@ export const SignInLayout = ({
         <div
           className={cn(
             'absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8',
-            ongoingIncident ? 'mt-14' : 'mt-6'
+            showIncidentBanner ? 'mt-14' : 'mt-6'
           )}
         >
           <nav className="relative flex items-center justify-between sm:h-10">

@@ -117,7 +117,7 @@ export const filterFields = [
     defaultOpen: false,
     options: [],
     hasDynamicOptions: true,
-    hasAsyncSearch: false,
+    hasAsyncSearch: true,
     component: (props: Option) => {
       return (
         <span className="truncate block w-full text-[0.75rem]" title={props.value as string}>
@@ -125,6 +125,15 @@ export const filterFields = [
         </span>
       )
     },
+  },
+  {
+    label: 'Pipeline ID',
+    value: 'pipeline_id',
+    type: 'checkbox',
+    defaultOpen: false,
+    options: [],
+    hasDynamicOptions: true,
+    hasAsyncSearch: true,
   },
   {
     label: 'Event message',

@@ -1,21 +1,19 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { POLL_INTERVAL_MS, RestoringState } from './RestoringState'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = components['schemas']['ProjectDetailResponse']
+type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectStatus = ProjectDetailResponse['status']
-type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsResponse']
+type DownloadableBackupsResponse = components['schemas']['DownloadableBackupsResponse_Output']
 
 const PROJECT_REF = 'default'
-
-const SETTLE_MS = 2000
 
 const createProject = (status: ProjectStatus): ProjectDetailResponse => ({
   cloud_provider: 'AWS',
@@ -54,12 +52,20 @@ const mockProjectDetail = (statuses: [ProjectStatus, ...ProjectStatus[]]) => {
 
 const mockProjectStatus = (statuses: [ProjectStatus, ...ProjectStatus[]]) => {
   const nextStatus = createStatusSequence(statuses)
+  const requests = { count: 0 }
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref/status',
-    response: () => HttpResponse.json({ status: nextStatus() }),
+    response: () => {
+      requests.count += 1
+      return HttpResponse.json({ status: nextStatus() })
+    },
   })
+  return requests
 }
+
+// Advances past one status poll so the next queued status is fetched
+const advancePoll = () => act(() => vi.advanceTimersByTimeAsync(POLL_INTERVAL_MS))
 
 const mockDownloadableBackups = () => {
   addAPIMock({
@@ -83,63 +89,44 @@ const mockDownloadableBackups = () => {
 
 describe('RestoringState', () => {
   beforeEach(() => {
+    // Status polling runs on a 4s interval; fake timers avoid waiting on it in real time
+    vi.useFakeTimers({ shouldAdvanceTime: true })
     window.localStorage.clear()
     mockDownloadableBackups()
   })
 
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
   test('shows restoration in progress while the backend reports RESTORING', async () => {
     mockProjectDetail(['RESTORING'])
-    mockProjectStatus(['RESTORING'])
+    const statusRequests = mockProjectStatus(['RESTORING'])
 
     customRender(<RestoringState />)
 
     expect(await screen.findByText('Restoration in progress')).toBeInTheDocument()
+    // A second poll only fires after the first response has been rendered
+    await advancePoll()
+    await waitFor(() => expect(statusRequests.count).toBe(2))
     expect(screen.queryByText('Restoration complete!')).not.toBeInTheDocument()
   })
 
-  test('shows restoration complete once the project goes healthy after restoring', async () => {
+  test('ignores an early stale healthy reading and only completes once the restore actually finishes', async () => {
     mockProjectDetail(['RESTORING'])
-    mockProjectStatus(['RESTORING', 'ACTIVE_HEALTHY'])
+    const statusRequests = mockProjectStatus(['ACTIVE_HEALTHY', 'RESTORING', 'ACTIVE_HEALTHY'])
 
     customRender(<RestoringState />)
 
     expect(await screen.findByText('Restoration in progress')).toBeInTheDocument()
-    expect(
-      await screen.findByText('Restoration complete!', {}, { timeout: POLL_INTERVAL_MS + 2000 })
-    ).toBeInTheDocument()
+    // A second poll only fires after the stale healthy response has been rendered
+    await advancePoll()
+    await waitFor(() => expect(statusRequests.count).toBe(2))
+    expect(screen.queryByText('Restoration complete!')).not.toBeInTheDocument()
+
+    await advancePoll()
+    expect(await screen.findByText('Restoration complete!')).toBeInTheDocument()
   })
-
-  test('does not claim completion when the first status poll still reports the pre-restore healthy state', async () => {
-    mockProjectDetail(['RESTORING'])
-    mockProjectStatus(['ACTIVE_HEALTHY', 'RESTORING'])
-
-    customRender(<RestoringState />)
-
-    await expect(
-      screen.findByText('Restoration complete!', {}, { timeout: SETTLE_MS })
-    ).rejects.toThrow()
-    expect(screen.getByText('Restoration in progress')).toBeInTheDocument()
-  })
-
-  test(
-    'still reaches completion after an early healthy reading, once the restore actually finishes',
-    async () => {
-      mockProjectDetail(['RESTORING'])
-      mockProjectStatus(['ACTIVE_HEALTHY', 'RESTORING', 'ACTIVE_HEALTHY'])
-
-      customRender(<RestoringState />)
-
-      expect(await screen.findByText('Restoration in progress')).toBeInTheDocument()
-      expect(
-        await screen.findByText(
-          'Restoration complete!',
-          {},
-          { timeout: POLL_INTERVAL_MS * 3 + SETTLE_MS }
-        )
-      ).toBeInTheDocument()
-    },
-    POLL_INTERVAL_MS * 3 + SETTLE_MS * 2
-  )
 
   test('clears the persisted restore start time when the restore fails', async () => {
     const storageKey = LOCAL_STORAGE_KEYS.PROJECT_RESTORING_STARTED_AT(PROJECT_REF)
@@ -154,25 +141,22 @@ describe('RestoringState', () => {
     })
   })
 
-  test(
-    'does not leave Return to project stuck loading when the details still report restoring',
-    async () => {
-      mockProjectDetail(['RESTORING'])
-      mockProjectStatus(['RESTORING', 'ACTIVE_HEALTHY'])
+  test('completes after restoring and does not leave Return to project stuck loading when the details still report restoring', async () => {
+    mockProjectDetail(['RESTORING'])
+    mockProjectStatus(['RESTORING', 'ACTIVE_HEALTHY'])
 
-      customRender(<RestoringState />)
+    customRender(<RestoringState />)
 
-      const returnToProject = await screen.findByRole(
-        'button',
-        { name: 'Return to project' },
-        { timeout: POLL_INTERVAL_MS + SETTLE_MS }
-      )
-      await userEvent.click(returnToProject)
+    expect(await screen.findByText('Restoration in progress')).toBeInTheDocument()
+    await advancePoll()
+    expect(await screen.findByText('Restoration complete!')).toBeInTheDocument()
 
-      await waitFor(() => {
-        expect(returnToProject).not.toBeDisabled()
-      })
-    },
-    POLL_INTERVAL_MS + SETTLE_MS * 2
-  )
+    const returnToProject = screen.getByRole('button', { name: 'Return to project' })
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    await user.click(returnToProject)
+
+    await waitFor(() => {
+      expect(returnToProject).not.toBeDisabled()
+    })
+  })
 })

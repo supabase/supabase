@@ -1,11 +1,11 @@
 import * as Sentry from '@sentry/nextjs'
 import type { PGTable } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import { isEmpty, isUndefined, noop } from 'lodash'
 import { useState } from 'react'
 import { toast } from 'sonner'
-import { SonnerProgress } from 'ui'
+import { SonnerProgress, StatusIcon } from 'ui'
 
 import { ColumnEditor } from './ColumnEditor/ColumnEditor'
 import type { ForeignKey } from './ForeignKeySelector/ForeignKeySelector.types'
@@ -47,7 +47,6 @@ import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constrain
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useTableApiAccessPrivilegesMutation } from '@/data/privileges/table-api-access-mutation'
-import { PG_META_SCOPED_INTROSPECTION_FLAG } from '@/data/table-editor/table-editor-query'
 import { isTableLike, type Entity } from '@/data/table-editor/table-editor-types'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
@@ -63,6 +62,7 @@ import { isObjectContainingKeys } from '@/lib/helpers'
 import type { SafePostgresTable } from '@/lib/postgres-types'
 import { useTrack } from '@/lib/telemetry/track'
 import type { DeepReadonly, Prettify } from '@/lib/type-helpers'
+import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot, type TableEditorState } from '@/state/table-editor'
 import { createTabId, useTabsStateSnapshot } from '@/state/tabs'
 import type { Dictionary } from '@/types'
@@ -191,7 +191,7 @@ export const SidePanelEditor = ({
   const { data: project } = useSelectedProjectQuery()
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
+  const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const [isEdited, setIsEdited] = useState<boolean>(false)
   const csvImportKey = useVisibleKey(snap.sidePanel?.type === 'csv-import')
@@ -660,7 +660,6 @@ export const SidePanelEditor = ({
                 isRLSEnabled,
                 importContent,
                 track,
-                scoped,
               })
 
               createTableSpan.setAttribute('table.created', 1)
@@ -700,7 +699,10 @@ export const SidePanelEditor = ({
                 }
               )
 
-              toast.success(`Table ${table.name} is good to go!`, { id: toastId })
+              toast.success(`Table ${table.name} is good to go!`, {
+                id: toastId,
+                icon: <StatusIcon variant="default" />,
+              })
 
               onTableCreated(table)
             } catch (error) {
@@ -764,7 +766,6 @@ export const SidePanelEditor = ({
           existingForeignKeyRelations,
           primaryKey,
           track,
-          scoped,
         })
 
         if (table === undefined) {
@@ -824,13 +825,14 @@ export const SidePanelEditor = ({
         table: selectedTable,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
               progress={progress}
               message={`Adding ${rowCount.toLocaleString()} rows to ${selectedTable.name}`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })
@@ -849,6 +851,7 @@ export const SidePanelEditor = ({
         rows: importContent.rows,
         selectedHeaders,
         emptyStringAsNullHeaders,
+        roleImpersonationState: getImpersonatedRoleState(),
         onProgressUpdate: (progress: number) => {
           toast.loading(
             <SonnerProgress
@@ -857,7 +860,7 @@ export const SidePanelEditor = ({
                 selectedTable.name
               }`}
             />,
-            { id: toastId }
+            { id: toastId, icon: null }
           )
         },
       })
@@ -875,6 +878,7 @@ export const SidePanelEditor = ({
     })
     toast.success(`Successfully imported ${rowCount} rows of data into ${selectedTable.name}`, {
       id: toastId,
+      icon: <StatusIcon variant="default" />,
     })
     resolve()
     snap.closeSidePanel()

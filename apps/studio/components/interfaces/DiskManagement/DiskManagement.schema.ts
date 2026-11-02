@@ -208,7 +208,7 @@ export const CreateDiskStorageSchema = ({
       if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
+          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
           path: ['totalSize'],
         })
       }
@@ -283,7 +283,7 @@ export const CreateDiskStorageSchema = ({
       if (totalSize > DISK_LIMITS[DiskType.GP3].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
+          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
           path: ['totalSize'],
         })
       }

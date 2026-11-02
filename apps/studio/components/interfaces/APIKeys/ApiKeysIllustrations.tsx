@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import {
   Card,
   CardContent,
@@ -138,7 +138,8 @@ export const ApiKeysFeedbackBanner = () => {
             href="https://github.com/orgs/supabase/discussions/29260"
             className="inline-flex items-center gap-1"
           >
-            Join the discussion on GitHub <ExternalLink aria-hidden size={14} strokeWidth={1.5} />
+            Join the discussion on GitHub{' '}
+            <ExternalLinkIcon aria-hidden size={14} strokeWidth={1.5} />
           </InlineLink>
         </p>
       </div>

@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { buildOperatorItems, buildPropertyItems, buildValueItems } from './menuItems'
+import {
+  buildOperatorItems,
+  buildPropertyChangeItems,
+  buildPropertyItems,
+  buildValueItems,
+} from './menuItems'
 import { FilterGroup, FilterProperty } from './types'
 
 const stringProperty: FilterProperty = {
@@ -31,7 +36,48 @@ const booleanProperty: FilterProperty = {
   ],
 }
 
-const filterProperties: FilterProperty[] = [stringProperty, booleanProperty]
+const pathProperty: FilterProperty = {
+  label: 'Pathname',
+  name: 'pathname',
+  type: 'string',
+  options: [
+    { label: '/auth/v1/health', value: '/auth/v1/health' },
+    { label: '/rest-admin/v1/ready', value: '/rest-admin/v1/ready' },
+  ],
+  operators: [
+    { value: '=', label: 'Equals', group: 'comparison' as const },
+    { value: '~~*', label: 'iLike', group: 'pattern' as const },
+    { value: '!~~*', label: 'Not iLike', group: 'pattern' as const },
+  ],
+}
+
+const filterProperties: FilterProperty[] = [stringProperty, booleanProperty, pathProperty]
+
+describe('consumer-controlled property availability', () => {
+  it.each([true, false, undefined])(
+    'respects isAvailable=%s in add and change menus',
+    (isAvailable) => {
+      const timeRange: FilterProperty = {
+        label: 'Time range',
+        name: 'date',
+        type: 'date',
+        isAvailable,
+      }
+      const params = { filterProperties: [...filterProperties, timeRange], inputValue: '' }
+      const addItems = buildPropertyItems(params)
+      const changeItems = buildPropertyChangeItems({ ...params, currentPropertyName: 'name' })
+      expect(addItems.some((item) => item.value === 'date')).toBe(isAvailable !== false)
+      expect(changeItems.some((item) => item.value === 'date')).toBe(isAvailable !== false)
+      expect(addItems.some((item) => item.value === 'name')).toBe(true)
+      const searchItems = buildPropertyItems({
+        ...params,
+        inputValue: 'range',
+        freeformDefaultProperty: timeRange,
+      })
+      expect(searchItems.some((item) => item.isFreeformSearch)).toBe(isAvailable !== false)
+    }
+  )
+})
 
 describe('buildOperatorItems', () => {
   it('returns matching operators for operator draft text', () => {
@@ -145,6 +191,75 @@ describe('buildValueItems', () => {
       { value: 'bob', label: 'Bob' },
     ])
   })
+
+  it('disables options already used by another condition on the same property', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [
+        { propertyName: 'name', operator: '=', value: 'alice' },
+        { propertyName: 'name', operator: '=', value: '' },
+      ],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [1] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: 'alice', label: 'Alice', disabled: true },
+      { value: 'bob', label: 'Bob' },
+    ])
+  })
+
+  it.each(['~~*', '!~~*'])(
+    'suppresses value suggestions for pattern-group operator `%s`',
+    (operator) => {
+      const filters: FilterGroup = {
+        logicalOperator: 'AND',
+        conditions: [{ propertyName: 'pathname', operator, value: '' }],
+      }
+
+      const items = buildValueItems(
+        { type: 'value', path: [0] },
+        filters,
+        filterProperties,
+        {},
+        {},
+        '',
+        false
+      )
+
+      expect(items).toEqual([])
+    }
+  )
+
+  it('still returns options for pathname with a comparison-group operator', () => {
+    const filters: FilterGroup = {
+      logicalOperator: 'AND',
+      conditions: [{ propertyName: 'pathname', operator: '=', value: '' }],
+    }
+
+    const items = buildValueItems(
+      { type: 'value', path: [0] },
+      filters,
+      filterProperties,
+      {},
+      {},
+      '',
+      false
+    )
+
+    expect(items).toEqual([
+      { value: '/auth/v1/health', label: '/auth/v1/health' },
+      { value: '/rest-admin/v1/ready', label: '/rest-admin/v1/ready' },
+    ])
+  })
 })
 
 describe('buildPropertyItems', () => {
@@ -162,26 +277,60 @@ describe('buildPropertyItems', () => {
     expect(items).toEqual([{ value: 'name', label: 'Name' }])
   })
 
-  it('uses a sentinel value for the "New Group" action when supportsOperators is true', () => {
+  it('hides topLevelOnly properties in nested groups only', () => {
+    const withTopLevelOnly: FilterProperty[] = [
+      ...properties,
+      { label: 'Date', name: 'date', type: 'date', operators: ['='], topLevelOnly: true },
+    ]
+
+    const rootItems = buildPropertyItems({ filterProperties: withTopLevelOnly, inputValue: '' })
+    const nestedItems = buildPropertyItems({
+      filterProperties: withTopLevelOnly,
+      inputValue: '',
+      isNested: true,
+    })
+
+    expect(rootItems.map((item) => item.value)).toEqual(['name', 'status', 'date'])
+    expect(nestedItems.map((item) => item.value)).toEqual(['name', 'status'])
+  })
+
+  it('hides topLevelOnly properties when changing a nested condition property', () => {
+    const withTopLevelOnly: FilterProperty[] = [
+      ...properties,
+      { label: 'Date', name: 'date', type: 'date', operators: ['='], topLevelOnly: true },
+    ]
+    const params = {
+      filterProperties: withTopLevelOnly,
+      currentPropertyName: 'name',
+      inputValue: '',
+    }
+
+    expect(buildPropertyChangeItems(params).map((item) => item.value)).toEqual(['status', 'date'])
+    expect(
+      buildPropertyChangeItems({ ...params, isNested: true }).map((item) => item.value)
+    ).toEqual(['status'])
+  })
+
+  it('uses a sentinel value for the "New filter group" action when supportsOperators is true', () => {
     const items = buildPropertyItems({
       filterProperties: properties,
       inputValue: '',
       supportsOperators: true,
     })
 
-    const groupItem = items.find((item) => item.label === 'New Group')
+    const groupItem = items.find((item) => item.label === 'New filter group')
     expect(groupItem).toBeDefined()
     expect(groupItem?.value).toBe('__new_group__')
   })
 
-  it('does not include "New Group" when supportsOperators is false', () => {
+  it('does not include "New filter group" when supportsOperators is false', () => {
     const items = buildPropertyItems({
       filterProperties: properties,
       inputValue: '',
       supportsOperators: false,
     })
 
-    expect(items.find((item) => item.label === 'New Group')).toBeUndefined()
+    expect(items.find((item) => item.label === 'New filter group')).toBeUndefined()
   })
 
   it('does not collide with a property named "group"', () => {
@@ -197,7 +346,7 @@ describe('buildPropertyItems', () => {
     })
 
     const groupPropertyItem = items.find((item) => item.label === 'group')
-    const newGroupItem = items.find((item) => item.label === 'New Group')
+    const newGroupItem = items.find((item) => item.label === 'New filter group')
 
     expect(groupPropertyItem).toBeDefined()
     expect(groupPropertyItem?.value).toBe('group')

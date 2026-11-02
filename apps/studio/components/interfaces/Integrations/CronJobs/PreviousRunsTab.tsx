@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { CircleCheck, CircleX, Loader } from 'lucide-react'
+import { CircleCheckIcon, CircleXIcon, LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -223,7 +223,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
       <span className="text-brand-600 flex items-center gap-1 text-xs">
-        <CircleCheck size={14} /> Succeeded
+        <CircleCheckIcon size={14} /> Succeeded
       </span>
     )
   }
@@ -231,7 +231,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'failed') {
     return (
       <span className="text-destructive flex items-center gap-1 text-xs">
-        <CircleX size={14} /> Failed
+        <CircleXIcon size={14} /> Failed
       </span>
     )
   }
@@ -239,7 +239,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
     return (
       <span className="text-_secondary flex items-center gap-1 text-xs">
-        <Loader size={14} className="animate-spin" /> Running
+        <LoaderIcon size={14} className="animate-spin" /> Running
       </span>
     )
   }

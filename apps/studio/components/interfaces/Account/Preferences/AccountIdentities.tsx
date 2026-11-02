@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { Edit, Unlink } from 'lucide-react'
+import { EditIcon, UnlinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -182,14 +182,14 @@ export const AccountIdentities = () => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
-                        <Button asChild variant="default">
+                        <Button asChild>
                           <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
                       {canUpdateEmail && (
                         <ButtonTooltip
                           variant="text"
-                          icon={<Edit />}
+                          icon={<EditIcon />}
                           className="w-7"
                           onClick={() => setSelectedProviderUpdateEmail(provider)}
                           tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
@@ -198,7 +198,7 @@ export const AccountIdentities = () => {
                       {identities.length > 1 && (
                         <ButtonTooltip
                           variant="text"
-                          icon={<Unlink />}
+                          icon={<UnlinkIcon />}
                           className="w-7"
                           onClick={() => setSelectedProviderUnlink(provider)}
                           tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
@@ -225,7 +225,6 @@ export const AccountIdentities = () => {
                       </div>
                     </div>
                     <Button
-                      variant="default"
                       loading={linkingProviderId === provider.id}
                       disabled={!!linkingProviderId}
                       onClick={() => onLinkExternalProvider(provider)}

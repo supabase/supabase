@@ -1,5 +1,4 @@
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -107,7 +106,6 @@ const openAddPasswordDialog = async () => {
 
 describe('AccountIdentities', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     refreshSessionMock.mockResolvedValue({ data: {}, error: null })
     signOutMock.mockResolvedValue({ error: null })
     useFlagMock.mockImplementation((name: string) => name === 'enableAccountPassword')
@@ -168,7 +166,9 @@ describe('AccountIdentities', () => {
     expect(emailInput).toBeDisabled()
     expect(emailInput).toHaveValue(EMAIL)
 
-    await userEvent.type(within(dialog).getByPlaceholderText('••••••••'), VALID_PASSWORD)
+    fireEvent.change(within(dialog).getByPlaceholderText('••••••••'), {
+      target: { value: VALID_PASSWORD },
+    })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Add password' }))
 
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
@@ -189,7 +189,9 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
     const dialog = await openAddPasswordDialog()
 
-    await userEvent.type(within(dialog).getByPlaceholderText('••••••••'), VALID_PASSWORD)
+    fireEvent.change(within(dialog).getByPlaceholderText('••••••••'), {
+      target: { value: VALID_PASSWORD },
+    })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Add password' }))
 
     await waitFor(() => expect(updateUserMock).toHaveBeenCalledWith({ password: VALID_PASSWORD }))
@@ -203,7 +205,7 @@ describe('AccountIdentities', () => {
     renderAccountIdentities()
     const dialog = await openAddPasswordDialog()
 
-    await userEvent.type(within(dialog).getByPlaceholderText('••••••••'), 'weak')
+    fireEvent.change(within(dialog).getByPlaceholderText('••••••••'), { target: { value: 'weak' } })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Add password' }))
 
     expect(

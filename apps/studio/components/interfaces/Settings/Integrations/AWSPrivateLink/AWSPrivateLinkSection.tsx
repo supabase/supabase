@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -126,7 +126,7 @@ export const AWSPrivateLinkSection = () => {
             <div className={cn(promptPlanUpgrade && 'opacity-25 pointer-events-none')}>
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-sm font-medium text-foreground">Connections</h3>
-                <Button variant="default" icon={<Plus />} onClick={onAddAccount}>
+                <Button icon={<PlusIcon />} onClick={onAddAccount}>
                   Add connection
                 </Button>
               </div>
@@ -172,7 +172,7 @@ export const AWSPrivateLinkSection = () => {
             <AlertDialogDescription>
               This removes the PrivateLink connection for{' '}
               {showDeleteConnectionId ? (
-                <code className="text-code-inline">{deleteConnectionTitle}</code>
+                <code>{deleteConnectionTitle}</code>
               ) : (
                 deleteConnectionTitle
               )}{' '}

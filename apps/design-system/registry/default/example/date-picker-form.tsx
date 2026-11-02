@@ -8,6 +8,7 @@ import {
   Button,
   Calendar,
   Form,
+  FormControl,
   FormDescription,
   FormField,
   FormItem,
@@ -53,11 +54,13 @@ export default function DatePickerForm() {
             <FormItem className="flex flex-col">
               <FormLabel>Date of birth</FormLabel>
               <DatePicker>
-                <DatePickerTrigger asChild>
-                  <DatePickerButton isInvalid={fieldState.invalid}>
-                    {field.value ? format(field.value, 'PPP') : 'Pick a date'}
-                  </DatePickerButton>
-                </DatePickerTrigger>
+                <FormControl>
+                  <DatePickerTrigger asChild>
+                    <DatePickerButton isInvalid={fieldState.invalid}>
+                      {field.value ? format(field.value, 'PPP') : 'Pick a date'}
+                    </DatePickerButton>
+                  </DatePickerTrigger>
+                </FormControl>
                 <DatePickerContent>
                   <Calendar
                     mode="single"
@@ -73,7 +76,9 @@ export default function DatePickerForm() {
             </FormItem>
           )}
         />
-        <Button type="submit">Submit</Button>
+        <Button variant="primary" type="submit">
+          Submit
+        </Button>
       </form>
     </Form>
   )

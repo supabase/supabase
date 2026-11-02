@@ -1,8 +1,14 @@
 import Link from 'next/link'
 
+import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { DOCS_URL } from '@/lib/constants'
 
 export const ObservabilityLink = () => {
+  const { isHighAvailability } = useHighAvailability()
+
+  // The Metrics API is not available for High Availability (Multigres) projects
+  if (isHighAvailability) return null
+
   return (
     <div className="flex items-center justify-center gap-1.5 text-sm">
       <p className="text-foreground-light">

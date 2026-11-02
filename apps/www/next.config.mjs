@@ -67,6 +67,9 @@ const nextConfig = {
       // Next.js build artifacts
       '.next/cache/**/*',
       '.next/static/**/*',
+      // Next 16 creates `.next/lock` during `next build` and deletes it on exit. Routes that read
+      // `process.cwd()` get the whole app dir traced, so Vercel would try to deploy the missing file.
+      '.next/lock',
       // Static assets
       'public/**/*',
     ],
@@ -85,6 +88,11 @@ const nextConfig = {
   reactStrictMode: true,
   images: {
     dangerouslyAllowSVG: false,
+    // Next 16 rejects local images with a query string (e.g. `/images/blog/foo/thumb.png?v=3`,
+    // used for cache busting) unless `localPatterns` allows it. Omitting `search` allows any.
+    localPatterns: [{ pathname: '/**' }],
+    // Next 16 only allows `quality` values listed here (default is [75]); the app uses 75, 80 and 100.
+    qualities: [75, 80, 100],
     remotePatterns,
   },
   async headers() {
@@ -149,6 +157,13 @@ const nextConfig = {
         ],
       },
       {
+        source: '/schemas/:path*',
+        headers: [
+          { key: 'access-control-allow-origin', value: '*' },
+          { key: 'cache-control', value: 'public, max-age=3600' },
+        ],
+      },
+      {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
@@ -165,7 +180,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(docs|blog)/:path*',
+        source: '/(docs|blog|kb)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
@@ -210,28 +225,13 @@ const nextConfig = {
     }
   },
   async redirects() {
-    // For /docs/guides/ redirects, auto-generate .md variants so renamed/deleted pages
-    // redirect correctly when fetched as markdown
-    const docsMdRedirects = redirects
-      .filter(
-        (r) =>
-          r.source.startsWith('/docs/guides/') &&
-          typeof r.destination === 'string' &&
-          r.destination.startsWith('/')
-      )
-      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
-
-    return [...docsMdRedirects, ...redirects]
+    return redirects
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency
     // On production, we turn it on to prevent errors from conflicting PRs getting into
     // prod
     ignoreBuildErrors: process.env.NEXT_PUBLIC_VERCEL_ENV === 'production' ? false : true,
-  },
-  eslint: {
-    // We are already running linting via GH action, this will skip linting during production build on Vercel.
-    ignoreDuringBuilds: true,
   },
 }
 
@@ -247,6 +247,13 @@ export default withSentryConfig(configExport, {
 
   org: 'supabase',
   project: 'www',
+  applicationKey: 'supabase-www',
+  webpack: {
+    treeshake: {
+      // Automatically tree-shake Sentry logger statements to reduce bundle size
+      removeDebugLogging: true,
+    },
+  },
 
   // Only print logs for uploading source maps in CI
   silent: !process.env.CI,
@@ -262,9 +269,6 @@ export default withSentryConfig(configExport, {
   // Note: Check that the configured route will not match with your Next.js middleware, otherwise reporting of client-
   // side errors will fail.
   // tunnelRoute: "/monitoring",
-
-  // Automatically tree-shake Sentry logger statements to reduce bundle size
-  disableLogger: true,
 })
 
 function getAssetPrefix() {
