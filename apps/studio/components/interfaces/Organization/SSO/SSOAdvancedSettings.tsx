@@ -27,7 +27,7 @@ export const SSOAdvancedSettings = ({ form }: { form: UseFormReturn<SSOConfigFor
         <FormItemLayout
           layout="flex-row-reverse"
           label="ID-JAG Issuer"
-          description="The ID-JAG issuer URL of your identity provider."
+          description="Enter the issuer URL of your identity provider or Claude so that Supabase can verify your members' ID-JAGs."
         >
           <FormControl>
             <Input placeholder="https://your-org.okta.com" {...field} />
