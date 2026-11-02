@@ -1,7 +1,7 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
@@ -216,7 +216,7 @@ export const BillingMetric = ({
               </p>
             ) : (
               <>
-                {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
+                {isLogMetricOnNonPlatformPlan && (
                   <p className="text-foreground-light">
                     Billing and enforcement will only start after the grace period ends in early
                     2027.
