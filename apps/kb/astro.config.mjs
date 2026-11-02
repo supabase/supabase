@@ -7,11 +7,12 @@ import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
+import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
 
 import { BASE_PATH } from './src/lib/constants.ts'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import { sharedCodeBlock } from './src/lib/mdx/shiki-code-block.ts'
-import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
+import { getSitemapLastmods } from './src/lib/sitemap-lastmod.ts'
 
 // Absolute dir of lodash-es, for the lodash alias below (same fix
 // apps/studio/vite.config.ts uses). `packages/ui`'s clipboard util does
@@ -43,6 +44,9 @@ const nextPublicEnv = Object.fromEntries(
   Object.entries(process.env).filter(([key]) => key.startsWith('NEXT_PUBLIC_'))
 )
 
+// Loaded once per config evaluation: article URL -> last-modified date for the sitemap.
+const sitemapLastmods = await getSitemapLastmods()
+
 // https://astro.build/config
 export default defineConfig({
   site: 'https://supabase.com',
@@ -56,7 +60,12 @@ export default defineConfig({
         rehypePlugins: [rehypeAdmonitions],
       }),
     }),
-    sitemap(),
+    sitemap({
+      serialize(item) {
+        const lastmod = sitemapLastmods.get(item.url)
+        return lastmod ? { ...item, lastmod } : item
+      },
+    }),
   ],
   vite: {
     // Client only: a top-level `define` would also replace `process.env` in server code that reads SUPABASE_SERVICE_ROLE_KEY.
