@@ -52,6 +52,7 @@ const LOG_FIELDS: BlockFieldConfig[] = [
 type GenericLogOverviewProps = Pick<ServiceFlowBlockProps, 'filterFields' | 'table'> & {
   data: ColumnSchema
   attributes?: ColumnSchema['metadata']
+  onAddAttributeFilter?: (key: string, value: string) => void
 }
 
 export function GenericLogOverview({
@@ -59,6 +60,7 @@ export function GenericLogOverview({
   attributes,
   filterFields,
   table,
+  onAddAttributeFilter,
 }: GenericLogOverviewProps) {
   const logFields = LOG_FIELDS.map((config) => ({ config, value: config.getValue(data) })).filter(
     ({ value }) => value !== null && value !== undefined && value !== ''
@@ -78,6 +80,20 @@ export function GenericLogOverview({
           />
         ))}
       </CollapsibleDetailSection>
+      <LogAttributes attributes={attributes} onAddFilter={onAddAttributeFilter} />
+    </>
+  )
+}
+
+export function LogAttributes({
+  attributes,
+  onAddFilter,
+}: {
+  attributes?: ColumnSchema['metadata']
+  onAddFilter?: (key: string, value: string) => void
+}) {
+  return (
+    <>
       {groupLogAttributes(attributes ?? {}).map((section) => (
         <CollapsibleDetailSection
           key={section.id}
@@ -90,8 +106,12 @@ export function GenericLogOverview({
               key={key}
               label={label}
               value={typeof value === 'object' ? JSON.stringify(value, null, 2) : String(value)}
-              filterFields={filterFields}
-              table={table}
+              filterFields={[]}
+              onAddFilter={
+                onAddFilter && ['string', 'number', 'boolean'].includes(typeof value)
+                  ? () => onAddFilter(key, String(value))
+                  : undefined
+              }
               className="pl-9.5"
             >
               <LogFields data={value} />
