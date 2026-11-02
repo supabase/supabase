@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Maximize } from 'lucide-react'
+import { MaximizeIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
@@ -23,6 +23,8 @@ import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const verifyJSON = (value: string) => {
   try {
@@ -86,6 +88,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
   const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -104,6 +107,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       {
         onSuccess: (data) => {
@@ -219,7 +223,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                     ].join(' ')}
                     onClick={() => onSelectExpand()}
                   >
-                    <Maximize size={12} strokeWidth={2} />
+                    <MaximizeIcon size={12} strokeWidth={2} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="center">

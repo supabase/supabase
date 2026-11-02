@@ -1,7 +1,7 @@
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { Alert, AlertTitle, cn } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { DataApiEnableSwitch } from '@/components/interfaces/Settings/API/DataApiEnableSwitch'
 import { DataApiProjectUrlCard } from '@/components/interfaces/Settings/API/DataApiProjectUrlCard'
@@ -19,7 +19,7 @@ export const DataApiURLSettings = () => {
     <div className="flex flex-col">
       {!isProjectLoading && project?.status !== PROJECT_STATUS.ACTIVE_HEALTHY ? (
         <Alert variant="destructive">
-          <AlertCircle size={16} />
+          <AlertCircleIcon size={16} />
           <AlertTitle>API settings are unavailable as the project is not active</AlertTitle>
         </Alert>
       ) : (

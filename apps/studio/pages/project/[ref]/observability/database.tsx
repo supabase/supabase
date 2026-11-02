@@ -1,22 +1,22 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Alert, AlertDescription, Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import { ReportChartUpsell } from '@/components/interfaces/Reports/v2/ReportChartUpsell'
 import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -26,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { getMemoryCommitmentPreviewData } from '@/components/ui/DevToolbar/MetricsTab.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -39,13 +40,14 @@ import { getReportAttributesV2 } from '@/data/reports/database-charts'
 import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
@@ -68,11 +70,90 @@ export type UpdateDateRange = (from: string, to: string) => void
 export default DatabaseReport
 
 const REPORT_TITLE = 'Database'
+const CHART_LAYOUT_OBSERVATION_DURATION = 10_000
+const CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS = [
+  'keydown',
+  'pointerdown',
+  'touchstart',
+  'wheel',
+] as const
+
+const isChartFullyVisible = (target: HTMLElement) => {
+  const targetBounds = target.getBoundingClientRect()
+  const scrollContainerBounds = target.closest('main')?.getBoundingClientRect()
+  const viewportTop = scrollContainerBounds?.top ?? 0
+  const viewportBottom = scrollContainerBounds?.bottom ?? window.innerHeight
+
+  return targetBounds.top >= viewportTop && targetBounds.bottom <= viewportBottom
+}
+
+export const useDatabaseChartDeepLink = (chart?: string) => {
+  useEffect(() => {
+    if (chart === undefined) return
+
+    let chartTargetObserver: MutationObserver | undefined
+    let resizeObserver: ResizeObserver | undefined
+    let stopObservingTimer: number | undefined
+
+    const stopDeepLink = () => {
+      if (stopObservingTimer !== undefined) window.clearTimeout(stopObservingTimer)
+      chartTargetObserver?.disconnect()
+      resizeObserver?.disconnect()
+      CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
+        window.removeEventListener(eventName, stopDeepLink, true)
+      )
+    }
+
+    CHART_LAYOUT_OBSERVATION_CANCEL_EVENTS.forEach((eventName) =>
+      window.addEventListener(eventName, stopDeepLink, true)
+    )
+
+    const scrollToChart = () => {
+      const target = document.getElementById(chart)
+      if (target === null) return false
+
+      chartTargetObserver?.disconnect()
+      target.scrollIntoView({ behavior: 'smooth', block: 'center' })
+
+      const chartList = target.parentElement
+      if (chartList === null) return true
+
+      resizeObserver = new ResizeObserver(() => {
+        if (!isChartFullyVisible(target)) {
+          target.scrollIntoView({ behavior: 'auto', block: 'center' })
+        }
+      })
+      resizeObserver.observe(chartList)
+      stopObservingTimer = window.setTimeout(stopDeepLink, CHART_LAYOUT_OBSERVATION_DURATION)
+      return true
+    }
+
+    if (!scrollToChart()) {
+      chartTargetObserver = new MutationObserver(scrollToChart)
+      chartTargetObserver.observe(document.body, { childList: true, subtree: true })
+    }
+
+    return stopDeepLink
+  }, [chart])
+}
+
+export const useDatabaseSelectionFromUrl = (
+  db: string | undefined,
+  setSelectedDatabaseId: (databaseId: string) => void
+) => {
+  useEffect(() => {
+    if (db === undefined) return
+
+    const timeout = window.setTimeout(() => setSelectedDatabaseId(db), 100)
+    return () => window.clearTimeout(timeout)
+  }, [db, setSelectedDatabaseId])
+}
 
 const DatabaseUsage = () => {
   const { db, chart, ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
+  const isHighAvailability = useIsHighAvailability()
 
   const {
     selectedDateRange,
@@ -120,14 +201,8 @@ const DatabaseUsage = () => {
     ]
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const { getEntitlementSetValues, isLoading: isEntitlementLoading } = useCheckEntitlements(
@@ -135,13 +210,17 @@ const DatabaseUsage = () => {
   )
   const entitledFeatures = getEntitlementSetValues()
 
-  const isSpendCapEnabled =
-    entitledFeatures.includes('database') &&
-    !org?.usage_billing_enabled &&
-    project?.cloud_provider !== 'FLY'
+  const isSpendCapEnabled = entitledFeatures.includes('database') && !org?.usage_billing_enabled
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
+  const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
+  const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
+  const memoryCommitmentPreviewData = getMemoryCommitmentPreviewData(
+    memoryCommitmentPreview,
+    selectedDateRange?.period_start?.date,
+    selectedDateRange?.period_end?.date
+  )
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -151,7 +230,8 @@ const DatabaseUsage = () => {
     defaultMaxClientConn,
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
-    showMemoryCommitmentChart
+    showMemoryCommitmentChart,
+    showMemoryCommitmentRiskZones
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -208,26 +288,10 @@ const DatabaseUsage = () => {
     setShowDatePicker((open) => !open)
   })
 
-  const stateSyncedFromUrlRef = useRef(false)
-  useEffect(() => {
-    if (stateSyncedFromUrlRef.current) return
-    stateSyncedFromUrlRef.current = true
+  useDatabaseSelectionFromUrl(db, state.setSelectedDatabaseId)
 
-    if (db !== undefined) {
-      setTimeout(() => {
-        // [Joshen] Adding a timeout here to support navigation from settings to reports
-        // Both are rendering different instances of ProjectLayout which is where the
-        // DatabaseSelectorContextProvider lies in (unless we reckon shifting the provider up one more level is better)
-        state.setSelectedDatabaseId(db)
-      }, 100)
-    }
-    if (chart !== undefined) {
-      setTimeout(() => {
-        const el = document.getElementById(chart)
-        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'center' })
-      }, 200)
-    }
-  }, [db, chart, state])
+  // Loading charts above the target resize after the first scroll and can push it out of view.
+  useDatabaseChartDeepLink(chart)
 
   return (
     <>
@@ -242,9 +306,9 @@ const DatabaseUsage = () => {
               side="bottom"
             >
               <Button
-                variant="default"
+                aria-label="Refresh report"
                 disabled={isRefreshing}
-                icon={<RefreshCw className={isRefreshing ? 'animate-spin' : ''} />}
+                icon={<RefreshCwIcon className={isRefreshing ? 'animate-spin' : ''} />}
                 className="w-7"
                 onClick={onRefreshReport}
               />
@@ -272,7 +336,7 @@ const DatabaseUsage = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}
@@ -285,6 +349,8 @@ const DatabaseUsage = () => {
       >
         {selectedDateRange &&
           REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            const chartPreviewData =
+              chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
             const chartAvailable =
               !chart.entitlement ||
               isEntitlementLoading ||
@@ -293,6 +359,8 @@ const DatabaseUsage = () => {
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
+                data={chartPreviewData}
+                highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
                 startDate={selectedDateRange?.period_start?.date}
@@ -371,23 +439,26 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="ml-auto">
-                    {project?.cloud_provider === 'AWS' ? (
-                      <Button asChild variant="default">
-                        <Link href={`/project/${ref}/settings/compute-and-disk`}>
-                          Increase disk size
-                        </Link>
+                    {/*
+                      [Joshen] TODO: Check if this check is still relevant
+                      The DiskSizeConfigurationModal is old and might be obsolete
+                     */}
+                    {project?.cloud_provider === 'AWS' && !isHighAvailability ? (
+                      <Button asChild>
+                        <Link href={getInfrastructurePath(ref)}>Increase disk size</Link>
                       </Button>
                     ) : (
                       <ButtonTooltip
-                        variant="default"
-                        disabled={!canUpdateDiskSizeConfig}
+                        disabled={!canUpdateDiskSizeConfig || isHighAvailability}
                         onClick={() => setshowIncreaseDiskSizeModal(true)}
                         tooltip={{
                           content: {
                             side: 'bottom',
                             text: !canUpdateDiskSizeConfig
                               ? 'You need additional permissions to increase the disk size'
-                              : undefined,
+                              : isHighAvailability
+                                ? 'Disk size management is unavailable for High Availability projects'
+                                : undefined,
                           },
                         }}
                       >
@@ -436,32 +507,7 @@ const DatabaseUsage = () => {
               </div>
             )
           }}
-          append={() => (
-            <div className="px-6 pb-6">
-              <Alert variant="default" className="mt-4">
-                <AlertDescription>
-                  <div className="space-y-2">
-                    <p>
-                      New Supabase projects have a database size of ~40-60mb. This space includes
-                      pre-installed extensions, schemas, and default Postgres data. Additional
-                      database size is used when installing extensions, even if those extensions are
-                      inactive.
-                    </p>
-
-                    <Button asChild variant="default" icon={<ExternalLink />}>
-                      <Link
-                        href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
-                        target="_blank"
-                        rel="noreferrer"
-                      >
-                        Read about database size
-                      </Link>
-                    </Button>
-                  </div>
-                </AlertDescription>
-              </Alert>
-            </div>
-          )}
+          append={renderDatabaseSizeAdditionalInfo}
         />
         <DiskSizeConfigurationModal
           visible={showIncreaseDiskSizeModal}
@@ -473,5 +519,33 @@ const DatabaseUsage = () => {
         <ObservabilityLink />
       </div>
     </>
+  )
+}
+
+const renderDatabaseSizeAdditionalInfo = () => {
+  return (
+    <div className="px-6 pb-6">
+      <Alert variant="default" className="mt-4">
+        <AlertDescription>
+          <div className="space-y-2">
+            <p>
+              New Supabase projects have a database size of ~40-60mb. This space includes
+              pre-installed extensions, schemas, and default Postgres data. Additional database size
+              is used when installing extensions, even if those extensions are inactive.
+            </p>
+
+            <Button asChild icon={<ExternalLinkIcon />}>
+              <Link
+                href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Read about database size
+              </Link>
+            </Button>
+          </div>
+        </AlertDescription>
+      </Alert>
+    </div>
   )
 }

@@ -1,12 +1,21 @@
 import { LOCAL_STORAGE_KEYS, useFlag, useIsMFAEnabled, useParams } from 'common'
-import { AnimatePresence, motion, MotionProps } from 'framer-motion'
 import { Home } from 'icons'
 import { isUndefined } from 'lodash'
-import { Blocks, Boxes, ChartArea, PanelLeftDashed, Receipt, Settings, Users } from 'lucide-react'
+import {
+  BlocksIcon,
+  BoxesIcon,
+  ChartAreaIcon,
+  PanelLeftDashedIcon,
+  ReceiptIcon,
+  SettingsIcon,
+  UsersIcon,
+} from 'lucide-react'
+import { AnimatePresence, motion, MotionProps } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ComponentProps, ComponentPropsWithoutRef, FC, ReactNode, useEffect } from 'react'
 import {
+  Badge,
   Button,
   cn,
   DropdownMenu,
@@ -29,12 +38,11 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
-import { useUnifiedLogsPreview } from './App/FeaturePreview/FeaturePreviewContext'
 import {
-  generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
-  generateToolRoutes,
+  useGenerateOtherRoutes,
+  useGenerateToolRoutes,
 } from '@/components/layouts/Navigation/NavigationBar/NavigationBar.utils'
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
@@ -43,6 +51,7 @@ import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const ICON_SIZE = 32
@@ -97,7 +106,7 @@ export const Sidebar = ({ className, ...props }: SidebarProps) => {
                   <Button
                     variant="text"
                     className={`w-min px-1.5 mx-0.5 ${sidebarBehaviour === 'open' ? 'px-2!' : ''}`}
-                    icon={<PanelLeftDashed size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
+                    icon={<PanelLeftDashedIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />}
                     aria-label="Sidebar control"
                   />
                 </DropdownMenuTrigger>
@@ -168,6 +177,7 @@ export function SideBarNavLink({
 } & ComponentPropsWithoutRef<typeof SidebarMenuButton>) {
   const router = useRouter()
   const { state: sidebarState } = useSidebar()
+
   const [sidebarBehaviour] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
     DEFAULT_SIDEBAR_BEHAVIOR
@@ -196,6 +206,14 @@ export function SideBarNavLink({
     <>
       {route.icon}
       <span>{route.label}</span>
+      {route.isNew && (
+        <Badge
+          variant="success"
+          className="ml-auto shrink-0 px-1.5 py-0.5 text-[9px] uppercase tracking-wider"
+        >
+          New
+        </Badge>
+      )}
     </>
   )
 
@@ -215,6 +233,7 @@ export function SideBarNavLink({
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
+          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -226,10 +245,21 @@ export function SideBarNavLink({
 }
 
 const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
+  const [sidebarBehaviour] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
+    DEFAULT_SIDEBAR_BEHAVIOR
+  )
+
+  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
+  // persistently open — not on hover-expand. Tie the dot to the same
+  // condition so it stays put while skimming the nav.
+  const isPersistentlyOpen = sidebarBehaviour === 'open'
+
   return (
     <div
       className={cn(
-        'absolute pointer-events-none flex h-2 w-2 left-[18px] group-data-[state=expanded]:left-[20px] top-2 z-10 rounded-full',
+        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
+        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
         hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
       )}
     />
@@ -238,13 +268,10 @@ const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings
 
 const ProjectLinks = () => {
   const router = useRouter()
+  const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
   const { securityLints, errorLints } = useLints()
-  const showReports = useIsFeatureEnabled('reports:all')
-  const showLogs = useIsFeatureEnabled('logs:all')
-
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -261,20 +288,18 @@ const ProjectLinks = () => {
   ])
 
   const authOverviewPageEnabled = useFlag('authOverviewPage')
+  const computeEnabled = useFlag('compute')
 
-  const toolRoutes = generateToolRoutes(ref, project)
+  const toolRoutes = useGenerateToolRoutes()
   const productRoutes = generateProductRoutes(ref, project, {
     auth: authEnabled,
     edgeFunctions: edgeFunctionsEnabled,
     storage: storageEnabled,
     realtime: realtimeEnabled,
     authOverviewPage: authOverviewPageEnabled,
+    compute: computeEnabled,
   })
-  const otherRoutes = generateOtherRoutes(ref, project, {
-    unifiedLogs: isUnifiedLogsEnabled,
-    showReports,
-    showLogs,
-  })
+  const otherRoutes = useGenerateOtherRoutes()
   const settingsRoutes = generateSettingsRoutes(ref)
 
   return (
@@ -299,6 +324,11 @@ const ProjectLinks = () => {
               route={route}
               active={activeRoute === route.key}
               isLoading={isProjectPending}
+              onClick={
+                route.key === 'explorer' && activeRoute === 'sql'
+                  ? () => track('sql_editor_back_explorer_clicked')
+                  : undefined
+              }
             />
           ))}
         </SidebarMenu>
@@ -396,28 +426,28 @@ const OrganizationLinks = () => {
       label: 'Projects',
       href: `/org/${organizationSlug}`,
       key: 'projects',
-      icon: <Boxes size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BoxesIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_PROJECTS,
     },
     {
       label: 'Team',
       href: `/org/${organizationSlug}/team`,
       key: 'team',
-      icon: <Users size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <UsersIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_TEAM,
     },
     {
       label: 'Integrations',
       href: `/org/${organizationSlug}/integrations`,
       key: 'integrations',
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_INTEGRATIONS,
     },
     {
       label: 'Usage',
       href: `/org/${organizationSlug}/usage`,
       key: 'usage',
-      icon: <ChartArea size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <ChartAreaIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_USAGE,
     },
     ...(showBilling
@@ -426,7 +456,7 @@ const OrganizationLinks = () => {
             label: 'Billing',
             href: `/org/${organizationSlug}/billing`,
             key: 'billing',
-            icon: <Receipt size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <ReceiptIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             shortcutId: SHORTCUT_IDS.NAV_ORG_BILLING,
           },
         ]
@@ -435,7 +465,7 @@ const OrganizationLinks = () => {
       label: 'Organization Settings',
       href: `/org/${organizationSlug}/general`,
       key: 'settings',
-      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       shortcutId: SHORTCUT_IDS.NAV_ORG_SETTINGS,
     },
   ]

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useInView } from 'react-intersection-observer'
 
@@ -14,14 +13,13 @@ import { FormPanel } from '@/components/ui/Forms/FormPanel'
 import { FormSection, FormSectionContent } from '@/components/ui/Forms/FormSection'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 const CreditBalance = () => {
   const { slug } = useParams()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
   const { ref, inView } = useInView({ triggerOnce: true })
 

@@ -3,23 +3,35 @@ id: 'manage-usage-pipelines'
 title: 'Manage Pipelines usage'
 ---
 
+Understand [Pipelines charges](#what-you-are-charged-for), compare [billing examples](#billing-examples), and [reduce unnecessary usage](#optimize-usage).
+
 ## What you are charged for
 
-You are charged for all pipelines configured, initial/backfill data and replicated data. Pipelines are charged by the hour for as long as they are configured.
+Pipelines has three charges:
 
-### Usage on your invoice
+- **Pipeline hours** measure how long each pipeline remains configured, including while stopped. Delete the pipeline to end this charge.
+- **Initial sync data processed** is the Postgres row data accepted by the destination when a table is first synchronized or synchronized again.
+- **Ongoing replication data processed** is the Postgres row data accepted by the destination for subsequent database changes. It depends on how much your published data changes, not on the source table size, WAL size, or destination's compressed storage size.
 
-Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB" and "ETL Replicated Data GB" on your invoice.
+Tables excluded from **Initial sync** do not incur an initial sync data charge. Pipeline-hour charges and charges for ongoing changes still apply. See [Choosing which tables to copy](/docs/guides/database/replication/pipelines#choosing-which-tables-to-copy).
+
+Destination-provider charges are separate. For example, Google Cloud can charge for BigQuery ingestion, storage, and CDC compute.
 
 ## Pricing
 
 <$Partial path="billing/pricing/pricing_pipelines.mdx" />
 
+## Cost estimates
+
+The Dashboard estimates initial sync volume and cost from source table metadata without scanning all rows. You can create a pipeline or restart table replication even if an estimate is unavailable.
+
+Estimates are planning guidance, not exact quotes. Actual charges reflect row data copied after publication column and row filters and accepted by the destination.
+
 ## Billing examples
 
-### Single project with no backfill
+### Billing period without an initial sync
 
-The project has an active pipeline for the entire month.
+The project has a configured pipeline for the entire month.
 
 | Line Item                     | Units     | Costs                        |
 | ----------------------------- | --------- | ---------------------------- |
@@ -31,9 +43,9 @@ The project has an active pipeline for the entire month.
 | Compute Credits               |           | -<Price price="10" />        |
 | **Total**                     |           | **<Price price="518.73" />** |
 
-### Multiple projects with backfills
+### Multiple projects with initial syncs
 
-Multiple projects had an active pipeline for the entire month and had initial backfills and replicated data.
+Multiple projects had a configured pipeline for the entire month and processed data during initial sync and ongoing replication.
 
 | Line Item                           | Units     | Costs                         |
 | ----------------------------------- | --------- | ----------------------------- |
@@ -53,10 +65,9 @@ Multiple projects had an active pipeline for the entire month and had initial ba
 | Compute Credits                     |           | -<Price price="10" />         |
 | **Total**                           |           | **<Price price="1367.46" />** |
 
-### After disabling an add-on for a day
+### After deleting a pipeline after one day
 
-Project add-ons are billed in arrears based on how many hours you used them.
-If you remove the add-on, you are no longer billed from the time of removal onward.
+Pipeline hours are billed in arrears. Deleting the pipeline after 24 hours ends that charge; other project charges continue.
 
 | Line Item                     | Hours | Costs                       |
 | ----------------------------- | ----- | --------------------------- |
@@ -71,7 +82,23 @@ If you remove the add-on, you are no longer billed from the time of removal onwa
 
 ## Optimize usage
 
-- Only replicate tables you need to replicate
-- If you no longer require replication, remove the pipeline through your [project's replication settings](/dashboard/project/_/database/replication)
-- Reduce the number of writes to your table
-- Exclude columns you do not need from replication - Pipelines let you configure which columns to replicate
+- Include only the tables and columns that you need at the destination.
+- Keep high-churn tables out of the publication when their changes are not needed for analytics.
+- If you no longer require replication, delete the pipeline through your [project's Pipelines settings](/dashboard/project/_/database/pipelines) to stop pipeline-hour charges.
+
+## How data processed is measured
+
+Data processed measures logical Postgres row data accepted by the destination, independent of physical storage size or destination encoding.
+
+The measurement includes:
+
+- **Initial sync and resynchronization**: Row data emitted by Postgres COPY.
+- **Ongoing replication**: Row values Postgres emits for inserts, updates, and deletes. Updates include new row values and any previous identity values Postgres emits. Deletes include the emitted identity values.
+
+Failed destination write attempts that Pipelines retries are not counted. Data is counted only after the destination acknowledges successful processing. In rare cases, Pipelines can count an acknowledged batch but crash or be interrupted before its replication checkpoint is persisted. Recovery can then process and count the same data again.
+
+Data successfully processed again after [restarting table replication](/docs/guides/database/replication/pipelines-monitoring#restarting-tables), repeating an interrupted initial sync, or recovering a lost main slot is also counted again. **Restart pipeline** normally resumes saved progress, but [startup recovery](/docs/guides/database/replication/pipelines#pipeline-restarts-and-recovery) can require copying data again.
+
+## Usage on your invoice
+
+Usage is shown as "ETL Pipeline Hours", "ETL Copy Backfill Data GB", and "ETL Replicated Data GB" on your invoice.

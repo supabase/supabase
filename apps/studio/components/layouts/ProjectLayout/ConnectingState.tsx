@@ -1,9 +1,10 @@
 import { useParams } from 'common'
-import { ExternalLink, Loader, Monitor, Server } from 'lucide-react'
+import { ExternalLinkIcon, LoaderIcon, MonitorIcon, ServerIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { Badge, Button } from 'ui'
 
+import { getInfrastructurePath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
 import ShimmerLine from '@/components/ui/ShimmerLine'
 import {
   useInvalidateProjectDetailsQuery,
@@ -57,7 +58,7 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
             <div>
               <Badge variant="success">
                 <div className="flex items-center gap-2">
-                  <Loader className="animate-spin" size={12} />
+                  <LoaderIcon className="animate-spin" size={12} />
                   <span>Connecting to project</span>
                 </div>
               </Badge>
@@ -68,13 +69,13 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               <div className="mx-auto flex max-w-[300px] items-center justify-center">
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <Monitor className="text-foreground-light" size={30} strokeWidth={1.5} />
+                    <MonitorIcon className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
                 <ShimmerLine active />
                 <div>
                   <div className="flex items-center justify-center w-12 h-12 rounded-md border">
-                    <Server className="text-foreground-light" size={30} strokeWidth={1.5} />
+                    <ServerIcon className="text-foreground-light" size={30} strokeWidth={1.5} />
                   </div>
                 </div>
               </div>
@@ -88,12 +89,10 @@ const ConnectingState = ({ project }: ConnectingStateProps) => {
               </div>
 
               <div className="flex items-center justify-center space-x-2">
-                <Button asChild variant="default">
-                  <Link href={`/project/${ref}/settings/infrastructure`}>
-                    Check database health
-                  </Link>
+                <Button asChild>
+                  <Link href={getInfrastructurePath(ref)}>Check database health</Link>
                 </Button>
-                <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+                <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                   <Link
                     href={`${DOCS_URL}/guides/troubleshooting?products=platform#unable-to-connect-to-your-supabase-project`}
                     className="translate-y-px"

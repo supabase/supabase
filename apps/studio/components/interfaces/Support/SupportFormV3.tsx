@@ -4,6 +4,7 @@ import { useConstant, useFlag } from 'common'
 import { CLIENT_LIBRARIES } from 'common/constants'
 import { type Dispatch, type MouseEventHandler } from 'react'
 import type { SubmitHandler, UseFormReturn } from 'react-hook-form'
+import { useWatch } from 'react-hook-form'
 import { Form, Separator } from 'ui'
 import { v4 as uuidv4 } from 'uuid'
 
@@ -25,15 +26,17 @@ import { OrganizationSelector } from './OrganizationSelector'
 import { PlanExpectationInfoContent, ProjectAndPlanInfo } from './ProjectAndPlanInfo'
 import { SubjectAndSuggestionsInfo } from './SubjectAndSuggestionsInfo'
 import { SubmitButton } from './SubmitButton'
-import { DISABLE_SUPPORT_ACCESS_CATEGORIES, SupportAccessToggle } from './SupportAccessToggle'
+import { SupportAccessToggle } from './SupportAccessToggle'
 import type { SupportFormValues } from './SupportForm.schema'
 import type { SupportFormActions, SupportFormState } from './SupportForm.state'
 import {
+  canAllowSupportAccess,
   formatMessage,
   formatStudioVersion,
   getOrgSubscriptionPlan,
   NO_ORG_MARKER,
   NO_PROJECT_MARKER,
+  scrollToRequiredField,
 } from './SupportForm.utils'
 import { SupportFormDirectEmailContent } from './SupportFormDirectEmailInfo'
 import { getProjectAuthConfig } from '@/data/auth/auth-config-query'
@@ -79,7 +82,10 @@ export const SupportFormV3 = ({
   const { profile } = useProfile()
   const respondToEmail = profile?.primary_email ?? 'your email'
 
-  const { organizationSlug, projectRef, category, severity, subject, library } = form.watch()
+  const [organizationSlug, projectRef, category, severity, subject, library] = useWatch({
+    control: form.control,
+    name: ['organizationSlug', 'projectRef', 'category', 'severity', 'subject', 'library'],
+  })
 
   const selectedOrgSlug = organizationSlug === NO_ORG_MARKER ? null : organizationSlug
   const currentProjectRef = projectRef === NO_PROJECT_MARKER ? null : projectRef
@@ -143,6 +149,8 @@ export const SupportFormV3 = ({
         type: 'manual',
         message: "Please select the library that you're facing issues with",
       })
+      // setError triggers a re-render; wait for it before querying aria-invalid
+      requestAnimationFrame(() => scrollToRequiredField('support-form', 'library'))
       return
     }
 
@@ -171,10 +179,9 @@ export const SupportFormV3 = ({
       ...values,
       organizationSlug: values.organizationSlug ?? NO_ORG_MARKER,
       projectRef: values.projectRef ?? NO_PROJECT_MARKER,
-      allowSupportAccess:
-        values.category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(values.category)
-          ? values.allowSupportAccess
-          : false,
+      allowSupportAccess: canAllowSupportAccess(values.category, values.projectRef)
+        ? values.allowSupportAccess
+        : false,
       library:
         values.category === SupportCategories.PROBLEM && selectedLibrary !== undefined
           ? selectedLibrary.key
@@ -219,7 +226,9 @@ export const SupportFormV3 = ({
     submitSupportTicket(payload)
   }
 
-  const handleFormSubmit = form.handleSubmit(onSubmit)
+  const handleFormSubmit = form.handleSubmit(onSubmit, (errors) => {
+    scrollToRequiredField('support-form', Object.keys(errors)[0])
+  })
 
   const handleSubmitButtonClick: MouseEventHandler<HTMLButtonElement> = (event) => {
     handleFormSubmit(event)
@@ -242,7 +251,6 @@ export const SupportFormV3 = ({
             orgSlug={selectedOrgSlug}
             projectRef={currentProjectRef}
             subscriptionPlanId={subscriptionPlanId}
-            category={category}
           />
           <CategoryAndSeverityInfo
             form={form}
@@ -265,7 +273,7 @@ export const SupportFormV3 = ({
         </div>
 
         {(DASHBOARD_LOG_CATEGORIES.includes(category) ||
-          (!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category)) ||
+          canAllowSupportAccess(category, projectRef) ||
           showPlanExpectationInfo ||
           showDirectEmailInfo) && (
           <div className="flex flex-col gap-y-6">
@@ -275,7 +283,7 @@ export const SupportFormV3 = ({
               <DashboardLogsToggle form={form} sanitizedLog={sanitizedLogSnapshot} align="right" />
             )}
 
-            {!!category && !DISABLE_SUPPORT_ACCESS_CATEGORIES.includes(category) && (
+            {canAllowSupportAccess(category, projectRef) && (
               <SupportAccessToggle form={form} align="right" />
             )}
 

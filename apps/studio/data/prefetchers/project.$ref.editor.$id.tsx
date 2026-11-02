@@ -47,7 +47,8 @@ export function prefetchEditorTablePage({
       const { sorts: localSorts = [], filters: localFilters = [] } =
         loadTableEditorStateFromLocalStorage(projectRef, entity.id) ?? {}
 
-      prefetchTableRows(queryClient, {
+      // Returned so the caller's catch handles it: a cancelled prefetch rejects with CancelledError.
+      return prefetchTableRows(queryClient, {
         projectRef,
         connectionString,
         readReplicaIdentifier,

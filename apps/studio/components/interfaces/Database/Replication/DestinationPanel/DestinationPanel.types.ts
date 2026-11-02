@@ -1,14 +1,16 @@
 export type DestinationType =
-  | 'Read Replica'
   | 'BigQuery'
   | 'Analytics Bucket'
   | 'DuckLake'
   | 'Snowflake'
+  | 'ClickHouse'
+
+export type FlowDestination = Exclude<DestinationType, 'Analytics Bucket'>
 
 export type ExistingDestination = {
   sourceId?: number
   destinationId: number
-  pipelineId?: number
+  pipelineId?: string
   enabled: boolean
   statusName?: string
 }

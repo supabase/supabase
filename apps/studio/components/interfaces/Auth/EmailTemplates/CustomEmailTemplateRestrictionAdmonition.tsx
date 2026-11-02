@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -8,7 +8,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
@@ -27,18 +27,16 @@ export const CustomEmailTemplateRestrictionAdmonition = () => {
         <div className="flex w-full @lg:w-auto">
           <Button
             asChild
-            variant="default"
-            className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10"
+            className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
           >
             <Link href={`/project/${projectRef}/auth/smtp`}>Set up SMTP</Link>
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
-                variant="default"
                 aria-label="More email template editing options"
-                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px"
-                icon={<ChevronDown />}
+                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                icon={<ChevronDownIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">

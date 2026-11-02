@@ -1,8 +1,8 @@
 'use client'
 
 import { setBlogViewCookie, type BlogView } from 'app/blog/blog-view'
-import { motion } from 'framer-motion'
 import { AlignJustify, Grid } from 'lucide-react'
+import { motion } from 'motion/react'
 import { cn } from 'ui'
 
 export default function BlogViewToggle({
@@ -16,6 +16,7 @@ export default function BlogViewToggle({
     <div className="flex items-center border border-border rounded-md p-0.5 gap-0.5 bg-surface-100">
       {(['list', 'grid'] as BlogView[]).map((v) => (
         <button
+          tabIndex={0}
           key={v}
           onClick={() => {
             setView(v)

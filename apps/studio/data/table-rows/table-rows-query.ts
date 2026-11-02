@@ -1,15 +1,17 @@
 import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
-import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
+import {
+  formatPatternMatchFilterValue,
+  getTableRowsSql,
+} from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { handleError } from '@/data/fetchers'
+import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
@@ -143,7 +145,7 @@ export const getAllTableRowsSql = ({
   filters
     .filter((filter) => filter.value && filter.value !== '')
     .forEach((filter) => {
-      const value = formatFilterValue(table, filter)
+      const value = formatPatternMatchFilterValue(filter.value, filter.operator)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
@@ -254,7 +256,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -286,7 +288,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -377,6 +379,7 @@ async function getTableRows(
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
         preflightCheck,
+        grant: unguarded.migrating,
       },
       signal
     )

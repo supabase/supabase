@@ -9,6 +9,7 @@ import {
   getDatabaseOperations,
   getDebuggingOperations,
   getDevelopmentOperations,
+  getFeedbackOperations,
 } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
@@ -20,7 +21,13 @@ import { DEFAULT_PROJECT } from '@/lib/constants/api'
 // and returns a Web `Response` directly, so the handler can pass the
 // request through unmodified.
 
-const supportedFeatureGroupSchema = z.enum(['docs', 'database', 'development', 'debugging'])
+const supportedFeatureGroupSchema = z.enum([
+  'docs',
+  'database',
+  'development',
+  'debugging',
+  'feedback',
+])
 
 const mcpQuerySchema = z.object({
   features: z
@@ -61,6 +68,7 @@ const POST = async ({ request }: { request: Request }) => {
     database: getDatabaseOperations({ headers }),
     development: getDevelopmentOperations({ headers }),
     debugging: getDebuggingOperations({ headers }),
+    feedback: getFeedbackOperations(),
   }
 
   try {

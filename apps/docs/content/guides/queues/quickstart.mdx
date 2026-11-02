@@ -1,6 +1,7 @@
 ---
 title: Quickstart
 subtitle: 'Learn how to use Supabase Queues to add and read messages'
+tocVideo: UEwfaElBnZk
 ---
 
 This guide is an introduction to interacting with Supabase Queues via the Dashboard and official client library. Check out [Queues API Reference](/docs/guides/queues/api) for more details on our API.
@@ -51,7 +52,7 @@ On the [Queues page](/dashboard/project/_/integrations/queues/queues):
 
 - Name your queue
 
-<Admonition type="tip">
+<Admonition type="note">
 
 Queue names can only be lowercase and hyphens and underscores are permitted.
 
@@ -73,7 +74,7 @@ width={1456}
 height={1420}
 />
 
-<Admonition type="tip" title="What happens when you create a queue?">
+<Admonition type="note" title="What happens when you create a queue?">
 
 Every new Queue creates two tables in the `pgmq` schema. These tables are `pgmq.q_<queue_name>` to store and process active messages and `pgmq.a_<queue_name>` to store any archived messages.
 

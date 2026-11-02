@@ -3,7 +3,7 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
 import { AnalyticsBucket as AnalyticsBucketIcon, FilesBucket, Storage, VectorBucket } from 'icons'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 
 import {
@@ -260,7 +260,7 @@ export function StorageSearchResults({ query }: StorageSearchResultsProps) {
       <div className="flex items-center gap-x-2">
         {isLoading ? (
           <span className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin" /> Loading...
+            <Loader2Icon size={14} className="animate-spin" /> Loading...
           </span>
         ) : (
           <span>

@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { edgeFunctionsKeys } from './keys'
-import { handleError, patch } from '@/data/fetchers'
+import { handleError, patch, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionsUpdateVariables = {
@@ -27,6 +27,7 @@ export async function updateEdgeFunction({
       path: { ref: projectRef, function_slug: slug },
     },
     body: payload,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

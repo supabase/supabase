@@ -1,7 +1,7 @@
 'use client'
 
 import BrowserFrame from '~/components/BrowserFrame'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useTheme } from 'next-themes'
 import React, { useRef, useState } from 'react'
 import { cn } from 'ui'
@@ -35,6 +35,7 @@ export function DashboardFeaturesSection({
         <div className="flex gap-2" role="tablist">
           {tabs.map((tab, index) => (
             <button
+              tabIndex={0}
               key={index}
               onClick={() => setActiveTabIdx(index)}
               aria-selected={index === activeTabIdx}

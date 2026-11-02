@@ -11,8 +11,10 @@ import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
-import { handleError as handleErrorFetchers, post } from '@/data/fetchers'
+import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
+import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
+import type { GrantFor } from '@/lib/grants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
 import { ResponseError, UseCustomMutationOptions } from '@/types'
@@ -46,6 +48,7 @@ export type QueryResponseError = {
 
 type ExecuteSqlVariables = {
   projectRef?: string
+  grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'> | Unguarded
   connectionString?: string | null
   sql: SafeSqlFragment
   queryKey?: QueryKey
@@ -77,6 +80,7 @@ export async function executeSql<T = any>(
     projectRef,
     connectionString,
     sql,
+    grant,
     queryKey,
     handleError,
     isRoleImpersonationEnabled = false,
@@ -115,6 +119,7 @@ export async function executeSql<T = any>(
     const options = {
       signal,
       headers,
+      grant,
       params: {
         path: { ref: projectRef },
         header: {
@@ -159,7 +164,7 @@ export async function executeSql<T = any>(
 
     const key =
       queryKey?.filter((seg) => typeof seg === 'string' || typeof seg === 'number').join('-') ?? ''
-    const result = await post('/platform/pg-meta/{ref}/query', {
+    const result = await post(QUERY_SOURCE_REGISTRY.database.endpoint, {
       ...options,
       body: { query: sql, disable_statement_timeout: isStatementTimeoutDisabled },
       params: {

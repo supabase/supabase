@@ -1,8 +1,9 @@
 import { useParams } from 'common'
 import { useCallback, useMemo, useState } from 'react'
-import { FEATURE_GROUPS_PLATFORM, MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
+import { MCP_CLIENTS } from 'ui-patterns/McpUrlBuilder'
 
 import {
+  CONNECTION_SOURCE_LOAD_BALANCER,
   connectionStringMethodOptions,
   DATABASE_CONNECTION_TYPES,
   FRAMEWORKS,
@@ -15,7 +16,12 @@ import {
   resetDependentFields,
   resolveSteps,
 } from './connect.resolver'
-import { connectSchema } from './connect.schema'
+import {
+  connectSchema,
+  getDefaultMcpFeatures,
+  getSupportedMcpFeatureGroups,
+  normalizeMcpFeatures,
+} from './connect.schema'
 import type {
   ConnectMode,
   ConnectSchema,
@@ -45,11 +51,15 @@ function getFieldOptionsFromSource({
   state,
   databases,
   deploymentMode,
+  isHighAvailability,
+  projectRef,
 }: {
   source: string
   state: ConnectState
   databases: Database[]
   deploymentMode: DeploymentMode
+  isHighAvailability: boolean
+  projectRef?: string
 }): FieldOption[] {
   switch (source) {
     case 'frameworks':
@@ -130,15 +140,23 @@ function getFieldOptionsFromSource({
       }))
     }
 
-    case 'connectionSources':
-      return databases.map((db) => {
+    case 'connectionSources': {
+      const options = databases.map((db) => {
         const region = formatDatabaseRegion(db?.region ?? '')
         const id = formatDatabaseID(db.identifier ?? '')
         const label = db.identifier.includes('-rr-')
-          ? `Read Replica (${region} - ${id})`
-          : 'Primary Database'
+          ? `Read replica (${region} - ${id})`
+          : 'Primary database'
         return { value: db.identifier, label }
       })
+      if (!isHighAvailability) return options
+      // Multigres replicas are only reachable through the read-only load
+      // balancer, so the sources are the primary and the load balancer.
+      return [
+        ...options.filter((option) => option.value === projectRef),
+        { value: CONNECTION_SOURCE_LOAD_BALANCER, label: 'Replica (read-only)' },
+      ]
+    }
 
     case 'connectionTypes':
       return DATABASE_CONNECTION_TYPES.map((t) => ({
@@ -161,7 +179,7 @@ function getFieldOptionsFromSource({
       }))
 
     case 'mcpFeatures':
-      return FEATURE_GROUPS_PLATFORM.map((f) => ({
+      return getSupportedMcpFeatureGroups(deploymentMode.isPlatform).map((f) => ({
         value: f.id,
         label: f.name,
         description: f.description,
@@ -180,11 +198,15 @@ function resolveFieldOptionsWithSource({
   state,
   databases,
   deploymentMode,
+  isHighAvailability,
+  projectRef,
 }: {
   field: ResolvedField
   state: ConnectState
   databases: Database[]
   deploymentMode: DeploymentMode
+  isHighAvailability: boolean
+  projectRef?: string
 }): FieldOption[] {
   // If already resolved (from conditional resolution)
   if (field.resolvedOptions.length > 0) {
@@ -199,6 +221,8 @@ function resolveFieldOptionsWithSource({
       state,
       databases,
       deploymentMode,
+      isHighAvailability,
+      projectRef,
     })
   }
 
@@ -337,18 +361,43 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
           next.orm = ORMS[0]?.key ?? ''
         }
 
-        if (mode === 'mcp' && !next.mcpClient) {
-          next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+        if (mode === 'mcp') {
+          if (!next.mcpClient) {
+            next.mcpClient = MCP_CLIENTS[0]?.key ?? ''
+          }
+          if (next.mcpFeatures === undefined) {
+            next.mcpFeatures = getDefaultMcpFeatures(deploymentMode.isPlatform)
+          } else if (Array.isArray(next.mcpFeatures)) {
+            next.mcpFeatures = normalizeMcpFeatures(next.mcpFeatures, deploymentMode.isPlatform)
+          }
         }
 
         return next
       })
     },
-    [projectRef, deploymentMode.isSelfHosted]
+    [projectRef, deploymentMode.isSelfHosted, deploymentMode.isPlatform]
   )
 
+  // Multigres has no pooler, so pooler-flavored selections restored from the
+  // URL or localStorage (shared across projects) must never leak into an HA
+  // project — every consumer sees the direct connection method. Likewise a
+  // stale connection source (e.g. a replica identifier restored from the URL)
+  // falls back to the primary, since HA sources are only the primary and the
+  // load balancer.
+  const resolvedState = useMemo(() => {
+    if (!isHighAvailability) return state
+
+    const next: ConnectState = { ...state, connectionMethod: 'direct', useSharedPooler: false }
+    const hasValidSource =
+      state.connectionSource === undefined ||
+      state.connectionSource === projectRef ||
+      state.connectionSource === CONNECTION_SOURCE_LOAD_BALANCER
+    if (!hasValidSource) next.connectionSource = projectRef ?? '_'
+    return next
+  }, [state, isHighAvailability, projectRef])
+
   const activeFields = useMemo(() => {
-    let fields = getActiveFields(connectSchema, state)
+    let fields = getActiveFields(connectSchema, resolvedState)
     if (!hasDedicatedPooler || !deploymentMode.isPlatform) {
       // useSharedPooler is a platform-only toggle (CLI has no pooler; self-hosted
       // already uses Supavisor shared)
@@ -360,21 +409,28 @@ export function useConnectState(initialState?: Partial<ConnectState>): UseConnec
         .map((f) => (f.id === 'connectionType' ? { ...f, label: 'Connection Type' } : f))
     }
     return fields
-  }, [state, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
+  }, [resolvedState, hasDedicatedPooler, isHighAvailability, deploymentMode.isPlatform])
 
-  const resolvedSteps = useMemo(() => resolveSteps(connectSchema, state), [state])
+  const resolvedSteps = useMemo(() => resolveSteps(connectSchema, resolvedState), [resolvedState])
 
   const getFieldOptions = useCallback(
     (fieldId: string): FieldOption[] => {
       const field = activeFields.find((f) => f.id === fieldId)
       if (!field) return []
-      return resolveFieldOptionsWithSource({ field, state, databases, deploymentMode })
+      return resolveFieldOptionsWithSource({
+        field,
+        state: resolvedState,
+        databases,
+        deploymentMode,
+        isHighAvailability,
+        projectRef,
+      })
     },
-    [activeFields, state, databases, deploymentMode]
+    [activeFields, resolvedState, databases, deploymentMode, isHighAvailability, projectRef]
   )
 
   return {
-    state,
+    state: resolvedState,
     updateField,
     setMode,
     activeFields,

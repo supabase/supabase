@@ -1,11 +1,11 @@
 import { useIsLoggedIn, useParams } from 'common'
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useEffectEvent, useRef, useState, type ReactNode } from 'react'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
@@ -27,7 +27,7 @@ const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize CLI', brand: 'Supa
 
 const CliLogo = () => (
   <LogoBox className="bg-black">
-    <Terminal className="size-6 text-white" strokeWidth={2} />
+    <TerminalIcon className="size-6 text-white" strokeWidth={2} />
   </LogoBox>
 )
 
@@ -167,7 +167,6 @@ export const CliLoginScreen = ({
     return () => {
       isActive = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [deviceCode, isLoggedIn, publicKey, routerReady, sessionId, tokenName])
 
   if (status._tag === 'loading') {
@@ -207,7 +206,7 @@ export const CliLoginScreen = ({
               isPlural ? 's' : ''
             }: ${status.missingParameters.join(', ')}.`}
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>
@@ -235,7 +234,7 @@ export const CliLoginScreen = ({
               </>
             }
           />
-          <Button variant="default" block asChild>
+          <Button block asChild>
             <Link href="/organizations">Back to dashboard</Link>
           </Button>
         </div>

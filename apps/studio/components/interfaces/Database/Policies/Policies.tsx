@@ -4,7 +4,7 @@ import Link from 'next/link'
 import { useCallback, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, Card, CardContent } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { usePoliciesData } from './PoliciesDataContext'
@@ -142,7 +142,7 @@ export const Policies = ({
             RLS Policies control per-user access to table rows. Create a table in this schema first
             before creating a policy.
           </p>
-          <Button asChild variant="default">
+          <Button asChild>
             <Link href={`/project/${ref}/editor`}>Create a table</Link>
           </Button>
         </CardContent>
@@ -157,7 +157,7 @@ export const Policies = ({
 
         {!isSchemaExposedAPI && (
           <Admonition
-            variant="warning"
+            type="warning"
             title="No data from any table in this schema will be selectable via Supabase APIs"
           >
             This schema is not exposed via the Supabase APIs. You may configure this in your

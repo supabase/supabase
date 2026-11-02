@@ -7,7 +7,7 @@
   "repository": "supabase/supabase",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "clean": "rimraf node_modules .turbo tsconfig.tsbuildinfo",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
     "test": "test/run-tests.sh vitest run --coverage",
     "test:update": "test/run-tests.sh vitest run --update",
     "lint": "tsc --noEmit",

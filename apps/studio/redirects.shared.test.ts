@@ -1,6 +1,23 @@
+import { readdirSync } from 'node:fs'
+import { createRequire } from 'node:module'
+import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
 
-import { matchRedirect, preserveQueryAndHash } from './redirects.shared'
+import {
+  getMaintenanceRedirects,
+  MAINTENANCE_PASSTHROUGH_SEGMENTS,
+  matchRedirect,
+  preserveQueryAndHash,
+} from './redirects.shared'
+
+// Next's own redirect matcher, so the declarative rule is tested as Next runs it.
+const require = createRequire(import.meta.url)
+const { getPathMatch } = require('next/dist/shared/lib/router/utils/path-match') as {
+  getPathMatch: (
+    path: string,
+    options: { strict: boolean; removeUnnamedParams: boolean }
+  ) => (pathname: string) => false | Record<string, string>
+}
 
 describe('preserveQueryAndHash', () => {
   it('carries incoming query params onto the destination', () => {
@@ -51,7 +68,113 @@ describe('preserveQueryAndHash', () => {
   })
 })
 
+describe('matchRedirect moved Studio routes', () => {
+  const ref = 'abcdefghijklmnopqrst'
+
+  it.each([
+    [`/project/${ref}/database/backups`, `/project/${ref}/database/backups/scheduled`],
+    [`/project/${ref}/auth/emails`, `/project/${ref}/auth/templates`],
+    [`/project/${ref}/logs/edge-functions`, `/project/${ref}/logs/edge-functions-logs`],
+    [`/project/${ref}/settings/vault`, `/project/${ref}/integrations/vault/secrets`],
+    [`/project/${ref}/settings/billing`, '/org/_/billing'],
+    [`/project/${ref}/database/hooks`, `/project/${ref}/integrations/webhooks/overview`],
+    ['/account', '/account/me'],
+    ['/org/my-org/projects', '/org/my-org'],
+    ['/project', '/organizations'],
+  ])('redirects %s to %s', (pathname, destination) => {
+    expect(matchRedirect({ pathname, search: {}, isPlatform: true })).toEqual({
+      destination,
+      permanent: true,
+    })
+  })
+
+  it('preserves the incoming query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: `/project/${ref}/database/backups`,
+        search: { source: 'bookmark' },
+        hash: 'scheduled',
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: `/project/${ref}/database/backups/scheduled?source=bookmark#scheduled`,
+      permanent: true,
+    })
+  })
+
+  it('does not intercept the project selector', () => {
+    expect(matchRedirect({ pathname: '/project/_', search: {}, isPlatform: true })).toBeNull()
+  })
+})
+
 describe('matchRedirect query/hash preservation', () => {
+  it('redirects the legacy compute and disk route while preserving query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/settings/compute-and-disk',
+        search: { upgrade: 'micro' },
+        isPlatform: true,
+        hash: 'disk',
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure?upgrade=micro#disk',
+      permanent: true,
+    })
+  })
+
+  it('redirects legacy replication replica detail to infrastructure', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/replica/replica-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure/replica/replica-1',
+      permanent: true,
+    })
+  })
+
+  it('redirects the legacy replication list route to Pipelines while preserving query and hash', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication',
+        search: { source: 'bookmark' },
+        isPlatform: true,
+        hash: 'destinations',
+      })
+    ).toEqual({
+      destination: '/project/abc/database/pipelines?source=bookmark#destinations',
+      permanent: true,
+    })
+  })
+
+  it('redirects legacy pipeline detail URLs to Pipelines', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/database/replication/pipeline-1',
+        search: {},
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/database/pipelines/pipeline-1',
+      permanent: true,
+    })
+  })
+
+  it('redirects the legacy compute billing panel to the CPU section', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/settings/billing/subscription',
+        search: { panel: 'computeInstance', source: 'banner' },
+        isPlatform: true,
+      })
+    ).toEqual({
+      destination: '/project/abc/settings/infrastructure?source=banner#cpu',
+      permanent: true,
+    })
+  })
+
   it('carries the incoming query and hash through a plain rule', () => {
     expect(
       matchRedirect({
@@ -115,5 +238,129 @@ describe('matchRedirect query/hash preservation', () => {
     expect(
       matchRedirect({ pathname: '/project/abc/editor', search: { a: '1' }, isPlatform: true })
     ).toBeNull()
+  })
+})
+
+describe('matchRedirect maintenance mode', () => {
+  it('sends every other path to /maintenance when enabled', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/editor',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toEqual({ destination: '/maintenance', permanent: false })
+  })
+
+  it('carries query and hash onto /maintenance', () => {
+    expect(
+      matchRedirect({
+        pathname: '/project/abc/editor',
+        search: { a: '1' },
+        isPlatform: true,
+        maintenanceMode: true,
+        hash: 'section',
+      })
+    ).toEqual({ destination: '/maintenance?a=1#section', permanent: false })
+  })
+
+  it('leaves /maintenance and /img reachable when enabled', () => {
+    expect(
+      matchRedirect({
+        pathname: '/maintenance',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toBeNull()
+    expect(
+      matchRedirect({
+        pathname: '/img/supabase-logo.svg',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: true,
+      })
+    ).toBeNull()
+  })
+
+  // Static files the maintenance page (or the SPA shell rendering it) loads.
+  const assetPaths = [
+    '/maintenance',
+    '/maintenance/',
+    '/img/supabase-dark.svg',
+    '/favicon/favicon.ico',
+    '/favicon/manifest.json',
+    '/fonts/CustomFont-Book.woff2',
+    '/assets/main-abc123.js',
+    '/_vercel/immutable/salt/nitro/main-abc123.js',
+    '/_vercel/immutable/salt/nitro/styles-abc123.css',
+    '/_next/static/chunks/main-abc123.js',
+    '/monaco-editor/vs/loader.js',
+    '/supabase-logo.svg',
+  ]
+  const pagePaths = [
+    '/',
+    '/project/abc/editor',
+    '/org/acme/billing',
+    '/sign-in',
+    '/maintenance-other',
+    '/images/logo.svg',
+    '/project/img',
+    '/api/platform/profile',
+    '/_serverFn/function-id',
+  ]
+
+  it.each(assetPaths)('leaves %s reachable when enabled', (pathname) => {
+    expect(
+      matchRedirect({ pathname, search: {}, isPlatform: true, maintenanceMode: true })
+    ).toBeNull()
+  })
+
+  it.each(pagePaths)('redirects %s when enabled', (pathname) => {
+    expect(
+      matchRedirect({ pathname, search: {}, isPlatform: true, maintenanceMode: true })
+    ).toEqual({ destination: '/maintenance', permanent: false })
+  })
+
+  it.each(['', '/dashboard'])(
+    'declarative rule agrees with the runtime matcher under Next with base path "%s"',
+    (basePath) => {
+      const [rule] = getMaintenanceRedirects(true)
+      // Next prepends basePath to redirect sources.
+      const match = getPathMatch(`${basePath}${rule.source}`, {
+        strict: true,
+        removeUnnamedParams: true,
+      })
+      for (const pathname of assetPaths) {
+        expect(match(`${basePath}${pathname}`), pathname).toBe(false)
+      }
+      for (const pathname of pagePaths) {
+        expect(match(`${basePath}${pathname}`), pathname).not.toBe(false)
+      }
+    }
+  )
+
+  it('keeps every top-level public/ entry reachable', () => {
+    const publicDir = fileURLToPath(new URL('./public', import.meta.url))
+    for (const entry of readdirSync(publicDir)) {
+      if (entry.startsWith('.')) continue
+      expect(MAINTENANCE_PASSTHROUGH_SEGMENTS, entry).toContain(entry)
+    }
+  })
+
+  it('bounces /maintenance back to / when disabled', () => {
+    expect(matchRedirect({ pathname: '/maintenance', search: {}, isPlatform: true })).toEqual({
+      destination: '/',
+      permanent: false,
+    })
+    expect(
+      matchRedirect({
+        pathname: '/maintenance',
+        search: {},
+        isPlatform: true,
+        maintenanceMode: false,
+      })
+    ).toEqual({ destination: '/', permanent: false })
   })
 })

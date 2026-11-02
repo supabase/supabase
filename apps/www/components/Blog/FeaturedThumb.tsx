@@ -51,7 +51,7 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
         </div>
 
         {/* Text */}
-        <div className="flex flex-col lg:col-span-6 md:justify-center">
+        <div className="flex flex-col lg:col-span-6 md:justify-center lg:pr-8">
           <div>
             <h2 className="h2 lg:text-2xl! xl:text-3xl! mb-2! group-hover:underline">
               {blog.title}
@@ -59,18 +59,20 @@ function renderFeaturedThumb(blog: PostTypes, author: any[]) {
             <p className="p">{blog.description}</p>
           </div>
 
-          <div className="flex items-center justify-between mt-4">
-            <div>
+          <div className="flex items-center justify-between gap-4 mt-4">
+            <div className="min-w-0 flex-1">
               <span className="sr-only">Author: </span>
               <AuthorAvatars authors={author} size="md" />
             </div>
-            <div className="text-foreground-lighter flex space-x-2 text-sm">
+            <div className="text-foreground-lighter flex shrink-0 space-x-2 text-xs">
               <span>
                 <span className="sr-only">Published </span>
                 {blog.formattedDate}
               </span>
-              <span aria-hidden="true">·</span>
-              <span>{blog.readingTime}</span>
+              <span aria-hidden="true" className="hidden sm:inline">
+                ·
+              </span>
+              <span className="hidden sm:inline">{blog.readingTime}</span>
             </div>
           </div>
         </div>

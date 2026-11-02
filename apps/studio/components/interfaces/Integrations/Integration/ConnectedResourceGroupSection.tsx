@@ -1,7 +1,7 @@
-import { Settings, Trash2, TriangleAlert } from 'lucide-react'
+import { SettingsIcon, Trash2Icon, TriangleAlertIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { type ResourceGroup } from './MarketplaceIntegrationSettingsTab.types'
 import { type ConnectedResource } from '@/components/interfaces/Integrations/Landing/Landing.utils'
@@ -20,13 +20,13 @@ export const ResourceGroupSection = ({
           <h3 className="text-base text-foreground">{group.title}</h3>
           {group.missing ? (
             <Badge variant="warning" className="gap-x-1.5">
-              <TriangleAlert size={12} strokeWidth={1.5} />
+              <TriangleAlertIcon size={12} strokeWidth={1.5} />
               Not connected
             </Badge>
           ) : (
             group.badge && (
               <Badge variant="success" className="gap-x-1.5">
-                <span className="h-1.5 w-1.5 rounded-full bg-brand" />
+                <span className="h-1.5 w-1.5 rounded-full bg-primary-bright" />
                 {group.badge}
               </Badge>
             )
@@ -46,7 +46,7 @@ export const ResourceGroupSection = ({
       {group.missing ? (
         group.manageAction && (
           <div className="max-w-2xl">
-            <Button asChild variant="default" icon={<Settings />}>
+            <Button asChild icon={<SettingsIcon />}>
               <Link href={group.manageAction.href}>{group.manageAction.label}</Link>
             </Button>
           </div>
@@ -60,6 +60,7 @@ export const ResourceGroupSection = ({
             >
               <div className="flex min-w-0 flex-col">
                 <code
+                  data-code-style="plain"
                   className="truncate font-mono text-sm text-foreground"
                   title={item.identifier}
                 >
@@ -69,13 +70,12 @@ export const ResourceGroupSection = ({
               </div>
               <div className="flex shrink-0 items-center gap-x-2">
                 {group.manageAction && (
-                  <Button asChild variant="default" icon={<Settings />}>
+                  <Button asChild icon={<SettingsIcon />}>
                     <Link href={group.manageAction.href}>{group.manageAction.label}</Link>
                   </Button>
                 )}
                 <Button
-                  variant="default"
-                  icon={<Trash2 className="text-foreground-light" />}
+                  icon={<Trash2Icon className="text-foreground-light" />}
                   onClick={() => onRemove(item.resource)}
                 >
                   Remove

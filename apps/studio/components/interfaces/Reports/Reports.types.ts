@@ -1,6 +1,7 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import type { Granularity } from '@/data/reports/report.utils'
 import type { ResponseError } from '@/types'
 
 export enum Presets {
@@ -33,6 +34,7 @@ export interface ReportQueryLogs {
     page?: number,
     pageSize?: number
   ) => SafeLogSqlFragment
+  safeSqlOtel?: (filters: ReportFilterItem[], granularity?: Granularity) => SafeLogSqlFragment
 }
 
 export interface ReportQueryDb {

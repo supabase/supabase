@@ -160,7 +160,7 @@ function CodeBlock(props: CodeBlockProps) {
                 variant="text"
                 icon={
                   copied ? (
-                    <span className="text-brand">
+                    <span className="text-primary">
                       <Check strokeWidth={3} />
                     </span>
                   ) : (

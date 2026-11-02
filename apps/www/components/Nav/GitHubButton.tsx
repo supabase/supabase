@@ -45,7 +45,7 @@ const GitHubButton = () => {
               fill="currentColor"
             />
           </svg>
-          {kFormatter(githubStars)}
+          {typeof githubStars === 'number' && githubStars > 0 ? kFormatter(githubStars) : 'GitHub'}
         </span>
       </a>
     </Button>

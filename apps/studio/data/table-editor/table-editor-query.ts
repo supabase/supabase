@@ -3,6 +3,7 @@ import { QueryClient, queryOptions, useQuery } from '@tanstack/react-query'
 
 import { tableEditorKeys } from './keys'
 import { Entity } from './table-editor-types'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -30,6 +31,7 @@ export async function getTableEditor(
       connectionString,
       sql,
       queryKey: ['table-editor', id],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -46,8 +48,8 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableEditorData, TableEditorError, TData> = {}
-) =>
-  useQuery<TableEditorData, TableEditorError, TData>({
+) => {
+  return useQuery<TableEditorData, TableEditorError, TData>({
     ...tableEditorQueryOptions({ projectRef, connectionString, id }),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
@@ -56,6 +58,7 @@ export const useTableEditorQuery = <TData = TableEditorData>(
     staleTime: 5 * 60 * 1000,
     ...options,
   })
+}
 
 export function prefetchTableEditor(
   client: QueryClient,

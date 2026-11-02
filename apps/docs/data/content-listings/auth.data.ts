@@ -17,6 +17,11 @@ export const authGetStarted: ContentListingGroup = {
       description: 'Create a Supabase client for SSR frameworks like Next.js and SvelteKit.',
     },
     {
+      title: 'Which package to use',
+      href: '/guides/auth/choosing-a-server-package',
+      description: 'supabase-js vs @supabase/ssr vs @supabase/server — which to use on the server.',
+    },
+    {
       title: 'Row Level Security',
       href: '/guides/database/postgres/row-level-security',
       description: 'Use RLS policies to authorize data access from the client.',

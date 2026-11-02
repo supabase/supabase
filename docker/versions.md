@@ -1,4 +1,34 @@
-# Docker Image Versions
+# Docker image version updates in docker-compose.yml
+
+## 2026-10-16
+- supabase/studio:2026.10.12-sha-3699278 (prev supabase/studio:2026.09.07-sha-7996410)
+- supabase/gotrue:v2.197.0 (prev supabase/gotrue:v2.196.0)
+- postgrest/postgrest:v14.18 (prev postgrest/postgrest:v14.17)
+- supabase/realtime:v2.143.3 (prev supabase/realtime:v2.134.10)
+- supabase/storage-api:v1.81.0 (prev supabase/storage-api:v1.74.0)
+- supabase/postgres-meta:v0.100.0 (prev supabase/postgres-meta:v0.99.0)
+- supabase/edge-runtime:v1.77.4 (prev supabase/edge-runtime:v1.76.2)
+- supabase/supavisor:2.9.13 (prev supabase/supavisor:2.9.12)
+- jonasal/nginx-certbot:6.2.0-nginx1.31.6 (prev jonasal/nginx-certbot:6.2.0-nginx1.31.5)
+- rustfs/rustfs:1.0.1 (prev rustfs/rustfs:v1.0.0-rc.5)
+- supabase/logflare:1.50.15 (prev supabase/logflare:1.50.10)
+
+## 2026-09-09
+- supabase/studio:2026.09.07-sha-7996410 (prev supabase/studio:2026.08.03-sha-022b374)
+- envoyproxy/envoy:v1.39.1 (prev envoyproxy/envoy:v1.39.0)
+- supabase/gotrue:v2.196.0 (prev supabase/gotrue:v2.189.0)
+- postgrest/postgrest:v14.17 (prev postgrest/postgrest:v14.12)
+- supabase/realtime:v2.134.10 (prev supabase/realtime:v2.102.3)
+- supabase/storage-api:v1.74.0 (prev supabase/storage-api:v1.60.4)
+- darthsim/imgproxy:v3.31.4 (prev darthsim/imgproxy:v3.30.1)
+- supabase/postgres-meta:v0.99.0 (prev supabase/postgres-meta:v0.96.6)
+- supabase/edge-runtime:v1.76.2 (prev supabase/edge-runtime:v1.74.0)
+- supabase/supavisor:2.9.12 (prev supabase/supavisor:2.9.5)
+- supabase/logflare:1.50.10 (prev supabase/logflare:1.43.1)
+
+## 2026-08-03
+- supabase/studio:2026.08.03-sha-022b374 (prev supabase/studio:2026.07.07-sha-a6a04f2)
+- kong/kong:3.9.3 (prev kong/kong:3.9.1)
 
 ## 2026-07-07
 - supabase/studio:2026.07.07-sha-a6a04f2 (prev supabase/studio:2026.06.03-sha-0bca601)

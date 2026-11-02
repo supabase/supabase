@@ -26,7 +26,6 @@ describe('MCP advisor operations pass exposedSchemas to getLints', () => {
   const headers = { Authorization: 'Bearer test' }
 
   beforeEach(() => {
-    vi.clearAllMocks()
     mockGetLints.mockResolvedValue({
       data: [
         {
@@ -56,33 +55,17 @@ describe('MCP advisor operations pass exposedSchemas to getLints', () => {
     })
   })
 
-  it('getSecurityAdvisors should pass exposedSchemas to getLints', async () => {
-    const ops = getDebuggingOperations({ headers })
-    await ops.getSecurityAdvisors('test-project')
+  it.each(['getSecurityAdvisors', 'getPerformanceAdvisors'] as const)(
+    '%s passes DEFAULT_EXPOSED_SCHEMAS to getLints',
+    async (operation) => {
+      const ops = getDebuggingOperations({ headers })
+      await ops[operation]('test-project')
 
-    expect(mockGetLints).toHaveBeenCalledOnce()
-    const callArgs = mockGetLints.mock.calls[0][0]
-    expect(callArgs).toHaveProperty('exposedSchemas')
-    expect(callArgs.exposedSchemas).toBeTruthy()
-  })
-
-  it('getPerformanceAdvisors should pass exposedSchemas to getLints', async () => {
-    const ops = getDebuggingOperations({ headers })
-    await ops.getPerformanceAdvisors('test-project')
-
-    expect(mockGetLints).toHaveBeenCalledOnce()
-    const callArgs = mockGetLints.mock.calls[0][0]
-    expect(callArgs).toHaveProperty('exposedSchemas')
-    expect(callArgs.exposedSchemas).toBeTruthy()
-  })
-
-  it('should use DEFAULT_EXPOSED_SCHEMAS constant', async () => {
-    const ops = getDebuggingOperations({ headers })
-    await ops.getSecurityAdvisors('test-project')
-
-    const callArgs = mockGetLints.mock.calls[0][0]
-    expect(callArgs.exposedSchemas).toBe(DEFAULT_EXPOSED_SCHEMAS)
-  })
+      expect(mockGetLints).toHaveBeenCalledWith(
+        expect.objectContaining({ exposedSchemas: DEFAULT_EXPOSED_SCHEMAS })
+      )
+    }
+  )
 
   it('getSecurityAdvisors should filter to SECURITY category', async () => {
     const ops = getDebuggingOperations({ headers })

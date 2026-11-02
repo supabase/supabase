@@ -1,5 +1,5 @@
 import { ReactNode } from 'react'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
@@ -230,6 +230,23 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     ],
   })
 
+  const logStorageAttributes: CategoryAttribute[] =
+    subscription?.plan.id === 'platform'
+      ? [
+          {
+            anchor: 'logStorage',
+            key: PricingMetric.LOG_STORAGE,
+            attributes: [{ key: PricingMetric.LOG_STORAGE.toLowerCase(), color: 'white' }],
+            name: 'Log Storage',
+            unit: 'absolute',
+            description:
+              'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
+            chartDescription: 'The data refreshes every hour.',
+            links: [],
+          },
+        ]
+      : []
+
   return [
     {
       key: 'egress',
@@ -373,34 +390,46 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
           key: PricingMetric.LOG_INGESTION,
           attributes: [{ key: PricingMetric.LOG_INGESTION.toLowerCase(), color: 'white' }],
           name: 'Log Ingestion',
-          unit: 'absolute',
+          unit: 'bytes',
           description:
-            'Total amount of logs ingested across all projects.\nBilling is based on the total amount of logs ingested in Gigabyte.',
+            subscription?.plan.id === 'platform'
+              ? "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle."
+              : "Total volume of log data that Supabase ingests across all your project's services (Postgres, API gateway, Auth, Storage, Realtime, Edge Functions, and others) during the billing cycle.\nBilling starts after the grace period ends in early 2027.",
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Log Ingestion',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/logs-ingest`,
+            },
+          ],
         },
         {
           anchor: 'logQuery',
           key: PricingMetric.LOG_QUERYING,
           attributes: [{ key: PricingMetric.LOG_QUERYING.toLowerCase(), color: 'white' }],
           name: 'Log Query',
-          unit: 'absolute',
+          unit: 'bytes',
           description:
-            'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.',
+            subscription?.plan.id === 'platform'
+              ? 'Total amount of logs queried across all projects.\nBilling is based on the total amount of logs queried in Gigabyte.'
+              : "Total amount of logs queried across all projects.\nLogs Query usage isn't billed directly. Instead, your organization gets a log query allowance that scales with how much log data you ingest. The allowance covers the volume of log data scanned when you read logs through the Studio UI, the Management API, the CLI, or any other interface.\nAn enforcement timeline will be announced at a future date before it will take effect.",
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Log Query',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/logs-query`,
+            },
+            ...(subscription?.plan.id !== 'platform'
+              ? [
+                  {
+                    name: 'Share feedback on GitHub',
+                    url: 'https://github.com/orgs/supabase/discussions/50925',
+                  },
+                ]
+              : []),
+          ],
         },
-        {
-          anchor: 'logStorage',
-          key: PricingMetric.LOG_STORAGE,
-          attributes: [{ key: PricingMetric.LOG_STORAGE.toLowerCase(), color: 'white' }],
-          name: 'Log Storage',
-          unit: 'absolute',
-          description:
-            'Total amount of logs stored on the platform. Log retention depends on your platform agreement.\nBilling is based on the total amount of logs stored and factors in the retention period.',
-          chartDescription: 'The data refreshes every hour.',
-          links: [],
-        },
+        ...logStorageAttributes,
       ],
     },
 
@@ -410,26 +439,40 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       description: 'Usage statistics related to your pipelines',
       attributes: [
         {
-          anchor: 'pipeline-backfill-data',
-          key: PricingMetric.ETL_COPY_BACKFILL_DATA,
-          attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Backfill Data',
+          anchor: 'pipeline-initial-sync-data',
+          key: PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
+          attributes: [
+            { key: PricingMetric.PIPELINES_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' },
+          ],
+          name: 'Initial Sync Data Processed',
           unit: 'bytes',
           description:
-            'Total amount of backfill/initial copy data processed across all projects.\nBilling is based on the total amount of backfill/initial copy data processed in Gigabyte.',
+            'Postgres row data accepted by pipeline destinations during initial sync or resynchronization across all projects.\nBilling is based on the total amount of initial sync data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+            },
+          ],
         },
         {
-          anchor: 'pipeline-replicated-data',
-          key: PricingMetric.ETL_REPLICATED_DATA,
-          attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
-          name: 'Pipeline Replicated Data',
+          anchor: 'pipeline-ongoing-replication-data',
+          key: PricingMetric.PIPELINES_REPLICATED_DATA,
+          attributes: [
+            { key: PricingMetric.PIPELINES_REPLICATED_DATA.toLowerCase(), color: 'white' },
+          ],
+          name: 'Ongoing Replication Data Processed',
           unit: 'bytes',
           description:
-            'Total amount of replicated data processed across all projects.\nBilling is based on the total amount of replicated data processed in Gigabyte.',
+            'Postgres row data accepted by pipeline destinations during ongoing replication across all projects.\nBilling is based on the total amount of ongoing replication data processed in gigabytes.',
           chartDescription: 'The data refreshes every hour.',
-          links: [],
+          links: [
+            {
+              name: 'Pipelines',
+              url: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+            },
+          ],
         },
       ],
     },

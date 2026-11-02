@@ -1,23 +1,20 @@
 import { useParams } from 'common'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
 import RecentQueriesItem from '@/components/interfaces/Settings/Logs/RecentQueriesItem'
+import { useRecentLogSqlSnippets } from '@/components/interfaces/Settings/Logs/useRecentLogSqlSnippets'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import Table from '@/components/to-be-cleaned/Table'
 import LogsExplorerHeader from '@/components/ui/Logs/LogsExplorerHeader'
-import { useLocalStorage } from '@/hooks/misc/useLocalStorage'
-import type { LogSqlSnippets, NextPageWithLayout } from '@/types'
+import type { NextPageWithLayout } from '@/types'
 
 export const LogsSavedPage: NextPageWithLayout = () => {
   const { ref } = useParams()
 
-  const [recentLogSnippets, setRecentLogSnippets] = useLocalStorage<LogSqlSnippets.Content[]>(
-    `project-content-${ref}-recent-log-sql`,
-    []
-  )
+  const [recentLogSnippets, setRecentLogSnippets] = useRecentLogSqlSnippets(ref)
   const recent = recentLogSnippets.slice().reverse()
 
   return (
@@ -29,21 +26,21 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             <>
               <Table.th>Snippets</Table.th>
               <Table.th className="w-24">
-                <Button size="tiny" variant="default" onClick={() => setRecentLogSnippets([])}>
+                <Button size="tiny" onClick={() => setRecentLogSnippets([])}>
                   Clear history
                 </Button>
               </Table.th>
             </>
           }
-          body={recent.map((item: LogSqlSnippets.Content) => (
-            <RecentQueriesItem key={item.sql} item={item} />
+          body={recent.map((item) => (
+            <RecentQueriesItem key={item.unchecked_sql} item={item} />
           ))}
         />
       )}
       {recent.length === 0 && (
         <>
           <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
-            <Clock className="animate-bounce" />
+            <ClockIcon className="animate-bounce" />
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">
               Your recent queries run from the{' '}

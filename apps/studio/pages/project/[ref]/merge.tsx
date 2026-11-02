@@ -1,11 +1,12 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { AlertTriangle, GitBranchIcon, X } from 'lucide-react'
+import { AlertTriangleIcon, GitBranchIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, NavMenu, NavMenuItem } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useIsPgDeltaDiffEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -23,17 +24,21 @@ import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
 import { ProjectLayoutWithAuth } from '@/components/layouts/ProjectLayout'
 import { ScaffoldContainer } from '@/components/layouts/Scaffold'
 import ProductEmptyState from '@/components/to-be-cleaned/ProductEmptyState'
+import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchDeleteMutation } from '@/data/branches/branch-delete-mutation'
 import { useBranchMergeMutation } from '@/data/branches/branch-merge-mutation'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import type { NextPageWithLayout } from '@/types'
 
@@ -57,16 +62,22 @@ const MergePage: NextPageWithLayout = () => {
     ref: parentProjectRef,
   })
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: parentProjectRef },
-    {
-      refetchOnMount: 'always',
-      refetchOnWindowFocus: true,
-      staleTime: 0,
-    }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: parentProjectRef,
+  })
+
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
+    refetchOnMount: 'always',
+    refetchOnWindowFocus: true,
+    staleTime: 0,
+  })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
 
   const {
     diffContent,
@@ -241,8 +252,9 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleCloseBranch = () => {
-    if (!ref || !parentProjectRef) return
+    if (!ref || !parentProjectRef || deleteBranchGrant.status !== 'granted') return
     deleteBranch({
+      grant: deleteBranchGrant.grant,
       branchRef: ref,
       projectRef: parentProjectRef,
     })
@@ -299,6 +311,29 @@ const MergePage: NextPageWithLayout = () => {
   useEffect(() => {
     setWorkflowFinalStatus(null)
   }, [currentWorkflowRunId])
+
+  if (branchesGrant.status === 'denied') {
+    return (
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <NoPermission resourceText="view this project's branches" />
+        </ScaffoldContainer>
+      </PageLayout>
+    )
+  }
+
+  if (branchesGrant.status === 'error') {
+    return (
+      <PageLayout>
+        <ScaffoldContainer size="full">
+          <AlertError
+            error={branchesGrant.error}
+            subject="Failed to check your permissions to view branches"
+          />
+        </ScaffoldContainer>
+      </PageLayout>
+    )
+  }
 
   // If not on a preview branch or branch info unavailable, show notice
   if (!isBranch || !currentBranch) {
@@ -380,7 +415,7 @@ const MergePage: NextPageWithLayout = () => {
                 }
                 overrideIcon={
                   hasCurrentWorkflowFailed ? (
-                    <AlertTriangle
+                    <AlertTriangleIcon
                       size={16}
                       strokeWidth={1.5}
                       className="text-destructive shrink-0"
@@ -390,7 +425,6 @@ const MergePage: NextPageWithLayout = () => {
                 overrideAction={
                   hasCurrentWorkflowFailed ? (
                     <Button
-                      variant="default"
                       asChild
                       icon={<GitBranchIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
@@ -399,10 +433,10 @@ const MergePage: NextPageWithLayout = () => {
                     </Button>
                   ) : hasCurrentWorkflowCompleted ? (
                     <Button
-                      variant="default"
                       onClick={handleCloseBranch}
+                      disabled={deleteBranchGrant.status !== 'granted'}
                       loading={isDeleting}
-                      icon={<X size={16} strokeWidth={1.5} />}
+                      icon={<XIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
                     >
                       Close branch

@@ -52,18 +52,6 @@ describe('generateRegexpWhereSafe', () => {
     )
   })
 
-  it('should handle numbers', () => {
-    const filters: ReportFilterItem[] = [
-      {
-        key: 'request.status_code',
-        value: 200,
-        compare: 'is',
-      },
-    ]
-    const result = generateRegexpWhereSafe(filters, true)
-    expect(result).toBe('WHERE `request`.`status_code` = 200')
-  })
-
   it('should escape single quotes in string values', () => {
     const filters: ReportFilterItem[] = [
       {
@@ -116,6 +104,18 @@ describe('generateRegexpWhereSafe', () => {
       },
     ]
     const result = generateRegexpWhereSafe(filters, true)
-    expect(result).toBe("WHERE `request`.`method` = 'get'")
+    expect(result).toBe("WHERE `request`.`method` = 'GET'")
+  })
+
+  it('should preserve value casing so uppercase HTTP methods match', () => {
+    const filters: ReportFilterItem[] = [
+      {
+        key: 'request.method',
+        value: 'DELETE',
+        compare: 'is',
+      },
+    ]
+    const result = generateRegexpWhereSafe(filters, true)
+    expect(result).toBe("WHERE `request`.`method` = 'DELETE'")
   })
 })

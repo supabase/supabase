@@ -14,11 +14,11 @@ Edge Functions currently doesn't support image processing libraries such as `Sha
 
 </Admonition>
 
-### Prerequisites
+## Prerequisites
 
-Make sure you have the latest version of the [Supabase CLI](/docs/guides/cli#installation) installed.
+Make sure you have the latest version of the [Supabase CLI](/docs/guides/local-development/cli/getting-started#installing-the-supabase-cli) installed.
 
-### Create the Edge Function
+## Create the Edge Function
 
 Create a new function locally:
 
@@ -27,7 +27,7 @@ supabase functions new image-blur
 
 ```
 
-### Write the function
+## Write the function
 
 In this example, we are implementing a function allowing users to upload an image and get a blurred thumbnail.
 
@@ -38,7 +38,7 @@ path="edge-functions/supabase/functions/image-manipulation/index.ts"
 lines={[[1, -1]]}
 />
 
-### Test it locally
+## Test it locally
 
 You can test the function locally by running:
 
@@ -59,7 +59,7 @@ curl --location '<http://localhost:54321/functions/v1/image-blur>' \\
 
 If you open the `output.png` file you will find a transformed version of your original image.
 
-### Deploy to your hosted project
+## Deploy to your hosted project
 
 Deploy the function to your Supabase project.
 

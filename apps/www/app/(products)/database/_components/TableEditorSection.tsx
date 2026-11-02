@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
 import { FileDown, Link2, Table, TableProperties } from 'lucide-react'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 
@@ -131,6 +131,7 @@ export function TableEditorSection() {
             const Icon = ICONS[tab.icon]
             return (
               <button
+                tabIndex={0}
                 key={tab.label}
                 onClick={() => handleTabClick(index)}
                 className={cn(

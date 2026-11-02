@@ -37,7 +37,7 @@ describe('VectorBucketsErrorState', () => {
 
     expect(screen.getByText('Vector buckets are not enabled')).toBeInTheDocument()
     expect(screen.getByText('supabase/config.toml')).toBeInTheDocument()
-    expect(screen.queryByText('Contact support')).not.toBeInTheDocument()
+    expect(screen.queryByRole('link', { name: /contact support/i })).not.toBeInTheDocument()
   })
 
   test('platform: shows the generic support error', () => {
@@ -46,7 +46,7 @@ describe('VectorBucketsErrorState', () => {
     customRender(<VectorBucketsErrorState error={new ResponseError('boom')} />)
 
     expect(screen.getByText('Failed to retrieve vector buckets')).toBeInTheDocument()
-    expect(screen.getByText('Contact support')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: /contact support/i })).toBeInTheDocument()
     expect(screen.queryByText('Vector buckets are not enabled')).not.toBeInTheDocument()
   })
 })

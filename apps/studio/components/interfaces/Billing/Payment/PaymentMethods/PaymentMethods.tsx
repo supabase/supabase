@@ -1,10 +1,11 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CreditCardIcon, ExternalLink, Plus } from 'lucide-react'
+import { CreditCardIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
+import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import ChangePaymentMethodModal from './ChangePaymentMethodModal'
@@ -25,7 +26,7 @@ import PartnerManagedResource from '@/components/ui/PartnerManagedResource'
 import { isPartnerBillingOrganization } from '@/data/organizations/managed-by-utils'
 import { useOrganizationPaymentMethodsQuery } from '@/data/organizations/organization-payment-methods-query'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { getURL } from '@/lib/helpers'
@@ -37,22 +38,21 @@ const PaymentMethods = () => {
   const [selectedMethodToDelete, setSelectedMethodToDelete] = useState<any>()
   const [showAddPaymentMethodModal, setShowAddPaymentMethodModal] = useState(false)
 
-  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug })
+  const { ref, inView } = useInView({ triggerOnce: true })
+  const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: slug }, { enabled: inView })
   const {
     data: paymentMethods,
     error,
     isPending: isLoading,
     isError,
     isSuccess,
-  } = useOrganizationPaymentMethodsQuery({ slug })
+  } = useOrganizationPaymentMethodsQuery({ slug }, { enabled: inView })
 
-  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
+  const { can: canReadPaymentMethods, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
-  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.payment_methods'
+  const { can: canUpdatePaymentMethods } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE
   )
   const isPartnerBilledOrganization = isPartnerBillingOrganization(
     selectedOrganization?.billing_partner
@@ -61,7 +61,7 @@ const PaymentMethods = () => {
     selectedOrganization?.managed_by === MANAGED_BY.STRIPE_PROJECTS
   return (
     <>
-      <ScaffoldSection>
+      <ScaffoldSection ref={ref}>
         <ScaffoldSectionDetail>
           <div className="sticky space-y-2 top-12">
             <p className="text-foreground text-base m-0">Payment Methods</p>
@@ -114,8 +114,7 @@ const PaymentMethods = () => {
                           <Button
                             asChild
                             key="stripe-projects-billing-docs"
-                            variant="default"
-                            iconRight={<ExternalLink size={14} />}
+                            iconRight={<ExternalLinkIcon size={14} />}
                           >
                             <a
                               href="https://docs.stripe.com/projects#manage-billing"
@@ -126,7 +125,7 @@ const PaymentMethods = () => {
                             </a>
                           </Button>
                         ) : (
-                          <Button asChild key="payment-method-support" variant="default">
+                          <Button asChild key="payment-method-support">
                             <SupportLink
                               queryParams={{
                                 category: SupportCategories.BILLING,
@@ -152,8 +151,7 @@ const PaymentMethods = () => {
                             <div />
                           )}
                           <Button
-                            variant="default"
-                            icon={<Plus />}
+                            icon={<PlusIcon />}
                             disabled={!canUpdatePaymentMethods}
                             onClick={() => setShowAddPaymentMethodModal(true)}
                           >

@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { MoreHorizontal, PlugZap, TrashIcon } from 'lucide-react'
+import { MoreHorizontalIcon, PlugZapIcon, TrashIcon } from 'lucide-react'
 import { cloneElement, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -148,13 +148,13 @@ export function LogDrainsList({
                         <Button
                           variant="text"
                           className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
-                          icon={<MoreHorizontal />}
+                          icon={<MoreHorizontalIcon />}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[160px]" align="end">
                         {onTestDrain && (
                           <DropdownMenuItem onClick={() => onTestDrain(drain)}>
-                            <PlugZap className="h-4 w-4 mr-2" />
+                            <PlugZapIcon className="h-4 w-4 mr-2" />
                             Test connection
                           </DropdownMenuItem>
                         )}

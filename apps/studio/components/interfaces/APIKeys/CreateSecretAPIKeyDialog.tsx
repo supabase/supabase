@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Plus, ShieldCheck } from 'lucide-react'
+import { PlusIcon, ShieldCheckIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useRef } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -92,7 +92,7 @@ export const CreateSecretAPIKeyDialog = () => {
         side="bottom"
         tooltipOpen={visible === 'secret' ? false : undefined}
       >
-        <Button variant="default" className="mt-2" icon={<Plus />} onClick={openDialog}>
+        <Button className="mt-2" icon={<PlusIcon />} onClick={openDialog}>
           New secret key
         </Button>
       </Shortcut>
@@ -148,7 +148,7 @@ export const CreateSecretAPIKeyDialog = () => {
             </form>
           </Form>
           <Alert variant="warning">
-            <ShieldCheck />
+            <ShieldCheckIcon />
             <AlertTitle>Securing your API key</AlertTitle>
             <AlertDescription className="">
               <ul className="list-disc">
@@ -176,7 +176,7 @@ export const CreateSecretAPIKeyDialog = () => {
             options={{ enabled: visible === 'secret' && !isCreatingAPIKey }}
             side="top"
           >
-            <Button form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
+            <Button variant="primary" form={FORM_ID} type="submit" loading={isCreatingAPIKey}>
               Create API key
             </Button>
           </Shortcut>

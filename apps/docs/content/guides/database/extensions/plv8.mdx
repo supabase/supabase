@@ -99,6 +99,15 @@ val data = supabase.postgrest.rpc("function_name")
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Rpc("function_name", null);
+```
+
+</TabPanel>
+</$Show>
 </Tabs>
 
 ## Examples

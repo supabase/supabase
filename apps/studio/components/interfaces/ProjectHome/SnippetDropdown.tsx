@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { ReactNode, useEffect, useMemo, useRef, useState } from 'react'
 import {
   Command,
@@ -105,6 +105,10 @@ export const SnippetDropdown = ({
               <p className="text-xs text-center text-foreground-lighter py-3">Loading...</p>
             ) : search.length > 0 && snippets.length === 0 ? (
               <p className="text-xs text-center text-foreground-lighter py-3">No snippets found</p>
+            ) : search.length === 0 && snippets.length === 0 ? (
+              <p className="text-xs text-center text-foreground-lighter py-3">
+                No snippets available
+              </p>
             ) : (
               <CommandGroup>
                 <ScrollArea className={snippets.length > 7 ? 'h-[210px]' : ''}>
@@ -145,7 +149,7 @@ export const SnippetDropdown = ({
                 }}
               >
                 <div className="w-full flex items-center gap-2">
-                  <Plus size={14} strokeWidth={1.5} />
+                  <PlusIcon size={14} strokeWidth={1.5} />
                   <p>Create snippet</p>
                 </div>
               </CommandItem>

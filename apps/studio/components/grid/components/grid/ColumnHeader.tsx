@@ -1,7 +1,7 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
 import { FOREIGN_KEY_CASCADE_ACTION } from '@supabase/pg-meta'
-import { ArrowRight, Key, Lightbulb, Link, Lock } from 'lucide-react'
+import { ArrowRightIcon, KeyIcon, LightbulbIcon, LinkIcon, LockIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import {
@@ -46,7 +46,7 @@ export function ColumnHeader<R>({
             <Tooltip>
               <TooltipTrigger>
                 <div className="sb-grid-column-header__inner__primary-key">
-                  <Key size={14} strokeWidth={2} />
+                  <KeyIcon size={14} strokeWidth={2} />
                 </div>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
@@ -73,7 +73,7 @@ export function ColumnHeader<R>({
           {isEncrypted && (
             <Tooltip>
               <TooltipTrigger>
-                <Lock size={14} strokeWidth={2} />
+                <LockIcon size={14} strokeWidth={2} />
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
                 Encrypted column
@@ -85,10 +85,11 @@ export function ColumnHeader<R>({
               <TooltipTrigger asChild>
                 <button
                   className="flex items-center"
+                  tabIndex={0}
                   onClick={() => openSheet(column.name as string)}
                 >
                   <span className="sr-only">View {column.name} index suggestion</span>
-                  <Lightbulb size={14} strokeWidth={2} className="text-warning!" />
+                  <LightbulbIcon size={14} strokeWidth={2} className="text-warning!" />
                 </button>
               </TooltipTrigger>
               <TooltipContent side="bottom" className="font-normal">
@@ -118,14 +119,14 @@ function ColumnIcon({
       return (
         <Tooltip>
           <TooltipTrigger>
-            <Link size={14} strokeWidth={2} />
+            <LinkIcon size={14} strokeWidth={2} />
           </TooltipTrigger>
           <TooltipContent side="bottom">
             <div className="font-normal">
               <p className="text-xs text-foreground-light">Foreign key relation:</p>
               <div className="flex items-center space-x-1">
                 <p className="text-xs text-foreground!">{name}</p>
-                <ArrowRight size={14} strokeWidth={1.5} className="text-foreground-light!" />
+                <ArrowRightIcon size={14} strokeWidth={1.5} className="text-foreground-light!" />
                 <p className="text-xs text-foreground!">
                   {foreignKey?.targetTableSchema}.{foreignKey?.targetTableName}.
                   {foreignKey?.targetColumnName}

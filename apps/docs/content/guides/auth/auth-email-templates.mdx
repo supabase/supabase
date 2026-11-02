@@ -59,6 +59,8 @@ Edit templates on the [Email Templates](/dashboard/project/_/auth/templates) pag
 
 The dashboard template builder **does not apply** when running [local development with CLI](/docs/guides/local-development) or [self-hosted Supabase](/docs/guides/self-hosting). Customize templates in `supabase/config.toml` and local HTML files instead.
 
+For local development with the CLI, [open the emails your templates produce in Mailpit](/docs/guides/auth/testing-auth-flows#test-email-flows-locally).
+
 <Admonition type="note" title="Customizing templates locally">
 
 See [Customizing email templates](/docs/guides/local-development/customizing-email-templates) for:
@@ -133,7 +135,7 @@ For mobile applications, you might need to link or redirect to a specific page w
 ### Email prefetching
 
 Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
-In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "[Token has expired or is invalid](/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors)" error.
 To guard against this there are the options below:
 
 **Option 1**
@@ -169,7 +171,7 @@ If you are using an external email provider that enables "email tracking", the l
 
 ### Redirecting the user to a server-side endpoint
 
-If you intend to use [Server-side rendering](/docs/guides/auth/server-side-rendering), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
+If you intend to use [Server-side rendering](/docs/guides/auth/server-side/advanced-guide), you might want the email link to redirect the user to a server-side endpoint to check if they are authenticated before returning the page. However, the default email link will redirect the user after verification to the redirect URL with the session in the query fragments. Since the session is returned in the query fragments by default, you won't be able to access it on the server-side.
 
 You can customize the email link in the email template to redirect the user to a server-side endpoint successfully. For example:
 

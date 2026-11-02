@@ -42,3 +42,8 @@ export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
     retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
+
+export const useReplicationSourceId = ({ projectRef }: { projectRef?: string }) => {
+  const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
+  return sourcesData?.sources.find((s) => s.name === projectRef)?.id
+}

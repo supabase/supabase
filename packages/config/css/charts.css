@@ -1,0 +1,48 @@
+:root {
+  --chart-1: var(--color-brand-800);
+  --chart-2: var(--color-blue-900);
+  --chart-3: var(--color-pink-1000);
+  --chart-4: var(--color-violet-900);
+  --chart-5: var(--color-tomato-1000);
+  --chart-6: var(--color-indigo-1000);
+  --chart-7: var(--color-green-1100);
+  --chart-8: var(--color-purple-1000);
+
+  --chart-1-fill: var(--color-brand-500);
+  --chart-2-fill: var(--color-blue-500);
+  --chart-3-fill: var(--color-pink-500);
+  --chart-4-fill: var(--color-violet-500);
+  --chart-5-fill: var(--color-tomato-500);
+  --chart-6-fill: var(--color-indigo-500);
+  --chart-7-fill: var(--color-green-500);
+  --chart-8-fill: var(--color-purple-500);
+
+  --chart-in: var(--chart-2);
+  --chart-out: var(--chart-5);
+  --chart-in-fill: var(--chart-2-fill);
+  --chart-out-fill: var(--chart-5-fill);
+
+  --chart-reference: var(--color-scale-1000);
+  --chart-muted: var(--color-scale-700);
+  --chart-muted-fill: var(--color-scale-400);
+
+  --chart-status-success: hsl(var(--brand-default));
+  --chart-status-success-muted: hsl(var(--brand-500));
+  --chart-status-warning: var(--warning);
+  --chart-status-warning-muted: hsl(var(--warning-500));
+  --chart-status-destructive: var(--destructive);
+  --chart-status-destructive-muted: hsl(var(--destructive-500));
+}
+
+[data-theme*='dark'] {
+  --chart-1: var(--color-brand-900);
+  --chart-2: var(--color-blue-1100);
+  --chart-3: var(--color-pink-1100);
+  --chart-4: var(--color-violet-1100);
+  --chart-5: var(--color-tomato-1100);
+  --chart-6: var(--color-indigo-1100);
+  --chart-7: var(--color-green-1100);
+  --chart-8: var(--color-purple-1100);
+
+  --chart-muted: var(--color-scale-800);
+}

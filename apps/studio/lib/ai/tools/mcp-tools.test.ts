@@ -1,11 +1,11 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { createInProcessSupabaseMCPClient, createSupabaseMCPClient } from '../supabase-mcp'
+import { createSupabaseMCPClient } from '../supabase-mcp'
 import { getMcpTools } from './mcp-tools'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 
 vi.mock('../supabase-mcp', () => ({
   createSupabaseMCPClient: vi.fn(),
-  createInProcessSupabaseMCPClient: vi.fn(),
 }))
 
 const BASE_PARAMS = {
@@ -16,7 +16,7 @@ const BASE_PARAMS = {
   signal: new AbortController().signal,
 }
 
-// A realistic remote tool set: all expected read tools plus the UI-executed ones
+// A realistic remote tool set: all expected read tools plus write tools Studio must not expose
 const FULL_REMOTE_TOOLS = {
   search_docs: { description: 'docs' },
   list_tables: { description: 'list tables' },
@@ -24,9 +24,11 @@ const FULL_REMOTE_TOOLS = {
   list_edge_functions: { description: 'edge functions' },
   list_branches: { description: 'branches' },
   get_advisors: { description: 'advisors' },
-  get_logs: { description: 'get logs' },
+  query_logs: { description: 'query logs' },
   execute_sql: { description: 'execute sql' },
   deploy_edge_function: { description: 'deploy' },
+  apply_migration: { description: 'migrate' },
+  create_branch: { description: 'branch' },
 }
 
 describe('ai/tools/mcp-tools getMcpTools', () => {
@@ -35,9 +37,6 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   let consoleErrorSpy: ReturnType<typeof vi.spyOn>
 
   beforeEach(() => {
-    vi.clearAllMocks()
-    // These tests exercise the remote transport; pin the migration gate to it.
-    process.env.USE_REMOTE_MCP = 'true'
     consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
     close = vi.fn().mockResolvedValue(undefined)
     tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })
@@ -45,17 +44,32 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
   })
 
   afterEach(() => {
-    delete process.env.USE_REMOTE_MCP
     consoleErrorSpy.mockRestore()
   })
 
-  it('returns MCP tools and strips UI-executed tools handled locally', async () => {
+  it('returns only tools with a remote contract', async () => {
     const result = await getMcpTools(BASE_PARAMS)
 
     expect(result).toHaveProperty('list_tables')
-    expect(result).toHaveProperty('get_logs')
-    expect(result).not.toHaveProperty('execute_sql')
-    expect(result).not.toHaveProperty('deploy_edge_function')
+    expect(result).toHaveProperty('query_logs')
+    // MCP's versions lose to Studio's own, and write tools never get through
+    for (const name of [
+      'execute_sql',
+      'deploy_edge_function',
+      'apply_migration',
+      'create_branch',
+    ]) {
+      expect(result).not.toHaveProperty(name)
+    }
+    expect(Object.keys(result).sort()).toEqual(Object.keys(REMOTE_TOOL_CONTRACTS).sort())
+  })
+
+  it('takes needsApproval from the contract', async () => {
+    const result = await getMcpTools(BASE_PARAMS)
+
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      expect(result[contract.name]?.needsApproval).toBe(contract.needsApproval)
+    }
   })
 
   it('warns when the remote server is missing an expected tool (contract drift)', async () => {
@@ -122,51 +136,13 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     await expect(getMcpTools(BASE_PARAMS)).rejects.toThrow('MCP tools validation failed')
     expect(close).toHaveBeenCalledTimes(1)
   })
-})
 
-describe('ai/tools/mcp-tools getMcpTools transport selection', () => {
-  let close: ReturnType<typeof vi.fn>
-  let tools: ReturnType<typeof vi.fn>
-  let consoleErrorSpy: ReturnType<typeof vi.spyOn>
+  it('rejects a malformed contract tool even when the opt-in level would stub it', async () => {
+    tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
 
-  beforeEach(() => {
-    vi.clearAllMocks()
-    consoleErrorSpy = vi.spyOn(console, 'error').mockImplementation(() => {})
-    close = vi.fn().mockResolvedValue(undefined)
-    tools = vi.fn().mockResolvedValue({ ...FULL_REMOTE_TOOLS })
-    vi.mocked(createSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
-    vi.mocked(createInProcessSupabaseMCPClient).mockResolvedValue({ tools, close } as any)
-  })
-
-  afterEach(() => {
-    delete process.env.USE_REMOTE_MCP
-    consoleErrorSpy.mockRestore()
-  })
-
-  it('uses the remote client when USE_REMOTE_MCP is "true"', async () => {
-    process.env.USE_REMOTE_MCP = 'true'
-
-    await getMcpTools(BASE_PARAMS)
-
-    expect(createSupabaseMCPClient).toHaveBeenCalledTimes(1)
-    expect(createInProcessSupabaseMCPClient).not.toHaveBeenCalled()
-  })
-
-  it('falls back to the in-process client when USE_REMOTE_MCP is unset (default)', async () => {
-    delete process.env.USE_REMOTE_MCP
-
-    await getMcpTools(BASE_PARAMS)
-
-    expect(createInProcessSupabaseMCPClient).toHaveBeenCalledTimes(1)
-    expect(createSupabaseMCPClient).not.toHaveBeenCalled()
-  })
-
-  it('uses the in-process client for any non-"true" value', async () => {
-    process.env.USE_REMOTE_MCP = 'false'
-
-    await getMcpTools(BASE_PARAMS)
-
-    expect(createInProcessSupabaseMCPClient).toHaveBeenCalledTimes(1)
-    expect(createSupabaseMCPClient).not.toHaveBeenCalled()
+    await expect(getMcpTools({ ...BASE_PARAMS, aiOptInLevel: 'disabled' })).rejects.toThrow(
+      'MCP tools validation failed'
+    )
+    expect(close).toHaveBeenCalledTimes(1)
   })
 })

@@ -1,8 +1,15 @@
 export const privilegeKeys = {
   tablePrivilegesList: (projectRef: string | undefined, includedSchemas?: string[]) =>
     ['projects', projectRef, 'database', 'table-privileges', includedSchemas].filter(Boolean),
-  columnPrivilegesList: (projectRef: string | undefined, schema?: string | undefined) =>
-    ['projects', projectRef, 'database', 'column-privileges', schema].filter(Boolean),
+  columnPrivilegesList: (
+    projectRef: string | undefined,
+    schema?: string | undefined,
+    table?: string | undefined
+  ) => {
+    const base = ['projects', projectRef, 'database', 'column-privileges'].filter(Boolean)
+    if (table === undefined) return schema === undefined ? base : [...base, schema]
+    return [...base, schema ?? null, table]
+  },
   exposedTablesInfinite: (projectRef: string | undefined, search?: string) =>
     [
       'projects',

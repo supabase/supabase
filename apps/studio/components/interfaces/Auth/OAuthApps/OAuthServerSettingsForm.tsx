@@ -1,9 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -16,7 +15,7 @@ import {
   Input,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
@@ -29,7 +28,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useOAuthServerAppsQuery } from '@/data/oauth-server-apps/oauth-server-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 const configUrlSchema = z.object({
@@ -106,15 +105,14 @@ export const OAuthServerSettingsForm = () => {
     can: canReadConfig,
     isLoading: isLoadingPermissions,
     isSuccess: isPermissionsLoaded,
-  } = useAsyncCheckPermissions(PermissionAction.READ, 'custom_config_gotrue')
+  } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ)
 
   const { data: oAuthAppsData } = useOAuthServerAppsQuery({ projectRef })
 
   const oauthApps = oAuthAppsData?.clients || []
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const form = useForm<OAuthServerSettings>({
@@ -187,6 +185,12 @@ export const OAuthServerSettingsForm = () => {
     setShowDisableOAuthServerConfirmation(false)
   }
 
+  const oauthServerEnabled = useWatch({ control: form.control, name: 'OAUTH_SERVER_ENABLED' })
+  const authorizationPath = useWatch({
+    control: form.control,
+    name: 'OAUTH_SERVER_AUTHORIZATION_PATH',
+  })
+
   if (isPermissionsLoaded && !canReadConfig) {
     return <NoPermission resourceText="view OAuth server settings" />
   }
@@ -234,7 +238,7 @@ export const OAuthServerSettingsForm = () => {
                     )}
                   />
                 </CardContent>
-                {form.watch('OAUTH_SERVER_ENABLED') && (
+                {oauthServerEnabled && (
                   <>
                     <CardContent>
                       <FormItemLayout
@@ -279,13 +283,15 @@ export const OAuthServerSettingsForm = () => {
                       />
                       {(() => {
                         const siteUrl = authConfig?.SITE_URL?.trim()
-                        const authorizationPath =
-                          form.watch('OAUTH_SERVER_AUTHORIZATION_PATH')?.trim() || '/oauth/consent'
-                        const authorizationUrl = siteUrl ? `${siteUrl}${authorizationPath}` : ''
+                        const resolvedAuthorizationPath =
+                          authorizationPath?.trim() || '/oauth/consent'
+                        const authorizationUrl = siteUrl
+                          ? `${siteUrl}${resolvedAuthorizationPath}`
+                          : ''
 
                         return (
                           <Admonition
-                            type="tip"
+                            type="note"
                             title="Make sure this path is implemented in your application."
                             description={
                               <>
@@ -345,7 +351,7 @@ export const OAuthServerSettingsForm = () => {
                 )}
 
                 <CardFooter className="justify-end space-x-2">
-                  <Button variant="default" onClick={() => form.reset()} disabled={isPending}>
+                  <Button onClick={() => form.reset()} disabled={isPending}>
                     Cancel
                   </Button>
                   <Button
@@ -362,7 +368,7 @@ export const OAuthServerSettingsForm = () => {
           </Form>
         </PageSectionContent>
       </PageSection>
-      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && form.watch('OAUTH_SERVER_ENABLED') && (
+      {isSuccess && authConfig?.OAUTH_SERVER_ENABLED && oauthServerEnabled && (
         <OAuthEndpointsTable isLoading={isPending} />
       )}
 

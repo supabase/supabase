@@ -58,42 +58,42 @@ Postgres Changes uses temporary replication slots. When no clients are subscribe
 
 The Realtime team built it this way on purpose. Guaranteed delivery requires persistent state tracking, message queuing, and acknowledgment protocols. Those things add latency and complexity that would make Realtime worse at its actual job: delivering live updates as fast as possible.
 
-If you need every change to arrive at its destination, no matter what, Realtime is not the right tool.
+If another system needs a durable, recoverable copy of selected database data, Realtime is not the right tool.
 
 ## What Pipelines does
 
-Pipelines creates managed change-data-capture (CDC) pipelines. A pipeline reads every INSERT, UPDATE, DELETE, and TRUNCATE from your Postgres tables and writes them to a supported destination.
+Pipelines creates managed change-data-capture (CDC) pipelines. A pipeline reads the operations, rows, and columns selected by your Postgres publication and writes them to a supported destination.
 
-Pipelines replicates your data 1-to-1 in near real time. If your destination disconnects or has problems, the pipeline does not skip over data.
+Pipelines keeps the current state of selected Postgres data synchronized with a supported destination in near real time. It maps source names and values to destination-compatible representations and retries transient delivery failures.
 
 ### How Pipelines works
 
-When you create a pipeline, it connects to your database through a permanent replication slot. First, it performs a full copy of your existing data. Then it switches to streaming mode and captures every change as it happens, with latency measured in milliseconds to seconds based on configuration parameters, data size, and destination type.
+When you create a pipeline, it connects to your database through a persistent replication slot. First, it performs an initial sync of the existing rows in the publication. It then begins ongoing replication, processing changes in batches. Latency depends on source activity, network conditions, pipeline configuration, and destination throughput.
 
-It's important to note that Pipelines doesn't respect Row-Level Security. A pipeline reads every piece of data in its publication. If you need to filter data, you should use publication filters.
+Row Level Security does not apply to Pipelines. A pipeline can read all rows and columns selected by its publication. Use publication row filters and column lists to limit the replicated data.
 
-Changes are batched and written to your destination. If the pipeline crashes, it restarts from the last acknowledged position. No data changes are lost. Note that schema changes (adding or removing columns) do not propagate automatically and require manual handling.
+Changes are batched and written to your destination. After a restart, the pipeline resumes from its last acknowledged position while Postgres still retains the required WAL. BigQuery supports a limited set of schema changes in beta; other changes require manual handling.
 
 ### What Pipelines guarantees
 
-Pipelines provides at-least-once delivery. Every change that happens in your database will reach the destination at least once. In rare cases (like a crash during a long-running transaction), a change might be delivered more than once. Exactly-once processing is handled by the destination.
+Pipelines uses at-least-once processing. A retry or restart can process the same change more than once, so destination writes must be idempotent. BigQuery uses the replicated source primary key to apply current-state upserts and deletes.
 
-Pipelines uses permanent replication slots. This means Postgres holds onto WAL data until the pipeline confirms it has been processed. If you stop the pipeline for maintenance and restart it later, it picks up exactly where it left off. Be aware that while the pipeline is paused, Postgres continues to retain WAL data. Extended pauses can lead to significant disk growth, and depending on your Postgres configuration, the pipeline may fail if the WAL retention limit is exceeded.
+Pipelines uses persistent replication slots. Postgres retains WAL until the pipeline confirms it has been processed, subject to the database's WAL retention limit. If you stop and restart a pipeline while its slot remains valid, it continues from the retained WAL. A long stop can increase disk usage or invalidate the slot; recovering from a lost slot requires a new initial sync.
 
-This is the opposite of Realtime's approach. Pipelines trades speed for reliability. It may not deliver changes to your warehouse in the same millisecond they happen, but it will deliver every single one.
+This is the opposite of Realtime's approach. Pipelines prioritizes durable progress tracking and recovery over millisecond delivery to end users.
 
 ## The key differences
 
 ### Delivery guarantees
 
-|                         | **Realtime** | **Pipelines**         |
-| ----------------------- | ------------ | --------------------- |
-| Guarantee               | Best effort  | At-least-once         |
-| Missed changes          | Lost forever | Replayed on reconnect |
-| Replication slot        | Temporary    | Permanent             |
-| Resume after disconnect | No           | Yes                   |
+|                         | **Realtime** | **Pipelines**                                       |
+| ----------------------- | ------------ | --------------------------------------------------- |
+| Guarantee               | Best effort  | At-least-once                                       |
+| Disconnected changes    | Not replayed | Read from retained WAL while the slot remains valid |
+| Replication slot        | Temporary    | Permanent                                           |
+| Resume after disconnect | No           | Yes, while the replication slot remains valid       |
 
-This is the most important difference. If you need every change to arrive, use Pipelines. If you need changes to arrive fast and can tolerate occasional gaps, use Realtime.
+This is the most important difference. Use Pipelines when another system needs a durable, monitored copy of your selected data. Use Realtime when client applications need live updates and can tolerate gaps while disconnected.
 
 ### Where data goes
 
@@ -135,13 +135,11 @@ The common thread: a human is watching and needs to see changes as they happen.
 Use Pipelines when you need reliable data movement to analytical systems:
 
 - **Analytics and reporting.** Move production data to an analytical destination for querying without impacting your production database.
-- **Audit trails.** Maintain a complete changelog of every INSERT, UPDATE, and DELETE. Nothing is lost.
 - **Data warehousing.** Replicate your operational data to a columnar format optimized for analytical queries.
-- **Compliance.** Maintain a complete, verifiable history of all data changes.
 - **ML pipelines.** Feed fresh data to training or feature stores without querying production.
 - **Workload isolation.** Run heavy analytical queries against your warehouse instead of your production database.
 
-The common thread: a system needs a complete, reliable copy of your data.
+The common thread: a system needs the current state of selected production data in an analytical destination. Pipelines does not automatically create a queryable history of every row version.
 
 ## The mistake we see most often
 
@@ -151,7 +149,7 @@ It works great in development. It even works fine in production for a while. The
 
 The problem is not that Realtime is broken. The problem is that Realtime was not designed for this job.
 
-If you are piping database changes into another system and you need every change to arrive, use Pipelines. That is exactly what it was built for.
+If you are maintaining a durable copy of database data in another system, use Pipelines. It persists replication progress and resumes from Postgres WAL after reconnecting.
 
 ## Can I use both?
 
@@ -175,7 +173,7 @@ Realtime handles the live experience. Pipelines handles the analytical pipeline.
 | Database required   | Only for Postgres Changes and Broadcast from Database                | Yes, always                                            |
 | Processing          | Sequential per-change with per-subscriber authorization              | Batched with configurable parallelism                  |
 | Latency             | Typically under 100ms                                                | Seconds (batched)                                      |
-| Best for            | Human users watching live data                                       | Systems consuming complete data                        |
+| Best for            | Human users watching live data                                       | Systems consuming current replicated data              |
 | Built with          | Elixir (Phoenix)                                                     | Rust                                                   |
 | Open source         | [github.com/supabase/realtime](https://github.com/supabase/realtime) | [Supabase ETL engine](https://github.com/supabase/etl) |
 
@@ -183,4 +181,4 @@ Realtime handles the live experience. Pipelines handles the analytical pipeline.
 
 Realtime is available on all Supabase projects. Check out the [Realtime documentation](/docs/guides/realtime) to get started.
 
-Pipelines is currently in alpha. Alpha features can be unstable and may introduce breaking changes while we evaluate the product direction, refine the feature set, and incorporate customer feedback. You can request access through the Supabase Dashboard or contact your account manager. Read the [Pipelines announcement](/blog/introducing-supabase-pipelines) for more details on how it works.
+Supabase Pipelines is currently in public alpha. Features and behavior may change as we continue developing the product. If Pipelines isn't available for your organization yet, request access through the Supabase Dashboard or contact your account manager. Read the [Pipelines announcement](/blog/introducing-supabase-pipelines) for more details on how it works.

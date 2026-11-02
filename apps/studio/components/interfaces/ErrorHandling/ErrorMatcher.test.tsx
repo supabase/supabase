@@ -1,5 +1,5 @@
 import { render, screen } from '@testing-library/react'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
 import { ConnectionTimeoutError } from '@/types/api-errors'
@@ -20,8 +20,6 @@ vi.mock('./RestartProjectDialog', () => ({
 }))
 
 describe('ErrorMatcher', () => {
-  beforeEach(() => vi.clearAllMocks())
-
   it('renders the provided title and error message', () => {
     render(
       <ErrorMatcher
@@ -64,6 +62,32 @@ describe('ErrorMatcher', () => {
     )
     expect(screen.getByText('Failed to load tables')).toBeInTheDocument()
     expect(screen.getByText('UNKNOWN ERROR')).toBeInTheDocument()
+  })
+
+  it('renders the caller-provided fallback when the error is unclassified', () => {
+    render(
+      <ErrorMatcher
+        title="Failed to load tables"
+        error="UNKNOWN ERROR"
+        supportFormParams={{}}
+        fallback={<div>Custom fallback</div>}
+      />
+    )
+    expect(screen.getByText('Custom fallback')).toBeInTheDocument()
+  })
+
+  it('ignores the caller-provided fallback when the error is classified', () => {
+    const error = new ConnectionTimeoutError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')
+    render(
+      <ErrorMatcher
+        title="Failed to load tables"
+        error={error}
+        supportFormParams={{}}
+        fallback={<div>Custom fallback</div>}
+      />
+    )
+    expect(screen.queryByText('Custom fallback')).not.toBeInTheDocument()
+    expect(screen.getByText('Try restarting your project')).toBeInTheDocument()
   })
 
   it('accepts error as object with message property', () => {

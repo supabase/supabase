@@ -6,7 +6,6 @@ import { toast } from 'sonner'
 import { Button, StatusIcon } from 'ui'
 
 import { useDeploymentCommitQuery } from '@/data/utils/deployment-commit-query'
-import { BASE_PATH } from '@/lib/constants'
 
 const DeployCheckToast = ({ id }: { id: string | number }) => {
   const router = useRouter()
@@ -26,10 +25,10 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
           Not now
         </Button>
         <Button
+          variant="primary"
           onClick={() => {
-            // Clear the deployment pin so the reload lands on the latest
-            // version. No-op on Next (the cookie isn't set there).
-            document.cookie = `__vdpl=; Path=${BASE_PATH || '/'}; Max-Age=0`
+            // Vercel never pins document navigations to a deployment, so a
+            // plain reload lands on the latest one.
             router.reload()
           }}
         >

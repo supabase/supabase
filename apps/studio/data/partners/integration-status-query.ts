@@ -10,7 +10,7 @@ export type IntegrationVariables = {
 }
 
 export type IntegrationStatus =
-  components['schemas']['PartnerIntegrationListResponse']['integrations'][0]
+  components['schemas']['PartnerIntegrationListResponse_Output']['integrations'][0]
 
 async function getIntegrations({ projectRef }: IntegrationVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('Project ref is required')

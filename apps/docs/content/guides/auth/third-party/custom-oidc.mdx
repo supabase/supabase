@@ -1,0 +1,109 @@
+---
+id: 'auth-third-party-custom-oidc'
+title: 'Custom OIDC provider'
+subtitle: 'Use any OIDC-compliant identity provider with your Supabase project'
+---
+
+Any identity provider that supports OpenID Connect (OIDC) can be used as a third-party authentication provider alongside Supabase Auth, or standalone, with your Supabase project. Use this guide for a provider that is not in the list of [supported providers](/docs/guides/auth/third-party/overview).
+
+## Getting started
+
+1. Check that your provider meets the [requirements](#requirements).
+2. Add a Third-Party Auth integration with your provider's issuer URL in the [Dashboard](#add-the-integration-in-the-dashboard) or with the [Management API](#add-the-integration-with-the-management-api).
+3. Add the `role` claim to the JWTs your provider issues.
+4. Set up the Supabase client in your application.
+
+## Requirements
+
+Your provider must meet the [limitations](/docs/guides/auth/third-party/overview#limitations) of third-party auth:
+
+1. It exposes an OIDC Issuer Discovery URL, served at `<issuer>/.well-known/openid-configuration`.
+2. It signs JWTs with an asymmetric key and includes a `kid` header parameter. Symmetrically signed JWTs, such as HS256, are not supported.
+3. Its JWTs contain a `role` claim. See [Assign the role claim](#assign-the-role-claim).
+
+The issuer URL must use HTTPS. Your project reads the signing keys from the `jwks_uri` listed in the discovery document.
+
+## Add the integration in the Dashboard
+
+1. In the Dashboard, go to **Authentication** > **Sign In / Providers** > [**Third-Party Auth**](/dashboard/project/_/auth/third-party).
+2. Click **Add provider** and select **Custom OIDC**.
+3. Enter your provider's issuer URL in **Issuer URL**, for example `https://login.example.com`.
+4. Click **Add provider**.
+
+The provider appears in the Third-Party Auth list with its issuer URL. To remove it, delete it from the same list.
+
+## Add the integration with the Management API
+
+Create a [personal access token](/docs/guides/platform/personal-access-tokens), then call the [create third-party auth integration](/docs/reference/api/v1-create-project-tpa-integration) endpoint with your provider's issuer URL in the `oidc_issuer_url` field. To list or remove integrations, use the [list](/docs/reference/api/v1-list-project-tpa-integrations) and [delete](/docs/reference/api/v1-delete-project-tpa-integration) endpoints.
+
+## Supabase CLI
+
+Custom OIDC providers are not available in the Supabase CLI. There is no `supabase/config.toml` option for them.
+
+## Assign the role claim
+
+Your Supabase project inspects the `role` claim in every JWT sent to it, to assign the correct Postgres role when using the Data API, Storage or Realtime authorization. Without a `role` claim, requests run as the `anon` role.
+
+Set `role` to `authenticated` for signed-in users. Use your provider's custom claims or token template feature to add it. See your provider's documentation for the steps.
+
+## Set up the Supabase client library
+
+Pass an `accessToken` async function that returns your provider's JWT for the current user, or `null` if there is no signed-in user:
+
+```typescript
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient(
+  'https://<supabase-project>.supabase.co',
+  'SUPABASE_PUBLISHABLE_KEY',
+  {
+    accessToken: async () => {
+      return getAccessTokenFromYourProvider()
+    },
+  }
+)
+```
+
+Replace `getAccessTokenFromYourProvider` with the call your provider's SDK offers to get the current user's JWT.
+
+## Using RLS policies
+
+After the client sends your provider's JWT, use RLS policies to secure access to your project's database, Storage objects and Realtime channels.
+
+### Identify the user
+
+The `sub` claim identifies the user. `auth.uid()` casts `sub` to `uuid`, so it fails if your provider issues subjects that are not UUIDs. Read the claim directly instead:
+
+```sql
+create policy "Users can read their own rows"
+  on table_name
+  for select
+  to authenticated
+  using (user_id = (select auth.jwt()->>'sub'));
+```
+
+Here `user_id` must be a `text` column.
+
+### Restrict access by issuer
+
+Your project trusts every issuer you add, and `sub` values from different issuers can collide. If you use more than one issuer, or you also use Supabase Auth, add a restrictive policy that checks the `iss` claim:
+
+```sql
+create policy "Restrict access to trusted issuers"
+  on table_name
+  as restrictive
+  to authenticated
+  using (
+    (auth.jwt()->>'iss' = 'https://<project-ref>.supabase.co/auth/v1')
+    or
+    (auth.jwt()->>'iss' = 'https://login.example.com')
+  );
+```
+
+<Admonition type="danger">
+
+Postgres has two types of policies: permissive and restrictive. This example uses a restrictive policy, so make sure you don't omit the `as restrictive` clause.
+
+</Admonition>
+
+For more on restrictive policies and on sharing the check across tables, Storage and Realtime, see the [Firebase Auth guide](/docs/guides/auth/third-party/firebase-auth#adding-an-extra-layer-of-security-to-your-projects-rls-policies-self-hosting-only).

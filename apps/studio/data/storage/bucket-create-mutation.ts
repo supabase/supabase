@@ -20,6 +20,7 @@ async function createBucket({
   isPublic,
   file_size_limit,
   allowed_mime_types,
+  versioning_status,
 }: BucketCreateVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!id) throw new Error('Bucket name is required')
@@ -28,6 +29,7 @@ async function createBucket({
   if (type === 'STANDARD') {
     if (file_size_limit) payload.file_size_limit = file_size_limit
     if (allowed_mime_types) payload.allowed_mime_types = allowed_mime_types
+    if (versioning_status) payload.versioning_status = versioning_status
   }
 
   const { data, error } = await post('/platform/storage/{ref}/buckets', {

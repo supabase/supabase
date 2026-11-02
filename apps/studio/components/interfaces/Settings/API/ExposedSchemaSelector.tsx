@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
@@ -13,11 +13,19 @@ import {
   PopoverContent,
   PopoverTrigger,
   ScrollArea,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getExposedSchemaCounts } from './ExposedSchemaSelector.utils'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import {
+  MULTIGRES_SCHEMA_NAME,
+  useHighAvailability,
+  useSchemasFilteredForHighAvailability,
+} from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
 import { pluralize } from '@/lib/helpers'
@@ -48,6 +56,7 @@ export const ExposedSchemaSelector = ({
   const [open, setOpen] = useState(false)
 
   const { data: project } = useSelectedProjectQuery()
+  const { isHighAvailability } = useHighAvailability()
 
   const {
     data: allSchemas,
@@ -59,44 +68,72 @@ export const ExposedSchemaSelector = ({
     connectionString: project?.connectionString,
   })
 
+  const visibleSchemas = useSchemasFilteredForHighAvailability(allSchemas)
   const schemas = useMemo(
     () =>
-      (allSchemas ?? [])
+      visibleSchemas
         .filter((s) => !internalSchemasCannotExpose.has(s.name))
         .sort((a, b) => a.name.localeCompare(b.name)),
-    [allSchemas]
+    [visibleSchemas]
+  )
+
+  // Persisted selections go through the same HA filtering as the schema list, so a
+  // multigres schema exposed in the config doesn't render as a "missing" schema row.
+  const visibleSelectedSchemas = useMemo(
+    () =>
+      isHighAvailability
+        ? selectedSchemas.filter((schema) => schema !== MULTIGRES_SCHEMA_NAME)
+        : selectedSchemas,
+    [selectedSchemas, isHighAvailability]
   )
 
   const missingExposedSchema = useMemo(
-    () => selectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
-    [schemas, selectedSchemas]
+    () => visibleSelectedSchemas.filter((schema) => !schemas.some((s) => s.name === schema)),
+    [schemas, visibleSelectedSchemas]
   )
 
-  const selectedSet = useMemo(() => new Set(selectedSchemas), [selectedSchemas])
+  const selectedSet = useMemo(() => new Set(visibleSelectedSchemas), [visibleSelectedSchemas])
   const { selectedCount, totalCount } = getExposedSchemaCounts({
     visibleSchemas: schemas.map((s) => s.name),
-    selectedSchemas,
+    selectedSchemas: visibleSelectedSchemas,
     protectedSchemas: internalSchemasCannotExpose,
   })
 
+  let schemasSummary: string
+
+  if (isSuccess) {
+    schemasSummary = `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
+  } else {
+    schemasSummary = 'Loading schemas...'
+  }
+
   return (
     <Popover open={open} onOpenChange={setOpen} modal={false}>
-      <PopoverTrigger asChild>
-        <Button
-          size="small"
-          variant="default"
-          className="w-full [&>span]:w-full pr-1! space-x-1"
-          iconRight={<ChevronsUpDown className="text-foreground-muted" strokeWidth={2} size={14} />}
-        >
-          <div className="w-full flex gap-1">
-            <p className="text-foreground-lighter">
-              {isSuccess
-                ? `${selectedCount} of ${totalCount} ${pluralize(totalCount, 'schema')} exposed`
-                : 'Loading schemas...'}
-            </p>
-          </div>
-        </Button>
-      </PopoverTrigger>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <PopoverTrigger asChild>
+            <Button
+              size="small"
+              className="w-full [&>span]:w-full pr-1! space-x-1"
+              iconRight={
+                <ChevronsUpDownIcon className="text-foreground-muted" strokeWidth={2} size={14} />
+              }
+              aria-label="Select schemas"
+              // Tooltip repeats the label; the description would read the name twice
+              aria-describedby={undefined}
+            >
+              <div className="w-full flex gap-1">
+                <p className="text-foreground-lighter" aria-live="polite">
+                  {schemasSummary}
+                </p>
+              </div>
+            </Button>
+          </PopoverTrigger>
+        </TooltipTrigger>
+        <TooltipContent side="bottom" align="end">
+          Select schemas
+        </TooltipContent>
+      </Tooltip>
       <PopoverContent
         className="p-0 min-w-[200px] pointer-events-auto"
         side="bottom"
@@ -140,7 +177,7 @@ export const ExposedSchemaSelector = ({
                       >
                         <div className="w-full flex flex-col">
                           <div className="w-full flex items-center gap-x-2">
-                            <Check size={16} className="text-brand shrink-0" />
+                            <CheckIcon size={16} className="text-primary shrink-0" />
                             <span className="truncate">{schema}</span>
                           </div>
                           {internalSchemasCannotExpose.has(schema) ? (
@@ -171,7 +208,7 @@ export const ExposedSchemaSelector = ({
                           <div
                             className={cn('w-full flex items-center gap-x-2', !isExposed && 'ml-6')}
                           >
-                            {isExposed && <Check size={16} className="text-brand shrink-0" />}
+                            {isExposed && <CheckIcon size={16} className="text-primary shrink-0" />}
                             <span className="truncate">{schema.name}</span>
                           </div>
                         </CommandItem>

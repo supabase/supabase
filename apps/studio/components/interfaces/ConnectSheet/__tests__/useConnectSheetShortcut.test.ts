@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -42,7 +43,6 @@ vi.mock('@/state/shortcuts/useShortcut', () => ({
 
 describe('useConnectSheetShortcut', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { status: PROJECT_STATUS.ACTIVE_HEALTHY },
     })

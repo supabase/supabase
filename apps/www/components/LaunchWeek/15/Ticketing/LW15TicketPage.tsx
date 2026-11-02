@@ -67,6 +67,7 @@ const LW15TicketPage = ({
                 <div className="flex gap-2 flex-wrap justify-end">
                   {TYPO_COLORS.map((color) => (
                     <button
+                      tabIndex={0}
                       key={color}
                       className={cn(
                         'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',
@@ -87,6 +88,7 @@ const LW15TicketPage = ({
                 <div className="flex gap-2 flex-wrap justify-end">
                   {BG_COLORS.map((color) => (
                     <button
+                      tabIndex={0}
                       key={color}
                       className={cn(
                         'flex-1 max-w-5 aspect-square rounded-full border flex items-center justify-center transition-all',

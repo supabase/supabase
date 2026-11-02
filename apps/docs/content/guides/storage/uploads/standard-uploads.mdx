@@ -95,6 +95,15 @@ response = supabase.storage.from_('bucket_name').upload('file_path', file)
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage.From("bucket_name").Upload("local_file_path", "file_path");
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="curl" label="cURL">
 
 ```bash
@@ -188,6 +197,17 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'upsert': 'true',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage
+  .From("bucket_name")
+  .Upload("local_file_path", "file_path", new FileOptions { Upsert = true });
 ```
 
 </TabPanel>
@@ -288,6 +308,21 @@ supabase.storage.from("bucket_name").upload("file_path", bytes) {
 response = supabase.storage.from_('bucket_name').upload('file_path', file, {
   'content-type': 'image/jpeg',
 })
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+await supabase.Storage
+  .From("bucket_name")
+  .Upload(
+    "local_file_path",
+    "file_path",
+    new FileOptions { ContentType = "image/jpeg" },
+    inferContentType: false);
 ```
 
 </TabPanel>

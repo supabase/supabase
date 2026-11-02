@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { DocsButton } from '@/components/ui/DocsButton'
@@ -62,7 +62,7 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
             <h4 className="text-foreground">Enable your custom domain</h4>
             <p className="text-sm text-foreground-light">
               Set up is almost complete. Press “Activate” below to enable{' '}
-              <code className="text-code-inline">{customDomain.hostname}</code> for this project.
+              <code>{customDomain.hostname}</code> for this project.
             </p>
             <p className="text-sm text-foreground-light">
               We recommend that you schedule a downtime window of 20 - 30 minutes for your
@@ -76,14 +76,9 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
               title="Retain your CNAME record for service continuity after activation"
             >
               <p>
-                Your custom domain CNAME record for{' '}
-                <code className="text-code-inline">{customDomain.hostname}</code> should resolve to{' '}
-                {endpoint ? (
-                  <code className="text-code-inline">{endpoint}</code>
-                ) : (
-                  "your project's API URL"
-                )}
-                . If you're using Cloudflare as your DNS provider, disable the proxy option.
+                Your custom domain CNAME record for <code>{customDomain.hostname}</code> should
+                resolve to {endpoint ? <code>{endpoint}</code> : "your project's API URL"}. If
+                you're using Cloudflare as your DNS provider, disable the proxy option.
               </p>
             </Admonition>
           </div>
@@ -95,15 +90,11 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
           <div className="flex items-center justify-between">
             <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
             <div className="flex items-center space-x-2">
-              <Button
-                variant="default"
-                className="self-end"
-                onClick={onCancelCustomDomain}
-                loading={isDeleting}
-              >
+              <Button className="self-end" onClick={onCancelCustomDomain} loading={isDeleting}>
                 Cancel
               </Button>
               <Button
+                variant="primary"
                 disabled={isDeleting}
                 onClick={() => setIsActivateConfirmModalVisible(true)}
                 className="self-end"
@@ -126,9 +117,9 @@ export const CustomDomainActivate = ({ projectRef, customDomain }: CustomDomainA
         onConfirm={onActivateCustomDomain}
       >
         <p className="text-sm">
-          Activating <code className="text-code-inline break-normal!">{customDomain.hostname}</code>{' '}
-          will make it visible to users in place of your project’s Supabase domain. The Supabase
-          domain will continue to work too.
+          Activating <code className="break-normal!">{customDomain.hostname}</code> will make it
+          visible to users in place of your project’s Supabase domain. The Supabase domain will
+          continue to work too.
         </p>
       </ConfirmationModal>
     </>

@@ -1,10 +1,48 @@
 'use client'
 
 import Link from 'next/link'
-import { useState, type PropsWithChildren } from 'react'
+import { type PropsWithChildren, type ReactNode } from 'react'
+import {
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+  IconGitHubSolid,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { getNotchFocusRing, getNotchStyle } from 'ui-patterns/Notch'
+import { NotchOutline } from 'ui-patterns/Notch/NotchOutline'
 
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+interface CodeSampleWrapperProps {
+  source: string | URL | (string | URL)[]
+}
+
+interface MultipleSourcesProps {
+  sources: (string | URL)[]
+}
+
+interface SingleSourceProps {
+  source: string | URL
+}
+
+interface SourceFrameProps {
+  footer: ReactNode
+  notchWidth?: number
+}
+
+export const SOURCE_FOOTER_CLASSES = cn(
+  'not-prose absolute right-0 bottom-0 z-1 flex h-8 w-(--notch-width) items-center gap-2 px-3 whitespace-nowrap',
+  'text-xs text-foreground-lighter no-underline transition-colors hover:text-foreground',
+  'focus-inset rounded-md'
+)
+
+const DEFAULT_NOTCH_WIDTH = 117
+
+const getSourcePath = (source: string | URL): string => {
+  const [, org, repo, , , ...path] = new URL(source).pathname.split('/')
+  return `${org}/${repo}/${path.join('/')}`
+}
 
 export function CodeSampleDummy() {
   return (
@@ -22,7 +60,7 @@ export function CodeSampleWrapper({
    * A GitHub URL to the source code file.
    */
   source: _source,
-}: PropsWithChildren<{ source: string | URL | (string | URL)[] }>) {
+}: PropsWithChildren<CodeSampleWrapperProps>) {
   const source = Array.isArray(_source) ? _source : [_source]
 
   if (source.length === 1) {
@@ -36,43 +74,76 @@ export function CodeSampleWrapper({
   return <>{children}</>
 }
 
-function MultipleSources({ children, sources }: PropsWithChildren<{ sources: (string | URL)[] }>) {
+function MultipleSources({ children, sources }: PropsWithChildren<MultipleSourcesProps>) {
   return (
-    <>
+    <SourceFrame
+      footer={
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <button tabIndex={0} className={SOURCE_FOOTER_CLASSES}>
+              <IconGitHubSolid size={14} aria-hidden />
+              View source
+            </button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="start">
+            {sources.map((source) => (
+              <DropdownMenuItem
+                key={source.toString()}
+                onSelect={() => window.open(source.toString(), '_blank', 'noopener noreferrer')}
+              >
+                {getSourcePath(source)}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
+      }
+    >
       {children}
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <button className="block -mt-4 mb-4 ml-auto text-foreground-lighter text-sm focus-visible:outline-hidden focus-visible:underline">
-            View sources
-          </button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-          {sources.map((source) => (
-            <DropdownMenuItem
-              key={source.toString()}
-              onSelect={() => window.open(source.toString(), '_blank', 'noopener noreferrer')}
-            >
-              ...{source.toString().split('/').slice(-2).join('/')}
-            </DropdownMenuItem>
-          ))}
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </>
+    </SourceFrame>
   )
 }
 
-function SingleSource({ children, source }: PropsWithChildren<{ source: string | URL }>) {
+function SingleSource({ children, source }: PropsWithChildren<SingleSourceProps>) {
   return (
-    <>
+    <SourceFrame
+      footer={
+        <Link
+          href={source.toString()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className={SOURCE_FOOTER_CLASSES}
+        >
+          <IconGitHubSolid size={14} aria-hidden />
+          View source
+        </Link>
+      }
+    >
       {children}
-      <Link
-        href={source.toString()}
-        target="_blank"
-        rel="noopener noreferrer"
-        className="block -mt-5 mb-4 text-right no-underline text-foreground-lighter text-sm"
-      >
-        View source
-      </Link>
-    </>
+    </SourceFrame>
+  )
+}
+
+export function SourceFrame({
+  children,
+  footer,
+  notchWidth = DEFAULT_NOTCH_WIDTH,
+}: PropsWithChildren<SourceFrameProps>) {
+  return (
+    <div
+      style={getNotchStyle(notchWidth)}
+      className="group/source code-sample-source shiki-wrapper relative w-full [&_.shiki]:pb-8 [&_.shiki]:shadow-none!"
+    >
+      <div className="codeblock-drop-shadow relative has-[.code-scroll:focus-visible]:z-1">
+        {children}
+      </div>
+      <NotchOutline width={notchWidth} surfaceClassName="stroke-background-200" className="z-1">
+        <path
+          d={getNotchFocusRing(notchWidth)}
+          strokeWidth={2}
+          className="hidden stroke-ring group-has-[.code-scroll:focus-visible]/source:inline"
+        />
+      </NotchOutline>
+      {footer}
+    </div>
   )
 }

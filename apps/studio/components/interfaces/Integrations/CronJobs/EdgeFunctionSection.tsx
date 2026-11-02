@@ -1,5 +1,5 @@
 import { useParams } from 'common/hooks'
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useId, useMemo, useState } from 'react'
 import { UseFormReturn } from 'react-hook-form'
@@ -37,15 +37,10 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { buildDatabaseEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
 
 interface HTTPRequestFieldsProps {
   form: UseFormReturn<CreateCronJobForm>
-}
-
-const buildFunctionUrl = (slug: string, projectRef: string, restUrl?: string) => {
-  const restUrlTld = restUrl ? new URL(restUrl).hostname.split('.').pop() : 'co'
-  const functionUrl = `https://${projectRef}.supabase.${restUrlTld}/functions/v1/${slug}`
-  return functionUrl
 }
 
 export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
@@ -62,7 +57,11 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
     () =>
       functions?.map((fn) => ({
         ...fn,
-        url: buildFunctionUrl(fn.slug, selectedProject?.ref || '', selectedProject?.restUrl),
+        url: buildDatabaseEdgeFunctionUrl(
+          fn.slug,
+          selectedProject?.ref || '',
+          selectedProject?.restUrl
+        ),
       })) ?? [],
     [functions, selectedProject]
   )
@@ -103,13 +102,13 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
         <div className="space-y-1">
           <p className="text-sm text-foreground-light">Select which edge function to trigger</p>
           {isLoading ? (
-            <Button variant="default" className="justify-start" block size="small" loading>
+            <Button className="justify-start" block size="small" loading>
               Loading edge functions...
             </Button>
           ) : (
             <div className="px-4 py-4 border rounded-sm bg-surface-300 border-strong flex items-center justify-between space-x-4">
               <p className="text-sm">No edge functions created yet</p>
-              <Button asChild>
+              <Button variant="primary" asChild>
                 <Link href={`/project/${ref}/functions`}>Create an edge function</Link>
               </Button>
             </div>
@@ -129,7 +128,6 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                   <PopoverTrigger asChild>
                     <FormControl>
                       <Button
-                        variant="default"
                         role="combobox"
                         aria-expanded={open}
                         aria-controls={listboxId}
@@ -139,7 +137,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                         )}
                         size="small"
                         iconRight={
-                          <ChevronsUpDown
+                          <ChevronsUpDownIcon
                             className="ml-2 h-4 w-4 shrink-0 opacity-50"
                             strokeWidth={1}
                           />
@@ -168,7 +166,7 @@ export const EdgeFunctionSection = ({ form }: HTTPRequestFieldsProps) => {
                                     setOpen(false)
                                   }}
                                 >
-                                  <Check
+                                  <CheckIcon
                                     className={cn(
                                       'mr-2 h-4 w-4',
                                       fn.url === field.value ? 'opacity-100' : 'opacity-0'

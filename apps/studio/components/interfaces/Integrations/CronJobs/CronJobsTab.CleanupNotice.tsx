@@ -1,5 +1,5 @@
 import { getScheduleDeleteCronJobRunDetailsSql } from '@supabase/pg-meta'
-import { CheckCircle2, XCircle } from 'lucide-react'
+import { CheckCircle2Icon, XCircleIcon } from 'lucide-react'
 import {
   Button,
   Dialog,
@@ -19,7 +19,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { CLEANUP_INTERVALS } from './CronJobsTab.constants'
@@ -77,7 +77,7 @@ const CronJobRunDetailsOverflowDialog = ({
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="default">Learn more</Button>
+        <Button>Learn more</Button>
       </DialogTrigger>
       <DialogContent
         aria-describedby={undefined}
@@ -90,9 +90,8 @@ const CronJobRunDetailsOverflowDialog = ({
         <DialogSection className="flex flex-col gap-y-2">
           <p className="text-sm">
             The dashboard fetches data for the cron jobs overview by running a join between the{' '}
-            <code className="text-code-inline">cron.job</code> and{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> tables to
-            show each cron job's latest run.
+            <code>cron.job</code> and <code className="break-keep!">cron.job_run_details</code>{' '}
+            tables to show each cron job's latest run.
           </p>
 
           <p className="text-sm">
@@ -102,12 +101,12 @@ const CronJobRunDetailsOverflowDialog = ({
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {queryCost?.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}
             exceeds safety thresholds, likely due to the size of{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
+            <code className="break-keep!">cron.job_run_details</code> table.
           </p>
         </DialogSection>
 
@@ -120,8 +119,8 @@ const CronJobRunDetailsOverflowDialog = ({
 
           <p className="text-sm">
             We recommend removing the old run history now, then scheduling a cron job that keeps
-            trimming the <code className="text-code-inline">cron.job_run_details</code> table
-            automatically. This also prevents unnecessary bloat on the database.
+            trimming the <code>cron.job_run_details</code> table automatically. This also prevents
+            unnecessary bloat on the database.
           </p>
 
           <div className="flex flex-col gap-y-2 text-sm">
@@ -156,11 +155,7 @@ const CronJobRunDetailsOverflowDialog = ({
                     </SelectContent>
                   </Select>
                 </div>
-                <Button
-                  variant="default"
-                  disabled={isBusy}
-                  onClick={() => runBatchedDeletion(cleanupInterval)}
-                >
+                <Button disabled={isBusy} onClick={() => runBatchedDeletion(cleanupInterval)}>
                   Delete rows now
                 </Button>
               </div>
@@ -188,7 +183,6 @@ const CronJobRunDetailsOverflowDialog = ({
                 <Button
                   block
                   size="small"
-                  variant="default"
                   className="mt-1"
                   loading={isScheduling}
                   disabled={isScheduling}
@@ -245,8 +239,8 @@ interface DeletionSuccessProps {
 }
 
 const DeletionSuccess = ({ totalRowsDeleted }: DeletionSuccessProps) => (
-  <div className="flex items-center gap-2 text-brand">
-    <CheckCircle2 size={16} />
+  <div className="flex items-center gap-2 text-primary">
+    <CheckCircle2Icon size={16} />
     <span className="text-sm">Successfully deleted {totalRowsDeleted.toLocaleString()} rows.</span>
   </div>
 )
@@ -259,10 +253,10 @@ interface DeletionErrorProps {
 const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
   <div className="space-y-2">
     <div className="flex items-center gap-2 text-destructive">
-      <XCircle size={16} />
+      <XCircleIcon size={16} />
       <span className="text-sm">Deletion failed: {error}</span>
     </div>
-    <Button variant="default" size="small" onClick={onRetry}>
+    <Button size="small" onClick={onRetry}>
       Retry
     </Button>
   </div>
@@ -270,8 +264,8 @@ const DeletionError = ({ error, onRetry }: DeletionErrorProps) => (
 
 const ScheduleSuccess = () => (
   <div className="space-y-2">
-    <div className="flex items-center gap-2 text-brand">
-      <CheckCircle2 size={16} />
+    <div className="flex items-center gap-2 text-primary">
+      <CheckCircle2Icon size={16} />
       <span className="text-sm">Daily cleanup job scheduled successfully.</span>
     </div>
     <div className="flex items-center gap-2">

@@ -4,6 +4,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -39,6 +40,7 @@ export async function getUsersCount(
       connectionString,
       sql,
       queryKey: ['users-count'],
+      grant: unguarded.migrating,
     },
     signal
   )

@@ -1,5 +1,4 @@
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -16,15 +15,15 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { MigrationsEmptyState } from './MigrationsEmptyState'
-import { SupportLink } from '@/components/interfaces/Support/SupportLink'
+import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { InlineLink } from '@/components/ui/InlineLink'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { DatabaseMigration, useMigrationsQuery } from '@/data/database/migrations-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -32,7 +31,7 @@ import { formatMigrationVersionLabel, parseMigrationVersion } from '@/lib/migrat
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-const Migrations = () => {
+export const Migrations = () => {
   const [search, setSearch] = useState('')
   const [selectedMigration, setSelectedMigration] = useState<DatabaseMigration>()
   const searchInputRef = useRef<HTMLInputElement>(null)
@@ -78,31 +77,11 @@ const Migrations = () => {
 
       <div>
         {isError && (
-          <Admonition
-            type="warning"
-            title="Failed to retrieve migration history for database"
-            description={
-              <>
-                <p className="mb-1">
-                  Try refreshing your browser, but if the issue persists for more than a few
-                  minutes, please reach out to us via support.
-                </p>
-                <p className="mb-4">Error: {error?.message ?? 'Unknown'}</p>
-              </>
-            }
-          >
-            <Button key="contact-support" asChild variant="default">
-              <SupportLink
-                queryParams={{
-                  projectRef: project?.ref,
-                  category: SupportCategories.DASHBOARD_BUG,
-                  subject: 'Unable to view database migrations',
-                }}
-              >
-                Contact support
-              </SupportLink>
-            </Button>
-          </Admonition>
+          <AlertError
+            projectRef={project?.ref}
+            subject="Failed to retrieve migration history for database"
+            error={error}
+          />
         )}
         {isSuccess && (
           <div>
@@ -116,8 +95,8 @@ const Migrations = () => {
                   placeholder="Search for a migration"
                   value={search}
                   className="w-full lg:w-52"
-                  onChange={(e: any) => setSearch(e.target.value)}
-                  icon={<Search />}
+                  onChange={(e) => setSearch(e.target.value)}
+                  icon={<SearchIcon />}
                 />
                 <Card>
                   <Table>
@@ -176,10 +155,7 @@ const Migrations = () => {
                                 </Tooltip>
                               </TableCell>
                               <TableCell align="right">
-                                <Button
-                                  variant="default"
-                                  onClick={() => setSelectedMigration(migration)}
-                                >
+                                <Button onClick={() => setSelectedMigration(migration)}>
                                   View migration SQL
                                 </Button>
                               </TableCell>
@@ -187,14 +163,7 @@ const Migrations = () => {
                           )
                         })
                       ) : (
-                        <TableRow>
-                          <TableCell colSpan={3}>
-                            <p className="text-sm text-foreground">No results found</p>
-                            <p className="text-sm text-foreground-light">
-                              Your search for "{search}" did not return any results
-                            </p>
-                          </TableCell>
-                        </TableRow>
+                        <TableRowNoResults colSpan={3} search={search} />
                       )}
                     </TableBody>
                   </Table>
@@ -211,20 +180,22 @@ const Migrations = () => {
         header={`Migration: ${selectedMigration?.version}`}
         onCancel={() => setSelectedMigration(undefined)}
         customFooter={
-          <div className="flex items-center justify-end p-4 border-t border-overlay-border">
-            <Button variant="default" onClick={() => setSelectedMigration(undefined)}>
-              Close
-            </Button>
+          <div className="flex items-center justify-end p-4 border-t">
+            <Button onClick={() => setSelectedMigration(undefined)}>Close</Button>
           </div>
         }
       >
         <div className="h-full">
           <div className="relative h-full">
             <CodeEditor
+              // The CodeEditor does not react to content only changes,
+              // specifically when two projects have migrations with the same version but different content.
+              // Setting the key ensure it always update when the migration changes
+              key={`${project?.ref}-${selectedMigration?.version}`}
               isReadOnly
               id={selectedMigration?.version ?? ''}
               language="pgsql"
-              defaultValue={
+              value={
                 selectedMigration?.statements?.join(';\n') +
                 (selectedMigration?.statements?.length ? ';' : '')
               }
@@ -235,5 +206,3 @@ const Migrations = () => {
     </>
   )
 }
-
-export default Migrations

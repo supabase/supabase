@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   AlertDialog,
@@ -10,7 +10,7 @@ import {
   AlertDialogFooter,
   AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { useOAuthAppDeleteMutation } from '@/data/oauth/oauth-app-delete-mutation'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
@@ -49,7 +49,7 @@ export const DeleteAppModal = ({ selectedApp, onClose }: DeleteAppModalProps) =>
             />
             <ul className="space-y-5">
               <li className="flex gap-3 text-sm">
-                <Lock size={14} className="shrink-0" />
+                <LockIcon size={14} className="shrink-0" />
                 <div>
                   <strong>Before you remove this application, consider:</strong>
                   <ul className="space-y-2 mt-2">

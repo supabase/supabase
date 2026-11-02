@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent } from 'react'
 import { Alert, AlertTitle } from 'ui'
@@ -45,7 +45,6 @@ export const DataApiProjectUrlCard = () => {
   })
   useEffect(() => {
     syncSelectedDb()
-    // eslint-disable-next-line react-hooks/exhaustive-deps -- useEffectEvent fn intentionally not a dep (eslint-plugin-react-hooks v5 doesn't recognize stable useEffectEvent yet)
   }, [querySource, projectRef])
 
   const selectedDatabase = databases?.find((db) => db.identifier === state.selectedDatabaseId)
@@ -94,7 +93,7 @@ export const DataApiProjectUrlCard = () => {
           </div>
         ) : isError ? (
           <Alert variant="destructive">
-            <AlertCircle size={16} />
+            <AlertCircleIcon size={16} />
             <AlertTitle>Failed to retrieve project URL</AlertTitle>
           </Alert>
         ) : (

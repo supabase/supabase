@@ -11,7 +11,7 @@ export type ProjectStorageConfigVariables = {
   projectRef?: string
 }
 
-export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse']
+export type ProjectStorageConfigResponse = components['schemas']['StorageConfigResponse_Output']
 
 export async function getProjectStorageConfig(
   { projectRef }: ProjectStorageConfigVariables,
@@ -60,9 +60,12 @@ export const useIsAnalyticsBucketsEnabled = ({ projectRef }: { projectRef?: stri
 }
 
 export const useIsVectorBucketsEnabled = ({ projectRef }: { projectRef?: string }) => {
-  const { data } = useProjectStorageConfigQuery({ projectRef })
+  const { data: isVectorBucketsEnabledData } = useProjectStorageConfigQuery(
+    { projectRef },
+    { select: (data) => data?.features.vectorBuckets?.enabled }
+  )
   const { isCli, isPlatform } = useDeploymentMode()
 
-  const isVectorBucketsEnabled = isCli || (isPlatform && !!data?.features.vectorBuckets?.enabled)
+  const isVectorBucketsEnabled = isCli || (isPlatform && !!isVectorBucketsEnabledData)
   return isVectorBucketsEnabled
 }

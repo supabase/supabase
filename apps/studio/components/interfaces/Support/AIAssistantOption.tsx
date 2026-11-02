@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { MessageSquare } from 'lucide-react'
+import { MessageSquareIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useCallback, useEffect, useState } from 'react'
 import { AiIconAnimation, Button } from 'ui'
@@ -64,7 +64,6 @@ export const AIAssistantOption = ({
                 {onClick ? (
                   <Button
                     size="tiny"
-                    variant="default"
                     icon={<AiIconAnimation size={14} />}
                     onClick={onAiAssistantClicked}
                   >
@@ -72,7 +71,7 @@ export const AIAssistantOption = ({
                   </Button>
                 ) : (
                   <Link href={aiLink} onClick={onAiAssistantClicked}>
-                    <Button size="tiny" variant="default" icon={<AiIconAnimation size={14} />}>
+                    <Button size="tiny" icon={<AiIconAnimation size={14} />}>
                       Ask the Assistant
                     </Button>
                   </Link>
@@ -84,7 +83,7 @@ export const AIAssistantOption = ({
               <div className="relative grow flex flex-col gap-3 w-[400px]">
                 <div className="flex items-start gap-3 pl-12">
                   <div className="w-8 h-8 rounded-full bg-background-surface-300 flex items-center justify-center">
-                    <MessageSquare size={16} className="text-foreground-lighter" />
+                    <MessageSquareIcon size={16} className="text-foreground-lighter" />
                   </div>
                   <div className="flex-1 bg-background-surface-200 rounded-lg p-4 max-w-[280px]">
                     <p className="text-sm text-foreground-lighter">

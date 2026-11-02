@@ -35,6 +35,122 @@ const withTestDatabase = (name: string, fn: (db: TestDb) => Promise<void>) => {
   })
 }
 
+// Mirrors the tables.retrieve ORDER BY: constraint_name, then the column names
+// (a composite FK expands to one entry per ordinal column pair).
+const sortRels = (rels: any[]) =>
+  [...rels].sort(
+    (a, b) =>
+      a.constraint_name.localeCompare(b.constraint_name) ||
+      a.source_column_name.localeCompare(b.source_column_name) ||
+      a.target_column_name.localeCompare(b.target_column_name)
+  )
+
+withTestDatabase(
+  'tables.retrieve returns FKs both directions, PK, comment, and enums',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+    create type mood as enum ('sad', 'ok', 'happy');
+    create table public.parent (id int primary key, label text);
+    create table public.child (
+      id int primary key,
+      parent_id int references public.parent(id),
+      feeling mood,
+      self_ref int references public.child(id)
+    );
+    comment on table public.child is 'a child table';
+  `)
+
+    const [{ parent_id }] = await executeQuery<{ parent_id: number }[]>(
+      `select 'public.parent'::regclass::oid::int8 as parent_id;`
+    )
+    const [{ child_id }] = await executeQuery<{ child_id: number }[]>(
+      `select 'public.child'::regclass::oid::int8 as child_id;`
+    )
+
+    const cases = [
+      { label: 'parent by id', ident: { id: Number(parent_id) } },
+      { label: 'child by name+schema', ident: { name: 'child', schema: 'public' } },
+      { label: 'child by id', ident: { id: Number(child_id) } },
+    ] as const
+
+    for (const c of cases) {
+      const { sql, zod } = pgMeta.tables.retrieve(c.ident as any)
+      const row: any = zod.parse((await executeQuery(sql))[0])
+      expect(row.relationships, c.label).toEqual(sortRels(row.relationships))
+    }
+
+    const parent = pgMeta.tables.retrieve({ id: Number(parent_id) })
+    const parentRow: any = parent.zod.parse((await executeQuery(parent.sql))[0])
+    expect(
+      parentRow.relationships.some(
+        (r: any) => r.source_table_name === 'child' && r.target_table_name === 'parent'
+      )
+    ).toBe(true)
+
+    const child = pgMeta.tables.retrieve({ id: Number(child_id) })
+    const childRow: any = child.zod.parse((await executeQuery(child.sql))[0])
+    expect(childRow.comment).toBe('a child table')
+  }
+)
+
+withTestDatabase(
+  'tables.retrieve orders relationships by constraint_name (adversarial)',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ref (id int primary key);
+      create table public.multi (id int primary key, a int, b int, c int);
+      alter table public.multi add constraint zzz_fk foreign key (a) references public.ref (id);
+      alter table public.multi add constraint aaa_fk foreign key (b) references public.ref (id);
+      alter table public.multi add constraint mmm_fk foreign key (c) references public.ref (id);
+    `)
+    const { sql, zod } = pgMeta.tables.retrieve({ name: 'multi', schema: 'public' })
+    const row: any = zod.parse((await executeQuery(sql))[0])
+
+    expect(row.relationships.map((r: any) => r.constraint_name)).toEqual([
+      'aaa_fk',
+      'mmm_fk',
+      'zzz_fk',
+    ])
+  }
+)
+
+// Composite (multi-column) FK: the relationships subquery expands it to one
+// entry per ordinal column pair, all sharing constraint_name, so the
+// ORDER BY tie-breaks on the column names to stay deterministic.
+withTestDatabase(
+  'tables.retrieve orders composite-FK relationship entries deterministically',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.ctgt (x int, y int, primary key (x, y));
+      create table public.csrc (a int, b int, foreign key (b, a) references public.ctgt (x, y));
+    `)
+    const { sql, zod } = pgMeta.tables.retrieve({ name: 'csrc', schema: 'public' })
+    const row: any = zod.parse((await executeQuery(sql))[0])
+
+    // Two ordinal pairs, both sharing one constraint_name.
+    expect(row.relationships).toHaveLength(2)
+    expect(new Set(row.relationships.map((r: any) => r.constraint_name)).size).toBe(1)
+    expect(row.relationships.map((r: any) => [r.source_column_name, r.target_column_name])).toEqual(
+      [
+        ['a', 'y'],
+        ['b', 'x'],
+      ]
+    )
+  }
+)
+
+withTestDatabase(
+  'tables.retrieve preserves composite primary-key column order (indkey, not sorted)',
+  async ({ executeQuery }) => {
+    await executeQuery(
+      `create table public.composite_pk (a int not null, b int not null, c int, primary key (b, a));`
+    )
+    const { sql, zod } = pgMeta.tables.retrieve({ name: 'composite_pk', schema: 'public' })
+    const row: any = zod.parse((await executeQuery(sql))[0])
+    expect(row.primary_keys.map((pk: any) => pk.name)).toEqual(['b', 'a'])
+  }
+)
+
 /** Original tests ported from postgres-meta */
 withTestDatabase('list tables', async ({ executeQuery }) => {
   const { sql, zod } = await pgMeta.tables.list()
@@ -594,6 +710,27 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
         {
           "check": null,
           "comment": null,
+          "data_type": "integer",
+          "default_value": "nextval('memes_id_seq'::regclass)",
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
           "data_type": "text",
           "default_value": null,
           "enums": [],
@@ -671,27 +808,6 @@ withTestDatabase('retrieve table by id', async ({ executeQuery }) => {
           "is_updatable": true,
           "name": "created_at",
           "ordinal_position": 5,
-          "schema": "public",
-          "table": "memes",
-          "table_id": 16510,
-        },
-        {
-          "check": null,
-          "comment": null,
-          "data_type": "integer",
-          "default_value": "nextval('memes_id_seq'::regclass)",
-          "enums": [],
-          "format": "int4",
-          "format_schema": "pg_catalog",
-          "id": "16510.1",
-          "identity_generation": null,
-          "is_generated": false,
-          "is_identity": false,
-          "is_nullable": false,
-          "is_unique": false,
-          "is_updatable": true,
-          "name": "id",
-          "ordinal_position": 1,
           "schema": "public",
           "table": "memes",
           "table_id": 16510,
@@ -776,6 +892,27 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
         {
           "check": null,
           "comment": null,
+          "data_type": "integer",
+          "default_value": "nextval('memes_id_seq'::regclass)",
+          "enums": [],
+          "format": "int4",
+          "format_schema": "pg_catalog",
+          "id": "16510.1",
+          "identity_generation": null,
+          "is_generated": false,
+          "is_identity": false,
+          "is_nullable": false,
+          "is_unique": false,
+          "is_updatable": true,
+          "name": "id",
+          "ordinal_position": 1,
+          "schema": "public",
+          "table": "memes",
+          "table_id": 16510,
+        },
+        {
+          "check": null,
+          "comment": null,
           "data_type": "text",
           "default_value": null,
           "enums": [],
@@ -853,27 +990,6 @@ withTestDatabase('retrieve table by name and schema', async ({ executeQuery }) =
           "is_updatable": true,
           "name": "created_at",
           "ordinal_position": 5,
-          "schema": "public",
-          "table": "memes",
-          "table_id": 16510,
-        },
-        {
-          "check": null,
-          "comment": null,
-          "data_type": "integer",
-          "default_value": "nextval('memes_id_seq'::regclass)",
-          "enums": [],
-          "format": "int4",
-          "format_schema": "pg_catalog",
-          "id": "16510.1",
-          "identity_generation": null,
-          "is_generated": false,
-          "is_identity": false,
-          "is_nullable": false,
-          "is_unique": false,
-          "is_updatable": true,
-          "name": "id",
-          "ordinal_position": 1,
           "schema": "public",
           "table": "memes",
           "table_id": 16510,

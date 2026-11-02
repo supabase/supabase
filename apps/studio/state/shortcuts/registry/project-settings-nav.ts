@@ -10,7 +10,6 @@ import { RegistryDefinations } from '../types'
  */
 export const PROJECT_SETTINGS_NAV_SHORTCUT_IDS = {
   NAV_PROJECT_SETTINGS_GENERAL: 'nav.project-settings-general',
-  NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK: 'nav.project-settings-compute-and-disk',
   NAV_PROJECT_SETTINGS_INFRASTRUCTURE: 'nav.project-settings-infrastructure',
   NAV_PROJECT_SETTINGS_INTEGRATIONS: 'nav.project-settings-integrations',
   NAV_PROJECT_SETTINGS_WEBHOOKS: 'nav.project-settings-webhooks',
@@ -29,13 +28,6 @@ export const projectSettingsNavRegistry: RegistryDefinations<ProjectSettingsNavS
     id: PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_GENERAL,
     label: 'Go to General',
     sequence: ['S', 'G'],
-    showInSettings: false,
-    referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS,
-  },
-  [PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK]: {
-    id: PROJECT_SETTINGS_NAV_SHORTCUT_IDS.NAV_PROJECT_SETTINGS_COMPUTE_AND_DISK,
-    label: 'Go to Compute and Disk',
-    sequence: ['S', 'C'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_PROJECT_SETTINGS,
   },

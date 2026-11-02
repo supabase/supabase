@@ -20,9 +20,19 @@ interface RouteCtx {
   params?: Record<string, string | undefined>
 }
 
+class InvalidJsonError extends Error {}
+
 export function toWebHandler(handler: NextHandler) {
   return async ({ request, params = {} }: RouteCtx): Promise<Response> => {
-    const req = await buildRequest(request, params)
+    let req: NextApiRequest
+    try {
+      req = await buildRequest(request, params)
+    } catch (error) {
+      if (error instanceof InvalidJsonError) {
+        return new Response('Invalid JSON', { status: 400, statusText: 'Invalid JSON' })
+      }
+      throw error
+    }
     const { res, finalize } = buildResponse()
 
     const result = await handler(req, res)
@@ -64,7 +74,12 @@ async function buildRequest(
       const eq = trimmed.indexOf('=')
       const name = eq >= 0 ? trimmed.slice(0, eq) : trimmed
       const value = eq >= 0 ? trimmed.slice(eq + 1) : ''
-      cookies[name] = decodeURIComponent(value)
+      cookies[name] = value
+      try {
+        cookies[name] = decodeURIComponent(value)
+      } catch {
+        // Next's cookie parser keeps values that cannot be URI-decoded.
+      }
     }
   }
 
@@ -82,15 +97,23 @@ async function buildRequest(
   }
 
   let body: unknown = undefined
-  if (method !== 'GET' && method !== 'HEAD' && request.body) {
-    const contentType = request.headers.get('content-type') ?? ''
-    if (contentType.includes('application/json')) {
+  if (method !== 'GET' && method !== 'HEAD') {
+    const contentType = (request.headers.get('content-type') ?? '')
+      .split(';', 1)[0]
+      .trim()
+      .toLowerCase()
+    if (contentType === 'application/json' || contentType === 'application/ld+json') {
       const text = await request.text()
-      body = text ? JSON.parse(text) : undefined
-    } else if (contentType.includes('application/x-www-form-urlencoded')) {
+      try {
+        // Next treats an empty JSON body as an empty object.
+        body = text ? JSON.parse(text) : {}
+      } catch {
+        throw new InvalidJsonError('Invalid JSON')
+      }
+    } else if (request.body && contentType === 'application/x-www-form-urlencoded') {
       const text = await request.text()
       body = Object.fromEntries(new URLSearchParams(text))
-    } else {
+    } else if (request.body) {
       body = await request.text()
     }
   }

@@ -6,3 +6,5 @@ title: Introduction
 `@supabase/server` is a framework-agnostic library for authenticating requests in server-side JavaScript environments. It verifies JWTs, resolves Supabase API keys, and creates pre-configured Supabase clients — exposing everything through a single `SupabaseContext` that is identical regardless of which adapter or primitive produced it.
 
 Adapters for Hono, H3, Elysia, and NestJS are included. You can also compose the lower-level primitives directly for custom frameworks or edge runtimes.
+
+Not sure this is the right package? See [which package to use](/docs/guides/auth/choosing-a-server-package) — for cookie-based sessions in SSR frameworks, use [`@supabase/ssr`](/docs/guides/auth/server-side) instead.

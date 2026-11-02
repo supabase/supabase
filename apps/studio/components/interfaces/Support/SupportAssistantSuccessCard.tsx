@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import {
   AiIconAnimation,
@@ -46,7 +46,7 @@ function SupportAssistantSuccessCardLoadingShell({ className }: { className?: st
       tabIndex={0}
       aria-label="Open assistant response"
       className={cn(
-        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand',
+        'group cursor-pointer bg-muted/50 transition-colors hover:bg-muted/50 focus-ring',
         className
       )}
     >
@@ -60,7 +60,7 @@ function SupportAssistantSuccessCardLoadingShell({ className }: { className?: st
             <CardDescription>Assistant may be able to help</CardDescription>
           </div>
         </div>
-        <ArrowUpRight
+        <ArrowUpRightIcon
           size={14}
           strokeWidth={1.5}
           className="shrink-0 text-foreground-lighter transition-colors group-hover:text-foreground"

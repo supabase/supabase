@@ -12,7 +12,7 @@ import {
   AlertDialogTrigger,
   Button,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 const resetTemplate = async () => {
   await new Promise((resolve) => setTimeout(resolve, 1200))

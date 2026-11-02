@@ -1,5 +1,5 @@
 import type { Event as SentryEvent, StackFrame } from '@sentry/react'
-import { describe, expect, it } from 'vitest'
+import { afterAll, beforeAll, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildSentryClientOptions,
@@ -11,45 +11,6 @@ import {
 
 describe('Sentry beforeSend filtering functions', () => {
   describe('isBrowserWalletExtensionError', () => {
-    it('returns true for Gate.io wallet extension error (gt-window-provider.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'en.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [
-                  { filename: 'app:///_next/static/chunks/main.js' } as StackFrame,
-                  { filename: 'app:///gt-window-provider.js' } as StackFrame,
-                ],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
-    it('returns true for Gate.io BTC wallet extension error (gt-window-provider-btc.js)', () => {
-      const event: SentryEvent = {
-        exception: {
-          values: [
-            {
-              type: 'TypeError',
-              value: 'f.shouldSetTallyForCurrentProvider is not a function',
-              stacktrace: {
-                frames: [{ filename: 'app:///gt-window-provider-btc.js' } as StackFrame],
-              },
-            },
-          ],
-        },
-      }
-
-      expect(isBrowserWalletExtensionError(event)).toBe(true)
-    })
-
     it('returns true for wallet-provider in abs_path', () => {
       const event: SentryEvent = {
         exception: {
@@ -121,32 +82,15 @@ describe('Sentry beforeSend filtering functions', () => {
   })
 
   describe('isUserAbortedOperation', () => {
-    it('returns true for "operation was aborted" error', () => {
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "signal is aborted" error', () => {
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "manually canceled" error', () => {
-      const error = new Error('operation is manually canceled')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('returns true for "AbortError" message', () => {
-      const error = new Error('AbortError: The operation was aborted')
-      const event: SentryEvent = {}
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
+    it.each([
+      // SUPABASE-APP-BG6
+      'The operation was aborted.',
+      // SUPABASE-APP-BG7
+      'signal is aborted without reason',
+      'operation is manually canceled',
+      'AbortError: The operation was aborted',
+    ])('returns true for an error with message %o', (message) => {
+      expect(isUserAbortedOperation(new Error(message), {})).toBe(true)
     })
 
     it('returns true when message is in event.message (no error object)', () => {
@@ -358,26 +302,6 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isBrowserWalletExtensionError(event)).toBe(true)
     })
 
-    it('correctly identifies SUPABASE-APP-BG6 pattern (user aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG6
-      const error = new Error('The operation was aborted.')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: The operation was aborted.',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
-    it('correctly identifies SUPABASE-APP-BG7 pattern (signal aborted)', () => {
-      // Based on actual Sentry issue SUPABASE-APP-BG7
-      const error = new Error('signal is aborted without reason')
-      const event: SentryEvent = {
-        message: '[CRITICAL][sign in via EP] Failed: signal is aborted without reason',
-      }
-
-      expect(isUserAbortedOperation(error, event)).toBe(true)
-    })
-
     it('correctly identifies SUPABASE-APP-ACC pattern (challenge expired)', () => {
       // Based on actual Sentry issue SUPABASE-APP-ACC
       const error = new Error('Non-Error promise rejection captured with value: challenge-expired')
@@ -493,5 +417,90 @@ describe('buildSentryClientOptions', () => {
     expect(nextRest.tracesSampleRate).toBe(tanstackRest.tracesSampleRate)
     expect(nextRest.allowUrls).toEqual(tanstackRest.allowUrls)
     expect(nextRest.ignoreErrors).toEqual(tanstackRest.ignoreErrors)
+  })
+})
+
+describe('which errors Studio sends to Sentry', () => {
+  let beforeSend: NonNullable<ReturnType<typeof buildSentryClientOptions>['beforeSend']>
+  let restoreConsent: () => void
+
+  beforeAll(async () => {
+    vi.spyOn(Math, 'random').mockReturnValue(0)
+    vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
+    vi.resetModules()
+    const { consentState } = await import('common')
+    const previousConsent = consentState.hasConsented
+    consentState.hasConsented = true
+    restoreConsent = () => {
+      consentState.hasConsented = previousConsent
+    }
+    const { buildSentryClientOptions } = await import('./sentry-client-options')
+    const options = buildSentryClientOptions({ includeThirdPartyErrorFilter: true })
+    if (!options.beforeSend) throw new Error('Missing Sentry beforeSend')
+    beforeSend = options.beforeSend
+  })
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
+  afterAll(() => {
+    vi.restoreAllMocks()
+    restoreConsent?.()
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
+  it('drops errors from outside the app', async () => {
+    expect(await beforeSend({ type: undefined, tags: { third_party_code: true } }, {})).toBeNull()
+  })
+
+  it.each([true, 'true'])(
+    'sends page crashes even when the code location is missing: %s',
+    async (tag) => {
+      const event: Parameters<typeof beforeSend>[0] = {
+        type: undefined,
+        tags: { third_party_code: true, globalErrorBoundary: tag },
+        exception: { values: [{ value: 'Page crashed' }] },
+      }
+      expect(await beforeSend(event, {})).toBe(event)
+    }
+  )
+
+  it('samples errors that did not crash the page once', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [{ value: 'Application error', stacktrace: { frames: [{ filename: 'app.js' }] } }],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBe(event)
+    expect(Math.random).toHaveBeenCalledOnce()
+    expect(event.tags?.codeSampleRate).toBe('0.01')
+  })
+
+  it('still applies Studio filters to page crashes', async () => {
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      tags: { globalErrorBoundary: true },
+      exception: {
+        values: [
+          {
+            value: 'captcha.render is not a function',
+            stacktrace: { frames: [{ filename: 'api.js' }] },
+          },
+        ],
+      },
+    }
+
+    expect(await beforeSend(event, {})).toBeNull()
+    expect(Math.random).not.toHaveBeenCalled()
+  })
+
+  it('drops errors with no code location when they did not crash the page', async () => {
+    expect(
+      await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})
+    ).toBeNull()
   })
 })

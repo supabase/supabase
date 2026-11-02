@@ -316,9 +316,10 @@ export default function FormPatternsSidePanel() {
                       <FormControl className="col-span-6">
                         <div className="flex gap-4 items-center">
                           <button
+                            tabIndex={0}
                             type="button"
                             onClick={() => uploadButtonRef.current?.click()}
-                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-visible:outline-brand-600"
+                            className="flex items-center justify-center h-10 w-10 shrink-0 text-foreground-lighter hover:text-foreground-light overflow-hidden rounded-full bg-cover border hover:border-strong focus-ring"
                             style={{
                               backgroundImage: logoUrl ? `url("${logoUrl}")` : 'none',
                             }}
@@ -337,7 +338,6 @@ export default function FormPatternsSidePanel() {
                             </Button>
                             {logoUrl && (
                               <Button
-                                variant="default"
                                 size="tiny"
                                 icon={<Trash size={12} />}
                                 onClick={() => {
@@ -424,6 +424,7 @@ export default function FormPatternsSidePanel() {
                             <p className="text-xs text-foreground-lighter">
                               Drag and drop or{' '}
                               <button
+                                tabIndex={0}
                                 type="button"
                                 onClick={() => fileUploadRef.current?.click()}
                                 className="underline cursor-pointer hover:text-foreground-light"
@@ -443,7 +444,6 @@ export default function FormPatternsSidePanel() {
                                       {file.name}
                                     </span>
                                     <Button
-                                      variant="default"
                                       size="tiny"
                                       icon={<Trash size={12} />}
                                       onClick={() => {
@@ -571,18 +571,18 @@ export default function FormPatternsSidePanel() {
                       label="Select (Dropdown)"
                       description="Single selection from a list of options"
                     >
-                      <FormControl className="col-span-6">
-                        <Select value={field.value} onValueChange={field.onChange}>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <FormControl className="col-span-6">
                           <SelectTrigger>
                             <SelectValue placeholder="Select an option" />
                           </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
-                            <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
-                            <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
+                        </FormControl>
+                        <SelectContent>
+                          <SelectItem value="us-east-1">US East (N. Virginia)</SelectItem>
+                          <SelectItem value="us-west-2">US West (Oregon)</SelectItem>
+                          <SelectItem value="eu-west-1">EU West (Ireland)</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormItemLayout>
                   )}
                 />
@@ -608,14 +608,16 @@ export default function FormPatternsSidePanel() {
                           size="small"
                           className="w-full"
                         >
-                          <MultiSelectorTrigger
-                            mode="inline-combobox"
-                            label="Select options..."
-                            badgeLimit="wrap"
-                            showIcon={false}
-                            deletableBadge
-                            className="w-full"
-                          />
+                          <FormControl>
+                            <MultiSelectorTrigger
+                              mode="inline-combobox"
+                              label="Select options..."
+                              badgeLimit="wrap"
+                              showIcon={false}
+                              deletableBadge
+                              className="w-full"
+                            />
+                          </FormControl>
                           <MultiSelectorContent>
                             <MultiSelectorList>
                               <MultiSelectorItem value="public">public</MultiSelectorItem>
@@ -675,23 +677,23 @@ export default function FormPatternsSidePanel() {
                       label="Date Picker"
                       description="Date selection with calendar popover"
                     >
-                      <FormControl className="col-span-6">
-                        <DatePicker>
+                      <DatePicker>
+                        <FormControl className="col-span-6">
                           <DatePickerTrigger asChild>
                             <DatePickerButton block isInvalid={fieldState.invalid}>
                               {field.value ? format(field.value, 'PPP') : 'Pick a date'}
                             </DatePickerButton>
                           </DatePickerTrigger>
-                          <DatePickerContent>
-                            <Calendar
-                              mode="single"
-                              selected={field.value}
-                              onSelect={field.onChange}
-                              initialFocus
-                            />
-                          </DatePickerContent>
-                        </DatePicker>
-                      </FormControl>
+                        </FormControl>
+                        <DatePickerContent>
+                          <Calendar
+                            mode="single"
+                            selected={field.value}
+                            onSelect={field.onChange}
+                            initialFocus
+                          />
+                        </DatePickerContent>
+                      </DatePicker>
                     </FormItemLayout>
                   )}
                 />
@@ -768,15 +770,12 @@ export default function FormPatternsSidePanel() {
                 >
                   <div className="col-span-6 flex gap-2 items-center">
                     <Button
-                      variant="default"
                       icon={<ExternalLink size={14} />}
                       onClick={() => console.log('Action performed')}
                     >
                       View documentation
                     </Button>
-                    <Button variant="default" onClick={() => console.log('Reset action')}>
-                      Reset API key
-                    </Button>
+                    <Button onClick={() => console.log('Reset action')}>Reset API key</Button>
                   </div>
                 </FormItemLayout>
               </SheetSection>
@@ -784,7 +783,6 @@ export default function FormPatternsSidePanel() {
           </Form>
           <SheetFooter>
             <Button
-              variant="default"
               onClick={() => {
                 form.reset()
                 setOpen(false)

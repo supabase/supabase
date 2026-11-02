@@ -10,7 +10,7 @@ import {
   DialogTitle,
   DialogTrigger,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { INTERNAL_SCHEMAS, useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
@@ -44,9 +44,7 @@ export const ProtectedSchemaDialog = ({ onClose }: { onClose: () => void }) => {
       </DialogSection>
       <DialogFooter>
         <div className="flex items-center justify-end space-x-2">
-          <Button variant="default" onClick={onClose}>
-            Understood
-          </Button>
+          <Button onClick={onClose}>Understood</Button>
         </div>
       </DialogFooter>
     </>
@@ -81,18 +79,18 @@ export const ProtectedSchemaWarning = ({
       description={
         reason === 'fdw' && fdwType === 'iceberg' ? (
           <p>
-            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
-            connect to analytics buckets and is read-only through the dashboard.
+            The <code>{schema}</code> schema is used by Supabase to connect to analytics buckets and
+            is read-only through the dashboard.
           </p>
         ) : reason === 'fdw' && fdwType === 's3_vectors' ? (
           <p>
-            The <code className="text-code-inline">{schema}</code> schema is used by Supabase to
-            connect to vector buckets and is read-only through the dashboard.
+            The <code>{schema}</code> schema is used by Supabase to connect to vector buckets and is
+            read-only through the dashboard.
           </p>
         ) : (
           <p>
-            The <code className="text-code-inline">{schema}</code> schema is managed by Supabase and
-            is read-only through the dashboard.
+            The <code>{schema}</code> schema is managed by Supabase and is read-only through the
+            dashboard.
           </p>
         )
       }
@@ -100,7 +98,7 @@ export const ProtectedSchemaWarning = ({
         showLearnMoreDialog && (
           <Dialog open={showModal} onOpenChange={setShowModal}>
             <DialogTrigger asChild>
-              <Button variant="default" size="tiny" onClick={() => setShowModal(true)}>
+              <Button size="tiny" onClick={() => setShowModal(true)}>
                 Learn more
               </Button>
             </DialogTrigger>

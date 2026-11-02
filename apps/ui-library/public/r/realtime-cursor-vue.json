@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "realtime-cursor-vue",
-  "type": "registry:component",
   "title": "Realtime Cursor for Vue and Supabase",
   "description": "Component which renders realtime cursors from other users in a room.",
   "dependencies": [
@@ -28,5 +27,6 @@
       "type": "registry:component",
       "target": "composables/useRealtimeCursors.ts"
     }
-  ]
+  ],
+  "type": "registry:component"
 }

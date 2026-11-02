@@ -70,7 +70,7 @@ export default function TableRowLinkActions() {
           {policies.map((policy) => (
             <TableRow
               key={policy.id}
-              className="relative cursor-pointer inset-focus"
+              className="relative cursor-pointer focus-inset"
               onClick={(event) => {
                 if (event.currentTarget !== event.target) return
                 handlePolicyNavigation(policy.id, event)
@@ -89,9 +89,7 @@ export default function TableRowLinkActions() {
               </TableCell>
               <TableCell>{policy.name}</TableCell>
               <TableCell>
-                <code className="text-foreground-muted text-code-inline uppercase">
-                  {policy.command}
-                </code>
+                <code className="text-foreground-muted uppercase">{policy.command}</code>
               </TableCell>
               <TableCell className="text-foreground-lighter">{policy.appliedTo}</TableCell>
               <TableCell className="flex justify-end items-center h-full gap-3">
@@ -103,7 +101,6 @@ export default function TableRowLinkActions() {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        variant="default"
                         icon={<EllipsisVertical />}
                         aria-label="More actions"
                         className="w-7 hit-area-2"

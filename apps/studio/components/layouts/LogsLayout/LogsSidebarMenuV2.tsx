@@ -1,5 +1,5 @@
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronRight, Plus } from 'lucide-react'
+import { ChevronRightIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import React, { useState } from 'react'
@@ -13,17 +13,17 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { useIsETLPrivateAlpha } from '@/components/interfaces/Database/Replication/useIsETLPrivateAlpha'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
+import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
   children,
@@ -37,7 +37,7 @@ export function SidebarCollapsible({
   return (
     <Collapsible defaultOpen={defaultOpen}>
       <CollapsibleTrigger className="flex items-center gap-x-2 px-4 [&[data-state=open]>svg]:rotate-90! pb-2">
-        <ChevronRight
+        <ChevronRightIcon
           size={16}
           className={'text-foreground-light transition-transform duration-200'}
         />
@@ -69,24 +69,11 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const enablePgReplicate = useIsETLPrivateAlpha()
-  const { data: etlData, isPending: isETLLoading } = useReplicationSourcesQuery(
-    {
-      projectRef: ref,
-    },
-    {
-      enabled: enablePgReplicate,
-      retry: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  )
-
-  // [Jordi] We only want to show ETL logs if the user has the feature enabled AND they're using the feature aka they've created a source.
-  const showETLLogs = enablePgReplicate && (etlData?.sources?.length ?? 0) > 0 && !isETLLoading
+  const { showPipelinesLogs } = useShowPipelinesLogs()
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
+  const showPostgresUpgradeLogs = useShowPostgresUpgradeLogs()
 
   const { data: savedQueriesRes, isPending: savedQueriesLoading } = useContentQuery({
     projectRef: ref,
@@ -172,11 +159,11 @@ export function LogsSidebarMenuV2() {
       url: `/project/${ref}/logs/pgcron-logs`,
       items: [],
     },
-    showETLLogs
+    showPipelinesLogs
       ? {
-          name: 'Replication',
-          key: 'replication_logs',
-          url: `/project/${ref}/logs/replication-logs`,
+          name: 'Pipelines',
+          key: 'pipelines-logs',
+          url: `/project/${ref}/logs/pipelines-logs`,
           items: [],
         }
       : null,
@@ -190,16 +177,17 @@ export function LogsSidebarMenuV2() {
       : null,
   ].filter((x) => x !== null)
 
-  const OPERATIONAL_COLLECTIONS = IS_PLATFORM
-    ? [
-        {
-          name: 'Postgres Version Upgrade',
-          key: 'pg-upgrade-logs',
-          url: `/project/${ref}/logs/pg-upgrade-logs`,
-          items: [],
-        },
-      ]
-    : []
+  const OPERATIONAL_COLLECTIONS =
+    IS_PLATFORM && showPostgresUpgradeLogs
+      ? [
+          {
+            name: 'Postgres Version Upgrade',
+            key: 'pg-upgrade-logs',
+            url: `/project/${ref}/logs/pg-upgrade-logs`,
+            items: [],
+          },
+        ]
+      : []
 
   const filteredLogs = BASE_COLLECTIONS.filter((collection) => {
     return collection?.name.toLowerCase().includes(searchText.toLowerCase())
@@ -230,8 +218,7 @@ export function LogsSidebarMenuV2() {
 
         <ButtonTooltip
           asChild
-          variant="default"
-          icon={<Plus className="text-foreground" />}
+          icon={<PlusIcon className="text-foreground" />}
           className="w-[26px]"
           tooltip={{ content: { text: 'New query', side: 'bottom' } }}
         >
@@ -298,7 +285,7 @@ export function LogsSidebarMenuV2() {
               IS_PLATFORM ? 'Create and save your queries to use them in the explorer' : undefined
             }
             actions={
-              <Button asChild variant="default">
+              <Button asChild>
                 <Link href={`/project/${ref}/logs/explorer`}>Create query</Link>
               </Button>
             }
@@ -325,7 +312,7 @@ export function LogsSidebarMenuV2() {
           </div>
         }
         actions={
-          <Button asChild variant="default">
+          <Button asChild>
             <Link href={`/project/${ref}/settings/log-drains`}>Go to Log Drains</Link>
           </Button>
         }

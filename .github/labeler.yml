@@ -8,8 +8,3 @@ documentation:
 self-hosted:
   - changed-files:
       - any-glob-to-any-file: 'apps/docs/content/guides/self-hosting/**/*'
-
-# Add 'api-deploy-required' to any change in packages/api-types/types
-api-deploy-required:
-  - changed-files:
-      - any-glob-to-any-file: 'packages/api-types/types/**'

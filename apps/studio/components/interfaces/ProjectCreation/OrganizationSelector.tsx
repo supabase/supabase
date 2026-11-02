@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useRouter } from 'next/router'
@@ -23,19 +22,23 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import Panel from '@/components/ui/Panel'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { permissionKeys } from '@/data/permissions/keys'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 interface OrganizationSelectorProps {
   form: UseFormReturn<CreateProjectForm>
+  disableOrganizationSelection: boolean
 }
 
-export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
+export const OrganizationSelector = ({
+  form,
+  disableOrganizationSelection,
+}: OrganizationSelectorProps) => {
   const router = useRouter()
   const { slug } = useParams()
   const queryClient = useQueryClient()
   const { data: currentOrg } = useSelectedOrganizationQuery()
-  const { can: isAdmin } = useAsyncCheckPermissions(PermissionAction.CREATE, 'projects')
+  const { can: isAdmin } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.ORGANIZATION.PROJECTS_CREATE)
 
   // Permissions may be stale for newly created accounts due to replication lag between
   // org setup and the permissions endpoint. Invalidate in the background on mount so the
@@ -54,35 +57,35 @@ export const OrganizationSelector = ({ form }: OrganizationSelectorProps) => {
         control={form.control}
         name="organization"
         render={({ field }) => (
-          <FormItemLayout id="organization" label="Organization" layout="horizontal">
+          <FormItemLayout label="Organization" layout="horizontal">
             {(organizations?.length ?? 0) > 0 && (
-              <FormControl>
-                <Select
-                  name="organization"
-                  onValueChange={(slug) => {
-                    field.onChange(slug)
-                    router.push(`/new/${slug}`)
-                  }}
-                  value={field.value}
-                  defaultValue={field.value}
-                >
-                  <SelectTrigger id="organization">
+              <Select
+                onValueChange={(slug) => {
+                  field.onChange(slug)
+                  router.push(`/new/${slug}`)
+                }}
+                value={field.value}
+                defaultValue={field.value}
+                disabled={disableOrganizationSelection}
+              >
+                <FormControl>
+                  <SelectTrigger>
                     <SelectValue placeholder="Select an organization" />
                   </SelectTrigger>
-                  <SelectContent>
-                    <SelectGroup>
-                      {organizations?.map((x) => (
-                        <SelectItem key={x.id} value={x.slug}>
-                          <div className="flex justify-between items-center gap-2 w-full">
-                            <span>{x.name}</span>
-                            <Badge className="mt-px">{x.plan.name}</Badge>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectGroup>
-                  </SelectContent>
-                </Select>
-              </FormControl>
+                </FormControl>
+                <SelectContent>
+                  <SelectGroup>
+                    {organizations?.map((x) => (
+                      <SelectItem key={x.id} value={x.slug}>
+                        <div className="flex justify-between items-center gap-2 w-full">
+                          <span>{x.name}</span>
+                          <Badge className="mt-px">{x.plan.name}</Badge>
+                        </div>
+                      </SelectItem>
+                    ))}
+                  </SelectGroup>
+                </SelectContent>
+              </Select>
             )}
           </FormItemLayout>
         )}

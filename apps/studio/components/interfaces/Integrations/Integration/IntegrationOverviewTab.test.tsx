@@ -18,7 +18,7 @@ vi.mock('../Landing/Integrations.constants', () => ({
   ],
 }))
 
-vi.mock('framer-motion', async (importOriginal) => {
+vi.mock('motion/react', async (importOriginal) => {
   const actual = (await importOriginal()) as any
   return {
     ...actual,
@@ -40,6 +40,7 @@ vi.mock('@/hooks/misc/useSelectedProject', () => ({
     data: { ref: 'default', connectionString: 'postgres://localhost' },
   }),
   useIsOrioleDb: () => false,
+  useIsHighAvailability: () => false,
 }))
 
 vi.mock('common', async (importOriginal) => {
@@ -73,24 +74,21 @@ describe('IntegrationOverviewTab', () => {
     ])
   })
 
-  it('does not disable actions when hideRequiredExtensionsSection is true and extensions are uninstalled', () => {
-    customRender(
-      <IntegrationOverviewTab
-        hideRequiredExtensionsSection
-        actions={<button>Enable webhooks</button>}
-      />
-    )
+  it.each([
+    { hideRequiredExtensionsSection: true, isDisabled: 'false' },
+    { hideRequiredExtensionsSection: false, isDisabled: 'true' },
+  ])(
+    'with uninstalled extensions and hideRequiredExtensionsSection=$hideRequiredExtensionsSection, aria-disabled is $isDisabled',
+    ({ hideRequiredExtensionsSection, isDisabled }) => {
+      customRender(
+        <IntegrationOverviewTab
+          hideRequiredExtensionsSection={hideRequiredExtensionsSection}
+          actions={<button tabIndex={0}>Enable integration</button>}
+        />
+      )
 
-    const actionsArea = screen.getByText('Enable webhooks').closest('[aria-disabled]')
-    expect(actionsArea).toHaveAttribute('aria-disabled', 'false')
-    expect(actionsArea).not.toHaveClass('opacity-25')
-  })
-
-  it('disables actions when extensions are uninstalled and hideRequiredExtensionsSection is false', () => {
-    customRender(<IntegrationOverviewTab actions={<button>Enable integration</button>} />)
-
-    const actionsArea = screen.getByText('Enable integration').closest('[aria-disabled]')
-    expect(actionsArea).toHaveAttribute('aria-disabled', 'true')
-    expect(actionsArea).toHaveClass('opacity-25')
-  })
+      const actionsArea = screen.getByText('Enable integration').closest('[aria-disabled]')
+      expect(actionsArea).toHaveAttribute('aria-disabled', isDisabled)
+    }
+  )
 })

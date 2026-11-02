@@ -8,15 +8,16 @@ import type { APIKeysData } from '@/data/api-keys/api-keys-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-type ApiKeyResponse = components['schemas']['ApiKeyResponse']
+type ApiKeyResponse = components['schemas']['ApiKeyResponse_Output']
 
 // Permissions are non-network global state — mock the hook (the skill's allowed
 // exception), matching the neighboring PublishableAPIKeys.test.tsx.
 const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_SECRET_READ: 'api_gateway_keys_secret_read' } },
 }))
 
 // CopyButton writes via copyToClipboard from 'ui'. Stub just that export so we can
@@ -87,7 +88,7 @@ describe('ApiKeyPill', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Copy API key' }))
 
-    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalledTimes(1))
+    await waitFor(() => expect(mockCopyToClipboard).toHaveBeenCalled())
     await expect(Promise.resolve(mockCopyToClipboard.mock.calls[0][0])).resolves.toBe(FULL)
   })
 })

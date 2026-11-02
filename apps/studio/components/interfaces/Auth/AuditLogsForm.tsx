@@ -1,11 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useEffect } from 'react'
-import { useForm } from 'react-hook-form'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import {
   PageSection,
@@ -21,8 +20,10 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
+import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
+import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const schema = z.object({
@@ -31,13 +32,39 @@ const schema = z.object({
 
 const AUDIT_LOG_ENTRIES_TABLE = 'audit_log_entries'
 
+const AUTH_AUDIT_LOGS_QUERY = safeSql`
+  select
+    cast(timestamp as datetime) as timestamp,
+    event_message,
+    metadata
+  from auth_audit_logs
+  limit 10
+`
+
+const AUTH_AUDIT_LOGS_QUERY_OTEL = safeSql`
+  select
+    timestamp,
+    event_message,
+    log_attributes
+  from logs
+  where source = 'auth_audit_logs'
+  order by timestamp desc
+  limit 10
+`
+
 export const AuditLogsForm = () => {
   const { ref: projectRef } = useParams()
+  const useOtel = useFlag('otelLegacyLogs')
   const { data: project } = useSelectedProjectQuery()
+  const authAuditLogsQuery = pickLogsQueryBuilder(
+    useOtel,
+    AUTH_AUDIT_LOGS_QUERY_OTEL,
+    AUTH_AUDIT_LOGS_QUERY
+  )
+  const authAuditLogsUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(authAuditLogsQuery)}`
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { data: tables = [] } = useTablesQuery({
@@ -69,7 +96,9 @@ export const AuditLogsForm = () => {
     defaultValues: { AUDIT_LOG_DISABLE_POSTGRES: false },
   })
   const { isDirty } = form.formState
-  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = form.watch()
+  const { AUDIT_LOG_DISABLE_POSTGRES: formValueDisablePostgres } = useWatch({
+    control: form.control,
+  })
   const currentlyDisabled = authConfig?.AUDIT_LOG_DISABLE_POSTGRES ?? false
   const isDisabling = !currentlyDisabled && formValueDisablePostgres
 
@@ -134,18 +163,12 @@ export const AuditLogsForm = () => {
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
+                            <code>{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
                           table.
                           <br />
                           You can disable this to reduce disk usage while still accessing logs
-                          through the{' '}
-                          <InlineLink
-                            href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                          >
-                            Auth logs
-                          </InlineLink>
-                          .
+                          through the <InlineLink href={authAuditLogsUrl}>Auth logs</InlineLink>.
                         </p>
                       }
                     >
@@ -167,17 +190,10 @@ export const AuditLogsForm = () => {
                     description={
                       <p>
                         Future audit logs will only appear in the project’s{' '}
-                        <InlineLink
-                          href={`/project/${projectRef}/logs/explorer?q=select%0A++cast(timestamp+as+datetime)+as+timestamp%2C%0A++event_message%2C+metadata+%0Afrom+auth_audit_logs+%0Alimit+10%0A`}
-                        >
-                          auth logs
-                        </InlineLink>
-                        . You are responsible for backing up, copying, or migrating existing data
-                        from the{' '}
-                        <code className="text-code-inline break-keep!">
-                          {AUDIT_LOG_ENTRIES_TABLE}
-                        </code>{' '}
-                        table if needed.
+                        <InlineLink href={authAuditLogsUrl}>auth logs</InlineLink>. You are
+                        responsible for backing up, copying, or migrating existing data from the{' '}
+                        <code className="break-keep!">{AUDIT_LOG_ENTRIES_TABLE}</code> table if
+                        needed.
                       </p>
                     }
                   />
@@ -185,11 +201,7 @@ export const AuditLogsForm = () => {
               </CardContent>
 
               <CardFooter className="justify-end space-x-2">
-                {isDirty && (
-                  <Button variant="default" onClick={() => form.reset()}>
-                    Cancel
-                  </Button>
-                )}
+                {isDirty && <Button onClick={() => form.reset()}>Cancel</Button>}
                 <Button
                   variant="primary"
                   type="submit"

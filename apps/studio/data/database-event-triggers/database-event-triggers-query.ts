@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseEventTriggerKeys } from './keys'
 import type { EventTrigger } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggerList.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -59,6 +60,7 @@ export async function getDatabaseEventTriggers(
       connectionString,
       sql: EVENT_TRIGGERS_SQL,
       queryKey: databaseEventTriggerKeys.list(projectRef),
+      grant: unguarded.migrating,
     },
     signal
   )

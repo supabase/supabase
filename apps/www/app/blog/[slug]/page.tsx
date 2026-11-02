@@ -10,9 +10,12 @@ import {
   toAbsoluteBlogImageUrl,
 } from '@/lib/blog-images'
 import { breadcrumbs } from '@/lib/breadcrumbs'
+import { canonicalAlternates } from '@/lib/canonical'
 import { SITE_ORIGIN } from '@/lib/constants'
+import { parseFrontmatter } from '@/lib/frontmatter.mjs'
 import { blogPostingSchema, breadcrumbListSchema, serializeJsonLd } from '@/lib/json-ld'
-import { getAllPostSlugs, getPostdata, getSortedPosts } from '@/lib/posts'
+import { mdAlternates } from '@/lib/md-alternates'
+import { getAllPostSlugs, getPostdata, getSortedPosts, resolveBlogSlug } from '@/lib/posts'
 import type { Blog, BlogData, PostReturnType } from '@/types/post'
 
 function resolveBlogAuthors(authorField: string | undefined) {
@@ -59,27 +62,26 @@ export async function generateMetadata({ params }: { params: Promise<Params> }):
     }
   }
 
-  const matter = (await import('gray-matter')).default
-
   // Try to get static markdown post first
   try {
     const postContent = await getPostdata(slug, '_blog')
-    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const parsedContent = parseFrontmatter(postContent) as unknown as MatterReturn
     const blogPost = parsedContent.data
     const metaImageUrl = getAbsoluteBlogSocialImage(blogPost, SITE_ORIGIN)
+    // Aliases (e.g. `/blog/postgres-13`) render the same post, so the canonical is the resolved slug.
+    const canonicalSlug = resolveBlogSlug(slug) ?? slug
 
     return {
       title: blogPost.title,
       description: blogPost.description,
       alternates: {
-        types: {
-          'text/markdown': `/blog/${slug}.md`,
-        },
+        ...canonicalAlternates(`/blog/${encodeURIComponent(canonicalSlug)}`),
+        ...mdAlternates(`blog/${slug}`),
       },
       openGraph: {
         title: blogPost.title,
         description: blogPost.description,
-        url: `${SITE_ORIGIN}/blog/${slug}`,
+        url: `${SITE_ORIGIN}/blog/${canonicalSlug}`,
         type: 'article',
         images: metaImageUrl ? [metaImageUrl] : undefined,
       },
@@ -106,11 +108,9 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
 
   const { isEnabled: isDraft } = await draftMode()
 
-  const matter = (await import('gray-matter')).default
-
   try {
     const postContent = await getPostdata(slug, '_blog')
-    const parsedContent = matter(postContent) as unknown as MatterReturn
+    const parsedContent = parseFrontmatter(postContent) as unknown as MatterReturn
     const content = parsedContent.content
     const tocDepth = (parsedContent.data as any)?.toc_depth ?? 3
     const { preprocessMdxWithCodeTabs } = await import('~/components/CodeTabs')
@@ -160,21 +160,24 @@ export default async function BlogPostPage({ params }: { params: Promise<Params>
     }
 
     const frontmatter = parsedContent.data
+    // Same identity as the canonical, so alias pages publish one post URL.
+    const canonicalSlug = resolveBlogSlug(slug) ?? slug
     const blogAuthors = resolveBlogAuthors(frontmatter.author)
     const imageUrl =
       getAbsoluteBlogSocialImage(frontmatter, SITE_ORIGIN) ??
       toAbsoluteBlogImageUrl(BLOG_PLACEHOLDER_IMAGE, SITE_ORIGIN)
     const blogJsonLd = blogPostingSchema({
-      url: `${SITE_ORIGIN}/blog/${slug}`,
+      url: `${SITE_ORIGIN}/blog/${canonicalSlug}`,
       headline: frontmatter.title,
       description: frontmatter.description,
       image: imageUrl,
       datePublished: frontmatter.date,
+      dateModified: frontmatter.updated ?? frontmatter.date,
       authors: blogAuthors.length > 0 ? blogAuthors : [{ name: 'Supabase' }],
     })
     const breadcrumbJsonLd = breadcrumbListSchema([
       ...breadcrumbs.blogIndex,
-      { name: frontmatter.title, url: `https://supabase.com/blog/${slug}` },
+      { name: frontmatter.title, url: `https://supabase.com/blog/${canonicalSlug}` },
     ])
 
     return (

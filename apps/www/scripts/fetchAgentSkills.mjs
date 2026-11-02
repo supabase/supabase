@@ -8,10 +8,14 @@
  * URLs — no rewriting needed on this side.
  *
  * Spec: https://github.com/agentskills/agentskills/pull/254
- * Runs unauthenticated — public repo, build-time only.
+ * Uses AGENT_SKILLS_GITHUB_TOKEN if set to avoid GitHub's unauthenticated
+ * rate limit (60 req/hr per IP, shared across Vercel build machines).
+ *
+ * If the fetch fails outside production, the committed index.json is kept so
+ * preview and local builds don't break on GitHub rate limits.
  */
 
-import { promises as fs } from 'node:fs'
+import { existsSync, promises as fs } from 'node:fs'
 import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -20,7 +24,11 @@ const OUT_DIR = join(__dirname, '..', 'public', '.well-known', 'agent-skills')
 const REPO = 'supabase/agent-skills'
 
 async function fetchJson(url) {
-  const res = await fetch(url, { headers: { 'User-Agent': 'supabase-www-build' } })
+  const headers = { 'User-Agent': 'supabase-www-build' }
+  if (process.env.AGENT_SKILLS_GITHUB_TOKEN) {
+    headers['Authorization'] = `Bearer ${process.env.AGENT_SKILLS_GITHUB_TOKEN}`
+  }
+  const res = await fetch(url, { headers })
   if (!res.ok) throw new Error(`GET ${url} → ${res.status}`)
   return res.json()
 }
@@ -45,5 +53,12 @@ async function main() {
 
 main().catch((err) => {
   console.error(err)
+  const canFallBack = process.env.VERCEL_ENV !== 'production'
+  const hasPreviousWrite = existsSync(join(OUT_DIR, 'index.json'))
+
+  if (canFallBack && hasPreviousWrite) {
+    console.warn('Done — keeping committed public/.well-known/agent-skills/index.json')
+    process.exit(0)
+  }
   process.exit(1)
 })

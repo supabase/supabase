@@ -5,6 +5,7 @@ import { DropdownMenu as DropdownMenuPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 
 const DropdownMenu = ({
   modal = false,
@@ -13,7 +14,22 @@ const DropdownMenu = ({
   <DropdownMenuPrimitive.Root modal={modal} {...props} />
 )
 
-const DropdownMenuTrigger = DropdownMenuPrimitive.Trigger
+const DropdownMenuTrigger = React.forwardRef<
+  React.ElementRef<typeof DropdownMenuPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof DropdownMenuPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <DropdownMenuPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+DropdownMenuTrigger.displayName = DropdownMenuPrimitive.Trigger.displayName
 
 const DropdownMenuGroup = DropdownMenuPrimitive.Group
 
@@ -32,7 +48,7 @@ const DropdownMenuSubTrigger = React.forwardRef<
   <DropdownMenuPrimitive.SubTrigger
     ref={ref}
     className={cn(
-      'flex cursor-default select-none items-center rounded-xs pl-2 pr-1 py-1.5 text-xs outline-hidden focus:bg-overlay-hover data-[state=open]:bg-overlay-hover',
+      'flex cursor-default select-none items-center rounded-item pl-2 pr-1 py-1.5 text-xs outline-hidden focus:bg-overlay-hover data-[state=open]:bg-overlay-hover',
       inset && 'pl-8',
       className
     )}
@@ -68,7 +84,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        'z-50 min-w-32 overflow-hidden rounded-md border border-overlay bg-overlay p-1 text-foreground-light shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-64',
+        'z-50 min-w-32 max-h-(--radix-dropdown-menu-content-available-height) overflow-y-auto overflow-x-hidden rounded-md border border-overlay bg-overlay p-1 text-foreground-light shadow-md data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 w-64',
         className
       )}
       {...props}
@@ -86,7 +102,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-xs outline-hidden transition-colors focus:bg-overlay-hover focus:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-item px-2 py-1.5 text-xs outline-hidden transition-colors focus:bg-overlay-hover focus:text-foreground data-disabled:pointer-events-none data-disabled:opacity-50',
       inset && 'pl-8',
       className
     )}
@@ -102,7 +118,7 @@ const DropdownMenuCheckboxItem = React.forwardRef<
   <DropdownMenuPrimitive.CheckboxItem
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-xs outline-hidden transition-colors focus:bg-overlay-hover data-disabled:pointer-events-none data-disabled:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-item py-1.5 pl-8 pr-2 text-xs outline-hidden transition-colors focus:bg-overlay-hover data-disabled:pointer-events-none data-disabled:opacity-50',
       className
     )}
     checked={checked}
@@ -125,7 +141,7 @@ const DropdownMenuRadioItem = React.forwardRef<
   <DropdownMenuPrimitive.RadioItem
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-xs py-1.5 pl-8 pr-2 text-xs outline-hidden transition-colors focus:bg-overlay-hover data-disabled:pointer-events-none data-disabled:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-item py-1.5 pl-8 pr-2 text-xs outline-hidden transition-colors focus:bg-overlay-hover data-disabled:pointer-events-none data-disabled:opacity-50',
       className
     )}
     {...props}

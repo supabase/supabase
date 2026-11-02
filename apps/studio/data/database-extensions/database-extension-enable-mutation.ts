@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseExtensionsKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -35,6 +36,7 @@ export async function enableDatabaseExtension({
     connectionString,
     sql,
     queryKey: ['extension', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

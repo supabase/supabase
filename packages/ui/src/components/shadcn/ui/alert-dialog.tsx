@@ -5,6 +5,7 @@ import { AlertDialog as AlertDialogPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
+import { getExplicitTabIndex } from '../../../lib/utils/getExplicitTabIndex'
 import { Button, ButtonVariantProps, buttonVariants } from './../../Button'
 
 type AlertDialogContextValue = {
@@ -75,7 +76,22 @@ const AlertDialog = ({
 }
 AlertDialog.displayName = AlertDialogPrimitive.Root.displayName
 
-const AlertDialogTrigger = AlertDialogPrimitive.Trigger
+const AlertDialogTrigger = React.forwardRef<
+  React.ElementRef<typeof AlertDialogPrimitive.Trigger>,
+  React.ComponentPropsWithoutRef<typeof AlertDialogPrimitive.Trigger>
+>(({ disabled, tabIndex, ...props }, ref) => {
+  const computedTabIndex = getExplicitTabIndex(tabIndex, disabled)
+
+  return (
+    <AlertDialogPrimitive.Trigger
+      ref={ref}
+      {...props}
+      disabled={disabled}
+      tabIndex={computedTabIndex}
+    />
+  )
+})
+AlertDialogTrigger.displayName = AlertDialogPrimitive.Trigger.displayName
 
 const AlertDialogPortal = ({ children, ...props }: AlertDialogPrimitive.AlertDialogPortalProps) => (
   <AlertDialogPrimitive.Portal {...props}>
@@ -199,7 +215,7 @@ const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
   <div
     data-slot="alert-dialog-footer"
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5 [[data-slot=alert-dialog-body]:has(>[role=alert])+&]:border-t-0',
+      'flex flex-col-reverse gap-y-2 sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5 [[data-slot=alert-dialog-body]:has(>[role=alert])+&]:border-t-0',
       className
     )}
     {...props}
@@ -357,11 +373,7 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
-      className={cn(
-        buttonVariants({ variant: 'default', size: 'tiny' }),
-        'mt-2 sm:mt-0',
-        className
-      )}
+      className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), className)}
       disabled={disabled || alertDialogContext?.loading}
       {...props}
     />

@@ -26,6 +26,12 @@ export const IS_STAGING_OR_LOCAL =
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
   process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
 
+/**
+ * Base URL for the internal Admin Studio tool (kept out of source since this
+ * repo is public).
+ */
+export const ADMIN_STUDIO_URL = process.env.NEXT_PUBLIC_ADMIN_STUDIO_URL
+
 export const API_URL = (() => {
   if (process.env.NODE_ENV === 'test') return 'http://localhost:3000/api'
   //  If running in platform, use API_URL from the env var
@@ -58,12 +64,6 @@ export const GOTRUE_ERRORS = {
 
 export const STRIPE_PUBLIC_KEY =
   process.env.NEXT_PUBLIC_STRIPE_PUBLIC_KEY || 'pk_test_XVwg5IZH3I9Gti98hZw6KRzd00v5858heG'
-
-export const POSTHOG_URL =
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging' ||
-  process.env.NEXT_PUBLIC_ENVIRONMENT === 'local'
-    ? 'https://ph.supabase.green'
-    : 'https://ph.supabase.com'
 
 export const USAGE_APPROACHING_THRESHOLD = 0.75
 

@@ -1,11 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useCallback } from 'react'
 import { Button } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import DeleteConfirmationDialogs from './DeleteConfirmationDialogs'
@@ -21,7 +20,7 @@ import {
   isView,
   TableLike,
 } from '@/data/table-editor/table-editor-types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDashboardHistory } from '@/hooks/misc/useDashboardHistory'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
@@ -51,14 +50,8 @@ export const TableGridEditor = ({
 
   const [selectedView] = useQueryState('view', parseAsString.withDefault('data'))
 
-  const { can: canEditTables } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
-  )
-  const { can: canEditColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
-  )
+  const { can: canEditTables } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
+  const { can: canEditColumns } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
   const isReadOnly = !canEditTables && !canEditColumns
   const tabId = !!id ? tabs.openTabs.find((x) => x.endsWith(id)) : undefined
   const openTabs = tabs.openTabs.filter((x) => !x.startsWith('sql'))
@@ -130,7 +123,6 @@ export const TableGridEditor = ({
             >
               {!!tabId ? (
                 <Button
-                  variant="default"
                   className="mt-2"
                   onClick={() => {
                     tabs.handleTabClose({
@@ -144,23 +136,13 @@ export const TableGridEditor = ({
                   Close tab
                 </Button>
               ) : openTabs.length > 0 ? (
-                <Button
-                  asChild
-                  variant="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor/${openTabs[0].split('-')[1]}`}>
                     Close tab
                   </Link>
                 </Button>
               ) : (
-                <Button
-                  asChild
-                  variant="default"
-                  className="mt-2"
-                  onClick={() => setLastVisitedTable(undefined)}
-                >
+                <Button asChild className="mt-2" onClick={() => setLastVisitedTable(undefined)}>
                   <Link href={`/project/${projectRef}/editor`}>Head back</Link>
                 </Button>
               )}
@@ -169,7 +151,8 @@ export const TableGridEditor = ({
         </div>
       ) : (
         <TableEditorTableStateContextProvider
-          key={`table-editor-table-${selectedTable.id}`}
+          // Table ids are per-database OIDs, so the same id can exist in another project.
+          key={`table-editor-table-${projectRef}-${selectedTable.id}`}
           projectRef={projectRef}
           table={selectedTable}
           editable={editable}
