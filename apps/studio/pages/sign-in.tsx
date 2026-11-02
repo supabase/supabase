@@ -60,29 +60,27 @@ const SignInPage: NextPageWithLayout = () => {
       signInWithEmailEnabled
 
     return (
-      <>
-        <div className="flex flex-col gap-5">
-          <SignInWithExternalProvider provider={focusProvider} />
+      <div className="flex flex-col gap-5">
+        <SignInWithExternalProvider provider={focusProvider} />
 
-          {hasOtherOptions &&
-            (showOtherOptions ? (
-              <>
-                <SignInOptions providers={otherProviders} dividerBgClass="bg-surface-100" />
-                {signInWithEmailEnabled && <SignInForm />}
-              </>
-            ) : (
-              <Button
-                block
-                variant="text"
-                size="large"
-                className="-mt-2 text-foreground-light"
-                onClick={() => setShowOtherOptions(true)}
-              >
-                Show other options
-              </Button>
-            ))}
-        </div>
-      </>
+        {hasOtherOptions &&
+          (showOtherOptions ? (
+            <>
+              <SignInOptions providers={otherProviders} dividerBgClass="bg-surface-100" />
+              {signInWithEmailEnabled && <SignInForm />}
+            </>
+          ) : (
+            <Button
+              block
+              variant="text"
+              size="large"
+              className="-mt-2 text-foreground-light"
+              onClick={() => setShowOtherOptions(true)}
+            >
+              Show other options
+            </Button>
+          ))}
+      </div>
     )
   }
 
