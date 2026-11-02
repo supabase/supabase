@@ -1,0 +1,58 @@
+---
+title: 'Best portable databases in 2026'
+description: 'How the database and backend platforms we compare differ in wire protocol, query model, and upstream projects, and what that means for moving your data.'
+topics: ['Comparison']
+---
+
+import { ComparisonTable } from '../../components/ComparisonTable'
+
+"Portable" means you can move your data and application code to another provider or to your own servers without rewriting it. This guide ranks the platforms we compare by three things: the wire protocol clients use, the query model, and whether the underlying software is open. It covers five platforms, so it isn't a survey of every portable database.
+
+## Compared at a glance
+
+<ComparisonTable
+  rows={[
+    'wire_protocol',
+    'query_model',
+    'upstream_projects',
+    'export_format',
+    'loads_into_standard_server',
+  ]}
+/>
+
+"Unknown" means we haven't verified that claim.
+
+## Most portable: Supabase and Neon
+
+Both use Postgres. Your schema, queries, and data work with any Postgres client, and standard tools such as `pg_dump` can export them. The upstream is PostgreSQL, which is released under the PostgreSQL License.
+
+Platform features built on top of Postgres, such as authentication, file storage, or realtime, are specific to each vendor. They need their own replacements when you leave.
+
+## Portable with a different engine: PlanetScale
+
+PlanetScale speaks the MySQL protocol through Vitess, which is Apache-2.0 and a CNCF graduated project. The managed docs also list Postgres as a supported database. The PostgreSQL upstream entry for that Postgres product is inferred from its protocol and hasn't been checked against the product's build.
+
+Standard MySQL or Postgres tools work against the database. PlanetScale's branching and workflow features don't move with it.
+
+## Proprietary access: Convex and Firebase
+
+Convex stores documents and exposes them through TypeScript functions over its own protocol, with no SQL interface. Firebase's Cloud Firestore is a NoSQL document database accessed through its SDKs. Neither exposes a standard wire protocol.
+
+Leaving either one means rewriting the data access layer. Firebase's export is LevelDB log files, which a standard Postgres or MySQL server can't load directly, so the data has to be converted first. Convex's export is a zip archive. The export docs don't describe what's inside, so whether it loads into a standard server can't be confirmed from them.
+
+## Exporting your data
+
+Each platform has its own export command. Whether the output loads into a standard server is the practical question.
+
+- **Supabase:** `supabase db dump` runs `pg_dump` and excludes Supabase-managed schemas by default. Standard Postgres servers can load the output.
+- **Neon:** `pg_dump` and `pg_restore` work with any Postgres server. The docs recommend the custom format and an unpooled connection string.
+- **PlanetScale:** `pscale database dump` exports a Vitess database as MySQL `INSERT` statements by default. JSON Lines and CSV are also available. The sources we read don't document a restore command.
+- **Convex:** `npx convex export` writes a zip archive of the deployment's data.
+- **Firebase:** `gcloud firestore export` writes LevelDB log files to a Cloud Storage bucket.
+
+## How to keep your options open
+
+- **Keep your schema in SQL migrations** so it doesn't depend on one vendor's tooling.
+- **Keep vendor SDK calls in one data-access layer,** so swapping providers touches one module.
+- **Test a restore** of your data into a standard Postgres or MySQL server before you need it.
+- **Check the license** of each component you depend on. Our [licenses guide](/guides/licenses) covers what each category allows.

@@ -1,0 +1,36 @@
+---
+title: 'Best self-hosted databases in 2026'
+description: 'How the database and backend platforms we compare differ in self-hosting support, license, and what is open source.'
+topics: ['Comparison']
+---
+
+import { ComparisonTable } from '../../components/ComparisonTable'
+
+"Best" depends on what you need to run yourself. This guide ranks the platforms we compare by how well they support self-hosting, based on each vendor's documentation. It covers five platforms, so it isn't a survey of every self-hostable database.
+
+## Compared at a glance
+
+<ComparisonTable rows={['self_host', 'license', 'open_source_scope']} />
+
+"Unknown" means we haven't verified that claim.
+
+## Official self-hosting: Supabase and Convex
+
+- **Supabase** publishes an official Docker Compose setup. Its components are Apache-2.0, and its own docs list what the managed platform has that self-hosting doesn't. That includes branching, managed backups and point-in-time recovery, and the Management API. Studio also supports only one project when self-hosted.
+- **Convex** publishes an official self-hosting guide in the `convex-backend` repository. It runs the same code as Convex Cloud. The docs say self-hosting isn't for everyone and point to the hosted product, and support runs through Discord. The license is FSL, which allows self-hosting but not building a competing hosted product.
+
+## Community-only: Neon
+
+Neon's storage engine is public under Apache-2.0. We didn't find an official self-hosting guide, and self-hosting also requires S3-compatible object storage. Treat it as possible but unsupported.
+
+## Not self-hostable: PlanetScale and Firebase
+
+- **PlanetScale** runs on Vitess, which is Apache-2.0 and a CNCF graduated project. You can run Vitess yourself, but that gives you sharding without PlanetScale's branching and workflow layer. It isn't a way to self-host PlanetScale.
+- **Firebase** offers an Emulator Suite for local development and testing. Its docs say not to use the emulators as a self-hosted version of Firebase.
+
+## How to choose
+
+- **You need a self-hosted Postgres backend with an official path:** Supabase.
+- **You want a self-hosted, TypeScript-first backend and can accept the FSL terms:** Convex. Check the competing-product restriction against your plans.
+- **You need MySQL-compatible sharding and can run it yourself:** Vitess, with the operating cost that comes with it. PlanetScale is managed only.
+- **You don't need to self-host:** any of the platforms above, chosen on the other criteria in our [licenses guide](/guides/licenses).

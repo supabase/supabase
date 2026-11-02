@@ -1,7 +1,6 @@
 import type { CompetitorProfile } from './types'
 
 export const convex = {
-  id: 'convex',
   name: 'Convex',
   last_verified: '2026-11-02',
   deployment: {
@@ -32,7 +31,7 @@ export const convex = {
   },
   portability: {
     wire_protocol: {
-      value: 'proprietary',
+      value: ['proprietary'],
       notes:
         'Clients call TypeScript functions over Convex’s own protocol. There is no SQL wire interface.',
       sourcing_urls: ['https://docs.convex.dev/database/types'],
@@ -45,6 +44,21 @@ export const convex = {
     upstream_projects: {
       value: [],
       notes: 'No upstream project was identified in this pass.',
+      sourcing_urls: [],
+    },
+    export_tool: {
+      value: 'npx convex export',
+      sourcing_urls: ['https://docs.convex.dev/database/import-export/export'],
+    },
+    export_format: {
+      value: 'zip',
+      notes:
+        'The export is a zip archive. Its contents, file storage coverage, and limits are not documented on the export page.',
+      sourcing_urls: ['https://docs.convex.dev/database/import-export/export'],
+    },
+    loads_into_standard_server: {
+      value: null,
+      notes: 'Not verified. Whether a standard server can load it depends on the archive contents.',
       sourcing_urls: [],
     },
   },

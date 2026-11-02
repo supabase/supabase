@@ -1,7 +1,6 @@
 import type { CompetitorProfile } from './types'
 
 export const firebase = {
-  id: 'firebase',
   name: 'Firebase',
   last_verified: '2026-11-02',
   deployment: {
@@ -29,7 +28,7 @@ export const firebase = {
   },
   portability: {
     wire_protocol: {
-      value: 'proprietary',
+      value: ['proprietary'],
       notes:
         'Cloud Firestore is accessed through language SDKs. The data-model docs describe no SQL or standard wire interface, so this rests on that SDK-only documentation.',
       sourcing_urls: ['https://firebase.google.com/docs/firestore/data-model'],
@@ -44,6 +43,21 @@ export const firebase = {
       value: [],
       notes: 'No upstream open-source project for the hosted service was identified.',
       sourcing_urls: [],
+    },
+    export_tool: {
+      value: 'gcloud firestore export',
+      sourcing_urls: ['https://firebase.google.com/docs/firestore/manage-data/export-import'],
+    },
+    export_format: {
+      value: 'leveldb',
+      notes: 'Exports go to a Cloud Storage bucket in LevelDB log format, with protobuf metadata.',
+      sourcing_urls: ['https://firebase.google.com/docs/firestore/manage-data/export-import'],
+    },
+    loads_into_standard_server: {
+      value: false,
+      notes:
+        'LevelDB logs are not a SQL dump, so a standard Postgres or MySQL server can’t load them directly.',
+      sourcing_urls: ['https://firebase.google.com/docs/firestore/manage-data/export-import'],
     },
   },
 } satisfies CompetitorProfile

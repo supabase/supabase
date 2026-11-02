@@ -1,7 +1,6 @@
 import type { CompetitorProfile } from './types'
 
 export const supabase = {
-  id: 'supabase',
   name: 'Supabase',
   last_verified: '2026-11-02',
   deployment: {
@@ -29,7 +28,7 @@ export const supabase = {
   },
   portability: {
     wire_protocol: {
-      value: 'postgres',
+      value: ['postgres'],
       notes: 'Every project gets a full Postgres database, not a Postgres abstraction.',
       sourcing_urls: ['https://supabase.com/docs/guides/database/overview'],
     },
@@ -44,6 +43,22 @@ export const supabase = {
         'https://supabase.com/docs/guides/database/overview',
         'https://www.postgresql.org/about/licence/',
       ],
+    },
+    export_tool: {
+      value: 'supabase db dump (pg_dump)',
+      notes: 'Excludes Supabase-managed schemas by default. Data and roles need separate flags.',
+      sourcing_urls: ['https://supabase.com/docs/reference/cli/supabase-db-dump'],
+    },
+    export_format: {
+      value: 'pg_dump',
+      notes: 'The page does not say whether the output is plain SQL or pg_dump custom format.',
+      sourcing_urls: ['https://supabase.com/docs/reference/cli/supabase-db-dump'],
+    },
+    loads_into_standard_server: {
+      value: true,
+      notes:
+        'pg_dump output loads into a standard Postgres server. Restores can inherit default privileges from the target.',
+      sourcing_urls: ['https://supabase.com/docs/reference/cli/supabase-db-dump'],
     },
   },
 } satisfies CompetitorProfile

@@ -1,0 +1,46 @@
+---
+title: 'Licenses and what they mean for you'
+description: 'What open source, fair source, and closed licenses mean for self-hosting, forking, and leaving Supabase, Neon, PlanetScale, Convex, and Firebase.'
+topics: ['Comparison']
+---
+
+import { ComparisonTable } from '../../components/ComparisonTable'
+
+A license answers three practical questions: can you run the software yourself, can you change it, and can you move away from it? This guide explains the license categories for the database and backend platforms we compare, and what each one means in practice.
+
+## Three license categories
+
+- **Open source (OSI-approved).** Apache-2.0 and MIT are common examples. You can read, run, modify, fork, and self-host the code, and nothing stops you from building a product on it.
+- **Fair source.** Convex uses the Functional Source License (FSL). You can read, run, and self-host the code, but you can't use it to build a product that competes with Convex's hosted service. Each release converts to Apache-2.0 two years after it was published.
+- **Closed.** You can't see the source or run it yourself. You depend on the vendor's hosted service for as long as the vendor offers it.
+
+## How each platform compares
+
+<ComparisonTable />
+
+"Unknown" means we haven't verified that claim. Profiles last verified on X.
+
+## What this means for you
+
+- **Running it yourself.** Supabase publishes an official Docker setup for its components. Convex publishes an official self-hosting guide. Neon's storage engine is public, but we found no official self-hosting guide. PlanetScale and Firebase can't be self-hosted.
+- **Forking or modifying.** Apache-2.0 and MIT allow both. Under Convex's FSL you can modify the code, but you can't sell a competing hosted service.
+- **Leaving the vendor.** The protocol matters as much as the license. Supabase and Neon use Postgres, so standard tools such as `pg_dump` and any Postgres client work. PlanetScale uses MySQL through Vitess and also offers Postgres. Convex and Firebase use proprietary client APIs, so leaving means rewriting your data access.
+- **If the vendor stops offering the service.** Open source code lets you keep running it, though the operating cost falls on you. A closed service ends when the vendor stops running it.
+
+## Where Supabase comes out ahead
+
+- Most of its components are Apache-2.0, the most permissive common license in this group. Neon's storage engine is also Apache-2.0, so the license alone doesn't separate the two.
+- It has an official self-hosting path with Docker Compose, which is the bigger difference.
+- It runs on standard Postgres, so your data can move with standard tools.
+
+## Where Supabase falls short
+
+- Its hosted control plane isn't open source. Only the components are. Neon's control plane is also not in its public repository, so this isn't unique to Supabase.
+- According to Supabase's own docs, self-hosting doesn't include branching, managed backups and point-in-time recovery, or the Management API.
+- Convex's FSL is less restrictive than it sounds for most users. Its one real limit is building a competing hosted product, so it's a meaningful difference only if that applies to you.
+
+## Caveats
+
+- A license covers the code, not the operations. Self-hosting means you run the infrastructure, backups, and upgrades.
+- Each repository can carry its own license. We checked the top-level licenses, not every component.
+- PlanetScale's platform license couldn't be confirmed from a primary source. The open parts we found are Vitess and some client tooling.

@@ -1,7 +1,6 @@
 import type { CompetitorProfile } from './types'
 
 export const neon = {
-  id: 'neon',
   name: 'Neon',
   last_verified: '2026-11-02',
   deployment: {
@@ -26,7 +25,7 @@ export const neon = {
   },
   portability: {
     wire_protocol: {
-      value: 'postgres',
+      value: ['postgres'],
       notes: 'Neon is Postgres-compatible, and its compute runs Postgres.',
       sourcing_urls: ['https://github.com/neondatabase/neon'],
     },
@@ -41,6 +40,21 @@ export const neon = {
         'https://github.com/neondatabase/neon',
         'https://www.postgresql.org/about/licence/',
       ],
+    },
+    export_tool: {
+      value: 'pg_dump and pg_restore',
+      sourcing_urls: ['https://neon.com/docs/import/import-from-postgres'],
+    },
+    export_format: {
+      value: 'pg_dump',
+      notes: 'The docs recommend the custom format (-Fc). Plain SQL also works with psql.',
+      sourcing_urls: ['https://neon.com/docs/import/import-from-postgres'],
+    },
+    loads_into_standard_server: {
+      value: true,
+      notes:
+        'Use an unpooled connection string for dump and restore. Neon supports PostgreSQL 14 through 17.',
+      sourcing_urls: ['https://neon.com/docs/import/import-from-postgres'],
     },
   },
 } satisfies CompetitorProfile

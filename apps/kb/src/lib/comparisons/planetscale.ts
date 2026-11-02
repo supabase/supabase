@@ -1,7 +1,6 @@
 import type { CompetitorProfile } from './types'
 
 export const planetscale = {
-  id: 'planetscale',
   name: 'PlanetScale',
   last_verified: '2026-11-02',
   deployment: {
@@ -29,10 +28,12 @@ export const planetscale = {
   },
   portability: {
     wire_protocol: {
-      value: 'mysql',
-      notes: 'MySQL-compatible via Vitess. PlanetScale also offers a Postgres product.',
+      value: ['mysql', 'postgres'],
+      notes:
+        'MySQL-compatible through Vitess, and a Postgres database is also supported. Both appear in the managed docs.',
       sourcing_urls: [
         'https://planetscale.com/docs/vitess',
+        'https://planetscale.com/docs/plans/managed',
         'https://dbdb.io/db/planetscale/revisions/5',
       ],
     },
@@ -41,12 +42,34 @@ export const planetscale = {
       sourcing_urls: ['https://planetscale.com/docs/vitess'],
     },
     upstream_projects: {
-      value: [{ name: 'Vitess', license: 'Apache-2.0', cncf_status: 'Graduated' }],
-      notes: 'Graduated on November 5, 2019.',
+      value: [
+        { name: 'Vitess', license: 'Apache-2.0', cncf_status: 'Graduated' },
+        { name: 'PostgreSQL', license: 'PostgreSQL', cncf_status: null },
+      ],
+      notes:
+        'Vitess was graduated on November 5, 2019. PostgreSQL is listed for the Postgres product, based on its wire protocol. The Postgres product’s build was not checked directly.',
       sourcing_urls: [
         'https://github.com/vitessio/vitess/blob/main/LICENSE',
         'https://www.cncf.io/projects/vitess/',
+        'https://planetscale.com/docs/plans/managed',
+        'https://www.postgresql.org/about/licence/',
       ],
+    },
+    export_tool: {
+      value: 'pscale database dump',
+      sourcing_urls: ['https://planetscale.com/changelog/database-dump-output-formats'],
+    },
+    export_format: {
+      value: 'mysql_sql',
+      notes:
+        'Default output is MySQL INSERT statements. JSON Lines and CSV are also available with --output-format.',
+      sourcing_urls: ['https://planetscale.com/changelog/database-dump-output-formats'],
+    },
+    loads_into_standard_server: {
+      value: true,
+      notes:
+        'The default SQL output is standard MySQL. The sources read do not document a restore command, so the import path is unconfirmed.',
+      sourcing_urls: ['https://planetscale.com/changelog/database-dump-output-formats'],
     },
   },
 } satisfies CompetitorProfile

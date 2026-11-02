@@ -48,6 +48,9 @@ export type WireProtocol = 'postgres' | 'mysql' | 'proprietary'
 // wire_protocol field already records whether that access is proprietary.
 export type QueryModel = 'sql' | 'document'
 
+// Format of a data export. `zip` means a zip archive whose contents aren't documented.
+export type ExportFormat = 'pg_dump' | 'mysql_sql' | 'jsonl' | 'csv' | 'leveldb' | 'zip'
+
 export interface UpstreamProject {
   name: string
   /** SPDX license identifier, such as `Apache-2.0` or `PostgreSQL`. */
@@ -57,8 +60,6 @@ export interface UpstreamProject {
 }
 
 export interface CompetitorProfile {
-  /** Stable slug, matches the filename. */
-  id: string
   name: string
   /** ISO date (YYYY-MM-DD) of the most recent source check. */
   last_verified: string
@@ -68,9 +69,15 @@ export interface CompetitorProfile {
     self_host: Characteristic<SelfHostLevel>
   }
   portability: {
-    wire_protocol: Characteristic<WireProtocol>
+    /** Every protocol the product accepts. Multi-product vendors list each one. */
+    wire_protocol: Characteristic<WireProtocol[]>
     query_model: Characteristic<QueryModel>
     /** Open-source or standards projects the product is built on. */
     upstream_projects: Characteristic<UpstreamProject[]>
+    /** Command or console action that exports the data. */
+    export_tool: Characteristic<string>
+    export_format: Characteristic<ExportFormat>
+    /** Whether a standard Postgres or MySQL server can load the export without conversion. */
+    loads_into_standard_server: Characteristic<boolean>
   }
 }
