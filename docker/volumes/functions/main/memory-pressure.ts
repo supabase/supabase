@@ -23,15 +23,19 @@ export function startMemoryPressureLoop(): void {
         return
       }
       const current = (await Deno.readTextFile('/sys/fs/cgroup/memory.current')).trim()
+      const stat = await Deno.readTextFile('/sys/fs/cgroup/memory.stat')
       const limitBytes = parseBytes(max, 1)
       const currentBytes = parseBytes(current, 0)
+      const inactiveFileBytes = parseBytes(stat.match(/^inactive_file[ \t]+(\S+)[ \t]*$/m)?.[1] ?? '', 0)
+      // Exclude inactive file cache that the kernel can reclaim under pressure.
+      const workingSetBytes = Math.max(0, currentBytes - inactiveFileBytes)
 
-      if (currentBytes / limitBytes >= PRESSURE_THRESHOLD) {
+      if (workingSetBytes / limitBytes >= PRESSURE_THRESHOLD) {
         delay = RETRY_INTERVAL_MS
         const acknowledged = await EdgeRuntime.userWorkers.tryCleanupIdleWorkers(CLEANUP_TIMEOUT_MS)
         EdgeRuntime.miCollect()
         console.warn(
-          `Memory pressure: ${currentBytes} / ${limitBytes} bytes before cleanup; ` +
+          `Memory pressure: working set ${workingSetBytes} / ${limitBytes} bytes before cleanup; ` +
             `${acknowledged} worker(s) acknowledged retirement`
         )
       }
