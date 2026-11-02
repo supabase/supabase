@@ -41,7 +41,7 @@ The assistant uses a dedicated Postgres schema called `memories` to store all of
 Three complementary memory types maintain conversation continuity:
 
 - **Message History (Short-term Memory)**: Maintains a chronological list of recent messages for immediate context
-- **Semantic Memory (Vector Search using pgvector)**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
+- **Semantic Memory (Vector Search using [pgvector](/docs/guides/database/extensions/pgvector))**: Stores conversation embeddings using pgvector for fuzzy concept retrieval ("that productivity thing we talked about last month")
 - **Structured Memory (SQL Data)**: Stores concrete facts in LLM-created tables for precise queries ("How much did I spend on coffee last quarter?")
 
 ### Scheduled Prompts
@@ -151,7 +151,7 @@ When you say "be more formal" or "address me by name," these preferences are sto
 
 ### Optional: Using the CLI
 
-If you prefer the command line, you can use the Supabase CLI to set up your database and Edge Functions. This replaces **Step 1** and **Step 2**.
+If you prefer the command line, you can use the [Supabase CLI](/features/cli) to set up your database and [Edge Functions](/edge-functions). This replaces **Step 1** and **Step 2**.
 
 1.  **Clone the repository**.
     ```bash

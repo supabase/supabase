@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import { useWatch } from 'ui'
@@ -12,7 +11,7 @@ import {
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { uuidv4 } from '@/lib/helpers'
 
 interface HTTPHeadersProps {
@@ -21,7 +20,10 @@ interface HTTPHeadersProps {
 
 export const HTTPHeaders = ({ form }: HTTPHeadersProps) => {
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const { data: apiKeyData } = useAPIKeys(
     {

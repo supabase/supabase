@@ -35,7 +35,7 @@ export const useWebhookDeliveryRetryMutation = ({
     mutationFn: retryDelivery,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({
-        queryKey: platformWebhooksKeys.deliveries(variables.scope, variables.endpointId),
+        queryKey: platformWebhooksKeys.deliveriesAll(variables.scope, variables.endpointId),
       })
 
       await onSuccess?.(data, variables, context)

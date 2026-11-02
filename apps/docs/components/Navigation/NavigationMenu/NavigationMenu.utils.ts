@@ -1,5 +1,6 @@
 'use client'
 
+import type { GlobalMenuItems } from '~/components/Navigation/Navigation.types'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
@@ -137,8 +138,6 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.AiTools
     case pathname.startsWith('observability'):
       return MenuId.Telemetry
-    case pathname.startsWith('troubleshooting'):
-      return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
     case pathname.startsWith('queues'):
@@ -167,3 +166,16 @@ export const useCloseMenuOnRouteChange = () => {
     menuState.setMenuMobileOpen(false)
   }, [pathname])
 }
+
+// a versioned menu id such as reference_javascript_v2 belongs to the reference_javascript level
+export const isMenuLevel = (menuId: string, level: string | undefined): boolean =>
+  !!level && menuId.replace(/_v\d+$/, '') === level
+
+// the top-level group that holds a section: start itself, or the group that links to it
+export const getMenuGroupLabel = (menuId: string, menuItems: GlobalMenuItems): string | undefined =>
+  menuItems.find(
+    ([section]) =>
+      section.enabled !== false &&
+      (isMenuLevel(menuId, section.level) ||
+        section.menuItems?.some((group) => group.some((item) => isMenuLevel(menuId, item.level))))
+  )?.[0].label

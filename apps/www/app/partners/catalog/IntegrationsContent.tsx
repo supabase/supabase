@@ -451,6 +451,18 @@ export default function IntegrationsContent({
                 <Loader size={16} className="animate-spin text-foreground-lighter" />
               </div>
             )}
+            <noscript>
+              <ul className="divide-y rounded-xl border bg-background">
+                {listPartners.slice(PARTNERS_PAGE_SIZE).map((partner) => (
+                  <li key={partner.slug} className="px-5 py-4">
+                    <a href={`/partners/catalog/${partner.slug}`} className="block space-y-1">
+                      <h3 className="text-sm font-medium text-foreground">{partner.title}</h3>
+                      <p className="text-sm text-foreground-lighter">{partner.description}</p>
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </noscript>
           </div>
         </div>
       </SectionContainer>

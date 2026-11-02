@@ -98,8 +98,8 @@ export const EnableCleanupButton = ({ onScheduled }: EnableCleanupButtonProps) =
         <DialogSection className="flex flex-col gap-y-4">
           <p className="text-sm">
             Every cron job run is recorded in the{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
-            Without periodic cleanup, the table grows indefinitely and bloats the database.
+            <code className="break-keep!">cron.job_run_details</code> table. Without periodic
+            cleanup, the table grows indefinitely and bloats the database.
           </p>
           <div className="flex flex-col gap-y-2 text-sm">
             <p className="text-foreground">Delete run history</p>

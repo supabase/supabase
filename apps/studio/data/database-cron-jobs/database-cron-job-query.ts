@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { CronJob } from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -28,6 +29,7 @@ export async function getDatabaseCronJob({
       ? safeSql`SELECT * FROM cron.job where jobid = ${literal(id)};`
       : safeSql`SELECT * FROM cron.job where jobname = ${literal(name)};`,
     queryKey: ['cron-job', id ?? name],
+    grant: unguarded.migrating,
   })
 
   return (result[0] ?? null) as CronJob | null

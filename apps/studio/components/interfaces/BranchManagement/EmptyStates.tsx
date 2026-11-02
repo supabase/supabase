@@ -1,6 +1,5 @@
-import { GithubIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button } from 'ui'
+import { Button, GithubIcon } from 'ui'
 
 import { BranchSelector } from './BranchSelector'
 import { DocsButton } from '@/components/ui/DocsButton'

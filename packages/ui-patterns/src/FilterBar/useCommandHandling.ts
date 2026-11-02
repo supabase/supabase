@@ -22,6 +22,7 @@ export function useCommandHandling({
   handleOperatorChange,
   newPathRef,
   setIsCommandMenuVisible,
+  defaultGroupOperator,
 }: {
   activeInput: ActiveInputState
   setActiveInput: (input: ActiveInputState) => void
@@ -34,6 +35,7 @@ export function useCommandHandling({
   handleOperatorChange: (path: number[], value: string) => void
   newPathRef: React.MutableRefObject<number[]>
   setIsCommandMenuVisible: (visible: boolean) => void
+  defaultGroupOperator?: FilterGroup['logicalOperator']
 }) {
   const handleGroupCommand = useCallback(() => {
     if (activeInput && activeInput.type === 'group') {
@@ -43,7 +45,7 @@ export function useCommandHandling({
 
       // Group-add is structural (no value typed yet), so update draft state only — onApply will
       // fire once a value gets committed inside the new group.
-      const updatedFilters = addGroupToGroup(activeFilters, currentPath)
+      const updatedFilters = addGroupToGroup(activeFilters, currentPath, defaultGroupOperator)
       onFilterChange(updatedFilters)
       newPathRef.current = [...currentPath, group.conditions.length]
       setTimeout(() => {
@@ -51,7 +53,15 @@ export function useCommandHandling({
       }, 0)
       onFreeformTextChange('')
     }
-  }, [activeInput, activeFilters, onFilterChange, newPathRef, setActiveInput, onFreeformTextChange])
+  }, [
+    activeInput,
+    activeFilters,
+    onFilterChange,
+    newPathRef,
+    setActiveInput,
+    onFreeformTextChange,
+    defaultGroupOperator,
+  ])
 
   const handleValueCommand = useCallback(
     (item: MenuItem) => {

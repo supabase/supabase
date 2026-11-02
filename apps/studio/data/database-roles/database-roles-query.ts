@@ -3,6 +3,7 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseRoleKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -20,7 +21,13 @@ export async function getDatabaseRoles(
   signal?: AbortSignal
 ) {
   const { result } = await executeSql(
-    { projectRef, connectionString, sql: pgMetaRolesList.sql, queryKey: ['database-roles'] },
+    {
+      projectRef,
+      connectionString,
+      sql: pgMetaRolesList.sql,
+      queryKey: ['database-roles'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

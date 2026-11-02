@@ -2,6 +2,7 @@ import { getMigrationsSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -26,7 +27,7 @@ export async function getMigrations(
 
   try {
     const { result } = await executeSql(
-      { projectRef, connectionString, sql, queryKey: ['migrations'] },
+      { projectRef, connectionString, sql, queryKey: ['migrations'], grant: unguarded.migrating },
       signal
     )
 

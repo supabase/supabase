@@ -213,7 +213,7 @@ export const ProjectUpgradeAlert = () => {
                           <div>
                             <p className="mb-1">Run the following commands after the upgrade:</p>
                             <div className="flex items-baseline gap-2">
-                              <code className="text-xs">
+                              <code data-code-style="plain" className="text-xs">
                                 {legacyAuthCustomRoles.map((role) => (
                                   <div key={role} className="pb-1">
                                     ALTER ROLE <span className="text-primary">{role}</span> WITH

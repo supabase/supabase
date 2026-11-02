@@ -58,7 +58,7 @@ npx supabase link
 npx supabase inspect db bloat --linked
 ```
 
-If you find a table you would like to immediately clean, you can run the following in the [SQL Editor](/dashboard/project/_/sql/new):
+If you find a table you would like to immediately clean, run `vacuum full` on it. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 vacuum full <table name>;
@@ -85,9 +85,9 @@ Supabase uses network-attached storage to balance performance with scalability. 
 
 ### Paid plan behavior
 
-Projects on the Pro Plan and higher have auto-scaling disks.
+Projects on the Pro Plan and higher have autoscaling disks.
 
-Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB). Auto-scaling is limited to four modifications within a rolling 24-hour window. If you reach 95% disk utilization and have exhausted your modification quota, your project will enter read-only mode.
+Disk size expands automatically when the database reaches 90% of the allocated disk size. The disk is expanded to be 50% larger (for example, 8 GB -> 12 GB). Autoscaling is limited to four modifications within a rolling 24-hour window. If you reach 95% disk utilization and have exhausted your modification quota, your project will enter read-only mode.
 
 <Admonition type="note">
 
@@ -99,7 +99,7 @@ Disk size can also be manually expanded on the [Database Settings page](/dashboa
 
 <Admonition type="note">
 
-You may want to import a lot of data into your database which requires multiple disk expansions. for example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](/dashboard/project/_/database/settings).
+You may want to import a lot of data into your database which requires multiple disk expansions. For example, uploading more than 1.5x the current size of your database storage will put your database into [read-only mode](#read-only-mode). If so, it is highly recommended you increase the disk size manually on the [Database Settings page](/dashboard/project/_/database/settings).
 
 Due to restrictions on the underlying cloud provider, disk expansions can occur only once every four hours. During the four hour cool down window, the disk cannot be resized again.
 
@@ -107,10 +107,41 @@ Due to restrictions on the underlying cloud provider, disk expansions can occur 
 
 ### Free Plan behavior
 
-Free Plan projects enter [read-only](#read-only-mode) mode when your **database size** exceeds 500 MB. Note that this is the _database size_ limit (the size of your actual Postgres data), not the _disk size_. Free Plan projects include 1 GB of disk space, but read-only mode is triggered by the 500 MB database size quota. Once in read-only mode, you have these options:
+Free Plan projects have a fixed disk size of 2 GB. The disk does not autoscale.
 
-- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to increase the database size quota. [Disable the Spend Cap](https://app.supabase.com/org/_/billing?panel=costControl) if you want your Pro instance to auto-scale beyond the 8 GB disk size limit.
+When disk usage reaches 95%, Supabase puts your database into [read-only mode](#read-only-mode). This helps prevent the disk from filling completely. When disk usage goes below 95%, Supabase turns off read-only mode automatically.
+
+<Admonition type="danger">
+
+If the disk becomes full, Postgres shuts down. It stays down until you upgrade to the Pro Plan. Read-only mode at 95% is a best-effort safeguard. Writes that are already in progress, and WAL, can continue to fill the disk after read-only mode starts.
+
+To prevent this, keep disk usage well below 95%, or upgrade to the Pro Plan before you reach the limit.
+
+</Admonition>
+
+Read-only mode depends on _disk usage_. The 500 MB _database size_ quota does not trigger it. The database size quota is a billing quota for your organization. For more information, see [Fair use database size restriction](#fair-use-database-size-restriction).
+
+If your project is in read-only mode and Postgres is still running, you have these options:
+
+- [Upgrade to the Pro Plan](/dashboard/org/_/billing) to get an 8 GB disk that autoscales. To autoscale beyond 8 GB, [disable the Spend Cap](/dashboard/org/_/billing?panel=costControl).
 - [Disable read-only mode](#disabling-read-only-mode) and reduce your database size.
+
+If your database is down because the disk is full:
+
+1. [Upgrade to the Pro Plan](/dashboard/org/_/billing).
+2. On the [General settings page](/dashboard/project/_/settings/general), select **Restart project**.
+3. Wait about 10 minutes for the project to recover.
+
+#### Write Ahead Log (WAL) on the Free Plan
+
+The [Write Ahead Log (WAL)](#disk-space-usage) uses disk space in addition to your data. On a 2 GB disk, WAL can fill the disk even when your database size is small.
+
+WAL grows fast when you write a lot of data in a short time. Examples are bulk imports, large `update` or `delete` statements, and index builds. During heavy writes, WAL can grow past the default `max_wal_size` of 1 GB before Postgres removes old WAL files. An inactive [replication slot](/docs/guides/database/replication) can also keep WAL on the disk. By default, `max_slot_wal_keep_size` limits this to about 512 MB.
+
+To keep WAL small:
+
+- Split large writes into smaller batches.
+- Drop replication slots that you do not use with `select pg_drop_replication_slot('<slot_name>');`.
 
 ### Fair use database size restriction
 
@@ -145,7 +176,7 @@ limit 50;
 
 ### Disabling read-only mode
 
-You manually override read-only mode to reduce disk size. To do this, run the following in the [SQL Editor](/dashboard/project/_/sql):
+You can manually override read-only mode to reduce disk size. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 First, change the [transaction access mode](https://www.postgresql.org/docs/current/sql-set-transaction.html):
 

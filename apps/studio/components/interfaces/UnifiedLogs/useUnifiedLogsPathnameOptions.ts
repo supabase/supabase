@@ -29,7 +29,7 @@ export function useUnifiedLogsPathnameOptions(value: string, options?: Option[])
     dateValue.length === 2 &&
     dateValue.every((value) => value instanceof Date)
       ? dateValue
-      : null
+      : undefined
   const scopedSearch = hasPendingFilterChange
     ? {
         ...searchParameters,

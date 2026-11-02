@@ -72,7 +72,6 @@ function getBannerDescription({
 /**
  * Global banner for incident.io status page items — a relevant active incident,
  * in-progress maintenance, or upcoming maintenance, in that priority order.
- * Replaces the legacy StatusPageBanner while `incidentIoStatusPage` is on.
  */
 export const StatusBanner = ({ signedOut = false }: { signedOut?: boolean } = {}) => {
   const state = useStatusBanner({ signedOut })

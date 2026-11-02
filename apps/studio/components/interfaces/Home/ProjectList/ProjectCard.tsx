@@ -1,4 +1,4 @@
-import { CopyIcon, GithubIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
+import { CopyIcon, MoreVerticalIcon, SettingsIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import InlineSVG from 'react-inlinesvg'
 import { toast } from 'sonner'
@@ -9,6 +9,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  GithubIcon,
 } from 'ui'
 
 import { inferProjectStatus } from './ProjectCard.utils'

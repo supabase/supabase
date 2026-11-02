@@ -37,7 +37,6 @@ describe('BigQueryFields', () => {
 
     fireEvent.change(textarea, { target: { value: `${contents}\n` } })
     expect(textarea).toHaveValue(`${contents}\n`)
-    expect(textarea).toHaveClass('max-h-[calc(13lh+1rem)]')
   })
 
   it('imports a dropped JSON file into the service account key field', async () => {

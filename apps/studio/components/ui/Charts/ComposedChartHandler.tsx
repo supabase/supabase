@@ -7,7 +7,7 @@ import { Card, cn, WarningIcon } from 'ui'
 import type { ChartHighlightAction } from './ChartHighlightActions'
 import type { ChartData } from './Charts.types'
 import { ComposedChart } from './ComposedChart'
-import { MultiAttribute } from './ComposedChart.utils'
+import { MultiAttribute, ThresholdZone } from './ComposedChart.utils'
 import { useChartHighlight } from './useChartHighlight'
 import Panel from '@/components/ui/Panel'
 import { AnalyticsInterval, DataPoint } from '@/data/analytics/constants'
@@ -27,6 +27,8 @@ export interface ComposedChartHandlerProps {
   id?: string
   label: string
   attributes: MultiAttribute[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   startDate: string
   endDate: string
   interval?: string
@@ -109,6 +111,7 @@ const LazyChartWrapper = ({ id, children }: PropsWithChildren<{ id: string }>) =
 const ComposedChartHandler = ({
   label,
   attributes,
+  thresholdZoneAttribute,
   startDate,
   endDate,
   interval,
@@ -149,7 +152,8 @@ const ComposedChartHandler = ({
     interval as AnalyticsInterval,
     databaseIdentifier,
     Array.isArray(data) ? undefined : data,
-    isVisible
+    isVisible,
+    thresholdZoneAttribute
   )
 
   const combinedData = useMemo(() => {
@@ -191,6 +195,8 @@ const ComposedChartHandler = ({
 
           const queryData = attributeQueries[index]?.data?.data
           const matchingPoint = queryData?.find((p: any) => p.period_start === timestamp)
+          if (attr.attribute === thresholdZoneAttribute && matchingPoint?.[attr.attribute] == null)
+            return
           let value = matchingPoint?.[attr.attribute] ?? 0
 
           if (attr.manipulateValue && typeof attr.manipulateValue === 'function') {
@@ -216,9 +222,12 @@ const ComposedChartHandler = ({
       })
 
     return combined as DataPoint[]
-  }, [data, attributeQueries, attributes])
+  }, [data, attributeQueries, attributes, thresholdZoneAttribute])
 
-  const loading = isLoading || attributeQueries.some((query: any) => query.isLoading)
+  const loading =
+    data !== undefined
+      ? isLoading
+      : isLoading || attributeQueries.some((query: any) => query.isLoading)
 
   const _highlightedValue = useMemo(() => {
     if (highlightedValue !== undefined) return highlightedValue
@@ -298,6 +307,7 @@ const ComposedChartHandler = ({
         <div className="absolute right-6 z-50 flex justify-between scroll-mt-16">{children}</div>
         <ComposedChart
           attributes={attributes}
+          thresholdZoneAttribute={thresholdZoneAttribute}
           data={combinedData as DataPoint[]}
           format={format}
           // [Joshen] This is where it's messing up
@@ -333,7 +343,8 @@ const useAttributeQueries = (
   interval: AnalyticsInterval,
   databaseIdentifier: string | undefined,
   data: ChartData | undefined,
-  isVisible: boolean
+  isVisible: boolean,
+  thresholdZoneAttribute?: string
 ) => {
   const infraAttributes = attributes
     .filter((attr) => attr?.provider === 'infra-monitoring')
@@ -351,7 +362,8 @@ const useAttributeQueries = (
     interval,
     databaseIdentifier,
     data,
-    isVisible
+    isVisible,
+    thresholdZoneAttribute
   )
   const dailyStatsQueries = useProjectDailyStatsQueries(
     dailyStatsAttributes,

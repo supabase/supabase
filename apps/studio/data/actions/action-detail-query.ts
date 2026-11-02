@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { actionKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type ActionRunVariables = {
@@ -24,6 +24,7 @@ export async function getActionRun(
   const { data, error } = await get('/v1/projects/{ref}/actions/{run_id}', {
     params: { path: { ref: projectRef, run_id: runId } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

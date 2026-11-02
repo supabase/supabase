@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { JWTAlgorithm } from './jwt-signing-keys-query'
 import { jwtSigningKeysKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 interface JWTSigningKeyCreateVariables {
@@ -25,6 +25,7 @@ export async function createJWTSigningKey(payload: JWTSigningKeyCreateVariables)
       status: payload.status,
       ...(payload.private_jwk ? { private_jwk: payload.private_jwk } : null),
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

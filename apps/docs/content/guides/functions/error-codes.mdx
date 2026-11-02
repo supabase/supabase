@@ -1,6 +1,6 @@
 ---
 id: 'functions-error-codes'
-title: 'Error codes'
+title: 'Edge Functions error codes'
 description: 'Edge Functions can return the following error codes.'
 subtitle: 'Understand the error codes returned by Edge Functions to properly debug issues and handle responses.'
 ---
@@ -264,7 +264,7 @@ These errors indicate issues with function loading, execution, or the underlying
 
 ### NOT_FOUND_FUNCTION_BLOB
 
-**Cause:** Your Edge Function metadata resolved, but its deployment bundle was missing from storage and could not be loaded (the metadata points at a different version than the stored bundle). This returns the same `Requested function was not found` message as `NOT_FOUND`, so the `sb-error-code` header is what distinguishes them — see [Edge Function 404 error response](/docs/guides/troubleshooting/edge-function-404-error-response).
+**Cause:** Your Edge Function metadata resolved, but its deployment bundle was missing from storage and could not be loaded (the metadata points at a different version than the stored bundle). This returns the same `Requested function was not found` message as `NOT_FOUND`, so the `sb-error-code` header is what distinguishes them — see [Edge Function 404 error response](/kb/troubleshooting/edge-function-404-error-response).
 
 **Common causes:**
 

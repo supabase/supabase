@@ -11,15 +11,9 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-import { CHART_INTERVALS } from './logs.utils'
+import { CHART_INTERVALS, getDaysRequired } from './logs.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-
-function getDaysRequired(startValue: number, startUnit: string): number {
-  if (startUnit === 'day') return startValue
-  if (startUnit === 'hour') return startValue / 24
-  return 0
-}
 
 interface ChartIntervalDropdownProps {
   value: string
