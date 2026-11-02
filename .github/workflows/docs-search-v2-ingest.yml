@@ -8,7 +8,11 @@ on:
       - '.github/workflows/docs-search-v2-ingest.yml'
       - 'apps/docs/content/**/*.mdx'
       - 'apps/docs/scripts/search_v2/**'
+      - 'packages/docs-search/**'
+      - 'supabase/migrations/*_docs_search_v2*.sql'
   workflow_dispatch:
+  schedule:
+    - cron: '0 0 * * *'
 
 concurrency:
   group: ${{ github.workflow }}-prod
@@ -22,11 +26,11 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
     env:
-      SEARCH_V2_SUPABASE_PROJECT_ID: ${{ secrets.SEARCH_V2_SUPABASE_PROJECT_ID }}
-      SEARCH_V2_SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_V2_SUPABASE_SECRET_KEY }}
       DOCS_GITHUB_APP_ID: ${{ secrets.SEARCH_GITHUB_APP_ID }}
       DOCS_GITHUB_APP_INSTALLATION_ID: ${{ secrets.SEARCH_GITHUB_APP_INSTALLATION_ID }}
       DOCS_GITHUB_APP_PRIVATE_KEY: ${{ secrets.SEARCH_GITHUB_APP_PRIVATE_KEY }}
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.SEARCH_SUPABASE_URL }}
+      SUPABASE_SECRET_KEY: ${{ secrets.SEARCH_SUPABASE_SERVICE_ROLE_KEY }}
 
     steps:
       - name: Check out repo
@@ -51,10 +55,6 @@ jobs:
       - name: Download dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Fetch federated content
-        working-directory: ./apps/docs
-        run: pnpm run build:federated-content
-
       - name: Ingest content
         working-directory: ./apps/docs
-        run: pnpm run search-v2:ingest
+        run: pnpm run ingest:search_v2

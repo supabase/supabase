@@ -11,6 +11,7 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -42,6 +43,7 @@ export async function createFDW({ projectRef, connectionString, ...rest }: FDWCr
     connectionString,
     sql,
     queryKey: ['create-fdw'],
+    grant: unguarded.migrating,
   })
   return result
 }

@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { customDomainKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -70,6 +70,7 @@ export async function getCustomDomains(
   const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (_error) {

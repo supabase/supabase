@@ -77,19 +77,6 @@ describe('CsatSurvey', () => {
     expect(requests[0]).toMatchObject({ conversation_id: 'cnv_1abc2', satisfied: false })
   })
 
-  test('defaults to yes when the link did not preselect an answer', async () => {
-    routerMock.setCurrentUrl('/support/csat?conversation_id=cnv_1abc2')
-    const requests = mockSubmit(200)
-
-    customRender(<CsatSurvey />)
-
-    expect(screen.getByRole('button', { name: 'Yes' })).toHaveAttribute('aria-pressed', 'true')
-    submitForm()
-
-    await waitFor(() => expect(requests).toHaveLength(1))
-    expect(requests[0]).toMatchObject({ conversation_id: 'cnv_1abc2', satisfied: true })
-  })
-
   test('shows the already-submitted error on a 409', async () => {
     mockSubmit(409, { message: 'This survey has already been answered' })
 

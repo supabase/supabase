@@ -43,7 +43,7 @@ export const DeleteProjectModal = ({
   const projectRef = project?.ref
   const { data: subscription } = useOrgSubscriptionQuery({ orgSlug: organization?.slug })
   const projectPlan = subscription?.plan?.id ?? 'free'
-  const isFree = projectPlan === 'free'
+  const shouldShowExitSurvey = ['pro', 'team'].includes(projectPlan)
 
   const [message, setMessage] = useState<string>('')
   const [selectedReason, setSelectedReason] = useState<string[]>([])
@@ -88,11 +88,11 @@ export const DeleteProjectModal = ({
 
   async function handleDeleteProject() {
     if (project === undefined) return
-    if (!isFree && selectedReason.length === 0) {
+    if (shouldShowExitSurvey && selectedReason.length === 0) {
       return toast.error('Please select a reason for deleting your project')
     }
 
-    if (!isFree) {
+    if (shouldShowExitSurvey) {
       // The survey must be sent before the delete: deleting the project removes its permissions,
       // so the survey endpoint would reject the request afterwards.
       try {
@@ -122,16 +122,18 @@ export const DeleteProjectModal = ({
     <TextConfirmModal
       visible={visible}
       loading={isSubmitting}
-      size={isFree ? 'medium' : 'xlarge'}
+      size={shouldShowExitSurvey ? 'xlarge' : 'medium'}
       title={`Confirm deletion of ${project?.name}`}
       variant="destructive"
       alert={{
-        title: isFree
-          ? 'This action cannot be undone.'
-          : `This will permanently delete the ${project?.name}`,
+        title: shouldShowExitSurvey
+          ? `This will permanently delete the ${project?.name}`
+          : 'This action cannot be undone.',
         description: (
           <>
-            {!isFree && 'All project data will be lost, and cannot be undone. '}
+            {shouldShowExitSurvey
+              ? 'All project data will be lost, and cannot be undone. '
+              : `This will permanently delete the ${project?.name} project and all of its data. `}
             Read the{' '}
             <InlineLink href={`${DOCS_URL}/guides/platform/delete-project`}>
               documentation
@@ -140,11 +142,6 @@ export const DeleteProjectModal = ({
           </>
         ),
       }}
-      text={
-        isFree
-          ? `This will permanently delete the ${project?.name} project and all of its data.`
-          : undefined
-      }
       confirmPlaceholder="Type the project name in here"
       confirmString={project?.name || ''}
       confirmLabel="I understand, delete this project"
@@ -173,7 +170,7 @@ export const DeleteProjectModal = ({
           in ExitSurvey has a Form wrapped around it already. Will probably need some effort to refactor
           but leaving that for the future.
         */}
-        {!isFree && (
+        {shouldShowExitSurvey && (
           <div className="flex flex-col gap-y-6">
             <FormItemLayout
               isReactForm={false}

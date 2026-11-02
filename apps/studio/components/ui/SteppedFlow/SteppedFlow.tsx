@@ -106,7 +106,9 @@ export const SteppedFlow = ({
         </p>
         <Card
           key={currentStep}
-          className="animate-in fade-in-0 duration-200 motion-reduce:animate-none"
+          className={cn(
+            currentIndex > 0 && 'animate-in fade-in-0 duration-200 motion-reduce:animate-none'
+          )}
         >
           {children}
           <CardFooter

@@ -3,6 +3,7 @@ import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-que
 
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
@@ -54,6 +55,7 @@ export async function getEntityTypes(
       connectionString,
       sql,
       queryKey: ['entity-types', ...schemas, page],
+      grant: unguarded.migrating,
     },
     signal
   )

@@ -11,7 +11,7 @@ import {
 import { buildPipelineApiConfig } from './utils'
 
 describe('buildPipelineApiConfig', () => {
-  it('maps selective initial-copy configuration to the ETL API shape', () => {
+  it('maps selective initial-copy configuration to the Pipelines API shape', () => {
     expect(
       buildPipelineApiConfig({
         publicationName: 'analytics',
@@ -154,17 +154,11 @@ describe('buildBigQueryApiConfig', () => {
     })
   })
 
-  it('sends table_options: null on update when every configured table is removed or blank', () => {
-    expect(
-      buildBigQueryUpdateApiConfig({
-        ...baseConfig,
-        tableOptions: [{ tableId: 16_408, clusterBy: [] }],
-      })
-    ).toMatchObject({ big_query: { table_options: null } })
-  })
-
-  it('sends table_options: null on update when every configured table is removed', () => {
-    expect(buildBigQueryUpdateApiConfig({ ...baseConfig, tableOptions: [] })).toMatchObject({
+  it.each([
+    ['blank', [{ tableId: 16_408, clusterBy: [] }]],
+    ['removed', []],
+  ])('sends table_options: null on update when every configured table is %s', (_, tableOptions) => {
+    expect(buildBigQueryUpdateApiConfig({ ...baseConfig, tableOptions })).toMatchObject({
       big_query: { table_options: null },
     })
   })

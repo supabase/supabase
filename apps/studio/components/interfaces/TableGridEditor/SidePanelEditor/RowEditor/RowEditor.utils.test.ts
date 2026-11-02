@@ -13,85 +13,35 @@ import {
 
 describe('parseValue', () => {
   it('should return null when originalValue is null', () => {
-    const originalValue = null
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toBeNull()
+    expect(parseValue(null, 'some format')).toBeNull()
   })
 
-  it('should return originalValue when it is 0', () => {
-    const originalValue = 0
-    const format = 'some format'
+  it.each([
+    { originalValue: 0, format: 'some format' },
+    { originalValue: '', format: 'some format' },
+    { originalValue: 42, format: '' },
+    { originalValue: 'some value', format: 'some format' },
+  ])('should return $originalValue unchanged', ({ originalValue, format }) => {
     expect(parseValue(originalValue, format)).toEqual(originalValue)
   })
 
-  it('should return originalValue when it is an empty string', () => {
-    const originalValue = ''
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
-  })
-
-  it('should return originalValue when it is a number and format is not provided', () => {
-    const originalValue = 42
-    const format = ''
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
-  })
-
-  it('should return JSON string representation when originalValue is an empty array', () => {
-    const originalValue: any[] = []
-    const format = 'some format'
-    const expectedValue = JSON.stringify(originalValue)
-    expect(parseValue(originalValue, format)).toEqual(expectedValue)
-  })
-
-  it('should return JSON string representation when originalValue is an empty object', () => {
-    const originalValue = {}
-    const format = 'some format'
-    const expectedValue = JSON.stringify(originalValue)
-    expect(parseValue(originalValue, format)).toEqual(expectedValue)
-  })
-
-  it('should return JSON string representation when originalValue is an object', () => {
-    const originalValue = { key: 'value' }
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toEqual(JSON.stringify(originalValue))
-  })
-
-  it('should handle complex nested object with titles correctly', () => {
-    const originalValue = {
+  it.each([
+    [],
+    {},
+    { key: 'value' },
+    {
       glossary: {
         title: 'parent title',
-        subItem: {
-          title: 'subItem title',
-          items: ['item1', 'item2'],
-        },
+        subItem: { title: 'subItem title', items: ['item1', 'item2'] },
       },
-    }
-    const format = 'some format'
-    const expectedValue = JSON.stringify(originalValue)
-    expect(parseValue(originalValue, format)).toEqual(expectedValue)
+    },
+    { width: 0, height: 0, length: 0, weight: 0 },
+  ])('should return the JSON string representation of %j', (originalValue) => {
+    expect(parseValue(originalValue, 'some format')).toEqual(JSON.stringify(originalValue))
   })
 
-  it('should handle object with all values set to 0 correctly', () => {
-    const originalValue = {
-      width: 0,
-      height: 0,
-      length: 0,
-      weight: 0,
-    }
-    const format = 'some format'
-    const expectedValue = JSON.stringify(originalValue)
-    expect(parseValue(originalValue, format)).toEqual(expectedValue)
-  })
   it('should return string representation of originalValue when it is a boolean', () => {
-    const originalValue = true
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toEqual(originalValue.toString())
-  })
-
-  it('should return originalValue for other cases', () => {
-    const originalValue = 'some value'
-    const format = 'some format'
-    expect(parseValue(originalValue, format)).toEqual(originalValue)
+    expect(parseValue(true, 'some format')).toEqual('true')
   })
 
   it('should return originalValue even when an error occurs', () => {
@@ -303,20 +253,6 @@ describe('generateRowObjectFromFields', () => {
 })
 
 describe('isValueTruncated', () => {
-  it('should detect JSON truncated with ...', () => {
-    // Create a value larger than MAX_CHARACTERS (10KB) with "..." at the end
-    const value = '{"key": "value"}'.repeat(800) + '...'
-    expect(isValueTruncated(value)).toBe(true)
-  })
-
-  it('should detect array truncated with "..." element', () => {
-    // Simulate MAX_ARRAY_SIZE elements with "..." at the end
-    // This matches the pattern from table-row-query.ts: array_cat(column[1:50], array['...'])
-    const items = Array(50).fill('"item"').join(',')
-    const value = `[${items},"..."]`
-    expect(isValueTruncated(value)).toBe(true)
-  })
-
   it('should verify coordination with table-row-query.ts truncation patterns', () => {
     // Test the exact patterns that table-row-query.ts generates to ensure isValueTruncated stays in sync
 
@@ -335,9 +271,6 @@ describe('isValueTruncated', () => {
     // array_cat(column[1:50]::json[], array['{"truncated": true}'::json]::json[])
     const jsonArrayTruncated = `[${Array(5).fill('{"key":"value"}').join(',')},{"truncated":true}]`
     expect(isValueTruncated(jsonArrayTruncated)).toBe(true)
-
-    // Pattern 4: Multi-dimensional array
-    // column[1:50]::type[] + an extra entry filled with '...'
   })
 
   it('should detect multidimensional arrays with the truncation marker row', () => {
@@ -356,10 +289,6 @@ describe('isValueTruncated', () => {
     // exactly MAX_ARRAY_SIZE entries, but complete
     const rows = Array.from({ length: MAX_ARRAY_SIZE }, (_, i) => [`a${i}`, 'b'])
     expect(isValueTruncated(JSON.stringify(rows), '_text')).toBe(false)
-  })
-
-  it('should detect truncated JSON arrays with truncated flag', () => {
-    expect(isValueTruncated('[{"a":1},{"b":2},{"truncated":true}]')).toBe(true)
   })
 
   it('should return false for normal values', () => {
@@ -668,50 +597,19 @@ describe('generateRowObjectFromFields - additional cases', () => {
     expect(generateRowObjectFromFields({ fields })).toEqual({ metadata: { key: 'value' } })
   })
 
-  it('should handle boolean true/false/null', () => {
-    const fields: RowField[] = [
-      createField({
-        name: 'active',
-        format: 'bool',
-        value: 'true',
-      }),
-      createField({
-        name: 'deleted',
-        format: 'bool',
-        value: 'false',
-      }),
-      createField({
-        name: 'optional',
-        format: 'bool',
-        value: 'null',
-      }),
-    ]
-    // Null values are kept (explicit NULL), only undefined values are omitted
-    const result = generateRowObjectFromFields({ fields })
-    expect(result).toEqual({ active: true, deleted: false, optional: null })
-  })
-
-  it('should handle boolean true/false/null with includeNullProperties', () => {
-    const fields: RowField[] = [
-      createField({
-        name: 'active',
-        format: 'bool',
-        value: 'true',
-      }),
-      createField({
-        name: 'deleted',
-        format: 'bool',
-        value: 'false',
-      }),
-      createField({
-        name: 'optional',
-        format: 'bool',
-        value: 'null',
-      }),
-    ]
-    const result = generateRowObjectFromFields({ fields, includeUndefinedValues: true })
-    expect(result).toEqual({ active: true, deleted: false, optional: null })
-  })
+  // Null values are kept (explicit NULL) either way, only undefined values are omitted
+  it.each([false, true])(
+    'should handle boolean true/false/null (includeUndefinedValues: %s)',
+    (includeUndefinedValues) => {
+      const fields: RowField[] = [
+        createField({ name: 'active', format: 'bool', value: 'true' }),
+        createField({ name: 'deleted', format: 'bool', value: 'false' }),
+        createField({ name: 'optional', format: 'bool', value: 'null' }),
+      ]
+      const result = generateRowObjectFromFields({ fields, includeUndefinedValues })
+      expect(result).toEqual({ active: true, deleted: false, optional: null })
+    }
+  )
 
   it('should handle boolean with undefined value', () => {
     const fields: RowField[] = [

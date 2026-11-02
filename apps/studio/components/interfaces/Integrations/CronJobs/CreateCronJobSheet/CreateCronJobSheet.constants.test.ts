@@ -2,83 +2,38 @@ import { describe, expect, it } from 'vitest'
 
 import { FormSchema } from './CreateCronJobSheet.constants'
 
+const httpRequest = (overrides: {
+  endpoint?: string
+  httpHeaders?: { name: string; value: string }[]
+}) => ({
+  type: 'http_request' as const,
+  method: 'POST' as const,
+  endpoint: 'https://hooks.example.com/webhook',
+  timeoutMs: 1000,
+  httpHeaders: [],
+  snippet: '',
+  ...overrides,
+})
+
 describe('CreateCronJobSheet FormSchema', () => {
-  it('rejects incomplete http_request hostnames', () => {
-    const result = FormSchema.safeParse({
-      name: 'Send webhook',
-      supportsSeconds: false,
-      schedule: '* * * * *',
-      values: {
-        type: 'http_request' as const,
-        method: 'POST' as const,
-        endpoint: 'https://webhook',
-        timeoutMs: 1000,
-        httpHeaders: [],
-        snippet: '',
-      },
-    })
-
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(
-        result.error.issues.some((issue) => issue.message === 'Please provide a valid URL')
-      ).toBe(true)
-    }
-  })
-
-  it('rejects http_request URLs without an explicit protocol', () => {
-    const result = FormSchema.safeParse({
-      name: 'Send webhook',
-      supportsSeconds: false,
-      schedule: '* * * * *',
-      values: {
-        type: 'http_request' as const,
-        method: 'POST' as const,
-        endpoint: 'hooks.example.com/webhook',
-        timeoutMs: 1000,
-        httpHeaders: [],
-        snippet: '',
-      },
-    })
-
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(
-        result.error.issues.some(
-          (issue) => issue.message === 'Please prefix your URL with http:// or https://'
-        )
-      ).toBe(true)
-    }
-  })
-
-  it('rejects key-only http_request headers', () => {
-    const result = FormSchema.safeParse({
-      name: 'Send webhook',
-      supportsSeconds: false,
-      schedule: '* * * * *',
-      values: {
-        type: 'http_request' as const,
-        method: 'POST' as const,
-        endpoint: 'https://hooks.example.com/webhook',
-        timeoutMs: 1000,
-        httpHeaders: [{ name: 'X-Test', value: '' }],
-        snippet: '',
-      },
-    })
-
-    expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(
-        result.error.issues.some((issue) => issue.message === 'Header value is required')
-      ).toBe(true)
-    }
-  })
-
-  it('rejects value-only edge function headers', () => {
-    const result = FormSchema.safeParse({
-      name: 'Invoke edge function',
-      supportsSeconds: false,
-      schedule: '* * * * *',
+  it.each([
+    {
+      case: 'incomplete http_request hostnames',
+      values: httpRequest({ endpoint: 'https://webhook' }),
+      message: 'Please provide a valid URL',
+    },
+    {
+      case: 'http_request URLs without an explicit protocol',
+      values: httpRequest({ endpoint: 'hooks.example.com/webhook' }),
+      message: 'Please prefix your URL with http:// or https://',
+    },
+    {
+      case: 'key-only http_request headers',
+      values: httpRequest({ httpHeaders: [{ name: 'X-Test', value: '' }] }),
+      message: 'Header value is required',
+    },
+    {
+      case: 'value-only edge function headers',
       values: {
         type: 'edge_function' as const,
         method: 'POST' as const,
@@ -87,13 +42,17 @@ describe('CreateCronJobSheet FormSchema', () => {
         httpHeaders: [{ name: '', value: 'test-value' }],
         snippet: '',
       },
+      message: 'Header name is required',
+    },
+  ])('rejects $case', ({ values, message }) => {
+    const result = FormSchema.safeParse({
+      name: 'Job',
+      supportsSeconds: false,
+      schedule: '* * * * *',
+      values,
     })
 
     expect(result.success).toBe(false)
-    if (!result.success) {
-      expect(result.error.issues.some((issue) => issue.message === 'Header name is required')).toBe(
-        true
-      )
-    }
+    expect(result.error?.issues.map((issue) => issue.message)).toContain(message)
   })
 })

@@ -4,6 +4,7 @@ import bundleAnalyzer from '@next/bundle-analyzer'
 import { withSentryConfig } from '@sentry/nextjs'
 import type { NextConfig } from 'next'
 
+import { getAssetCdnOrigin } from './asset-cdn'
 import { getCSP } from './csp'
 import {
   getMaintenanceRedirects,
@@ -17,22 +18,10 @@ const withBundleAnalyzer = bundleAnalyzer({
 })
 
 function getAssetPrefix() {
-  // If not force enabled, but not production env, disable CDN
-  if (process.env.FORCE_ASSET_CDN !== '1' && process.env.VERCEL_ENV !== 'production') {
-    return undefined
-  }
+  const assetCdnOrigin = getAssetCdnOrigin()
+  if (!assetCdnOrigin) return undefined
 
-  // Force disable CDN
-  if (process.env.FORCE_ASSET_CDN === '-1') {
-    return undefined
-  }
-
-  const SUPABASE_ASSETS_URL =
-    process.env.NEXT_PUBLIC_ENVIRONMENT === 'staging'
-      ? 'https://frontend-assets.supabase.green'
-      : 'https://frontend-assets.supabase.com'
-
-  return `${SUPABASE_ASSETS_URL}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
+  return `${assetCdnOrigin}/${process.env.SITE_NAME}/${process.env.VERCEL_GIT_COMMIT_SHA?.substring(0, 12) ?? 'unknown'}`
 }
 
 const isPlatform = process.env.NEXT_PUBLIC_IS_PLATFORM === 'true'

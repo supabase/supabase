@@ -99,19 +99,20 @@ export function TableSearchResults({ debouncedFilterString }: TableSearchResults
           <EmptyState icon={DatabaseIcon} label="Database Tables" query={debouncedFilterString} />
         ) : (
           <>
-            <ResultsList
-              results={tableResults}
-              icon={DatabaseIcon}
-              getRoute={(result) => {
-                const table = tables?.find((t) => String(t.id) === result.id)
-                if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
+            <div className="h-full pb-9">
+              <ResultsList
+                results={tableResults}
+                icon={DatabaseIcon}
+                getRoute={(result) => {
+                  const table = tables?.find((t) => String(t.id) === result.id)
+                  if (!table || !projectRef) return `/project/${projectRef}/editor` as `/${string}`
 
-                const schemaParam = table.schema ? `?schema=${table.schema}` : ''
-                return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
-              }}
-              infiniteLoadingObserverRef={sentinelRef}
-              className="pb-9"
-            />
+                  const schemaParam = table.schema ? `?schema=${table.schema}` : ''
+                  return `/project/${projectRef}/editor/${table.id}${schemaParam}` as `/${string}`
+                }}
+                infiniteLoadingObserverRef={sentinelRef}
+              />
+            </div>
             <div className="absolute bottom-0 left-0 right-0 flex items-center justify-between min-h-9 h-9 px-4 border-t bg-surface-200 text-xs text-foreground-light z-10">
               <div className="flex items-center gap-x-2">
                 {isLoadingTables ? (

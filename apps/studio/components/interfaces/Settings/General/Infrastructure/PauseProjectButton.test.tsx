@@ -22,8 +22,9 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: mockUseCheckEntitlements,
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { ADMIN_WRITE: 'project_admin_write' } },
 }))
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
@@ -61,14 +62,11 @@ describe('PauseProjectButton', () => {
     const button = screen.getByRole('button', { name: 'Pause project' })
     expect(button).toBeAriaDisabled()
 
-    // Radix opens the tooltip on pointermove; focusable disabled buttons support this
-    fireEvent.pointerMove(button)
+    // aria-disabled keeps the button focusable; Radix opens the tooltip on focus without the
+    // hover delay
+    fireEvent.focus(button)
     expect(
-      await screen.findAllByText(
-        'Pausing is unavailable on High Availability projects',
-        {},
-        { timeout: 2000 }
-      )
+      await screen.findAllByText('Pausing is unavailable on High Availability projects')
     ).not.toHaveLength(0)
   })
 })

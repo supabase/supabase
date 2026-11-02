@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { customDomainKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -20,6 +20,7 @@ export async function deleteCustomDomain({
       path: { ref: projectRef },
       query: { remove_addon: removeAddon ? 'true' : 'false' },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

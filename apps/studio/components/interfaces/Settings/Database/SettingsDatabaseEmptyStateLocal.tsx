@@ -12,9 +12,8 @@ export function SettingsDatabaseEmptyStateLocal() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-foreground-light mb-4">
-            Configure database settings in{' '}
-            <code className="text-code-inline">supabase/config.toml</code> — applied automatically
-            on <code className="text-code-inline">supabase start</code>.
+            Configure database settings in <code>supabase/config.toml</code> — applied automatically
+            on <code>supabase start</code>.
           </p>
           <DocsButton href={`${DOCS_URL}/guides/local-development/cli/config#database-config`} />
         </CardContent>

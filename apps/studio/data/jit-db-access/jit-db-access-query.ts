@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { jitDbAccessKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type JitDbAccessVariables = { projectRef?: string }
@@ -15,6 +15,7 @@ async function getJitDbAccessConfiguration(
   const { data, error } = await get(`/v1/projects/{ref}/jit-access`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

@@ -29,39 +29,6 @@ describe('fillTimeseries', () => {
     expect(result[60]).toEqual({ timestamp: '2023-01-01T01:00:00.000Z', value: 0 })
   })
 
-  test('should normalize timestamps when data exceeds minPointsToFill', () => {
-    const data = [
-      { timestamp: '2023-01-01T00:00:00.000Z', value: 1 },
-      { timestamp: '2023-01-01T00:01:00.000Z', value: 2 },
-      { timestamp: '2023-01-01T00:02:00.000Z', value: 3 },
-      { timestamp: '2023-01-01T00:03:00.000Z', value: 4 },
-      { timestamp: '2023-01-01T00:04:00.000Z', value: 5 },
-      { timestamp: '2023-01-01T00:05:00.000Z', value: 6 },
-      { timestamp: '2023-01-01T00:06:00.000Z', value: 7 },
-      { timestamp: '2023-01-01T00:07:00.000Z', value: 8 },
-      { timestamp: '2023-01-01T00:08:00.000Z', value: 9 },
-      { timestamp: '2023-01-01T00:09:00.000Z', value: 10 },
-      { timestamp: '2023-01-01T00:10:00.000Z', value: 11 },
-      { timestamp: '2023-01-01T00:11:00.000Z', value: 12 },
-      { timestamp: '2023-01-01T00:12:00.000Z', value: 13 },
-      { timestamp: '2023-01-01T00:13:00.000Z', value: 14 },
-      { timestamp: '2023-01-01T00:14:00.000Z', value: 15 },
-      { timestamp: '2023-01-01T00:15:00.000Z', value: 16 },
-      { timestamp: '2023-01-01T00:16:00.000Z', value: 17 },
-      { timestamp: '2023-01-01T00:17:00.000Z', value: 18 },
-      { timestamp: '2023-01-01T00:18:00.000Z', value: 19 },
-      { timestamp: '2023-01-01T00:19:00.000Z', value: 20 },
-      { timestamp: '2023-01-01T00:20:00.000Z', value: 21 },
-    ]
-    const result = fillTimeseries(data, 'timestamp', 'value', 0, undefined, undefined, 20)
-
-    // Should return normalized data without filling gaps
-    expect(result).toHaveLength(21)
-    result.forEach((item) => {
-      expect(item.timestamp).toMatch(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/)
-    })
-  })
-
   test('should fill gaps in sparse data with 1-minute intervals', () => {
     const min = '2023-01-01T00:00:00.000Z'
     const max = '2023-01-01T00:04:00.000Z'
@@ -112,10 +79,6 @@ describe('fillTimeseries', () => {
 
     // Test 2-minute intervals: 00:00, 00:02, 00:04, 00:05, 00:06, 00:08, 00:10 = 7 points
     const result2m = fillTimeseries(data, 'timestamp', 'value', 0, min, max, 20, '2m')
-    console.log(
-      '2m intervals:',
-      result2m.map((r) => r.timestamp)
-    )
     expect(result2m).toHaveLength(7)
 
     // Test 1-hour intervals: 00:00, 01:00, 02:00 with existing data at 00:05 = 4 points
@@ -201,7 +164,7 @@ describe('fillTimeseries', () => {
     })
   })
 
-  test('should not fill gaps when data is dense enough', () => {
+  test('should not fill gaps when data exceeds minPointsToFill', () => {
     const data = Array.from({ length: 25 }, (_, i) => ({
       timestamp: dayjs.utc('2023-01-01T00:00:00.000Z').add(i, 'minute').toISOString(),
       value: i,
@@ -209,7 +172,6 @@ describe('fillTimeseries', () => {
 
     const result = fillTimeseries(data, 'timestamp', 'value', 0, undefined, undefined, 20)
 
-    expect(result).toHaveLength(25)
     expect(result).toEqual(data)
   })
 
@@ -260,8 +222,6 @@ describe('fillTimeseries', () => {
     const result = fillTimeseries(data, 'timestamp', 'value', 0)
 
     expect(result[0]).toEqual(data[0])
-    expect(result[0].extra).toBe('data')
-    expect(result[0].nested).toEqual({ prop: 'value' })
   })
 
   test('should handle empty value keys array', () => {

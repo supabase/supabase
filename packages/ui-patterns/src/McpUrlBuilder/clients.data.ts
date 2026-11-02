@@ -56,6 +56,11 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
     description: 'Manage database branches',
   },
   {
+    id: 'feedback',
+    name: 'Feedback',
+    description: 'Send feedback about Supabase tools to the Supabase team',
+  },
+  {
     id: 'storage',
     name: 'Storage',
     description: 'Manage files and storage buckets',

@@ -10,8 +10,13 @@ import {
   ReleaseChannel,
 } from '@/data/projects/new-project.constants'
 
+/** Form value of the "Auto" option in the region selector, which maps to `{ code: 'auto', type: 'auto' }` */
+export const AUTO_REGION_VALUE = 'best_available'
+
 export function smartRegionToExactRegion(smartOrExactRegion: string) {
-  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartOrExactRegion) ?? smartOrExactRegion
+  // available-versions doesn't accept 'auto', so look versions up against the Americas region for Auto
+  const smartRegion = smartOrExactRegion === AUTO_REGION_VALUE ? 'Americas' : smartOrExactRegion
+  return SMART_REGION_TO_EXACT_REGION_MAP.get(smartRegion) ?? smartRegion
 }
 
 export function getAvailableRegions(
@@ -44,7 +49,11 @@ type ResolveDefaultDbRegionArgs = {
   isHighAvailabilityRestricted: boolean
   highAvailabilityRegionName: string | undefined
   isSmartRegionEnabled: boolean
+  /** Whether the Auto option is offered, in which case it is preferred over the recommended region */
+  isAutoRegionAvailable?: boolean
   recommendedSmartRegion: string | undefined
+  /** Used when there's no recommended smart region */
+  firstAvailableSmartRegion?: string
   autoDefaultRegion: string | undefined
   fixedDefaultRegion: string
   environment?: string
@@ -55,13 +64,16 @@ export function resolveDefaultDbRegion({
   isHighAvailabilityRestricted,
   highAvailabilityRegionName,
   isSmartRegionEnabled,
+  isAutoRegionAvailable = false,
   recommendedSmartRegion,
+  firstAvailableSmartRegion,
   autoDefaultRegion,
   fixedDefaultRegion,
   environment = process.env.NEXT_PUBLIC_ENVIRONMENT,
 }: ResolveDefaultDbRegionArgs): string | undefined {
   if (isHighAvailabilityRestricted) return highAvailabilityRegionName
-  if (isSmartRegionEnabled) return recommendedSmartRegion
+  if (isSmartRegionEnabled && isAutoRegionAvailable) return AUTO_REGION_VALUE
+  if (isSmartRegionEnabled) return recommendedSmartRegion ?? firstAvailableSmartRegion
 
   // The geolocated default is only usable if the provider actually offers that region
   // (e.g. AWS_NIMBUS is restricted to a single region)
@@ -141,26 +153,23 @@ export type AvailableRegions = NonNullable<OrganizationAvailableRegionsData>['al
 type GetRegionSelectionTypeArgs = {
   dbRegion: string | undefined
   availableRegions: AvailableRegions | undefined
-  /** Whether the user ever touched the region field. Defaults to true for untracked callers. */
-  isDbRegionDirty?: boolean
 }
 
 /**
- * How the submitted region was arrived at: the auto-assigned default left untouched ('auto'),
- * a smart group region picked by the user (e.g. Americas, 'general'), or an exact region picked
- * by the user (e.g. us-east-1, 'specific'). Returns undefined if dbRegion matches neither list,
- * regardless of whether the field was touched.
+ * Classifies the submitted region: the Auto (best available) option ('auto'), a smart group
+ * region (e.g. Americas, 'general') or an exact region (e.g. us-east-1, 'specific'). An untouched
+ * field reports whichever default it holds. Returns undefined if dbRegion matches neither list.
  */
 export function getRegionSelectionType({
   dbRegion,
   availableRegions,
-  isDbRegionDirty = true,
 }: GetRegionSelectionTypeArgs): 'general' | 'auto' | 'specific' | undefined {
   if (!dbRegion || !availableRegions) return undefined
+  if (dbRegion === AUTO_REGION_VALUE)
+    return availableRegions.auto !== undefined ? 'auto' : undefined
   const isGeneral = availableRegions.smartGroup.some((region) => region.name === dbRegion)
   const isSpecific = availableRegions.specific.some((region) => region.name === dbRegion)
   if (!isGeneral && !isSpecific) return undefined
-  if (!isDbRegionDirty) return 'auto'
   return isGeneral ? 'general' : 'specific'
 }
 

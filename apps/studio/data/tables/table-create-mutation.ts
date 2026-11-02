@@ -2,6 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
@@ -28,6 +29,7 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
     connectionString,
     sql,
     queryKey: ['table', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result

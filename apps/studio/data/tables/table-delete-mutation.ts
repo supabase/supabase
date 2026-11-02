@@ -2,6 +2,7 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { viewKeys } from '@/data/views/keys'
@@ -31,6 +32,7 @@ export async function deleteTable({
     connectionString,
     sql,
     queryKey: ['table', 'delete', id],
+    grant: unguarded.migrating,
   })
 
   return result

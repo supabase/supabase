@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { executeSql } from '../sql/execute-sql-mutation'
 import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type TableName = {
@@ -39,7 +40,13 @@ export async function getTableNames(
   signal?: AbortSignal
 ) {
   const { result } = await executeSql<TableName[]>(
-    { projectRef, connectionString, sql: TABLE_NAMES_SQL, queryKey: ['table-names'] },
+    {
+      projectRef,
+      connectionString,
+      sql: TABLE_NAMES_SQL,
+      queryKey: ['table-names'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return result

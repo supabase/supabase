@@ -173,6 +173,10 @@ content.
 See [`e2e/www/README.md`](https://github.com/supabase/supabase/blob/master/e2e/www/README.md)
 for coverage and limits.
 
+## Redirects
+
+Redirects for non-docs URLs live in [`lib/redirects.js`](lib/redirects.js). Redirects for `/docs` URLs moved to the docs app, so add new `/docs` redirects in [`apps/docs/lib/redirects/`](../docs/lib/redirects/README.md) instead.
+
 ## Go pages (`/go/*`)
 
 `/go/` is a system for building standalone campaign landing pages (lead generation, legal, thank-you flows). The name is intentionally generic — these pages are typically linked from ads, emails, or partner campaigns and are not part of the main site navigation.

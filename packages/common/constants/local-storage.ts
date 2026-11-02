@@ -56,6 +56,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  SQL_EDITOR_CONFIRM_UNSAVED_CHANGES: 'sql-editor-confirm-unsaved-changes',
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
   NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
@@ -125,8 +126,6 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
-  // Dated so the key retires with the banner; see BannerLogsAllDeprecation
-  LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
@@ -184,7 +183,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 
 export function clearLocalStorage() {
   for (const key of safeLocalStorage.keys()) {
-    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
+    const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
+    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) && !isRecoveryReminder) {
       safeLocalStorage.removeItem(key)
     }
   }

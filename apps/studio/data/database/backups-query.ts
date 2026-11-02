@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import type { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { useIsOrioleDbInAws, useOrioleDbReleaseStage } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -20,6 +20,7 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
   const { data, error } = await get(`/platform/database/{ref}/backups`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

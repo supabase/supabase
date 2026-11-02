@@ -10,6 +10,7 @@ import {
   pgmqQueueTable,
 } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { QUEUE_MESSAGE_TYPE } from '@/components/interfaces/Integrations/Queues/SingleQueue/Queue.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { DATE_FORMAT } from '@/lib/constants'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
@@ -98,6 +99,7 @@ export async function getDatabaseQueue({
     projectRef,
     connectionString,
     sql,
+    grant: unguarded.migrating,
   })
   return result as DatabaseQueueData
 }

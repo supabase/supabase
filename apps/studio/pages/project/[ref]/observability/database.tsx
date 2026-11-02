@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
@@ -27,6 +26,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
 import { ReportSettings } from '@/components/ui/Charts/ReportSettings'
+import { getMemoryCommitmentPreviewData } from '@/components/ui/DevToolbar/MetricsTab.utils'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { ObservabilityLink } from '@/components/ui/ObservabilityLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -40,13 +40,14 @@ import { getReportAttributesV2 } from '@/data/reports/database-charts'
 import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
+import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import type { NextPageWithLayout } from '@/types'
@@ -200,14 +201,8 @@ const DatabaseUsage = () => {
     ]
   const defaultMaxClientConn = poolingOptimizations.maxClientConn ?? 200
 
-  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    {
-      resource: {
-        project_id: project?.id,
-      },
-    }
+  const { can: canUpdateDiskSizeConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const { getEntitlementSetValues, isLoading: isEntitlementLoading } = useCheckEntitlements(
@@ -219,6 +214,13 @@ const DatabaseUsage = () => {
 
   const showDiskIOBurstBalanceChart = useFlag('showDiskIOBurstBalanceChart')
   const showMemoryCommitmentChart = useFlag('showMemoryCommitmentChart')
+  const showMemoryCommitmentRiskZones = useFlag('showMemoryCommitmentRiskZones')
+  const memoryCommitmentPreview = useMemoryCommitmentPreview(ref)
+  const memoryCommitmentPreviewData = getMemoryCommitmentPreviewData(
+    memoryCommitmentPreview,
+    selectedDateRange?.period_start?.date,
+    selectedDateRange?.period_end?.date
+  )
 
   const REPORT_ATTRIBUTES = getReportAttributesV2(
     entitledFeatures,
@@ -228,7 +230,8 @@ const DatabaseUsage = () => {
     defaultMaxClientConn,
     isSpendCapEnabled,
     showDiskIOBurstBalanceChart,
-    showMemoryCommitmentChart
+    showMemoryCommitmentChart,
+    showMemoryCommitmentRiskZones
   )
 
   const { isPending: isUpdatingDiskSize } = useProjectDiskResizeMutation({
@@ -346,6 +349,8 @@ const DatabaseUsage = () => {
       >
         {selectedDateRange &&
           REPORT_ATTRIBUTES.filter((chart) => !chart.hide).map((chart) => {
+            const chartPreviewData =
+              chart.id === 'memory-commitment' ? memoryCommitmentPreviewData : undefined
             const chartAvailable =
               !chart.entitlement ||
               isEntitlementLoading ||
@@ -354,6 +359,8 @@ const DatabaseUsage = () => {
               <LazyComposedChartHandler
                 key={chart.id}
                 {...chart}
+                data={chartPreviewData}
+                highlightedValue={chartPreviewData?.at(-1)?.ram_commit_used}
                 attributes={chart.attributes as MultiAttribute[]}
                 interval={selectedDateRange.interval}
                 startDate={selectedDateRange?.period_start?.date}
@@ -432,7 +439,7 @@ const DatabaseUsage = () => {
                   </div>
 
                   <div className="ml-auto">
-                    {/* 
+                    {/*
                       [Joshen] TODO: Check if this check is still relevant
                       The DiskSizeConfigurationModal is old and might be obsolete
                      */}

@@ -30,45 +30,31 @@ describe('formatSelectedDateRange', () => {
     expect(to.hour()).toBe(NOW.hour())
   })
 
-  test('single date matching today: from is set to 00:00:00', () => {
+  test('single date matching today: from starts at 00:00:00 and to keeps current time', () => {
     fakeNow()
     const today = NOW.format('YYYY-MM-DD')
     const result = formatSelectedDateRange({ from: today, to: today })
     const from = dayjs(result.from)
+    const to = dayjs(result.to)
     expect(from.hour()).toBe(0)
     expect(from.minute()).toBe(0)
     expect(from.second()).toBe(0)
-  })
-
-  test('single date matching today: to keeps current time', () => {
-    fakeNow()
-    const today = NOW.format('YYYY-MM-DD')
-    const result = formatSelectedDateRange({ from: today, to: today })
-    const to = dayjs(result.to)
     expect(to.hour()).toBe(NOW.hour())
     expect(to.minute()).toBe(NOW.minute())
   })
 
-  test('single date in the past: to is set to 23:59:59', () => {
-    fakeNow()
-    const result = formatSelectedDateRange({
-      from: '2024-06-01',
-      to: '2024-06-01',
-    })
-    const to = dayjs(result.to)
-    expect(to.hour()).toBe(23)
-    expect(to.minute()).toBe(59)
-    expect(to.second()).toBe(59)
-  })
-
-  test('single date in the past: from keeps current time', () => {
+  test('single date in the past: from keeps current time and to ends at 23:59:59', () => {
     fakeNow()
     const result = formatSelectedDateRange({
       from: '2024-06-01',
       to: '2024-06-01',
     })
     const from = dayjs(result.from)
+    const to = dayjs(result.to)
     expect(from.hour()).toBe(NOW.hour())
+    expect(to.hour()).toBe(23)
+    expect(to.minute()).toBe(59)
+    expect(to.second()).toBe(59)
   })
 
   test('output is in UTC ISO format', () => {
