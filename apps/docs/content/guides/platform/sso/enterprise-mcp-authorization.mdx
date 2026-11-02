@@ -11,12 +11,14 @@ This feature is only available on the [Team and Enterprise Plans](/pricing).
 
 Enterprise-managed authorization replaces per-member consent prompts with one approval by a Supabase organization owner or admin. Every member then gets access to the [Supabase MCP Server](/docs/guides/ai-tools/mcp) with their own existing Supabase permissions. For each member, your identity provider (IdP) or Claude issues an _Identity Assertion JWT Authorization Grant_ (ID-JAG) as defined by the MCP specification's [Enterprise-Managed Authorization extension](https://modelcontextprotocol.io/extensions/auth/enterprise-managed-authorization).
 
+Claude is the first MCP client to support the extension. Other clients can use it once they implement the MCP specification's Enterprise-Managed Authorization extension.
+
 This page covers the Supabase MCP Server. If you're building your own MCP server backed by Supabase Auth, see [Model Context Protocol (MCP) Authentication](/docs/guides/auth/oauth-server/mcp-authentication) instead.
 
 ## Before you start
 
 - **Plans.** Your Supabase organization needs a Team or Enterprise Plan and your Claude organization needs a Claude Team or Enterprise plan.
-- **SSO.** Your Supabase organization must have [SSO configured](/docs/guides/platform/sso). Each member must have signed in through SSO at least once.
+- **SSO.** Your Supabase organization must have [single sign-on (SSO) configured](/docs/guides/platform/sso). Each member must have signed in through SSO at least once.
 - **Supabase owners or admins.** You need an owner or admin of your Supabase organization. If Claude issues the grants, you also need an admin of your Claude organization.
 - **Matching email addresses.** Each member's email in your IdP or Claude must match their Supabase email. Matching is case-insensitive but doesn't work with aliases or plus-addresses.
 
@@ -75,7 +77,7 @@ When Claude is the issuer, it confirms only that the person is a member of your 
 
 - **To revoke the MCP client for your whole organization**, remove its authorization under **Authorized apps**.
 - **To remove a member when your IdP is the issuer**, deprovision them in your IdP and remove them from your Supabase organization. Your IdP stops issuing ID-JAGs when their session ends and Supabase rejects grants for anyone who is no longer a member.
-- **To remove a member when Claude is the issuer**, remove them from your Claude organization and from your Supabase organization. Disabling them in your IdP doesn't cut off their access because Claude issues grants from its own membership records. With directory sync (SCIM), Claude removes a member when your directory deletes them but not when it only suspends them or marks them inactive.
+- **To remove a member when Claude is the issuer**, remove them from your Claude organization and from your Supabase organization. Disabling them in your IdP doesn't cut off their access because Claude issues grants from its own membership records. With System for Cross-domain Identity Management (SCIM) directory sync, Claude removes a member when your directory deletes them but not when it only suspends them or marks them inactive.
 - **Issued tokens last until they expire.** Removing a member only stops new grants.
 - **Before you reassign a former member's email address**, remove the former member from your Supabase organization. Otherwise the new person is signed in as the old member.
 
