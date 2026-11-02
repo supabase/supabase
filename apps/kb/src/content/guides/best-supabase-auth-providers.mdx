@@ -1,5 +1,5 @@
 ---
-title: 'Best Authentication providers to use with Supabase in 2026'
+title: 'Best authentication providers to use with Supabase in 2026'
 description: 'Learn which authentication providers you can use with Supabase in 2026.'
 topics: ['Rundowns']
 lastEdited: 2026-10-30
@@ -7,7 +7,7 @@ lastEdited: 2026-10-30
 
 Authentication is the part of an app that decides who a user is before any data is read or written.
 
-You can use these providers with Supabase through [third-party auth](/docs/guides/auth/third-party/overview), alongside Supabase Auth or on their own. Supabase accepts their JSON Web Tokens (JWTs) to access the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions).
+Supabase includes its own authentication service, Supabase Auth, and also accepts tokens from the following third-party identity providers. You can use them through [third-party auth](/docs/guides/auth/third-party/overview), alongside Supabase Auth or on their own. Supabase accepts their JSON Web Tokens (JWTs) to access the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions).
 
 ## Supabase Auth
 
@@ -53,10 +53,10 @@ If you already have a production app using WorkOS and want to use the rest of th
 
 ## Custom OIDC providers
 
-If your identity provider isn't listed here but supports OpenID Connect (OIDC), you can still use it with Supabase.
+If your identity provider isn't listed here but supports OpenID Connect (OIDC), you can use it with Supabase.
 
-See the [Custom OIDC guide](/docs/guides/auth/third-party/custom-oidc) for the full setup, including provider requirements, the Management API option, client configuration, and Row Level Security policies.
+For the full setup, including provider requirements, the Management API option, client configuration, and Row Level Security policies, see [Custom OIDC provider](/docs/guides/auth/third-party/custom-oidc).
 
 ## Other providers
 
-You can also use Supabase as a [standalone Postgres database](/database), entirely separate from the rest of the Supabase Platform. In this case, you can set up your own authentication and authorization flows using any provider.
+You can also use Supabase as a [standalone Postgres database](/database), entirely separate from the rest of the Supabase Platform. You can set up your own authentication and authorization flows using any provider.
