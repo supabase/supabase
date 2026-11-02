@@ -27,6 +27,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
@@ -859,6 +864,11 @@ module.exports = [
     permanent: true,
     source: '/partners/integrations',
     destination: '/partners/catalog',
+  },
+  {
+    permanent: true,
+    source: '/partners/sitemap.xml',
+    destination: '/sitemap_www.xml',
   },
   {
     permanent: true,
