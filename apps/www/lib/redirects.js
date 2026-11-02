@@ -27,6 +27,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
