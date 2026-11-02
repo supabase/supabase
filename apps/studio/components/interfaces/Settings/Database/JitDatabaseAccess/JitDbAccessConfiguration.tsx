@@ -62,6 +62,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
@@ -152,6 +153,12 @@ export const JitDbAccessConfiguration = () => {
       onError: () => {},
     })
 
+  const deleteInvitationGrant = useGrant(
+    'DELETE /v1/projects/{ref}/database/jit/invite/{invite_id}',
+    {
+      projectRef: ref,
+    }
+  )
   const { mutateAsync: deleteInvitation, isPending: isDeletingInvitation } =
     useJitDbAccessInviteDeleteMutation({
       onSuccess: () => {
@@ -303,7 +310,11 @@ export const JitDbAccessConfiguration = () => {
 
       if (selectedUserToDelete.inviteState) {
         if (!selectedUserToDelete.inviteId) throw new Error('Invitation ID is required')
+        if (deleteInvitationGrant.status !== 'granted') {
+          throw new Error('You need additional permissions to delete invitations')
+        }
         await deleteInvitation({
+          grant: deleteInvitationGrant.grant,
           projectRef: ref,
           inviteId: selectedUserToDelete.inviteId,
         })

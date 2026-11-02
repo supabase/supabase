@@ -1,9 +1,9 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessInviteAcceptVariables = {
   projectRef: string
@@ -20,8 +20,7 @@ async function acceptJitDbAccessInvite({
   if (!email) throw new Error('email is required')
   if (!token) throw new Error('token is required')
 
-  // [SEC-859] Endpoint is not yet in the generated OpenAPI spec; cast until it is.
-  const { data, error } = await (post as any)('/v1/projects/{ref}/database/jit/invite/accept', {
+  const { data, error } = await post('/v1/projects/{ref}/database/jit/invite/accept', {
     params: { path: { ref: projectRef } },
     body: { email, token },
   })
@@ -37,7 +36,11 @@ export const useJitDbAccessInviteAcceptMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JitDbAccessInviteAcceptData, ResponseError, JitDbAccessInviteAcceptVariables>,
+  UseCustomMutationOptions<
+    JitDbAccessInviteAcceptData,
+    ResponseError,
+    JitDbAccessInviteAcceptVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

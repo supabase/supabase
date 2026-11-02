@@ -158,7 +158,7 @@ export const JitDbAccessInvite = () => {
               return (
                 <div key={role} className="flex flex-col gap-2">
                   <p className="text-sm text-foreground">
-                    Role <code className="text-code-inline">{role}</code>
+                    Role <code>{role}</code>
                   </p>
                   <div className="flex items-center gap-2">
                     <code

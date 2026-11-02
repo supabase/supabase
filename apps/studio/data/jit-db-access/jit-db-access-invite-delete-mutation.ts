@@ -1,22 +1,28 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { GrantFor } from '@/lib/grants'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessInviteDeleteVariables = {
+  grant: GrantFor<'delete', '/v1/projects/{ref}/database/jit/invite/{invite_id}'>
   projectRef: string
   inviteId: string
 }
 
-async function deleteJitDbAccessInvite({ projectRef, inviteId }: JitDbAccessInviteDeleteVariables) {
+async function deleteJitDbAccessInvite({
+  grant,
+  projectRef,
+  inviteId,
+}: JitDbAccessInviteDeleteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!inviteId) throw new Error('inviteId is required')
 
-  // [SEC-859] Endpoint is not yet in the generated OpenAPI spec; cast until it is.
-  const { data, error } = await (del as any)('/v1/projects/{ref}/database/jit/invite/{invite_id}', {
+  const { data, error } = await del('/v1/projects/{ref}/database/jit/invite/{invite_id}', {
     params: { path: { ref: projectRef, invite_id: inviteId } },
+    grant,
   })
 
   if (error) handleError(error)
@@ -30,7 +36,11 @@ export const useJitDbAccessInviteDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JitDbAccessInviteDeleteData, ResponseError, JitDbAccessInviteDeleteVariables>,
+  UseCustomMutationOptions<
+    JitDbAccessInviteDeleteData,
+    ResponseError,
+    JitDbAccessInviteDeleteVariables
+  >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

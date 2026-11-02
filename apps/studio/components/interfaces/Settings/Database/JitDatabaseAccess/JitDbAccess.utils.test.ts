@@ -8,8 +8,10 @@ import {
   getInvalidIpRangeRows,
   getJitMemberOptions,
   getRelativeDatetimeByMode,
+  mapJitMembersToUserRules,
   serializeDraftRolesForGrantMutation,
 } from './JitDbAccess.utils'
+import type { JitDbAccessMembersData } from '@/data/jit-db-access/jit-db-access-members-query'
 import type { OrganizationMembersData } from '@/data/organizations/organization-members-query'
 
 describe('jitDbAccess.utils', () => {
@@ -151,5 +153,59 @@ describe('getJitMemberOptions', () => {
         name: 'Active User',
       },
     ])
+  })
+})
+
+describe('mapJitMembersToUserRules', () => {
+  it('maps members and pending invitations, keying invitations by invite ID', () => {
+    const jitMembers: JitDbAccessMembersData = [
+      {
+        user_id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+        primary_email: 'member@example.com',
+        expires_at: null,
+        invite_id: null,
+        user_roles: [{ role: 'postgres' }],
+      },
+      {
+        user_id: null,
+        primary_email: 'external@example.com',
+        expires_at: dayjs().add(1, 'day').toISOString(),
+        invite_id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        user_roles: [{ role: 'postgres' }],
+      },
+    ]
+
+    const rules = mapJitMembersToUserRules(jitMembers, [], [])
+
+    expect(rules).toHaveLength(2)
+    expect(rules[0]).toMatchObject({
+      id: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+      memberId: 'de305d54-75b4-431b-adb2-eb6b9e546014',
+      email: 'member@example.com',
+      inviteState: undefined,
+      inviteId: undefined,
+    })
+    expect(rules[1]).toMatchObject({
+      id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      memberId: '',
+      email: 'external@example.com',
+      inviteState: 'pending',
+      inviteId: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+      isExternal: true,
+    })
+  })
+
+  it('marks invitations past their expiry as expired', () => {
+    const jitMembers: JitDbAccessMembersData = [
+      {
+        user_id: null,
+        primary_email: 'external@example.com',
+        expires_at: dayjs().subtract(1, 'day').toISOString(),
+        invite_id: '7c9e6679-7425-40de-944b-e07fc1f90ae7',
+        user_roles: [{ role: 'postgres' }],
+      },
+    ]
+
+    expect(mapJitMembersToUserRules(jitMembers, [], [])[0].inviteState).toBe('expired')
   })
 })

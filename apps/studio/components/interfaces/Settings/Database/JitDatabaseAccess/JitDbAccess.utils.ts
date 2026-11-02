@@ -264,9 +264,11 @@ export function mapJitMembersToUserRules(
   const baseRoleIds = roleOptions.map((role) => role.id)
 
   return (jitMembers ?? []).flatMap((item) => {
-    if (!item.user_id) return []
+    // [SEC-859] Pending invitations have no user_id yet, so they're keyed by invite_id instead
+    const id = item.user_id ?? item.invite_id
+    if (!id) return []
 
-    const mappedMember = memberMap.get(item.user_id)
+    const mappedMember = item.user_id ? memberMap.get(item.user_id) : undefined
     const assignedRoles: JitRoleGrantDraft[] = (item.user_roles ?? []).map((roleObj) => {
       const roleWithBranchRestriction = roleObj as typeof roleObj & { branches_only?: boolean }
       const expiresAt = typeof roleObj.expires_at === 'number' ? roleObj.expires_at : undefined
@@ -299,33 +301,23 @@ export function mapJitMembersToUserRules(
       roleId,
     }))
 
-    // [SEC-859] Access list now also includes pending invitations and surfaces
-    // primary_email + user_id (and expires_at + invite_id on invites). Some
-    // fields aren't in the typed OpenAPI response yet — widen locally.
-    const itemWithInvite = item as typeof item & {
-      primary_email?: string
-      expires_at?: string
-      invite_id?: string
-    }
-
-    const email = itemWithInvite.primary_email ?? mappedMember?.primary_email ?? item.user_id
+    const email = item.primary_email ?? mappedMember?.primary_email ?? id
     const name = mappedMember?.username ?? undefined
-    const inviteExpiresAt = itemWithInvite.expires_at
     const parsedInviteExpiry =
-      typeof inviteExpiresAt === 'string' ? dayjs(inviteExpiresAt) : undefined
+      typeof item.expires_at === 'string' ? dayjs(item.expires_at) : undefined
     const inviteState: JitInviteState | undefined =
       parsedInviteExpiry && parsedInviteExpiry.isValid()
         ? parsedInviteExpiry.isAfter(dayjs())
           ? 'pending'
           : 'expired'
         : undefined
-    const inviteId = inviteState ? itemWithInvite.invite_id : undefined
+    const inviteId = inviteState ? (item.invite_id ?? undefined) : undefined
     const isExternal = !mappedMember
 
     return [
       {
-        id: item.user_id,
-        memberId: item.user_id,
+        id,
+        memberId: item.user_id ?? '',
         email,
         name,
         grants: cloneGrants(grants),

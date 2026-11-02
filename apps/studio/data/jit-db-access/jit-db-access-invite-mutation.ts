@@ -1,11 +1,13 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { GrantFor } from '@/lib/grants'
+import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessInviteVariables = {
+  grant: GrantFor<'post', '/v1/projects/{ref}/database/jit/invite'>
   projectRef: string
   email: string
   roles: Array<{
@@ -19,15 +21,15 @@ type JitDbAccessInviteVariables = {
   }>
 }
 
-async function inviteJitDbAccess({ projectRef, email, roles }: JitDbAccessInviteVariables) {
+async function inviteJitDbAccess({ grant, projectRef, email, roles }: JitDbAccessInviteVariables) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!email) throw new Error('email is required')
   if (!roles || roles.length === 0) throw new Error('At least one role is required')
 
-  // [SEC-859] Endpoint is not yet in the generated OpenAPI spec; cast until it is.
-  const { data, error } = await (post as any)('/v1/projects/{ref}/database/jit/invite', {
+  const { data, error } = await post('/v1/projects/{ref}/database/jit/invite', {
     params: { path: { ref: projectRef } },
     body: { email, roles },
+    grant,
   })
 
   if (error) handleError(error)
@@ -41,7 +43,7 @@ export const useJitDbAccessInviteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<JitDbAccessInviteData, ResponseError, JitDbAccessInviteVariables>,
+  UseCustomMutationOptions<JitDbAccessInviteData, ResponseError, JitDbAccessInviteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()

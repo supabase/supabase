@@ -52,6 +52,7 @@ import { useProjectMembersQuery } from '@/data/projects/project-members-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const grantSchema = z.object({
   roleId: z.string(),
@@ -221,6 +222,7 @@ export function JitDbAccessRuleSheet({
     },
   })
 
+  const inviteGrant = useGrant('POST /v1/projects/{ref}/database/jit/invite', { projectRef })
   const { mutate: inviteUserAccess, isPending: isInviting } = useJitDbAccessInviteMutation({
     onSuccess: (_, variables) => {
       toast.success(`Invitation sent to ${variables.email}`)
@@ -248,7 +250,15 @@ export function JitDbAccessRuleSheet({
     if (roles.length === 0) return
 
     if (isInvite) {
-      inviteUserAccess({ projectRef, email: data.inviteEmail.trim(), roles })
+      if (inviteGrant.status !== 'granted') {
+        return toast.error('You need additional permissions to invite users')
+      }
+      inviteUserAccess({
+        grant: inviteGrant.grant,
+        projectRef,
+        email: data.inviteEmail.trim(),
+        roles,
+      })
     } else {
       grantUserAccess({ projectRef, userId: data.memberId, roles })
     }
