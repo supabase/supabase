@@ -12,6 +12,8 @@ import remarkStringify from 'remark-stringify'
 import { unified } from 'unified'
 import YAML from 'yaml'
 
+import './utils/dotenv.js'
+
 import { BASE_PATH } from '../src/lib/constants.ts'
 import { toContentId } from '../src/lib/content-id.ts'
 import { formatDisplayDate } from '../src/lib/format-date.ts'
