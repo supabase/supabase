@@ -20,7 +20,6 @@ import { isTracingAllowed } from '@/lib/ai/braintrust-logger'
 import { generateAssistantResponse } from '@/lib/ai/generate-assistant-response'
 import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
-import { higherOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL } from '@/lib/ai/opt-in-level'
 import {
   DEFAULT_ASSISTANT_BASE_MODEL_ID,
   getAssistantModelEntry,
@@ -28,6 +27,7 @@ import {
   isKnownAssistantModelId,
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
+import { higherOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL } from '@/lib/ai/opt-in-level'
 import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
