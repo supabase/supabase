@@ -88,8 +88,10 @@ You need:
 
 2. **Select Claude as the identity source.** In Claude, go to **Organization settings**, then **Connectors**, and select the Supabase connector. On the **Configuration** tab, next to **Managed authorization**, click **Set up**. In the **Connect** step, under **Identity source**, select **Claude-issued** and copy the **Issuer URL**. It is unique to your Claude organization.
 
+3. **Register the issuer in Supabase.** Open the **SSO** page of your Dashboard's organization settings, expand **Advanced settings**, paste the URL into the **ID-JAG Issuer** field, and save.
+
    <Img
-     alt="The Connect step in Claude showing the Claude-issued identity source and the Issuer URL"
+     alt="The ID-JAG Issuer field in the Advanced settings of the SSO page in Supabase, with the Claude issuer URL pasted in"
      src={{
        light:
          '/images/blog/2026-11-03-claude-issued-enterprise-managed-auth-for-mcp/issuer-light.png',
@@ -97,8 +99,6 @@ You need:
      }}
      zoomable={true}
    />
-
-3. **Register the issuer in Supabase.** Open the **SSO** page of your Dashboard's organization settings, expand **Advanced settings**, paste the URL into the **ID-JAG Issuer** field, and save.
 
 4. **Test and enable.** Back in Claude, click **Run test** and confirm that every check passes. Then click **Enable and continue** and complete the **Roles** and **Scopes** steps. The **Roles** step chooses which Claude roles get connected automatically.
 
