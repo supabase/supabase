@@ -2,19 +2,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
-import { handleError, post, unguarded } from '@/data/fetchers'
+import { handleError, post } from '@/data/fetchers'
+import type { GrantForVariants } from '@/lib/grants'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+export type BranchResetGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/reset'>
+
 export type BranchResetVariables = {
+  grant: BranchResetGrant
   branchRef: string
   projectRef: string
 }
 
-export async function resetBranch({ branchRef }: Pick<BranchResetVariables, 'branchRef'>) {
+export async function resetBranch({
+  branchRef,
+  grant,
+}: Pick<BranchResetVariables, 'branchRef' | 'grant'>) {
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/reset', {
     params: { path: { branch_id_or_ref: branchRef } },
     body: {},
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)

@@ -107,7 +107,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
         {
           name: 'Map team members to Postgres roles',
-          url: '/guides/platform/temporary-access#configure-user-access',
+          url: '/guides/platform/team-database-access',
         },
       ],
     },
@@ -139,7 +139,7 @@ export const runAndManage: NavMenuConstant = {
         },
         {
           name: 'Production security checklist',
-          url: '/guides/deployment/going-into-prod#security',
+          url: '/guides/security/production-checklist',
         },
       ],
     },
@@ -316,7 +316,7 @@ export const runAndManage: NavMenuConstant = {
             },
             {
               name: 'Log slow and failing queries',
-              url: '/guides/database/postgres/postgres-log-config#logmindurationstatement',
+              url: '/guides/observability/log-slow-queries',
             },
           ],
         },
