@@ -4249,7 +4249,7 @@ export interface WarehouseDisabledEvent {
  * @source Automatic reminder controller
  * @page /organizations, /org/*, /project/*, /new, /new/*
  */
-export interface AccountRecoveryReminderExposed {
+export interface AccountRecoveryReminderExposedEvent {
   action: 'account_recovery_reminder_exposed'
   properties: { gap: 'missing' | 'exhausted' }
   groups: TelemetryGroups
@@ -4260,7 +4260,7 @@ export interface AccountRecoveryReminderExposed {
  * @source User starts a recovery task
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryActionClicked {
+export interface AccountRecoveryActionClickedEvent {
   action: 'account_recovery_action_clicked'
   properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
   groups: TelemetryGroups
@@ -4271,7 +4271,7 @@ export interface AccountRecoveryActionClicked {
  * @source User saves recovery codes or verifies another authenticator
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryTaskCompleted {
+export interface AccountRecoveryTaskCompletedEvent {
   action: 'account_recovery_task_completed'
   properties: { taskType: 'recovery_codes' | 'authenticator' }
   groups: TelemetryGroups
@@ -4282,7 +4282,7 @@ export interface AccountRecoveryTaskCompleted {
  * @source User skips or continues from the recovery interstitial
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryReminderClosed {
+export interface AccountRecoveryReminderClosedEvent {
   action: 'account_recovery_reminder_closed'
   properties: { hasCompletedTask: boolean }
   groups: TelemetryGroups
@@ -4292,10 +4292,10 @@ export interface AccountRecoveryReminderClosed {
  * @hidden
  */
 export type TelemetryEvent =
-  | AccountRecoveryReminderExposed
-  | AccountRecoveryActionClicked
-  | AccountRecoveryTaskCompleted
-  | AccountRecoveryReminderClosed
+  | AccountRecoveryReminderExposedEvent
+  | AccountRecoveryActionClickedEvent
+  | AccountRecoveryTaskCompletedEvent
+  | AccountRecoveryReminderClosedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
