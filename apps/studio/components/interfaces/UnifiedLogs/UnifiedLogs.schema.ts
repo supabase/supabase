@@ -21,6 +21,7 @@ export const columnSchema = z.object({
   logs: z.array(z.any()).optional(), // array of function logs
   auth_user: z.string().nullable().optional(),
   metadata: z.record(z.string(), z.unknown()).nullable().optional(),
+  pipeline_id: z.string().nullish(),
 })
 
 export type ColumnSchema = z.infer<typeof columnSchema>
@@ -82,7 +83,18 @@ export const timelineChartSchema = z.object({
 
 export type TimelineChartSchema = z.infer<typeof timelineChartSchema>
 
+export const unifiedLogsScopeSchema = z.object({
+  filters: z.array(
+    z.object({
+      column: z.string().min(1),
+      operator: z.enum(['=', '<>', '~~*', '!~~*']),
+      value: z.string(),
+    })
+  ),
+})
+
 export const querySearchParamsSchema = z.object({
+  scope: unifiedLogsScopeSchema.optional(),
   filter: z.array(z.string()).optional(),
   latency: z.array(z.number()).optional(),
   'timing.dns': z.array(z.number()).optional(),

@@ -7,6 +7,7 @@ import rehypeSlug from 'rehype-slug'
 import remarkGfm from 'remark-gfm'
 import { parse as parseToml } from 'smol-toml'
 
+import { dynamicRedirects } from './lib/redirects/dynamic-redirects.js'
 import remotePatterns from './lib/remotePatterns.js'
 
 const withBundleAnalyzer = configureBundleAnalyzer({
@@ -66,7 +67,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
-    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
   serverExternalPackages: ['libpg-query', 'twoslash'],
@@ -126,112 +127,23 @@ const nextConfig = {
   },
 
   /**
-   * Doc rewrites and redirects are
-   * handled by the `www` nextjs config:
-   *
-   * ./apps/www/lib/redirects.js
-   *
-   * Only add dev/preview specific redirects
-   * in this config.
+   * Redirects for /docs paths live in ./lib/redirects (see its README.md).
+   * Static one-to-one rules are served by Vercel bulk redirects via vercel.json.
+   * Dynamic rules, including the dev/preview redirects, come from dynamic-redirects.js.
    */
   async redirects() {
-    return [
-      {
-        source: '/guides/observability/access-data',
-        destination: '/guides/observability',
-        permanent: true,
-      },
-      {
-        source: '/guides/observability/access-data.md',
-        destination: '/guides/observability.md',
-        permanent: true,
-      },
-      // Redirect root to docs base path in dev/preview envs
-      {
-        source: '/',
-        destination: '/docs',
-        basePath: false,
-        permanent: false,
-      },
+    // For /docs/guides/ dynamic redirects, auto-generate .md variants so renamed/deleted pages
+    // redirect correctly when fetched as markdown
+    const docsMdRedirects = dynamicRedirects
+      .filter(
+        (r) =>
+          r.source.startsWith('/docs/guides/') &&
+          typeof r.destination === 'string' &&
+          r.destination.startsWith('/')
+      )
+      .map((r) => ({ ...r, source: `${r.source}.md`, destination: `${r.destination}.md` }))
 
-      // Redirect dashboard links in dev/preview envs
-      {
-        source: '/dashboard/:path*',
-        destination: 'https://supabase.com/dashboard/:path*',
-        basePath: false,
-        permanent: false,
-      },
-
-      // Redirect blog links in dev/preview envs
-      {
-        source: '/blog/:path*',
-        destination: 'https://supabase.com/blog/:path*',
-        basePath: false,
-        permanent: false,
-      },
-
-      // Redirect old managed pipeline slugs in dev/preview envs
-      {
-        source: '/guides/database/replication/bigquery',
-        destination: '/guides/database/replication/pipelines/bigquery',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/clickhouse',
-        destination: '/guides/database/replication/pipelines/clickhouse',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/ducklake',
-        destination: '/guides/database/replication/pipelines/ducklake',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/snowflake',
-        destination: '/guides/database/replication/pipelines/snowflake',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/external-replication-setup',
-        destination: '/guides/database/replication/pipelines',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/external-replication-monitoring',
-        destination: '/guides/database/replication/pipelines-monitoring',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/external-replication-faq',
-        destination: '/guides/database/replication/pipelines-faq',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/replication-setup',
-        destination: '/guides/database/replication/pipelines',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/replication-monitoring',
-        destination: '/guides/database/replication/pipelines-monitoring',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/replication/replication-faq',
-        destination: '/guides/database/replication/pipelines-faq',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/inspect',
-        destination: '/guides/monitoring-and-debugging/inspect',
-        permanent: true,
-      },
-      {
-        source: '/guides/database/database-advisors',
-        destination: '/guides/observability/advisors',
-        permanent: true,
-      },
-    ]
+    return [...docsMdRedirects, ...dynamicRedirects]
   },
   typescript: {
     // On previews, typechecking is run via GitHub Action only for efficiency

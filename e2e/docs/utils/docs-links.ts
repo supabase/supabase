@@ -1,23 +1,7 @@
 import type { Page } from '@playwright/test'
 
 export const GUIDE_ARTICLE_SELECTOR = '[data-testid="sb-docs-guide-main-article"]'
-export const TROUBLESHOOTING_ARTICLE_SELECTOR =
-  '[data-testid="sb-docs-troubleshooting-main-article"]'
 const DOCS_PATH_PREFIX = '/docs'
-const TROUBLESHOOTING_PATH_PREFIX = '/docs/guides/troubleshooting/'
-
-export function articleSelectorForPagePath(pagePath: string): string {
-  const pathname = pagePath.startsWith('http') ? new URL(pagePath).pathname : pagePath
-
-  if (
-    pathname === TROUBLESHOOTING_PATH_PREFIX.slice(0, -1) ||
-    pathname.startsWith(TROUBLESHOOTING_PATH_PREFIX)
-  ) {
-    return TROUBLESHOOTING_ARTICLE_SELECTOR
-  }
-
-  return GUIDE_ARTICLE_SELECTOR
-}
 
 export type LinkTarget = {
   url: string
@@ -130,7 +114,7 @@ export function checkLinkFromBrowser(
       {
         linkUrl: url,
         readAnchors: withAnchors,
-        articleSelector: articleSelectorForPagePath(new URL(url).pathname),
+        articleSelector: GUIDE_ARTICLE_SELECTOR,
       }
     )
     check.then(

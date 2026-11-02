@@ -361,7 +361,10 @@ const MergePage: NextPageWithLayout = () => {
     return (
       <PageLayout>
         <ScaffoldContainer size="full">
-          <AlertError subject="Failed to check your permissions to view branches" />
+          <AlertError
+            error={branchesGrant.error}
+            subject="Failed to check your permissions to view branches"
+          />
         </ScaffoldContainer>
       </PageLayout>
     )

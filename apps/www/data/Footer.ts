@@ -109,8 +109,8 @@ const footerData = [
         url: '/kb/topics/faqs',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',

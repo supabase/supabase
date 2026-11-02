@@ -54,7 +54,6 @@ export const entitySearchQueryOptions = (
   { enabled = true }: { enabled?: boolean } = {}
 ) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.entitySearch(projectRef, query),
     queryFn: ({ signal }) => getEntitySearch({ projectRef, connectionString, query }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && query.length > 0,

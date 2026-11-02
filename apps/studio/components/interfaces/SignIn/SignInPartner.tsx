@@ -15,6 +15,8 @@ export const SignInPartner = () => {
   const trackFunnelError = useTrackFunnelError()
 
   useEffect(() => {
+    let isMounted = true
+
     ;(async () => {
       const params = new URLSearchParams(window.location.hash.substring(1))
 
@@ -22,6 +24,7 @@ export const SignInPartner = () => {
       const token = params.get('id_token')
 
       const { data } = await auth.getSession()
+      if (!isMounted) return
 
       if (!data.session && partner && token) {
         // partner comes from the URL hash unauthenticated; only registry-known values may
@@ -38,12 +41,16 @@ export const SignInPartner = () => {
             trackFunnelError('signin', classifyApiError('signin', error), 'form')
           }
         } finally {
-          router.replace({ pathname: '/sign-in-mfa', query: { method } })
+          if (isMounted) router.replace({ pathname: '/sign-in-mfa', query: { method } })
         }
       } else {
         router.replace({ pathname: '/sign-in' })
       }
     })()
+
+    return () => {
+      isMounted = false
+    }
   }, [])
 
   return (

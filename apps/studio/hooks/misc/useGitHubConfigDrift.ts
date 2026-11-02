@@ -13,6 +13,7 @@ import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useGitHubConfigQuery } from '@/data/config/github-config-query'
 import { projectConfigV2QueryOptions } from '@/data/config/project-config-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
+import { usePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
@@ -64,21 +65,29 @@ export function useSelectedGitHubConfigDrift() {
     { enabled: queriesEnabled }
   )
 
+  const { refetch: permissionsRefetch } = usePermissionsQueryV2()
   const { refetch: branchesRefetch } = branchesQuery
   const { refetch: connectionRefetch } = connectionQuery
   const { refetch: projectConfigRefetch } = projectConfigQuery
   const { refetch: githubConfigRefetch } = githubConfigQuery
 
-  const refetch = useCallback(
-    () =>
-      Promise.all([
-        branchesRefetch(),
-        connectionRefetch(),
-        projectConfigRefetch(),
-        githubConfigRefetch(),
-      ]),
-    [branchesRefetch, connectionRefetch, projectConfigRefetch, githubConfigRefetch]
-  )
+  const isGrantError = branchesGrant.status === 'error'
+  const refetch = useCallback(() => {
+    if (isGrantError) return Promise.all([permissionsRefetch(), connectionRefetch()])
+    return Promise.all([
+      branchesRefetch(),
+      connectionRefetch(),
+      projectConfigRefetch(),
+      githubConfigRefetch(),
+    ])
+  }, [
+    isGrantError,
+    permissionsRefetch,
+    branchesRefetch,
+    connectionRefetch,
+    projectConfigRefetch,
+    githubConfigRefetch,
+  ])
 
   const driftResult = useMemo((): ConfigDriftMemoResult => {
     let dashboardConfig

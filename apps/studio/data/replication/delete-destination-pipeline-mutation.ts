@@ -3,13 +3,14 @@ import { toast } from 'sonner'
 
 import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { del, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DeleteDestinationPipelineParams = {
   projectRef?: string
   destinationId: number
-  pipelineId: number
+  pipelineId: string
 }
 
 async function deleteDestinationPipeline(
@@ -29,7 +30,7 @@ async function deleteDestinationPipeline(
     handleError(error)
   }
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type DeleteDestinationPipelineData = Awaited<ReturnType<typeof deleteDestinationPipeline>>

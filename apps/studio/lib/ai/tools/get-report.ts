@@ -54,6 +54,9 @@ export const contract = {
   inputSchema,
   outputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+  },
   needsApproval: false,
   toModelOutput: (output: z.infer<typeof outputSchema>) => output,
 } as const satisfies ToolContract

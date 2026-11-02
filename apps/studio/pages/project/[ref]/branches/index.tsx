@@ -88,7 +88,10 @@ const BranchesPage: NextPageWithLayout = () => {
                 <NoPermission resourceText="view this project's branches" />
               )}
               {branchesGrant.status === 'error' && (
-                <AlertError subject="Failed to check your permissions to view branches" />
+                <AlertError
+                  error={branchesGrant.error}
+                  subject="Failed to check your permissions to view branches"
+                />
               )}
               {(branchesGrant.status === 'loading' || branchesGrant.status === 'granted') && (
                 <>

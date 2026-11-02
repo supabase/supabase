@@ -116,12 +116,14 @@ export const Usage = () => {
   const isResolvingBranch =
     !!selectedProjectRef && !!selectedBranchRef && isPendingBranches && !isProjectLookupBlocked
   const isBranchLookupBlocked = !!selectedBranchRef && isErrorBranches
+  const isBranchLookupDenied = !!selectedBranchRef && branchesGrant.status === 'denied'
   const isBranchUnavailable =
     !!selectedBranchRef && isSuccessBranches && usageProjectRef !== selectedBranchRef
   const canShowUsage =
     !isLoadingSelectedProject &&
     !isResolvingBranch &&
     !isBranchLookupBlocked &&
+    !isBranchLookupDenied &&
     !isProjectLookupBlocked
   const canLoadUsage = canLoadProjectUsage && canShowUsage
 
@@ -373,6 +375,12 @@ export const Usage = () => {
       {isErrorBranches && (
         <ScaffoldContainer className="mt-5">
           <AlertError subject="Failed to retrieve branches" error={branchesError} />
+        </ScaffoldContainer>
+      )}
+
+      {isBranchLookupDenied && (
+        <ScaffoldContainer className="mt-5">
+          <NoPermission resourceText="view this branch's usage" />
         </ScaffoldContainer>
       )}
 

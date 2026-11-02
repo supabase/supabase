@@ -46,7 +46,6 @@ export const authenticatorRoleConfigQueryOptions = ({
   connectionString,
 }: AuthenticatorRoleConfigVariables) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.authenticatorRoleConfig(projectRef),
     queryFn: ({ signal }) => getAuthenticatorRoleConfig({ projectRef, connectionString }, signal),
     // The fix for this override is usually applied outside the Dashboard (SQL editor, another

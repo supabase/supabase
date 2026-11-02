@@ -73,7 +73,6 @@ export const getTableQuery = async ({
 }) => {
   const queryClient = getQueryClient()
   const table = await queryClient.fetchQuery({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: tableKeys.retrieve(projectRef, name, schema),
     queryFn: ({ signal }) => getTable({ projectRef, connectionString, name, schema }, signal),
   })

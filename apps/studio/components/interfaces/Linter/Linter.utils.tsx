@@ -167,7 +167,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <ClockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
+    docsLink: `${DOCS_URL}/guides/security/production-checklist#auth`,
     category: 'security',
   },
   {
@@ -176,7 +176,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
+    docsLink: `${DOCS_URL}/guides/security/production-checklist#auth`,
     category: 'security',
   },
   {
@@ -249,7 +249,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <RulerIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/providers?provider=Email`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/platform/going-into-prod#security`,
+    docsLink: `${DOCS_URL}/guides/auth/password-security#password-strength-and-leaked-password-protection`,
     category: 'security',
   },
   {
@@ -304,7 +304,7 @@ export const lintInfoMap: LintInfo[] = [
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/settings/api-keys`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/api/api-keys#the-servicerole-key`,
+    docsLink: `${DOCS_URL}/guides/security/rotate-leaked-api-keys`,
     category: 'security',
   },
   {

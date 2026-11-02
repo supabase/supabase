@@ -173,7 +173,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
               <NoPermission resourceText="view this project's branches" />
             )}
             {branchesGrant.status === 'error' && (
-              <AlertError subject="Failed to check your permissions to view branches" />
+              <AlertError
+                error={branchesGrant.error}
+                subject="Failed to check your permissions to view branches"
+              />
             )}
             {(branchesGrant.status === 'loading' || branchesGrant.status === 'granted') && (
               <>
@@ -342,6 +345,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
     branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
   )
   const previewBranches = (branches || []).filter((b) => !b.is_default)
+  const canListBranches = branchesGrant.status !== 'error' && branchesGrant.status !== 'denied'
 
   const track = useTrack()
 
@@ -388,12 +392,14 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
       title="Merge requests"
       subtitle="Review and merge changes from one branch into another"
       primaryActions={
-        <BranchSelector
-          branches={previewBranches}
-          onBranchSelected={handleMarkBranchForReview}
-          disabled={!projectRef || updateBranchGrant.status !== 'granted'}
-          isUpdating={isUpdating}
-        />
+        canListBranches && (
+          <BranchSelector
+            branches={previewBranches}
+            onBranchSelected={handleMarkBranchForReview}
+            disabled={!projectRef || updateBranchGrant.status !== 'granted'}
+            isUpdating={isUpdating}
+          />
+        )
       }
       secondaryActions={<DocsButton href={`${DOCS_URL}/guides/platform/branching`} />}
     >

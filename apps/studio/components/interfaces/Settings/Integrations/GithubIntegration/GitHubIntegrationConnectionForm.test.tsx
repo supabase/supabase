@@ -1,9 +1,11 @@
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
 import { GitHubIntegrationConnectionForm } from './GitHubIntegrationConnectionForm'
+import { type components } from '@/data/api'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { FGA_PERMISSIONS, type FgaPermissions } from '@/hooks/misc/useCheckPermissionsV2'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -12,6 +14,8 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { mockPermissions } from '@/tests/lib/msw-permissions'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+
+type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 const ORGANIZATION_SLUG = 'acme'
 const PROJECT_REF = 'project-ref'
@@ -42,6 +46,17 @@ const CONNECTION: GitHubConnection = {
   project: { id: 1, name: 'Production', ref: PROJECT_REF },
   repository: { id: 1, name: 'acme/app' },
   user: null,
+}
+
+const CAN_MANAGE_GITHUB_CONNECTIONS_PERMISSION: AccessControlPermission = {
+  actions: [PermissionAction.CREATE, PermissionAction.UPDATE],
+  condition: null,
+  organization_id: null,
+  organization_slug: ORGANIZATION_SLUG,
+  project_ids: null,
+  project_refs: [],
+  resources: ['integrations.github_connections'],
+  restrictive: false,
 }
 
 const PRODUCTION_BRANCH = createTestBranch({
@@ -93,10 +108,16 @@ function mockEndpoints(projectPermissions: FgaPermissions[]) {
       {
         slug: ORGANIZATION_SLUG,
         role: 'developer',
-        permissions: [FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE],
+        permissions: [],
         projects: [{ ref: PROJECT_REF, role: 'developer', permissions: projectPermissions }],
       },
     ],
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/profile/permissions',
+    response: () =>
+      HttpResponse.json<AccessControlPermission[]>([CAN_MANAGE_GITHUB_CONNECTIONS_PERMISSION]),
   })
   addAPIMock({ method: 'get', path: '/v1/projects/:ref/branches', response: [PRODUCTION_BRANCH] })
   addAPIMock({

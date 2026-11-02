@@ -29,7 +29,7 @@ export async function getUser(
   )
 
   const user = result[0] as User | undefined
-  return user
+  return user ?? null
 }
 
 export type UserData = Awaited<ReturnType<typeof getUser>>
