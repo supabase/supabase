@@ -214,7 +214,7 @@ The functions service has two memory limits: a shared container budget and a per
 
 ### Container memory budget
 
-`FUNCTIONS_MEMORY_LIMIT` defaults to `2g`, or 2 GiB, in the main `docker/.env` file. All user workers, the main worker, and other memory charged to the container share this budget, including page cache.
+`FUNCTIONS_MEMORY_LIMIT` defaults to `2g`, or 2 GiB, in the main `docker/.env` file. All user workers, the main worker, and page cache share this budget. The monitor excludes inactive file cache when deciding whether to clean up idle workers.
 
 Docker Compose applies this setting through `mem_limit`. The monitor reads the applied cgroup limit. This is a service resource setting, separate from custom environment variables that function code reads through `Deno.env.get()`.
 
@@ -251,15 +251,15 @@ To change the per-worker limit:
 
 ### Idle-worker cleanup
 
-The main worker samples container memory usage every second while usage is below 80% of the limit. At or above 80%, it asks eligible idle workers to retire and requests allocator memory collection. Cleanup skips workers with active requests or pending tasks, including tasks registered with `EdgeRuntime.waitUntil()`.
+The monitor uses the container's _working set_: `memory.current` minus `inactive_file` from `memory.stat`, with a minimum of zero.
 
-The monitor waits 5 seconds after each cleanup attempt before sampling again, even when no workers acknowledge retirement. Logs report retirement acknowledgments. An acknowledgment does not mean worker shutdown or memory reclamation has finished. Retiring workers can cause cold starts on later requests.
+The main worker samples the working set every second while it is below 80% of the container limit. At or above 80%, it asks eligible idle workers to retire and requests allocator memory collection. Cleanup skips workers with active requests or pending tasks, including tasks registered with `EdgeRuntime.waitUntil()`.
 
-Monitoring requires cgroup v2 mounted at `/sys/fs/cgroup`, with readable `memory.current` and `memory.max` files and a finite limit. An unlimited limit or missing or inaccessible files disable monitoring with a warning. Requests continue to use the per-worker limits. After correcting the configuration, restart the functions service to reinitialize the monitor.
+The monitor waits 5 seconds after each cleanup attempt before sampling again, even when no workers acknowledge retirement. It logs a cleanup warning only when at least one worker acknowledges retirement. An acknowledgment does not mean worker shutdown or memory reclamation has finished. Retiring workers can cause cold starts on later requests.
 
-For other failures, the monitor retries after 5 seconds and warns once until a cycle succeeds. The monitor does not fall back to host memory measurements or support cgroup v1 or alternative mount paths.
+Monitoring requires a finite cgroup v2 limit and readable `memory.current`, `memory.max`, and `memory.stat` files under `/sys/fs/cgroup`. An unlimited limit or unavailable files disable monitoring with a warning. After fixing the configuration, run `sh run.sh recreate functions` from `docker/`. Other failures trigger retries every 5 seconds, with one warning until recovery.
 
-Cleanup cannot guarantee immediate memory reclamation or prevent every out-of-memory error. Active function requests and background tasks can still exhaust available memory and interrupt requests. Stricter parent cgroup limits and host memory shortages can also interrupt requests. Restarting the container does not recover interrupted requests.
+Per-worker limits still apply. The monitor does not use host memory measurements or guarantee protection from out-of-memory errors. Active tasks, stricter parent cgroup limits, or host memory shortages can still interrupt requests.
 
 ## Troubleshooting
 
