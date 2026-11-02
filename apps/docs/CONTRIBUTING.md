@@ -84,11 +84,12 @@ Adding a new guide requires:
 - YAML frontmatter
 - A navigation entry in a separate file
 
-Frontmatter looks like this. `title` is mandatory. There are also optional properties that you can use to control the page display, including `subtitle`, `tocVideo`, and `hideToc`.
+Frontmatter looks like this. `title` and `description` are required. Optional properties control the page display, including `subtitle`, `tocVideo`, and `hideToc`. For what goes in `description` and `subtitle`, see [Write good frontmatter](./style-guide/03-page-structure.md#write-good-frontmatter).
 
 ```yaml
 ---
 title: How to connect to Supabase
+description: Connect to your Supabase Postgres database from a frontend app, a backend server, or a database tool, using a direct connection or the connection pooler.
 hideToc: true
 ---
 ```

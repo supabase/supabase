@@ -15,7 +15,7 @@ import { DeleteBranchModal } from '../../BranchManagement/DeleteBranchModal'
 import { SwitchToPreviewModal } from '../../BranchManagement/SwitchToPreviewModal'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
@@ -31,15 +31,16 @@ export const DeleteBranchPanel = () => {
   const [showDeleteModal, setShowDeleteModal] = useState(false)
   const [showSwitchToPreviewModal, setShowSwitchToPreviewModal] = useState(false)
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.BRANCHING_DEVELOPMENT_DELETE
-  )
-
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
   const { data: branches } = useQuery(
     branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
   )
   const branch = branches?.find((b) => b.project_ref === branchRef)
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch?.is_default,
+  })
+  const canDeleteBranches = deleteBranchGrant.status === 'granted'
   const isBranchMetadataReady =
     branchRef !== undefined && projectRef !== undefined && branch !== undefined
   const isPersistentBranch = Boolean(branch?.persistent)
@@ -53,6 +54,19 @@ export const DeleteBranchPanel = () => {
       setShowDeleteModal(true)
     }
   }
+
+  const getDeleteDisabledReason = () => {
+    const error =
+      (branchesGrant.status === 'error' && branchesGrant.error) ||
+      (deleteBranchGrant.status === 'error' && deleteBranchGrant.error)
+    if (error) return `Failed to check permissions`
+    if (branchesGrant.status === 'denied' || deleteBranchGrant.status === 'denied') {
+      return 'You need additional permissions to delete this branch'
+    }
+    if (!canDeleteBranches || !isBranchMetadataReady) return 'Branch details are still loading'
+    return undefined
+  }
+  const deleteDisabledReason = getDeleteDisabledReason()
 
   if (project === undefined) return null
 
@@ -82,11 +96,7 @@ export const DeleteBranchPanel = () => {
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: !canDeleteBranches
-                    ? 'You need additional permissions to delete this branch'
-                    : !isBranchMetadataReady
-                      ? 'Branch details are still loading'
-                      : undefined,
+                  text: deleteDisabledReason,
                 },
               }}
             >

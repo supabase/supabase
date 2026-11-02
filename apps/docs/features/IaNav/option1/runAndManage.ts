@@ -107,7 +107,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
         {
           name: 'Map team members to Postgres roles',
-          url: '/guides/platform/temporary-access#configure-user-access',
+          url: '/guides/platform/team-database-access',
         },
       ],
     },

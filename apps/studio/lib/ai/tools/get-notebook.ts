@@ -28,5 +28,6 @@ export const contract = {
     requires: new Set(['explorer']),
   },
   needsApproval: false,
+  promptGuidance: `- When describing an existing notebook, report each query cell's configuration that changes what it returns — a log cell's time range, a database cell's row limit — and don't count markdown cells as queries.`,
   toModelOutput: (output: z.infer<typeof outputSchema>) => output,
 } as const satisfies ToolContract

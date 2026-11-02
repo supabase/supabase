@@ -909,6 +909,12 @@
         "title": "List organization roles",
         "slug": "v2-list-organization-roles",
         "type": "operation"
+      },
+      {
+        "id": "v2-remove-organization-members",
+        "title": "Remove organization members",
+        "slug": "v2-remove-organization-members",
+        "type": "operation"
       }
     ]
   },

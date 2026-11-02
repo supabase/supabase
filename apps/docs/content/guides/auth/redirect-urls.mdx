@@ -94,6 +94,8 @@ const { data, error } = await supabase.auth.signInWithOAuth({
 })
 ```
 
+To point each preview deployment at its own Supabase preview branch, see [Preview branches on Vercel](/docs/guides/integrations/vercel-preview-branches).
+
 ## Email templates when using `redirectTo`
 
 When using a `redirectTo` option, you may need to replace the `{{ .SiteURL }}` with `{{ .RedirectTo }}` in your email templates. See the [Email Templates guide](/docs/guides/auth/auth-email-templates) for more information.

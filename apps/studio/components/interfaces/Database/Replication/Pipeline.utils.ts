@@ -1,6 +1,30 @@
 import { PipelineStatusName } from './Replication.constants'
+import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
+
+export const getPipelineUnifiedLogsUrl = ({
+  projectRef = '_',
+  pipelineId,
+}: {
+  projectRef?: string
+  pipelineId?: string
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: ['log_type:eq:pipelines', ...(pipelineId ? [`pipeline_id:eq:${pipelineId}`] : [])],
+  })
+
+export const getPipelineLegacyLogsUrl = ({
+  projectRef = '_',
+  pipelineId,
+}: {
+  projectRef?: string
+  pipelineId?: string
+}) => {
+  const path = `/project/${projectRef}/logs/pipelines-logs`
+  if (!pipelineId) return path
+  return `${path}?${new URLSearchParams({ f: JSON.stringify({ pipeline_id: pipelineId }) })}`
+}
 
 export const getStatusName = (
   status: ReplicationPipelineStatusData['status'] | undefined

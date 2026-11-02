@@ -78,7 +78,7 @@ export const BackupItem = ({
               disabled={!canTriggerScheduledBackups || isDownloading}
               onClick={() => {
                 if (!projectRef) return console.error('Project ref is required')
-                downloadBackup({ ref: projectRef, backup })
+                downloadBackup({ ref: projectRef, backupId: backup.id })
               }}
               tooltip={{
                 content: {

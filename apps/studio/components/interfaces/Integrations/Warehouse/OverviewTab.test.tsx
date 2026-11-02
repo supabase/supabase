@@ -332,7 +332,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -353,7 +353,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)
