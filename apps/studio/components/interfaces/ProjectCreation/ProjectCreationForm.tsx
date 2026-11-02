@@ -403,7 +403,6 @@ export const ProjectCreationForm = ({
         ? getRegionSelectionType({
             dbRegion: form.getValues('dbRegion'),
             availableRegions: availableRegionsData?.all,
-            isDbRegionDirty,
           })
         : undefined
       track(

@@ -2650,6 +2650,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/reference/auth/config",
+    "destination": "/docs/guides/local-development/cli/config",
+    "permanent": true
+  },
+  {
     "source": "/docs/reference/auth-helpers",
     "destination": "/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers",
     "permanent": true

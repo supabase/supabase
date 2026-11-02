@@ -16,12 +16,12 @@ import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinat
 import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
 import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesIcebergEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
@@ -106,11 +106,11 @@ export const DestinationForm = ({
   const isDuckLakeProjectBlocked =
     selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
     // api keys reveal = true will require this perms
@@ -134,19 +134,19 @@ export const DestinationForm = ({
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
     const destinations = []
-    if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (etlEnableIceberg)
+    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (isIcebergEnabled)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
-    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
+    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
   }, [
-    etlEnableBigQuery,
-    etlEnableDucklake,
-    etlEnableIceberg,
-    etlEnableSnowflake,
-    etlEnableClickHouse,
+    isBigQueryEnabled,
+    isDuckLakeEnabled,
+    isIcebergEnabled,
+    isSnowflakeEnabled,
+    isClickHouseEnabled,
   ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
@@ -487,17 +487,17 @@ export const DestinationForm = ({
 
   const destinationFields = (
     <>
-      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+      {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
+      {selectedType === 'Analytics Bucket' && isIcebergEnabled && (
         <AnalyticsBucketFields
           form={form}
           editMode={editMode}
           onSelectNewBucket={() => setNewBucketSheetVisible(true)}
         />
       )}
-      {selectedType === 'DuckLake' && etlEnableDucklake && (
+      {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>
           <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
             {isManagedDuckLake && isProjectPending && !isProjectFetched
@@ -527,10 +527,10 @@ export const DestinationForm = ({
           <DuckLakeFields form={form} editMode={editMode} />
         </>
       )}
-      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+      {selectedType === 'Snowflake' && isSnowflakeEnabled && (
         <SnowflakeFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+      {selectedType === 'ClickHouse' && isClickHouseEnabled && (
         <ClickHouseFields form={form} editMode={editMode} />
       )}
     </>
