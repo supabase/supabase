@@ -867,6 +867,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations/atomic_crm',
     destination: '/partners/catalog',
   },
