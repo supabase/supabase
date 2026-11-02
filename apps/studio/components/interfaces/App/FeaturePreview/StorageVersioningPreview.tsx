@@ -1,4 +1,6 @@
 import { useParams } from 'common'
+import Image from 'next/image'
+import { BASE_PATH } from 'ui-patterns/CommandMenu/prepackaged/shared/constants'
 
 import { InlineLink } from '@/components/ui/InlineLink'
 
@@ -13,7 +15,14 @@ export const StorageVersioningPreview = () => {
         version from the file preview panel, and use lifecycle policies to expire noncurrent
         versions automatically and keep storage costs in check.
       </p>
-      {/* TODO: storage-versioning-preview.png (1296x900) */}
+
+      <Image
+        src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
+        width={1296}
+        height={900}
+        alt="explorer-preview"
+        className="rounded-sm border"
+      />
 
       <div className="space-y-2 mt-4!">
         <p className="text-sm">Enabling this preview will:</p>
@@ -28,7 +37,7 @@ export const StorageVersioningPreview = () => {
           </li>
           <li>
             Archive files instead of deleting them in versioned buckets, so you can bring them back
-            from Show archived
+            if needed
           </li>
           <li>
             Let you expire noncurrent versions automatically by age, by how many to keep, or both
