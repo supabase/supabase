@@ -275,7 +275,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
     }
   }
 
-  if (!jwtAlgorithm) {
+  if (typeof jwtAlgorithm !== 'string' || !jwtAlgorithm) {
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
