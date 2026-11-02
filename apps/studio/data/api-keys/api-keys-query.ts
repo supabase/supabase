@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
@@ -55,8 +55,9 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+    params: { path: { ref: projectRef }, query: { reveal: reveal ? 'true' : 'false' } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

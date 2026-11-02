@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 
 import { DEFAULT_FALLBACK_PATH, getReturnToPath } from '@/lib/gotrue'

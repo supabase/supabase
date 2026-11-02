@@ -1,13 +1,13 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportFilterBar from '@/components/interfaces/Reports/ReportFilterBar'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
-import ReportPadding from '@/components/interfaces/Reports/ReportPadding'
+import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { SharedAPIReport } from '@/components/interfaces/Reports/SharedAPIReport/SharedAPIReport'
@@ -131,9 +131,8 @@ const PostgrestReport = () => {
                 side="bottom"
               >
                 <Button
-                  variant="default"
                   disabled={isRefetching}
-                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={isRefetching ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -159,7 +158,7 @@ const PostgrestReport = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}

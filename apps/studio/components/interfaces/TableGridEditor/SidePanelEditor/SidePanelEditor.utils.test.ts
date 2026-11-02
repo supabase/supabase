@@ -178,40 +178,13 @@ describe('getRowFromSidePanel', () => {
     expect(getRowFromSidePanel(sidePanel)).toEqual(mockRow)
   })
 
-  test('returns undefined for table side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'table',
-      mode: 'new',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for column side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'column',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for schema side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'schema',
-      mode: 'new',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for csv-import side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'csv-import',
-    }
-    expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
-  })
-
-  test('returns undefined for operation-queue side panel', () => {
-    const sidePanel: SidePanel = {
-      type: 'operation-queue',
-    }
+  test.each<SidePanel>([
+    { type: 'table', mode: 'new' },
+    { type: 'column' },
+    { type: 'schema', mode: 'new' },
+    { type: 'csv-import' },
+    { type: 'operation-queue' },
+  ])('returns undefined for $type side panel', (sidePanel) => {
     expect(getRowFromSidePanel(sidePanel)).toBeUndefined()
   })
 })

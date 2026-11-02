@@ -34,7 +34,7 @@ const page: GoPageInput = {
       title: "Tonight's hosts",
       children: (
         <>
-          <Link
+          <a
             href="https://supabase.com/dashboard"
             className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center transition-colors hover:border-foreground-muted hover:bg-surface-100"
           >
@@ -43,12 +43,16 @@ const page: GoPageInput = {
             <p className="text-foreground-light text-sm leading-relaxed">
               Open-source Postgres development platform
             </p>
-          </Link>
+          </a>
           <Link
             href="https://stigg.io"
             className="flex flex-col items-center gap-4 rounded-xl border border-muted p-8 text-center transition-colors hover:border-foreground-muted hover:bg-surface-100"
           >
-            <img src="/images/customers/logos/stigg.svg" alt="Stigg" className="h-10 w-auto" />
+            <img
+              src="/images/customers/logos/on-light/stigg.svg"
+              alt="Stigg"
+              className="h-10 w-auto"
+            />
             <h3 className="text-foreground font-medium text-lg">Stigg</h3>
             <p className="text-foreground-light text-sm leading-relaxed">
               Monetization layer for AI products
@@ -100,7 +104,7 @@ const page: GoPageInput = {
             <li>Complete these steps by Monday, May 11, 2026 at 12:00 PM PST</li>
           </ol>
           <Button asChild variant="primary" size="medium">
-            <Link href="https://supabase.com/dashboard">Start with Supabase</Link>
+            <a href="https://supabase.com/dashboard">Start with Supabase</a>
           </Button>
           <p className="text-xs text-foreground-lighter mt-4">
             No purchase necessary. Void where prohibited.{' '}

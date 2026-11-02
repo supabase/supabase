@@ -53,6 +53,27 @@ export const formatFolderResponseForTreeView = (
   return [root, ...formattedFolders, ...formattedContents]
 }
 
+/**
+ * Append the active snippet to a section's list when it belongs there (per the
+ * section's predicate) and isn't already present. Each nav section lists
+ * server-filtered pages, so a just-opened or just-created snippet may not appear
+ * until a refetch — this surfaces it immediately, in the one section it belongs to.
+ */
+export function withActiveSnippet<T extends { id: string }>(
+  snippets: T[],
+  activeSnippet: T | undefined,
+  belongsInSection: (snippet: T) => boolean
+): T[] {
+  if (
+    activeSnippet !== undefined &&
+    belongsInSection(activeSnippet) &&
+    !snippets.some((snippet) => snippet.id === activeSnippet.id)
+  ) {
+    return [...snippets, activeSnippet]
+  }
+  return snippets
+}
+
 export function getLastItemIds(items: TreeViewItemProps[]) {
   let lastItemIds = new Set<string>()
 

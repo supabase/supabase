@@ -20,7 +20,7 @@ export default function AlertDialogDestructive() {
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>
-            Delete <code className="text-code-inline">hello-world</code>
+            Delete <code>hello-world</code>
           </AlertDialogTitle>
           <AlertDialogDescription>
             This action cannot be undone. Ensure that you have a backup in case you want to restore

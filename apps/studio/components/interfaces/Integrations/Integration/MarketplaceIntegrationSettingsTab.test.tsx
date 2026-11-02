@@ -15,10 +15,8 @@ import { addAPIMock } from '@/tests/lib/msw'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
-type OAuthAppResponse = components['schemas']['OAuthAppResponse']
-type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse']
-// Same story for permissions: the frontend `Permission` type narrows nullable wire fields, so build
-// the fixture against the raw `AccessControlPermission` shape the MSW resolver actually returns.
+type OAuthAppResponse = components['schemas']['OAuthAppResponse_Output']
+type PartnerIntegrationListResponse = components['schemas']['PartnerIntegrationListResponse_Output']
 type AccessControlPermission = components['schemas']['AccessControlPermission']
 
 // `useIntegrationDetail` resolves the integration definition from the route, the marketplace query
@@ -142,7 +140,7 @@ const mockProjectResources = ({
 
 describe('MarketplaceIntegrationSettingsTab', () => {
   describe('section visibility follows the integration definition', () => {
-    test('renders the secret API key section when the integration declares a secret key prefix', async () => {
+    test('renders the secret API key section with a Remove action and generic warning when the integration declares a secret key prefix', async () => {
       setIntegration({ secretKeyPrefix: 'custom_' })
       mockProjectResources({ apiKeys: [secretApiKey('custom_metrics_key')] })
 
@@ -150,6 +148,13 @@ describe('MarketplaceIntegrationSettingsTab', () => {
 
       expect(await screen.findByRole('heading', { name: 'Secret API key' })).toBeInTheDocument()
       expect(screen.getByText('custom_metrics_key')).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
+      // No integration-specific override, so the generic removal warning is used.
+      expect(
+        screen.getByText(
+          'Removing this key takes effect immediately and can interrupt the integration.'
+        )
+      ).toBeInTheDocument()
     })
 
     test('does not render a secret API key section when the integration declares no prefix, even if secret keys exist', async () => {
@@ -214,29 +219,6 @@ describe('MarketplaceIntegrationSettingsTab', () => {
   })
 
   describe('resource section states', () => {
-    test('a present resource shows the Connected badge and a Remove action', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(await screen.findByText('custom_key')).toBeInTheDocument()
-      expect(screen.getByRole('button', { name: 'Remove' })).toBeInTheDocument()
-    })
-
-    test('uses the generic removal warning when the integration has no override copy', async () => {
-      setIntegration({ secretKeyPrefix: 'custom_' })
-      mockProjectResources({ apiKeys: [secretApiKey('custom_key')] })
-
-      customRender(<MarketplaceIntegrationSettingsTab />)
-
-      expect(
-        await screen.findByText(
-          'Removing this key takes effect immediately and can interrupt the integration.'
-        )
-      ).toBeInTheDocument()
-    })
-
     test('uses the integration-specific removal warning override when one is defined', async () => {
       setIntegration({ id: 'grafana', name: 'Grafana' })
       mockProjectResources({ apiKeys: [secretApiKey('grafana_cloud_integration_metrics')] })

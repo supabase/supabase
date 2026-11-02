@@ -164,10 +164,10 @@ const RealtimeVisual: React.FC<Props> = ({ className }) => {
           // transition: 'transform 0.1s ease-out', // Smooth transition
         }}
       >
-        <div className="w-auto h-auto px-2.5 py-1.5 absolute left-full flex items-center justify-center gap-1 -top-6 border border-brand rounded-full bg-brand-300">
-          <div className="w-1.5 h-1.5 rounded-full bg-brand animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_infinite] pause group-hover:run" />
-          <div className="w-1.5 h-1.5 rounded-full bg-brand animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_200ms_infinite] pause group-hover:run" />
-          <div className="w-1.5 h-1.5 rounded-full bg-brand animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_400ms_infinite] pause group-hover:run" />
+        <div className="w-auto h-auto px-2.5 py-1.5 absolute left-full flex items-center justify-center gap-1 -top-6 border border-brand-default rounded-full bg-brand-300">
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-default animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_infinite] pause group-hover:run" />
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-default animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_200ms_infinite] pause group-hover:run" />
+          <div className="w-1.5 h-1.5 rounded-full bg-brand-default animate-[pulse_600ms_cubic-bezier(0.4,0,0.6,1)_400ms_infinite] pause group-hover:run" />
         </div>
       </div>
       {/* Gradient to hide animation under text to maintain readability */}

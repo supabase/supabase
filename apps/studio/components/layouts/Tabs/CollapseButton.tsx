@@ -1,5 +1,5 @@
 import { useBreakpoint } from 'common'
-import { PanelLeftClose, PanelLeftOpen } from 'lucide-react'
+import { PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { useAppStateSnapshot } from '@/state/app-state'
@@ -29,7 +29,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
         >
           {showSidebar ? (
             <>
-              <PanelLeftClose
+              <PanelLeftCloseIcon
                 size={16}
                 strokeWidth={1.5}
                 className="text-foreground-lighter hover:text-foreground-light"
@@ -38,7 +38,7 @@ export function CollapseButton({ hideTabs }: { hideTabs: boolean }) {
             </>
           ) : (
             <>
-              <PanelLeftOpen
+              <PanelLeftOpenIcon
                 size={16}
                 strokeWidth={1.5}
                 className="text-foreground-lighter hover:text-foreground-light"

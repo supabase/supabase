@@ -1,5 +1,5 @@
-import { Button } from '@ui/components/shadcn/ui/button'
 import { useMemo, useState } from 'react'
+import { Button } from 'ui'
 import {
   CommandMenu,
   CommandMenuInput,

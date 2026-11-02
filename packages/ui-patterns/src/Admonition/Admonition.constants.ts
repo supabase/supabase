@@ -2,7 +2,6 @@ import type { AdmonitionType } from './Admonition.types'
 
 export const TYPE_TO_VARIANT = {
   note: 'default',
-  tip: 'default',
   caution: 'warning',
   danger: 'destructive',
   deprecation: 'warning',
@@ -14,7 +13,6 @@ export const TYPE_TO_VARIANT = {
 
 export const TYPE_LABEL = {
   note: 'Note',
-  tip: 'Tip',
   caution: 'Caution',
   danger: 'Danger',
   deprecation: 'Deprecated',

@@ -1,8 +1,8 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import type { PGTrigger } from '@supabase/pg-meta'
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -136,7 +136,10 @@ export const TriggerSheet = ({
     resolver: zodResolver(FormSchema),
     defaultValues,
   })
-  const { function_name, function_schema } = form.watch()
+  const [function_name, function_schema] = useWatch({
+    control: form.control,
+    name: ['function_name', 'function_schema'],
+  })
 
   const { confirmOnClose, handleOpenChange, modalProps } = useConfirmOnClose({
     checkIsDirty: () => form.formState.isDirty,
@@ -429,7 +432,7 @@ export const TriggerSheet = ({
                                 onClick={() => setShowFunctionSelector(true)}
                               >
                                 <FormBoxEmpty
-                                  icon={<Terminal size={14} strokeWidth={2} />}
+                                  icon={<TerminalIcon size={14} strokeWidth={2} />}
                                   text="Choose a function to trigger"
                                 />
                               </button>
@@ -443,7 +446,7 @@ export const TriggerSheet = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <div className="flex h-6 w-6 items-center justify-center rounded-sm bg-foreground text-background focus-within:bg-foreground/10">
-                                    <Terminal size="18" strokeWidth={2} width={14} />
+                                    <TerminalIcon size="18" strokeWidth={2} width={14} />
                                   </div>
                                   <p>
                                     <span className="text-sm text-foreground-light">
@@ -453,10 +456,7 @@ export const TriggerSheet = ({
                                     <span className="text-sm text-foreground">{function_name}</span>
                                   </p>
                                 </div>
-                                <Button
-                                  variant="default"
-                                  onClick={() => setShowFunctionSelector(true)}
-                                >
+                                <Button onClick={() => setShowFunctionSelector(true)}>
                                   Change function
                                 </Button>
                               </div>
@@ -472,15 +472,15 @@ export const TriggerSheet = ({
           </Form>
 
           <SheetFooter className="shrink-0">
-            <Button
-              variant="default"
-              type="reset"
-              disabled={isCreating || isUpdating}
-              onClick={confirmOnClose}
-            >
+            <Button type="reset" disabled={isCreating || isUpdating} onClick={confirmOnClose}>
               Cancel
             </Button>
-            <Button form={formId} type="submit" loading={isCreating || isUpdating}>
+            <Button
+              variant="primary"
+              form={formId}
+              type="submit"
+              loading={isCreating || isUpdating}
+            >
               {isEditing ? 'Save' : 'Create'} trigger
             </Button>
           </SheetFooter>

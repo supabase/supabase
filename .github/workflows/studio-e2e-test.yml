@@ -38,18 +38,30 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+          # On push events paths-filter diffs against github.event.before with
+          # local git; without enough history it falls back to a git fetch that
+          # fails unauthenticated (persist-credentials is false).
+          fetch-depth: 50
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         with:
           filters: |
             studio:
               - 'packages/pg-meta/**'
+              - 'packages/ui/**'
+              - 'packages/ui-patterns/**'
               - 'apps/studio/**'
               - 'apps/ui-library/**'
               - 'apps/design-system/**'
               - 'e2e/studio/**'
               - 'pnpm-lock.yaml'
               - '.github/workflows/studio-e2e-test.yml'
+
+      # NOTE: Ports in e2e/studio/supabase/config.toml overlap the ephemeral range.
+      # Reserve them before dependency installs and image pulls.
+      - name: Reserve Supabase local ports from the ephemeral range
+        if: steps.filter.outputs.studio == 'true'
+        run: current=$(cat /proc/sys/net/ipv4/ip_local_reserved_ports); sudo sysctl -w net.ipv4.ip_local_reserved_ports="${current:+$current,}54320-54329"
 
       - uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
         if: steps.filter.outputs.studio == 'true'
@@ -68,8 +80,12 @@ jobs:
         if: steps.filter.outputs.studio == 'true'
         run: pnpm install --frozen-lockfile
 
+      # Chromium install, `supabase start` and the Studio build don't depend on
+      # each other, so run them side by side and wait before the tests.
       - name: Install Playwright Browsers
         if: steps.filter.outputs.studio == 'true'
+        id: playwright-install
+        background: true
         run: pnpm -C e2e/studio exec playwright install chromium --with-deps --only-shell
 
       - name: Set up NextJS/Turbo cache
@@ -93,7 +109,7 @@ jobs:
         with:
           role-to-assume: ${{ secrets.PROD_AWS_ROLE }}
           aws-region: us-east-1
-      - uses: docker/login-action@465a07811f14bebb1938fbed4728c6a1ff8901fc # v2.2.0
+      - uses: docker/login-action@af1e73f918a031802d376d3c8bbc3fe56130a9b0 # v4.4.0
         if: steps.filter.outputs.studio == 'true' && !github.event.pull_request.head.repo.fork
         with:
           registry: public.ecr.aws
@@ -101,27 +117,60 @@ jobs:
       - name: Pre-start diagnostics
         run: |
           docker ps -a
-          sudo ss -tlnp | grep 54322 || echo "54322 free"
+          echo "ip_local_reserved_ports=$(cat /proc/sys/net/ipv4/ip_local_reserved_ports)"
+          echo "ip_local_port_range=$(cat /proc/sys/net/ipv4/ip_local_port_range)"
+          sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
 
       - name: Start supabase
         if: steps.filter.outputs.studio == 'true'
-        run: SKIP_ASSET_UPLOAD=1 pnpm run e2e:setup:cli
-
-      - name: Failure diagnostics
-        if: failure()
+        id: supabase
+        background: true
         run: |
-          docker ps -a
-          sudo ss -tlnp | grep 54322 || echo "54322 not listening"
-          docker logs $(docker ps -aq) 2>&1 || true
+          pnpm exec supabase stop --all --no-backup --workdir ./e2e/studio || true
+          if ! pnpm exec supabase start --exclude studio,mailpit --workdir ./e2e/studio; then
+            sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
+            exit 1
+          fi
 
       - name: Build studio
         if: steps.filter.outputs.studio == 'true'
+        # The build runs before `supabase status` can report keys. It only
+        # inlines NEXT_PUBLIC_* vars, and the only one derived from status is
+        # the API URL, fixed by e2e/studio/supabase/config.toml. So build
+        # against that URL and check it against the real value once supabase is up.
+        #
         # `MODE=test` so the Vite build (TanStack) loads `.env.test` for env
         # resolution; Next ignores it but reads `NODE_ENV=test` for the same
         # purpose. Vite's `vite.config.ts` overrides the bundle NODE_ENV to
         # 'production' regardless of input, mirroring Next's build behaviour
         # so vitest-only constants (e.g. `API_URL`) don't bleed in here.
-        run: SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+        run: |
+          echo '{"API_URL":"http://127.0.0.1:54321"}' > keys.json
+          node scripts/generateLocalEnv.js
+          grep '^NEXT_PUBLIC_' apps/studio/.env.test | sort > "$RUNNER_TEMP/build-public-env"
+          SKIP_ASSET_UPLOAD=1 NODE_ENV=test MODE=test NODE_OPTIONS="--max-old-space-size=4096" pnpm run build:studio
+
+      - name: Wait for supabase and Playwright browsers
+        wait: [supabase, playwright-install]
+
+      - name: Failure diagnostics
+        if: failure()
+        run: |
+          docker ps -a
+          sudo ss -tanp '( sport >= :54320 and sport <= :54329 )' || true
+          for id in $(docker ps -aq); do
+            echo "::group::$(docker inspect -f '{{.Name}}' "$id")"
+            docker logs --tail 300 "$id" 2>&1 || true
+            echo "::endgroup::"
+          done
+
+      - name: Write runtime env
+        if: steps.filter.outputs.studio == 'true'
+        run: |
+          pnpm exec supabase status --output json --workdir ./e2e/studio > keys.json
+          node scripts/generateLocalEnv.js
+          # Fail if the build inlined NEXT_PUBLIC_* values that differ from the real ones.
+          diff "$RUNNER_TEMP/build-public-env" <(grep '^NEXT_PUBLIC_' apps/studio/.env.test | sort)
 
       - name: 🚀 Run Playwright tests against local studio build
         if: steps.filter.outputs.studio == 'true'

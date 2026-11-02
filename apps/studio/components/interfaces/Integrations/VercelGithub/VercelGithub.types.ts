@@ -33,4 +33,6 @@ export interface ProjectLinkerProps {
   defaultForeignProjectId?: string
   mode: 'Vercel' | 'GitHub'
   variant?: 'default' | 'interstitial'
+  actionError?: string
+  onSelectionChange?: () => void
 }

@@ -9,8 +9,8 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type OrganizationProjectsResponse = components['schemas']['OrganizationProjectsResponse_Output']
 
 const PROFILE_CONTEXT: ProfileContextType = {
   profile: {

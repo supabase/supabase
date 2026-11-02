@@ -1,5 +1,5 @@
 import { useEffect } from 'react'
-import { ControllerRenderProps, UseFormReturn } from 'react-hook-form'
+import { ControllerRenderProps, UseFormReturn, useWatch } from 'react-hook-form'
 import type { CloudProvider } from 'shared-data'
 import {
   Badge,
@@ -15,23 +15,32 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
 import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
-import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-interface PostgresVersionDetails {
-  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
-  releaseChannel?: ReleaseChannel
-}
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
   dbRegion: string
+  disabled?: boolean
   organizationSlug?: string
+  highAvailability?: boolean
   field: ControllerRenderProps<any, 'postgresVersionSelection'>
   form: UseFormReturn<any>
+  /**
+   * Owned by the form owner (not this component) so the last valid selection
+   * survives this selector unmounting, e.g. when its collapsible section
+   * closes. Create it with useRef('') alongside the form.
+   */
+  lastValidSelectionRef: { current: string }
+  /**
+   * Used when creating a project. If true, it will filter all versions to only OrioleDB versions (or exclude them if false).
+   *
+   * Defaults to undefined, which is not filtering.
+   */
+  useOrioleDbForCreate?: boolean
   type?: 'create' | 'unpause'
   layout?: 'vertical' | 'horizontal'
   label?: string
+  description?: string
 }
 
 const formatValue = ({
@@ -44,24 +53,20 @@ const formatValue = ({
   return `${postgres_engine}|${release_channel}`
 }
 
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
-  if (!value) {
-    return { postgresEngine: undefined, releaseChannel: undefined }
-  }
-
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
-}
-
 export const PostgresVersionSelector = ({
   cloudProvider,
   dbRegion,
+  disabled = false,
   organizationSlug,
+  highAvailability,
   field,
   form,
+  lastValidSelectionRef,
   type = 'create',
+  useOrioleDbForCreate = undefined,
   layout = 'horizontal',
   label = 'Postgres version',
+  description,
 }: PostgresVersionSelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -76,8 +81,21 @@ export const PostgresVersionSelector = ({
       cloudProvider,
       dbRegion: dbRegionExact,
       organizationSlug,
+      highAvailability,
     },
-    { enabled: type === 'create' }
+    {
+      enabled: type === 'create',
+      select: (data) => {
+        if (useOrioleDbForCreate === undefined) return data
+        return {
+          available_versions: data?.available_versions.filter((version) =>
+            useOrioleDbForCreate
+              ? version.postgres_engine.endsWith('oriole')
+              : !version.postgres_engine.endsWith('oriole')
+          ),
+        }
+      },
+    }
   )
 
   const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
@@ -91,22 +109,45 @@ export const PostgresVersionSelector = ({
       ? (createVersions?.available_versions ?? [])
       : (unpauseVersions?.available_versions ?? [])
   const availableVersions = versions.sort((a, b) => a.version.localeCompare(b.version)).reverse()
-  const { postgresVersionSelection } = form.watch()
+  const postgresVersionSelection = useWatch({
+    control: form.control,
+    name: 'postgresVersionSelection',
+  })
 
+  // react-hook-form intermittently drops this field's value when its Controller
+  // remounts, so a one-shot "set the default once versions load" effect leaves
+  // the select stuck empty. Instead this effect re-asserts off the watched value:
+  // a selection present in the current list is kept (and remembered in the
+  // owner-held lastValidSelectionRef), and when the value is missing or cleared
+  // out from under us it restores the last valid selection, falling back to the
+  // GA default.
   useEffect(() => {
-    if (availableVersions.length > 0) {
-      const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
-      const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
-      form.setValue('postgresVersionSelection', defaultValue)
+    if (availableVersions.length === 0) return
+    const isSelectionAvailable = (selection: string) =>
+      availableVersions.some((version) => formatValue(version) === selection)
+
+    if (postgresVersionSelection && isSelectionAvailable(postgresVersionSelection)) {
+      lastValidSelectionRef.current = postgresVersionSelection
+      return
     }
-  }, [isSuccess, availableVersions, form])
+
+    if (isSelectionAvailable(lastValidSelectionRef.current)) {
+      form.setValue('postgresVersionSelection', lastValidSelectionRef.current)
+      return
+    }
+
+    const gaVersion = availableVersions.find((x) => x.release_channel === 'ga')
+    const defaultValue = gaVersion ? formatValue(gaVersion) : formatValue(availableVersions[0])
+    form.setValue('postgresVersionSelection', defaultValue)
+  }, [isSuccess, availableVersions, postgresVersionSelection, lastValidSelectionRef, form])
 
   return (
-    <FormItemLayout id={field.name} label={label} layout={layout}>
+    <FormItemLayout id={field.name} label={label} layout={layout} description={description}>
       <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}
         disabled={
+          disabled ||
           availableVersions.length === 0 ||
           (type === 'create' && isLoadingProjectCreateVersions) ||
           (type === 'unpause' && isLoadingProjectUnpauseVersions)

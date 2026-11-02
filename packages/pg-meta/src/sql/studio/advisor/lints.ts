@@ -9,7 +9,7 @@ exception when others then
   -- not a superuser or extension not installed, skip silently
 end
 $$;
-${!!exposedSchemas ? safeSql`set local pgrst.db_schemas = ${literal(exposedSchemas)};` : safeSql``}
+${exposedSchemas !== undefined ? safeSql`set local pgrst.db_schemas = ${literal(exposedSchemas)};` : safeSql``}
 -- source: dashboard
 -- user: self host
 -- date: ${new Date().toISOString() as SafeSqlFragment}

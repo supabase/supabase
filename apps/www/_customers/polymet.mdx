@@ -1,0 +1,95 @@
+---
+name: Polymet
+title: How Polymet gives every user a real backend without a backend team
+description: Polymet is an AI product designer that turns a prompt or an image into working code. A three-person team runs the backend for tens of thousands of user projects a month, on Supabase, without hiring a single backend engineer.
+author: wendie_cheung
+author_title: Product Marketing
+logo: /images/customers/logos/on-light/polymet.png
+logo_inverse: /images/customers/logos/on-dark/polymet.png
+tags:
+  - supabase
+date: '2026-09-23'
+company_url: https://polymet.ai
+stats: []
+misc:
+  [
+    {
+      label: 'Use case',
+      text: 'Auto-provisioned Postgres backends for an AI-generated app builder',
+    },
+    { label: 'Solutions', text: 'Database, Storage, Edge Functions, Management API' },
+  ]
+about: 'Polymet is an AI product designer that turns a prompt or an image into working code, provisioning a real Supabase backend for any project that needs one, tens of thousands of times a month.'
+# "healthcare" | "fintech" | "ecommerce" | "education" | "gaming" | "media" | "real-estate" | "saas" | "social" | "analytics" | "ai" | "developer-tools"
+industry: ['ai', 'developer-tools']
+# "startup" | "enterprise" | "indie_dev"
+company_size: 'startup'
+# "Asia" | "Europe" | "North America" | "South America" | "Africa" | "Oceania"
+region: 'Europe'
+# "database" | "auth" | "storage" | "realtime" | "functions" | "vector"
+supabase_products: ['database', 'storage', 'functions']
+---
+
+> The database part was something we didn't want to build. We needed a provider that gave us backend capabilities: edge functions, secret management, the whole combo. Now, whatever we want to build, we can build it.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_
+
+Polymet is an AI product designer. A user can describe an app in a prompt, and Polymet designs it and writes the code. Its users range from product managers at large companies to founders at early stage startups to engineers at growing companies, along with a growing group of self-styled vibe coders who build complete, full stack applications.
+
+Many of those projects need a real backend, not just mock data. Polymet provisions one on Supabase for any project that needs it, tens of thousands of times a month, with a team of three people.
+
+## From mock data to a real backend
+
+Polymet started as a front end tool. It generated code from a prompt or an image, but it had no way to store real data. Early on, that was enough when users worked with mock data files. Polymet's users quickly asked for more, wanting to test a full application workflow, not just a prototype, to see their applications work end to end before they shipped.
+
+To provide users with the ability to input real data to test workflows of their apps, Polymet needed to give every user a real backend including database, storage, and a way to run backend code, at a scale that kept climbing every month.
+
+## Why Polymet chose Supabase
+
+Polymet looked at several ways to add a backend, including Turso and Drizzle, and considered building the infrastructure itself. Supabase's ability to scale to zero was the deciding factor. Polymet expected to provision a large number of databases for its users, most of which would sit idle most of the time, and it needed a database that could scale down automatically instead of running, and costing money, around the clock.
+
+Polymet also had firsthand proof that Supabase worked before it ever offered Supabase to a user. Polymet's own product runs on Supabase. Its tables and its database are a Supabase database, the same product it hands to its users.
+
+> We are customers of Supabase ourselves. We know it works and we love it. It made sense for us to provision Supabase to our users.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_
+
+## How Polymet runs on Supabase
+
+When a Polymet user submits a prompt, Polymet's agent asks clarifying questions to figure out whether the app needs a real backend or just a prototype. If it does, Polymet creates a Supabase project for that user through the Supabase Management API.
+
+Polymet built its own SDK on top of Supabase's OpenAPI spec to manage those projects, and embeds Supabase's platform kit directly in its product as a backend tab. Everything outside the backend, like Polymet's build system, its Git integration, and its hosting and domain proxying, is built in house. Everything inside the backend, the database, storage, and edge functions, runs on Supabase.
+
+That split matters at Polymet's scale. Users create and abandon projects constantly, but because Supabase scales databases to zero automatically, no one at Polymet has to spin one up or down by hand. The team built its own admin tooling on top of the Supabase SDK to watch for unusual usage across live projects, while Supabase handles the database lifecycle itself.
+
+Getting there took surprisingly little hand-holding. Polymet built almost that entire integration from Supabase's documentation alone.
+
+> We built almost the whole integration from the docs alone. The one thing that wasn't documented was a one-line change for scale to zero, and the Supabase support team were on hand and helped us get it right.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_
+
+Day to day, though, it's a simpler feature Yus's team leans on most: the table editor, especially for support.
+
+> The table editor is great, especially being able to follow a reference from one row to another. If a project links to a user, I can click through and see the data right there.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_
+
+Yus is also a heavy user of the Supabase MCP server for his own work, querying Polymet's internal databases to verify what Polymet's own AI agents build, with deeper MCP integration inside the product itself on the roadmap.
+
+## Provisioning tens of thousands of backends without a backend team
+
+Polymet now provisions thousands of databases a month for more than 30,000 teams building on Polymet, and runs that entire backend with a three-person team and no dedicated backend hire. Every database scales to zero automatically, so none of them cost Polymet money while idle or need a person to manage their lifecycle.
+
+> If we didn't use something like Supabase, we would need a whole team just to build and run a backend infrastructure. You should only build something yourself if it's core to your business. The database wasn't core to ours, so we found the best people already doing it.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_
+
+## What's next: staying focused
+
+Polymet is now focused on building towards its next public launch. Its success and growth so far has come organically, from people finding Polymet through YouTube and X, and Yus expects that pattern to continue after launch.
+
+Polymet plans to keep building on Supabase rather than look elsewhere, with deeper integration into the Supabase MCP server on the roadmap. Yus's advice to another founder scaling a lean team is the same lesson that shaped Polymet's own backend decision.
+
+> Keep focused. Don't spend time on things that aren't going to add value to you. Be brutal on what you cut down.
+>
+> _— Yus Hilmi, Founder and CEO, Polymet_

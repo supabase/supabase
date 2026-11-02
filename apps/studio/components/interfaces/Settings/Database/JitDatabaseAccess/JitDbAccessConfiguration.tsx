@@ -1,6 +1,6 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,6 +42,7 @@ import {
 import { JitDbAccessDeleteDialog } from './JitDbAccessDeleteDialog'
 import { JitDbAccessRuleSheet } from './JitDbAccessRuleSheet'
 import { JitDbAccessRulesTable } from './JitDbAccessRulesTable'
+import { SSLEnforcementConfirmDialog } from '@/components/interfaces/Settings/Database/SSLEnforcementConfirmDialog'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { AlertError } from '@/components/ui/AlertError'
@@ -55,7 +56,8 @@ import { useJitDbAccessRevokeMutation } from '@/data/jit-db-access/jit-db-access
 import { useJitDbAccessUpdateMutation } from '@/data/jit-db-access/jit-db-access-update-mutation'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useProjectMembersQuery } from '@/data/projects/project-members-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useSSLEnforcementUpdateMutation } from '@/data/ssl-enforcement/ssl-enforcement-update-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -102,10 +104,8 @@ export const JitDbAccessConfiguration = () => {
     connectionString: project?.connectionString,
   })
 
-  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateJitDbAccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { mutateAsync: updateJitDbAccess, isPending: isUpdatingJitDbAccess } =
@@ -125,6 +125,21 @@ export const JitDbAccessConfiguration = () => {
       },
       onError: () => {},
     })
+
+  const { mutateAsync: enableSSLEnforcement, isPending: isEnablingSSLEnforcement } =
+    useSSLEnforcementUpdateMutation({
+      onSuccess: () => {
+        toast.success('Successfully enabled SSL enforcement')
+      },
+      onError: (error) => {
+        toast.error(`Failed to enable SSL enforcement: ${error.message}`)
+      },
+    })
+
+  const handleEnableSSLEnforcement = async () => {
+    if (!ref) return console.error('Project ref is required')
+    await enableSSLEnforcement({ projectRef: ref, requestedConfig: { database: true } })
+  }
 
   const { mutateAsync: revokeUserAccess, isPending: isRevokingAccess } =
     useJitDbAccessRevokeMutation({
@@ -293,7 +308,7 @@ export const JitDbAccessConfiguration = () => {
 
   const projectReference = ref ? (
     <>
-      This project <code className="text-code-inline">{ref}</code>
+      This project <code>{ref}</code>
     </>
   ) : (
     'This project'
@@ -301,19 +316,15 @@ export const JitDbAccessConfiguration = () => {
   const unavailableTitle =
     unavailableReason === 'postgres_upgrade_required'
       ? 'Postgres upgrade required'
-      : unavailableReason === 'manual_migration_required'
-        ? 'Migration required'
-        : unavailableReason === 'ssl_enforcement_required'
-          ? 'SSL enforcement required'
-          : 'Temporary access unavailable'
+      : unavailableReason === 'ssl_enforcement_required'
+        ? 'SSL enforcement required'
+        : 'Temporary access unavailable'
   const unavailableDescription =
     unavailableReason === 'postgres_upgrade_required'
       ? 'must be upgraded to Postgres 17 or later before temporary access can be enabled.'
-      : unavailableReason === 'manual_migration_required'
-        ? 'must be migrated before temporary access can be enabled. Contact support to migrate this project.'
-        : unavailableReason === 'ssl_enforcement_required'
-          ? 'must have SSL enforcement enabled before temporary access can be enabled.'
-          : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
+      : unavailableReason === 'ssl_enforcement_required'
+        ? 'must have SSL enforcement enabled before temporary access can be enabled.'
+        : 'This feature is currently unavailable for this project. Contact support if you need help enabling it.'
 
   useEffect(() => {
     if (!isLoadingConfiguration && jitDbAccessConfiguration) {
@@ -369,27 +380,30 @@ export const JitDbAccessConfiguration = () => {
               layout="responsive"
               title={unavailableTitle}
               description={
-                unavailableReason === 'temporarily_unavailable' ? (
-                  unavailableDescription
-                ) : (
+                unavailableReason === 'postgres_upgrade_required' ||
+                unavailableReason === 'ssl_enforcement_required' ? (
                   <>
                     {projectReference} {unavailableDescription}
                   </>
+                ) : (
+                  unavailableDescription
                 )
               }
               actions={
                 unavailableReason === 'postgres_upgrade_required' && ref ? (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <Link href={getServiceVersionsPath(ref)}>Upgrade Postgres</Link>
                   </Button>
                 ) : unavailableReason === 'ssl_enforcement_required' && ref ? (
-                  <Button variant="default" asChild>
-                    <Link href={`/project/${ref}/settings/database#ssl-configuration`}>
-                      Enable SSL enforcement
-                    </Link>
-                  </Button>
+                  <SSLEnforcementConfirmDialog
+                    isTargetEnforced
+                    isSubmitting={isEnablingSSLEnforcement}
+                    onConfirm={handleEnableSSLEnforcement}
+                  >
+                    <Button loading={isEnablingSSLEnforcement}>Enable SSL enforcement</Button>
+                  </SSLEnforcementConfirmDialog>
                 ) : (
-                  <Button variant="default" asChild>
+                  <Button asChild>
                     <SupportLink
                       queryParams={{
                         category: SupportCategories.PROBLEM,
@@ -415,7 +429,7 @@ export const JitDbAccessConfiguration = () => {
                 >
                   <div className="flex w-fit shrink-0 items-center justify-end gap-2">
                     {(isLoadingConfiguration || isUpdatingJitDbAccess) && (
-                      <Loader2
+                      <Loader2Icon
                         className="animate-spin text-foreground-muted/50"
                         strokeWidth={2}
                         size={16}

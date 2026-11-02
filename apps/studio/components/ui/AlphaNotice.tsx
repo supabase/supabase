@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
 import { Badge, Button } from 'ui'
@@ -21,15 +21,10 @@ export const AlphaNotice = ({
   return (
     <Admonition
       showIcon={false}
-      type="tip"
+      type="note"
       layout="horizontal"
       actions={
-        <Button
-          asChild
-          variant="default"
-          icon={<ExternalLink strokeWidth={1.5} />}
-          className="mt-2"
-        >
+        <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
           <Link target="_blank" rel="noopener noreferrer" href={feedbackUrl}>
             Share feedback
           </Link>

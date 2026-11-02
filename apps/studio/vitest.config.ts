@@ -1,7 +1,6 @@
 import { resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import react from '@vitejs/plugin-react'
-import tsconfigPaths from 'vite-tsconfig-paths'
 import { configDefaults, defineConfig } from 'vitest/config'
 
 // Some tools like Vitest VSCode extensions, have trouble with resolving relative paths,
@@ -9,32 +8,52 @@ import { configDefaults, defineConfig } from 'vitest/config'
 // `setupFiles` live next to the test file itself. This forces them to always resolve correctly.
 const dirname = fileURLToPath(new URL('.', import.meta.url))
 
+const IS_CI = !!process.env.CI
+
 export default defineConfig({
-  plugins: [
-    react(),
-    tsconfigPaths({
-      projects: ['.'],
-    }),
-  ],
+  plugins: [react()],
   resolve: {
+    tsconfigPaths: true,
     alias: {
       '@ui': resolve(__dirname, './../../packages/ui/src'),
     },
   },
   test: {
     globals: true,
-    environment: 'jsdom', // TODO(kamil): This should be set per test via header in .tsx files only
+    // Retry flaky tests in CI only; failures locally should surface immediately.
+    retry: IS_CI ? 2 : 0,
+    // The DOM setup files (`dom.ts`, `radix.js`) no-op when there's no jsdom environment.
     setupFiles: [
-      resolve(dirname, './tests/setup/polyfills.ts'),
+      resolve(dirname, './tests/setup/dom.ts'),
       resolve(dirname, './tests/vitestSetup.ts'),
       resolve(dirname, './tests/setup/radix.js'),
     ],
     // Don't look for tests in the nextjs output directory
-    exclude: [
-      ...configDefaults.exclude,
-      `.next/*`,
-      'tests/features/logs/logs-query.test.tsx',
-      'tests/features/reports/storage-report.test.tsx',
+    exclude: [...configDefaults.exclude, `.next/*`],
+    // jsdom costs ~1s of setup per file, so pure-logic `.test.ts` files run in node.
+    // A `.test.ts` file that needs the DOM (e.g. `renderHook`) opts in with a
+    // `// @vitest-environment jsdom` docblock at the top of the file.
+    projects: [
+      { extends: true, test: { name: 'node', environment: 'node', include: ['**/*.test.ts'] } },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['**/*.test.tsx'],
+          exclude: [...configDefaults.exclude, '.next/*', '**/*.platform.test.tsx'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom-platform',
+          environment: 'jsdom',
+          include: ['**/*.platform.test.tsx'],
+          exclude: [...configDefaults.exclude, '.next/*'],
+          env: { NEXT_PUBLIC_IS_PLATFORM: 'true' },
+        },
+      },
     ],
     reporters: [['default']],
     coverage: {

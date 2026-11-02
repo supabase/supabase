@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,12 +21,13 @@ import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfi
 import { ProjectAccessSection } from './ProjectAccessSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const General = () => {
   const { ref } = useParams()
@@ -34,23 +35,29 @@ export const General = () => {
   const isBranch = Boolean(project?.parent_project_ref)
   const entityLabel = isBranch ? 'Branch' : 'Project'
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: project?.parent_project_ref },
-    { enabled: isBranch }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: project?.parent_project_ref,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({
+      projectRef: project?.parent_project_ref,
+      grant: branchesGrant.grant,
+    }),
+    enabled: isBranch,
+  })
   const branch = branches?.find((x) => x.project_ref === ref)
   const projectName = isBranch ? branch?.name : project?.name
 
-  const { can: canUpdateProject } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-    resource: {
-      project_id: project?.id,
-    },
-  })
+  const { can: canUpdateProject } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.ADMIN_WRITE)
 
   const { mutate: updateProject, isPending: isUpdating } = useProjectUpdateMutation()
 
   const formSchema = z.object({
-    name: z.string().trim().min(3, 'Project name must be at least 3 characters long'),
+    name: z
+      .string()
+      .trim()
+      .min(3, 'Project name must be at least 3 characters long')
+      .max(256, 'Project name must be no longer than 256 characters'),
   })
 
   const defaultValues = { name: projectName ?? '' }
@@ -118,9 +125,8 @@ export const General = () => {
               title="Local development with the Supabase CLI"
               description={
                 <p>
-                  Project settings are configured in{' '}
-                  <code className="text-code-inline">supabase/config.toml</code> — applied on{' '}
-                  <code className="text-code-inline">supabase start</code>.
+                  Project settings are configured in <code>supabase/config.toml</code> — applied on{' '}
+                  <code>supabase start</code>.
                 </p>
               }
               actions={<DocsButton href={`${DOCS_URL}/guides/local-development`} />}
@@ -240,7 +246,6 @@ export const General = () => {
                   <CardFooter className="justify-end space-x-2">
                     {form.formState.isDirty && (
                       <Button
-                        variant="default"
                         type="button"
                         disabled={isUpdating}
                         onClick={() => form.reset({ name: project?.name ?? '' })}

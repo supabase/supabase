@@ -1,0 +1,42 @@
+---
+import { getCollection, render } from 'astro:content'
+import { Admonition } from 'ui-patterns/Admonition'
+
+import ArticleLayout from '../../layouts/ArticleLayout.astro'
+import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL, techArticleSchema } from '../../lib/json-ld'
+import { getEntryMetadataBySlug } from '../../lib/troubleshooting-db'
+
+export async function getStaticPaths() {
+	const troubleshooting = await getCollection('troubleshooting')
+
+	// github_url and date_updated live in the DB, not the fetched frontmatter —
+	// looked up here (build time; kb is fully static, no SSR) rather than baked
+	// into the fetched files.
+	const metadataBySlug = await getEntryMetadataBySlug(troubleshooting.map((entry) => entry.id))
+
+	return troubleshooting.map((entry) => {
+		const metadata = metadataBySlug.get(entry.id)
+		return {
+			params: { slug: entry.id },
+			props: { entry, githubUrl: metadata?.githubUrl, lastEdited: metadata?.dateUpdated },
+		}
+	})
+}
+
+const { entry, githubUrl, lastEdited } = Astro.props
+const { title, description, topics } = entry.data
+const { Content } = await render(entry)
+
+const url = canonicalUrl(Astro.url.pathname)
+const jsonLd = [
+	techArticleSchema({ url, headline: title, description, dateModified: lastEdited }),
+	breadcrumbListSchema([
+		{ name: 'Knowledge Base', url: KB_BASE_URL },
+		{ name: title, url },
+	]),
+]
+---
+
+<ArticleLayout title={title} description={description} topics={topics} github_url={githubUrl} lastEdited={lastEdited} jsonLd={jsonLd}>
+	<Content components={{ Admonition }} />
+</ArticleLayout>

@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import type { CalculatedColumn } from 'react-data-grid'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -38,7 +38,7 @@ const AddColumnHeader = () => {
             block
             variant="text"
             onClick={tableEditorSnap.onAddColumn}
-            icon={<Plus />}
+            icon={<PlusIcon />}
             aria-label="Add new column"
           />
         </TooltipTrigger>

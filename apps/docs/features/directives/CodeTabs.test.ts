@@ -6,7 +6,7 @@ import { codeTabsRemark } from './CodeTabs'
 import { fromDocsMarkdown } from './utils.server'
 
 describe('CodeTabs', () => {
-  it('should wrap code blocks in Tabs and TabPanel', () => {
+  it('should wrap code blocks in CodeTabs and TabPanel', () => {
     const mdx = `
 <$CodeTabs>
 
@@ -26,7 +26,7 @@ console.log('Hello, world!');
 
     expect(output).toEqual(
       `
-<Tabs listClassNames="flex-nowrap overflow-x-auto -mb-6">
+<CodeTabs>
   <TabPanel id="a.js" label="a.js">
     \`\`\`js name=a.js
     console.log('Hello, world!');
@@ -38,7 +38,7 @@ console.log('Hello, world!');
     console.log('Hello, world!');
     \`\`\`
   </TabPanel>
-</Tabs>
+</CodeTabs>
 `.trimStart()
     )
   })

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -30,6 +31,7 @@ export async function revokeTablePrivileges({
     connectionString,
     sql,
     queryKey: ['table-privileges', 'revoke'],
+    grant: unguarded.migrating,
   })
   return result
 }

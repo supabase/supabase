@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -19,7 +20,13 @@ async function fetchReplicationPipelines(
   })
 
   if (error) handleError(error)
-  return data
+  return {
+    ...data,
+    pipelines: data.pipelines.map((pipeline) => ({
+      ...pipeline,
+      id: pipelineIdSchema.parse(pipeline.id),
+    })),
+  }
 }
 
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>

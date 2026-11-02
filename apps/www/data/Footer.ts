@@ -27,6 +27,10 @@ const footerData = [
         url: '/edge-functions',
       },
       {
+        text: 'Compute',
+        url: '/compute',
+      },
+      {
         text: 'Realtime',
         url: '/realtime',
       },
@@ -97,16 +101,24 @@ const footerData = [
         url: '/partners/catalog',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Knowledge Base',
+        url: '/kb',
+      },
+      {
+        text: 'FAQs',
+        url: '/kb/topics/faqs',
+      },
+      {
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',
         url: '/security',
       },
       {
-        text: 'DPA',
-        url: '/legal/dpa',
+        text: 'Regions',
+        url: '/regions',
       },
       {
         text: 'SOC2',
@@ -126,8 +138,8 @@ const footerData = [
         url: '/docs',
       },
       {
-        text: 'Supabase UI',
-        url: 'https://supabase.com/ui',
+        text: 'Supabase Library',
+        url: 'https://supabase.com/library',
       },
       {
         text: 'Changelog',

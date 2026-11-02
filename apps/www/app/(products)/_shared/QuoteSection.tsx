@@ -24,7 +24,7 @@ export function QuoteSection({ quote, highlight, author }: QuoteSectionProps) {
               {highlight && (
                 <>
                   {' '}
-                  <span className="text-brand-link">{highlight}</span>
+                  <span className="text-primary">{highlight}</span>
                 </>
               )}
             </p>

@@ -1,5 +1,5 @@
 import { noop } from 'lodash'
-import { Edit, ExternalLink, FlaskConical, Grid } from 'lucide-react'
+import { EditIcon, ExternalLinkIcon, FlaskConicalIcon, GridIcon } from 'lucide-react'
 import { Alert, AlertDescription, AlertTitle, Button, DialogSection } from 'ui'
 
 import CardButton from '@/components/ui/CardButton'
@@ -36,7 +36,7 @@ export const PolicySelection = ({
                   rounded-sm bg-foreground text-background
                 "
                 >
-                  <Grid size={14} strokeWidth={2} />
+                  <GridIcon size={14} strokeWidth={2} />
                 </div>
               </div>
             }
@@ -54,7 +54,7 @@ export const PolicySelection = ({
                   rounded-sm bg-foreground text-background
                 "
                 >
-                  <Edit size={14} strokeWidth={2} />
+                  <EditIcon size={14} strokeWidth={2} />
                 </div>
               </div>
             }
@@ -65,16 +65,14 @@ export const PolicySelection = ({
 
       {showAssistantPreview && onToggleFeaturePreviewModal !== undefined && (
         <Alert>
-          <FlaskConical />
+          <FlaskConicalIcon />
           <AlertTitle>Try the new Supabase Assistant for RLS policies</AlertTitle>
           <AlertDescription>
             Create RLS policies for your tables with the help of AI
           </AlertDescription>
           <div className="flex items-center gap-x-2 mt-3">
-            <Button variant="default" onClick={onToggleFeaturePreviewModal}>
-              Toggle feature preview
-            </Button>
-            <Button asChild variant="default" icon={<ExternalLink strokeWidth={1.5} />}>
+            <Button onClick={onToggleFeaturePreviewModal}>Toggle feature preview</Button>
+            <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
               <a
                 href="https://supabase.com/blog/studio-introducing-assistant#introducing-the-supabase-assistant"
                 target="_blank"

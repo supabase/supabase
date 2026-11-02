@@ -18,7 +18,8 @@ const HomeLayout = ({ children }: PropsWithChildren) => {
               lang="bash"
               lineNumbers={false}
               hideControls
-              className="!-mx-4 !-my-3.5 !border-0 !rounded-none !bg-transparent [&_.code-content]:!px-4 [&_.code-content]:!py-3.5"
+              compact
+              className="-mx-4 w-auto bg-transparent [&_.code-content]:px-4 [&_.code-content]:py-0"
             />
           }
         />

@@ -12,6 +12,11 @@ export const SqlEditorManualSavePreview = () => {
           <li>Let you save with Cmd+S at any time</li>
         </ul>
       </div>
+      <p className="text-sm text-foreground-light">
+        Manual saving is becoming the default for the SQL Editor. This preview can no longer be
+        turned off. To opt into manual saving before the change reaches your account, enable this
+        preview.
+      </p>
     </div>
   )
 }

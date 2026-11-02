@@ -4,7 +4,9 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
+import { reportEmptyBodyResponse } from './empty-body-diagnostics'
 import { ERROR_PATTERNS } from './error-patterns'
+import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 import { ResponseError } from '@/types'
@@ -73,8 +75,18 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
  * short-circuits regardless of transport. Non-empty responses are returned untouched.
  */
-export async function normalizeEmptyBodyResponse(response: Response): Promise<Response> {
-  if (response.status === 204 || response.headers.has('Content-Length')) {
+export async function normalizeEmptyBodyResponse(
+  response: Response,
+  source?: { request: Request; schemaPath: string }
+): Promise<Response> {
+  if (response.status === 204) {
+    return response
+  }
+
+  if (response.headers.has('Content-Length')) {
+    if (source && response.headers.get('Content-Length') === '0') {
+      void reportEmptyBodyResponse({ ...source, response })
+    }
     return response
   }
 
@@ -82,6 +94,8 @@ export async function normalizeEmptyBodyResponse(response: Response): Promise<Re
   if (body.length > 0) {
     return response
   }
+
+  if (source) void reportEmptyBodyResponse({ ...source, response })
 
   const headers = new Headers(response.headers)
   headers.set('Content-Length', '0')
@@ -125,9 +139,9 @@ client.use(
   },
   {
     // Middleware to format errors
-    async onResponse({ request, response }) {
+    async onResponse({ request, response, schemaPath }) {
       if (response.ok) {
-        return normalizeEmptyBodyResponse(response)
+        return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
       // handle errors
@@ -161,16 +175,14 @@ client.use(
   }
 )
 
-export const {
-  GET: get,
-  POST: post,
-  PUT: put,
-  PATCH: patch,
-  DELETE: del,
-  HEAD: head,
-  TRACE: trace,
-  OPTIONS: options,
-} = client
+export const get = guardMethod('get', client.GET) as GuardedClientMethod<paths, 'get'>
+export const post = guardMethod('post', client.POST) as GuardedClientMethod<paths, 'post'>
+export const put = guardMethod('put', client.PUT) as GuardedClientMethod<paths, 'put'>
+export const patch = guardMethod('patch', client.PATCH) as GuardedClientMethod<paths, 'patch'>
+export const del = guardMethod('delete', client.DELETE) as GuardedClientMethod<paths, 'delete'>
+export const { HEAD: head, TRACE: trace, OPTIONS: options } = client
+
+export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean

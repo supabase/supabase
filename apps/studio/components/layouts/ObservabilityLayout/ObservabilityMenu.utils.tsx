@@ -45,10 +45,9 @@ const usePreservedQueryParams = () => {
 export const useGenerateObservabilityMenu = () => {
   const { ref } = useParams()
   const preservedQueryParams = usePreservedQueryParams()
+  const { isSupamonitorEnabled } = useSupamonitorStatus()
 
   const showOverview = useFlag('observabilityOverview')
-  const topForPostgres = useFlag('topForPostgres')
-  const { isSupamonitorEnabled } = useSupamonitorStatus()
   const storageSupported = useIsFeatureEnabled('project_storage:all')
 
   const baseUrl = `/project/${ref}/observability`
@@ -91,16 +90,12 @@ export const useGenerateObservabilityMenu = () => {
           },
         ]
       : []),
-    ...(topForPostgres
-      ? [
-          {
-            name: 'Database Connections',
-            key: 'connections',
-            url: `${baseUrl}/connections`,
-            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_API_GATEWAY,
-          },
-        ]
-      : []),
+    {
+      name: 'Database Connections',
+      key: 'connections',
+      url: `${baseUrl}/connections`,
+      shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_CONNECTIONS,
+    },
   ]
 
   const productItems: ObservabilityMenuItem[] = [

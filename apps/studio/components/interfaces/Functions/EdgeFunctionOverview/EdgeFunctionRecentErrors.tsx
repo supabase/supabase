@@ -1,19 +1,7 @@
-import { BookOpen, Check, ExternalLink, Eye } from 'lucide-react'
+import { CheckIcon, ExternalLinkIcon, EyeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Fragment, useMemo } from 'react'
-import {
-  Badge,
-  Button,
-  Card,
-  cn,
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui'
-import { PageContainer } from 'ui-patterns/PageContainer'
+import { useMemo } from 'react'
+import { Button, Card } from 'ui'
 import {
   PageSection,
   PageSectionAside,
@@ -22,33 +10,32 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
-  buildGroupAssistantPrompt,
-  buildTroubleshootingDocsUrl,
-  formatLogTimestamp,
-  formatSingleLineMessage,
-  getDisplayErrorMessage,
-  getFunctionRuntimeLogsSql,
-  getRecentErrorGroups,
-  getRecentErrorGroupsBase,
-  getRecentErrorInvocationsSql,
-  getRelatedExecutionIds,
-  getSinceLastDeployInvocationCount,
-  getSinceLastDeployInvocationCountSql,
+  EDGE_FUNCTION_LOGS_VIEW,
+  getEdgeFunctionLogsScope,
+  getEdgeFunctionLogsUrl,
+  getLegacyEdgeFunctionLogsUrl,
+} from './EdgeFunctionOverview.utils'
+import {
   getSinceLastDeployInvocationPhrase,
   getSinceLastDeployLogRange,
-  getStatusBadgeVariant,
-  toAlertError,
-  type RecentErrorGroup,
 } from './EdgeFunctionRecentErrors.utils'
-import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
-import { AiAssistantDropdown } from '@/components/ui/AiAssistantDropdown'
-import { AlertError } from '@/components/ui/AlertError'
-import { useLogsQuery } from '@/hooks/analytics/useLogsQuery'
-import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
-import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
+import { EdgeFunctionRecentErrorsActions } from './EdgeFunctionRecentErrorsActions'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { EmbeddedLogsTable } from '@/components/interfaces/UnifiedLogs/components/EmbeddedLogsTable'
+import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
+import {
+  createUnifiedLogsSearch,
+  getFacetValueCount,
+  getUniqueLogRows,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
+import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
+import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
+
+const ERROR_LOG_FILTERS = ['level:eq:error']
+
+const MAX_VISIBLE_ERRORS = 5
 
 interface EdgeFunctionRecentErrorsProps {
   functionId?: string
@@ -64,310 +51,143 @@ export const EdgeFunctionRecentErrors = ({
   updatedAt,
 }: EdgeFunctionRecentErrorsProps) => {
   const router = useRouter()
-  const { openSidebar } = useSidebarManagerSnapshot()
-  const aiAssistant = useAiAssistantStateSnapshot()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const { isoTimestampStart, isoTimestampEnd } = useMemo(
     () => getSinceLastDeployLogRange(updatedAt),
     [updatedAt]
   )
-  const emptyStateFallback =
-    'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'
 
+  const { errorsSearch, countsSearch } = useMemo(() => {
+    const scope = functionId ? getEdgeFunctionLogsScope(functionId) : undefined
+    const date =
+      isoTimestampStart && isoTimestampEnd
+        ? [new Date(isoTimestampStart), new Date(isoTimestampEnd)]
+        : null
+    return {
+      errorsSearch: createUnifiedLogsSearch({ filter: ERROR_LOG_FILTERS, date }, scope),
+
+      countsSearch: createUnifiedLogsSearch({ date }, scope),
+    }
+  }, [functionId, isoTimestampStart, isoTimestampEnd])
   const isQueryEnabled = Boolean(projectRef && functionId && isoTimestampStart)
-  const recentErrorInvocationsSql = useMemo(
-    () => getRecentErrorInvocationsSql(functionId),
-    [functionId]
-  )
-  const sinceLastDeployInvocationCountSql = useMemo(
-    () => getSinceLastDeployInvocationCountSql(functionId),
-    [functionId]
-  )
 
-  const {
-    logData: recentErrorInvocations,
-    isLoading: isLoadingRecentErrorInvocations,
-    error: recentErrorInvocationsError,
-  } = useLogsQuery({
-    projectRef: projectRef!,
-    initialParams: {
-      sql: recentErrorInvocationsSql,
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-    },
-    enabled: isQueryEnabled,
-    options: { useOtel: true },
-  })
-
-  const recentErrorGroupsBase = useMemo(
-    () => getRecentErrorGroupsBase(recentErrorInvocations),
-    [recentErrorInvocations]
+  const { data, error, isError, isPending, isFetching } = useUnifiedLogsInfiniteQuery(
+    { projectRef, search: errorsSearch, pageSize: MAX_VISIBLE_ERRORS },
+    { enabled: isQueryEnabled, placeholderData: undefined }
   )
-  const {
-    logData: sinceLastDeployInvocationCountRows,
-    isLoading: isLoadingSinceLastDeployInvocationCount,
-    error: sinceLastDeployInvocationCountError,
-  } = useLogsQuery({
-    projectRef: projectRef!,
-    initialParams: {
-      sql: sinceLastDeployInvocationCountSql,
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-    },
-    enabled: Boolean(projectRef && sinceLastDeployInvocationCountSql && isoTimestampStart),
-    options: { useOtel: true },
-  })
-
-  const relatedExecutionIds = useMemo(
-    () => getRelatedExecutionIds(recentErrorGroupsBase),
-    [recentErrorGroupsBase]
+  const { data: counts } = useUnifiedLogsCountQuery(
+    { projectRef, search: countsSearch },
+    { enabled: isQueryEnabled }
   )
 
-  const functionRuntimeLogsSql = useMemo(
-    () => getFunctionRuntimeLogsSql({ functionId, executionIds: relatedExecutionIds }),
-    [functionId, relatedExecutionIds]
-  )
+  const rows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
 
-  const {
-    logData: functionRuntimeLogs,
-    isLoading: isLoadingFunctionRuntimeLogs,
-    error: functionRuntimeLogsError,
-  } = useLogsQuery({
-    projectRef: projectRef!,
-    initialParams: {
-      sql: functionRuntimeLogsSql,
-      iso_timestamp_start: isoTimestampStart,
-      iso_timestamp_end: isoTimestampEnd,
-    },
-    enabled: Boolean(projectRef && functionRuntimeLogsSql && isoTimestampStart),
-    options: { useOtel: true },
-  })
-  const queryError =
-    toAlertError(recentErrorInvocationsError) ?? toAlertError(functionRuntimeLogsError)
+  const errorCount = counts ? getFacetValueCount(counts.facets, 'level', 'error') : rows.length
+  const hiddenErrorCount = Math.max(errorCount - rows.length, 0)
+  const invocationCount = counts
+    ? getFacetValueCount(counts.facets, 'log_type', 'edge function')
+    : undefined
 
-  const recentErrorGroups = useMemo(
-    () => getRecentErrorGroups({ recentErrorGroupsBase, functionRuntimeLogs }),
-    [functionRuntimeLogs, recentErrorGroupsBase]
-  )
-  const sinceLastDeployInvocationCount = useMemo(
-    () => getSinceLastDeployInvocationCount(sinceLastDeployInvocationCountRows),
-    [sinceLastDeployInvocationCountRows]
-  )
-  const emptyStateMessage = useMemo(() => {
-    if (!isoTimestampStart || sinceLastDeployInvocationCountError) return emptyStateFallback
-
-    const verb = sinceLastDeployInvocationCount === 1 ? 'has' : 'have'
-    const invocationPhrase = getSinceLastDeployInvocationPhrase(sinceLastDeployInvocationCount)
-
-    return (
-      <>
-        There {verb} been <span className="text-foreground">{invocationPhrase}</span> since last
-        deploy and no errors.
-      </>
-    )
-  }, [
-    emptyStateFallback,
-    isoTimestampStart,
-    sinceLastDeployInvocationCount,
-    sinceLastDeployInvocationCountError,
-  ])
-  const emptyStateIcon =
-    isoTimestampStart && !sinceLastDeployInvocationCountError ? (
-      sinceLastDeployInvocationCount > 0 ? (
-        <Check
-          size={16}
-          strokeWidth={1.5}
-          className="mt-0.5 shrink-0 text-brand"
-          aria-hidden="true"
-        />
-      ) : (
-        <Eye
-          size={16}
-          strokeWidth={1.5}
-          className="mt-0.5 shrink-0 text-foreground-muted"
-          aria-hidden="true"
-        />
-      )
-    ) : null
-
-  const handleOpenAssistant = (group: RecentErrorGroup) => {
-    openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
-    aiAssistant.newChat({
-      name: `Investigate ${functionSlug ?? 'error'}`,
-      initialMessage: buildGroupAssistantPrompt(group, functionSlug),
-    })
+  const getLogsUrl = (row?: ColumnSchema) => {
+    const target = {
+      projectRef: projectRef ?? '',
+      functionSlug: functionSlug ?? '',
+      start: isoTimestampStart,
+      end: isoTimestampEnd,
+      logId: row?.id,
+    }
+    if (isUnifiedLogsEnabled) {
+      return getEdgeFunctionLogsUrl({ ...target, filters: ERROR_LOG_FILTERS })
+    }
+    const tab = row?.log_type === 'edge function' ? 'invocations' : 'logs'
+    return getLegacyEdgeFunctionLogsUrl({ ...target, tab })
   }
+  const handleOpenLogs = () => router.push(getLogsUrl())
+  const handleOpenLog = (logId: string) => {
+    router.push(getLogsUrl(rows.find((row) => row.id === logId)))
+  }
+
+  const isLoading = !functionId || (isQueryEnabled && isPending)
+  const hasNoErrors = !isLoading && !isError && rows.length === 0
 
   return (
     <PageSection>
+      <PageSectionMeta>
+        <PageSectionSummary>
+          <PageSectionTitle>Errors in the last 24h</PageSectionTitle>
+        </PageSectionSummary>
+        <PageSectionAside>
+          <EdgeFunctionRecentErrorsActions rows={rows} omittedCount={hiddenErrorCount} />
+          <Button size="tiny" icon={<ExternalLinkIcon size={14} />} onClick={handleOpenLogs}>
+            View logs
+          </Button>
+        </PageSectionAside>
+      </PageSectionMeta>
       <PageSectionContent>
-        <PageContainer size="full">
-          <div className="flex flex-col gap-6">
-            <PageSectionMeta>
-              <PageSectionSummary>
-                <PageSectionTitle>Errors in the last 24h</PageSectionTitle>
-              </PageSectionSummary>
-              <PageSectionAside>
-                <Button
-                  variant="default"
-                  size="tiny"
-                  icon={<ExternalLink size={14} />}
-                  onClick={() =>
-                    router.push(`/project/${projectRef}/functions/${functionSlug}/logs`)
-                  }
-                >
-                  View logs
-                </Button>
-              </PageSectionAside>
-            </PageSectionMeta>
-
-            {recentErrorInvocationsError || functionRuntimeLogsError ? (
-              <AlertError
-                error={queryError}
-                subject="Failed to retrieve edge function errors since the last deploy"
-              />
-            ) : isLoadingRecentErrorInvocations ||
-              isLoadingFunctionRuntimeLogs ||
-              isLoadingSinceLastDeployInvocationCount ? (
-              <GenericSkeletonLoader />
-            ) : recentErrorGroups.length === 0 ? (
-              <div className="rounded-md border border-dashed px-5 py-6 text-sm text-foreground-light">
-                <div className="flex items-start gap-3">
-                  {emptyStateIcon}
-                  <div>{emptyStateMessage}</div>
-                </div>
+        {hasNoErrors && (
+          <div className="rounded-md border border-dashed px-5 py-6 text-sm text-foreground-light">
+            <div className="flex items-start gap-3">
+              {invocationCount !== undefined && invocationCount > 0 && (
+                <CheckIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="mt-0.5 shrink-0 text-primary"
+                  aria-hidden="true"
+                />
+              )}
+              {invocationCount === 0 && (
+                <EyeIcon
+                  size={16}
+                  strokeWidth={1.5}
+                  className="mt-0.5 shrink-0 text-foreground-muted"
+                  aria-hidden="true"
+                />
+              )}
+              <div>
+                {invocationCount !== undefined ? (
+                  <>
+                    There {invocationCount === 1 ? 'has' : 'have'} been{' '}
+                    <span className="text-foreground">
+                      {getSinceLastDeployInvocationPhrase(invocationCount)}
+                    </span>{' '}
+                    since last deploy and no errors.
+                  </>
+                ) : (
+                  'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'
+                )}
               </div>
-            ) : (
-              <Card className="p-0 overflow-hidden">
-                <Table>
-                  <TableHeader>
-                    <TableRow>
-                      <TableHead>Error</TableHead>
-                      <TableHead>Count</TableHead>
-                      <TableHead>Last Seen</TableHead>
-                      <TableHead>Method</TableHead>
-                      <TableHead>Status</TableHead>
-                      <TableHead>Duration</TableHead>
-                      <TableHead className="text-right">Troubleshoot</TableHead>
-                    </TableRow>
-                  </TableHeader>
-                  <TableBody>
-                    {recentErrorGroups.map((group) => {
-                      const displayMessage = getDisplayErrorMessage(group)
-                      const docsUrl = buildTroubleshootingDocsUrl({
-                        statusCode: group.lastStatusCode,
-                      })
-
-                      return (
-                        <Fragment key={group.message}>
-                          <TableRow key={`${group.message}-summary`}>
-                            <TableCell className="max-w-[420px]">
-                              <span
-                                className="block truncate whitespace-nowrap text-foreground"
-                                title={displayMessage}
-                              >
-                                {displayMessage}
-                              </span>
-                            </TableCell>
-                            <TableCell className="text-foreground-light">{group.count}</TableCell>
-                            <TableCell className="text-foreground-light">
-                              {formatLogTimestamp(group.lastSeen, 'relative')}
-                            </TableCell>
-                            <TableCell className="text-foreground-light">
-                              {group.lastMethod ?? '-'}
-                            </TableCell>
-                            <TableCell>
-                              {group.lastStatusCode ? (
-                                <Badge
-                                  variant={getStatusBadgeVariant(group.lastStatusCode)}
-                                  className="font-mono"
-                                >
-                                  {group.lastStatusCode}
-                                </Badge>
-                              ) : (
-                                <Badge variant="destructive" className="font-mono">
-                                  Error
-                                </Badge>
-                              )}
-                            </TableCell>
-                            <TableCell className="text-foreground-light">
-                              {group.executionTime ?? '-'}
-                            </TableCell>
-                            <TableCell className="text-right">
-                              <div className="flex justify-end">
-                                <AiAssistantDropdown
-                                  label="Ask Assistant"
-                                  size="tiny"
-                                  buildPrompt={() => buildGroupAssistantPrompt(group, functionSlug)}
-                                  onOpenAssistant={() => handleOpenAssistant(group)}
-                                  additionalDropdownItems={[
-                                    {
-                                      label: 'View troubleshooting guide',
-                                      icon: <BookOpen size={14} />,
-                                      onClick: () =>
-                                        window.open(docsUrl, '_blank', 'noopener,noreferrer'),
-                                    },
-                                  ]}
-                                />
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                          <TableRow key={`${group.message}-logs`} className="hover:bg-transparent">
-                            <TableCell colSpan={7} className="p-0">
-                              <div className="max-h-64 overflow-auto bg-surface-75 font-mono text-xs">
-                                {group.logs.length === 0 ? (
-                                  <div className="px-4 py-3 text-foreground-lighter">
-                                    No related runtime logs found for this error group.
-                                  </div>
-                                ) : (
-                                  group.logs.map((log, index) => {
-                                    const isError = log.level === 'error'
-                                    return (
-                                      <div
-                                        key={log.key}
-                                        className={cn(
-                                          'flex items-start gap-3 px-4 py-2',
-                                          index !== 0 && 'border-t border-default',
-                                          isError && 'bg-destructive-200/40'
-                                        )}
-                                      >
-                                        <span className="shrink-0 tabular-nums text-foreground-muted">
-                                          {formatLogTimestamp(log.lastSeen, 'time')}
-                                        </span>
-                                        <Badge
-                                          variant={isError ? 'destructive' : 'default'}
-                                          className="shrink-0"
-                                        >
-                                          {log.level}
-                                        </Badge>
-                                        {log.count > 1 && (
-                                          <span className="shrink-0 text-foreground-muted tabular-nums">
-                                            ×{log.count}
-                                          </span>
-                                        )}
-                                        <span
-                                          className={cn(
-                                            'flex-1 wrap-break-word whitespace-pre-wrap',
-                                            isError ? 'text-destructive' : 'text-foreground-light'
-                                          )}
-                                        >
-                                          {formatSingleLineMessage(log.message)}
-                                        </span>
-                                      </div>
-                                    )
-                                  })
-                                )}
-                              </div>
-                            </TableCell>
-                          </TableRow>
-                        </Fragment>
-                      )
-                    })}
-                  </TableBody>
-                </Table>
-              </Card>
-            )}
+            </div>
           </div>
-        </PageContainer>
+        )}
+
+        {!hasNoErrors && (
+          <Card className="overflow-hidden">
+            <EmbeddedLogsTable
+              rows={rows}
+              isLoading={isLoading}
+              isFetching={isFetching}
+              error={error}
+              isError={isError}
+              onRowClick={handleOpenLog}
+              skeletonRowCount={MAX_VISIBLE_ERRORS}
+              columnPreferencesKey={EDGE_FUNCTION_LOGS_VIEW.columnPreferencesKey}
+              footer={
+                hiddenErrorCount > 0 && (
+                  <div className="px-0.5 py-0.5">
+                    <Button
+                      variant="text"
+                      size="tiny"
+                      className="text-foreground-lighter"
+                      onClick={handleOpenLogs}
+                    >
+                      +{hiddenErrorCount.toLocaleString('en-US')} more
+                    </Button>
+                  </div>
+                )
+              }
+            />
+          </Card>
+        )}
       </PageSectionContent>
     </PageSection>
   )

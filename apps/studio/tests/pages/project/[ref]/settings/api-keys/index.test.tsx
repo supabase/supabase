@@ -23,8 +23,9 @@ vi.mock('common', async () => {
   }
 })
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { API_GATEWAY_KEYS_READ: 'api_gateway_keys_read' } },
 }))
 
 vi.mock('@/data/api-keys/api-keys-query', () => ({
@@ -52,7 +53,10 @@ vi.mock('@/components/layouts/APIKeys/APIKeysLayout', () => ({
 
 vi.mock('@/components/interfaces/APIKeys/ApiKeysIllustrations', () => ({
   ApiKeysCreateCallout: () => <div>ApiKeysCreateCallout</div>,
-  ApiKeysFeedbackBanner: () => <div>ApiKeysFeedbackBanner</div>,
+}))
+
+vi.mock('@/components/interfaces/APIKeys/LegacyAPIKeysRetirementNotice', () => ({
+  LegacyAPIKeysRetirementNotice: () => <div>LegacyAPIKeysRetirementNotice</div>,
 }))
 
 vi.mock('@/components/interfaces/APIKeys/PublishableAPIKeys', () => ({
@@ -78,62 +82,68 @@ describe('/project/[ref]/settings/api-keys', () => {
     })
     mockUseAPIKeysQuery.mockReturnValue({
       data: [{ type: 'publishable' }, { type: 'secret' }],
+      isSuccess: true,
     })
   })
 
-  it('renders publishable and secret keys with the feedback banner on platform when keys exist', () => {
+  it('renders publishable and secret keys with the retirement notice on platform when keys exist', () => {
     render(<ApiKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
     expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('ApiKeysFeedbackBanner')).toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
     expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
     expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
     expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
   })
 
   it('renders the create callout on platform when no new keys exist', () => {
-    mockUseAPIKeysQuery.mockReturnValue({ data: [] })
+    mockUseAPIKeysQuery.mockReturnValue({ data: [], isSuccess: true })
 
     render(<ApiKeysPage dehydratedState={{}} />)
 
     expect(screen.getByText('ApiKeysCreateCallout')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
   })
 
-  it('renders the CLI admonition above the keys on self-hosted (CLI mode)', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
+  it('does not render the create callout while keys are loading', () => {
+    mockUseAPIKeysQuery.mockReturnValue({ data: undefined, isSuccess: false })
+
+    render(<ApiKeysPage dehydratedState={{}} />)
+
+    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
+    expect(screen.getByText('LegacyAPIKeysRetirementNotice')).toBeInTheDocument()
+  })
+
+  it.each([
+    {
+      mode: 'CLI',
       isCli: true,
       isSelfHosted: false,
-    })
-
-    render(<ApiKeysPage dehydratedState={{}} />)
-
-    expect(screen.getByText(/Local development with the Supabase CLI/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Self-hosted Supabase/i)).not.toBeInTheDocument()
-    expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
-  })
-
-  it('renders the self-hosted admonition above the keys on self-hosted (Docker mode)', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
+      shown: /Local development with the Supabase CLI/i,
+      hidden: /Self-hosted Supabase/i,
+    },
+    {
+      mode: 'Docker',
       isCli: false,
       isSelfHosted: true,
-    })
+      shown: /Self-hosted Supabase/i,
+      hidden: /Local development with the Supabase CLI/i,
+    },
+  ])(
+    'renders the matching admonition above the keys on self-hosted ($mode mode)',
+    ({ isCli, isSelfHosted, shown, hidden }) => {
+      mockIsPlatform.value = false
+      mockUseDeploymentMode.mockReturnValue({ isPlatform: false, isCli, isSelfHosted })
 
-    render(<ApiKeysPage dehydratedState={{}} />)
+      render(<ApiKeysPage dehydratedState={{}} />)
 
-    expect(screen.getByText(/Self-hosted Supabase/i)).toBeInTheDocument()
-    expect(screen.queryByText(/Local development with the Supabase CLI/i)).not.toBeInTheDocument()
-    expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
-    expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
-    expect(screen.queryByText('ApiKeysFeedbackBanner')).not.toBeInTheDocument()
-  })
+      expect(screen.getByText(shown)).toBeInTheDocument()
+      expect(screen.queryByText(hidden)).not.toBeInTheDocument()
+      expect(screen.getByText('PublishableAPIKeys')).toBeInTheDocument()
+      expect(screen.getByText('SecretAPIKeys')).toBeInTheDocument()
+      expect(screen.queryByText('ApiKeysCreateCallout')).not.toBeInTheDocument()
+      expect(screen.queryByText('LegacyAPIKeysRetirementNotice')).not.toBeInTheDocument()
+    }
+  )
 })

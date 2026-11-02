@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcwIcon } from 'lucide-react'
 import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -38,7 +38,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
 
   const { error: diskAttributesError, isError: isDiskAttributesError } = useDiskAttributesQuery(
     { projectRef },
-    { enabled: project && project.cloud_provider !== 'FLY' }
+    { enabled: !!project }
   )
 
   const {
@@ -95,7 +95,6 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                 form={form}
                 actions={
                   <Button
-                    variant="default"
                     onClick={() => {
                       setValue('storageType', 'io2', { shouldDirty: true })
                       trigger('provisionedIOPS')
@@ -171,7 +170,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                     }}
                     title="Reset"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    <RotateCcwIcon className="h-4 w-4" aria-hidden="true" />
                   </InputGroupButton>
                 ) : null}
               </InputGroupAddon>

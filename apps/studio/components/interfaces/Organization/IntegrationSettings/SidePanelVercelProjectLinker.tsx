@@ -13,9 +13,10 @@ import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integratio
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { BASE_PATH } from '@/lib/constants'
+import { getFrameworkIconUrl } from '@/lib/integration-utils'
 import { EMPTY_ARR } from '@/lib/void'
 import { useSidePanelsStateSnapshot } from '@/state/side-panels'
+import type { ResponseError } from '@/types'
 
 const VERCEL_ICON = (
   <svg xmlns="http://www.w3.org/2000/svg" fill="white" viewBox="0 0 512 512" className="w-6">
@@ -56,16 +57,12 @@ export const SidePanelVercelProjectLinker = () => {
   const getForeignProjectIcon = useCallback(
     (_project: ForeignProject) => {
       const project = vercelProjectsById[_project.id]
+      const frameworkIconUrl = getFrameworkIconUrl(project?.framework)
 
-      return !project?.framework ? (
+      return !frameworkIconUrl ? (
         vercelIcon
       ) : (
-        <img
-          src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-          width={21}
-          height={21}
-          alt={`icon`}
-        />
+        <img src={frameworkIconUrl} width={21} height={21} alt={`icon`} />
       )
     },
     [vercelProjectsById]
@@ -81,6 +78,9 @@ export const SidePanelVercelProjectLinker = () => {
         }
 
         sidePanelStateSnapshot.setVercelConnectionsOpen(false)
+      },
+      onError(error: ResponseError) {
+        toast.error(`Failed to create connection: ${error.message}`)
       },
     })
 

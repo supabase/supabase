@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
@@ -24,13 +23,14 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     clearSelectedItems,
     setSelectedItemsToDelete,
     setSelectedItemsToMove,
-    setSelectedFilePreview,
     downloadFile,
     downloadSelectedFiles,
     refreshAll,
   } = useStorageExplorerStateSnapshot()
 
-  const { can: canUpdateFiles } = useAsyncCheckPermissions(PermissionAction.STORAGE_WRITE, '*')
+  const { clearPreviewedFile } = useStorageExplorerNavigation()
+
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH, () => {
     refreshAll()
@@ -64,13 +64,9 @@ export function useStorageExplorerShortcuts({ onClearSearch }: UseStorageExplore
     enabled: selectedItems.length > 0,
   })
 
-  useShortcut(
-    SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_PREVIEW,
-    () => setSelectedFilePreview(undefined),
-    {
-      enabled: selectedItems.length === 0 && !!selectedFilePreview,
-    }
-  )
+  useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_PREVIEW, clearPreviewedFile, {
+    enabled: selectedItems.length === 0 && !!selectedFilePreview,
+  })
 
   useShortcut(SHORTCUT_IDS.STORAGE_EXPLORER_CLOSE_SEARCH, onClearSearch, {
     enabled: selectedItems.length === 0 && !selectedFilePreview && isSearching,

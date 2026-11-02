@@ -5,7 +5,7 @@
  */
 
 import dayjs from 'dayjs'
-import { AlertCircle, Info } from 'lucide-react'
+import { AlertCircleIcon, InfoIcon } from 'lucide-react'
 import React from 'react'
 import { cn } from 'ui'
 
@@ -98,7 +98,7 @@ export const ResponseCodeFormatter = ({ value }: { value: string }) => {
     case '1':
       return <ResponseCodeItem>{value}</ResponseCodeItem>
     case '2':
-      return <ResponseCodeItem className="bg-surface-100 text-brand">{value}</ResponseCodeItem>
+      return <ResponseCodeItem className="bg-surface-100 text-primary">{value}</ResponseCodeItem>
     // 5XX responses
     case '5':
       return <ResponseCodeItem className="bg-red-300 text-red-1100">{value}</ResponseCodeItem>
@@ -154,7 +154,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded-sm text-red-900!">
-            <AlertCircle size={14} strokeWidth={2} />
+            <AlertCircleIcon size={14} strokeWidth={2} />
           </div>
           <span className="text-red-900! block! titlecase">{text}</span>
         </Layout>
@@ -167,7 +167,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded-sm text-blue-900!">
-            <AlertCircle size={14} strokeWidth={2} />
+            <AlertCircleIcon size={14} strokeWidth={2} />
           </div>
           <span className="text-blue-900! block! titlecase">{text}</span>
         </Layout>
@@ -178,7 +178,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded-sm text-blue-900!">
-            <Info size={14} strokeWidth={2} />
+            <InfoIcon size={14} strokeWidth={2} />
           </div>
           <span className="text-blue-900! block! titlecase">{text}</span>
         </Layout>
@@ -190,7 +190,7 @@ export const SeverityFormatter = ({
       return (
         <Layout className="gap-1">
           <div className=" p-0.5 rounded-sm text-amber-900!">
-            <AlertCircle size={14} strokeWidth={2} />
+            <AlertCircleIcon size={14} strokeWidth={2} />
           </div>
           <span className="text-amber-900! block! titlecase">{text}</span>
         </Layout>

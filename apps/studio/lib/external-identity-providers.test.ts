@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import {
@@ -24,6 +25,15 @@ describe('external identity providers', () => {
     expect(getProviderDisplay('email').displayName).toBe('Email')
     expect(getProviderDisplay('sso:test').displayName).toBe('SSO')
     expect(getProviderDisplay('my_provider').displayName).toBe('my provider')
+  })
+
+  test('derives a title-cased name for unregistered custom providers', () => {
+    expect(getProviderDisplay('custom:acme').displayName).toBe('Acme')
+    expect(getProviderDisplay('Custom:Acme').displayName).toBe('Acme')
+    expect(getProviderDisplay('custom:my_provider').displayName).toBe('My Provider')
+    expect(getProviderDisplay('custom:MY_PROVIDER').displayName).toBe('My Provider')
+    // registered custom providers keep their configured display name
+    expect(getProviderDisplay('custom:openai').displayName).toBe('ChatGPT')
   })
 
   test('marks static provider icons as monochrome but not built-in or fallback icons', () => {

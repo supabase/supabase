@@ -1,14 +1,16 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { del, handleError } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DeleteDestinationPipelineParams = {
   projectRef?: string
   destinationId: number
-  pipelineId: number
+  pipelineId: string
 }
 
 async function deleteDestinationPipeline(
@@ -28,7 +30,7 @@ async function deleteDestinationPipeline(
     handleError(error)
   }
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type DeleteDestinationPipelineData = Awaited<ReturnType<typeof deleteDestinationPipeline>>
@@ -51,23 +53,10 @@ export const useDeleteDestinationPipelineMutation = ({
     {
       mutationFn: (vars) => deleteDestinationPipeline(vars),
       async onSuccess(data, variables, context) {
-        const { projectRef, destinationId, pipelineId } = variables
-
+        const { projectRef } = variables
         await Promise.all([
           queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.destinationById(projectRef, destinationId),
-          }),
+          invalidateReplicationPipelineQueries(queryClient, projectRef),
         ])
 
         await onSuccess?.(data, variables, context)

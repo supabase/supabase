@@ -1,5 +1,6 @@
-import { PermissionAction, SupportCategories } from '@supabase/shared-types/out/constants'
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -17,17 +18,22 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { MANAGED_BY } from '@/lib/constants/infrastructure'
 import { useOrgSettingsPageStateSnapshot } from '@/state/organization-settings'
+
+const COMPARE_PLANS_URL = 'https://supabase.com/pricing#compare-plans'
+const AWS_MARKETPLACE_URL = 'https://supabase.com/aws-marketplace'
 
 const Subscription = () => {
   const { slug } = useParams()
   const snap = useOrgSettingsPageStateSnapshot()
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   const {
@@ -43,6 +49,16 @@ const Subscription = () => {
 
   const canChangeTier =
     !projectUpdateDisabled && !['enterprise', 'platform'].includes(currentPlan?.id ?? '')
+  const isDirectlyManaged = selectedOrganization?.managed_by === MANAGED_BY.SUPABASE
+  // Fail closed until subscription succeeds: unresolved plans look like Free and
+  // `billing_via_partner !== true` is true when the field is still undefined.
+  // Also require billing-read: disabled queries can keep a cached isSuccess.
+  const canPurchaseThroughAws =
+    canReadSubscriptions &&
+    isSuccess &&
+    canChangeTier &&
+    isDirectlyManaged &&
+    subscription.billing_via_partner === false
 
   return (
     <>
@@ -58,6 +74,25 @@ const Subscription = () => {
                 Each organization has it's own subscription plan, billing cycle, payment methods and
                 usage quotas.
               </p>
+            </div>
+            <div className="flex flex-col gap-y-2">
+              <p className="text-sm text-foreground-light m-0">More information</p>
+              <div className="flex flex-col gap-y-1">
+                <Link href={COMPARE_PLANS_URL} target="_blank" rel="noreferrer">
+                  <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                    <p className="m-0 text-sm">Compare plans</p>
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
+                  </div>
+                </Link>
+                {canPurchaseThroughAws && (
+                  <Link href={AWS_MARKETPLACE_URL} target="_blank" rel="noreferrer">
+                    <div className="flex items-center space-x-2 opacity-50 transition hover:opacity-100">
+                      <p className="m-0 text-sm">AWS Marketplace</p>
+                      <ExternalLinkIcon size={16} strokeWidth={1.5} />
+                    </div>
+                  </Link>
+                )}
+              </div>
             </div>
           </div>
         </ScaffoldSectionDetail>
@@ -79,14 +114,13 @@ const Subscription = () => {
               {isSuccess && (
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
-                    <p className="text-2xl text-brand leading-none">
+                    <p className="text-2xl text-primary leading-none">
                       {currentPlan?.name ?? 'Unknown'} Plan
                     </p>
 
                     {canChangeTier && (
                       <div className="flex space-x-2">
                         <Button
-                          variant="default"
                           className="pointer-events-auto"
                           onClick={() => snap.setPanelKey('subscriptionPlan')}
                         >
@@ -94,7 +128,7 @@ const Subscription = () => {
                         </Button>
                         {currentPlan && currentPlan.id !== 'free' && (
                           <InitiateCancellationFlowButton variant="danger">
-                            Cancel Subscription
+                            Cancel subscription
                           </InitiateCancellationFlowButton>
                         )}
                       </div>
@@ -118,7 +152,7 @@ const Subscription = () => {
                           title={`Unable to update plan from ${planName}`}
                           description="Please contact us if you'd like to change your plan."
                           actions={
-                            <Button asChild key="contact-support" variant="default">
+                            <Button asChild key="contact-support">
                               <SupportLink
                                 queryParams={{
                                   category: SupportCategories.SALES_ENQUIRY,

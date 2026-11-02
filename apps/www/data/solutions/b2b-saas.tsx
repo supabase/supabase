@@ -1,4 +1,5 @@
 import { CubeIcon } from '@heroicons/react/outline'
+import { DASHBOARD_SIGN_UP_URL } from '@/lib/dashboard-links'
 import { useBreakpoint } from 'common'
 import {
   Check,
@@ -91,7 +92,7 @@ const data: () => {
       ctas: [
         {
           label: 'Start your project',
-          href: 'https://supabase.com/dashboard',
+          href: DASHBOARD_SIGN_UP_URL,
           type: 'primary' as any,
           onClick: () =>
             sendTelemetryEvent({
@@ -121,14 +122,14 @@ const data: () => {
         logo: (
           <>
             <Image
-              src="/images/customers/logos/resend.png"
+              src="/images/customers/logos/on-light/resend.png"
               alt="Resend"
               width={128}
               height={48}
               className="object-contain w-24 md:w-32 dark:hidden"
             />
             <Image
-              src="/images/customers/logos/light/resend.png"
+              src="/images/customers/logos/on-dark/resend.png"
               alt="Resend"
               width={128}
               height={48}
@@ -261,7 +262,7 @@ const data: () => {
       customers: [
         {
           name: 'Resend',
-          logo: '/images/customers/logos/resend.png',
+          logo: '/images/customers/logos/on-light/resend.png',
           highlights: [
             'Focus on building the best email infrastructure for developers',
             'Backend complexity handled by Supabase',
@@ -270,7 +271,7 @@ const data: () => {
         },
         {
           name: 'Mobbin',
-          logo: '/images/customers/logos/mobbin.png',
+          logo: '/images/customers/logos/on-light/mobbin.png',
           highlights: [
             'Migrated 200,000 users from Firebase',
             'Better authentication experience at scale',
@@ -279,7 +280,7 @@ const data: () => {
         },
         {
           name: 'Shotgun',
-          logo: '/images/customers/logos/shotgun.png',
+          logo: '/images/customers/logos/on-light/shotgun.png',
           highlights: [
             '83% reduction in data infrastructure costs',
             'Remarkable database efficiency through migration',
@@ -288,7 +289,7 @@ const data: () => {
         },
         {
           name: 'Quilia',
-          logo: '/images/customers/logos/quilia.png',
+          logo: '/images/customers/logos/on-light/quilia.png',
           highlights: [
             '75% reduction in development time',
             '50% lower costs with enhanced security for sensitive client data',

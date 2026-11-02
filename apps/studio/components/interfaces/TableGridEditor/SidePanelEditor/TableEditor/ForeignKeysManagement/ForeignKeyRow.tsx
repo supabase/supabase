@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
 import { Badge, Button, cn } from 'ui'
@@ -60,7 +60,6 @@ export const ForeignKeyRow = ({
             </p>
             <Button
               asChild
-              variant="default"
               title={`${foreignKey.schema}.${foreignKey.table}`}
               className="py-0.5 px-1.5 font-mono"
               icon={
@@ -95,8 +94,8 @@ export const ForeignKeyRow = ({
               >
                 {x.source || '[column_name]'}
               </code>
-              <ArrowRight size={16} />
-              <code className="text-code-inline">
+              <ArrowRightIcon size={16} />
+              <code>
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>
@@ -105,17 +104,11 @@ export const ForeignKeyRow = ({
       </div>
       {!disabled && (
         <div className="flex items-center gap-x-2">
-          <Button variant="default" onClick={onSelectEdit}>
-            Edit
-          </Button>
+          <Button onClick={onSelectEdit}>Edit</Button>
           {foreignKey.toRemove ? (
-            <Button variant="default" onClick={onSelectUndoRemove}>
-              Cancel remove
-            </Button>
+            <Button onClick={onSelectUndoRemove}>Cancel remove</Button>
           ) : (
-            <Button variant="default" onClick={onSelectRemove}>
-              Remove
-            </Button>
+            <Button onClick={onSelectRemove}>Remove</Button>
           )}
         </div>
       )}

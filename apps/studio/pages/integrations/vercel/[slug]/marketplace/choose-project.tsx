@@ -2,7 +2,6 @@ import { useParams } from 'common'
 import { keyBy } from 'lodash'
 import Head from 'next/head'
 import { useCallback, useMemo } from 'react'
-import { toast } from 'sonner'
 import { Card, CardContent } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -26,8 +25,8 @@ import { useIntegrationVercelConnectionsCreateMutation } from '@/data/integratio
 import { useVercelProjectsQuery } from '@/data/integrations/integrations-vercel-projects-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { BASE_PATH } from '@/lib/constants'
 import { getErrorMessage } from '@/lib/get-error-message'
+import { getFrameworkIconUrl } from '@/lib/integration-utils'
 import { hasVercelDeployButtonSignals } from '@/lib/integrations/vercel-install.utils'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import { useProfileNameAndPicture } from '@/lib/profile'
@@ -84,16 +83,12 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
   const getForeignProjectIcon = useCallback(
     (_project: ForeignProject) => {
       const project = vercelProjectsById[_project.id]
+      const frameworkIconUrl = getFrameworkIconUrl(project?.framework)
 
-      return !project?.framework ? (
+      return !frameworkIconUrl ? (
         vercelIcon
       ) : (
-        <img
-          src={`${BASE_PATH}/img/icons/frameworks/${project.framework}.svg`}
-          width={21}
-          height={21}
-          alt="Framework icon"
-        />
+        <img src={frameworkIconUrl} width={21} height={21} alt="Framework icon" />
       )
     },
     [vercelProjectsById]
@@ -101,25 +96,29 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
 
   const snapshot = useIntegrationInstallationSnapshot()
 
-  const { mutate: createConnections, isPending: isCreatingConnection } =
-    useIntegrationVercelConnectionsCreateMutation({
-      onSuccess() {
-        if (next && isVercelUrl(next)) {
-          snapshot.setLoading(false)
-          window.location.href = next
-        }
-      },
-      onMutate() {
-        snapshot.setLoading(true)
-      },
-      onError(error) {
+  const {
+    mutate: createConnections,
+    isPending: isCreatingConnection,
+    error: createConnectionsError,
+    reset: resetCreateConnectionsError,
+  } = useIntegrationVercelConnectionsCreateMutation({
+    onSuccess() {
+      if (next && isVercelUrl(next)) {
         snapshot.setLoading(false)
-        toast.error(`Creating connection failed: ${error.message}`)
-      },
-    })
+        window.location.href = next
+      }
+    },
+    onMutate() {
+      snapshot.setLoading(true)
+    },
+  })
+  const actionError = createConnectionsError
+    ? `Creating connection failed: ${createConnectionsError.message}`
+    : undefined
 
   const onCreateConnections = useCallback(
     (vars: Parameters<typeof createConnections>[0]) => {
+      resetCreateConnectionsError()
       createConnections({
         ...vars,
         connection: {
@@ -135,7 +134,7 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
         },
       })
     },
-    [createConnections]
+    [createConnections, resetCreateConnectionsError]
   )
 
   const showLoadingState =
@@ -212,6 +211,8 @@ const VercelChooseProjectPage: NextPageWithLayout = () => {
                 }
                 loadingForeignProjects={isLoadingVercelProjectsData}
                 mode="Vercel"
+                actionError={actionError}
+                onSelectionChange={resetCreateConnectionsError}
               />
             </div>
           )}

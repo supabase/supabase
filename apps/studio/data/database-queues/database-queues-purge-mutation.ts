@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -29,6 +30,7 @@ export async function purgeDatabaseQueue({
     connectionString,
     sql: safeSql`select * from pgmq.purge_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
+    grant: unguarded.migrating,
   })
 
   return result

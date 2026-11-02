@@ -1,0 +1,97 @@
+@property --ask-ai-icon-shift {
+  syntax: '<length>';
+  inherits: false;
+  initial-value: 0px;
+}
+
+@keyframes ask-ai-icon-shift {
+  to {
+    --ask-ai-icon-shift: 48px;
+  }
+}
+
+.ask-ai-icon {
+  --ask-ai-icon-gray: 1;
+  display: inline-block;
+  filter: drop-shadow(0.4px 0 0 oklch(0.65 0.2 25 / 0.6))
+    drop-shadow(-0.4px 0 0 oklch(0.75 0.12 200 / 0.6)) blur(0.15px)
+    grayscale(var(--ask-ai-icon-gray));
+  transition: filter 400ms ease-out;
+}
+
+.ask-ai-icon[data-thinking='true'] {
+  --ask-ai-icon-gray: 0;
+}
+
+.ask-ai-icon-groove {
+  position: relative;
+  display: block;
+  height: 100%;
+  overflow: hidden;
+  mask: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='-2 -2 113 117' fill='none' stroke='black' stroke-width='1.5' stroke-linejoin='round'><path fill='black' fill-opacity='0.25' d='M45.317 2.07103C48.1765 -1.53037 53.9745 0.442937 54.0434 5.04075L54.2721 40.0627H99.1935C107.384 40.0627 111.952 49.5228 106.859 55.9374L63.7076 110.284C60.8481 113.885 55.0502 111.912 54.9813 107.314L54.4608 72.2922H9.83113C1.64038 72.2922 -2.92775 62.8321 2.1655 56.4175L45.317 2.07103Z'/></svg>")
+    center / contain no-repeat;
+}
+
+.ask-ai-icon-groove::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><filter id='grain'><feTurbulence type='fractalNoise' baseFrequency='1.4' numOctaves='2' stitchTiles='stitch'/></filter><rect width='64' height='64' filter='url(%23grain)'/></svg>");
+  mix-blend-mode: overlay;
+  opacity: 0.9;
+}
+
+.ask-ai-icon-foil {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+      oklch(0.63 0.18 30) 0 12%,
+      transparent 12% 16.7%,
+      oklch(0.72 0.16 55) 16.7% 28.7%,
+      transparent 28.7% 33.3%,
+      oklch(0.84 0.15 90) 33.3% 45.3%,
+      transparent 45.3% 50%,
+      oklch(0.72 0.14 150) 50% 62%,
+      transparent 62% 66.7%,
+      oklch(0.65 0.12 230) 66.7% 78.7%,
+      transparent 78.7% 83.3%,
+      oklch(0.55 0.15 300) 83.3% 95.3%,
+      transparent 95.3%
+    )
+    0 0 / 100% 16px;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .ask-ai-icon-foil {
+    background-position-y: var(--ask-ai-icon-shift);
+    animation: ask-ai-icon-shift 2.8s linear infinite paused;
+  }
+
+  [data-thinking='true'] .ask-ai-icon-foil {
+    animation-play-state: running;
+  }
+}
+
+.ask-ai-edge {
+  position: absolute;
+  inset: 0 1px auto;
+  height: 88px;
+  max-height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 150ms ease-out;
+  background: linear-gradient(to bottom, var(--background-dash-sidebar), transparent);
+}
+
+[data-scrolled] + .ask-ai-edge {
+  opacity: 1;
+}
+
+.ask-ai-answer ol > li {
+  padding-inline-start: 0.75rem;
+}
+
+.ask-ai-answer ol > li::before {
+  top: 2px;
+  line-height: 1;
+}

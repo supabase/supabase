@@ -131,7 +131,7 @@ export const ProjectAccessSection = () => {
                       <p className="text-sm text-foreground-light">{projectAccessDescription}</p>
                     </div>
                     {!!organization?.slug && (
-                      <Button asChild variant="default">
+                      <Button asChild>
                         <Link href={`/org/${organization.slug}/team`}>
                           {hasLimitedVisibility ? 'View team' : 'Manage members'}
                         </Link>

@@ -1,8 +1,8 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
-import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
 import Link from 'next/link'
 import { ReactNode, useRef } from 'react'
 import { Button } from 'ui'
@@ -82,11 +82,11 @@ const UseCase = ({
           </div>
           {useCase.cta &&
             (useCase.cta.isDisabled ? (
-              <Button size="tiny" variant="default" disabled className="justify-end">
+              <Button size="tiny" disabled className="justify-end">
                 {useCase.cta.label ?? 'View example'}
               </Button>
             ) : (
-              <Button asChild size="tiny" variant="default" iconRight={<ArrowUpRight />}>
+              <Button asChild size="tiny" iconRight={<ArrowUpRight />}>
                 <Link href={useCase.cta.link} target="_blank">
                   {useCase.cta.label ?? 'View example'}
                 </Link>

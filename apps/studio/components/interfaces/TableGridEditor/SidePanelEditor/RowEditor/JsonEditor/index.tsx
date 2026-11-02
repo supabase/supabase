@@ -1,7 +1,7 @@
 import type { OnMount } from '@monaco-editor/react'
 import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { useParams } from 'common'
-import { AlignLeft } from 'lucide-react'
+import { AlignLeftIcon } from 'lucide-react'
 import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, SidePanel } from 'ui'
@@ -163,8 +163,7 @@ export const JsonEditor = ({
             <div className="flex items-center gap-x-2">
               {view === 'edit' && (
                 <ButtonTooltip
-                  variant="default"
-                  icon={<AlignLeft />}
+                  icon={<AlignLeftIcon />}
                   className="px-1"
                   onClick={() => prettify()}
                   tooltip={{ content: { side: 'bottom', text: 'Prettify JSON' } }}
@@ -222,7 +221,7 @@ export const JsonEditor = ({
                 performance issues
               </p>
             </div>
-            <Button variant="default" loading={isPending} onClick={loadFullValue}>
+            <Button loading={isPending} onClick={loadFullValue}>
               Load full JSON data
             </Button>
           </div>
