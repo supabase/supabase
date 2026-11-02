@@ -4,8 +4,10 @@ import { SUPABASE_TARGET_SCHEMA_OPTION, WRAPPER_HANDLERS } from './Wrappers.cons
 import { Table } from './Wrappers.types'
 import {
   getEditionFormSchema,
+  getRequiredExtensionsToInstall,
   getTableFormSchema,
   getWrapperCreationFormSchema,
+  hasForeignSchemaSupport,
 } from './Wrappers.utils'
 
 const stripe_wrapper = {
@@ -42,19 +44,27 @@ const stripe_wrapper = {
 }
 
 describe('getWrapperCreationFormSchema', () => {
-  it('should build a schema that validates tables mode', () => {
+  it('should build a schema that validates tables mode and wrapper specific options', () => {
     const schema = getWrapperCreationFormSchema(stripe_wrapper)
     const result = schema.safeParse({ mode: 'tables' })
 
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     // Table mode specific field
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'tables'))
     ).toBeDefined()
+    // Required wrapper option
+    expect(
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'api_key_id'))
+    ).toBeDefined()
+    // Optional wrapper option
+    expect(
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'api_url'))
+    ).toBeUndefined()
   })
 
   it('should build a schema that validates schema mode', () => {
@@ -64,7 +74,7 @@ describe('getWrapperCreationFormSchema', () => {
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     // Schema mode specific field
     expect(
@@ -73,20 +83,6 @@ describe('getWrapperCreationFormSchema', () => {
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'target_schema'))
     ).toBeDefined()
-  })
-
-  it('should build a schema that validates wrapper specific options', () => {
-    const schema = getWrapperCreationFormSchema(stripe_wrapper)
-    const result = schema.safeParse({ mode: 'tables' })
-    expect(result.success).toEqual(false)
-    // Required option
-    expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'api_key_id'))
-    ).toBeDefined()
-    // Optional option
-    expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'api_url'))
-    ).toBeUndefined()
   })
 })
 
@@ -97,7 +93,7 @@ describe('getEditionFormSchema', () => {
     expect(result.success).toEqual(false)
     // Common required field
     expect(
-      result.error?.issues.find((issue) => issue.path.some((p) => p === 'wrapper_name'))
+      result.error?.issues.find((issue) => issue.path.some((p) => p === 'server_name'))
     ).toBeDefined()
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'tables'))
@@ -205,5 +201,71 @@ describe('getTableFormSchema', () => {
     expect(
       result.error?.issues.find((issue) => issue.path.some((p) => p === 'schema_name'))
     ).toBeDefined()
+  })
+})
+
+// ─── getRequiredExtensionsToInstall ──────────────────────────────────────────
+
+describe('getRequiredExtensionsToInstall', () => {
+  type Extension = { name: string; installed_version: string | null }
+  const wrappers: Extension = { name: 'wrappers', installed_version: null }
+  const vault = { name: 'supabase_vault', installed_version: null }
+  const wrappersInstalled = { name: 'wrappers', installed_version: '0.4.1' }
+  const vaultInstalled = { name: 'supabase_vault', installed_version: '0.2.8' }
+  const unrelated = { name: 'pgmq', installed_version: null }
+
+  it('returns null when extensions are undefined (still loading)', () => {
+    expect(getRequiredExtensionsToInstall(undefined, ['wrappers'])).toBeNull()
+  })
+
+  it.each<{ case: string; extensions: Extension[]; required: string[] }>([
+    { case: 'the required list is empty', extensions: [wrappers], required: [] },
+    {
+      case: 'all required extensions are already installed',
+      extensions: [wrappersInstalled, vaultInstalled],
+      required: ['wrappers', 'supabase_vault'],
+    },
+    { case: 'the extensions list is empty', extensions: [], required: ['wrappers'] },
+  ])('returns an empty array when $case', ({ extensions, required }) => {
+    expect(getRequiredExtensionsToInstall(extensions, required)).toEqual([])
+  })
+
+  it('returns extensions that are required but not installed', () => {
+    const result = getRequiredExtensionsToInstall(
+      [wrappers, vaultInstalled],
+      ['wrappers', 'supabase_vault']
+    )
+    expect(result).toHaveLength(1)
+    expect(result![0].name).toBe('wrappers')
+  })
+
+  it('returns all required extensions when none are installed', () => {
+    const result = getRequiredExtensionsToInstall([wrappers, vault], ['wrappers', 'supabase_vault'])
+    expect(result).toHaveLength(2)
+  })
+
+  it('excludes extensions that are not in the required list', () => {
+    const result = getRequiredExtensionsToInstall([wrappers, unrelated], ['wrappers'])
+    expect(result).toHaveLength(1)
+    expect(result![0].name).toBe('wrappers')
+  })
+})
+
+// ─── hasForeignSchemaSupport ──────────────────────────────────────────────────
+
+describe('hasForeignSchemaSupport', () => {
+  it('returns false when extension is undefined', () => {
+    expect(hasForeignSchemaSupport(undefined)).toBe(false)
+  })
+
+  it.each([
+    [null, false],
+    ['0.1.0', false],
+    ['0.4.9', false],
+    ['0.5.0', true],
+    ['0.5.1', true],
+    ['1.0.0', true],
+  ])('installed_version %s returns %s', (installed_version, expected) => {
+    expect(hasForeignSchemaSupport({ installed_version })).toBe(expected)
   })
 })

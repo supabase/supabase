@@ -1,38 +1,38 @@
 import {
-  Calendar,
-  Check,
-  ChevronsUpDown,
-  ExternalLink,
-  Hash,
-  ListPlus,
-  ToggleRight,
-  Type,
+  CalendarIcon,
+  CheckIcon,
+  ChevronsUpDownIcon,
+  ExternalLinkIcon,
+  HashIcon,
+  ListPlusIcon,
+  ToggleRightIcon,
+  TypeIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { ReactNode, useId, useState } from 'react'
 import { Control } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Button,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+  CommandSeparator,
   CriticalIcon,
   FormControl,
   FormField,
   FormItem,
   FormLabel,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -82,11 +82,11 @@ export const ColumnType = ({
   const inferIcon = (type: string) => {
     switch (type) {
       case 'number':
-        return <Hash size={14} className="text-foreground" strokeWidth={1.5} />
+        return <HashIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'time':
-        return <Calendar size={14} className="text-foreground" strokeWidth={1.5} />
+        return <CalendarIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'text':
-        return <Type size={14} className="text-foreground" strokeWidth={1.5} />
+        return <TypeIcon size={14} className="text-foreground" strokeWidth={1.5} />
       case 'json':
         return (
           <div className="text-foreground" style={{ padding: '0px 1px' }}>
@@ -100,9 +100,9 @@ export const ColumnType = ({
           </div>
         )
       case 'bool':
-        return <ToggleRight size={14} className="text-foreground" strokeWidth={1.5} />
+        return <ToggleRightIcon size={14} className="text-foreground" strokeWidth={1.5} />
       default:
-        return <ListPlus size={16} className="text-foreground" strokeWidth={1.5} />
+        return <ListPlusIcon size={16} className="text-foreground" strokeWidth={1.5} />
     }
   }
 
@@ -124,60 +124,57 @@ export const ColumnType = ({
               className={className}
             >
               <FormControl>
-                <Input_Shadcn_ {...field} id={name} disabled readOnly />
+                <Input {...field} disabled readOnly />
               </FormControl>
             </FormItemLayout>
           )
         }
         return (
           <FormItem className={cn('flex flex-col space-y-2', className)}>
-            <FormLabel className="text-foreground flex gap-2 items-center break-words">
+            <FormLabel className="text-foreground flex gap-2 items-center wrap-break-word">
               Type
             </FormLabel>
-            <Popover_Shadcn_ modal open={open} onOpenChange={setOpen}>
-              <PopoverTrigger_Shadcn_ asChild>
-                <Button
-                  role="combobox"
-                  size={'small'}
-                  aria-expanded={open}
-                  aria-controls={listboxId}
-                  className={cn(
-                    'w-full justify-between bg-background-control',
-                    !field.value && 'text-foreground-lighter'
-                  )}
-                  iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
-                  title={field.value && field.value.replaceAll('"', '')}
-                >
-                  {field.value ? (
-                    <div className="flex gap-2 items-center">
-                      <span>{inferIcon(getOptionByName(field.value)?.type ?? '')}</span>
-                      <span className="block truncate">{field.value.replaceAll('"', '')}</span>
-                    </div>
-                  ) : (
-                    'Choose a column type...'
-                  )}
-                </Button>
-              </PopoverTrigger_Shadcn_>
-              <PopoverContent_Shadcn_
-                id={listboxId}
-                className="w-[460px] p-0"
-                side="bottom"
-                align="center"
-              >
-                <Command_Shadcn_>
-                  <CommandInput_Shadcn_
+            <Popover modal open={open} onOpenChange={setOpen}>
+              <FormControl>
+                <PopoverTrigger asChild>
+                  <Button
+                    role="combobox"
+                    size={'small'}
+                    aria-expanded={open}
+                    aria-controls={listboxId}
+                    className={cn(
+                      'w-full justify-between bg-background-control',
+                      !field.value && 'text-foreground-lighter'
+                    )}
+                    iconRight={<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+                    title={field.value && field.value.replaceAll('"', '')}
+                  >
+                    {field.value ? (
+                      <div className="flex gap-2 items-center">
+                        <span>{inferIcon(getOptionByName(field.value)?.type ?? '')}</span>
+                        <span className="block truncate">{field.value.replaceAll('"', '')}</span>
+                      </div>
+                    ) : (
+                      'Choose a column type...'
+                    )}
+                  </Button>
+                </PopoverTrigger>
+              </FormControl>
+              <PopoverContent id={listboxId} className="w-[460px] p-0" side="bottom" align="center">
+                <Command>
+                  <CommandInput
                     placeholder="Search types..."
                     // [Joshen] Addresses style issues when this component is being used in the old Form component
                     // Specifically in WrapperDynamicColumns - can be cleaned up once we're no longer using that
-                    className="!bg-transparent focus:!shadow-none focus:!ring-0 text-xs"
+                    className="bg-transparent! focus:shadow-none! focus:ring-0! text-xs"
                   />
-                  <CommandEmpty_Shadcn_>Type not found.</CommandEmpty_Shadcn_>
+                  <CommandEmpty>Type not found.</CommandEmpty>
 
-                  <CommandList_Shadcn_>
+                  <CommandList>
                     <ScrollArea className="h-[240px]">
-                      <CommandGroup_Shadcn_ heading="Postgres data types">
+                      <CommandGroup heading="Postgres data types">
                         {POSTGRES_DATA_TYPE_OPTIONS.map((option: PostgresDataTypeOption) => (
-                          <CommandItem_Shadcn_
+                          <CommandItem
                             key={option.name}
                             value={option.name}
                             className={cn(
@@ -196,21 +193,21 @@ export const ColumnType = ({
                             </div>
                             <span className="absolute right-3 top-2">
                               {option.name === field.value ? (
-                                <Check className="text-brand" size={14} />
+                                <CheckIcon className="text-primary" size={14} />
                               ) : (
                                 ''
                               )}
                             </span>
-                          </CommandItem_Shadcn_>
+                          </CommandItem>
                         ))}
-                      </CommandGroup_Shadcn_>
+                      </CommandGroup>
 
                       {enumTypes.length > 0 && (
                         <>
-                          <CommandSeparator_Shadcn_ />
-                          <CommandGroup_Shadcn_ heading="Other types">
+                          <CommandSeparator />
+                          <CommandGroup heading="Other types">
                             {enumTypes.map((option) => (
-                              <CommandItem_Shadcn_
+                              <CommandItem
                                 key={option.id}
                                 value={option.format}
                                 className={cn(
@@ -228,7 +225,7 @@ export const ColumnType = ({
                               >
                                 <div className="flex items-center gap-2">
                                   <div>
-                                    <ListPlus
+                                    <ListPlusIcon
                                       size={16}
                                       className="text-foreground"
                                       strokeWidth={1.5}
@@ -247,49 +244,47 @@ export const ColumnType = ({
                                   )}
                                   {option.format === field.value && (
                                     <span className="absolute right-3 top-2">
-                                      <Check className="text-brand" size={14} />
+                                      <CheckIcon className="text-primary" size={14} />
                                     </span>
                                   )}
                                 </div>
-                              </CommandItem_Shadcn_>
+                              </CommandItem>
                             ))}
-                          </CommandGroup_Shadcn_>
+                          </CommandGroup>
                         </>
                       )}
                     </ScrollArea>
-                  </CommandList_Shadcn_>
-                </Command_Shadcn_>
-              </PopoverContent_Shadcn_>
-            </Popover_Shadcn_>
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
             {showRecommendation && recommendation !== undefined && (
-              <Alert_Shadcn_ variant="warning" className="mt-2">
+              <Alert variant="warning" className="mt-2">
                 <CriticalIcon />
-                <AlertTitle_Shadcn_>
+                <AlertTitle>
                   {' '}
-                  It is recommended to use{' '}
-                  <code className="text-code-inline">{recommendation.alternative}</code> instead
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
+                  It is recommended to use <code>{recommendation.alternative}</code> instead
+                </AlertTitle>
+                <AlertDescription>
                   <p>
-                    Postgres recommends against using the data type{' '}
-                    <code className="text-code-inline">{field.value}</code> unless you have a very
-                    specific use case.
+                    Postgres recommends against using the data type <code>{field.value}</code>{' '}
+                    unless you have a very specific use case.
                   </p>
                   <div className="flex items-center space-x-2 mt-3">
-                    <Button asChild type="default" icon={<ExternalLink />}>
+                    <Button asChild icon={<ExternalLinkIcon />}>
                       <Link href={recommendation.reference} target="_blank" rel="noreferrer">
                         Read more
                       </Link>
                     </Button>
                     <Button
-                      type="primary"
+                      variant="primary"
                       onClick={() => field.onChange(recommendation.alternative)}
                     >
                       Use {recommendation.alternative}
                     </Button>
                   </div>
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                </AlertDescription>
+              </Alert>
             )}
           </FormItem>
         )

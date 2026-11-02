@@ -1,19 +1,22 @@
 'use client'
 
-import dayjs from 'dayjs'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from 'ui'
 
 import { CHART_COLORS, DateTimeFormats } from './Charts.constants'
+import type { Datum } from './Charts.types'
 import { formatPercentage, numberFormatter } from './Charts.utils'
-import { guessLocalTimezone } from '@/lib/dayjs'
-import { formatBytes } from '@/lib/helpers'
+import { getThresholdZoneValues } from './ComposedChartThresholdZones.utils'
+import { useFormatDateTime, useTimezone } from '@/lib/datetime'
+import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
 export interface ReportAttributes {
   id?: string
   titleTooltip?: string
   label: string
   attributes?: (MultiAttribute | false)[]
+  thresholdZones?: ThresholdZone[]
+  thresholdZoneAttribute?: string
   defaultChartStyle?: 'bar' | 'line' | 'stackedAreaLine'
   hide?: boolean
   entitlement?: string
@@ -39,20 +42,38 @@ export interface ReportAttributes {
   hideHighlightedValue?: boolean
 }
 
+export type ThresholdZone = {
+  label: string
+  color: string
+  textColor?: string
+  badgeLabel?: string
+  tooltipLabel?: string
+  isAlwaysVisible?: boolean
+  tooltip: string
+  getRanges: (data: Datum[]) => ([number, number] | null)[]
+}
+
 export type Provider = 'infra-monitoring' | 'daily-stats' | 'mock' | 'reference-line' | 'logs'
+
+export type ThemedColor = {
+  light?: string
+  dark?: string
+}
+
+export const resolveChartColor = (
+  color: string | ThemedColor | undefined,
+  isDarkMode: boolean | undefined
+) => {
+  if (typeof color === 'string') return color
+  return isDarkMode ? color?.dark : color?.light
+}
 
 export type MultiAttribute = {
   attribute: string
   provider?: Provider
   label?: string
-  color?: {
-    light: string
-    dark: string
-  }
-  fill?: {
-    light?: string
-    dark?: string
-  }
+  color?: string | { light: string; dark: string }
+  fill?: string | ThemedColor
   statusCode?: string
   grantType?: string
   providerType?: string
@@ -116,7 +137,8 @@ interface TooltipProps {
   payload?: any[]
   label?: string | number
   attributes?: MultiAttribute[]
-  data?: Record<string, unknown>[]
+  data?: Datum[]
+  thresholdZones?: ThresholdZone[]
   xAxisKey?: string
   isPercentage?: boolean
   format?: string | ((value: unknown) => string)
@@ -127,6 +149,26 @@ interface TooltipProps {
 }
 
 const isMaxAttribute = (attributes?: MultiAttribute[]) => attributes?.find((a) => a.isMaxValue)
+
+/**
+ * Resolve the recharts `stackId` for a series.
+ *
+ * Series that share a `stackId` are stacked additively, so overlaid series
+ * (e.g. min/max/avg of the same metric) must each get a distinct id. Bar
+ * charts pass `'1'` as the fallback to stack together; area charts pass the
+ * attribute name so each series overlays independently. An explicit per-
+ * attribute `stackId` always wins.
+ */
+export const getStackId = (
+  attributes: (MultiAttribute | false | null | undefined)[] | null | undefined,
+  name: string | null | undefined,
+  fallback: string
+): string => {
+  const configured = Array.isArray(attributes)
+    ? attributes.find((a): a is MultiAttribute => !!a && a.attribute === name)?.stackId
+    : undefined
+  return configured ?? fallback
+}
 
 /**
  * Calculate the total aggregate of the chart values
@@ -147,6 +189,7 @@ export const CustomTooltip = ({
   label: _label,
   attributes,
   data,
+  thresholdZones,
   xAxisKey = 'period_start',
   isPercentage,
   format,
@@ -154,6 +197,8 @@ export const CustomTooltip = ({
   showTotal,
   isActiveHoveredChart,
 }: TooltipProps) => {
+  const formatDateTime = useFormatDateTime()
+  const { timezone } = useTimezone()
   if (active && payload && payload.length) {
     /**
      * Depending on the data source, the timestamp key could be 'timestamp' or 'period_start'
@@ -164,6 +209,7 @@ export const CustomTooltip = ({
     const rawDataPoint = data?.find(
       (point) => point[xAxisKey] === timestamp || point[timestampKey] === timestamp
     )
+    const thresholdValues = getThresholdZoneValues(rawDataPoint, thresholdZones)
     const maxValueAttribute = isMaxAttribute(attributes)
     const maxValue =
       maxValueAttribute && rawDataPoint
@@ -173,12 +219,14 @@ export const CustomTooltip = ({
     const isRamChart =
       !payload?.some((p: any) => p.dataKey.toLowerCase() === 'ram_usage') &&
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('ram_'))
+    const isSwapChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('swap_'))
+    const isMemoryChart = isRamChart || isSwapChart
     const isDBSizeChart =
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('disk_fs_')) ||
       payload?.some((p: any) => p.dataKey.toLowerCase().includes('pg_database_size'))
     const isNetworkChart = payload?.some((p: any) => p.dataKey.toLowerCase().includes('network_'))
     const isBytesFormat = format === 'bytes' || format === 'bytes-per-second'
-    const shouldFormatBytes = isBytesFormat || isRamChart || isDBSizeChart || isNetworkChart
+    const shouldFormatBytes = isBytesFormat || isMemoryChart || isDBSizeChart || isNetworkChart
     const byteUnitSuffix = format === 'bytes-per-second' ? '/s' : ''
 
     const attributesToIgnore =
@@ -194,7 +242,7 @@ export const CustomTooltip = ({
       ...(maxValueAttribute?.attribute ? [maxValueAttribute.attribute] : []),
     ]
 
-    const localTimeZone = guessLocalTimezone()
+    const localTimeZone = timezone
 
     const rawPayload = payload.map((entry: any) => ({
       ...entry,
@@ -211,9 +259,22 @@ export const CustomTooltip = ({
 
     const formatNumeric = (value: number) => {
       if (!shouldFormatBytes && valuePrecision === 0 && value > 0 && value < 1) return '<1'
-      return shouldFormatBytes
-        ? formatBytes(isNetworkChart ? Math.abs(value) : value, valuePrecision)
-        : numberFormatter(value, valuePrecision)
+      if (shouldFormatBytes) {
+        const val = isNetworkChart ? Math.abs(value) : value
+        if (isMemoryChart) return formatBytesMinMB(val, valuePrecision)
+        return formatBytes(val, valuePrecision)
+      }
+      const formatted = numberFormatter(value, valuePrecision)
+      if (
+        !isBytesFormat &&
+        format !== '%' &&
+        format !== 'ms' &&
+        typeof format === 'string' &&
+        format
+      ) {
+        return `${formatted}${format}`
+      }
+      return formatted
     }
 
     const LabelItem = ({ entry }: { entry: any }) => {
@@ -251,15 +312,24 @@ export const CustomTooltip = ({
     return (
       <div
         className={cn(
-          'grid min-w-[8rem] items-start gap-1.5 rounded-lg border border-border/50 bg px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
+          'grid min-w-32 items-start gap-1.5 rounded-lg border border-border/50 bg-default px-2.5 py-1.5 text-xs shadow-xl transition-opacity opacity-100',
           !isActiveHoveredChart && 'opacity-0'
         )}
       >
         <p className="text-foreground-light text-xs">{localTimeZone}</p>
-        <p className="font-medium">{dayjs(timestamp).format(DateTimeFormats.FULL_SECONDS)}</p>
+        <p className="font-medium">{formatDateTime(timestamp, DateTimeFormats.FULL_SECONDS)}</p>
         <div className="grid gap-0">
           {[...payload].reverse().map((entry: any, index: number) => (
             <LabelItem key={`${entry.name}-${index}`} entry={entry} />
+          ))}
+          {thresholdValues?.map((threshold) => (
+            <div key={threshold.label} className="flex items-center w-full">
+              <MaxConnectionsIcon color={threshold.color} />
+              <span className="text-foreground-lighter ml-1 grow cursor-default select-none">
+                {threshold.label}
+              </span>
+              <span className="ml-3.5">{formatNumeric(threshold.value)}</span>
+            </div>
           ))}
           {active && showTotal && (
             <div className="flex md:flex-col gap-1 md:gap-0 text-foreground mt-1">
@@ -352,6 +422,7 @@ export const CustomLabel = ({
     return (
       <button
         key={entry.name}
+        tabIndex={0}
         className="flex md:flex-col gap-1 md:gap-0 w-fit text-foreground rounded-lg  hover:bg-background-overlay-hover"
         onMouseOver={() => handleMouseEnter(entry.name)}
         onMouseOutCapture={handleMouseLeave}

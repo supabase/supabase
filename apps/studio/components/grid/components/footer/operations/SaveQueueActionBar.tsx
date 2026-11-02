@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { Eye, MoreVertical, Trash } from 'lucide-react'
+import { EyeIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { createPortal } from 'react-dom'
 import {
   Button,
@@ -60,7 +60,7 @@ export const SaveQueueActionBar = () => {
                 <div className="flex items-center gap-x-2">
                   <Button
                     size="tiny"
-                    type="primary"
+                    variant="primary"
                     onClick={handleSave}
                     disabled={isSaving}
                     loading={isSaving}
@@ -75,9 +75,9 @@ export const SaveQueueActionBar = () => {
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
                       <Button
-                        type="outline"
+                        variant="outline"
                         className="w-7"
-                        icon={<MoreVertical />}
+                        icon={<MoreVerticalIcon />}
                         aria-label="More options"
                       />
                     </DropdownMenuTrigger>
@@ -87,7 +87,7 @@ export const SaveQueueActionBar = () => {
                         onClick={() => snap.toggleViewOperationQueue()}
                       >
                         <div className="flex items-center gap-x-2">
-                          <Eye size={14} />
+                          <EyeIcon size={14} />
                           <span>Review</span>
                         </div>
                         <KeyboardShortcut keys={['Meta', '.']} />
@@ -95,7 +95,7 @@ export const SaveQueueActionBar = () => {
                       <DropdownMenuSeparator />
                       <DropdownMenuItem onClick={confirmOnClose}>
                         <div className="flex items-center gap-x-2">
-                          <Trash size={14} />
+                          <TrashIcon size={14} />
                           <span>Discard</span>
                         </div>
                       </DropdownMenuItem>

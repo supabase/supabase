@@ -4,9 +4,15 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import type { GrantFor, GrantForVariants } from '@/lib/grants'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+export type BranchCreateGrant =
+  | GrantFor<'post', '/v1/projects/{ref}/branches'>
+  | GrantForVariants<'post', '/v1/projects/{ref}/branches'>
+
 export type BranchCreateVariables = {
+  grant: BranchCreateGrant
   projectRef: string
   branchName: string
   gitBranch?: string
@@ -22,6 +28,7 @@ export async function createBranch({
   region,
   withData,
   desired_instance_size,
+  grant,
 }: BranchCreateVariables) {
   const { data, error } = await post('/v1/projects/{ref}/branches', {
     params: {
@@ -35,6 +42,7 @@ export async function createBranch({
       with_data: withData,
       desired_instance_size,
     },
+    grant,
   })
 
   if (error) handleError(error)

@@ -9,7 +9,7 @@ tags:
   - launch-week
   - edge-functions
   - storage
-date: '2025-07-18:00:00'
+date: '2025-07-18T00:00'
 toc_depth: 3
 author: laktek,nyannyacha
 imgSocial: launch-week-15/day-5-persistent-storage-for-functions/og.png
@@ -17,7 +17,7 @@ imgThumb: launch-week-15/day-5-persistent-storage-for-functions/thumb.png
 launchweek: '15'
 ---
 
-Today, we are introducing Persistent Storage and up to 97% faster cold start times for Edge Functions. Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
+Today, we are introducing Persistent Storage and up to 97% faster cold start times for [Edge Functions](/edge-functions). Previously, Edge Functions only supported ephemeral file storage by writing to `/tmp` directory. Many common libraries for performing tasks, such as zipping/unzipping files and image transformations, are built to work with persistent file storage, so making them work with Edge Functions required extra steps.
 
 The persistent storage option is built on top of the S3 protocol. It allows you to mount any [S3-compatible bucket](https://supabase.com/docs/guides/storage/s3/compatibility), including [Supabase Storage Buckets](https://supabase.com/docs/guides/storage), as a directory for your Edge Functions. You can perform operations such as reading and writing files to the mounted buckets as you would in a POSIX file system.
 

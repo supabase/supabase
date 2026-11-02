@@ -1,5 +1,6 @@
 import { afterAll, describe, expect, test } from 'vitest'
 
+import { ident, joinSqlFragments, safeSql } from '../../src/pg-format'
 import { Query } from '../../src/query/Query'
 import { cleanupRoot, createTestDatabase } from '../db/utils'
 
@@ -117,7 +118,7 @@ describe('Advanced Query Tests', () => {
   describe('Special Table and Column Names', () => {
     withTestDatabase('should handle tables with spaces', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('*').toSql()
+      const sql = query.from('table with spaces', 'public').select().toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public."table with spaces";"`)
       const result = await validateSql(db, sql)
@@ -128,7 +129,7 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle tables with double quotes', async (db) => {
       const query = new Query()
-      const sql = query.from('quoted"table', 'public').select('*').toSql()
+      const sql = query.from('quoted"table', 'public').select().toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public."quoted""table";"`)
       const result = await validateSql(db, sql)
@@ -139,7 +140,7 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle tables with single quotes', async (db) => {
       const query = new Query()
-      const sql = query.from("quoted'table", 'public').select('*').toSql()
+      const sql = query.from("quoted'table", 'public').select().toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public."quoted'table";"`)
       const result = await validateSql(db, sql)
@@ -150,7 +151,7 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle camelCase table names', async (db) => {
       const query = new Query()
-      const sql = query.from('camelCaseTable', 'public').select('*').toSql()
+      const sql = query.from('camelCaseTable', 'public').select().toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public."camelCaseTable";"`)
       const result = await validateSql(db, sql)
@@ -161,7 +162,7 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle tables with special characters', async (db) => {
       const query = new Query()
-      const sql = query.from('special#$%^&Table', 'public').select('*').toSql()
+      const sql = query.from('special#$%^&Table', 'public').select().toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public."special#$%^&Table";"`)
       const result = await validateSql(db, sql)
@@ -172,7 +173,10 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle columns with spaces', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('"column with spaces"').toSql()
+      const sql = query
+        .from('table with spaces', 'public')
+        .select(safeSql`"column with spaces"`)
+        .toSql()
 
       expect(sql).toMatchInlineSnapshot(
         `"select "column with spaces" from public."table with spaces";"`
@@ -185,7 +189,10 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle columns with double quotes', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('"quoted""column"').toSql()
+      const sql = query
+        .from('table with spaces', 'public')
+        .select(safeSql`"quoted""column"`)
+        .toSql()
 
       expect(sql).toMatchInlineSnapshot(
         `"select "quoted""column" from public."table with spaces";"`
@@ -198,7 +205,10 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle columns with single quotes', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('"quoted\'column"').toSql()
+      const sql = query
+        .from('table with spaces', 'public')
+        .select(safeSql`"quoted'column"`)
+        .toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select "quoted'column" from public."table with spaces";"`)
       const result = await validateSql(db, sql)
@@ -209,7 +219,10 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle camelCase column names', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('"camelCaseColumn"').toSql()
+      const sql = query
+        .from('table with spaces', 'public')
+        .select(safeSql`"camelCaseColumn"`)
+        .toSql()
 
       expect(sql).toMatchInlineSnapshot(
         `"select "camelCaseColumn" from public."table with spaces";"`
@@ -222,7 +235,10 @@ describe('Advanced Query Tests', () => {
 
     withTestDatabase('should handle columns with special characters', async (db) => {
       const query = new Query()
-      const sql = query.from('table with spaces', 'public').select('"special#$%^&Column"').toSql()
+      const sql = query
+        .from('table with spaces', 'public')
+        .select(safeSql`"special#$%^&Column"`)
+        .toSql()
 
       expect(sql).toMatchInlineSnapshot(
         `"select "special#$%^&Column" from public."table with spaces";"`
@@ -255,7 +271,7 @@ describe('Advanced Query Tests', () => {
       // The Query class handles the proper quoting
       const sql = query
         .from('table with spaces', 'public')
-        .select('*')
+        .select()
         .filter('column with spaces', '=', 'test value')
         .toSql()
 
@@ -278,7 +294,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query
         .from('normal_table', 'public')
-        .select('*')
+        .select()
         .filter('name', '=', "O'Reilly")
         .toSql()
 
@@ -336,7 +352,7 @@ describe('Advanced Query Tests', () => {
         const query = new Query()
         const sql = query
           .from('normal_table', 'public')
-          .select('id, name')
+          .select(safeSql`id, name`)
           .filter('id', '>', 10)
           .filter('name', '~~', '%John%')
           .order('normal_table', 'name', true, false)
@@ -501,7 +517,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query
         .from('normal_table', 'public')
-        .select('*')
+        .select()
         .filter('name', '=', 'Special $ ^ & * ( ) _ + { } | : < > ? characters')
         .toSql()
 
@@ -527,7 +543,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query
         .from('normal_table', 'public')
-        .select('*')
+        .select()
         .filter('id', 'in', [1, 2, 3])
         .toSql()
 
@@ -547,11 +563,7 @@ describe('Advanced Query Tests', () => {
       `)
 
       const query = new Query()
-      const sql = query
-        .from('normal_table', 'public')
-        .select('*')
-        .filter('name', 'is', 'null')
-        .toSql()
+      const sql = query.from('normal_table', 'public').select().filter('name', 'is', 'null').toSql()
 
       expect(sql).toMatchInlineSnapshot(`"select * from public.normal_table where name is null;"`)
       const result = await validateSql(db, sql)
@@ -572,7 +584,7 @@ describe('Advanced Query Tests', () => {
       const query = new Query()
       const sql = query
         .from('normal_table', 'public')
-        .select('*')
+        .select()
         .filter('name', 'is', 'not null')
         .toSql()
 

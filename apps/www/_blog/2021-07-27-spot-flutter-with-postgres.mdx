@@ -43,7 +43,7 @@ He wanted the benefits of SQL and Relational schemas, and decided to build an ap
 
 Tyler had been thinking about building Spot, a mobile app for sharing geo-based video content. When he previously planned Spot,
 he felt like hacking around Firebase would be too much effort. After researching the PostGIS extension for geospatial data,
-he realized Supabase was the perfect fit. As an avid Flutter fan, Supabase's Dart library was a bonus.
+he realized Supabase was the perfect fit. As an avid Flutter fan, Supabase's [Dart library](/features/client-library-flutter) was a bonus.
 Tyler loves the open-source nature of Supabase and immediately began contributing to the Dart library to enable functionality that he needed.
 
 Tyler decided that Spot would be perfect to showcase the power of Supabase and Flutter. Since he's active in the open-source community,
@@ -57,9 +57,9 @@ Although Spot seems simple, it has a lot of complicated components. Implementing
 which is notoriously tricky in Firebase. In Supabase, because it's just Postgres under the hood, `count` is implemented
 using a simple SQL `count` query.
 
-Supabase has Row-Level Security, which Tyler uses as a filter - something he can't do with Firebase.
+Supabase has [Row-Level Security](/docs/guides/database/postgres/row-level-security), which Tyler uses as a filter - something he can't do with Firebase.
 
-Spot uses Supabase Storage for managing large video files. Firebase Storage [has a reputation](https://stackoverflow.com/questions/43851742/firebase-storage-very-slow-compared-to-firebase-hosting) for slowness until it is public, which was a privacy concern for Tyler. With Supabase Storage, this wasn't an issue - storage is performant and secure.
+Spot uses [Supabase Storage](/storage) for managing large video files. Firebase Storage [has a reputation](https://stackoverflow.com/questions/43851742/firebase-storage-very-slow-compared-to-firebase-hosting) for slowness until it is public, which was a privacy concern for Tyler. With Supabase Storage, this wasn't an issue - storage is performant and secure.
 
 The Firebase API pricing model makes it is difficult to predict pricing upfront for new projects. With Supabase,
 Tyler doesn't need to worry about how many API calls his project makes.
@@ -87,7 +87,7 @@ With Supabase, Tyler can use Flutter to build a performant app quickly at a low 
 experience and has even joined the SupaSquad.
 
 > Update: After being part of the SupaSquad, Tyler joined Supabase full time as part of the DevRel squad, focusing on Flutter. This is some of his latest work: [Flutter Tutorial: building a Flutter chat app
-> ](https://supabase.com/blog/flutter-tutorial-building-a-chat-app) and [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls).
+> ](https://supabase.com/blog/flutter-tutorial-building-a-chat-app) and [Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authorization-with-rls).
 
 You can download and install spot for [iOS](https://apps.apple.com/us/app/spot-videos/id1564675926?utm_source=supabase&utm_campaign=static)
 and [Android](https://play.google.com/store/apps/details?id=app.spotvideo&utm_source=supabase&utm_campaign=static)

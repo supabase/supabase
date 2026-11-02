@@ -13,7 +13,7 @@ tags:
   - sql
   - postgres
   - planetpg
-date: '02-27-2021'
+date: '2021-02-27'
 ---
 
 There are plenty of resources out there for preparing for PostgreSQL interview questions. Most posts are for technical interviews with a focus on PostgreSQL, however many just cover the basics and the advanced resources often conflate transactional SQL with analytical SQL (WINDOW/RANK functions, aggregates etc.).
@@ -96,7 +96,7 @@ GRANT INSERT ON students TO PUBLIC;
 
 ### Know how to do RLS - Policies
 
-We use Row Level Security in Supabase as a way to grant/restrict access on a row level basis. For example if you're writing a Discord clone, perhaps only a given user should be able to write their own messages:
+We use [Row Level Security](/docs/guides/database/postgres/row-level-security) in Supabase as a way to grant/restrict access on a row level basis. For example if you're writing a Discord clone, perhaps only a given user should be able to write their own messages:
 
 ```sql
 CREATE POLICY "Individuals can only write their own messages." ON messages FOR
@@ -165,6 +165,6 @@ Thanks Steve Chavez for providing all the good bits of this post :)
 - [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
 - [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
 - [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
 - [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
 - [Realtime Postgres RLS on Supabase](https://supabase.com/blog/realtime-row-level-security-in-postgresql)

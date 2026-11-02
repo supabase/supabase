@@ -1,6 +1,7 @@
 'use client'
 
-import { consentState, isBrowser } from 'common'
+import { consentState } from 'common/consent-state'
+import { isBrowser } from 'common/helpers'
 import { useCallback, useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
@@ -9,7 +10,7 @@ import { useSnapshot } from 'valtio'
 import { ConsentToast } from './ConsentToast'
 
 export const useConsentToast = () => {
-  const consentToastId = useRef<string | number>()
+  const consentToastId = useRef<string | number | undefined>(undefined)
   const snap = useSnapshot(consentState)
 
   const acceptAll = useCallback(() => {
@@ -47,8 +48,8 @@ export const useConsentToast = () => {
         closeButton: false,
         dismissible: false,
         className: cn(
-          '!w-screen !fixed !border-t !h-auto !left-0 !bottom-0 !top-auto !right-0 !rounded-none !max-w-none !bg-overlay !text',
-          'sm:!w-full sm:!max-w-[356px] sm:!left-auto sm:!right-8 sm:!bottom-8 sm:!rounded-lg sm:border'
+          'w-screen! fixed! border-t! h-auto! left-0! bottom-0! top-auto! right-0! rounded-none! max-w-none! !bg-overlay !text',
+          'sm:w-full! sm:max-w-[356px]! sm:left-auto! sm:right-8! sm:bottom-8! sm:rounded-lg! sm:border'
         ),
       })
     } else if (consentToastId.current) {

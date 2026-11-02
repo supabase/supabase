@@ -10,7 +10,7 @@ import {
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
 import { RealtimePolicies } from '@/components/interfaces/Realtime/Policies'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import RealtimeLayout from '@/components/layouts/RealtimeLayout/RealtimeLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { DOCS_URL } from '@/lib/constants'

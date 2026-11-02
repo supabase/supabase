@@ -1,10 +1,9 @@
-import React, { FC } from 'react'
-import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { cn } from 'ui'
-
 import { buildDays as days } from 'components/LaunchWeek/15/data'
 import SectionContainer from 'components/Layouts/SectionContainer'
+import { motion, useInView } from 'motion/react'
+import Link from 'next/link'
+import React, { FC } from 'react'
+import { cn } from 'ui'
 
 const LW15BuildStage: FC = () => {
   const ref = React.useRef(null)
@@ -25,7 +24,7 @@ const LW15BuildStage: FC = () => {
   return (
     <>
       <SectionContainer
-        className="!max-w-none lg:!container py-8 md:py-8 lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
+        className="max-w-none! lg:container! py-8 md:py-8 lw-nav-anchor flex flex-col lg:grid lg:grid-cols-5 gap-4 lg:gap-2"
         id="build-stage"
       >
         <div className="flex flex-col md:gap-2 h-full justify-between col-span-2">

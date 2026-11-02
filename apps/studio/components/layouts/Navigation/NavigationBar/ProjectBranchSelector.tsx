@@ -1,10 +1,11 @@
+import { useQuery } from '@tanstack/react-query'
 import { useBreakpoint, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   SidebarMenu,
   SidebarMenuButton,
   SidebarMenuItem,
@@ -15,11 +16,12 @@ import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
 import { ProjectBranchSelectorPopover } from './ProjectBranchSelectorPopover'
 import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
 import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export function ProjectBranchSelector() {
   const router = useRouter()
@@ -38,10 +40,14 @@ export function ProjectBranchSelector() {
   const [open, setOpen] = useState(false)
 
   const isBranchingEnabled = project?.is_branch_enabled === true
-  const { data: branches } = useBranchesQuery(
-    { projectRef: project?.parent_project_ref || ref },
-    { enabled: open && Boolean(project) }
-  )
+  const branchesProjectRef = project?.parent_project_ref || ref
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: branchesProjectRef,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
+    enabled: open && Boolean(project),
+  })
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
   const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =
@@ -103,14 +109,14 @@ export function ProjectBranchSelector() {
   return (
     <SidebarMenu>
       <SidebarMenuItem>
-        <Popover_Shadcn_ open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger_Shadcn_ asChild>
+        <Popover open={open} onOpenChange={setOpen} modal={false}>
+          <PopoverTrigger asChild>
             <ProjectBranchSelectorTrigger {...triggerProps} />
-          </PopoverTrigger_Shadcn_>
-          <PopoverContent_Shadcn_ className="p-0 w-[780px]" side="bottom" align="start">
+          </PopoverTrigger>
+          <PopoverContent className="p-0 w-[780px]" side="bottom" align="start">
             <ProjectBranchSelectorPopover onClose={() => setOpen(false)} />
-          </PopoverContent_Shadcn_>
-        </Popover_Shadcn_>
+          </PopoverContent>
+        </Popover>
       </SidebarMenuItem>
     </SidebarMenu>
   )

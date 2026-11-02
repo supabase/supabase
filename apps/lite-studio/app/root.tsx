@@ -2,10 +2,25 @@ import { isRouteErrorResponse, Links, Meta, Outlet, Scripts, ScrollRestoration }
 
 import type { Route } from './+types/root'
 
-import './app.css'
-import 'config/typography.css'
+import '../styles/globals.css'
 
 export const links: Route.LinksFunction = () => [
+  ...(import.meta.env.DEV
+    ? [
+        {
+          rel: 'icon',
+          type: 'image/x-icon',
+          sizes: '16x16 32x32 48x48',
+          href: '/favicon/local/favicon.ico',
+        },
+        {
+          rel: 'apple-touch-icon',
+          sizes: '180x180',
+          href: '/favicon/local/apple-icon-180x180.png',
+        },
+        { rel: 'manifest', href: '/favicon/local/manifest.json' },
+      ]
+    : [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]),
   { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
   {
     rel: 'preconnect',

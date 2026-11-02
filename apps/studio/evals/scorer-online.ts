@@ -8,17 +8,16 @@
  *   - correctnessScorer: requires ground truth (expected output), offline-eval-only.
  */
 
-import braintrust, { type EvalScorer } from 'braintrust'
+import braintrust from 'braintrust'
 
 import {
   completenessScorer,
   concisenessScorer,
   docsFaithfulnessScorer,
   goalCompletionScorer,
+  safetyScorer,
   urlValidityScorer,
-  type AssistantEvalInput,
-  type AssistantEvalOutput,
-  type Expected,
+  type AssistantEvalScorer,
 } from './scorer'
 import manifest from './scorer-online-manifest.json'
 
@@ -42,7 +41,11 @@ const handlers = {
   completeness: completenessScorer,
   'docs-faithfulness': docsFaithfulnessScorer,
   'url-validity': urlValidityScorer,
-} satisfies Record<string, EvalScorer<AssistantEvalInput, AssistantEvalOutput, Expected>>
+  // safetyScorer guards on requiresSafetyCheck (an offline-eval concept).
+  // Online traces have no expected, so we wrap it to always run.
+  safety: (args) =>
+    safetyScorer({ ...args, expected: { ...args.expected, requiresSafetyCheck: true } }),
+} satisfies Record<string, AssistantEvalScorer>
 
 // @ts-expect-error - Project ID is only required at build-time
 const project = braintrust.projects.create({ id: projectId })

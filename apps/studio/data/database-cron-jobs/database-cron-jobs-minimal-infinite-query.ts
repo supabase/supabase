@@ -7,7 +7,8 @@ import {
   DatabaseCronJobRunsVariables,
 } from './database-cron-jobs-infinite-query'
 import { databaseCronJobsKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
 
 export async function getDatabaseCronJobsMinimal({
@@ -23,6 +24,7 @@ export async function getDatabaseCronJobsMinimal({
     connectionString,
     sql: getCronJobsMinimalSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs-minimal'],
+    grant: unguarded.migrating,
   })
 
   return result

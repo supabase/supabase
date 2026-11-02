@@ -1,7 +1,7 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
-import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
 import Link from 'next/link'
 import { ReactNode, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
@@ -50,7 +50,7 @@ const FeaturesSection = ({
               </h2>
               <p className="text-lighter mb-4">{paragraph}</p>
               {cta && (
-                <Button asChild type="default" size="small" icon={<ArrowUpRight />}>
+                <Button asChild size="small" icon={<ArrowUpRight />}>
                   <Link href={cta.link}>{cta.label ?? 'Explore documentation'}</Link>
                 </Button>
               )}
@@ -102,7 +102,7 @@ const Feature = ({
             >
               <path
                 d={feature.icon}
-                stroke="hsl(var(--foreground-default))"
+                stroke="var(--foreground-default)"
                 strokeMiterlimit="10"
                 strokeLinejoin="round"
                 strokeLinecap="round"

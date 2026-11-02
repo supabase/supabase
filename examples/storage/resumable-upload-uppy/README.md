@@ -10,7 +10,7 @@ This example shows how to use [Supabase Storage](https://supabase.com/docs/refer
 - Open the index.html file and replace the following variables with your own:
 
 ```js
-const SUPABASE_ANON_KEY = '' // your project's anon key
+const SUPABASE_PUBLISHABLE_KEY = '' // your project's publishable key
 const SUPABASE_PROJECT_ID = '' // your project ref
 const STORAGE_BUCKET = '' // your storage bucket name
 const BEARER_TOKEN = '' // your bearer token

@@ -2,57 +2,26 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
-import { createClient } from 'npm:supabase-js@2'
-// New approach (v2.95.0+)
-import { corsHeaders } from 'jsr:@supabase/supabase-js@2/cors'
-// For older versions, use hardcoded headers:
-// const corsHeaders = {
-//   'Access-Control-Allow-Origin': '*',
-//   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-// }
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-Deno.serve(async (req) => {
-  // read a text file from storage and print its contents
-  // This is needed if you're planning to invoke your function from a browser.
-  if (req.method === 'OPTIONS') {
-    return new Response('ok', { headers: corsHeaders })
-  }
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (req, ctx) => {
+    // read a text file from storage and print its contents
+    try {
+      const { data, error } = await ctx.supabase.storage.from('my-bucket').download('sample.txt')
+      if (error) throw error
 
-  try {
-    // Create a Supabase client with the Auth context of the logged in user.
-    const supabaseClient = createClient(
-      // Supabase API URL - env var exported by default.
-      Deno.env.get('SUPABASE_URL') ?? '',
-      // Supabase API ANON KEY - env var exported by default.
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      // Create client with Auth context of the user that called the function.
-      // This way your row-level-security (RLS) policies are applied.
-      {
-        global: {
-          headers: { Authorization: req.headers.get('Authorization')! },
-        },
-      }
-    )
+      // file contents are returned as a blob, we can convert it to utf-8 text by calling text() method.
+      const contents = await data.text()
 
-    const { data, error } = await supabaseClient.storage.from('my-bucket').download('sample.txt')
-    if (error) throw error
+      // prints out the contents of the file
+      console.log(contents)
 
-    // file contents are returned as a blob, we can convert it to utf-8 text by calling text() method.
-    const contents = await data.text()
+      return Response.json({ contents })
+    } catch (error) {
+      console.error(error)
 
-    // prints out the contents of the file
-    console.log(contents)
-
-    return new Response(JSON.stringify({ contents }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 200,
-    })
-  } catch (error) {
-    console.error(error)
-
-    return new Response(JSON.stringify({ error: error.message }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      status: 400,
-    })
-  }
-})
+      return Response.json({ error: error.message }, { status: 400 })
+    }
+  }),
+}

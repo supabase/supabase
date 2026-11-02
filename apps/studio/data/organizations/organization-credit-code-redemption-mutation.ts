@@ -65,6 +65,7 @@ export const useOrganizationCreditCodeRedemptionMutation = ({
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: organizationKeys.customerProfile(slug) }),
         queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgSubscription(slug) }),
+        queryClient.invalidateQueries({ queryKey: subscriptionKeys.orgBalance(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

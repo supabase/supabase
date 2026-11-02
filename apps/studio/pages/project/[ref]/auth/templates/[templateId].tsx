@@ -1,13 +1,26 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
-import { Admonition, GenericSkeletonLoader } from 'ui-patterns'
+import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+  Button,
+  Card,
+  CardContent,
+  CardFooter,
+  Form,
+  FormControl,
+  FormField,
+  Switch,
+} from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -26,25 +39,28 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import {
-  BreadcrumbItem,
-  BreadcrumbLink,
-  BreadcrumbList,
-  BreadcrumbPage,
-  BreadcrumbSeparator,
-} from 'ui/src/components/shadcn/ui/breadcrumb'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import * as z from 'zod'
 
-import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/AuthTemplatesValidation'
-import { slugifyTitle } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { TEMPLATES_SCHEMAS } from '@/components/interfaces/Auth/EmailTemplates/AuthTemplatesValidation'
+import { CustomEmailTemplateRestrictionAdmonition } from '@/components/interfaces/Auth/EmailTemplates/CustomEmailTemplateRestrictionAdmonition'
+import { AUTH_EMAIL_TEMPLATES_DOCS_PATH } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.constants'
+import {
+  isCustomEmailTemplateEditingRestricted,
+  isCustomEmailTemplateRestrictionStatusKnown,
+  slugifyTitle,
+} from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates.utils'
+import { SendEmailHookActiveAdmonition } from '@/components/interfaces/Auth/EmailTemplates/SendEmailHookActiveAdmonition'
 import { TemplateEditor } from '@/components/interfaces/Auth/EmailTemplates/TemplateEditor'
 import AuthLayout from '@/components/layouts/AuthLayout/AuthLayout'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
 
@@ -57,17 +73,33 @@ const RedirectToTemplates = () => {
   const { templateId, ref } = router.query
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'custom_config_gotrue'
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
   )
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { data: authConfig, isPending: isLoadingConfig } = useAuthConfigQuery({ projectRef })
+  const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const { data: selectedProject } = useSelectedProjectQuery()
+  const isTemplateRestrictionStatusKnown = isCustomEmailTemplateRestrictionStatusKnown({
+    authConfig,
+    organization: selectedOrganization,
+    projectInsertedAt: selectedProject?.inserted_at,
+  })
+  const isTemplateEditBlocked =
+    isTemplateRestrictionStatusKnown &&
+    isCustomEmailTemplateEditingRestricted({
+      authConfig,
+      organization: selectedOrganization,
+      projectInsertedAt: selectedProject?.inserted_at,
+    })
+  const isTemplateEditorReadOnly = !isTemplateRestrictionStatusKnown || isTemplateEditBlocked
+  const hasSendEmailHook = !!(
+    authConfig?.HOOK_SEND_EMAIL_ENABLED && authConfig?.HOOK_SEND_EMAIL_URI
+  )
 
   const { mutate: updateAuthConfig, isPending: isUpdatingConfig } = useAuthConfigUpdateMutation({
     onError: (error) => {
@@ -83,10 +115,6 @@ const RedirectToTemplates = () => {
     templateId && typeof templateId === 'string'
       ? TEMPLATES_SCHEMAS.find((template) => slugifyTitle(template.title) === templateId)
       : null
-
-  // Convert templateId slug to one lowercase word to match docs anchor tag
-  const templateIdForDocs =
-    typeof templateId === 'string' ? templateId.replace(/-/g, '').toLowerCase() : ''
 
   // Determine if this is a security notification template
   const isSecurityTemplate = template?.misc?.emailTemplateType === 'security'
@@ -150,7 +178,7 @@ const RedirectToTemplates = () => {
           title="Unable to find template"
           description={`${templateId ? `The template "${templateId}"` : 'This template'} doesn’t seem to exist.`}
         >
-          <Button asChild type="default" className="mt-2">
+          <Button asChild className="mt-2">
             <Link href={`/project/${ref}/auth/templates`}>Head back</Link>
           </Button>
         </Admonition>
@@ -182,9 +210,7 @@ const RedirectToTemplates = () => {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <DocsButton
-              href={`${DOCS_URL}/guides/local-development/customizing-email-templates#${isSecurityTemplate ? 'security' : 'auth'}emailtemplate${templateIdForDocs}`}
-            />
+            <DocsButton href={`${DOCS_URL}${AUTH_EMAIL_TEMPLATES_DOCS_PATH}`} />
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
@@ -231,13 +257,11 @@ const RedirectToTemplates = () => {
                         </CardContent>
                         <CardFooter className="justify-end space-x-2">
                           {templateForm.formState.isDirty && (
-                            <Button type="default" onClick={() => templateForm.reset()}>
-                              Cancel
-                            </Button>
+                            <Button onClick={() => templateForm.reset()}>Cancel</Button>
                           )}
                           <Button
-                            type="primary"
-                            htmlType="submit"
+                            variant="primary"
+                            type="submit"
                             disabled={
                               !canUpdateConfig ||
                               isUpdatingConfig ||
@@ -256,7 +280,7 @@ const RedirectToTemplates = () => {
             )}
 
             <PageSection>
-              {showConfigurationSection && (
+              {(showConfigurationSection || isTemplateEditBlocked) && (
                 <PageSectionMeta>
                   <PageSectionSummary>
                     <PageSectionTitle>Content</PageSectionTitle>
@@ -264,8 +288,18 @@ const RedirectToTemplates = () => {
                 </PageSectionMeta>
               )}
               <PageSectionContent>
+                {isTemplateEditBlocked && !hasSendEmailHook && (
+                  <div className="mb-4">
+                    <CustomEmailTemplateRestrictionAdmonition />
+                  </div>
+                )}
+                {hasSendEmailHook && (
+                  <div className="mb-4">
+                    <SendEmailHookActiveAdmonition />
+                  </div>
+                )}
                 <Card>
-                  <TemplateEditor template={template} />
+                  <TemplateEditor template={template} isReadOnly={isTemplateEditorReadOnly} />
                 </Card>
               </PageSectionContent>
             </PageSection>

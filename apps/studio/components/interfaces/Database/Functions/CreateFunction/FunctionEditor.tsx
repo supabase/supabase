@@ -1,7 +1,7 @@
-import { Maximize2, Minimize2 } from 'lucide-react'
+import { Maximize2Icon, Minimize2Icon } from 'lucide-react'
 import { Button, cn, FormControl, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import CodeEditor from '@/components/ui/CodeEditor/CodeEditor'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 
 export const FunctionEditor = ({
   field,
@@ -29,21 +29,24 @@ export const FunctionEditor = ({
       </FormControl>
       <div
         className={cn(
-          'absolute top-0 right-2 bg-surface-300 border border-strong rounded h-[28px]',
+          'absolute top-0 right-2 bg-surface-300 border border-strong rounded-sm h-[28px]',
           'opacity-0 group-hover:opacity-100 group-hover:top-2 transition-all'
         )}
       >
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
-              type="text"
+              variant="text"
               size="tiny"
               className={cn(
                 'px-1.5 text-foreground-lighter hover:text-foreground',
                 'transition z-50'
               )}
               onClick={() => setFocused(!focused)}
-              icon={focused ? <Minimize2 /> : <Maximize2 />}
+              icon={focused ? <Minimize2Icon /> : <Maximize2Icon />}
+              aria-label={focused ? 'Minimize editor' : 'Maximize editor'}
+              // Tooltip repeats the label; screen readers would read it twice
+              aria-describedby={undefined}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">

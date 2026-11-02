@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { useFlag } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
@@ -8,9 +8,10 @@ import { cn } from 'ui'
 import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { AccountMenuContent } from './AccountMenuContent'
 import { WithSidebar } from './WithSidebar'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { IS_PLATFORM } from '@/lib/constants'
 import { buildStudioPageTitle } from '@/lib/page-title'
@@ -23,19 +24,15 @@ export interface AccountLayoutProps {
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
   const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-
+  const showOAuthApps = useFlag('OauthAppScopedGrants') && USE_MOCKS
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
-
-  const [lastVisitedOrganization] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.LAST_VISITED_ORGANIZATION,
-    ''
-  )
 
   const backToDashboardURL =
     appSnap.lastRouteBeforeVisitingAccountPage.length > 0
@@ -96,6 +93,16 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
                       },
                     ]
                   : []),
+                ...(showOAuthApps
+                  ? [
+                      {
+                        key: 'oauth-apps',
+                        label: 'OAuth Apps',
+                        href: '/account/apps',
+                        isActive: currentPath === '/account/apps',
+                      },
+                    ]
+                  : []),
               ],
             },
             {
@@ -111,7 +118,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
               ],
             },
           ],
-    [currentPath, showSecuritySettings]
+    [currentPath, showOAuthApps, showSecuritySettings]
   )
 
   useLayoutEffect(() => {

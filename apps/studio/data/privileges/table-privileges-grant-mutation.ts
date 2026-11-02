@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TablePrivilegesGrant = Parameters<
@@ -30,6 +31,7 @@ export async function grantTablePrivileges({
     connectionString,
     sql,
     queryKey: ['table-privileges', 'grant'],
+    grant: unguarded.migrating,
   })
   return result
 }

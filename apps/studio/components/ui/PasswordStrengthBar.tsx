@@ -1,6 +1,7 @@
 import { InlineLinkClassName } from './InlineLink'
+import { SpecialSymbolsCallout } from './SpecialSymbolsCallout'
 import { PASSWORD_STRENGTH_COLOR, PASSWORD_STRENGTH_PERCENTAGE } from '@/lib/constants'
-import { PasswordStrengthScore } from '@/lib/password-strength'
+import { passwordNeedsPercentEncoding, PasswordStrengthScore } from '@/lib/password-strength'
 
 interface Props {
   passwordStrengthScore: PasswordStrengthScore
@@ -17,6 +18,7 @@ export const PasswordStrengthBar = ({
 }: Props) => {
   return (
     <>
+      {passwordNeedsPercentEncoding(password) && <SpecialSymbolsCallout />}
       {password && (
         <div
           aria-valuemax={100}
@@ -24,7 +26,7 @@ export const PasswordStrengthBar = ({
           aria-valuenow={PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}
           aria-valuetext={`${PASSWORD_STRENGTH_PERCENTAGE[passwordStrengthScore]}%`}
           role="progressbar"
-          className="mb-2 overflow-hidden transition-all border rounded bg-200 w-full"
+          className="mb-2 overflow-hidden transition-all border rounded-sm bg-200 w-full"
         >
           <div
             style={{
@@ -39,7 +41,12 @@ export const PasswordStrengthBar = ({
           ? passwordStrengthMessage
           : 'This is the password to your Postgres database, so it must be strong and hard to guess.') +
           ' '}
-        <button type="button" className={InlineLinkClassName} onClick={generateStrongPassword}>
+        <button
+          type="button"
+          tabIndex={0}
+          className={InlineLinkClassName}
+          onClick={generateStrongPassword}
+        >
           Generate a password
         </button>
         .

@@ -1,7 +1,6 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Calendar, PartyPopper } from 'lucide-react'
+import { CalendarIcon, InfoIcon, PartyPopperIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
@@ -19,20 +18,21 @@ import {
   DialogTrigger,
   Form,
   FormField,
-  Input_Shadcn_,
+  Input,
   Separator,
 } from 'ui'
-import { Admonition, ShimmeringLoader, TimestampInfo } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 import { z } from 'zod'
 
-import { getTotalCreditBalanceCents } from './helpers'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useOrganizationCreditCodeRedemptionMutation } from '@/data/organizations/organization-credit-code-redemption-mutation'
-import { useOrganizationCustomerProfileQuery } from '@/data/organizations/organization-customer-profile-query'
 import { useOrganizationQuery } from '@/data/organizations/organization-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useOrgBalanceQuery } from '@/data/subscriptions/org-balance-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
 
 const FORM_ID = 'credit-code-redemption'
@@ -58,26 +58,21 @@ export const CreditCodeRedemption = ({
   )
 
   const { data: org, isLoading: isOrgLoading } = useOrganizationQuery({ slug })
-  const { data: customerProfile, isLoading: isCustomerProfileLoading } =
-    useOrganizationCustomerProfileQuery({ slug })
-  const combinedCreditBalanceCents = customerProfile
-    ? getTotalCreditBalanceCents({
-        customerBalance: customerProfile.balance,
-        prepaidCreditsBalance: customerProfile.prepaid_credits_balance,
-      })
-    : undefined
+  const { data: orgBalance, isLoading: isOrgBalanceLoading } = useOrgBalanceQuery(
+    { orgSlug: slug },
+    { enabled: codeRedemptionModalVisible }
+  )
+  const combinedCreditBalanceCents = orgBalance?.total_balance_cents
 
-  const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions',
-    undefined,
+  const { can: canRedeemCode, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_WRITE,
     { organizationSlug: slug }
   )
 
   const captchaRef = useRef<HCaptcha>(null)
   const captchaTokenRef = useRef<string | null>(null)
   const codeRedemptionDisabled =
-    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isCustomerProfileLoading
+    !canRedeemCode || !isPermissionsLoaded || isOrgLoading || isOrgBalanceLoading
 
   const form = useForm<CreditCodeRedemptionForm>({
     resolver: zodResolver(FormSchema),
@@ -152,12 +147,27 @@ export const CreditCodeRedemption = ({
     }
   }, [codeRedemptionModalVisible, initHcaptchaRef])
 
+  function getRedemptionNotice() {
+    const redemptionIsReady = !!codeRedemptionResult
+    if (!redemptionIsReady) {
+      return undefined
+    }
+
+    const alreadyRedeemedCents = codeRedemptionResult.already_redeemed_partner_credits ?? 0
+    if (!alreadyRedeemedCents) {
+      return undefined
+    }
+
+    return `Since you already redeemed $${alreadyRedeemedCents / 100} through other deals, we couldn't grant the full $${((alreadyRedeemedCents + codeRedemptionResult.amount_cents) / 100).toFixed(0)}.`
+  }
+
+  const redemptionNotice = getRedemptionNotice()
+
   return (
     <Dialog open={codeRedemptionModalVisible} onOpenChange={onCodeRedemptionDialogVisibilityChange}>
       {!modalVisible && (
         <DialogTrigger asChild>
           <ButtonTooltip
-            type="default"
             className="pointer-events-auto"
             disabled={codeRedemptionDisabled}
             tooltip={{
@@ -182,24 +192,30 @@ export const CreditCodeRedemption = ({
           size="invisible"
           onOpen={() => {
             // [Joshen] This is to ensure that hCaptcha popup remains clickable
-            if (document !== undefined) document.body.classList.add('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.add('pointer-events-auto!')
           }}
           onClose={() => {
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onVerify={(token) => {
             captchaTokenRef.current = token
-            if (document !== undefined) document.body.classList.remove('!pointer-events-auto')
+            if (document !== undefined) document.body.classList.remove('pointer-events-auto!')
           }}
           onExpire={() => {
             captchaTokenRef.current = null
           }}
         />
 
+        {/* screen reader */}
+        <div role="status" aria-live="polite" className="sr-only">
+          {!!codeRedemptionResult && `$${codeRedemptionResult.amount_cents / 100} credits applied.`}
+          {redemptionNotice && ` ${redemptionNotice}`}
+        </div>
+
         {!!codeRedemptionResult ? (
           <div className="p-8">
             <div className="text-center flex items-center justify-center">
-              <PartyPopper strokeWidth={1} className="h-14 w-14" />
+              <PartyPopperIcon strokeWidth={1} className="h-14 w-14" />
             </div>
 
             <div className="text-center">
@@ -215,16 +231,24 @@ export const CreditCodeRedemption = ({
             </div>
 
             {codeRedemptionResult.credits_expire_at && (
-              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-4 rounded-lg">
-                <Calendar className="h-4 w-4" />
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
+                <CalendarIcon className="h-4 w-4" />
                 <span>
-                  Expires on{' '}
+                  Your credits expire on{' '}
                   <TimestampInfo
                     className="text-sm"
                     utcTimestamp={codeRedemptionResult.credits_expire_at}
                     labelFormat="MMMM DD, YYYY"
                   />
+                  .
                 </span>
+              </div>
+            )}
+
+            {!!redemptionNotice && (
+              <div className="mt-2 flex items-center justify-center gap-2 text-sm text-muted-foreground bg-muted/50 py-3 px-8 rounded-lg">
+                <InfoIcon className="h-4 w-4 shrink-0" />
+                <span>{redemptionNotice}</span>
               </div>
             )}
 
@@ -239,7 +263,7 @@ export const CreditCodeRedemption = ({
                   )}
 
                   {!router.pathname.includes('/org/') && (
-                    <Button asChild type="default">
+                    <Button asChild>
                       <Link href={`/org/${org?.slug}`}>Go to organization</Link>
                     </Button>
                   )}
@@ -259,7 +283,7 @@ export const CreditCodeRedemption = ({
             <DialogSectionSeparator />
 
             <Form {...form}>
-              {isOrgLoading || isCustomerProfileLoading || !isPermissionsLoaded ? (
+              {isOrgLoading || isOrgBalanceLoading || !isPermissionsLoaded ? (
                 <div className="p-6 space-y-4">
                   <ShimmeringLoader />
                   <div className="flex space-x-4">
@@ -280,7 +304,7 @@ export const CreditCodeRedemption = ({
                           className="gap-1"
                           layout="horizontal"
                         >
-                          <Input_Shadcn_
+                          <Input
                             {...field}
                             className="uppercase w-56 ml-auto"
                             placeholder="ABCD-1234-EFGH-5678"
@@ -323,11 +347,11 @@ export const CreditCodeRedemption = ({
 
                   <DialogFooter>
                     <ButtonTooltip
-                      type="primary"
+                      variant="primary"
                       className="pointer-events-auto"
                       loading={redeemingCode}
                       disabled={codeRedemptionDisabled || !isValid}
-                      htmlType="submit"
+                      type="submit"
                       tooltip={{
                         content: {
                           side: 'bottom',

@@ -1,4 +1,3 @@
-import dayjs from 'dayjs'
 import type { ReactNode } from 'react'
 
 import { useIsFeatureEnabled } from './useIsFeatureEnabled'
@@ -52,15 +51,14 @@ export function useOrganizationRestrictions() {
   }
 
   if (overdueInvoicesFromOtherOrgs?.length) {
-    const otherOrgSlug = organizations?.find(
-      (o) => o.id === overdueInvoicesFromOtherOrgs[0].organization_id
-    )?.slug
+    const overdueOrgIds = new Set(overdueInvoicesFromOtherOrgs.map((i) => i.organization_id))
+    const orgsWithOverdueInvoices = (organizations ?? []).filter((o) => overdueOrgIds.has(o.id))
+
     warnings.push({
       variant: 'danger',
       title: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.title,
-      description: RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(
-        otherOrgSlug ?? org?.slug ?? 'default'
-      ),
+      description:
+        RESTRICTION_MESSAGES.OVERDUE_INVOICES_FROM_OTHER_ORGS.description(orgsWithOverdueInvoices),
     })
   }
 
@@ -69,7 +67,7 @@ export function useOrganizationRestrictions() {
       variant: 'warning',
       title: RESTRICTION_MESSAGES.GRACE_PERIOD.title,
       description: RESTRICTION_MESSAGES.GRACE_PERIOD.description(
-        dayjs(org?.restriction_data?.['grace_period_end']).format('DD MMM, YYYY'),
+        org?.restriction_data?.['grace_period_end'] ?? '',
         org.slug
       ),
     })

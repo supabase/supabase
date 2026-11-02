@@ -1,4 +1,4 @@
-import { keepPreviousData, useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, UseQueryResult } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import type { CustomerAddress, CustomerTaxId } from './types'
@@ -44,6 +44,11 @@ export async function previewOrganizationBillingSubscription({
 
 export type OrganizationBillingSubscriptionPreviewData = Awaited<
   ReturnType<typeof previewOrganizationBillingSubscription>
+>
+
+export type OrganizationBillingSubscriptionPreviewQueryResult = UseQueryResult<
+  OrganizationBillingSubscriptionPreviewData,
+  ResponseError
 >
 
 export const useOrganizationBillingSubscriptionPreview = <

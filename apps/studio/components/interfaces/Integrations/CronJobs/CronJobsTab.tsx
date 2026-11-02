@@ -1,11 +1,15 @@
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
-import { MouseEvent, useEffect, useMemo, useState } from 'react'
+import { MouseEvent, useEffect, useMemo, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { LoadingLine } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { PageSection } from 'ui-patterns/PageSection'
 
+import { ConstrainedIntegrationTabScaffold } from '../ConstrainedIntegrationTabScaffold'
+import { useIntegrationDetail } from '../Landing/useIntegrationDetail'
 import { formatCronJobColumns } from './CronJobs.utils'
 import { CronJobRunDetailsOverflowNotice } from './CronJobsTab.CleanupNotice'
 import { CronJobsTabDataGrid } from './CronJobsTab.DataGrid'
@@ -14,12 +18,13 @@ import { useCronJobsData } from './CronJobsTab.useCronJobsData'
 import { DeleteCronJob } from './DeleteCronJob'
 import { CreateCronJobSheet } from '@/components/interfaces/Integrations/CronJobs/CreateCronJobSheet/CreateCronJobSheet'
 import { CronJob } from '@/data/database-cron-jobs/database-cron-jobs-infinite-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
 import { useInfiniteScroll } from '@/hooks/misc/useInfiniteScroll'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { cleanPointerEventsNoneOnBody } from '@/lib/helpers'
 import { createNavigationHandler } from '@/lib/navigation'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 const EMPTY_CRON_JOB = { jobname: '', schedule: '', active: true, command: '' }
 
@@ -27,7 +32,9 @@ export const CronjobsTab = () => {
   const router = useRouter()
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
+
+  const { isInstalled } = useIntegrationDetail()
 
   const [searchQuery, setSearchQuery] = useQueryState('search', parseAsString.withDefault(''))
 
@@ -46,6 +53,7 @@ export const CronjobsTab = () => {
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     searchQuery,
+    enabled: isInstalled,
   })
 
   const [createCronJobSheetShown, setCreateCronJobSheetShown] = useQueryState(
@@ -58,27 +66,19 @@ export const CronjobsTab = () => {
 
   const [, setCronJobForDeletion] = useQueryState('delete', parseAsString)
 
-  const { mutate: sendEvent } = useSendEventMutation()
-
   const columns = useMemo(
     () =>
       formatCronJobColumns({
         onSelectEdit: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_update_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_update_clicked')
           setCronJobForEditing(job.jobid.toString())
         },
         onSelectDelete: (job: CronJob) => {
-          sendEvent({
-            action: 'cron_job_delete_clicked',
-            groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-          })
+          track('cron_job_delete_clicked')
           setCronJobForDeletion(job.jobid.toString())
         },
       }),
-    [org?.slug, ref, sendEvent, setCronJobForEditing, setCronJobForDeletion]
+    [track, setCronJobForEditing, setCronJobForDeletion]
   )
 
   const handleScroll = useInfiniteScroll({
@@ -89,12 +89,22 @@ export const CronjobsTab = () => {
   })
 
   const onOpenCreateJobSheet = () => {
-    sendEvent({
-      action: 'cron_job_create_clicked',
-      groups: { project: project?.ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_create_clicked')
     setCreateCronJobSheetShown(true)
   }
+
+  const searchInputRef = useRef<HTMLInputElement>(null)
+
+  useShortcut(
+    SHORTCUT_IDS.LIST_PAGE_FOCUS_SEARCH,
+    () => {
+      searchInputRef.current?.focus()
+      searchInputRef.current?.select()
+    },
+    { label: 'Search cron jobs' }
+  )
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, handleClearSearch)
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, onOpenCreateJobSheet, { label: 'Create cron job' })
 
   // Row click handler
   const handleRowClick = (row: CronJob, event: MouseEvent<HTMLDivElement>) => {
@@ -103,10 +113,7 @@ export const CronjobsTab = () => {
       jobname || `Job #${jobid}`
     )}`
 
-    sendEvent({
-      action: 'cron_job_history_clicked',
-      groups: { project: ref ?? 'Unknown', organization: org?.slug ?? 'Unknown' },
-    })
+    track('cron_job_history_clicked')
 
     createNavigationHandler(url, router)(event)
   }
@@ -124,6 +131,18 @@ export const CronjobsTab = () => {
     }
   }, [cronJobForEditing, cronJobIdForEditing, grid.isSuccess, setCronJobForEditing])
 
+  if (!isInstalled) {
+    return (
+      <div className="mx-auto w-full max-w-6xl px-6 xl:px-10">
+        <ConstrainedIntegrationTabScaffold>
+          <PageSection className="py-0">
+            <Admonition type="default" description="Cron is not installed." />
+          </PageSection>
+        </ConstrainedIntegrationTabScaffold>
+      </div>
+    )
+  }
+
   return (
     <>
       <div className="h-full w-full space-y-4">
@@ -131,6 +150,7 @@ export const CronjobsTab = () => {
           <CronJobsTabHeader
             search={search}
             isRefreshing={grid.isRefetching && !grid.isFetchingNextPage}
+            searchInputRef={searchInputRef}
             onSearchChange={setSearch}
             onSearchSubmit={handleSearchSubmit}
             onClearSearch={handleClearSearch}
@@ -181,7 +201,7 @@ const CronJobsFooter = ({ count }: CronJobsFooterProps) => (
   <div className="flex justify-between min-h-9 h-9 overflow-hidden items-center px-6 w-full border-t text-xs text-foreground-light">
     {count.isLoading ? (
       <span className="flex items-center gap-2">
-        <Loader2 size={14} className="animate-spin" /> Loading...
+        <Loader2Icon size={14} className="animate-spin" /> Loading...
       </span>
     ) : (
       `Total: ${count.value ?? 0} jobs${count.isEstimate ? ' (estimate)' : ''}`

@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronDown, Loader2, PlusIcon, RefreshCw } from 'lucide-react'
-import { useEffect, useMemo, useState } from 'react'
-import { useForm } from 'react-hook-form'
+import { useQuery } from '@tanstack/react-query'
+import { Loader2Icon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { useState } from 'react'
+import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -11,58 +12,39 @@ import {
   CardContent,
   CardFooter,
   cn,
-  Command_Shadcn_,
-  CommandEmpty_Shadcn_,
-  CommandGroup_Shadcn_,
-  CommandInput_Shadcn_,
-  CommandItem_Shadcn_,
-  CommandList_Shadcn_,
-  CommandSeparator_Shadcn_,
   Form,
   FormControl,
   FormField,
-  Input_Shadcn_,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Input,
   Switch,
 } from 'ui'
-import { Admonition } from 'ui-patterns/admonition'
+import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ConnectGitHubButton } from './ConnectGitHubButton'
+import {
+  GitHubRepositoryField,
+  useGitHubRepositoryOptions,
+} from '@/components/interfaces/Settings/Integrations/GithubIntegration/GitHubRepositoryField'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import { useBranchCreateMutation } from '@/data/branches/branch-create-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
-import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useCheckGithubBranchValidity } from '@/data/integrations/github-branch-check-query'
 import { useGitHubConnectionCreateMutation } from '@/data/integrations/github-connection-create-mutation'
 import { useGitHubConnectionDeleteMutation } from '@/data/integrations/github-connection-delete-mutation'
 import { useGitHubConnectionUpdateMutation } from '@/data/integrations/github-connection-update-mutation'
-import { useGitHubRepositoriesQuery } from '@/data/integrations/github-repositories-query'
 import type { GitHubConnection } from '@/data/integrations/integrations.types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
-import { openInstallGitHubIntegrationWindow } from '@/lib/github'
-import { EMPTY_ARR } from '@/lib/void'
-
-const GITHUB_ICON = (
-  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 98 96" className="w-6">
-    <title>GitHub icon</title>
-    <path
-      fill="#ffffff"
-      fillRule="evenodd"
-      d="M48.854 0C21.839 0 0 22 0 49.217c0 21.756 13.993 40.172 33.405 46.69 2.427.49 3.316-1.059 3.316-2.362 0-1.141-.08-5.052-.08-9.127-13.59 2.934-16.42-5.867-16.42-5.867-2.184-5.704-5.42-7.17-5.42-7.17-4.448-3.015.324-3.015.324-3.015 4.934.326 7.523 5.052 7.523 5.052 4.367 7.496 11.404 5.378 14.235 4.074.404-3.178 1.699-5.378 3.074-6.6-10.839-1.141-22.243-5.378-22.243-24.283 0-5.378 1.94-9.778 5.014-13.2-.485-1.222-2.184-6.275.486-13.038 0 0 4.125-1.304 13.426 5.052a46.97 46.97 0 0 1 12.214-1.63c4.125 0 8.33.571 12.213 1.63 9.302-6.356 13.427-5.052 13.427-5.052 2.67 6.763.97 11.816.485 13.038 3.155 3.422 5.015 7.822 5.015 13.2 0 18.905-11.404 23.06-22.324 24.283 1.78 1.548 3.316 4.481 3.316 9.126 0 6.6-.08 11.897-.08 13.526 0 1.304.89 2.853 3.316 2.364 19.412-6.52 33.405-24.935 33.405-46.691C97.707 22 75.788 0 48.854 0z"
-      clipRule="evenodd"
-    />
-  </svg>
-)
+import { useGrant } from '@/lib/grants'
 
 interface GitHubIntegrationConnectionFormProps {
   connection?: GitHubConnection
@@ -75,7 +57,6 @@ export const GitHubIntegrationConnectionForm = ({
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
   const [isConfirmingBranchChange, setIsConfirmingBranchChange] = useState(false)
   const [isConfirmingRepoChange, setIsConfirmingRepoChange] = useState(false)
-  const [repoComboBoxOpen, setRepoComboboxOpen] = useState(false)
   const isParentProject = !selectedProject?.parent_project_ref
 
   const { hasAccess: hasAccessToGitHubIntegration, isLoading: isLoadingEntitlements } =
@@ -92,30 +73,22 @@ export const GitHubIntegrationConnectionForm = ({
     'integrations.github_connections'
   )
 
-  const { data: gitHubAuthorization, refetch: refetchGitHubAuthorization } =
-    useGitHubAuthorizationQuery()
+  const canManageGitHubConnection = canCreateGitHubConnection && canUpdateGitHubConnection
 
   const {
-    data: githubReposData,
-    isPending: isLoadingGitHubRepos,
-    refetch: refetchGitHubRepositories,
-  } = useGitHubRepositoriesQuery({
-    enabled: Boolean(gitHubAuthorization),
-  })
+    gitHubAuthorization,
+    githubRepos,
+    hasPartialResponseDueToSSO,
+    isLoading: isLoadingRepositoryOptions,
+    refetch: refetchRepositoryOptions,
+  } = useGitHubRepositoryOptions()
 
-  const refetchGitHubAuthorizationAndRepositories = () => {
-    setTimeout(() => {
-      refetchGitHubAuthorization()
-      refetchGitHubRepositories()
-    }, 2000) // 2 second to delay to let github authorization and repositories to be updated
-  }
-
-  const { mutate: updateBranch } = useBranchUpdateMutation({
+  const { mutateAsync: updateBranch } = useBranchUpdateMutation({
     onSuccess: () => {
       toast.success('Production branch settings successfully updated')
     },
   })
-  const { mutate: createBranch } = useBranchCreateMutation({
+  const { mutateAsync: createBranch } = useBranchCreateMutation({
     onSuccess: () => {
       toast.success('Production branch settings successfully updated')
     },
@@ -124,19 +97,24 @@ export const GitHubIntegrationConnectionForm = ({
     },
   })
 
-  const { data: existingBranches } = useBranchesQuery(
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: selectedProject?.ref,
+  })
+  const createBranchGrant = useGrant(
+    'POST /v1/projects/{ref}/branches',
     { projectRef: selectedProject?.ref },
-    { enabled: !!selectedProject?.ref }
+    { variant: 'production' }
   )
+  const { data: existingBranches } = useQuery({
+    ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
+    enabled: !!selectedProject?.ref,
+  })
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
 
-  const { mutate: createConnection, isPending: isCreatingConnection } =
+  const { mutateAsync: createConnection, isPending: isCreatingConnection } =
     useGitHubConnectionCreateMutation({
-      onSuccess: () => {
-        toast.success('GitHub integration successfully updated')
-      },
       onError: (error) => {
         // Don't show error toast when connection already exists - the branch
         // settings update will still proceed and show its own success toast
@@ -149,25 +127,12 @@ export const GitHubIntegrationConnectionForm = ({
   const { mutateAsync: deleteConnection, isPending: isDeletingConnection } =
     useGitHubConnectionDeleteMutation({
       onSuccess: () => {
-        toast.success('Successfully removed GitHub integration')
+        toast.success('GitHub connection removed')
       },
     })
 
-  const { mutate: updateConnectionSettings, isPending: isUpdatingConnection } =
+  const { mutateAsync: updateConnectionSettings, isPending: isUpdatingConnection } =
     useGitHubConnectionUpdateMutation()
-
-  const githubRepos = useMemo(
-    () =>
-      githubReposData?.repositories?.map((repo) => ({
-        id: repo.id.toString(),
-        name: repo.name,
-        installation_id: repo.installation_id,
-        default_branch: repo.default_branch || 'main',
-      })) ?? EMPTY_ARR,
-    [githubReposData]
-  )
-
-  const hasPartialResponseDueToSSO = githubReposData?.partial_response_due_to_sso ?? false
 
   const prodBranch = existingBranches?.find((branch) => branch.is_default)
 
@@ -205,27 +170,48 @@ export const GitHubIntegrationConnectionForm = ({
       }
     })
 
+  const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
+  const connectionValues: z.infer<typeof GitHubSettingsSchema> | undefined = connection
+    ? {
+        repositoryId: connection.repository.id.toString(),
+        enableProductionSync: hasGitBranch,
+        branchName: hasGitBranch ? (prodBranch?.git_branch ?? '') : '',
+        new_branch_per_pr: connection.new_branch_per_pr,
+        supabaseDirectory: connection.workdir || '',
+        supabaseChangesOnly: connection.supabase_changes_only,
+        branchLimit: String(connection.branch_limit),
+      }
+    : undefined
+
   const githubSettingsForm = useForm<z.infer<typeof GitHubSettingsSchema>>({
     resolver: zodResolver(GitHubSettingsSchema),
     mode: 'onSubmit',
     reValidateMode: 'onBlur',
     defaultValues: {
       repositoryId: connection?.repository.id.toString() || '',
+      branchName: prodBranch?.git_branch || 'main',
       enableProductionSync: true,
-      branchName: 'main',
       new_branch_per_pr: true,
       supabaseDirectory: '.',
       supabaseChangesOnly: true,
       branchLimit: '3',
     },
+    values: connectionValues,
+    resetOptions: { keepDirtyValues: true },
   })
 
-  const enableProductionSync = githubSettingsForm.watch('enableProductionSync')
-  const newBranchPerPr = githubSettingsForm.watch('new_branch_per_pr')
-  const currentRepositoryId = githubSettingsForm.watch('repositoryId')
-
-  // Calculate selected repository based on current form value
-  const selectedRepository = githubRepos.find((repo) => repo.id === currentRepositoryId)
+  const enableProductionSync = useWatch({
+    control: githubSettingsForm.control,
+    name: 'enableProductionSync',
+  })
+  const newBranchPerPr = useWatch({
+    control: githubSettingsForm.control,
+    name: 'new_branch_per_pr',
+  })
+  const currentRepositoryId = useWatch({
+    control: githubSettingsForm.control,
+    name: 'repositoryId',
+  })
 
   const handleCreateOrUpdateConnection = async (data: z.infer<typeof GitHubSettingsSchema>) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
@@ -259,32 +245,44 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    createConnection({
+    const connectionRequest = createConnection({
       organizationId: selectedOrganization.id,
       connection: {
         installation_id: selectedRepo.installation_id,
         project_ref: selectedProject.ref,
         repository_id: Number(selectedRepo.id),
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
-    if (!prodBranch) {
-      createBranch({
-        projectRef: selectedProject.ref,
-        branchName: 'main',
-        gitBranch: data.branchName,
-        is_default: true,
-      })
-    } else {
-      updateBranch({
-        branchRef: prodBranch.project_ref,
-        projectRef: selectedProject.ref,
-        gitBranch: data.branchName,
-      })
+    const branchRequest = prodBranch
+      ? updateBranch({
+          branchRef: prodBranch.project_ref,
+          projectRef: selectedProject.ref,
+          gitBranch: data.branchName,
+        })
+      : createBranchGrant.status === 'granted'
+        ? createBranch({
+            grant: createBranchGrant.grant,
+            projectRef: selectedProject.ref,
+            branchName: 'main',
+            gitBranch: data.branchName,
+            is_default: true,
+          })
+        : Promise.reject(
+            new Error('You need additional permissions to update the production branch')
+          )
+
+    // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
+    const results = await Promise.allSettled([connectionRequest, branchRequest])
+    if (results.every((result) => result.status === 'fulfilled')) {
+      toast.success('GitHub connection updated')
+      githubSettingsForm.reset(data, { keepDirtyValues: false })
     }
   }
 
@@ -310,35 +308,46 @@ export const GitHubIntegrationConnectionForm = ({
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
 
-    updateConnectionSettings({
+    const connectionRequest = updateConnectionSettings({
       connectionId: currentConnection.id,
       organizationId: selectedOrganization.id,
       connection: {
         workdir: data.supabaseDirectory,
-        supabase_changes_only: data.supabaseChangesOnly,
-        branch_limit: Number(data.branchLimit),
-        new_branch_per_pr: data.new_branch_per_pr,
+        ...(hasAccessToBranching && {
+          supabase_changes_only: data.supabaseChangesOnly,
+          branch_limit: Number(data.branchLimit),
+          new_branch_per_pr: data.new_branch_per_pr ?? false,
+        }),
       },
     })
 
-    if (prodBranch) {
-      updateBranch({
-        branchRef: prodBranch.project_ref,
-        projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
-        branchName: data.branchName || 'main',
-      })
-    } else {
-      // if for some reason, the project doesn't have a default branch yet, create it.
-      createBranch({
-        projectRef: selectedProject.ref,
-        gitBranch: data.enableProductionSync ? data.branchName : '',
-        branchName: data.branchName || 'main',
-        is_default: true,
-      })
-    }
+    // if for some reason, the project doesn't have a default branch yet, create it.
+    const branchRequest = prodBranch
+      ? updateBranch({
+          branchRef: prodBranch.project_ref,
+          projectRef: selectedProject.ref,
+          gitBranch: data.enableProductionSync ? data.branchName : '',
+          branchName: data.branchName || 'main',
+        })
+      : createBranchGrant.status === 'granted'
+        ? createBranch({
+            grant: createBranchGrant.grant,
+            projectRef: selectedProject.ref,
+            gitBranch: data.enableProductionSync ? data.branchName : '',
+            branchName: data.branchName || 'main',
+            is_default: true,
+          })
+        : Promise.reject(
+            new Error('You need additional permissions to update the production branch')
+          )
 
     setIsConfirmingBranchChange(false)
+
+    // Only re-baseline the form once both requests succeed, so a failure keeps the edits unsaved
+    const results = await Promise.allSettled([connectionRequest, branchRequest])
+    if (results.every((result) => result.status === 'fulfilled')) {
+      githubSettingsForm.reset(data, { keepDirtyValues: false })
+    }
   }
 
   const onConfirmBranchChange = async () => {
@@ -356,15 +365,18 @@ export const GitHubIntegrationConnectionForm = ({
         connectionId: connection.id,
       })
 
-      githubSettingsForm.reset({
-        repositoryId: '',
-        enableProductionSync: true,
-        branchName: 'main',
-        new_branch_per_pr: true,
-        supabaseDirectory: '.',
-        supabaseChangesOnly: true,
-        branchLimit: '3',
-      })
+      githubSettingsForm.reset(
+        {
+          repositoryId: '',
+          enableProductionSync: true,
+          branchName: 'main',
+          new_branch_per_pr: true,
+          supabaseDirectory: '.',
+          supabaseChangesOnly: true,
+          branchLimit: '3',
+        },
+        { keepDirtyValues: false }
+      )
     } catch (error) {
       console.error('Error removing integration:', error)
       toast.error('Failed to remove integration')
@@ -392,60 +404,41 @@ export const GitHubIntegrationConnectionForm = ({
     }
   }
 
-  useEffect(() => {
-    if (connection) {
-      const hasGitBranch = Boolean(prodBranch?.git_branch?.trim())
-
-      githubSettingsForm.reset({
-        repositoryId: connection.repository.id.toString(),
-        enableProductionSync: hasGitBranch,
-        branchName: prodBranch?.git_branch || 'main',
-        new_branch_per_pr: connection.new_branch_per_pr,
-        supabaseDirectory: connection.workdir || '',
-        supabaseChangesOnly: connection.supabase_changes_only,
-        branchLimit: String(connection.branch_limit),
-      })
-    }
-  }, [connection, prodBranch, githubSettingsForm])
-
-  // Handle clearing branch name when production sync is disabled
-  useEffect(() => {
-    if (!enableProductionSync) {
-      githubSettingsForm.setValue('branchName', '')
-    } else if (enableProductionSync && !githubSettingsForm.getValues().branchName) {
-      githubSettingsForm.setValue('branchName', 'main')
-    }
-  }, [enableProductionSync, githubSettingsForm])
-
-  // Show authorization prompt if not authorized
-  if (gitHubAuthorization === null) {
-    return (
-      <Card>
-        <CardContent className="flex flex-col items-center justify-center py-12">
-          <p className="text-sm text-center">Authorize with GitHub</p>
-          <p className="text-sm text-center text-foreground-light mb-4">
-            Connect your GitHub account to access and select repositories for integration.
-          </p>
-          <Button
-            onClick={() => {
-              openInstallGitHubIntegrationWindow(
-                'authorize',
-                refetchGitHubAuthorizationAndRepositories
-              )
-            }}
-          >
-            Authorize GitHub
-          </Button>
-        </CardContent>
-      </Card>
-    )
+  const handleToggleProductionSync = (isEnabled: boolean) => {
+    githubSettingsForm.setValue('enableProductionSync', isEnabled, { shouldDirty: true })
+    githubSettingsForm.setValue('branchName', isEnabled ? prodBranch?.git_branch || 'main' : '', {
+      shouldDirty: true,
+    })
   }
 
   const isLoading =
-    isLoadingEntitlements || isCreatingConnection || isUpdatingConnection || isDeletingConnection
+    isLoadingEntitlements ||
+    isCreatingConnection ||
+    isUpdatingConnection ||
+    isDeletingConnection ||
+    (!!gitHubAuthorization && isLoadingRepositoryOptions)
+
+  const isFieldDisabled = !canUpdateGitHubConnection || !gitHubAuthorization
+
+  let repositoryDescription = 'Select the repository to connect to your project'
+  if (connection) {
+    repositoryDescription = 'Change the connected repository'
+  } else if (gitHubAuthorization === null) {
+    repositoryDescription = 'Connect GitHub to link a repository to this project'
+  }
 
   return (
     <>
+      {!gitHubAuthorization && !!currentRepositoryId && (
+        <Admonition
+          className="mb-4"
+          layout="responsive"
+          title="Authorize GitHub to manage integration settings"
+          description="Required to list your repositories and change this project's connection"
+          actions={<ConnectGitHubButton refetch={refetchRepositoryOptions} />}
+        />
+      )}
+
       <Form {...githubSettingsForm}>
         <form
           onSubmit={githubSettingsForm.handleSubmit(handleCreateOrUpdateConnection)}
@@ -453,117 +446,22 @@ export const GitHubIntegrationConnectionForm = ({
         >
           <Card>
             <CardContent className="space-y-6">
-              {/* Repository Selection */}
-              <FormField
-                control={githubSettingsForm.control}
+              <GitHubRepositoryField
+                form={githubSettingsForm}
                 name="repositoryId"
-                render={({ field }) => (
-                  <FormItemLayout
-                    layout="flex-row-reverse"
-                    label="GitHub repository"
-                    description={
-                      connection
-                        ? 'Change the connected repository'
-                        : 'Select the repository to connect to your project'
-                    }
-                  >
-                    <Popover_Shadcn_ open={repoComboBoxOpen} onOpenChange={setRepoComboboxOpen}>
-                      <PopoverTrigger_Shadcn_ asChild>
-                        <FormControl>
-                          <Button
-                            type="default"
-                            className="justify-start h-[34px] w-full"
-                            disabled={isLoadingGitHubRepos}
-                            loading={isLoadingGitHubRepos}
-                            icon={
-                              <div className="bg-black shadow rounded p-1 w-6 h-6 flex justify-center items-center">
-                                {GITHUB_ICON}
-                              </div>
-                            }
-                            iconRight={
-                              <span className="grow flex justify-end">
-                                <ChevronDown />
-                              </span>
-                            }
-                          >
-                            {selectedRepository || connection
-                              ? selectedRepository?.name || connection?.repository.name
-                              : 'Choose GitHub repository'}
-                          </Button>
-                        </FormControl>
-                      </PopoverTrigger_Shadcn_>
-                      <PopoverContent_Shadcn_ className="p-0 w-80" side="bottom" align="start">
-                        <Command_Shadcn_>
-                          <CommandInput_Shadcn_ placeholder="Search repositories..." />
-                          <CommandList_Shadcn_ className="!max-h-[200px]">
-                            <CommandEmpty_Shadcn_>No repositories found.</CommandEmpty_Shadcn_>
-                            {githubRepos.length > 0 ? (
-                              <CommandGroup_Shadcn_>
-                                {githubRepos.map((repo, i) => (
-                                  <CommandItem_Shadcn_
-                                    key={repo.id}
-                                    value={`${repo.name.replaceAll('"', '')}-${i}`}
-                                    className="flex gap-2 items-center"
-                                    onSelect={() => {
-                                      field.onChange(repo.id)
-                                      setRepoComboboxOpen(false)
-                                      githubSettingsForm.setValue(
-                                        'branchName',
-                                        repo.default_branch || 'main'
-                                      )
-                                    }}
-                                  >
-                                    <div className="bg-black shadow rounded p-1 w-5 h-5 flex justify-center items-center">
-                                      {GITHUB_ICON}
-                                    </div>
-                                    <span className="truncate" title={repo.name}>
-                                      {repo.name}
-                                    </span>
-                                  </CommandItem_Shadcn_>
-                                ))}
-                              </CommandGroup_Shadcn_>
-                            ) : null}
-                            <CommandGroup_Shadcn_>
-                              <CommandItem_Shadcn_
-                                className="flex gap-2 items-center cursor-pointer"
-                                onSelect={() =>
-                                  openInstallGitHubIntegrationWindow(
-                                    'install',
-                                    refetchGitHubAuthorizationAndRepositories
-                                  )
-                                }
-                              >
-                                <PlusIcon size={16} />
-                                Add GitHub Repositories
-                              </CommandItem_Shadcn_>
-                            </CommandGroup_Shadcn_>
-                            {hasPartialResponseDueToSSO && (
-                              <>
-                                <CommandSeparator_Shadcn_ />
-                                <CommandGroup_Shadcn_>
-                                  <CommandItem_Shadcn_
-                                    className="flex gap-2 items-start cursor-pointer"
-                                    onSelect={() => {
-                                      openInstallGitHubIntegrationWindow(
-                                        'authorize',
-                                        refetchGitHubAuthorizationAndRepositories
-                                      )
-                                    }}
-                                  >
-                                    <RefreshCw size={16} className="mt-0.5 shrink-0" />
-                                    <div className="text-xs text-foreground-light">
-                                      Re-authorize GitHub with SSO to show all repositories
-                                    </div>
-                                  </CommandItem_Shadcn_>
-                                </CommandGroup_Shadcn_>
-                              </>
-                            )}
-                          </CommandList_Shadcn_>
-                        </Command_Shadcn_>
-                      </PopoverContent_Shadcn_>
-                    </Popover_Shadcn_>
-                  </FormItemLayout>
-                )}
+                label="GitHub repository"
+                layout="flex-row-reverse"
+                description={repositoryDescription}
+                disabled={!gitHubAuthorization || !canManageGitHubConnection}
+                selectedRepositoryName={connection?.repository.name}
+                repositories={githubRepos}
+                gitHubAuthorization={gitHubAuthorization}
+                hasPartialResponseDueToSSO={hasPartialResponseDueToSSO}
+                isLoading={isLoadingRepositoryOptions}
+                refetch={refetchRepositoryOptions}
+                onRepositorySelect={(repo) => {
+                  githubSettingsForm.setValue('branchName', repo.default_branch || 'main')
+                }}
               />
             </CardContent>
 
@@ -585,8 +483,7 @@ export const GitHubIntegrationConnectionForm = ({
                           description={
                             <>
                               Relative path to the directory containing your{' '}
-                              <code className="text-code-inline whitespace-nowrap">supabase/</code>{' '}
-                              folder.{' '}
+                              <code className="whitespace-nowrap">supabase/</code> folder.{' '}
                               <InlineLink
                                 href={`${DOCS_URL}/guides/deployment/branching/github-integration#set-the-working-directory`}
                               >
@@ -596,11 +493,11 @@ export const GitHubIntegrationConnectionForm = ({
                           }
                         >
                           <FormControl>
-                            <Input_Shadcn_
+                            <Input
                               {...field}
                               placeholder="."
                               autoComplete="off"
-                              disabled={!canUpdateGitHubConnection}
+                              disabled={isFieldDisabled}
                             />
                           </FormControl>
                         </FormItemLayout>
@@ -617,13 +514,14 @@ export const GitHubIntegrationConnectionForm = ({
                           <FormItemLayout
                             layout="flex-row-reverse"
                             label="Deploy to production"
-                            description="Deploy changes to production on push including PR merges"
+                            description="Apply changes to your production database when you merge into your configured production GitHub branch"
                           >
                             <FormControl>
                               <Switch
+                                aria-label="Toggle deploy to production"
                                 checked={field.value}
-                                onCheckedChange={field.onChange}
-                                disabled={!canUpdateGitHubConnection}
+                                onCheckedChange={handleToggleProductionSync}
+                                disabled={isFieldDisabled}
                               />
                             </FormControl>
                           </FormItemLayout>
@@ -647,15 +545,15 @@ export const GitHubIntegrationConnectionForm = ({
                             >
                               <div className="relative w-full">
                                 <FormControl>
-                                  <Input_Shadcn_
+                                  <Input
                                     {...field}
                                     autoComplete="off"
-                                    disabled={!canUpdateGitHubConnection || !enableProductionSync}
+                                    disabled={isFieldDisabled || !enableProductionSync}
                                   />
                                 </FormControl>
                                 <div className="absolute top-2.5 right-3 flex items-center gap-2">
                                   {isCheckingBranch && (
-                                    <Loader2 size={14} className="animate-spin" />
+                                    <Loader2Icon size={14} className="animate-spin" />
                                   )}
                                 </div>
                               </div>
@@ -703,9 +601,14 @@ export const GitHubIntegrationConnectionForm = ({
                           >
                             <FormControl>
                               <Switch
+                                aria-label="Toggle automatic branching"
                                 checked={!hasAccessToBranching ? false : field.value}
                                 onCheckedChange={field.onChange}
-                                disabled={!hasAccessToBranching || !canCreateGitHubConnection}
+                                disabled={
+                                  !hasAccessToBranching ||
+                                  !canCreateGitHubConnection ||
+                                  isFieldDisabled
+                                }
                               />
                             </FormControl>
                           </FormItemLayout>
@@ -729,7 +632,7 @@ export const GitHubIntegrationConnectionForm = ({
                               description="Maximum number of preview branches"
                             >
                               <FormControl>
-                                <Input_Shadcn_
+                                <Input
                                   {...field}
                                   type="number"
                                   autoComplete="off"
@@ -737,7 +640,8 @@ export const GitHubIntegrationConnectionForm = ({
                                   disabled={
                                     !hasAccessToBranching ||
                                     !newBranchPerPr ||
-                                    !canUpdateGitHubConnection
+                                    !canUpdateGitHubConnection ||
+                                    isFieldDisabled
                                   }
                                 />
                               </FormControl>
@@ -756,12 +660,14 @@ export const GitHubIntegrationConnectionForm = ({
                             >
                               <FormControl>
                                 <Switch
+                                  aria-label="Toggle Supabase changes only"
                                   checked={!hasAccessToBranching ? false : field.value}
                                   onCheckedChange={(val) => field.onChange(val)}
                                   disabled={
                                     !hasAccessToBranching ||
                                     !newBranchPerPr ||
-                                    !canUpdateGitHubConnection
+                                    !canUpdateGitHubConnection ||
+                                    isFieldDisabled
                                   }
                                 />
                               </FormControl>
@@ -775,7 +681,7 @@ export const GitHubIntegrationConnectionForm = ({
                     <div>
                       {connection && (
                         <Button
-                          type="outline"
+                          variant="outline"
                           onClick={handleRemoveIntegration}
                           disabled={isDeletingConnection || isCheckingBranch}
                           loading={isDeletingConnection}
@@ -787,29 +693,37 @@ export const GitHubIntegrationConnectionForm = ({
                     <div className="flex space-x-2">
                       {githubSettingsForm.formState.isDirty && (
                         <Button
-                          type="default"
-                          onClick={() => githubSettingsForm.reset()}
+                          onClick={() =>
+                            githubSettingsForm.reset(connectionValues, { keepDirtyValues: false })
+                          }
                           disabled={!canUpdateGitHubConnection || isCheckingBranch}
                         >
                           Cancel
                         </Button>
                       )}
-                      <Button
-                        type="primary"
-                        htmlType="submit"
+                      <ButtonTooltip
+                        variant="primary"
+                        type="submit"
                         disabled={
                           !hasAccessToGitHubIntegration ||
-                          (!connection && !canCreateGitHubConnection) ||
-                          (connection && !canUpdateGitHubConnection) ||
                           isCheckingBranch ||
                           isLoading ||
+                          !canManageGitHubConnection ||
                           (!connection && !githubSettingsForm.getValues().repositoryId) ||
                           (connection && !githubSettingsForm.formState.isDirty)
                         }
                         loading={isLoading}
+                        tooltip={{
+                          content: {
+                            side: 'bottom',
+                            text: !canManageGitHubConnection
+                              ? "You need additional permissions to update this project's GitHub integration settings"
+                              : undefined,
+                          },
+                        }}
                       >
                         {connection ? 'Save changes' : 'Enable integration'}
-                      </Button>
+                      </ButtonTooltip>
                     </div>
                   </CardFooter>
                 </motion.div>

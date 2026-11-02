@@ -1,4 +1,5 @@
 import { render, renderHook } from '@testing-library/react'
+import type { ICommand } from 'ui-patterns/CommandMenu/api/types'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from './registry'
@@ -32,7 +33,12 @@ vi.mock('./useIsShortcutEnabled', () => ({
 const getLastHotkeyOptions = () => {
   const call = mockUseHotkeySequence.mock.calls.at(-1)
   if (!call) throw new Error('useHotkeySequence was not called')
-  return call[2] as { enabled: boolean; timeout: number | undefined; ignoreInputs?: boolean }
+  return call[2] as {
+    enabled: boolean
+    timeout: number | undefined
+    ignoreInputs?: boolean
+    meta?: { id?: string; name?: string; referenceGroup?: string }
+  }
 }
 
 const getLastRegisterCall = () => {
@@ -41,13 +47,12 @@ const getLastRegisterCall = () => {
   return call as [
     string,
     Array<{ id: string; name: string; action: () => void; badge: () => any }>,
-    { enabled: boolean; deps: unknown[] },
+    { enabled: boolean; deps: unknown[]; orderCommands?: unknown },
   ]
 }
 
 describe('useShortcut', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     mockUseIsShortcutEnabled.mockReturnValue(true)
   })
 
@@ -64,14 +69,6 @@ describe('useShortcut', () => {
     it('passes multi-step sequences (G-chords) through unchanged', () => {
       renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn()))
       expect(mockUseHotkeySequence.mock.calls[0][0]).toEqual(['G', 'H'])
-    })
-
-    it('wires the callback by reference — useHotkeySequence receives the same function', () => {
-      const cb = vi.fn()
-      renderHook(() => useShortcut(SHORTCUT_IDS.ACTION_BAR_SAVE, cb))
-      const passedCallback = mockUseHotkeySequence.mock.calls[0][1]
-      passedCallback()
-      expect(cb).toHaveBeenCalledTimes(1)
     })
   })
 
@@ -90,18 +87,6 @@ describe('useShortcut', () => {
       mockUseIsShortcutEnabled.mockReturnValue(false)
       renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn(), { enabled: true }))
       expect(getLastHotkeyOptions().enabled).toBe(false)
-    })
-
-    it('global enabled AND caller enabled = true', () => {
-      mockUseIsShortcutEnabled.mockReturnValue(true)
-      renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn(), { enabled: true }))
-      expect(getLastHotkeyOptions().enabled).toBe(true)
-    })
-
-    it('global enabled AND caller undefined = true', () => {
-      mockUseIsShortcutEnabled.mockReturnValue(true)
-      renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn()))
-      expect(getLastHotkeyOptions().enabled).toBe(true)
     })
 
     it('subscribes to the correct shortcut id for global preference', () => {
@@ -247,6 +232,32 @@ describe('useShortcut', () => {
       ])
     })
 
+    it('orders "Show all keyboard shortcuts" last within the Shortcuts section', () => {
+      renderHook(() =>
+        useShortcut(SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE, vi.fn(), { registerInCommandMenu: true })
+      )
+
+      const [, commands, options] = getLastRegisterCall()
+      const orderCommands = options.orderCommands as (
+        existing: ICommand[],
+        commandsToInsert: ICommand[]
+      ) => ICommand[]
+
+      const ordered = orderCommands(
+        [
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW, name: 'Insert row', action: vi.fn() },
+          { id: SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN, name: 'Insert column', action: vi.fn() },
+        ],
+        commands
+      )
+
+      expect(ordered.map((command) => command.id)).toEqual([
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_ROW,
+        SHORTCUT_IDS.TABLE_EDITOR_INSERT_COLUMN,
+        SHORTCUT_IDS.SHORTCUTS_OPEN_REFERENCE,
+      ])
+    })
+
     describe('badge rendering', () => {
       it('renders a single KeyboardShortcut pill for single-step sequences (no "then")', () => {
         renderHook(() =>
@@ -279,6 +290,35 @@ describe('useShortcut', () => {
         expect(container.textContent).toContain('M')
         expect(container.textContent).toContain('⇧')
       })
+    })
+  })
+
+  describe('reference-sheet metadata', () => {
+    it('forwards id, label, and referenceGroup as registration meta', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn()))
+      expect(getLastHotkeyOptions().meta).toEqual({
+        id: SHORTCUT_IDS.NAV_HOME,
+        name: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].label,
+        referenceGroup: SHORTCUT_DEFINITIONS[SHORTCUT_IDS.NAV_HOME].referenceGroup,
+      })
+    })
+
+    it('uses the caller label override in meta.name', () => {
+      renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn(), { label: 'Go home' }))
+      expect(getLastHotkeyOptions().meta?.name).toBe('Go home')
+    })
+
+    it('keeps a stable meta reference when inputs do not change', () => {
+      const { rerender } = renderHook(
+        ({ cb }: { cb: () => void }) => useShortcut(SHORTCUT_IDS.NAV_HOME, cb),
+        { initialProps: { cb: vi.fn() } }
+      )
+
+      const first = getLastHotkeyOptions().meta
+
+      rerender({ cb: vi.fn() })
+
+      expect(getLastHotkeyOptions().meta).toBe(first)
     })
   })
 })

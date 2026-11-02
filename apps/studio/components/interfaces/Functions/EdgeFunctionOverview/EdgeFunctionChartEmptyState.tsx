@@ -1,4 +1,4 @@
-import { BarChart2 } from 'lucide-react'
+import { BarChart2Icon } from 'lucide-react'
 import { ChartEmptyState } from 'ui-patterns/Chart'
 
 interface EdgeFunctionChartEmptyStateProps {
@@ -12,7 +12,7 @@ export const EdgeFunctionChartEmptyState = ({
 }: EdgeFunctionChartEmptyStateProps) => {
   return (
     <ChartEmptyState
-      icon={<BarChart2 size={16} />}
+      icon={<BarChart2Icon size={16} />}
       title={title}
       description={description ?? 'It may take up to 24 hours for data to refresh'}
     />

@@ -87,11 +87,11 @@ port = 54324
 # sender_name = "Admin"
 
 [auth.email.template.confirmation]
-subject = "Confirm Your Email"
+subject = "Confirm your email"
 content_path = "./supabase/auth/email/confirmation.html"
 
 [auth.email.template.magic_link]
-subject = "Your Magic Link"
+subject = "Your sign-in link"
 content_path = "./supabase/auth/email/magic-link.html"
 
 [storage.buckets.avatars]

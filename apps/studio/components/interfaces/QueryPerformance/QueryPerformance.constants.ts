@@ -13,7 +13,7 @@ export const QUERY_PERFORMANCE_PRESET_MAP = {
 } as const
 
 export const QUERY_PERFORMANCE_COLUMNS = [
-  { id: 'query', name: 'Query', description: undefined, minWidth: 500 },
+  { id: 'query', name: 'Query', description: undefined, minWidth: 450 },
   { id: 'prop_total_time', name: 'Time consumed', description: undefined, minWidth: 150 },
   { id: 'calls', name: 'Calls', description: undefined, minWidth: 100 },
   { id: 'max_time', name: 'Max time', description: undefined, minWidth: 100 },
@@ -55,9 +55,13 @@ export const QUERY_PERFORMANCE_ROLE_DESCRIPTION = [
   {
     name: 'supabase_storage_admin',
     description:
-      'Used by the Auth middleware to connect to the database and run migration. Access is scoped to the storage schema.',
+      'Used by the Storage middleware to connect to the database and run migration. Access is scoped to the storage schema.',
   },
-  { name: 'dashboard_user', description: 'For running commands via the Supabase UI.' },
+  {
+    name: 'dashboard_user',
+    description:
+      'The Supabase Dashboard doesn\'t connect as this role. Dashboard queries execute as postgres and include a "-- source: dashboard" comment.',
+  },
   {
     name: 'supabase_admin',
     description:

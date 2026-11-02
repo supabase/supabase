@@ -1,3 +1,7 @@
+import type { SafeSqlFragment } from '@supabase/pg-meta'
+
+import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
+import type { Granularity } from '@/data/reports/report.utils'
 import type { ResponseError } from '@/types'
 
 export enum Presets {
@@ -19,9 +23,9 @@ export interface PresetConfig {
 }
 export type BaseQueries<Keys extends string> = Record<Keys, ReportQuery>
 
-export interface ReportQuery {
-  queryType: ReportQueryType
-  sql: (
+export interface ReportQueryLogs {
+  queryType: 'logs'
+  safeSql: (
     filters: ReportFilterItem[],
     where?: string,
     orderBy?: string,
@@ -29,10 +33,26 @@ export interface ReportQuery {
     filterIndexAdvisor?: boolean,
     page?: number,
     pageSize?: number
-  ) => string
+  ) => SafeLogSqlFragment
+  safeSqlOtel?: (filters: ReportFilterItem[], granularity?: Granularity) => SafeLogSqlFragment
 }
 
-export type ReportQueryType = 'db' | 'logs'
+export interface ReportQueryDb {
+  queryType: 'db'
+  safeSql: (
+    filters: ReportFilterItem[],
+    where?: SafeSqlFragment,
+    orderBy?: SafeSqlFragment,
+    runIndexAdvisor?: boolean,
+    filterIndexAdvisor?: boolean,
+    page?: number,
+    pageSize?: number
+  ) => SafeSqlFragment
+}
+
+export type ReportQuery = ReportQueryLogs | ReportQueryDb
+
+export type ReportQueryType = ReportQuery['queryType']
 
 export interface StatusCodesDatum {
   timestamp: number

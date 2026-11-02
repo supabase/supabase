@@ -1,4 +1,4 @@
-import { ChevronDown, ChevronRight } from 'lucide-react'
+import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -49,18 +49,19 @@ export function ExplainNodeRow({ node, depth, maxDuration }: ExplainNodeRowProps
             {/* Expand/collapse button */}
             <button
               type="button"
+              tabIndex={canExpand ? 0 : -1}
               onClick={() => canExpand && setIsExpanded(!isExpanded)}
               disabled={!canExpand}
               className={cn(
-                'flex items-center justify-center w-5 h-5 rounded border border-border-muted shrink-0',
+                'flex items-center justify-center w-5 h-5 rounded-sm border border-border-muted shrink-0',
                 canExpand ? 'hover:bg-surface-200 cursor-pointer' : 'opacity-30 cursor-default'
               )}
               aria-label={isExpanded ? 'Collapse details' : 'Expand details'}
             >
               {isExpanded ? (
-                <ChevronDown size={12} className="text-foreground-light" />
+                <ChevronDownIcon size={12} className="text-foreground-light" />
               ) : (
-                <ChevronRight size={12} className="text-foreground-light" />
+                <ChevronRightIcon size={12} className="text-foreground-light" />
               )}
             </button>
 

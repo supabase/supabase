@@ -1,13 +1,21 @@
 import { Handle, Node, NodeProps, Position } from '@xyflow/react'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Database, DatabaseBackup, HelpCircle, Loader2, MoreVertical } from 'lucide-react'
+import {
+  DatabaseBackupIcon,
+  DatabaseIcon,
+  HelpCircleIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
+import { toast } from 'sonner'
 import {
   Badge,
   Button,
   cn,
+  copyToClipboard,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -17,7 +25,9 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
+import { ComputeMetricsFooter } from './ComputeMetricsFooter'
 import {
   ERROR_STATES,
   INIT_PROGRESS,
@@ -25,21 +35,21 @@ import {
   NODE_SEP,
   NODE_WIDTH,
   PrimaryNodeData,
-  REPLICA_STATUS,
+  REGION_NODE_HEIGHT,
   ReplicaNodeData,
 } from './InstanceConfiguration.constants'
 import { formatSeconds } from './InstanceConfiguration.utils'
-import { metricColor } from './InstanceNode.utils'
-import SparkBar from '@/components/ui/SparkBar'
+import { getReadReplicaPath } from '@/components/interfaces/Settings/Infrastructure/Infrastructure.utils'
+import { REPLICA_STATUS } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/ReadReplicas.constants'
+import { RegionFlag } from '@/components/ui/RegionFlag'
+import { SparkBar } from '@/components/ui/SparkBar'
 import {
   DatabaseInitEstimations,
   ReplicaInitializationStatus,
   useReadReplicasStatusesQuery,
 } from '@/data/read-replicas/replicas-status-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
-import { useComputeMetrics } from '@/hooks/analytics/useComputeMetrics'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { BASE_PATH } from '@/lib/constants'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) => {
@@ -48,14 +58,14 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
 
   return (
     <>
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3 gap-x-4"
           style={{ width: NODE_WIDTH / 2 - 10 }}
         >
           <div className="flex gap-x-3">
             <div className="min-w-8 h-8 bg-blue-600 border border-blue-800 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">API Load Balancer</p>
@@ -67,7 +77,7 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
           </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button type="text" icon={<MoreVertical />} className="px-1" />
+              <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-40" side="bottom" align="end">
               <DropdownMenuItem asChild className="gap-x-2">
@@ -87,24 +97,10 @@ export const LoadBalancerNode = ({ data }: NodeProps<Node<LoadBalancerData>>) =>
 export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
   // [Joshen] Just FYI Handles cannot be conditionally rendered
   const { region, computeSize, numReplicas, numRegions, hasLoadBalancer } = data
-  const { ref } = useParams()
 
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
-
-  const {
-    cpu,
-    disk,
-    memory,
-    connections,
-    isLoading: metricsLoading,
-    isError: metricsError,
-  } = useComputeMetrics({
-    projectRef: ref,
-  })
-
-  const observabilityUrl = `/project/${ref}/observability/database`
 
   return (
     <>
@@ -114,14 +110,14 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
         className={!hasLoadBalancer ? 'opacity-0' : ''}
         style={{ background: 'transparent' }}
       />
-      <div className="flex flex-col rounded bg-surface-100 border border-default">
+      <div className="flex flex-col rounded-sm bg-surface-100 border border-default">
         <div
           className="flex items-start justify-between p-3"
           style={{ width: NODE_WIDTH / 2 - 10 }}
         >
           <div className="flex gap-x-3">
             <div className="w-8 h-8 bg-brand-500 border border-brand-600 rounded-md flex items-center justify-center">
-              <Database size={16} />
+              <DatabaseIcon size={16} />
             </div>
             <div className="flex flex-col gap-y-0.5">
               <p className="text-sm">Primary Database</p>
@@ -129,7 +125,19 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
                 <span className="text-sm text-foreground-light">{region.name}</span>
               </p>
               <p className="flex items-center gap-x-1">
-                <span className="text-sm text-foreground-light">{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied project region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && (
                   <>
                     <span className="text-sm text-foreground-lighter">·</span>
@@ -139,11 +147,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
               </p>
             </div>
           </div>
-          <img
-            alt="region icon"
-            className="w-8 rounded-sm mt-0.5"
-            src={`${BASE_PATH}/img/regions/${region.region}.svg`}
-          />
+          <RegionFlag className="mt-0.5 w-8" region={region.region} />
         </div>
         {numReplicas > 0 && (
           <div className="border-t p-3 py-2">
@@ -158,43 +162,7 @@ export const PrimaryNode = ({ data }: NodeProps<Node<PrimaryNodeData>>) => {
             </p>
           </div>
         )}
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Link
-              href={observabilityUrl}
-              className="border-t px-3 py-2 hover:bg-surface-200 transition flex items-center gap-x-3 text-xs"
-            >
-              {metricsLoading ? (
-                <div className="h-3 w-44 rounded bg-surface-300 animate-pulse" />
-              ) : metricsError ? (
-                <span className="text-foreground-lighter">Metrics unavailable</span>
-              ) : (
-                <>
-                  <span>
-                    CPU <span className={metricColor(cpu)}>{cpu.toFixed(0)}%</span>
-                  </span>
-                  <span className="text-foreground-lighter">·</span>
-                  <span>
-                    Disk <span className={metricColor(disk)}>{disk.toFixed(0)}%</span>
-                  </span>
-                  <span className="text-foreground-lighter">·</span>
-                  <span>
-                    RAM <span className={metricColor(memory)}>{memory.toFixed(0)}%</span>
-                  </span>
-                  {connections.max > 0 && (
-                    <>
-                      <span className="text-foreground-lighter">·</span>
-                      <span className="text-foreground-light">
-                        {connections.current}/{connections.max} conns
-                      </span>
-                    </>
-                  )}
-                </>
-              )}
-            </Link>
-          </TooltipTrigger>
-          <TooltipContent side="bottom">Go to Database Report</TooltipContent>
-        </Tooltip>
+        <ComputeMetricsFooter />
       </div>
       <Handle
         type="source"
@@ -256,7 +224,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
     <>
       <Handle type="target" position={Position.Top} style={{ background: 'transparent' }} />
       <div
-        className="flex justify-between items-start rounded bg-surface-100 border border-default p-3"
+        className="flex justify-between items-start rounded-sm bg-surface-100 border border-default p-3"
         style={{ width: NODE_WIDTH / 2 - 10 }}
       >
         <div className="flex gap-x-3">
@@ -270,9 +238,9 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             )}
           >
             {isInTransition ? (
-              <Loader2 className="animate-spin" size={16} />
+              <Loader2Icon className="animate-spin" size={16} />
             ) : (
-              <DatabaseBackup size={16} />
+              <DatabaseBackupIcon size={16} />
             )}
           </div>
           <div className="flex flex-col gap-y-0.5">
@@ -291,7 +259,7 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                   <Badge variant="destructive">Init failed</Badge>
                   <Tooltip>
                     <TooltipTrigger>
-                      <HelpCircle size={16} />
+                      <HelpCircleIcon size={16} />
                     </TooltipTrigger>
                     <TooltipContent
                       side="bottom"
@@ -318,7 +286,19 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
             <div className="my-0.5">
               <p className="text-sm text-foreground-light">{region.name}</p>
               <p className="flex text-sm text-foreground-light items-center gap-x-1">
-                <span>{region.region}</span>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <span
+                      className="text-sm transition text-foreground-light hover:text-foreground"
+                      onClick={async () =>
+                        await copyToClipboard(region.region, () => toast('Copied replica region'))
+                      }
+                    >
+                      {region.region}
+                    </span>
+                  </TooltipTrigger>
+                  <TooltipContent side="bottom">Click to copy</TooltipContent>
+                </Tooltip>
                 {projectHomepageShowInstanceSize && !!computeSize && (
                   <>
                     <span className="text-foreground-lighter">·</span>
@@ -333,11 +313,11 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                   <div className="w-56">
                     <SparkBar
                       labelBottom={INIT_PROGRESS[progress as keyof typeof INIT_PROGRESS]}
-                      labelBottomClass="text-xs !normal-nums text-foreground-light"
+                      labelBottomClass="text-xs normal-nums! text-foreground-light"
                       type="horizontal"
                       value={stagePercent * 100}
                       max={100}
-                      barClass="bg-brand"
+                      barClass="bg-primary-bright"
                     />
                   </div>
                 </TooltipTrigger>
@@ -366,13 +346,16 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
                 Error: {ERROR_STATES[error as keyof typeof ERROR_STATES]}
               </p>
             ) : (
-              <p className="text-sm text-foreground-light">Created: {created}</p>
+              <p className="text-sm text-foreground-light">
+                Created:{' '}
+                <TimestampInfo className="text-sm" utcTimestamp={inserted_at} label={created} />
+              </p>
             )}
           </div>
         </div>
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="text" icon={<MoreVertical />} className="px-1" />
+            <Button variant="text" icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent className="w-40" side="bottom" align="end">
             <DropdownMenuItem
@@ -385,10 +368,8 @@ export const ReplicaNode = ({ data }: NodeProps<Node<ReplicaNodeData>>) => {
               View connection string
             </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="gap-x-2">
-              <Link href={`/project/${ref}/database/replication/replica/${id}`}>
-                Manage replica
-              </Link>
+            <DropdownMenuItem className="gap-x-2" asChild>
+              <Link href={getReadReplicaPath(ref, id)}>Manage replica</Link>
             </DropdownMenuItem>
           </DropdownMenuContent>
         </DropdownMenu>
@@ -404,15 +385,11 @@ export const RegionNode = ({ data }: any) => {
 
   return (
     <div
-      className="relative flex justify-between rounded bg-black/10 border border-default border-white/10 border-2 p-3"
-      style={{ width: regionNodeWidth, height: 162 }}
+      className="relative flex justify-between rounded-sm bg-black/10 border border-default border-white/10 border-2 p-3"
+      style={{ width: regionNodeWidth, height: REGION_NODE_HEIGHT }}
     >
       <div className="absolute bottom-2 flex items-center justify-between gap-x-2">
-        <img
-          alt="region icon"
-          className="w-5 rounded-sm"
-          src={`${BASE_PATH}/img/regions/${region.region}.svg`}
-        />
+        <RegionFlag className="w-5" region={region.region} />
         <p className="text-sm">{region.name}</p>
       </div>
     </div>

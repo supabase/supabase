@@ -1,0 +1,7 @@
+rules:
+  dangerous-triggers:
+    ignore:
+      - "authorize-vercel-deploys.yml"
+      - "external-pr-comment.yml"
+      - "label_prs.yml"
+      - "studio-master-alert.yml"

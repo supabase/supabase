@@ -1,12 +1,12 @@
-import { type PostgrestError } from '@supabase/supabase-js'
 import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import util, { styleText } from 'node:util'
-import { parse } from 'smol-toml'
+import { type PostgrestError } from '@supabase/supabase-js'
+
 import { Service } from '../../__generated__/graphql'
 import { extractMessageFromAnyError, MultiError } from '../../app/api/utils'
 import { Result } from '../../features/helpers.fn'
-import { CONTENT_DIRECTORY } from '../../lib/docs'
+import { DOCS_DIRECTORY } from '../../lib/docs'
 import { DatabaseCorrected } from '../../lib/supabase'
 import { supabaseAdmin } from '../../lib/supabaseAdmin'
 import { type ErrorCodeDefinition } from './errorTypes'
@@ -14,7 +14,7 @@ import { type ErrorCodeDefinition } from './errorTypes'
 type ErrorCodeUploadParameters =
   DatabaseCorrected['content']['Functions']['update_error_code']['Args']
 
-const ERROR_CODES_DIRECTORY = path.join(CONTENT_DIRECTORY, 'errorCodes')
+const ERROR_CODES_DIRECTORY = path.join(DOCS_DIRECTORY, 'data', 'errorCodes')
 
 async function doFetchErrorCodes(
   file: string,
@@ -29,9 +29,9 @@ async function doFetchErrorCodes(
         })
     )
   )
-    .flatMap((toml) =>
+    .flatMap((json) =>
       Result.tryCatchSync(
-        () => parse(toml) as unknown as Record<string, ErrorCodeDefinition>,
+        () => JSON.parse(json) as Record<string, ErrorCodeDefinition>,
         (error) =>
           new Error(
             `Failed to parse error code file ${file}: ${extractMessageFromAnyError(error)}`,
@@ -53,8 +53,8 @@ async function doFetchErrorCodes(
 
 async function fetchErrorCodes(): Promise<Result<Array<ErrorCodeUploadParameters>, MultiError>> {
   const arrayOfResults = await Promise.all([
-    doFetchErrorCodes('authErrorCodes.toml', Service.Auth),
-    doFetchErrorCodes('realtimeErrorCodes.toml', Service.Realtime),
+    doFetchErrorCodes('authErrorCodes.json', Service.Auth),
+    doFetchErrorCodes('realtimeErrorCodes.json', Service.Realtime),
   ])
   return Result.transposeArray(arrayOfResults).map((result) => result.flat())
 }

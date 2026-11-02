@@ -1,4 +1,4 @@
-import { ident, literal } from '../../../pg-format'
+import { ident, joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 
 export const getDuplicateTableSQL = ({
   comment,
@@ -10,13 +10,13 @@ export const getDuplicateTableSQL = ({
   duplicatedTableName: string
   sourceTableName: string
   sourceTableSchema: string
-}) => {
-  return [
-    `CREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`,
+}): SafeSqlFragment => {
+  const createSql = safeSql`CREATE TABLE ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} (LIKE ${ident(sourceTableSchema)}.${ident(sourceTableName)} INCLUDING ALL);`
+  const commentSql =
     comment != undefined
-      ? `comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is ${literal(comment)};`
-      : '',
-  ].join('\n')
+      ? safeSql`comment on table ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} is ${literal(comment)};`
+      : safeSql``
+  return joinSqlFragments([createSql, commentSql], '\n')
 }
 
 export const getDuplicateRowsSQL = ({
@@ -27,14 +27,14 @@ export const getDuplicateRowsSQL = ({
   duplicatedTableName: string
   sourceTableName: string
   sourceTableSchema: string
-}) => {
-  return `INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
+}): SafeSqlFragment => {
+  return safeSql`INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
 }
 
-export const getTableEditorSql = ({ id }: { id?: number }) => {
-  if (!id) return ''
+export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
+  if (!id) return safeSql``
 
-  return /* SQL */ `
+  return safeSql`
     with base_table_info as (
         select
             c.oid::int8 as id,
@@ -55,7 +55,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
         left join pg_foreign_server fs on fs.oid = ft.ftserver
         left join pg_foreign_data_wrapper fdw on fdw.oid = fs.srvfdw
         left join pg_proc fdw_handler on fdw.fdwhandler = fdw_handler.oid
-        where c.oid = ${id}
+        where c.oid = ${literal(id)}
             and not pg_is_other_temp_schema(nc.oid)
             and (
                 pg_has_role(c.relowner, 'USAGE')
@@ -99,6 +99,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
         join pg_namespace n on c.relnamespace = n.oid
 		join pg_attribute a on a.attrelid = c.oid and a.attnum = any(i.indkey)
         where i.indisprimary
+            and i.indrelid = ${literal(id)}
         group by i.indrelid
     ),
     index_cols as (
@@ -115,6 +116,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
             and a.attnum = any(i.indkey)
         where i.indisunique
             and i.indisprimary = false
+            and i.indrelid = ${literal(id)}
         group by i.indrelid, i.indkey
     ),
     unique_indexes as (
@@ -157,6 +159,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
         join pg_namespace nta on cta.relnamespace = nta.oid
         join pg_attribute ta on (ta.attrelid = c.confrelid and ta.attnum = any(c.confkey))
         where c.contype = 'f'
+            and (c.conrelid = ${literal(id)} or c.confrelid = ${literal(id)})
     ),
     columns as (
         select
@@ -186,15 +189,8 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
                             else 'USER-DEFINED'
                         end
                 end,
-                'format', case
-                    when t.typtype = 'e' then
-                        case
-                            when nt.nspname <> 'public' then concat(nt.nspname, '.', coalesce(bt.typname, t.typname))
-                            else coalesce(bt.typname, t.typname)
-                        end
-                    else
-                        coalesce(bt.typname, t.typname)
-                end,
+                'format', coalesce(bt.typname, t.typname),
+                'format_schema', coalesce(nbt.nspname, nt.nspname),
                 'is_identity', a.attidentity in ('a', 'd'),
                 'identity_generation', case a.attidentity
                     when 'a' then 'ALWAYS'
@@ -235,6 +231,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
                 conkey[1] as ordinal_position
             from pg_catalog.pg_constraint
             where contype = 'u' and cardinality(conkey) = 1
+                and conrelid = ${literal(id)}
             group by conrelid, conkey[1]
         ) as uniques on uniques.table_id = a.attrelid and uniques.ordinal_position = a.attnum
         left join (
@@ -248,6 +245,7 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
                 ) as definition
             from pg_constraint
             where contype = 'c' and cardinality(conkey) = 1
+                and conrelid = ${literal(id)}
             order by conrelid, conkey[1], oid asc
         ) as check_constraints on check_constraints.table_id = a.attrelid
                             and check_constraints.ordinal_position = a.attnum
@@ -338,5 +336,5 @@ export const getTableEditorSql = ({ id }: { id?: number }) => {
     left join primary_keys pk on b.id = pk.table_id
     left join unique_indexes ui on b.id = ui.table_id
     left join columns c on b.id = c.table_id;
-  `.trim()
+  `
 }

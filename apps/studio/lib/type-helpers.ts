@@ -2,8 +2,12 @@ export type PlainObject<Value = unknown> = Record<string | number | symbol, Valu
 
 export type Prettify<T> = { [K in keyof T]: T[K] } & {}
 
-export type DeepReadonly<T> = T extends (infer R)[]
-  ? ReadonlyArray<DeepReadonly<R>>
-  : T extends Object
-    ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
-    : T
+type Primitive = string | number | bigint | boolean | symbol | null | undefined
+
+export type DeepReadonly<T> = T extends Primitive
+  ? T
+  : T extends (infer R)[]
+    ? ReadonlyArray<DeepReadonly<R>>
+    : T extends object
+      ? { readonly [K in keyof T]: DeepReadonly<T[K]> }
+      : T

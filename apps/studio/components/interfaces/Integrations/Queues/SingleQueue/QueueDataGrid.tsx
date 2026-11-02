@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { TextSearch } from 'lucide-react'
+import { TextSearchIcon } from 'lucide-react'
 import { parseAsInteger, useQueryState } from 'nuqs'
 import { UIEvent, useMemo, useRef } from 'react'
 import DataGrid, { Column, DataGridHandle, Row } from 'react-data-grid'
@@ -7,7 +7,7 @@ import { Badge, Button, cn, ResizableHandle, ResizablePanel, ResizablePanelGroup
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DATE_FORMAT, MessageDetailsPanel } from './MessageDetailsPanel'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { PostgresQueueMessage } from '@/data/database-queues/database-queue-messages-infinite-query'
 import type { ResponseError } from '@/types'
 
@@ -117,7 +117,7 @@ const columns = messagesCols.map((col) => {
             col.id === 'id' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -154,7 +154,7 @@ export const QueueMessagesDataGrid = ({
     <div className="relative h-full">
       <DataGrid
         ref={gridRef}
-        className="h-full"
+        className="h-full border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         columns={columns}
@@ -163,7 +163,7 @@ export const QueueMessagesDataGrid = ({
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}
@@ -192,13 +192,13 @@ export const QueueMessagesDataGrid = ({
             </div>
           ) : (
             <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-              <TextSearch className="text-foreground-muted" strokeWidth={1} />
+              <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
               <div className="text-center">
                 <p className="text-foreground">No messages found</p>
                 <p className="text-foreground-light">
                   The selected queue doesn't have any messages.
                 </p>
-                <Button className="mt-2" onClick={() => showMessageModal()}>
+                <Button variant="primary" className="mt-2" onClick={() => showMessageModal()}>
                   Add message
                 </Button>
               </div>

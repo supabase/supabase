@@ -150,11 +150,32 @@ export const analyticsKeys = {
         databaseIdentifier,
       },
     ] as const,
+  apiKeysLastUsed: (
+    projectRef: string | undefined,
+    {
+      isoTimestampStart,
+      isoTimestampEnd,
+    }: {
+      isoTimestampStart?: string
+      isoTimestampEnd?: string
+    }
+  ) =>
+    ['projects', projectRef, 'api-keys-last-used', { isoTimestampStart, isoTimestampEnd }] as const,
   usageApiCounts: (projectRef: string | undefined, interval: string | undefined) =>
     ['projects', projectRef, 'usage.api-counts', interval] as const,
 
-  usageApiRequestsCount: (projectRef: string | undefined) =>
-    ['projects', projectRef, 'usage.api-requests-count'] as const,
+  serviceHealth: (
+    projectRef: string | undefined,
+    {
+      startDate,
+      endDate,
+      granularity,
+    }: {
+      startDate?: string
+      endDate?: string
+      granularity?: string
+    }
+  ) => ['projects', projectRef, 'service-health', { startDate, endDate, granularity }] as const,
 }
 
 function isoDateStringToDate(isoDateString: string | undefined): string | undefined {

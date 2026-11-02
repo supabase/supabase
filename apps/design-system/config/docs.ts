@@ -71,6 +71,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Connect Interstitials',
+          href: '/docs/ui-patterns/connect-interstitials',
+          items: [],
+        },
+        {
           title: 'Empty States',
           href: '/docs/ui-patterns/empty-states',
           items: [],
@@ -86,13 +91,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          href: '/docs/ui-patterns/modality',
-          title: 'Modality',
+          title: 'Markdown',
+          href: '/docs/ui-patterns/markdown',
           items: [],
         },
         {
-          href: '/docs/ui-patterns/navigation',
+          title: 'Modality',
+          href: '/docs/ui-patterns/modality',
+          items: [],
+        },
+        {
           title: 'Navigation',
+          href: '/docs/ui-patterns/navigation',
           items: [],
         },
         {
@@ -118,6 +128,16 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'Code Block',
+          href: '/docs/fragments/code-block',
+          items: [],
+        },
+        {
+          title: 'Collapsible Card Section',
+          href: '/docs/fragments/collapsible-card-section',
+          items: [],
+        },
+        {
           title: 'Assistant Chat',
           href: '/docs/fragments/assistant-chat',
           items: [],
@@ -128,13 +148,18 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
-          title: 'Modal',
-          href: '/docs/fragments/modal',
+          title: 'Page Container',
+          href: '/docs/fragments/page-container',
           items: [],
         },
         {
-          title: 'Page Container',
-          href: '/docs/fragments/page-container',
+          title: 'Page Breadcrumbs',
+          href: '/docs/fragments/page-breadcrumbs',
+          items: [],
+        },
+        {
+          title: 'Page Nav',
+          href: '/docs/fragments/page-nav',
           items: [],
         },
         {
@@ -198,6 +223,11 @@ export const docsConfig: DocsConfig = {
           items: [],
         },
         {
+          title: 'AI Tools',
+          href: '/docs/fragments/ai-tools',
+          items: [],
+        },
+        {
           title: 'Table of Contents (TOC)',
           href: '/docs/fragments/toc',
           items: [],
@@ -220,6 +250,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Single Value Field Array',
           href: '/docs/fragments/single-value-field-array',
+          items: [],
+        },
+        {
+          title: 'Skip to Content',
+          href: '/docs/fragments/skip-to-content',
           items: [],
         },
       ],
@@ -465,6 +500,11 @@ export const docsConfig: DocsConfig = {
         {
           title: 'Sonner',
           href: '/docs/components/sonner',
+          items: [],
+        },
+        {
+          title: 'Success Check',
+          href: '/docs/components/success-check',
           items: [],
         },
         {

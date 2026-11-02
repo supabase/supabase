@@ -10,7 +10,7 @@ source:
 
 ## Installation
 
-The Date Picker is built using a composition of the `<Popover />` and the `<Calendar />` components.
+The Date Picker is built using a composition of the `<Popover />`, `<Button />` and `<Calendar />` components.
 
 See installation instructions for the [Popover](/docs/components/popover#installation) and the [Calendar](/docs/components/calendar#installation) components.
 
@@ -20,40 +20,41 @@ See installation instructions for the [Popover](/docs/components/popover#install
 'use client'
 
 import { format } from 'date-fns'
-import { Calendar as CalendarIcon } from 'lucide-react'
 import * as React from 'react'
-
-import { Button } from '@/components/ui/button'
-import { Calendar } from '@/components/ui/calendar'
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
-import { cn } from '@/lib/utils'
+import { Button, Calendar } from 'ui'
+import {
+  DatePicker,
+  DatePickerButton,
+  DatePickerContent,
+  DatePickerTrigger,
+} from 'ui-patterns/DatePicker'
 
 export function DatePickerDemo() {
   const [date, setDate] = React.useState<Date>()
 
   return (
-    <Popover>
-      <PopoverTrigger asChild>
-        <Button
-          variant={'outline'}
-          className={cn(
-            'w-[280px] justify-start text-left font-normal',
-            !date && 'text-muted-foreground'
-          )}
-        >
-          <CalendarIcon className="mr-2 h-4 w-4" />
+    <DatePicker>
+      <DatePickerTrigger asChild>
+        <DatePickerButton variant="outline" className="w-[280px]">
           {date ? format(date, 'PPP') : <span>Pick a date</span>}
-        </Button>
-      </PopoverTrigger>
-      <PopoverContent className="w-auto p-0">
+        </DatePickerButton>
+      </DatePickerTrigger>
+      <DatePickerContent>
         <Calendar mode="single" selected={date} onSelect={setDate} initialFocus />
-      </PopoverContent>
-    </Popover>
+      </DatePickerContent>
+    </DatePicker>
   )
 }
 ```
 
 See the [React DayPicker](https://react-day-picker.js.org) documentation for more information.
+
+## API Reference
+
+- `<DatePicker />` accepts the same props as [the `<Popover />` component](./popover).
+- `<DatePickerTrigger />` accepts the same props as [the `<PopoverTrigger />` component](./popover#api-reference).
+- `<DatePickerContent />` accepts the same props as [the `<PopoverContent />` component](./popover#api-reference).
+- `<DatePickerButton />` accepts the same props as [the `<Button />` component](./button) and an optional `isInvalid` prop to visually indicate an invalid date.
 
 ## Examples
 

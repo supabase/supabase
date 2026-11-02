@@ -11,7 +11,7 @@ import { Swiper, SwiperSlide } from 'swiper/react'
 const Quotes: FC<Quotes> = (props) => (
   <section id={props.id}>
     <div className="overflow-hidden">
-      <SectionContainer className="!py-4">
+      <SectionContainer className="py-4!">
         <ul className="hidden xl:flex flex-col gap-4 md:flex-row items-stretch w-full h-auto min-h-64">
           {props.items?.map((quote: Quote) => (
             <li key={quote.author} className="w-full">
@@ -29,7 +29,7 @@ const Quotes: FC<Quotes> = (props) => (
             watchOverflow
             threshold={2}
             updateOnWindowResize
-            className="h-[300px] w-full !overflow-visible"
+            className="h-[300px] w-full overflow-visible!"
             breakpoints={{
               320: {
                 slidesPerView: 1.2,

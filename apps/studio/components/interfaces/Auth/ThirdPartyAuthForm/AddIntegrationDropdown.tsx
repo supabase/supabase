@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Image from 'next/image'
 import {
   Button,
@@ -20,7 +20,9 @@ import {
 interface AddIntegrationDropdownProps {
   buttonText?: string
   align?: 'end' | 'center'
-  type?: 'primary' | 'default'
+  variant?: 'primary' | 'default'
+  open?: boolean
+  onOpenChange?: (open: boolean) => void
   onSelectIntegrationType: (type: INTEGRATION_TYPES) => void
 }
 
@@ -47,14 +49,16 @@ const ProviderDropdownItem = ({
 }
 
 export const AddIntegrationDropdown = ({
-  type = 'primary',
+  variant = 'primary',
   align = 'end',
+  open,
+  onOpenChange,
   onSelectIntegrationType,
 }: AddIntegrationDropdownProps) => {
   return (
-    <DropdownMenu>
+    <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button type={type} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDownIcon />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
@@ -66,6 +70,7 @@ export const AddIntegrationDropdown = ({
         <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="custom" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

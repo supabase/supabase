@@ -1,22 +1,20 @@
-import { PostgresColumn } from '@supabase/postgres-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { noop } from 'lodash'
 import {
-  Braces,
-  Calendar,
+  BracesIcon,
+  CalendarIcon,
   DiamondIcon,
-  Fingerprint,
-  Hash,
-  Key,
-  Link as LinkIcon,
-  ListPlus,
-  MoreVertical,
-  Plus,
-  Search,
-  ToggleRight,
-  Trash,
-  Type,
+  FingerprintIcon,
+  HashIcon,
+  KeyIcon,
+  LinkIcon,
+  ListPlusIcon,
+  MoreVerticalIcon,
+  PlusIcon,
+  SearchIcon,
+  ToggleRightIcon,
+  TrashIcon,
+  TypeIcon,
 } from 'lucide-react'
 import { useState } from 'react'
 import {
@@ -25,6 +23,7 @@ import {
   cn,
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuItem,
   DropdownMenuTrigger,
   Table,
   TableBody,
@@ -48,49 +47,50 @@ import {
   getUniqueIndexColumnNames,
 } from './ColumnList.utils'
 import { ConstraintToken } from './ConstraintToken'
-import AlertError from '@/components/ui/AlertError'
+import { displayColumnType } from '@/components/interfaces/TableGridEditor/SidePanelEditor/ColumnEditor/ColumnEditor.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
+import type { SafePostgresColumn } from '@/lib/postgres-types'
 
-const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
+const getColumnTypeAffordancePresentation = (column: SafePostgresColumn) => {
   const { kind, label } = getColumnTypeAffordance(column.format)
   const iconClassName = 'text-foreground-muted'
 
   switch (kind) {
     case 'number':
       return {
-        icon: <Hash size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <HashIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'time':
       return {
-        icon: <Calendar size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <CalendarIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'text':
       return {
-        icon: <Type size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <TypeIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'json':
       return {
-        icon: <Braces size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <BracesIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     case 'bool':
       return {
-        icon: <ToggleRight size={14} className={iconClassName} strokeWidth={1.5} />,
+        icon: <ToggleRightIcon size={14} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
     default:
       return {
-        icon: <ListPlus size={16} className={iconClassName} strokeWidth={1.5} />,
+        icon: <ListPlusIcon size={16} className={iconClassName} strokeWidth={1.5} />,
         label,
       }
   }
@@ -98,8 +98,8 @@ const getColumnTypeAffordancePresentation = (column: PostgresColumn) => {
 
 interface ColumnListProps {
   onAddColumn: () => void
-  onEditColumn: (column: PostgresColumn) => void
-  onDeleteColumn: (column: PostgresColumn) => void
+  onEditColumn: (column: SafePostgresColumn) => void
+  onDeleteColumn: (column: SafePostgresColumn) => void
 }
 
 export const ColumnList = ({
@@ -138,13 +138,9 @@ export const ColumnList = ({
         )) ?? []
 
   const { isSchemaLocked } = useIsProtectedSchema({ schema: selectedTable?.schema ?? '' })
-  const { can: canUpdateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canUpdateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
-  const deleteColumnTooltipText = !canUpdateColumns
-    ? 'Additional permissions required to delete column'
-    : undefined
 
   return (
     <div className="space-y-4">
@@ -155,12 +151,12 @@ export const ColumnList = ({
             placeholder="Filter columns"
             value={filterString}
             onChange={(e) => setFilterString(e.target.value)}
-            icon={<Search />}
+            icon={<SearchIcon />}
           />
         </div>
         {!isSchemaLocked && isTableEntity && (
           <ButtonTooltip
-            icon={<Plus />}
+            icon={<PlusIcon />}
             disabled={!canUpdateColumns}
             onClick={() => onAddColumn()}
             tooltip={{
@@ -190,7 +186,7 @@ export const ColumnList = ({
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead className="w-0 !px-0" />
+                <TableHead className="w-0 px-0!" />
 
                 <TableHead
                   className={cn(columns.length === 0 ? 'text-foreground-muted' : undefined)}
@@ -244,14 +240,14 @@ export const ColumnList = ({
 
               {isSuccess &&
                 columns.map((column) => {
-                  const { icon: TypeIcon, label: typeLabel } =
+                  const { icon: typeIcon, label: typeLabel } =
                     getColumnTypeAffordancePresentation(column)
 
                   const constraintTokens = [
                     primaryKeyColumns.has(column.name) ? (
                       <ConstraintToken
                         key="primary"
-                        icon={<Key size={12} strokeWidth={1.7} className="shrink-0" />}
+                        icon={<KeyIcon size={12} strokeWidth={1.7} className="shrink-0" />}
                         label="Primary"
                         variant="primary"
                       />
@@ -273,7 +269,7 @@ export const ColumnList = ({
                       <ConstraintToken
                         key="unique"
                         icon={
-                          <Fingerprint
+                          <FingerprintIcon
                             size={12}
                             strokeWidth={1.7}
                             className="shrink-0 text-foreground-light"
@@ -286,7 +282,7 @@ export const ColumnList = ({
                       <ConstraintToken
                         key="identity"
                         icon={
-                          <Hash
+                          <HashIcon
                             size={12}
                             strokeWidth={1.7}
                             className="shrink-0 text-foreground-lighter"
@@ -312,17 +308,21 @@ export const ColumnList = ({
 
                   return (
                     <TableRow key={column.name}>
-                      <TableCell className="w-0 !pl-5 !pr-1">
+                      <TableCell className="w-0 pl-5! pr-1!">
                         <Tooltip>
                           <TooltipTrigger asChild className="cursor-default" aria-label={typeLabel}>
-                            <div className="flex w-4 justify-center">{TypeIcon}</div>
+                            <div className="flex w-4 justify-center">{typeIcon}</div>
                           </TooltipTrigger>
                           <TooltipContent side="bottom">
                             <div className="flex flex-col">
                               <span>{column.data_type}</span>
                               {column.format !== column.data_type && (
                                 <span className="text-xs text-foreground-light">
-                                  {column.format}
+                                  {displayColumnType(
+                                    column.format,
+                                    column.format_schema,
+                                    column.data_type === 'ARRAY'
+                                  )}
                                 </span>
                               )}
                             </div>
@@ -343,7 +343,13 @@ export const ColumnList = ({
                         </div>
                       </TableCell>
                       <TableCell>
-                        <p className="text-foreground-lighter">{column.format}</p>
+                        <p className="text-foreground-lighter">
+                          {displayColumnType(
+                            column.format,
+                            column.format_schema,
+                            column.data_type === 'ARRAY'
+                          )}
+                        </p>
                       </TableCell>
                       <TableCell>
                         <div className="flex flex-wrap gap-1.5">{constraintTokens}</div>
@@ -352,7 +358,6 @@ export const ColumnList = ({
                         {!isSchemaLocked && isTableEntity && (
                           <div className="flex justify-end gap-2">
                             <ButtonTooltip
-                              type="default"
                               disabled={!canUpdateColumns}
                               onClick={() => onEditColumn(column)}
                               tooltip={{
@@ -367,24 +372,33 @@ export const ColumnList = ({
                               Edit
                             </ButtonTooltip>
                             <DropdownMenu>
-                              <DropdownMenuTrigger asChild>
-                                <Button type="default" className="px-1" icon={<MoreVertical />} />
-                              </DropdownMenuTrigger>
+                              <Tooltip>
+                                <TooltipTrigger asChild>
+                                  <DropdownMenuTrigger asChild>
+                                    <Button
+                                      aria-label={`Delete ${column.name} column`}
+                                      // Tooltip repeats the label; screen readers would read it twice
+                                      aria-describedby={undefined}
+                                      className="px-1"
+                                      icon={<MoreVerticalIcon />}
+                                    />
+                                  </DropdownMenuTrigger>
+                                </TooltipTrigger>
+                                <TooltipContent side="bottom">
+                                  {!canUpdateColumns
+                                    ? 'Additional permissions required to delete column'
+                                    : `Delete ${column.name} column`}
+                                </TooltipContent>
+                              </Tooltip>
                               <DropdownMenuContent side="bottom" align="end" className="w-32">
-                                <DropdownMenuItemTooltip
+                                <DropdownMenuItem
                                   disabled={!canUpdateColumns}
                                   onClick={() => onDeleteColumn(column)}
                                   className="gap-x-2"
-                                  tooltip={{
-                                    content: {
-                                      side: 'left',
-                                      text: deleteColumnTooltipText,
-                                    },
-                                  }}
                                 >
-                                  <Trash size={12} />
+                                  <TrashIcon size={12} />
                                   <p>Delete column</p>
-                                </DropdownMenuItemTooltip>
+                                </DropdownMenuItem>
                               </DropdownMenuContent>
                             </DropdownMenu>
                           </div>

@@ -11,7 +11,7 @@ import {
 } from 'ui-patterns/PageHeader'
 
 import { DashboardPreferences } from '@/components/interfaces/Settings/General/DashboardPreferences'
-import DefaultLayout from '@/components/layouts/DefaultLayout'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'

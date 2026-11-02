@@ -46,7 +46,7 @@ VUE_APP_SUPABASE_KEY=YOUR_SUPABASE_KEY
 
 </$CodeTabs>
 
-With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since Supabase enables [Row Level Security](/docs/guides/auth#row-level-security) on Databases by default.
+With the API credentials in place, create a helper file to initialize the Supabase client. These variables will be exposed on the browser, and that's fine since Supabase enables [Row Level Security](/docs/guides/database/postgres/row-level-security) on Databases by default.
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/supabase.ts"
@@ -54,9 +54,9 @@ lines={[[1, -1]]}
 meta="name=src/supabase.ts"
 />
 
-### Set up a login route
+### Set up a sign-in route
 
-Create a Vue component to manage logins and sign ups that uses Magic Links, so users can sign in with their email without using passwords.
+Create a Vue component to manage sign-ins and sign-ups that uses Magic Links, so users can sign in with their email without using passwords.
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/views/Login.vue"
@@ -70,13 +70,15 @@ After a user has signed in, let them edit their profile details and manage their
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/views/Account.vue"
-lines={[[1, -1]]}
+lines={[[1, 9], [11, 67], [69, -1]]}
 meta="name=src/views/Account.vue"
 />
 
 ### Launch!
 
 With all the components in place, update `App.vue` and the app routes:
+
+<$Partial path="auth_methods.mdx" />
 
 <$CodeSample
 path="/user-management/ionic-vue-user-management/src/router/index.ts"
@@ -134,6 +136,12 @@ meta="name=src/components/Avatar.vue"
 
 ### Add the new widget
 
-Add the widget to the Account page (already included in the Account.vue code above since the example includes the Avatar component by default).
+And then add the widget to the Account page:
+
+<$CodeSample
+path="/user-management/ionic-vue-user-management/src/views/Account.vue"
+lines={[[1, -1]]}
+meta="name=src/views/Account.vue"
+/>
 
 At this stage you have a fully functional application!

@@ -1,4 +1,4 @@
-import Link from 'next/link'
+import { useParams } from 'common'
 import { UseFormReturn } from 'react-hook-form'
 import {
   Checkbox,
@@ -13,22 +13,44 @@ import {
   TooltipTrigger,
   useWatch,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { CreateProjectForm } from './ProjectCreation.schema'
+import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useTrackDefaultPrivilegesExposure } from '@/hooks/misc/useDataApiRevokeOnCreateDefault'
+import { DOCS_URL } from '@/lib/constants'
 
 interface SecurityOptionsProps {
   form: UseFormReturn<CreateProjectForm>
   layout?: 'vertical' | 'horizontal'
+  surface: 'main' | 'vercel'
 }
 
-export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptionsProps) => {
+export const SecurityOptions = ({ form, layout = 'horizontal', surface }: SecurityOptionsProps) => {
+  const { slug } = useParams()
   const dataApi = useWatch({ control: form.control, name: 'dataApi' })
+  const dataApiDefaultPrivileges = useWatch({
+    control: form.control,
+    name: 'dataApiDefaultPrivileges',
+  })
+  const hasUserModified = form.getFieldState('dataApiDefaultPrivileges', form.formState).isDirty
 
-  useTrackDefaultPrivilegesExposure({ surface: 'main', dataApiEnabled: dataApi ?? true })
+  useTrackDefaultPrivilegesExposure(
+    surface === 'main'
+      ? {
+          surface: 'main',
+          dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+          hasUserModified,
+        }
+      : {
+          surface: 'vercel',
+          orgSlug: slug,
+          dataApiDefaultPrivileges: dataApiDefaultPrivileges ?? true,
+          hasUserModified,
+        }
+  )
 
   return (
     <Panel.Content className="pb-8">
@@ -51,13 +73,9 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                   <FormDescription className="text-foreground-lighter">
                     Autogenerate a RESTful API for your public schema. Recommended if using a client
                     library like{' '}
-                    <Link
-                      href="https://supabase.com/docs/reference/javascript/introduction"
-                      target="_blank"
-                      className="text-link"
-                    >
+                    <InlineLink href={`${DOCS_URL}/reference/javascript/introduction`}>
                       supabase-js
-                    </Link>
+                    </InlineLink>
                     .
                   </FormDescription>
                 </div>
@@ -99,11 +117,10 @@ export const SecurityOptions = ({ form, layout = 'horizontal' }: SecurityOptions
                   <FormLabel
                     className={cn('text-sm text-foreground', !dataApi && 'text-foreground-muted')}
                   >
-                    Automatically expose new tables and functions
+                    Automatically expose new tables
                   </FormLabel>
                   <FormDescription className="text-foreground-lighter">
-                    Grants privileges to Data API roles by default, exposing new tables and
-                    functions.
+                    Grants privileges to Data API roles by default, exposing new tables.
                     <br />
                     <strong className="font-medium text-foreground-light">
                       We recommend disabling this to control access manually.

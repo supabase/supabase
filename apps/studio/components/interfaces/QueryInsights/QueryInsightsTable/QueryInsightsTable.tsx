@@ -1,12 +1,12 @@
+import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
-import { Search, TextSearch, X } from 'lucide-react'
+import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-// eslint-disable-next-line no-restricted-imports
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs_Shadcn_, TabsList_Shadcn_, TabsTrigger_Shadcn_ } from 'ui'
+import { Button, cn, FloatingPlate, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -27,7 +27,8 @@ import type { QueryPlanRow } from '@/components/interfaces/ExplainVisualizer/Exp
 import { FilterPill } from '@/components/interfaces/QueryPerformance/components/FilterPill'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
-import TwoOptionToggle from '@/components/ui/TwoOptionToggle'
+import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -174,7 +175,7 @@ export const QueryInsightsTable = ({
   }, [mode, selectedTriageRow, selectedRow, filteredTriageItems, explorerItems])
 
   const runExplain = useCallback(
-    (query: string) => {
+    (query: SafeSqlFragment) => {
       if (explainResults[query]) return
       if (explainLoadingQuery) return
       const requestQuery = query
@@ -183,7 +184,8 @@ export const QueryInsightsTable = ({
         {
           projectRef: project?.ref,
           connectionString: project?.connectionString,
-          sql: wrapWithRollback(`EXPLAIN ANALYZE ${requestQuery}`),
+          sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          grant: unguarded.migrating,
         },
         {
           onSuccess(data) {
@@ -341,7 +343,7 @@ export const QueryInsightsTable = ({
               options={['explorer', 'triage']}
               activeOption={mode}
               borderOverride="border"
-              onClickOption={setMode}
+              onClickOption={(mode) => setMode(mode as Mode)}
             />
             {appNameFilter.length > 0 ? (
               <FilterPill
@@ -364,39 +366,27 @@ export const QueryInsightsTable = ({
 
           <div className="flex items-center">
             {mode === 'triage' ? (
-              <Tabs_Shadcn_ value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
-                <TabsList_Shadcn_ className="flex gap-x-4 rounded-none !mt-0 pt-0 !border-none">
-                  <TabsTrigger_Shadcn_
-                    value="all"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                  >
+              <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
+                <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
+                  <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
                     All{triageItems.length > 0 && ` (${triageItems.length})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="error"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
                     Errors{errorCount > 0 && ` (${errorCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="index"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
                     Index{indexCount > 0 && ` (${indexCount})`}
-                  </TabsTrigger_Shadcn_>
-                  <TabsTrigger_Shadcn_
-                    value="slow"
-                    className="text-xs py-3 border-b-[1px] font-mono uppercase"
-                  >
+                  </TabsTrigger>
+                  <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
                     Slow{slowCount > 0 && ` (${slowCount})`}
-                  </TabsTrigger_Shadcn_>
-                </TabsList_Shadcn_>
-              </Tabs_Shadcn_>
+                  </TabsTrigger>
+                </TabsList>
+              </Tabs>
             ) : (
               <Input
                 size="tiny"
                 autoComplete="off"
-                icon={<Search className="h-4 w-4" />}
+                icon={<SearchIcon className="h-4 w-4" />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 name="search"
@@ -408,8 +398,8 @@ export const QueryInsightsTable = ({
                     <Button
                       key="clear"
                       size="tiny"
-                      type="text"
-                      icon={<X className="h-4 w-4" />}
+                      variant="text"
+                      icon={<XIcon className="h-4 w-4" />}
                       onClick={() => setSearchQuery('')}
                       className="p-0 h-5 w-5"
                     />
@@ -434,14 +424,15 @@ export const QueryInsightsTable = ({
               : 'opacity-0 translate-y-4 pointer-events-none',
           ].join(' ')}
         >
-          <Button
-            type="default"
-            size="tiny"
-            className="rounded-full shadow-md"
-            onClick={() => onCurrentSelectQuery?.(null)}
-          >
-            Clear query
-          </Button>
+          <FloatingPlate rounded="full">
+            <Button
+              size="tiny"
+              className="rounded-full shadow-md"
+              onClick={() => onCurrentSelectQuery?.(null)}
+            >
+              Clear query
+            </Button>
+          </FloatingPlate>
         </div>
         {isLoading ? (
           <div className="px-6 py-4">
@@ -452,7 +443,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={triageGridRef}
               style={{ height: '100%' }}
-              className="flex-1 grow h-full"
+              className="flex-1 grow h-full border-t-0! border-b-0!"
               rowHeight={60}
               headerRowHeight={36}
               columns={triageColumns}
@@ -465,7 +456,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}
@@ -489,7 +480,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No issues found</p>
                       <p className="text-foreground-light">
@@ -508,7 +499,7 @@ export const QueryInsightsTable = ({
             <DataGrid
               ref={gridRef}
               style={{ height: '100%' }}
-              className={cn('flex-1 grow h-full')}
+              className={cn('flex-1 grow h-full border-t-0! border-b-0!')}
               rowHeight={44}
               headerRowHeight={36}
               columns={columns}
@@ -521,7 +512,7 @@ export const QueryInsightsTable = ({
                   `${isSelected ? 'bg-surface-300 dark:bg-surface-300' : isCharted ? 'bg-surface-200 dark:bg-surface-200' : 'bg-200 hover:bg-surface-200'} cursor-pointer`,
                   '[&>div:first-child]:border-l-4 [&>div:first-child]:pl-5 [&>div:last-child]:pr-6',
                   `${isSelected || isCharted ? '[&>div:first-child]:border-l-foreground' : '[&>div:first-child]:border-l-transparent'}`,
-                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
+                  '[&>.rdg-cell]:box-border [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none [&>.rdg-cell]:py-3',
                   '[&>.rdg-cell.column-prop_total_time]:relative',
                 ].join(' ')
               }}
@@ -545,7 +536,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No queries found</p>
                       <p className="text-foreground-light">

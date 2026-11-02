@@ -1,17 +1,18 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode, useMemo } from 'react'
 import { Badge, cn } from 'ui'
-import { CommandMenuTriggerInput } from 'ui-patterns'
+import { CommandMenuTriggerInput } from 'ui-patterns/CommandMenu'
 
+import { AdminStudioButton } from './AdminStudioButton'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
-import { HeaderUpgradeButton } from './HeaderUpgradeButton'
 import { HomeIcon } from './HomeIcon'
+import { LayoutHeaderDivider } from './LayoutHeaderDivider'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
@@ -30,27 +31,9 @@ import { useOrgUsageQuery } from '@/data/usage/org-usage-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
-
-const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
-  <span className={cn('text-border-stronger pr-2', className)} {...props}>
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      stroke="currentColor"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-      shapeRendering="geometricPrecision"
-      aria-hidden={true}
-    >
-      <path d="M16 3.549L7.12 20.600" />
-    </svg>
-  </span>
-)
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode
@@ -69,6 +52,7 @@ export const LayoutHeader = ({
   const { ref: projectRef, slug } = useParams()
   const { data: selectedProject } = useSelectedProjectQuery()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
+  const track = useTrack()
 
   const commandMenuEnabled = useIsShortcutEnabled(SHORTCUT_IDS.COMMAND_MENU_OPEN)
 
@@ -92,7 +76,7 @@ export const LayoutHeader = ({
     selectedProject?.inserted_at !== undefined &&
     dayjs(selectedProject.inserted_at).isAfter(dayjs().subtract(5, 'day'))
 
-  const connectButtonType = isNewProject ? 'primary' : 'default'
+  const connectButtonVariant = isNewProject ? 'primary' : 'default'
 
   // show org selection if we are on a project page or on a explicit org route
   const showOrgSelection = slug || (selectedOrganization && projectRef)
@@ -104,9 +88,10 @@ export const LayoutHeader = ({
           <div className="flex items-center justify-center border-r flex-0 md:hidden h-full aspect-square">
             <Link
               href={backToDashboardURL}
-              className="flex items-center justify-center border-none !bg-transparent rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
+              onClick={() => track('header_back_to_dashboard_clicked')}
+              className="flex items-center justify-center border-none bg-transparent! rounded-md min-w-[30px] w-[30px] h-[30px] text-foreground-lighter hover:text-foreground transition-colors"
             >
-              <ChevronLeft strokeWidth={1.5} size={16} />
+              <ChevronLeftIcon strokeWidth={1.5} size={16} />
             </Link>
           </div>
         )}
@@ -134,6 +119,7 @@ export const LayoutHeader = ({
               )}
             </AnimatePresence>
           </div>
+
           <div className="hidden md:flex items-center text-sm">
             <HomeIcon />
             <div className="flex items-center md:pl-2">
@@ -143,6 +129,7 @@ export const LayoutHeader = ({
                   <OrganizationDropdown />
                 </>
               ) : null}
+
               <AnimatePresence>
                 {projectRef && (
                   <motion.div
@@ -156,11 +143,15 @@ export const LayoutHeader = ({
                     }}
                   >
                     {IS_PLATFORM && <LayoutHeaderDivider />}
+
                     <ProjectDropdown />
 
                     {exceedingLimits && (
                       <div className="ml-2">
-                        <Link href={`/org/${selectedOrganization?.slug}/usage`}>
+                        <Link
+                          href={`/org/${selectedOrganization?.slug}/usage`}
+                          onClick={() => track('header_exceeding_usage_badge_clicked')}
+                        >
                           <Badge variant="destructive">Exceeding usage limits</Badge>
                         </Link>
                       </div>
@@ -176,6 +167,7 @@ export const LayoutHeader = ({
                 )}
               </AnimatePresence>
             </div>
+
             <AnimatePresence>
               {headerTitle && (
                 <motion.div
@@ -207,7 +199,8 @@ export const LayoutHeader = ({
                   }}
                 >
                   {IS_PLATFORM && <MergeRequestButton />}
-                  <ConnectButton buttonType={connectButtonType} />
+                  <AdminStudioButton />
+                  <ConnectButton buttonVariant={connectButtonVariant} />
                 </motion.div>
               )}
             </AnimatePresence>
@@ -224,7 +217,7 @@ export const LayoutHeader = ({
                     showShortcut={commandMenuEnabled}
                     placeholder="Search..."
                     className={cn(
-                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent',
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
                       '[&_.command-shortcut]:border-none',
                       '[&_.command-shortcut]:pr-2',
                       '[&_.command-shortcut]:bg-transparent',
@@ -243,7 +236,6 @@ export const LayoutHeader = ({
                     )}
                   </AnimatePresence>
                 </div>
-                <HeaderUpgradeButton className="hidden md:flex" />
                 <UserDropdown triggerClassName="hidden md:flex" />
               </>
             ) : (
@@ -252,13 +244,14 @@ export const LayoutHeader = ({
                 <div className="flex items-center gap-1 md:gap-2">
                   <CommandMenuTriggerInput
                     placeholder="Search..."
-                    className="hidden md:flex md:min-w-32 xl:min-w-32 rounded-full bg-transparent
-                        [&_.command-shortcut]:border-none
-                        [&_.command-shortcut]:pr-2
-                        [&_.command-shortcut]:bg-transparent
-                        [&_.command-shortcut]:text-foreground-lighter
-                        [&_.command-shortcut]:shadow-none
-                      "
+                    className={cn(
+                      'hidden md:flex md:min-w-32 xl:min-w-32 rounded-full',
+                      '[&_.command-shortcut]:border-none',
+                      '[&_.command-shortcut]:pr-2',
+                      '[&_.command-shortcut]:bg-transparent',
+                      '[&_.command-shortcut]:text-foreground-lighter',
+                      '[&_.command-shortcut]:shadow-none'
+                    )}
                   />
                   <HelpButton />
                   <AdvisorButton projectRef={projectRef} />

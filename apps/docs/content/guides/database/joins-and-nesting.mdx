@@ -8,7 +8,7 @@ The data APIs automatically detect relationships between Postgres tables. Since 
 
 ## One-to-many joins
 
-Let's use an example database that stores `orchestral_sections` and `instruments`:
+Use an example database that stores `orchestral_sections` and `instruments`:
 
 <Tabs
   scrollable
@@ -111,7 +111,7 @@ create table instruments (
 We can get the nested `SectionsWithInstruments` type like this:
 
 ```ts
-import { QueryResult, QueryData, QueryError } from '@supabase/supabase-js'
+import { QueryData, QueryError, QueryResult } from '@supabase/supabase-js'
 
 const sectionsWithInstrumentsQuery = supabase.from('orchestral_sections').select(`
   id,
@@ -176,6 +176,18 @@ val data = supabase.from("orchestral_sections").select(Columns.raw("id, name, in
 
 ```python
 data = supabase.from_('orchestral_sections').select('id, name, instruments(id, name)').execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<OrchestralSection>()
+  .Select("id, name, instruments(id, name)")
+  .Get();
 ```
 
 </TabPanel>
@@ -768,6 +780,18 @@ data = supabase.from_('teams').select('id, team_name, users(id, name)').execute(
 
 </TabPanel>
 </$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Team>()
+  .Select("id, team_name, users(id, name)")
+  .Get();
+```
+
+</TabPanel>
+</$Show>
 <TabPanel id="graphql" label="GraphQL">
 
 ````javascript
@@ -896,7 +920,8 @@ struct Shift: Codable {
   let userId: Int
   let attendanceStatus: String?
 
-  let scans: [Scan]
+  let startScan: Scan
+  let endScan: Scan
 
   struct Scan: Codable {
     let id: Int
@@ -914,6 +939,8 @@ struct Shift: Codable {
     case id
     case userId = "user_id"
     case attendanceStatus = "attendance_status"
+    case startScan = "start_scan"
+    case endScan = "end_scan"
   }
 }
 
@@ -927,11 +954,11 @@ let shifts: [Shift] = try await supabase
         user_id,
         badge_scan_time
       ),
-     scans: scan_id_end (
+      end_scan:scans!scan_id_end (
         id,
         user_id,
         badge_scan_time
-     )
+      )
     """
   )
   .execute()
@@ -980,6 +1007,30 @@ data = supabase.from_('shifts').select("""
     badge_scan_time
   )
 """).execute()
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+var result = await supabase
+  .From<Shift>()
+  .Select(@"
+    *,
+    start_scan:scans!scan_id_start (
+      id,
+      user_id,
+      badge_scan_time
+    ),
+    end_scan:scans!scan_id_end (
+      id,
+      user_id,
+      badge_scan_time
+    )
+  ")
+  .Get();
 ```
 
 </TabPanel>

@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { cn } from 'ui'
@@ -21,6 +20,7 @@ import { AddIntegrationDropdown } from './AddIntegrationDropdown'
 import { CreateAuth0IntegrationDialog } from './CreateAuth0Dialog'
 import { CreateAwsCognitoAuthIntegrationDialog } from './CreateAwsCognitoAuthDialog'
 import { CreateClerkAuthIntegrationDialog } from './CreateClerkAuthDialog'
+import { CreateCustomOidcIntegrationDialog } from './CreateCustomOidcDialog'
 import { CreateFirebaseAuthIntegrationDialog } from './CreateFirebaseAuthDialog'
 import { CreateWorkOSIntegrationDialog } from './CreateWorkOSDialog'
 import { IntegrationCard } from './IntegrationCard'
@@ -29,7 +29,7 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
-import AlertError from '@/components/ui/AlertError'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDeleteThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-delete-mutation'
@@ -37,8 +37,10 @@ import {
   ThirdPartyAuthIntegration,
   thirdPartyAuthIntegrationsQueryOptions,
 } from '@/data/third-party-auth/integrations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
@@ -54,11 +56,15 @@ export const ThirdPartyAuthForm = () => {
   const [selectedIntegration, setSelectedIntegration] = useState<INTEGRATION_TYPES>()
   const [selectedIntegrationForDeletion, setSelectedIntegrationForDeletion] =
     useState<ThirdPartyAuthIntegration>()
+  const [addIntegrationOpen, setAddIntegrationOpen] = useState(false)
+
+  useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setAddIntegrationOpen(true), {
+    label: 'Add provider',
+  })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   if (isError) {
@@ -87,17 +93,21 @@ export const ThirdPartyAuthForm = () => {
         </PageSectionSummary>
         <PageSectionAside>
           <DocsButton href={`${DOCS_URL}/guides/auth/third-party/overview`} />
-          <AddIntegrationDropdown onSelectIntegrationType={setSelectedIntegration} />
+          <AddIntegrationDropdown
+            open={addIntegrationOpen}
+            onOpenChange={setAddIntegrationOpen}
+            onSelectIntegrationType={setSelectedIntegration}
+          />
         </PageSectionAside>
       </PageSectionMeta>
       <PageSectionContent>
         {isLoading && (
           <div
             className={cn(
-              'border rounded border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
+              'border rounded-sm border-default px-20 py-16 flex flex-col items-center justify-center space-y-4'
             )}
           >
-            <Loader2 size={24} className="animate-spin" />
+            <Loader2Icon size={24} className="animate-spin" />
           </div>
         )}
 
@@ -109,7 +119,7 @@ export const ThirdPartyAuthForm = () => {
             >
               <AddIntegrationDropdown
                 align="center"
-                type="default"
+                variant="default"
                 onSelectIntegrationType={setSelectedIntegration}
               />
             </EmptyStatePresentational>
@@ -158,6 +168,11 @@ export const ThirdPartyAuthForm = () => {
         <CreateWorkOSIntegrationDialog
           visible={selectedIntegration === 'workos'}
           onDelete={() => {}}
+          onClose={() => setSelectedIntegration(undefined)}
+        />
+
+        <CreateCustomOidcIntegrationDialog
+          visible={selectedIntegration === 'custom'}
           onClose={() => setSelectedIntegration(undefined)}
         />
 

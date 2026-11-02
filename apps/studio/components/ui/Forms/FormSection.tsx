@@ -56,9 +56,9 @@ export const FormSectionLabel = ({
 
 const Shimmer = () => (
   <div className="flex w-full flex-col gap-2">
-    <div className="shimmering-loader h-2 w-1/3 rounded"></div>
+    <div className="shimmering-loader h-2 w-1/3 rounded-sm"></div>
     <div className="flex flex-col justify-between space-y-2">
-      <div className="shimmering-loader h-[34px] w-2/3 rounded" />
+      <div className="shimmering-loader h-[34px] w-2/3 rounded-sm" />
     </div>
   </div>
 )
@@ -80,7 +80,7 @@ export const FormSectionContent = ({
     <div
       className={`
         relative col-span-12 flex flex-col gap-6 @lg:col-span-7
-        ${fullWidth && '!col-span-12'}
+        ${fullWidth && 'col-span-12!'}
         ${className}
       `}
     >

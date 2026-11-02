@@ -1,7 +1,7 @@
 import { useEffect, useRef } from 'react'
 
 export function useChanged<T>(value: T): boolean {
-  const prev = useRef<T>()
+  const prev = useRef<T>(null)
   const changed = prev.current !== value
 
   useEffect(() => {
@@ -12,7 +12,7 @@ export function useChanged<T>(value: T): boolean {
 }
 
 export function useChangedSync<T>(value: T): boolean {
-  const prev = useRef<T>()
+  const prev = useRef<T>(null)
   const changed = prev.current !== value
   prev.current = value
 

@@ -1,12 +1,12 @@
 import { ComponentProps } from 'react'
 import {
-  Select_Shadcn_,
-  SelectContent_Shadcn_,
-  SelectGroup_Shadcn_,
-  SelectItem_Shadcn_,
-  SelectLabel_Shadcn_,
-  SelectTrigger_Shadcn_,
-  SelectValue_Shadcn_,
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
   SonnerToaster,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -38,7 +38,7 @@ function SonnerPositionConfig() {
           description="You will need to fire a few Sonner toasts first"
           layout="flex"
         >
-          <Select_Shadcn_
+          <Select
             value={config.sonnerPosition}
             defaultValue={config.sonnerPosition}
             onValueChange={(e: Position) => {
@@ -48,20 +48,20 @@ function SonnerPositionConfig() {
               })
             }}
           >
-            <SelectTrigger_Shadcn_ className="w-[180px]">
-              <SelectValue_Shadcn_ placeholder="Select a position" />
-            </SelectTrigger_Shadcn_>
-            <SelectContent_Shadcn_>
-              <SelectGroup_Shadcn_>
-                <SelectLabel_Shadcn_>Positions available</SelectLabel_Shadcn_>
+            <SelectTrigger className="w-[180px]">
+              <SelectValue placeholder="Select a position" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectGroup>
+                <SelectLabel>Positions available</SelectLabel>
                 {positions.map((position) => (
-                  <SelectItem_Shadcn_ key={position} value={position}>
+                  <SelectItem key={position} value={position}>
                     {position}
-                  </SelectItem_Shadcn_>
+                  </SelectItem>
                 ))}
-              </SelectGroup_Shadcn_>
-            </SelectContent_Shadcn_>
-          </Select_Shadcn_>
+              </SelectGroup>
+            </SelectContent>
+          </Select>
         </FormItemLayout>
       </form>
     </div>

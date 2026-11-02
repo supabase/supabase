@@ -102,4 +102,18 @@ describe('api/self-hosted/constants', () => {
       expect(POSTGRES_USER_READ_ONLY).toBe('supabase_read_only_user')
     })
   })
+
+  describe('AUTH_JWT_SECRET', () => {
+    it('should use AUTH_JWT_SECRET when set', async () => {
+      vi.stubEnv('AUTH_JWT_SECRET', 'custom-jwt-secret-32-chars-long-xyz')
+      const { AUTH_JWT_SECRET } = await import('./constants')
+      expect(AUTH_JWT_SECRET).toBe('custom-jwt-secret-32-chars-long-xyz')
+    })
+
+    it('should fall back to DEFAULT_AUTH_JWT_SECRET when unset', async () => {
+      vi.stubEnv('AUTH_JWT_SECRET', '')
+      const { AUTH_JWT_SECRET, DEFAULT_AUTH_JWT_SECRET } = await import('./constants')
+      expect(AUTH_JWT_SECRET).toBe(DEFAULT_AUTH_JWT_SECRET)
+    })
+  })
 })

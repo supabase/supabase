@@ -2,7 +2,7 @@
 
 import { useParams } from 'common'
 import { Auth } from 'icons'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useMemo } from 'react'
 
 import {
@@ -85,7 +85,7 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
       <div className="flex items-center gap-x-2">
         {isLoadingPolicies ? (
           <span className="flex items-center gap-2">
-            <Loader2 size={14} className="animate-spin" /> Loading...
+            <Loader2Icon size={14} className="animate-spin" /> Loading...
           </span>
         ) : (
           <span>
@@ -134,23 +134,22 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
 
   return (
     <div className="relative h-full flex flex-col">
-      <div className="flex-1 min-h-0 overflow-hidden">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-9">
         <ResultsList
           results={policyResults}
           icon={Auth}
           getRoute={(result) => {
             const policy = policies?.find((p) => String(p.id) === result.id)
             if (!policy || !projectRef)
-              return `/project/${projectRef}/auth/policies` as `/${string}`
+              return `/project/${projectRef}/database/policies` as `/${string}`
 
             const params = new URLSearchParams()
             params.set('edit', String(policy.id))
             if (policy.schema) {
               params.set('schema', policy.schema)
             }
-            return `/project/${projectRef}/auth/policies?${params.toString()}` as `/${string}`
+            return `/project/${projectRef}/database/policies?${params.toString()}` as `/${string}`
           }}
-          className="pb-9"
         />
       </div>
       {renderFooter()}

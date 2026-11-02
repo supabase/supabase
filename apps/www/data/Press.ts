@@ -8,6 +8,12 @@ type PressItem = {
 const data: PressItem[] = [
   {
     type: 'article',
+    href: 'https://supabase.com/blog/supabase-series-f',
+    title: 'Supabase Series F',
+    publisher: 'Supabase',
+  },
+  {
+    type: 'article',
     href: 'https://techcrunch.com/2022/05/10/supabase-raises-80m-series-b-for-its-open-source-firebase-alternative/',
     title: 'Supabase raises $80M Series B for its open source Firebase alternative',
     publisher: 'TechCrunch',

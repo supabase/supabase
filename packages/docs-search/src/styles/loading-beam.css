@@ -1,0 +1,80 @@
+@property --loading-beam-x {
+  syntax: '<number>';
+  initial-value: 0.5;
+  inherits: true;
+}
+
+@keyframes loading-beam-sweep {
+  0%,
+  100% {
+    --loading-beam-x: 0;
+  }
+  50% {
+    --loading-beam-x: 1;
+  }
+}
+
+@layer components {
+  .loading-beam {
+    --loading-beam-color: var(--foreground-default);
+    --loading-beam-half: 100px;
+    --loading-beam-center: calc(
+      var(--loading-beam-half) + var(--loading-beam-x) * (100% - var(--loading-beam-half) * 2)
+    );
+    position: absolute;
+    inset: auto 0 0;
+    height: 16px;
+    overflow: hidden;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 150ms ease-out;
+    animation: loading-beam-sweep 2s ease-in-out -0.25s infinite paused;
+  }
+
+  :is([data-theme='light'], .light) .loading-beam {
+    --loading-beam-color: var(--primary);
+  }
+
+  .loading-beam[data-direction='backward'] {
+    animation-delay: -1.25s;
+  }
+
+  .loading-beam[data-active] {
+    opacity: 1;
+    transition-duration: 250ms;
+    animation-play-state: running;
+  }
+
+  .loading-beam::before,
+  .loading-beam::after {
+    content: '';
+    position: absolute;
+  }
+
+  .loading-beam::before {
+    inset: 0 0 -8px;
+    filter: blur(4px);
+    background: radial-gradient(
+      120px 12px at var(--loading-beam-center) calc(100% - 8px),
+      color-mix(in oklch, var(--loading-beam-color) 3.2%, transparent),
+      transparent
+    );
+  }
+
+  .loading-beam::after {
+    inset: auto 0 0;
+    height: 1px;
+    background: radial-gradient(
+      var(--loading-beam-half) 4px at var(--loading-beam-center) 100%,
+      color-mix(in oklch, var(--loading-beam-color) 44.5%, transparent),
+      color-mix(in oklch, var(--loading-beam-color) 16%, transparent) 45%,
+      transparent
+    );
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loading-beam {
+      animation: none;
+    }
+  }
+}

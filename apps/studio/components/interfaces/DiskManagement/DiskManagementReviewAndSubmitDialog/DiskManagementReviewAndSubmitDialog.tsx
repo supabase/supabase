@@ -1,9 +1,8 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
-  Alert_Shadcn_,
-  AlertTitle_Shadcn_,
+  Alert,
+  AlertTitle,
   Button,
   ButtonProps,
   Dialog,
@@ -29,8 +28,7 @@ import {
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatCurrency } from '@/lib/helpers'
 
 interface DiskManagementReviewAndSubmitDialogProps {
@@ -56,12 +54,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   message,
   buttonSize = 'medium',
 }: DiskManagementReviewAndSubmitDialogProps) => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -93,8 +87,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
       <DialogTrigger asChild>
         <ButtonTooltip
           size={buttonSize}
-          htmlType="submit"
-          type="primary"
+          type="submit"
+          variant="primary"
           onClick={async (e) => {
             e.preventDefault()
             const isValid = await form.trigger()
@@ -125,7 +119,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
         {(hasComputeChanges || anyBillableDiskChange) && (
           <>
             <div className="relative flex border-b">
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-gradient-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 border-r bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   Before
                 </span>
@@ -138,12 +132,16 @@ export const DiskManagementReviewAndSubmitDialog = ({
               </div>
 
               <div className="animate-badge-pulse absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 rounded-full bg-dash-sidebar border border-brand-500 flex items-center justify-center z-10 overflow-hidden">
-                <span className="absolute inset-0 bg-brand/10 rounded-full" />
-                <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-brand/20 to-transparent blur-md" />
-                <ArrowRight size={16} className="text-brand-600 relative z-10" strokeWidth={2.5} />
+                <span className="absolute inset-0 bg-brand-default/10 rounded-full" />
+                <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-linear-to-br from-transparent via-brand-default/20 to-transparent blur-md" />
+                <ArrowRightIcon
+                  size={16}
+                  className="text-brand-600 relative z-10"
+                  strokeWidth={2.5}
+                />
               </div>
 
-              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-gradient-to-t from-[hsl(var(--background-surface-100))] to-transparent">
+              <div className="flex-1 flex flex-col items-center gap-2 py-6 px-4 bg-linear-to-t from-[var(--background-surface-100)] to-transparent">
                 <span className="text-xs uppercase tracking-widest font-mono text-foreground-lighter">
                   After
                 </span>
@@ -187,7 +185,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
                 label="IOPS"
                 description={
                   anyDiskAttributeChange && !hasTotalSizeChanges && !hasStorageTypeChanges
-                    ? 'For 4 hours after changes you will not be able to modify disk attributes.'
+                    ? 'Disk attributes, including IOPS and disk size, will be locked for 4 hours after this change.'
                     : undefined
                 }
               >
@@ -268,14 +266,14 @@ export const DiskManagementReviewAndSubmitDialog = ({
         )}
 
         <DialogFooter className="px-5 py-4">
-          <Button block size="large" type="default" onClick={() => setIsDialogOpen(false)}>
+          <Button block size="large" onClick={() => setIsDialogOpen(false)}>
             Cancel
           </Button>
           <Button
             block
-            type="primary"
+            variant="primary"
             size="large"
-            htmlType="submit"
+            type="submit"
             loading={loading}
             onClick={async () => {
               await onSubmit(form.getValues())
@@ -288,10 +286,10 @@ export const DiskManagementReviewAndSubmitDialog = ({
           <>
             <DialogSectionSeparator />
             <DialogSection>
-              <Alert_Shadcn_ variant={message.type === 'error' ? 'destructive' : 'default'}>
+              <Alert variant={message.type === 'error' ? 'destructive' : 'default'}>
                 <WarningIcon />
-                <AlertTitle_Shadcn_>{message.message}</AlertTitle_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle>{message.message}</AlertTitle>
+              </Alert>
             </DialogSection>
           </>
         )}

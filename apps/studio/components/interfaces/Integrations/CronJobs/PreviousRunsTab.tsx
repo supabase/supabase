@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { CircleCheck, CircleX, Loader } from 'lucide-react'
+import { CircleCheckIcon, CircleXIcon, LoaderIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import DataGrid, { Column, Row } from 'react-data-grid'
 import { cn, LoadingLine, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { calculateDuration, formatDate } from './CronJobs.utils'
 import CronJobsEmptyState from './CronJobsEmptyState'
@@ -119,7 +119,7 @@ const columns = cronJobColumns.map((col) => {
             col.id === 'runid' && 'ml-8'
           )}
         >
-          <p className="!text-foreground">{col.name}</p>
+          <p className="text-foreground!">{col.name}</p>
         </div>
       )
     },
@@ -183,7 +183,7 @@ export const PreviousRunsTab = () => {
     <div className="h-full flex flex-col">
       <LoadingLine loading={isFetching} />
       <DataGrid
-        className="grow border-t-0"
+        className="grow border-t-0! border-b-0!"
         rowHeight={44}
         headerRowHeight={36}
         onScroll={handleScroll}
@@ -192,7 +192,7 @@ export const PreviousRunsTab = () => {
         rowClass={() => {
           return cn(
             'cursor-pointer',
-            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-none [&>.rdg-cell]:shadow-none',
+            '[&>.rdg-cell]:border-box [&>.rdg-cell]:outline-hidden [&>.rdg-cell]:shadow-none',
             '[&>.rdg-cell:first-child>div]:ml-8'
           )
         }}
@@ -223,7 +223,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'succeeded') {
     return (
       <span className="text-brand-600 flex items-center gap-1 text-xs">
-        <CircleCheck size={14} /> Succeeded
+        <CircleCheckIcon size={14} /> Succeeded
       </span>
     )
   }
@@ -231,7 +231,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (status === 'failed') {
     return (
       <span className="text-destructive flex items-center gap-1 text-xs">
-        <CircleX size={14} /> Failed
+        <CircleXIcon size={14} /> Failed
       </span>
     )
   }
@@ -239,7 +239,7 @@ function StatusBadge({ status }: StatusBadgeProps) {
   if (['running', 'starting', 'sending', 'connecting'].includes(status)) {
     return (
       <span className="text-_secondary flex items-center gap-1 text-xs">
-        <Loader size={14} className="animate-spin" /> Running
+        <LoaderIcon size={14} className="animate-spin" /> Running
       </span>
     )
   }

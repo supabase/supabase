@@ -3,7 +3,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { tableRowKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type TableRowTruncateVariables = {
@@ -29,6 +30,7 @@ export async function truncateTableRow({
     projectRef,
     connectionString,
     sql,
+    grant: unguarded.migrating,
   })
 
   return result

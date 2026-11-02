@@ -1,8 +1,9 @@
-import { Trash } from 'lucide-react'
-import { useState } from 'react'
+import { TrashIcon } from 'lucide-react'
+import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button } from 'ui'
+import { Button, Checkbox } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DocsButton } from '@/components/ui/DocsButton'
 import Panel from '@/components/ui/Panel'
@@ -16,7 +17,9 @@ export type CustomDomainDeleteProps = {
 }
 
 export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDeleteProps) => {
+  const [removeCustomDomain, setRemoveCustomDomain] = useState(false)
   const [isDeleteConfirmModalVisible, setIsDeleteConfirmModalVisible] = useState(false)
+
   const { mutate: deleteCustomDomain, isPending: isDeletingCustomDomain } =
     useCustomDomainDeleteMutation({
       onSuccess: () => {
@@ -29,8 +32,12 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
 
   const onDeleteCustomDomain = async () => {
     if (!projectRef) return console.error('Project ref is required')
-    deleteCustomDomain({ projectRef })
+    deleteCustomDomain({ projectRef, removeAddon: removeCustomDomain })
   }
+
+  useEffect(() => {
+    if (!isDeleteConfirmModalVisible) setRemoveCustomDomain(false)
+  }, [isDeleteConfirmModalVisible])
 
   return (
     <>
@@ -38,12 +45,12 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
         <div className="w-full space-y-2">
           <p className="text-xs text-foreground-light">Active custom domain:</p>
           <div className="flex items-center space-x-2">
-            <code className="text-lg mx-0 flex items-center space-x-2">
-              <div className="h-2 w-2 rounded-full bg-brand" />
+            <div className="font-mono text-lg mx-0 flex items-center space-x-2">
+              <div className="h-2 w-2 rounded-full bg-primary-bright" />
               <span>
-                <code className="text-code-inline">{customDomain.hostname}</code>
+                <code>{customDomain.hostname}</code>
               </span>
-            </code>
+            </div>
           </div>
           <p className="text-sm text-foreground-light">
             Your custom domain is currently active and is serving traffic
@@ -57,8 +64,8 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
         <div className="flex items-center justify-between">
           <DocsButton href={`${DOCS_URL}/guides/platform/custom-domains`} />
           <Button
-            type="danger"
-            icon={<Trash />}
+            variant="danger"
+            icon={<TrashIcon />}
             onClick={() => setIsDeleteConfirmModalVisible(true)}
           >
             Delete custom domain
@@ -76,11 +83,25 @@ export const CustomDomainDelete = ({ projectRef, customDomain }: CustomDomainDel
         onCancel={() => setIsDeleteConfirmModalVisible(false)}
         onConfirm={onDeleteCustomDomain}
       >
-        <p className="text-sm">
+        <p className="text-sm mb-4">
           Are you sure you want to delete the custom domain{' '}
-          <code className="text-code-inline !break-normal">{customDomain.hostname}</code> for your
-          project? You will need to re-verify this domain if you want to use it again.
+          <code className="break-normal!">{customDomain.hostname}</code> for your project? You will
+          need to re-verify this domain if you want to use it again.
         </p>
+
+        <FormItemLayout
+          isReactForm={false}
+          layout="flex"
+          name="removeCustomDomain"
+          label="Also remove custom domain add-on"
+          description="Stops the monthly add-on charge for this project"
+          className="[&>div:first-child>button]:translate-y-0.5"
+        >
+          <Checkbox
+            checked={removeCustomDomain}
+            onCheckedChange={(value) => setRemoveCustomDomain(!!value)}
+          />
+        </FormItemLayout>
       </ConfirmationModal>
     </>
   )

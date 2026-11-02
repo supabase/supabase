@@ -1,4 +1,10 @@
+import Link from 'next/link'
 import {
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
   Card,
   DropdownMenu,
@@ -13,6 +19,7 @@ import {
   TableHeader,
   TableRow,
 } from 'ui'
+import { PageBreadcrumbs } from 'ui-patterns/PageBreadcrumbs'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -33,7 +40,21 @@ export default function PageLayoutListSimple() {
 
   return (
     <div className="w-full">
-      <PageHeader size="large">
+      <PageBreadcrumbs>
+        <BreadcrumbList>
+          <BreadcrumbItem>
+            <BreadcrumbLink asChild>
+              <Link href="/org/demo">Organization</Link>
+            </BreadcrumbLink>
+          </BreadcrumbItem>
+          <BreadcrumbSeparator />
+          <BreadcrumbItem>
+            <BreadcrumbPage>Projects</BreadcrumbPage>
+          </BreadcrumbItem>
+        </BreadcrumbList>
+      </PageBreadcrumbs>
+
+      <PageHeader size="default">
         <PageHeaderMeta>
           <PageHeaderSummary>
             <PageHeaderTitle>Projects</PageHeaderTitle>
@@ -42,14 +63,14 @@ export default function PageLayoutListSimple() {
             </PageHeaderDescription>
           </PageHeaderSummary>
           <PageHeaderAside>
-            <Button type="primary" size="small">
+            <Button variant="primary" size="small">
               Create Project
             </Button>
           </PageHeaderAside>
         </PageHeaderMeta>
       </PageHeader>
 
-      <PageContainer size="large">
+      <PageContainer size="default">
         <PageSection>
           <PageSectionContent>
             <Card>
@@ -71,7 +92,7 @@ export default function PageLayoutListSimple() {
                       <TableCell className="text-right">
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button type="text" size="small">
+                            <Button variant="text" size="small">
                               Actions
                             </Button>
                           </DropdownMenuTrigger>

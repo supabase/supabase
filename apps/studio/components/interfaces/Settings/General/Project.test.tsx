@@ -4,17 +4,12 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Project } from './Project'
 
-const {
-  mockUseIsFeatureEnabled,
-  mockUseProjectPauseStatusQuery,
-  mockUseSelectedOrganizationQuery,
-  mockUseSelectedProjectQuery,
-} = vi.hoisted(() => ({
-  mockUseIsFeatureEnabled: vi.fn(),
-  mockUseProjectPauseStatusQuery: vi.fn(),
-  mockUseSelectedOrganizationQuery: vi.fn(),
-  mockUseSelectedProjectQuery: vi.fn(),
-}))
+const { mockUseIsFeatureEnabled, mockUseProjectPauseStatusQuery, mockUseSelectedProjectQuery } =
+  vi.hoisted(() => ({
+    mockUseIsFeatureEnabled: vi.fn(),
+    mockUseProjectPauseStatusQuery: vi.fn(),
+    mockUseSelectedProjectQuery: vi.fn(),
+  }))
 
 vi.mock('next/link', () => ({
   default: ({ href, children }: { href: string; children: ReactNode }) => (
@@ -32,7 +27,14 @@ vi.mock('ui', () => ({
     children: ReactNode
     asChild?: boolean
     type?: string
-  }) => (asChild ? <>{children}</> : <button {...props}>{children}</button>),
+  }) =>
+    asChild ? (
+      <>{children}</>
+    ) : (
+      <button tabIndex={0} {...props}>
+        {children}
+      </button>
+    ),
   Card: ({ children }: { children: ReactNode }) => <div>{children}</div>,
   CardContent: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }))
@@ -53,11 +55,11 @@ vi.mock('@/components/interfaces/Project/ResumeProjectButton', () => ({
 }))
 
 vi.mock('./Infrastructure/PauseProjectButton', () => ({
-  default: () => <div>PauseProjectButton</div>,
+  PauseProjectButton: () => <div>PauseProjectButton</div>,
 }))
 
 vi.mock('./Infrastructure/RestartServerButton', () => ({
-  default: () => <div>RestartServerButton</div>,
+  RestartServerButton: () => <div>RestartServerButton</div>,
 }))
 
 vi.mock('@/data/projects/project-pause-status-query', () => ({
@@ -68,24 +70,14 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: mockUseIsFeatureEnabled,
 }))
 
-vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
-  useSelectedOrganizationQuery: mockUseSelectedOrganizationQuery,
-}))
-
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useSelectedProjectQuery: mockUseSelectedProjectQuery,
 }))
 
 describe('Project settings availability', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
-
     mockUseIsFeatureEnabled.mockReturnValue({
       projectSettingsRestartProject: true,
-    })
-
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: { slug: 'supabase' },
     })
 
     mockUseProjectPauseStatusQuery.mockReturnValue({

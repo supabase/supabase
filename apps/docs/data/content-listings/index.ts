@@ -1,0 +1,104 @@
+import type { ContentListingGroup } from '~/lib/content-listings.schema'
+
+import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
+import { authGetStarted, authNextSteps, authPricing } from './auth.data'
+import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
+import {
+  functionsExamplesAiMedia,
+  functionsExamplesMessaging,
+  functionsExamplesOperations,
+  functionsExamplesSupabase,
+  functionsExamplesWebhooksPayments,
+  functionsGetStarted,
+} from './functions.data'
+import {
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedMobileTutorials,
+  gettingStartedOverview,
+  gettingStartedUseCases,
+  gettingStartedWebAppDemos,
+} from './getting-started.data'
+import {
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
+} from './local-development.data'
+import { logDrainsDestinations } from './log-drains.data'
+import { realtimeExamples, realtimeGetStarted, realtimeResources } from './realtime.data'
+import { resourcesMigrate, resourcesOverview, resourcesPostgres } from './resources.data'
+import {
+  selfHostingCommunity,
+  selfHostingGetStarted,
+  selfHostingSupport,
+  selfHostingThirdPartyGuides,
+} from './self-hosting.data'
+import { storageExamples, storageGetStarted, storageResources } from './storage.data'
+import {
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryExport,
+  telemetryHireAgent,
+} from './telemetry.data'
+import {
+  supabaseWayAuthBuild,
+  supabaseWayDatabaseBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
+  supabaseWayProgression,
+  supabaseWayRealtimeBuild,
+  supabaseWayRlsBuild,
+  supabaseWayStorageBuild,
+} from './the-supabase-way-to-build.data'
+
+const ALL_GROUPS: readonly ContentListingGroup[] = [
+  aiToolsSupportedAgents,
+  aiToolsBuildingIntoApp,
+  supabaseWayProgression,
+  supabaseWayDatabaseBuild,
+  supabaseWayAuthBuild,
+  supabaseWayRlsBuild,
+  supabaseWayRealtimeBuild,
+  supabaseWayStorageBuild,
+  supabaseWayFunctionsBuild,
+  supabaseWayProductionBuild,
+  authGetStarted,
+  authPricing,
+  authNextSteps,
+  databaseGetStarted,
+  databaseMultigresWhatYouGet,
+  databaseNextSteps,
+  functionsGetStarted,
+  functionsExamplesSupabase,
+  functionsExamplesWebhooksPayments,
+  functionsExamplesAiMedia,
+  functionsExamplesMessaging,
+  functionsExamplesOperations,
+  gettingStartedOverview,
+  gettingStartedUseCases,
+  gettingStartedFrameworkQuickstarts,
+  gettingStartedWebAppDemos,
+  gettingStartedMobileTutorials,
+  localDevelopmentParallelProjectsLearnMore,
+  localDevelopmentRuntimesLearnMore,
+  logDrainsDestinations,
+  realtimeGetStarted,
+  realtimeExamples,
+  realtimeResources,
+  resourcesOverview,
+  resourcesMigrate,
+  resourcesPostgres,
+  selfHostingGetStarted,
+  selfHostingCommunity,
+  selfHostingThirdPartyGuides,
+  selfHostingSupport,
+  storageGetStarted,
+  storageExamples,
+  storageResources,
+  telemetryAccessWhat,
+  telemetryDetect,
+  telemetryHireAgent,
+  telemetryExport,
+]
+
+export const CONTENT_LISTINGS: Readonly<Record<string, ContentListingGroup>> = Object.fromEntries(
+  ALL_GROUPS.map((group) => [group.id, group])
+)

@@ -45,11 +45,23 @@ export class HubSpotClient {
       consent?: string
     }
   ): Promise<void> {
-    const hubspotFields: HubSpotField[] = Object.entries(fields).map(([name, value]) => ({
-      objectTypeId: '0-1',
-      name,
-      value,
-    }))
+    // Field keys are plain HubSpot Contact property names (e.g. `firstname`)
+    // by default. A key may instead be prefixed `{objectTypeId}/{property}`
+    // (e.g. `0-2/name` for the Company object's `name` property) to target a
+    // property on an object other than Contact — this mirrors how HubSpot
+    // itself identifies associated-object fields in its own API error
+    // messages ("Error in 'fields.0-2/name'...").
+    const hubspotFields: HubSpotField[] = Object.entries(fields).map(([key, value]) => {
+      const slashIndex = key.indexOf('/')
+      if (slashIndex === -1) {
+        return { objectTypeId: '0-1', name: key, value }
+      }
+      return {
+        objectTypeId: key.slice(0, slashIndex),
+        name: key.slice(slashIndex + 1),
+        value,
+      }
+    })
 
     const body: HubSpotSubmission = {
       fields: hubspotFields,
@@ -71,8 +83,13 @@ export class HubSpotClient {
       }
     }
 
+    // portalId comes from env; formGuid is validated at the zod layer to a
+    // UUID-like shape, but encodeURIComponent keeps this safe even if the
+    // client is constructed from an untrusted source.
     const response = await fetch(
-      `https://api.hsforms.com/submissions/v3/integration/submit/${this.portalId}/${this.formGuid}`,
+      `https://api.hsforms.com/submissions/v3/integration/submit/${encodeURIComponent(
+        this.portalId
+      )}/${encodeURIComponent(this.formGuid)}`,
       {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },

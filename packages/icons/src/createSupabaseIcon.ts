@@ -2,14 +2,14 @@ import {
   createElement,
   forwardRef,
   ForwardRefExoticComponent,
-  ReactSVG,
   RefAttributes,
+  SVGElementType,
   SVGProps,
 } from 'react'
 
 import defaultAttributes from './defaultAttributes'
 
-export type IconNode = [elementName: keyof ReactSVG, attrs: Record<string, string>][]
+export type IconNode = [elementName: SVGElementType, attrs: Record<string, string>][]
 
 export type SVGAttributes = Partial<SVGProps<SVGSVGElement>>
 type ComponentAttributes = RefAttributes<SVGSVGElement> & SVGAttributes

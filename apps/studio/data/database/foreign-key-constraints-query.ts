@@ -3,9 +3,10 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM } from 'common'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetForeignKeyConstraintsVariables = {
   schema?: string
@@ -60,6 +61,7 @@ export async function getForeignKeyConstraints(
       connectionString,
       sql,
       queryKey: ['foreign-key-constraints', schema],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -74,7 +76,7 @@ export async function getForeignKeyConstraints(
 }
 
 export type ForeignKeyConstraintsData = Awaited<ReturnType<typeof getForeignKeyConstraints>>
-export type ForeignKeyConstraintsError = ExecuteSqlError
+export type ForeignKeyConstraintsError = ResponseError
 
 export const useForeignKeyConstraintsQuery = <TData = ForeignKeyConstraintsData>(
   {

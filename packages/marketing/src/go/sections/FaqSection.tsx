@@ -9,7 +9,7 @@ export default function FaqSection({ section }: { section: GoFaqSection }) {
   const [openIndex, setOpenIndex] = useState<number | null>(null)
 
   return (
-    <div className="max-w-[80rem] mx-auto px-8">
+    <div className="max-w-7xl mx-auto px-8">
       {(section.title || section.description) && (
         <div className="mb-12">
           {section.title && (

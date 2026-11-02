@@ -6,7 +6,7 @@ breadcrumb: 'AI Examples'
 
 Supabase provides a [Headless Search Toolkit](https://github.com/supabase/headless-vector-search) for adding "Generative Q&A" to your documentation. The toolkit is "headless", so that you can integrate it into your existing website and style it to match your website theme.
 
-You can see how this works with the Supabase docs. Just hit `cmd+k` and "ask" for something like "what are the features of Supabase?". You will see that the response is streamed back, using the information provided in the docs:
+You can see how this works with the Supabase docs. Enter `cmd+k` and ask, for example, "what are the features of Supabase?". You will see that the response is streamed back using the information provided in the docs:
 
 ![headless search](/docs/img/ai/headless-search/headless.png)
 
@@ -39,7 +39,7 @@ Now we can use the [Headless Vector Search](https://github.com/supabase/headless
 
 1. Clone the repo to your local machine: `git clone git@github.com:supabase/headless-vector-search.git`
 2. Link the repo to your remote project: `supabase link --project-ref XXX`
-3. Apply the database migrations: `supabase db push`
+3. Apply the database migrations: `supabase db push --remote`
 4. Set your OpenAI key as a secret: `supabase secrets set OPENAI_API_KEY=sk-xxx`
 5. Deploy the Edge Functions: `supabase functions deploy --no-verify-jwt`
 6. Expose `docs` schema via API in Supabase Dashboard [settings](/dashboard/project/_/settings/api) > `API Settings` > `Exposed schemas`
@@ -84,7 +84,7 @@ const onSubmit = (e: Event) => {
 
   const query = new URLSearchParams({ query: inputRef.current!.value })
   const projectUrl = `https://your-project-ref.supabase.co/functions/v1`
-  const queryURL = `${projectURL}/${query}`
+  const queryURL = `${projectUrl}/${query}`
   const eventSource = new EventSource(queryURL)
 
   eventSource.addEventListener("error", (err) => {

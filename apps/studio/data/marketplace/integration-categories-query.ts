@@ -1,23 +1,32 @@
-import { queryOptions } from '@tanstack/react-query'
-import { createMarketplaceClient } from 'common/marketplace-client'
+import { useQuery } from '@tanstack/react-query'
+import { createMarketplaceClient, type Category } from 'common/marketplace-client'
 
 import { marketplaceIntegrationsKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-async function getMarketplaceCategories() {
+export type MarketplaceCategory = Category
+
+export async function getMarketplaceCategories(signal?: AbortSignal) {
   const marketplaceClient = createMarketplaceClient()
-  const { data, error } = await marketplaceClient.from('categories').select('*')
+  let query = marketplaceClient.from('categories').select('*')
+  if (signal) query = query.abortSignal(signal)
+  const { data, error } = await query
 
   if (error) handleError(error)
   return data ?? []
 }
 
-export const marketplaceCategoriesQueryOptions = ({
+export type MarketplaceCategoriesData = Awaited<ReturnType<typeof getMarketplaceCategories>>
+export type MarketplaceCategoriesError = ResponseError
+
+export const useMarketplaceCategoriesQuery = <TData = MarketplaceCategoriesData>({
   enabled = true,
-}: { enabled?: boolean } = {}) => {
-  return queryOptions({
+  ...options
+}: UseCustomQueryOptions<MarketplaceCategoriesData, MarketplaceCategoriesError, TData> = {}) =>
+  useQuery<MarketplaceCategoriesData, MarketplaceCategoriesError, TData>({
     queryKey: marketplaceIntegrationsKeys.categories(),
-    queryFn: () => getMarketplaceCategories(),
+    queryFn: ({ signal }) => getMarketplaceCategories(signal),
     enabled,
+    ...options,
   })
-}

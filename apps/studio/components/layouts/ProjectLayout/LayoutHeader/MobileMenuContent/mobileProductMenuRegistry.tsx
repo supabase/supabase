@@ -49,7 +49,7 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
   ),
   observability: React.lazy(() =>
     import('@/components/layouts/ObservabilityLayout/ObservabilityMenu').then((m) => ({
-      default: m.default,
+      default: m.ObservabilityMenu,
     }))
   ),
   logs: React.lazy(() =>

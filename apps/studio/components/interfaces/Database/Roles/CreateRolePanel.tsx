@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Form,
@@ -8,12 +8,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-  Input_Shadcn_,
+  Input,
   SidePanel,
   Switch,
 } from 'ui'
 import z from 'zod'
 
+import { RolePasswordField } from './RolePasswordField'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useDatabaseRoleCreateMutation } from '@/data/database-roles/database-role-create-mutation'
@@ -32,6 +33,7 @@ const FormSchema = z.object({
   canCreateDb: z.boolean().default(false),
   isReplicationRole: z.boolean().default(false),
   canBypassRls: z.boolean().default(false),
+  password: z.string().default(''),
 })
 
 const initialValues = {
@@ -42,6 +44,7 @@ const initialValues = {
   canCreateDb: false,
   isReplicationRole: false,
   canBypassRls: false,
+  password: '',
 }
 
 export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
@@ -51,6 +54,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
 
   const form = useForm<z.infer<typeof FormSchema>>({
     resolver: zodResolver(FormSchema),
+    defaultValues: initialValues,
   })
 
   const { mutate: createDatabaseRole, isPending: isCreating } = useDatabaseRoleCreateMutation({
@@ -60,12 +64,16 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
     },
   })
 
-  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+  const canLogin = useWatch({ control: form.control, name: 'canLogin' })
+
+  const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async ({ password, ...values }) => {
     if (!project) return console.error('Project is required')
+    // An empty password is omitted so the role is created without one
+    const shouldSetPassword = values.canLogin && password.length > 0
     createDatabaseRole({
       projectRef: project.ref,
       connectionString: project.connectionString,
-      payload: values,
+      payload: shouldSetPassword ? { ...values, password } : values,
     })
   }
 
@@ -108,7 +116,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                   Name
                 </FormLabel>
                 <FormControl className="col-span-8">
-                  <Input_Shadcn_ {...field} className="w-full" />
+                  <Input {...field} className="w-full" />
                 </FormControl>
                 <FormMessage className="col-start-5 col-span-8" />
               </FormItem>
@@ -133,12 +141,12 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                       name={permissionKey}
                       render={({ field }) => (
                         <FormItem className="grid gap-2 md:grid md:grid-cols-12 space-y-0">
-                          <FormControl className="col-span-8 flex items-center gap-4">
-                            <div className="w-full text-sm">
+                          <div className="col-span-8 flex w-full items-center gap-4 text-sm">
+                            <FormControl>
                               <Switch checked={field.value} onCheckedChange={field.onChange} />
-                              <FormLabel>{permission.description}</FormLabel>
-                            </div>
-                          </FormControl>
+                            </FormControl>
+                            <FormLabel>{permission.description}</FormLabel>
+                          </div>
                           <FormMessage className="col-start-5 col-span-8" />
                         </FormItem>
                       )}
@@ -162,17 +170,17 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
                         name={permissionKey}
                         render={({ field }) => (
                           <FormItem className="space-y-0 opacity-70">
-                            <FormControl className="flex items-center gap-4">
-                              <div className="w-full text-sm">
+                            <div className="flex w-full items-center gap-4 text-sm">
+                              <FormControl>
                                 <Switch
                                   checked={field.value}
                                   onCheckedChange={field.onChange}
                                   disabled
                                   aria-readonly
                                 />
-                                <FormLabel>{permission.description}</FormLabel>
-                              </div>
-                            </FormControl>
+                              </FormControl>
+                              <FormLabel>{permission.description}</FormLabel>
+                            </div>
                             <FormMessage className="col-start-5 col-span-8" />
                           </FormItem>
                         )}
@@ -182,6 +190,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
               </div>
             </div>
           </div>
+          {canLogin && <RolePasswordField />}
         </form>
       </Form>
     </SidePanel>

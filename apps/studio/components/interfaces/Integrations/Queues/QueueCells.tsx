@@ -1,6 +1,7 @@
 import dayjs from 'dayjs'
-import { Check, Loader2, X } from 'lucide-react'
+import { CheckIcon, Loader2Icon, XIcon } from 'lucide-react'
 
+import { pgmqQueueTable } from './Queues.utils'
 import { useQueuesMetricsQuery } from '@/data/database-queues/database-queues-metrics-query'
 import { PostgresQueue } from '@/data/database-queues/database-queues-query'
 import { useTablesQuery } from '@/data/tables/tables-query'
@@ -43,12 +44,12 @@ export const QueueRLSCell = ({ queue }: QueueCellProps) => {
     schema: 'pgmq',
   })
 
-  const queueTable = queueTables?.find((x) => x.name === `q_${queue.queue_name}`)
+  const queueTable = queueTables?.find((x) => x.name === pgmqQueueTable(queue.queue_name))
   const isRlsEnabled = !!queueTable?.rls_enabled
 
   return (
     <div className="flex items-center">
-      {isRlsEnabled ? <Check size={14} className="text-brand" /> : <X size={14} />}
+      {isRlsEnabled ? <CheckIcon size={14} className="text-primary" /> : <XIcon size={14} />}
     </div>
   )
 }
@@ -76,7 +77,7 @@ export const QueueSizeCell = ({ queue }: QueueCellProps) => {
   return (
     <div className="flex items-center">
       {isLoading ? (
-        <Loader2 className="animate-spin" size={16} />
+        <Loader2Icon className="animate-spin" size={16} />
       ) : (
         <span>
           {metrics?.queue_length} {metrics?.method === 'estimated' ? '(Approximate)' : null}

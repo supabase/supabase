@@ -1,25 +1,94 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ChevronRight, Loader2 } from 'lucide-react'
-import Link from 'next/link'
-import { cn, InfoIcon, Popover_Shadcn_, PopoverContent_Shadcn_, PopoverTrigger_Shadcn_ } from 'ui'
-
 import {
-  extractDbSchema,
-  ProjectServiceStatus,
-  StatusIcon,
-  StatusMessage,
-} from '../Home/ServiceStatus'
+  AlertTriangleIcon,
+  CheckCircle2Icon,
+  ChevronRightIcon,
+  Loader2Icon,
+  MinusCircleIcon,
+} from 'lucide-react'
+import Link from 'next/link'
+import { cn, HoverCard, HoverCardContent, HoverCardTrigger, InfoIcon } from 'ui'
+
+import { useUnifiedLogsPreview } from '../App/FeaturePreview/FeaturePreviewContext'
+import type { ProjectServiceStatus } from './ServiceStatus.utils'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { SingleStat } from '@/components/ui/SingleStat'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useEdgeFunctionServiceStatusQuery } from '@/data/service-status/edge-functions-status-query'
-import { useProjectServiceStatusQuery } from '@/data/service-status/service-status-query'
+import {
+  useProjectServiceStatusQuery,
+  type ServiceHealthResponse,
+} from '@/data/service-status/service-status-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 const SERVICE_STATUS_THRESHOLD = 5 // minutes
+
+const SERVICE_ROW_CLASS =
+  'px-3 py-2 text-xs flex items-center justify-between border-b last:border-none'
+
+const iconProps = {
+  size: 18,
+  strokeWidth: 1.5,
+}
+const LoaderIcon = () => <Loader2Icon {...iconProps} className="animate-spin" />
+const AlertIcon = () => <AlertTriangleIcon {...iconProps} />
+const CheckIcon = () => <CheckCircle2Icon {...iconProps} className="text-primary" />
+const DisabledIcon = () => <MinusCircleIcon {...iconProps} className="text-foreground-lighter" />
+
+export const StatusIcon = ({
+  isLoading,
+  isProjectNew,
+  projectStatus,
+}: {
+  isLoading: boolean
+  isProjectNew: boolean
+  projectStatus?: ProjectServiceStatus
+}) => {
+  //
+  if (projectStatus === 'ACTIVE_HEALTHY') return <CheckIcon />
+  if (projectStatus === 'DISABLED') return <DisabledIcon />
+  if (projectStatus === 'COMING_UP') return <LoaderIcon />
+  if (isLoading) return <LoaderIcon />
+  // isProjectNew has to be above UNHEALTHY because in the first few minutes, some services might be starting up and show as UNHEALTHY
+  if (isProjectNew) return <LoaderIcon />
+  if (projectStatus === 'UNHEALTHY') return <AlertIcon />
+  return <AlertIcon />
+}
+
+const StatusMessage = ({
+  status,
+  isLoading,
+  isProjectNew,
+}: {
+  isLoading: boolean
+  isProjectNew: boolean
+  status?: ProjectServiceStatus
+}) => {
+  if (isLoading) return 'Checking status'
+  if (status === 'DISABLED') return 'Disabled'
+  if (status === 'UNHEALTHY') return 'Unhealthy'
+  if (status === 'COMING_UP') return 'Coming up...'
+  if (status === 'ACTIVE_HEALTHY') return 'Healthy'
+  // isProjectNew has to be after all other statuses
+  if (isProjectNew) return 'Coming up...'
+  if (status) return status
+  return 'Unable to connect'
+}
+
+/*
+ * Extract the db_schema from the response.info object
+ */
+const extractDbSchema = (response: ServiceHealthResponse | undefined) => {
+  if (response?.info && 'db_schema' in response.info) {
+    return response.info.db_schema
+  }
+  return undefined
+}
 
 /**
  * [Joshen] JFYI before we go live with this, we need to revisit the migrations section
@@ -42,6 +111,7 @@ const SERVICE_STATUS_THRESHOLD = 5 // minutes
 export const ServiceStatus = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
 
   const {
     projectAuthAll: authEnabled,
@@ -58,12 +128,18 @@ export const ServiceStatus = () => {
   const isBranch = project?.parentRef !== project?.ref
 
   // Get branches data when on a branch
-  const { data: branches, isPending: isBranchesLoading } = useBranchesQuery(
-    { projectRef: isBranch ? project?.parentRef : undefined },
-    {
-      enabled: isBranch,
-    }
-  )
+  const branchesProjectRef = isBranch ? project?.parentRef : undefined
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: branchesProjectRef,
+  })
+  const { data: branches, isPending: isBranchesPending } = useQuery({
+    ...branchesQueryOptions({ projectRef: branchesProjectRef, grant: branchesGrant.grant }),
+    enabled: isBranch,
+  })
+  const isBranchesLoading =
+    isBranch &&
+    (branchesGrant.status === 'loading' ||
+      (branchesGrant.status === 'granted' && isBranchesPending))
 
   const currentBranch = isBranch
     ? branches?.find((branch) => branch.project_ref === ref)
@@ -123,7 +199,7 @@ export const ServiceStatus = () => {
       docsUrl: undefined,
       isLoading: isLoading,
       status: dbStatus?.status ?? 'UNHEALTHY',
-      logsUrl: '/logs/postgres-logs',
+      logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:postgres' : '/logs/postgres-logs',
     },
     {
       name: 'PostgREST',
@@ -132,7 +208,7 @@ export const ServiceStatus = () => {
       isLoading,
       // If PostgREST has an empty schema, it means it's been disabled
       status: extractDbSchema(restStatus) === '' ? 'DISABLED' : (restStatus?.status ?? 'UNHEALTHY'),
-      logsUrl: '/logs/postgrest-logs',
+      logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:postgrest' : '/logs/postgrest-logs',
     },
     ...(authEnabled
       ? [
@@ -142,7 +218,7 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: authStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/auth-logs',
+            logsUrl: isUnifiedLogsEnabled ? '/logs?filter=log_type:eq:auth' : '/logs/auth-logs',
           },
         ]
       : []),
@@ -154,7 +230,9 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: realtimeStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/realtime-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:realtime'
+              : '/logs/realtime-logs',
           },
         ]
       : []),
@@ -166,7 +244,9 @@ export const ServiceStatus = () => {
             docsUrl: undefined,
             isLoading,
             status: storageStatus?.status ?? 'UNHEALTHY',
-            logsUrl: '/logs/storage-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:storage'
+              : '/logs/storage-logs',
           },
         ]
       : []),
@@ -182,7 +262,9 @@ export const ServiceStatus = () => {
               : isLoading
                 ? ('COMING_UP' as const)
                 : ('UNHEALTHY' as const),
-            logsUrl: '/logs/edge-functions-logs',
+            logsUrl: isUnifiedLogsEnabled
+              ? '/logs?filter=log_type:eq:edge+function'
+              : '/logs/edge-functions-logs',
           },
         ]
       : []),
@@ -240,13 +322,13 @@ export const ServiceStatus = () => {
   const overallStatusLabel = getOverallStatusLabel()
 
   return (
-    <Popover_Shadcn_>
-      <PopoverTrigger_Shadcn_>
+    <HoverCard openDelay={200} closeDelay={100}>
+      <HoverCardTrigger tabIndex={0}>
         <SingleStat
           icon={
             // Spinner only while the overall project is in COMING_UP; otherwise show 6-dot grid
             isProjectComingUp ? (
-              <Loader2 className="animate-spin" size={18} />
+              <Loader2Icon className="animate-spin" size={18} />
             ) : (
               <div className="grid grid-cols-3 gap-1">
                 {services.map((service, index) => (
@@ -259,7 +341,7 @@ export const ServiceStatus = () => {
                         (isProjectNew && service.status !== 'ACTIVE_HEALTHY')
                         ? 'bg-foreground-lighter animate-pulse'
                         : service.status === 'ACTIVE_HEALTHY'
-                          ? 'bg-brand'
+                          ? 'bg-brand-default'
                           : 'bg-selection'
                     )}
                   />
@@ -270,14 +352,10 @@ export const ServiceStatus = () => {
           label={<span>Status</span>}
           value={<span>{overallStatusLabel}</span>}
         />
-      </PopoverTrigger_Shadcn_>
-      <PopoverContent_Shadcn_ className="p-0 w-60" side="bottom" align="start">
-        {services.map((service) => (
-          <Link
-            href={`/project/${ref}${service.logsUrl}`}
-            key={service.name}
-            className="transition px-3 py-2 text-xs flex items-center justify-between border-b last:border-none group relative hover:bg-surface-300"
-          >
+      </HoverCardTrigger>
+      <HoverCardContent className="p-0 w-60" side="bottom" align="start">
+        {services.map((service) => {
+          const serviceInfo = (
             <div className="flex gap-x-2">
               <StatusIcon
                 isLoading={service.isLoading}
@@ -299,12 +377,31 @@ export const ServiceStatus = () => {
                 </p>
               </div>
             </div>
-            <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100">
-              <span className="text-xs text-foreground">View logs</span>
-              <ChevronRight size={14} className="text-foreground" />
-            </div>
-          </Link>
-        ))}
+          )
+
+          // Disabled services have no logs to link out to
+          if (service.status === 'DISABLED') {
+            return (
+              <div key={service.name} className={SERVICE_ROW_CLASS}>
+                {serviceInfo}
+              </div>
+            )
+          }
+
+          return (
+            <Link
+              href={`/project/${ref}${service.logsUrl}`}
+              key={service.name}
+              className={cn(SERVICE_ROW_CLASS, 'transition group relative hover:bg-surface-300')}
+            >
+              {serviceInfo}
+              <div className="flex items-center gap-x-1 transition opacity-0 group-hover:opacity-100 group-focus-visible:opacity-100">
+                <span className="text-xs text-foreground">View logs</span>
+                <ChevronRightIcon size={14} className="text-foreground" />
+              </div>
+            </Link>
+          )
+        })}
         {!allServicesOperational && (
           <div className="flex gap-2 text-xs text-foreground-light px-3 py-2">
             <div className="mt-0.5">
@@ -327,7 +424,7 @@ export const ServiceStatus = () => {
             </div>
           </div>
         )}
-      </PopoverContent_Shadcn_>
-    </Popover_Shadcn_>
+      </HoverCardContent>
+    </HoverCard>
   )
 }

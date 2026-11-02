@@ -16,9 +16,9 @@ interface HTTPParametersProps {
 export const HTTPParameters = ({ form }: HTTPParametersProps) => {
   return (
     <FormSection
-      header={<FormSectionLabel className="lg:!col-span-4">HTTP Parameters</FormSectionLabel>}
+      header={<FormSectionLabel className="lg:col-span-4!">HTTP Parameters</FormSectionLabel>}
     >
-      <FormSectionContent loading={false} className="lg:!col-span-8">
+      <FormSectionContent loading={false} className="lg:col-span-8!">
         <KeyValueFieldArray
           control={form.control}
           name="httpParameters"
@@ -27,7 +27,7 @@ export const HTTPParameters = ({ form }: HTTPParametersProps) => {
           createEmptyRow={() => ({ id: uuidv4(), name: '', value: '' })}
           keyPlaceholder="Parameter name"
           valuePlaceholder="Parameter value"
-          addLabel="Add a new parameter"
+          addLabel="Add parameter"
           removeLabel="Remove parameter"
         />
       </FormSectionContent>

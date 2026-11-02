@@ -46,6 +46,9 @@ export enum PricingMetric {
   LOG_INGESTION = 'LOG_INGESTION',
   LOG_QUERYING = 'LOG_QUERYING',
   LOG_STORAGE = 'LOG_STORAGE',
+  PIPELINES_PIPELINE = 'ETL_PIPELINE',
+  PIPELINES_REPLICATED_DATA = 'ETL_REPLICATED_DATA',
+  PIPELINES_COPY_BACKFILL_DATA = 'ETL_COPY_BACKFILL_DATA',
 }
 
 export enum ComputeUsageMetric {
@@ -121,7 +124,7 @@ export type OrgDailyStatsVariables = {
   projectRef?: string
 }
 
-export type OrgDailyUsageResponse = components['schemas']['OrgDailyUsageResponse']
+export type OrgDailyUsageResponse = components['schemas']['OrgDailyUsageResponse_Output']
 
 export async function getOrgDailyStats(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,

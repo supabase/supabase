@@ -3,9 +3,10 @@ import { useQuery } from '@tanstack/react-query'
 
 import { authKeys } from './keys'
 import { User } from './users-infinite-query'
-import { executeSql, type ExecuteSqlError } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { UUID_REGEX } from '@/lib/constants'
-import { UseCustomQueryOptions } from '@/types'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type UserVariables = {
   projectRef?: string
@@ -23,16 +24,16 @@ export async function getUser(
   const sql = getUserSQL(userId)
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: [`user-${userId}`] },
+    { projectRef, connectionString, sql, queryKey: [`user-${userId}`], grant: unguarded.migrating },
     signal
   )
 
   const user = result[0] as User | undefined
-  return user
+  return user ?? null
 }
 
 export type UserData = Awaited<ReturnType<typeof getUser>>
-export type UserError = ExecuteSqlError
+export type UserError = ResponseError
 
 export const useUserQuery = <TData = UserData>(
   { projectRef, connectionString, userId }: UserVariables,

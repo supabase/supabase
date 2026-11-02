@@ -1,0 +1,100 @@
+create table interfaces_feedback (
+	id bigint primary key generated always as identity,
+	created_at timestamptz not null default now(),
+	feedback text not null check (char_length(feedback) <= 1000),
+	delete_token uuid unique not null default gen_random_uuid(),
+	user_agent text check (char_length(user_agent) <= 255),
+	user_id text check (char_length(user_id) <= 255),
+	project_ref text check (char_length(project_ref) <= 255),
+	metadata jsonb check (pg_column_size(metadata) <= 8192)
+);
+
+comment on table interfaces_feedback is
+'General customer feedback submitted from Supabase interfaces such as the CLI and MCP server. Rows are inserted via submit_interfaces_feedback().';
+comment on column interfaces_feedback.feedback is
+'The free-form feedback text as submitted by the user.';
+comment on column interfaces_feedback.delete_token is
+'Server-generated capability token returned once by submit_interfaces_feedback(); presenting it via the x-feedback-token request header authorizes reading and deleting this row. Rows submitted with a project_ref and/or user_id additionally require the matching x-feedback-project-ref / x-feedback-user-id headers.';
+comment on column interfaces_feedback.user_agent is
+'User agent of the submitting interface, e.g. SupabaseCLI/2.3.4. Also identifies which interface the feedback came from.';
+comment on column interfaces_feedback.user_id is
+'Optional identifier of the submitting user, as reported by the interface. Unverified; format is interface-defined.';
+comment on column interfaces_feedback.project_ref is
+'Optional reference of the Supabase project the feedback relates to.';
+
+alter table interfaces_feedback enable row level security;
+
+-- The x-feedback-* request headers are the capability check: policies can
+-- only compare row data against session context (never a query's WHERE
+-- clause), so the values must arrive as headers. The token is always
+-- required; project_ref and user_id are additionally required when (and only
+-- when) the row was submitted with them — a null column imposes no
+-- requirement, and values must be re-presented byte-exact. The token column
+-- stays untransformed so lookups use its unique index; a malformed token
+-- header is rejected with a 400 (22P02), same as a malformed URL filter.
+create policy "Token holders can read their own feedback"
+on interfaces_feedback
+as permissive for select
+to anon
+using (
+	delete_token = (current_setting('request.headers', true)::json ->> 'x-feedback-token')::uuid
+	and (project_ref is null or project_ref = current_setting('request.headers', true)::json ->> 'x-feedback-project-ref')
+	and (user_id is null or user_id = current_setting('request.headers', true)::json ->> 'x-feedback-user-id')
+);
+
+create policy "Token holders can delete their own feedback"
+on interfaces_feedback
+as permissive for delete
+to anon
+using (
+	delete_token = (current_setting('request.headers', true)::json ->> 'x-feedback-token')::uuid
+	and (project_ref is null or project_ref = current_setting('request.headers', true)::json ->> 'x-feedback-project-ref')
+	and (user_id is null or user_id = current_setting('request.headers', true)::json ->> 'x-feedback-user-id')
+);
+
+-- Submissions go exclusively through this function so the delete token is
+-- always server-generated and returned exactly once to the submitter. There
+-- is deliberately no insert grant or policy on the table itself.
+create function public.submit_interfaces_feedback(
+	feedback text,
+	user_agent text default null,
+	user_id text default null,
+	project_ref text default null,
+	metadata jsonb default null
+)
+returns uuid
+security definer
+set search_path = ''
+language plpgsql
+as $$
+#variable_conflict use_variable
+declare
+	token uuid;
+begin
+	insert into public.interfaces_feedback (feedback, user_agent, user_id, project_ref, metadata)
+	values (feedback, user_agent, user_id, project_ref, metadata)
+	returning delete_token into token;
+	return token;
+end;
+$$;
+
+comment on function public.submit_interfaces_feedback is
+'Submits interface feedback and returns the delete token (issued exactly once).';
+
+-- Both lines are load-bearing, in different environments: locally, the
+-- default ACL gives new functions no EXECUTE at all (the grant is required);
+-- on prod, the built-in default gives EXECUTE to the PUBLIC pseudo-role (the
+-- revoke is required, and it must target public — revoking from anon or
+-- authenticated by name is a no-op).
+revoke execute on function public.submit_interfaces_feedback(text, text, text, text, jsonb) from public;
+grant execute on function public.submit_interfaces_feedback(text, text, text, text, jsonb) to anon;
+
+-- Two-gate model: these grants allow anon to ATTEMPT select/delete
+-- statements; the header-checked policies above decide which rows each
+-- statement can see. Column-scoped select keeps everything except the
+-- feedback text and the caller's own token unreadable. delete_token needs
+-- select because PostgREST rejects filterless deletes and WHERE columns
+-- require select privilege — clients send the token as both the filter and
+-- the header, and the policy stays the security boundary.
+grant select (feedback, delete_token) on table interfaces_feedback to anon;
+grant delete on table interfaces_feedback to anon;

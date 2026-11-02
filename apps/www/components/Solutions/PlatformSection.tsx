@@ -51,7 +51,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
         'flex-1 flex flex-col',
         'items-start sm:items-center lg:items-start justify-between',
         'bg-default w-full h-full min-h-[350px] sm:min-h-[400px]',
-        'text-foreground-lighter [&_strong]:!font-normal [&_strong]:!text-foreground',
+        'text-foreground-lighter [&_strong]:font-normal! [&_strong]:text-foreground!',
         feature.className
       )}
     >
@@ -95,7 +95,7 @@ const FeatureCard = ({ feature }: { feature: Feature }) => {
           <h3 className="">{feature.title}</h3>
         </div>
         <div className="flex-1 flex flex-col justify-between gap-2">
-          <p className="text-sm 2xl:text-base [&_strong]:!text-foreground">{feature.subheading}</p>
+          <p className="text-sm 2xl:text-base [&_strong]:text-foreground!">{feature.subheading}</p>
           {feature.highlights && (
             <span
               className={cn('hidden lg:block text-foreground', feature.isDatabase && 'md:block')}

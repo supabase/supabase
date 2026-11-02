@@ -3,18 +3,18 @@
 // Number is used for animated components (eg. AnimatedCounter)
 export const companyStats = {
   databasesManaged: {
-    number: 16_000_000,
-    text: '16,000,000+',
+    number: 44_000_000,
+    text: '44,000,000+',
     label: 'Databases Created',
   },
   databasesLaunchedDaily: {
-    number: 90_000,
-    text: '90,000+',
+    number: 200_000,
+    text: '200,000+',
     label: 'Databases launched daily',
   },
   developersRegistered: {
-    number: 7_000_000,
-    text: '7,000,000+',
+    number: 9_000_000,
+    text: '9,000,000+',
     label: 'Users',
   },
   developersRegisteredChange: {

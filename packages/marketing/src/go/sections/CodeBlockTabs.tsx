@@ -30,11 +30,11 @@ export default function CodeBlockTabs({ files }: CodeBlockTabsProps) {
         ))}
       </div>
       <div
-        className="hidden dark:block px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_code]:font-mono"
+        className="hidden dark:block px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:bg-transparent! [&_pre]:m-0! [&_code]:font-mono"
         dangerouslySetInnerHTML={{ __html: files[activeIndex].darkHtml }}
       />
       <div
-        className="block dark:hidden px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:!bg-transparent [&_pre]:!m-0 [&_code]:font-mono"
+        className="block dark:hidden px-5 py-4 sm:px-6 sm:py-5 overflow-x-auto text-[13px] leading-[1.6] [&_pre]:bg-transparent! [&_pre]:m-0! [&_code]:font-mono"
         dangerouslySetInnerHTML={{ __html: files[activeIndex].lightHtml }}
       />
     </>

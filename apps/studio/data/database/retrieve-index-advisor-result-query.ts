@@ -1,9 +1,11 @@
+import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetIndexAdvisorResultVariables = {
@@ -33,7 +35,15 @@ const IndexAdvisorResultSchema = z.object({
     .transform((v) => v ?? 0),
 })
 
-export type GetIndexAdvisorResultResponse = z.infer<typeof IndexAdvisorResultSchema>
+export type GetIndexAdvisorResultResponse = z.infer<typeof IndexAdvisorResultSchema> & {
+  index_statements: SafeSqlFragment[]
+}
+
+function markDatabaseSqlSafe(
+  indexAdvisorResult: z.infer<typeof IndexAdvisorResultSchema>
+): GetIndexAdvisorResultResponse {
+  return indexAdvisorResult as GetIndexAdvisorResultResponse
+}
 
 export async function getIndexAdvisorResult({
   projectRef,
@@ -42,12 +52,11 @@ export async function getIndexAdvisorResult({
 }: GetIndexAdvisorResultVariables) {
   if (!projectRef) throw new Error('Project ref is required')
 
-  const escapedQuery = query.replace(/'/g, "''")
-
   const { result: results } = await executeSql({
     projectRef,
     connectionString,
-    sql: `set search_path to public, extensions; select * from index_advisor('${escapedQuery}');`,
+    sql: safeSql`set search_path to public, extensions; select * from index_advisor(${literal(query)});`,
+    grant: unguarded.migrating,
   })
 
   if (!results || results.length === 0) {
@@ -65,7 +74,7 @@ export async function getIndexAdvisorResult({
     return null
   }
 
-  return filterProtectedSchemaIndexAdvisorResult(parsed.data)
+  return filterProtectedSchemaIndexAdvisorResult(markDatabaseSqlSafe(parsed.data))
 }
 
 export type GetIndexAdvisorResultData = Awaited<ReturnType<typeof getIndexAdvisorResult>>

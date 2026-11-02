@@ -15,10 +15,10 @@
   - [x] Realtime subscriptions. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Functions.
   - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
+  - [x] Edge Functions. [Docs](https://supabase.com/docs/guides/functions)
 - [x] File Storage. [Docs](https://supabase.com/docs/guides/storage)
 - [x] AI + Vector/Embeddings Toolkit. [Docs](https://supabase.com/docs/guides/ai)
-- [x] Dashboard
+- [x] Dashboard.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
@@ -54,10 +54,10 @@ You can also [self-host](https://supabase.com/docs/guides/hosting/overview) and 
 - [Realtime](https://github.com/supabase/realtime) is an Elixir server that allows you to listen to PostgreSQL inserts, updates, and deletes using websockets. Realtime polls Postgres' built-in replication functionality for database changes, converts changes to JSON, then broadcasts the JSON over websockets to authorized clients.
 - [PostgREST](http://postgrest.org/) is a web server that turns your PostgreSQL database directly into a RESTful API.
 - [GoTrue](https://github.com/supabase/gotrue) is a JWT-based authentication API that simplifies user sign-ups, logins, and session management in your applications.
-- [Storage](https://github.com/supabase/storage-api) a RESTful API for managing files in S3, with Postgres handling permissions.
-- [pg_graphql](http://github.com/supabase/pg_graphql/) a PostgreSQL extension that exposes a GraphQL API.
+- [Storage](https://github.com/supabase/storage-api) is a RESTful API for managing files in S3, with Postgres handling permissions.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) is a PostgreSQL extension that exposes a GraphQL API.
 - [postgres-meta](https://github.com/supabase/postgres-meta) is a RESTful API for managing your Postgres, allowing you to fetch tables, add roles, and run queries, etc.
-- [Kong](https://github.com/Kong/kong) is a cloud-native API gateway.
+- [Envoy](https://github.com/envoyproxy/envoy) is a cloud-native, high-performance edge and service proxy.
 
 #### Client libraries
 
@@ -105,11 +105,11 @@ Our approach for client libraries is modular. Each sub-library is a standalone i
     <tr>
     <td>Flutter</td>
     <td><a href="https://github.com/supabase/supabase-flutter" target="_blank" rel="noopener noreferrer">supabase-flutter</a></td>
-    <td><a href="https://github.com/supabase/postgrest-dart" target="_blank" rel="noopener noreferrer">postgrest-dart</a></td>
-    <td><a href="https://github.com/supabase/gotrue-dart" target="_blank" rel="noopener noreferrer">gotrue-dart</a></td>
-    <td><a href="https://github.com/supabase/realtime-dart" target="_blank" rel="noopener noreferrer">realtime-dart</a></td>
-    <td><a href="https://github.com/supabase/storage-dart" target="_blank" rel="noopener noreferrer">storage-dart</a></td>
-    <td><a href="https://github.com/supabase/functions-dart" target="_blank" rel="noopener noreferrer">functions-dart</a></td>
+    <td><a href="https://github.com/supabase/supabase-flutter/tree/main/packages/postgrest" target="_blank" rel="noopener noreferrer">postgrest</a></td>
+    <td><a href="https://github.com/supabase/supabase-flutter/tree/main/packages/supabase_auth" target="_blank" rel="noopener noreferrer">supabase_auth</a></td>
+    <td><a href="https://github.com/supabase/supabase-flutter/tree/main/packages/supabase_realtime" target="_blank" rel="noopener noreferrer">supabase_realtime</a></td>
+    <td><a href="https://github.com/supabase/supabase-flutter/tree/main/packages/supabase_storage" target="_blank" rel="noopener noreferrer">supabase_storage</a></td>
+    <td><a href="https://github.com/supabase/supabase-flutter/tree/main/packages/supabase_functions" target="_blank" rel="noopener noreferrer">supabase_functions</a></td>
   </tr>
   <tr>
     <td>Swift</td>

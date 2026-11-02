@@ -2,8 +2,8 @@
 
 import {
   Button,
-  Input_Shadcn_,
-  Label_Shadcn_,
+  Input,
+  Label,
   Sheet,
   SheetClose,
   SheetContent,
@@ -24,7 +24,7 @@ export default function SheetSide() {
       {SHEET_SIDES.map((side) => (
         <Sheet key={side}>
           <SheetTrigger asChild>
-            <Button type="outline">From {side}</Button>
+            <Button variant="outline">From {side}</Button>
           </SheetTrigger>
           <SheetContent side={side}>
             <SheetHeader>
@@ -35,21 +35,21 @@ export default function SheetSide() {
             </SheetHeader>
             <div className="grid gap-4 py-4">
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label_Shadcn_ htmlFor="name" className="text-right">
+                <Label htmlFor="name" className="text-right">
                   Name
-                </Label_Shadcn_>
-                <Input_Shadcn_ id="name" value="Pedro Duarte" className="col-span-3" />
+                </Label>
+                <Input id="name" value="Pedro Duarte" className="col-span-3" />
               </div>
               <div className="grid grid-cols-4 items-center gap-4">
-                <Label_Shadcn_ htmlFor="username" className="text-right">
+                <Label htmlFor="username" className="text-right">
                   Username
-                </Label_Shadcn_>
-                <Input_Shadcn_ id="username" value="@peduarte" className="col-span-3" />
+                </Label>
+                <Input id="username" value="@peduarte" className="col-span-3" />
               </div>
             </div>
             <SheetFooter>
               <SheetClose asChild>
-                <Button htmlType="submit" type="secondary">
+                <Button type="submit" variant="secondary">
                   Save changes
                 </Button>
               </SheetClose>

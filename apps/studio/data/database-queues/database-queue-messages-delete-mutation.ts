@@ -1,10 +1,11 @@
-import { literal } from '@supabase/pg-meta/src/pg-format'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageDeleteVariables = {
@@ -29,8 +30,9 @@ export async function deleteDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.delete(${literal(queueName)}, ${literal(messageId)})`,
+    sql: safeSql`SELECT * FROM pgmq.delete(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result

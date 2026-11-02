@@ -45,7 +45,7 @@ Follow the progress of the [Postgres Language Server on GitHub](https://github.c
 
 ![Inspect your database](/images/blog/launch-week-8/day-2/inspect-your-database.png)
 
-We’ve added [debugging utilities](https://supabase.com/docs/guides/database/inspect) to our CLI to identify production issues via the `supabase inspect db` command. This interface includes 19 different commands to help you solve everything from slow queries to redundant indexes.
+We’ve added [debugging utilities](https://supabase.com/docs/guides/observability/inspect) to our CLI to identify production issues via the `supabase inspect db` command. This interface includes 19 different commands to help you solve everything from slow queries to redundant indexes.
 
 A lot of the credit for this belongs to [Heroku’s pg-extras](https://github.com/heroku/heroku-pg-extras) feature, an amazingly useful set of functionality. We’ve adapted the work they started, added a few additional commands, and made it available for any Postgres database. Simply append the `--db-url` param to use these commands with your own Postgres database.
 
@@ -180,7 +180,7 @@ We’ve simplified the database testing experience, with `supabase test`. Runnin
 
 To make life even easier, our friends at [Basejump](https://usebasejump.com/) have created an entire suite of [Supabase Test Helpers](https://github.com/usebasejump/supabase-test-helpers) which make it simple to create users, run tests as an [authenticated user](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#testing-authenticated), and test your [RLS policies](https://usebasejump.com/blog/testing-on-supabase-with-pgtap#rls-testing).
 
-Finally, while you wait for us to make progress on the Language Server, we’ve added [support for linting](https://supabase.com/docs/guides/cli/testing-and-linting#linting-your-database) through the excellent [plpgsql_check](https://github.com/okbob/plpgsql_check) extension.
+Finally, while you wait for us to make progress on the Language Server, we’ve added [support for linting](https://supabase.com/docs/guides/local-development/cli/testing-and-linting#linting-your-database) through the excellent [plpgsql_check](https://github.com/okbob/plpgsql_check) extension.
 
 <BlogCollapsible title="See full command">
   <div>
@@ -222,9 +222,9 @@ Finally, while you wait for us to make progress on the Language Server, we’ve 
 
 Seeding is the process of populating a database with initial data, typically used to provide sample or default records for testing and development purposes. This gives you a reproducible development environment across your entire team.
 
-We’ve added [support for seeding](https://supabase.com/docs/guides/cli/seeding-your-database) to populate your local databases with data whenever you run `supabase start` or `supabase db reset`.
+We’ve added [support for seeding](https://supabase.com/docs/guides/local-development/seeding-your-database) to populate your local databases with data whenever you run `supabase start` or `supabase db reset`.
 
-We’ve also worked with our friends at Snaplet to [generate seed data](https://supabase.com/docs/guides/cli/seeding-your-database#generating-seed-data) directly from your database:
+We’ve also worked with our friends at Snaplet to [generate seed data](https://supabase.com/docs/guides/local-development/seeding-your-database#generating-seed-data) directly from your database:
 
 ```markdown
 npx snaplet generate --sql > supabase/seed.sql
@@ -268,7 +268,7 @@ let movie: Tables<'movies'> = // ...
 
 ![Support for GitHub Actions](/images/blog/launch-week-8/day-2/support-for-github-actions.png)
 
-We’ve developed an official [GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) which leverages the CLI. You can [generate types on every PR](https://supabase.com/docs/guides/cli/github-action/generating-types), or run [your tests on every commit](https://supabase.com/docs/guides/cli/github-action/testing).
+We’ve developed an official [GitHub Action](https://github.com/marketplace/actions/supabase-cli-action) which leverages the CLI. You can [generate types on every PR](https://supabase.com/docs/guides/deployment/ci/generating-types), or run [your tests on every commit](https://supabase.com/docs/guides/deployment/ci/testing).
 
 ## Local Logging and Debugging
 
@@ -321,7 +321,7 @@ Either way, we want to support _both_ seed data and anonymized production data, 
 
 ### Is it available yet?
 
-<Admonition type="note" label="Branching update 12/13/2023">
+<Admonition type="note" title="Branching update 12/13/2023">
 
 We are [rolling out access](https://supabase.com/blog/supabase-branching) and we'll be onboarding organizations in batches over the next few weeks. You can still [sign up for access](https://forms.supabase.com/branching-request).
 
@@ -329,9 +329,9 @@ We are [rolling out access](https://supabase.com/blog/supabase-branching) and we
 
 ## Get started
 
-Jump into our updated [Local Development documentation](https://supabase.com/docs/guides/cli) to get started with the CLI.
+Jump into our updated [Local Development documentation](https://supabase.com/docs/guides/local-development) to get started with the CLI.
 
-If you’re an existing user simply [update your CLI](https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli) and check out the [full command reference](https://supabase.com/docs/reference/cli/introduction) for all the latest commands.
+If you’re an existing user simply [update your CLI](https://supabase.com/docs/guides/local-development/cli/getting-started#updating-the-supabase-cli) and check out the [full command reference](https://supabase.com/docs/reference/cli/introduction) for all the latest commands.
 
 ## More Launch Week 8
 

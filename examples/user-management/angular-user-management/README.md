@@ -46,9 +46,10 @@ create policy "Users can update own profile." on profiles
 insert into storage.buckets (id, name)
   values ('avatars', 'avatars');
 
--- Set up access controls for storage
+-- Set up access controls for storage. Allows downloading object with public key
+-- See https://supabase.com/docs/guides/storage/security/access-control#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
-  for select using (bucket_id = 'avatars');
+  for select using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
 
 create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
@@ -56,13 +57,13 @@ create policy "Anyone can upload an avatar." on storage.objects
 
 ### 3. Configure environment variables
 
-Update the `src/environments/environment.ts` file with your Supabase project URL and anon key:
+Update the `src/environments/environment.ts` file with your Supabase project URL and publishable key:
 
 ```typescript
 export const environment = {
   production: false,
   supabaseUrl: 'YOUR_SUPABASE_URL',
-  supabaseKey: 'YOUR_SUPABASE_ANON_KEY',
+  supabasePublishableKey: 'YOUR_SUPABASE_PUBLISHABLE_KEY',
 }
 ```
 

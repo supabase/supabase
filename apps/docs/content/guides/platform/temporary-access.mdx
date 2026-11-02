@@ -1,0 +1,86 @@
+---
+title: 'Temporary access'
+description: 'Enable temporary access for short-lived database connections tied to a Supabase user.'
+---
+
+Your Supabase project supports connecting to the Postgres database using either your Supabase API token (Personal Access Token) or your current dashboard session token (JWT). This is called temporary access, as the authentication tokens can be short-lived and tied directly to a specific Supabase user. Temporary access is disabled by default.
+
+Enabling temporary access only applies to connections to Postgres and the shared pooler (Supavisor); all HTTP APIs offered by Supabase (e.g., PostgREST, Storage, Auth) require authentication tokens specific to the service and are independent of the Supabase platform user(s).
+
+<Admonition type="note">
+
+[Enforce SSL](/docs/guides/platform/ssl-enforcement) on incoming connections must be enabled before temporary access can be used.
+
+</Admonition>
+
+<Admonition type="note">
+
+Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable temporary access. You can find the Postgres version of your project on the [General Settings](/dashboard/project/_/settings/general) page. If your project is on an older version, you will need to [upgrade](/docs/guides/platform/upgrading) to use this feature.
+
+</Admonition>
+
+## Manage temporary access via the dashboard
+
+The easiest way to manage temporary access is via the "Enable temporary access" settings section in [Database Settings page](/dashboard/project/_/database/settings) of the dashboard.
+
+## Manage temporary access via the Management API
+
+You can also manage temporary access using the Management API:
+
+```bash
+# Get your access token from https://supabase.com/dashboard/account/tokens
+export SUPABASE_MANAGEMENT_API_TOKEN="your-access-token"
+export PROJECT_REF="your-project-ref"
+
+# Get current temporary access status
+curl -X GET "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN"
+
+# Enable temporary access
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state":"enabled"
+  }'
+
+# Disable temporary access
+curl -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/jit-access" \
+  -H "Authorization: Bearer $SUPABASE_MANAGEMENT_API_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "state":"disabled"
+  }'
+```
+
+## Configure user access
+
+After you enable temporary access, map each team member to the Postgres roles they can assume. You can also limit each role by expiry and by network. For more information, see [Map team members to Postgres roles](/docs/guides/platform/team-database-access).
+
+## Using temporary access
+
+<Admonition type="note">
+
+This feature does not work with the dedicated pooler. Direct connections and connections through the shared pooler are fully supported.
+
+</Admonition>
+
+To log in to the database using temporary access, existing connection strings can be used and only the password needs to be changed to the user's API or dashboard token.
+
+For example, if a user has been authorized to assume the `postgres` role:
+
+```
+psql 'postgres://postgres:sbp_111222333aaabbbccc@db.{project-ref}.supabase.co/postgres'
+```
+
+Since Supabase API tokens can be used, it is also possible to generate API tokens for services you don't want to share your Postgres role password with (for example a GitHub Action). The API token can be configured with an expiry time and temporary access-specific restrictions can also be applied.
+
+Connecting via the shared connection pooler requires the addition of a new connection option. This can be applied either directly in the connection URI or as `conninfo` (easier to read):
+
+```
+# directly in the URI
+psql 'postgres://postgres.{project-ref}:sbp_111222333aaabbbccc@aws-1-us-west-1.pooler.supabase.com:5432/postgres?options=-c%20jit%3dtrue'
+
+# or as a connection info string
+psql "host=aws-1-us-west-1.pooler.supabase.com user=postgres.{project-ref} options='-c jit=true'"
+```

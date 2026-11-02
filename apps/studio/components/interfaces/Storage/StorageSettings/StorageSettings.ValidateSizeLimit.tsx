@@ -123,9 +123,10 @@ export const ValidateSizeLimit = ({
           <TooltipTrigger asChild>
             <button
               type="button"
+              tabIndex={isValidating ? -1 : 0}
               className={cn(
                 'mt-2 ml-auto text-foreground-lighter',
-                '!w-fit text-xs',
+                'w-fit! text-xs',
                 isValidating ? 'cursor-wait' : 'hover:text-foreground'
               )}
               onClick={() => setShowModal(true)}
@@ -169,8 +170,8 @@ export const ValidateSizeLimit = ({
         onConfirm={handleValidate}
       >
         <p className="text-sm text-foreground-light">
-          Running this queries the <code className="text-code-inline">storage.buckets</code> table,
-          which may cause load on your database because you have more than{' '}
+          Running this queries the <code>storage.buckets</code> table, which may cause load on your
+          database because you have more than{' '}
           {THRESHOLD_FOR_AUTO_QUERYING_BUCKET_LIMITS.toLocaleString()} buckets.
         </p>
       </ConfirmationModal>

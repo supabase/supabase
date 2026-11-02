@@ -1,12 +1,24 @@
 import { useQuery } from '@tanstack/react-query'
+import { useFlag } from 'common'
 import dayjs from 'dayjs'
 
 import { edgeFunctionsKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import { quoteLiteral } from '@/lib/pg-format'
+import { handleError } from '@/data/fetchers'
+import { executeAnalyticsSql } from '@/data/logs/execute-analytics-sql'
+import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
+import {
+  analyticsLiteral,
+  joinSqlFragments,
+  safeSql,
+  type SafeLogSqlFragment,
+} from '@/data/logs/safe-analytics-sql'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
-export type EdgeFunctionsLastHourStatsVariables = { projectRef?: string; functionIds?: string[] }
+export type EdgeFunctionsLastHourStatsVariables = {
+  projectRef?: string
+  functionIds?: string[]
+  useOtel?: boolean
+}
 
 export type EdgeFunctionLastHourStats = {
   functionId: string
@@ -17,13 +29,13 @@ export type EdgeFunctionLastHourStats = {
 
 export type EdgeFunctionsLastHourStatsResponse = Record<string, EdgeFunctionLastHourStats>
 
-function getEdgeFunctionsLastHourStatsSql(functionIds: string[]) {
-  const functionIdFilter =
+function getEdgeFunctionsLastHourStatsSqlBq(functionIds: string[]): SafeLogSqlFragment {
+  const functionIdFilter: SafeLogSqlFragment =
     functionIds.length > 0
-      ? `  and function_id in (${functionIds.map(quoteLiteral).join(', ')})\n`
-      : ''
+      ? safeSql`  and function_id in (${joinSqlFragments(functionIds.map(analyticsLiteral), ', ')})\n`
+      : safeSql``
 
-  return `
+  return safeSql`
 -- edge-functions-last-hour-stats
 select
   function_id,
@@ -40,8 +52,38 @@ ${functionIdFilter}group by
 `
 }
 
+function getEdgeFunctionsLastHourStatsSqlOtel(functionIds: string[]): SafeLogSqlFragment {
+  const functionIdFilter: SafeLogSqlFragment =
+    functionIds.length > 0
+      ? safeSql`  and log_attributes['function_id'] in (${joinSqlFragments(functionIds.map(analyticsLiteral), ', ')})\n`
+      : safeSql``
+
+  return safeSql`
+-- edge-functions-last-hour-stats
+select
+  log_attributes['function_id'] as function_id,
+  count(distinct id) as requests_count,
+  count(distinct case when toInt32OrZero(log_attributes['response.status_code']) >= 500 then id end) as server_err_count
+from logs
+where
+  source = 'function_edge_logs'
+  and log_attributes['function_id'] != ''
+${functionIdFilter}group by
+  function_id
+`
+}
+
+function getEdgeFunctionsLastHourStatsSql(
+  functionIds: string[],
+  useOtel: boolean
+): SafeLogSqlFragment {
+  return useOtel
+    ? getEdgeFunctionsLastHourStatsSqlOtel(functionIds)
+    : getEdgeFunctionsLastHourStatsSqlBq(functionIds)
+}
+
 export async function getEdgeFunctionsLastHourStats(
-  { projectRef, functionIds = [] }: EdgeFunctionsLastHourStatsVariables,
+  { projectRef, functionIds = [], useOtel = false }: EdgeFunctionsLastHourStatsVariables,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -50,23 +92,17 @@ export async function getEdgeFunctionsLastHourStats(
   const endDate = dayjs().toISOString()
   const startDate = dayjs().subtract(1, 'hour').toISOString()
 
-  const { data, error } = await post(`/platform/projects/{ref}/analytics/endpoints/logs.all`, {
-    params: {
-      path: { ref: projectRef },
-      // @ts-ignore [Joshen] Just to easily identify this request in the network tools
-      query: { key: 'last-hour-stats' },
-    },
-    body: {
-      sql: getEdgeFunctionsLastHourStatsSql(functionIds),
-      iso_timestamp_start: startDate,
-      iso_timestamp_end: endDate,
-    },
+  const data = await executeAnalyticsSql({
+    projectRef,
+    endpoint: logsAllEndpointUrl(useOtel),
+    sql: getEdgeFunctionsLastHourStatsSql(functionIds, useOtel),
+    iso_timestamp_start: startDate,
+    iso_timestamp_end: endDate,
+    key: 'last-hour-stats',
     signal,
   })
 
-  if (error || data?.error) {
-    handleError(error ?? data?.error)
-  }
+  if (data?.error) handleError(data.error)
 
   const result = (data?.result ?? []) as {
     function_id: string
@@ -108,12 +144,16 @@ export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHour
     EdgeFunctionsLastHourStatsError,
     TData
   > = {}
-) =>
-  useQuery<EdgeFunctionsLastHourStatsData, EdgeFunctionsLastHourStatsError, TData>({
-    queryKey: edgeFunctionsKeys.lastHourStats(projectRef, functionIds),
-    queryFn: ({ signal }) => getEdgeFunctionsLastHourStats({ projectRef, functionIds }, signal),
+) => {
+  const useOtel = useFlag('otelLegacyLogs')
+
+  return useQuery<EdgeFunctionsLastHourStatsData, EdgeFunctionsLastHourStatsError, TData>({
+    queryKey: edgeFunctionsKeys.lastHourStats(projectRef, functionIds, useOtel),
+    queryFn: ({ signal }) =>
+      getEdgeFunctionsLastHourStats({ projectRef, functionIds, useOtel }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && functionIds.length > 0,
     staleTime: 60 * 1000,
     retry: false,
     ...options,
   })
+}

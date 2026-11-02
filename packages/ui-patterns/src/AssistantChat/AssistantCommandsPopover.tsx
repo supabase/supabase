@@ -5,13 +5,14 @@
 import { Popover as _RadixPopover } from 'radix-ui'
 import {
   ComponentPropsWithoutRef,
+  ComponentRef,
   createRef,
-  ElementRef,
   forwardRef,
   useEffect,
   useRef,
 } from 'react'
 import {
+  cn,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -19,17 +20,18 @@ import {
   CommandItem,
   CommandList,
   CommandSeparator,
-} from 'ui/src/components/shadcn/ui/command'
-import { Popover, PopoverAnchor, PopoverContent } from 'ui/src/components/shadcn/ui/popover'
-import { cn } from 'ui/src/lib/utils/cn'
+  Popover,
+  PopoverAnchor,
+  PopoverContent,
+} from 'ui'
 
 const AssistantCommandsPopover = forwardRef<
-  ElementRef<typeof Popover>,
+  ComponentRef<typeof Popover>,
   ComponentPropsWithoutRef<typeof Popover> & {
     /* The children to render - this is where the AssistantChatForm should be placed */
     children: React.ReactNode
     /* The ref for the textarea - used with the AssistantChatForm */
-    textAreaRef: React.RefObject<HTMLTextAreaElement>
+    textAreaRef: React.RefObject<HTMLTextAreaElement | null>
     /* The function to handle the value change */
     setValue: (value: string) => void
     /* The value of the textarea */
@@ -208,7 +210,7 @@ const AssistantCommandsPopover = forwardRef<
                         // closing of the popover is handled by the keydown event in AssistantChatForm
                       }}
                     >
-                      <span className="text-brand">/</span>
+                      <span className="text-primary">/</span>
                       <span className="text-default">{command}</span>
                     </CommandItem>
                   ))}

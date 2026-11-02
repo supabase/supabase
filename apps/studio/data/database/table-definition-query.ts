@@ -2,8 +2,9 @@ import { getTableDefinitionSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql, ExecuteSqlError } from '@/data/sql/execute-sql-query'
-import { UseCustomQueryOptions } from '@/types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { ResponseError, UseCustomQueryOptions } from '@/types'
 
 type GetTableDefinitionArgs = {
   id?: number
@@ -27,6 +28,7 @@ export async function getTableDefinition(
       connectionString,
       sql,
       queryKey: ['table-definition', id],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -35,7 +37,7 @@ export async function getTableDefinition(
 }
 
 export type TableDefinitionData = string
-export type TableDefinitionError = ExecuteSqlError
+export type TableDefinitionError = ResponseError
 
 export const useTableDefinitionQuery = <TData = TableDefinitionData>(
   { projectRef, connectionString, id }: TableDefinitionVariables,
@@ -43,11 +45,12 @@ export const useTableDefinitionQuery = <TData = TableDefinitionData>(
     enabled = true,
     ...options
   }: UseCustomQueryOptions<TableDefinitionData, TableDefinitionError, TData> = {}
-) =>
-  useQuery<TableDefinitionData, TableDefinitionError, TData>({
+) => {
+  return useQuery<TableDefinitionData, TableDefinitionError, TData>({
     queryKey: databaseKeys.tableDefinition(projectRef, id),
     queryFn: ({ signal }) => getTableDefinition({ projectRef, connectionString, id }, signal),
     enabled:
       enabled && typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     ...options,
   })
+}

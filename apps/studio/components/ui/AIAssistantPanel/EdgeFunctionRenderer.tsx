@@ -1,77 +1,52 @@
 import { useParams } from 'common'
-import { useMemo, useState, type PropsWithChildren } from 'react'
-import { toast } from 'sonner'
+import { useMemo, useState } from 'react'
 
 import { EdgeFunctionBlock } from '../EdgeFunctionBlock/EdgeFunctionBlock'
-import { ConfirmFooter } from './ConfirmFooter'
+import { Confirm } from './Confirm'
+import { type ConfirmFooterApprovalState } from './Confirm.utils'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useEdgeFunctionDeployMutation } from '@/data/edge-functions/edge-functions-deploy-mutation'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface EdgeFunctionRendererProps {
   label: string
   code: string
   functionName: string
-  onDeployed?: (result: { success: true } | { success: false; errorText: string }) => void
+  onApprove?: () => void
+  onDeny?: () => void
+  isDeploying?: boolean
   initialIsDeployed?: boolean
-  showConfirmFooter?: boolean
+  errorText?: string
+  confirmState?: ConfirmFooterApprovalState
 }
 
 export const EdgeFunctionRenderer = ({
   label,
   code,
   functionName,
-  onDeployed,
+  onApprove,
+  onDeny,
+  isDeploying = false,
   initialIsDeployed,
-  showConfirmFooter = true,
-}: PropsWithChildren<EdgeFunctionRendererProps>) => {
+  errorText,
+  confirmState,
+}: EdgeFunctionRendererProps) => {
   const { ref } = useParams()
-  const { data: org } = useSelectedOrganizationQuery()
-  const { mutate: sendEvent } = useSendEventMutation()
-  const [isDeployed, setIsDeployed] = useState(!!initialIsDeployed)
+  const track = useTrack()
   const [showReplaceWarning, setShowReplaceWarning] = useState(false)
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef: ref }, { enabled: !!ref })
   const { data: existingFunction } = useEdgeFunctionQuery(
     { projectRef: ref, slug: functionName },
-    { enabled: !!ref && !!functionName }
+    { enabled: !!ref && !!functionName && !initialIsDeployed }
   )
-
-  const {
-    mutate: deployFunction,
-    error: deployError,
-    isPending: isDeploying,
-  } = useEdgeFunctionDeployMutation({
-    onSuccess: () => {
-      setIsDeployed(true)
-      toast.success('Successfully deployed edge function')
-      onDeployed?.({ success: true })
-    },
-    onError: (error) => {
-      const errMsg = error?.message ?? 'Unknown error'
-      const message = `Failed to deploy function: ${errMsg}`
-      toast.error(message)
-      setIsDeployed(false)
-      onDeployed?.({ success: false, errorText: errMsg })
-    },
-  })
 
   const functionUrl = useMemo(() => {
     const endpoint = settings?.app_config?.endpoint
+    const protocol = settings?.app_config?.protocol ?? 'https'
     if (!endpoint || !ref || !functionName) return undefined
-
-    try {
-      const url = new URL(`https://${endpoint}`)
-      const restUrlTld = url.hostname.split('.').pop()
-      return restUrlTld
-        ? `https://${ref}.supabase.${restUrlTld}/functions/v1/${functionName}`
-        : undefined
-    } catch (error) {
-      return undefined
-    }
-  }, [settings?.app_config?.endpoint, ref, functionName])
+    return `${protocol}://${endpoint}/functions/v1/${functionName}`
+  }, [settings?.app_config?.endpoint, settings?.app_config?.protocol, ref, functionName])
 
   const deploymentDetailsUrl = useMemo(() => {
     if (!ref || !functionName) return undefined
@@ -83,76 +58,59 @@ export const EdgeFunctionRenderer = ({
     return `supabase functions download ${functionName}`
   }, [functionName])
 
-  const performDeploy = async () => {
-    if (!ref || !functionName || !code) return
-
-    deployFunction({
-      projectRef: ref,
-      slug: functionName,
-      metadata: {
-        entrypoint_path: 'index.ts',
-        name: functionName,
-        verify_jwt: true,
-      },
-      files: [{ name: 'index.ts', content: code }],
-    })
-
-    sendEvent({
-      action: 'edge_function_deploy_button_clicked',
-      properties: { origin: 'functions_ai_assistant' },
-      groups: {
-        project: ref ?? 'Unknown',
-        organization: org?.slug ?? 'Unknown',
-      },
-    })
+  const approveDeploy = () => {
+    if (!code || isDeploying || !ref || !functionName) return
 
     setShowReplaceWarning(false)
+    track('edge_function_deploy_button_clicked', { origin: 'functions_ai_assistant' })
+    onApprove?.()
   }
 
   const handleDeploy = () => {
-    if (!code || isDeploying || !ref) return
+    if (!code || isDeploying || !ref || !functionName) return
 
     if (existingFunction) {
       setShowReplaceWarning(true)
       return
     }
 
-    void performDeploy()
+    approveDeploy()
   }
 
+  const isConfirming = confirmState !== undefined
+
   return (
-    <div className="w-auto overflow-x-hidden my-4">
+    <Confirm
+      className="my-4"
+      state={confirmState}
+      message="Assistant wants to deploy this Edge Function"
+      cancelLabel="Skip"
+      confirmLabel="Deploy"
+      confirmLabelLoading="Deploying..."
+      successMessage="Edge Function deployed"
+      errorMessage="Failed to deploy Edge Function"
+      deniedMessage="Skipped Edge Function deployment"
+      isLoading={isDeploying}
+      onCancel={onDeny}
+      onConfirm={handleDeploy}
+    >
       <EdgeFunctionBlock
+        className="rounded-none border-0 shadow-none"
         label={label}
         code={code}
         functionName={functionName}
-        disabled={showConfirmFooter}
+        disabled={isConfirming}
         isDeploying={isDeploying}
-        isDeployed={isDeployed}
-        errorText={deployError?.message}
+        isDeployed={initialIsDeployed}
+        errorText={errorText}
         functionUrl={functionUrl}
         deploymentDetailsUrl={deploymentDetailsUrl}
         downloadCommand={downloadCommand}
+        hideDeployButton={isConfirming || initialIsDeployed}
         showReplaceWarning={showReplaceWarning}
         onCancelReplace={() => setShowReplaceWarning(false)}
-        onConfirmReplace={() => void performDeploy()}
-        onDeploy={handleDeploy}
-        hideDeployButton={showConfirmFooter}
+        onConfirmReplace={approveDeploy}
       />
-      {showConfirmFooter && (
-        <div className="mx-4">
-          <ConfirmFooter
-            message="Assistant wants to deploy this Edge Function"
-            cancelLabel="Skip"
-            confirmLabel={isDeploying ? 'Deploying...' : 'Deploy'}
-            isLoading={isDeploying}
-            onCancel={() => {
-              onDeployed?.({ success: false, errorText: 'Skipped' })
-            }}
-            onConfirm={() => handleDeploy()}
-          />
-        </div>
-      )}
-    </div>
+    </Confirm>
   )
 }

@@ -1,7 +1,9 @@
+import { joinSqlFragments, literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
@@ -31,7 +33,7 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-explain-query'],
-      sql: /* sql */ `
+      sql: safeSql`
         create or replace function pg_temp.explain_query(query text) returns jsonb
         language plpgsql
         as $$
@@ -101,8 +103,9 @@ export async function getInvolvedIndexesInSelectQuery({
         end;
         $$;
 
-        select pg_temp.explain_query('${query}') as plans;
+        select pg_temp.explain_query(${literal(query)}) as plans;
       `,
+      grant: unguarded.migrating,
     })
 
     const involvedIndexes = findIndexNames(result)
@@ -113,7 +116,8 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-names'],
-      sql: `select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${involvedIndexes.map((name) => `'${name}'`).join(', ')});`,
+      sql: safeSql`select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${joinSqlFragments(involvedIndexes.map(literal), ', ')});`,
+      grant: unguarded.migrating,
     })
 
     return indexResult as GetInvolvedIndexesFromSelectQueryResponse[]

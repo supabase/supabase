@@ -19,6 +19,10 @@ export const TABLE_EDITOR_SHORTCUT_IDS = {
   TABLE_EDITOR_CLEAR_FILTERS: 'table-editor.clear-filters',
   TABLE_EDITOR_CLEAR_SORT: 'table-editor.clear-sort',
   TABLE_EDITOR_REFRESH: 'table-editor.refresh',
+  TABLE_EDITOR_FOCUS_SCHEMA: 'table-editor.focus-schema',
+  OPERATION_QUEUE_SAVE: 'operation-queue.save',
+  OPERATION_QUEUE_TOGGLE: 'operation-queue.toggle',
+  OPERATION_QUEUE_UNDO: 'operation-queue.undo',
 }
 
 export type TableEditorShortcutId =
@@ -150,5 +154,30 @@ export const tableEditorRegistry: RegistryDefinations<TableEditorShortcutId> = {
     sequence: ['Shift+R'],
     showInSettings: false,
     options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.TABLE_EDITOR_FOCUS_SCHEMA,
+    label: 'Focus schema selector',
+    sequence: ['S', 'S'],
+    showInSettings: false,
+    options: { ignoreInputs: true },
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_SAVE]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_SAVE,
+    label: 'Save pending table edits',
+    sequence: ['Mod+S'],
+    showInSettings: false,
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_TOGGLE,
+    label: 'Toggle operation queue panel',
+    sequence: ['Mod+.'],
+    showInSettings: false,
+  },
+  [TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_UNDO]: {
+    id: TABLE_EDITOR_SHORTCUT_IDS.OPERATION_QUEUE_UNDO,
+    label: 'Undo latest table edit',
+    sequence: ['Mod+Z'],
+    showInSettings: false,
   },
 }

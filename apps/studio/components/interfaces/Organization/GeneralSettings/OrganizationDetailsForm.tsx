@@ -1,19 +1,18 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input_Shadcn_ } from 'ui'
-import { Input } from 'ui-patterns/DataInputs/Input'
+import { Card, CardContent, CardFooter, Form, FormControl, FormField, Input } from 'ui'
+import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useOrganizationUpdateMutation } from '@/data/organizations/organization-update-mutation'
 import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import type { ResponseError } from '@/types'
 
@@ -26,9 +25,8 @@ export const OrganizationDetailsForm = () => {
   const queryClient = useQueryClient()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
 
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const { mutate: updateOrganization, isPending: isUpdatingDetails } =
@@ -83,10 +81,7 @@ export const OrganizationDetailsForm = () => {
               render={({ field }) => (
                 <FormItemLayout label="Organization name" layout="flex-row-reverse">
                   <FormControl>
-                    <Input_Shadcn_
-                      {...field}
-                      disabled={!canUpdateOrganization || isUpdatingDetails}
-                    />
+                    <Input {...field} disabled={!canUpdateOrganization || isUpdatingDetails} />
                   </FormControl>
                 </FormItemLayout>
               )}
@@ -94,7 +89,7 @@ export const OrganizationDetailsForm = () => {
           </CardContent>
           <CardContent>
             <FormItemLayout label="Organization slug" layout="flex-row-reverse">
-              <Input copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
+              <PasswordInput copy disabled id="slug" value={selectedOrganization?.slug ?? ''} />
             </FormItemLayout>
           </CardContent>
           <CardFooter className="flex justify-end p-4 md:px-8">

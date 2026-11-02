@@ -1,58 +1,45 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BlobReader, BlobWriter, ZipWriter } from '@zip.js/zip.js'
 import { IS_PLATFORM, useParams } from 'common'
-import dayjs from 'dayjs'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import { Clock, Download, FileArchive, Send } from 'lucide-react'
+import { CopyIcon, DownloadIcon, FileArchiveIcon, SendIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import React, { useEffect, useState, type PropsWithChildren } from 'react'
+import { useEffect, useState, type PropsWithChildren } from 'react'
 import { toast } from 'sonner'
 import {
-  BreadcrumbItem_Shadcn_ as BreadcrumbItem,
-  BreadcrumbLink_Shadcn_ as BreadcrumbLink,
-  BreadcrumbList_Shadcn_ as BreadcrumbList,
-  BreadcrumbSeparator_Shadcn_ as BreadcrumbSeparator,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
   Button,
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
+  copyToClipboard,
   NavMenu,
   NavMenuItem,
-  Popover_Shadcn_,
-  PopoverContent_Shadcn_,
-  PopoverTrigger_Shadcn_,
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
   Separator,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
 import { Input } from 'ui-patterns/DataInputs/Input'
-import {
-  PageHeader,
-  PageHeaderAside,
-  PageHeaderBreadcrumb,
-  PageHeaderDescription,
-  PageHeaderMeta,
-  PageHeaderNavigationTabs,
-  PageHeaderSummary,
-  PageHeaderTitle,
-} from 'ui-patterns/PageHeader'
+import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+import { PageNav } from 'ui-patterns/PageNav'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
-import CopyButton from '@/components/ui/CopyButton'
+import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import { DocsButton } from '@/components/ui/DocsButton'
-import NoPermission from '@/components/ui/NoPermission'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionBodyQuery } from '@/data/edge-functions/edge-function-body-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
-import { useSendEventMutation } from '@/data/telemetry/send-event-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { DOCS_URL } from '@/lib/constants'
-
-dayjs.extend(relativeTime)
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface EdgeFunctionDetailsLayoutProps {
   title: string
@@ -63,17 +50,17 @@ const EdgeFunctionDetailsLayout = ({
   children,
 }: PropsWithChildren<EdgeFunctionDetailsLayoutProps>) => {
   const router = useRouter()
-  const { data: org } = useSelectedOrganizationQuery()
+  const track = useTrack()
   const { functionSlug, ref } = useParams()
-  const { mutate: sendEvent } = useSendEventMutation()
 
-  const { isLoading, can: canReadFunctions } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_READ,
-    '*'
+  const { isLoading, can: canReadFunctions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+
   const [isOpen, setIsOpen] = useState(false)
-  const [isTimestampHoverCardOpen, setIsTimestampHoverCardOpen] = useState(false)
+  const [isDownloadOpen, setIsDownloadOpen] = useState(false)
 
   const {
     data: selectedFunction,
@@ -103,27 +90,10 @@ const EdgeFunctionDetailsLayout = ({
   const name = selectedFunction?.name || ''
   const functionUrl =
     endpoint && selectedFunction?.slug ? `${endpoint}/functions/v1/${selectedFunction.slug}` : ''
-  const createdRelative = selectedFunction?.created_at
-    ? dayjs(selectedFunction.created_at).fromNow()
-    : undefined
-  const updatedRelative = selectedFunction?.updated_at
-    ? dayjs(selectedFunction.updated_at).fromNow()
-    : undefined
   const browserTitle = {
     entity: functionSlug ? name || functionSlug : undefined,
     section: title,
   }
-
-  const breadcrumbItems = [
-    {
-      label: 'Edge Functions',
-      href: `/project/${ref}/functions`,
-    },
-    {
-      label: functionSlug,
-      href: `/project/${ref}/functions/${functionSlug}`,
-    },
-  ]
 
   const navigationItems = functionSlug
     ? [
@@ -133,10 +103,14 @@ const EdgeFunctionDetailsLayout = ({
                 label: 'Overview',
                 href: `/project/${ref}/functions/${functionSlug}`,
               },
-              {
-                label: 'Invocations',
-                href: `/project/${ref}/functions/${functionSlug}/invocations`,
-              },
+              ...(isUnifiedLogsEnabled
+                ? []
+                : [
+                    {
+                      label: 'Invocations',
+                      href: `/project/${ref}/functions/${functionSlug}/invocations`,
+                    },
+                  ]),
               {
                 label: 'Logs',
                 href: `/project/${ref}/functions/${functionSlug}/logs`,
@@ -235,6 +209,31 @@ const EdgeFunctionDetailsLayout = ({
     }
   }, [isError])
 
+  const openTestSheet = () => {
+    if (!functionSlug) return
+    setIsOpen(true)
+    if (IS_PLATFORM) {
+      track('edge_function_test_side_panel_opened')
+    }
+  }
+
+  const copyFunctionUrl = () => {
+    if (!functionUrl) return
+    copyToClipboard(functionUrl)
+    toast.success('Function URL copied to clipboard')
+  }
+
+  useFunctionsDetailShortcuts({
+    projectRef: ref,
+    functionSlug,
+    canReadFunctions,
+    isPlatform: IS_PLATFORM,
+    hasInvocationsTab: !isUnifiedLogsEnabled,
+    onOpenTest: openTestSheet,
+    onOpenDownload: () => setIsDownloadOpen((prev) => !prev),
+    onCopyUrl: copyFunctionUrl,
+  })
+
   if (!isLoading && !canReadFunctions) {
     return (
       <ProjectLayout product="Edge Functions" browserTitle={browserTitle}>
@@ -246,97 +245,29 @@ const EdgeFunctionDetailsLayout = ({
   return (
     <EdgeFunctionsLayout title={title} browserTitle={browserTitle}>
       <div className="w-full min-h-full flex flex-col items-stretch">
-        <PageHeader size="full" className="sticky top-0 z-10 bg-surface-75">
-          {breadcrumbItems.length > 0 && (
-            <PageHeaderBreadcrumb>
-              <BreadcrumbList>
-                {breadcrumbItems.map((item, index) => (
-                  <React.Fragment key={item.label || `breadcrumb-${index}`}>
-                    <BreadcrumbItem>
-                      {item.href ? (
-                        <BreadcrumbLink asChild>
-                          <Link href={item.href}>{item.label}</Link>
-                        </BreadcrumbLink>
-                      ) : (
-                        <span>{item.label}</span>
-                      )}
-                    </BreadcrumbItem>
-                    {index < breadcrumbItems.length - 1 && <BreadcrumbSeparator />}
-                  </React.Fragment>
-                ))}
-              </BreadcrumbList>
-            </PageHeaderBreadcrumb>
-          )}
-
-          <PageHeaderMeta>
-            <PageHeaderSummary>
-              <PageHeaderTitle>{functionSlug ? name : 'Edge Functions'}</PageHeaderTitle>
-              <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-4 gap-y-1 !text-sm">
-                <div className="flex items-center gap-x-2">
-                  <span className="flex items-center gap-2">{functionUrl}</span>
-                  <CopyButton iconOnly type="text" text={functionUrl} />
-                </div>
-
-                <HoverCard
-                  openDelay={250}
-                  closeDelay={100}
-                  open={isTimestampHoverCardOpen}
-                  onOpenChange={setIsTimestampHoverCardOpen}
-                >
-                  <HoverCardTrigger asChild>
-                    <button type="button" className="flex items-center gap-2 group">
-                      <Clock size={16} strokeWidth={1.5} className="text-foreground-lighter" />
-                      <span className="transition text-foreground-light group-hover:text-foreground underline decoration-dotted decoration-foreground-muted underline-offset-4">
-                        {updatedRelative ?? 'Deploy status unavailable'}
-                      </span>
-                    </button>
-                  </HoverCardTrigger>
-                  <HoverCardContent side="bottom" align="start" className="w-40 p-0">
-                    {createdRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Created</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={createdRelative}
-                            utcTimestamp={selectedFunction.created_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {updatedRelative && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Last deployed</h3>
-                        {!!selectedFunction && (
-                          <TimestampInfo
-                            className="text-sm"
-                            label={updatedRelative}
-                            utcTimestamp={selectedFunction.updated_at}
-                          />
-                        )}
-                      </div>
-                    )}
-                    {selectedFunction?.version !== undefined && (
-                      <div className="px-4 py-2 space-y-1">
-                        <h3 className="heading-meta text-foreground-light">Deployments</h3>
-                        <p className="text-sm text-foreground">{selectedFunction.version}</p>
-                      </div>
-                    )}
-                  </HoverCardContent>
-                </HoverCard>
-              </PageHeaderDescription>
-            </PageHeaderSummary>
-
-            <PageHeaderAside>
-              <div className="flex items-center space-x-2">
+        <div className="sticky top-0 z-10 bg-sidebar">
+          <PageBreadcrumbs
+            actions={
+              <PageBreadcrumbsActions>
                 <DocsButton href={`${DOCS_URL}/guides/functions`} />
-                <Popover_Shadcn_>
-                  <PopoverTrigger_Shadcn_ asChild>
-                    <Button type="default" icon={<Download />}>
-                      Download
+                {!IS_PLATFORM && !!functionUrl && (
+                  <ShortcutTooltip shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_COPY_URL} side="bottom">
+                    <Button icon={<CopyIcon />} onClick={copyFunctionUrl}>
+                      Copy URL
                     </Button>
-                  </PopoverTrigger_Shadcn_>
-                  <PopoverContent_Shadcn_ align="end" className="p-0">
+                  </ShortcutTooltip>
+                )}
+                <Popover open={isDownloadOpen} onOpenChange={setIsDownloadOpen}>
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_DOWNLOAD}
+                    side="bottom"
+                    open={isDownloadOpen ? false : undefined}
+                  >
+                    <PopoverTrigger asChild>
+                      <Button icon={<DownloadIcon />}>Download</Button>
+                    </PopoverTrigger>
+                  </ShortcutTooltip>
+                  <PopoverContent align="end" className="p-0">
                     {IS_PLATFORM && (
                       <>
                         <div className="p-3 flex flex-col gap-y-2">
@@ -350,47 +281,49 @@ const EdgeFunctionDetailsLayout = ({
                             value={`supabase functions download ${functionSlug}`}
                           />
                         </div>
-                        <Separator className="!bg-border-overlay" />
+                        <Separator className="bg-border-overlay!" />
                       </>
                     )}
                     <div className="py-2 px-1">
                       <Button
-                        type="text"
+                        variant="text"
                         className="w-min hover:bg-transparent"
-                        icon={<FileArchive />}
+                        icon={<FileArchiveIcon />}
                         onClick={downloadFunction}
                       >
                         Download as ZIP
                       </Button>
                     </div>
-                  </PopoverContent_Shadcn_>
-                </Popover_Shadcn_>
+                  </PopoverContent>
+                </Popover>
                 {!!functionSlug && (
-                  <Button
-                    type="default"
-                    icon={<Send />}
-                    onClick={() => {
-                      setIsOpen(true)
-                      if (IS_PLATFORM) {
-                        sendEvent({
-                          action: 'edge_function_test_side_panel_opened',
-                          groups: {
-                            project: ref ?? 'Unknown',
-                            organization: org?.slug ?? 'Unknown',
-                          },
-                        })
-                      }
-                    }}
+                  <ShortcutTooltip
+                    shortcutId={SHORTCUT_IDS.FUNCTION_DETAIL_OPEN_TEST}
+                    side="bottom"
                   >
-                    Test
-                  </Button>
+                    <Button icon={<SendIcon />} onClick={openTestSheet}>
+                      Test
+                    </Button>
+                  </ShortcutTooltip>
                 )}
-              </div>
-            </PageHeaderAside>
-          </PageHeaderMeta>
+              </PageBreadcrumbsActions>
+            }
+          >
+            <BreadcrumbList>
+              <BreadcrumbItem>
+                <BreadcrumbLink asChild>
+                  <Link href={`/project/${ref}/functions`}>Edge Functions</Link>
+                </BreadcrumbLink>
+              </BreadcrumbItem>
+              <BreadcrumbSeparator />
+              <BreadcrumbItem>
+                <BreadcrumbPage>{name || functionSlug}</BreadcrumbPage>
+              </BreadcrumbItem>
+            </BreadcrumbList>
+          </PageBreadcrumbs>
 
           {navigationItems.length > 0 && (
-            <PageHeaderNavigationTabs>
+            <PageNav>
               <NavMenu>
                 {navigationItems.map((item) => {
                   const isActive = router.asPath.split('?')[0] === item.href
@@ -401,9 +334,9 @@ const EdgeFunctionDetailsLayout = ({
                   )
                 })}
               </NavMenu>
-            </PageHeaderNavigationTabs>
+            </PageNav>
           )}
-        </PageHeader>
+        </div>
 
         {children}
         <EdgeFunctionTesterSheet visible={isOpen} onClose={() => setIsOpen(false)} />

@@ -11,8 +11,7 @@ import {
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Theme,
-  themes,
+  singleThemes,
 } from 'ui'
 
 interface ThemeToggleProps {
@@ -26,7 +25,7 @@ export const ThemeToggle = ({
   triggerClassName,
   contentClassName,
 }: ThemeToggleProps) => {
-  const { theme, setTheme, resolvedTheme } = useTheme()
+  const { theme, setTheme } = useTheme()
   const [open, setOpen] = useState(false)
   const [isMounted, setIsMounted] = useState(false)
 
@@ -49,11 +48,8 @@ export const ThemeToggle = ({
             triggerClassName
           )}
         >
-          {resolvedTheme === 'dark' ? (
-            <Moon className="h-[20px] w-[20px] rotate-90 transition-all dark:rotate-0" />
-          ) : (
-            <Sun className="w-[20px] h-[20px] rotate-0 transition-all dark:-rotate-90" />
-          )}
+          <Moon className="hidden size-5 dark:block" />
+          <Sun className="block size-5 dark:hidden" />
           <span className="sr-only">Toggle theme</span>
         </button>
       </DropdownMenuTrigger>
@@ -65,9 +61,9 @@ export const ThemeToggle = ({
               setTheme(value)
             }}
           >
-            {themes
+            {singleThemes
               .filter((x) => x.value === 'dark' || x.value === 'light' || x.value === 'system')
-              .map((theme: Theme) => (
+              .map((theme) => (
                 <DropdownMenuRadioItem key={theme.value} value={theme.value}>
                   {theme.name}
                 </DropdownMenuRadioItem>

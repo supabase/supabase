@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { PropsWithChildren } from 'react'
+import { type MouseEvent, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
 interface InlineLinkProps {
@@ -8,11 +8,11 @@ interface InlineLinkProps {
   target?: string
   rel?: string
   title?: string
-  onClick?: () => void
+  onClick?: (e: MouseEvent<HTMLAnchorElement>) => void
 }
 
 export const InlineLinkClassName =
-  'underline transition underline-offset-2 decoration-foreground-lighter hover:decoration-foreground text-inherit hover:text-foreground'
+  'underline transition underline-offset-2 decoration-inherit hover:decoration-foreground text-inherit hover:text-foreground'
 
 export const InlineLink = ({
   href,

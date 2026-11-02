@@ -1,7 +1,9 @@
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
-import { executeSql } from '@/data/sql/execute-sql-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
@@ -18,7 +20,8 @@ export async function getSupamonitorEnabled({
   const { result } = await executeSql<{ libraries: string }[]>({
     projectRef,
     connectionString,
-    sql: `SELECT current_setting('shared_preload_libraries', true) AS libraries`,
+    sql: safeSql`SELECT current_setting('shared_preload_libraries', true) AS libraries`,
+    grant: unguarded.migrating,
   })
 
   const libraries = result[0]?.libraries ?? ''

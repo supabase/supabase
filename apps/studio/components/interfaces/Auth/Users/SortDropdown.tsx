@@ -1,4 +1,4 @@
-import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, ArrowDownWideNarrowIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -39,8 +39,8 @@ export const SortDropdown = ({
     return (
       <ButtonTooltip
         disabled
-        type="default"
-        icon={<ArrowDownNarrowWide />}
+        variant="default"
+        icon={<ArrowDownNarrowWideIcon />}
         tooltip={{
           content: {
             side: 'bottom',
@@ -63,7 +63,9 @@ export const SortDropdown = ({
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}>
+        <Button
+          icon={sortOrder === 'desc' ? <ArrowDownWideNarrowIcon /> : <ArrowDownNarrowWideIcon />}
+        >
           Sorted by {sortColumn === 'id' ? 'user ID' : sortColumn.replaceAll('_', ' ')}
         </Button>
       </DropdownMenuTrigger>

@@ -1,10 +1,12 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import type { GlobalMenuItems } from '~/components/Navigation/Navigation.types'
 import { MenuId } from '~/components/Navigation/NavigationMenu/NavigationMenu'
 import type { ICommonItem } from '~/components/reference/Reference.types'
 import type { Json } from '~/features/helpers.types'
+import { usePathname } from 'next/navigation'
+import { useEffect, useState } from 'react'
+
 import { menuState } from '../../../hooks/useMenuState'
 
 export function getPathWithoutHash(relativePath: string) {
@@ -110,7 +112,7 @@ export const getMenuId = (pathname: string | null) => {
   pathname = (pathname ??= '').replace(/^\/guides\//, '')
 
   switch (true) {
-    case pathname.startsWith('ai'):
+    case pathname.startsWith('ai') && !pathname.startsWith('ai-tools'):
       return MenuId.Ai
     case pathname.startsWith('api'):
       return MenuId.Api
@@ -132,7 +134,9 @@ export const getMenuId = (pathname: string | null) => {
       return MenuId.Integrations
     case pathname.startsWith('local-development'):
       return MenuId.LocalDevelopment
-    case pathname.startsWith('telemetry'):
+    case pathname.startsWith('ai-tools'):
+      return MenuId.AiTools
+    case pathname.startsWith('observability'):
       return MenuId.Telemetry
     case pathname.startsWith('platform'):
       return MenuId.Platform
@@ -162,3 +166,16 @@ export const useCloseMenuOnRouteChange = () => {
     menuState.setMenuMobileOpen(false)
   }, [pathname])
 }
+
+// a versioned menu id such as reference_javascript_v2 belongs to the reference_javascript level
+export const isMenuLevel = (menuId: string, level: string | undefined): boolean =>
+  !!level && menuId.replace(/_v\d+$/, '') === level
+
+// the top-level group that holds a section: start itself, or the group that links to it
+export const getMenuGroupLabel = (menuId: string, menuItems: GlobalMenuItems): string | undefined =>
+  menuItems.find(
+    ([section]) =>
+      section.enabled !== false &&
+      (isMenuLevel(menuId, section.level) ||
+        section.menuItems?.some((group) => group.some((item) => isMenuLevel(menuId, item.level))))
+  )?.[0].label

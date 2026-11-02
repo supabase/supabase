@@ -1,0 +1,36 @@
+import type { FederatedContentSource } from '../types'
+
+// We fetch these docs at build time from an external repo
+const terraform: FederatedContentSource = {
+  section: 'deployment/terraform',
+  org: 'supabase',
+  repo: 'terraform-provider-supabase',
+  branch: 'v1.11.0',
+  docsDir: 'docs',
+  externalSite: 'https://github.com/supabase/terraform-provider-supabase/blob/v1.11.0',
+  rawFallback: true,
+  pageMap: [
+    {
+      meta: {
+        title: 'Terraform Provider',
+        description:
+          'Overview of the Supabase Terraform provider, which manages Supabase project settings and branches as Terraform resources.',
+      },
+      remoteFile: 'README.md',
+      useRoot: true,
+      dropLeadingHeading: true,
+    },
+    {
+      slug: 'tutorial',
+      meta: {
+        title: 'Using the Supabase Terraform Provider',
+        description:
+          'Step-by-step guide to set up the Supabase Terraform provider and create a Supabase project as a Terraform resource.',
+      },
+      remoteFile: 'tutorial.md',
+    },
+  ],
+  rawFiles: [{ remoteFile: 'schema.json', outFile: 'terraform.schema.json' }],
+}
+
+export default terraform

@@ -30,7 +30,7 @@ export type ScopedAccessTokensData = Awaited<ReturnType<typeof getScopedAccessTo
 export type ScopedAccessTokensError = ResponseError
 
 export type ScopedAccessToken =
-  components['schemas']['GetScopedAccessTokensResponse']['tokens'][number]
+  components['schemas']['GetScopedAccessTokensResponse_Output']['tokens'][number]
 
 export type ScopedAccessTokenData = Awaited<ReturnType<typeof getScopedAccessToken>>
 

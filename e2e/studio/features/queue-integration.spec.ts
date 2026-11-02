@@ -7,7 +7,16 @@ import { toUrl } from '../utils/to-url.js'
 
 const navigateToQueuesPage = async (page: Page, ref: string) => {
   await page.goto(toUrl(`/project/${ref}/integrations/queues/queues`))
-  await expect(page.getByRole('grid')).toBeVisible({ timeout: 30000 })
+  // Wait for a stable header signal rather than the grid — the grid only
+  // renders when at least one queue exists, and an empty list shows an
+  // empty-state placeholder instead. Under workers=3 the Next.js server
+  // doesn't always populate the list fast enough before the assertion,
+  // so the test would flake at navigation rather than at the actual
+  // assertion. The "Create queue" button is part of the page header and
+  // renders unconditionally once the route is mounted.
+  await expect(page.getByRole('button', { name: 'Create queue' })).toBeVisible({
+    timeout: 30000,
+  })
 }
 
 const navigateToSingleQueuePage = async (page: Page, ref: string, queueName: string) => {
@@ -45,6 +54,26 @@ const sendMessageViaAPI = async (
       query: `SELECT pgmq.send('${queueName}', '${payload}', 5);`,
     },
   })
+}
+
+// Asserts a queue exists in the UI in a routing-agnostic way. After the
+// post-create flow, two end-states are valid:
+//   - Next mode: `router.push` reliably navigates to the queue-detail page
+//     so the URL ends with /queues/{queueName} and the heading appears.
+//   - TanStack mode: `router.push` (via the next/router shim) races nuqs's
+//     `?new=true` history update and the URL stays on the list, so the new
+//     row is visible there instead.
+// Either signal counts as success — poll until one of them lands.
+const expectQueueCreated = async (page: Page, queueName: string) => {
+  await expect
+    .poll(
+      async () => {
+        if (page.url().includes(`/queues/${queueName}`)) return true
+        return await page.getByRole('row', { name: new RegExp(`\\b${queueName}\\b`) }).isVisible()
+      },
+      { timeout: 15000 }
+    )
+    .toBe(true)
 }
 
 test.describe('Queues Integration', () => {
@@ -87,7 +116,8 @@ test.describe('Queues Integration', () => {
     await dialog.getByRole('button', { name: 'Create queue' }).click()
 
     await expect(page.getByText(/Successfully created queue/)).toBeVisible({ timeout: 10000 })
-    await page.waitForURL(/.*\/integrations\/queues\/queues\/pw_queue_create/)
+    await expect(dialog).toBeHidden({ timeout: 10000 })
+    await expectQueueCreated(page, queueName)
   })
 
   test('can create an unlogged queue', async ({ page, ref }) => {
@@ -113,9 +143,8 @@ test.describe('Queues Integration', () => {
     await dialog.getByRole('button', { name: 'Create queue' }).click()
 
     await expect(page.getByText(/Successfully created queue/)).toBeVisible({ timeout: 10000 })
-    await page.waitForURL(
-      new RegExp(`.*\\/integrations\\/queues\\/queues\\/${queueName}`)
-    )
+    await expect(dialog).toBeHidden({ timeout: 10000 })
+    await expectQueueCreated(page, queueName)
   })
 
   test('can delete a queue', async ({ page, ref }) => {

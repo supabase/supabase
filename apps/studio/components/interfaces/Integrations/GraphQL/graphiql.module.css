@@ -1,0 +1,118 @@
+@reference "../../../../styles/globals.css";
+
+.root :global(.graphiql-sidebar) {
+  @apply border-r border-default;
+  overflow-x: hidden;
+}
+
+.root :global(.graphiql-sidebar [data-value='settings']),
+.root :global(.graphiql-sidebar [data-value='short-keys']) {
+  display: none;
+}
+
+.root :global(.graphiql-sessions) {
+  @apply m-0;
+}
+
+.root :global(#graphiql-session) {
+  @apply p-0;
+}
+
+.root :global(.graphiql-session-header) {
+  display: none;
+}
+
+.root :global(.graphiql-horizontal-drag-bar) {
+  @apply border-l border-default;
+  background-color: var(--graphiql-response-bg);
+}
+
+.root :global(.graphiql-horizontal-drag-bar:hover::after) {
+  @apply rounded-full;
+}
+
+.root :global(.graphiql-plugin) {
+  border-left: 0;
+}
+
+/* Restore Monaco's intended clipping of the editor body. Monaco renders the gutter as an
+ * oversized, scroll-offset `.margin` (absolutely positioned, opaque background) and relies
+ * on `.overflow-guard { overflow: hidden }` to clip it to the editor box. Here the guard
+ * ends up `overflow: visible` via an inline style Monaco's layout sets at runtime, so the
+ * white gutter escapes the editor and paints over the page above it. An inline style beats
+ * any external selector regardless of specificity, so `!important` is required to win — it
+ * is not a specificity shortcut here. Scoped to `.root` so the SQL editor's Monaco is
+ * untouched. Autocomplete/hover popups live in `.overflowingContentWidgets` (a sibling of
+ * `.overflow-guard`), so they are not clipped. */
+.root :global(.monaco-editor .overflow-guard) {
+  @apply !overflow-hidden;
+}
+
+/* Drop GraphiQL's default 16px padding around the query editor so the editor sits flush to
+ * its container. This keeps Monaco's scroll shadow (`.scroll-decoration`, pinned to the
+ * editor's top edge) full-bleed instead of floating inset. The content's own breathing room
+ * is restored via Monaco's `padding`/`glyphMargin` options in GraphiQLTab.tsx. */
+.root :global(.graphiql-query-editor) {
+  @apply p-0;
+}
+
+/* Lift the response panel above the editor surface so the two read as separate panes.
+ * The token differs per theme because the editor sits at a different baseline lightness
+ * in each (~12% L in dark, ~94% L in light), so a single surface token can't lift it
+ * meaningfully in both directions. */
+.root :global(.graphiql-response),
+.root :global(.graphiql-response .monaco-editor),
+.root :global(.graphiql-response .monaco-editor .margin),
+.root :global(.graphiql-response .monaco-editor .monaco-editor-background) {
+  @apply pt-0;
+  background-color: var(--graphiql-response-bg) !important;
+}
+
+.root :global(.graphiql-button),
+.root :global(button.graphiql-button),
+.root :global(.graphiql-un-styled),
+.root :global(button.graphiql-un-styled),
+.root :global(button.graphiql-execute-button) {
+  @apply rounded-md;
+}
+
+.root :global(.graphiql-button-group) {
+  @apply rounded-lg;
+}
+
+.root :global(.graphiql-doc-explorer-search),
+.root :global(.graphiql-doc-explorer-search-input) {
+  @apply rounded-md;
+}
+
+.root :global(.graphiql-doc-explorer-search [role='listbox']) {
+  @apply rounded-b-md;
+}
+
+/* Theme variable overrides */
+
+.root {
+  --font-family: theme(fontFamily.sans);
+  --font-family-mono: theme(fontFamily.mono);
+  --border-radius-2: 0;
+  --border-radius-4: 0;
+  --border-radius-8: 0;
+  --border-radius-12: 0;
+  --popover-box-shadow: none;
+  /* Theme-independent: the Supabase green, and a response surface whose own token
+   * (--background-surface-300) already resolves per theme — so only --color-base below
+   * needs to branch on light/dark. */
+  --color-primary: 153, 50%, 50%;
+  --graphiql-response-bg: var(--background-surface-300);
+}
+
+:global(body.graphiql-dark) .root {
+  /* HSL form of #1f1f1f, matches the editor.background returned by getTheme('dark') */
+  --color-base: 0, 0%, 12%;
+}
+
+:global(body.graphiql-light) .root {
+  /* HSL form of #fcfcfc, matches the dashboard bg-default so the editor reads as part
+   * of the surrounding UI. */
+  --color-base: 0, 0%, 98.8%;
+}

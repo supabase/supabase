@@ -40,8 +40,8 @@ const Error404: NextPage = ({}) => {
         </nav>
       </div>
       <div
-        className={`absolute select-none opacity-[5%] filter transition duration-200 ${
-          show404 ? 'blur-sm' : 'blur-none'
+        className={`absolute select-none opacity-5 filter transition duration-200 ${
+          show404 ? 'blur-xs' : 'blur-none'
         }`}
       >
         <h1 style={{ fontSize: '28rem' }}>404</h1>
@@ -58,7 +58,7 @@ const Error404: NextPage = ({}) => {
           </p>
         </div>
         <div className="flex items-center space-x-4">
-          <Button asChild size="small">
+          <Button variant="primary" asChild size="small">
             <Link href="/projects">Head back</Link>
           </Button>
         </div>

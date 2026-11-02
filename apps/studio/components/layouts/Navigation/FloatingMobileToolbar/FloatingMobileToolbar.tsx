@@ -1,6 +1,6 @@
 import { useParams, useViewport } from 'common'
-import { AnimatePresence } from 'framer-motion'
-import { Menu, Search, X } from 'lucide-react'
+import { MenuIcon, SearchIcon, XIcon } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
 import { useRef } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 
@@ -50,6 +50,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       onPointerMove={drag.handlePointerMove}
     >
       <div
+        id="mobile-nav-actions"
         className={cn(
           'flex pointer-events-auto cursor-grab active:cursor-grabbing flex-row items-center justify-between w-auto rounded-full',
           'bg-overlay/80 backdrop-blur-md px-2.5 py-2 gap-2',
@@ -59,7 +60,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
         <AnimatePresence initial={false}>
           <ButtonTooltip
             key="search"
-            type={isSearchOpen ? 'secondary' : 'outline'}
+            variant={isSearchOpen ? 'secondary' : 'outline'}
             size="tiny"
             id="search-trigger"
             className={cn(
@@ -79,7 +80,7 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
             }}
             onClick={handleSearchClick}
           >
-            <Search size={16} strokeWidth={1} />
+            <SearchIcon size={16} strokeWidth={1} />
           </ButtonTooltip>
           <span key="help" data-sidebar-id={SIDEBAR_KEYS.HELP_PANEL}>
             <HelpButton />
@@ -101,12 +102,12 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
             <Button
               key="menu"
               title="Menu dropdown button"
-              type={sheet.isMenuOpen ? 'secondary' : 'default'}
+              variant={sheet.isMenuOpen ? 'secondary' : 'default'}
               className={cn(
-                'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-[state=open]:bg-overlay-hover/30',
-                !sheet.isMenuOpen && '!bg-surface-300'
+                'flex lg:hidden mr-1 rounded-md min-w-[30px] w-[30px] h-[30px] data-open:bg-overlay-hover/30',
+                !sheet.isMenuOpen && 'bg-surface-300!'
               )}
-              icon={<Menu />}
+              icon={<MenuIcon className={cn(sheet.isMenuOpen && 'text-background')} />}
               onClick={sheet.handleMenuClick}
             />
           )}
@@ -115,16 +116,16 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
       <AnimatePresence initial={false}>
         <Button
           title="close"
-          type="text"
+          variant="text"
           className={cn(
             'flex flex-row items-center justify-center rounded-full',
-            'bg-overlay/50 backdrop-blur-md my-auto !p-1 gap-2',
+            'bg-overlay/50 backdrop-blur-md my-auto p-1! gap-2',
             'border border-strong shadow-[0px_3px_6px_-2px_rgba(0,0,0,0.07),0px_10px_30px_0px_rgba(0,0,0,0.10)]',
-            '!w-10 !h-10 !min-w-10 !min-h-10',
+            'w-10! h-10! min-w-10! min-h-10!',
             'rounded-full',
             !sheet.isSheetOpen && 'hidden'
           )}
-          icon={<X />}
+          icon={<XIcon />}
           onClick={sheet.handleClose}
         />
       </AnimatePresence>

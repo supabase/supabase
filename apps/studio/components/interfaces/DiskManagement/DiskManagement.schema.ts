@@ -57,11 +57,10 @@ export const CreateDiskStorageSchema = ({
   cloudProvider: CloudProvider
   isSpendCapEnabled: boolean
 }) => {
-  const isFlyProject = cloudProvider === 'FLY'
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
   const isAwsK8sProject = cloudProvider === 'AWS_K8S'
 
-  const validateDiskConfiguration = !isFlyProject && !isAwsNimbusProject && !isAwsK8sProject
+  const validateDiskConfiguration = !isAwsNimbusProject && !isAwsK8sProject
 
   const schema = baseSchema.superRefine((data, ctx) => {
     const { storageType, totalSize, provisionedIOPS, throughput, maxSizeGb, computeSize } = data
@@ -161,7 +160,7 @@ export const CreateDiskStorageSchema = ({
       if (totalSize > DISK_LIMITS[DiskType.IO2].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
+          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.IO2].maxStorage)} GB `,
           path: ['totalSize'],
         })
       }
@@ -191,22 +190,14 @@ export const CreateDiskStorageSchema = ({
           path: ['provisionedIOPS'],
         })
       } else if (provisionedIOPS > maxIopsAllowedForDiskSizeWithGp3) {
-        if (totalSize >= 8) {
-          const diskSizeRequiredForIopsWithGp3 =
-            calculateDiskSizeRequiredForIopsWithGp3(provisionedIOPS)
+        const diskSizeRequiredForIopsWithGp3 =
+          calculateDiskSizeRequiredForIopsWithGp3(provisionedIOPS)
 
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithGp3)} GB required. Current max is ${formatNumber(maxIopsAllowedForDiskSizeWithGp3)} IOPS.`,
-            path: ['provisionedIOPS'],
-          })
-        } else {
-          ctx.addIssue({
-            code: z.ZodIssueCode.custom,
-            message: `Invalid IOPS value due to invalid disk size`,
-            path: ['provisionedIOPS'],
-          })
-        }
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Larger Disk size of at least ${formatNumber(diskSizeRequiredForIopsWithGp3)} GB required. Current max is ${formatNumber(maxIopsAllowedForDiskSizeWithGp3)} IOPS.`,
+          path: ['provisionedIOPS'],
+        })
       }
 
       if (throughput !== undefined) {
@@ -244,7 +235,7 @@ export const CreateDiskStorageSchema = ({
       if (totalSize > DISK_LIMITS[DiskType.GP3].maxStorage) {
         ctx.addIssue({
           code: z.ZodIssueCode.custom,
-          message: `Allocated disksize must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
+          message: `Allocated disk size must not exceed ${formatNumber(DISK_LIMITS[DiskType.GP3].maxStorage)} GB`,
           path: ['totalSize'],
         })
       }

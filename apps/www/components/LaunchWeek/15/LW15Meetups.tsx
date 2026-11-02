@@ -1,12 +1,13 @@
-import React, { PropsWithChildren, useState, useRef, useCallback, useEffect } from 'react'
-import { cn } from 'ui'
-import Image from 'next/image'
-import Link from 'next/link'
-import { motion, useInView } from 'framer-motion'
-import { FifteenSVG, LWSVG } from './lw15.components'
+import { LumaEvent } from 'app/api-v2/luma-events/route'
 import SectionContainer from 'components/Layouts/SectionContainer'
 import { DEFAULT_EASE } from 'lib/animations'
-import { LumaEvent } from 'app/api-v2/luma-events/route'
+import { motion, useInView } from 'motion/react'
+import Image from 'next/image'
+import Link from 'next/link'
+import React, { PropsWithChildren, useCallback, useEffect, useRef, useState } from 'react'
+import { cn } from 'ui'
+
+import { FifteenSVG, LWSVG } from './lw15.components'
 
 interface Props {
   className?: string
@@ -105,7 +106,7 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
 
       <SectionContainer
         className={cn(
-          'relative !max-w-none !pb-0 lg:!container flex flex-col overflow-hidden',
+          'relative max-w-none! pb-0! lg:container! flex flex-col overflow-hidden',
           className
         )}
         id="meetups"
@@ -146,13 +147,13 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
                     title={liveNow ? 'Live now' : undefined}
                     className={cn(
                       'h-10 group inline-flex items-center flex-wrap',
-                      '!leading-none transition-colors',
+                      'leading-none! transition-colors',
                       meetup.id === activeMeetup?.id && 'text-foreground'
                       // liveNow && 'text-foreground-light'
                     )}
                   >
                     {liveNow && (
-                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-brand-default mr-2 mb-4 animate-pulse" />
                     )}
                     <span>{getMeetupCity(meetup)}</span>
                   </MotionLink>
@@ -170,7 +171,7 @@ const LW15Meetups = ({ className, meetups = [] }: PropsWithChildren<Props>) => {
         </motion.div>
         <div
           ref={imageRef}
-          className="mx-auto h-[400px] -mt-32 -mb-20 lg:mt-0 lg:mb-0 aspect-square lg:aspect-[2/1] overflow-hidden relative"
+          className="mx-auto h-[400px] -mt-32 -mb-20 lg:mt-0 lg:mb-0 aspect-square lg:aspect-2/1 overflow-hidden relative"
         >
           <Image
             src="/images/launchweek/15/lw15-globe-dark.png"
@@ -246,7 +247,7 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
         top: mousePosition.y + 15,
       }}
     >
-      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-sm shadow-lg border w-screen max-w-xs flex flex-col gap-2">
+      <div className="bg-black dark:bg-foreground text-white dark:text-background p-2 rounded-xs shadow-lg border w-screen max-w-xs flex flex-col gap-2">
         <div className="w-full flex justify-between items-start gap-1 h-8">
           <LWSVG className="h-full w-auto" />
           <div className="relative h-full flex-1 overflow-hidden">
@@ -260,7 +261,7 @@ const MeetupOverlayCard = ({ meetup, mousePosition, visible }: MeetupOverlayCard
           </div>
           <FifteenSVG className="h-full w-auto mr-0.5" />
         </div>
-        <div className="w-full flex justify-between gap-1 text-lg !leading-none">
+        <div className="w-full flex justify-between gap-1 text-lg leading-none!">
           <div className="">Meetup</div>
           <div className="text-right">
             {getMeetupCity(meetup!)}, {getMeetupCountry(meetup!)}

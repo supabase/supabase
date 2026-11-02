@@ -1,12 +1,14 @@
-import { Card, CardContent, cn } from 'ui'
 import {
+  Card,
+  CardContent,
+  cn,
   Table,
   TableBody,
   TableHead,
   TableHeader,
   TableHeadSort,
   TableRow,
-} from 'ui/src/components/shadcn/ui/table'
+} from 'ui'
 
 import { AccessTokenSort, AccessTokenSortColumn } from '../AccessToken.types'
 
@@ -35,7 +37,7 @@ export const TableContainer = ({ children, sort, onSortChange }: TableContainerP
                 Expires
               </TableHeadSort>
             </TableHead>
-            <TableHead className={cn(tableHeaderClass, '!text-right')} />
+            <TableHead className={cn(tableHeaderClass, 'text-right!')} />
           </TableRow>
         </TableHeader>
         <TableBody>{children}</TableBody>

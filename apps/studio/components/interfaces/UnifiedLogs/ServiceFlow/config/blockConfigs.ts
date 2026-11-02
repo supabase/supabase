@@ -1,3 +1,18 @@
+import {
+  CableIcon,
+  CodeIcon,
+  GlobeIcon,
+  HardDriveIcon,
+  HashIcon,
+  LockIcon,
+  MonitorDotIcon,
+  PackageOpenIcon,
+  ReceiptTextIcon,
+  ServerIcon,
+  ShieldCheckIcon,
+  ZapIcon,
+} from 'lucide-react'
+
 import { BlockConfig } from '../components/shared/Block'
 import {
   apiKeyAdditionalFields,
@@ -9,12 +24,16 @@ import {
   locationAdditionalFields,
   locationPrimaryField,
   networkPrimaryFields,
-  postgresDetailsFields,
-  postgresPrimaryFields,
+  postgresSessionFields,
+  postgresStatementFields,
   postgrestPrimaryFields,
+  postgresTransactionFields,
   postgrestResponseFields,
   storageDetailsFields,
   storagePrimaryFields,
+  supavisorNodeFields,
+  supavisorPrimaryFields,
+  supavisorSourceFields,
   techDetailsFields,
   userAdditionalFields,
   userPrimaryField,
@@ -22,23 +41,26 @@ import {
 
 export const authBlockConfig: BlockConfig = {
   title: 'Authentication',
+  icon: LockIcon,
   primaryFields: authPrimaryFields,
 }
 
 export const postgrestBlockConfig: BlockConfig = {
   title: 'Data API',
+  icon: ServerIcon,
   primaryFields: postgrestPrimaryFields,
   sections: [
     {
       title: 'Response Details',
+      icon: ReceiptTextIcon,
       fields: postgrestResponseFields,
-      collapsible: true,
     },
   ],
 }
 
 export const networkBlockConfig: BlockConfig = {
   title: 'Network',
+  icon: GlobeIcon,
   primaryFields: networkPrimaryFields,
   sections: [
     {
@@ -59,49 +81,74 @@ export const networkBlockConfig: BlockConfig = {
     },
     {
       title: 'Authorization',
+      icon: ShieldCheckIcon,
       fields: authorizationFields,
-      collapsible: true,
     },
     {
       title: 'Tech Details',
+      icon: MonitorDotIcon,
       fields: techDetailsFields,
-      collapsible: true,
     },
   ],
 }
 
 export const edgeFunctionBlockConfig: BlockConfig = {
   title: 'Edge Function',
+  icon: ZapIcon,
   primaryFields: edgeFunctionPrimaryFields,
   sections: [
     {
       title: 'Function Details',
+      icon: CodeIcon,
       fields: edgeFunctionDetailsFields,
-      collapsible: true,
     },
   ],
 }
 
 export const storageBlockConfig: BlockConfig = {
   title: 'Storage',
+  icon: HardDriveIcon,
   primaryFields: storagePrimaryFields,
   sections: [
     {
       title: 'Storage Details',
+      icon: PackageOpenIcon,
       fields: storageDetailsFields,
-      collapsible: true,
     },
   ],
 }
 
 export const postgresBlockConfig: BlockConfig = {
   title: 'Postgres',
-  primaryFields: postgresPrimaryFields,
+  primaryFields: postgresStatementFields,
   sections: [
     {
-      title: 'Connection & Session Details',
-      fields: postgresDetailsFields,
-      collapsible: true,
+      title: 'Session',
+      icon: CableIcon,
+      fields: postgresSessionFields,
+    },
+    {
+      title: 'Transaction',
+      icon: HashIcon,
+      fields: postgresTransactionFields,
+    },
+  ],
+}
+
+export const supavisorBlockConfig: BlockConfig = {
+  title: 'Supavisor',
+  icon: CableIcon,
+  primaryFields: supavisorPrimaryFields,
+  sections: [
+    {
+      title: 'Node Details',
+      icon: ServerIcon,
+      fields: supavisorNodeFields,
+    },
+    {
+      title: 'Source',
+      icon: CodeIcon,
+      fields: supavisorSourceFields,
     },
   ],
 }

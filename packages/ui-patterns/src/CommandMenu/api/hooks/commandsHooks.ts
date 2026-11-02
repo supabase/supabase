@@ -32,7 +32,7 @@ const useRegisterCommands = (
   options.enabled ??= true
   const prevEnabled = useRef<boolean | undefined>(options.enabled)
 
-  const unsubscribe = useRef<() => void>()
+  const unsubscribe = useRef<(() => void) | undefined>(undefined)
 
   /**
    * useEffect handles the registration on first render, since React runs the

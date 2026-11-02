@@ -28,7 +28,8 @@ export async function GET(_request: Request, { params }: { params: Promise<{ slu
 
   const docsUrl = process.env.NEXT_PUBLIC_DOCS_URL
   if (docsUrl) {
-    const response = await fetch(`${docsUrl}/llms/${slug}`)
+    const filename = slug.replace(/\.txt$/, '.md')
+    const response = await fetch(`${docsUrl}/markdown/reference/${filename}`)
     if (response.ok) {
       const content = await response.text()
       return textResponse(content)

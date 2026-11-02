@@ -1,4 +1,4 @@
-import { LOCAL_STORAGE_KEYS } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useCallback } from 'react'
 
 import {
@@ -14,6 +14,7 @@ interface StoragePreference {
   sortBy: STORAGE_SORT_BY
   sortByOrder: STORAGE_SORT_BY_ORDER
   sortBucket: STORAGE_BUCKET_SORT
+  showArchivedInline: boolean
 }
 
 const DEFAULT_PREFERENCES: StoragePreference = {
@@ -21,6 +22,7 @@ const DEFAULT_PREFERENCES: StoragePreference = {
   sortBy: STORAGE_SORT_BY.NAME,
   sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
   sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
+  showArchivedInline: false,
 }
 
 /**
@@ -28,9 +30,8 @@ const DEFAULT_PREFERENCES: StoragePreference = {
  * Use this outside of React (e.g. inside Valtio state methods).
  */
 export function getStoragePreference(projectRef: string): StoragePreference {
-  if (typeof window === 'undefined') return DEFAULT_PREFERENCES
   try {
-    const raw = window.localStorage.getItem(LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef))
+    const raw = safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.STORAGE_PREFERENCE(projectRef))
     if (raw) {
       return { ...DEFAULT_PREFERENCES, ...JSON.parse(raw) }
     }
@@ -65,6 +66,13 @@ export function useStoragePreference(projectRef: string) {
     [setPreference]
   )
 
+  const setShowArchivedInline = useCallback(
+    (showArchivedInline: boolean) => {
+      setPreference((prev) => ({ ...prev, showArchivedInline }))
+    },
+    [setPreference]
+  )
+
   const setSortBucket = useCallback(
     (sortBucket: STORAGE_BUCKET_SORT) => {
       setPreference((prev) => ({ ...prev, sortBucket }))
@@ -77,9 +85,11 @@ export function useStoragePreference(projectRef: string) {
     sortBy: preference.sortBy,
     sortByOrder: preference.sortByOrder,
     sortBucket: preference.sortBucket,
+    showArchivedInline: preference.showArchivedInline,
     setView,
     setSortBy,
     setSortByOrder,
     setSortBucket,
+    setShowArchivedInline,
   }
 }

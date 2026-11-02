@@ -1,10 +1,6 @@
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLink } from 'lucide-react'
 import {
   Card,
   CardContent,
-  Separator,
   Table,
   TableBody,
   TableCell,
@@ -13,11 +9,9 @@ import {
   TableRow,
 } from 'ui'
 
-import { SupportLink } from '../Support/SupportLink'
 import { ApiKeyPill } from './ApiKeyPill'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { FeatureBanner } from '@/components/ui/FeatureBanner'
-import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 // Mock API Keys for demo
@@ -95,12 +89,12 @@ const ApiKeysIllustrationWithOverlay = () => {
       {/* Gradient overlay - horizontal on desktop, vertical on mobile */}
       <div
         className="absolute inset-x-0 bottom-0 h-1/2 xl:h-full xl:inset-x-auto xl:-right-16 xl:top-3 w-full xl:w-2/3
-        bg-gradient-to-t xl:bg-gradient-to-l
-        from-background-alternative via-background-alternative/90 via-[5%] to-transparent
-        z-[3] pointer-events-none xl:max-w-[500px]"
+        bg-linear-to-t xl:bg-linear-to-l
+        from-background-alternative via-background-alternative/90 via-5% to-transparent
+        z-3 pointer-events-none xl:max-w-[500px]"
       />
 
-      <div className="absolute scale-100 left-10 -bottom-14 w-[720px] xl:w-[500px] xl:left-auto xl:-right-[200px] 2xl:-right-16 xl:top-[21px] xl:scale-75">
+      <div className="absolute scale-100 left-10 -bottom-14 w-[720px] xl:w-[500px] xl:left-auto xl:right-[-200px] 2xl:-right-16 xl:top-[21px] xl:scale-75">
         <ApiKeysTableIllustration />
       </div>
     </>
@@ -110,7 +104,7 @@ const ApiKeysIllustrationWithOverlay = () => {
 export const ApiKeysCreateCallout = () => {
   return (
     <FeatureBanner illustration={<ApiKeysIllustrationWithOverlay />} bgAlt>
-      <div className="flex flex-col gap-0 z-[2]">
+      <div className="flex flex-col gap-0 z-2">
         <p className="text-sm text-foreground">Create API keys</p>
         <p className="text-sm text-foreground-lighter lg:max-w-sm 2xl:max-w-none">
           Use keys to authenticate requests to your app
@@ -118,46 +112,6 @@ export const ApiKeysCreateCallout = () => {
         <div className="mt-4">
           <CreateNewAPIKeysButton />
         </div>
-      </div>
-    </FeatureBanner>
-  )
-}
-
-export const ApiKeysFeedbackBanner = () => {
-  return (
-    <FeatureBanner
-      storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
-      className="!p-0 flex flex-col gap-0"
-      dismissable
-    >
-      <div className="p-5">
-        <p className="text-sm text-foreground">Your new API keys are here</p>
-        <p className="text-sm text-foreground-lighter">
-          We've updated our API keys to better support your application needs.{' '}
-          <InlineLink
-            href="https://github.com/orgs/supabase/discussions/29260"
-            className="inline-flex items-center gap-1"
-          >
-            Join the discussion on GitHub <ExternalLink aria-hidden size={14} strokeWidth={1.5} />
-          </InlineLink>
-        </p>
-      </div>
-
-      <Separator className="w-full" />
-
-      <div className="px-5 py-2 bg-surface-200/30">
-        <p className="text-sm text-foreground-lighter">
-          Having trouble with the new API keys?{' '}
-          <SupportLink
-            className={InlineLinkClassName}
-            queryParams={{
-              category: SupportCategories.PROBLEM,
-              subject: 'Help with API keys',
-            }}
-          >
-            Contact support
-          </SupportLink>
-        </p>
       </div>
     </FeatureBanner>
   )
