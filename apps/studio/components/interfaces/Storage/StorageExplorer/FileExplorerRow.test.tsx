@@ -281,4 +281,47 @@ describe('FileExplorerRow', () => {
     expect(screen.getByRole('checkbox')).toBeInTheDocument()
     expect(container.querySelector('.absolute')?.className).toContain('group-hover:hidden')
   })
+
+  describe('FileExplorerRowEditing selection', () => {
+    it('selects the full name when renaming a folder containing dots', () => {
+      const folder = item({
+        name: 'photos.backup',
+        type: STORAGE_ROW_TYPES.FOLDER,
+        status: STORAGE_ROW_STATUS.EDITING,
+        metadata: null,
+      })
+      render(
+        <FileExplorerRow
+          item={folder}
+          index={0}
+          view={STORAGE_VIEWS.COLUMNS}
+          columnIndex={0}
+          selectedItems={[]}
+        />
+      )
+      const input = screen.getByDisplayValue('photos.backup') as HTMLInputElement
+      expect(input.selectionStart).toBe(0)
+      expect(input.selectionEnd).toBe('photos.backup'.length)
+    })
+
+    it('selects only the filename excluding the extension when renaming a file', () => {
+      const file = item({
+        name: 'photos.backup.png',
+        type: STORAGE_ROW_TYPES.FILE,
+        status: STORAGE_ROW_STATUS.EDITING,
+      })
+      render(
+        <FileExplorerRow
+          item={file}
+          index={0}
+          view={STORAGE_VIEWS.COLUMNS}
+          columnIndex={0}
+          selectedItems={[]}
+        />
+      )
+      const input = screen.getByDisplayValue('photos.backup.png') as HTMLInputElement
+      expect(input.selectionStart).toBe(0)
+      expect(input.selectionEnd).toBe('photos.backup'.length)
+    })
+  })
 })
