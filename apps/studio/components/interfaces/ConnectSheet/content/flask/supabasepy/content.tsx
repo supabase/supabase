@@ -3,13 +3,18 @@ import { MultipleCodeBlock } from 'ui-patterns/MultipleCodeBlock'
 import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Connect.types'
 
 const ContentFile = ({ projectKeys }: StepContentProps) => {
+  const keyName = projectKeys?.publishableKey
+    ? 'SUPABASE_PUBLISHABLE_KEY'
+    : 'SUPABASE_ANON_KEY'
+  const keyValue = projectKeys?.publishableKey ?? projectKeys?.anonKey ?? 'your-anon-key'
+
   const files = [
     {
       name: '.env',
       language: 'bash',
       code: `
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-publishable-key'}
+${keyName}=${keyValue}
         `,
     },
     {
@@ -27,7 +32,7 @@ app = Flask(__name__)
 
 supabase: Client = create_client(
     os.environ.get("SUPABASE_URL"),
-    os.environ.get("SUPABASE_KEY")
+    os.environ.get("${keyName}")
 )
 
 @app.route('/')
