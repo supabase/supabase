@@ -197,5 +197,35 @@ describe('RoleRow', () => {
       expect(getUpdateQuery()).toContain(`'n3w-s3cret'`)
       await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
     })
+
+    test('closes on cancel without asking when nothing was entered', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+      expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument()
+    })
+
+    test('asks before discarding an entered password, and starts empty when reopened', async () => {
+      const role = createRole({ canLogin: true })
+      const user = await openMenu(role)
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+
+      await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+      expect(await screen.findByText('Unsaved changes')).toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toHaveValue('n3w-s3cret')
+
+      await user.click(await screen.findByRole('button', { name: 'Discard changes' }))
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+
+      await user.click(await screen.findByRole('button', { name: `${role.name} actions` }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      expect(await screen.findByLabelText('Password')).toHaveValue('')
+      expect(getUpdateQuery()).toBeUndefined()
+    })
   })
 })
