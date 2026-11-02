@@ -949,7 +949,7 @@ When `ack` is `true`, the server replies on error with `response.error` (an atom
 
 | Error code                               | Description                                                                                              |
 | ---------------------------------------- | -------------------------------------------------------------------------------------------------------- |
-| `unauthorized`                           | Unauthorized access to Realtime channel                                                                  |
+| `unauthorized`                           | The RLS write policy on `realtime.messages` denied the broadcast                                         |
 | `payload_size_exceeded`                  | The broadcast payload is larger than the tenant's maximum payload size                                   |
 | `rls_policy_error`                       | Error on RLS policy used for authorization                                                               |
 | `query_canceled`                         | A database query was canceled, usually due to a statement timeout                                        |
