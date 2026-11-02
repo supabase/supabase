@@ -5,6 +5,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -157,12 +158,12 @@ export const BillingMetric = ({
                     strokeWidth={4}
                     className={
                       isUsageBillingEnabled
-                        ? 'text-gray-dark-800'
+                        ? 'text-foreground-lighter'
                         : isExceededLimit
                           ? 'text-red-900'
                           : isApproachingLimit
                             ? 'text-yellow-1000'
-                            : 'text-gray-dark-800'
+                            : 'text-foreground-lighter'
                     }
                   />
                 </svg>
@@ -205,14 +206,9 @@ export const BillingMetric = ({
             {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan ? (
               <p className="text-foreground-light">
                 We won't enforce this metric until known mis-reporting issues are resolved.{' '}
-                <a
-                  href="https://github.com/orgs/supabase/discussions/50925"
-                  target="_blank"
-                  rel="noreferrer"
-                  className="underline"
-                >
+                <InlineLink href="https://github.com/orgs/supabase/discussions/50925">
                   Share feedback on GitHub.
-                </a>
+                </InlineLink>
               </p>
             ) : (
               <>
