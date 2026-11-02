@@ -173,7 +173,7 @@ export const ResourceExhaustionWarningBanner = () => {
 
   const isFreePlan = organization?.plan?.id === 'free'
   const diskSpaceDescription = (() => {
-    if (organization === undefined) return undefined
+    if (organization === undefined) return warningContent?.description
     return isFreePlan
       ? DISK_SPACE_EXHAUSTION_DESCRIPTION.free
       : DISK_SPACE_EXHAUSTION_DESCRIPTION.paid

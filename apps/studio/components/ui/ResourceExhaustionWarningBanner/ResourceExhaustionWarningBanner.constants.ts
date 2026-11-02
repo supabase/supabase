@@ -24,7 +24,7 @@ type ResourceWarningMessages = Record<string, ResourceWarningMessage>
 
 export const DISK_SPACE_EXHAUSTION_DESCRIPTION = {
   free: "Free Plan disks don't expand automatically. Free up space, or upgrade to the Pro Plan for a disk that expands as it fills up.",
-  paid: 'Your disk expands automatically as it fills up. To expand it sooner, increase the disk size on the Infrastructure page.',
+  paid: 'Your disk expands automatically as it fills up. The Infrastructure page shows its current size and any limits on resizing it.',
 }
 
 const RESOURCE_WARNING_MESSAGE_CONFIG = {
@@ -94,11 +94,13 @@ const RESOURCE_WARNING_MESSAGE_CONFIG = {
       warning: {
         title:
           'Your project is about to exhaust its available disk space, and may become unresponsive once fully exhausted',
-        description: DISK_SPACE_EXHAUSTION_DESCRIPTION.paid,
+        description:
+          "The Infrastructure page shows your disk's current size and any limits on resizing it.",
       },
       critical: {
         title: 'Your project has exhausted its available disk space, and may become unresponsive',
-        description: DISK_SPACE_EXHAUSTION_DESCRIPTION.paid,
+        description:
+          "The Infrastructure page shows your disk's current size and any limits on resizing it.",
       },
     },
     cardContent: {
