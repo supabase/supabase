@@ -35,10 +35,12 @@ region: 'Europe'
 supabase_products: ['database', 'auth', 'functions', 'storage']
 ---
 
-{/* TODO(Wendie): the Quote component only shows the caption when img is set. Get headshots for Arianna Bruni, Nitin Govardhane, and Emily Sofia Menghi, add them to apps/www/public/images/blog/avatars, and add img="file.jpg" to every Quote before merging. */}
+<Quote>
 
-<Quote caption="Arianna Bruni, CEO of BeeAPro">
-  I would suggest Supabase for any new application. It scales well and just works in production.
+I would suggest Supabase for any new application. It scales well and just works in production.
+
+Arianna Bruni, CEO of BeeAPro
+
 </Quote>
 
 BeeAPro is an Italian training platform for companies in compliance-heavy industries, such as finance, legal, and IT. Trainers upload their documents, slides, and videos, and AI helps them turn that material into short, interactive lessons for their company's employees. Learners answer questions to unlock the next lesson, practice in a text-based role-play game, and earn a certification at the end. For the companies that use it, BeeAPro is a complete training platform that covers building the course and certifying the people who take it.
@@ -56,8 +58,12 @@ The founding team started the company in 2025. They saw a common problem: compan
 
 The first version of BeeAPro ran on a custom microservice platform, with a front end the team built themselves. It did not work for users or for the team.
 
-<Quote caption="Arianna Bruni, CEO of BeeAPro">
-  The first version of BeeAPro was really ugly. It was hard to use and hard to maintain.
+<Quote>
+
+The first version of BeeAPro was really ugly. It was hard to use and hard to maintain.
+
+Arianna Bruni, CEO of BeeAPro
+
 </Quote>
 
 The team dropped it and rethought the product. For the second version, they built a prototype of the BeeAPro platform on Lovable, which uses Supabase as its backend. A month later, in September 2025, they saw that Lovable could not get them to a production-ready platform with their setup. So they took the code out of Lovable, started their own development process, and kept Supabase as the backend.
@@ -66,16 +72,22 @@ The team dropped it and rethought the product. For the second version, they buil
 
 BeeAPro founders knew what a production-ready solution looked like. They had previously built and run an insurance platform on MongoDB Atlas. It handles around 60 million motor insurance quotations a month, in a heavily regulated industry. Then they measured Supabase against that experience and made the technical call themselves.
 
-<Quote caption="Nitin Govardhane, Software Engineer at BeeAPro">
-  I know very well when something is ready for production. Supabase has proven itself to be a stable
-  platform that we can reliably use and build on.
+<Quote>
+
+I know very well when something is ready for production. Supabase has proven itself to be a stable platform that we can reliably use and build on.
+
+Nitin Govardhane, Software Engineer at BeeAPro
+
 </Quote>
 
 Stability got Supabase in the door. Beyond that, the team values the open-source core Supabase built its business around, and above all the support from the Supabase team. BeeAPro's technical team is lean, with three people, so a quick answer from someone who knows the platform matters more to them than any single feature.
 
-<Quote caption="Arianna Bruni, CEO of BeeAPro">
-  Above the technology, the support is really responsive. We get a response immediately, and we have
-  an engineer to talk to about our problems. For me, this is the most important thing.
+<Quote>
+
+Above the technology, the support is really responsive. We get a response immediately, and we have an engineer to talk to about our problems. For me, this is the most important thing.
+
+Arianna Bruni, CEO of BeeAPro
+
 </Quote>
 
 ## One Supabase project behind every company's courses
@@ -86,9 +98,12 @@ BeeAPro runs its whole backend on one Supabase project. Postgres holds the data,
 
 What keeps this safe for compliance-minded companies is Row Level Security. BeeAPro keeps every company in the same tables and lets the database decide who sees what.
 
-<Quote caption="Emily Sofia Menghi, Marketing Manager at BeeAPro">
-  We have one table with the courses. We slice that table using Row Level Security, so we can say this
-  company can access this course, and this other company can access these courses.
+<Quote>
+
+We have one table with the courses. We slice that table using Row Level Security, so we can say this company can access this course, and this other company can access these courses.
+
+Emily Sofia Menghi, Marketing Manager at BeeAPro
+
 </Quote>
 
 The team applies the same approach to almost every table, which keeps the data structure simple even though each new feature ships with a migration.
@@ -101,17 +116,24 @@ The rest of the stack is there so the team can spend its time shipping features 
 
 Edge Functions work the same way. They build on those same authenticated users, so a new feature is a new function, which keeps the release loop short. Branching gives each feature a running copy of the application to test before it reaches production. The team builds with Claude Code, and the whole process is fully automated.
 
-<Quote caption="Nitin Govardhane, Software Engineer at BeeAPro">
-  Every time we deploy a new feature, we build a new application on the fly, we test it, and when
-  everything is fine, we deploy in production.
+<Quote>
+
+Every time we deploy a new feature, we build a new application on the fly, we test it, and when everything is fine, we deploy in production.
+
+Nitin Govardhane, Software Engineer at BeeAPro
+
 </Quote>
 
 ## Daily releases from a team of three
 
 That setup pays off in speed.
 
-<Quote caption="Emily Sofia Menghi, Marketing Manager at BeeAPro">
-  We deploy new features a couple of times per day, so our development process is really quick.
+<Quote>
+
+We deploy new features a couple of times per day, so our development process is really quick.
+
+Emily Sofia Menghi, Marketing Manager at BeeAPro
+
 </Quote>
 
 Since going into production in May 2026, BeeAPro has grown to about 2,000 customers. A technical team of three runs the platform inside a company of 10 people.
@@ -122,9 +144,12 @@ Nethesis chose BeeAPro to distribute cybersecurity and NIS2 compliance courses a
 
 With the platform ready, BeeAPro plans to put its investment into sales and marketing over the next 12 months.
 
-<Quote caption="Emily Sofia Menghi, Marketing Manager at BeeAPro">
-  The platform is ready. We know we can scale easily with Supabase, so we can just add additional
-  servers when needed.
+<Quote>
+
+The platform is ready. We know we can scale easily with Supabase, so we can just add additional servers when needed.
+
+Emily Sofia Menghi, Marketing Manager at BeeAPro
+
 </Quote>
 
 Hiring will follow the workload. The founders expect new companies to ask for new features, and that may mean more developers.
