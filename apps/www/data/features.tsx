@@ -1779,7 +1779,7 @@ Supabase’s Image Transformations feature enables developers to dynamically man
 3. Resize modes: Choose from ‘cover’, ‘contain’, or ‘fill’ to control how images fit within specified dimensions.
 4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing egress usage.
 5. Flexible implementation: Utilize with public URLs, signed URLs, or direct downloads to fit various access control needs ([Server-side Auth](/features/server-side-auth)).
-6. [Next.js integration](/nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
+6. [Next.js integration](/docs/guides/getting-started/tutorials/with-nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
 7. Self-hosting option: Deploy your own image transformation service using Imgproxy for greater control and customization.
 
 
