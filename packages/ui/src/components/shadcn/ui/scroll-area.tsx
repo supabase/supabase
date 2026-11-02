@@ -5,6 +5,8 @@ import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'
 
+const ScrollRoot = ScrollAreaPrimitive.Root
+
 const ScrollArea = React.forwardRef<
   React.ElementRef<typeof ScrollAreaPrimitive.Root>,
   React.ComponentPropsWithoutRef<typeof ScrollAreaPrimitive.Root>
@@ -58,4 +60,4 @@ const ScrollBar = React.forwardRef<
 ))
 ScrollBar.displayName = ScrollAreaPrimitive.ScrollAreaScrollbar.displayName
 
-export { ScrollArea, ScrollBar, ScrollViewport }
+export { ScrollArea, ScrollBar, ScrollRoot, ScrollViewport }

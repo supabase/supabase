@@ -1,5 +1,6 @@
 import { preprocessMdxWithDefaults } from '~/features/directives/utils'
 import { components } from '~/features/docs/MdxBase.shared'
+import { remarkUniqueHeadingIds } from '~/lib/mdx/plugins/remarkUniqueHeadingIds'
 import { SerializeOptions } from '~/types/next-mdx-remote-serialize'
 import { isFeatureEnabled } from 'common'
 import { MDXRemote } from 'next-mdx-remote-client/rsc'
@@ -10,7 +11,11 @@ import remarkMath from 'remark-math'
 
 const mdxOptions: SerializeOptions = {
   mdxOptions: {
-    remarkPlugins: [[remarkMath, { singleDollarTextMath: false }], remarkGfm],
+    remarkPlugins: [
+      [remarkMath, { singleDollarTextMath: false }],
+      remarkGfm,
+      remarkUniqueHeadingIds,
+    ],
     rehypePlugins: [rehypeKatex as any],
   },
 }

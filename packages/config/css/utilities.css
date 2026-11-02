@@ -189,6 +189,43 @@
 }
 
 /*
+ * Fades the top edge of a vertical scroll area once the content scrolls under it
+ */
+@property --scroll-fade-top {
+  syntax: '<length>';
+  initial-value: 0px;
+  inherits: false;
+}
+
+/* the fade grows over the first 48px of the scroll */
+@keyframes scroll-fade-top {
+  from {
+    --scroll-fade-top: 0px;
+  }
+  to {
+    --scroll-fade-top: 24px;
+  }
+}
+
+@utility scroll-fade-top {
+  @supports (animation-timeline: scroll()) {
+    mask-image: linear-gradient(
+      to bottom,
+      transparent 0,
+      rgb(0 0 0 / 0.15) calc(var(--scroll-fade-top) * 0.25),
+      rgb(0 0 0 / 0.5) calc(var(--scroll-fade-top) * 0.5),
+      rgb(0 0 0 / 0.85) calc(var(--scroll-fade-top) * 0.75),
+      #000 var(--scroll-fade-top)
+    );
+    animation-name: scroll-fade-top;
+    animation-timing-function: linear;
+    animation-fill-mode: both;
+    animation-timeline: scroll(self block);
+    animation-range: 0 48px;
+  }
+}
+
+/*
  * Functional color utilities. The `--value(--color-*)` token accepts any
  * registered --color-* design token (e.g. highlight-foreground-light).
  */
