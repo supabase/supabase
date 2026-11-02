@@ -63,6 +63,15 @@ export default async function BlogPage() {
         totalPosts={allPosts.length}
         initialView={initialView}
       />
+      <noscript>
+        <ul className="flex flex-col gap-2 py-8 text-sm">
+          {allPosts.slice(INITIAL_POSTS_LIMIT).map((post) => (
+            <li key={post.slug}>
+              <a href={post.path}>{post.title}</a>
+            </li>
+          ))}
+        </ul>
+      </noscript>
     </>
   )
 }
