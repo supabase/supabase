@@ -23,6 +23,7 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
@@ -152,6 +153,10 @@ export const MergeActions = ({
   })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
 
   const {
     diffContent,
@@ -222,10 +227,12 @@ export const MergeActions = ({
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem
             className="gap-x-2"
+            disabled={updateBranchGrant.status !== 'granted'}
             onClick={() => {
-              if (!ref || !parentProjectRef) return
+              if (!ref || !parentProjectRef || updateBranchGrant.status !== 'granted') return
               updateBranch(
                 {
+                  grant: updateBranchGrant.grant,
                   branchRef: ref,
                   projectRef: parentProjectRef,
                   requestReview: false,
