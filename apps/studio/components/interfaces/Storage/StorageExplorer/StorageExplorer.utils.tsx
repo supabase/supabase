@@ -195,6 +195,23 @@ export function getStoragePathForItem(
   return folders.length > 0 ? `${folders.join('/')}/${item.name}` : item.name
 }
 
+/**
+ * Public URL of an object in a public bucket. Each path segment is encoded so that
+ * characters such as `?`, `#` and `%` in names stay part of the object path.
+ */
+export function getPublicObjectUrl({
+  endpoint,
+  bucketId,
+  path,
+}: {
+  endpoint: string
+  bucketId: string
+  path: string
+}): string {
+  const encodedPath = path.split('/').map(encodeURIComponent).join('/')
+  return `${endpoint}/storage/v1/object/public/${encodeURIComponent(bucketId)}/${encodedPath}`
+}
+
 /** Absolute dashboard URL that reopens the item in the storage explorer */
 export function getStorageExplorerUrlForItem({
   openedFolders,

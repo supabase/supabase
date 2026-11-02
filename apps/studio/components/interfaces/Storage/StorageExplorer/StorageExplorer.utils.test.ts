@@ -14,6 +14,7 @@ import {
   describeUploadFailure,
   getPathAlongFoldersToIndex,
   getPathAlongOpenedFolders,
+  getPublicObjectUrl,
   getReplaceableFileNames,
   getStorageExplorerUrlForItem,
   getStorageItemPath,
@@ -592,5 +593,24 @@ describe('getReplaceableFileNames', () => {
         versioningState: 'enabled',
       })
     ).toEqual(['a.txt'])
+  })
+})
+
+describe('getPublicObjectUrl', () => {
+  const endpoint = 'https://ref.supabase.co'
+
+  it('builds the public URL for a plain path', () => {
+    expect(getPublicObjectUrl({ endpoint, bucketId: 'public', path: 'docs/report.txt' })).toBe(
+      'https://ref.supabase.co/storage/v1/object/public/public/docs/report.txt'
+    )
+  })
+
+  it('encodes reserved characters in each path segment but keeps the slashes', () => {
+    expect(getPublicObjectUrl({ endpoint, bucketId: 'public', path: 'what?/report?.txt' })).toBe(
+      'https://ref.supabase.co/storage/v1/object/public/public/what%3F/report%3F.txt'
+    )
+    expect(getPublicObjectUrl({ endpoint, bucketId: 'public', path: 'a#b/100% done.txt' })).toBe(
+      'https://ref.supabase.co/storage/v1/object/public/public/a%23b/100%25%20done.txt'
+    )
   })
 })

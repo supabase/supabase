@@ -38,6 +38,7 @@ import {
   formatTime,
   getFilesDataTransferItems,
   getPathAlongFoldersToIndex,
+  getPublicObjectUrl,
   getReplaceableFileNames,
   getStorageItemPath,
   getUploadNameConflicts,
@@ -873,7 +874,11 @@ export function createStorageExplorerState({
           for (const filePath of filePaths) {
             urlByPath.set(
               filePath,
-              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
+              getPublicObjectUrl({
+                endpoint: clientEndpoint,
+                bucketId: state.selectedBucket.id,
+                path: filePath,
+              })
             )
           }
         } else {
