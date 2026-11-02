@@ -43,6 +43,7 @@ import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import {
+  getLegacyPipelineLogsUrl,
   getPipelineDisplayState,
   getPipelineLogsUrl,
   getRestartRequestStatus,
@@ -52,6 +53,7 @@ import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -80,6 +82,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
   const { ref: projectRef, pipelineId } = useParams()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
@@ -205,7 +208,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     }
   }
 
-  const logsUrl = getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+  const logsUrl = isUnifiedLogsEnabled
+    ? getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+    : getLegacyPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
 
   return (
     <div className="flex min-h-full w-full flex-col items-stretch">

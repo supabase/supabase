@@ -81,6 +81,7 @@ import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -121,6 +122,9 @@ export const UnifiedLogs = ({
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
+  const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
+  // Keep linked Pipelines filters until replication sources load.
+  const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
   const computeAvailability = getComputeLogsAvailability({
@@ -133,6 +137,7 @@ export const UnifiedLogs = ({
     getLogTypeVisibility(
       {
         multigres: showMultigresLogs,
+        pipelines: canShowPipelinesLogs,
         compute: computeAvailability.preserveComputeFilter,
       },
       scope
@@ -180,11 +185,12 @@ export const UnifiedLogs = ({
       getLogTypeVisibility(
         {
           multigres: showMultigresLogs,
+          pipelines: canShowPipelinesLogs,
           compute: computeAvailability.canQueryCompute,
         },
         scope
       ),
-    [showMultigresLogs, computeAvailability.canQueryCompute, scope]
+    [showMultigresLogs, canShowPipelinesLogs, computeAvailability.canQueryCompute, scope]
   )
 
   const searchParameters = useMemo(() => {
@@ -372,8 +378,13 @@ export const UnifiedLogs = ({
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
+    const canFilterByPipeline = queryLogTypeVisibility.pipelines !== false
     const gatedFields = gateLogTypeOptions(
-      defaultFilterFields.filter((field) => isOfferedFilter(field.value, offeredFilters)),
+      defaultFilterFields.filter(
+        (field) =>
+          isOfferedFilter(field.value, offeredFilters) &&
+          (field.value !== 'pipeline_id' || canFilterByPipeline)
+      ),
       queryLogTypeVisibility
     )
 
@@ -427,7 +438,7 @@ export const UnifiedLogs = ({
   useFilterSearchSync({
     applyFilterSearch,
     columnFilters,
-    enabled: computeAvailability.readyToSyncFilters,
+    enabled: computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs,
   })
 
   useEffect(() => {

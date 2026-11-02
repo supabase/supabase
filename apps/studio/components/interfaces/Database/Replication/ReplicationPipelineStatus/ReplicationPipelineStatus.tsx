@@ -33,13 +33,14 @@ import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoad
 
 import { BatchRestartDialog } from '../BatchRestartDialog'
 import { ErrorDetailsDialog } from '../ErrorDetailsDialog'
-import { getPipelineLogsUrl, getStatusName } from '../Pipeline.utils'
+import { getLegacyPipelineLogsUrl, getPipelineLogsUrl, getStatusName } from '../Pipeline.utils'
 import { PipelineStatusName } from '../Replication.constants'
 import { RestartTableDialog } from '../RestartTableDialog'
 import { PipelineHealthSection } from './PipelineHealthSection'
 import { getPipelineStateNotice, getTableStatusEmptyState } from './PipelineOverview.utils'
 import { getDisabledStateConfig } from './ReplicationPipelineStatus.utils'
 import { TableReplicationRow } from './TableReplicationRow'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { AlertError } from '@/components/ui/AlertError'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -113,6 +114,7 @@ const PipelineOverviewSkeleton = () => (
  */
 export const ReplicationPipelineStatus = () => {
   const { ref: projectRef, pipelineId } = useParams()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const [searchString, setSearchString] = useQueryState('search', parseAsString.withDefault(''))
 
   const [showErrorDialog, setShowErrorDialog] = useState(false)
@@ -218,7 +220,9 @@ export const ReplicationPipelineStatus = () => {
   const stateNotice = getPipelineStateNotice({ requestStatus, statusName, tableStatuses })
   const isSlotDisconnected =
     !isStatusError && statusName === PipelineStatusName.STARTED && applyLagMetrics?.active === false
-  const logsUrl = getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+  const logsUrl = isUnifiedLogsEnabled
+    ? getPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
+    : getLegacyPipelineLogsUrl({ projectRef: projectRef!, pipelineId })
   const emptyState = getTableStatusEmptyState({
     isDisabled: showDisabledState,
     disabledStateConfig: config,

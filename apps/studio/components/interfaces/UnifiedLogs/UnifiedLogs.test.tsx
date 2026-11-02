@@ -19,8 +19,17 @@ import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 type AnalyticsResponse = components['schemas']['AnalyticsResponse_Output']
 type ProjectResponse = components['schemas']['ProjectDetailResponse_Output']
+type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const FUNCTION_SCOPE = getEdgeFunctionLogsScope('fn-123')
+const PIPELINES_ENABLED_FLAGS = { etlEnableBigQueryPrivateAlpha: 'all' }
+
+const mockReplicationSources = (sources: SourcesResponse['sources']) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/:ref/sources',
+    response: () => HttpResponse.json<SourcesResponse>({ sources }),
+  })
 
 mockAnimationsApi()
 
@@ -149,9 +158,21 @@ describe('UnifiedLogs', () => {
           HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
         )
       )
+      mockReplicationSources([
+        {
+          id: 1,
+          name: 'default',
+          tenant_id: 'tenant',
+          config: { host: 'db.internal', port: 5432, name: 'postgres', username: 'postgres' },
+        },
+      ])
       customRender(
         <FeatureFlagContext.Provider
-          value={{ configcat: { otelUnifiedLogs: useOtel }, posthog: {}, hasLoaded: true }}
+          value={{
+            configcat: { otelUnifiedLogs: useOtel, ...PIPELINES_ENABLED_FLAGS },
+            posthog: {},
+            hasLoaded: true,
+          }}
         >
           <UnifiedLogs hasFilterSideBar={false} />
         </FeatureFlagContext.Provider>,
@@ -180,6 +201,33 @@ describe('UnifiedLogs', () => {
       expect((await screen.findAllByText(/table_id/)).length).toBeGreaterThan(0)
     }
   )
+
+  it('hides Pipelines logs for projects without a replication source', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () => HttpResponse.json<AnalyticsResponse>({ result: [] }),
+    })
+    mockReplicationSources([])
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{
+          configcat: { otelUnifiedLogs: true, ...PIPELINES_ENABLED_FLAGS },
+          posthog: {},
+          hasLoaded: true,
+        }}
+      >
+        <UnifiedLogs />
+      </FeatureFlagContext.Provider>,
+      { nuqs: { hasMemory: true, searchParams: '?filter=log_type:eq:pipelines' } }
+    )
+
+    expect(await screen.findByText('No results found', {}, { timeout: 5_000 })).toBeInTheDocument()
+    expect(screen.getAllByText('Postgres').length).toBeGreaterThan(0)
+    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Pipeline ID' })).not.toBeInTheDocument()
+  }, 15_000)
 
   it('limits function logs to the supported filters and scopes rows, counts, and chart requests', async () => {
     const user = userEvent.setup()

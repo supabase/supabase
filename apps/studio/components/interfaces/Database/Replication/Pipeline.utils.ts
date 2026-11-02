@@ -3,20 +3,29 @@ import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/Unifie
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
 
-export function getPipelineLogsUrl({
+/** Unified logs filtered to Pipelines, and to one pipeline when `pipelineId` is set. */
+export const getPipelineLogsUrl = ({
   projectRef,
   pipelineId,
 }: {
   projectRef: string
   pipelineId?: string
-}) {
+}) =>
+  serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
+    filter: ['log_type:eq:pipelines', ...(pipelineId ? [`pipeline_id:eq:${pipelineId}`] : [])],
+  })
+
+/** Legacy Pipelines logs collection, filtered to one pipeline when `pipelineId` is set. */
+export const getLegacyPipelineLogsUrl = ({
+  projectRef,
+  pipelineId,
+}: {
+  projectRef: string
+  pipelineId?: string
+}) => {
   const path = `/project/${projectRef}/logs/pipelines-logs`
   if (!pipelineId) return path
-
-  const query = new URLSearchParams({ f: JSON.stringify({ pipeline_id: pipelineId }) })
-  return serializeUnifiedLogsSearchParams(`${path}?${query}`, {
-    filter: [`pipeline_id:eq:${pipelineId}`],
-  })
+  return `${path}?${new URLSearchParams({ f: JSON.stringify({ pipeline_id: pipelineId }) })}`
 }
 
 export const getStatusName = (

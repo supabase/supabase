@@ -1,30 +1,20 @@
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { useParams } from 'common'
 
-import { LogPage as LegacyLogPage } from './replication-logs'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { UnifiedLogs } from '@/components/interfaces/UnifiedLogs/UnifiedLogs'
-import type { UnifiedLogsScope } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import LogsLayout from '@/components/layouts/LogsLayout/LogsLayout'
 import type { NextPageWithLayout } from '@/types'
 
-const PIPELINES_LOGS_SCOPE: UnifiedLogsScope = {
-  filters: [{ column: 'log_type', operator: '=', value: 'pipelines' }],
-}
-
 export const LogPage: NextPageWithLayout = () => {
-  const { isEnabled, isLoading } = useUnifiedLogsPreview()
-  if (isLoading) return <GenericSkeletonLoader />
-  if (!isEnabled) return <LegacyLogPage dehydratedState={undefined} />
+  const { ref } = useParams()
 
-  return (
-    <UnifiedLogs
-      scope={PIPELINES_LOGS_SCOPE}
-      hasFilterSideBar={false}
-      offeredFilters={['date', 'level', 'pipeline_id', 'event_message']}
-      columnPreferencesKey="pipelines"
-    />
-  )
+  return <LogsPreviewer condensedLayout queryType="pipelines" projectRef={ref!} />
 }
 
-LogPage.getLayout = LegacyLogPage.getLayout
+LogPage.getLayout = (page) => (
+  <DefaultLayout>
+    <LogsLayout title="Pipelines Logs">{page}</LogsLayout>
+  </DefaultLayout>
+)
 
 export default LogPage

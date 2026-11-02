@@ -13,18 +13,16 @@ import {
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { FeaturePreviewSidebarPanel } from '../../ui/FeaturePreviewSidebarPanel'
-import { getPipelineLogsUrl } from '@/components/interfaces/Database/Replication/Pipeline.utils'
-import { useIsPipelinesEnabled } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
 import { LOG_DRAIN_TYPES } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { SavedQueriesItem } from '@/components/interfaces/Settings/Logs/Logs.SavedQueriesItem'
 import { LogsSidebarItem } from '@/components/interfaces/Settings/Logs/SidebarV2/SidebarItem'
 import { UnifiedLogsBanner } from '@/components/interfaces/UnifiedLogs/UnifiedLogsBanner'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useContentQuery } from '@/data/content/content-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
 import { useShowPostgresUpgradeLogs } from '@/hooks/misc/useShowPostgresUpgradeLogs'
 
 export function SidebarCollapsible({
@@ -71,22 +69,7 @@ export function LogsSidebarMenuV2() {
     'logs:collections',
   ])
 
-  const isPipelinesEnabled = useIsPipelinesEnabled()
-  const { data: pipelineSources, isPending: isLoadingPipelineSources } = useReplicationSourcesQuery(
-    {
-      projectRef: ref,
-    },
-    {
-      enabled: isPipelinesEnabled,
-      retry: false,
-      refetchOnMount: false,
-      refetchOnWindowFocus: false,
-    }
-  )
-
-  // Show Pipelines logs for projects with Pipelines enabled and an existing source.
-  const showPipelinesLogs =
-    isPipelinesEnabled && (pipelineSources?.sources?.length ?? 0) > 0 && !isLoadingPipelineSources
+  const { showPipelinesLogs } = useShowPipelinesLogs()
 
   const { hasAccess: hasDedicatedPooler } = useCheckEntitlements('dedicated_pooler')
   const showMultigresLogs = useShowMultigresLogs()
@@ -179,8 +162,8 @@ export function LogsSidebarMenuV2() {
     showPipelinesLogs
       ? {
           name: 'Pipelines',
-          key: 'replication_logs',
-          url: getPipelineLogsUrl({ projectRef: ref }),
+          key: 'pipelines-logs',
+          url: `/project/${ref}/logs/pipelines-logs`,
           items: [],
         }
       : null,
@@ -259,9 +242,7 @@ export function LogsSidebarMenuV2() {
         <>
           <SidebarCollapsible title="Collections" defaultOpen={true}>
             {filteredLogs.map((collection) => {
-              const isItemActive =
-                isActive(collection?.url ?? '') ||
-                (collection.key === 'replication_logs' && isActive('/logs/replication-logs'))
+              const isItemActive = isActive(collection?.url ?? '')
               return (
                 <LogsSidebarItem
                   key={collection?.key ?? ''}

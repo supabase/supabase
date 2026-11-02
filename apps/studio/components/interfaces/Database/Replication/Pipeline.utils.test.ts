@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 
 import {
+  getLegacyPipelineLogsUrl,
   getPipelineDisplayState,
   getPipelineLogsUrl,
   getRestartRequestStatus,
@@ -34,20 +35,38 @@ describe('restart feedback', () => {
 
 describe('Pipelines logs links', () => {
   test.each(['150', '03dg2o5teb2eucxr9ggh3uie6', 'opaque:id'])(
-    'preserves identity %s for both viewers at the canonical URL',
+    'filters unified logs to Pipelines and pipeline %s',
     (pipelineId) => {
       const url = new URL(
         getPipelineLogsUrl({ projectRef: 'project', pipelineId }),
         'http://localhost'
       )
+      expect(url.pathname).toBe('/project/project/logs')
+      expect(url.searchParams.get('filter')).toBe(
+        `log_type:eq:pipelines,pipeline_id:eq:${pipelineId}`
+      )
+    }
+  )
+
+  test('filters unified logs to Pipelines without a pipeline', () => {
+    const url = new URL(getPipelineLogsUrl({ projectRef: 'project' }), 'http://localhost')
+    expect(url.searchParams.get('filter')).toBe('log_type:eq:pipelines')
+  })
+
+  test.each(['150', '03dg2o5teb2eucxr9ggh3uie6'])(
+    'filters the legacy collection to pipeline %s',
+    (pipelineId) => {
+      const url = new URL(
+        getLegacyPipelineLogsUrl({ projectRef: 'project', pipelineId }),
+        'http://localhost'
+      )
       expect(url.pathname).toBe('/project/project/logs/pipelines-logs')
-      expect(url.searchParams.get('filter')).toBe(`pipeline_id:eq:${pipelineId}`)
       expect(JSON.parse(url.searchParams.get('f')!)).toEqual({ pipeline_id: pipelineId })
     }
   )
 
-  test('opens all Pipelines logs from the sidebar', () => {
-    expect(getPipelineLogsUrl({ projectRef: 'project' })).toBe(
+  test('opens the full legacy collection without a pipeline', () => {
+    expect(getLegacyPipelineLogsUrl({ projectRef: 'project' })).toBe(
       '/project/project/logs/pipelines-logs'
     )
   })
