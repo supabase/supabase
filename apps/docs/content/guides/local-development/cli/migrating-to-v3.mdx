@@ -40,7 +40,7 @@ steps:
       version: v2.stable
 ```
 
-From `supabase/setup-cli` v3.2.0, `version` also accepts an npm semver range, such as `^2` or `~2.122.0`, and installs the newest release that matches it. `v2.stable` and ranges need `supabase/setup-cli@v3`. Moving the action to `@v3` doesn't upgrade the CLI while `version` pins v2.
+From `supabase/setup-cli` v3.2.0, `version` also accepts an npm semver range, such as `^2` or `~2.122.0`. The action installs npm's `latest` version if it matches the range, and otherwise the highest matching version that isn't deprecated. `v2.stable` and ranges need `supabase/setup-cli@v3`. Moving the action to `@v3` doesn't upgrade the CLI while `version` pins v2.
 
 During the transition, some commands work the same way on both majors. For example, `supabase db push --linked --yes` runs against the linked project on v2 and v3. v3 warns about `--linked`, which you can switch to `--remote` once you've upgraded.
 
@@ -54,6 +54,8 @@ v2 continues to receive security fixes and fixes for broken behavior, but no new
 | Homebrew       | `brew install supabase/tap/supabase@2`                           |
 | Scoop          | `scoop install supabase-v2-stable`                               |
 | GitHub Actions | `version: v2.stable` or `version: ^2` on `supabase/setup-cli@v3` |
+
+The `supabase` and `supabase@2` Homebrew formulas conflict, so if you installed v3 with Homebrew, run `brew uninstall supabase` before you install `supabase@2`.
 
 ## Quick reference for CI
 
