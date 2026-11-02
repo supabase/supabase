@@ -101,7 +101,7 @@ export const TotalUsage = ({
         return metricUsage && metricUsage.usage > 0
       })
 
-    const PINNED_METRICS = []
+    const PINNED_METRICS: PricingMetric[] = []
 
     return breakdownMetrics.slice().sort((a, b) => {
       const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
