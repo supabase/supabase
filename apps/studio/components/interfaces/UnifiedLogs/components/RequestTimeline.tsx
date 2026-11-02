@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ClockIcon, RouteIcon } from 'lucide-react'
 import { Skeleton } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
@@ -67,11 +68,13 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
 
   if (!data || data.logs.length === 0) {
     return (
-      <div className="flex flex-col gap-1 p-4 text-sm">
-        <p className="text-foreground-light">No related logs</p>
-        <p className="text-foreground-lighter">
-          Related logs need a shared request, trace, or function execution ID.
-        </p>
+      <div className="p-4">
+        <EmptyStatePresentational
+          icon={RouteIcon}
+          title="No related logs"
+          description="Logs appear here when they share a request, trace, or function execution ID."
+          className="border-0 bg-transparent px-2 py-6"
+        />
       </div>
     )
   }
