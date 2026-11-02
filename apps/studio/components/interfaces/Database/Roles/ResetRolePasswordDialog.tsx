@@ -77,7 +77,8 @@ export const ResetRolePasswordDialog = ({
 
   return (
     <>
-      <Dialog open={open} onOpenChange={handleOpenChange}>
+      {/* Dismissing mid-update would offer to discard a password that is still being saved */}
+      <Dialog open={open} onOpenChange={(nextOpen) => !isUpdating && handleOpenChange(nextOpen)}>
         <DialogContent size="medium">
           <DialogHeader>
             <DialogTitle>Reset password for "{role.name}"</DialogTitle>

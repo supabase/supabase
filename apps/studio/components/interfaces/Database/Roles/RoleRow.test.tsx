@@ -227,5 +227,33 @@ describe('RoleRow', () => {
       expect(await screen.findByLabelText('Password')).toHaveValue('')
       expect(getUpdateQuery()).toBeUndefined()
     })
+
+    test('ignores dismissal while the password is being saved', async () => {
+      let finishUpdate = () => {}
+      const updateFinished = new Promise<void>((resolve) => (finishUpdate = resolve))
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: async ({ request }) => {
+          queries.push(QueryBodySchema.parse(await request.json()).query)
+          await updateFinished
+          return HttpResponse.json<Record<string, unknown>[]>([])
+        },
+      })
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+      await waitFor(() => expect(getUpdateQuery()).toBeDefined())
+
+      await user.keyboard('{Escape}')
+
+      expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toBeInTheDocument()
+
+      finishUpdate()
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+    })
   })
 })
