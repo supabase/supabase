@@ -13,8 +13,11 @@ import { useCallback, useMemo, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Heading } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
+import { IsoShape } from 'ui-patterns/IsoShape/IsoShape'
+import { type IsoShapeName } from 'ui-patterns/IsoShape/IsoShape.shapes'
 
 import { resolveContentListingIcon } from './iconChip'
+import { useShapeMotion } from './useShapeMotion'
 
 const GRID_ITEM_CLASS = {
   // Stay 2-up until xl (~1280px) so cards aren't cramped beside the docs sidebar.
@@ -22,6 +25,16 @@ const GRID_ITEM_CLASS = {
   3: 'col-span-12 md:col-span-6 xl:col-span-4',
   4: 'col-span-12 md:col-span-6 xl:col-span-3',
 } as const
+
+const ISO_SHAPE_BY_ICON: Record<string, IsoShapeName> = {
+  database: 'Database',
+  auth: 'Auth',
+  rls: 'Row Level Security',
+  storage: 'Storage',
+  functions: 'Edge Functions',
+  realtime: 'Realtime',
+  production: 'Production',
+}
 
 function useContentListingClickHandler(group: ContentListingGroup) {
   const sendTelemetryEvent = useSendTelemetryEvent()
@@ -60,7 +73,7 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
     <ol
       aria-labelledby={group.labelledBy}
       aria-label={group.labelledBy ? undefined : (group.heading ?? 'Progression')}
-      className="m-0 flex list-none flex-col items-center p-0"
+      className="@container m-0 flex list-none flex-col items-center p-0"
     >
       {items.map((item, index) => (
         <ContentListingProgressionStep
@@ -92,7 +105,17 @@ function ContentListingProgressionStep({
   onStepActivate: (index: number) => void
   onStepDeactivate: () => void
 }) {
-  const handleActivate = () => onStepActivate(index)
+  const { shapeProps, activate, deactivate } = useShapeMotion()
+  const shape = typeof item.icon === 'string' ? ISO_SHAPE_BY_ICON[item.icon] : undefined
+
+  const handleActivate = () => {
+    activate()
+    onStepActivate(index)
+  }
+  const handleDeactivate = () => {
+    deactivate()
+    onStepDeactivate()
+  }
 
   return (
     <li className="flex w-full flex-col items-center">
@@ -113,9 +136,9 @@ function ContentListingProgressionStep({
         )}
         onClick={() => onItemClick(item)}
         onPointerEnter={handleActivate}
-        onPointerLeave={onStepDeactivate}
+        onPointerLeave={handleDeactivate}
         onFocus={handleActivate}
-        onBlur={onStepDeactivate}
+        onBlur={handleDeactivate}
       >
         <span className="absolute top-0 left-6 max-w-[calc(100%-3rem)] -translate-y-1/2 truncate bg-background px-2 text-foreground-light group-hover:text-foreground group-focus-visible:text-foreground">
           <span className="text-foreground-lighter group-hover:text-foreground-light group-focus-visible:text-foreground-light">
@@ -140,6 +163,19 @@ function ContentListingProgressionStep({
           aria-hidden
           className="absolute right-px bottom-px hidden h-px w-3 origin-right rotate-45 bg-foreground-light group-hover:block group-focus-visible:block"
         />
+        {shape ? (
+          <IsoShape
+            name={shape}
+            {...shapeProps}
+            preserveAspectRatio="xMidYMid meet"
+            className={cn(
+              'absolute top-1/2 right-full mr-10 hidden h-16 w-20 -translate-y-1/2 fill-background text-foreground-muted',
+              '@2xl:group-hover:block @2xl:group-focus-visible:block',
+              // the fitted area leaves room for the raised shackle, so the lock sits low
+              shape === 'Auth' && '-mt-2'
+            )}
+          />
+        ) : null}
       </a>
     </li>
   )
