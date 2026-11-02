@@ -13,6 +13,10 @@ import { unified } from 'unified'
 import YAML from 'yaml'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
+import { toContentId } from '../src/lib/content-id.ts'
+import { formatDisplayDate } from '../src/lib/format-date.ts'
+import { KB_BASE_URL } from '../src/lib/json-ld.ts'
+import { getSitemapLastmods } from '../src/lib/sitemap-lastmod.ts'
 import { isInTopic, TOPICS, topicToSlug, type Topic } from '../src/lib/topics.ts'
 import { addBaseUrlPrefix, stripHeadingCustomIds } from './helpers.ts'
 
@@ -38,6 +42,8 @@ interface Frontmatter {
 interface Entry {
   title: string
   url: string
+  // Display date, e.g. "Sep 24, 2026"; absent for entries without a date
+  updated?: string
 }
 
 // Single processor reused for every file: parses GFM markdown to an mdast
@@ -137,7 +143,12 @@ export function renderTopicMarkdown(
 
 const renderLinkList = (entries: Entry[]) =>
   entries.length
-    ? entries.map((entry) => `- [${entry.title}](${entry.url})`).join('\n')
+    ? entries
+        .map(
+          (entry) =>
+            `- [${entry.title}](${entry.url})${entry.updated ? ` (updated ${entry.updated})` : ''}`
+        )
+        .join('\n')
     : 'No entries'
 
 /**
@@ -208,6 +219,7 @@ async function writeFileEnsuringDir(outputPath: string, contents: string) {
 
 async function main() {
   const files = await findContentFiles(CONTENT_DIR)
+  const lastmods = await getSitemapLastmods()
 
   const guidesByTopic = new Map<Topic, Entry[]>(TOPICS.map((topic) => [topic.name, []]))
   const entriesByCollection: Record<'guides' | 'faqs' | 'troubleshooting', Entry[]> = {
@@ -229,7 +241,12 @@ async function main() {
       // the first folder under src/content is the collection, e.g. guides, faqs or troubleshooting
       const collection = relativePath.split(path.sep)[0] as keyof typeof entriesByCollection
       const topics: string[] = Array.isArray(data.topics) ? data.topics : []
-      const entry: Entry = { title: data.title ?? relativePath, url: toMdUrl(relativePath) }
+      const lastmod = lastmods.get(`${KB_BASE_URL}/${toContentId(relativePath)}`)
+      const entry: Entry = {
+        title: data.title ?? relativePath,
+        url: toMdUrl(relativePath),
+        updated: lastmod && formatDisplayDate(new Date(lastmod)),
+      }
       entriesByCollection[collection]?.push(entry)
       for (const { name } of TOPICS) {
         if (isInTopic({ collection, topics, topic: name })) guidesByTopic.get(name)!.push(entry)
