@@ -3075,8 +3075,7 @@ From then on, every member with a matching Supabase account is connected the nex
 `,
     icon: ShieldCheck,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
-    heroImage:
-      '/images/blog/2026-08-24-enterprise-managed-auth-for-the-supabase-mcp-server/thumb.png',
+    heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authorization',
     blogUrl: '[INSERT NEW BLOG POST URL HERE]',
     slug: 'enterprise-managed-auth-for-mcp',
