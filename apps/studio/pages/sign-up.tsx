@@ -1,3 +1,4 @@
+import Head from 'next/head'
 import Link from 'next/link'
 import { useState } from 'react'
 import { Button, cn } from 'ui'
@@ -10,7 +11,19 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
+
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Sign up', brand: 'Supabase' })
+const PAGE_DESCRIPTION =
+  'Sign up for Supabase. Start for free. Build production-grade applications with a Postgres database, Authentication, instant APIs, Realtime, Functions, Storage and Vector embeddings.'
+
+const SignUpPageHead = () => (
+  <Head>
+    <title>{PAGE_TITLE}</title>
+    <meta name="description" content={PAGE_DESCRIPTION} />
+  </Head>
+)
 
 const SignUpPage: NextPageWithLayout = () => {
   const [showOtherOptions, setShowOtherOptions] = useState(false)
@@ -21,11 +34,17 @@ const SignUpPage: NextPageWithLayout = () => {
   const signUpProviders = useEnabledIdentityProviders().filter((provider) => provider.showOnSignUp)
 
   if (!signUpEnabled) {
-    return <UnknownInterface fullHeight={false} urlBack="/sign-in" />
+    return (
+      <>
+        <SignUpPageHead />
+        <UnknownInterface fullHeight={false} urlBack="/sign-in" />
+      </>
+    )
   }
 
   return (
     <>
+      <SignUpPageHead />
       {focusProvider ? (
         <div className="flex flex-col gap-5">
           {!isSubmitted && <SignInWithExternalProvider provider={focusProvider} />}
