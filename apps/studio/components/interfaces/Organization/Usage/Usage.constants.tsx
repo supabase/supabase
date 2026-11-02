@@ -440,8 +440,10 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       attributes: [
         {
           anchor: 'pipeline-initial-sync-data',
-          key: PricingMetric.ETL_COPY_BACKFILL_DATA,
-          attributes: [{ key: PricingMetric.ETL_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' }],
+          key: PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
+          attributes: [
+            { key: PricingMetric.PIPELINES_COPY_BACKFILL_DATA.toLowerCase(), color: 'white' },
+          ],
           name: 'Initial Sync Data Processed',
           unit: 'bytes',
           description:
@@ -456,8 +458,10 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         },
         {
           anchor: 'pipeline-ongoing-replication-data',
-          key: PricingMetric.ETL_REPLICATED_DATA,
-          attributes: [{ key: PricingMetric.ETL_REPLICATED_DATA.toLowerCase(), color: 'white' }],
+          key: PricingMetric.PIPELINES_REPLICATED_DATA,
+          attributes: [
+            { key: PricingMetric.PIPELINES_REPLICATED_DATA.toLowerCase(), color: 'white' },
+          ],
           name: 'Ongoing Replication Data Processed',
           unit: 'bytes',
           description:

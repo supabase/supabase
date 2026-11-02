@@ -4169,6 +4169,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'pipelines'
       | 'compute'
   }
   groups: TelemetryGroups
