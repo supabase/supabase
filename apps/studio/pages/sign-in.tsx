@@ -1,4 +1,3 @@
-import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -15,23 +14,7 @@ import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { getSignUpReturnTo } from '@/lib/gotrue'
-import { buildStudioPageTitle } from '@/lib/page-title'
 import type { NextPageWithLayout } from '@/types'
-
-const PAGE_TITLE = buildStudioPageTitle({
-  section: 'Sign in',
-  surface: 'Dashboard',
-  brand: 'Supabase',
-})
-const PAGE_DESCRIPTION =
-  'Sign into the Supabase dashboard. Build production-grade applications with a Postgres database, Authentication, instant APIs, Realtime, Functions, Storage and Vector embeddings.'
-
-const SignInPageHead = () => (
-  <Head>
-    <title>{PAGE_TITLE}</title>
-    <meta name="description" content={PAGE_DESCRIPTION} />
-  </Head>
-)
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
@@ -78,7 +61,6 @@ const SignInPage: NextPageWithLayout = () => {
 
     return (
       <>
-        <SignInPageHead />
         <div className="flex flex-col gap-5">
           <SignInWithExternalProvider provider={focusProvider} />
 
@@ -106,7 +88,6 @@ const SignInPage: NextPageWithLayout = () => {
 
   return (
     <>
-      <SignInPageHead />
       <div className="flex flex-col gap-5">
         <SignInOptions providers={signInProviders} />
         {signInWithEmailEnabled && <SignInForm />}
