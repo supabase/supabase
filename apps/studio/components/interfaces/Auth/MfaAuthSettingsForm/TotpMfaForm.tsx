@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -59,17 +58,18 @@ interface TotpMfaFormProps {
 
 export const TotpMfaForm = ({ authConfig, canUpdateConfig }: TotpMfaFormProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const [isUpdatingTotpForm, setIsUpdatingTotpForm] = useState(false)
+  const { mutate: updateAuthConfig, isPending: isUpdatingTotpForm } = useAuthConfigUpdateMutation()
 
   const totpForm = useForm<TotpFormValues>({
     resolver: zodResolver(totpSchema),
     defaultValues: {
-      MFA_TOTP: 'Enabled',
-      MFA_MAX_ENROLLED_FACTORS: 10,
+      MFA_TOTP: determineMFAStatus(
+        authConfig.MFA_TOTP_VERIFY_ENABLED ?? true,
+        authConfig.MFA_TOTP_ENROLL_ENABLED ?? true
+      ),
+      MFA_MAX_ENROLLED_FACTORS: authConfig.MFA_MAX_ENROLLED_FACTORS ?? 10,
     },
   })
-  const { reset: resetTotpForm } = totpForm
 
   const onSubmitTotpForm: SubmitHandler<TotpFormValues> = (values) => {
     const { verifyEnabled: MFA_TOTP_VERIFY_ENABLED, enrollEnabled: MFA_TOTP_ENROLL_ENABLED } =
@@ -81,35 +81,19 @@ export const TotpMfaForm = ({ authConfig, canUpdateConfig }: TotpMfaFormProps) =
       MFA_TOTP_VERIFY_ENABLED,
     }
 
-    setIsUpdatingTotpForm(true)
-
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
           toast.error(`Failed to update TOTP settings: ${error?.message}`)
-          setIsUpdatingTotpForm(false)
         },
         onSuccess: () => {
           toast.success('Successfully updated TOTP settings')
-          setIsUpdatingTotpForm(false)
+          totpForm.reset(values)
         },
       }
     )
   }
-
-  useEffect(() => {
-    if (!isUpdatingTotpForm) {
-      resetTotpForm({
-        MFA_TOTP:
-          determineMFAStatus(
-            authConfig?.MFA_TOTP_VERIFY_ENABLED ?? true,
-            authConfig?.MFA_TOTP_ENROLL_ENABLED ?? true
-          ) || 'Enabled',
-        MFA_MAX_ENROLLED_FACTORS: authConfig?.MFA_MAX_ENROLLED_FACTORS ?? 10,
-      })
-    }
-  }, [authConfig, isUpdatingTotpForm, resetTotpForm])
 
   return (
     <PageSection>

@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -76,8 +76,7 @@ export const PhoneMfaForm = ({
   isBranch,
 }: PhoneMfaFormProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const [isUpdatingPhoneForm, setIsUpdatingPhoneForm] = useState(false)
+  const { mutate: updateAuthConfig, isPending: isUpdatingPhoneForm } = useAuthConfigUpdateMutation()
   const [isConfirmationModalVisible, setIsConfirmationModalVisible] = useState(false)
 
   // For now, we support Twilio and Vonage. Twilio Verify is not supported and the remaining providers are community maintained.
@@ -89,12 +88,14 @@ export const PhoneMfaForm = ({
   const phoneForm = useForm<PhoneFormValues>({
     resolver: zodResolver(phoneSchema),
     defaultValues: {
-      MFA_PHONE: 'Disabled',
-      MFA_PHONE_OTP_LENGTH: 6,
-      MFA_PHONE_TEMPLATE: 'Your code is {{ .Code }}',
+      MFA_PHONE: determineMFAStatus(
+        authConfig.MFA_PHONE_VERIFY_ENABLED || false,
+        authConfig.MFA_PHONE_ENROLL_ENABLED || false
+      ),
+      MFA_PHONE_OTP_LENGTH: authConfig.MFA_PHONE_OTP_LENGTH || 6,
+      MFA_PHONE_TEMPLATE: authConfig.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
     },
   })
-  const { reset: resetPhoneForm } = phoneForm
   const mfaPhoneValue = useWatch({ control: phoneForm.control, name: 'MFA_PHONE' })
 
   const onSubmitPhoneForm: SubmitHandler<PhoneFormValues> = (values) => {
@@ -114,36 +115,19 @@ export const PhoneMfaForm = ({
       }
     }
 
-    setIsUpdatingPhoneForm(true)
-
     updateAuthConfig(
       { projectRef: projectRef!, config: payload },
       {
         onError: (error) => {
           toast.error(`Failed to update phone MFA settings: ${error?.message}`)
-          setIsUpdatingPhoneForm(false)
         },
         onSuccess: () => {
           toast.success('Successfully updated phone MFA settings')
-          setIsUpdatingPhoneForm(false)
+          phoneForm.reset(values)
         },
       }
     )
   }
-
-  useEffect(() => {
-    if (!isUpdatingPhoneForm) {
-      resetPhoneForm({
-        MFA_PHONE:
-          determineMFAStatus(
-            authConfig?.MFA_PHONE_VERIFY_ENABLED || false,
-            authConfig?.MFA_PHONE_ENROLL_ENABLED || false
-          ) || 'Disabled',
-        MFA_PHONE_OTP_LENGTH: authConfig?.MFA_PHONE_OTP_LENGTH || 6,
-        MFA_PHONE_TEMPLATE: authConfig?.MFA_PHONE_TEMPLATE || 'Your code is {{ .Code }}',
-      })
-    }
-  }, [authConfig, isUpdatingPhoneForm, resetPhoneForm])
 
   const phoneMFAIsEnabled = mfaPhoneValue === 'Enabled' || mfaPhoneValue === 'Verify Enabled'
   const hasUpgradedPhoneMFA =
@@ -190,7 +174,7 @@ export const PhoneMfaForm = ({
                         <FormControl>
                           <Select
                             value={field.value}
-                            onValueChange={(value) => value && field.onChange(value)}
+                            onValueChange={field.onChange}
                             disabled={!canUpdateConfig || !hasAccessToMFA}
                           >
                             <SelectTrigger>

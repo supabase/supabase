@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardFooter, Form, FormControl, FormField, Switch } from 'ui'
@@ -38,42 +37,30 @@ export const EnhancedMfaSecurityForm = ({
   promptEnhancedSecurityUpgrade,
 }: EnhancedMfaSecurityFormProps) => {
   const { ref: projectRef } = useParams()
-  const { mutate: updateAuthConfig } = useAuthConfigUpdateMutation()
-  const [isUpdatingSecurityForm, setIsUpdatingSecurityForm] = useState(false)
+  const { mutate: updateAuthConfig, isPending: isUpdatingSecurityForm } =
+    useAuthConfigUpdateMutation()
 
   const securityForm = useForm<SecurityFormValues>({
     resolver: zodResolver(securitySchema),
     defaultValues: {
-      MFA_ALLOW_LOW_AAL: false,
+      MFA_ALLOW_LOW_AAL: authConfig.MFA_ALLOW_LOW_AAL ?? true,
     },
   })
-  const { reset: resetSecurityForm } = securityForm
 
   const onSubmitSecurityForm: SubmitHandler<SecurityFormValues> = (values) => {
-    setIsUpdatingSecurityForm(true)
-
     updateAuthConfig(
       { projectRef: projectRef!, config: values },
       {
         onError: (error) => {
           toast.error(`Failed to update enhanced MFA security settings: ${error?.message}`)
-          setIsUpdatingSecurityForm(false)
         },
         onSuccess: () => {
           toast.success('Successfully updated enhanced MFA security settings')
-          setIsUpdatingSecurityForm(false)
+          securityForm.reset(values)
         },
       }
     )
   }
-
-  useEffect(() => {
-    if (!isUpdatingSecurityForm) {
-      resetSecurityForm({
-        MFA_ALLOW_LOW_AAL: authConfig?.MFA_ALLOW_LOW_AAL ?? true,
-      })
-    }
-  }, [authConfig, isUpdatingSecurityForm, resetSecurityForm])
 
   return (
     <PageSection>
