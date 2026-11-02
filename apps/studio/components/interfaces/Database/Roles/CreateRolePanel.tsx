@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -13,16 +12,13 @@ import {
   SidePanel,
   Switch,
 } from 'ui'
-import { Input as PatternInput } from 'ui-patterns/DataInputs/Input'
-import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { RolePasswordField } from './RolePasswordField'
 import { ROLE_PERMISSIONS } from './Roles.constants'
 import { FormActions } from '@/components/ui/Forms/FormActions'
-import { InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRoleCreateMutation } from '@/data/database-roles/database-role-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { generateStrongPassword } from '@/lib/project'
 
 interface CreateRolePanelProps {
   visible: boolean
@@ -69,7 +65,6 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   })
 
   const canLogin = useWatch({ control: form.control, name: 'canLogin' })
-  const [isPasswordGenerated, setIsPasswordGenerated] = useState(false)
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async ({ password, ...values }) => {
     if (!project) return console.error('Project is required')
@@ -85,7 +80,6 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
   const handleClose = () => {
     onClose()
     form.reset(initialValues)
-    setIsPasswordGenerated(false)
   }
 
   return (
@@ -196,53 +190,7 @@ export const CreateRolePanel = ({ visible, onClose }: CreateRolePanelProps) => {
               </div>
             </div>
           </div>
-          {canLogin && (
-            <FormField
-              control={form.control}
-              name="password"
-              render={({ field }) => (
-                <FormItemLayout
-                  layout="horizontal"
-                  label="Password"
-                  description={
-                    <>
-                      Optional. Without a password, the role can't log in using password
-                      authentication.{' '}
-                      <button
-                        type="button"
-                        tabIndex={0}
-                        className={InlineLinkClassName}
-                        onClick={() => {
-                          form.setValue('password', generateStrongPassword(), { shouldDirty: true })
-                          setIsPasswordGenerated(true)
-                        }}
-                      >
-                        Generate a password
-                      </button>
-                      .
-                    </>
-                  }
-                >
-                  <FormControl>
-                    <PatternInput
-                      {...field}
-                      onChange={(event) => {
-                        field.onChange(event)
-                        setIsPasswordGenerated(false)
-                      }}
-                      copy={field.value.length > 0}
-                      type="password"
-                      autoComplete="new-password"
-                      placeholder="Type in a password"
-                    />
-                  </FormControl>
-                  <span role="status" aria-live="polite" className="sr-only">
-                    {isPasswordGenerated ? 'Password generated' : ''}
-                  </span>
-                </FormItemLayout>
-              )}
-            />
-          )}
+          {canLogin && <RolePasswordField />}
         </form>
       </Form>
     </SidePanel>
