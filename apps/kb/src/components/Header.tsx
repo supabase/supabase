@@ -1,15 +1,23 @@
-import { Menu, X } from 'lucide-react'
+import { SearchTrigger } from 'docs-search/components'
 import { useCallback, useRef, useState } from 'react'
-import { Button, buttonVariants, cn } from 'ui'
+import { Button } from 'ui'
 import { MobileNavThemeButton } from 'ui-patterns/MobileNav/MobileNavThemeButton'
 import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
+import {
+  TopNavMenu,
+  TopNavMenuGroup,
+  TopNavMenuGroupLink,
+  TopNavMenuItem,
+  TopNavMenuPanel,
+} from 'ui-patterns/TopNav/TopNavMenu'
+import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getNavMenus, SIGN_UP_URL } from '../lib/nav'
 import type { Topic } from '../lib/topics'
 import { HeaderMenu, useThemeChoice } from './HeaderMenu'
+import { openKbSearch } from './KbSearch'
 import { Logo } from './Logo'
 import { MobileMenu } from './MobileMenu'
-import { Nav } from './Nav'
 
 const MOBILE_MENU_ID = 'mobile-menu'
 
@@ -54,7 +62,7 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
     <>
       <nav
         ref={observePageTitle}
-        className="relative h-(--header-height) border-b border-default bg-background/90 backdrop-blur-xs dark:bg-background/95"
+        className="relative h-(--header-height) border-default max-lg:border-b bg-background/90 backdrop-blur-xs dark:bg-background/95"
       >
         <div className="section-container flex h-full items-center justify-between gap-3">
           <div className="flex h-full min-w-0 items-center">
@@ -66,51 +74,45 @@ export const Header = ({ topics, currentPath }: HeaderProps) => {
                 </HeadingReel>
               </div>
             </div>
-            <Nav menus={menus} className="hidden lg:flex" />
+            <TopNavMenu className="hidden lg:flex">
+              {menus.map((menu) => (
+                <TopNavMenuItem key={menu.label} label={menu.label}>
+                  <TopNavMenuPanel>
+                    {menu.groups.map((group) => (
+                      <TopNavMenuGroup key={group.label} label={group.label}>
+                        {group.links.map((link) => (
+                          <TopNavMenuGroupLink key={link.href} href={link.href}>
+                            {link.label}
+                          </TopNavMenuGroupLink>
+                        ))}
+                      </TopNavMenuGroup>
+                    ))}
+                  </TopNavMenuPanel>
+                </TopNavMenuItem>
+              ))}
+            </TopNavMenu>
           </div>
           <div className="flex items-center gap-2">
-            <Button variant="primary" asChild className="hidden h-7.5 lg:inline-flex">
-              <a href={SIGN_UP_URL}>Start your project</a>
-            </Button>
-            <HeaderMenu className="hidden lg:inline-flex" />
             {isMenuOpen ? (
               <MobileNavThemeButton
                 value={choice}
                 onValueChange={onChoiceChange}
                 className="lg:hidden"
               />
-            ) : null}
-            <button
+            ) : (
+              <SearchTrigger onClick={openKbSearch} placeholder="Search" />
+            )}
+            <Button variant="primary" asChild className="hidden h-7.5 lg:inline-flex">
+              <a href={SIGN_UP_URL}>Sign up</a>
+            </Button>
+            <HeaderMenu className="hidden lg:inline-flex" />
+            <TopNavMenuToggle
               ref={menuButtonRef}
-              type="button"
-              aria-expanded={isMenuOpen}
+              isOpen={isMenuOpen}
               aria-controls={MOBILE_MENU_ID}
               onClick={handleMenuToggle}
-              className={cn(
-                buttonVariants({ variant: 'default' }),
-                'relative size-7.5 min-w-7.5 border-default bg-surface-100/75 px-0',
-                'text-foreground-light lg:hidden',
-                "before:absolute before:-inset-y-2 before:left-0 before:-right-3 before:content-['']"
-              )}
-            >
-              <span className="sr-only">{isMenuOpen ? 'Close main menu' : 'Open main menu'}</span>
-              <Menu
-                aria-hidden
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto size-4.5 transition duration-150 ease-out',
-                  isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-              <X
-                aria-hidden
-                strokeWidth={1}
-                className={cn(
-                  'absolute inset-0 m-auto size-4.5 transition duration-150 ease-out',
-                  !isMenuOpen && 'opacity-0 scale-75 motion-reduce:scale-100'
-                )}
-              />
-            </button>
+              className="lg:hidden"
+            />
           </div>
         </div>
       </nav>

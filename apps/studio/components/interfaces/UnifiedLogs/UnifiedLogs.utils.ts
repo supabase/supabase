@@ -97,6 +97,7 @@ export const buildUnifiedLogsUrl = ({
   user,
   start,
   end,
+  logId,
 }: {
   projectRef: string
   logType?: UnifiedLogType
@@ -104,11 +105,13 @@ export const buildUnifiedLogsUrl = ({
   user?: string
   start?: string | Date
   end?: string | Date
+  logId?: string
 }) =>
   serializeUnifiedLogsSearchParams(`/project/${projectRef}/logs`, {
     filter: logType ? [`log_type:eq:${logType}`] : null,
     user: user ?? null,
     date: start && end ? [new Date(start), new Date(end)] : null,
+    id: logId ?? null,
   })
 
 export const getFacetValueCount = (

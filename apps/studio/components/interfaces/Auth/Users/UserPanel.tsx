@@ -17,8 +17,11 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { UserCard } from './UserCard'
 import { UserLogs } from './UserLogs'
 import { UserOverview } from './UserOverview'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { UserRecentLogs } from '@/components/interfaces/UnifiedLogs/components/UserRecentLogs'
 import { RawJsonView } from '@/components/ui/RawJsonView'
 import { useUserQuery } from '@/data/auth/user-query'
+import { useUnifiedLogsBackend } from '@/data/logs/unified-logs-infinite-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -27,6 +30,10 @@ type UserPanelView = 'overview' | 'raw' | 'logs'
 export const UserPanel = () => {
   const { data: project } = useSelectedProjectQuery()
   const showLogs = useIsFeatureEnabled('logs:all')
+  const isOtelUnifiedLogs = useUnifiedLogsBackend()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const showRecentLogs = showLogs && isOtelUnifiedLogs && isUnifiedLogsEnabled
+
   const [selectedId, setSelectedId] = useQueryState(
     'show',
     parseAsString.withOptions({ history: 'push', clearOnDefault: true })
@@ -84,8 +91,9 @@ export const UserPanel = () => {
               />
               <TabsList className="shrink-0 gap-x-4 px-4">
                 <TabsTrigger value="overview">Overview</TabsTrigger>
-                {showLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
+                {showLogs && !showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
                 <TabsTrigger value="raw">Raw JSON</TabsTrigger>
+                {showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}
                 <TabsIndicator />
               </TabsList>
 
@@ -96,7 +104,11 @@ export const UserPanel = () => {
               </TabsContent>
               {showLogs && (
                 <TabsContent value="logs" className={cn('mt-0 grow min-h-0 overflow-y-auto')}>
-                  {selectedUser && <UserLogs user={selectedUser} />}
+                  {showRecentLogs && selectedUser.id ? (
+                    <UserRecentLogs userId={selectedUser.id} />
+                  ) : (
+                    <UserLogs user={selectedUser} />
+                  )}
                 </TabsContent>
               )}
               <TabsContent value="raw" className="mt-0 grow min-h-0 overflow-y-auto">

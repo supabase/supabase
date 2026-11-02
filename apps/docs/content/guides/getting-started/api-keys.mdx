@@ -102,6 +102,8 @@ Unlike publishable keys, secret keys allow elevated access to your project's dat
 
 A secret key bypasses every Row Level Security policy you have. Never put one in a browser, a shipped application, or source control. For the full list of places a secret key must never go, see [Handling secret keys safely](#handling-secret-keys-safely).
 
+If a secret key leaks, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
+
 </Admonition>
 
 Secret keys authorize access to your project's data through the built-in `service_role` Postgres role. By design, this role has full access to your project's data. It also has the [`BYPASSRLS` attribute](https://www.postgresql.org/docs/current/ddl-rowsecurity.html#:~:text=BYPASSRLS), so it skips every Row Level Security policy you attach.
@@ -280,14 +282,7 @@ If you are replacing legacy keys in an existing application rather than starting
 
 ### Rotate a leaked or compromised key [#leaked-key]
 
-This procedure covers both a leaked secret key and a leaked `service_role` key.
-
-Don't rush. Fix the root cause of the leak before you rotate anything. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps.
-
-1. Create a new secret key in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
-2. Replace the compromised key with the new one everywhere your application uses it. If the compromised key is a JWT-based `service_role` key, replace it with the new secret key.
-3. Confirm that every component now uses the new key.
-4. Retire the compromised key. Delete a secret key, which can't be undone, so don't start until step 3 is done. For a legacy `anon` or `service_role` key, deactivate the legacy keys in the same Dashboard section instead. Deactivation is reversible, so you can re-enable them if you find a client you missed.
+To replace a leaked secret key or `service_role` key and retire the compromised one, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
 
 ## Security reference
 
@@ -340,7 +335,7 @@ Exposing a secret key puts all of your project's data at risk. The rules below a
 **Limiting the damage of a leak**
 
 - Use a separate secret key for each backend component. If one component leaks its key, you only rotate that one.
-- Delete a leaked key immediately. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools.
+- Rotate a leaked key as soon as you fix the cause of the leak. The browser block returns HTTP 401 Unauthorized, but an attacker can still use the key from other tools. For the steps, see [Rotate a leaked or compromised API key](/docs/guides/security/rotate-leaked-api-keys).
 
 Handle secret keys using [secure coding practices](https://owasp.org/www-project-secure-coding-practices-quick-reference-guide/stable-en/).
 

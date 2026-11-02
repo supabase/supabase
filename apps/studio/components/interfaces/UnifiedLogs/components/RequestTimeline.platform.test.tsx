@@ -19,6 +19,8 @@ import { toQuerySearchParams } from '../UnifiedLogs.utils'
 import { generateDynamicColumns } from './Columns'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
+import type { User } from '@/data/auth/users-infinite-query'
+import type { UnifiedLogsQueryRow } from '@/data/logs/unified-logs.utils'
 import { miscKeys } from '@/data/misc/keys'
 import { TimezoneProvider } from '@/lib/datetime'
 import { customRender } from '@/tests/lib/custom-render'
@@ -47,7 +49,7 @@ const gatewayLog: ColumnSchema = {
   event_message: 'POST | 200 | /auth/v1/token',
 }
 
-const timelineRows = [
+const timelineRows: (UnifiedLogsQueryRow & { source: string })[] = [
   {
     id: 'gateway-log',
     source: 'edge_logs',
@@ -80,11 +82,19 @@ const timelineRows = [
   },
 ]
 
-function PanelHarness({ scope }: { scope?: UnifiedLogsScope }) {
+function PanelHarness({
+  scope,
+  row = gatewayLog,
+  onSelectRow,
+}: {
+  scope?: UnifiedLogsScope
+  row?: ColumnSchema
+  onSelectRow?: (id: string) => void
+}) {
   const [searchParameters] = useQueryStates(SEARCH_PARAMS_PARSER)
-  const { columns } = generateDynamicColumns({ data: [gatewayLog] })
+  const { columns } = generateDynamicColumns({ data: [row] })
   const table = useReactTable({
-    data: [gatewayLog],
+    data: onSelectRow ? [row, { ...row, id: 'next-log' }] : [row],
     columns,
     getRowId: (row) => row.id,
     getCoreRowModel: getCoreRowModel(),
@@ -99,12 +109,14 @@ function PanelHarness({ scope }: { scope?: UnifiedLogsScope }) {
       isLoading={false}
       isFetching={false}
       isLoadingCounts={false}
+      openRowId={row.id}
+      onSelectRow={onSelectRow}
     >
       <ResizablePanelGroup orientation="horizontal">
         <ServiceFlowPanel
           dock="right"
           setDock={vi.fn()}
-          selectedRows={[gatewayLog]}
+          selectedRows={[row]}
           searchParameters={{ ...toQuerySearchParams(searchParameters), scope }}
         />
       </ResizablePanelGroup>
@@ -118,7 +130,15 @@ function renderPanel(
     scope,
     flag = true,
     timezone,
-  }: { scope?: UnifiedLogsScope; flag?: boolean | null; timezone?: string } = {}
+    selectedLog,
+    onSelectRow,
+  }: {
+    scope?: UnifiedLogsScope
+    flag?: boolean | null
+    timezone?: string
+    selectedLog?: ColumnSchema
+    onSelectRow?: (id: string) => void
+  } = {}
 ) {
   const queries: string[] = []
   addAPIMock({
@@ -178,7 +198,7 @@ function renderPanel(
     >
       <FeaturePreviewContextProvider>
         <TimezoneProvider>
-          <PanelHarness scope={scope} />
+          <PanelHarness scope={scope} row={selectedLog} onSelectRow={onSelectRow} />
         </TimezoneProvider>
       </FeaturePreviewContextProvider>
     </FeatureFlagContext.Provider>,
@@ -297,6 +317,68 @@ describe('request timeline tab', () => {
     const expanded = stepsIn(list)
     expect(expanded).toHaveLength(9)
     expect(expanded[6]).toHaveAttribute('aria-current', 'true')
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+  it('shows the user of the opened timeline log instead of the initially selected log', async () => {
+    const user = userEvent.setup()
+    const firstUser = '11111111-1111-4111-8111-111111111111'
+    const openedUser = '22222222-2222-4222-8222-222222222222'
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = z.object({ query: z.string() }).parse(await request.json())
+        const isOpenedUser = query.includes(openedUser)
+        return HttpResponse.json<User[]>([
+          {
+            id: isOpenedUser ? openedUser : firstUser,
+            email: isOpenedUser ? 'opened@example.com' : 'initial@example.com',
+            providers: ['email'],
+          },
+        ])
+      },
+    })
+    const { queryClient } = renderPanel(
+      [
+        { ...timelineRows[0], auth_user: firstUser },
+        { ...timelineRows[1], auth_user: openedUser },
+      ],
+      { selectedLog: { ...gatewayLog, auth_user: firstUser } }
+    )
+    const items = stepsIn(await openTimeline(user))
+    await user.click(items[1])
+    await user.click(screen.getByRole('tab', { name: 'User' }))
+    expect(await screen.findAllByText('opened@example.com')).toHaveLength(2)
+    expect(screen.queryByText('initial@example.com')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+  it('copies the user ID with arrow keys without navigating away from the log', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    const userId = '11111111-1111-4111-8111-111111111111'
+    const onSelectRow = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => HttpResponse.json<User[]>([{ id: userId, providers: ['email'] }]),
+    })
+    const { queryClient } = renderPanel(timelineRows, {
+      selectedLog: { ...gatewayLog, auth_user: userId },
+      onSelectRow,
+    })
+    await user.click(screen.getByRole('tab', { name: 'User' }))
+    const field = await screen.findByRole('button', { name: `User ID ${userId}` })
+    field.focus()
+    await user.keyboard('{Enter}')
+    expect(await screen.findByRole('menuitem', { name: 'Add filter' })).toHaveFocus()
+    await user.keyboard('{ArrowDown}')
+    expect(screen.getByRole('menuitem', { name: 'Copy User ID' })).toHaveFocus()
+    expect(onSelectRow).not.toHaveBeenCalled()
+    await user.keyboard('{Enter}')
+    expect(copy).toHaveBeenCalledWith(userId)
+    expect(screen.queryByRole('menu')).not.toBeInTheDocument()
+    await user.keyboard('{ArrowDown}')
+    expect(onSelectRow).toHaveBeenCalledWith('next-log', { shiftKey: false })
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 })

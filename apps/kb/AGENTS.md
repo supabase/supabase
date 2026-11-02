@@ -55,11 +55,12 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 content files, and read from every collection.
 
 Separately, `scripts/generate-markdown.ts` runs as a `prebuild` step and exports every content file — plus
-one page per topic, listing its guides, and a root `sitemap.md` linking every topic, troubleshooting article, and guide — as a plain `.md` file under the gitignored `public/markdown/`,
+one page per topic, listing its guides, and a root `sitemap.md` linking every topic, guide, FAQ, and troubleshooting article — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
-rewrites guide, topic, and troubleshooting page requests that send `Accept: text/markdown` to the same files
-(content negotiation), and sets `Vary: Accept` on those pages. The negotiated rewrites must stay above the generic
+rewrites guide, topic, troubleshooting, and FAQ page requests that send `Accept: text/markdown` to the same files
+(content negotiation), rewrites homepage (`/kb`) requests with that header to `sitemap.md`, and sets `Vary: Accept` on those pages.
+Requests to `/` are redirected to `/kb` before rewrites run, so the homepage rule only needs to match `/kb`. The negotiated rewrites must stay above the generic
 `/kb/:path*` rewrite, since Vercel uses the first match.
 
 If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and

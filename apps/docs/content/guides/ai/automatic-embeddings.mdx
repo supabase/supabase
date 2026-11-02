@@ -787,7 +787,7 @@ Each failed job includes an `error` field with a description of the failure. Rea
 
 - An error generating the embedding via external API
 - An error connecting to the database
-- The edge function being terminated (e.g. due to a wall clock limit)
+- The edge function being terminated (e.g. due to a [wall clock limit](/kb/troubleshooting/edge-function-wall-clock-time-limit-reached-Nk38bW))
 - Any other error thrown during processing
 
 `pg_net` stores HTTP responses in the `net._http_response` table, which can be queried to diagnose issues with the embedding generation process.

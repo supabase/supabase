@@ -1,11 +1,12 @@
 import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
-import { FeatureFlagContext } from 'common'
+import type { platformComponents } from 'api-types'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
 import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
 import { ResizablePanelGroup } from 'ui'
-import { afterAll, beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { UserPanel } from './UserPanel'
 import { FeaturePreviewContextProvider } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
@@ -34,7 +35,15 @@ const removeRouteParser = routerMock.useParser(
 )
 afterAll(removeRouteParser)
 
-const renderPanel = (disabledFeatures: string[] = []) => {
+vi.mock('./UserLogs', () => ({
+  UserLogs: () => <div data-testid="user-logs" />,
+}))
+
+const renderPanel = (
+  disabledFeatures: string[] = [],
+  { otel = false, unifiedLogs = false }: { otel?: boolean | null; unifiedLogs?: boolean } = {}
+) => {
+  localStorage.setItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS, JSON.stringify(unifiedLogs))
   mockPermissions(NO_PERMISSIONS)
   addAPIMock({
     method: 'get',
@@ -72,29 +81,38 @@ const renderPanel = (disabledFeatures: string[] = []) => {
   const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
   queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
 
-  const rendered = customRender(
+  const content = (backend = otel) => (
     <FeatureFlagContext.Provider
-      value={{ configcat: { otelUnifiedLogs: false }, posthog: {}, hasLoaded: true }}
+      value={{
+        configcat: backend === null ? {} : { otelUnifiedLogs: backend },
+        posthog: {},
+        hasLoaded: true,
+      }}
     >
       <FeaturePreviewContextProvider>
         <ResizablePanelGroup orientation="horizontal">
           <UserPanel />
         </ResizablePanelGroup>
       </FeaturePreviewContextProvider>
-    </FeatureFlagContext.Provider>,
-    {
-      queryClient,
-      nuqs: { searchParams: `?show=${mockUser.id}` },
-      profileContext: createMockProfileContext({
-        profile: createMockProfile({ disabled_features: disabledFeatures }),
-      }),
-    }
+    </FeatureFlagContext.Provider>
   )
-  return { ...rendered, queryClient }
+  const rendered = customRender(content(), {
+    queryClient,
+    nuqs: { searchParams: `?show=${mockUser.id}` },
+    profileContext: createMockProfileContext({
+      profile: createMockProfile({ disabled_features: disabledFeatures }),
+    }),
+  })
+  return {
+    ...rendered,
+    queryClient,
+    updateBackend: (backend: boolean) => rendered.rerender(content(backend)),
+  }
 }
 
 describe('UserPanel', () => {
   beforeEach(() => routerMock.setCurrentUrl('/project/default/auth/users'))
+  afterEach(() => localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS))
 
   it('shows the legacy Logs tab when logs are enabled', async () => {
     const { queryClient } = renderPanel()
@@ -131,6 +149,52 @@ describe('UserPanel', () => {
     expect(copy).toHaveBeenCalledTimes(2)
     expect(JSON.parse(copy.mock.calls[1][0])).toEqual(mockUser)
     expect(screen.queryByPlaceholderText('Filter...')).not.toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+  it.each([true, null])(
+    'shows recent user logs after Raw JSON with backend flag %s',
+    async (otel) => {
+      const user = userEvent.setup()
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: () =>
+          HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
+            result: [],
+          }),
+      })
+      const { queryClient } = renderPanel([], { otel, unifiedLogs: true })
+      await screen.findByRole('tab', { name: 'Logs' })
+      expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+        'Overview',
+        'Raw JSON',
+        'Logs',
+      ])
+      await user.click(screen.getByRole('tab', { name: 'Logs' }))
+      expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
+      expect(screen.queryByRole('link', { name: 'View logs' })).not.toBeInTheDocument()
+      await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+    }
+  )
+  it('keeps Logs selected when switching between legacy and unified logs', async () => {
+    const user = userEvent.setup()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+      response: () =>
+        HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
+          result: [],
+        }),
+    })
+    const { updateBackend, queryClient } = renderPanel([], { otel: false, unifiedLogs: true })
+    await user.click(await screen.findByRole('tab', { name: 'Logs' }))
+    expect(await screen.findByTestId('user-logs')).toBeVisible()
+    updateBackend(true)
+    expect(await screen.findByText('No logs in the last 24 hours')).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true')
+    updateBackend(false)
+    expect(await screen.findByTestId('user-logs')).toBeVisible()
+    expect(screen.getByRole('tab', { name: 'Logs' })).toHaveAttribute('aria-selected', 'true')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 })

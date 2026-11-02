@@ -1124,8 +1124,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
-        specifier: ^0.12.0
-        version: 0.12.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+        specifier: ^0.15.0
+        version: 0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -5561,6 +5561,12 @@ packages:
     resolution: {integrity: sha512-z8QBKqdfXLPzkLQuG4xp8hrVEMm1PZ1IgxMN2sMbJiFiAKOWXnAzogXn2W4aqIBlP1ea6U5yiqVquvUNM1Cj6Q==}
     engines: {node: '>=20'}
 
+  '@modelcontextprotocol/node@2.1.2':
+    resolution: {integrity: sha512-IIcIqBpr6NCQQs5DgJTgvbSOAw+3iaR/uquqg+e0nXCdudfjPg/80x0TseUnQx14AUAtE4fsJCEpJKPyb6WPVA==}
+    engines: {node: '>=20'}
+    peerDependencies:
+      '@modelcontextprotocol/server': ^2.4.0
+
   '@modelcontextprotocol/sdk@1.32.0':
     resolution: {integrity: sha512-8BviX/hK4Gd2eL1KdTwm0gfl4d3wdoErW0Jd00h6nomUAtk6IJk5vwQJc6kfWtJTzN5OEV/lgIiJKI8fiDGAlA==}
     engines: {node: '>=18'}
@@ -8449,15 +8455,15 @@ packages:
     resolution: {integrity: sha512-6GuizbP4N5xWaxEVUsI+UQpJdmMmn0t3sYNpObo9gCAldvM22gFjnYzRVmkHxp5ylU21azEYmiWVwk9iDgCMkQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.12.0':
-    resolution: {integrity: sha512-Rjh3k7pQel+vePiffG8m8DkqCT2y3pD9Z4dKejzjACfvrzGeFsaoRhgXoDeZio6kjgOvi8Wy7mgdezEwPklJhg==}
+  '@supabase/mcp-server-supabase@0.15.0':
+    resolution: {integrity: sha512-+Zhu0iKjgKfN1gJlGuaQmzjiXvlHtN+LHMj22piHgErC/miWsre+TmLtCH2AVse+n0xB2eehyHhhFQOJbjkCGQ==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
 
-  '@supabase/mcp-utils@0.8.0':
-    resolution: {integrity: sha512-T3PpwysWEFBuvD7TMekFSv7xLqO6DjoUUh2ZHojyRdJD7UNaydffJx8ZGoUW2Ju9NOf5ffomfuzreioJUTFFcQ==}
+  '@supabase/mcp-utils@0.9.0':
+    resolution: {integrity: sha512-OsWQL6zPqm+VbchSyp7PuJx4tL39WSgaNdD+IPSko1KCsdX7xZ6Cmmj4As52KuJWmeymX/4cSS+8lNAwyaqFmA==}
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
       zod: ^3.25.0 || ^4.0.0
@@ -15047,8 +15053,8 @@ packages:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  node-forge@1.4.0:
-    resolution: {integrity: sha512-LarFH0+6VfriEhqMMcLX2F7SwSXeWwnEAJEsYm5QKWchiVYVvJyV9v7UDvUv+w5HO23ZpQTXDv/GxdDdMyOuoQ==}
+  node-forge@1.4.2:
+    resolution: {integrity: sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==}
     engines: {node: '>= 6.13.0'}
 
   node-gyp-build-optional-packages@5.2.2:
@@ -16921,13 +16927,13 @@ packages:
     peerDependencies:
       seroval: ^1.0
 
-  seroval@1.6.7:
-    resolution: {integrity: sha512-AeDcLh0yO2SFm9W71essgnSzLV9DI8ZH0x0knXn2DMnUZj728mpLbxjlbB6IqKCmqh8JA3cEqRyGoNkt584JcQ==}
+  seroval@1.6.12:
+    resolution: {integrity: sha512-CqbIVfk/7GL3ITwZI55lcPbpQbjHZ2DD5cUj4iH7E9YsCfHNJV1mx7yNp86Z84w5IpmkZZS/2s5vPOWmVWSdQg==}
     engines: {node: '>=10'}
 
-  seroval@1.6.9:
-    resolution: {integrity: sha512-UeEzHwAK+yl0YLbsvROV1t5yMYEwZZ0CfKYxDvUgS2fO9Vxdf8djqVIB+OuVpuawRNPqw68LE1Du/GMsW2ZPqA==}
-    engines: {node: '>=10'}
+  seroval@1.7.2:
+    resolution: {integrity: sha512-NPOYrDVbvtuTo5m9InqKE7O6wBASON46OabjyqLUGPvoXNDYp0pReuFYkqOQwGsoj1OpZVj6mIdnRRgt5O1/gQ==}
+    engines: {node: '>=20'}
 
   serve-placeholder@2.0.2:
     resolution: {integrity: sha512-/TMG8SboeiQbZJWRlfTCqMs2DD3SZgWp0kDQePz9yUuCnDfDh/92gf7/PxGhzXTKBIPASIHxFcZndoNbp6QOLQ==}
@@ -22139,6 +22145,12 @@ snapshots:
     dependencies:
       zod: 4.6.7
 
+  '@modelcontextprotocol/node@2.1.2(@modelcontextprotocol/server@2.4.0)':
+    dependencies:
+      '@hono/node-server': 1.19.17(hono@4.13.14)
+      '@modelcontextprotocol/server': 2.4.0
+      hono: 4.13.14
+
   '@modelcontextprotocol/sdk@1.32.0(supports-color@8.1.1)(zod@3.25.76)':
     dependencies:
       '@hono/node-server': 1.19.17(hono@4.13.14)
@@ -22718,7 +22730,7 @@ snapshots:
       pkg-types: 2.3.1
       postcss: 8.5.28
       rolldown-string: 0.3.1(rolldown@1.2.15)
-      seroval: 1.6.9
+      seroval: 1.7.2
       std-env: 4.2.0
       ufo: 1.6.4
       unenv: 2.0.0-rc.24
@@ -25370,18 +25382,19 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.12.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
+      '@modelcontextprotocol/node': 2.1.2(@modelcontextprotocol/server@2.4.0)
       '@modelcontextprotocol/server': 2.4.0
-      '@supabase/mcp-utils': 0.8.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+      '@supabase/mcp-utils': 0.9.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       common-tags: 1.8.2
       gqlmin: 0.3.1
       graphql: 16.11.0
       openapi-fetch: 0.13.8
       zod: 3.25.76
 
-  '@supabase/mcp-utils@0.8.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-utils@0.9.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@modelcontextprotocol/server': 2.4.0
       zod: 3.25.76
@@ -25795,8 +25808,8 @@ snapshots:
     dependencies:
       '@tanstack/history': 1.162.5
       cookie-es: 3.1.1
-      seroval: 1.6.9
-      seroval-plugins: 1.6.9(seroval@1.6.9)
+      seroval: 1.7.2
+      seroval-plugins: 1.6.9(seroval@1.7.2)
 
   '@tanstack/router-devtools-core@1.168.2(@tanstack/router-core@1.171.37)(csstype@3.2.3)':
     dependencies:
@@ -25867,7 +25880,7 @@ snapshots:
       '@tanstack/router-core': 1.171.37
       '@tanstack/start-fn-stubs': 1.162.0
       '@tanstack/start-storage-context': 1.167.39
-      seroval: 1.6.7
+      seroval: 1.7.2
 
   '@tanstack/start-fn-stubs@1.162.0': {}
 
@@ -25886,7 +25899,7 @@ snapshots:
       lightningcss: 1.33.0
       pathe: 2.0.3
       picomatch: 4.0.7
-      seroval: 1.6.7
+      seroval: 1.7.2
       source-map: 0.7.6
       srvx: 1.0.5
       tinyglobby: 0.2.17
@@ -25917,7 +25930,7 @@ snapshots:
       '@tanstack/start-storage-context': 1.167.39
       cookie-es: 3.1.1
       fetchdts: 0.2.0
-      seroval: 1.6.7
+      seroval: 1.7.2
 
   '@tanstack/start-storage-context@1.167.39':
     dependencies:
@@ -31784,7 +31797,7 @@ snapshots:
       http-shutdown: 1.2.2
       jiti: 2.7.0
       mlly: 1.8.2
-      node-forge: 1.4.0
+      node-forge: 1.4.2
       pathe: 2.0.3
       std-env: 4.2.0
       tinyclip: 0.1.15
@@ -33660,7 +33673,7 @@ snapshots:
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
 
-  node-forge@1.4.0: {}
+  node-forge@1.4.2: {}
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
@@ -36000,13 +36013,17 @@ snapshots:
 
   serialize-javascript@7.1.4: {}
 
-  seroval-plugins@1.6.9(seroval@1.6.9):
+  seroval-plugins@1.6.9(seroval@1.6.12):
     dependencies:
-      seroval: 1.6.9
+      seroval: 1.6.12
 
-  seroval@1.6.7: {}
+  seroval-plugins@1.6.9(seroval@1.7.2):
+    dependencies:
+      seroval: 1.7.2
 
-  seroval@1.6.9: {}
+  seroval@1.6.12: {}
+
+  seroval@1.7.2: {}
 
   serve-placeholder@2.0.2:
     dependencies:
@@ -36362,8 +36379,8 @@ snapshots:
   solid-js@1.9.17:
     dependencies:
       csstype: 3.2.3
-      seroval: 1.6.9
-      seroval-plugins: 1.6.9(seroval@1.6.9)
+      seroval: 1.6.12
+      seroval-plugins: 1.6.9(seroval@1.6.12)
 
   solid-presence@0.2.0(solid-js@1.9.17):
     dependencies:

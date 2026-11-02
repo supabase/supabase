@@ -8,6 +8,10 @@ describe('consent islands', () => {
     expect(read('./Layout.astro')).toContain('<ConsentIsland client:only="react" />')
   })
 
+  it('mounts pageview telemetry on every page', () => {
+    expect(read('./Layout.astro')).toContain('<PageTelemetryIsland client:only="react" />')
+  })
+
   it('mounts the Privacy Settings link in the footer', () => {
     expect(read('../components/Footer.astro')).toContain(
       '<PrivacySettingsIsland client:only="react" />'
