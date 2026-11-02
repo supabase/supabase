@@ -12,6 +12,7 @@ import { AdminStudioButton } from './AdminStudioButton'
 import { BreadcrumbsView } from './BreadcrumbsView'
 import { FeedbackDropdown } from './FeedbackDropdown/FeedbackDropdown'
 import { HomeIcon } from './HomeIcon'
+import { LayoutHeaderDivider } from './LayoutHeaderDivider'
 import { LocalVersionPopover } from './LocalVersionPopover'
 import { MergeRequestButton } from './MergeRequestButton'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
@@ -33,25 +34,6 @@ import { IS_PLATFORM } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
-
-const LayoutHeaderDivider = ({ className, ...props }: React.HTMLProps<HTMLSpanElement>) => (
-  <span className={cn('text-border-stronger pr-2', className)} {...props}>
-    <svg
-      viewBox="0 0 24 24"
-      width="16"
-      height="16"
-      stroke="currentColor"
-      strokeWidth="1"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      fill="none"
-      shapeRendering="geometricPrecision"
-      aria-hidden={true}
-    >
-      <path d="M16 3.549L7.12 20.600" />
-    </svg>
-  </span>
-)
 
 interface LayoutHeaderProps {
   customHeaderComponents?: ReactNode

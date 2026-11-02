@@ -41,11 +41,8 @@ import { Route as ApiGetDeploymentCommitRouteImport } from './routes/api/get-dep
 import { Route as ApiGetIpAddressRouteImport } from './routes/api/get-ip-address'
 import { Route as ApiGetS3KeysRouteImport } from './routes/api/get-s3-keys'
 import { Route as ApiGetUtcTimeRouteImport } from './routes/api/get-utc-time'
-import { Route as ApiIncidentBannerRouteImport } from './routes/api/incident-banner'
-import { Route as ApiIncidentStatusRouteImport } from './routes/api/incident-status'
 import { Route as ApiParseQueryRouteImport } from './routes/api/parse-query'
 import { Route as ApiScopedAccessTokenPermissionsRouteImport } from './routes/api/scoped-access-token-permissions'
-import { Route as ApiStatusOverrideRouteImport } from './routes/api/status-override'
 import { Route as ApiStatusPageRouteImport } from './routes/api/status-page'
 import { Route as IntegrationsVercelRouteImport } from './routes/integrations/vercel'
 import { Route as McpSecretsRouteImport } from './routes/mcp/secrets'
@@ -177,6 +174,7 @@ import { Route as ProjectRefLogsEdgeLogsRouteImport } from './routes/project/$re
 import { Route as ProjectRefLogsMultigresLogsRouteImport } from './routes/project/$ref/logs/multigres-logs'
 import { Route as ProjectRefLogsPgUpgradeLogsRouteImport } from './routes/project/$ref/logs/pg-upgrade-logs'
 import { Route as ProjectRefLogsPgcronLogsRouteImport } from './routes/project/$ref/logs/pgcron-logs'
+import { Route as ProjectRefLogsPipelinesLogsRouteImport } from './routes/project/$ref/logs/pipelines-logs'
 import { Route as ProjectRefLogsPoolerLogsRouteImport } from './routes/project/$ref/logs/pooler-logs'
 import { Route as ProjectRefLogsPostgresLogsRouteImport } from './routes/project/$ref/logs/postgres-logs'
 import { Route as ProjectRefLogsPostgrestLogsRouteImport } from './routes/project/$ref/logs/postgrest-logs'
@@ -211,6 +209,7 @@ import { Route as ProjectRefSqlIdRouteImport } from './routes/project/$ref/sql/$
 import { Route as ProjectRefSqlExamplesRouteImport } from './routes/project/$ref/sql/examples'
 import { Route as ProjectRefSqlTemplatesRouteImport } from './routes/project/$ref/sql/templates'
 import { Route as ProjectRefStorageS3RouteImport } from './routes/project/$ref/storage/s3'
+import { Route as ProjectRefStorageSigningKeysRouteImport } from './routes/project/$ref/storage/signing-keys'
 import { Route as AppOrgSlugPrivateAppsIndexRouteImport } from './routes/_app/org/$slug/private-apps/index'
 import { Route as AppOrgSlugWebhooksIndexRouteImport } from './routes/_app/org/$slug/webhooks/index'
 import { Route as AppOrgSlugWebhooksEndpointIdRouteImport } from './routes/_app/org/$slug/webhooks/$endpointId'
@@ -251,6 +250,7 @@ import { Route as ProjectRefDatabaseBackupsRestoreToNewProjectRouteImport } from
 import { Route as ProjectRefDatabaseBackupsScheduledRouteImport } from './routes/project/$ref/database/backups/scheduled'
 import { Route as ProjectRefDatabasePipelinesIndexRouteImport } from './routes/project/$ref/database/pipelines/index'
 import { Route as ProjectRefDatabasePipelinesPipelineIdRouteImport } from './routes/project/$ref/database/pipelines/$pipelineId'
+import { Route as ProjectRefDatabasePipelinesNewRouteImport } from './routes/project/$ref/database/pipelines/new'
 import { Route as ProjectRefDatabasePublicationsIndexRouteImport } from './routes/project/$ref/database/publications/index'
 import { Route as ProjectRefDatabasePublicationsIdRouteImport } from './routes/project/$ref/database/publications/$id'
 import { Route as ProjectRefDatabaseTablesIndexRouteImport } from './routes/project/$ref/database/tables/index'
@@ -497,16 +497,6 @@ const ApiGetUtcTimeRoute = ApiGetUtcTimeRouteImport.update({
   path: '/api/get-utc-time',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ApiIncidentBannerRoute = ApiIncidentBannerRouteImport.update({
-  id: '/api/incident-banner',
-  path: '/api/incident-banner',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiIncidentStatusRoute = ApiIncidentStatusRouteImport.update({
-  id: '/api/incident-status',
-  path: '/api/incident-status',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiParseQueryRoute = ApiParseQueryRouteImport.update({
   id: '/api/parse-query',
   path: '/api/parse-query',
@@ -518,11 +508,6 @@ const ApiScopedAccessTokenPermissionsRoute =
     path: '/api/scoped-access-token-permissions',
     getParentRoute: () => rootRouteImport,
   } as any)
-const ApiStatusOverrideRoute = ApiStatusOverrideRouteImport.update({
-  id: '/api/status-override',
-  path: '/api/status-override',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiStatusPageRoute = ApiStatusPageRouteImport.update({
   id: '/api/status-page',
   path: '/api/status-page',
@@ -1218,6 +1203,12 @@ const ProjectRefLogsPgcronLogsRoute =
     path: '/pgcron-logs',
     getParentRoute: () => ProjectRefLogsRoute,
   } as any)
+const ProjectRefLogsPipelinesLogsRoute =
+  ProjectRefLogsPipelinesLogsRouteImport.update({
+    id: '/pipelines-logs',
+    path: '/pipelines-logs',
+    getParentRoute: () => ProjectRefLogsRoute,
+  } as any)
 const ProjectRefLogsPoolerLogsRoute =
   ProjectRefLogsPoolerLogsRouteImport.update({
     id: '/pooler-logs',
@@ -1416,6 +1407,12 @@ const ProjectRefStorageS3Route = ProjectRefStorageS3RouteImport.update({
   path: '/s3',
   getParentRoute: () => ProjectRefStorageRoute,
 } as any)
+const ProjectRefStorageSigningKeysRoute =
+  ProjectRefStorageSigningKeysRouteImport.update({
+    id: '/signing-keys',
+    path: '/signing-keys',
+    getParentRoute: () => ProjectRefStorageRoute,
+  } as any)
 const AppOrgSlugPrivateAppsIndexRoute =
   AppOrgSlugPrivateAppsIndexRouteImport.update({
     id: '/$slug/private-apps/',
@@ -1650,6 +1647,12 @@ const ProjectRefDatabasePipelinesPipelineIdRoute =
   ProjectRefDatabasePipelinesPipelineIdRouteImport.update({
     id: '/$pipelineId',
     path: '/$pipelineId',
+    getParentRoute: () => ProjectRefDatabasePipelinesRoute,
+  } as any)
+const ProjectRefDatabasePipelinesNewRoute =
+  ProjectRefDatabasePipelinesNewRouteImport.update({
+    id: '/new',
+    path: '/new',
     getParentRoute: () => ProjectRefDatabasePipelinesRoute,
   } as any)
 const ProjectRefDatabasePublicationsIndexRoute =
@@ -2188,11 +2191,8 @@ export interface FileRoutesByFullPath {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2311,6 +2311,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -2343,6 +2344,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/account/tokens/': typeof AppAccountTokensIndexRoute
   '/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -2393,6 +2395,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2513,11 +2516,8 @@ export interface FileRoutesByTo {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2623,6 +2623,7 @@ export interface FileRoutesByTo {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -2654,6 +2655,7 @@ export interface FileRoutesByTo {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/account/tokens': typeof AppAccountTokensIndexRoute
   '/org/$slug': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations': typeof ApiPlatformOrganizationsIndexRoute
@@ -2704,6 +2706,7 @@ export interface FileRoutesByTo {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -2828,11 +2831,8 @@ export interface FileRoutesById {
   '/api/get-ip-address': typeof ApiGetIpAddressRoute
   '/api/get-s3-keys': typeof ApiGetS3KeysRoute
   '/api/get-utc-time': typeof ApiGetUtcTimeRoute
-  '/api/incident-banner': typeof ApiIncidentBannerRoute
-  '/api/incident-status': typeof ApiIncidentStatusRoute
   '/api/parse-query': typeof ApiParseQueryRoute
   '/api/scoped-access-token-permissions': typeof ApiScopedAccessTokenPermissionsRoute
-  '/api/status-override': typeof ApiStatusOverrideRoute
   '/api/status-page': typeof ApiStatusPageRoute
   '/integrations/vercel': typeof IntegrationsVercelRouteWithChildren
   '/mcp/secrets': typeof McpSecretsRoute
@@ -2951,6 +2951,7 @@ export interface FileRoutesById {
   '/project/$ref/logs/multigres-logs': typeof ProjectRefLogsMultigresLogsRoute
   '/project/$ref/logs/pg-upgrade-logs': typeof ProjectRefLogsPgUpgradeLogsRoute
   '/project/$ref/logs/pgcron-logs': typeof ProjectRefLogsPgcronLogsRoute
+  '/project/$ref/logs/pipelines-logs': typeof ProjectRefLogsPipelinesLogsRoute
   '/project/$ref/logs/pooler-logs': typeof ProjectRefLogsPoolerLogsRoute
   '/project/$ref/logs/postgres-logs': typeof ProjectRefLogsPostgresLogsRoute
   '/project/$ref/logs/postgrest-logs': typeof ProjectRefLogsPostgrestLogsRoute
@@ -2983,6 +2984,7 @@ export interface FileRoutesById {
   '/project/$ref/sql/examples': typeof ProjectRefSqlExamplesRoute
   '/project/$ref/sql/templates': typeof ProjectRefSqlTemplatesRoute
   '/project/$ref/storage/s3': typeof ProjectRefStorageS3Route
+  '/project/$ref/storage/signing-keys': typeof ProjectRefStorageSigningKeysRoute
   '/_app/account/tokens/': typeof AppAccountTokensIndexRoute
   '/_app/org/$slug/': typeof AppOrgSlugIndexRoute
   '/api/platform/organizations/': typeof ApiPlatformOrganizationsIndexRoute
@@ -3033,6 +3035,7 @@ export interface FileRoutesById {
   '/project/$ref/database/backups/restore-to-new-project': typeof ProjectRefDatabaseBackupsRestoreToNewProjectRoute
   '/project/$ref/database/backups/scheduled': typeof ProjectRefDatabaseBackupsScheduledRoute
   '/project/$ref/database/pipelines/$pipelineId': typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  '/project/$ref/database/pipelines/new': typeof ProjectRefDatabasePipelinesNewRoute
   '/project/$ref/database/publications/$id': typeof ProjectRefDatabasePublicationsIdRoute
   '/project/$ref/database/tables/$id': typeof ProjectRefDatabaseTablesIdRoute
   '/project/$ref/database/triggers/data': typeof ProjectRefDatabaseTriggersDataRoute
@@ -3156,11 +3159,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3279,6 +3279,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -3311,6 +3312,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/account/tokens/'
     | '/org/$slug/'
     | '/api/platform/organizations/'
@@ -3361,6 +3363,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3481,11 +3484,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3591,6 +3591,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -3622,6 +3623,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/account/tokens'
     | '/org/$slug'
     | '/api/platform/organizations'
@@ -3672,6 +3674,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -3795,11 +3798,8 @@ export interface FileRouteTypes {
     | '/api/get-ip-address'
     | '/api/get-s3-keys'
     | '/api/get-utc-time'
-    | '/api/incident-banner'
-    | '/api/incident-status'
     | '/api/parse-query'
     | '/api/scoped-access-token-permissions'
-    | '/api/status-override'
     | '/api/status-page'
     | '/integrations/vercel'
     | '/mcp/secrets'
@@ -3918,6 +3918,7 @@ export interface FileRouteTypes {
     | '/project/$ref/logs/multigres-logs'
     | '/project/$ref/logs/pg-upgrade-logs'
     | '/project/$ref/logs/pgcron-logs'
+    | '/project/$ref/logs/pipelines-logs'
     | '/project/$ref/logs/pooler-logs'
     | '/project/$ref/logs/postgres-logs'
     | '/project/$ref/logs/postgrest-logs'
@@ -3950,6 +3951,7 @@ export interface FileRouteTypes {
     | '/project/$ref/sql/examples'
     | '/project/$ref/sql/templates'
     | '/project/$ref/storage/s3'
+    | '/project/$ref/storage/signing-keys'
     | '/_app/account/tokens/'
     | '/_app/org/$slug/'
     | '/api/platform/organizations/'
@@ -4000,6 +4002,7 @@ export interface FileRouteTypes {
     | '/project/$ref/database/backups/restore-to-new-project'
     | '/project/$ref/database/backups/scheduled'
     | '/project/$ref/database/pipelines/$pipelineId'
+    | '/project/$ref/database/pipelines/new'
     | '/project/$ref/database/publications/$id'
     | '/project/$ref/database/tables/$id'
     | '/project/$ref/database/triggers/data'
@@ -4112,11 +4115,8 @@ export interface RootRouteChildren {
   ApiGetIpAddressRoute: typeof ApiGetIpAddressRoute
   ApiGetS3KeysRoute: typeof ApiGetS3KeysRoute
   ApiGetUtcTimeRoute: typeof ApiGetUtcTimeRoute
-  ApiIncidentBannerRoute: typeof ApiIncidentBannerRoute
-  ApiIncidentStatusRoute: typeof ApiIncidentStatusRoute
   ApiParseQueryRoute: typeof ApiParseQueryRoute
   ApiScopedAccessTokenPermissionsRoute: typeof ApiScopedAccessTokenPermissionsRoute
-  ApiStatusOverrideRoute: typeof ApiStatusOverrideRoute
   ApiStatusPageRoute: typeof ApiStatusPageRoute
   IntegrationsVercelRoute: typeof IntegrationsVercelRouteWithChildren
   McpSecretsRoute: typeof McpSecretsRoute
@@ -4445,20 +4445,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiGetUtcTimeRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/api/incident-banner': {
-      id: '/api/incident-banner'
-      path: '/api/incident-banner'
-      fullPath: '/api/incident-banner'
-      preLoaderRoute: typeof ApiIncidentBannerRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/incident-status': {
-      id: '/api/incident-status'
-      path: '/api/incident-status'
-      fullPath: '/api/incident-status'
-      preLoaderRoute: typeof ApiIncidentStatusRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/parse-query': {
       id: '/api/parse-query'
       path: '/api/parse-query'
@@ -4471,13 +4457,6 @@ declare module '@tanstack/react-router' {
       path: '/api/scoped-access-token-permissions'
       fullPath: '/api/scoped-access-token-permissions'
       preLoaderRoute: typeof ApiScopedAccessTokenPermissionsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/status-override': {
-      id: '/api/status-override'
-      path: '/api/status-override'
-      fullPath: '/api/status-override'
-      preLoaderRoute: typeof ApiStatusOverrideRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/api/status-page': {
@@ -5397,6 +5376,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefLogsPgcronLogsRouteImport
       parentRoute: typeof ProjectRefLogsRoute
     }
+    '/project/$ref/logs/pipelines-logs': {
+      id: '/project/$ref/logs/pipelines-logs'
+      path: '/pipelines-logs'
+      fullPath: '/project/$ref/logs/pipelines-logs'
+      preLoaderRoute: typeof ProjectRefLogsPipelinesLogsRouteImport
+      parentRoute: typeof ProjectRefLogsRoute
+    }
     '/project/$ref/logs/pooler-logs': {
       id: '/project/$ref/logs/pooler-logs'
       path: '/pooler-logs'
@@ -5633,6 +5619,13 @@ declare module '@tanstack/react-router' {
       path: '/s3'
       fullPath: '/project/$ref/storage/s3'
       preLoaderRoute: typeof ProjectRefStorageS3RouteImport
+      parentRoute: typeof ProjectRefStorageRoute
+    }
+    '/project/$ref/storage/signing-keys': {
+      id: '/project/$ref/storage/signing-keys'
+      path: '/signing-keys'
+      fullPath: '/project/$ref/storage/signing-keys'
+      preLoaderRoute: typeof ProjectRefStorageSigningKeysRouteImport
       parentRoute: typeof ProjectRefStorageRoute
     }
     '/_app/org/$slug/private-apps/': {
@@ -5913,6 +5906,13 @@ declare module '@tanstack/react-router' {
       path: '/$pipelineId'
       fullPath: '/project/$ref/database/pipelines/$pipelineId'
       preLoaderRoute: typeof ProjectRefDatabasePipelinesPipelineIdRouteImport
+      parentRoute: typeof ProjectRefDatabasePipelinesRoute
+    }
+    '/project/$ref/database/pipelines/new': {
+      id: '/project/$ref/database/pipelines/new'
+      path: '/new'
+      fullPath: '/project/$ref/database/pipelines/new'
+      preLoaderRoute: typeof ProjectRefDatabasePipelinesNewRouteImport
       parentRoute: typeof ProjectRefDatabasePipelinesRoute
     }
     '/project/$ref/database/publications/': {
@@ -6758,6 +6758,7 @@ const ProjectRefComputeRouteWithChildren =
 
 interface ProjectRefDatabasePipelinesRouteChildren {
   ProjectRefDatabasePipelinesPipelineIdRoute: typeof ProjectRefDatabasePipelinesPipelineIdRoute
+  ProjectRefDatabasePipelinesNewRoute: typeof ProjectRefDatabasePipelinesNewRoute
   ProjectRefDatabasePipelinesIndexRoute: typeof ProjectRefDatabasePipelinesIndexRoute
 }
 
@@ -6765,6 +6766,7 @@ const ProjectRefDatabasePipelinesRouteChildren: ProjectRefDatabasePipelinesRoute
   {
     ProjectRefDatabasePipelinesPipelineIdRoute:
       ProjectRefDatabasePipelinesPipelineIdRoute,
+    ProjectRefDatabasePipelinesNewRoute: ProjectRefDatabasePipelinesNewRoute,
     ProjectRefDatabasePipelinesIndexRoute:
       ProjectRefDatabasePipelinesIndexRoute,
   }
@@ -6952,6 +6954,7 @@ interface ProjectRefLogsRouteChildren {
   ProjectRefLogsMultigresLogsRoute: typeof ProjectRefLogsMultigresLogsRoute
   ProjectRefLogsPgUpgradeLogsRoute: typeof ProjectRefLogsPgUpgradeLogsRoute
   ProjectRefLogsPgcronLogsRoute: typeof ProjectRefLogsPgcronLogsRoute
+  ProjectRefLogsPipelinesLogsRoute: typeof ProjectRefLogsPipelinesLogsRoute
   ProjectRefLogsPoolerLogsRoute: typeof ProjectRefLogsPoolerLogsRoute
   ProjectRefLogsPostgresLogsRoute: typeof ProjectRefLogsPostgresLogsRoute
   ProjectRefLogsPostgrestLogsRoute: typeof ProjectRefLogsPostgrestLogsRoute
@@ -6975,6 +6978,7 @@ const ProjectRefLogsRouteChildren: ProjectRefLogsRouteChildren = {
   ProjectRefLogsMultigresLogsRoute: ProjectRefLogsMultigresLogsRoute,
   ProjectRefLogsPgUpgradeLogsRoute: ProjectRefLogsPgUpgradeLogsRoute,
   ProjectRefLogsPgcronLogsRoute: ProjectRefLogsPgcronLogsRoute,
+  ProjectRefLogsPipelinesLogsRoute: ProjectRefLogsPipelinesLogsRoute,
   ProjectRefLogsPoolerLogsRoute: ProjectRefLogsPoolerLogsRoute,
   ProjectRefLogsPostgresLogsRoute: ProjectRefLogsPostgresLogsRoute,
   ProjectRefLogsPostgrestLogsRoute: ProjectRefLogsPostgrestLogsRoute,
@@ -7128,6 +7132,7 @@ const ProjectRefSqlRouteWithChildren = ProjectRefSqlRoute._addFileChildren(
 
 interface ProjectRefStorageRouteChildren {
   ProjectRefStorageS3Route: typeof ProjectRefStorageS3Route
+  ProjectRefStorageSigningKeysRoute: typeof ProjectRefStorageSigningKeysRoute
   ProjectRefStorageFilesPoliciesRoute: typeof ProjectRefStorageFilesPoliciesRoute
   ProjectRefStorageFilesSettingsRoute: typeof ProjectRefStorageFilesSettingsRoute
   ProjectRefStorageAnalyticsIndexRoute: typeof ProjectRefStorageAnalyticsIndexRoute
@@ -7140,6 +7145,7 @@ interface ProjectRefStorageRouteChildren {
 
 const ProjectRefStorageRouteChildren: ProjectRefStorageRouteChildren = {
   ProjectRefStorageS3Route: ProjectRefStorageS3Route,
+  ProjectRefStorageSigningKeysRoute: ProjectRefStorageSigningKeysRoute,
   ProjectRefStorageFilesPoliciesRoute: ProjectRefStorageFilesPoliciesRoute,
   ProjectRefStorageFilesSettingsRoute: ProjectRefStorageFilesSettingsRoute,
   ProjectRefStorageAnalyticsIndexRoute: ProjectRefStorageAnalyticsIndexRoute,
@@ -7263,11 +7269,8 @@ const rootRouteChildren: RootRouteChildren = {
   ApiGetIpAddressRoute: ApiGetIpAddressRoute,
   ApiGetS3KeysRoute: ApiGetS3KeysRoute,
   ApiGetUtcTimeRoute: ApiGetUtcTimeRoute,
-  ApiIncidentBannerRoute: ApiIncidentBannerRoute,
-  ApiIncidentStatusRoute: ApiIncidentStatusRoute,
   ApiParseQueryRoute: ApiParseQueryRoute,
   ApiScopedAccessTokenPermissionsRoute: ApiScopedAccessTokenPermissionsRoute,
-  ApiStatusOverrideRoute: ApiStatusOverrideRoute,
   ApiStatusPageRoute: ApiStatusPageRoute,
   IntegrationsVercelRoute: IntegrationsVercelRouteWithChildren,
   McpSecretsRoute: McpSecretsRoute,

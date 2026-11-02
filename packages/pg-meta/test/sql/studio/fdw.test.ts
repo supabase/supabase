@@ -52,8 +52,8 @@ test('encrypted server options still resolve their value through Vault unchanged
     formState: { wrapper_name: 'my_wrapper', server_name: 'my_server', api_secret: 'shh' },
   })
 
-  // Encrypted options keep the ''%s'' placeholder filled by the vault secret id.
-  expect(sql).toContain("api_secret ''%s''")
+  // Encrypted options are passed as a format() %L argument filled by the vault secret id.
+  expect(sql).toContain('api_secret %L')
   expect(sql).toContain('vault.create_secret')
 })
 

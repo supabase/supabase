@@ -1,7 +1,7 @@
 export const siteConfig = {
   name: 'Supabase Design System',
   url: 'https://supabase.com/design-system',
-  ogImage: 'https://supabase.com/design-system/og.jpg',
+  ogImage: 'https://supabase.com/docs/img/supabase-og-image.png',
   description: 'Design System of Supabase',
   links: {
     twitter: 'https://twitter.com/supabase',

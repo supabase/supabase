@@ -12,7 +12,7 @@ imgSocial: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
 imgThumb: supabase-auth-build-vs-buy/supabase-auth-build-vs-buy-og.png
 ---
 
-Authentication appears in nearly every application but is rarely the core value proposition. Yet development teams often spend weeks or months building, testing, and maintaining auth systems. Let's explore the real costs of building authentication from scratch versus using a solution like Supabase Auth.
+Authentication appears in nearly every application but is rarely the core value proposition. Yet development teams often spend weeks or months building, testing, and maintaining auth systems. Let's explore the real costs of building authentication from scratch versus using a solution like [Supabase Auth](/auth).
 
 ## How Supabase Auth works under the hood
 
@@ -20,7 +20,7 @@ Before diving into the cost analysis, it's important to understand what Supabase
 
 1. **Postgres-native authentication**: Supabase Auth stores users directly in your Postgres database in the `auth.users` table, not in a separate service
 2. **JWT-based**: Authorization give you total control over security
-3. **Row Level Security integration**: Seamlessly connects authentication with Postgres's RLS policies
+3. **[Row Level Security](/docs/guides/database/postgres/row-level-security) integration**: Seamlessly connects authentication with Postgres's RLS policies
 4. **Hybrid token architecture**: Supabase Auth issues stateless JWTs for access control, while maintaining refresh tokens and session data in your Postgres database for secure, persistent login
 
 ## The hidden costs of building your own auth
@@ -78,7 +78,7 @@ Supabase takes a different approach by providing authentication that's:
 2. **Open source**: No vendor lock-in, with the ability to self-host if needed.
 3. **Developer-focused**: Simple APIs with client libraries for major frameworks.
 4. **Secure**: Supabase maintains security best practices for token issuance, password hashing (using `bcrypt`), and provider updates so you don’t have to monitor every standards update. However, developers are still responsible for securely handling user data and managing secure client environments.
-5. **Extensible**: Edge Functions enable custom auth logic to implement post-signup profile creation, role assignment based on domains, and third-party webhooks for things like sending Discord invites or syncing with your CRM.
+5. **Extensible**: [Edge Functions](/edge-functions) enable custom auth logic to implement post-signup profile creation, role assignment based on domains, and third-party webhooks for things like sending Discord invites or syncing with your CRM.
 
 ### Time to market
 

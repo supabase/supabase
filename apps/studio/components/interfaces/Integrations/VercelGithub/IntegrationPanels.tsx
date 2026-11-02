@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { ArrowRightIcon, ExternalLinkIcon, GithubIcon } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, cn, GithubIcon } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'

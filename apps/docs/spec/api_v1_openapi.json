@@ -592,7 +592,7 @@
             "description": "",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/RegionsInfo_Output" }
+                "schema": { "$ref": "#/components/schemas/RegionsInfoV1_Output" }
               }
             }
           }
@@ -1521,6 +1521,7 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
+          "404": { "description": "API key not found for project" },
           "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
@@ -1577,6 +1578,7 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
+          "404": { "description": "API key not found for project" },
           "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
@@ -1649,6 +1651,7 @@
           },
           "401": { "description": "Unauthorized" },
           "403": { "description": "Forbidden action" },
+          "404": { "description": "API key not found for project" },
           "429": { "description": "Rate limit exceeded" }
         },
         "security": [{ "bearer": [] }],
@@ -6489,10 +6492,10 @@
           "required": true,
           "content": {
             "application/vnd.denoland.eszip": {
-              "schema": { "type": "string", "format": "binary" }
+              "schema": { "$ref": "#/components/schemas/V1UpdateFunctionBodyEszip" }
             },
             "application/json": {
-              "schema": { "$ref": "#/components/schemas/V1UpdateFunctionBody" }
+              "schema": { "$ref": "#/components/schemas/V1UpdateFunctionBodyJson" }
             }
           }
         },
@@ -8661,7 +8664,7 @@
           "status"
         ]
       },
-      "RegionsInfo_Output": {
+      "RegionsInfoV1_Output": {
         "type": "object",
         "properties": {
           "recommendations": {
@@ -9593,6 +9596,20 @@
             "description": "If `null`, the value is automatically configured to 10.",
             "nullable": true
           },
+          "db_pool_max_lifetime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600,
+            "description": "If `null`, the value is automatically configured to 1800.",
+            "nullable": true
+          },
+          "db_pool_max_idletime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "If `null`, the value is automatically configured to 30.",
+            "nullable": true
+          },
           "jwt_secret": { "type": "string" }
         },
         "required": [
@@ -9600,7 +9617,9 @@
           "max_rows",
           "db_extra_search_path",
           "db_pool",
-          "db_pool_acquisition_timeout"
+          "db_pool_acquisition_timeout",
+          "db_pool_max_lifetime",
+          "db_pool_max_idletime"
         ]
       },
       "V1UpdatePostgrestConfigBody": {
@@ -9610,7 +9629,9 @@
           "db_schema": { "type": "string" },
           "max_rows": { "type": "integer", "minimum": 0, "maximum": 1000000 },
           "db_pool": { "type": "integer", "minimum": 0, "maximum": 1000 },
-          "db_pool_acquisition_timeout": { "type": "integer", "minimum": 0, "maximum": 60 }
+          "db_pool_acquisition_timeout": { "type": "integer", "minimum": 0, "maximum": 60 },
+          "db_pool_max_lifetime": { "type": "integer", "minimum": 0, "maximum": 3600 },
+          "db_pool_max_idletime": { "type": "integer", "minimum": 0, "maximum": 60 }
         },
         "example": { "db_schema": "public,storage", "db_pool": 20, "max_rows": 1000 }
       },
@@ -9637,6 +9658,20 @@
             "maximum": 9007199254740991,
             "description": "If `null`, the value is automatically configured to 10.",
             "nullable": true
+          },
+          "db_pool_max_lifetime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600,
+            "description": "If `null`, the value is automatically configured to 1800.",
+            "nullable": true
+          },
+          "db_pool_max_idletime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "If `null`, the value is automatically configured to 30.",
+            "nullable": true
           }
         },
         "required": [
@@ -9644,7 +9679,9 @@
           "max_rows",
           "db_extra_search_path",
           "db_pool",
-          "db_pool_acquisition_timeout"
+          "db_pool_acquisition_timeout",
+          "db_pool_max_lifetime",
+          "db_pool_max_idletime"
         ]
       },
       "V1ProjectRefResponse_Output": {
@@ -11774,6 +11811,9 @@
                     "log_auth_error_rate_high",
                     "log_storage_error_rate_high",
                     "log_edge_function_error_rate_high",
+                    "realtime_authorization_timeouts",
+                    "realtime_postgres_changes_spike",
+                    "realtime_concurrent_users_near_limit",
                     "project_not_active",
                     "advisor_check_unavailable"
                   ]
@@ -12797,7 +12837,7 @@
         "required": ["id", "slug", "name", "status", "version", "created_at", "updated_at"]
       },
       "StreamableFile": { "type": "object", "properties": {} },
-      "V1UpdateFunctionBody": {
+      "V1UpdateFunctionBodyJson": {
         "type": "object",
         "properties": {
           "name": { "type": "string" },
@@ -12809,6 +12849,13 @@
           "body": "Deno.serve(() => new Response('Hello again!'))",
           "verify_jwt": true
         }
+      },
+      "V1UpdateFunctionBodyEszip": {
+        "type": "string",
+        "format": "binary",
+        "contentEncoding": "binary",
+        "description": "Raw Brotli-compressed ESZIP binary file.\n\n**Validation requirements** - The file must start with the four magic bytes `EZBR` (hex: `45 5A 42 52`).\n- The `ezbr_sha256` query parameter must contain the SHA-256 hash of the uploaded ESZIP payload.\n\n**Example**\n```javascript\nimport { readFile } from 'node:fs/promises';\nimport { brotliCompress } from 'node:zlib';\nimport { promisify } from 'node:util';\nimport { createHash } from 'node:crypto';\n\nconst compress = promisify(brotliCompress);\nconst marker = Buffer.from('EZBR', 'ascii');\n\nconst file = await readFile('./function.eszip');\nconst compressed = await compress(file);\n\nconst payload = Buffer.concat([marker, compressed]);\n\nconst ezbr_sha256 = createHash('sha256')\n  .update(payload)\n  .digest('hex');\n\nconsole.log(ezbr_sha256);\n```\n\n",
+        "examples": ["Binary Brotli-compressed ESZIP file"]
       },
       "V1StorageBucketResponse_Output": {
         "type": "object",
@@ -13228,6 +13275,10 @@
         "properties": {
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
+          "pg_stat_statements.max": { "type": "integer", "minimum": 100, "maximum": 45000 },
+          "pg_net.batch_size": { "type": "integer", "minimum": 0, "maximum": 32767 },
+          "autovacuum_max_workers": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "autovacuum_work_mem": { "type": "string" },
           "cron.log_statement": { "type": "boolean" },
           "log_autovacuum_min_duration": {
             "type": "string",
@@ -13303,6 +13354,10 @@
         "properties": {
           "effective_cache_size": { "type": "string" },
           "logical_decoding_work_mem": { "type": "string" },
+          "pg_stat_statements.max": { "type": "integer", "minimum": 100, "maximum": 45000 },
+          "pg_net.batch_size": { "type": "integer", "minimum": 0, "maximum": 32767 },
+          "autovacuum_max_workers": { "type": "integer", "minimum": 1, "maximum": 262143 },
+          "autovacuum_work_mem": { "type": "string" },
           "cron.log_statement": { "type": "boolean" },
           "log_autovacuum_min_duration": {
             "type": "string",

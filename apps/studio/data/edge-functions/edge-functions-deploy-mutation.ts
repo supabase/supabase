@@ -8,7 +8,7 @@ import {
   getFallbackImportMapPath,
   getStaticPatterns,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type EdgeFunctionsDeployBodyMetadata = components['schemas']['FunctionDeployBody']['metadata']
@@ -56,6 +56,7 @@ export async function deployEdgeFunction({
 
       return formData
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

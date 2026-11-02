@@ -30,7 +30,7 @@ export interface WebhookEndpointAttributesInput {
   description?: string | null
   enabled?: boolean
   event_types: { type: WebhookEventType }[]
-  custom_headers?: Record<string, string> | null
+  custom_headers?: Record<string, string>
   signing_secret?: string
 }
 
@@ -195,16 +195,29 @@ export async function getWebhookDelivery(
   return data
 }
 
-export async function sendTestWebhookEvent(scope: WebhookScopeParams, id: string) {
+export async function sendTestWebhookEvent(
+  scope: WebhookScopeParams,
+  id: string,
+  eventType?: string
+) {
+  const body = eventType
+    ? {
+        data: {
+          type: 'event' as const,
+          attributes: { type: eventType as Exclude<WebhookEventType, '*'> },
+        },
+      }
+    : {}
+
   const { data, error } =
     scope.scope === 'organization'
       ? await post('/v2/organizations/{slug}/webhooks/endpoints/{id}/test', {
           params: { path: { slug: scope.orgSlug, id } },
-          body: {},
+          body,
         })
       : await post('/v2/projects/{ref}/webhooks/endpoints/{id}/test', {
           params: { path: { ref: scope.projectRef, id } },
-          body: {},
+          body,
         })
 
   if (error) handleError(error)

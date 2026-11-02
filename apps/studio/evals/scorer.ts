@@ -7,7 +7,7 @@ import { z } from 'zod'
 import { getParsedToolSpans, getThreadParts, getToolSpans } from './trace-utils'
 import type { Transcript } from './transcript'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
-import { loadKnowledgeInputSchema } from '@/lib/ai/tools/studio-tools'
+import { contract as loadKnowledgeContract } from '@/lib/ai/tools/load-knowledge'
 import { extractUrls } from '@/lib/helpers'
 
 const LLM_AS_A_JUDGE_MODEL = 'gpt-5.2' // NOTE: `gpt-5.2-2025-12-11` snapshot not yet working with online scorers
@@ -166,7 +166,7 @@ export const knowledgeUsageScorer: AssistantEvalScorer = async ({ expected, trac
   if (!expected.requiredKnowledge || !trace) return null
 
   const knowledgeSpans = await getParsedToolSpans(trace, 'load_knowledge', {
-    inputSchema: loadKnowledgeInputSchema,
+    inputSchema: loadKnowledgeContract.inputSchema,
   })
   const loadedKnowledge: string[] = knowledgeSpans.map((s) => s.input.name)
 

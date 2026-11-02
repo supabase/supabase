@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -20,7 +19,7 @@ import { useToggleLegacyAPIKeysMutation } from '@/data/api-keys/legacy-api-key-t
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export const ToggleLegacyApiKeysPanel = () => {
@@ -30,10 +29,11 @@ export const ToggleLegacyApiKeysPanel = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_WRITE,
-    '*'
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
+  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_WRITE
   )
 
   const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =

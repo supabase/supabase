@@ -45,7 +45,7 @@ export const useObjectVersionRestoreMutation = ({
 
   return useMutation<void, ResponseError, ObjectVersionRestoreVariables>({
     mutationFn: restoreObjectVersion,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.objectVersions(
           variables.projectRef,
@@ -53,11 +53,11 @@ export const useObjectVersionRestoreMutation = ({
           variables.path
         ),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to restore version: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })

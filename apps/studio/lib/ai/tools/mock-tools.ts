@@ -2,8 +2,18 @@ import assert from 'node:assert'
 import { tool, type ToolExecutionOptions } from 'ai'
 import { z } from 'zod'
 
-import { getOptInTools, getStudioTools } from '../tools/studio-tools'
-import { getNotebookTools } from './notebook-tools'
+import { createTool as createCreateNotebookTool } from './create-notebook.server'
+import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
+import { createTool as createDeployEdgeFunctionTool } from './deploy-edge-function.server'
+import { createTool as createExecuteSqlTool } from './execute-sql.server'
+import { createTool as createGetNotebookTool } from './get-notebook.server'
+import { createTool as createListDatabasesTool } from './list-databases.server'
+import { createTool as createListNotebooksTool } from './list-notebooks.server'
+import { createTool as createLoadKnowledgeTool } from './load-knowledge.server'
+import { createTool as createRenameChatTool } from './rename-chat.server'
+import { createTool as createRunNotebookTool } from './run-notebook.server'
+import { createTool as createUpdateNotebookTool } from './update-notebook.server'
+import { createTool as createUpdateOptInLevelTool } from './update-opt-in-level.server'
 import {
   applyNotebookOperations,
   describeNotebookOperationError,
@@ -233,7 +243,15 @@ export const MOCK_NOTEBOOKS_DATA: MockNotebook[] = [
 ]
 
 function createMockedStudioTools() {
-  const studioTools = getStudioTools()
+  // Pinned to `schema` so the model sees the same execute_sql output it always has in evals,
+  // whatever level the eval runs at. Evals don't yet use one level for every tool and for replay.
+  const ctx = { aiOptInLevel: 'schema' } as const
+  const studioTools = {
+    execute_sql: createExecuteSqlTool(ctx),
+    deploy_edge_function: createDeployEdgeFunctionTool(ctx),
+    rename_chat: createRenameChatTool(ctx),
+    load_knowledge: createLoadKnowledgeTool(ctx),
+  }
 
   return Object.fromEntries(
     Object.entries(studioTools).map(([name, baseTool]) => {
@@ -443,6 +461,7 @@ const MOCK_DATABASES_DATA = [
 // against the exact schemas production uses (agentCellSchema's `.strict()` rejection of
 // agent-authored cell ids, update_notebook's real operations schema, etc).
 function createMockNotebookTools(store: MockNotebookStore) {
+  const ctx = { aiOptInLevel: 'schema_and_log_and_data' } as const
   const {
     list_databases,
     list_notebooks,
@@ -451,7 +470,15 @@ function createMockNotebookTools(store: MockNotebookStore) {
     create_notebook,
     update_notebook,
     delete_notebook,
-  } = getNotebookTools({ aiOptInLevel: 'schema_and_log_and_data' })
+  } = {
+    list_databases: createListDatabasesTool(ctx),
+    list_notebooks: createListNotebooksTool(ctx),
+    get_notebook: createGetNotebookTool(ctx),
+    run_notebook: createRunNotebookTool(ctx),
+    create_notebook: createCreateNotebookTool(ctx),
+    update_notebook: createUpdateNotebookTool(ctx),
+    delete_notebook: createDeleteNotebookTool(ctx),
+  }
 
   return {
     list_databases: {
@@ -616,7 +643,7 @@ export async function getMockTools(
 
   const tools = {
     ...mockedStudioTools,
-    ...getOptInTools({ aiOptInLevel }),
+    update_opt_in_level: createUpdateOptInLevelTool({ aiOptInLevel }),
     search_docs,
     list_tables: createMockListTablesTool(overrides?.list_tables),
     list_extensions: createMockListExtensionsTool(),

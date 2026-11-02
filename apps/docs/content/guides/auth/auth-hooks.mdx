@@ -105,7 +105,7 @@ When an HTTP hook is created, the secret generated should be of the `v1,whsec_<b
 
 The secret is used to verify the payload received in your hook. Create an entry in your `.env.local` file to store the `<standard-base64-secret>` portion of the secret for each hook that you have. For example:
 
-```ini
+```dotenv
 SEND_SMS_HOOK_SECRETS=v1,whsec_<base64-secret>
 ```
 
@@ -251,7 +251,7 @@ secrets = "env(SEND_SMS_HOOK_SECRETS)"
 
 Fill in the Hook Secret in `supabase/functions/.env`
 
-```ini
+```dotenv
 SEND_SMS_HOOK_SECRETS='v1,whsec_<base64-secret>'
 ```
 

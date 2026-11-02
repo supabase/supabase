@@ -1,6 +1,6 @@
 import { useDocsSearch, type DocsSearchResult } from 'common'
-import { BookIcon, GithubIcon, Loader2Icon } from 'lucide-react'
-import { cn } from 'ui'
+import { BookIcon, Loader2Icon } from 'lucide-react'
+import { cn, GithubIcon } from 'ui'
 
 import { useChangedSync } from '@/hooks/misc/useChanged'
 import { DOCS_URL } from '@/lib/constants'

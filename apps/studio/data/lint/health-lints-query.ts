@@ -4,7 +4,7 @@ import { useFlag } from 'common'
 
 import { lintKeys } from './keys'
 import type { Lint } from './lint-query'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 import { EMPTY_ARR } from '@/lib/void'
@@ -57,6 +57,7 @@ export async function getProjectHealthLints(
       },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

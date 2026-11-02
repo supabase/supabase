@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { keys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 export type CreateThirdPartyAuthVariables = {
@@ -29,6 +29,7 @@ export async function createThirdPartyIntegration({
       jwks_url: jwksUrl,
       oidc_issuer_url: oidcIssuerUrl,
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
 

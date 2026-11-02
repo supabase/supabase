@@ -66,6 +66,21 @@ export const MemberRow = memo(function MemberRow({
     })
   }, [member.role_ids, roleById])
 
+  const roleBreakdown = useMemo(
+    () =>
+      roleRows.flatMap(({ id, roleName, appliesToAllProjects, projectsApplied }) =>
+        appliesToAllProjects
+          ? [{ key: `${id}-all`, roleName, label: 'Organization' }]
+          : projectsApplied.map((project) => ({
+              key: `${id}-${project.ref}`,
+              roleName,
+              label: project.name,
+            }))
+      ),
+    [roleRows]
+  )
+  const totalProjectsApplied = roleRows.reduce((sum, row) => sum + row.projectsApplied.length, 0)
+
   return (
     <div
       role="row"
@@ -149,6 +164,31 @@ export const MemberRow = memo(function MemberRow({
       <div role="cell" className="min-w-0">
         {isLoadingRoles ? (
           <ShimmeringLoader className="w-32" />
+        ) : roleRows.length > 1 ? (
+          <div className="flex items-center gap-x-2 min-w-0 text-sm">
+            <p className="text-foreground-light whitespace-nowrap">Multiple roles</p>
+            <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={14} />
+            <HoverCard openDelay={200}>
+              <HoverCardTrigger asChild>
+                <span className="text-foreground-light truncate">
+                  {totalProjectsApplied} {pluralize(totalProjectsApplied, 'project')}
+                </span>
+              </HoverCardTrigger>
+              <HoverCardContent className="p-0">
+                <div className="flex flex-col py-1">
+                  <ScrollArea className={cn(roleBreakdown.length > 5 ? 'h-[130px]' : '')}>
+                    {roleBreakdown.map(({ key, roleName, label }) => (
+                      <div key={key} className="px-2 py-1 flex items-center gap-x-2 text-xs">
+                        <span className="whitespace-nowrap">{roleName}</span>
+                        <ChevronRightIcon className="text-foreground-muted/50 shrink-0" size={12} />
+                        <span className="text-foreground-light truncate">{label}</span>
+                      </div>
+                    ))}
+                  </ScrollArea>
+                </div>
+              </HoverCardContent>
+            </HoverCard>
+          </div>
         ) : (
           roleRows.map(({ id, roleName, appliesToAllProjects, projectsApplied }) => (
             <div key={`role-${id}`} className="flex items-center gap-x-2 min-w-0 text-sm">

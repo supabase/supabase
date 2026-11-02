@@ -1,7 +1,6 @@
 import { useParams } from 'common'
-import { GithubIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { Button } from 'ui'
+import { Button, GithubIcon } from 'ui'
 
 import { useGitHubAuthorizationQuery } from '@/data/integrations/github-authorization-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'

@@ -5,12 +5,16 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { promisify } from 'node:util'
 
+import { generateFgaRequirementsSource } from './fga-requirements.mjs'
+
 const run = promisify(execFile)
 const packageDirectory = dirname(dirname(fileURLToPath(import.meta.url)))
 const typesDirectory = process.env.API_TYPES_DIRECTORY ?? join(packageDirectory, 'types')
 const platformApiUrl =
   process.env.PLATFORM_API_OPENAPI_URL ?? 'https://api.supabase.com/api/platform-json'
 const fetchTimeout = 30_000
+
+export const FGA_REQUIREMENTS_FILENAME = 'fga-requirements.ts'
 
 export const specifications = [
   { name: 'api-v1', url: 'https://api.supabase.com/api/v1-json' },
@@ -51,9 +55,9 @@ export async function findMismatchedTypes(
   specifications,
   { readFileImpl = readFile, generatedTypesDirectory, typesDirectory }
 ) {
+  const filenames = [...specifications.map(({ name }) => `${name}.d.ts`), FGA_REQUIREMENTS_FILENAME]
   const mismatches = await Promise.all(
-    specifications.map(async ({ name }) => {
-      const filename = `${name}.d.ts`
+    filenames.map(async (filename) => {
       const [generated, committed] = await Promise.all([
         readFileImpl(join(generatedTypesDirectory, filename), 'utf8'),
         readFileImpl(join(typesDirectory, filename), 'utf8'),
@@ -123,7 +127,14 @@ export async function reportTypeDifferences(
 // committed types directory).
 export async function generateTypes(
   specifications,
-  { temporaryDirectory, generatedTypesDirectory, runImpl = run, fetchImpl, writeFileImpl }
+  {
+    temporaryDirectory,
+    generatedTypesDirectory,
+    runImpl = run,
+    fetchImpl,
+    writeFileImpl,
+    readFileImpl = readFile,
+  }
 ) {
   const config = await fetchOpenApiSpecifications(specifications, {
     temporaryDirectory,
@@ -131,6 +142,17 @@ export async function generateTypes(
     fetchImpl,
     writeFileImpl,
   })
+
+  const parsedSpecifications = await Promise.all(
+    specifications.map(async ({ name }) => ({
+      name,
+      spec: JSON.parse(await readFileImpl(join(temporaryDirectory, `${name}.json`), 'utf8')),
+    }))
+  )
+  await writeFile(
+    join(generatedTypesDirectory, FGA_REQUIREMENTS_FILENAME),
+    generateFgaRequirementsSource(parsedSpecifications)
+  )
 
   await writeFile(join(temporaryDirectory, 'redocly.yaml'), `apis:\n${config.join('\n')}`)
   await runImpl(
@@ -164,6 +186,7 @@ export async function generateTypes(
       prettierConfigPath.trim(),
       '--write',
       ...specifications.map(({ name }) => join(generatedTypesDirectory, `${name}.d.ts`)),
+      join(generatedTypesDirectory, FGA_REQUIREMENTS_FILENAME),
     ],
     { cwd: packageDirectory }
   )

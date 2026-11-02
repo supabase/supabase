@@ -22,7 +22,6 @@ export const env = {
   API_URL: process.env.API_URL || 'http://127.0.0.1:54321',
 
   IS_PLATFORM: toBoolean(process.env.IS_PLATFORM || 'false'),
-  STUDIO_FRAMEWORK: process.env.STUDIO_FRAMEWORK || 'next',
   EMAIL: process.env.EMAIL,
   PASSWORD: process.env.PASSWORD,
   PROJECT_REF: process.env.PROJECT_REF || undefined,

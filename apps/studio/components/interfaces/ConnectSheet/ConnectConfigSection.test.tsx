@@ -33,7 +33,7 @@ const manyFrameworkOptions = Array.from({ length: 20 }, (_, index) => ({
 }))
 
 describe('ConnectConfigSection', () => {
-  test('filters frameworks and selects the matching option', async () => {
+  test('filters frameworks, selects the matching option, and clears the search on close', async () => {
     const user = userEvent.setup()
     const onFieldChange = vi.fn()
 
@@ -55,6 +55,9 @@ describe('ConnectConfigSection', () => {
     await user.click(screen.getByRole('option', { name: 'React Native' }))
 
     expect(onFieldChange).toHaveBeenCalledWith('framework', 'react-native')
+
+    await user.click(screen.getByRole('combobox'))
+    expect(screen.getByPlaceholderText('Search frameworks...')).toHaveValue('')
   })
 
   test('matches frameworks by key without announcing the empty state', async () => {
@@ -92,27 +95,6 @@ describe('ConnectConfigSection', () => {
     await user.type(screen.getByPlaceholderText('Search frameworks...'), 'missing')
 
     expect(screen.getByRole('status')).toHaveTextContent('No frameworks found')
-  })
-
-  test('clears the search when the combobox closes after selecting an option', async () => {
-    const user = userEvent.setup()
-
-    customRender(
-      <ConnectConfigSection
-        activeFields={[frameworkField]}
-        state={{ framework: 'nextjs' }}
-        onFieldChange={vi.fn()}
-        getFieldOptions={() => frameworkOptions}
-      />
-    )
-
-    await user.click(screen.getByRole('combobox'))
-    const searchInput = screen.getByPlaceholderText('Search frameworks...')
-    await user.type(searchInput, 'native')
-    await user.click(screen.getByRole('option', { name: 'React Native' }))
-    await user.click(screen.getByRole('combobox'))
-
-    expect(screen.getByPlaceholderText('Search frameworks...')).toHaveValue('')
   })
 
   test('uses a bounded scroll area for long framework lists', async () => {

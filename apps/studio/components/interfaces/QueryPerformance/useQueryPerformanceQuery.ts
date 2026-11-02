@@ -15,6 +15,7 @@ import {
   QueryPerformanceSort,
   QueryPerformanceSQLParams,
 } from './QueryPerformance.types'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import useDbQuery from '@/hooks/analytics/useDbQuery'
@@ -184,6 +185,7 @@ export const useQueryPerformanceInfiniteQuery = (
             projectRef: project?.ref,
             connectionString: effectiveConnectionString,
             sql,
+            grant: unguarded.migrating,
           },
           signal
         ).then((res) => res.result)

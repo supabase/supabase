@@ -1,8 +1,8 @@
 export const profileKeys = {
   profile: () => ['profile'] as const,
-  mfaFactors: () => ['mfa', 'factors'] as const,
-  identities: () => ['profile', 'identities'] as const,
-  aaLevel: () => ['mfa', 'aaLevel'] as const,
+  mfaFactors: (userId?: string) => ['mfa', 'factors', userId].filter(Boolean),
+  identities: (userId?: string) => ['profile', 'identities', userId].filter(Boolean),
+  aaLevel: (userId?: string) => ['mfa', 'aaLevel', userId].filter(Boolean),
   auditLogs: ({
     date_start,
     date_end,

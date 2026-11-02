@@ -244,7 +244,7 @@ const Content = (props) => {
 
   return (
     <div className="relative w-full flex flex-col gap-0 pb-5">
-      <Link href={menu.url ?? ''}>
+      <Link href={menu.url ?? ''} className="max-lg:hidden">
         <div className="flex items-center gap-3 my-3 text-primary">
           <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />

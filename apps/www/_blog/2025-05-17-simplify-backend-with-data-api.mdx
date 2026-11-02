@@ -165,7 +165,7 @@ In practice, Supabase becomes a unified data plane: the single, secure interface
 
 ## **Controlling access and ensuring security**
 
-Auto-generated does not mean exposed. When you use Postgres’s [Row Level Security](https://supabase.com/docs/guides/auth/row-level-security) (RLS), Supabase’s APIs are [secure by default](https://supabase.com/docs/guides/security/product-security). This means you write policies at the data layer, enforced by the database itself, not in brittle middleware code.
+Auto-generated does not mean exposed. When you use Postgres’s [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) (RLS), Supabase’s APIs are [secure by default](https://supabase.com/docs/guides/security/product-security). This means you write policies at the data layer, enforced by the database itself, not in brittle middleware code.
 
 Want to restrict access to rows where `user_id = auth.uid()?` One RLS policy handles it. Want public access to a `products` table but private access to `orders`? Define policies per table.
 
@@ -210,5 +210,5 @@ Whether you are replacing a fleet of microservices or spinning up a new prototyp
 Ready to try it yourself?
 
 - [Get started with Supabase](https://supabase.com/docs/guides/getting-started)
-- [Secure your APIs with RLS](https://supabase.com/docs/guides/auth/row-level-security)
+- [Secure your APIs with RLS](https://supabase.com/docs/guides/database/postgres/row-level-security)
 - [Explore our API Reference](https://supabase.com/docs/reference)

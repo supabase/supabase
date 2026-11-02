@@ -4,19 +4,13 @@ import { getEdgeFunctionErrorDocs } from '@/components/interfaces/Functions/Edge
 import { DOCS_URL } from '@/lib/constants'
 
 describe('getEdgeFunctionErrorDocs', () => {
-  it('builds a documentation link from the error code header', () => {
-    expect(
-      getEdgeFunctionErrorDocs({ 'sb-error-code': 'UNAUTHORIZED_INVALID_JWT_FORMAT' })
-    ).toEqual({
-      code: 'UNAUTHORIZED_INVALID_JWT_FORMAT',
-      href: `${DOCS_URL}/guides/functions/error-codes#unauthorizedinvalidjwtformat`,
-    })
-  })
-
-  it('uses the same anchor format as documentation headings', () => {
-    expect(getEdgeFunctionErrorDocs({ 'sb-error-code': 'WORKER_RESOURCE_LIMIT' })).toEqual({
-      code: 'WORKER_RESOURCE_LIMIT',
-      href: `${DOCS_URL}/guides/functions/error-codes#workerresourcelimit`,
+  it.each([
+    ['UNAUTHORIZED_INVALID_JWT_FORMAT', 'unauthorizedinvalidjwtformat'],
+    ['WORKER_RESOURCE_LIMIT', 'workerresourcelimit'],
+  ])('builds a documentation link for %s using the docs heading anchor format', (code, anchor) => {
+    expect(getEdgeFunctionErrorDocs({ 'sb-error-code': code })).toEqual({
+      code,
+      href: `${DOCS_URL}/guides/functions/error-codes#${anchor}`,
     })
   })
 

@@ -5,7 +5,7 @@ import { getRequest } from '@tanstack/react-start/server'
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 
 const confirmFn = createServerFn({ method: 'GET' })
-  .inputValidator((searchParams: unknown) => {
+  .validator((searchParams: unknown) => {
     if (
       searchParams &&
       typeof searchParams === 'object' &&

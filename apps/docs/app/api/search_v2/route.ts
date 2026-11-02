@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { supabaseSearchV2 } from '~/scripts/search_v2/client'
+import { createSupabaseClient, SEARCH_FUNCTION } from '~/scripts/search_v2/supabase'
 import { type NextRequest } from 'next/server'
 
 import { corsHeaders } from './cors'
@@ -20,7 +20,7 @@ export async function GET(request: NextRequest) {
       return Response.json({ error: 'Missing q parameter' }, { status: 400, headers: corsHeaders })
     }
 
-    const { data, error } = await supabaseSearchV2().rpc('search_docs', {
+    const { data, error } = await createSupabaseClient().rpc(SEARCH_FUNCTION, {
       query_text: query,
       match_limit: limit,
     })

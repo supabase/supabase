@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useFormContext } from 'react-hook-form'
 import { FormLabel, SheetSection } from 'ui'
@@ -7,7 +6,7 @@ import { KeyValueFieldArray } from 'ui-patterns/form/KeyValueFieldArray/KeyValue
 import { CreateCronJobForm } from './CreateCronJobSheet/CreateCronJobSheet.constants'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import { useAPIKeys } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface HTTPHeaderFieldsSectionProps {
   variant: 'edge_function' | 'http_request'
@@ -17,7 +16,10 @@ export const HTTPHeaderFieldsSection = ({ variant }: HTTPHeaderFieldsSectionProp
   const form = useFormContext<CreateCronJobForm>()
 
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
   const { data: apiKeysData } = useAPIKeys(
     { projectRef: ref, reveal: true },
     { enabled: canReadAPIKeys }

@@ -20,7 +20,7 @@
   "dependencies": {
     "common": "workspace:*",
     "jotai": "^2.8.0",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "motion": "catalog:",
     "next": "catalog:",
     "next-themes": "catalog:",

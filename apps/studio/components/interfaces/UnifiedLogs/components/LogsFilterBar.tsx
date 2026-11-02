@@ -10,16 +10,19 @@ import {
   type FilterGroup,
 } from 'ui-patterns/FilterBar'
 
+import { isOfferedFilter } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
   getUserFilterValue,
-  parseTimeRange,
-  serializeTimeRange,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
 } from './LogsFilterBar.utils'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
 import { searchAuthUsers } from '@/components/interfaces/UserJourneys/UserJourneys.queries'
 import { DataTableFilterTimerange } from '@/components/ui/DataTable/DataTableFilters/DataTableFilterTimerange'
 import { useDataTable } from '@/components/ui/DataTable/providers/DataTableProvider'
@@ -38,7 +41,11 @@ const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
   />
 )
 
-export const LogsFilterBar = () => {
+interface LogsFilterBarProps {
+  offeredFilters?: readonly string[]
+}
+
+export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching } = useDataTable()
@@ -69,7 +76,7 @@ export const LogsFilterBar = () => {
     fields: filterFields,
     userOptions: searchUserOptions,
     timeRangeOptions: { component: TimeRangeOption },
-  })
+  }).filter((property) => isOfferedFilter(property.name, offeredFilters))
 
   const withUserCondition = (group: FilterGroup): FilterGroup => {
     if (!user) return group

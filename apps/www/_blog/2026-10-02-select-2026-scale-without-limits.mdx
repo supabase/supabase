@@ -14,7 +14,7 @@ imgThumb: 'select-2026-scale-without-limits/thumb.png'
 toc_depth: 2
 ---
 
-Today at Supabase Select, we announced Multigres for high availability and scalable connection pooling, and OrioleDB for high performance storage. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
+Today at Supabase Select, we announced [Multigres](/blog/multigres-vitess-for-postgres) for high availability and scalable connection pooling, and [OrioleDB](/features/orioledb) for high performance storage. We launched dbarena, an open benchmarks site for comparing managed Postgres providers’ performance results and costs.
 
 Every Supabase project starts with a single Postgres database. As your project grows, vertically upgrading the database’s available RAM & CPU resources can help, but it isn’t a solution to every challenge.
 
@@ -56,7 +56,7 @@ Many developers are familiar with basic Primary / Standby HA architecture and it
 
 Multigres runs three Postgres nodes across availability zones in one region, so losing one zone doesn't take your database down. You don't need to change your application code to move to Multigres.
 
-You can also add read replicas and gateways for more read throughput and client connections. During the alpha, our team adds them for you.
+You can also add [read replicas](/docs/guides/platform/read-replicas) and gateways for more read throughput and client connections. During the alpha, our team adds them for you.
 
 Multigres is in private alpha, by invite. It works with Supabase Auth, Storage, and Edge Functions, and it's built for testing during the alpha, not production workloads. [Request access](https://supabase.com/go/multigres-early-access).
 
