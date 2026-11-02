@@ -3077,7 +3077,7 @@ From then on, every member with a matching Supabase account is connected the nex
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: '',
     docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authorization',
-    blogUrl: '[INSERT NEW BLOG POST URL HERE]',
+    blogUrl: '/blog/claude-issued-enterprise-managed-auth-for-mcp',
     slug: 'enterprise-managed-auth-for-mcp',
     status: {
       stage: PRODUCT_STAGES.GA,
