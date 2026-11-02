@@ -34,10 +34,12 @@ export function startMemoryPressureLoop(): void {
         delay = RETRY_INTERVAL_MS
         const acknowledged = await EdgeRuntime.userWorkers.tryCleanupIdleWorkers(CLEANUP_TIMEOUT_MS)
         EdgeRuntime.miCollect()
-        console.warn(
-          `Memory pressure: working set ${workingSetBytes} / ${limitBytes} bytes before cleanup; ` +
-            `${acknowledged} worker(s) acknowledged retirement`
-        )
+        if (acknowledged > 0) {
+          console.warn(
+            `Memory pressure: working set ${workingSetBytes} / ${limitBytes} bytes before cleanup; ` +
+              `${acknowledged} worker(s) acknowledged retirement`
+          )
+        }
       }
       errorReported = false
     } catch (error) {
