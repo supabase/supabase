@@ -3043,7 +3043,7 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     title: 'Enterprise-Managed Authorization for MCP',
     subtitle: "Govern how your company's AI tools access Supabase through MCP.",
     description: `
-Enterprise-Managed Authorization for MCP puts your company in charge of which AI tools can connect to Supabase instead of each employee. After the Supabase organization's owner or admin approves Claude, your identity provider or Claude on its behalf confirms the identity of each employee who uses it. From then on, an employee who signs in to Claude sees Supabase already connected with the role they already have. There is no consent screen to click through and no token to create or share.
+Enterprise-Managed Authorization for MCP puts your company in charge of which AI tools can connect to Supabase instead of each employee. After the Supabase organization's owner or admin approves Claude, your identity provider or Claude confirms the identity of each employee who uses it. From then on, an employee who signs in to Claude sees Supabase already connected with the role they already have. There is no consent screen to click through and no token to create or share.
 
 ## Key benefits
 1. Approve once: One approval by an owner or admin covers the whole organization. Members never see a consent screen.
