@@ -68,7 +68,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
 
   if (!data || data.logs.length === 0) {
     return (
-      <div className="p-4">
+      <div className="flex min-h-full items-center justify-center p-4">
         <EmptyStatePresentational
           icon={RouteIcon}
           title="No related logs"
