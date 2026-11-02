@@ -117,7 +117,8 @@ describe('RoleRow', () => {
 
     await waitFor(() => expect(getUpdateQuery()).toBeDefined())
     expect(getUpdateQuery()).toMatch(/\blogin\b/)
-    expect(getUpdateQuery()).toContain(`'s3cret'`)
+    expect(getUpdateQuery()).toContain(`'SCRAM-SHA-256$`)
+    expect(getUpdateQuery()).not.toContain('s3cret')
   })
 
   test('turns on login without a password when the field is empty', async () => {
@@ -194,7 +195,8 @@ describe('RoleRow', () => {
       fireEvent.submit(document.getElementById('reset-role-password-form')!)
 
       await waitFor(() => expect(getUpdateQuery()).toBeDefined())
-      expect(getUpdateQuery()).toContain(`'n3w-s3cret'`)
+      expect(getUpdateQuery()).toContain(`'SCRAM-SHA-256$`)
+      expect(getUpdateQuery()).not.toContain('n3w-s3cret')
       await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
     })
 
