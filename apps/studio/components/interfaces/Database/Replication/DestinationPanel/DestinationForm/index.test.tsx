@@ -247,14 +247,9 @@ vi.mock('./useDestinationForm', () => ({
   }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
   useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
-  FGA_PERMISSIONS: {
-    PROJECT: {
-      API_GATEWAY_KEYS_READ: 'api_gateway_keys_read',
-      API_GATEWAY_KEYS_SECRET_READ: 'api_gateway_keys_secret_read',
-    },
-  },
 }))
 
 vi.mock('./DestinationNameInput', () => ({ DestinationNameInput: () => null }))
