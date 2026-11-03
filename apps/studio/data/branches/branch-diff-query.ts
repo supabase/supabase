@@ -3,8 +3,8 @@ import { queryOptions, skipToken } from '@tanstack/react-query'
 import { branchKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { GrantForVariants } from '@/lib/grants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
 
 export type BranchDiffGrant = GrantForVariants<'get', '/v1/branches/{branch_id_or_ref}/diff'>
 

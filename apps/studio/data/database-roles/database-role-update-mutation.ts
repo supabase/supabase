@@ -5,8 +5,8 @@ import { toast } from 'sonner'
 import { invalidateRolesQuery } from './database-roles-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { getRolePasswordForSql } from '@/lib/scram-sha-256'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { getRolePasswordForSql } from '@/lib/scram-sha-256'
 import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]

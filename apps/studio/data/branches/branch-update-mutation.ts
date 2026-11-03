@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { GrantForVariants } from '@/lib/grants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchUpdateGrant = GrantForVariants<'patch', '/v1/branches/{branch_id_or_ref}'>

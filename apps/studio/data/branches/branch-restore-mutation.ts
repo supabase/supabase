@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { GrantForVariants } from '@/lib/grants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
 
 export type BranchRestoreGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/restore'>
 

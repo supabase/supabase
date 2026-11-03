@@ -4,8 +4,8 @@ import { toast } from 'sonner'
 import { actionKeys } from '../actions/keys'
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { GrantForVariants } from '@/lib/grants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchPushGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/push'>
