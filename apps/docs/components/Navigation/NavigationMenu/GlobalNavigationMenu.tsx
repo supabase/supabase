@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import React, { FC } from 'react'
 import { Badge, cn } from 'ui'
 import {
@@ -16,12 +15,12 @@ import {
 import type { DropdownMenuItem } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 import { getMenuGroupLabelByPath } from './NavigationMenu.utils'
-import { IA_NAV_PENDING_CLASS, useIaNavReady, useNavItems } from '@/features/IaNav'
+import { IA_NAV_PENDING_CLASS, useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
 
 const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
   const isNavReady = useIaNavReady()
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const activeLabel = getMenuGroupLabelByPath({ menu: GLOBAL_MENU_ITEMS, pathname })
   const itemClassName = cn(!isNavReady && IA_NAV_PENDING_CLASS)
 
