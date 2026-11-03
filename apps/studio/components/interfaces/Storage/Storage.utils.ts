@@ -60,38 +60,59 @@ export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', '
 
 const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
-  const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
 
-    const bucketName =
-      policyDefinition !== null
-        ? extractBucketNameFromDefinition(policyDefinition)
-        : extractBucketNameFromDefinition(policyCheck)
+  return policies.flatMap((policy) => {
+    const bucketNames = getPolicyBucketNames(policy)
 
-    if (bucketName) {
-      const isBucketLoaded = availableBuckets.includes(bucketName)
+    if (bucketNames.length === 0) return [{ ...policy, bucket: UNGROUPED_POLICY_SYMBOL }]
 
-      return {
-        ...policy,
-        bucket: isBucketLoaded ? bucketName : UNKNOWN_BUCKET_SYMBOL,
-      }
-    }
-
-    return { ...policy, bucket: UNGROUPED_POLICY_SYMBOL }
+    // A policy can cover several buckets, so it is listed once under each of them
+    const groups = bucketNames.map((bucketName) =>
+      availableBuckets.includes(bucketName) ? bucketName : UNKNOWN_BUCKET_SYMBOL
+    )
+    return Array.from(new Set(groups)).map((bucket) => ({ ...policy, bucket }))
   })
-
-  return formattedPolicies
 }
 
-export const extractBucketNameFromDefinition = (definition: string | null) => {
-  if (!definition) return null
+const STRING_LITERAL = "'((?:[^']|'')*)'"
+const EQUALS_BUCKET_REGEX = new RegExp(`\\bbucket_id\\s*=\\s*${STRING_LITERAL}`, 'g')
+const ANY_ARRAY_BUCKET_REGEX = /\bbucket_id\s*=\s*ANY\s*\(\s*(?:ARRAY\s*)?\[([^\]]*)\]/g
+const NEGATED_BUCKET_REGEX = /\bbucket_id\s*(?:<>|!=)|\bNOT\s*\(*\s*bucket_id\b/i
 
-  const definitionSegments = definition?.split(' AND ') ?? []
-  const [bucketDefinition] = definitionSegments.filter((segment: string) =>
-    segment.includes('bucket_id')
+/**
+ * Returns the names of the buckets a policy expression restricts access to, e.g. from
+ * `bucket_id = 'a'` or `bucket_id = ANY (ARRAY['a', 'b'])` (how Postgres renders `IN`).
+ *
+ * Returns no buckets when the expression negates the bucket condition (`<>`, `NOT IN`,
+ * `NOT (...)`), because such a policy applies to every bucket except the named ones.
+ * Callers treat that as "not tied to a specific bucket", which is the safe default for
+ * both listing and deleting.
+ */
+export const extractBucketNamesFromDefinition = (definition: string | null): string[] => {
+  if (!definition || NEGATED_BUCKET_REGEX.test(definition)) return []
+
+  const names = new Set<string>()
+  const unquote = (literal: string) => literal.replace(/''/g, "'")
+
+  for (const [, name] of definition.matchAll(EQUALS_BUCKET_REGEX)) names.add(unquote(name))
+  for (const [, list] of definition.matchAll(ANY_ARRAY_BUCKET_REGEX)) {
+    for (const [, name] of list.matchAll(new RegExp(STRING_LITERAL, 'g'))) names.add(unquote(name))
+  }
+  return Array.from(names)
+}
+
+/**
+ * All buckets a storage.objects policy targets, across both its `using` and `with check`
+ * expressions. Shared by the policies page, per-bucket counts, and bucket deletion so they
+ * agree on which buckets a policy belongs to.
+ */
+export const getPolicyBucketNames = (policy: Pick<Policy, 'definition' | 'check'>): string[] =>
+  Array.from(
+    new Set([
+      ...extractBucketNamesFromDefinition(policy.definition),
+      ...extractBucketNamesFromDefinition(policy.check),
+    ])
   )
-  return bucketDefinition ? bucketDefinition.split("'")[1] : null
-}
 
 const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
   const policiesByBucket = new Map<string | Symbol, Policy[]>()
