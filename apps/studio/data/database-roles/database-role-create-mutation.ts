@@ -3,7 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateRolesQuery } from './database-roles-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { getRolePasswordForSql } from '@/lib/scram-sha-256'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type CreateRoleBody = Parameters<typeof pgMeta.roles.create>[0]
@@ -19,12 +21,15 @@ export async function createDatabaseRole({
   connectionString,
   payload,
 }: DatabaseRoleCreateVariables) {
-  const sql = pgMeta.roles.create(payload).sql
+  const password =
+    payload.password === undefined ? undefined : await getRolePasswordForSql(payload.password)
+  const sql = pgMeta.roles.create({ ...payload, password }).sql
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
     queryKey: ['roles', 'create'],
+    grant: unguarded.migrating,
   })
   return result
 }

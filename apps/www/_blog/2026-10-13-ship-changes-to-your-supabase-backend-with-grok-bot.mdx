@@ -14,7 +14,7 @@ imgThumb: '2026-10-13-ship-changes-to-your-supabase-backend-with-grok-bot/thumb.
 toc_depth: 2
 ---
 
-Supabase is joining the SpaceXAI Partner Network. With Grok Bot connected to Cursor, anyone on your team can request a change in chat, and Cursor builds and runs it against your Supabase backend through the [Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp).
+Supabase is joining the SpaceXAI Partner Network. With Grok Bot connected to Cursor, anyone on your team can request a change in chat, and Cursor builds and runs it against your Supabase backend through the [Supabase MCP server](https://supabase.com/docs/guides/ai-tools/mcp).
 
 Grok Bot takes a request from the person who needs it, in the place they already work, and hands it to Cursor as scoped engineering work. Cursor writes and runs the code, and through the Supabase MCP server, it can query the database, inspect the schema, read logs, and deploy Supabase Edge Functions, all inside the one Supabase project where the data already lives.
 
@@ -40,7 +40,7 @@ The person asking doesn't need to know which project holds the answer or which t
 
 ## Add a security check to the loop
 
-Agents already verify their own changes: after an `apply_migration`, 81% of sessions follow up with a query or `list_tables` to confirm the change landed. `get_advisors` goes further and scans the project for issues like tables missing Row Level Security or unindexed foreign keys, which matters when requests can come from anyone and ship automatically.
+Agents already verify their own changes: after an `apply_migration`, 81% of sessions follow up with a query or `list_tables` to confirm the change landed. `get_advisors` goes further and scans the project for issues like tables missing [Row Level Security](/docs/guides/database/postgres/row-level-security) or unindexed foreign keys, which matters when requests can come from anyone and ship automatically.
 
 A simple Cursor rule makes the scan part of every schema change:
 
@@ -62,5 +62,5 @@ Developers found the Supabase integration on their own, and it consistently rank
 
 ## Get started
 
-- [Connect the Supabase MCP server](https://supabase.com/docs/guides/getting-started/mcp)
+- [Connect the Supabase MCP server](https://supabase.com/docs/guides/ai-tools/mcp)
 - New to Supabase? [Start your project for free](https://supabase.com/dashboard), then connect it to Cursor

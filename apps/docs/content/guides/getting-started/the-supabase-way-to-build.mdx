@@ -1,0 +1,128 @@
+---
+title: 'The Supabase way to build'
+subtitle: 'Which building block to reach for, and when.'
+description: 'Which Supabase building blocks to add as your app grows, from a single database to a production system.'
+---
+
+Supabase is more than hosted Postgres. It's a set of composable building blocks you grow into. Start with a database, add more features as you need them, and keep as much logic in Postgres as possible.
+
+The [Architecture](/docs/guides/getting-started/architecture) page tells you what the pieces are. This page tells you which piece to reach for, how to uses it as a building block, and when. Each section explains what you are adding and for what purpose, the mental model to hold, and a common mistake to avoid. The linked guides show you how to build each piece.
+
+## The progression at a glance
+
+Follow the path from the first need you have. Each step names the block to add and the idea to keep in mind, and opens that section.
+
+<ContentListings id="supabase-way-progression" />
+
+You don't need all of these things to start. Most apps start with a database and add as needed. Over time, many apps use all of them.
+
+## Start with a database: Postgres + API
+
+Every Supabase project is a full Postgres database, and Supabase generates a [REST API](/docs/guides/api) from your schema automatically. Design your tables well and you have a working backend with no server code.
+
+**Mental model:** your schema is your API. The shape of your data is the shape of what clients can do.
+
+**Enough on its own for:** internal tools, prototypes, and read-heavy apps.
+
+Any table a browser or mobile client can reach still needs [Row Level Security](#scope-data-to-each-user-row-level-security), even for public data. Reserve unprotected tables for server-side callers. A single-user or trusted-client assumption is not a security boundary.
+
+Avoid hand-writing a REST server that only forwards create, read, update, and delete calls to the database. That rebuilds what PostgREST already generates for you. Put your effort into the schema instead.
+
+The Next.js quickstart allows public read on its sample table so the page can load. Return here before that table holds private rows. A [publishable key](/docs/guides/getting-started/api-keys) only reaches what Row Level Security allows.
+
+<ContentListings id="supabase-way-database-build" />
+
+## Add users: Auth
+
+When your app needs to know who is making a request, add [Supabase Auth](/docs/guides/auth). It manages users and issues a signed JWT that carries the caller's identity.
+
+**Mental model:** auth issues a verifiable identity (a JWT) that the database itself can read. Other blocks use that identity for per-user behavior.
+
+**Trigger:** any multi-user app, personalization, or anything that must be private to an account.
+
+Once email and password sign-in works, add [social login](/docs/guides/auth/social-sign-in) for providers such as Google and GitHub.
+
+<ContentListings id="supabase-way-auth-build" />
+
+## Scope data to each user: Row Level Security
+
+After you have users, each user needs to see only their own data. With [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS), you write that rule once, as a policy on the table, and Postgres enforces it on every request made with your publishable (`anon`) or user keys. The secret (`service_role`) key bypasses RLS, so keep it server-side and enforce authorization there yourself.
+
+**Mental model:** authorization is data, enforced by Postgres, not logic scattered across your app. The policy lives next to the rows it protects.
+
+**Trigger:** users must not see each other's rows, multi-tenant apps, and anything where a leaked query would leak data.
+
+<Admonition type="caution" title="Don't filter by user in application code">
+
+App-layer filtering leaks data the moment one query forgets the filter, a new client is added, or someone writes a new endpoint. A query like `select * from orders where user_id = $currentUser` looks safe, but it can be bypassed, gets duplicated, and drifts out of sync. An RLS policy can't be forgotten, because the database applies it to every request.
+
+</Admonition>
+
+<ContentListings id="supabase-way-rls-build" />
+
+## Handle files and uploads: Storage
+
+For uploads, images, and documents, [Storage](/docs/guides/storage) gives you S3-compatible object storage that keeps its metadata in Postgres, so you secure files with RLS, the same model you use for your rows.
+
+**Mental model:** files are secured by RLS too, but with their own policies on the `storage.objects` table. They don't inherit your app-table policies, and a public bucket serves files to anyone.
+
+**Trigger:** user avatars, attachments, media, and any binary a user owns.
+
+Write and review Storage policies alongside your data policies. They don't sync automatically, and a public bucket or a missing policy exposes files regardless of your table rules.
+
+When you serve images, resize them with [image transformations](/docs/guides/storage/serving/image-transformations).
+
+<ContentListings id="supabase-way-storage-build" />
+
+## Add server-side logic: Edge Functions
+
+Some logic can't live in the client, because it needs secrets, and isn't a good fit for the database, because it calls third-party APIs or reacts to events. That's what [Edge Functions](/docs/guides/functions) are for: TypeScript functions you deploy at the edge.
+
+**Mental model:** put data-shaped logic in Postgres (triggers, [database functions](/docs/guides/database/functions), and RPC) and integration-shaped logic at the edge (webhooks, third-party calls, and anything holding a secret key). For logic that's really about your data, prefer a Postgres function, closer to the data and easier to secure.
+
+<Admonition type="note" title="Long-running or non-TypeScript workloads">
+
+[Supabase Compute](https://supabase.com/compute) runs long-running jobs, always-on services, and code in any language next to your database. Compute is in Private Alpha. Existing Edge Functions keep running unchanged.
+
+</Admonition>
+
+**Trigger:** payment webhooks, calls to an external API, sending email, and any code that must hold a credential the browser can't see.
+
+<Admonition type="danger" title="Never ship a secret key in client code">
+
+A secret key in frontend code is exposed to anyone who opens the browser. Keep credentials in Edge Function secrets or [Supabase Vault](/docs/guides/database/vault), never in client code. See [API keys](/docs/guides/getting-started/api-keys) for which key belongs in the browser and which key stays on the server.
+
+</Admonition>
+
+<ContentListings id="supabase-way-functions-build" />
+
+## Reflect changes live: Realtime
+
+When your UI has to reflect changes as they happen, [Realtime](/docs/guides/realtime) streams database changes, broadcasts messages, and tracks presence over WebSockets.
+
+**Mental model:** subscribe to the database instead of polling it. The client reacts to change; it doesn't ask "anything new?" on a timer.
+
+**Trigger:** dashboards that update live, chat, collaboration, presence indicators, and multiplayer.
+
+Avoid polling loops. A `setInterval` that re-fetches every few seconds wastes requests, adds latency, and still misses fast changes. Subscribe once and let the change come to you.
+
+Authorize Broadcast and Presence with [Realtime Authorization](/docs/guides/realtime/authorization). Those channels use policies on `realtime.messages`.
+
+<ContentListings id="supabase-way-realtime-build" />
+
+## Serve real traffic: Harden for production
+
+Before real traffic, confirm the app is secure and ready to scale. Run the [advisors](/docs/guides/observability/advisors), review every RLS policy, pool connections with [Supavisor](/docs/guides/database/connecting-to-postgres), set up observability and [backups](/docs/guides/platform/backups), and check query and index performance.
+
+**Mental model:** production readiness is verification, not new features. Confirm the blocks you already added are configured correctly for traffic.
+
+**Trigger:** launch, production users, and production data.
+
+<ContentListings id="supabase-way-production-build" />
+
+## Where to go next
+
+- New here? Start with a [framework quickstart](/docs/guides/getting-started/quickstarts/nextjs) and come back to add blocks as you need them.
+- Working locally? Use the [Supabase CLI](/docs/guides/local-development/cli/getting-started).
+- Want the component-level picture? See [Architecture](/docs/guides/getting-started/architecture).
+- Ready to build a specific piece? Follow the **Build it** links in each stage above.

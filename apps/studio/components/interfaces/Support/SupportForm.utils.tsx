@@ -8,7 +8,7 @@ import {
 } from 'common'
 import dayjs from 'dayjs'
 import { partition } from 'lodash'
-import { BookIcon, GithubIcon, HashIcon, MessageSquareIcon } from 'lucide-react'
+import { BookIcon, HashIcon, MessageSquareIcon } from 'lucide-react'
 import {
   createLoader,
   createParser,
@@ -17,6 +17,7 @@ import {
   type inferParserType,
   type UseQueryStatesKeysMap,
 } from 'nuqs'
+import { GithubIcon } from 'ui'
 
 import { CATEGORY_OPTIONS, type ExtendedSupportCategories } from './Support.constants'
 import { getProjectDetail } from '@/data/projects/project-detail-query'

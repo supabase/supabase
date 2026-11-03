@@ -98,7 +98,7 @@ export function ResultsList({
             <div className="flex flex-col min-w-0 text-foreground-light">
               <TextHighlighter>{command.name}</TextHighlighter>
               {command.value && command.value !== command.name && (
-                <p className="text-xs text-foreground-lighter/70 truncate mt-0.5">
+                <p className="text-xs text-foreground-lighter truncate">
                   {command.value.replace(command.name, '').trim()}
                 </p>
               )}

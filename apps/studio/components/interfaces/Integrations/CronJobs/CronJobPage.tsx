@@ -85,7 +85,7 @@ export const CronJobPage = () => {
       with command{' '}
       <Tooltip>
         <TooltipTrigger asChild>
-          <code className="text-code-inline max-w-[200px] inline-block truncate align-bottom cursor-pointer">
+          <code className="max-w-[200px] inline-block truncate align-bottom cursor-pointer">
             {job.command}
           </code>
         </TooltipTrigger>

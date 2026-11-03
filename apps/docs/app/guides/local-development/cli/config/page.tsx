@@ -4,7 +4,7 @@ import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
 import ReactMarkdown from 'react-markdown'
-import { Heading } from 'ui'
+import { Heading, Table } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const meta = {
@@ -54,7 +54,7 @@ function Info({ parameter }: { parameter: Parameter }) {
         <div className="border-b pb-8" key={parameter.id}>
           <div className=" mb-16">
             <div>
-              <table className="table-auto">
+              <Table prose className="table-auto">
                 <thead>
                   <tr>
                     <th className="text-left">Name</th>
@@ -69,7 +69,7 @@ function Info({ parameter }: { parameter: Parameter }) {
                     <td>{parameter.required !== undefined && parameter.required.toString()}</td>
                   </tr>
                 </tbody>
-              </table>
+              </Table>
             </div>
             <div className="mb-4 scroll-mt-16 mt-0 ">
               <p className="text-sm font-bold uppercase">Description</p>

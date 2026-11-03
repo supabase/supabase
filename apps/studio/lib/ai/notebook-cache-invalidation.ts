@@ -1,10 +1,9 @@
 import type { QueryClient } from '@tanstack/react-query'
 import type { ToolUIPart, UIMessage } from 'ai'
 
-import { notebookToolOutputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
 import { contentKeys } from '@/data/content/keys'
 import { evictNotebookFromCaches } from '@/data/content/notebooks/notebook-cache'
-import type { ToolName } from '@/lib/ai/tool-filter'
+import { TOOL_CONTRACTS, type ContractToolName } from '@/lib/ai/tools/registry'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 
 export type NotebookCacheEffect =
@@ -15,13 +14,21 @@ const NOTEBOOK_MUTATION_TOOLS = [
   'create_notebook',
   'update_notebook',
   'delete_notebook',
-] as const satisfies readonly ToolName[]
+] as const satisfies readonly ContractToolName[]
+
+const NOTEBOOK_MUTATION_CONTRACTS = {
+  'tool-create_notebook': TOOL_CONTRACTS.create_notebook,
+  'tool-update_notebook': TOOL_CONTRACTS.update_notebook,
+  'tool-delete_notebook': TOOL_CONTRACTS.delete_notebook,
+} as const
 
 const NOTEBOOK_MUTATION_TOOL_TYPES: ReadonlySet<string> = new Set(
   NOTEBOOK_MUTATION_TOOLS.map((name) => `tool-${name}`)
 )
 
-function isNotebookMutationPart(part: UIMessage['parts'][number]): part is ToolUIPart {
+function isNotebookMutationPart(
+  part: UIMessage['parts'][number]
+): part is ToolUIPart & { type: keyof typeof NOTEBOOK_MUTATION_CONTRACTS } {
   return NOTEBOOK_MUTATION_TOOL_TYPES.has(part.type)
 }
 
@@ -39,7 +46,7 @@ export function collectNotebookCacheEffects(
       if (part.state !== 'output-available') continue
       if (processed.has(part.toolCallId)) continue
 
-      const result = notebookToolOutputSchema.safeParse(part.output)
+      const result = NOTEBOOK_MUTATION_CONTRACTS[part.type].outputSchema.safeParse(part.output)
       if (!result.success) continue
 
       effects.push({

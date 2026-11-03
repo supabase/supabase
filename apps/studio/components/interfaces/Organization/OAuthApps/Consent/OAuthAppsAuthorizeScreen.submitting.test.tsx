@@ -28,8 +28,8 @@ describe('OAuthAppsAuthorizeScreen while the approve mutation is in flight', () 
       />
     )
 
-    expect(await screen.findByText("Don't close this window.")).toBeInTheDocument()
+    expect(await screen.findByText('Authorizing...')).toBeInTheDocument()
+    expect(screen.getByText("Don't close this window.")).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
-    expect(screen.getByText('Authorizing...')).toBeInTheDocument()
   })
 })

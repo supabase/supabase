@@ -60,22 +60,58 @@ const mockPublicationRequests = (publishViaPartitionRoot: boolean) => {
   })
 }
 
-const PublicationSelectionHarness = () => {
+const PublicationSelectionHarness = ({ showLoadError = true }: { showLoadError?: boolean }) => {
   const form = useForm<DestinationPanelSchemaType>({
     defaultValues: { publicationName: 'analytics' },
   })
 
   return (
     <Form {...form}>
-      <PublicationSelection form={form} onSelectNewPublication={vi.fn()} />
+      <PublicationSelection
+        form={form}
+        onSelectNewPublication={vi.fn()}
+        showLoadError={showLoadError}
+      />
     </Form>
   )
 }
 
 describe('PublicationSelection', () => {
+  it.each([true, false])(
+    'controls the publication error helper when showLoadError is %s',
+    async (showLoadError) => {
+      mockPublicationRequests(false)
+      addAPIMock({
+        method: 'get',
+        path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+        response: () =>
+          HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 500 }),
+      })
+      customRender(<PublicationSelectionHarness showLoadError={showLoadError} />)
+
+      await waitFor(() =>
+        expect(screen.getByRole('status')).not.toHaveTextContent('Loading partition handling...')
+      )
+      if (showLoadError) {
+        expect(screen.getByRole('status')).toHaveTextContent(
+          'Partition handling could not be loaded.'
+        )
+      } else {
+        expect(screen.getByRole('status')).toBeEmptyDOMElement()
+      }
+      if (!showLoadError) {
+        expect(
+          screen.getByText(
+            'Tables in the selected publication will be replicated to this destination.'
+          )
+        ).toBeInTheDocument()
+      }
+    }
+  )
+
   it('includes parent-table partition handling in the publication description', async () => {
     mockPublicationRequests(true)
-    customRender(<PublicationSelectionHarness />)
+    customRender(<PublicationSelectionHarness showLoadError={false} />)
 
     expect(screen.getByRole('status')).toHaveTextContent('Loading partition handling...')
 
@@ -115,7 +151,7 @@ describe('PublicationSelection', () => {
           sources: [{ ...mockSources.sources[0], name: 'another-project' }],
         }),
     })
-    customRender(<PublicationSelectionHarness />)
+    customRender(<PublicationSelectionHarness showLoadError={false} />)
 
     expect(
       await screen.findByText(
@@ -135,7 +171,7 @@ describe('PublicationSelection', () => {
           { status: 503 }
         ),
     })
-    customRender(<PublicationSelectionHarness />)
+    customRender(<PublicationSelectionHarness showLoadError={false} />)
 
     expect(
       await screen.findByText(

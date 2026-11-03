@@ -4,6 +4,7 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
@@ -55,6 +56,7 @@ export async function getIndexAdvisorResult({
     projectRef,
     connectionString,
     sql: safeSql`set search_path to public, extensions; select * from index_advisor(${literal(query)});`,
+    grant: unguarded.migrating,
   })
 
   if (!results || results.length === 0) {

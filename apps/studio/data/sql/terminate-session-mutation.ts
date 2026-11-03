@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { ResponseError, type UseCustomMutationOptions } from '@/types'
 
@@ -26,6 +27,7 @@ export async function terminateSession({
     connectionString,
     sql,
     queryKey: ['terminate-session'],
+    grant: unguarded.migrating,
   })
   if (backendStart !== undefined && result.length === 0) {
     throw new ResponseError(

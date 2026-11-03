@@ -4,7 +4,7 @@ All notable changes to the Supabase self-hosted Docker configuration.
 
 Changes are grouped by service rather than by change type. See [versions.md](./versions.md) for complete image version history and rollback information.
 
-See per-service updates below for details. Only the most important changes relevant to [self-hosted Supabase](https://supabase.com/docs/guides/self-hosting) are included here. For the full list of changes, refer to the release notes and changelogs of each individual service.
+See per-service updates below for details. Only the most important changes relevant to [self-hosted Supabase](https://supabase.com/docs/guides/self-hosting) are included here. Image updates list the upstream changes most relevant to self-hosted below each version. For the full list of changes, refer to the release notes and changelogs of each individual service.
 
 **Note:** Configuration updates marked with "requires [...] update" are already included in the latest version of the repository. Pull the latest changes or refer to the linked PR for manual updates. After updating `docker-compose.yml`, pull the latest images and recreate containers - use `docker compose pull && docker compose down && docker compose up -d`.
 
@@ -19,6 +19,79 @@ See per-service updates below for details. Only the most important changes relev
 - `docker-compose.pg15.yml` - Postgres 15 (Postgres 17 has been the default since [0.6.0](#060---2026-06-17))
 
 If you depend on any of these overrides, plan to migrate before they are removed.
+
+---
+
+## [0.8.3](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.3) - 2026-10-16
+
+⚠️ **Note:** This update includes **important changes**. Please check the details below:
+- Includes **security fixes** for Storage and Realtime - updating is **strongly recommended**
+- Storage database migrations in this release are one-way: rolling back to the previous Storage version after updating makes all uploads fail. **Back up your database** before updating. See the **Storage** section below
+- Realtime has a known issue: Postgres Changes events can be missed for a few seconds every 10 minutes. See the **Realtime** section below for a workaround
+- The bare `/.well-known/oauth-authorization-server` route was removed in favor of the platform-compatible discovery routes. See the **API gateway** section below
+
+### Documentation
+- Updated the [Edge Functions](https://supabase.com/docs/guides/self-hosting/self-hosted-functions) and [Envoy](https://supabase.com/docs/guides/self-hosting/self-hosted-envoy) guides with the current function limits, timeouts and error codes - PR [#50807](https://github.com/supabase/supabase/pull/50807) (via [@luizfelmach](https://github.com/luizfelmach))
+
+### Utils and tests
+- Fixed `reset.sh` deleting `volumes/storage/.gitkeep`, and updated the Edge Functions checks in `tests/test-auth-keys.sh` to work with `FUNCTIONS_VERIFY_JWT=true` - PR [#51108](https://github.com/supabase/supabase/pull/51108) (via [@luizfelmach](https://github.com/luizfelmach))
+
+### API gateway
+- Added API key handling to the `/functions/v1/` route: `sb_` publishable and secret keys are now translated for Edge Functions, as on other routes (requires `volumes/api/envoy/lds.template.yaml`, `volumes/api/kong.yml`, `volumes/api/kong-entrypoint.sh`, and `volumes/functions/main/index.ts` update) - PR [#46810](https://github.com/supabase/supabase/pull/46810)
+- ⚠️ Changed the OAuth and OpenID Connect discovery routes to match the platform: added `/.well-known/oauth-authorization-server/auth/v1` (RFC 8414), made `/auth/v1/.well-known/oauth-authorization-server` and `/auth/v1/.well-known/openid-configuration` available without an API key, and removed the bare `/.well-known/oauth-authorization-server` route added in 0.8.2 (requires `volumes/api/envoy/lds.template.yaml`, `volumes/api/kong.yml`, `volumes/proxy/caddy/Caddyfile`, and `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#51493](https://github.com/supabase/supabase/pull/51493) (via [@singh-inder](https://github.com/singh-inder))
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.6` (requires `docker-compose.nginx.yml` update)
+
+### Studio
+- Updated to `2026.10.12-sha-3699278`
+
+### Auth
+- Updated to `v2.197.0` - [Changelog](https://github.com/supabase/auth/blob/master/CHANGELOG.md) | [Release](https://github.com/supabase/auth/releases/tag/v2.197.0)
+  - Changed: creating a user through the admin API, including **Create user** in Studio, now enforces the password strength policy - [auth#2758](https://github.com/supabase/auth/pull/2758)
+  - Changed: changing a user's email or phone through the admin API now invalidates their pending confirmation, recovery and email change links - [auth#2757](https://github.com/supabase/auth/pull/2757)
+  - Fixed the admin API accepting requests from banned users that hold an admin-role JWT - [auth#2759](https://github.com/supabase/auth/pull/2759)
+  - Added opt-in MFA recovery codes (`GOTRUE_MFA_RECOVERY_CODES_*`, off by default)
+
+### PostgREST
+- Updated to `v14.18` - [Changelog](https://github.com/PostgREST/postgrest/blob/main/CHANGELOG.md) | [Release](https://github.com/PostgREST/postgrest/releases/tag/v14.18)
+  - Fixed intermittent `PGRST303 JWT issued at future` errors - [postgrest#5233](https://github.com/PostgREST/postgrest/pull/5233)
+
+### Realtime
+- Updated to `v2.143.3` - [Release](https://github.com/supabase/realtime/releases/tag/v2.143.3)
+  - ⚠️ Fixed a **security** issue: a client sending binary broadcasts could inject forged protocol messages, such as fake Postgres Changes events, into other subscribers on public channels using only the anon key - [GHSA-9vjf-j9f7-j42c](https://github.com/supabase/realtime/security/advisories/GHSA-9vjf-j9f7-j42c), [realtime#2266](https://github.com/supabase/realtime/pull/2266)
+  - Changed: the container now runs as the non-root `nobody` user, so files you mount into it (for example `DB_SSL_CA_CERT`) must be readable by UID 65534 - [realtime#2207](https://github.com/supabase/realtime/pull/2207)
+  - Changed: Postgres Changes subscriptions with an empty `select` list now return only primary key columns - [realtime#2140](https://github.com/supabase/realtime/pull/2140)
+  - ⚠️ Known issue: every 10 minutes Realtime restarts its database connection and Postgres Changes replication, and changes made during the few seconds it takes to reconnect are not delivered to subscribers. If you rely on Postgres Changes, add `REGION: us-east-1` to the `realtime` service's `environment` in `docker-compose.yml` until the upstream fix is released - [realtime#2289](https://github.com/supabase/realtime/issues/2289)
+
+### Storage
+- Updated to `v1.81.0` - [Release](https://github.com/supabase/storage/releases/tag/v1.81.0)
+  - ⚠️ Fixed a **security** issue: signed resumable (TUS) upload URLs could be used to upload or overwrite objects without authorization, bypassing RLS - [GHSA-8rrf-w776-x75g](https://github.com/supabase/storage/security/advisories/GHSA-8rrf-w776-x75g), [storage#1492](https://github.com/supabase/storage/pull/1492)
+  - Fixed a **security** issue in Iceberg table access through the S3 protocol; the default setup, where Iceberg is disabled, isn't affected - [GHSA-67rp-h2mf-ph72](https://github.com/supabase/storage/security/advisories/GHSA-67rp-h2mf-ph72), [storage#1491](https://github.com/supabase/storage/pull/1491)
+  - ⚠️ Changed: adds one-way database migrations, so rolling back to `v1.74.0` after upgrading makes all uploads fail. Back up your database before updating. If you ever ran Storage `v1.72.0`-`v1.72.3`, apply the fix from [storage#1394](https://github.com/supabase/storage/issues/1394) first
+  - Added object versioning, off by default (`STORAGE_VERSIONING_ENABLED`); Studio doesn't support it on self-hosted yet - [storage#1347](https://github.com/supabase/storage/pull/1347)
+- Updated RustFS to `1.0.1` (requires `docker-compose.rustfs.yml` update)
+
+### Postgres Meta
+- Updated to `v0.100.0` - [Release](https://github.com/supabase/postgres-meta/releases/tag/v0.100.0)
+  - Changed: generated TypeScript types now include `ComputedFields` for every table and view, and zero-argument functions get `Args: Record<PropertyKey, never>`; expect diffs when you regenerate checked-in types - [postgres-meta#1155](https://github.com/supabase/postgres-meta/pull/1155)
+
+### Edge Runtime
+- Updated to `v1.77.4` - [Release](https://github.com/supabase/edge-runtime/releases/tag/v1.77.4)
+  - Fixed `Math.E`, `Math.LN2`, `Math.LN10`, `Math.LOG2E` and `Math.LOG10E` returning truncated values on x86_64 (amd64) hosts - [edge-runtime#723](https://github.com/supabase/edge-runtime/issues/723)
+  - Fixed an intermittent crash when several functions start at the same time on an empty Deno cache - [edge-runtime#747](https://github.com/supabase/edge-runtime/pull/747)
+- Added structured error responses: the main worker now returns `{ code, message }` with an `sb-error-code` header (for example `404 NOT_FOUND` for an unknown function, `503 BOOT_ERROR`, `504 IDLE_TIMEOUT`), and the request idle timeout is now 150 seconds (requires `docker-compose.yml`, `volumes/functions/main/index.ts`, `volumes/api/envoy/lds.template.yaml`, and `volumes/api/kong.yml` update) - PR [#50589](https://github.com/supabase/supabase/pull/50589) (via [@luizfelmach](https://github.com/luizfelmach))
+- Added up to 3 retries when a function worker retires before it handles a request (requires `volumes/functions/main/index.ts` and `volumes/proxy/nginx/supabase-nginx.conf.tpl` update) - PR [#50618](https://github.com/supabase/supabase/pull/50618) (via [@luizfelmach](https://github.com/luizfelmach))
+
+### Supavisor
+- Updated to `2.9.13` - [Release](https://github.com/supabase/supavisor/releases/tag/v2.9.13)
+  - Changed: the image is now based on Debian 12 (bookworm) instead of Debian 11 (bullseye)
+  - Changed: when the client connection limit is reached, Supavisor now waits 500 ms before returning the error, to slow down reconnect storms - [supavisor#1188](https://github.com/supabase/supavisor/pull/1188)
+  - Added optional push of metrics to a remote endpoint (`METRICS_PUSHER_*`, off by default) - [supavisor#1184](https://github.com/supabase/supavisor/pull/1184)
+
+### Analytics (Logflare)
+- Updated to `1.50.15` - [Release](https://github.com/Logflare/logflare/releases/tag/v1.50.15)
+  - Fixed **security** issues in dependencies: Bandit, Phoenix and cowboy (denial of service; the Analytics ports aren't exposed outside the Docker network by default) - [logflare#3749](https://github.com/Logflare/logflare/pull/3749)
+  - Changed: Logflare now logs a harmless `ANTHROPIC_API_KEY is not set` warning at startup
+  - Skipped `1.52.0` and later for now: they break log queries in Studio on the Postgres backend - [logflare#4158](https://github.com/Logflare/logflare/issues/4158)
 
 ---
 

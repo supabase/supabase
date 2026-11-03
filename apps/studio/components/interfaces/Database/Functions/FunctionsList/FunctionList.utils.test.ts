@@ -9,18 +9,14 @@ describe('FunctionList.utils: getDatabaseTriggersHref', () => {
     )
   })
 
-  it('preserves special characters in the function name', () => {
-    const href = getDatabaseTriggersHref('abc', 'on_insert&schema=secret')
-    const parsed = new URL(href, 'http://example.com')
-    expect(parsed.searchParams.get('search')).toBe('on_insert&schema=secret')
-    expect(parsed.searchParams.get('schema')).toBeNull()
-  })
-
-  it('preserves spaces and plus signs in the function name', () => {
-    const href = getDatabaseTriggersHref('abc', 'a name+x')
-    const parsed = new URL(href, 'http://example.com')
-    expect(parsed.searchParams.get('search')).toBe('a name+x')
-  })
+  it.each(['on_insert&schema=secret', 'a name+x'])(
+    'encodes special characters in the function name: %s',
+    (name) => {
+      const parsed = new URL(getDatabaseTriggersHref('abc', name), 'http://example.com')
+      expect(parsed.searchParams.get('search')).toBe(name)
+      expect(parsed.searchParams.get('schema')).toBeNull()
+    }
+  )
 
   it('falls back to empty strings for undefined inputs', () => {
     expect(getDatabaseTriggersHref(undefined, undefined)).toBe(

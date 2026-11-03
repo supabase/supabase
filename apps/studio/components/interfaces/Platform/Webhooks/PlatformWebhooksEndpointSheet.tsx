@@ -39,7 +39,7 @@ import type {
   WebhookEndpoint,
   WebhookScope,
 } from './PlatformWebhooks.types'
-import { generateSigningSecret, generateWebhookEndpointName } from './PlatformWebhooks.utils'
+import { generateSigningSecret } from './PlatformWebhooks.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { Shortcut } from '@/components/ui/Shortcut'
@@ -50,7 +50,6 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 const buildEndpointFormSchema = (mode: 'create' | 'edit') =>
   z
     .object({
-      name: z.string().trim().max(64, 'Name cannot exceed 64 characters'),
       url: httpEndpointUrlSchema({
         requiredMessage: 'Please provide a URL',
         invalidMessage: 'Please provide a valid URL',
@@ -153,7 +152,6 @@ const toControlId = (prefix: string, value: string) =>
   `${prefix}-${value.replace(/[^a-zA-Z0-9_-]/g, '-')}`
 
 export const toEndpointPayload = (values: EndpointFormValues): UpsertWebhookEndpointInput => ({
-  name: values.name,
   url: values.url,
   description: values.description,
   enabled: values.enabled,
@@ -192,7 +190,6 @@ export const PlatformWebhooksEndpointSheet = ({
   const form = useForm<EndpointFormValues>({
     resolver: zodResolver(buildEndpointFormSchema(mode)),
     defaultValues: {
-      name: generateWebhookEndpointName(),
       url: '',
       description: '',
       enabled: true,
@@ -225,7 +222,6 @@ export const PlatformWebhooksEndpointSheet = ({
 
     if (!endpoint) {
       form.reset({
-        name: generateWebhookEndpointName(),
         url: '',
         description: '',
         enabled: true,
@@ -238,7 +234,6 @@ export const PlatformWebhooksEndpointSheet = ({
     }
 
     form.reset({
-      name: endpoint.name,
       url: endpoint.url,
       description: endpoint.description,
       enabled: enabledOverride ?? endpoint.enabled,
@@ -278,8 +273,8 @@ export const PlatformWebhooksEndpointSheet = ({
           <SheetTitle>{mode === 'create' ? 'Create endpoint' : 'Edit endpoint'}</SheetTitle>
           <SheetDescription className="sr-only">
             {mode === 'create'
-              ? 'Create a webhook endpoint by setting a name, URL, and event subscriptions.'
-              : 'Edit this webhook endpoint name, URL, and event subscriptions.'}
+              ? 'Create a webhook endpoint by setting a URL and event subscriptions.'
+              : 'Edit this webhook endpoint URL and event subscriptions.'}
           </SheetDescription>
         </SheetHeader>
         <Separator />
@@ -291,27 +286,6 @@ export const PlatformWebhooksEndpointSheet = ({
               onSubmit={form.handleSubmit(onSubmit)}
             >
               <div className="px-5 space-y-5">
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label={
-                        <>
-                          Name
-                          {/* Technically optional but encourage, so no (optional) label */}
-                        </>
-                      }
-                      layout="vertical"
-                      className="gap-1"
-                    >
-                      <FormControl>
-                        <Input {...field} placeholder="winged-envelope" maxLength={64} />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-
                 <FormField
                   control={form.control}
                   name="url"
@@ -483,8 +457,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                     />
                                   </FormControl>
                                   <span className="text-sm text-foreground">
-                                    Subscribe to all events{' '}
-                                    <code className="text-code-inline">(*)</code>
+                                    Subscribe to all events <code>(*)</code>
                                   </span>
                                 </Label>
                               </div>
@@ -581,7 +554,7 @@ export const PlatformWebhooksEndpointSheet = ({
                                                 )
                                               }}
                                             />
-                                            <code className="text-code-inline">{eventType}</code>
+                                            <code>{eventType}</code>
                                           </Label>
                                         )
                                       })}

@@ -8,6 +8,7 @@ import { getTableRowCreateSql } from './table-row-create-mutation'
 import { getTableRowDeleteSql } from './table-row-delete-mutation'
 import { getTableRowUpdateSql } from './table-row-update-mutation'
 import type { PendingAddRow } from '@/components/grid/types'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
@@ -169,6 +170,7 @@ export async function saveOperationQueue({
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['operation-queue-save'],
+    grant: unguarded.migrating,
   })
 
   return { result }

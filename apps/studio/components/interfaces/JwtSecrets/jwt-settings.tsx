@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
@@ -65,7 +64,7 @@ import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-muta
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -86,13 +85,11 @@ export const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'field.jwt_secret'
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
-  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.projects.update_jwt'
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
@@ -100,7 +97,9 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
     { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
@@ -189,8 +188,8 @@ export const JWTSettings = () => {
                     {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
                       <p className="leading-normal!">
                         <em className="text-warning not-italic">
-                          This includes the <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline">service_role</code> JWT based API keys.
+                          This includes the <code>anon</code> and <code>service_role</code> JWT
+                          based API keys.
                         </em>{' '}
                         Consider switching to publishable and secret API keys to disable them.
                       </p>
@@ -303,10 +302,10 @@ export const JWTSettings = () => {
                             API Keys
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
-                          in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline break-keep!">service_role</code>{' '}
-                          respectively. Watch the "Last used" indicators to confirm no traffic still
-                          depends on the legacy keys.
+                          in place of <code>anon</code> and{' '}
+                          <code className="break-keep!">service_role</code> respectively. Watch the
+                          "Last used" indicators to confirm no traffic still depends on the legacy
+                          keys.
                         </p>
                       </li>
                       <li>
@@ -318,13 +317,10 @@ export const JWTSettings = () => {
                           to start signing new JWTs with the standby key.
                         </p>
                         <p className="text-foreground-lighter">
-                          Existing <code className="text-code-inline">anon</code>,{' '}
-                          <code className="text-code-inline">service_role</code>, and active user
+                          Existing <code>anon</code>, <code>service_role</code>, and active user
                           JWTs stay valid. Before rotating, switch any code that verifies JWTs
-                          directly against the legacy secret (e.g.{' '}
-                          <code className="text-code-inline">jose</code>,{' '}
-                          <code className="text-code-inline">jsonwebtoken</code>) to{' '}
-                          <code className="text-code-inline">supabase.auth.getClaims()</code> or a
+                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
+                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
                           JWKS-based verifier, and disable the "Verify JWT" setting on any affected
                           Edge Functions.
                         </p>
@@ -357,7 +353,7 @@ export const JWTSettings = () => {
                       </li>
                       <li>
                         Improve app's performance by using public keys to verify JWTs instead of
-                        calling <code className="text-code-inline">getUser()</code>.
+                        calling <code>getUser()</code>.
                       </li>
                     </ul>
                   )}

@@ -55,6 +55,14 @@ const rewrites = [
     source: '/evals/:path*',
     destination: 'https://supabase-evals.vercel.app/:path*',
   },
+  {
+    source: '/migrate/instantdb',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+  },
+  {
+    source: '/migrate/instantdb/:path*',
+    destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
+  },
 
   {
     source: '/new-docs',

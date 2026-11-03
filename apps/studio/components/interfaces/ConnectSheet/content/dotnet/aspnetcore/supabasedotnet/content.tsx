@@ -4,7 +4,7 @@ import type { StepContentProps } from '@/components/interfaces/ConnectSheet/Conn
 
 const ContentFile = ({ projectKeys }: StepContentProps) => {
   const supabaseUrl = projectKeys.apiUrl ?? 'your-project-url'
-  const supabaseKey = projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'
+  const supabaseKey = projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-publishable-key'
 
   const files = [
     {

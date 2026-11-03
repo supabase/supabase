@@ -7,6 +7,7 @@ import { FDW } from './fdws-query'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
@@ -38,6 +39,7 @@ export async function updateFDW({
     connectionString,
     sql,
     queryKey: ['update-fdw'],
+    grant: unguarded.migrating,
   })
   return result
 }

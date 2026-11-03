@@ -1,13 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
 import { useMemo } from 'react'
 import { Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import {
-  ApiKeysCreateCallout,
-  ApiKeysFeedbackBanner,
-} from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { ApiKeysCreateCallout } from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { LegacyAPIKeysRetirementNotice } from '@/components/interfaces/APIKeys/LegacyAPIKeysRetirementNotice'
 import { PublishableAPIKeys } from '@/components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from '@/components/interfaces/APIKeys/SecretAPIKeys'
 import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
@@ -16,7 +13,7 @@ import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsL
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
 import type { NextPageWithLayout } from '@/types'
@@ -24,8 +21,10 @@ import type { NextPageWithLayout } from '@/types'
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData = [] } = useAPIKeysQuery(
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  )
+  const { data: apiKeysData = [], isSuccess: isSuccessAPIKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,
@@ -38,6 +37,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
     [apiKeysData]
   )
   const hasNewApiKeys = newApiKeys.length > 0
+  const shouldShowCreateCallout = canReadAPIKeys && isSuccessAPIKeys && !hasNewApiKeys
 
   if (!IS_PLATFORM) {
     return (
@@ -61,9 +61,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
             title="Self-hosted Supabase"
             description={
               <p>
-                <code className="text-code-inline">SUPABASE_PUBLISHABLE_KEY</code> and{' '}
-                <code className="text-code-inline">SUPABASE_SECRET_KEY</code> are set via
-                environment variables.
+                <code>SUPABASE_PUBLISHABLE_KEY</code> and <code>SUPABASE_SECRET_KEY</code> are set
+                via environment variables.
               </p>
             }
             actions={<DocsButton href={`${DOCS_URL}/guides/self-hosting/self-hosted-auth-keys`} />}
@@ -78,8 +77,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {canReadAPIKeys && !hasNewApiKeys && <ApiKeysCreateCallout />}
-      {hasNewApiKeys && <ApiKeysFeedbackBanner />}
+      {shouldShowCreateCallout && <ApiKeysCreateCallout />}
+      <LegacyAPIKeysRetirementNotice />
       <DisableInteraction disabled={!hasNewApiKeys} className="flex flex-col gap-8">
         <PublishableAPIKeys />
         <Separator />

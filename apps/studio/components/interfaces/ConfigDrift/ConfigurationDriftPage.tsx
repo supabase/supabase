@@ -1,13 +1,7 @@
 import { useParams } from 'common'
-import {
-  ArrowRightIcon,
-  CheckCircle2Icon,
-  FileWarningIcon,
-  GithubIcon,
-  PlusIcon,
-} from 'lucide-react'
+import { ArrowRightIcon, CheckCircle2Icon, FileWarningIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, Skeleton } from 'ui'
+import { Button, Card, GithubIcon, Skeleton } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -20,6 +14,7 @@ import {
   type ConfigurationDriftRow,
 } from './ConfigurationDriftPage.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { NoPermission } from '@/components/ui/NoPermission'
 import { useSelectedGitHubConfigDrift } from '@/hooks/misc/useGitHubConfigDrift'
 
 export function ConfigurationDriftPageSkeleton() {
@@ -114,7 +109,7 @@ function ConfigurationDriftItem({ row }: { row: ConfigurationDriftRow }) {
       <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex min-w-0 flex-wrap items-baseline gap-x-2 gap-y-1">
           <h3 className="text-sm font-medium text-foreground">{row.settingLabel}</h3>
-          <code className="text-code-inline max-w-full truncate text-xs" title={row.configPath}>
+          <code className="max-w-full truncate text-xs" title={row.configPath}>
             {row.configPath}
           </code>
           <span className="text-xs text-warning">Drift</span>
@@ -205,6 +200,7 @@ function ConfigFieldSection({
                   >
                     <span className="text-foreground-light">{row.label}</span>
                     <code
+                      data-code-style="plain"
                       className="max-w-[60%] truncate text-xs text-foreground-muted"
                       title={row.value}
                     >
@@ -223,8 +219,17 @@ function ConfigFieldSection({
 
 export function ConfigurationDriftPage() {
   const { ref: projectRef = '' } = useParams()
-  const { summary, isReady, isPending, isFetching, isError, error, errorSource, refetch } =
-    useSelectedGitHubConfigDrift()
+  const {
+    summary,
+    isReady,
+    isPermissionDenied,
+    isPending,
+    isFetching,
+    isError,
+    error,
+    errorSource,
+    refetch,
+  } = useSelectedGitHubConfigDrift()
   const driftRows = createConfigurationDriftRows(summary.driftedFields, projectRef)
   const comparableSettingCount = summary.matchedFields.length + driftRows.length
   const matchedGroups = groupMatchedConfigFields(summary.matchedFields)
@@ -232,6 +237,10 @@ export function ConfigurationDriftPage() {
 
   if (isPending) {
     return <ConfigurationDriftPageSkeleton />
+  }
+
+  if (isPermissionDenied) {
+    return <NoPermission resourceText="check this project's configuration drift" />
   }
 
   if (isError) {
@@ -287,9 +296,8 @@ export function ConfigurationDriftPage() {
         description={
           <>
             This project is connected to GitHub. The next commit redeploys{' '}
-            <code className="text-code-inline text-xs">config.toml</code> and overwrite changes made
-            here. To keep these changes, run{' '}
-            <code className="text-code-inline text-xs">supabase config pull</code> locally.
+            <code className="text-xs">config.toml</code> and overwrite changes made here. To keep
+            these changes, run <code className="text-xs">supabase config pull</code> locally.
           </>
         }
       />

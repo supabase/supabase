@@ -2,7 +2,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
+import { handleError, put, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessUpdateVariables = {
@@ -16,6 +16,7 @@ async function updateJitDbAccess({ projectRef, requestedConfig }: JitDbAccessUpd
   const { data, error } = await put(`/v1/projects/{ref}/jit-access`, {
     params: { path: { ref: projectRef } },
     body: requestedConfig,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { platformAppKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppInstallation =
@@ -17,6 +17,7 @@ export async function getPlatformAppInstallations(
   const { data, error } = await get('/platform/organizations/{slug}/apps/installations', {
     params: { path: { slug } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

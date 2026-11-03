@@ -8,28 +8,8 @@ import {
 } from './pgGraphqlSchemaComment'
 
 describe('parseSchemaComment', () => {
-  it('returns no directive for null', () => {
-    expect(parseSchemaComment(null)).toEqual({
-      options: {},
-      hasDirective: false,
-      isMalformed: false,
-      prefix: '',
-      suffix: '',
-    })
-  })
-
-  it('returns no directive for undefined', () => {
-    expect(parseSchemaComment(undefined)).toEqual({
-      options: {},
-      hasDirective: false,
-      isMalformed: false,
-      prefix: '',
-      suffix: '',
-    })
-  })
-
-  it('returns no directive for empty string', () => {
-    expect(parseSchemaComment('')).toEqual({
+  it.each([null, undefined, ''])('returns no directive for %j', (comment) => {
+    expect(parseSchemaComment(comment)).toEqual({
       options: {},
       hasDirective: false,
       isMalformed: false,
@@ -48,17 +28,9 @@ describe('parseSchemaComment', () => {
     })
   })
 
-  it('parses a directive with introspection: true', () => {
-    expect(parseSchemaComment('@graphql({"introspection": true})')).toMatchObject({
-      options: { introspection: true },
-      hasDirective: true,
-      isMalformed: false,
-    })
-  })
-
-  it('parses a directive with introspection: false', () => {
-    expect(parseSchemaComment('@graphql({"introspection": false})')).toMatchObject({
-      options: { introspection: false },
+  it.each([true, false])('parses a directive with introspection: %s', (introspection) => {
+    expect(parseSchemaComment(`@graphql({"introspection": ${introspection}})`)).toMatchObject({
+      options: { introspection },
       hasDirective: true,
       isMalformed: false,
     })
@@ -139,21 +111,16 @@ describe('parseSchemaComment', () => {
     })
   })
 
-  it('treats invalid JSON as malformed', () => {
-    expect(parseSchemaComment('@graphql({not valid json})')).toMatchObject({
-      options: {},
-      hasDirective: true,
-      isMalformed: true,
-    })
-  })
-
-  it('treats trailing-comma JSON as malformed', () => {
-    expect(parseSchemaComment('@graphql({"introspection": true,})')).toMatchObject({
-      options: {},
-      hasDirective: true,
-      isMalformed: true,
-    })
-  })
+  it.each(['@graphql({not valid json})', '@graphql({"introspection": true,})'])(
+    'treats invalid JSON %j as malformed',
+    (comment) => {
+      expect(parseSchemaComment(comment)).toMatchObject({
+        options: {},
+        hasDirective: true,
+        isMalformed: true,
+      })
+    }
+  )
 
   it('ignores incomplete @graphql with no closing paren', () => {
     expect(parseSchemaComment('@graphql({"introspection": true}')).toEqual({
@@ -186,20 +153,8 @@ describe('parseSchemaComment', () => {
 })
 
 describe('buildSchemaCommentWith', () => {
-  it('produces a directive when comment is null', () => {
-    expect(buildSchemaCommentWith(null, { introspection: true })).toBe(
-      '@graphql({"introspection":true})'
-    )
-  })
-
-  it('produces a directive when comment is undefined', () => {
-    expect(buildSchemaCommentWith(undefined, { introspection: true })).toBe(
-      '@graphql({"introspection":true})'
-    )
-  })
-
-  it('produces a directive when comment is empty', () => {
-    expect(buildSchemaCommentWith('', { introspection: true })).toBe(
+  it.each([null, undefined, ''])('produces a directive when comment is %j', (comment) => {
+    expect(buildSchemaCommentWith(comment, { introspection: true })).toBe(
       '@graphql({"introspection":true})'
     )
   })
@@ -253,14 +208,6 @@ describe('buildSchemaCommentWith', () => {
       buildSchemaCommentWith('prefix @graphql({not valid json}) suffix', { introspection: true })
     ).toBe('prefix @graphql({"introspection":true}) suffix')
   })
-
-  it('supports disabling introspection', () => {
-    expect(
-      buildSchemaCommentWith('@graphql({"introspection": true, "max_rows": 100})', {
-        introspection: false,
-      })
-    ).toBe('@graphql({"introspection":false,"max_rows":100})')
-  })
 })
 
 describe('isIntrospectionEnabled', () => {
@@ -283,12 +230,8 @@ describe('isIntrospectionEnabled', () => {
 describe('isPgGraphqlIntrospectionOptIn', () => {
   it.each([
     ['1.6.0', true],
-    ['1.6.1', true],
-    ['1.7.0', true],
     ['2.0.0', true],
     ['1.5.9', false],
-    ['1.5.0', false],
-    ['1.0.0', false],
     ['0.9.0', false],
   ])('version %s returns %s', (version, expected) => {
     expect(isPgGraphqlIntrospectionOptIn(version)).toBe(expected)

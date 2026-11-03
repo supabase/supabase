@@ -8,11 +8,10 @@ import { AssistantNotebookPreview } from './AssistantNotebookPreview'
 import { toAssistantQueryResult } from './AssistantQueryCell.utils'
 import { Confirm } from './Confirm'
 import type { ConfirmFooterApprovalState } from './Confirm.utils'
-import { runNotebookInputSchema } from './Message.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useNotebookQuery } from '@/data/content/notebooks/notebook-query'
 import { toWireNotebook } from '@/data/content/notebooks/notebook-schema'
-import { notebookRunOutputSchema } from '@/lib/ai/tools/notebook-run-output'
+import { contract as runNotebookContract } from '@/lib/ai/tools/run-notebook'
 
 export type NotebookRunState =
   | 'input-available'
@@ -40,7 +39,7 @@ export const NotebookRunRenderer = ({
   onDeny,
 }: NotebookRunRendererProps) => {
   const { ref } = useParams()
-  const parsedInput = runNotebookInputSchema.safeParse(input)
+  const parsedInput = runNotebookContract.inputSchema.safeParse(input)
   const {
     data: notebook,
     isLoading,
@@ -139,7 +138,7 @@ export const NotebookRunRenderer = ({
     _tag: 'unchanged' as const,
     cell,
   }))
-  const parsedOutput = notebookRunOutputSchema.safeParse(output)
+  const parsedOutput = runNotebookContract.outputSchema.safeParse(output)
   const isHistoricalRun = state === 'output-available' || state === 'output-error'
   const referencedUpdatedAt =
     state === 'output-available' && parsedOutput.success

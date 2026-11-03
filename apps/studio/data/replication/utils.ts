@@ -14,14 +14,14 @@ const isLocal =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' &&
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
 
-export const checkLocalETLNotSetUp = (error: ResponseError | null) => {
+export const checkLocalPipelinesNotSetUp = (error: ResponseError | null) => {
   if (error === null) return false
 
-  const isETLAPINotRunning =
+  const isPipelinesApiNotRunning =
     error.code === undefined && error.message.includes('API error happened')
-  const isETLNotSetUp =
+  const isPipelinesNotSetUp =
     error.code === 503 && error.message.includes('replication API URL is not configured')
-  return isLocal && (isETLAPINotRunning || isETLNotSetUp)
+  return isLocal && (isPipelinesApiNotRunning || isPipelinesNotSetUp)
 }
 
 export const checkReplicationFeatureFlagRetry = (
@@ -33,9 +33,9 @@ export const checkReplicationFeatureFlagRetry = (
     error.code === 503 &&
     error.message.includes('feature flag is required')
 
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(error)
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(error)
 
-  if (isFeatureFlagRequiredError || isLocalETLNotSetUp) {
+  if (isFeatureFlagRequiredError || isLocalPipelinesNotSetUp) {
     return false
   }
 

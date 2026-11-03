@@ -3,6 +3,7 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { handleError, post } from '@/data/fetchers'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
@@ -10,16 +11,14 @@ export type RollbackTablesTarget = components['schemas']['RollbackTablesBody']['
 
 type RollbackTablesParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   target: RollbackTablesTarget
 }
-
-type RollbackTablesResponse = components['schemas']['RollbackTablesResponse_Output']
 
 async function rollbackTables(
   { projectRef, pipelineId, target }: RollbackTablesParams,
   signal?: AbortSignal
-): Promise<RollbackTablesResponse> {
+) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!pipelineId) throw new Error('Pipeline ID is required')
 
@@ -34,7 +33,7 @@ async function rollbackTables(
   )
   if (error) handleError(error)
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type RollbackTablesData = Awaited<ReturnType<typeof rollbackTables>>

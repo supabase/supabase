@@ -108,10 +108,12 @@ export const HomePageActions = ({ slug: _slug, hideNewProject = false }: HomePag
           <FilterPopover
             name="Status"
             title="Filter projects by status"
-            options={[
-              { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
-              { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
-            ]}
+            options={
+              [
+                { key: PROJECT_STATUS.ACTIVE_HEALTHY, label: 'Active' },
+                { key: PROJECT_STATUS.INACTIVE, label: 'Paused' },
+              ] as { key: string; label: string }[]
+            }
             activeOptions={filterStatus}
             valueKey="key"
             labelKey="label"

@@ -28,10 +28,7 @@ async function createEndpoint({
   })
   if (!result?.data) throw new Error('Endpoint was created but no data was returned')
 
-  // The server never stores `name` (see PlatformWebhooks.types.ts) — carry through
-  // what the user typed so it's visible for this session, even though it won't
-  // survive a refetch or page reload.
-  return { ...toWebhookEndpoint(result.data), name: input.name }
+  return toWebhookEndpoint(result.data)
 }
 
 type WebhookEndpointCreateData = Awaited<ReturnType<typeof createEndpoint>>

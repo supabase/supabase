@@ -1,35 +1,47 @@
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { executeWithRetry } from './table-rows-query'
 
+const rateLimitError = { status: 429, headers: { get: () => '1' } }
+
 describe('executeWithRetry', () => {
-  it('should return the result of the function when successful', async () => {
+  beforeEach(() => {
+    vi.useFakeTimers()
+  })
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('returns the result of the function when successful', async () => {
     const mockFn = vi.fn().mockResolvedValue('success')
-    const result = await executeWithRetry(mockFn)
-    expect(result).toBe('success')
+    await expect(executeWithRetry(mockFn)).resolves.toBe('success')
     expect(mockFn).toHaveBeenCalledTimes(1)
   })
 
-  it('should retry on 429 errors with exponential backoff', async () => {
+  it('retries on 429 errors until the function succeeds', async () => {
     const mockFn = vi
       .fn()
-      .mockRejectedValueOnce({ status: 429, headers: { get: () => '1' } })
-      .mockRejectedValueOnce({ status: 429, headers: { get: () => '1' } })
+      .mockRejectedValueOnce(rateLimitError)
+      .mockRejectedValueOnce(rateLimitError)
       .mockResolvedValue('success')
 
-    const result = await executeWithRetry(mockFn)
-    expect(result).toBe('success')
+    const result = executeWithRetry(mockFn)
+    await vi.runAllTimersAsync()
+    await expect(result).resolves.toBe('success')
     expect(mockFn).toHaveBeenCalledTimes(3)
   })
 
-  it('should throw error after max retries', async () => {
-    const mockFn = vi.fn().mockRejectedValue({ status: 429, headers: { get: () => '1' } })
+  it('throws after max retries', async () => {
+    const mockFn = vi.fn().mockRejectedValue(rateLimitError)
 
-    await expect(executeWithRetry(mockFn, 2)).rejects.toMatchObject({ status: 429 })
+    const result = executeWithRetry(mockFn, 2)
+    const assertion = expect(result).rejects.toMatchObject({ status: 429 })
+    await vi.runAllTimersAsync()
+    await assertion
     expect(mockFn).toHaveBeenCalledTimes(3) // Initial attempt + 2 retries
   })
 
-  it('should throw non-429 errors immediately', async () => {
+  it('throws non-429 errors immediately', async () => {
     const mockFn = vi.fn().mockRejectedValue(new Error('Some other error'))
 
     await expect(executeWithRetry(mockFn)).rejects.toThrow('Some other error')
