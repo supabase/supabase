@@ -13,6 +13,7 @@ import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
 import { getCdnUrlForBuiltFile, getTanstackAssetCdnUrl } from './asset-cdn'
+import { PRERENDERED_ROUTES } from './lib/prerendered-routes'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -553,6 +554,9 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Signed-out pages prerendered next to the SPA shell. Platform builds only: self-hosted
+  // sign-in redirects straight to the default project.
+  const prerenderedRoutes = env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? PRERENDERED_ROUTES : []
   // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
   // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
   // base stays `/dashboard` so documents, server functions and API routes stay
@@ -855,7 +859,7 @@ export default defineConfig(({ command, mode }) => {
         },
         // Documents from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
-        modules: [vercelSpaRoutes({ basePath })],
+        modules: [vercelSpaRoutes({ basePath, prerenderedRoutes })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
       }),
       tanstackStart({
@@ -863,6 +867,13 @@ export default defineConfig(({ command, mode }) => {
         spa: {
           enabled: true,
         },
+        // Explicit pages only: no crawling, no static path discovery.
+        prerender: { crawlLinks: false, autoStaticPathsDiscovery: false },
+        pages: prerenderedRoutes.map((path) => ({
+          path,
+          prerender: { enabled: true },
+          sitemap: { exclude: true },
+        })),
         // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
         // its slash-stripping branch. See the basePath comment above.
         ...(basePath && { router: { basepath: basePath } }),

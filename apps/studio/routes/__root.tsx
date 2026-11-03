@@ -92,6 +92,7 @@ import { splitInternalUrl } from '@/lib/internal-url'
 // Custom adapter instead of `nuqs/adapters/tanstack-router` — the stock one
 // injects a trailing slash before the query on every nuqs write (see module).
 import { NuqsAdapter } from '@/lib/nuqs-tanstack-adapter'
+import { isPrerenderedRoute } from '@/lib/prerendered-routes'
 import { ProfileProvider } from '@/lib/profile'
 import { Telemetry } from '@/lib/telemetry'
 import { ToastErrorTracker } from '@/lib/toast-errors'
@@ -365,6 +366,9 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 function RootComponent() {
   const recoveryLocation = useLocation()
   useThemeSandbox()
+  // Prerendered pages render on the server so their HTML holds the page content. Every other
+  // route renders only on the client, behind the shell fallback.
+  const shouldRenderOnServer = IS_PLATFORM && isPrerenderedRoute(recoveryLocation.pathname)
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -385,9 +389,13 @@ function RootComponent() {
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
                                     <RecoveryReminderController href={recoveryLocation.href}>
-                                      <ClientOnly fallback={<ShellFallback />}>
+                                      {shouldRenderOnServer ? (
                                         <Outlet />
-                                      </ClientOnly>
+                                      ) : (
+                                        <ClientOnly fallback={<ShellFallback />}>
+                                          <Outlet />
+                                        </ClientOnly>
+                                      )}
                                     </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
