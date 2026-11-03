@@ -95,13 +95,19 @@ export const ResetPasswordForm = () => {
                             icon={currentPasswordHidden ? <EyeIcon /> : <EyeOffIcon />}
                             className="w-7"
                             onClick={() => setCurrentPasswordHidden((prev) => !prev)}
-                            aria-label={currentPasswordHidden ? 'Show current password' : 'Hide current password'}
+                            aria-label={
+                              currentPasswordHidden
+                                ? 'Show current password'
+                                : 'Hide current password'
+                            }
                             // Tooltip repeats the label; screen readers would read it twice
                             aria-describedby={undefined}
                           />
                         </TooltipTrigger>
                         <TooltipContent side="bottom">
-                          {currentPasswordHidden ? 'Show current password' : 'Hide current password'}
+                          {currentPasswordHidden
+                            ? 'Show current password'
+                            : 'Hide current password'}
                         </TooltipContent>
                       </Tooltip>
                     }
