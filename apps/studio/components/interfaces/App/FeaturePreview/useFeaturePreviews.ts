@@ -35,7 +35,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isPipelineCreationWizardAvailable = useFlag('pipelineCreationWizard')
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isExplorerEnabled = useFlag('explorer')
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
 
@@ -126,16 +125,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         getRoute: (ref?: string) => `/project/${ref}/database/column-privileges`,
       },
       {
-        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-        name: 'One-click Integrations',
-        discussionsUrl: undefined,
-        enabled: isMarketplaceEnabled,
-        isNew: false,
-        isPlatformOnly: false,
-        isDefaultOptIn: true,
-        getRoute: (ref?: string) => `/project/${ref}/integrations`,
-      },
-      {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
         category: 'editors',
         name: 'Disable snippet auto-saving',
@@ -167,7 +156,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
-    isMarketplaceEnabled,
     isExplorerEnabled,
     isStorageVersioningEnabled,
   ])
