@@ -10,24 +10,24 @@ subtitle: 'Configure database log settings to better suit your observability and
 
 The table lists _configurable_ log settings. See each setting's section for details.
 
-| Setting                                                        | Category            |  Default  | Set By                |
-| :------------------------------------------------------------- | :------------------ | :-------: | :-------------------- |
-| [`log_autovacuum_min_duration`](#logautovacuumminduration)     | Background Activity |  `10min`  | `CLI`                 |
-| [`log_checkpoints`](#logcheckpoints)                           | Background Activity |  `true`   | `CLI`                 |
-| [`log_lock_waits`](#loglockwaits)                              | Background Activity |  `true`   | `CLI` + `SQL`         |
-| [`log_recovery_conflict_waits`](#logrecoveryconflictwaits)     | Background Activity |  `false`  | `CLI`                 |
-| [`log_startup_progress_interval`](#logstartupprogressinterval) | Background Activity | `10000ms` | `CLI`                 |
-| [`log_temp_files`](#logtempfiles)                              | Background Activity |   `-1`    | `CLI` + `SQL`         |
-| [`log_connections`](#logconnections)                           | Network Monitoring  |  `false`  | `CLI`                 |
-| [`log_disconnections`](#logdisconnections)                     | Network Monitoring  |  `false`  | `CLI`                 |
-| [`cron.log_statement`](#cronlogstatement)                      | Query Activity      |  `true`   | `CLI`                 |
-| [`auto_explain.*`](#autoexplain)                               | Query Activity      | `10000ms` | `SQL`                 |
-| [`log_duration`](#logduration)                                 | Query Activity      |  `false`  | `SQL`                 |
-| [`log_min_duration_statement`](#logmindurationstatement)       | Query Activity      |   `-1`    | `SQL`                 |
-| [`log_min_error_statement`](#logminerrorstatement)             | Query Activity      |  `error`  | `SQL`                 |
-| [`log_min_messages`](#logminmessages)                          | Query Activity      | `warning` | `SQL`                 |
-| [`log_statement`](#logstatement)                               | Query Activity      |   `ddl`   | `SQL`                 |
-| [`pgaudit.*`](#pgaudit)                                        | Query Activity      |   `N/A`   | `SQL`                 |
+| Setting                                                        | Category            |  Default  | Set By        |
+| :------------------------------------------------------------- | :------------------ | :-------: | :------------ |
+| [`log_autovacuum_min_duration`](#logautovacuumminduration)     | Background Activity |  `10min`  | `CLI`         |
+| [`log_checkpoints`](#logcheckpoints)                           | Background Activity |  `true`   | `CLI`         |
+| [`log_lock_waits`](#loglockwaits)                              | Background Activity |  `true`   | `CLI` + `SQL` |
+| [`log_recovery_conflict_waits`](#logrecoveryconflictwaits)     | Background Activity |  `false`  | `CLI`         |
+| [`log_startup_progress_interval`](#logstartupprogressinterval) | Background Activity | `10000ms` | `CLI`         |
+| [`log_temp_files`](#logtempfiles)                              | Background Activity |   `-1`    | `CLI` + `SQL` |
+| [`log_connections`](#logconnections)                           | Network Monitoring  |  `false`  | `CLI`         |
+| [`log_disconnections`](#logdisconnections)                     | Network Monitoring  |  `false`  | `CLI`         |
+| [`cron.log_statement`](#cronlogstatement)                      | Query Activity      |  `true`   | `CLI`         |
+| [`auto_explain.*`](#autoexplain)                               | Query Activity      | `10000ms` | `SQL`         |
+| [`log_duration`](#logduration)                                 | Query Activity      |  `false`  | `SQL`         |
+| [`log_min_duration_statement`](#logmindurationstatement)       | Query Activity      |   `-1`    | `SQL`         |
+| [`log_min_error_statement`](#logminerrorstatement)             | Query Activity      |  `error`  | `SQL`         |
+| [`log_min_messages`](#logminmessages)                          | Query Activity      | `warning` | `SQL`         |
+| [`log_statement`](#logstatement)                               | Query Activity      |   `ddl`   | `SQL`         |
+| [`pgaudit.*`](#pgaudit)                                        | Query Activity      |   `N/A`   | `SQL`         |
 
 To view log settings for your project, you can run:
 
