@@ -99,7 +99,10 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
-                  <ChartTitle tooltip="Active hours consumed so far this period, against the plan allowance.">
+                  <ChartTitle
+                    className="text-sm"
+                    tooltip="Active hours consumed so far this period, against the plan allowance."
+                  >
                     Active hours
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
@@ -203,7 +206,10 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
-                  <ChartTitle tooltip="Active hours split by instance size. Larger sizes reserve more vCPU and memory per hour.">
+                  <ChartTitle
+                    className="text-sm"
+                    tooltip="Active hours split by instance size. Larger sizes reserve more vCPU and memory per hour."
+                  >
                     Instance hours by size
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
@@ -239,7 +245,10 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
-                  <ChartTitle tooltip="Computes, instances and active hours attributed to each project.">
+                  <ChartTitle
+                    className="text-sm"
+                    tooltip="Computes, instances and active hours attributed to each project."
+                  >
                     Usage by project
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
@@ -290,7 +299,7 @@ const ComputeBurndownLegend = ({ burndown }: { burndown: ComputeBurndown }) => {
   }
 
   return (
-    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+    <div className="mt-3 flex flex-wrap justify-center items-center gap-x-4 gap-y-1.5">
       <LegendItem className="bg-foreground" label="Used" />
       {burndown.warningHours !== null && (
         <LegendItem
