@@ -1,6 +1,9 @@
 import { expect, test } from '@playwright/test'
 
 const SUPABASE_URL_ERROR = /supabaseUrl is required/i
+const NOT_FOUND_HEADING = /we couldn.t find that page/i
+// dev streams the guide loading skeleton first, so it sends 200 before the page finds it is missing
+const MISSING_PAGE_STATUSES = [200, 404]
 
 function collectPageErrors(page: import('@playwright/test').Page) {
   const errors: string[] = []
@@ -34,9 +37,12 @@ test.describe('docs dev runs locally without credentials', () => {
     await expect(page.getByRole('heading', { name: 'Advisors' })).toBeVisible()
   })
 
-  test('a federated guide missing locally returns a clean 404, not a crash', async ({ page }) => {
+  test('a federated guide missing locally shows the not-found page, not a crash', async ({
+    page,
+  }) => {
     const response = await page.goto('/docs/guides/graphql')
-    expect(response?.status()).toBe(404)
+    expect(MISSING_PAGE_STATUSES).toContain(response?.status())
+    await expect(page.getByRole('heading', { name: NOT_FOUND_HEADING })).toBeVisible()
   })
 
   test('the wrappers overview page renders without GitHub credentials', async ({ page }) => {
@@ -50,10 +56,11 @@ test.describe('docs dev runs locally without credentials', () => {
     expect(errors.some((message) => SUPABASE_URL_ERROR.test(message))).toBeFalsy()
   })
 
-  test('a federated wrappers page missing locally returns a clean 404, not a crash', async ({
+  test('a federated wrappers page missing locally shows the not-found page, not a crash', async ({
     page,
   }) => {
     const response = await page.goto('/docs/guides/database/extensions/wrappers/stripe')
-    expect(response?.status()).toBe(404)
+    expect(MISSING_PAGE_STATUSES).toContain(response?.status())
+    await expect(page.getByRole('heading', { name: NOT_FOUND_HEADING })).toBeVisible()
   })
 })
