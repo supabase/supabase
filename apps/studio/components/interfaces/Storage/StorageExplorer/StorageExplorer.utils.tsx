@@ -198,6 +198,9 @@ export function getStoragePathForItem(
 /**
  * Public URL of an object in a public bucket. Each path segment is encoded so that
  * characters such as `?`, `#` and `%` in names stay part of the object path.
+ *
+ * This is meant to be used only when constructing multiple public URLs and to avoid DDOSing the management API. You should
+ * use getBucketObjectPublicUrl instead whenever possible.
  */
 export function getPublicObjectUrl({
   endpoint,

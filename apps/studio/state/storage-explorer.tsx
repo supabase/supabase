@@ -1872,6 +1872,7 @@ export function createStorageExplorerState({
 
       try {
         const url = await fetchFileUrl(
+          getQueryClient(),
           file.path,
           state.projectRef,
           state.selectedBucket.id,
@@ -1916,6 +1917,7 @@ export function createStorageExplorerState({
 
       try {
         const url = await fetchFileUrl(
+          getQueryClient(),
           file.path,
           state.projectRef,
           state.selectedBucket.id,

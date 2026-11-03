@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { copyToClipboard } from 'ui'
@@ -8,6 +9,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
 export const useCopyUrl = () => {
+  const queryClient = useQueryClient()
   const { projectRef, selectedBucket } = useStorageExplorerStateSnapshot()
 
   const { hostEndpoint, customEndpoint } = useProjectApiUrl({ projectRef })
@@ -15,9 +17,16 @@ export const useCopyUrl = () => {
 
   const getFileUrl = useCallback(
     (filePath: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      return fetchFileUrl(filePath, projectRef, selectedBucket.id, selectedBucket.public, expiresIn)
+      return fetchFileUrl(
+        queryClient,
+        filePath,
+        projectRef,
+        selectedBucket.id,
+        selectedBucket.public,
+        expiresIn
+      )
     },
-    [projectRef, selectedBucket]
+    [projectRef, queryClient, selectedBucket]
   )
 
   const onCopyUrl = useCallback(
