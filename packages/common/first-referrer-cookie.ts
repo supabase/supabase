@@ -92,6 +92,8 @@ export function isExternalReferrer(referrer: string): boolean {
   }
 }
 
+const SIGN_IN_PAGE_HOSTNAMES = new Set(['accounts.youtube.com', 'auth.openai.com', 'appleid.apple.com'])
+
 /**
  * Returns true if the referrer URL is an OAuth/SSO redirect that should NOT
  * be treated as a genuine traffic source.
@@ -99,6 +101,8 @@ export function isExternalReferrer(referrer: string): boolean {
  * A referrer should reflect how someone discovered Supabase, not how they
  * authenticated. This function identifies auth provider redirects:
  * - accounts.google.com — blocked entirely (dedicated SSO subdomain)
+ * - accounts.google.* regional domains, accounts.youtube.com, auth.openai.com,
+ *   appleid.apple.com: blocked entirely (sign-in pages)
  * - github.com with no path (bare domain) — blocked (OAuth strips the path
  *   via origin-when-cross-origin Referrer-Policy)
  * - github.com/login/oauth/* — blocked (explicit OAuth path, rare)
@@ -111,7 +115,8 @@ export function isOAuthRedirectReferrer(referrer: string): boolean {
     const hostname = url.hostname
 
     // Google SSO — entire subdomain is auth traffic
-    if (hostname === 'accounts.google.com') return true
+    if (hostname.startsWith('accounts.google.')) return true
+    if (SIGN_IN_PAGE_HOSTNAMES.has(hostname)) return true
 
     // GitHub — bare domain (no meaningful path) is OAuth redirect noise
     if (hostname === 'github.com') {
