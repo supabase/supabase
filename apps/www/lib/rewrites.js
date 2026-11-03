@@ -15,6 +15,17 @@ const rewrites = [
   },
   ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? [
+        // vercel sends prefetches as .segments paths with the header, so docs adds the suffix twice
+        {
+          source: '/docs/:path(.*)\\.segments/:segment(.*)\\.segment\\.rsc',
+          destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path`,
+        },
+        {
+          source: '/docs\\.segments/:segment(.*)\\.segment\\.rsc',
+          destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
+        },
+        // docs serves its root as index.rsc
+        { source: '/docs\\.rsc', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}` },
         { source: '/docs', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}` },
         {
           source: '/docs/',

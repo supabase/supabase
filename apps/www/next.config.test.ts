@@ -108,6 +108,28 @@ describe('next.config.mjs', () => {
     )
   })
 
+  it('forwards docs prefetches as the page path, so docs adds the rsc suffix once', async () => {
+    vi.resetModules()
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production')
+    vi.stubEnv('NEXT_PUBLIC_DOCS_URL', 'https://docs.example.com/docs')
+    const { default: rewrites } = (await import('./lib/rewrites.js')) as {
+      default: Array<{ source: string; destination: string }>
+    }
+    vi.unstubAllEnvs()
+
+    // the first rule rewrites every path to itself, so routing goes on to the next match
+    const forward = (path: string) =>
+      rewrites.find((rule) => rule.source !== '/:path*' && getPathMatch(rule.source)(path))
+        ?.destination
+
+    expect(forward('/docs/guides/auth/architecture.segments/_tree.segment.rsc')).toBe(
+      'https://docs.example.com/docs/:path'
+    )
+    expect(forward('/docs.segments/_tree.segment.rsc')).toBe('https://docs.example.com/docs')
+    expect(forward('/docs.rsc')).toBe('https://docs.example.com/docs')
+    expect(forward('/docs/guides/auth/architecture')).toBe('https://docs.example.com/docs/:path*')
+  })
+
   it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
     const rewrites = await config.rewrites?.()
