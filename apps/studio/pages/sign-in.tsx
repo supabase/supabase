@@ -1,3 +1,4 @@
+import { useHydrated } from '@tanstack/react-router'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -18,6 +19,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const isHydrated = useHydrated()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
   const {
@@ -84,6 +86,9 @@ const SignInPage: NextPageWithLayout = () => {
     )
   }
 
+  // Search params aren't in the prerendered HTML.
+  const query = isHydrated ? router.query : {}
+
   return (
     <>
       <div className="flex flex-col gap-5">
@@ -97,7 +102,7 @@ const SignInPage: NextPageWithLayout = () => {
           <Link
             href={{
               pathname: '/sign-up',
-              query: { ...router.query, returnTo: getSignUpReturnTo(router.query.returnTo) },
+              query: { ...query, returnTo: getSignUpReturnTo(query.returnTo) },
             }}
             className="underline transition text-foreground hover:text-foreground-light"
           >

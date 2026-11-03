@@ -1,6 +1,7 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { useHydrated } from '@tanstack/react-router'
 import { LockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -144,11 +145,13 @@ export const SignInSSOForm = () => {
 
 export const SignInWithSSOButton = () => {
   const router = useRouter()
+  // Search params aren't in the prerendered HTML.
+  const query = useHydrated() ? router.query : {}
 
   return (
     <LastSignInWrapper type="sso">
       <Button asChild block size="large" variant="outline" icon={<LockIcon />}>
-        <Link href={{ pathname: '/sign-in-sso', query: router.query }}>Continue with SSO</Link>
+        <Link href={{ pathname: '/sign-in-sso', query }}>Continue with SSO</Link>
       </Button>
     </LastSignInWrapper>
   )
