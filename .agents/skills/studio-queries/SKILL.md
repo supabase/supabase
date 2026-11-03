@@ -50,10 +50,10 @@ import { queryOptions } from '@tanstack/react-query'
 import { xKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type XVariables = { projectRef?: string }
-export type XError = ResponseError
+export type XError = StudioError
 
 async function getX({ projectRef }: XVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')

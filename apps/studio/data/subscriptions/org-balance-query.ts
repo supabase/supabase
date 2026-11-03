@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { subscriptionKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrgBalanceVariables = {
   orgSlug?: string
@@ -27,7 +28,7 @@ export async function getOrgBalance(
 }
 
 export type OrgBalanceData = Awaited<ReturnType<typeof getOrgBalance>>
-export type OrgBalanceError = ResponseError
+export type OrgBalanceError = StudioError
 
 export const useOrgBalanceQuery = <TData = OrgBalanceData>(
   { orgSlug }: OrgBalanceVariables,

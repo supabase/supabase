@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { invalidateSchemasQuery } from './schemas-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SchemaCreateVariables = {
   name: string
@@ -32,11 +33,11 @@ export const useSchemaCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SchemaCreateData, ResponseError, SchemaCreateVariables>,
+  UseCustomMutationOptions<SchemaCreateData, StudioError, SchemaCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SchemaCreateData, ResponseError, SchemaCreateVariables>({
+  return useMutation<SchemaCreateData, StudioError, SchemaCreateVariables>({
     mutationFn: (vars) => createSchema(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

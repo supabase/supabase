@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { oauthServerAppKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthServerAppRegenerateSecretVariables = {
   projectRef: string | undefined
@@ -37,7 +38,7 @@ export const useOAuthServerAppRegenerateSecretMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthAppRegenerateSecretData,
-    ResponseError,
+    StudioError,
     OAuthServerAppRegenerateSecretVariables
   >,
   'mutationFn'
@@ -46,7 +47,7 @@ export const useOAuthServerAppRegenerateSecretMutation = ({
 
   return useMutation<
     OAuthAppRegenerateSecretData,
-    ResponseError,
+    StudioError,
     OAuthServerAppRegenerateSecretVariables
   >({
     mutationFn: (vars) => regenerateSecret(vars),

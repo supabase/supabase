@@ -4,10 +4,10 @@ import { z } from 'zod'
 import { getHaAdmin, parseHaAdminResponse } from './get-ha-admin'
 import { haAdminKeys } from './keys'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type HaClusterPoolersVariables = { projectRef?: string }
-export type HaClusterPoolersError = ResponseError
+export type HaClusterPoolersError = StudioError
 
 const shardRefSchema = z
   .object({

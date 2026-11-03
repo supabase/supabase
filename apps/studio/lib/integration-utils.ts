@@ -4,20 +4,21 @@ import { isResponseOk } from './api/apiWrapper'
 import { fetchHandler } from '@/data/fetchers'
 import type { Integration } from '@/data/integrations/integrations.types'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, type SupaResponse } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import { type SupaResponse } from '@/types'
 
 async function fetchGitHub<T = any>(url: string, responseJson = true): Promise<SupaResponse<T>> {
   const response = await fetchHandler(url)
   if (!response.ok) {
     return {
-      error: new ResponseError(response.statusText, response.status),
+      error: new StudioError(response.statusText, response.status),
     }
   }
   try {
     return (responseJson ? await response.json() : await response.text()) as T
   } catch (error: any) {
     return {
-      error: new ResponseError(error.message, 500),
+      error: new StudioError(error.message, 500),
     }
   }
 }

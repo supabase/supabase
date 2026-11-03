@@ -5,8 +5,9 @@ import { getBranchDiff, type BranchDiffGrant } from './branch-diff-query'
 import { branchKeys } from './keys'
 import { upsertMigration } from '@/data/database/migration-upsert-mutation'
 import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantForVariants } from '@/lib/grants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchMergeGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/merge'>
 
@@ -76,11 +77,11 @@ export const useBranchMergeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchMergeData, ResponseError, BranchMergeVariables>,
+  UseCustomMutationOptions<BranchMergeData, StudioError, BranchMergeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchMergeData, ResponseError, BranchMergeVariables>({
+  return useMutation<BranchMergeData, StudioError, BranchMergeVariables>({
     mutationFn: (vars) => mergeBranch(vars),
     async onSuccess(data, variables, context) {
       const { baseProjectRef } = variables

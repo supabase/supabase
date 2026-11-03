@@ -3,7 +3,8 @@ import type { components } from 'api-types'
 
 import { analyticsKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export enum EgressType {
   REST = 'egress_rest',
@@ -152,7 +153,7 @@ export async function getOrgDailyStats(
 }
 
 export type OrgDailyStatsData = Awaited<ReturnType<typeof getOrgDailyStats>>
-export type OrgDailyStatsError = ResponseError
+export type OrgDailyStatsError = StudioError
 
 export const useOrgDailyStatsQuery = <TData = OrgDailyStatsData>(
   { orgSlug, startDate, endDate, projectRef }: OrgDailyStatsVariables,

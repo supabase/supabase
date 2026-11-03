@@ -57,8 +57,8 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { noop } from '@/lib/void'
-import type { ResponseError } from '@/types'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
@@ -274,7 +274,7 @@ export const PostgrestConfig = () => {
         functionNamesToRemove: [],
       })
     } catch (error) {
-      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+      toast.error('Failed to save settings: ' + (error as StudioError).message || 'Unknown error')
     } finally {
       setIsUpdating(false)
     }

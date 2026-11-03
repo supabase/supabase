@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthIntegrationInstallVariables = {
   projectRef: string
@@ -30,12 +31,12 @@ export const useInstallOAuthIntegrationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OAuthIntegrationInstallData,
-    ResponseError,
+    StudioError,
     OAuthIntegrationInstallVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<OAuthIntegrationInstallData, ResponseError, OAuthIntegrationInstallVariables>({
+  return useMutation<OAuthIntegrationInstallData, StudioError, OAuthIntegrationInstallVariables>({
     mutationFn: (vars) => installOAuthIntegration(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

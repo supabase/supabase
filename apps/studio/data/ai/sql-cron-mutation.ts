@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 export type SqlCronGenerateResponse = string
 
@@ -28,7 +29,7 @@ export async function generateSqlCron({ prompt }: SqlCronGenerateVariables) {
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw new StudioError(body?.message, response.status)
   }
 
   return body as SqlCronGenerateResponse
@@ -41,10 +42,10 @@ export const useSqlCronGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
+  UseCustomMutationOptions<SqlCronGenerateData, StudioError, SqlCronGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>({
+  return useMutation<SqlCronGenerateData, StudioError, SqlCronGenerateVariables>({
     mutationFn: (vars) => generateSqlCron(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

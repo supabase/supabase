@@ -2,7 +2,7 @@ import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { assertSelfHosted } from './util'
 import { fetchGet } from '@/data/fetchers'
 import { PG_META_URL } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type GenerateTypescriptTypesOptions = {
   headers?: HeadersInit
@@ -19,7 +19,7 @@ type GenerateTypescriptTypesResult = {
  */
 export async function generateTypescriptTypes({
   headers,
-}: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | ResponseError> {
+}: GenerateTypescriptTypesOptions): Promise<GenerateTypescriptTypesResult | StudioError> {
   assertSelfHosted()
 
   // Use the schemas actually exposed via PostgREST (PGRST_DB_SCHEMAS) so generated

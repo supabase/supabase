@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteBucketObjectParams = {
   projectRef: string
@@ -39,10 +40,10 @@ export const useBucketObjectDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>,
+  UseCustomMutationOptions<BucketObjectDeleteData, StudioError, DeleteBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BucketObjectDeleteData, ResponseError, DeleteBucketObjectParams>({
+  return useMutation<BucketObjectDeleteData, StudioError, DeleteBucketObjectParams>({
     mutationFn: (vars) => deleteBucketObject(vars),
     async onSuccess(data, variables, context) {
       // [Joshen] TODO figure out what queries to invalidate
