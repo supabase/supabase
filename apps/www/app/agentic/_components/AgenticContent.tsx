@@ -13,6 +13,7 @@ import { Button, cn } from 'ui'
 import { EVALS_DRAWING, IsoArt, TimelineRing } from './art'
 import { STAGES, type Primitive } from './content'
 import { Conversation } from './Conversation'
+import { createLifecycleClock } from './lifecycle'
 import { LifecycleCube } from './LifecycleCube'
 import DefaultLayout from '@/components/Layouts/Default'
 
@@ -194,6 +195,7 @@ function PanelContent({
 }
 
 export function AgenticContent() {
+  const [clock] = useState(createLifecycleClock)
   const [selectedId, setSelectedId] = useState<string | null>(null)
   // Shared by every primitive, so moving along the journey stays on the same kind of view
   const [isChatting, setIsChatting] = useState(false)
@@ -270,15 +272,23 @@ export function AgenticContent() {
           {/* Sized to clear the copy, so on a phone its sides run off the page */}
           <TimelineRing
             text={`${HEADLINE} + ${LEAD} + `}
+            clock={clock}
             className="pointer-events-none absolute top-1/2 left-1/2 size-132 -translate-x-1/2 -translate-y-1/2 sm:size-176"
           />
-          {/* The copy is widest at the bottom, so it sits a little above the ring's center */}
-          <div className="relative flex h-132 flex-col items-center justify-center pb-6 text-center sm:h-176 sm:pb-10">
+          {/*
+            The copy is widest at the bottom, so it sits a little above the ring's center. This box
+            reaches the ring, so only the text in it takes the pointer.
+          */}
+          <div className="pointer-events-none relative flex h-132 flex-col items-center justify-center pb-6 text-center sm:h-176 sm:pb-10">
             <LifecycleCube
               text="Your Supabase project + "
-              className={cn('mb-6 h-24 sm:mb-8 sm:h-36', HERO_REVEAL)}
+              clock={clock}
+              className={cn('mb-6 h-28 sm:mb-8 sm:h-44', HERO_REVEAL)}
             />
-            <h1 className="text-4xl leading-none font-semibold sm:text-6xl" style={DISPLAY_STYLE}>
+            <h1
+              className="pointer-events-auto text-4xl leading-none font-semibold sm:text-6xl"
+              style={DISPLAY_STYLE}
+            >
               <span
                 className={cn('block text-foreground', HERO_REVEAL)}
                 style={{ animationDelay: '150ms' }}
@@ -294,7 +304,7 @@ export function AgenticContent() {
             </h1>
             <p
               className={cn(
-                'mt-5 max-w-145 text-balance leading-7 text-foreground-light',
+                'pointer-events-auto mt-5 max-w-145 text-balance leading-7 text-foreground-light',
                 HERO_REVEAL
               )}
               style={{ animationDelay: '400ms' }}

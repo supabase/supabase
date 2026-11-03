@@ -1,10 +1,10 @@
 'use client'
 
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useCallback, useEffect, useMemo, useRef, type PointerEvent } from 'react'
 import { cn } from 'ui'
 import { toOpaque } from 'ui-patterns/GlyphLines'
 
-import { EVENTS_PER_LAP, LAP_MS, LIFECYCLE_STAGES, LIFECYCLE_STARTS_AT_MS } from './lifecycle'
+import { EVENTS_PER_LAP, LAP_MS, LIFECYCLE_STAGES, type LifecycleClock } from './lifecycle'
 
 // The knowledge base's drawing language: faint construction drawings, with lines made of very small
 // text. Faces fill with the surface color, so a near face hides the lines behind it.
@@ -111,9 +111,12 @@ function GlyphCanvas({
   playing = true,
   surface = 'caret-background',
   className,
+  clock,
   onLap,
 }: GlyphCanvasProps & {
   scene: SceneBuilder
+  /** Where a pulse is on its lap. */
+  clock?: LifecycleClock
   /** Called as a pulse travels, with how far round the lap it is, from 0 to 1. */
   onLap?: (lap: number) => void
 }) {
@@ -190,9 +193,9 @@ function GlyphCanvas({
       })
     }
 
-    const paintPulse = (elapsed: number) => {
+    const paintPulse = () => {
       const { accentColor, caretColor } = getComputedStyle(canvas)
-      const head = (Math.max(elapsed - LIFECYCLE_STARTS_AT_MS, 0) / LAP_MS) % 1
+      const head = ((clock?.read() ?? 0) % LAP_MS) / LAP_MS
       onLap?.(head)
       ctx.setTransform(1, 0, 0, 1, 0, 0)
       ctx.clearRect(0, 0, canvas.width, canvas.height)
@@ -223,7 +226,7 @@ function GlyphCanvas({
       }
       if (!pulseGlyphs.length || isReducedMotion) return
       const box = canvas.getBoundingClientRect()
-      if (box.bottom > 0 && box.top < innerHeight) paintPulse(elapsed)
+      if (box.bottom > 0 && box.top < innerHeight) paintPulse()
       frame = requestAnimationFrame(tick)
     }
 
@@ -280,7 +283,7 @@ function GlyphCanvas({
       visualViewport?.removeEventListener('resize', resize)
       themeObserver.disconnect()
     }
-  }, [scene, text, playing, onLap])
+  }, [scene, text, playing, clock, onLap])
 
   return (
     <canvas
@@ -423,10 +426,26 @@ const ringScene: SceneBuilder = (width, height) => {
   }
 }
 
-/** The project's life cycle running round the page. The current stage's label brightens. */
-export function TimelineRing({ className, ...props }: GlyphCanvasProps) {
+const getPointerAngle = (event: PointerEvent<SVGCircleElement>) => {
+  const box = event.currentTarget.getBoundingClientRect()
+  return Math.atan2(
+    event.clientY - box.top - box.height / 2,
+    event.clientX - box.left - box.width / 2
+  )
+}
+
+/**
+ * The project's life cycle running round the page. The current stage's label brightens, and dragging
+ * the ring moves the life cycle forward or back.
+ */
+export function TimelineRing({
+  clock,
+  className,
+  ...props
+}: GlyphCanvasProps & { clock: LifecycleClock }) {
   const labels = useRef<(HTMLSpanElement | null)[]>([])
   const currentStage = useRef(-1)
+  const dragAngle = useRef<number | null>(null)
 
   const onLap = useCallback((lap: number) => {
     const stage = Math.floor(lap * LIFECYCLE_STAGES.length)
@@ -440,7 +459,7 @@ export function TimelineRing({ className, ...props }: GlyphCanvasProps) {
 
   return (
     <div className={className}>
-      <GlyphCanvas scene={ringScene} onLap={onLap} className="size-full" {...props} />
+      <GlyphCanvas scene={ringScene} clock={clock} onLap={onLap} className="size-full" {...props} />
       {/* Phones hide these, because the ring runs off the sides of the page */}
       {LIFECYCLE_STAGES.map((stage, index) => (
         <span
@@ -456,6 +475,42 @@ export function TimelineRing({ className, ...props }: GlyphCanvasProps) {
           {stage}
         </span>
       ))}
+      {/* Only the band of the ring can be grabbed. A swipe up or down still scrolls the page. */}
+      <svg
+        aria-hidden
+        viewBox="0 0 100 100"
+        className="absolute inset-0 size-full overflow-visible motion-reduce:hidden"
+      >
+        <circle
+          cx={50}
+          cy={50}
+          r={45}
+          fill="none"
+          stroke="transparent"
+          strokeWidth={14}
+          className="pointer-events-auto cursor-grab touch-pan-y select-none active:cursor-grabbing"
+          onPointerDown={(event) => {
+            if (event.button !== 0) return
+            event.currentTarget.setPointerCapture(event.pointerId)
+            dragAngle.current = getPointerAngle(event)
+            clock.hold()
+          }}
+          onPointerMove={(event) => {
+            if (dragAngle.current === null) return
+            const angle = getPointerAngle(event)
+            const turned = angle - dragAngle.current
+            // The short way round, so crossing from one side of the angle's range to the other
+            // doesn't count as a whole lap
+            const shortest = Math.atan2(Math.sin(turned), Math.cos(turned))
+            clock.scrub((shortest / (Math.PI * 2)) * LAP_MS)
+            dragAngle.current = angle
+          }}
+          onLostPointerCapture={() => {
+            dragAngle.current = null
+            clock.release()
+          }}
+        />
+      </svg>
     </div>
   )
 }
