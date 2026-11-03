@@ -12,8 +12,12 @@ import type { Bucket } from '@/data/storage/buckets-query'
 
 const makePolicy = (
   name: string,
-  { definition = null, check = null }: { definition?: string | null; check?: string | null }
-) => ({ name, definition, check }) as unknown as Policy
+  {
+    definition = null,
+    check = null,
+    command = 'ALL',
+  }: { definition?: string | null; check?: string | null; command?: Policy['command'] }
+) => ({ name, definition, check, command }) as unknown as Policy
 
 const makeBucket = (name: string) => ({ id: name, name }) as unknown as Bucket
 
@@ -83,10 +87,32 @@ describe('getPolicyBucketNames', () => {
     expect(getPolicyBucketNames(policy)).toEqual([])
   })
 
-  it('reads buckets from check when definition has none', () => {
+  it('reads buckets from check for INSERT policies, which have no using expression', () => {
+    const policy = makePolicy('p', { check: "(bucket_id = 'avatars'::text)", command: 'INSERT' })
+    expect(getPolicyBucketNames(policy)).toEqual(['avatars'])
+  })
+
+  it('reads buckets from using for SELECT policies', () => {
+    const policy = makePolicy('p', {
+      definition: "(bucket_id = 'avatars'::text)",
+      command: 'SELECT',
+    })
+    expect(getPolicyBucketNames(policy)).toEqual(['avatars'])
+  })
+
+  it('returns no buckets when using is not bucket-limited but check names a bucket', () => {
     const policy = makePolicy('p', {
       definition: "(auth.role() = 'authenticated'::text)",
       check: "(bucket_id = 'avatars'::text)",
+      command: 'ALL',
+    })
+    expect(getPolicyBucketNames(policy)).toEqual([])
+  })
+
+  it('falls back to using for UPDATE policies without a check', () => {
+    const policy = makePolicy('p', {
+      definition: "(bucket_id = 'avatars'::text)",
+      command: 'UPDATE',
     })
     expect(getPolicyBucketNames(policy)).toEqual(['avatars'])
   })
@@ -134,7 +160,10 @@ describe('formatPoliciesForStorage', () => {
   })
 
   it('groups check-only policies under their bucket', () => {
-    const insert = makePolicy('insert', { check: "(bucket_id = 'logos'::text)" })
+    const insert = makePolicy('insert', {
+      check: "(bucket_id = 'logos'::text)",
+      command: 'INSERT',
+    })
     expect(groupNamesFor([insert])).toEqual({ logos: ['insert'] })
   })
 })

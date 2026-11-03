@@ -168,27 +168,29 @@ export const extractBucketNamesFromDefinition = (definition: string | null): str
 }
 
 /**
- * All buckets a storage.objects policy targets, across both its `using` and `with check`
- * expressions. Shared by the policies page, per-bucket counts, and bucket deletion so they
- * agree on which buckets a policy belongs to.
+ * All buckets a storage.objects policy targets. Shared by the policies page, per-bucket
+ * counts, and bucket deletion so they agree on which buckets a policy belongs to.
  *
- * If either expression mentions `bucket_id` but isn't limited to specific buckets (negated, or
- * with an unrestricted `OR` branch), the policy reaches other buckets, so it isn't tied to any
- * bucket, even when the other expression names one. Expressions without `bucket_id` are
- * ignored, so check-only policies are still grouped from `check`.
+ * Every expression the policy's command evaluates (`using` for SELECT/DELETE, `with check`
+ * for INSERT, both for UPDATE/ALL) has to be limited to specific buckets. Otherwise the
+ * policy also reaches other buckets (negated, an unrestricted `OR` branch, or no `bucket_id`
+ * condition at all), so it isn't tied to any bucket, even when another expression names one.
  */
-export const getPolicyBucketNames = (policy: Pick<Policy, 'definition' | 'check'>): string[] => {
-  const clauseNames = [policy.definition, policy.check]
-    .filter((clause): clause is NonNullable<typeof clause> => !!clause)
-    .map((clause) => ({
-      mentionsBucket: /\bbucket_id\b/.test(clause),
-      names: extractBucketNamesFromDefinition(clause),
-    }))
+export const getPolicyBucketNames = (
+  policy: Pick<Policy, 'definition' | 'check' | 'command'>
+): string[] => {
+  const { definition, check, command } = policy
 
-  if (clauseNames.some(({ mentionsBucket, names }) => mentionsBucket && names.length === 0)) {
-    return []
+  const getAppliedExpressions = () => {
+    if (command === 'INSERT') return [check]
+    if (command === 'SELECT' || command === 'DELETE') return [definition]
+    // For UPDATE/ALL a missing `with check` falls back to the `using` expression
+    return [definition, check ?? definition]
   }
-  return Array.from(new Set(clauseNames.flatMap(({ names }) => names)))
+
+  const expressionNames = getAppliedExpressions().map(extractBucketNamesFromDefinition)
+  if (expressionNames.some((names) => names.length === 0)) return []
+  return Array.from(new Set(expressionNames.flat()))
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {
