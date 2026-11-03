@@ -27,6 +27,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/blog/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/blog/introducing-supabase-etl',
     destination: '/blog/introducing-supabase-pipelines',
   },
@@ -862,6 +867,11 @@ module.exports = [
   },
   {
     permanent: true,
+    source: '/partners/sitemap.xml',
+    destination: '/sitemap_www.xml',
+  },
+  {
+    permanent: true,
     source: '/partners/integrations/atomic_crm',
     destination: '/partners/catalog',
   },
@@ -922,6 +932,11 @@ module.exports = [
     permanent: true,
     source: '/contact/mfa',
     destination: '/docs/guides/auth/auth-mfa',
+  },
+  {
+    permanent: true,
+    source: '/nextjs',
+    destination: '/docs/guides/getting-started/tutorials/with-nextjs',
   },
   {
     permanent: false,

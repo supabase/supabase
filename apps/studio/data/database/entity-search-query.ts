@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type EntitySearchVariables = {
   projectRef?: string
@@ -47,7 +47,7 @@ async function getEntitySearch(
 
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
-export type EntitySearchError = ResponseError
+export type EntitySearchError = StudioError
 
 export const entitySearchQueryOptions = (
   { projectRef, connectionString, query }: EntitySearchVariables,

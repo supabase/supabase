@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { orgSSOKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SSOConfigDeleteVariables = {
   slug: string
@@ -26,12 +27,12 @@ export const useSSOConfigDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SSOConfigDeleteData, ResponseError, SSOConfigDeleteVariables>,
+  UseCustomMutationOptions<SSOConfigDeleteData, StudioError, SSOConfigDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigDeleteData, ResponseError, SSOConfigDeleteVariables>({
+  return useMutation<SSOConfigDeleteData, StudioError, SSOConfigDeleteVariables>({
     mutationFn: (vars) => deleteSSOConfig(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

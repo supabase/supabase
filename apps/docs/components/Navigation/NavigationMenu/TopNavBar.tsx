@@ -18,7 +18,7 @@ import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
 import GlobalNavigationMenu from './GlobalNavigationMenu'
 import useDropdownMenu from './useDropdownMenu'
-import { SearchV2Trigger } from '@/features/SearchV2'
+import { AskAiTrigger, SearchV2Trigger } from '@/features/SearchV2'
 
 const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
 const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
@@ -66,19 +66,15 @@ const TopNavBar: FC<TopNavBarProps> = ({
               <MobileHeaderLogo scrolledTitle={scrolledTitle} />
             </div>
 
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-3 items-center">
               <DevToolbarTrigger />
               {onMenuToggle && isOpen ? (
                 <MobileNavThemeButton value={theme} onValueChange={setTheme} />
               ) : (
-                <SearchV2Trigger
-                  placeholder={
-                    <>
-                      Search
-                      <span className="hidden xl:inline ml-1"> docs...</span>
-                    </>
-                  }
-                />
+                <>
+                  <SearchV2Trigger placeholder="Search" />
+                  <AskAiTrigger />
+                </>
               )}
               <TopNavMenuToggle
                 ref={menuButtonRef}
@@ -89,13 +85,13 @@ const TopNavBar: FC<TopNavBarProps> = ({
             </div>
           </div>
           <div className="hidden lg:flex items-center justify-end gap-3">
-            {!isUserLoading && (
+            {!isUserLoading && !isLoggedIn ? (
               <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
-                  {isLoggedIn ? 'Dashboard' : 'Sign up'}
+                  Sign up
                 </a>
               </Button>
-            )}
+            ) : null}
             {process.env.NEXT_PUBLIC_DEV_AUTH_PAGE === 'true' && (
               <Button asChild>
                 <Link href="/dev-secret-auth">Dev-only secret sign-in</Link>

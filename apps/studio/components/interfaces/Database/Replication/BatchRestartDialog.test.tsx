@@ -75,7 +75,7 @@ describe('BatchRestartDialog', () => {
       response: async ({ request }) => {
         requests.push(await request.json())
         return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-          pipeline_id: 9,
+          pipeline_id: '9',
           tables: [1, 2, 3].map((table_id) => ({ table_id, new_state: { name: 'queued' } })),
         })
       },
@@ -187,7 +187,7 @@ describe('BatchRestartDialog', () => {
           requests.push(await request.json())
           await response
           return HttpResponse.json<components['schemas']['RollbackTablesResponse_Output']>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             tables: [{ table_id: 1, new_state: { name: 'queued' } }],
           })
         },

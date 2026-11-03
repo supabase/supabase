@@ -531,7 +531,12 @@
   },
   {
     "source": "/docs/guides/api/rest/debugging-performance",
-    "destination": "/docs/guides/database/debugging-performance",
+    "destination": "/docs/guides/api/query-plans",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/database/debugging-performance",
+    "destination": "/docs/guides/api/query-plans",
     "permanent": true
   },
   {
@@ -2647,6 +2652,11 @@
   {
     "source": "/docs/reference/auth",
     "destination": "/docs/reference/self-hosting-auth/start",
+    "permanent": true
+  },
+  {
+    "source": "/docs/reference/auth/config",
+    "destination": "/docs/guides/local-development/cli/config",
     "permanent": true
   },
   {

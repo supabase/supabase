@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelineByIdParams = { projectRef?: string; pipelineId?: string }
 
@@ -31,9 +32,9 @@ export const useReplicationPipelineByIdQuery = <TData = ReplicationPipelineByIdD
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<ReplicationPipelineByIdData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelineByIdData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineByIdData, ResponseError, TData>({
+  useQuery<ReplicationPipelineByIdData, StudioError, TData>({
     queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
     queryFn: ({ signal }) => fetchReplicationPipelineById({ projectRef, pipelineId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',

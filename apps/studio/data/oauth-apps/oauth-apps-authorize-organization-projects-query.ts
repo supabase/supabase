@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsAuthorizeOrganizationProjects, USE_MOCKS } from './mocks'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsAuthorizeOrganizationProjectsVariables = {
   id?: string
@@ -26,7 +27,7 @@ export async function getOAuthAppsAuthorizeOrganizationProjects({
 export type OAuthAppsAuthorizeOrganizationProjectsData = Awaited<
   ReturnType<typeof getOAuthAppsAuthorizeOrganizationProjects>
 >
-export type OAuthAppsAuthorizeOrganizationProjectsError = ResponseError
+export type OAuthAppsAuthorizeOrganizationProjectsError = StudioError
 
 export const useOAuthAppsAuthorizeOrganizationProjectsQuery = <
   TData = OAuthAppsAuthorizeOrganizationProjectsData,

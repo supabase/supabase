@@ -8,7 +8,8 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWDropForeignTableVariables = {
   projectRef?: string
@@ -41,12 +42,12 @@ export const useFDWDropForeignTableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DropForeignTableData, ResponseError, FDWDropForeignTableVariables>,
+  UseCustomMutationOptions<DropForeignTableData, StudioError, FDWDropForeignTableVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DropForeignTableData, ResponseError, FDWDropForeignTableVariables>({
+  return useMutation<DropForeignTableData, StudioError, FDWDropForeignTableVariables>({
     mutationFn: (vars) => dropForeignTable(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

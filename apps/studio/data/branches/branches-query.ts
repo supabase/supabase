@@ -4,9 +4,9 @@ import { branchKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError } from '@/types'
 
 export type BranchesGrant = GrantFor<'get', '/v1/projects/{ref}/branches'>
 
@@ -28,7 +28,7 @@ async function getBranches(
   })
 
   if (error) {
-    if ((error as ResponseError).message === 'Preview branching is not enabled for this project.') {
+    if ((error as StudioError).message === 'Preview branching is not enabled for this project.') {
       return EMPTY_ARR
     } else {
       handleError(error)
@@ -39,7 +39,7 @@ async function getBranches(
 }
 
 export type BranchesData = Awaited<ReturnType<typeof getBranches>>
-export type BranchesError = ResponseError
+export type BranchesError = StudioError
 
 export const branchesQueryOptions = ({ projectRef, grant }: BranchesVariables) =>
   queryOptions<BranchesData, BranchesError>({

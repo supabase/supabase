@@ -4,8 +4,9 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor, GrantForVariants } from '@/lib/grants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchCreateGrant =
   | GrantFor<'post', '/v1/projects/{ref}/branches'>
@@ -56,11 +57,11 @@ export const useBranchCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchCreateData, ResponseError, BranchCreateVariables>,
+  UseCustomMutationOptions<BranchCreateData, StudioError, BranchCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchCreateData, ResponseError, BranchCreateVariables>({
+  return useMutation<BranchCreateData, StudioError, BranchCreateVariables>({
     mutationFn: (vars) => createBranch(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

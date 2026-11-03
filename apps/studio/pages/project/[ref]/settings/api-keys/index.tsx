@@ -3,10 +3,8 @@ import { useMemo } from 'react'
 import { Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import {
-  ApiKeysCreateCallout,
-  ApiKeysFeedbackBanner,
-} from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { ApiKeysCreateCallout } from '@/components/interfaces/APIKeys/ApiKeysIllustrations'
+import { LegacyAPIKeysRetirementNotice } from '@/components/interfaces/APIKeys/LegacyAPIKeysRetirementNotice'
 import { PublishableAPIKeys } from '@/components/interfaces/APIKeys/PublishableAPIKeys'
 import { SecretAPIKeys } from '@/components/interfaces/APIKeys/SecretAPIKeys'
 import ApiKeysLayout from '@/components/layouts/APIKeys/APIKeysLayout'
@@ -26,7 +24,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
   const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
-  const { data: apiKeysData = [] } = useAPIKeysQuery(
+  const { data: apiKeysData = [], isSuccess: isSuccessAPIKeys } = useAPIKeysQuery(
     {
       projectRef,
       reveal: false,
@@ -39,6 +37,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
     [apiKeysData]
   )
   const hasNewApiKeys = newApiKeys.length > 0
+  const shouldShowCreateCallout = canReadAPIKeys && isSuccessAPIKeys && !hasNewApiKeys
 
   if (!IS_PLATFORM) {
     return (
@@ -78,8 +77,8 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
 
   return (
     <>
-      {canReadAPIKeys && !hasNewApiKeys && <ApiKeysCreateCallout />}
-      {hasNewApiKeys && <ApiKeysFeedbackBanner />}
+      {shouldShowCreateCallout && <ApiKeysCreateCallout />}
+      <LegacyAPIKeysRetirementNotice />
       <DisableInteraction disabled={!hasNewApiKeys} className="flex flex-col gap-8">
         <PublishableAPIKeys />
         <Separator />

@@ -3,13 +3,13 @@ import { components } from 'api-types'
 
 import { keys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ThirdPartyAuthIntegrationsVariables = {
   projectRef?: string
 }
 
-export type ThirdPartyAuthIntegrationsError = ResponseError
+export type ThirdPartyAuthIntegrationsError = StudioError
 
 export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth_Output']
 

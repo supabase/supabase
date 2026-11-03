@@ -5,7 +5,9 @@ import { toast } from 'sonner'
 import { invalidateRolesQuery } from './database-roles-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { getRolePasswordForSql } from '@/lib/scram-sha-256'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
@@ -22,7 +24,9 @@ export async function updateDatabaseRole({
   id,
   payload,
 }: DatabaseRoleUpdateVariables) {
-  const sql = pgMeta.roles.update({ id }, payload).sql
+  const password =
+    payload.password === undefined ? undefined : await getRolePasswordForSql(payload.password)
+  const sql = pgMeta.roles.update({ id }, { ...payload, password }).sql
   const { result } = await executeSql({
     projectRef,
     connectionString,
@@ -40,12 +44,12 @@ export const useDatabaseRoleUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>,
+  UseCustomMutationOptions<DatabaseRoleUpdateData, StudioError, DatabaseRoleUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>({
+  return useMutation<DatabaseRoleUpdateData, StudioError, DatabaseRoleUpdateVariables>({
     mutationFn: (vars) => updateDatabaseRole(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
