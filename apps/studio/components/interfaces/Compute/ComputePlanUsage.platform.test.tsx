@@ -100,9 +100,9 @@ describe('ComputePlanUsage', () => {
     expect(await screen.findByText('Active hours')).toBeInTheDocument()
     expect(await screen.findByText('Computes')).toBeInTheDocument()
     expect(await screen.findByText('Instances')).toBeInTheDocument()
-    // Pro includes 5 computes and 10 instances; one compute running one instance is deployed.
-    expect(await screen.findByText('1 of 5')).toBeInTheDocument()
+    // Pro includes 10 computes and 25 instances; one compute running one instance is deployed.
     expect(await screen.findByText('1 of 10')).toBeInTheDocument()
+    expect(await screen.findByText('1 of 25')).toBeInTheDocument()
   })
 
   it('counts computes separately from the instances they run', async () => {
@@ -119,8 +119,8 @@ describe('ComputePlanUsage', () => {
     )
 
     // Two computes, seven instances between them.
-    expect(await screen.findByText('2 of 5')).toBeInTheDocument()
-    expect(await screen.findByText('7 of 10')).toBeInTheDocument()
+    expect(await screen.findByText('2 of 10')).toBeInTheDocument()
+    expect(await screen.findByText('7 of 25')).toBeInTheDocument()
   })
 
   it('flags a count that exceeds the plan limit, but not one that merely fills it', async () => {
@@ -163,7 +163,7 @@ describe('ComputePlanUsage', () => {
     })
 
     expect(await screen.findByText(/Team Plan · last 30 days/)).toBeInTheDocument()
-    expect(await screen.findByText('1 of 15')).toBeInTheDocument()
-    expect(await screen.findByText('1 of 25')).toBeInTheDocument()
+    expect(await screen.findByText('1 of 30')).toBeInTheDocument()
+    expect(await screen.findByText('1 of 75')).toBeInTheDocument()
   })
 })

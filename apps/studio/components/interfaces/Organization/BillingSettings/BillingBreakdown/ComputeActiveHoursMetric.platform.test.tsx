@@ -27,14 +27,14 @@ describe('ComputeActiveHoursMetric', () => {
     render('pro')
 
     expect(await screen.findByText('Compute Active Hours')).toBeInTheDocument()
-    expect(await screen.findByText(/\/ 500 hours/)).toBeInTheDocument()
+    expect(await screen.findByText(/\/ 3,000 hours/)).toBeInTheDocument()
   })
 
   it('shows how many computes the hours came from', async () => {
     render('pro')
 
-    // The five stand-in projects run nine computes between them.
-    expect(await screen.findByText('9 of 5 computes')).toBeInTheDocument()
+    // The five stand-in projects run seven computes between them.
+    expect(await screen.findByText('7 of 10 computes')).toBeInTheDocument()
   })
 
   it('links through to the Compute section of the usage page', async () => {
@@ -55,15 +55,15 @@ describe('ComputeActiveHoursMetric', () => {
     render('pro', false)
 
     expect(await screen.findByText(/^\d[\d,]* hours$/)).toBeInTheDocument()
-    expect(screen.queryByText(/\/ 500 hours/)).not.toBeInTheDocument()
+    expect(screen.queryByText(/\/ 3,000 hours/)).not.toBeInTheDocument()
   })
 
   it('reports a smaller allowance on Free than on Team', async () => {
     const { unmount } = render('free')
-    expect(await screen.findByText(/\/ 50 hours/)).toBeInTheDocument()
+    expect(await screen.findByText(/\/ 300 hours/)).toBeInTheDocument()
     unmount()
 
     render('team')
-    expect(await screen.findByText(/\/ 2,000 hours/)).toBeInTheDocument()
+    expect(await screen.findByText(/\/ 12,000 hours/)).toBeInTheDocument()
   })
 })

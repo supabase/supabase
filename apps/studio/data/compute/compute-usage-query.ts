@@ -44,9 +44,13 @@ const createRandom = (seed: number) => {
   }
 }
 
-/** Business-hours hump, so every series reads as a real daily cycle rather than noise. */
-const diurnalWeight = (hour: number) =>
-  0.4 + 0.6 * Math.max(0, Math.sin(((hour - 5) / 24) * Math.PI * 2) * 0.5 + 0.5)
+/**
+ * Weekends run quieter than weekdays. A daily bucket has no hour-of-day to shape, so this
+ * is the only cycle that actually shows up at this granularity.
+ */
+const WEEKEND_WEIGHT = 0.65
+const dayOfWeekWeight = (day: dayjs.Dayjs) =>
+  day.day() === 0 || day.day() === 6 ? WEEKEND_WEIGHT : 1
 
 interface GenerateUsageParams {
   seed: string
@@ -75,7 +79,7 @@ const generateUsagePoints = ({
   return Array.from({ length: days }, (_, index) => {
     const day = start.add(index, 'day')
     const variation = 0.75 + random() * 0.5
-    const dailyDuty = Math.min(1, dutyCycle * variation * diurnalWeight(day.hour() + 12))
+    const dailyDuty = Math.min(1, dutyCycle * variation * dayOfWeekWeight(day))
     const activeHours = Number((24 * dailyDuty * instances).toFixed(2))
     const liveInstances = Number((instances * Math.min(1, dailyDuty * 1.4)).toFixed(2))
 
@@ -224,25 +228,25 @@ const MOCK_PROJECTS = [
     projectRef: 'prod-api',
     projectName: 'Production API',
     size: '4gb-2vcpu',
-    deployments: 3,
-    instances: 7,
-    dutyCycle: 0.92,
+    deployments: 2,
+    instances: 3,
+    dutyCycle: 0.6,
   },
   {
     projectRef: 'media-jobs',
     projectName: 'Media jobs',
     size: '4gb-2vcpu',
     deployments: 2,
-    instances: 4,
-    dutyCycle: 0.35,
+    instances: 2,
+    dutyCycle: 0.18,
   },
   {
     projectRef: 'webhooks',
     projectName: 'Webhook relay',
     size: '2gb-1vcpu',
-    deployments: 2,
-    instances: 3,
-    dutyCycle: 0.68,
+    deployments: 1,
+    instances: 2,
+    dutyCycle: 0.25,
   },
   {
     projectRef: 'staging',
@@ -250,7 +254,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.22,
+    dutyCycle: 0.15,
   },
   {
     projectRef: 'sandbox',
@@ -258,7 +262,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.08,
+    dutyCycle: 0.04,
   },
 ]
 

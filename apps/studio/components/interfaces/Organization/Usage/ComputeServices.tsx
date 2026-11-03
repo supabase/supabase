@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { BarChart2Icon } from 'lucide-react'
 import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import { ChartContainer, ChartTooltip, ChartTooltipContent, cn } from 'ui'
 import {
   Chart,
   ChartCard,
@@ -32,6 +32,7 @@ import {
   sumBy,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import type {
+  ComputeBurndown,
   ComputeUsageByProject,
   ComputeUsageBySize,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
@@ -177,23 +178,10 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                         y={burndown.warningHours}
                         stroke="var(--chart-status-warning)"
                         strokeDasharray="4 4"
-                        label={{
-                          value: `80% · ${formatComputeHours(burndown.warningHours)}`,
-                          position: 'insideTopLeft',
-                          className: 'text-xs fill-warning',
-                        }}
                       />
                     )}
                     {burndown.allowanceHours !== null && (
-                      <ReferenceLine
-                        y={burndown.allowanceHours}
-                        stroke="var(--chart-reference)"
-                        label={{
-                          value: `Limit · ${formatComputeHours(burndown.allowanceHours)}`,
-                          position: 'insideTopLeft',
-                          className: 'text-xs fill-foreground-light',
-                        }}
-                      />
+                      <ReferenceLine y={burndown.allowanceHours} stroke="var(--chart-reference)" />
                     )}
                     <Area
                       dataKey="usedHours"
@@ -204,6 +192,8 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                     />
                   </AreaChart>
                 </ChartContainer>
+
+                <ComputeBurndownLegend burndown={burndown} />
               </ChartContent>
             </ChartCard>
           </Chart>
@@ -288,6 +278,57 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
     </div>
   )
 }
+
+/** Names what each line in the burn-down means, below the plot rather than on top of it. */
+const ComputeBurndownLegend = ({ burndown }: { burndown: ComputeBurndown }) => {
+  if (burndown.allowanceHours === null) {
+    return (
+      <p className="mt-3 text-xs text-foreground-lighter">
+        Active hours used over the period. This plan has no fixed allowance.
+      </p>
+    )
+  }
+
+  return (
+    <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-1.5">
+      <LegendItem className="bg-foreground" label="Used" />
+      {burndown.warningHours !== null && (
+        <LegendItem
+          className="bg-warning"
+          isDashed
+          label={`80% threshold · ${formatComputeHours(burndown.warningHours)}`}
+        />
+      )}
+      <LegendItem
+        className="bg-foreground-muted"
+        label={`Plan limit · ${formatComputeHours(burndown.allowanceHours)}`}
+      />
+    </div>
+  )
+}
+
+const LegendItem = ({
+  className,
+  label,
+  isDashed,
+}: {
+  className: string
+  label: string
+  isDashed?: boolean
+}) => (
+  <span className="flex items-center gap-2 text-xs text-foreground-light">
+    <span
+      aria-hidden
+      className={cn('h-px w-4 shrink-0', className, isDashed && 'opacity-80')}
+      style={
+        isDashed
+          ? { maskImage: 'repeating-linear-gradient(90deg,#000 0 4px,transparent 4px 7px)' }
+          : undefined
+      }
+    />
+    {label}
+  </span>
+)
 
 /** Each size as a share of the period's active hours, using the page's standard h-1 meter. */
 const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {

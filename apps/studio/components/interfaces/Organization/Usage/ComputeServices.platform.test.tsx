@@ -17,6 +17,23 @@ describe('ComputeServices', () => {
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
   })
 
+  it('names the burn-down reference lines in a legend below the plot', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
+
+    // The threshold and limit sit within 20% of each other, so labelling them on the plot
+    // overlapped. They belong in the legend instead.
+    expect(await screen.findByText('Used')).toBeInTheDocument()
+    expect(await screen.findByText(/80% threshold · 2,400 hrs/)).toBeInTheDocument()
+    expect(await screen.findByText(/Plan limit · 3,000 hrs/)).toBeInTheDocument()
+  })
+
+  it('says there is no allowance rather than showing an empty legend on enterprise', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('enterprise')} />)
+
+    expect(await screen.findByText(/This plan has no fixed allowance/)).toBeInTheDocument()
+    expect(screen.queryByText(/Plan limit ·/)).not.toBeInTheDocument()
+  })
+
   it('renders instance hours by size as labelled meters', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
 
@@ -29,8 +46,8 @@ describe('ComputeServices', () => {
   it('measures usage against the plan allowance and labels the limit', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
 
-    // Pro carries a 500 hour allowance, so the summary names it as the denominator.
-    expect(await screen.findByText(/of 500 hrs used/)).toBeInTheDocument()
+    // Pro carries a 3,000 hour allowance, so the summary names it as the denominator.
+    expect(await screen.findByText(/of 3,000 hrs used/)).toBeInTheDocument()
     expect(await screen.findByText('Remaining')).toBeInTheDocument()
   })
 
@@ -38,11 +55,11 @@ describe('ComputeServices', () => {
     const { unmount } = customRender(
       <ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('free')} />
     )
-    expect(await screen.findByText(/of 50 hrs used/)).toBeInTheDocument()
+    expect(await screen.findByText(/of 300 hrs used/)).toBeInTheDocument()
     unmount()
 
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('team')} />)
-    expect(await screen.findByText(/of 2,000 hrs used/)).toBeInTheDocument()
+    expect(await screen.findByText(/of 12,000 hrs used/)).toBeInTheDocument()
   })
 
   it('reports no fixed allowance on enterprise rather than inventing a limit', async () => {
