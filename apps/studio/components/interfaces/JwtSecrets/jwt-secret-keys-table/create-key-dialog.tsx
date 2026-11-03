@@ -18,6 +18,7 @@ import {
   SelectValue,
   Textarea,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
@@ -27,6 +28,7 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
 const EC_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'y', 'd']
+const OKP_JWK_REQUIRED_PROPERTIES = ['kty', 'crv', 'x', 'd']
 
 export const CreateKeyDialog = ({
   projectRef,
@@ -35,7 +37,7 @@ export const CreateKeyDialog = ({
   projectRef: string
   onClose: () => void
 }) => {
-  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('ES256')
+  const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('EdDSA')
   const [isBYOK, setBYOK] = useState(false)
   const [privateKey, setPrivateKey] = useState('')
   const [isBase64, setBase64] = useState(false)
@@ -96,6 +98,20 @@ export const CreateKeyDialog = ({
       for (let prop of EC_JWK_REQUIRED_PROPERTIES) {
         if (typeof jwk[prop] !== 'string' || !jwk[prop]) {
           return `Incomplete EC private key, required properties are: ${EC_JWK_REQUIRED_PROPERTIES.join(', ')}`
+        }
+      }
+    } else if (newKeyAlgorithm === 'EdDSA') {
+      if (jwk.kty !== 'OKP') {
+        return 'Private key must be of OKP type'
+      }
+
+      if (jwk.crv !== 'Ed25519') {
+        return 'OKP private keys must use Ed25519 curve'
+      }
+
+      for (let prop of OKP_JWK_REQUIRED_PROPERTIES) {
+        if (typeof jwk[prop] !== 'string' || !jwk[prop]) {
+          return `Incomplete Ed25519 private key, required properties are: ${OKP_JWK_REQUIRED_PROPERTIES.join(', ')}`
         }
       }
     }
@@ -176,16 +192,24 @@ export const CreateKeyDialog = ({
               <SelectValue placeholder="Select algorithm" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="ES256">
-                <span>ES256 (ECC)</span>
+              <SelectItem value="EdDSA">
+                <span>Ed25519 (EdDSA)</span>
                 <Badge variant="success" className="ml-2">
                   Recommended
                 </Badge>
               </SelectItem>
               <SelectItem value="RS256">RS256 (RSA)</SelectItem>
+              <SelectItem value="ES256">ES256 (ECC)</SelectItem>
               <SelectItem value="HS256">HS256 (Shared Secret)</SelectItem>
             </SelectContent>
           </Select>
+          {newKeyAlgorithm === 'ES256' && (
+            <Admonition
+              type="warning"
+              title="ES256 can slow down Data API requests"
+              description="ES256 has known performance issues with the Supabase Data API. Use Ed25519 or RS256 instead."
+            />
+          )}
         </div>
         <div className="flex flex-col gap-4">
           <Label htmlFor="byok" className="flex items-center gap-x-2">

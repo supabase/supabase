@@ -60,12 +60,35 @@ export const algorithmDetails: Record<string, AlgorithmDetail> = {
       'Ideal tradeoff between JWT size and efficiency',
       'Public key does not need to be kept secret',
     ],
-    cons: ['Wide support but some libraries might make it harder to work with than RSA'],
+    cons: [
+      'Known performance issues with the Supabase Data API',
+      'Wide support but some libraries might make it harder to work with than RSA',
+    ],
     shortDescription: 'ECDSA with SHA-256: Faster, more efficient alternative to RSA',
     links: [
       {
         url: 'https://datatracker.ietf.org/doc/html/rfc7518#section-3.4',
         label: 'RFC 7518 Specification Section 3.4',
+      },
+    ],
+  },
+  EdDSA: {
+    label: 'Ed25519',
+    name: 'EdDSA with Ed25519',
+    description:
+      'JWT is signed with a private and verified with a public key using the Ed25519 curve.',
+    pros: [
+      'Compatible with SOC2 and other security compliance frameworks',
+      'Fastest to create and verify signatures of the asymmetric choices',
+      'Smallest keys and JWT signatures',
+      'Public key does not need to be kept secret',
+    ],
+    cons: ['Newer algorithm, some older JWT libraries do not support it'],
+    shortDescription: 'EdDSA with Ed25519: Fastest, smallest asymmetric choice',
+    links: [
+      {
+        url: 'https://datatracker.ietf.org/doc/html/rfc8037',
+        label: 'RFC 8037 Specification',
       },
     ],
   },
