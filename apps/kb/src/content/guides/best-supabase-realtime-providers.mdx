@@ -1,0 +1,61 @@
+---
+title: 'Best realtime providers to use with Supabase in 2026'
+description: 'Learn which realtime providers you can use with Supabase in 2026.'
+topics: ['Rundowns']
+lastEdited: 2026-11-03
+---
+
+Realtime providers send messages, presence updates, and data changes between clients and servers as they happen, without a page refresh. They power chat, live dashboards, collaborative editing, multiplayer games, and notifications.
+
+Supabase includes its own realtime service, [Supabase Realtime](/docs/guides/realtime). The following providers are also options, whether you use them alongside Supabase or on their own.
+
+## Supabase Realtime
+
+Supabase Realtime is the best choice if you already use Supabase and want realtime features to work with your data and users without extra setup. It's also a great choice for new projects that need a [Data API](/docs/guides/api), [Edge Functions](/docs/guides/functions), [Storage](/docs/guides/storage), or [Auth](/docs/guides/auth).
+
+Supabase Realtime includes three features:
+
+- [Broadcast](/docs/guides/realtime/broadcast) sends low-latency messages between clients, such as chat messages, cursor positions, or game events.
+- [Presence](/docs/guides/realtime/presence) tracks and syncs user state, such as who is online.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes) listens to database changes and sends them to subscribed clients.
+
+Realtime is billed by messages and peak connections, and each plan includes a quota of both. For details, see [Realtime pricing](/docs/guides/realtime/pricing) and [Realtime limits](/docs/guides/realtime/limits).
+
+## Ably
+
+Ably is a managed realtime platform for pub/sub messaging, presence, push notifications, and chat. It stores presence events for 24 or 72 hours, depending on your plan.
+
+Ably offers a free tier, and its paid plans have a monthly fee plus usage. Its 99.999% uptime SLA is available on the Enterprise plan.
+
+Ably works alongside Supabase. Your app can keep its data in Postgres and publish changes to Ably from an [Edge Function](/docs/guides/functions). The function sends a `POST` request to the [Ably REST API](https://ably.com/docs/api/rest-api) with your API key, which you store as an [Edge Function secret](/docs/guides/functions/secrets).
+
+## Pusher
+
+Pusher Channels is a hosted WebSocket service for publish and subscribe messaging. It supports public, private, and presence channels, and presence channels expose the list of members subscribed to them.
+
+Pusher has a free Sandbox plan for development. Its paid plans are priced per month and sized by daily message volume and concurrent connections.
+
+Pusher is a good fit if you need a simple hosted WebSocket API for live updates and notifications. It doesn't sync data from your database, so you'd publish changes from an [Edge Function](/docs/guides/functions). Pusher's HTTP API requires each request to carry an HMAC signature computed with your app secret, not just the key, so use a server library or implement the signing.
+
+## PubNub
+
+PubNub is a realtime messaging platform with publish and subscribe messaging, presence, message storage, and serverless Functions that run on its network. It runs 11 points of presence, and users connect to a nearby edge. It offers a 99.999% uptime SLA.
+
+PubNub's free tier covers up to 200 monthly active users (MAU) or 1 million transactions per month. Its paid plans are priced by MAU rather than by individual message.
+
+PubNub suits apps that need presence and server-side message processing on the messaging network itself. Like Ably, it works alongside Supabase: an [Edge Function](/docs/guides/functions) can publish changes through PubNub's REST publish endpoint with your publish and subscribe keys. A signature is required only when Access Manager is enabled.
+
+## Firebase Realtime Database
+
+Firebase Realtime Database is Google's cloud-hosted NoSQL database. It stores data as a single JSON tree and syncs it to every connected client. It also works offline, merges changes when a device reconnects, and uses expression-based security rules with [Firebase Authentication](https://firebase.google.com/docs/auth).
+
+Google recommends [Cloud Firestore](https://firebase.google.com/docs/firestore) for new projects that need richer data models and higher availability. Realtime Database is still a good fit for simple data that needs very low-latency sync.
+
+Firebase works alongside Supabase differently. Clients listen to database paths rather than subscribing to channels, so an [Edge Function](/docs/guides/functions) would write to a path over the REST API, using a database secret or an access token. Google recommends the Firebase Admin SDK for privileged servers.
+
+> [!NOTE]
+> If you're moving data from Cloud Firestore to Supabase, see the [Firestore migration guide](/kb/guides/migrate-from-firestore-data).
+
+## Other options
+
+You can also build realtime features yourself on an open-source WebSocket library, such as [Socket.IO](https://socket.io). This gives you full control over your infrastructure, but you're responsible for running, scaling, and securing the server.
