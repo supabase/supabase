@@ -20,7 +20,7 @@ if [ ! -f .env ] || [ ! -d volumes/functions ]; then
     exit 1
 fi
 
-ANON_KEY=$(grep '^ANON_KEY=' .env | cut -d= -f2-)
+SUPABASE_PUBLISHABLE_KEY=$(grep '^SUPABASE_PUBLISHABLE_KEY=' .env | cut -d= -f2-)
 
 fn_dir=""
 headers=""
@@ -77,7 +77,7 @@ preflight() {
 post() {
     curl -s -o /dev/null -D "$headers" -w '%{http_code}' -X POST "$fn_url" \
         -H "Origin: $1" \
-        -H "Authorization: Bearer $ANON_KEY" \
+        -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
         -d 'x'
 }
 
