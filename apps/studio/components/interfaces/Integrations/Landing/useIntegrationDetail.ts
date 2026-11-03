@@ -5,10 +5,7 @@ import { useEffect, useMemo } from 'react'
 import { useProjectOAuthIntegrationData } from './Landing.utils'
 import { useAvailableIntegrations } from './useAvailableIntegrations'
 import { useInstalledIntegrations } from './useInstalledIntegrations'
-import {
-  getInstallActionType,
-  type InstallActionType,
-} from './useIntegrationDetail.utils'
+import { getInstallActionType, type InstallActionType } from './useIntegrationDetail.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -79,8 +76,7 @@ export const useIntegrationDetail = () => {
   )
 
   const installActionType: InstallActionType = useMemo(
-    () =>
-      getInstallActionType({ integration, isInstalled }),
+    () => getInstallActionType({ integration, isInstalled }),
     [integration, isInstalled]
   )
 

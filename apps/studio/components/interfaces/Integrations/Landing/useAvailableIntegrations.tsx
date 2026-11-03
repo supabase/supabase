@@ -56,10 +56,8 @@ const isPreviewEnabled = (featureFlags: FeatureFlagContextType, listingSlug: str
 const useMarketplaceListings = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
   const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery()
-  const isPending =
-    IS_PLATFORM && (!hasLoaded || (!marketplaceData && !error))
-  const isSuccess =
-    !IS_PLATFORM || (hasLoaded && !!marketplaceData && !error)
+  const isPending = IS_PLATFORM && (!hasLoaded || (!marketplaceData && !error))
+  const isSuccess = !IS_PLATFORM || (hasLoaded && !!marketplaceData && !error)
   const isError = IS_PLATFORM && !!error
 
   // This flag can globally enable preview listings for all partners for a given user (i.e. for Supabase users)

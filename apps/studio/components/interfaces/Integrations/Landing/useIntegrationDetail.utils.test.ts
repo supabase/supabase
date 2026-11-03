@@ -23,9 +23,7 @@ describe('getInstallActionType', () => {
     expect(getInstallActionType({ integration: oauthIntegration, isInstalled: false })).toBe(
       'oauth'
     )
-    expect(getInstallActionType({ integration: oauthIntegration, isInstalled: true })).toBe(
-      'oauth'
-    )
+    expect(getInstallActionType({ integration: oauthIntegration, isInstalled: true })).toBe('oauth')
   })
 
   it('returns "add-wrapper" for wrappers, installed or not', () => {
