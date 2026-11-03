@@ -4,6 +4,8 @@ description: 'What open source, fair source, and closed licenses mean for self-h
 topics: ['Comparison']
 ---
 
+import { ComparisonTable } from '../../components/ComparisonTable'
+
 A license answers three practical questions: can you run the software yourself, can you change it, and can you move away from it? This guide explains the license categories for the database and backend platforms we compare, and what each one means in practice.
 
 ## Three license categories
@@ -14,22 +16,7 @@ A license answers three practical questions: can you run the software yourself, 
 
 ## How each platform compares
 
-{/* comparison-table:start licenses */}
-
-|  | Supabase | Neon | PlanetScale | Convex | Firebase |
-| --- | --- | --- | --- | --- | --- |
-| License | Open source (OSI) (Apache-2.0) | Open source (OSI) (Apache-2.0) | Closed | Fair source | Closed |
-| Open-source scope | Backend services, Dashboard | Storage engine | None | Backend services, Dashboard | Client SDKs |
-| Self-host | Official (Docker) | Community only | No self-host | Official guide | No self-host |
-| Wire protocol | Postgres[^1] | Postgres | MySQL, Postgres | Proprietary | Proprietary |
-| Query model | SQL | SQL | SQL | Document | Document |
-| Upstream projects | PostgreSQL (PostgreSQL) | PostgreSQL (PostgreSQL) | Vitess (Apache-2.0), CNCF Graduated; PostgreSQL (PostgreSQL) | None | None |
-| Export format | pg_dump | pg_dump | MySQL SQL | Zip archive | LevelDB |
-| Loads into a standard server | Yes | Yes | Yes | Unknown | No |
-
-[^1]: Sample footnote for the wire protocol column. Sources: https://supabase.com/docs/guides/database/overview
-
-{/* comparison-table:end licenses */}
+<ComparisonTable />
 
 "Unknown" means we haven't verified that claim. Profiles last verified on X.
 

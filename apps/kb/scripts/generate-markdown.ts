@@ -14,6 +14,7 @@ import YAML from 'yaml'
 
 import { BASE_PATH } from '../src/lib/constants.ts'
 import { isInTopic, TOPICS, topicToSlug, type Topic } from '../src/lib/topics.ts'
+import { expandComparisonTables } from './comparison-tables.ts'
 import { addBaseUrlPrefix, stripHeadingCustomIds } from './helpers.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
@@ -116,7 +117,7 @@ export function renderMarkdown(data: Frontmatter, body: string): string {
   const lead = data.description ? `${data.description}\n\n` : ''
   // absolutizeLinks() already normalizes to exactly one trailing newline
   // (remark-stringify's doing, not ours) — no extra "\n" needed here.
-  return `${heading}${lead}${absolutizeLinks(body.trim())}`
+  return `${heading}${lead}${absolutizeLinks(expandComparisonTables(body.trim()))}`
 }
 
 /**
