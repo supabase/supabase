@@ -3,19 +3,26 @@ import { toast } from 'sonner'
 
 import { actionKeys } from '../actions/keys'
 import { branchKeys } from './keys'
-import { handleError, post, unguarded } from '@/data/fetchers'
+import { handleError, post } from '@/data/fetchers'
+import type { GrantForVariants } from '@/lib/grants'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
+export type BranchPushGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/push'>
+
 export type BranchPushVariables = {
+  grant: BranchPushGrant
   branchRef: string
   projectRef: string
 }
 
-export async function pushBranch({ branchRef }: Pick<BranchPushVariables, 'branchRef'>) {
+export async function pushBranch({
+  branchRef,
+  grant,
+}: Pick<BranchPushVariables, 'branchRef' | 'grant'>) {
   const { data, error } = await post('/v1/branches/{branch_id_or_ref}/push', {
     params: { path: { branch_id_or_ref: branchRef } },
     body: {},
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
