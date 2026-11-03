@@ -22,7 +22,7 @@ export type FeaturePreview = {
    */
   isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
-  category?: 'observability' | 'database' | 'editors'
+  category?: 'observability' | 'database' | 'editors' | 'storage'
   /**
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
@@ -151,7 +151,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
-        name: 'Storage versioning',
+        name: 'Storage object versioning',
+        category: 'storage',
         discussionsUrl: undefined,
         isNew: true,
         isPlatformOnly: true,
