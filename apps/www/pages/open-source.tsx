@@ -67,14 +67,18 @@ async function fetchSupabaseRepos(): Promise<GitHubRepo[] | null> {
     const data: unknown = await res.json()
     if (!Array.isArray(data)) throw new Error('GitHub returned a non-array body')
 
-    return data.map((repo) => ({
-      name: repo.name,
-      description: repo.description ?? null,
-      html_url: repo.html_url,
-      full_name: repo.full_name,
-      forks: repo.forks ?? 0,
-      stargazers_count: repo.stargazers_count ?? 0,
-    }))
+    const tabRepoNames = new Set(pageData.repo_tabs.flatMap((tab) => tab.repos ?? []))
+
+    return data
+      .filter((repo) => tabRepoNames.has(repo.name))
+      .map((repo) => ({
+        name: repo.name,
+        description: repo.description ?? null,
+        html_url: repo.html_url,
+        full_name: repo.full_name,
+        forks: repo.forks ?? 0,
+        stargazers_count: repo.stargazers_count ?? 0,
+      }))
   } catch (error) {
     console.error('Failed to fetch supabase repos for /open-source', error)
     return null
