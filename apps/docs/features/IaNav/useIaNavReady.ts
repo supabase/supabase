@@ -4,6 +4,7 @@ import { useFeatureFlags, useSearchParamsShallow } from 'common'
 import { useEffect, useState } from 'react'
 
 import { IA_NAV_FLAG, isIaNavVariant } from './constants'
+import { useIaNavRouteVariant } from './IaNavRouteProvider'
 
 const READY_TIMEOUT_MS = 1000
 
@@ -14,6 +15,7 @@ const READY_TIMEOUT_MS = 1000
  */
 export function useIaNavReady(): boolean {
   const { hasLoaded } = useFeatureFlags()
+  const routeVariant = useIaNavRouteVariant()
   const override = useSearchParamsShallow().get(IA_NAV_FLAG)
   const [hasTimedOut, setHasTimedOut] = useState(false)
 
@@ -22,5 +24,5 @@ export function useIaNavReady(): boolean {
     return () => clearTimeout(timer)
   }, [])
 
-  return isIaNavVariant(override) || Boolean(hasLoaded) || hasTimedOut
+  return Boolean(routeVariant) || isIaNavVariant(override) || Boolean(hasLoaded) || hasTimedOut
 }

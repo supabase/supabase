@@ -4,6 +4,7 @@ import { posthogClient, useConsentState, useFeatureFlags, useSearchParamsShallow
 import { useEffect } from 'react'
 
 import { IA_NAV_FLAG, isIaNavVariant as isVariant, type IaNavVariant } from './constants'
+import { useIaNavRouteVariant } from './IaNavRouteProvider'
 
 /**
  * Reads the `docs-ia-mvp-v1` PostHog experiment flag.
@@ -14,7 +15,8 @@ export function useIaNavVariant(): IaNavVariant {
   const { posthog } = useFeatureFlags()
   const { hasAccepted } = useConsentState()
   const searchParams = useSearchParamsShallow()
-  const override = searchParams.get(IA_NAV_FLAG)
+  const routeVariant = useIaNavRouteVariant()
+  const override = routeVariant ?? searchParams.get(IA_NAV_FLAG)
 
   const flagValue = posthog[IA_NAV_FLAG]
   // `false` means the visitor is outside the rollout, not assigned to control.
@@ -22,13 +24,13 @@ export function useIaNavVariant(): IaNavVariant {
   const flagVariant: IaNavVariant = flagValue === 'option-1' ? 'option-1' : 'control'
 
   useEffect(() => {
-    if (!isAssigned) return
+    if (!isAssigned || routeVariant) return
     // useSearchParamsShallow is empty until its own effect runs, so read the URL directly.
     const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
     if (isVariant(urlOverride)) return
 
     posthogClient.captureExperimentExposure(IA_NAV_FLAG, { variant: flagVariant }, hasAccepted)
-  }, [isAssigned, flagVariant, hasAccepted])
+  }, [isAssigned, routeVariant, flagVariant, hasAccepted])
 
   return isVariant(override) ? override : flagVariant
 }

@@ -1,9 +1,9 @@
 'use client'
 
+import { useDocsPathname, useNavItems } from '~/features/IaNav'
 import { resolveBreadcrumbs } from '~/lib/breadcrumbs'
 import { useBreakpoint } from 'common'
 import Link from 'next/link'
-import { usePathname, useSearchParams } from 'next/navigation'
 import React, { Fragment, Suspense } from 'react'
 import {
   Breadcrumb,
@@ -155,6 +155,7 @@ const BreadcrumbsInternal = ({
 }
 
 function useBreadcrumbs() {
-  const pathname = usePathname()
-  return resolveBreadcrumbs(pathname)
+  const pathname = useDocsPathname()
+  const navItems = useNavItems()
+  return resolveBreadcrumbs(pathname, navItems)
 }

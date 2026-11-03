@@ -1,7 +1,6 @@
 'use client'
 
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import React, { FC, useEffect, useState } from 'react'
 import { Badge, cn } from 'ui'
 import {
@@ -15,13 +14,13 @@ import {
 
 import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
-import { useIaNavReady, useNavItems } from '@/features/IaNav'
+import { useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
 
 /**
  * Get TopNav active label based on current pathname
  */
 export const useActiveMenuLabel = (menu: GlobalMenuItems) => {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const [activeLabel, setActiveLabel] = useState('')
 
   useEffect(() => {

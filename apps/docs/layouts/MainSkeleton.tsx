@@ -9,7 +9,7 @@ import {
   getMenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
-import { useNavItems } from '~/features/IaNav'
+import { useDocsPathname, useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
 import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
@@ -17,7 +17,6 @@ import { MobileHeaderSlotsContext } from '~/layouts/MobileHeaderSlots'
 
 import { isFeatureEnabled } from 'common'
 import dynamic from 'next/dynamic'
-import { usePathname } from 'next/navigation'
 import {
   memo,
   useEffect,
@@ -186,7 +185,7 @@ function SidebarSkeleton({
   hideSideNav,
   additionalNavItems,
 }: SkeletonProps) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const menuId = _menuId ?? getMenuId(pathname)
 
   const mobileMenuOpen = useMenuMobileOpen()
