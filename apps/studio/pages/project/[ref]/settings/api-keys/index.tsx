@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useMemo } from 'react'
 import { Separator } from 'ui'
@@ -12,24 +13,18 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import SettingsLayout from '@/components/layouts/ProjectSettingsLayout/SettingsLayout'
 import { DisableInteraction } from '@/components/ui/DisableInteraction'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { apiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import type { NextPageWithLayout } from '@/types'
 
 const ApiKeysNewPage: NextPageWithLayout = () => {
   const { ref: projectRef } = useParams()
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
-  const { data: apiKeysData = [], isSuccess: isSuccessAPIKeys } = useAPIKeysQuery(
-    {
-      projectRef,
-      reveal: false,
-    },
-    { enabled: canReadAPIKeys }
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData = [], isSuccess: isSuccessAPIKeys } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant })
   )
 
   const newApiKeys = useMemo(
@@ -37,7 +32,7 @@ const ApiKeysNewPage: NextPageWithLayout = () => {
     [apiKeysData]
   )
   const hasNewApiKeys = newApiKeys.length > 0
-  const shouldShowCreateCallout = canReadAPIKeys && isSuccessAPIKeys && !hasNewApiKeys
+  const shouldShowCreateCallout = isSuccessAPIKeys && !hasNewApiKeys
 
   if (!IS_PLATFORM) {
     return (
