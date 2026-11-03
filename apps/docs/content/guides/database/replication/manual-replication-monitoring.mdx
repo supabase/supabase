@@ -107,7 +107,7 @@ order by table_name;
 
 `synchronization_lsn` coordinates the table's initial synchronization. It is not a continuously updated replication checkpoint.
 
-### Check the LSN
+### Check the LSN [#subscriber-check-the-lsn]
 
 Use [`pg_stat_subscription`](https://www.postgresql.org/docs/15/monitoring-stats.html#MONITORING-PG-STAT-SUBSCRIPTION) to inspect the WAL positions reported by subscription workers:
 
