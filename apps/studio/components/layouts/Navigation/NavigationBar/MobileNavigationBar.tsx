@@ -8,7 +8,7 @@ import { MobileSheetNav } from 'ui-patterns/MobileSheetNav'
 import { HomeIcon } from '../LayoutHeader/HomeIcon'
 import { useMobileSheet } from './MobileSheetContext'
 import { OrgSelector } from './OrgSelector'
-import { ProjectBranchSelector } from './ProjectBranchSelector'
+import { MobileProjectSwitcher } from './MobileProjectSwitcher'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { LocalDropdown } from '@/components/interfaces/LocalDropdown'
 import { SidebarContent } from '@/components/interfaces/Sidebar'
@@ -60,7 +60,7 @@ export const MobileNavigationBar = ({
           {!IS_PLATFORM && <HomeIcon />}
           {isProjectScope ? (
             <>
-              <ProjectBranchSelector />
+              <MobileProjectSwitcher />
               <ConnectButton iconOnly className="w-8 h-8" />
             </>
           ) : IS_PLATFORM && showOrgSelection ? (

@@ -5,9 +5,9 @@ import { useState } from 'react'
 import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
-import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
-import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
+import { getMobileProjectSwitcherState } from './MobileProjectSwitcher.utils'
+import { MobileProjectSwitcherSheet } from './MobileProjectSwitcherSheet'
+import { MobileProjectSwitcherTrigger } from './MobileProjectSwitcherTrigger'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -15,7 +15,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
 
-export function ProjectBranchSelector() {
+export function MobileProjectSwitcher() {
   const router = useRouter()
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -43,7 +43,7 @@ export function ProjectBranchSelector() {
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
   const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =
-    getProjectBranchSelectorState({
+    getMobileProjectSwitcherState({
       selectedBranch,
       isBranchingEnabled,
       selectedOrganization: selectedOrganization ?? undefined,
@@ -80,8 +80,8 @@ export function ProjectBranchSelector() {
 
   return (
     <>
-      <ProjectBranchSelectorTrigger {...triggerProps} onClick={() => setOpen(true)} />
-      <ProjectBranchSelectorSheet
+      <MobileProjectSwitcherTrigger {...triggerProps} onClick={() => setOpen(true)} />
+      <MobileProjectSwitcherSheet
         open={open}
         onOpenChange={setOpen}
         selectedRef={ref}

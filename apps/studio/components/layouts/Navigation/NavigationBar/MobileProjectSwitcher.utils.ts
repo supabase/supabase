@@ -1,7 +1,7 @@
 import type { Branch } from '@/data/branches/branches-query'
 import type { Organization } from '@/types'
 
-export interface ProjectBranchSelectorState {
+export interface MobileProjectSwitcherState {
   selectedBranch: Branch | undefined
   isMainBranch: boolean
   branchDisplayName: string
@@ -9,11 +9,11 @@ export interface ProjectBranchSelectorState {
   organizationHref: string
 }
 
-export function getProjectBranchSelectorState(params: {
+export function getMobileProjectSwitcherState(params: {
   selectedBranch: Branch | undefined
   isBranchingEnabled: boolean
   selectedOrganization: Organization | undefined
-}): ProjectBranchSelectorState {
+}): MobileProjectSwitcherState {
   const { selectedBranch, isBranchingEnabled, selectedOrganization } = params
 
   const isMainBranch = !isBranchingEnabled || selectedBranch?.is_default === true
