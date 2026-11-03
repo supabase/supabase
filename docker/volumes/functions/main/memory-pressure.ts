@@ -13,6 +13,7 @@ function parseBytes(value: string, minimum: number): number {
 
 export function startMemoryPressureLoop(): void {
   let errorReported = false
+  let activeReported = false
 
   const tick = async () => {
     let delay = CHECK_INTERVAL_MS
@@ -29,6 +30,11 @@ export function startMemoryPressureLoop(): void {
       const inactiveFileBytes = parseBytes(stat.match(/^inactive_file[ \t]+(\S+)[ \t]*$/m)?.[1] ?? '', 0)
       // Exclude inactive file cache that the kernel can reclaim under pressure.
       const workingSetBytes = Math.max(0, currentBytes - inactiveFileBytes)
+      // Logged once so operators (and test-container-logs.sh) can confirm monitoring is on.
+      if (!activeReported) {
+        console.log(`Memory pressure monitor active (limit ${limitBytes} bytes)`)
+        activeReported = true
+      }
 
       if (workingSetBytes / limitBytes >= PRESSURE_THRESHOLD) {
         delay = RETRY_INTERVAL_MS
