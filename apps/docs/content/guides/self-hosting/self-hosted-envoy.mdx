@@ -136,7 +136,7 @@ MCP routes are denied at the gateway by default. Allowing local access requires 
 
 </Admonition>
 
-The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Memory or timeout errors](/docs/guides/self-hosting/self-hosted-functions#memory-or-timeout-errors) for the runtime settings.
+The `/functions/v1/` route sets `idle_timeout` to `160s` and `timeout` to `410s` in `volumes/api/envoy/lds.template.yaml`. These allow the runtime's 150-second request idle timeout and 400-second worker lifetime limit to expire first. See [Timeout errors](/docs/guides/self-hosting/self-hosted-functions#timeout-errors) for the runtime settings.
 
 ## Authentication
 
