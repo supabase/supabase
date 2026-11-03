@@ -1,7 +1,8 @@
 // @vitest-environment jsdom
 import { renderHook } from '@testing-library/react'
 import { posthogClient, useFeatureFlags, useSearchParamsShallow } from 'common'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IA_NAV_FLAG } from './constants'
 import { useIaNavVariant } from './useIaNavVariant'
@@ -19,10 +20,12 @@ function renderVariant({
   flagValue,
   override,
   isOverrideLoaded = true,
+  hasLoaded = true,
 }: {
   flagValue?: string | boolean
   override?: string
   isOverrideLoaded?: boolean
+  hasLoaded?: boolean
 }) {
   const posthog = flagValue === undefined ? {} : { [IA_NAV_FLAG]: flagValue }
   const query = new URLSearchParams(override ? { [IA_NAV_FLAG]: override } : {})
@@ -30,7 +33,7 @@ function renderVariant({
   const searchParams = isOverrideLoaded ? query : new URLSearchParams()
 
   window.history.replaceState(null, '', `/?${query}`)
-  vi.mocked(useFeatureFlags).mockReturnValue({ posthog } as unknown as ReturnType<
+  vi.mocked(useFeatureFlags).mockReturnValue({ posthog, hasLoaded } as unknown as ReturnType<
     typeof useFeatureFlags
   >)
   vi.mocked(useSearchParamsShallow).mockReturnValue(
@@ -43,6 +46,10 @@ function renderVariant({
 describe('useIaNavVariant', () => {
   beforeEach(() => {
     captureExposure.mockClear()
+  })
+
+  afterEach(() => {
+    localStorage.clear()
   })
 
   it('returns option-1 and records its exposure', () => {
@@ -84,5 +91,28 @@ describe('useIaNavVariant', () => {
 
     expect(result.current).toBe('option-1')
     expect(captureExposure).toHaveBeenCalledWith(IA_NAV_FLAG, { variant: 'option-1' }, true)
+  })
+
+  it('uses the cached flag while the flags load, without recording exposure', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
+
+    const { result } = renderVariant({ hasLoaded: false })
+
+    expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('caches the flag once the flags load', () => {
+    renderVariant({ flagValue: false })
+
+    expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('false')
+  })
+
+  it('keeps the cached flag when the loaded flags do not include it', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
+
+    renderVariant({})
+
+    expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('option-1')
   })
 })
