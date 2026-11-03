@@ -11,6 +11,7 @@ import { getCustomContent } from '~/lib/custom-content/getCustomContent'
 import { GUIDES_DIRECTORY, isValidGuideFrontmatter, type GuideFrontmatter } from '~/lib/docs'
 import { getGuideLastUpdated } from '~/lib/last-changed'
 import { mdAlternate } from '~/lib/md-alternates'
+import { mdToPlainText } from '~/lib/md-to-plain-text'
 import { GuideModelLoader } from '~/resources/guide/guideModelLoader'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { gfmFromMarkdown } from 'mdast-util-gfm'
@@ -18,6 +19,8 @@ import { gfm } from 'micromark-extension-gfm'
 import { type Metadata, type ResolvingMetadata } from 'next'
 import { notFound } from 'next/navigation'
 
+import { getGuideOutline } from './GuidesMdx.outline'
+import type { GuideShapes } from './GuidesMdx.skeleton'
 import { newEditLink } from './GuidesMdx.template'
 import { checkGuidePageEnabled } from './NavigationPageStatus.utils'
 
@@ -170,6 +173,35 @@ const genGuidesStaticParams = (directory?: string) => async () => {
   return enabledParams
 }
 
+const getGuideShapesInternal = async (section: string): Promise<GuideShapes> => {
+  const params = await genGuidesStaticParams(section)()
+  // a page that fails to load only loses its own shape, the skeleton then draws the common one
+  const guides = await Promise.allSettled(
+    params.map(({ slug }) => getGuidesMarkdown([section, ...slug]))
+  )
+
+  return guides.reduce<GuideShapes>((shapes, guide) => {
+    if (guide.status === 'rejected' || !guide.value) return shapes
+    const { pathname, meta } = guide.value
+    const outline = getGuideOutline(guide.value.content)
+    shapes[pathname] = {
+      title: mdToPlainText(meta.title),
+      ...(meta.subtitle ? { subtitle: mdToPlainText(meta.subtitle) } : {}),
+      ...(meta.tocVideo ? { hasVideo: true } : {}),
+      ...(meta.hideToc || meta.hide_table_of_contents ? { hideToc: true } : {}),
+      ...(outline.length ? { outline } : {}),
+    }
+    return shapes
+  }, {})
+}
+
+// every page build in a section renders its loading state, so the cache reads each section one time
+const getGuideShapes = cache_fullProcess_withDevCacheBust(
+  getGuideShapesInternal,
+  GUIDES_DIRECTORY,
+  (filename: string) => JSON.stringify([filename.replace(/\.mdx$/, '').split(sep)[0]])
+)
+
 const genGuideMeta =
   <Params,>(
     generate: (params: Params) => OrPromise<{
@@ -229,4 +261,4 @@ function removeRedundantH1(content: string) {
   return content
 }
 
-export { genGuideMeta, genGuidesStaticParams, getGuidesMarkdown, removeRedundantH1 }
+export { genGuideMeta, genGuidesStaticParams, getGuideShapes, getGuidesMarkdown, removeRedundantH1 }
