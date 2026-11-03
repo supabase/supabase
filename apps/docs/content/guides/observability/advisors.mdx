@@ -9,11 +9,19 @@ Advisors are deterministic checks that ship with the platform. They flag health,
 You or an agent can run them from:
 
 - Studio: [Health Advisor](/dashboard/project/_/advisors/health), [Security Advisor](/dashboard/project/_/advisors/security), and [Performance Advisor](/dashboard/project/_/advisors/performance)
-- MCP: `get_advisors` with `type` set to `security` or `performance`
+- MCP: `get_advisors` with `type` set to `security`, `performance`, or `health`
 - CLI: [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
 - Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) advisors
 
+<Admonition type="note">
+
+Health advisors aren't available through the hosted Supabase MCP server. To run them with MCP, serve the MCP endpoint yourself using `createSupabaseApiPlatform` from `@supabase/mcp-server-supabase` version 0.14.0 or later. For setup steps, see [Self-hosting the MCP endpoint](https://github.com/supabase/mcp#self-hosting-the-mcp-endpoint) in the `supabase/mcp` repository on GitHub.
+
+</Admonition>
+
 Some findings may be intentional, so check them against your intended schema and access model before you change anything. Health findings can take a while to clear after a fix, since the check measures error rates over a period of time.
+
+Through MCP, an empty health result might mean that a check didn't run. `get_advisors` omits a health check when the project is paused or otherwise inactive, or when its logs are unavailable.
 
 ## Available checks
 
