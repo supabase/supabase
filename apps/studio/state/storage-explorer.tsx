@@ -296,6 +296,10 @@ export function createStorageExplorerState({
           bucketId: state.selectedBucket.id,
           paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
+        // The parent's placeholder was the only object hidden from its listing
+        state.columns = state.columns.map((col, idx) =>
+          idx === columnIndex ? { ...col, hiddenItemsCount: 0 } : col
+        )
       }
 
       const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
@@ -367,6 +371,7 @@ export function createStorageExplorerState({
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
+            hiddenItemsCount: (data ?? []).length - formattedItems.length,
             // Compare the raw page, not the formatted one: formatFolderItems drops the
             // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
             // pagination a page early.
@@ -399,9 +404,13 @@ export function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
+      // `column` may be an overlaid copy (archived rows merged in for display), whose item
+      // count the live listing never had, so count from the column held in state.
+      const liveColumn = state.columns[index] ?? column
       const options = {
         limit: LIMIT,
-        offset: column.items.length,
+        // items.length alone undercounts: formatFolderItems hides the .emptyFolderPlaceholder
+        offset: liveColumn.items.length + (liveColumn.hiddenItemsCount ?? 0),
         search: searchString,
         sortBy: getSortOptions(),
       }
@@ -424,6 +433,7 @@ export function createStorageExplorerState({
             return {
               ...col,
               items: col.items.concat(formattedItems),
+              hiddenItemsCount: (col.hiddenItemsCount ?? 0) + data.length - formattedItems.length,
               isLoadingMoreItems: false,
               hasMoreItems: data.length === LIMIT,
             }
@@ -536,6 +546,7 @@ export function createStorageExplorerState({
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
           items: formattedItems,
+          hiddenItemsCount: items.length - formattedItems.length,
           // Raw page length — see fetchFolderContents. Getting this wrong here also
           // makes isParentListingExhaustive below claim a folder is missing.
           hasMoreItems: items.length === LIMIT,
