@@ -74,6 +74,15 @@ const MergePage: NextPageWithLayout = () => {
   })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
   const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
     projectRef: parentProjectRef,
     isDefault: currentBranch?.is_default,
@@ -125,9 +134,15 @@ const MergePage: NextPageWithLayout = () => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
-      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
+      if (
+        ref &&
+        parentProjectRef &&
+        currentBranch?.review_requested_at &&
+        updateBranchGrant.status === 'granted'
+      ) {
         updateBranch(
           {
+            grant: updateBranchGrant.grant,
             branchRef: ref,
             projectRef: parentProjectRef,
             requestReview: false,
@@ -144,6 +159,7 @@ const MergePage: NextPageWithLayout = () => {
       parentProjectRef,
       ref,
       updateBranch,
+      updateBranchGrant,
       currentBranch?.review_requested_at,
     ]
   )
@@ -244,8 +260,9 @@ const MergePage: NextPageWithLayout = () => {
   })
 
   const handlePush = () => {
-    if (!ref || !parentProjectRef) return
+    if (!ref || !parentProjectRef || pushBranchGrant.status !== 'granted') return
     pushBranch({
+      grant: pushBranchGrant.grant,
       branchRef: ref,
       projectRef: parentProjectRef,
     })
@@ -398,6 +415,7 @@ const MergePage: NextPageWithLayout = () => {
               hasEdgeFunctionModifications={hasEdgeFunctionModifications}
               modifiedFunctionsCount={modifiedFunctionsCount}
               isPushing={isPushing}
+              canPush={pushBranchGrant.status === 'granted'}
               onPush={handlePush}
             />
           ) : currentWorkflowRunId ? (
