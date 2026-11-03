@@ -26,6 +26,10 @@ const hasTableAccess = (oid: SafeSqlFragment, owner: SafeSqlFragment) => safeSql
   or has_any_column_privilege(${oid}, 'SELECT, INSERT, UPDATE, REFERENCES')
 )`
 
+// Name matches rank by policy name. Policies pulled in through a matched table
+// group by that table first (in the table's own order), then by policy name.
+const POLICY_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
+
 export type SearchEntitiesTable = {
   id: number
   schema: string
@@ -181,7 +185,9 @@ export const getSearchEntitiesSql = ({
         pnc.relname as table_name,
         pnc.table_oid::int8 as table_id,
         0 as source,
-        pnc.rank
+        pnc.rank,
+        0 as table_sort_length,
+        '' as table_sort_name
       from policy_name_candidates pnc
       where ${hasTableAccess(safeSql`pnc.table_oid`, safeSql`pnc.relowner`)}
 
@@ -195,7 +201,9 @@ export const getSearchEntitiesSql = ({
         mt.name,
         mt.id,
         1,
-        mt.rank
+        mt.rank,
+        length(mt.name),
+        mt.name
       from matched_tables mt
       cross join lateral (
         select p.oid, p.polname, p.polcmd
@@ -212,7 +220,7 @@ export const getSearchEntitiesSql = ({
         from policy_matches pm
         order by pm.id, pm.source
       ) deduped
-      order by source, rank, length(table_name), table_name, length(name), name
+      order by ${POLICY_ORDER}
       limit ${literal(limit)}
     )
     select
@@ -249,7 +257,7 @@ export const getSearchEntitiesSql = ({
               'table', p.table_name,
               'table_id', p.table_id
             )
-            order by p.source, p.rank, length(p.table_name), p.table_name, length(p.name), p.name
+            order by ${POLICY_ORDER}
           )
           from matched_policies p
         ),

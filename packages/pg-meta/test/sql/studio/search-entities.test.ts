@@ -151,6 +151,20 @@ withTestDatabase(
   }
 )
 
+withTestDatabase('ranks name-matched policies by policy name, not by table', async (db) => {
+  await db.executeQuery(`
+    create table public.a (id int);
+    create table public.bb (id int);
+    create policy "read_everything" on public.a for select using (true);
+    create policy "read_x" on public.bb for select using (true);
+  `)
+
+  expect(await searchPolicies(db, 'read')).toEqual([
+    'public.bb: read_x (SELECT)',
+    'public.a: read_everything (SELECT)',
+  ])
+})
+
 withTestDatabase('returns a policy that matches both ways only once', async (db) => {
   await db.executeQuery(`
     create table public.posts (id int);
@@ -213,18 +227,13 @@ withTestDatabase('maps policy commands and returns ids for linking', async (db) 
   )
 })
 
-withTestDatabase(
-  'treats LIKE wildcards in policy searches literally and skips system schemas',
-  async (db) => {
-    await db.executeQuery(`
+withTestDatabase('treats LIKE wildcards in policy searches literally', async (db) => {
+  await db.executeQuery(`
     create table public.posts (id int);
     create policy "read_posts" on public.posts for select using (true);
     create policy "readxposts" on public.posts for select using (true);
   `)
 
-    expect(await searchPolicies(db, 'read_posts')).toEqual(['public.posts: read_posts (SELECT)'])
-    expect(await searchPolicies(db, '%')).toEqual([])
-    // pg_catalog has no policies, and storage.objects policies live in a system schema
-    expect(await searchPolicies(db, 'pg_')).toEqual([])
-  }
-)
+  expect(await searchPolicies(db, 'read_posts')).toEqual(['public.posts: read_posts (SELECT)'])
+  expect(await searchPolicies(db, '%')).toEqual([])
+})

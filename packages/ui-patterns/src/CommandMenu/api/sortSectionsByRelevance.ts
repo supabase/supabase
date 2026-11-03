@@ -1,5 +1,7 @@
 import { commandScore } from './commandScore'
 
+type SectionMeta = { relevanceGroup?: string; priority?: number }
+
 /**
  * cmdk is meant to reorder groups by their best matching item while searching,
  * but its lookup of the group element fails, so groups stay in registration
@@ -13,7 +15,7 @@ import { commandScore } from './commandScore'
  * relevance doesn't reshuffle them relative to each other.
  */
 export function sortSectionsByRelevance<
-  T extends { commands: readonly { name: string; value?: string }[]; meta?: any },
+  T extends { commands: readonly { name: string; value?: string }[]; meta?: SectionMeta },
 >(sections: readonly T[], query: string): readonly T[] {
   const search = query.trim()
   if (!search) return sections
@@ -28,8 +30,8 @@ export function sortSectionsByRelevance<
   const entries = sections.map((section, index) => ({
     section,
     index,
-    group: section.meta?.relevanceGroup as string | undefined,
-    priority: (section.meta?.priority as number | undefined) ?? Infinity,
+    group: section.meta?.relevanceGroup,
+    priority: section.meta?.priority ?? Infinity,
     score: bestScore(section),
   }))
 
