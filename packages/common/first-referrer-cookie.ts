@@ -71,7 +71,7 @@ export interface FirstReferrerData {
   /** Ad-network click IDs parsed from the landing URL */
   click_ids: Record<string, string>
   /** Unix timestamp (ms) when the cookie was written */
-  ts: number
+  ts?: number
 }
 
 // ---------------------------------------------------------------------------
@@ -396,7 +396,7 @@ export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerDat
     const utms = toStringRecord(utmsRaw)
     const click_ids = toStringRecord(clickIdsRaw)
 
-    const ts = typeof tsRaw === 'number' && Number.isFinite(tsRaw) ? tsRaw : Date.now()
+    const ts = typeof tsRaw === 'number' && Number.isFinite(tsRaw) ? tsRaw : undefined
 
     return {
       referrer,
