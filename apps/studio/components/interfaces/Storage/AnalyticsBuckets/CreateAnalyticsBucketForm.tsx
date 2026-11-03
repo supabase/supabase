@@ -139,6 +139,8 @@ export const CreateAnalyticsBucketForm = ({
     mutateAsync: createIcebergWrapper,
     isPending: isCreatingIcebergWrapper,
     apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
   } = useIcebergWrapperCreateMutation()
 
   const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
@@ -155,7 +157,7 @@ export const CreateAnalyticsBucketForm = ({
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
-    if (apiKeysGrant.status !== 'granted') return
+    if (!isApiKeyReady) return
 
     const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
@@ -226,6 +228,7 @@ export const CreateAnalyticsBucketForm = ({
             <ApiKeysAccessNote
               className="px-5 pb-5"
               grant={apiKeysGrant}
+              keyState={apiKeyState}
               fallback="They're needed to set up the Iceberg Wrapper, so you can't create an Analytics bucket."
             />
 
@@ -274,9 +277,7 @@ export const CreateAnalyticsBucketForm = ({
           form={formId}
           type="submit"
           loading={isCreating}
-          disabled={
-            wrappersExtensionNeedsUpgrading || isCreating || apiKeysGrant.status !== 'granted'
-          }
+          disabled={wrappersExtensionNeedsUpgrading || isCreating || !isApiKeyReady}
         >
           Create bucket
         </Button>

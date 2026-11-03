@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { WrapperMissing } from './BucketCallouts'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
 import { ALL_FGA_PERMISSIONS, type PermissionsV2Response } from '@/tests/lib/permissions-fixtures'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -34,9 +35,38 @@ const renderCallout = () =>
     profileContext: createMockProfileContext(),
   })
 
+const secretKey = {
+  type: 'secret' as const,
+  name: 'default',
+  api_key: 'sb_secret_abc',
+  id: 'id',
+  hash: 'hash',
+  prefix: 'sb_secret_',
+  inserted_at: '2024-01-01',
+  secret_jwt_template: { role: 'service_role' },
+}
+
+const mockApiKeys = (keys: Array<typeof secretKey>) =>
+  addAPIMock({
+    method: 'get',
+    path: '/v1/projects/:ref/api-keys',
+    response: keys,
+  })
+
 describe('WrapperMissing', () => {
+  it('keeps installing disabled and explains when no usable key is returned', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    mockApiKeys([])
+
+    renderCallout()
+
+    expect(await screen.findByText(/Couldn't load your API keys\./)).toBeVisible()
+    expect(screen.getByRole('button', { name: 'Install wrapper' })).toBeDisabled()
+  })
+
   it('enables installing the wrapper when the user can read secret keys', async () => {
     mockProjectGrantContext({ ref: 'default' })
+    mockApiKeys([secretKey])
 
     renderCallout()
 

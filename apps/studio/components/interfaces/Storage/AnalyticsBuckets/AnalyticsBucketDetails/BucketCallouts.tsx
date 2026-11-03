@@ -118,10 +118,13 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
     mutateAsync: createIcebergWrapper,
     isPending: isCreatingIcebergWrapper,
     apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
   } = useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')
+    if (!isApiKeyReady) return
     await createIcebergWrapper({ bucketName })
   }
 
@@ -131,8 +134,11 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
           <Button
-            loading={isCreatingIcebergWrapper}
-            disabled={apiKeysGrant.status !== 'granted'}
+            loading={
+              isCreatingIcebergWrapper ||
+              (apiKeysGrant.status === 'granted' && apiKeyState === 'loading')
+            }
+            disabled={!isApiKeyReady}
             onClick={onSetupWrapper}
           >
             Install wrapper
@@ -140,6 +146,7 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
           <ApiKeysAccessNote
             className="mt-2"
             grant={apiKeysGrant}
+            keyState={apiKeyState}
             fallback="They're needed to set up the Iceberg Wrapper."
           />
         </Admonition>

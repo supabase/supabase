@@ -17,6 +17,23 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
 
+type ApiKeyState = 'ready' | 'loading' | 'error' | 'missing'
+
+function getApiKeyState({
+  hasApiKey,
+  isError,
+  hasData,
+}: {
+  hasApiKey: boolean
+  isError: boolean
+  hasData: boolean
+}): ApiKeyState {
+  if (hasApiKey) return 'ready'
+  if (isError) return 'error'
+  if (hasData) return 'missing'
+  return 'loading'
+}
+
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -26,7 +43,7 @@ export const useIcebergWrapperCreateMutation = () => {
     { projectRef: project?.ref },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useQuery({
+  const { data: apiKeysData, isError: isApiKeysError } = useQuery({
     ...revealedApiKeysQueryOptions({ projectRef: project?.ref, grant: apiKeysGrant.grant }),
     select: getKeys,
   })
@@ -35,7 +52,13 @@ export const useIcebergWrapperCreateMutation = () => {
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 
-  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key
+  // Only meaningful once the grant is `granted`; before that the grant itself explains why
+  const apiKeyState = getApiKeyState({
+    hasApiKey: Boolean(apiKey),
+    isError: isApiKeysError,
+    hasData: Boolean(apiKeysData),
+  })
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
@@ -53,6 +76,13 @@ export const useIcebergWrapperCreateMutation = () => {
     if (apiKeysGrant.status !== 'granted') {
       throw new Error(
         'You need additional permissions to view API keys, which are needed to create an Iceberg wrapper.'
+      )
+    }
+
+    // Never fall back to a placeholder token: the wrapper would be created but never work
+    if (!apiKey) {
+      throw new Error(
+        'Unable to load a secret API key, which is needed to create an Iceberg wrapper.'
       )
     }
 
@@ -89,5 +119,9 @@ export const useIcebergWrapperCreateMutation = () => {
     hasPermission: canCreateCredentials,
     /** Callers should block creation and explain when this isn't `granted`. */
     apiKeysGrant,
+    /** True once the grant is `granted` and a usable secret key has been revealed. */
+    isApiKeyReady: apiKeysGrant.status === 'granted' && apiKeyState === 'ready',
+    /** Progress of revealing the key, for callers that explain why creation is blocked. */
+    apiKeyState,
   }
 }
