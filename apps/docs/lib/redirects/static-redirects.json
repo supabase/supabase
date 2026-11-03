@@ -531,7 +531,12 @@
   },
   {
     "source": "/docs/guides/api/rest/debugging-performance",
-    "destination": "/docs/guides/database/debugging-performance",
+    "destination": "/docs/guides/api/query-plans",
+    "permanent": true
+  },
+  {
+    "source": "/docs/guides/database/debugging-performance",
+    "destination": "/docs/guides/api/query-plans",
     "permanent": true
   },
   {

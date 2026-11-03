@@ -112,7 +112,9 @@ describe('CreateRolePanel', () => {
     fireEvent.submit(document.getElementById(FORM_ID)!)
 
     await waitFor(() => expect(getCreateQuery()).toBeDefined())
-    expect(getCreateQuery()).toContain(`password 's3cret'`)
+    // The password is sent as a SCRAM-SHA-256 verifier, not as plaintext
+    expect(getCreateQuery()).toContain(`password 'SCRAM-SHA-256$`)
+    expect(getCreateQuery()).not.toContain('s3cret')
   })
 
   test('omits the password when login is enabled but the field is empty', async () => {
