@@ -42,11 +42,18 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
-import { getPipelineDisplayState, getRestartRequestStatus, getStatusName } from './Pipeline.utils'
+import {
+  getPipelineDisplayState,
+  getPipelineLegacyLogsUrl,
+  getPipelineUnifiedLogsUrl,
+  getRestartRequestStatus,
+  getStatusName,
+} from './Pipeline.utils'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
+import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
@@ -74,8 +81,8 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef, pipelineId: pipelineIdParam } = useParams()
-  const pipelineId = Number(pipelineIdParam)
+  const { ref: projectRef, pipelineId } = useParams()
+  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
   const [showDeleteDestination, setShowDeleteDestination] = useState(false)
@@ -92,10 +99,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     data: pipeline,
     error: pipelineError,
     isPending: isPipelineLoading,
-  } = useReplicationPipelineByIdQuery(
-    { projectRef, pipelineId },
-    { enabled: Number.isSafeInteger(pipelineId) }
-  )
+  } = useReplicationPipelineByIdQuery({ projectRef, pipelineId }, { enabled: !!pipelineId })
   const {
     data: pipelineStatusData,
     error: pipelineStatusError,
@@ -204,9 +208,9 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     }
   }
 
-  const logsUrl = `/project/${projectRef}/logs/replication-logs?f=${encodeURIComponent(
-    JSON.stringify({ pipeline_id: pipelineId })
-  )}`
+  const logsUrl = isUnifiedLogsEnabled
+    ? getPipelineUnifiedLogsUrl({ projectRef: projectRef!, pipelineId })
+    : getPipelineLegacyLogsUrl({ projectRef: projectRef!, pipelineId })
 
   return (
     <div className="flex min-h-full w-full flex-col items-stretch">

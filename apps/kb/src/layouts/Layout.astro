@@ -1,8 +1,11 @@
 ---
 import { getCollection } from 'astro:content'
 import { genFaviconLinks } from 'common/MetaFavicons/icons'
+import { ConsentIsland } from '../components/ConsentIsland'
 import Footer from '../components/Footer.astro'
 import { Header } from '../components/Header'
+import { KbSearch } from '../components/KbSearch'
+import { PageTelemetryIsland } from '../components/PageTelemetryIsland'
 import { toSummary, toTroubleshootingSummary } from '../lib/guides'
 import { getListedTopics } from '../lib/topics'
 import '../styles/globals.css'
@@ -22,9 +25,11 @@ const navTopics = getListedTopics({
 }).map((topic) => topic.name)
 const faviconRoute = import.meta.env.DEV ? '/favicon/local' : '/favicon'
 const canonicalHref = canonicalUrl(Astro.url.pathname)
-const ogImage = title
-	? `https://obuldanrptloktxcffvn.supabase.co/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
-	: 'https://supabase.com/docs/img/supabase-og-image.png'
+const miscUrl = import.meta.env.MISC_URL
+const ogImage =
+	title && miscUrl
+		? `${miscUrl}/functions/v1/og-images?site=kb&title=${encodeURIComponent(title)}&description=${encodeURIComponent(description ?? 'undefined')}`
+		: 'https://supabase.com/docs/img/supabase-og-image.png'
 const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowledge Base'
 ---
 
@@ -86,6 +91,9 @@ const pageTitle = title ? `${title} | Supabase Knowledge Base` : 'Supabase Knowl
 			<slot />
 		</main>
 		<Footer />
+		<KbSearch client:load />
+		<ConsentIsland client:only="react" />
+		<PageTelemetryIsland client:only="react" />
 	</body>
 </html>
 

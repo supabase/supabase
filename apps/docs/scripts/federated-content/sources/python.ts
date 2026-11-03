@@ -13,6 +13,8 @@ const python: FederatedContentSource = {
       slug: 'api',
       meta: {
         title: 'API',
+        description:
+          'Reference for the vecs Python client, covering installation, connecting to Postgres, and creating and querying vector collections.',
       },
       remoteFile: 'api.md',
     },
@@ -20,6 +22,8 @@ const python: FederatedContentSource = {
       slug: 'collections',
       meta: {
         title: 'Collections',
+        description:
+          'Explains vecs collections, the Postgres tables that store vector records with an ID, a vector, and JSON metadata.',
       },
       remoteFile: 'concepts_collections.md',
     },
@@ -27,6 +31,8 @@ const python: FederatedContentSource = {
       slug: 'indexes',
       meta: {
         title: 'Indexes',
+        description:
+          'Explains how to create an index on a vecs collection to speed up vector queries, and the distance measures and index methods to choose from.',
       },
       remoteFile: 'concepts_indexes.md',
     },
@@ -34,6 +40,8 @@ const python: FederatedContentSource = {
       slug: 'metadata',
       meta: {
         title: 'Metadata',
+        description:
+          'Describes the metadata types and query operators that vecs supports for filtering vector queries on metadata fields.',
       },
       remoteFile: 'concepts_metadata.md',
     },

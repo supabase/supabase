@@ -157,6 +157,13 @@ const nextConfig = {
         ],
       },
       {
+        source: '/schemas/:path*',
+        headers: [
+          { key: 'access-control-allow-origin', value: '*' },
+          { key: 'cache-control', value: 'public, max-age=3600' },
+        ],
+      },
+      {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },

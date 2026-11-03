@@ -25,7 +25,7 @@ interface PipelineStatePillProps {
   isSuccess: boolean
   requestStatus: PipelineStatusRequestStatus
   projectRef?: string
-  pipelineId?: number
+  pipelineId?: string
 }
 
 /**

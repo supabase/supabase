@@ -28,7 +28,6 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 interface PlatformWebhooksDeliveryDetailsSheetProps {
-  deliveryAttempt: number | null
   deliveryDetailsTab: 'event' | 'response'
   deliveryEventPayload: string
   deliveryResponsePayload: string
@@ -41,7 +40,6 @@ interface PlatformWebhooksDeliveryDetailsSheetProps {
 }
 
 export const PlatformWebhooksDeliveryDetailsSheet = ({
-  deliveryAttempt,
   deliveryDetailsTab,
   deliveryEventPayload,
   deliveryResponsePayload,
@@ -90,12 +88,6 @@ export const PlatformWebhooksDeliveryDetailsSheet = ({
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Delivery ID</p>
                     <code>{selectedDelivery.id}</code>
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-sm text-foreground-light">Attempt</p>
-                    <p className="text-sm text-foreground">
-                      {deliveryAttempt ? `#${deliveryAttempt}` : '-'}
-                    </p>
                   </div>
                   <div className="space-y-1">
                     <p className="text-sm text-foreground-light">Timestamp</p>

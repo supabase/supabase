@@ -67,7 +67,7 @@ const nextConfig = {
   outputFileTracingIncludes: {
     '/api/crawlers': ['./features/docs/generated/**/*', './docs/ref/**/*'],
     '/api/guides-md/**/*': ['./public/markdown/guides/**/*'],
-    '/guides/**/*': ['./content/guides/**/*', './content/troubleshooting/**/*', './examples/**/*'],
+    '/guides/**/*': ['./content/guides/**/*', './examples/**/*'],
     '/reference/**/*': ['./features/docs/generated/**/*', './docs/ref/**/*'],
   },
   serverExternalPackages: ['libpg-query', 'twoslash'],

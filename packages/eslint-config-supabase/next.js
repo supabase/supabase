@@ -77,7 +77,8 @@ module.exports = defineConfig([
     },
     rules: {
       'shadcn/no-unknown-classes': ['warn', { allow: ['not-prose'] }],
-      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout'] }],
+      // a transition-[...] list names css properties, not a design value, so no token can replace it
+      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout', 'transition'] }],
       'shadcn/no-raw-colors': 'warn',
     },
   },
