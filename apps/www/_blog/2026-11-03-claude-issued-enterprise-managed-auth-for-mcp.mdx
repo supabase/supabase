@@ -30,7 +30,7 @@ Availability:
 
 By default, every member signs in with their own Supabase account and approves Claude for an organization through a consent screen. The [enterprise-managed auth](/blog/enterprise-managed-auth-for-the-supabase-mcp-server) we launched in August replaces that with one admin approval for organizations that set it up. The identity provider then issues a signed assertion for each member.
 
-Okta was the only identity provider that supported the extension at launch and most still don't. Organizations on those providers no longer have to wait because Claude can now be the issuer instead.
+Okta was the only identity provider that supported the extension at launch and most still don't. Organizations on those providers no longer have to wait because Claude can now be the issuer instead. Nothing changes in your identity provider.
 
 ## How it works
 
@@ -59,7 +59,7 @@ If all three pass, Supabase issues a short-lived access token bound to that memb
 
 ## How to set it up
 
-You need:
+Setup takes about ten minutes if SSO is already configured. You need:
 
 - an owner or admin of your Supabase organization and an admin of your Claude organization
 - each member to have signed in to Supabase through SSO at least once with the email they use in Claude
