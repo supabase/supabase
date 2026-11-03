@@ -3293,7 +3293,7 @@ Enterprise-Managed Authorization for MCP puts your company in charge of which AI
 
 ## When to use it
 - Developers share personal access tokens because every Claude connection needs an owner or admin to approve it
-- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them so that offboarding an employee removes their access everywhere
+- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them
 
 ## How it works
 There are two ways to issue the identity assertion that Claude presents to Supabase:
