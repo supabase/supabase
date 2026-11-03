@@ -21,13 +21,15 @@ function renderVariant({
   override,
   isOverrideLoaded = true,
   hasLoaded = true,
+  otherFlags = {},
 }: {
   flagValue?: string | boolean
   override?: string
   isOverrideLoaded?: boolean
   hasLoaded?: boolean
+  otherFlags?: Record<string, boolean>
 }) {
-  const posthog = flagValue === undefined ? {} : { [IA_NAV_FLAG]: flagValue }
+  const posthog = flagValue === undefined ? otherFlags : { ...otherFlags, [IA_NAV_FLAG]: flagValue }
   const query = new URLSearchParams(override ? { [IA_NAV_FLAG]: override } : {})
   // useSearchParamsShallow starts empty and reads the URL in an effect after mount.
   const searchParams = isOverrideLoaded ? query : new URLSearchParams()
@@ -108,11 +110,22 @@ describe('useIaNavVariant', () => {
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('false')
   })
 
-  it('keeps the cached flag when the loaded flags do not include it', () => {
+  it('keeps the cached flag without exposure when the posthog request fails', () => {
     localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
 
-    renderVariant({})
+    const { result } = renderVariant({})
 
+    expect(result.current).toBe('option-1')
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
+  })
+
+  it('drops the cached flag once posthog no longer has it', () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, 'option-1')
+
+    const { result } = renderVariant({ otherFlags: { 'another-flag': true } })
+
+    expect(result.current).toBe('control')
+    expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('false')
   })
 })

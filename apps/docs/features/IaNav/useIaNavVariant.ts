@@ -17,8 +17,8 @@ const readKnownFlag = () => {
 
 /**
  * Reads the `docs-ia-mvp-v1` PostHog experiment flag.
- * Uses the cached value from the last visit while the flag store is loading, and defaults to
- * `'control'` if neither is known, so an unresolved state always falls back to the current navigation.
+ * While the flags load, or when the posthog request fails, it uses the value from the last visit.
+ * If neither is known, it returns `'control'`, the current navigation.
  */
 export function useIaNavVariant(): IaNavVariant {
   const { posthog, hasLoaded } = useFeatureFlags()
@@ -28,28 +28,29 @@ export function useIaNavVariant(): IaNavVariant {
   // the value known before the flags load. it is null on the server and on a first visit
   const knownFlag = useSyncExternalStore(subscribeToNothing, readKnownFlag, () => null)
 
-  const flagValue = hasLoaded ? posthog[IA_NAV_FLAG] : knownFlag
+  // a failed posthog request loads no flags at all, so the last assignment stays
+  const hasPosthogFlags = hasLoaded && Object.keys(posthog).length > 0
+  const flagValue = hasPosthogFlags ? posthog[IA_NAV_FLAG] : knownFlag
   // `false` means the visitor is outside the rollout, not assigned to control.
   const isAssigned = isVariant(flagValue)
   const flagVariant: IaNavVariant = flagValue === 'option-1' ? 'option-1' : 'control'
 
   // exception: the flags arrive through context, with no event to hook
   useEffect(() => {
-    const loadedFlag = posthog[IA_NAV_FLAG]
-    // a failed or skipped posthog load leaves the flag undefined, so the last assignment stays
-    if (!hasLoaded || loadedFlag === undefined) return
-    safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, String(loadedFlag))
-  }, [hasLoaded, posthog])
+    if (!hasPosthogFlags) return
+    // a missing key means the flag is gone, so the cache drops the old assignment
+    safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG, String(posthog[IA_NAV_FLAG] ?? false))
+  }, [hasPosthogFlags, posthog])
 
   useEffect(() => {
     // the cached flag can be stale, so only the loaded flag records an exposure
-    if (!hasLoaded || !isAssigned) return
+    if (!hasPosthogFlags || !isAssigned) return
     // useSearchParamsShallow is empty until its own effect runs, so read the URL directly.
     const urlOverride = new URLSearchParams(window.location.search).get(IA_NAV_FLAG)
     if (isVariant(urlOverride)) return
 
     posthogClient.captureExperimentExposure(IA_NAV_FLAG, { variant: flagVariant }, hasAccepted)
-  }, [hasLoaded, isAssigned, flagVariant, hasAccepted])
+  }, [hasPosthogFlags, isAssigned, flagVariant, hasAccepted])
 
   return isVariant(override) ? override : flagVariant
 }
