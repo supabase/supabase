@@ -440,13 +440,6 @@ export const Usage = () => {
             />
           )}
 
-          <ComputeServices
-            orgSlug={slug as string}
-            projectRef={usageProjectRef}
-            subscription={subscription}
-            currentBillingCycleSelected={currentBillingCycleSelected}
-          />
-
           <Egress
             orgSlug={slug as string}
             projectRef={usageProjectRef}
@@ -478,6 +471,13 @@ export const Usage = () => {
             currentBillingCycleSelected={currentBillingCycleSelected}
             orgDailyStats={orgDailyStats}
             isLoadingOrgDailyStats={isLoadingOrgDailyStats}
+          />
+
+          <ComputeServices
+            orgSlug={slug as string}
+            projectRef={usageProjectRef}
+            subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
           />
 
           <OrgLogUsage
