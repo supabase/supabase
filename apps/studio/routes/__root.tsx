@@ -24,12 +24,12 @@ import { TanStackDevtools } from '@tanstack/react-devtools'
 import type { QueryClient } from '@tanstack/react-query'
 import { ReactQueryDevtoolsPanel } from '@tanstack/react-query-devtools'
 import {
-  ClientOnly,
   createRootRouteWithContext,
   HeadContent,
   Outlet,
   redirect,
   Scripts,
+  useHydrated,
   useLocation,
   type AnyRouter,
   type ErrorComponentProps,
@@ -364,11 +364,11 @@ export const Route = createRootRouteWithContext<RouterContext>()({
 })
 
 function RootComponent() {
-  const recoveryLocation = useLocation()
+  const location = useLocation()
+  const isHydrated = useHydrated()
   useThemeSandbox()
-  // Prerendered pages render on the server so their HTML holds the page content. Every other
-  // route renders only on the client, behind the shell fallback.
-  const shouldRenderOnServer = IS_PLATFORM && isPrerenderedRoute(recoveryLocation.pathname)
+  // Until hydration, match the served HTML: a prerendered page, or the SPA shell's fallback.
+  const canRenderPage = isHydrated || (IS_PLATFORM && isPrerenderedRoute(location.pathname))
 
   return (
     <ErrorBoundary FallbackComponent={GlobalErrorBoundaryState} onError={errorBoundaryHandler}>
@@ -388,14 +388,8 @@ function RootComponent() {
                               <BannerStackProvider>
                                 <FeaturePreviewContextProvider>
                                   <MainScrollContainerProvider>
-                                    <RecoveryReminderController href={recoveryLocation.href}>
-                                      {shouldRenderOnServer ? (
-                                        <Outlet />
-                                      ) : (
-                                        <ClientOnly fallback={<ShellFallback />}>
-                                          <Outlet />
-                                        </ClientOnly>
-                                      )}
+                                    <RecoveryReminderController href={location.href}>
+                                      {canRenderPage ? <Outlet /> : <ShellFallback />}
                                     </RecoveryReminderController>
                                   </MainScrollContainerProvider>
                                   <GlobalShortcuts />
