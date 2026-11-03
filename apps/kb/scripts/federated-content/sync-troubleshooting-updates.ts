@@ -1,26 +1,17 @@
 // Pushes title/content updates to already-synced GitHub Discussions when the
-// local troubleshooting guide has changed. Compares the row's stored checksum
-// against a freshly computed one — never the discussion's live content — so
-// this is immune to whatever GitHub does internally to stored title/body. A
-// null checksum always counts as changed. Updates target the discussion
-// directly via the row's stored github_id — no need to list/paginate the
-// category's discussions.
-//
-// A guide is matched to its row by exact slug (the file name without its
-// extension, hash suffix included), the same key sync-troubleshooting-entries.ts
-// uses. A guide with no row is skipped here: that script creates it.
-//
+// local guide's checksum differs from the one stored on its row (a null
+// checksum counts as changed). Guides are matched to rows by exact slug; a
+// guide with no row is skipped (sync-troubleshooting-entries.ts creates it).
 // The discussion is updated first and the checksum stored second, so a failed
-// DB write only means the next run pushes the same content again (idempotent),
-// never that a changed guide is recorded as synced without having been pushed.
+// DB write only means the next run pushes the same content again.
 //
 // Run after sync-troubleshooting-entries.ts, from CI only.
 //
-// --dry-run is read-only: it reads the database and the local guides, and
-// prints each discussion it would update (url, id, and old -> new checksum),
-// but updates nothing.
+// --dry-run is read-only: prints each discussion it would update (url, id,
+// old -> new checksum) and updates nothing.
 import '../utils/dotenv.js'
 
+import { createPacer, isRateLimitError, readMinIntervalMs } from './github-throttle.ts'
 import {
   computeChecksum,
   createDb,
@@ -47,7 +38,8 @@ async function updateDiscussion(
       }
     }
   `
-  await octokit.graphql(mutation, { discussionId, title, body })
+  // retries: 0 disables @octokit/plugin-retry; mutations are sent once.
+  await octokit.graphql(mutation, { discussionId, title, body, request: { retries: 0 } })
 }
 
 async function syncDiscussionUpdates() {
@@ -64,15 +56,25 @@ async function syncDiscussionUpdates() {
   let updated = 0
   let noStoredChecksum = 0
   const failures: string[] = []
+  const notAttempted: string[] = []
+
+  const minIntervalMs = readMinIntervalMs()
+  const pace = createPacer(minIntervalMs)
+  let rateLimited = false
 
   console.log(
     `${LOG} ${guides.length} local guide(s), ${entries.length} row(s)${DRY_RUN ? ' (dry run)' : ''}.`
   )
+  if (DRY_RUN) {
+    console.log(
+      `  (pacing: at least ${minIntervalMs}ms between updates; a failed update is not retried)`
+    )
+  }
 
   for (const guide of guides) {
     const row = entryBySlug.get(guide.slug)
     if (!row) {
-      withoutRow++ // not synced yet — sync-troubleshooting-entries.ts handles that
+      withoutRow++
       continue
     }
 
@@ -104,7 +106,14 @@ async function syncDiscussionUpdates() {
       continue
     }
 
+    // After a rate limit the next calls would fail too: stop, next run resumes.
+    if (rateLimited) {
+      notAttempted.push(guide.slug)
+      continue
+    }
+
     try {
+      await pace()
       await updateDiscussion(octokit, row.github_id, guide.title, guide.body)
       const { error } = await db
         .from('troubleshooting_entries')
@@ -116,6 +125,7 @@ async function syncDiscussionUpdates() {
     } catch (err) {
       console.error(`${LOG} Failed to update ${guide.slug}:`, err)
       failures.push(guide.slug)
+      if (isRateLimitError(err)) rateLimited = true
     }
   }
 
@@ -124,6 +134,13 @@ async function syncDiscussionUpdates() {
       `(${updated - noStoredChecksum} changed, ${noStoredChecksum} with no stored checksum); ` +
       `${unchanged} unchanged, ${withoutRow} without a row yet.`
   )
+  if (notAttempted.length > 0) {
+    console.error(
+      `${LOG} Stopped early: GitHub rate-limited the request. ${notAttempted.length} discussion(s) not ` +
+        `attempted, the next run will pick them up (or raise --delay-ms): ${notAttempted.join(', ')}`
+    )
+    process.exitCode = 1
+  }
   if (failures.length > 0) {
     console.error(`${LOG} Failed: ${failures.join(', ')}`)
     process.exitCode = 1

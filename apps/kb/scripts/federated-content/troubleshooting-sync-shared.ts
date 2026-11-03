@@ -1,6 +1,5 @@
-// Shared by sync-troubleshooting-entries.ts and sync-troubleshooting-updates.ts.
-// Kept in one place so both scripts always agree on how a guide is read, what
-// its checksum is, and how a guide maps to a troubleshooting_entries row.
+// Shared by sync-troubleshooting-entries.ts and sync-troubleshooting-updates.ts,
+// so both agree on how guides are read, checksummed, and matched to rows.
 import { createHash } from 'node:crypto'
 import { readdir, readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
@@ -44,20 +43,15 @@ export function createDb(): SupabaseClient {
   )
 }
 
-/**
- * The single definition of a guide's checksum: what a discussion is stored as
- * having been last synced with. Changing this invalidates every stored checksum.
- */
+/** The one definition of a guide's checksum. Changing it invalidates every stored one. */
 export function computeChecksum(title: string, body: string): string {
   return createHash('sha256').update(JSON.stringify({ title, body })).digest('hex')
 }
 
 /**
- * Reads every guide fetch-federated-content.ts wrote. The slug is the file
- * name without its extension, hash suffix included, and is the key that ties a
- * guide to its troubleshooting_entries row. Throws when there are no guides at
- * all (a failed or skipped fetch), rather than letting the sync report
- * "nothing to do".
+ * Reads the guides fetch-federated-content.ts wrote. The slug is the file name
+ * without its extension (hash suffix included), the key to the guide's row.
+ * Throws if there are none, so a failed fetch isn't reported as "nothing to do".
  */
 export async function readLocalGuides(): Promise<LocalGuide[]> {
   const filenames = (await readdir(TROUBLESHOOTING_DIRECTORY)).filter((f) => f.endsWith('.mdx'))
@@ -84,12 +78,7 @@ export async function readLocalGuides(): Promise<LocalGuide[]> {
   return guides.sort((a, b) => a.slug.localeCompare(b.slug))
 }
 
-/**
- * Every troubleshooting_entries row, including ones with no slug. Fetched in
- * full (paged, since PostgREST caps a response at 1000 rows) instead of with an
- * `.in('slug', …)` filter, which puts hundreds of slugs in the request URL and
- * would hide slug-less rows.
- */
+/** Every row, slug-less ones included, paged (PostgREST caps responses at 1000). */
 export async function fetchAllEntries(db: SupabaseClient): Promise<EntryRow[]> {
   const pageSize = 1000
   const rows: EntryRow[] = []
@@ -148,14 +137,11 @@ export type TitleConflict =
 const normalizeTitle = (title: string) => title.trim().toLowerCase()
 
 /**
- * Looks for discussions that already carry a new guide's title, i.e. the ways
- * creating one would duplicate a discussion that already exists:
- *   - orphan:       no row references it (e.g. a rollback that never completed),
- *   - slugless-row: a row references it but has no slug, so the guide never
- *                   matched it (the slug needs backfilling, not a new discussion),
- *   - other-slug:   a row with a DIFFERENT slug references it. Suspicious but
- *                   can be legitimate, so it only warns.
- * Only the first two should block creation (see `isBlocking`).
+ * Discussions that already carry a new guide's title:
+ *   - orphan:       no row references it,
+ *   - slugless-row: a slug-less row references it (its slug needs backfilling),
+ *   - other-slug:   a row with a different slug references it (warn only).
+ * The first two block creation (see `isBlocking`).
  */
 export function findTitleConflicts(
   guideTitle: string,

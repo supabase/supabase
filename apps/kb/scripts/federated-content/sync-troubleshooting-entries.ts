@@ -1,31 +1,23 @@
-// Creates a GitHub Discussion for every troubleshooting guide that doesn't
-// have a troubleshooting_entries row yet, and inserts the row (slug,
-// github_id, github_url, checksum). Run after fetch-federated-content.ts, from
-// CI only (never kb's own prebuild — this has real side effects).
+// Creates a GitHub Discussion for every guide with no troubleshooting_entries
+// row yet, and inserts the row (slug, github_id, github_url, checksum). Guides
+// are matched to rows by exact slug. Run after fetch-federated-content.ts,
+// from CI only.
 //
-// A guide is matched to its row by exact slug (the file name without its
-// extension, hash suffix included). Matching rows are never touched here; the
-// checksum comparison for those lives in sync-troubleshooting-updates.ts.
+// Duplicate guards:
+//   - A new guide whose title already belongs to an unreferenced discussion,
+//     or to a slug-less row, is reported instead of created.
+//   - The row is inserted, not upserted: if it already exists (e.g. an
+//     overlapping run), the new discussion is deleted again.
+//   - Creations are paced (2s apart, `--delay-ms=<n>`) and never retried, since
+//     a retry after a timeout could create a second discussion. On a GitHub
+//     rate limit the run stops and the next run resumes.
 //
-// Guarding against duplicate discussions:
-//   - Before creating anything, the Troubleshooting category's existing
-//     discussions are listed. A new guide whose title already belongs to a
-//     discussion nothing references (an orphan), or to a slug-less row, is
-//     NOT created and is reported instead: that discussion already exists,
-//     the row just needs its slug fixed.
-//   - The row is INSERTed, never upserted. If a row for the slug appeared in
-//     the meantime (e.g. an overlapping run), the insert fails on the unique
-//     constraint and the discussion just created is deleted again, instead of
-//     silently overwriting the other run's row and orphaning its discussion.
-//   - Discussions are created one at a time (GitHub asks for serial mutations).
-//
-// --dry-run is read-only: it reads the database, the local guides and the
-// category's discussions, runs every check, and prints exactly what it would
-// create and insert, but creates and writes nothing.
+// --dry-run is read-only: prints what it would create and insert, writes nothing.
 import '../utils/dotenv.js'
 
 import type { SupabaseClient } from '@supabase/supabase-js'
 
+import { createPacer, isRateLimitError, readMinIntervalMs } from './github-throttle.ts'
 import {
   computeChecksum,
   createDb,
@@ -58,9 +50,16 @@ async function createDiscussion(
       }
     }
   `
+  // retries: 0 disables @octokit/plugin-retry, which would re-send on a 5xx.
   const result = await octokit.graphql<{
     createDiscussion: { discussion: { id: string; url: string } }
-  }>(mutation, { repository: REPOSITORY_ID, category: TROUBLESHOOTING_CATEGORY_ID, title, body })
+  }>(mutation, {
+    repository: REPOSITORY_ID,
+    category: TROUBLESHOOTING_CATEGORY_ID,
+    title,
+    body,
+    request: { retries: 0 },
+  })
   return result.createDiscussion.discussion
 }
 
@@ -70,15 +69,18 @@ async function deleteDiscussion(octokit: RetryOctokitInstance, id: string): Prom
       deleteDiscussion(input: { discussionId: $discussionId }) { discussion { id } }
     }
   `
-  await octokit.graphql(mutation, { discussionId: id })
+  await octokit.graphql(mutation, { discussionId: id, request: { retries: 0 } })
 }
 
 async function createGuide(
   db: SupabaseClient,
   octokit: RetryOctokitInstance,
   guide: LocalGuide,
-  existingRow: EntryRow | undefined
+  existingRow: EntryRow | undefined,
+  pace: () => Promise<void>
 ): Promise<void> {
+  // Sent once: if a timeout hid a success, the next run's title check flags it.
+  await pace()
   const discussion = await createDiscussion(octokit, guide.title, guide.body)
   const row = {
     slug: guide.slug,
@@ -87,7 +89,7 @@ async function createGuide(
     checksum: computeChecksum(guide.title, guide.body),
   }
 
-  // A row can only already exist here with an empty github_id; fill it in place.
+  // An existing row here has an empty github_id; fill it in place.
   const { error } = existingRow
     ? await db.from('troubleshooting_entries').update(row).eq('id', existingRow.id)
     : await db.from('troubleshooting_entries').insert(row)
@@ -95,6 +97,7 @@ async function createGuide(
   if (error) {
     console.error(`${LOG} DB write failed for ${guide.slug}, rolling back discussion`)
     try {
+      await pace()
       await deleteDiscussion(octokit, discussion.id)
     } catch (rollbackError) {
       console.error(
@@ -132,8 +135,7 @@ async function syncNewDiscussions() {
   const sluglessRows = entries.filter((entry) => !entry.slug)
   const rowsWithoutGuide = entries.filter((entry) => entry.slug && !localSlugs.has(entry.slug))
 
-  // "Already synced" is a row for this slug that has a discussion. Everything
-  // else is new.
+  // New = no row for this slug with a discussion.
   const newGuides = guides.filter((guide) => !entryBySlug.get(guide.slug)?.github_id)
 
   console.log(
@@ -160,16 +162,31 @@ async function syncNewDiscussions() {
     return
   }
 
-  // Read-only in both modes. If this fails, nothing is created: without it
-  // there's no way to rule out duplicating an existing discussion.
+  // Read-only. If it fails nothing is created: duplicates can't be ruled out.
   const discussions = await listCategoryDiscussions(octokit)
 
   const blocked: Array<{ slug: string; reasons: string[] }> = []
   const failures: string[] = []
+  const notAttempted: string[] = []
   let created = 0
 
+  const minIntervalMs = readMinIntervalMs()
+  const pace = createPacer(minIntervalMs)
+  let rateLimited = false
+
   console.log(`\n${LOG} New guide(s):`)
+  if (DRY_RUN) {
+    console.log(
+      `  (pacing: at least ${minIntervalMs}ms between creations; a failed creation is not retried)`
+    )
+  }
   for (const guide of newGuides) {
+    // After a rate limit the next calls would fail too: stop, next run resumes.
+    if (rateLimited) {
+      notAttempted.push(guide.slug)
+      continue
+    }
+
     const conflicts = findTitleConflicts(guide.title, discussions, entries)
     const blockers = conflicts.filter(isBlocking)
 
@@ -191,11 +208,12 @@ async function syncNewDiscussions() {
 
     for (const c of conflicts) console.warn(`  ? ${guide.slug}: ${describeConflict(c)}`)
     try {
-      await createGuide(db, octokit, guide, existingRow)
+      await createGuide(db, octokit, guide, existingRow, pace)
       created++
     } catch (error) {
       console.error(`${LOG} Failed for ${guide.slug}:`, error)
       failures.push(guide.slug)
+      if (isRateLimitError(error)) rateLimited = true
     }
   }
 
@@ -203,6 +221,14 @@ async function syncNewDiscussions() {
     `\n${LOG} ${DRY_RUN ? 'Would create' : 'Created'} ${created}/${newGuides.length} new guide(s) ` +
       `(a discussion and a row each); ${blocked.length} blocked as duplicates, ${failures.length} failed.`
   )
+
+  if (notAttempted.length > 0) {
+    console.error(
+      `${LOG} Stopped early: GitHub rate-limited the request. ${notAttempted.length} guide(s) were not attempted ` +
+        `and will be picked up by the next run (or raise --delay-ms): ${notAttempted.join(', ')}`
+    )
+    process.exitCode = 1
+  }
 
   if (blocked.length > 0 || failures.length > 0) {
     if (blocked.length > 0) {
