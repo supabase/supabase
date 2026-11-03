@@ -5,6 +5,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
+import { ComputeActiveHoursMetric } from '../BillingSettings/BillingBreakdown/ComputeActiveHoursMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
 import { SectionContent } from './SectionContent'
 import { AlertError } from '@/components/ui/AlertError'
@@ -260,7 +261,23 @@ export const TotalUsage = ({
                 )
               })}
 
-              {!isMobile && (sortedBillingMetrics.length + computeMetrics.length) % 2 === 1 && (
+              <div
+                className={cn(
+                  'col-span-2 md:col-span-1 bg-sidebar space-y-4 py-4',
+                  (sortedBillingMetrics.length + computeMetrics.length) % 2 === 0
+                    ? 'md:pr-4'
+                    : 'md:pl-4'
+                )}
+              >
+                <ComputeActiveHoursMetric
+                  slug={orgSlug}
+                  projectRef={projectRef}
+                  subscription={subscription}
+                  relativeToSubscription={showRelationToSubscription}
+                />
+              </div>
+
+              {!isMobile && (sortedBillingMetrics.length + computeMetrics.length + 1) % 2 === 1 && (
                 <div className="col-span-2 md:col-span-1 bg-sidebar" />
               )}
             </div>

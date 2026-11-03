@@ -1,16 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { BarChart2Icon } from 'lucide-react'
-import {
-  Area,
-  AreaChart,
-  Bar,
-  BarChart,
-  CartesianGrid,
-  ReferenceLine,
-  XAxis,
-  YAxis,
-} from 'recharts'
+import { Area, AreaChart, CartesianGrid, ReferenceLine, XAxis, YAxis } from 'recharts'
 import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
 import {
   Chart,
@@ -40,7 +31,11 @@ import {
   getUsageConcentration,
   sumBy,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
-import type { ComputeUsageByProject } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import type {
+  ComputeUsageByProject,
+  ComputeUsageBySize,
+} from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { SparkBar } from '@/components/ui/SparkBar'
 import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 
@@ -48,10 +43,6 @@ const USAGE_WINDOW_DAYS = 30
 
 const burndownConfig = {
   usedHours: { label: 'Active hours used' },
-} satisfies ChartConfig
-
-const bySizeConfig = {
-  activeHours: { label: 'Active hours' },
 } satisfies ChartConfig
 
 export interface ComputeServicesProps {
@@ -217,7 +208,7 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
             </ChartCard>
           </Chart>
 
-          {/* Instance-hours by size */}
+          {/* Instance hours by size — the same h-1 meter the rest of the usage page uses */}
           <Chart isLoading={isPending} isErrored={isError}>
             <ChartCard>
               <ChartHeader align="start">
@@ -244,34 +235,11 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                   <ChartEmptyState
                     icon={<BarChart2Icon size={16} />}
                     title="No instance hours yet"
-                    description="Deploy an instance to see usage by size"
+                    description="Deploy a compute to see usage by size"
                   />
                 }
               >
-                <ChartContainer config={bySizeConfig} className="h-44 w-full">
-                  <BarChart
-                    data={bySize.map((entry) => ({ ...entry, label: formatSize(entry.size) }))}
-                    layout="vertical"
-                    margin={{ top: 4, right: 8, left: 0, bottom: 0 }}
-                  >
-                    <CartesianGrid
-                      horizontal={false}
-                      strokeDasharray="3 3"
-                      className="stroke-border-stronger"
-                    />
-                    <XAxis type="number" tickLine={false} axisLine={false} className="text-xs" />
-                    <YAxis
-                      type="category"
-                      dataKey="label"
-                      tickLine={false}
-                      axisLine={false}
-                      width={110}
-                      className="text-xs"
-                    />
-                    <ChartTooltip content={<ChartTooltipContent />} />
-                    <Bar dataKey="activeHours" className="fill-foreground" radius={[0, 4, 4, 0]} />
-                  </BarChart>
-                </ChartContainer>
+                <ComputeSizeMeters rows={bySize} />
               </ChartContent>
             </ChartCard>
           </Chart>
@@ -317,6 +285,28 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
           </Chart>
         </div>
       </SectionContent>
+    </div>
+  )
+}
+
+/** Each size as a share of the period's active hours, using the page's standard h-1 meter. */
+const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
+  const totalActiveHours = sumBy(rows, (row) => row.activeHours)
+
+  return (
+    <div className="flex flex-col gap-4">
+      {rows.map((row) => (
+        <SparkBar
+          key={row.size}
+          type="horizontal"
+          barClass="bg-foreground-light"
+          bgClass="bg-surface-300"
+          value={row.activeHours}
+          max={totalActiveHours || 1}
+          labelBottom={formatSize(row.size)}
+          labelTop={formatComputeHours(row.activeHours)}
+        />
+      ))}
     </div>
   )
 }

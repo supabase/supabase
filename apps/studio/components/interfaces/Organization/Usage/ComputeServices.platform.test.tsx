@@ -17,6 +17,15 @@ describe('ComputeServices', () => {
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
   })
 
+  it('renders instance hours by size as labelled meters', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
+
+    await screen.findByText('Instance hours by size')
+    // Both stand-in sizes, rendered through the page's standard meter.
+    expect(await screen.findByText('4 GB · 2 vCPU')).toBeInTheDocument()
+    expect(await screen.findByText('2 GB · 1 vCPU')).toBeInTheDocument()
+  })
+
   it('measures usage against the plan allowance and labels the limit', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
 
