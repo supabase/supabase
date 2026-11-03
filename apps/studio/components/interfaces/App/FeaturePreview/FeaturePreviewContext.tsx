@@ -161,9 +161,6 @@ export const useIsSqlEditorManualSaveEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
-// TODO: temporary stub, removed along with its call sites in the follow-up steps
-export const useIsMarketplaceEnabled = () => true
-
 export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isExplorerEnabled = useFlag('explorer')

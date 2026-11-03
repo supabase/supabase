@@ -13,7 +13,6 @@ import { useContext, useMemo } from 'react'
 import { cn } from 'ui'
 
 import { INTEGRATIONS, Loading, type IntegrationDefinition } from './Integrations.constants'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   useMarketplaceIntegrationsQuery,
   type MarketplaceIntegration,
@@ -56,16 +55,12 @@ const isPreviewEnabled = (featureFlags: FeatureFlagContextType, listingSlug: str
 
 const useMarketplaceListings = () => {
   const { hasLoaded } = useContext(FeatureFlagContext)
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery({
-    enabled: isMarketplaceEnabled,
-  })
+  const { data: marketplaceData, error } = useMarketplaceIntegrationsQuery()
   const isPending =
-    IS_PLATFORM && (!hasLoaded || (isMarketplaceEnabled && !marketplaceData && !error))
+    IS_PLATFORM && (!hasLoaded || (!marketplaceData && !error))
   const isSuccess =
-    !IS_PLATFORM || (hasLoaded && (!isMarketplaceEnabled || (!!marketplaceData && !error)))
-  const isError = IS_PLATFORM && isMarketplaceEnabled && !!error
+    !IS_PLATFORM || (hasLoaded && !!marketplaceData && !error)
+  const isError = IS_PLATFORM && !!error
 
   // This flag can globally enable preview listings for all partners for a given user (i.e. for Supabase users)
   const previewAllListingsEnabled = useFlag<boolean>('previewMarketplaceListingsEnabled')
@@ -178,16 +173,6 @@ export const useAvailableIntegrations = () => {
             ],
             navigate: ({ pageId = 'overview' }) => {
               switch (pageId) {
-                case 'overview':
-                  return dynamic(
-                    () =>
-                      import('@/components/interfaces/Integrations/Integration/MarketplaceIntegrationOverviewTab').then(
-                        (mod) => mod.MarketplaceIntegrationOverviewTab
-                      ),
-                    {
-                      loading: Loading,
-                    }
-                  )
                 case 'settings':
                   return dynamic(
                     () =>
