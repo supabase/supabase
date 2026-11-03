@@ -7,8 +7,9 @@ import type { Lint } from './lint-query'
 import { handleError, post, unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 type AdvisorLintName =
   components['schemas']['V2RunProjectAdvisorsBody']['data']['attributes']['lints'][number]['name']
@@ -67,7 +68,7 @@ export async function getProjectHealthLints(
 }
 
 export type ProjectHealthLintsData = Awaited<ReturnType<typeof getProjectHealthLints>>
-export type ProjectHealthLintsError = ResponseError
+export type ProjectHealthLintsError = StudioError
 
 export const useProjectHealthLintsQuery = <TData = ProjectHealthLintsData>(
   { projectRef }: ProjectHealthLintsVariables,

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { customDomainKeys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
 import { subscriptionKeys } from '@/data/subscriptions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CustomDomainDeleteVariables = {
   projectRef: string
@@ -34,12 +35,12 @@ export const useCustomDomainDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>,
+  UseCustomMutationOptions<CustomDomainDeleteData, StudioError, CustomDomainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CustomDomainDeleteData, ResponseError, CustomDomainDeleteVariables>({
+  return useMutation<CustomDomainDeleteData, StudioError, CustomDomainDeleteVariables>({
     mutationFn: (vars) => deleteCustomDomain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, removeAddon } = variables

@@ -3,7 +3,7 @@ import { match } from 'path-to-regexp'
 import { useState } from 'react'
 
 import { IS_PLATFORM } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
 
 // When running locally we don't need the internet
 // so we can pretend we're online all the time
@@ -23,7 +23,7 @@ export const MAX_RETRY_FAILURE_COUNT = 3
 function isQueryEndpointStatementTimeout(error: unknown) {
   const PG_META_QUERY_PATHNAME_MATCHER = match('/platform/pg-meta/:ref/query')
   return (
-    error instanceof ResponseError &&
+    error instanceof StudioError &&
     !!error.requestPathname &&
     !!PG_META_QUERY_PATHNAME_MATCHER(error.requestPathname) &&
     !!error.message?.includes('canceling statement due to statement timeout')
@@ -42,7 +42,7 @@ export function getQueryClient() {
           retry(failureCount, error) {
             // Don't retry on 4xx errors
             if (
-              error instanceof ResponseError &&
+              error instanceof StudioError &&
               error.code !== undefined &&
               error.code >= 400 &&
               error.code < 500 &&
@@ -59,7 +59,7 @@ export function getQueryClient() {
             // the rate limiting problem. By retrying 429s with proper backoff (using the
             // retryAfter header below), we respect rate limits and prevent request storms.
             if (
-              error instanceof ResponseError &&
+              error instanceof StudioError &&
               error.requestPathname &&
               SKIP_RETRY_PATHNAME_MATCHERS.some((matchFn) => matchFn(error.requestPathname!)) &&
               error.code !== 429
@@ -74,7 +74,7 @@ export function getQueryClient() {
             return false
           },
           retryDelay(failureCount, error) {
-            if (error instanceof ResponseError && error.retryAfter) {
+            if (error instanceof StudioError && error.retryAfter) {
               return error.retryAfter * 1000
             }
 

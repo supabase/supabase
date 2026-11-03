@@ -7,7 +7,8 @@ import {
   sendTestWebhookEvent,
   type WebhookScopeParams,
 } from './platform-webhooks-fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointTestVariables = {
   scope: WebhookScopeParams
@@ -26,12 +27,12 @@ export const useWebhookEndpointTestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WebhookEndpointTestData, ResponseError, WebhookEndpointTestVariables>,
+  UseCustomMutationOptions<WebhookEndpointTestData, StudioError, WebhookEndpointTestVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointTestData, ResponseError, WebhookEndpointTestVariables>({
+  return useMutation<WebhookEndpointTestData, StudioError, WebhookEndpointTestVariables>({
     mutationFn: testEndpoint,
     async onSuccess(data, variables, context) {
       // The test delivery lands asynchronously — invalidate so it shows up once it does.

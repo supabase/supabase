@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { branchKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type BranchDiffVariables = {
   branchRef: string
@@ -52,9 +53,9 @@ export const useBranchDiffQuery = (
   {
     enabled = true,
     ...options
-  }: Omit<UseCustomQueryOptions<BranchDiffData, ResponseError>, 'queryKey' | 'queryFn'> = {}
+  }: Omit<UseCustomQueryOptions<BranchDiffData, StudioError>, 'queryKey' | 'queryFn'> = {}
 ) =>
-  useQuery<BranchDiffData, ResponseError>({
+  useQuery<BranchDiffData, StudioError>({
     queryKey: branchKeys.diff(projectRef, branchRef, pgdelta),
     queryFn: () => getBranchDiff({ branchRef, includedSchemas, pgdelta }),
     enabled: IS_PLATFORM && enabled && Boolean(branchRef),

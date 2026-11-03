@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { configKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ComplianceConfigUpdateVariables = {
   projectRef: string
@@ -34,14 +35,14 @@ export const useComplianceConfigUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ComplianceConfigUpdateData,
-    ResponseError,
+    StudioError,
     ComplianceConfigUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ComplianceConfigUpdateData, ResponseError, ComplianceConfigUpdateVariables>({
+  return useMutation<ComplianceConfigUpdateData, StudioError, ComplianceConfigUpdateVariables>({
     mutationFn: (vars) => updateComplianceConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

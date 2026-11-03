@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { branchKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type BranchVariables = {
   branchRef?: string
@@ -24,7 +25,7 @@ export async function getBranch({ branchRef }: BranchVariables, signal?: AbortSi
 }
 
 export type BranchData = Awaited<ReturnType<typeof getBranch>>
-export type BranchError = ResponseError
+export type BranchError = StudioError
 
 export const useBranchQuery = <TData = BranchData>(
   { projectRef, branchRef }: BranchVariables,

@@ -5,8 +5,9 @@ import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { getQueryClient } from '@/data/query-client'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
   projectRef?: string
@@ -36,7 +37,7 @@ export async function getTable(
 }
 
 export type RetrieveTableResult = Awaited<ReturnType<typeof getTable>>
-export type RetrieveTableError = ResponseError
+export type RetrieveTableError = StudioError
 export type RetrievedTableColumn = NonNullable<RetrieveTableResult['columns']>[number]
 
 export const useTableQuery = <TData = RetrieveTableResult>(

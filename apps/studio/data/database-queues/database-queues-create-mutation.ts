@@ -10,7 +10,8 @@ import {
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueCreateVariables = {
   projectRef: string
@@ -82,12 +83,12 @@ export const useDatabaseQueueCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>,
+  UseCustomMutationOptions<DatabaseQueueCreateData, StudioError, DatabaseQueueCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueueCreateData, ResponseError, DatabaseQueueCreateVariables>({
+  return useMutation<DatabaseQueueCreateData, StudioError, DatabaseQueueCreateVariables>({
     mutationFn: (vars) => createDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, name } = variables

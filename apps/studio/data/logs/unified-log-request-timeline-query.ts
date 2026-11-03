@@ -16,7 +16,7 @@ import {
   type RequestCorrelationIds,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const TIMELINE_WINDOW_MS = 7 * 60 * 1000
 
@@ -26,7 +26,7 @@ const timelineRowSchema = unifiedLogsQueryRowSchema.extend({ source: z.string() 
 
 export type UnifiedLogRequestTimelineVariables = UnifiedLogAttributesVariables
 
-export type UnifiedLogRequestTimelineError = ResponseError
+export type UnifiedLogRequestTimelineError = StudioError
 
 const hasNewIds = (next: RequestCorrelationIds, prev: RequestCorrelationIds) =>
   next.requestIds.some((id) => !prev.requestIds.includes(id)) ||

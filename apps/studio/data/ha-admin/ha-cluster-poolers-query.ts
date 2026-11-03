@@ -4,10 +4,10 @@ import { z } from 'zod'
 import { getHaAdmin, parseHaAdminResponse } from './get-ha-admin'
 import { haAdminKeys } from './keys'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type HaClusterPoolersVariables = { projectRef?: string }
-export type HaClusterPoolersError = ResponseError
+export type HaClusterPoolersError = StudioError
 
 // Hand-modelled subset of multiadmin's OpenAPI spec. Every field is optional
 // because proto3 JSON omits zero values, and enum-shaped fields stay plain

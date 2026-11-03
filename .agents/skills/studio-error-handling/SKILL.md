@@ -12,7 +12,7 @@ Full docs and code examples: `apps/studio/components/interfaces/ErrorHandling/RE
 
 ## How it works
 
-Classification happens in the **data layer**: `handleError` in `data/fetchers.ts` tests the error message against `ERROR_PATTERNS` and throws the matching error subclass (e.g. `ConnectionTimeoutError extends ResponseError`). The component (`ErrorMatcher`) reads `errorType` from the instance and does an O(1) lookup — it never does regex matching.
+Classification happens in the **data layer**: `handleError` in `data/fetchers.ts` tests the error message against `ERROR_PATTERNS` and throws the matching error subclass (e.g. `ConnectionTimeoutError extends StudioError`). The component (`ErrorMatcher`) reads `errorType` from the instance and does an O(1) lookup — it never does regex matching.
 
 ```
 handleError() → throws ConnectionTimeoutError → React Query catches → ErrorMatcher reads errorType → renders troubleshooting
@@ -23,7 +23,7 @@ handleError() → throws ConnectionTimeoutError → React Query catches → Erro
 | File                                  | Purpose                                                          |
 | ------------------------------------- | ---------------------------------------------------------------- |
 | `data/error-patterns.ts`              | Array of `{ pattern, ErrorClass }` — the regex lives here        |
-| `types/api-errors.ts`                 | Error classes, `KnownErrorType` union, `ClassifiedError` type    |
+| `@/lib/errors/studio-errors.ts`       | Error classes, `KnownErrorType` union, `ClassifiedError` type    |
 | `ErrorMatcher.tsx`                    | Component — reads `errorType`, looks up mapping, renders         |
 | `error-mappings.tsx`                  | `Record<KnownErrorType, { id, Troubleshooting: ComponentType }>` |
 | `errorMappings/ConnectionTimeout.tsx` | Reference troubleshooting component                              |

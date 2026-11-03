@@ -5,7 +5,8 @@ import { subscriptionKeys } from './keys'
 import type { AddonVariantId, ProjectAddonType } from './types'
 import { configKeys } from '@/data/config/keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectAddonUpdateVariables = {
   projectRef?: string
@@ -46,12 +47,12 @@ export const useProjectAddonUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>,
+  UseCustomMutationOptions<ProjectAddonUpdateData, StudioError, ProjectAddonUpdateVariables>,
   'mutationFn'
 > & { suppressToast?: boolean } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectAddonUpdateData, ResponseError, ProjectAddonUpdateVariables>({
+  return useMutation<ProjectAddonUpdateData, StudioError, ProjectAddonUpdateVariables>({
     mutationFn: (vars) => updateSubscriptionAddon(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

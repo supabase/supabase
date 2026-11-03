@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, patch, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchUpdateVariables = {
   branchRef: string
@@ -45,11 +46,11 @@ export const useBranchUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchUpdateData, ResponseError, BranchUpdateVariables>,
+  UseCustomMutationOptions<BranchUpdateData, StudioError, BranchUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchUpdateData, ResponseError, BranchUpdateVariables>({
+  return useMutation<BranchUpdateData, StudioError, BranchUpdateVariables>({
     mutationFn: (vars) => updateBranch(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

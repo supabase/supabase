@@ -6,7 +6,8 @@ import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageDeleteVariables = {
   projectRef: string
@@ -47,7 +48,7 @@ export const useDatabaseQueueMessageDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueMessageDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageDeleteVariables
   >,
   'mutationFn'
@@ -56,7 +57,7 @@ export const useDatabaseQueueMessageDeleteMutation = ({
 
   return useMutation<
     DatabaseQueueMessageDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageDeleteVariables
   >({
     mutationFn: (vars) => deleteDatabaseQueueMessage(vars),
