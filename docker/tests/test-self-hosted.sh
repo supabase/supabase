@@ -464,6 +464,9 @@ fn_missing_status=$(http_status "$BASE_URL/functions/v1/smoke-test-missing-$$" \
 check "Unknown function returns 404" "404" "$fn_missing_status"
 fn_error_code=$(awk 'tolower($1) == "sb-error-code:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }' "$fn_headers")
 check "Unknown function returns sb-error-code header" "NOT_FOUND" "$fn_error_code"
+# Router errors carry their own CORS headers, so browsers can read them.
+fn_error_cors=$(awk 'tolower($1) == "access-control-allow-origin:" { sub(/^[^:]*:[[:space:]]*/, ""); sub(/[[:space:]]*$/, ""); print }' "$fn_headers")
+check "Unknown function returns Access-Control-Allow-Origin" "*" "$fn_error_cors"
 
 # A non-sb_ value (typo / legacy / third-party JWT) is not rejected at the
 # gateway - it passes to the function, where the Supabase Server SDK rejects it.
