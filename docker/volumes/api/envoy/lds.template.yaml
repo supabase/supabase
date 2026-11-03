@@ -1151,9 +1151,15 @@ resources:
                         return string.match(auth, "^[Bb]earer%s+(.+)$")
                       end
 
+                      -- Gateway CORS is off on this route, so this error carries
+                      -- its own CORS header and stays readable by browsers.
                       local function unauthorized(request_handle, message)
                         request_handle:respond(
-                          { [":status"] = "401", ["content-type"] = "text/plain" },
+                          {
+                            [":status"] = "401",
+                            ["content-type"] = "text/plain",
+                            ["access-control-allow-origin"] = "*",
+                          },
                           message
                         )
                       end

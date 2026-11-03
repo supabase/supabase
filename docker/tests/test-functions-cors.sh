@@ -75,11 +75,12 @@ preflight() {
         -H 'Access-Control-Request-Headers: authorization, content-type'
 }
 
+# post <origin> [apikey]: defaults to the publishable key
 post() {
     : > "$headers"
     curl -s --max-time 30 -o /dev/null -D "$headers" -w '%{http_code}' -X POST "$fn_url" \
         -H "Origin: $1" \
-        -H "apikey: $SUPABASE_PUBLISHABLE_KEY" \
+        -H "apikey: ${2:-$SUPABASE_PUBLISHABLE_KEY}" \
         -d 'x'
 }
 
@@ -93,14 +94,28 @@ check "POST from other origin has no Allow-Origin" "" "$(allow_origin)"
 check "POST from allowed origin succeeds" "200" "$(post "$ALLOWED_ORIGIN")"
 check "POST from allowed origin keeps the function's Allow-Origin" "$ALLOWED_ORIGIN" "$(allow_origin)"
 
+# Envoy rejects an unknown sb_ key itself (Kong passes it to the function).
+# That error must stay readable by browsers.
+if docker ps --format '{{.Names}}' 2>/dev/null | grep -q '^supabase-envoy$'; then
+    check "Unknown sb_ key gets Envoy's 401" "401" \
+        "$(post "$OTHER_ORIGIN" sb_publishable_0000000000000000000000_00000000)"
+    check "Envoy's 401 allows any origin" "*" "$(allow_origin)"
+else
+    echo "  SKIP: Envoy 401 checks (Envoy not running)"
+fi
+
 # Other routes keep the gateway's CORS policy.
 : > "$headers"
-curl -s --max-time 30 -o /dev/null -D "$headers" -X OPTIONS "$BASE_URL/rest/v1/" \
+rest_status=$(curl -s --max-time 30 -o /dev/null -D "$headers" -w '%{http_code}' \
+    -X OPTIONS "$BASE_URL/rest/v1/" \
     -H "Origin: $OTHER_ORIGIN" \
-    -H 'Access-Control-Request-Method: GET' || true
-rest_cors=no
-[ -n "$(allow_origin)" ] && rest_cors=yes
-check "REST preflight still gets gateway CORS" "yes" "$rest_cors"
+    -H 'Access-Control-Request-Method: GET') || true
+check "REST preflight succeeds" "200" "$rest_status"
+case "$(allow_origin)" in
+    '*' | "$OTHER_ORIGIN") rest_cors=yes ;;
+    *) rest_cors=no ;;
+esac
+check "REST preflight allows the origin (gateway CORS)" "yes" "$rest_cors"
 
 echo ""
 echo "=== Results: $pass passed, $fail failed ==="
