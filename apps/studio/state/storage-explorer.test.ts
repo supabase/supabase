@@ -200,6 +200,37 @@ describe('fetchMoreFolderContents', () => {
     expect(requestedOffsets).toEqual([0, PAGE_SIZE])
   })
 
+  it('stays in step with the server after a folder is created in a partly loaded column', async () => {
+    const files = Array.from({ length: 300 }, (_, i) =>
+      makeObject(`file-${String(i).padStart(3, '0')}.txt`)
+    )
+    const listing = [makeObject(EMPTY_PLACEHOLDER), ...files]
+    const requestedOffsets = mockPaginatedListing(listing)
+
+    const state = createState(makeBucket('bucket-a'))
+    state.columns = [
+      { id: null, name: 'bucket-a', path: '', status: STORAGE_ROW_STATUS.READY, items: [] },
+    ]
+    await state.fetchFolderContents({
+      bucketId: 'bucket-a',
+      folderId: null,
+      folderName: 'docs',
+      index: 0,
+    })
+
+    // The user creates a folder that sorts into the loaded part of the listing: the row
+    // appears locally and the server listing gains an entry ahead of the page boundary.
+    state.addNewFolderPlaceholder(1)
+    state.updateFolderAfterEdit({ folderName: 'aaa', columnIndex: 1 })
+    listing.splice(1, 0, { ...makeObject('aaa'), id: null, metadata: null })
+
+    await state.fetchMoreFolderContents({ index: 1, column: state.columns[1]! })
+
+    const names = state.columns[1]?.items.map((item) => item.name)
+    expect(names).toEqual(['aaa', ...files.map((file) => file.name)])
+    expect(requestedOffsets).toEqual([0, PAGE_SIZE + 1])
+  })
+
   it('pages by the visible item count when the folder has no placeholder', async () => {
     const files = Array.from({ length: 450 }, (_, i) =>
       makeObject(`file-${String(i).padStart(3, '0')}.txt`)
