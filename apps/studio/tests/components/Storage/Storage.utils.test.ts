@@ -42,7 +42,39 @@ describe('extractBucketNamesFromDefinition', () => {
   })
 })
 
+describe('extractBucketNamesFromDefinition with unrestricted branches', () => {
+  it.each([
+    "((bucket_id = 'a'::text) OR (auth.uid() IS NOT NULL))",
+    "(bucket_id = 'a'::text OR auth.uid() IS NOT NULL)",
+    "((bucket_id = 'a'::text) OR true)",
+  ])('returns no buckets when an OR branch is not bucket-limited: %s', (definition) => {
+    expect(extractBucketNamesFromDefinition(definition)).toEqual([])
+  })
+
+  it('still extracts buckets when an unrestricted condition is ANDed in', () => {
+    expect(
+      extractBucketNamesFromDefinition(
+        "((bucket_id = 'a'::text) AND ((auth.uid() IS NOT NULL) OR (owner = 'x'::text)))"
+      )
+    ).toEqual(['a'])
+  })
+
+  it('does not split on OR/AND inside string literals', () => {
+    expect(extractBucketNamesFromDefinition("(bucket_id = 'this OR that'::text)")).toEqual([
+      'this OR that',
+    ])
+  })
+})
+
 describe('getPolicyBucketNames', () => {
+  it('returns no buckets when only one of definition and check is negated', () => {
+    const policy = makePolicy('p', {
+      definition: "(bucket_id <> 'a'::text)",
+      check: "(bucket_id = 'a'::text)",
+    })
+    expect(getPolicyBucketNames(policy)).toEqual([])
+  })
+
   it('reads buckets from check when definition has none', () => {
     const policy = makePolicy('p', {
       definition: "(auth.role() = 'authenticated'::text)",
