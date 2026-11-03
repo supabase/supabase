@@ -1,11 +1,10 @@
 import { screen, waitFor } from '@testing-library/react'
-import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { FilePreview } from '@/components/interfaces/Storage/StorageExplorer/FilePreview'
 import { storageKeys } from '@/data/storage/keys'
 import { customRender as render } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { mockStorageSigning } from '@/tests/lib/storage-client-mocks'
 
 const SIGNED_URL = '/storage/v1/object/sign/my-bucket/photo.png?token=abc'
 
@@ -16,20 +15,7 @@ vi.mock('@/state/storage-explorer', () => ({
   }),
 }))
 
-const mockSignEndpoint = () => {
-  const bodies: Array<Record<string, unknown>> = []
-
-  addAPIMock({
-    method: 'post',
-    path: '/platform/storage/:ref/buckets/:id/objects/sign',
-    response: async ({ request }) => {
-      bodies.push((await request.json()) as Record<string, unknown>)
-      return HttpResponse.json<{ signedUrl: string }>({ signedUrl: SIGNED_URL })
-    },
-  })
-
-  return bodies
-}
+const mockSignEndpoint = () => mockStorageSigning()
 
 describe('FilePreview', () => {
   it('asks for the specific version it was given', async () => {
@@ -41,8 +27,7 @@ describe('FilePreview', () => {
 
     await waitFor(() => expect(bodies).toHaveLength(1))
     expect(bodies[0]).toMatchObject({
-      path: 'folder/photo.png',
-      options: { versionId: 'v-older' },
+      versionId: 'v-older',
     })
   })
 
@@ -52,7 +37,7 @@ describe('FilePreview', () => {
     render(<FilePreview path="folder/photo.png" mimeType="image/png" size={100} />)
 
     await waitFor(() => expect(bodies).toHaveLength(1))
-    expect(bodies[0].options).toBeUndefined()
+    expect(bodies[0]).not.toHaveProperty('versionId')
   })
 
   it('renders the resolved URL rather than a placeholder for an image', async () => {

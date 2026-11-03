@@ -1,62 +1,61 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { components } from '@/data/api'
-import { handleError, post } from '@/data/fetchers'
+import { handleError } from '@/data/fetchers'
+import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
 import type { ResponseError, UseCustomMutationOptions } from '@/types'
 
 type SignBucketObjectParams = {
   projectRef: string
+  clientEndpoint: string
   bucketId?: string
   path: string
   expiresIn: number
-  options?: components['schemas']['GetSignedUrlBody']['options']
+  /** Signs a specific version of the object. Defaults to the current one. */
+  versionId?: string
 }
-export const signBucketObject = async (
-  { projectRef, bucketId, path, expiresIn, options }: SignBucketObjectParams,
-  signal?: AbortSignal
-) => {
+export const signBucketObject = async ({
+  projectRef,
+  clientEndpoint,
+  bucketId,
+  path,
+  expiresIn,
+  versionId,
+}: SignBucketObjectParams) => {
   if (!bucketId) throw new Error('bucketId is required')
 
-  const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/sign', {
-    params: {
-      path: {
-        ref: projectRef,
-        id: bucketId,
-      },
-    },
-    body: { path, expiresIn, options },
-    signal,
-  })
+  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  // Omitted rather than sent as `undefined`, so current-version requests are unchanged.
+  const { data, error } = await supabaseClient.storage
+    .from(bucketId)
+    .createSignedUrl(path, expiresIn, versionId === undefined ? undefined : { versionId })
 
   if (error) handleError(error)
-  return data
+  return data!
 }
 
 type SignBucketObjectData = Awaited<ReturnType<typeof signBucketObject>>
 
 type SignBucketObjectsParams = {
   projectRef: string
+  clientEndpoint: string
   bucketId?: string
   paths: Array<string>
   expiresIn: number
 }
-export const signBucketObjects = async (
-  { projectRef, bucketId, paths, expiresIn }: SignBucketObjectsParams,
-  signal?: AbortSignal
-) => {
+export const signBucketObjects = async ({
+  projectRef,
+  clientEndpoint,
+  bucketId,
+  paths,
+  expiresIn,
+}: SignBucketObjectsParams) => {
   if (!bucketId) throw new Error('bucketId is required')
 
-  const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/sign-multi', {
-    params: {
-      path: {
-        ref: projectRef,
-        id: bucketId,
-      },
-    },
-    body: { path: paths, expiresIn },
-    signal,
-  })
+  const supabaseClient = await createProjectSupabaseClient(projectRef, clientEndpoint)
+  const { data, error } = await supabaseClient.storage
+    .from(bucketId)
+    .createSignedUrls(paths, expiresIn)
 
   if (error) handleError(error)
   return data ?? []
