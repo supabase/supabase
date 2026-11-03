@@ -1,6 +1,8 @@
 import * as Sentry from '@sentry/nextjs'
 import { createClient } from '@supabase/supabase-js'
 import { ImageResponse } from '@vercel/og'
+import { type Database } from 'common'
+import { type UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
 import useTicketBg from 'components/LaunchWeek/15/hooks/use-ticket-bg'
 
 export const runtime = 'edge' // 'nodejs' is the default
@@ -34,7 +36,7 @@ export async function GET(req: Request) {
   try {
     if (!username) throw new Error('missing username param')
 
-    const supabaseAdminClient = createClient(
+    const supabaseAdminClient = createClient<Database>(
       process.env.NEXT_PUBLIC_SUPABASE_URL as string,
       process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY as string
     )
@@ -74,9 +76,11 @@ export async function GET(req: Request) {
     )
     const FONT_DATA = await FONT_SANS
 
-    const { metadata, ticket_number } = user
+    const { ticket_number } = user
+    // `metadata` is an untyped `Json` column in the generated types
+    const metadata = user.metadata as NonNullable<UserTicketData['metadata']>
 
-    const ticketBg = useTicketBg(ticket_number)
+    const ticketBg = useTicketBg(ticket_number!)
 
     // Generate image and upload to storage.
     const ticketType = 'regular'

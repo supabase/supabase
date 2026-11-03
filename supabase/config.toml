@@ -17,15 +17,19 @@ extra_search_path = ["public", "extensions"]
 # for accidental or malicious requests.
 max_rows = 1000
 
-[remotes.prod.api]
-schemas = ["public", "content", "storage", "graphql_public"]
-
 [db]
 # Port to use for the local database URL.
 port = 54322
 # The database major version to use. This has to be the same as your remote database's. Run `SHOW
 # server_version;` on the remote database to check.
 major_version = 15
+
+[db.pooler]
+default_pool_size = 15
+max_client_conn = 400
+
+[db.ssl_enforcement]
+enabled = true
 
 [studio]
 # Port to use for Supabase Studio.
@@ -43,9 +47,28 @@ port = 54324
 # The maximum file size allowed (e.g. "5MB", "500KB").
 file_size_limit = "50MiB"
 
+[storage.analytics]
+enabled = true
+max_namespaces = 10
+
+[storage.image_transformation]
+enabled = true
+
 [storage.buckets.fonts]
 public = true
 objects_path = "buckets/fonts"
+
+[storage.buckets.images]
+public = true
+
+[storage.buckets.videos]
+public = true
+
+[storage.buckets.integrations-images]
+public = true
+
+[storage.buckets.temp-for-testing-integrations]
+public = true
 
 [auth]
 # The base URL of your website. Used as an allow-list for redirects and for constructing URLs used
@@ -74,6 +97,16 @@ enable_confirmations = false
 
 [remotes.prod.auth.email]
 enable_signup = false
+
+# Additional project setup as a failover for the prod project.
+[remotes.failover]
+project_id = "lyxzkpcqokptigyoulja"
+
+[remotes.failover.auth.email]
+enable_signup = false
+
+[remotes.failover.db]
+major_version = 17
 
 # Uncomment the following to use gh oAuth app locally with your own test app
 # to use env vars locally, run > `source ./supabase/.env && supabase [command...]`
@@ -104,3 +137,8 @@ url = ""
 
 [functions.search-embeddings]
 verify_jwt = false
+
+[db.migrations]
+schema_paths = [
+  "schemas",
+]

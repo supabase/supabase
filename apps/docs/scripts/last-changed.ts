@@ -11,19 +11,20 @@
  *  the last Git commit date.
  */
 
-import _configureDotEnv from './utils/dotenv.js'
-
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import matter from 'gray-matter'
 import { createHash } from 'node:crypto'
 import { readdirSync } from 'node:fs'
 import { readFile } from 'node:fs/promises'
 import path, { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { parseArgs } from 'node:util'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { type Database } from 'common'
+import matter from 'gray-matter'
 import { SimpleGit, simpleGit } from 'simple-git'
 import { parse } from 'smol-toml'
+
 import { Section } from './helpers.mdx.js'
+import _configureDotEnv from './utils/dotenv.js'
 
 const _ = _configureDotEnv
 
@@ -37,7 +38,7 @@ interface Stats {
 }
 
 interface Ctx {
-  supabase: SupabaseClient
+  supabase: SupabaseClient<Database>
   git: SimpleGit
   stats: Stats
 }
@@ -110,7 +111,7 @@ function parseOptions(): Options {
 }
 
 function createSupabaseClient() {
-  return createClient(
+  return createClient<Database>(
     process.env[REQUIRED_ENV_VARS.SUPABASE_URL]!,
     process.env[REQUIRED_ENV_VARS.SERVICE_ROLE_KEY]!
   )
@@ -227,7 +228,7 @@ async function updateTimestampsWithLastCommitDate(
           heading: section.heading,
           checksum: section.checksum,
           last_updated: updatedAt,
-          last_checked: timestamp,
+          last_checked: timestamp.toISOString(),
         },
         {
           onConflict: 'parent_page,heading',
@@ -262,7 +263,7 @@ async function updateTimestampsWithChecksumMatch(
       new_heading: section.heading,
       new_checksum: section.checksum,
       git_update_time: gitUpdatedAt,
-      check_time: timestamp,
+      check_time: timestamp.toISOString(),
     })
     if (error) {
       throw Error(error.message || 'Error running function to update checksum')

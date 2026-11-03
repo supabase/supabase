@@ -1,12 +1,13 @@
-import { NextSeo } from 'next-seo'
-import dayjs from 'dayjs'
-import Error from 'next/error'
-import { GetStaticPaths, GetStaticProps } from 'next'
-import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
-import { Lw15ConfDataProvider, UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
 import { createClient } from '@supabase/supabase-js'
-import DefaultLayout from 'components/Layouts/Default'
+import { type Database } from 'common'
+import { Lw15ConfDataProvider, UserTicketData } from 'components/LaunchWeek/15/hooks/use-conf-data'
 import LW15TicketPage from 'components/LaunchWeek/15/Ticketing/LW15TicketPage'
+import DefaultLayout from 'components/Layouts/Default'
+import dayjs from 'dayjs'
+import { LW15_DATE, LW15_TITLE, LW15_URL, SITE_ORIGIN } from 'lib/constants'
+import { GetStaticPaths, GetStaticProps } from 'next'
+import { NextSeo } from 'next-seo'
+import Error from 'next/error'
 import { useRouter } from 'next/router'
 
 interface Props {
@@ -75,7 +76,7 @@ export const getStaticProps: GetStaticProps = async ({ params }) => {
   const username = params?.username?.toString() || null
   let user
 
-  const supabaseAdmin = createClient(
+  const supabaseAdmin = createClient<Database>(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.LIVE_SUPABASE_COM_SERVICE_ROLE_KEY!
   )

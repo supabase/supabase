@@ -1,5 +1,6 @@
 import { SupabaseClient } from '@supabase/supabase-js'
-import { ApplicationError, UserError, clippy } from 'ai-commands/edge'
+import { ApplicationError, clippy, UserError } from 'ai-commands/edge'
+import { type Database } from 'common'
 import { NextRequest } from 'next/server'
 import OpenAI from 'openai'
 
@@ -104,7 +105,7 @@ async function handlePost(request: NextRequest) {
     throw new UserError('Missing messages in request data')
   }
 
-  const supabaseClient = new SupabaseClient(supabaseUrl, supabaseServiceKey)
+  const supabaseClient = new SupabaseClient<Database>(supabaseUrl, supabaseServiceKey)
 
   try {
     const response = await clippy(openai, supabaseClient, messages)

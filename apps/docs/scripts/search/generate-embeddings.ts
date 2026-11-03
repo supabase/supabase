@@ -1,21 +1,22 @@
 import '../utils/dotenv.js'
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 import { parseArgs } from 'node:util'
+import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { type Database, type Json } from 'common'
 import { OpenAI } from 'openai'
 import { v4 as uuidv4 } from 'uuid'
 
 import type { Section } from '../helpers.mdx.js'
 import {
+  computePageResults,
+  createBatches,
+  logFailedSections,
+  mapEmbeddingsToSections,
+  updatePageInsertionCounts,
   type PageInfo,
   type PageSectionForEmbedding,
   type PageSectionWithEmbedding,
   type ProcessingResult,
-  createBatches,
-  mapEmbeddingsToSections,
-  updatePageInsertionCounts,
-  computePageResults,
-  logFailedSections,
 } from './embeddings/utils.js'
 import { fetchAllSources } from './sources/index.js'
 
@@ -92,7 +93,10 @@ function isNimbusMode(): boolean {
   return process.env.ENABLED_FEATURES_OVERRIDE_DISABLE_ALL === 'true'
 }
 
-function getPageTables() {
+type PageTable = 'page' | 'page_nimbus'
+type PageSectionTable = 'page_section' | 'page_section_nimbus'
+
+function getPageTables(): { pageTable: PageTable; pageSectionTable: PageSectionTable } {
   const nimbus = isNimbusMode()
   return {
     pageTable: nimbus ? 'page_nimbus' : 'page',
@@ -109,10 +113,14 @@ function requireEnvOrThrow(names: string[]): void {
   }
 }
 
-function initSupabase(): SupabaseClient {
-  return createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SECRET_KEY!, {
-    auth: { persistSession: false, autoRefreshToken: false },
-  })
+function initSupabase(): SupabaseClient<Database> {
+  return createClient<Database>(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SECRET_KEY!,
+    {
+      auth: { persistSession: false, autoRefreshToken: false },
+    }
+  )
 }
 
 type PreparedSections = {
@@ -121,9 +129,9 @@ type PreparedSections = {
 }
 
 async function prepareSections(
-  supabaseClient: SupabaseClient,
-  pageTable: string,
-  pageSectionTable: string,
+  supabaseClient: SupabaseClient<Database>,
+  pageTable: PageTable,
+  pageSectionTable: PageSectionTable,
   shouldRefresh: boolean,
   refreshVersion: string,
   refreshDate: Date,
@@ -153,6 +161,9 @@ async function prepareSections(
             ragIgnore?: boolean
             meta?: Record<string, unknown>
           } = await embeddingSource.process()
+          // Sources type `meta` as `Record<string, unknown>`, but it only ever holds parsed
+          // frontmatter / JSON-serializable data, which is what the `meta` jsonb column expects.
+          const metaJson = meta as Json
 
           const { error: fetchPageError, data: existingPage } = await supabaseClient
             .from(pageTable)
@@ -169,9 +180,9 @@ async function prepareSections(
               .update({
                 type,
                 source,
-                meta,
+                meta: metaJson,
                 version: refreshVersion,
-                last_refresh: refreshDate,
+                last_refresh: refreshDate.toISOString(),
               })
               .filter('id', 'eq', existingPage.id)
             if (updatePageError) throw updatePageError
@@ -202,10 +213,10 @@ async function prepareSections(
                 path,
                 type,
                 source,
-                meta,
+                meta: metaJson,
                 content: embeddingSource.extractIndexedContent(),
                 version: refreshVersion,
-                last_refresh: refreshDate,
+                last_refresh: refreshDate.toISOString(),
               },
               { onConflict: 'path' }
             )
@@ -251,8 +262,8 @@ async function prepareSections(
 
 async function processAndInsertEmbeddings(
   openai: OpenAI,
-  supabaseClient: SupabaseClient,
-  pageSectionTable: string,
+  supabaseClient: SupabaseClient<Database>,
+  pageSectionTable: PageSectionTable,
   allSections: PageSectionForEmbedding[],
   pageInfoMap: Map<number, PageInfo>
 ): Promise<ProcessingResult> {
@@ -392,8 +403,8 @@ async function processEmbeddingBatch(
 }
 
 async function insertSectionBatch(
-  supabaseClient: SupabaseClient,
-  pageSectionTable: string,
+  supabaseClient: SupabaseClient<Database>,
+  pageSectionTable: PageSectionTable,
   sectionsWithEmbeddings: PageSectionWithEmbedding[]
 ): Promise<number> {
   if (sectionsWithEmbeddings.length === 0) {
@@ -405,7 +416,8 @@ async function insertSectionBatch(
     slug: section.slug,
     heading: section.heading,
     content: section.content,
-    embedding: section.embedding,
+    // The generated type for `vector` is `string`, but the array is serialized as JSON either way
+    embedding: section.embedding as unknown as string,
     rag_ignore: section.ragIgnore,
   }))
 
@@ -518,8 +530,8 @@ async function generateEmbeddings() {
 }
 
 async function updateSuccessfulChecksums(
-  supabaseClient: SupabaseClient,
-  pageTable: string,
+  supabaseClient: SupabaseClient<Database>,
+  pageTable: PageTable,
   pageInfoMap: Map<number, PageInfo>,
   processingResult: ProcessingResult
 ): Promise<number> {
@@ -569,8 +581,8 @@ function logFailedPages(pageInfoMap: Map<number, PageInfo>, processingResult: Pr
 }
 
 async function purgeOldPages(
-  supabaseClient: SupabaseClient,
-  pageTable: string,
+  supabaseClient: SupabaseClient<Database>,
+  pageTable: PageTable,
   refreshVersion: string
 ) {
   console.log(`Removing old pages and their sections`)
