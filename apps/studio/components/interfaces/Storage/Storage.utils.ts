@@ -172,14 +172,23 @@ export const extractBucketNamesFromDefinition = (definition: string | null): str
  * expressions. Shared by the policies page, per-bucket counts, and bucket deletion so they
  * agree on which buckets a policy belongs to.
  *
- * If either expression negates the bucket condition the policy reaches other buckets, so it
- * isn't tied to any bucket, even when the other expression names one.
+ * If either expression mentions `bucket_id` but isn't limited to specific buckets (negated, or
+ * with an unrestricted `OR` branch), the policy reaches other buckets, so it isn't tied to any
+ * bucket, even when the other expression names one. Expressions without `bucket_id` are
+ * ignored, so check-only policies are still grouped from `check`.
  */
 export const getPolicyBucketNames = (policy: Pick<Policy, 'definition' | 'check'>): string[] => {
-  const clauses = [policy.definition, policy.check]
-  if (clauses.some((clause) => clause && NEGATED_BUCKET_REGEX.test(clause))) return []
+  const clauseNames = [policy.definition, policy.check]
+    .filter((clause): clause is NonNullable<typeof clause> => !!clause)
+    .map((clause) => ({
+      mentionsBucket: /\bbucket_id\b/.test(clause),
+      names: extractBucketNamesFromDefinition(clause),
+    }))
 
-  return Array.from(new Set(clauses.flatMap(extractBucketNamesFromDefinition)))
+  if (clauseNames.some(({ mentionsBucket, names }) => mentionsBucket && names.length === 0)) {
+    return []
+  }
+  return Array.from(new Set(clauseNames.flatMap(({ names }) => names)))
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {

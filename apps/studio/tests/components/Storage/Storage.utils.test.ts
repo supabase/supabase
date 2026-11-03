@@ -67,6 +67,14 @@ describe('extractBucketNamesFromDefinition with unrestricted branches', () => {
 })
 
 describe('getPolicyBucketNames', () => {
+  it('returns no buckets when definition has an unrestricted OR branch but check names a bucket', () => {
+    const policy = makePolicy('p', {
+      definition: "((bucket_id = 'a'::text) OR (auth.uid() IS NOT NULL))",
+      check: "(bucket_id = 'a'::text)",
+    })
+    expect(getPolicyBucketNames(policy)).toEqual([])
+  })
+
   it('returns no buckets when only one of definition and check is negated', () => {
     const policy = makePolicy('p', {
       definition: "(bucket_id <> 'a'::text)",
