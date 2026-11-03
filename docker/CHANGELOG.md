@@ -26,7 +26,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ### API gateway
 
-- ⚠️ Changed the `/functions/v1/` route to leave CORS to the function, as on the platform. The gateway no longer answers preflight requests or adds CORS headers to function responses, so the function's own CORS policy applies. Functions called from a browser must handle CORS themselves, see [CORS support for Edge Functions](https://supabase.com/docs/guides/functions/cors) (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#XXXXX](https://github.com/supabase/supabase/pull/XXXXX)
+- ⚠️ Changed the `/functions/v1/` route to leave CORS to the function, as on the platform. The gateway no longer answers preflight requests or adds CORS headers to function responses, so the function's own CORS policy applies. Functions called from a browser must handle CORS themselves, see [CORS support for Edge Functions](https://supabase.com/docs/guides/functions/cors) (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#52709](https://github.com/supabase/supabase/pull/52709)
 
 ### Edge Functions
 
