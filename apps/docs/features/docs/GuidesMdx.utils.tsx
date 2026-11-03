@@ -174,7 +174,8 @@ const genGuidesStaticParams = (directory?: string) => async () => {
 }
 
 const getGuideShapesInternal = async (section: string): Promise<GuideShapes> => {
-  const params = await genGuidesStaticParams(section)()
+  // federated sections such as graphql have no folder until their content is fetched
+  const params = await genGuidesStaticParams(section)().catch(() => [])
   // a page that fails to load only loses its own shape, the skeleton then draws the common one
   const guides = await Promise.allSettled(
     params.map(({ slug }) => getGuidesMarkdown([section, ...slug]))
