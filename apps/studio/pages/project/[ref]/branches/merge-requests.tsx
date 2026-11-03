@@ -33,6 +33,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions, type Branch } from '@/data/branches/branches-query'
 import { useGitHubConnectionsQuery } from '@/data/integrations/github-connections-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -51,6 +52,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: false,
+  })
 
   const {
     data: connections,
@@ -100,8 +105,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     parent_project_ref: projectRef,
     persistent,
   }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
     updateBranch(
       {
+        grant: updateBranchGrant.grant,
         branchRef,
         projectRef,
         requestReview: true,
@@ -129,8 +136,10 @@ const MergeRequestsPage: NextPageWithLayout = () => {
     project_ref: branchRef,
     parent_project_ref: projectRef,
   }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
     updateBranch(
       {
+        grant: updateBranchGrant.grant,
         branchRef,
         projectRef,
         requestReview: false,
@@ -196,6 +205,7 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                             variant="primary"
                             size="tiny"
                             loading={currentBranch && isUpdating}
+                            disabled={updateBranchGrant.status !== 'granted'}
                             onClick={() =>
                               currentBranch && handleMarkBranchForReview(currentBranch)
                             }
@@ -276,7 +286,9 @@ const MergeRequestsPage: NextPageWithLayout = () => {
                                       <Tooltip>
                                         <DropdownMenuItem
                                           className="gap-x-2"
-                                          disabled={isUpdating}
+                                          disabled={
+                                            isUpdating || updateBranchGrant.status !== 'granted'
+                                          }
                                           onSelect={(e) => {
                                             e.stopPropagation()
                                             handleCloseMergeRequest(branch)
@@ -324,6 +336,10 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
     project !== undefined ? (isBranch ? project.parent_project_ref : ref) : undefined
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: false,
+  })
 
   const { data: branches } = useQuery(
     branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
@@ -344,8 +360,10 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
     parent_project_ref: projectRef,
     persistent,
   }: Branch) => {
+    if (updateBranchGrant.status !== 'granted') return
     updateBranch(
       {
+        grant: updateBranchGrant.grant,
         branchRef,
         projectRef,
         requestReview: true,
@@ -378,7 +396,7 @@ export const MergeRequestsPageWrapper = ({ children }: PropsWithChildren<{}>) =>
           <BranchSelector
             branches={previewBranches}
             onBranchSelected={handleMarkBranchForReview}
-            disabled={!projectRef}
+            disabled={!projectRef || updateBranchGrant.status !== 'granted'}
             isUpdating={isUpdating}
           />
         )

@@ -298,7 +298,7 @@
           ]
         },
         "enable_signup": {
-          "description": "Allow/disallow new user signups to your project.",
+          "description": "Allow/disallow new user signups to your project. Existing users can still sign in.",
           "default": true,
           "anyOf": [
             {
@@ -844,8 +844,21 @@
         "email": {
           "type": "object",
           "properties": {
+            "enabled": {
+              "description": "Allow/disallow the email provider. When false, users can't sign up or sign in with email (password, magic link or OTP); set `auth.enable_signup = false` to block new signups only.",
+              "default": true,
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^env\\((.*)\\)$"
+                }
+              ]
+            },
             "enable_signup": {
-              "description": "Allow/disallow new user signups via email to your project.",
+              "description": "Deprecated: use `auth.email.enabled` instead. Allow/disallow the email provider; when false, users can't sign up or sign in with email.",
               "default": true,
               "anyOf": [
                 {
@@ -1068,8 +1081,21 @@
         "sms": {
           "type": "object",
           "properties": {
+            "enabled": {
+              "description": "Allow/disallow the phone provider. When false, users can't sign up or sign in with a phone number (password or SMS OTP); set `auth.enable_signup = false` to block new signups only.",
+              "default": false,
+              "anyOf": [
+                {
+                  "type": "boolean"
+                },
+                {
+                  "type": "string",
+                  "pattern": "^env\\((.*)\\)$"
+                }
+              ]
+            },
             "enable_signup": {
-              "description": "Allow/disallow new user signups via SMS to your project.",
+              "description": "Deprecated: use `auth.sms.enabled` instead. Allow/disallow the phone provider; when false, users can't sign up or sign in with a phone number.",
               "default": false,
               "anyOf": [
                 {
@@ -2994,6 +3020,290 @@
                   "pattern": "^env\\((.*)\\)$"
                 }
               ]
+            },
+            "checks": {
+              "type": "object",
+              "properties": {
+                "rls_disabled_in_public": {
+                  "description": "Severity for rls_disabled_in_public: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "rls_enabled_no_policy": {
+                  "description": "Severity for rls_enabled_no_policy: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "policy_exists_rls_disabled": {
+                  "description": "Severity for policy_exists_rls_disabled: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "security_definer_view": {
+                  "description": "Severity for security_definer_view: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "rls_policy_always_true": {
+                  "description": "Severity for rls_policy_always_true: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "sensitive_columns_exposed": {
+                  "description": "Severity for sensitive_columns_exposed: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "auth_users_exposed": {
+                  "description": "Severity for auth_users_exposed: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "function_search_path_mutable": {
+                  "description": "Severity for function_search_path_mutable: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "rls_references_user_metadata": {
+                  "description": "Severity for rls_references_user_metadata: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                  "default": "warn",
+                  "anyOf": [
+                    {
+                      "type": "string",
+                      "enum": ["error", "warn", "off"]
+                    },
+                    {
+                      "type": "string",
+                      "pattern": "^env\\((.*)\\)$"
+                    }
+                  ]
+                },
+                "exclude": {
+                  "type": "object",
+                  "properties": {
+                    "rls_disabled_in_public": {
+                      "description": "Objects rls_disabled_in_public skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "rls_enabled_no_policy": {
+                      "description": "Objects rls_enabled_no_policy skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "policy_exists_rls_disabled": {
+                      "description": "Objects policy_exists_rls_disabled skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "security_definer_view": {
+                      "description": "Objects security_definer_view skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "rls_policy_always_true": {
+                      "description": "Objects rls_policy_always_true skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "sensitive_columns_exposed": {
+                      "description": "Objects sensitive_columns_exposed skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "auth_users_exposed": {
+                      "description": "Objects auth_users_exposed skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "function_search_path_mutable": {
+                      "description": "Objects function_search_path_mutable skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    },
+                    "rls_references_user_metadata": {
+                      "description": "Objects rls_references_user_metadata skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                      "anyOf": [
+                        {
+                          "type": "array",
+                          "items": {
+                            "type": "string",
+                            "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                          }
+                        },
+                        {
+                          "type": "string",
+                          "pattern": "^env\\((.*)\\)$"
+                        }
+                      ]
+                    }
+                  },
+                  "additionalProperties": false,
+                  "description": "Objects each rule skips, keyed by rule."
+                }
+              },
+              "additionalProperties": false,
+              "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config.toml."
             }
           },
           "additionalProperties": false
@@ -3983,7 +4293,8 @@
         },
         "orioledb_version": {
           "type": "string",
-          "description": "Deprecated: use `db.orioledb_version` instead. Postgres storage engine version for OrioleDB."
+          "enum": [""],
+          "description": "Removed: use `db.orioledb_version` instead. Only an empty value is accepted, for older generated config files."
         },
         "s3_host": {
           "type": "string",
@@ -4030,8 +4341,8 @@
           "type": "object",
           "properties": {
             "enabled": {
-              "description": "Use pg-delta as the schema diff engine for db diff / db pull / db remote commit. Set false to fall back to the legacy migra engine.",
-              "default": false,
+              "description": "Use pg-delta as the schema diff engine for db diff / db pull (the default). Set false to fall back to the legacy migra engine.",
+              "default": true,
               "anyOf": [
                 {
                   "type": "boolean"
@@ -4566,7 +4877,7 @@
                         ]
                       },
                       "enable_signup": {
-                        "description": "Allow/disallow new user signups to your project.",
+                        "description": "Allow/disallow new user signups to your project. Existing users can still sign in.",
                         "default": true,
                         "anyOf": [
                           {
@@ -5112,8 +5423,21 @@
                       "email": {
                         "type": "object",
                         "properties": {
+                          "enabled": {
+                            "description": "Allow/disallow the email provider. When false, users can't sign up or sign in with email (password, magic link or OTP); set `auth.enable_signup = false` to block new signups only.",
+                            "default": true,
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^env\\((.*)\\)$"
+                              }
+                            ]
+                          },
                           "enable_signup": {
-                            "description": "Allow/disallow new user signups via email to your project.",
+                            "description": "Deprecated: use `auth.email.enabled` instead. Allow/disallow the email provider; when false, users can't sign up or sign in with email.",
                             "default": true,
                             "anyOf": [
                               {
@@ -5336,8 +5660,21 @@
                       "sms": {
                         "type": "object",
                         "properties": {
+                          "enabled": {
+                            "description": "Allow/disallow the phone provider. When false, users can't sign up or sign in with a phone number (password or SMS OTP); set `auth.enable_signup = false` to block new signups only.",
+                            "default": false,
+                            "anyOf": [
+                              {
+                                "type": "boolean"
+                              },
+                              {
+                                "type": "string",
+                                "pattern": "^env\\((.*)\\)$"
+                              }
+                            ]
+                          },
                           "enable_signup": {
-                            "description": "Allow/disallow new user signups via SMS to your project.",
+                            "description": "Deprecated: use `auth.sms.enabled` instead. Allow/disallow the phone provider; when false, users can't sign up or sign in with a phone number.",
                             "default": false,
                             "anyOf": [
                               {
@@ -7262,6 +7599,290 @@
                                 "pattern": "^env\\((.*)\\)$"
                               }
                             ]
+                          },
+                          "checks": {
+                            "type": "object",
+                            "properties": {
+                              "rls_disabled_in_public": {
+                                "description": "Severity for rls_disabled_in_public: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "rls_enabled_no_policy": {
+                                "description": "Severity for rls_enabled_no_policy: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "policy_exists_rls_disabled": {
+                                "description": "Severity for policy_exists_rls_disabled: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "security_definer_view": {
+                                "description": "Severity for security_definer_view: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "rls_policy_always_true": {
+                                "description": "Severity for rls_policy_always_true: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "sensitive_columns_exposed": {
+                                "description": "Severity for sensitive_columns_exposed: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "auth_users_exposed": {
+                                "description": "Severity for auth_users_exposed: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "function_search_path_mutable": {
+                                "description": "Severity for function_search_path_mutable: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "rls_references_user_metadata": {
+                                "description": "Severity for rls_references_user_metadata: \"error\" will block the migration; until blocking ships it reports like \"warn\". \"warn\" reports it, \"off\" skips the rule.",
+                                "default": "warn",
+                                "anyOf": [
+                                  {
+                                    "type": "string",
+                                    "enum": ["error", "warn", "off"]
+                                  },
+                                  {
+                                    "type": "string",
+                                    "pattern": "^env\\((.*)\\)$"
+                                  }
+                                ]
+                              },
+                              "exclude": {
+                                "type": "object",
+                                "properties": {
+                                  "rls_disabled_in_public": {
+                                    "description": "Objects rls_disabled_in_public skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "rls_enabled_no_policy": {
+                                    "description": "Objects rls_enabled_no_policy skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "policy_exists_rls_disabled": {
+                                    "description": "Objects policy_exists_rls_disabled skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "security_definer_view": {
+                                    "description": "Objects security_definer_view skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "rls_policy_always_true": {
+                                    "description": "Objects rls_policy_always_true skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "sensitive_columns_exposed": {
+                                    "description": "Objects sensitive_columns_exposed skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "auth_users_exposed": {
+                                    "description": "Objects auth_users_exposed skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "function_search_path_mutable": {
+                                    "description": "Objects function_search_path_mutable skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  },
+                                  "rls_references_user_metadata": {
+                                    "description": "Objects rls_references_user_metadata skips, each written \"schema.name\", for example \"public.countries\". An entry like \"public.set_updated_at\" matches every overload of that function.",
+                                    "anyOf": [
+                                      {
+                                        "type": "array",
+                                        "items": {
+                                          "type": "string",
+                                          "pattern": "^(?!\\s)[^.]*[^.\\s]\\.(?!\\s)[\\s\\S]*\\S(?![\\s\\S])"
+                                        }
+                                      },
+                                      {
+                                        "type": "string",
+                                        "pattern": "^env\\((.*)\\)$"
+                                      }
+                                    ]
+                                  }
+                                },
+                                "additionalProperties": false,
+                                "description": "Objects each rule skips, keyed by rule."
+                              }
+                            },
+                            "additionalProperties": false,
+                            "description": "Security checks run on each migration. Each rule takes \"error\", \"warn\" or \"off\"; a rule left unset uses \"warn\". When migrations run against --db-url, this section is read only from the local config.toml."
                           }
                         },
                         "additionalProperties": false
@@ -8251,7 +8872,8 @@
                       },
                       "orioledb_version": {
                         "type": "string",
-                        "description": "Deprecated: use `db.orioledb_version` instead. Postgres storage engine version for OrioleDB."
+                        "enum": [""],
+                        "description": "Removed: use `db.orioledb_version` instead. Only an empty value is accepted, for older generated config files."
                       },
                       "s3_host": {
                         "type": "string",
@@ -8298,8 +8920,8 @@
                         "type": "object",
                         "properties": {
                           "enabled": {
-                            "description": "Use pg-delta as the schema diff engine for db diff / db pull / db remote commit. Set false to fall back to the legacy migra engine.",
-                            "default": false,
+                            "description": "Use pg-delta as the schema diff engine for db diff / db pull (the default). Set false to fall back to the legacy migra engine.",
+                            "default": true,
                             "anyOf": [
                               {
                                 "type": "boolean"

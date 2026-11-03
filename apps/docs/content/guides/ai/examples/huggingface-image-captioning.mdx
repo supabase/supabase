@@ -31,7 +31,7 @@ We can combine Hugging Face with [Supabase Storage](/storage) and [Database Webh
 To generate the types.ts file for the storage and public schemas, run the following command in the terminal:
 
 ```bash
-supabase gen types typescript --project-id=your-project-ref --schema=storage,public > supabase/functions/huggingface-image-captioning/types.ts
+supabase gen types typescript --remote=your-project-ref --schema=storage,public > supabase/functions/huggingface-image-captioning/types.ts
 ```
 
 ## Code

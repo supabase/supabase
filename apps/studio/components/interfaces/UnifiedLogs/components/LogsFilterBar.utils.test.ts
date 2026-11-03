@@ -1,11 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { createUnifiedLogsSearch } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
   filterPropertySchema,
   formatTimeRangeValue,
+  getLogAttributeSources,
   getUserFilterValue,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
@@ -245,5 +247,31 @@ describe('time range labels', () => {
   it('preserves incomplete values while editing', () => {
     expect(formatTimeRangeValue('unfinished')).toBe('unfinished')
     expect(formatTimeRangeValue(null)).toBe('')
+  })
+})
+
+describe('attribute discovery scope', () => {
+  it('intersects the selected types with fixed resource scope', () => {
+    const search = createUnifiedLogsSearch(
+      { filter: ['log_type:neq:edge function runtime'] },
+      {
+        filters: [
+          { column: 'log_type', operator: '=', value: 'edge function' },
+          { column: 'log_type', operator: '=', value: 'edge function runtime' },
+          { column: 'function_id', operator: '=', value: 'fn-1' },
+        ],
+      }
+    )
+    expect(getLogAttributeSources(search)).toEqual(['function_edge_logs'])
+  })
+
+  it('does not discover sources that cannot match a scoped user filter', () => {
+    const search = createUnifiedLogsSearch(
+      { user: 'user-1' },
+      {
+        filters: [{ column: 'log_type', operator: '=', value: 'edge function' }],
+      }
+    )
+    expect(getLogAttributeSources(search)).toEqual([])
   })
 })

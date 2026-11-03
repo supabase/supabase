@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { invalidateRolesQuery } from './database-roles-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import { getRolePasswordForSql } from '@/lib/scram-sha-256'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
@@ -23,7 +24,9 @@ export async function updateDatabaseRole({
   id,
   payload,
 }: DatabaseRoleUpdateVariables) {
-  const sql = pgMeta.roles.update({ id }, payload).sql
+  const password =
+    payload.password === undefined ? undefined : await getRolePasswordForSql(payload.password)
+  const sql = pgMeta.roles.update({ id }, { ...payload, password }).sql
   const { result } = await executeSql({
     projectRef,
     connectionString,

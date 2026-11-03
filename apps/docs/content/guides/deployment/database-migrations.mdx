@@ -332,7 +332,7 @@ supabase link
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db push
+supabase db push --remote
 ```
 
     </StepHikeCompact.Code>
@@ -350,7 +350,7 @@ supabase db push
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db push --include-seed
+supabase db push --include-seed --remote
 ```
 
     </StepHikeCompact.Code>
@@ -438,7 +438,7 @@ supabase db reset
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db push
+supabase db push --remote
 ```
 
     </StepHikeCompact.Code>
@@ -449,7 +449,7 @@ supabase db push
 
 <Admonition type="note">
 
-For a more automated deployment approach, consider using [Supabase Branching](/docs/guides/deployment/branching) or a CI/CD pipeline that runs `supabase db push` on merge to your main branch.
+For a more automated deployment approach, consider using [Supabase Branching](/docs/guides/deployment/branching) or a CI/CD pipeline that runs `supabase db push --yes --remote` on merge to your main branch.
 
 </Admonition>
 
@@ -459,7 +459,7 @@ If `db push` fails with errors suggesting you run `supabase migration repair`, y
 
 ### How migration tracking works
 
-Supabase tracks which migrations have been applied on each database in a table called `supabase_migrations.schema_migrations`. When you run `supabase db push`, it compares your local `supabase/migrations` folder against that table and runs only the ones not yet applied, in order.
+Supabase tracks which migrations have been applied on each database in a table called `supabase_migrations.schema_migrations`. When you run `supabase db push --remote`, it compares your local `supabase/migrations` folder against that table and runs only the ones not yet applied, in order.
 
 Git tracks your migration _files_. Supabase tracks what's been _applied to each database_. These are two separate systems that need to stay in sync.
 
@@ -468,7 +468,7 @@ Git tracks your migration _files_. Supabase tracks what's been _applied to each 
 Start by listing the migration status across local and remote:
 
 ```bash name=Terminal
-supabase migration list
+supabase migration list --remote
 ```
 
 This shows which migrations are applied locally, which are applied on the remote, and where they diverge.
@@ -478,7 +478,7 @@ This shows which migrations are applied locally, which are applied on the remote
 Pull the current remote state into a migration file to get back in sync:
 
 ```bash name=Terminal
-supabase db pull
+supabase db pull --remote
 ```
 
 This creates a new migration file capturing the current remote schema. Commit it to git, then follow the standard workflow going forward.
@@ -487,11 +487,11 @@ What `db pull` captures in managed schemas depends on your project's diff engine
 
 <$Partial path="diff_engine_check.mdx" />
 
-On `pg-delta`, a plain `supabase db pull` captures your customizations automatically, such as a trigger on `auth.users` that calls a function in `public`, or RLS policies on `storage.objects`. A trigger whose function lives inside `auth` or `storage` is excluded even if you created it, so deliver it through a versioned migration. On the legacy `migra` engine, the initial pull's `pg_dump` skips those schemas, but the diff pass that follows appends your triggers and RLS policies there to the same migration, and later pulls diff them too. Older CLI versions excluded `auth` and `storage` entirely and printed a message saying so. If you see that message, capture existing customizations once with explicit pulls:
+On `pg-delta`, a plain `supabase db pull --remote` captures your customizations automatically, such as a trigger on `auth.users` that calls a function in `public`, or RLS policies on `storage.objects`. A trigger whose function lives inside `auth` or `storage` is excluded even if you created it, so deliver it through a versioned migration. On the legacy `migra` engine, the initial pull's `pg_dump` skips those schemas, but the diff pass that follows appends your triggers and RLS policies there to the same migration, and later pulls diff them too. Older CLI versions excluded `auth` and `storage` entirely and printed a message saying so. If you see that message, capture existing customizations once with explicit pulls:
 
 ```bash name=Terminal
-supabase db pull --schema auth
-supabase db pull --schema storage
+supabase db pull --schema auth --remote
+supabase db pull --schema storage --remote
 ```
 
 See [Diff engines](/docs/guides/local-development/diff-engines) for what each engine captures in managed schemas.
@@ -501,13 +501,13 @@ See [Diff engines](/docs/guides/local-development/diff-engines) for what each en
 If a migration shows as missing in the remote history table but the schema change is already there (for example, it was applied manually), you can mark it as applied without re-running it:
 
 ```bash name=Terminal
-supabase migration repair --status applied <migration-timestamp>
+supabase migration repair --status applied <migration-timestamp> --remote
 ```
 
 Or if a migration is recorded as applied but was never run:
 
 ```bash name=Terminal
-supabase migration repair --status reverted <migration-timestamp>
+supabase migration repair --status reverted <migration-timestamp> --remote
 ```
 
 <Admonition type="caution">
