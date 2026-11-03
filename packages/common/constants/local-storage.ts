@@ -16,6 +16,7 @@ export const LOCAL_STORAGE_KEYS = {
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
   STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  LOG_VISIBILITY: (ref: string) => `log-visibility-${ref}`,
   HOME_CHART_INTERVAL: (ref: string) => `home-chart-interval-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 

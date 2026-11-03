@@ -64,6 +64,9 @@ const parseAsSort = createParser({
   },
 })
 
+export const LOG_VISIBILITY_VALUES = ['all', 'errors_only'] as const
+export type LogVisibility = (typeof LOG_VISIBILITY_VALUES)[number]
+
 export const SEARCH_PARAMS_PARSER = {
   // Equality filters. Repeatable `?filter=column:opAbbrev:value` (e.g. `level:eq:info`,
   // `host:neq:foo`). Parsed with the helpers in `UnifiedLogs.filters.ts`.

@@ -61,6 +61,7 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
+import { useLogVisibility } from './useLogVisibility'
 import { AlertError } from '@/components/ui/AlertError'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -193,13 +194,15 @@ export const UnifiedLogs = ({
     [showMultigresLogs, canShowPipelinesLogs, computeAvailability.canQueryCompute, scope]
   )
 
+  const { logVisibility } = useLogVisibility(projectRef)
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search, scope)
     if (parameters.filter) {
       parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
+    if (logVisibility !== 'all') parameters.log_visibility = logVisibility
     return parameters
-  }, [search, scope, queryLogTypeVisibility])
+  }, [search, scope, queryLogTypeVisibility, logVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
   const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
   const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
@@ -387,7 +390,8 @@ export const UnifiedLogs = ({
       defaultFilterFields.filter(
         (field) =>
           isOfferedFilter(field.value, offeredFilters) &&
-          (field.value !== 'pipeline_id' || canFilterByPipeline)
+          (field.value !== 'pipeline_id' || canFilterByPipeline) &&
+          (field.value !== 'level' || logVisibility === 'all')
       ),
       queryLogTypeVisibility
     )
@@ -429,7 +433,7 @@ export const UnifiedLogs = ({
 
       return { ...field, options }
     })
-  }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
+  }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView, logVisibility])
 
   const applyFilterSearch = () => {
     const offeredColumnFilters = columnFilters.filter(

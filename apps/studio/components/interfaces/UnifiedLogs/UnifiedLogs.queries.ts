@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE, type LogVisibility } from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -478,11 +478,19 @@ export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean 
   return !sources.some((source) => USER_ATTRIBUTABLE_SOURCES.has(source))
 }
 
+const getLogVisibilityCondition = (visibility?: LogVisibility): SafeLogSqlFragment | null => {
+  if (visibility !== 'errors_only') return null
+  return safeSql`(toInt32OrZero((${HTTP_STATUS_EXPR})) >= 400 OR severity_text IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY') OR lower(log_attributes['level']) IN ('error','fatal'))`
+}
+
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const conditions: SafeLogSqlFragment[] = []
 
   const userCondition = userAttributionCondition(search)
   if (userCondition) conditions.push(userCondition)
+
+  const logVisibilityCondition = getLogVisibilityCondition(search.log_visibility)
+  if (logVisibilityCondition) conditions.push(logVisibilityCondition)
 
   // Visible by default — only an explicit `false` hides connection logs.
   if (search.show_connection_logs === false) {

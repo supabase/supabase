@@ -841,3 +841,29 @@ describe('Pipelines logs', () => {
     }
   )
 })
+
+describe('log visibility', () => {
+  const errorsOnly = { ...baseSearch, log_visibility: 'errors_only' as const }
+  const condition = "severity_text IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY')"
+
+  it('adds the errors only condition to the row, count, and chart queries', () => {
+    expect(getUnifiedLogsQuery(errorsOnly)).toContain(condition)
+    expect(getLogsCountQuery(errorsOnly)).toContain(condition)
+    expect(getLogsChartQuery(errorsOnly)).toContain(condition)
+  })
+
+  it('leaves the query unchanged for all', () => {
+    expect(getUnifiedLogsQuery({ ...baseSearch, log_visibility: 'all' })).toBe(
+      getUnifiedLogsQuery(baseSearch)
+    )
+  })
+
+  it('keeps user filters as an additional narrowing condition', () => {
+    const sql = getUnifiedLogsQuery({
+      ...withFilters('level:eq:success'),
+      log_visibility: 'errors_only',
+    })
+    expect(sql).toContain(condition)
+    expect(sql).toContain("IN ('success')")
+  })
+})
