@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - master
+    paths:
+      - '.github/workflows/kb-troubleshooting-sync.yml'
+      - 'apps/kb/**'
   workflow_dispatch:
 
 permissions:
