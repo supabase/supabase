@@ -1,0 +1,52 @@
+:root {
+  --guide-reveal-duration: 400ms;
+}
+
+.guide-skeleton-well {
+  --well-bg: rgb(0 0 0 / 0.025);
+  --well-ring: rgb(0 0 0 / 0.06);
+  --well-top: rgb(0 0 0 / 0.1);
+  --well-soft: rgb(0 0 0 / 0.05);
+  --well-lip: rgb(255 255 255 / 0.9);
+  background: var(--well-bg);
+  box-shadow:
+    inset 0 0 0 0.5px var(--well-ring),
+    inset 0 1px 1px -0.5px var(--well-top),
+    inset 0 1px 3px 0 var(--well-soft),
+    0 0.5px 0 0 var(--well-lip);
+  animation: guide-skeleton-breathe 1800ms ease-in-out infinite;
+}
+
+html[data-theme*='dark'] .guide-skeleton-well {
+  --well-bg: rgb(0 0 0 / 0.16);
+  --well-ring: rgb(255 255 255 / 0.05);
+  --well-top: rgb(0 0 0 / 0.55);
+  --well-soft: rgb(0 0 0 / 0.35);
+  --well-lip: rgb(255 255 255 / 0.07);
+}
+
+@keyframes guide-skeleton-breathe {
+  50% {
+    opacity: 0.75;
+  }
+}
+
+/* the skeleton already drew the breadcrumbs and title, so only the rest of the page fades in */
+html[data-guide-reveal] [data-guide-page] > :not(:first-child),
+html[data-guide-reveal] #sb-docs-guide-main-article > :not(header),
+html[data-guide-reveal] #sb-docs-guide-main-article > header > :not(h1) {
+  animation: guide-skeleton-reveal var(--guide-reveal-duration) ease-in-out;
+}
+
+@keyframes guide-skeleton-reveal {
+  from {
+    opacity: 0.35;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .guide-skeleton-well,
+  html[data-guide-reveal] [data-guide-page] * {
+    animation: none;
+  }
+}

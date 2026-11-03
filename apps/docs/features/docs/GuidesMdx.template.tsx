@@ -98,7 +98,7 @@ const GuideTemplate = ({
 
   return (
     <TocAnchorsProvider>
-      <div className={'grid grid-cols-12 relative gap-4'}>
+      <div data-guide-page className={'grid grid-cols-12 relative gap-4'}>
         <div
           className={cn(
             'relative',
