@@ -16,9 +16,9 @@ Two smaller changes can affect a production project: `config push` now applies `
 
 A removed command or flag still parses: it exits with code 1 and prints its replacement, so a failing run tells you what to change.
 
-<Admonition type="caution" label="Older projects fail to start until you rename [inbucket]">
+<Admonition type="caution" title="Older projects fail to start until you rename [inbucket]">
 
-v3 can't load a `supabase/config.toml` that has an `[inbucket]` section, so `supabase start`, `stop`, `status`, and the `db` commands fail. Projects created with `supabase init` before v2.108.0 have that section. Rename it to `[local_smtp]` before you upgrade: the keys inside it don't change, and v2.108.0 and later already read `[local_smtp]`. See [Rename `[inbucket]` to `[local_smtp]`](#inbucket).
+v3 can't load a `supabase/config.toml` that has an `[inbucket]` section, so `supabase start`, `stop`, `status`, and the `db` commands fail. Projects created with `supabase init` before v2.108.0 have that section. Rename it to `[local_smtp]` before you upgrade. The keys inside it don't change. v2.108.0 and later already read `[local_smtp]`. See [Rename `[inbucket]` to `[local_smtp]`](#inbucket).
 
 </Admonition>
 
@@ -339,7 +339,7 @@ If a script reads `INBUCKET_URL` from `supabase status -o env`, it now gets an e
 
 ### Rename `[inbucket]` to `[local_smtp]` [#inbucket]
 
-Before v2.108.0, `supabase init` wrote an `[inbucket]` section for the local email testing server. v3 no longer reads it, so every command that loads your project config fails, including `supabase start`, `stop`, `status`, and the `db` commands:
+Before v2.108.0, `supabase init` wrote an `[inbucket]` section for the local email testing server. v3 no longer reads it. Every command that loads your project config fails, including `supabase start`, `stop`, `status`, and the `db` commands:
 
 ```text
 [inbucket] in supabase/config.toml is no longer supported. Use [local_smtp] instead.
@@ -361,7 +361,7 @@ port = 54324
 
 - Rename any `[remotes.<name>.inbucket]` block to `[remotes.<name>.local_smtp]`.
 - In `supabase/config.json`, rename the `inbucket` key to `local_smtp`.
-- v2.108.0 and later read `[local_smtp]` and warn about `[inbucket]`, so you can rename the section before you upgrade without breaking CI jobs that run v2.108.0 or later.
+- v2.108.0 and later read `[local_smtp]` and warn about `[inbucket]`. You can rename the section before you upgrade without breaking CI jobs on v2.108.0 or later.
 
 ## Error names and messages
 
