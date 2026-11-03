@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { createMarketplaceClient, type MarketplaceListing } from 'common/marketplace-client'
 
 import { marketplaceIntegrationsKeys } from './keys'
@@ -30,6 +31,6 @@ export const useMarketplaceIntegrationsQuery = <TData = MarketplaceIntegrationsD
   useQuery<MarketplaceIntegrationsData, MarketplaceIntegrationsError, TData>({
     queryKey: marketplaceIntegrationsKeys.list(),
     queryFn: ({ signal }) => getMarketplaceIntegrations(signal),
-    enabled,
+    enabled: enabled && IS_PLATFORM,
     ...options,
   })
