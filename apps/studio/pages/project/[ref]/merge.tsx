@@ -34,6 +34,7 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -73,6 +74,19 @@ const MergePage: NextPageWithLayout = () => {
   })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
 
   const {
     diffContent,
@@ -120,9 +134,15 @@ const MergePage: NextPageWithLayout = () => {
       setWorkflowFinalStatus(status)
       refetchDiff()
       clearDiffsOptimistically()
-      if (ref && parentProjectRef && currentBranch?.review_requested_at) {
+      if (
+        ref &&
+        parentProjectRef &&
+        currentBranch?.review_requested_at &&
+        updateBranchGrant.status === 'granted'
+      ) {
         updateBranch(
           {
+            grant: updateBranchGrant.grant,
             branchRef: ref,
             projectRef: parentProjectRef,
             requestReview: false,
@@ -139,6 +159,7 @@ const MergePage: NextPageWithLayout = () => {
       parentProjectRef,
       ref,
       updateBranch,
+      updateBranchGrant,
       currentBranch?.review_requested_at,
     ]
   )
@@ -239,16 +260,18 @@ const MergePage: NextPageWithLayout = () => {
   })
 
   const handlePush = () => {
-    if (!ref || !parentProjectRef) return
+    if (!ref || !parentProjectRef || pushBranchGrant.status !== 'granted') return
     pushBranch({
+      grant: pushBranchGrant.grant,
       branchRef: ref,
       projectRef: parentProjectRef,
     })
   }
 
   const handleCloseBranch = () => {
-    if (!ref || !parentProjectRef) return
+    if (!ref || !parentProjectRef || deleteBranchGrant.status !== 'granted') return
     deleteBranch({
+      grant: deleteBranchGrant.grant,
       branchRef: ref,
       projectRef: parentProjectRef,
     })
@@ -392,6 +415,7 @@ const MergePage: NextPageWithLayout = () => {
               hasEdgeFunctionModifications={hasEdgeFunctionModifications}
               modifiedFunctionsCount={modifiedFunctionsCount}
               isPushing={isPushing}
+              canPush={pushBranchGrant.status === 'granted'}
               onPush={handlePush}
             />
           ) : currentWorkflowRunId ? (
@@ -428,6 +452,7 @@ const MergePage: NextPageWithLayout = () => {
                   ) : hasCurrentWorkflowCompleted ? (
                     <Button
                       onClick={handleCloseBranch}
+                      disabled={deleteBranchGrant.status !== 'granted'}
                       loading={isDeleting}
                       icon={<XIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"

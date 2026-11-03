@@ -6,6 +6,7 @@ import {
   DatabaseIcon,
   NetworkIcon,
   TerminalIcon,
+  WorkflowIcon,
 } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -31,6 +32,7 @@ const ICON_MAP = new Map<string, IconComponent>([
   ['supavisor', CableIcon],
   ['pgbouncer', CableIcon],
   ['multigres', NetworkIcon],
+  ['pipelines', WorkflowIcon],
   ['compute', Compute],
 ])
 

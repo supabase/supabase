@@ -14,11 +14,11 @@ import { PipelineDestinationSelection } from '../CreatePipeline/PipelineDestinat
 import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../useIsPipelinesEnabled'
 import { DestinationType } from './DestinationPanel.types'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
@@ -37,10 +37,10 @@ interface DestinationTypeGroup {
 
 export const DestinationTypeSelection = () => {
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -76,28 +76,28 @@ export const DestinationTypeSelection = () => {
           label: 'BigQuery',
           description: 'Replicate changes to BigQuery for analytics and BI',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+          enabled: isOptionVisible('BigQuery', isBigQueryEnabled),
         },
         {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to DuckLake for open lakehouse storage',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+          enabled: isOptionVisible('DuckLake', isDuckLakeEnabled),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description: 'Replicate changes to Snowflake for cloud data warehousing',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+          enabled: isOptionVisible('Snowflake', isSnowflakeEnabled),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Replicate changes to ClickHouse for real-time analytics',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
+          enabled: isOptionVisible('ClickHouse', isClickHouseEnabled),
         },
       ],
     },

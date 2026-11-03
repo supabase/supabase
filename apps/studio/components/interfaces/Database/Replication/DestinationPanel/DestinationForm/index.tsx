@@ -16,11 +16,11 @@ import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinat
 import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
 import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import {
@@ -99,10 +99,10 @@ export const DestinationForm = ({
   const isDuckLakeProjectBlocked =
     selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
@@ -119,12 +119,12 @@ export const DestinationForm = ({
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
     const destinations = []
-    if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
+    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [etlEnableBigQuery, etlEnableDucklake, etlEnableSnowflake, etlEnableClickHouse])
+  }, [isBigQueryEnabled, isDuckLakeEnabled, isSnowflakeEnabled, isClickHouseEnabled])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
@@ -443,10 +443,10 @@ export const DestinationForm = ({
 
   const destinationFields = (
     <>
-      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+      {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'DuckLake' && etlEnableDucklake && (
+      {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>
           <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
             {isManagedDuckLake && isProjectPending && !isProjectFetched
@@ -476,10 +476,10 @@ export const DestinationForm = ({
           <DuckLakeFields form={form} editMode={editMode} />
         </>
       )}
-      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+      {selectedType === 'Snowflake' && isSnowflakeEnabled && (
         <SnowflakeFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+      {selectedType === 'ClickHouse' && isClickHouseEnabled && (
         <ClickHouseFields form={form} editMode={editMode} />
       )}
     </>

@@ -23,32 +23,29 @@ const useIsCurrentOrgInFlagList = (flag: string) => {
   return allowedOrgSlugs.includes(organization?.slug ?? '')
 }
 
-export const useIsETLBigQueryPrivateAlpha = () => {
+export const useIsPipelinesBigQueryEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
 }
 
-export const useIsETLDucklakePrivateAlpha = () => {
+export const useIsPipelinesDuckLakeEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
 }
 
-export const useIsETLSnowflakePrivateAlpha = () => {
+export const useIsPipelinesSnowflakeEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
 }
 
-export const useIsETLClickHousePrivateAlpha = () => {
+export const useIsPipelinesClickHouseEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableClickHousePrivateAlpha')
 }
 
-export const useIsETLPrivateAlpha = () => {
-  const hasAccessToETLBigQuery = useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
-  const hasAccessToETLDucklake = useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
-  const hasAccessToETLSnowflake = useIsCurrentOrgInFlagList('etlEnableSnowflakePrivateAlpha')
-  const hasAccessToETLClickHouse = useIsCurrentOrgInFlagList('etlEnableClickHousePrivateAlpha')
+export const useIsPipelinesEnabled = () => {
+  const destinationAccess = [
+    useIsPipelinesBigQueryEnabled(),
+    useIsPipelinesDuckLakeEnabled(),
+    useIsPipelinesSnowflakeEnabled(),
+    useIsPipelinesClickHouseEnabled(),
+  ]
 
-  return (
-    hasAccessToETLBigQuery ||
-    hasAccessToETLDucklake ||
-    hasAccessToETLSnowflake ||
-    hasAccessToETLClickHouse
-  )
+  return destinationAccess.some(Boolean)
 }

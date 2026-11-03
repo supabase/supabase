@@ -290,6 +290,21 @@ describe('request timeline tab', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
+  it('shows an empty state when no related logs share an ID', async () => {
+    const user = userEvent.setup()
+    const { queryClient } = renderPanel([])
+
+    await user.click(screen.getByRole('tab', { name: 'Timeline' }))
+
+    expect(await screen.findByRole('heading', { name: 'No related logs' })).toBeVisible()
+    expect(
+      screen.getByText(
+        'Logs appear here when they share a request, trace, or function execution ID.'
+      )
+    ).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
   it('keeps an open log between the hidden steps before and after it', async () => {
     const user = userEvent.setup()
     const authSteps = Array.from({ length: 8 }, (_, i) => ({

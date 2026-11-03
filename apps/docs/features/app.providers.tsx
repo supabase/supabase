@@ -6,6 +6,7 @@ import type { PropsWithChildren } from 'react'
 import { TooltipProvider } from 'ui'
 
 import { AuthContainer } from './auth/auth.client'
+import { SearchV2Provider } from './SearchV2/SearchV2Provider'
 import { QueryClientProvider } from './data/queryClient.client'
 import { PageTelemetry } from './telemetry/telemetry.client'
 import { Toaster } from './toaster'
@@ -25,10 +26,12 @@ function GlobalProviders({ children }: PropsWithChildren) {
             <ScrollRestoration />
             <ThemeProvider>
               <TooltipProvider delayDuration={0}>
-                <div className="flex flex-col">
-                  <SiteLayout>{children}</SiteLayout>
-                  <ThemeSandbox />
-                </div>
+                <SearchV2Provider>
+                  <div className="flex flex-col">
+                    <SiteLayout>{children}</SiteLayout>
+                    <ThemeSandbox />
+                  </div>
+                </SearchV2Provider>
                 <Toaster />
                 <DevToolbar />
               </TooltipProvider>
