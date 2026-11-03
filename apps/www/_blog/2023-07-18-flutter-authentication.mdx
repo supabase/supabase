@@ -29,7 +29,7 @@ We will use the following tools
 
 ## What is Open ID Connect?
 
-We will implement third-party login with Google utilizing the Open ID Connect functionality of Supabase Auth. Open ID Connect, or OIDC is a protocol built on top of OAuth 2.0 that allows third-party applications to request the users to provide some personal information, such as name or profile image, in the form of an identity token along with an access token. This identity token can then be verified and decoded by the application to obtain that personal information.
+We will implement third-party login with Google utilizing the Open ID Connect functionality of [Supabase Auth](/auth). Open ID Connect, or OIDC is a protocol built on top of OAuth 2.0 that allows third-party applications to request the users to provide some personal information, such as name or profile image, in the form of an identity token along with an access token. This identity token can then be verified and decoded by the application to obtain that personal information.
 
 Supabase auth provides `signInWithIdToken` method where we can sign in a user using their ID token obtained from third-party auth providers such as Google. Upon signing a user with the `signInWithIdToken` method, Supabase automatically populates the content of the ID token in the Supabase user metadata for easy access to the information. We will be utilizing this feature in this example to display the user profile upon the user signing in.
 
