@@ -23,6 +23,16 @@ const entitySearchResultSchema = z.object({
       policy_count: z.number(),
     })
   ),
+  policies: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      command: z.enum(['ALL', 'SELECT', 'INSERT', 'UPDATE', 'DELETE']),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+    })
+  ),
 })
 
 async function getEntitySearch(
@@ -47,6 +57,7 @@ async function getEntitySearch(
 
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
+export type EntitySearchPolicy = EntitySearchData['policies'][number]
 export type EntitySearchError = ResponseError
 
 export const entitySearchQueryOptions = (
