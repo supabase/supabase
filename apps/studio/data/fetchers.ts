@@ -1,16 +1,19 @@
-import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
 import { reportEmptyBodyResponse } from './empty-body-diagnostics'
-import { ERROR_PATTERNS } from './error-patterns'
+import {
+  classifyError,
+  classifyResponseError,
+  parseResponseErrorBody,
+} from './error-classification'
 import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
-import { StudioError, UnknownAPIResponseError } from '@/lib/errors/studio-errors'
+import { reportStudioError, type StudioSentryContext } from '@/lib/errors/report-studio-error'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
-import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
 
@@ -112,12 +115,12 @@ function pgMetaGuard(request: Request) {
     // in such case, we save the hops and throw a 421 response instead
     if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
       const retryAfterHeader = request.headers.get('Retry-After')
-      throw new StudioError(
-        'API Error: happened while trying to acquire connection to the database',
-        400,
-        request.headers.get('X-Request-Id') ?? undefined,
-        retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-      )
+      throw classifyResponseError({
+        message: 'API Error: happened while trying to acquire connection to the database',
+        code: 400,
+        requestId: request.headers.get('X-Request-Id') ?? undefined,
+        retryAfter: retryAfterHeader ? parseInt(retryAfterHeader) : undefined,
+      })
     }
     if (!request.headers.get('x-pg-application-name')) {
       request.headers.set('x-pg-application-name', DEFAULT_PLATFORM_APPLICATION_NAME)
@@ -185,74 +188,19 @@ export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
-  sentryContext?: Parameters<typeof Sentry.captureException>[1]
+  sentryContext?: StudioSentryContext
 }
 
+/**
+ * Classifies an error (API response bodies by status and pattern), reports it to Sentry according to its routing (or always, with
+ * `alwaysCapture`), and throws it. Query and mutation functions call this so React Query receives
+ * a tagged error in its `error` state.
+ */
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
-  if (error && typeof error === 'object') {
-    if (options.alwaysCapture) {
-      Sentry.captureException(error, options.sentryContext)
-    }
-    const errorMessage =
-      'msg' in error && typeof error.msg === 'string'
-        ? error.msg
-        : 'message' in error && typeof error.message === 'string'
-          ? error.message
-          : undefined
-
-    const errorCode = 'code' in error && typeof error.code === 'number' ? error.code : undefined
-    const requestId =
-      'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
-    const retryAfter =
-      'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
-    const requestPathname =
-      'requestPathname' in error && typeof error.requestPathname === 'string'
-        ? error.requestPathname
-        : undefined
-    const metadata =
-      'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
-        ? (error.metadata as ErrorMetadata)
-        : undefined
-    const formattedError =
-      'formattedError' in error && typeof error.formattedError === 'string'
-        ? error.formattedError
-        : undefined
-
-    if (errorMessage) {
-      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
-      throw matched
-        ? new matched.ErrorClass(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
-        : new UnknownAPIResponseError(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
-    }
-  }
-
-  if (error !== null && typeof error === 'object' && 'stack' in error) {
-    console.error(error.stack)
-  }
-
-  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
-  // add handling for it.
-  Sentry.captureException(error, options.sentryContext)
-
-  // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
-  // up in the UI.
-  throw new UnknownAPIResponseError(undefined)
+  const raw = parseResponseErrorBody(error)
+  const classified = raw ? classifyResponseError(raw) : classifyError(error)
+  reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
+  throw classified
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them
@@ -314,11 +262,11 @@ async function handleFetchError(response: unknown): Promise<StudioError> {
       : null
   const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
 
-  let error = new StudioError(message, status, undefined, retryAfter)
+  let error = classifyResponseError({ message, code: status, retryAfter })
 
   // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
   // This is a fix to keep those checks working without breaking changes.
-  // In future we should check for `if (response instanceof StudioError)` instead.
+  // In future we should check for `if (isStudioError(response))` instead.
   error.error = error
 
   return error

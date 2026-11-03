@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 type CaptureMessageOptions = {
   context: string
@@ -43,7 +44,7 @@ export function captureCriticalError(
     return
   }
 
-  if (error instanceof StudioError) {
+  if (isStudioError(error)) {
     handleResponseError(error, context)
     return
   }

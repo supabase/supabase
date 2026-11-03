@@ -16,7 +16,7 @@ import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
 import { handleError } from '@/data/fetchers'
 import { tableKeys } from '@/data/tables/keys'
 import { isManualApprovalRequested } from '@/lib/ai/message-utils'
-import { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { tryParseJson } from '@/lib/helpers'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
 
@@ -154,7 +154,7 @@ export const onErrorChat = (error: Error) => {
   try {
     handleError(parsedError?.error || parsedError || error)
   } catch (e: any) {
-    if (e instanceof StudioError) {
+    if (isStudioError(e)) {
       toast.error(e.message)
     } else if (e instanceof Error) {
       toast.error(e.message)

@@ -3,6 +3,7 @@ import { fgaRequirements, type FgaGuardedEndpoint } from 'api-types'
 import { useIsLoggedIn } from 'common'
 import { useMemo } from 'react'
 
+import { classifyError } from '@/data/error-classification'
 import {
   permissionsQueryOptionsV2,
   usePermissionsQueryV2,
@@ -11,7 +12,7 @@ import {
 import { prefetchProjectDetail } from '@/data/projects/project-detail-query'
 import { doPermissionsCheckV2, usePermissionScopeV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { fgaRefinements, type FgaRefinementMap, type FgaRefinements } from '@/lib/fga-refinements'
 
 export type VariantOf<E extends FgaGuardedEndpoint> = FgaRefinements extends {
@@ -219,10 +220,6 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
     ])
     return getGrant(permissions, endpoint, resolvedScope, opts)
   } catch (error) {
-    const responseError =
-      error instanceof StudioError
-        ? error
-        : new StudioError(error instanceof Error ? error.message : undefined)
-    return { status: 'error', error: responseError }
+    return { status: 'error', error: classifyError(error) }
   }
 }
