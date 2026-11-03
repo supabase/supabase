@@ -10,19 +10,9 @@ import {
 } from './labels'
 import type { Characteristic, CompetitorProfile } from './types'
 
-export type RowKey =
-  | 'license'
-  | 'open_source_scope'
-  | 'self_host'
-  | 'wire_protocol'
-  | 'query_model'
-  | 'upstream_projects'
-  | 'export_format'
-  | 'loads_into_standard_server'
-
 export interface CellResult {
   text: string
-  /** Footnote number, present when the characteristic has notes. */
+  /** Footnote number, present when the characteristic has a footnote. */
   footnote?: number
 }
 
@@ -39,62 +29,55 @@ export interface ComparisonTable {
 }
 
 interface Row {
-  key: RowKey
   label: string
-  cell: (profile: CompetitorProfile) => { text: string; notes?: string; sourcing_urls: string[] }
+  cell: (profile: CompetitorProfile) => { text: string; footnote?: string; sourcing_urls: string[] }
 }
 
 // Turns one characteristic into display text. `null` means not verified, so it
 // renders as "Unknown" and never as "No".
 const row = <T>(
-  key: RowKey,
   label: string,
   characteristic: (profile: CompetitorProfile) => Characteristic<T>,
   format: (value: T) => string
 ): Row => ({
-  key,
   label,
   cell: (profile) => {
     const c = characteristic(profile)
     const text = c.value === null ? UNKNOWN_LABEL : format(c.value)
-    return { text, notes: c.notes, sourcing_urls: c.sourcing_urls }
+    return { text, footnote: c.footnote, sourcing_urls: c.sourcing_urls }
   },
 })
 
-const ROWS: Row[] = [
-  row(
-    'license',
+// The single place a row is defined. Its key is the object key, so `RowKey`,
+// the default row list, and the generator's row choices all follow from here.
+const ROW_DEFINITIONS = {
+  license: row(
     'License',
     (p) => p.deployment.license,
     ({ tier, spdx_id }) => (spdx_id ? `${LICENSE_LABELS[tier]} (${spdx_id})` : LICENSE_LABELS[tier])
   ),
-  row(
-    'open_source_scope',
+  open_source_scope: row(
     'Open-source scope',
     (p) => p.deployment.open_source_scope,
     (scopes) =>
       scopes.length === 0 ? NONE_LABEL : scopes.map((s) => OPEN_SOURCE_SCOPE_LABELS[s]).join(', ')
   ),
-  row(
-    'self_host',
+  self_host: row(
     'Self-host',
     (p) => p.deployment.self_host,
     (level) => SELF_HOST_LABELS[level]
   ),
-  row(
-    'wire_protocol',
+  wire_protocol: row(
     'Wire protocol',
     (p) => p.portability.wire_protocol,
     (protocols) => protocols.map((p) => WIRE_PROTOCOL_LABELS[p]).join(', ')
   ),
-  row(
-    'query_model',
+  query_model: row(
     'Query model',
     (p) => p.portability.query_model,
     (model) => QUERY_MODEL_LABELS[model]
   ),
-  row(
-    'upstream_projects',
+  upstream_projects: row(
     'Upstream projects',
     (p) => p.portability.upstream_projects,
     (projects) =>
@@ -104,25 +87,26 @@ const ROWS: Row[] = [
             .map((u) => `${u.name} (${u.license})${u.cncf_status ? `, CNCF ${u.cncf_status}` : ''}`)
             .join('; ')
   ),
-  row(
-    'export_format',
+  export_format: row(
     'Export format',
     (p) => p.portability.export_format,
     (format) => EXPORT_FORMAT_LABELS[format]
   ),
-  row(
-    'loads_into_standard_server',
+  loads_into_standard_server: row(
     'Loads into a standard server',
     (p) => p.portability.loads_into_standard_server,
     (loads) => (loads ? 'Yes' : 'No')
   ),
-]
+} satisfies Record<string, Row>
 
-export const ALL_ROW_KEYS: RowKey[] = ROWS.map((r) => r.key)
+export type RowKey = keyof typeof ROW_DEFINITIONS
+
+// Object keys keep insertion order, so this is the order of the rows as defined above.
+export const ALL_ROW_KEYS = Object.keys(ROW_DEFINITIONS) as RowKey[]
 
 // Builds the table model. Rows appear in the order given by `rowKeys`. Footnotes
-// are numbered in reading order, so a cell with notes gets a number and its note
-// is listed below the table with sources.
+// are numbered in reading order, so a cell with a footnote gets a number and its
+// text is listed below the table with sources.
 export const buildComparisonTable = (
   profiles: CompetitorProfile[],
   rowKeys: RowKey[] = ALL_ROW_KEYS
@@ -130,14 +114,14 @@ export const buildComparisonTable = (
   const footnotes: Footnote[] = []
 
   const rows = rowKeys.map((key) => {
-    const r = ROWS.find((candidate) => candidate.key === key)!
+    const r = ROW_DEFINITIONS[key]
     return {
       label: r.label,
       cells: profiles.map((profile): CellResult => {
-        const { text, notes, sourcing_urls } = r.cell(profile)
-        if (!notes) return { text }
+        const { text, footnote, sourcing_urls } = r.cell(profile)
+        if (!footnote) return { text }
         const number = footnotes.length + 1
-        footnotes.push({ number, notes, sourcing_urls })
+        footnotes.push({ number, notes: footnote, sourcing_urls })
         return { text, footnote: number }
       }),
     }

@@ -20,7 +20,10 @@ export const ComparisonTable = ({ profiles = allProfiles, rows }: ComparisonTabl
         <table className="w-full min-w-max border-collapse text-left text-sm">
           <thead>
             <tr>
-              <th scope="col" className="border-b px-3 py-2 font-medium text-foreground-light" />
+              <th
+                scope="col"
+                className="sticky left-0 z-10 border-b bg-background px-3 py-2 font-medium text-foreground-light"
+              />
               {table.profileNames.map((name) => (
                 <th
                   key={name}
@@ -37,7 +40,7 @@ export const ComparisonTable = ({ profiles = allProfiles, rows }: ComparisonTabl
               <tr key={row.label}>
                 <th
                   scope="row"
-                  className="border-b px-3 py-2 align-top font-medium text-foreground-light"
+                  className="sticky left-0 z-10 border-b bg-background px-3 py-2 align-top font-medium text-foreground-light"
                 >
                   {row.label}
                 </th>

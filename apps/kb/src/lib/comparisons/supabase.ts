@@ -30,6 +30,7 @@ export const supabase = {
     wire_protocol: {
       value: ['postgres'],
       notes: 'Every project gets a full Postgres database, not a Postgres abstraction.',
+      footnote: 'Sample footnote for the wire protocol column.',
       sourcing_urls: ['https://supabase.com/docs/guides/database/overview'],
     },
     query_model: {

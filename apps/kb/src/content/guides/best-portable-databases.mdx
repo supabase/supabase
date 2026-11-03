@@ -4,21 +4,23 @@ description: 'How the database and backend platforms we compare differ in wire p
 topics: ['Comparison']
 ---
 
-import { ComparisonTable } from '../../components/ComparisonTable'
-
 "Portable" means you can move your data and application code to another provider or to your own servers without rewriting it. This guide ranks the platforms we compare by three things: the wire protocol clients use, the query model, and whether the underlying software is open. It covers five platforms, so it isn't a survey of every portable database.
 
 ## Compared at a glance
 
-<ComparisonTable
-  rows={[
-    'wire_protocol',
-    'query_model',
-    'upstream_projects',
-    'export_format',
-    'loads_into_standard_server',
-  ]}
-/>
+{/* comparison-table:start best-portable */}
+
+|  | Supabase | Neon | PlanetScale | Convex | Firebase |
+| --- | --- | --- | --- | --- | --- |
+| Wire protocol | Postgres[^1] | Postgres | MySQL, Postgres | Proprietary | Proprietary |
+| Query model | SQL | SQL | SQL | Document | Document |
+| Upstream projects | PostgreSQL (PostgreSQL) | PostgreSQL (PostgreSQL) | Vitess (Apache-2.0), CNCF Graduated; PostgreSQL (PostgreSQL) | None | None |
+| Export format | pg_dump | pg_dump | MySQL SQL | Zip archive | LevelDB |
+| Loads into a standard server | Yes | Yes | Yes | Unknown | No |
+
+[^1]: Sample footnote for the wire protocol column. Sources: https://supabase.com/docs/guides/database/overview
+
+{/* comparison-table:end best-portable */}
 
 "Unknown" means we haven't verified that claim.
 

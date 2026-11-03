@@ -18,6 +18,8 @@ export interface Characteristic<T> {
   value: T | null
   /** Caveats or the scope the value applies to. */
   notes?: string
+  /** Text for a numbered footnote under the table. Not populated yet, and the table reads this instead of `notes`. */
+  footnote?: string
   /** URLs that support `value`. Empty when `value` is `null`. */
   sourcing_urls: string[]
 }

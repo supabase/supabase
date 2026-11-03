@@ -40,12 +40,35 @@ describe('buildComparisonTable', () => {
     expect(cellText(table, 'Upstream projects', 'Convex')).toBe('None')
   })
 
-  it('numbers footnotes in order, one per cell with notes', () => {
-    const numbers = table.footnotes.map((f) => f.number)
-    expect(numbers).toEqual(numbers.map((_, i) => i + 1))
+  it('ignores notes and creates no footnotes without a footnote field', () => {
+    const withoutFootnotes = buildComparisonTable(profiles.filter((p) => p.name !== 'Supabase'))
+    expect(withoutFootnotes.footnotes).toEqual([])
+    expect(
+      withoutFootnotes.rows.flatMap((r) => r.cells).every((c) => c.footnote === undefined)
+    ).toBe(true)
+  })
 
-    const footnoteCells = table.rows.flatMap((r) => r.cells).filter((c) => c.footnote !== undefined)
-    expect(footnoteCells.length).toBe(table.footnotes.length)
+  it('pulls footnotes from the footnote field, not notes', () => {
+    const withFootnote = {
+      ...supabase,
+      deployment: {
+        ...supabase.deployment,
+        self_host: { ...supabase.deployment.self_host, footnote: 'Test footnote' },
+      },
+    } as CompetitorProfile
+
+    const footnoteTable = buildComparisonTable([withFootnote], ['self_host'])
+    expect(footnoteTable.rows.find((r) => r.label === 'Self-host')!.cells[0]).toEqual({
+      text: 'Official (Docker)',
+      footnote: 1,
+    })
+    expect(footnoteTable.footnotes).toEqual([
+      {
+        number: 1,
+        notes: 'Test footnote',
+        sourcing_urls: supabase.deployment.self_host.sourcing_urls,
+      },
+    ])
   })
 
   it('renders null as Unknown, never as a negative', () => {

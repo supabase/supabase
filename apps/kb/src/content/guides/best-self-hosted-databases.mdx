@@ -4,13 +4,19 @@ description: 'How the database and backend platforms we compare differ in self-h
 topics: ['Comparison']
 ---
 
-import { ComparisonTable } from '../../components/ComparisonTable'
-
 "Best" depends on what you need to run yourself. This guide ranks the platforms we compare by how well they support self-hosting, based on each vendor's documentation. It covers five platforms, so it isn't a survey of every self-hostable database.
 
 ## Compared at a glance
 
-<ComparisonTable rows={['self_host', 'license', 'open_source_scope']} />
+{/* comparison-table:start best-self-hosted */}
+
+|  | Supabase | Neon | PlanetScale | Convex | Firebase |
+| --- | --- | --- | --- | --- | --- |
+| Self-host | Official (Docker) | Community only | No self-host | Official guide | No self-host |
+| License | Open source (OSI) (Apache-2.0) | Open source (OSI) (Apache-2.0) | Closed | Fair source | Closed |
+| Open-source scope | Backend services, Dashboard | Storage engine | None | Backend services, Dashboard | Client SDKs |
+
+{/* comparison-table:end best-self-hosted */}
 
 "Unknown" means we haven't verified that claim.
 
