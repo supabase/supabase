@@ -18,11 +18,23 @@ describe('next.config.mjs', () => {
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
-          source: '/dashboard/:path*',
+          source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
           headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
         }),
       ])
     )
+  })
+
+  it('keeps sign-in and sign-up indexable while other dashboard paths stay noindex', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+    const noindexRule = headers.find((header) => header.source.startsWith('/dashboard/'))
+    const matches = getPathMatch(noindexRule!.source)
+
+    expect(matches('/dashboard/sign-in')).toBe(false)
+    expect(matches('/dashboard/sign-up')).toBe(false)
+    expect(matches('/dashboard/org')).toBeTruthy()
+    expect(matches('/dashboard/project/abc')).toBeTruthy()
   })
 
   it('serves the published CLI schemas with CORS and a short cache', async () => {
