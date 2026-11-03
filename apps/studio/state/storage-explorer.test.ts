@@ -136,6 +136,84 @@ describe('refetchAllOpenedFolders', () => {
   })
 })
 
+describe('fetchMoreFolderContents', () => {
+  const PAGE_SIZE = 200
+  const EMPTY_PLACEHOLDER = '.emptyFolderPlaceholder'
+
+  function makeObject(name: string): StorageObject {
+    return {
+      id: `id-${name}`,
+      name,
+      created_at: '2024-01-01T00:00:00Z',
+      updated_at: '2024-01-01T00:00:00Z',
+      last_accessed_at: '2024-01-01T00:00:00Z',
+      metadata: { size: 1, mimetype: 'text/plain' },
+    }
+  }
+
+  /** Serves `listing` the way the Storage API does: sliced by the request's offset and limit. */
+  function mockPaginatedListing(listing: StorageObject[]) {
+    const requestedOffsets: number[] = []
+    addAPIMock({
+      method: 'post',
+      path: '/platform/storage/:ref/buckets/:id/objects/list',
+      response: async ({ request }) => {
+        const { options } = (await request.json()) as {
+          options: { offset: number; limit: number }
+        }
+        const { offset, limit } = options
+        requestedOffsets.push(offset)
+        return HttpResponse.json<StorageObject[]>(listing.slice(offset, offset + limit))
+      },
+    })
+    return requestedOffsets
+  }
+
+  /** Opens `docs` from the bucket root, then scrolls until the listing is exhausted. */
+  async function loadAllPages(state: ReturnType<typeof createState>) {
+    state.columns = [
+      { id: null, name: 'bucket-a', path: '', status: STORAGE_ROW_STATUS.READY, items: [] },
+    ]
+    await state.fetchFolderContents({
+      bucketId: 'bucket-a',
+      folderId: null,
+      folderName: 'docs',
+      index: 0,
+    })
+    while (state.columns[1]?.hasMoreItems) {
+      await state.fetchMoreFolderContents({ index: 1, column: state.columns[1] })
+    }
+    return state.columns[1]?.items.map((item) => item.name)
+  }
+
+  it('does not repeat a file at the page boundary when the folder holds a hidden placeholder', async () => {
+    const files = Array.from({ length: 300 }, (_, i) =>
+      makeObject(`file-${String(i).padStart(3, '0')}.txt`)
+    )
+    // The placeholder sorts first, so it occupies a slot in the first page but is never shown
+    const requestedOffsets = mockPaginatedListing([makeObject(EMPTY_PLACEHOLDER), ...files])
+
+    const state = createState(makeBucket('bucket-a'))
+    const names = await loadAllPages(state)
+
+    expect(names).toEqual(files.map((file) => file.name))
+    expect(requestedOffsets).toEqual([0, PAGE_SIZE])
+  })
+
+  it('pages by the visible item count when the folder has no placeholder', async () => {
+    const files = Array.from({ length: 450 }, (_, i) =>
+      makeObject(`file-${String(i).padStart(3, '0')}.txt`)
+    )
+    const requestedOffsets = mockPaginatedListing(files)
+
+    const state = createState(makeBucket('bucket-a'))
+    const names = await loadAllPages(state)
+
+    expect(names).toEqual(files.map((f) => f.name))
+    expect(requestedOffsets).toEqual([0, PAGE_SIZE, PAGE_SIZE * 2])
+  })
+})
+
 describe('selectRangeItems', () => {
   function makeFile(id: string): StorageItem {
     return {

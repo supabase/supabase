@@ -367,6 +367,7 @@ export function createStorageExplorerState({
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
+            fetchedItemsCount: (data ?? []).length,
             // Compare the raw page, not the formatted one: formatFolderItems drops the
             // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
             // pagination a page early.
@@ -401,7 +402,8 @@ export function createStorageExplorerState({
 
       const options = {
         limit: LIMIT,
-        offset: column.items.length,
+        // Raw count, not items.length: formatFolderItems hides the .emptyFolderPlaceholder
+        offset: column.fetchedItemsCount ?? column.items.length,
         search: searchString,
         sortBy: getSortOptions(),
       }
@@ -424,6 +426,7 @@ export function createStorageExplorerState({
             return {
               ...col,
               items: col.items.concat(formattedItems),
+              fetchedItemsCount: options.offset + data.length,
               isLoadingMoreItems: false,
               hasMoreItems: data.length === LIMIT,
             }
@@ -536,6 +539,7 @@ export function createStorageExplorerState({
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
           items: formattedItems,
+          fetchedItemsCount: items.length,
           // Raw page length — see fetchFolderContents. Getting this wrong here also
           // makes isParentListingExhaustive below claim a folder is missing.
           hasMoreItems: items.length === LIMIT,

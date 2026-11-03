@@ -24,6 +24,9 @@ export interface StorageColumn {
   path: string
   status: string
   items: StorageItem[]
+  // Objects the API has returned for this column, including ones hidden from `items`
+  // (e.g. .emptyFolderPlaceholder). Use this, not items.length, as the next page offset.
+  fetchedItemsCount?: number
   hasMoreItems?: boolean
   isLoadingMoreItems?: boolean
 }
