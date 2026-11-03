@@ -295,6 +295,8 @@ The API gateway leaves CORS on `/functions/v1/` to your function, as on the plat
 
 When you call a function from a browser, the function must handle preflight requests and return its own CORS headers. `withSupabase` does both. See [CORS support for Edge Functions](/docs/guides/functions/cors).
 
+A missing function, or one that fails to start, also shows up in the browser as a CORS or network error. Its preflight request gets an error status, so the browser doesn't send the actual request. Check the function name in the URL and run `docker compose logs functions`.
+
 ### Changes to function code not reflected after editing
 
 Restart the functions service:
