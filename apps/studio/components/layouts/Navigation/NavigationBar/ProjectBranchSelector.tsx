@@ -1,19 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
-import { useBreakpoint, useParams } from 'common'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from 'ui'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
-import { ProjectBranchSelectorPopover } from './ProjectBranchSelectorPopover'
 import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
 import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
@@ -62,8 +54,6 @@ export function ProjectBranchSelector() {
     router.push(organizationHref)
   }
 
-  const isMobile = useBreakpoint('md')
-
   if (isLoadingProject || !displayProject)
     return <ShimmeringLoader className="w-[120px] ml-1 md:py-3" />
 
@@ -88,36 +78,19 @@ export function ProjectBranchSelector() {
     onGoToOrganization: goToOrganization,
   }
 
-  if (isMobile) {
-    return (
-      <>
-        <ProjectBranchSelectorTrigger {...triggerProps} onClick={() => setOpen(true)} />
-        <ProjectBranchSelectorSheet
-          open={open}
-          onOpenChange={setOpen}
-          selectedRef={ref}
-          onClose={() => setOpen(false)}
-          selectedOrganization={selectedOrganization ?? null}
-          displayProject={displayProject ?? null}
-          selectedBranch={selectedBranch ?? null}
-          isMainBranch={isMainBranch}
-        />
-      </>
-    )
-  }
-
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <Popover open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger asChild>
-            <ProjectBranchSelectorTrigger {...triggerProps} />
-          </PopoverTrigger>
-          <PopoverContent className="p-0 w-[780px]" side="bottom" align="start">
-            <ProjectBranchSelectorPopover onClose={() => setOpen(false)} />
-          </PopoverContent>
-        </Popover>
-      </SidebarMenuItem>
-    </SidebarMenu>
+    <>
+      <ProjectBranchSelectorTrigger {...triggerProps} onClick={() => setOpen(true)} />
+      <ProjectBranchSelectorSheet
+        open={open}
+        onOpenChange={setOpen}
+        selectedRef={ref}
+        onClose={() => setOpen(false)}
+        selectedOrganization={selectedOrganization ?? null}
+        displayProject={displayProject ?? null}
+        selectedBranch={selectedBranch ?? null}
+        isMainBranch={isMainBranch}
+      />
+    </>
   )
 }
