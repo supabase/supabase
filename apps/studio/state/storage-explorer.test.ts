@@ -1,5 +1,5 @@
 // @vitest-environment jsdom
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { createStorageExplorerState } from './storage-explorer'
@@ -12,7 +12,7 @@ import { getQueryClient } from '@/data/query-client'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import type { Bucket } from '@/data/storage/buckets-query'
 import { storageKeys } from '@/data/storage/keys'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
 function makeBucket(id: string): Bucket {
   return {
@@ -49,13 +49,13 @@ const FOLDER_LISTING: StorageObject[] = [
   },
 ]
 
-function createState(bucket: Bucket) {
+function createState(bucket: Bucket, clientEndpoint = '') {
   return createStorageExplorerState({
     projectRef: 'test-ref',
     connectionString: '',
     bucket,
     resumableUploadUrl: '',
-    clientEndpoint: '',
+    clientEndpoint,
   })
 }
 
@@ -151,16 +151,21 @@ describe('fetchMoreFolderContents', () => {
     }
   }
 
-  /** Serves `listing` the way the Storage API does: sliced by the request's offset and limit. */
-  function mockPaginatedListing(listing: StorageObject[]) {
+  /**
+   * Serves `listing` for `listedPath` the way the Storage API does: sliced by the request's
+   * offset and limit. Other paths list as empty and are not recorded.
+   */
+  function mockPaginatedListing(listing: StorageObject[], listedPath = '') {
     const requestedOffsets: number[] = []
     addAPIMock({
       method: 'post',
       path: '/platform/storage/:ref/buckets/:id/objects/list',
       response: async ({ request }) => {
-        const { options } = (await request.json()) as {
+        const { path, options } = (await request.json()) as {
+          path: string
           options: { offset: number; limit: number }
         }
+        if (path !== listedPath) return HttpResponse.json<StorageObject[]>([])
         const { offset, limit } = options
         requestedOffsets.push(offset)
         return HttpResponse.json<StorageObject[]>(listing.slice(offset, offset + limit))
@@ -229,6 +234,103 @@ describe('fetchMoreFolderContents', () => {
     const names = state.columns[1]?.items.map((item) => item.name)
     expect(names).toEqual(['aaa', ...files.map((file) => file.name)])
     expect(requestedOffsets).toEqual([0, PAGE_SIZE + 1])
+  })
+
+  it('counts from the live column when archived rows are overlaid on the rendered one', async () => {
+    const files = Array.from({ length: 300 }, (_, i) =>
+      makeObject(`file-${String(i).padStart(3, '0')}.txt`)
+    )
+    const requestedOffsets = mockPaginatedListing([makeObject(EMPTY_PLACEHOLDER), ...files])
+
+    const state = createState(makeBucket('bucket-a'))
+    state.columns = [
+      { id: null, name: 'bucket-a', path: '', status: STORAGE_ROW_STATUS.READY, items: [] },
+    ]
+    await state.fetchFolderContents({
+      bucketId: 'bucket-a',
+      folderId: null,
+      folderName: 'docs',
+      index: 0,
+    })
+
+    // FileExplorer hands over a copy with archived rows merged in; the live listing has no such row
+    const liveColumn = state.columns[1]!
+    const archivedRow: StorageItem = {
+      ...liveColumn.items[0],
+      id: 'archived',
+      name: 'archived.txt',
+    }
+    await state.fetchMoreFolderContents({
+      index: 1,
+      column: { ...liveColumn, items: [...liveColumn.items, archivedRow] },
+    })
+
+    expect(requestedOffsets).toEqual([0, PAGE_SIZE])
+    expect(state.columns[1]?.items.map((item) => item.name)).toEqual(files.map((file) => file.name))
+  })
+
+  it("stays in step when creating a folder deletes the parent's hidden placeholder", async () => {
+    const clientEndpoint = 'http://storage.test'
+    const files = Array.from({ length: 250 }, (_, i) =>
+      makeObject(`file-${String(i).padStart(3, '0')}.txt`)
+    )
+    const listing = [makeObject(EMPTY_PLACEHOLDER), ...files]
+    const requestedOffsets = mockPaginatedListing(listing, 'docs')
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/projects/:ref/api-keys/temporary',
+      response: { api_key: 'sb_temp_nonce1234567890ab_payload1' },
+    })
+    // Creating the folder uploads its own placeholder, which lists as a folder in `docs`
+    mswServer.use(
+      http.post(`${clientEndpoint}/storage/v1/object/*`, () => {
+        listing.splice(1, 0, { ...makeObject('aaa-new'), id: null, metadata: null })
+        return HttpResponse.json({ Key: 'bucket-a/docs/aaa-new/.emptyFolderPlaceholder' })
+      })
+    )
+    addAPIMock({
+      method: 'delete',
+      path: '/platform/storage/:ref/buckets/:id/objects',
+      response: () => {
+        listing.shift()
+        return HttpResponse.json([])
+      },
+    })
+
+    const state = createState(makeBucket('bucket-a'), clientEndpoint)
+    state.columns = [
+      { id: null, name: 'bucket-a', path: '', status: STORAGE_ROW_STATUS.READY, items: [] },
+    ]
+    state.openedFolders = [
+      {
+        id: null,
+        name: 'docs',
+        type: STORAGE_ROW_TYPES.FOLDER,
+        status: STORAGE_ROW_STATUS.READY,
+        metadata: null,
+        created_at: null,
+        updated_at: null,
+        last_accessed_at: null,
+        isCorrupted: false,
+      },
+    ]
+    await state.fetchFolderContents({
+      bucketId: 'bucket-a',
+      folderId: null,
+      folderName: 'docs',
+      index: 0,
+    })
+
+    state.addNewFolderPlaceholder(1)
+    await state.addNewFolder({ folderName: 'aaa-new', columnIndex: 1 })
+    await state.fetchMoreFolderContents({ index: 1, column: state.columns[1]! })
+
+    expect(state.columns[1]?.items.map((item) => item.name)).toEqual([
+      'aaa-new',
+      ...files.map((file) => file.name),
+    ])
+    expect(requestedOffsets).toEqual([0, PAGE_SIZE])
   })
 
   it('pages by the visible item count when the folder has no placeholder', async () => {

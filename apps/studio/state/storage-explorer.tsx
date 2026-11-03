@@ -296,6 +296,10 @@ export function createStorageExplorerState({
           bucketId: state.selectedBucket.id,
           paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
+        // The parent's placeholder was the only object hidden from its listing
+        state.columns = state.columns.map((col, idx) =>
+          idx === columnIndex ? { ...col, hiddenItemsCount: 0 } : col
+        )
       }
 
       const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
@@ -400,10 +404,13 @@ export function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
+      // `column` may be an overlaid copy (archived rows merged in for display), whose item
+      // count the live listing never had, so count from the column held in state.
+      const liveColumn = state.columns[index] ?? column
       const options = {
         limit: LIMIT,
         // items.length alone undercounts: formatFolderItems hides the .emptyFolderPlaceholder
-        offset: column.items.length + (column.hiddenItemsCount ?? 0),
+        offset: liveColumn.items.length + (liveColumn.hiddenItemsCount ?? 0),
         search: searchString,
         sortBy: getSortOptions(),
       }
