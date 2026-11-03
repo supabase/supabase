@@ -1,12 +1,14 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import Head from 'next/head'
 import { useEffect, useEffectEvent, useMemo, useState, type ReactNode } from 'react'
-import { useForm, type UseFormReturn } from 'react-hook-form'
+import { useForm, useWatch, type UseFormReturn } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { ApiAuthorizationApprovedScreen } from './ApiAuthorization.Approved'
+import { resolveEffectiveScopes } from './ApiAuthorization.EffectiveScopes'
 import { ApiAuthorizationErrorScreen } from './ApiAuthorization.Error'
-import { ApiAuthorizationMainView } from './ApiAuthorization.Form'
+import { ApiAuthorizationMainView, type ScopesState } from './ApiAuthorization.Form'
 import { ApiAuthorizationLoadingScreen } from './ApiAuthorization.Loading'
 import {
   approvalFormSchema,
@@ -15,7 +17,11 @@ import {
 } from './ApiAuthorization.Schema'
 import { useApiAuthorizationApproveMutation } from '@/data/api-authorization/api-authorization-approve-mutation'
 import { useApiAuthorizationDeclineMutation } from '@/data/api-authorization/api-authorization-decline-mutation'
-import { useApiAuthorizationQuery } from '@/data/api-authorization/api-authorization-query'
+import { apiAuthorizationPreflightQueryOptions } from '@/data/api-authorization/api-authorization-preflight-query'
+import {
+  useApiAuthorizationQuery,
+  type ApiAuthorizationResponse,
+} from '@/data/api-authorization/api-authorization-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { buildStudioPageTitle } from '@/lib/page-title'
 import type { Organization } from '@/types'
@@ -111,6 +117,28 @@ function usePrefillFormOnOrganizationsSuccess(
   }, [organizationsState._tag])
 }
 
+function useScopesState(
+  auth_id: string,
+  requester: ApiAuthorizationResponse | undefined,
+  selectedOrgSlug: string
+): ScopesState {
+  const isMemberBound = requester?.grant_kind === 'member_bound'
+  const isApproved = (requester?.approved_at ?? null) !== null
+  const { data, isPending, isError, error } = useQuery({
+    ...apiAuthorizationPreflightQueryOptions({ slug: selectedOrgSlug, id: auth_id }),
+    enabled: isMemberBound && !isApproved && !!selectedOrgSlug,
+  })
+
+  if (!requester || !isMemberBound || !selectedOrgSlug) return { _tag: 'requested' }
+  if (isError) return { _tag: 'error', error }
+  if (isPending) return { _tag: 'loading' }
+  return resolveEffectiveScopes({
+    requested: requester.scopes,
+    allowPartialGrants: requester.allow_partial_grants ?? false,
+    preflight: data,
+  })
+}
+
 export interface ApiAuthorizationValidScreenProps {
   auth_id: string
   organization_slug: string | undefined
@@ -141,6 +169,9 @@ export function ApiAuthorizationValidScreen({
     error,
   } = useApiAuthorizationQuery({ id: auth_id })
   const isApproved = (requester?.approved_at ?? null) !== null
+
+  const selectedOrgSlug = useWatch({ control: form.control, name: 'selectedOrgSlug' })
+  const scopesState = useScopesState(auth_id, requester, selectedOrgSlug)
 
   const {
     mutate: approveRequest,
@@ -183,7 +214,11 @@ export function ApiAuthorizationValidScreen({
     }
     resetActionError()
     setApprovalState('approving')
-    approveRequest({ id: auth_id, slug: values.selectedOrgSlug })
+    approveRequest({
+      id: auth_id,
+      slug: values.selectedOrgSlug,
+      partial: scopesState._tag === 'partial',
+    })
   })
 
   const onDeclineRequest = form.handleSubmit((values) => {
@@ -244,6 +279,7 @@ export function ApiAuthorizationValidScreen({
         requester={effectiveRequester}
         requestedOrganizationSlug={effectiveOrganizationSlug}
         organizations={effectiveOrganizationsState}
+        scopes={scopesState}
         actionError={actionError}
         onOrganizationChange={resetActionError}
         onApprove={onApproveRequest}

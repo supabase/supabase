@@ -19,6 +19,9 @@ export type ApiAuthorizationResponse = {
   expires_at: string
   approved_at: string | null
   approved_organization_slug?: string
+  // Older APIs omit these, which keeps the full-scope consent flow
+  grant_kind?: 'organization_bound' | 'member_bound'
+  allow_partial_grants?: boolean
   registration_type: string
 }
 

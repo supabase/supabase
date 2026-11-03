@@ -1,8 +1,9 @@
+import { OAuthScope } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import dayjs from 'dayjs'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
 import { describe, expect, test, vi } from 'vitest'
 
@@ -11,11 +12,13 @@ import {
   type ApiAuthorizationScreenProps,
 } from '@/components/interfaces/ApiAuthorization/ApiAuthorization'
 import { AuthorizeConnectLogo } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
+import type { ApiAuthorizationPreflightResponse } from '@/data/api-authorization/api-authorization-preflight-query'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
+import { API_URL } from '@/lib/constants'
 import type { ProfileContextType } from '@/lib/profile'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse_Output']
@@ -494,6 +497,136 @@ describe('ApiAuthorizationScreen', () => {
             'Failed to cancel authorization request: Cancellation failed'
           )
           expect(screen.getByRole('button', { name: 'Cancel' })).toBeEnabled()
+        })
+      })
+
+      describe('member-bound grants', () => {
+        const MEMBER_BOUND_SCOPES = [
+          OAuthScope.DATABASE_READ,
+          OAuthScope.DATABASE_WRITE,
+          OAuthScope.SECRETS_READ,
+        ]
+        const PARTIAL_FAILURE: ApiAuthorizationPreflightResponse = {
+          existing_grant: null,
+          validation_failure: {
+            scope_target: 'all_projects',
+            role: { name: 'Developer' },
+            failed_scopes: [OAuthScope.SECRETS_READ],
+          },
+        }
+
+        // Preflight isn't in the generated API types yet, so addAPIMock can't type it
+        function mockPreflight(response: ApiAuthorizationPreflightResponse) {
+          const handler = vi.fn(() => HttpResponse.json(response))
+          mswServer.use(
+            http.get(
+              `${API_URL}/platform/organizations/:slug/oauth/authorizations/:id/preflight`,
+              handler
+            )
+          )
+          return handler
+        }
+
+        function mockApprove() {
+          const bodies: string[] = []
+          addAPIMock({
+            method: 'post',
+            path: '/platform/organizations/:slug/oauth/authorizations/:id',
+            response: async ({ request }) => {
+              bodies.push(await request.text())
+              return HttpResponse.json<ApproveAuthorizationResponse>({
+                url: 'https://redirect.example.com',
+              })
+            },
+          })
+          return bodies
+        }
+
+        function memberBoundAuth(allow_partial_grants: boolean) {
+          return createMockAuthResponse({
+            scopes: MEMBER_BOUND_SCOPES,
+            grant_kind: 'member_bound',
+            allow_partial_grants,
+          })
+        }
+
+        test('lists denied scopes with the role and approves with partial: true', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints(memberBoundAuth(true))
+          mockPreflight(PARTIAL_FAILURE)
+          const bodies = mockApprove()
+          renderScreen()
+
+          expect(await screen.findByText("Some permissions won't be granted")).toBeInTheDocument()
+          expect(
+            screen.getByText(
+              /Your Developer role in this organization doesn't include: Secrets \(Read\)/
+            )
+          ).toBeInTheDocument()
+
+          await user.click(screen.getByRole('button', { name: /Authorize Test App/ }))
+          await waitFor(() => expect(bodies).toHaveLength(1))
+          expect(JSON.parse(bodies[0])).toEqual({ partial: true })
+        })
+
+        test('disables Authorize when the app does not allow partial grants', async () => {
+          mockBothEndpoints(memberBoundAuth(false))
+          mockPreflight(PARTIAL_FAILURE)
+          renderScreen()
+
+          expect(await screen.findByText("Your role can't authorize Test App")).toBeInTheDocument()
+          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeDisabled()
+        })
+
+        test('disables Authorize on organization-level role failures', async () => {
+          mockBothEndpoints(memberBoundAuth(true))
+          mockPreflight({
+            existing_grant: null,
+            validation_failure: { scope_target: 'organization', role: { name: 'Read-only' } },
+          })
+          renderScreen()
+
+          expect(
+            await screen.findByText(
+              "Your Read-only role in this organization doesn't allow authorizing this app."
+            )
+          ).toBeInTheDocument()
+          expect(screen.getByRole('button', { name: /Authorize Test App/ })).toBeDisabled()
+        })
+
+        test('approves without a partial flag when the role covers every scope', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints(memberBoundAuth(true))
+          mockPreflight({ existing_grant: null, validation_failure: null })
+          const bodies = mockApprove()
+          renderScreen()
+
+          const authorize = await screen.findByRole('button', { name: /Authorize Test App/ })
+          await waitFor(() => expect(authorize).toBeEnabled())
+          expect(screen.queryByText("Some permissions won't be granted")).not.toBeInTheDocument()
+
+          await user.click(authorize)
+          await waitFor(() => expect(bodies).toHaveLength(1))
+          expect(bodies[0]).toBe('')
+        })
+
+        test('skips preflight for organization-bound apps', async () => {
+          const user = userEvent.setup()
+          mockBothEndpoints(
+            createMockAuthResponse({
+              scopes: MEMBER_BOUND_SCOPES,
+              grant_kind: 'organization_bound',
+              allow_partial_grants: true,
+            })
+          )
+          const preflight = mockPreflight(PARTIAL_FAILURE)
+          const bodies = mockApprove()
+          renderScreen()
+
+          await user.click(await screen.findByRole('button', { name: /Authorize Test App/ }))
+          await waitFor(() => expect(bodies).toHaveLength(1))
+          expect(bodies[0]).toBe('')
+          expect(preflight).not.toHaveBeenCalled()
         })
       })
 

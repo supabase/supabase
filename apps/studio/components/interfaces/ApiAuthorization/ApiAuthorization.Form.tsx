@@ -18,11 +18,13 @@ import {
 import { Admonition } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import type { EffectiveScopes } from './ApiAuthorization.EffectiveScopes'
 import type { ApprovalState, IApprovalFormSchema } from './ApiAuthorization.Schema'
 import {
   AuthorizeConnectLogo,
   AuthorizeImpersonationWarning,
   AuthorizeRequesterDetails,
+  formatScopeLabels,
 } from '@/components/interfaces/Organization/OAuthApps/AuthorizeRequesterDetails'
 import { getOAuthImpersonationWarning } from '@/components/interfaces/Organization/OAuthApps/OAuthApps.utils'
 import {
@@ -62,6 +64,13 @@ export type OrganizationsState =
   | OrganizationsState_NotMember
   | OrganizationsState_Success
 
+/** `requested` means no preflight ran (organization-bound app or older API). */
+export type ScopesState =
+  | { _tag: 'requested' }
+  | { _tag: 'loading' }
+  | { _tag: 'error'; error: StudioError | null }
+  | EffectiveScopes
+
 function isExternalRedirectUrl(url: string): boolean {
   try {
     const { hostname } = new URL(url)
@@ -77,6 +86,7 @@ export interface ApiAuthorizationMainViewProps {
   form: UseFormReturn<IApprovalFormSchema>
   requester: ApiAuthorizationResponse
   organizations: OrganizationsState
+  scopes: ScopesState
   requestedOrganizationSlug: string | undefined
   actionError?: string
   onOrganizationChange: () => void
@@ -90,6 +100,7 @@ export function ApiAuthorizationMainView({
   form,
   requester,
   organizations,
+  scopes,
   requestedOrganizationSlug,
   actionError,
   onOrganizationChange,
@@ -98,6 +109,8 @@ export function ApiAuthorizationMainView({
 }: ApiAuthorizationMainViewProps): ReactNode {
   const isExpired = dayjs().isAfter(dayjs(requester.expires_at))
   const showReadyContent = !isExpired && organizations._tag === 'success'
+  const canApprove =
+    scopes._tag === 'requested' || scopes._tag === 'full' || scopes._tag === 'partial'
   const redirectUrl = requester.redirect_uri ?? requester.website
   const externalRedirectUrl = isExternalRedirectUrl(redirectUrl) ? redirectUrl : undefined
 
@@ -142,13 +155,10 @@ export function ApiAuthorizationMainView({
               )}
               {showReadyContent && (
                 <>
-                  <AuthorizeRequesterDetails
-                    name={requester.name}
-                    domain={requester.domain}
-                    scopes={requester.scopes}
-                  />
+                  <ScopesSection requester={requester} scopes={scopes} />
                   <FormFooter
                     approvalState={approvalState}
+                    approveDisabled={!canApprove}
                     requester={requester}
                     redirectUrl={externalRedirectUrl}
                     actionError={actionError}
@@ -163,6 +173,80 @@ export function ApiAuthorizationMainView({
       </div>
     </InterstitialLayout>
   )
+}
+
+interface ScopesSectionProps {
+  requester: ApiAuthorizationResponse
+  scopes: ScopesState
+}
+
+function ScopesSection({ requester, scopes }: ScopesSectionProps): ReactNode {
+  switch (scopes._tag) {
+    case 'loading':
+      return (
+        <section className="space-y-2" aria-label="Permissions">
+          <p className="text-xs font-medium uppercase tracking-wider text-foreground-light">
+            Permissions
+          </p>
+          <ShimmeringLoader className="h-[46px] w-full rounded-md py-0" />
+        </section>
+      )
+    case 'error':
+      return (
+        <Admonition
+          type="warning"
+          title="Unable to check your permissions"
+          description={
+            <>
+              Please try again. If the problem persists, contact support.
+              {scopes.error && (
+                <span className="mt-1 block text-foreground-lighter">
+                  Error: {scopes.error.message}
+                </span>
+              )}
+            </>
+          }
+        />
+      )
+    case 'blocked':
+      return (
+        <Admonition
+          type="warning"
+          title={`Your role can't authorize ${requester.name}`}
+          description={
+            scopes.missing.length > 0
+              ? `Your ${scopes.roleName} role in this organization doesn't include: ${formatScopeLabels(scopes.missing).join(', ')}.`
+              : `Your ${scopes.roleName} role in this organization doesn't allow authorizing this app.`
+          }
+        />
+      )
+    case 'partial':
+      return (
+        <>
+          <AuthorizeRequesterDetails
+            name={requester.name}
+            domain={requester.domain}
+            scopes={scopes.granted}
+          />
+          {scopes.denied.length > 0 && (
+            <Admonition
+              type="warning"
+              title="Some permissions won't be granted"
+              description={`Your ${scopes.roleName} role in this organization doesn't include: ${formatScopeLabels(scopes.denied).join(', ')}. ${requester.name} will only get the permissions listed above.`}
+            />
+          )}
+        </>
+      )
+    case 'full':
+    case 'requested':
+      return (
+        <AuthorizeRequesterDetails
+          name={requester.name}
+          domain={requester.domain}
+          scopes={scopes._tag === 'full' ? scopes.scopes : requester.scopes}
+        />
+      )
+  }
 }
 
 function ExpiredNotice(): ReactNode {
@@ -311,6 +395,7 @@ function OrganizationSelector({
 
 interface FormFooterProps {
   approvalState: ApprovalState
+  approveDisabled?: boolean
   requester: ApiAuthorizationResponse
   redirectUrl?: string
   actionError?: string
@@ -320,6 +405,7 @@ interface FormFooterProps {
 
 function FormFooter({
   approvalState,
+  approveDisabled = false,
   requester,
   redirectUrl,
   actionError,
@@ -336,7 +422,7 @@ function FormFooter({
   return (
     <div className="flex flex-col gap-2">
       <ApprovalButton
-        disabled={approvalState !== 'indeterminate'}
+        disabled={approveDisabled || approvalState !== 'indeterminate'}
         approvalState={approvalState}
         requester={requester}
         onApprove={onApprove}

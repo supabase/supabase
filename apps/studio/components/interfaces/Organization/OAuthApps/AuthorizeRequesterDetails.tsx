@@ -402,6 +402,13 @@ function getRequestedPermissions(scopes: OAuthScope[]): RequestedPermission[] {
   )
 }
 
+/** Human-readable permission labels, e.g. `Database (Read + Write)`. */
+export function formatScopeLabels(scopes: OAuthScope[]): string[] {
+  return getRequestedPermissions(scopes).map(
+    ({ label, level }) => `${label} (${formatPermissionLevel(level)})`
+  )
+}
+
 function formatPermissionLevel(level: PermissionLevel) {
   if (level === 'read') return 'Read'
   if (level === 'write') return 'Write'
