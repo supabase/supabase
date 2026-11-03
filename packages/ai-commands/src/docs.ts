@@ -182,7 +182,7 @@ export async function clippy(
     },
   ]
 
-  const model = 'gpt-4o-mini-2024-07-18'
+  const model = 'gpt-6-luna'
   const maxCompletionTokenCount = 1024
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
@@ -195,8 +195,8 @@ export async function clippy(
   const completionOptions = {
     model,
     messages: completionMessages,
-    max_tokens: 1024,
-    temperature: 0,
+    max_completion_tokens: 1024,
+    reasoning_effort: 'low',
     stream: true,
   }
 

@@ -72,24 +72,30 @@ export async function generateCron(openai: OpenAI, prompt: string) {
   }
 
   try {
-    const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
-      messages: initMessages,
-      max_tokens: 1024,
-      temperature: 0,
-      stream: false,
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: completionFunction.name,
-        },
-      },
-      tools: [
-        {
+    const response = await openai.post<
+      Record<string, unknown>,
+      OpenAI.Chat.Completions.ChatCompletion
+    >('/chat/completions', {
+      body: {
+        model: 'gpt-6-luna',
+        messages: initMessages,
+        max_completion_tokens: 1024,
+        reasoning_effort: 'none',
+        temperature: 0,
+        stream: false,
+        tool_choice: {
           type: 'function',
-          function: completionFunction,
+          function: {
+            name: completionFunction.name,
+          },
         },
-      ],
+        tools: [
+          {
+            type: 'function',
+            function: completionFunction,
+          },
+        ],
+      },
     })
 
     // Parse the JSON string in arguments using jsonrepair

@@ -104,24 +104,30 @@ export async function debugSql(
   )
 
   try {
-    const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
-      messages: completionMessages,
-      max_tokens: 2048,
-      temperature: 0,
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: completionFunctions.debugSql.name,
-        },
-      },
-      tools: [
-        {
+    const completionResponse = await openai.post<
+      Record<string, unknown>,
+      OpenAI.Chat.Completions.ChatCompletion
+    >('/chat/completions', {
+      body: {
+        model: 'gpt-6-luna',
+        messages: completionMessages,
+        max_completion_tokens: 2048,
+        reasoning_effort: 'none',
+        temperature: 0,
+        tool_choice: {
           type: 'function',
-          function: completionFunctions.debugSql,
+          function: {
+            name: completionFunctions.debugSql.name,
+          },
         },
-      ],
-      stream: false,
+        tools: [
+          {
+            type: 'function',
+            function: completionFunctions.debugSql,
+          },
+        ],
+        stream: false,
+      },
     })
 
     const [firstChoice] = completionResponse.choices
@@ -164,24 +170,30 @@ export async function titleSql(openai: OpenAI, sql: string) {
   ]
 
   try {
-    const completionResponse = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
-      messages: completionMessages,
-      max_tokens: 1024,
-      temperature: 0,
-      tool_choice: {
-        type: 'function',
-        function: {
-          name: completionFunctions.generateTitle.name,
-        },
-      },
-      tools: [
-        {
+    const completionResponse = await openai.post<
+      Record<string, unknown>,
+      OpenAI.Chat.Completions.ChatCompletion
+    >('/chat/completions', {
+      body: {
+        model: 'gpt-6-luna',
+        messages: completionMessages,
+        max_completion_tokens: 1024,
+        reasoning_effort: 'none',
+        temperature: 0,
+        tool_choice: {
           type: 'function',
-          function: completionFunctions.generateTitle,
+          function: {
+            name: completionFunctions.generateTitle.name,
+          },
         },
-      ],
-      stream: false,
+        tools: [
+          {
+            type: 'function',
+            function: completionFunctions.generateTitle,
+          },
+        ],
+        stream: false,
+      },
     })
 
     const [firstChoice] = completionResponse.choices
