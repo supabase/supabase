@@ -21,6 +21,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { usePostgresConfigurationUpdateMutation } from '@/data/config/postgres-config-mutation'
 import { postgresConfigurationQueryOptions } from '@/data/config/postgres-config-query'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
@@ -66,7 +67,7 @@ export const ConnectionLogging = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (payload) => {
     if (!projectRef) return
-    updatePostgresConfig({ projectRef, payload })
+    updatePostgresConfig({ projectRef, payload: { ...postgresConfig, ...payload } })
   }
 
   useEffect(() => {
