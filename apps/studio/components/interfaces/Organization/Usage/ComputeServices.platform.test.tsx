@@ -1,12 +1,20 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it } from 'vitest'
 
 import { ComputeServices } from './ComputeServices'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { customRender } from '@/tests/lib/custom-render'
 
-/** Only `plan.id` is read by this section; the rest of the subscription is irrelevant here. */
-const subscriptionOnPlan = (id: string) => ({ plan: { id } }) as unknown as OrgSubscription
+/** Only `plan` is read by this section; the rest of the subscription is irrelevant here. */
+const PLAN_NAMES: Record<string, string> = {
+  free: 'Free',
+  pro: 'Pro',
+  team: 'Team',
+  enterprise: 'Enterprise',
+}
+
+const subscriptionOnPlan = (id: string) =>
+  ({ plan: { id, name: PLAN_NAMES[id] } }) as unknown as OrgSubscription
 
 describe('ComputeServices', () => {
   it('renders the three Compute usage charts', async () => {
@@ -15,6 +23,51 @@ describe('ComputeServices', () => {
     expect(await screen.findByText('Active hours')).toBeInTheDocument()
     expect(await screen.findByText('Instance hours by size')).toBeInTheDocument()
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
+  })
+
+  it('breaks the allowance down the way the other usage sections do', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
+
+    expect(await screen.findByText('Included in Pro Plan')).toBeInTheDocument()
+    expect(await screen.findByText('Used in period')).toBeInTheDocument()
+    expect(await screen.findByText('Overage in period')).toBeInTheDocument()
+  })
+
+  it('reports no overage while usage sits inside the allowance', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
+
+    const overage = (await screen.findByText('Overage in period')).parentElement
+    expect(within(overage!).getByText('0 hrs')).toBeInTheDocument()
+  })
+
+  it('reports the excess once usage passes the allowance', async () => {
+    // The stand-in org runs ~1,860 hours, well past the 300 included on Free.
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('free')} />)
+
+    const overage = (await screen.findByText('Overage in period')).parentElement
+    expect(within(overage!).queryByText('0 hrs')).not.toBeInTheDocument()
+  })
+
+  it('shows an unlimited allowance and no overage row on enterprise', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('enterprise')} />)
+
+    expect(await screen.findByText('Included in Enterprise Plan')).toBeInTheDocument()
+    expect(await screen.findByText('Unlimited')).toBeInTheDocument()
+    expect(screen.queryByText('Overage in period')).not.toBeInTheDocument()
+  })
+
+  it('drops the period rows outside the current billing cycle', async () => {
+    customRender(
+      <ComputeServices
+        orgSlug="acme"
+        subscription={subscriptionOnPlan('pro')}
+        currentBillingCycleSelected={false}
+      />
+    )
+
+    expect(await screen.findByText('Included in Pro Plan')).toBeInTheDocument()
+    expect(screen.queryByText('Used in period')).not.toBeInTheDocument()
+    expect(screen.queryByText('Overage in period')).not.toBeInTheDocument()
   })
 
   it('names the burn-down reference lines in a legend below the plot', async () => {

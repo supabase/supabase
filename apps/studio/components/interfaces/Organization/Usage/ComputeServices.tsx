@@ -50,9 +50,15 @@ export interface ComputeServicesProps {
   orgSlug: string
   projectRef?: string | null
   subscription: OrgSubscription | undefined
+  currentBillingCycleSelected?: boolean
 }
 
-export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeServicesProps) => {
+export const ComputeServices = ({
+  orgSlug,
+  projectRef,
+  subscription,
+  currentBillingCycleSelected = true,
+}: ComputeServicesProps) => {
   const { data, isPending, isError } = useQuery(
     computeOrgUsageQueryOptions({ orgSlug, projectRef, days: USAGE_WINDOW_DAYS })
   )
@@ -197,6 +203,12 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
                 </ChartContainer>
 
                 <ComputeBurndownLegend burndown={burndown} />
+
+                <ComputeAllowanceBreakdown
+                  burndown={burndown}
+                  planName={subscription?.plan.name}
+                  currentBillingCycleSelected={currentBillingCycleSelected}
+                />
               </ChartContent>
             </ChartCard>
           </Chart>
@@ -284,6 +296,47 @@ export const ComputeServices = ({ orgSlug, projectRef, subscription }: ComputeSe
           </Chart>
         </div>
       </SectionContent>
+    </div>
+  )
+}
+
+/**
+ * The included / used / overage rows every other usage section renders, so Compute reads
+ * the same way. Active hours is the only Compute measure with an allowance behind it, so
+ * it is the only one that can show these.
+ */
+const ComputeAllowanceBreakdown = ({
+  burndown,
+  planName,
+  currentBillingCycleSelected,
+}: {
+  burndown: ComputeBurndown
+  planName: string | undefined
+  currentBillingCycleSelected: boolean
+}) => {
+  const hasAllowance = burndown.allowanceHours !== null
+  const overageHours = hasAllowance ? Math.max(0, burndown.usedHours - burndown.allowanceHours!) : 0
+
+  return (
+    <div className="mt-4">
+      <div className="flex items-center justify-between border-b py-1">
+        <p className="text-xs text-foreground-light">Included in {planName} Plan</p>
+        <p className="text-xs">
+          {hasAllowance ? formatComputeHours(burndown.allowanceHours!) : 'Unlimited'}
+        </p>
+      </div>
+      {currentBillingCycleSelected && (
+        <div className="flex items-center justify-between py-1">
+          <p className="text-xs text-foreground-light">Used in period</p>
+          <p className="text-xs">{formatComputeHours(burndown.usedHours)}</p>
+        </div>
+      )}
+      {currentBillingCycleSelected && hasAllowance && (
+        <div className="flex items-center justify-between border-t py-1">
+          <p className="text-xs text-foreground-light">Overage in period</p>
+          <p className="text-xs">{formatComputeHours(overageHours)}</p>
+        </div>
+      )}
     </div>
   )
 }

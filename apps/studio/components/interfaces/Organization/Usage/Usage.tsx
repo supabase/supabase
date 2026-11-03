@@ -444,6 +444,7 @@ export const Usage = () => {
             orgSlug={slug as string}
             projectRef={usageProjectRef}
             subscription={subscription}
+            currentBillingCycleSelected={currentBillingCycleSelected}
           />
 
           <Egress
