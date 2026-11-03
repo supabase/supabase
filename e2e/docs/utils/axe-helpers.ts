@@ -1,7 +1,7 @@
 import type { Page, TestInfo } from '@playwright/test'
 import type { Result } from 'axe-core'
 
-import { scan } from '../../shared/axe.ts'
+import { scan, scanResults } from '../../shared/axe.ts'
 
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
@@ -47,7 +47,11 @@ export async function scanArticle(
   include: string
 ): Promise<A11yScanResult> {
   const reported = await scan(page, { tags: WCAG_TAGS, excludeRules: EXCLUDED_RULES, include })
-  const enforced = await scan(page, { rules: ENFORCED_RULES })
+  const enforcedResults = await scanResults(page, { rules: ENFORCED_RULES })
+  const enforced = [
+    ...enforcedResults.violations,
+    ...enforcedResults.incomplete.filter((result) => result.id === 'duplicate-id-aria'),
+  ]
 
   const byRule = new Map([...reported, ...enforced].map((violation) => [violation.id, violation]))
 
