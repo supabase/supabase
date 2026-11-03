@@ -22,6 +22,14 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ---
 
+## Unreleased
+
+### Edge Functions
+
+- Changed: the functions container now has a default memory limit of 2 GiB, shared by all workers. This also applies to existing deployments when updating `docker-compose.yml`. Set `FUNCTIONS_MEMORY_LIMIT` in `.env` to a suitable value before recreating the container. If memory exhaustion terminates the runtime, all functions are interrupted until the container restarts - PR [#51957](https://github.com/supabase/supabase/pull/51957)
+
+---
+
 ## [0.8.3](https://github.com/supabase/supabase/releases/tag/self-hosted/v0.8.3) - 2026-10-16
 
 ⚠️ **Note:** This update includes **important changes**. Please check the details below:

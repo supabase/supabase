@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { ResponseData } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionDetails.types'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionTestResponse = {
   title: string
@@ -49,10 +50,10 @@ export const useEdgeFunctionTestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>,
+  UseCustomMutationOptions<EdgeFunctionTestData, StudioError, EdgeFunctionTestVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<EdgeFunctionTestData, ResponseError, EdgeFunctionTestVariables>({
+  return useMutation<EdgeFunctionTestData, StudioError, EdgeFunctionTestVariables>({
     mutationFn: (vars) => testEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

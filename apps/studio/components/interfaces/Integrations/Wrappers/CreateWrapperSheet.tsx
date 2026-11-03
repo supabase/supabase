@@ -43,8 +43,8 @@ import { useSchemaCreateMutation } from '@/data/database/schema-create-mutation'
 import { invalidateSchemasQuery, useSchemasQuery } from '@/data/database/schemas-query'
 import { useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import type { ResponseError } from '@/types'
 
 const FORM_ID = 'create-wrapper-form'
 
@@ -190,7 +190,7 @@ export const CreateWrapperSheet = ({
       form.reset()
     } catch (error) {
       toast.error(
-        `Failed to create ${wrapperMeta.label} wrapper: ${(error as ResponseError).message}`,
+        `Failed to create ${wrapperMeta.label} wrapper: ${(error as StudioError).message}`,
         { id: toastId }
       )
     }

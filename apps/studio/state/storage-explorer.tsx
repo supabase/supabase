@@ -70,9 +70,9 @@ import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { archivedObjectNamesQueryOptions } from '@/data/storage/versioning/archived-object-names-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import { ResponseError } from '@/types'
 
 type UploadProgress = {
   percentage: number
@@ -739,7 +739,7 @@ export function createStorageExplorerState({
               })
               success = true
             } catch (error) {
-              if ((error as ResponseError).code === 429) {
+              if ((error as StudioError).code === 429) {
                 isRateLimited = true
                 retrySeconds = RATE_LIMIT_RETRY_SECONDS
               } else {
@@ -1838,7 +1838,7 @@ export function createStorageExplorerState({
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
-            description: (err as ResponseError).message,
+            description: (err as StudioError).message,
           })
 
           if (!files.some((f) => f.prefix)) {

@@ -3,8 +3,9 @@ import { queryOptions } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { databaseKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type EntitySearchVariables = {
   projectRef?: string
@@ -36,6 +37,7 @@ async function getEntitySearch(
       connectionString,
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -45,14 +47,13 @@ async function getEntitySearch(
 
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
-export type EntitySearchError = ResponseError
+export type EntitySearchError = StudioError
 
 export const entitySearchQueryOptions = (
   { projectRef, connectionString, query }: EntitySearchVariables,
   { enabled = true }: { enabled?: boolean } = {}
 ) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.entitySearch(projectRef, query),
     queryFn: ({ signal }) => getEntitySearch({ projectRef, connectionString, query }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && query.length > 0,

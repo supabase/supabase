@@ -36,7 +36,7 @@ select
 from pg_replication_slots;
 ```
 
-An inactive slot can still retain WAL. Investigate a slot whose retained WAL keeps growing, whose remaining retention keeps shrinking, or whose `wal_status` becomes `unreserved`. A `lost` slot can't continue from its previous position and usually requires a new initial sync.
+An [inactive slot](/kb/troubleshooting/autovacuum-stalled-due-to-inactive-replication-slot) can still retain WAL. Investigate a slot whose retained WAL keeps growing, whose remaining retention keeps shrinking, or whose `wal_status` becomes `unreserved`. A `lost` slot can't continue from its previous position and usually requires a new initial sync.
 
 ### Replication status and lag
 

@@ -4,10 +4,10 @@ import { computeRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
 
 export type ComputeVariables = { projectRef?: string }
-export type ComputeError = ResponseError
+export type ComputeError = StudioError
 
 async function getComputeInstances({ projectRef }: ComputeVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -19,7 +19,7 @@ async function getComputeInstances({ projectRef }: ComputeVariables, signal?: Ab
   })
 
   if (response.status === 404) {
-    throw new ResponseError('Compute is not available for this project', 404)
+    throw new StudioError('Compute is not available for this project', 404)
   }
   if (error) return handleError(error)
   return data.data.map((instance) => parseComputeInstance(instance))

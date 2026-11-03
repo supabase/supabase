@@ -71,18 +71,16 @@ export const StripeAtlasApplicationScreen = () => {
             type="caution"
             title="Only Pre-Filled Applications supported"
             description={
-              <p>
-                We currently only support pre-filled Stripe Atlas Perk applications of already
-                incorporated companies.
-                <br />
-                <br />
-                If you're not yet incorporated, please wait until you receive the confirmation from
-                Stripe.
-                <br />
-                <br />
-                If you are already incorporated, please head to the Stripe Atlas dashboard and use
-                the "Pre-fill my application" button.
-              </p>
+              <div>
+                <p>To claim your Stripe Atlas perk, please make sure:</p>
+                <ul>
+                  <li>You're a founder of the Stripe Atlas company.</li>
+                  <li>Your company is already incorporated on Stripe.</li>
+                  <li>
+                    You're using the "Pre-fill my application" button on the Stripe Atlas dashboard.
+                  </li>
+                </ul>
+              </div>
             }
           />
         </CardContent>

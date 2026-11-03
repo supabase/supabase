@@ -1,0 +1,57 @@
+import { expect } from '@playwright/test'
+
+import { createUserViaUI, deleteUserViaUI, navigateToAuthUsers } from '../utils/auth-helpers.js'
+import { expectClipboardValue } from '../utils/clipboard.js'
+import { test } from '../utils/test.js'
+
+test('user details support copying fields and raw JSON with mouse and keyboard', async ({
+  page,
+  ref,
+}) => {
+  const email = `test-user-panel-${Date.now()}@example.com`
+  await navigateToAuthUsers(page, ref)
+
+  try {
+    await createUserViaUI(page, ref, email, 'testpassword123')
+    await page.getByRole('row').filter({ hasText: email }).getByText(email, { exact: true }).click()
+    const overview = page.getByRole('tabpanel', { name: 'Overview' })
+    const emailField = overview.getByRole('button', { name: `Email ${email}`, exact: true })
+    await expect(emailField, 'User overview should show a copyable email field').toBeVisible()
+    const copyEmail = page.getByRole('menuitem', { name: 'Copy Email', exact: true })
+    await emailField.focus()
+    await page.keyboard.press('Enter')
+    await expect(copyEmail, 'Keyboard activation should open the email copy action').toBeVisible()
+    await copyEmail.press('Enter')
+    await expectClipboardValue({ page, value: email })
+    await expect(copyEmail, 'Keyboard copying should close the email menu').not.toBeVisible()
+    await emailField.click()
+    await copyEmail.click()
+    await expectClipboardValue({ page, value: email })
+
+    await expect(copyEmail, 'Mouse copying should close the email menu').not.toBeVisible()
+    await page.getByRole('tab', { name: 'Raw JSON' }).focus()
+    await page.keyboard.press('Enter')
+    const rawPanel = page.getByRole('tabpanel', { name: 'Raw JSON' })
+    await expect(rawPanel, 'Raw JSON should include the selected user').toContainText(email)
+    await rawPanel.getByRole('button', { name: 'Copy user as JSON' }).click()
+    await expectClipboardValue({ page, value: `"email": "${email}"` })
+    await page.keyboard.press('Escape')
+    await expect(rawPanel, 'Escape should close the user details panel').not.toBeVisible()
+  } finally {
+    if (!page.isClosed()) {
+      await navigateToAuthUsers(page, ref)
+      const loadedUsers = page
+        .getByRole('gridcell')
+        .first()
+        .or(page.getByText('No users in your project', { exact: true }))
+      await expect(
+        loadedUsers,
+        'Cleanup should wait for users or the loaded empty state'
+      ).toBeVisible()
+      const userRow = page.getByRole('row').filter({ hasText: email })
+      if ((await userRow.count()) > 0) {
+        await deleteUserViaUI(page, ref, email)
+      }
+    }
+  }
+})

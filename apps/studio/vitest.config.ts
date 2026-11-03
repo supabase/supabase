@@ -35,7 +35,25 @@ export default defineConfig({
     // `// @vitest-environment jsdom` docblock at the top of the file.
     projects: [
       { extends: true, test: { name: 'node', environment: 'node', include: ['**/*.test.ts'] } },
-      { extends: true, test: { name: 'jsdom', environment: 'jsdom', include: ['**/*.test.tsx'] } },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom',
+          environment: 'jsdom',
+          include: ['**/*.test.tsx'],
+          exclude: [...configDefaults.exclude, '.next/*', '**/*.platform.test.tsx'],
+        },
+      },
+      {
+        extends: true,
+        test: {
+          name: 'jsdom-platform',
+          environment: 'jsdom',
+          include: ['**/*.platform.test.tsx'],
+          exclude: [...configDefaults.exclude, '.next/*'],
+          env: { NEXT_PUBLIC_IS_PLATFORM: 'true' },
+        },
+      },
     ],
     reporters: [['default']],
     coverage: {

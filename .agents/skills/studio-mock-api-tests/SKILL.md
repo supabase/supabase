@@ -34,13 +34,12 @@ import { HttpResponse } from 'msw'
 import { describe, expect, test } from 'vitest'
 
 import { MyComponent } from './MyComponent'
+import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
 type OrganizationResponse = components['schemas']['OrganizationResponse']
 
-// Needed if the component renders inside a Sheet, Modal, Popover, or
-// anything else built on Radix that uses Web Animations.
 mockAnimationsApi()
 
 describe('MyComponent', () => {
@@ -50,9 +49,7 @@ describe('MyComponent', () => {
       path: '/platform/organizations',
       response: () =>
         HttpResponse.json<OrganizationResponse[]>([
-          {
-            /* ... */
-          },
+          createMockOrganizationResponse({ name: 'Acme' }),
         ]),
     })
 
@@ -63,8 +60,9 @@ describe('MyComponent', () => {
 })
 ```
 
-That's the whole pattern (add `fireEvent`, `waitFor`, or `userEvent` as the
-interactions need them — see the gotchas below). Server lifecycle (`listen`/`resetHandlers`/
+Use `mockAnimationsApi()` when the component renders Radix UI that needs Web
+Animations, such as a Sheet, Modal, or Popover. Add `fireEvent`, `waitFor`, or `userEvent` as the
+interactions need them — see the gotchas below. Server lifecycle (`listen`/`resetHandlers`/
 `close`) is handled by `apps/studio/tests/vitestSetup.ts` — handlers
 registered via `addAPIMock` are scoped to the current test.
 
@@ -164,7 +162,11 @@ component (or any child it renders) fires an unmocked request, you'll see
 MSW errors in stderr and likely flaky behavior. Cards, lists, and details
 panels often fire nested queries (e.g. `OrganizationCard` calls
 `useOrgProjectsInfiniteQuery`) — read what the rendered subtree does and
-mock all of it, or stub it with `vi.mock` for nested components only.
+mock those endpoints at the network boundary. Keep child components and hooks
+real so the test exercises their integration. If a heavy dependency cannot run
+in jsdom, use an existing injection point with a faithful test implementation
+at its boundary, or extract the independently testable behavior. Do not replace
+the child or shared hook with a module mock.
 
 ### 7. Don't put query strings in the handler `path`
 
@@ -209,6 +211,26 @@ For mocks at the network boundary, also prefer `createMockOrganizationResponse`
 query layer attaches). Same pattern applies to any type that's a frontend
 extension of an OpenAPI schema: build a `createMockXResponse` helper that
 returns the raw API shape.
+
+### 9. Mock FGA permissions with `mockPermissions`
+
+Components that check permissions (`useGrant`, `useAsyncCheckPermissionsV2`)
+request `/platform/profile/permissions/v2`. There's no global default — mock it
+in each test that needs it:
+
+```ts
+import { mockPermissions, mockPermissionsError } from '@/tests/lib/msw-permissions'
+import { allPermissionsFor, NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
+
+mockPermissions(allPermissionsFor(['my-org'])) // everything in my-org
+mockPermissions(NO_PERMISSIONS) // denied everywhere
+mockPermissions({ organizations: [{ slug: 'my-org', role: 'developer', permissions: [...], projects: [] }] })
+mockPermissionsError({ status: 500 }) // grant resolves to an error
+```
+
+Unit tests of fetchers or query options that take a grant can use
+`testGrant(endpoint, { projectRef })` from `@/tests/lib/test-grant` instead of
+going through permissions at all.
 
 ## Prefer asserting on UI state
 
@@ -274,9 +296,14 @@ It bypasses the network boundary, so:
 - It drifts independently from the OpenAPI types — handlers stay in sync,
   module-level mocks don't.
 
-Reach for `vi.mock` only for non-network concerns: a heavy child
-component (e.g. a Monaco editor) you want to stub, or a `common`-package
-hook with global state.
+Do not add module mocks for non-network dependencies either. Use supported
+providers and context for shared state, inject a faithful boundary implementation
+for unavailable infrastructure, or extract logic behind a useful public contract.
+Keep the interactions under test real.
+
+The existing global harness includes router and environment mocks. Use its
+supported configuration instead of adding local replacements; this guidance does
+not require migrating unrelated harness mocks as part of a focused test change.
 
 ## Further reading
 
@@ -298,4 +325,5 @@ hook with global state.
 | `addAPIMock` source                                            | `apps/studio/tests/lib/msw.ts`                                                                          |
 | `customRender` source                                          | `apps/studio/tests/lib/custom-render.tsx`                                                               |
 | Global handlers + lifecycle                                    | `apps/studio/tests/lib/msw-global-api-mocks.ts`, `apps/studio/tests/vitestSetup.ts`                     |
+| Permissions mocks + `testGrant`                                | `apps/studio/tests/lib/msw-permissions.ts`, `apps/studio/tests/lib/test-grant.ts`                       |
 | Related skills                                                 | `studio-testing` (when to write a component test at all), `studio-queries` (hook conventions), `vitest` |

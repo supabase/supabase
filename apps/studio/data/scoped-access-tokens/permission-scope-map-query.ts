@@ -3,7 +3,7 @@ import { z } from 'zod'
 
 import { scopedAccessTokenKeys } from './keys'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
 
 /**
  * Cross-reference between OpenFGA permission scopes, Management API endpoints, and MCP tools.
@@ -228,7 +228,7 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
       if (Number.isFinite(parsed) && parsed > 0) retryAfter = parsed
     }
 
-    throw new ResponseError(
+    throw new StudioError(
       `Failed to fetch scoped access token permissions: ${response.statusText}`,
       response.status,
       undefined,
@@ -240,7 +240,7 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
   return normalizePermissionScopeMap(payload)
 }
 
-export type ScopedAccessTokenPermissionsForScopeError = ResponseError
+export type ScopedAccessTokenPermissionsForScopeError = StudioError
 
 export const useGetEnabledEndpointsForCapability = () => {
   return useQuery<PermissionScopeMap, ScopedAccessTokenPermissionsForScopeError>({

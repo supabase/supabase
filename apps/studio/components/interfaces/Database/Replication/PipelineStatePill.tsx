@@ -7,8 +7,8 @@ import type { PipelineDisplayType } from './Pipeline.utils'
 import { PipelineStatusName } from './Replication.constants'
 import { StateDot, type StateDotVariant } from '@/components/ui/StateDot'
 import { ReplicationPipelineStatusData } from '@/data/replication/pipeline-status-query'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { PipelineStatusRequestStatus } from '@/state/replication-pipeline-request-status'
-import type { ResponseError } from '@/types'
 
 const VARIANT_BY_TYPE: Record<PipelineDisplayType, StateDotVariant> = {
   success: 'success',
@@ -19,13 +19,13 @@ const VARIANT_BY_TYPE: Record<PipelineDisplayType, StateDotVariant> = {
 
 interface PipelineStatePillProps {
   pipelineStatus: ReplicationPipelineStatusData['status'] | undefined
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
   requestStatus: PipelineStatusRequestStatus
   projectRef?: string
-  pipelineId?: number
+  pipelineId?: string
 }
 
 /**

@@ -16,11 +16,11 @@ import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
-import { ResponseError } from '@/types'
 
-export const GridError = ({ error }: { error?: ResponseError | null }) => {
+export const GridError = ({ error }: { error?: StudioError | null }) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
@@ -140,7 +140,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
   )
 }
 
-const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
+const InvalidOrderingOperatorError = ({ error }: { error: StudioError }) => {
   const { sorts, onApplySorts } = useTableSort()
   const invalidDataType = (error.message ?? '').split('type ').pop() ?? ''
   const formattedInvalidDataType = invalidDataType.includes('json')
@@ -171,7 +171,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
+const IcebergUnauthorizedError = ({ error }: { error: StudioError }) => {
   const { ref } = useParams()
 
   return (
@@ -195,7 +195,7 @@ const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const GeneralError = ({ error }: { error: ResponseError }) => {
+const GeneralError = ({ error }: { error: StudioError }) => {
   const { filters } = useTableFilter()
   const { data: project } = useSelectedProjectQuery()
   const { data: org } = useSelectedOrganizationQuery()
@@ -218,7 +218,7 @@ const GeneralError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const ExpandError = ({ error }: { error: ResponseError }) => {
+const ExpandError = ({ error }: { error: StudioError }) => {
   return (
     <Collapsible>
       <CollapsibleTrigger className="mt-2 group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">

@@ -6,7 +6,8 @@ import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageArchiveVariables = {
   projectRef: string
@@ -46,7 +47,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
   >,
   'mutationFn'
@@ -55,7 +56,7 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 
   return useMutation<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
   >({
     mutationFn: (vars) => archiveDatabaseQueueMessage(vars),

@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { miscKeys } from './keys'
 import { fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getLocalS3Keys() {
   try {
@@ -15,7 +16,7 @@ export async function getLocalS3Keys() {
 }
 
 export type LocalS3KeysData = Awaited<ReturnType<typeof getLocalS3Keys>>
-export type LocalS3KeysError = ResponseError
+export type LocalS3KeysError = StudioError
 
 /**
  * Specifically only for local CLI - to use the S3 keys as defined in the env file

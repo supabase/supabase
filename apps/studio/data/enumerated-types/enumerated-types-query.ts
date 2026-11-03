@@ -5,7 +5,8 @@ import { executeSql } from '../sql/execute-sql-mutation'
 import { enumeratedTypesKeys } from './keys'
 import type { components } from '@/data/api'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type EnumeratedTypesVariables = {
   projectRef?: string
@@ -37,7 +38,7 @@ export async function getEnumeratedTypes(
 }
 
 export type EnumeratedTypesData = Awaited<ReturnType<typeof getEnumeratedTypes>>
-export type EnumeratedTypesError = ResponseError
+export type EnumeratedTypesError = StudioError
 
 export const useEnumeratedTypesQuery = <TData = EnumeratedTypesData>(
   { projectRef, connectionString, schemas }: EnumeratedTypesVariables,

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { oauthAppKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppDeleteVariables = {
   id: string
@@ -29,12 +30,12 @@ export const useOAuthAppDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppDeleteData, ResponseError, OAuthAppDeleteVariables>,
+  UseCustomMutationOptions<OAuthAppDeleteData, StudioError, OAuthAppDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppDeleteData, ResponseError, OAuthAppDeleteVariables>({
+  return useMutation<OAuthAppDeleteData, StudioError, OAuthAppDeleteVariables>({
     mutationFn: (vars) => deleteOAuthApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

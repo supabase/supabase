@@ -3,8 +3,9 @@ import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
   api_key: string
@@ -71,9 +72,9 @@ export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 
 export const useAPIKeysQuery = <TData = APIKeysData>(
   { projectRef, reveal = false }: APIKeysVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, ResponseError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, StudioError, TData> = {}
 ) => {
-  return useQuery<APIKeysData, ResponseError, TData>({
+  return useQuery<APIKeysData, StudioError, TData>({
     queryKey: apiKeysKeys.list(projectRef, reveal),
     queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',
@@ -109,7 +110,7 @@ const PlaceholderData: APIKeysData = []
 
 export const useAPIKeys = (
   variables: APIKeysVariables,
-  options: UseCustomQueryOptions<APIKeysData, ResponseError, APIKeysData> = {}
+  options: UseCustomQueryOptions<APIKeysData, StudioError, APIKeysData> = {}
 ) => {
   const select = useCallback(
     (data: APIKeysData) => getKeys(options.enabled ? data : []),

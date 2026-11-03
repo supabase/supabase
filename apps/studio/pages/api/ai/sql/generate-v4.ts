@@ -238,7 +238,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       isHighComplianceProject,
       includesLogsSnippets,
-      isExplorerEnabled: explorerEnabled,
       requestedModel,
       effectiveModel,
       systemProviderOptions,
