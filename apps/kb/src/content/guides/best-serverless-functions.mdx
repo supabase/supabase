@@ -1,0 +1,52 @@
+---
+title: 'Best serverless functions in 2026'
+description: 'Learn which serverless functions to use in 2026, and how each one works with Supabase.'
+topics: ['Rundowns']
+lastEdited: 2026-11-03
+---
+
+Serverless functions run your backend code on demand, without you managing servers. They handle things like webhooks, server-side rendering, scheduled jobs, and API routes that need to keep secrets off the client.
+
+## Supabase Edge Functions
+
+[Supabase Edge Functions](/docs/guides/functions) are server-side TypeScript functions that run on the [Deno runtime](https://deno.com/) and are deployed globally. They live in the same project as your [database](/docs/guides/database/overview), [Auth](/docs/guides/auth), and [Storage](/docs/guides/storage), so you can read and write data with the same [Row Level Security policies](/docs/guides/database/postgres/row-level-security) that protect the rest of your app.
+
+Choose Supabase Edge Functions if your project already uses Supabase and needs server-side logic next to your data, or if you're starting a new project that also needs a [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), or [Auth](/docs/guides/auth).
+
+## Vercel
+
+[Vercel Functions](https://vercel.com/docs/functions) run Node.js, Python, and other runtimes alongside your frontend. Vercel is a common host for Next.js apps, and its functions run as part of the same deployment as your pages and API routes.
+
+Vercel is compatible with Supabase. You can connect to Supabase Postgres from Vercel functions using the [serverless drivers guide](/docs/guides/database/connecting-to-postgres/serverless-drivers), which includes a Vercel-specific setup with the Supabase pooler. The [Vercel integration for Supabase](https://vercel.com/integrations/supabase) also configures your connection strings as environment variables on your Vercel project.
+
+## Cloudflare Workers
+
+[Cloudflare Workers](https://developers.cloudflare.com/workers/) run JavaScript and WebAssembly on Cloudflare's global network, close to your users.
+
+Cloudflare is compatible with Supabase. See the [serverless drivers guide](/docs/guides/database/connecting-to-postgres/serverless-drivers#cloudflare-workers) for the Cloudflare Workers setup.
+
+## AWS Lambda
+
+[AWS Lambda](https://aws.amazon.com/lambda/) runs functions in response to events from other AWS services, HTTP requests through Amazon API Gateway or Lambda function URLs, and schedules. It supports many languages and offers fine-grained control over memory, timeouts, and networking.
+
+Lambda fits teams whose infrastructure already runs on AWS. You can connect Lambda functions to Supabase Postgres with a standard Postgres client, or call the Data API with supabase-js. Use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode) for connections from short-lived functions, so you do not exhaust your database connections during traffic spikes.
+
+## Netlify Functions
+
+[Netlify Functions](https://docs.netlify.com/build/functions/overview/) are serverless functions that deploy with your site on Netlify. They are a good fit for static sites and front-end frameworks that need a small amount of server-side logic, such as form handling or API proxies.
+
+Netlify Functions can call Supabase through supabase-js or connect with a Postgres client. For direct connections, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode) and [configure your client](/docs/guides/database/connecting-to-postgres#configure-your-client) for a short-lived environment.
+
+## Other providers
+
+Any platform that can run HTTPS requests or open a Postgres connection can work with Supabase. If you use a runtime not listed here, start with the [Data API](/docs/guides/api) for HTTP access or the [connection guide](/docs/guides/database/connecting-to-postgres) for a direct connection.
+
+## Which serverless function to choose
+
+If you already use Supabase or are starting a new project, Supabase Edge Functions are the default choice. Otherwise, use this list to narrow down your options:
+
+- **Your project already uses Supabase, or you are starting a new project:** [Supabase Edge Functions](/docs/guides/functions)
+- **You host a Next.js app and want its API routes in the same deployment:** [Vercel Functions](https://vercel.com/docs/functions)
+- **You want lightweight logic that runs close to users worldwide, and you can work within the Workers runtime:** [Cloudflare Workers](https://developers.cloudflare.com/workers/)
+- **Your infrastructure already runs on AWS and you need fine-grained control over resources:** [AWS Lambda](https://aws.amazon.com/lambda/)
+- **You host a static or front-end site on Netlify and need a little server-side logic:** [Netlify Functions](https://docs.netlify.com/build/functions/overview/)
