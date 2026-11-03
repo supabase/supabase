@@ -92,7 +92,12 @@ export function isExternalReferrer(referrer: string): boolean {
   }
 }
 
-const SIGN_IN_PAGE_HOSTNAMES = new Set(['accounts.youtube.com', 'auth.openai.com', 'appleid.apple.com'])
+const GOOGLE_ACCOUNTS_HOSTNAME = /^accounts\.google\.(?:(?:com|co)\.)?[a-z]{2,3}$/
+const SIGN_IN_PAGE_HOSTNAMES = new Set([
+  'accounts.youtube.com',
+  'auth.openai.com',
+  'appleid.apple.com',
+])
 
 /**
  * Returns true if the referrer URL is an OAuth/SSO redirect that should NOT
@@ -115,7 +120,7 @@ export function isOAuthRedirectReferrer(referrer: string): boolean {
     const hostname = url.hostname
 
     // Google SSO — entire subdomain is auth traffic
-    if (hostname.startsWith('accounts.google.')) return true
+    if (GOOGLE_ACCOUNTS_HOSTNAME.test(hostname)) return true
     if (SIGN_IN_PAGE_HOSTNAMES.has(hostname)) return true
 
     // GitHub — bare domain (no meaningful path) is OAuth redirect noise
@@ -396,7 +401,8 @@ export function parseFirstReferrerCookie(cookieHeader: string): FirstReferrerDat
     const utms = toStringRecord(utmsRaw)
     const click_ids = toStringRecord(clickIdsRaw)
 
-    const ts = typeof tsRaw === 'number' && Number.isFinite(tsRaw) ? tsRaw : undefined
+    const ts =
+      typeof tsRaw === 'number' && !Number.isNaN(new Date(tsRaw).getTime()) ? tsRaw : undefined
 
     return {
       referrer,

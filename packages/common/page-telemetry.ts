@@ -129,12 +129,12 @@ export function handlePageTelemetry({
         } else {
           delete firstTouchAttributionProps.first_touch_search
         }
-
-        if (ts !== undefined) {
-          firstTouchAttributionProps.first_touch_timestamp = new Date(ts).toISOString()
-        }
       } catch {
-        // Skip if landing URL or timestamp is malformed
+        // Skip if landing URL is malformed
+      }
+
+      if (ts !== undefined) {
+        firstTouchAttributionProps.first_touch_timestamp = new Date(ts).toISOString()
       }
     }
 

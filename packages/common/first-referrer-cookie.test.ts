@@ -63,6 +63,10 @@ describe('first-referrer-cookie', () => {
       expect(isOAuthRedirectReferrer('https://chatgpt.com/')).toBe(false)
     })
 
+    it('returns false for a lookalike of accounts.google.com', () => {
+      expect(isOAuthRedirectReferrer('https://accounts.google.com.example.org/')).toBe(false)
+    })
+
     // GitHub OAuth — block bare domain only
     it('returns true for bare github.com/', () => {
       expect(isOAuthRedirectReferrer('https://github.com/')).toBe(true)
