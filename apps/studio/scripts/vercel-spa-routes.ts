@@ -107,6 +107,8 @@ export function buildSpaRoutes(
       prefixes.map((prefix) => ({
         src: `${escapeRegExp(`${prefix}${route}`)}/?`,
         dest: `${route}/index.html`,
+        // `isPrerenderedRoute()` is case-sensitive, so other casings must get the shell.
+        caseSensitive: true,
       }))
     ),
     { src: '/(.*)', dest: SHELL_PATH },

@@ -554,8 +554,7 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
-  // Signed-out pages prerendered next to the SPA shell. Platform builds only: self-hosted
-  // sign-in redirects straight to the default project.
+  // Self-hosted sign-in redirects straight to the default project, so there's nothing to prerender.
   const prerenderedRoutes = env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? PRERENDERED_ROUTES : []
   // Client JS/CSS (and CSS-referenced fonts/images) load from the R2 asset CDN
   // on production builds, uploaded by scripts/upload-static-assets.sh. Vite's
@@ -867,13 +866,10 @@ export default defineConfig(({ command, mode }) => {
         spa: {
           enabled: true,
         },
-        // Explicit pages only: no crawling, no static path discovery.
+        // Only the listed pages: crawling would follow their links into signed-in pages
+        // such as /organizations.
         prerender: { crawlLinks: false, autoStaticPathsDiscovery: false },
-        pages: prerenderedRoutes.map((path) => ({
-          path,
-          prerender: { enabled: true },
-          sitemap: { exclude: true },
-        })),
+        pages: prerenderedRoutes.map((path) => ({ path, prerender: { enabled: true } })),
         // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
         // its slash-stripping branch. See the basePath comment above.
         ...(basePath && { router: { basepath: basePath } }),

@@ -73,8 +73,8 @@ describe('buildSpaRoutes', () => {
     )
 
     expect(routes.slice(-3)).toEqual([
-      { src: '/dashboard/sign-in/?', dest: '/sign-in/index.html' },
-      { src: '/sign-in/?', dest: '/sign-in/index.html' },
+      { src: '/dashboard/sign-in/?', dest: '/sign-in/index.html', caseSensitive: true },
+      { src: '/sign-in/?', dest: '/sign-in/index.html', caseSensitive: true },
       { src: '/(.*)', dest: '/_shell.html' },
     ])
     const signIn = new RegExp(`^${routes.at(-3)!.src}$`)
