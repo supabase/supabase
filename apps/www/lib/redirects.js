@@ -934,6 +934,11 @@ module.exports = [
     destination: '/docs/guides/auth/auth-mfa',
   },
   {
+    permanent: true,
+    source: '/nextjs',
+    destination: '/docs/guides/getting-started/tutorials/with-nextjs',
+  },
+  {
     permanent: false,
     source: '/special-announcement',
     destination: '/ga-week',

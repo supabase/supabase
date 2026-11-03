@@ -32,7 +32,7 @@ export const apis: NavMenuConstant = {
             { name: 'SQL to JavaScript API', url: '/guides/api/sql-to-api' },
             {
               name: 'Query plans with explain()',
-              url: '/guides/database/debugging-performance#using-explain',
+              url: '/guides/api/query-plans',
             },
           ],
         },

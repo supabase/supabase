@@ -117,7 +117,8 @@ describe('RoleRow', () => {
 
     await waitFor(() => expect(getUpdateQuery()).toBeDefined())
     expect(getUpdateQuery()).toMatch(/\blogin\b/)
-    expect(getUpdateQuery()).toContain(`'s3cret'`)
+    expect(getUpdateQuery()).toContain(`'SCRAM-SHA-256$`)
+    expect(getUpdateQuery()).not.toContain('s3cret')
   })
 
   test('turns on login without a password when the field is empty', async () => {
@@ -142,5 +143,119 @@ describe('RoleRow', () => {
     await waitFor(() => expect(getUpdateQuery()).toBeDefined())
     expect(getUpdateQuery()).toContain('createdb')
     expect(getUpdateQuery()).not.toContain('password')
+  })
+
+  describe('reset password', () => {
+    const openMenu = async (role: PgRole) => {
+      customRender(
+        <ProjectContextProvider projectRef="default">
+          <RoleRow role={role} onSelectDelete={vi.fn()} />
+        </ProjectContextProvider>
+      )
+      const user = userEvent.setup()
+      await user.click(await screen.findByRole('button', { name: `${role.name} actions` }))
+      return user
+    }
+
+    test('is available for a custom role that can log in', async () => {
+      await openMenu(createRole({ canLogin: true }))
+
+      expect(await screen.findByRole('menuitem', { name: 'Reset password' })).not.toHaveAttribute(
+        'data-disabled'
+      )
+    })
+
+    test.each([
+      ['a system role', createRole({ name: 'postgres', canLogin: true })],
+      ['a role that cannot log in', createRole({ canLogin: false })],
+    ])('is disabled for %s', async (_, role) => {
+      await openMenu(role)
+
+      expect(await screen.findByRole('menuitem', { name: 'Reset password' })).toHaveAttribute(
+        'data-disabled'
+      )
+    })
+
+    test('requires a password', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+
+      expect(await screen.findByText('You must provide a password')).toBeInTheDocument()
+      expect(getUpdateQuery()).toBeUndefined()
+    })
+
+    test('sets the new password and closes the dialog', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+
+      await waitFor(() => expect(getUpdateQuery()).toBeDefined())
+      expect(getUpdateQuery()).toContain(`'SCRAM-SHA-256$`)
+      expect(getUpdateQuery()).not.toContain('n3w-s3cret')
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+    })
+
+    test('closes on cancel without asking when nothing was entered', async () => {
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+
+      await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+      expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument()
+    })
+
+    test('asks before discarding an entered password, and starts empty when reopened', async () => {
+      const role = createRole({ canLogin: true })
+      const user = await openMenu(role)
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+
+      await user.click(await screen.findByRole('button', { name: 'Cancel' }))
+      expect(await screen.findByText('Unsaved changes')).toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toHaveValue('n3w-s3cret')
+
+      await user.click(await screen.findByRole('button', { name: 'Discard changes' }))
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+
+      await user.click(await screen.findByRole('button', { name: `${role.name} actions` }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      expect(await screen.findByLabelText('Password')).toHaveValue('')
+      expect(getUpdateQuery()).toBeUndefined()
+    })
+
+    test('ignores dismissal while the password is being saved', async () => {
+      let finishUpdate = () => {}
+      const updateFinished = new Promise<void>((resolve) => (finishUpdate = resolve))
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: async ({ request }) => {
+          queries.push(QueryBodySchema.parse(await request.json()).query)
+          await updateFinished
+          return HttpResponse.json<Record<string, unknown>[]>([])
+        },
+      })
+      const user = await openMenu(createRole({ canLogin: true }))
+      await user.click(await screen.findByRole('menuitem', { name: 'Reset password' }))
+      await user.click(await screen.findByLabelText('Password'))
+      await user.paste('n3w-s3cret')
+      fireEvent.submit(document.getElementById('reset-role-password-form')!)
+      await waitFor(() => expect(getUpdateQuery()).toBeDefined())
+
+      await user.keyboard('{Escape}')
+
+      expect(screen.queryByText('Unsaved changes')).not.toBeInTheDocument()
+      expect(screen.getByLabelText('Password')).toBeInTheDocument()
+
+      finishUpdate()
+      await waitFor(() => expect(screen.queryByLabelText('Password')).not.toBeInTheDocument())
+    })
   })
 })
