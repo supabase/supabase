@@ -475,6 +475,15 @@ check "Functions reject non-sb_ apikey (Server SDK)" "401" \
         -H "Content-Type: application/json" \
         -d '{}')"
 
+# A main worker crash exits the edge-runtime process and Docker restarts it,
+# after which the requests above can still pass. Catch that here.
+if command -v docker >/dev/null 2>&1; then
+    fn_restarts=$(docker inspect -f '{{.RestartCount}}' supabase-edge-functions 2>/dev/null || echo missing)
+    check "Functions container has not restarted" "0" "$fn_restarts"
+else
+    echo "  SKIP: docker not available"
+fi
+
 # ---------------------------------------------
 # 8. pg-meta (Studio backend)
 # ---------------------------------------------
