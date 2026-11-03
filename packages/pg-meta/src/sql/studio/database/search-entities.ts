@@ -11,10 +11,6 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 // role can't access doesn't starve the result set.
 const CANDIDATE_LIMIT = 50
 
-// A table with many policies shouldn't crowd out other results, so only a few
-// of the policies on each matched table are surfaced.
-const POLICIES_PER_TABLE_LIMIT = 3
-
 // Mirrors what the table list endpoints expose: the role owns the table or has
 // some privilege on it (or one of its columns).
 const hasTableAccess = (oid: SafeSqlFragment, owner: SafeSqlFragment) => safeSql`(
@@ -210,7 +206,7 @@ export const getSearchEntitiesSql = ({
         from pg_policy p
         where p.polrelid = mt.oid
         order by p.polname
-        limit ${literal(POLICIES_PER_TABLE_LIMIT)}
+        limit ${literal(limit)}
       ) pol
     ),
     matched_policies as (

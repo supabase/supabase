@@ -174,18 +174,6 @@ withTestDatabase('returns a policy that matches both ways only once', async (db)
   expect(await searchPolicies(db, 'posts')).toEqual(['public.posts: posts read (SELECT)'])
 })
 
-withTestDatabase('caps the policies surfaced per matched table', async (db) => {
-  await db.executeQuery(`
-    create table public.posts (id int);
-    create policy "a" on public.posts for select using (true);
-    create policy "b" on public.posts for select using (true);
-    create policy "c" on public.posts for select using (true);
-    create policy "d" on public.posts for select using (true);
-  `)
-
-  expect(await searchPolicies(db, 'posts')).toHaveLength(3)
-})
-
 withTestDatabase('caps the total number of policies', async (db) => {
   await db.executeQuery(`
     create table public.posts (id int);
