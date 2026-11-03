@@ -20,7 +20,7 @@ export const StorageVersioningPreview = () => {
         src={`${BASE_PATH}/img/previews/storage-object-versioning.png`}
         width={1296}
         height={900}
-        alt="explorer-preview"
+        alt="storage object versioning settings and version history preview"
         className="rounded-sm border"
       />
 
