@@ -5,7 +5,14 @@ import { scan } from '../../shared/axe.ts'
 
 export const WCAG_TAGS = ['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa']
 
-export const ENFORCED_RULES = ['heading-order', 'page-has-heading-one', 'button-name']
+export const ENFORCED_RULES = [
+  'heading-order',
+  'page-has-heading-one',
+  'button-name',
+  'duplicate-id',
+  'duplicate-id-active',
+  'duplicate-id-aria',
+]
 
 export const EXCLUDED_RULES = [
   'color-contrast',

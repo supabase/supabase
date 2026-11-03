@@ -175,7 +175,7 @@ Always maintain at least one non-SSO owner account during migrations to ensure y
 
 Organizations with multiple email domains need provider configurations for each domain.
 
-### Example scenario
+### Example scenario [#use-case-4-acquisitions-and-subsidiaries-example-scenario]
 
 - Parent company: `parent.com`
 - Subsidiary 1: `subsidiary1.com`
@@ -183,7 +183,7 @@ Organizations with multiple email domains need provider configurations for each 
 
 All authenticate through the same central IDP but use different email domains.
 
-### Configuration approach
+### Configuration approach [#use-case-4-acquisitions-and-subsidiaries-configuration-approach]
 
 #### Option A: Single provider with multiple domains (SP-initiated)
 
@@ -421,17 +421,17 @@ User clicks "Supabase Prod" tile but sees the dev environment.
 
 ### Configuration drift between environments
 
-#### Symptom
+#### Symptom [#configuration-drift-between-environments-symptom]
 
 SSO works in dev but fails in staging or production.
 
-#### Causes
+#### Causes [#configuration-drift-between-environments-causes]
 
 - Attribute mappings differ between providers
 - Certificate expired in one environment but not others
 - Domain configuration inconsistent (if using SP-initiated)
 
-#### Solution
+#### Solution [#configuration-drift-between-environments-solution]
 
 1. Compare SSO configurations side-by-side
 2. Check attribute mappings are identical
@@ -441,17 +441,17 @@ SSO works in dev but fails in staging or production.
 
 ### Users don't see expected app tiles
 
-#### Symptom
+#### Symptom [#users-dont-see-expected-app-tiles-symptom]
 
 User cannot find "Supabase Staging" tile in IDP dashboard.
 
-#### Causes
+#### Causes [#users-dont-see-expected-app-tiles-causes]
 
 - User not assigned to the app in IDP
 - App not deployed/published in IDP
 - User looking in wrong place (different IDP portal)
 
-#### Solution
+#### Solution [#users-dont-see-expected-app-tiles-solution]
 
 1. Verify app assignment in IDP admin console
 2. Check app is published/active
@@ -460,7 +460,7 @@ User cannot find "Supabase Staging" tile in IDP dashboard.
 
 ### Auto-join adding users to wrong organization
 
-#### Symptom
+#### Symptom [#auto-join-adding-users-to-wrong-organization-symptom]
 
 User joins dev environment when they should join production.
 
@@ -484,15 +484,15 @@ User clicked wrong app tile, auto-join is enabled.
 
 ### Multiple organizations with same domain (SP-initiated confusion)
 
-#### Symptom
+#### Symptom [#multiple-organizations-with-same-domain-sp-initiated-confusion-symptom]
 
 With SP-initiated enabled and same domain in multiple organizations, users get routed to unexpected organization.
 
-#### Cause
+#### Cause [#multiple-organizations-with-same-domain-sp-initiated-confusion-cause]
 
 SP-initiated routing uses first matching provider.
 
-#### Solution
+#### Solution [#multiple-organizations-with-same-domain-sp-initiated-confusion-solution]
 
 - **Recommended:** Switch to IDP-initiated only (disable SP-initiated)
 - Remove domain configuration from all but one organization
