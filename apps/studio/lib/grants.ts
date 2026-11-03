@@ -11,8 +11,8 @@ import {
 import { prefetchProjectDetail } from '@/data/projects/project-detail-query'
 import { doPermissionsCheckV2, usePermissionScopeV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
+import { StudioError } from '@/lib/errors/studio-errors'
 import { fgaRefinements, type FgaRefinementMap, type FgaRefinements } from '@/lib/fga-refinements'
-import { ResponseError } from '@/types'
 
 export type VariantOf<E extends FgaGuardedEndpoint> = FgaRefinements extends {
   readonly [K in E]: { readonly variants: infer Vs }
@@ -39,7 +39,7 @@ export type GrantResult<E extends FgaGuardedEndpoint, V extends VariantOf<E> = n
   | { status: 'loading'; grant?: never }
   | { status: 'granted'; grant: Grant<E, V> }
   | { status: 'denied'; grant?: never }
-  | { status: 'error'; error: ResponseError; grant?: never }
+  | { status: 'error'; error: StudioError; grant?: never }
 
 export type GrantScope = {
   organizationSlug?: string
@@ -210,7 +210,7 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
 ): Promise<
   | { status: 'granted'; grant: Grant<E, V> }
   | { status: 'denied' }
-  | { status: 'error'; error: ResponseError }
+  | { status: 'error'; error: StudioError }
 > {
   try {
     const [permissions, resolvedScope] = await Promise.all([
@@ -220,9 +220,9 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
     return getGrant(permissions, endpoint, resolvedScope, opts)
   } catch (error) {
     const responseError =
-      error instanceof ResponseError
+      error instanceof StudioError
         ? error
-        : new ResponseError(error instanceof Error ? error.message : undefined)
+        : new StudioError(error instanceof Error ? error.message : undefined)
     return { status: 'error', error: responseError }
   }
 }

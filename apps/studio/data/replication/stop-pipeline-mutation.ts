@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { replicationKeys } from './keys'
 import { waitForPipelineStopped } from './pipeline-status-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type StopPipelineParams = {
   projectRef: string
@@ -36,12 +37,12 @@ export const useStopPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<StopPipelineData, ResponseError, StopPipelineParams>,
+  UseCustomMutationOptions<StopPipelineData, StudioError, StopPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StopPipelineData, ResponseError, StopPipelineParams>({
+  return useMutation<StopPipelineData, StudioError, StopPipelineParams>({
     mutationFn: async (variables) => {
       const data = await stopPipeline(variables)
       if (variables.waitUntilStopped) await waitForPipelineStopped(queryClient, variables)

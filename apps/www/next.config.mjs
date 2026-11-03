@@ -189,7 +189,8 @@ const nextConfig = {
         ],
       },
       {
-        source: '/dashboard/:path*',
+        // Public auth pages are indexable; every other dashboard path stays noindex
+        source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
         headers: [
           {
             key: 'X-Robots-Tag',

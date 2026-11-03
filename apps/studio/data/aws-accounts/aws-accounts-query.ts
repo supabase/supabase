@@ -5,7 +5,7 @@ import { components } from 'api-types'
 import { awsAccountKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type AWSAccountsVariables = {
   projectRef?: string
@@ -36,7 +36,7 @@ async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: Abo
 }
 
 type AWSAccountsData = Awaited<ReturnType<typeof getAWSAccounts>>
-type AWSAccountsError = ResponseError
+type AWSAccountsError = StudioError
 
 export const useAWSAccountsQuery = <TData = AWSAccountsData>(
   { projectRef }: AWSAccountsVariables,

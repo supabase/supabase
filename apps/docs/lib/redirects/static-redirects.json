@@ -3068,5 +3068,10 @@
     "source": "/docs/assets/images/supabase-architecture-9050a7317e9ec7efb7807f5194122e48.png",
     "destination": "/docs/img/supabase-architecture.svg",
     "permanent": true
+  },
+  {
+    "source": "/docs/guides/platform/sso/enterprise-mcp-authentication",
+    "destination": "/docs/guides/platform/sso/enterprise-mcp-authorization",
+    "permanent": true
   }
 ]

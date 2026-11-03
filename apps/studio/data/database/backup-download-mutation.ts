@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BackupDownloadVariables = {
   ref: string
@@ -26,10 +27,10 @@ export const useBackupDownloadMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BackupDownloadData, ResponseError, BackupDownloadVariables>,
+  UseCustomMutationOptions<BackupDownloadData, StudioError, BackupDownloadVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupDownloadData, ResponseError, BackupDownloadVariables>({
+  return useMutation<BackupDownloadData, StudioError, BackupDownloadVariables>({
     mutationFn: (vars) => downloadBackup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

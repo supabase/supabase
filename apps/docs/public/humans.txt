@@ -8,6 +8,7 @@ Adam Mohammed
 Adam Mokan
 Adam Whitlock
 Aditya Maruvada
+Adrian Johnson
 AJ Matias
 Akash Manimaran
 Akilesh Sethu
@@ -228,6 +229,7 @@ Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
 Leonardo Santiago
+Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
 Lovro Mažgon
@@ -378,6 +380,7 @@ Warda Bibi
 Warwick Mitchell
 Wen Bo Xie
 Wendie Cheung
+Yann Braga
 Yara Lacerda
 Yorvi Arias
 Yuliya Marinova

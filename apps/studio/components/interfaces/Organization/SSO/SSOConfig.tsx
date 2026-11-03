@@ -174,7 +174,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
-        idjag_issuer_url: values.idjagIssuerUrl || undefined,
+        idjag_issuer_url: values.idjagIssuerUrl || null,
       },
     }
 

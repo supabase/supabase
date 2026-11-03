@@ -6,7 +6,8 @@ import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TablePrivilegesRevoke = Parameters<
   typeof pgMeta.tablePrivileges.revoke
@@ -43,16 +44,12 @@ export const useTablePrivilegesRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    TablePrivilegesRevokeData,
-    ResponseError,
-    TablePrivilegesRevokeVariables
-  >,
+  UseCustomMutationOptions<TablePrivilegesRevokeData, StudioError, TablePrivilegesRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TablePrivilegesRevokeData, ResponseError, TablePrivilegesRevokeVariables>({
+  return useMutation<TablePrivilegesRevokeData, StudioError, TablePrivilegesRevokeVariables>({
     mutationFn: (vars) => revokeTablePrivileges(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

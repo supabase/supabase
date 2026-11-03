@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserDeleteMFAFactorsVariables = {
   projectRef: string
@@ -26,10 +27,10 @@ export const useUserDeleteMFAFactorsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>,
+  UseCustomMutationOptions<UserDeleteMFAFactorsData, StudioError, UserDeleteMFAFactorsVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserDeleteMFAFactorsData, ResponseError, UserDeleteMFAFactorsVariables>({
+  return useMutation<UserDeleteMFAFactorsData, StudioError, UserDeleteMFAFactorsVariables>({
     mutationFn: (vars) => deleteMFAFactors(vars),
     async onSuccess(data, variables, context) {
       // [Joshen] If we need to invalidate any queries

@@ -6,7 +6,8 @@ import { profileKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import { organizationKeys } from '@/data/organizations/keys'
 import { permissionKeys } from '@/data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProfileResponse = components['schemas']['ProfileResponse_Output']
 
@@ -23,10 +24,10 @@ export const useProfileCreateMutation = ({
   onSuccess,
   onError,
   ...options
-}: Omit<UseCustomMutationOptions<ProfileCreateData, ResponseError, void>, 'mutationFn'> = {}) => {
+}: Omit<UseCustomMutationOptions<ProfileCreateData, StudioError, void>, 'mutationFn'> = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileCreateData, ResponseError, void>({
+  return useMutation<ProfileCreateData, StudioError, void>({
     mutationFn: () => createProfile(),
     // Retry transient failures (5xx, network, 429), but never 4xx - a 409 means the profile
     // already exists, so retrying the POST can't help

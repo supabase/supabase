@@ -1,21 +1,21 @@
 // Reference: https://usehooks.com/useLocalStorage/
 import { safeLocalStorage } from 'common'
-import { useCallback, useState } from 'react'
+import { useCallback, useLayoutEffect, useState } from 'react'
 
 export function useLocalStorage<T>(key: string, initialValue: T) {
   // State to store our value
-  // Pass initial state function to useState so logic is only executed once
-  const [storedValue, setStoredValue] = useState<T>(() => {
-    // safeLocalStorage handles SSR and unavailable storage (returns null);
-    // the try/catch here only guards JSON.parse against corrupt values.
+  const [storedValue, setStoredValue] = useState<T>(initialValue)
+
+  // Read after mount so the server render and the hydrating client render agree.
+  useLayoutEffect(() => {
     const item = safeLocalStorage.getItem(key)
+    if (!item) return
     try {
-      return item ? (JSON.parse(item) as T) : initialValue
+      setStoredValue(JSON.parse(item) as T)
     } catch (error) {
       console.warn(`Failed to parse localStorage value for "${key}"`, error)
-      return initialValue
     }
-  })
+  }, [key])
 
   // Return a wrapped version of useState's setter function that ...
   // ... persists the new value to localStorage.

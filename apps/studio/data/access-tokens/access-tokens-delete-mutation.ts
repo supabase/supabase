@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { accessTokenKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AccessTokenDeleteVariables = {
   id: number
@@ -25,12 +26,12 @@ export const useAccessTokenDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
+  UseCustomMutationOptions<AccessTokenDeleteData, StudioError, AccessTokenDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>({
+  return useMutation<AccessTokenDeleteData, StudioError, AccessTokenDeleteVariables>({
     mutationFn: (vars) => deleteAccessToken(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })

@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { materializedViewKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type MaterializedViewsVariables = {
   projectRef?: string
@@ -35,7 +36,7 @@ export async function getMaterializedViews(
 }
 
 export type MaterializedViewsData = Awaited<ReturnType<typeof getMaterializedViews>>
-export type MaterializedViewsError = ResponseError
+export type MaterializedViewsError = StudioError
 
 export const useMaterializedViewsQuery = <TData = MaterializedViewsData>(
   { projectRef, connectionString, schemas }: MaterializedViewsVariables,
