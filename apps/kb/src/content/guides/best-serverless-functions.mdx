@@ -35,11 +35,11 @@ Lambda fits teams whose infrastructure already runs on AWS. You can connect Lamb
 
 [Netlify Functions](https://docs.netlify.com/build/functions/overview/) are serverless functions that deploy with your site on Netlify. They are a good fit for static sites and front-end frameworks that need a small amount of server-side logic, such as form handling or API proxies.
 
-Netlify Functions can call Supabase through supabase-js or connect with a Postgres client. For direct connections, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode) and [configure your client](/docs/guides/database/connecting-to-postgres#configure-your-client) for a short-lived environment.
+Netlify Functions can call Supabase through supabase-js or connect with a Postgres client. When using a Postgres client, use the [shared pooler in transaction mode](/docs/guides/database/connecting-to-postgres#pooler-transaction-mode) and [configure your client](/docs/guides/database/connecting-to-postgres#configure-your-client) for a short-lived environment.
 
 ## Other providers
 
-Any platform that can run HTTPS requests or open a Postgres connection can work with Supabase. If you use a runtime not listed here, start with the [Data API](/docs/guides/api) for HTTP access or the [connection guide](/docs/guides/database/connecting-to-postgres) for a direct connection.
+Any platform that can run HTTPS requests or open a Postgres connection can work with Supabase. If you use a runtime not listed here, start with the [Data API](/docs/guides/api) for HTTP access or the [connection guide](/docs/guides/database/connecting-to-postgres) for a Postgres client connection.
 
 ## Which serverless function to choose
 
