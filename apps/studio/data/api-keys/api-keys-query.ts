@@ -97,25 +97,18 @@ export const revealedApiKeysQueryOptions = ({ projectRef, grant }: RevealedAPIKe
       projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
   })
 
-type TransitionalVariables = { projectRef?: string; reveal?: boolean }
+type TransitionalVariables = { projectRef?: string }
 
 /**
- * @deprecated Transitional: mints the grant internally. Migrate callers to `apiKeysQueryOptions`
- * (FE-4731) or `revealedApiKeysQueryOptions` (FE-4730) with `useGrant`, then delete this hook.
+ * @deprecated Transitional: mints a plain grant internally. Migrate callers to `apiKeysQueryOptions`
+ * with `useGrant` (FE-4731), then delete this hook.
  */
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal = false }: TransitionalVariables,
+  { projectRef }: TransitionalVariables,
   { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, StudioError, TData> = {}
 ) => {
-  const plainGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const revealGrant = useGrant(
-    'GET /v1/projects/{ref}/api-keys',
-    { projectRef },
-    { variant: 'reveal' }
-  )
-  const { queryKey, queryFn } = reveal
-    ? revealedApiKeysQueryOptions({ projectRef, grant: revealGrant.grant })
-    : apiKeysQueryOptions({ projectRef, grant: plainGrant.grant })
+  const grant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { queryKey, queryFn } = apiKeysQueryOptions({ projectRef, grant: grant.grant })
 
   return useQuery<APIKeysData, StudioError, TData>({
     queryKey,
@@ -151,7 +144,7 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
 
 const PlaceholderData: APIKeysData = []
 
-/** @deprecated Transitional, see `useAPIKeysQuery`. Migrate with FE-4730 / FE-4731. */
+/** @deprecated Transitional, see `useAPIKeysQuery`. Migrate with FE-4731. */
 export const useAPIKeys = (
   variables: TransitionalVariables,
   options: UseCustomQueryOptions<APIKeysData, StudioError, APIKeysData> = {}

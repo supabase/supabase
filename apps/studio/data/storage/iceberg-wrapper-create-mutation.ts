@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
@@ -8,22 +10,26 @@ import {
   getCatalogURI,
   getConnectionURL,
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+  // The wrapper's catalog token is a secret API key, so it needs the `reveal` grant
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: project?.ref },
+    { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef: project?.ref, reveal: true },
-    { enabled: canReadAPIKeys }
-  )
+  const { data: apiKeysData } = useQuery({
+    ...revealedApiKeysQueryOptions({ projectRef: project?.ref, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
   const { secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
@@ -43,6 +49,13 @@ export const useIcebergWrapperCreateMutation = () => {
   const { mutateAsync: createFDW, isPending: isCreatingFDW } = useFDWCreateMutation()
 
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
+    // Without the keys the wrapper would be saved with a placeholder token that never works
+    if (apiKeysGrant.status !== 'granted') {
+      throw new Error(
+        'You need additional permissions to view API keys, which are needed to create an Iceberg wrapper.'
+      )
+    }
+
     const createS3KeyData = await createS3AccessKey({
       projectRef: project?.ref,
       description: getAnalyticsBucketS3KeyName(bucketName),
@@ -74,5 +87,7 @@ export const useIcebergWrapperCreateMutation = () => {
     mutateAsync,
     isPending: isCreatingFDW || isCreatingS3AccessKey,
     hasPermission: canCreateCredentials,
+    /** Callers should block creation and explain when this isn't `granted`. */
+    apiKeysGrant,
   }
 }
