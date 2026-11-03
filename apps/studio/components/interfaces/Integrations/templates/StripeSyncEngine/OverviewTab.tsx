@@ -26,7 +26,6 @@ import { RequiredExtensionsSection } from '../../Integration/RequiredExtensionsS
 import { InstallationError } from './InstallationError'
 import { IntegrationInstalledActions, IntegrationNotInstalledActions } from './IntegrationActions'
 import {
-  canInstall as checkCanInstall,
   hasInstallError,
   hasUninstallError,
   isInstallDone,
@@ -48,7 +47,7 @@ const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
-const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolean }) => {
+const StripeSyncContent = () => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
@@ -131,7 +130,6 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   const installing = (installInProgress || isInstallRequested || isInstallInitiated) && !timedOut
   const uninstalling =
     (uninstallInProgress || isUninstallRequested || isUninstallInitiated) && !timedOut
-  const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
   const hasError = (uninstallError || installError) && ((!uninstalling && !installing) || timedOut)
 
@@ -215,12 +213,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
             isUpgrade={upgradeAvailable}
           />
           <IntegrationNotInstalledActions
-            hideInstallCTA={hideInstallCTA}
-            installing={installing}
-            canInstall={canInstall}
             isUninstallRequested={isUninstallRequested}
             handleUninstall={handleUninstall}
-            setShouldShowInstallSheet={setShouldShowInstallSheet}
           />
         </>
       ) : (
@@ -389,6 +383,6 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
 export const StripeSyncEngineOverviewTab = () => (
   <>
     <RequiredExtensionsSection />
-    <StripeSyncContent hideInstallCTA />
+    <StripeSyncContent />
   </>
 )
