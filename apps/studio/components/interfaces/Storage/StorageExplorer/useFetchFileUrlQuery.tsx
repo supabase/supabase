@@ -1,6 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 
-import { getPublicUrlForBucketObject } from '@/data/storage/bucket-object-get-public-url-mutation'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { getBucketObjectPublicUrl } from '@/data/storage/bucket-object-public-url-query'
 import { signBucketObject } from '@/data/storage/bucket-object-sign-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { storageKeys } from '@/data/storage/keys'
@@ -8,35 +9,36 @@ import type { ResponseError, UseCustomQueryOptions } from '@/types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week
 
-export const fetchFileUrl = async (
-  pathToFile: string,
-  projectRef: string,
-  bucketId: string,
-  isBucketPublic: boolean,
-  expiresIn?: number,
+export const fetchFileUrl = async ({
+  projectRef,
+  clientEndpoint,
+  bucketId,
+  isBucketPublic,
+  path,
+  expiresIn = DEFAULT_EXPIRY,
+  versionId,
+}: {
+  projectRef: string
+  clientEndpoint: string
+  bucketId: string
+  isBucketPublic: boolean
+  path: string
+  expiresIn?: number
   versionId?: string
-) => {
-  // Omitted rather than sent as `undefined`, so current-version requests are unchanged.
-  const options = versionId === undefined ? undefined : { versionId }
-
+}) => {
   if (isBucketPublic) {
-    const data = await getPublicUrlForBucketObject({
-      projectRef: projectRef,
-      bucketId: bucketId,
-      path: pathToFile,
-      options,
-    })
-    return data.publicUrl
-  } else {
-    const data = await signBucketObject({
-      projectRef: projectRef,
-      bucketId: bucketId,
-      path: pathToFile,
-      expiresIn: expiresIn ?? DEFAULT_EXPIRY,
-      options,
-    })
-    return data.signedUrl
+    return getBucketObjectPublicUrl({ projectRef, clientEndpoint, bucketId, path, versionId })
   }
+
+  const data = await signBucketObject({
+    projectRef,
+    clientEndpoint,
+    bucketId,
+    path,
+    expiresIn,
+    versionId,
+  })
+  return data.signedUrl
 }
 
 type UseFileUrlQueryVariables = {
@@ -49,8 +51,11 @@ type UseFileUrlQueryVariables = {
 
 export const useFetchFileUrlQuery = (
   { path, projectRef, bucket, versionId }: UseFileUrlQueryVariables,
-  { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<string, ResponseError> = {}
 ) => {
+  const { hostEndpoint } = useProjectApiUrl({ projectRef })
+
+  // eslint-disable-next-line @tanstack/query/exhaustive-deps -- hostEndpoint is derived from projectRef
   return useQuery<string, ResponseError, string>({
     queryKey: storageKeys.fileUrl({
       projectRef,
@@ -60,8 +65,16 @@ export const useFetchFileUrlQuery = (
       versionId,
     }),
     queryFn: () =>
-      fetchFileUrl(path, projectRef, bucket.id, bucket.public, DEFAULT_EXPIRY, versionId),
+      fetchFileUrl({
+        projectRef,
+        clientEndpoint: hostEndpoint!,
+        bucketId: bucket.id,
+        isBucketPublic: bucket.public,
+        path,
+        versionId,
+      }),
     staleTime: DEFAULT_EXPIRY * 1000,
+    enabled: enabled && !!hostEndpoint,
     ...options,
   })
 }

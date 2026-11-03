@@ -7,6 +7,7 @@ import type { ArchivedVersionRow } from '@/components/interfaces/Storage/Storage
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
 import { customRender as render } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockStorageSigning } from '@/tests/lib/storage-client-mocks'
 
 const refetchAllOpenedFolders = vi.fn().mockResolvedValue(undefined)
 const clearArchivedSelection = vi.fn()
@@ -56,30 +57,17 @@ vi.mock('@/hooks/misc/useCheckPermissions', () => ({
 
 describe('ArchivedFilePreviewPane', () => {
   // The pane previews the archived file, so every test makes this request.
-  let signed: unknown[] = []
+  let signed: Array<Record<string, unknown>> = []
   beforeEach(() => {
-    signed = []
     selectedArchivedVersion = undefined
-    addAPIMock({
-      method: 'post',
-      path: '/platform/storage/:ref/buckets/:id/objects/sign',
-      response: async ({ request }) => {
-        signed.push(await request.json())
-        return Response.json({ signedUrl: 'https://example.com/gone.png' })
-      },
-    })
+    signed = mockStorageSigning('/object/sign/my-bucket/images/gone.png?token=abc')
   })
 
   it('signs the archived version, since the path itself resolves to the delete marker', async () => {
     render(<ArchivedFilePreviewPane />)
 
     await waitFor(() =>
-      expect(signed).toContainEqual(
-        expect.objectContaining({
-          path: 'images/gone.png',
-          options: expect.objectContaining({ versionId: 'v-current' }),
-        })
-      )
+      expect(signed).toContainEqual(expect.objectContaining({ versionId: 'v-current' }))
     )
   })
 

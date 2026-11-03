@@ -15,9 +15,16 @@ export const useCopyUrl = () => {
 
   const getFileUrl = useCallback(
     (filePath: string, expiresIn?: URL_EXPIRY_DURATION) => {
-      return fetchFileUrl(filePath, projectRef, selectedBucket.id, selectedBucket.public, expiresIn)
+      return fetchFileUrl({
+        projectRef,
+        clientEndpoint: hostEndpoint!,
+        bucketId: selectedBucket.id,
+        isBucketPublic: selectedBucket.public,
+        path: filePath,
+        expiresIn,
+      })
     },
-    [projectRef, selectedBucket]
+    [hostEndpoint, projectRef, selectedBucket]
   )
 
   const onCopyUrl = useCallback(

@@ -61,6 +61,7 @@ import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import type { ProjectStorageConfigResponse } from '@/data/config/project-storage-config-query'
 import { getQueryClient } from '@/data/query-client'
 import { deleteBucketObject } from '@/data/storage/bucket-object-delete-mutation'
+import { getBucketObjectPublicUrl } from '@/data/storage/bucket-object-public-url-query'
 import { signBucketObjects } from '@/data/storage/bucket-object-sign-mutation'
 import { listBucketObjects, StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { deleteBucketPrefix } from '@/data/storage/bucket-prefix-delete-mutation'
@@ -870,15 +871,21 @@ export function createStorageExplorerState({
         const urlByPath = new Map<string, string>()
 
         if (state.selectedBucket.public) {
-          for (const filePath of filePaths) {
-            urlByPath.set(
-              filePath,
-              `${clientEndpoint}/storage/v1/object/public/${state.selectedBucket.id}/${filePath}`
-            )
-          }
+          await Promise.all(
+            filePaths.map(async (filePath) => {
+              const publicUrl = await getBucketObjectPublicUrl({
+                projectRef: state.projectRef,
+                clientEndpoint,
+                bucketId: state.selectedBucket.id,
+                path: filePath,
+              })
+              urlByPath.set(filePath, publicUrl)
+            })
+          )
         } else {
           const signedUrls = await signBucketObjects({
             projectRef: state.projectRef,
+            clientEndpoint,
             bucketId: state.selectedBucket.id,
             paths: filePaths,
             expiresIn: 60 * 60, // 1 hour — enough for large folder downloads
@@ -1866,12 +1873,13 @@ export function createStorageExplorerState({
       const toastId = showToast ? toast.loading(`Retrieving ${fileName}...`) : undefined
 
       try {
-        const url = await fetchFileUrl(
-          file.path,
-          state.projectRef,
-          state.selectedBucket.id,
-          state.selectedBucket.public
-        )
+        const url = await fetchFileUrl({
+          projectRef: state.projectRef,
+          clientEndpoint,
+          bucketId: state.selectedBucket.id,
+          isBucketPublic: state.selectedBucket.public,
+          path: file.path,
+        })
         const response = await fetch(url)
         if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
         const data = await response.blob()
@@ -1910,12 +1918,13 @@ export function createStorageExplorerState({
       if (!file.path) return false
 
       try {
-        const url = await fetchFileUrl(
-          file.path,
-          state.projectRef,
-          state.selectedBucket.id,
-          state.selectedBucket.public
-        )
+        const url = await fetchFileUrl({
+          projectRef: state.projectRef,
+          clientEndpoint,
+          bucketId: state.selectedBucket.id,
+          isBucketPublic: state.selectedBucket.public,
+          path: file.path,
+        })
         const response = await fetch(url)
         if (!response.ok) throw new Error(`Failed to retrieve file ${file.path}`)
         const data = await response.blob()
