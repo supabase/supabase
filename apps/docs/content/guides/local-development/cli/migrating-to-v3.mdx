@@ -16,6 +16,12 @@ Two smaller changes can affect a production project: `config push` now applies `
 
 A removed command or flag still parses: it exits with code 1 and prints its replacement, so a failing run tells you what to change.
 
+<Admonition type="caution" label="Older projects fail to start until you rename [inbucket]">
+
+v3 can't load a `supabase/config.toml` that has an `[inbucket]` section, so `supabase start`, `stop`, `status`, and the `db` commands fail. Projects created with `supabase init` before v2.108.0 have that section. Rename it to `[local_smtp]` before you upgrade: the keys inside it don't change, and v2.108.0 and later already read `[local_smtp]`. See [Rename `[inbucket]` to `[local_smtp]`](#inbucket).
+
+</Admonition>
+
 ## Before you upgrade
 
 1. **Update to the latest v2 release.** v2.122.0 and later warn about removed commands, flags, config keys, and environment variables, and about commands whose default target changes in v3. Run your usual workflows, including CI and deploy scripts, and fix each warning. v2 doesn't warn about the confirmation, config precedence, diff engine, or SMS changes, so read those sections too.
@@ -330,6 +336,32 @@ Removed config keys fail, so you see them on the first run. Some removed environ
 | `COBRA_COMPLETION_DESCRIPTIONS`                              | Ignored                   | `SUPABASE_COMPLETION_DESCRIPTIONS`                               |
 
 If a script reads `INBUCKET_URL` from `supabase status -o env`, it now gets an empty value. The shared `supabase/functions/import_map.json` fallback still works.
+
+### Rename `[inbucket]` to `[local_smtp]` [#inbucket]
+
+Before v2.108.0, `supabase init` wrote an `[inbucket]` section for the local email testing server. v3 no longer reads it, so every command that loads your project config fails, including `supabase start`, `stop`, `status`, and the `db` commands:
+
+```text
+[inbucket] in supabase/config.toml is no longer supported. Use [local_smtp] instead.
+```
+
+Rename the section. The keys inside it, and the email testing server they configure, are unchanged:
+
+```toml
+# Before
+[inbucket]
+enabled = true
+port = 54324
+
+# After
+[local_smtp]
+enabled = true
+port = 54324
+```
+
+- Rename any `[remotes.<name>.inbucket]` block to `[remotes.<name>.local_smtp]`.
+- In `supabase/config.json`, rename the `inbucket` key to `local_smtp`.
+- v2.108.0 and later read `[local_smtp]` and warn about `[inbucket]`, so you can rename the section before you upgrade without breaking CI jobs that run v2.108.0 or later.
 
 ## Error names and messages
 
