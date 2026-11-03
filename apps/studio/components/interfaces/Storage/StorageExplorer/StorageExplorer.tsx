@@ -27,12 +27,10 @@ export const StorageExplorer = () => {
         <span aria-live="polite" aria-atomic="true" className="sr-only">
           {isBucketReady ? 'Bucket contents loaded' : 'Loading bucket contents'}
         </span>
-        <StorageExplorerNavigationProvider
-          isBucketReady={isBucketReady}
-          searchString={debouncedSearchString}
-        >
+        <StorageExplorerNavigationProvider isBucketReady={isBucketReady}>
           <StorageExplorerContent
             itemSearchString={itemSearchString}
+            debouncedSearchString={debouncedSearchString}
             setItemSearchString={setItemSearchString}
             isLoading={!isBucketReady}
           />

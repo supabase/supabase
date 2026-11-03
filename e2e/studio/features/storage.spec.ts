@@ -291,6 +291,46 @@ test.describe('Storage', () => {
     await deleteBucketViaApi(bucketName)
   })
 
+  test('searches the whole bucket and jumps to a match', async ({ page, ref }) => {
+    const bucketName = `${bucketNamePrefix}_search_files`
+    const folderName = 'search_folder'
+    const fileName = 'test-file.txt'
+
+    await deleteBucketViaApi(bucketName)
+    await createBucketViaApi(bucketName, false)
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // Creating a folder drills into it, so the upload lands inside the folder
+    await createFolder(page, folderName)
+    const filePath = path.join(import.meta.dirname, 'files', fileName)
+    await uploadFile(page, filePath, fileName)
+
+    // Always start the search from the bucket root
+    await navigateToStorageFiles(page, ref)
+    await navigateToBucket(page, ref, bucketName)
+
+    // The standard find combo focuses the search field
+    await page.keyboard.press('ControlOrMeta+f')
+    const searchInput = page.getByPlaceholder(`Search ${bucketName}...`)
+    await expect(searchInput, 'Search field should be focused by the find shortcut').toBeFocused()
+
+    await searchInput.fill(fileName)
+    const result = page.getByRole('button', { name: `${fileName} in ${folderName}` })
+    await expect(
+      result,
+      'File in a nested folder should be found from the bucket root'
+    ).toBeVisible({ timeout: 30_000 })
+
+    // Selecting the match opens the file where it actually lives
+    await result.click()
+    await expect(page).toHaveURL((url) => url.searchParams.get('path') === folderName)
+    await expect(page).toHaveURL((url) => url.searchParams.get('preview') === fileName)
+    await expect(searchInput, 'Search should be cleared after jumping to a match').toHaveValue('')
+
+    await deleteBucketViaApi(bucketName)
+  })
+
   test('can rename a file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_rename_file`
     const fileName = 'test-file.txt'
@@ -557,7 +597,7 @@ test.describe('Storage', () => {
     await deleteItem(page, fileName)
   })
 
-  test('Deleting a file preserves the current filter', async ({ page, ref }) => {
+  test('Search no longer lists a deleted file', async ({ page, ref }) => {
     const bucketName = `${bucketNamePrefix}_delete_file_filter`
     const fileName = 'test-file.txt'
 
@@ -588,18 +628,24 @@ test.describe('Storage', () => {
       path.join(import.meta.dirname, 'files', 'another-file.txt'),
       'another-file.txt'
     )
-    await page.getByPlaceholder('Search in root directory...').fill('test')
-    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
-    await expect(page.getByTitle('test-file.txt')).toHaveCount(1)
-    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
+    const searchInput = page.getByPlaceholder(`Search ${bucketName}...`)
+    const searchResult = (name: string) =>
+      page.getByRole('button', { name: `${name} in ${bucketName}` })
 
-    // Delete the file
+    await searchInput.fill('test')
+    await expect(searchResult('test-file.txt')).toBeVisible({ timeout: 30_000 })
+    await expect(searchResult('test-file-2.txt')).toBeVisible()
+    await expect(searchResult('another-file.txt')).toHaveCount(0)
+
+    // Delete the file from the folder view, with the search cleared
+    await searchInput.clear()
     await deleteItem(page, fileName)
 
-    // Check the filter is still applied
-    await expect(page.getByTitle('test-file.txt')).toHaveCount(0)
-    await expect(page.getByTitle('test-file-2.txt')).toHaveCount(1)
-    await expect(page.getByTitle('another-file.txt')).toHaveCount(0)
+    // Searching again no longer lists the deleted file
+    await searchInput.fill('test')
+    await expect(searchResult('test-file-2.txt')).toBeVisible({ timeout: 30_000 })
+    await expect(searchResult('test-file.txt')).toHaveCount(0)
+    await expect(searchResult('another-file.txt')).toHaveCount(0)
   })
 
   test('can delete a folder', async ({ page, ref }) => {

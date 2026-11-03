@@ -1,6 +1,6 @@
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import type { StorageItem } from '../Storage.types'
-import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from './StorageExplorer.utils'
+import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/data/storage/bucket-util'
 import type { ArchivedObject } from '@/data/storage/versioning/archived-objects-query'
 
 const splitPath = (path: string): string[] => path.split('/').filter((segment) => segment !== '')

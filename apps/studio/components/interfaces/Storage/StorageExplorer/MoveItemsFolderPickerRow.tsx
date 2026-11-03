@@ -4,7 +4,7 @@ import { cn } from 'ui'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from '../Storage.constants'
 import { StorageRowIcon } from '../StorageRowIcon'
-import { getParentPathLabel } from './MoveItemsModal.utils'
+import { getParentPathLabel } from './StorageExplorer.utils'
 import type { StorageFolder } from '@/data/storage/bucket-folders-query'
 
 interface FolderPickerRowProps {

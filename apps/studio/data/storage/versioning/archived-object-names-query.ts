@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { listBucketObjectsV2 } from '../bucket-objects-list-mutation'
 import { storageKeys } from '../keys'
 import { dropPartialTrailingPath, toArchivedObjects } from './archived-objects-query'
-import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/components/interfaces/Storage/StorageExplorer/StorageExplorer.utils'
+import { EMPTY_FOLDER_PLACEHOLDER_FILE_NAME } from '@/data/storage/bucket-util'
 import { IS_PLATFORM } from '@/lib/constants'
 import type { ResponseError } from '@/types'
 

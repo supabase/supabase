@@ -7,6 +7,7 @@ import { RegistryDefinations } from '../types'
  * shortcut and reused here via a contextual `label` override.
  */
 export const STORAGE_EXPLORER_SHORTCUT_IDS = {
+  STORAGE_EXPLORER_FOCUS_SEARCH: 'storage-explorer.focus-search',
   STORAGE_EXPLORER_REFRESH: 'storage-explorer.refresh',
   STORAGE_EXPLORER_UPLOAD: 'storage-explorer.upload',
   STORAGE_EXPLORER_NEW_FOLDER: 'storage-explorer.new-folder',
@@ -24,6 +25,12 @@ export type StorageExplorerShortcutId =
   (typeof STORAGE_EXPLORER_SHORTCUT_IDS)[keyof typeof STORAGE_EXPLORER_SHORTCUT_IDS]
 
 export const storageExplorerRegistry: RegistryDefinations<StorageExplorerShortcutId> = {
+  [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH]: {
+    id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_FOCUS_SEARCH,
+    label: 'Search bucket',
+    sequence: ['Mod+F'],
+    options: { registerInCommandMenu: true },
+  },
   [STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH]: {
     id: STORAGE_EXPLORER_SHORTCUT_IDS.STORAGE_EXPLORER_REFRESH,
     label: 'Refresh',
