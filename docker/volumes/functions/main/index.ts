@@ -1,6 +1,8 @@
 import * as jose from 'jsr:@panva/jose@6'
+import { startMemoryPressureLoop } from './memory-pressure.ts'
 
 console.log('main function started')
+startMemoryPressureLoop()
 
 addEventListener('unhandledrejection', (ev) => {
   // Without preventDefault(), a floating rejection destroys the main worker and the process exits.
@@ -351,7 +353,7 @@ Deno.serve({ onError }, async (req: Request) => {
     })
   }
 
-  const memoryLimitMb = 150
+  const memoryLimitMb = 256
   // Keep the wall clock above the 150s request idle timeout configured in Compose.
   const workerTimeoutMs = 400_000
   const requestAbsentTimeoutMs = 60_000
