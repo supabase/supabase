@@ -22,6 +22,7 @@ import {
   getTriggerEditorRoute,
   matchesEntitySearch,
   matchesTableRelatedSearch,
+  matchesTriggerSearch,
 } from './DatabaseEntitySearch.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
@@ -72,7 +73,7 @@ export function useDatabaseEntitySearchCommands() {
   }
   const tables = getVisibleResults(data?.tables ?? [], matchesEntitySearch)
   const policies = getVisibleResults(data?.policies ?? [], matchesTableRelatedSearch)
-  const triggers = getVisibleResults(data?.triggers ?? [], matchesTableRelatedSearch)
+  const triggers = getVisibleResults(data?.triggers ?? [], matchesTriggerSearch)
   const functions = getVisibleResults(data?.functions ?? [], matchesEntitySearch)
   const projectRef = project?.ref ?? '_'
 

@@ -81,13 +81,29 @@ export function getPolicyEditorRoute(
   return `/project/${projectRef}/database/policies?schema=${encodeURIComponent(policy.schema)}&edit=${policy.id}`
 }
 
+// Triggers found through their function don't match by name or table, so say which
+// function they run instead of their timing
 export function formatTriggerSearchDetails({
   activation,
   events,
   schema,
   table,
-}: Pick<EntitySearchTrigger, 'activation' | 'events' | 'schema' | 'table'>) {
+  matched_function,
+}: Pick<EntitySearchTrigger, 'activation' | 'events' | 'schema' | 'table' | 'matched_function'>) {
+  if (matched_function) return `Runs ${matched_function}`
   return `${activation} ${events.join(' OR ')} on ${schema}.${table}`
+}
+
+/**
+ * Client-side mirror of how triggers are matched in getSearchEntitiesSql: like
+ * policies, by name or table, plus triggers found through the function they run.
+ */
+export function matchesTriggerSearch(
+  trigger: Pick<EntitySearchTrigger, 'name' | 'schema' | 'table' | 'matched_function'>,
+  query: string
+) {
+  if (matchesTableRelatedSearch(trigger, query)) return true
+  return trigger.matched_function?.toLowerCase().includes(query.toLowerCase()) ?? false
 }
 
 // The triggers page lists triggers per schema (of their table), so the schema

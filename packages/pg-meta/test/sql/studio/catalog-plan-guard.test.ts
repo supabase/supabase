@@ -550,6 +550,16 @@ test('getSearchEntitiesSql: broad trigger name search stays within budget', asyn
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 300_000)
 
+test('getSearchEntitiesSql: triggers found through a function stay within budget', async () => {
+  // Matches the `audit_row_fn` function; the triggers that run it (aud_*) only match
+  // through the function, which must share the one pg_trigger pass
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getSearchEntitiesSql({ query: 'audit_row_fn' })
+  )
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
 test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)

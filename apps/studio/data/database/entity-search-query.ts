@@ -42,6 +42,7 @@ const entitySearchResultSchema = z.object({
       schema: z.string(),
       table: z.string(),
       table_id: z.number(),
+      matched_function: z.string().nullable(),
     })
   ),
   functions: z.array(
