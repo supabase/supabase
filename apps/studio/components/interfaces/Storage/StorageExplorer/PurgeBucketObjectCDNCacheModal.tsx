@@ -125,7 +125,7 @@ export const PurgeBucketObjectCDNCacheModal = ({
           <AlertDialogDescription asChild>
             <div className="space-y-4">
               <p>
-                Invalidation can take <strong className="font-bold">up to 60 seconds</strong>{' '}
+                Invalidation can take <strong className="font-bold">up to 60 seconds</strong> to
                 propagate across all CDN edge nodes worldwide.
               </p>
               <p>
