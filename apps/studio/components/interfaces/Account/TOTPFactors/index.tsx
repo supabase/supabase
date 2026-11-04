@@ -129,7 +129,7 @@ export const TOTPFactors = () => {
                           content: {
                             side: 'top',
                             text: disableDeleteFactor
-                              ? 'Check recovery code status before removing an authenticator'
+                              ? 'Check recovery code status'
                               : 'Remove authenticator',
                           },
                         }}
