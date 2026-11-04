@@ -60,7 +60,10 @@ const GlobalNavigationMenu: FC = () => {
 
   return (
     <>
-      <TopNavMenu className={cn('ml-3.5', !isNavReady && 'invisible noscript:visible')}>
+      <TopNavMenu
+        data-docs-nav="top-nav"
+        className={cn('ml-3.5', !isNavReady && 'invisible noscript:visible')}
+      >
         {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
           const label =
             section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
@@ -98,7 +101,7 @@ const GlobalNavigationMenu: FC = () => {
 // the menu panels mount on the client, so their links are also rendered for readers without JavaScript
 const GlobalMenuPanelsFallback = ({ menuItems }: { menuItems: GlobalMenuItems }) => (
   <noscript>
-    <nav aria-label="Docs sections" className="sr-only">
+    <nav aria-label="Docs sections" data-docs-nav="top-nav-subheads" className="sr-only">
       {menuItems
         .filter(([section]) => section.enabled !== false && section.menuItems)
         .map(([section]) => (
