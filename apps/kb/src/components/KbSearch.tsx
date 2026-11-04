@@ -22,10 +22,10 @@ interface KbSearchDialogProps {
 const OPEN_SEARCH_EVENT = 'kb-search:open'
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
-// loaded on first use: the sender pulls in the auth client, which the KB otherwise never needs
 const sendKbTelemetryEvent = (event: TelemetryEvent) => {
   if (!IS_PLATFORM || !hasConsented()) return
   const { pathname } = window.location
+  // keep this a dynamic import: a static one bundles the auth client into every KB page
   import('common/telemetry-event').then(({ sendTelemetryEvent }) =>
     sendTelemetryEvent(API_URL, event, pathname)
   )
