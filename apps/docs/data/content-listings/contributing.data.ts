@@ -10,7 +10,7 @@ export const contributingDetails: ContentListingGroup = {
       href: 'https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md',
       icon: '/docs/img/icons/github-icon',
       description:
-        'Learn more about authoring, where our docs source lives, and how the docs app works.',
+        'Get started in GitHub with our docs source, agent skills for docs authoring, and style guide.',
     },
   ],
 }
