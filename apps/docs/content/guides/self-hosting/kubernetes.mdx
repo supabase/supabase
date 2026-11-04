@@ -43,8 +43,6 @@ The operator turns these resources into Deployments, StatefulSets, Services, Sec
 
 ```mermaid
 flowchart TD
-  accTitle: Supabase Operator deployment
-  accDescr: Helm installs the operator and custom resource definitions. The project chart creates custom resources that the operator reconciles into database and service workloads. Clients access Studio and APIs through Envoy.
   Helm["Helm"] --> Operator["Operator and CRDs"]
   Helm --> Resources["Project, SingleDatabase, and components"]
   Resources --> Operator
