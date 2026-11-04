@@ -31,10 +31,8 @@ import { DATETIME_FORMAT } from '@/lib/constants'
 export const TOTPFactors = () => {
   const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
-  const [factorToBeDeleted, setFactorToBeDeleted] = useQueryState(
-    'removeAuthenticator',
-    parseAsString
-  )
+  const [resumeFactorId, setResumeFactorId] = useQueryState('removeAuthenticator', parseAsString)
+  const [factorToBeDeleted, setFactorToBeDeleted] = useState(resumeFactorId)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
@@ -239,7 +237,10 @@ export const TOTPFactors = () => {
         isCheckingRecoveryCodes={recoveryCodesIsFetching}
         onRetryRecoveryCodes={() => void refetchRecoveryCodesStatus()}
         lastFactorToBeDeleted={totpFactors.length === 1}
-        onClose={() => setFactorToBeDeleted(null)}
+        onClose={() => {
+          setFactorToBeDeleted(null)
+          void setResumeFactorId(null)
+        }}
         hasRecoveryCodes={status === 'available'}
       />
     </>
