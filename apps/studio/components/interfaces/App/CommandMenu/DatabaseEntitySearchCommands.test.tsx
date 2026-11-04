@@ -49,6 +49,10 @@ const SEARCH_RESULT: EntitySearchData = {
       table_id: 102,
     },
   ],
+  functions: [
+    { id: 301, schema: 'public', name: 'get_blog_post', type: 'function', args: 'id bigint' },
+    { id: 302, schema: 'blog', name: 'archive_blog_posts', type: 'procedure', args: '' },
+  ],
 }
 
 /** Renders the registered command sections as a plain list, driven by a text input. */
@@ -131,6 +135,21 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('/project/default/database/policies?schema=blog&edit=202')
   })
 
+  it('lists matching functions with their arguments, linking to the function editor', async () => {
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_post')
+
+    const section = await screen.findByRole('region', { name: 'Functions' })
+    expect(section).toHaveTextContent('public.get_blog_post')
+    expect(section).toHaveTextContent('(id bigint)')
+    expect(section).toHaveTextContent('blog.archive_blog_posts')
+    expect(section).toHaveTextContent('procedure ()')
+    // The functions page lists functions per schema, so the link has to carry it
+    expect(section).toHaveTextContent('/project/default/database/functions?schema=public&edit=301')
+    expect(section).toHaveTextContent('/project/default/database/functions?schema=blog&edit=302')
+  })
+
   it('debounces typing into a single database query', async () => {
     customRender(<CommandMenuHarness />)
 
@@ -150,6 +169,7 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Policies' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Functions' })).not.toBeInTheDocument()
   })
 
   it('does not show results from a previous project while searching another', async () => {
@@ -224,25 +244,23 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
   })
 
-  it('lists tables above policies even when a policy matches the search better', async () => {
+  it('lists tables, then policies, then functions, even when a function matches best', async () => {
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () =>
-        HttpResponse.json([
-          {
-            tables: [SEARCH_RESULT.tables[0]],
-            policies: [{ ...SEARCH_RESULT.policies[0], name: 'blog_posts_owner_update' }],
-          },
-        ]),
+      response: () => HttpResponse.json([SEARCH_RESULT]),
     })
     customRender(<CommandMenuListHarness />)
 
-    await userEvent.type(screen.getByRole('combobox'), 'blog_posts')
+    // Matches the `blog.archive_blog_posts` function far better than anything else
+    await userEvent.type(screen.getByRole('combobox'), 'archive_blog_posts')
 
-    await screen.findByText('UPDATE on public.blog_posts')
-    const [first, second] = screen.getAllByText(/^(Tables|Policies)$/)
-    expect(first).toHaveTextContent('Tables')
-    expect(second).toHaveTextContent('Policies')
+    await screen.findByText('procedure ()')
+    const headings = screen.getAllByText(/^(Tables|Policies|Functions)$/)
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      'Tables',
+      'Policies',
+      'Functions',
+    ])
   })
 })

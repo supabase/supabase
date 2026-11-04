@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { DatabaseIcon, ShieldIcon } from 'lucide-react'
+import { DatabaseIcon, FunctionSquareIcon, ShieldIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   useCommandMenuOpen,
@@ -11,8 +11,10 @@ import {
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
   ENTITY_SEARCH_DEBOUNCE_MS,
+  formatFunctionSearchDetails,
   formatTableSearchDetails,
   getEntitySearchQuery,
+  getFunctionEditorRoute,
   getPolicyEditorRoute,
   getTableEditorRoute,
   matchesEntitySearch,
@@ -22,14 +24,15 @@ import { orderCommandSectionsByPriority } from './ordering'
 import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
-// Tables and policies are ranked as one unit by the command menu's relevance
-// sort, so a policy that matches better than its table doesn't jump above it
+// Tables, policies and functions are ranked as one unit by the command menu's
+// relevance sort, so a better-matching policy or function doesn't jump above
+// the tables
 const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
 
 /**
  * Searches the project's database entities by name as the user types in the
  * command menu, and registers matches as their own sections (tables,
- * policies). Filtering happens in the database (see getSearchEntitiesSql), so
+ * policies, functions). Filtering happens in the database (see getSearchEntitiesSql), so
  * results are force-mounted to stop cmdk from filtering them a second time.
  */
 export function useDatabaseEntitySearchCommands() {
@@ -63,6 +66,7 @@ export function useDatabaseEntitySearchCommands() {
   }
   const tables = getVisibleResults(data?.tables ?? [], matchesEntitySearch)
   const policies = getVisibleResults(data?.policies ?? [], matchesPolicySearch)
+  const functions = getVisibleResults(data?.functions ?? [], matchesEntitySearch)
   const projectRef = project?.ref ?? '_'
 
   const tableCommands: ICommand[] = tables.map((table) => {
@@ -99,6 +103,23 @@ export function useDatabaseEntitySearchCommands() {
     }
   })
 
+  const functionCommands: ICommand[] = functions.map((fn) => {
+    const displayName = `${fn.schema}.${fn.name}`
+    return {
+      id: `entity-search-function-${fn.id}`,
+      name: displayName,
+      value: `entity-search-function-${fn.id} ${displayName}`,
+      forceMount: true,
+      icon: () => <FunctionSquareIcon />,
+      badge: () => (
+        <span className="text-xs text-foreground-lighter truncate pl-4">
+          {formatFunctionSearchDetails(fn)}
+        </span>
+      ),
+      route: getFunctionEditorRoute(projectRef, fn),
+    }
+  })
+
   useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_TABLES, tableCommands, {
     deps: [tables, projectRef],
     enabled: tableCommands.length > 0,
@@ -114,5 +135,14 @@ export function useDatabaseEntitySearchCommands() {
     orderSection: orderCommandSectionsByPriority,
     // Ranked together with Tables, and listed after it
     sectionMeta: { priority: 3, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
+  })
+
+  useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_FUNCTIONS, functionCommands, {
+    deps: [functions, projectRef],
+    enabled: functionCommands.length > 0,
+    forceMountSection: true,
+    orderSection: orderCommandSectionsByPriority,
+    // Ranked together with Tables and Policies, and listed after both
+    sectionMeta: { priority: 4, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
   })
 }
