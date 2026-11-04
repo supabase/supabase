@@ -24,7 +24,6 @@ import {
   type ClientTelemetryEvent,
   type SessionRecordingOptions,
 } from './posthog-client'
-import { TelemetryEvent } from './telemetry-constants'
 import { sendTelemetryEvent } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
 
