@@ -3,7 +3,7 @@ import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, CardFooter } from 'ui'
-import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+import { WarningIcon } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
@@ -194,8 +194,8 @@ export const RecoveryReminder = ({
       logo={
         <div className="relative">
           <SupabaseLogo />
-          <span className="absolute -top-2 -right-2 scale-80">
-            <AdmonitionTypeIcon type="warning" />
+          <span className="absolute -top-2 -right-2 inline-flex size-5 items-center justify-center rounded-sm bg-warning-600 text-warning-200">
+            <WarningIcon className="size-3.5" />
           </span>
         </div>
       }

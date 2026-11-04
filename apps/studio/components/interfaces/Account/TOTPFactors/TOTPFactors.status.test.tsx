@@ -49,6 +49,10 @@ const renderFactors = () => {
 describe('authenticator removal recovery-status guard', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
