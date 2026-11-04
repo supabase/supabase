@@ -13,7 +13,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -161,9 +161,14 @@ export const TOTPFactors = () => {
           <PageSectionContent aria-live="polite">
             {recoveryCodesIsPending && (
               <Card>
-                <CardContent role="status">
+                <CardContent role="status" className="flex items-center gap-4">
                   <span className="sr-only">Checking recovery codes</span>
-                  <GenericSkeletonLoader />
+                  <ShimmeringLoader className="size-9 shrink-0 rounded-full py-0" />
+                  <div className="flex flex-1 flex-col gap-2 py-1">
+                    <ShimmeringLoader className="h-3 w-48 py-0" />
+                    <ShimmeringLoader className="h-3 w-40 py-0" />
+                  </div>
+                  <ShimmeringLoader className="h-7 w-24 py-0" />
                 </CardContent>
               </Card>
             )}
