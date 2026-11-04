@@ -61,7 +61,7 @@ export const UpdateRolesPanel = ({ visible, member, onClose }: UpdateRolesPanelP
   const { data: allRoles, isSuccess: isSuccessRoles } = useOrganizationRolesV2Query({ slug })
 
   const { data: projectsData } = useOrgProjectsInfiniteQuery({ slug })
-  const totalNumOrgProjects = projectsData?.pages[0].pagination.count ?? 0
+  const totalNumOrgProjects = projectsData?.pages[0]?.pagination?.count ?? 0
 
   // [Joshen] We use the org scoped roles as the source for available roles
   const orgScopedRoles = allRoles?.org_scoped_roles ?? []
