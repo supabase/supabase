@@ -21,32 +21,43 @@ Realtime is billed by messages and peak connections, and each plan includes a qu
 
 ## Ably
 
-Ably is a managed realtime platform for pub/sub messaging, presence, push notifications, and chat. It stores presence events for 24 or 72 hours, depending on your plan.
+Ably is a managed realtime platform for pub/sub messaging, presence, push notifications, and chat.
 
-Ably offers a free tier, and its paid plans have a monthly fee plus usage. Its 99.999% uptime SLA is available on the Enterprise plan.
+Ably offers a free tier for proof of concept development, and its paid plans have a monthly fee plus usage.
+
+Ably suits apps that need presence, chat, or push notifications alongside messaging. Its usage-based billing works if your bill can move with your traffic.
 
 ## Pusher
 
-Pusher Channels is a hosted WebSocket service for publish and subscribe messaging. It supports public, private, and presence channels, and presence channels expose the list of members subscribed to them.
+Pusher Channels is a hosted WebSocket service for publish and subscribe messaging.
 
 Pusher has a free Sandbox plan for development. Its paid plans are priced per month and sized by daily message volume and concurrent connections.
 
-Pusher is a good fit if you need a simple hosted WebSocket API for live updates and notifications.
+Choose Pusher when you want predictable pricing and quick setup.
 
 ## PubNub
 
-PubNub is a realtime messaging platform with publish and subscribe messaging, presence, message storage, and serverless Functions that run on its network. It runs 11 points of presence, and users connect to a nearby edge. It offers a 99.999% uptime SLA.
+PubNub is a realtime messaging platform with publish and subscribe messaging, presence, message storage, and serverless Functions that run on its network.
 
-PubNub's free tier covers up to 200 monthly active users (MAU) or 1 million transactions per month. Its paid plans are priced by MAU rather than by individual message.
+PubNub offers a free tier. Its paid tiers are priced by monthly active users (MAU) rather than by message.
 
-PubNub suits apps that need presence and server-side message processing on the messaging network itself.
+Because it's priced by MAU, choose PubNub when you have many concurrent users but relatively few monthly active users.
 
 ## Firebase Realtime Database
 
-Firebase Realtime Database is Google's cloud-hosted NoSQL database. It stores data as a single JSON tree and syncs it to every connected client. It also works offline, merges changes when a device reconnects, and uses expression-based security rules with [Firebase Authentication](https://firebase.google.com/docs/auth).
+Firebase Realtime Database is Google's cloud-hosted NoSQL database.
 
-Realtime Database has very low latency, with typical response times of no more than 10 ms, and it's suited to simple data models and frequent state syncing. Google recommends [Cloud Firestore](https://firebase.google.com/docs/firestore) for new customers that need richer data models and higher availability.
+Choose Firebase Realtime Database when your app is already on Firebase or using Firebase Authentication.
 
 ## Other options
 
-You can also build realtime features yourself on an open-source WebSocket library, such as [Socket.IO](https://socket.io). This gives you full control over your infrastructure, but you're responsible for running, scaling, and securing the server.
+You can also build realtime features yourself on an open-source WebSocket library, such as [Socket.IO](https://socket.io). This gives you full control over your infrastructure, but you run, scale, and secure the server yourself.
+
+## When to choose
+
+- **Supabase Realtime:** you already use Supabase, or you're starting a new project that needs a Data API, Edge Functions, Storage, or Auth alongside realtime.
+- **Ably:** you need presence, chat, or push notifications alongside messaging, and your bill can move with your traffic.
+- **Pusher:** you want predictable pricing and quick setup.
+- **PubNub:** many users are connected but few are monthly actives.
+- **Firebase Realtime Database:** your app is already on Firebase or uses Firebase Authentication.
+- **A self-hosted WebSocket library such as Socket.IO:** you want full control over your infrastructure and can run and secure the server yourself.
