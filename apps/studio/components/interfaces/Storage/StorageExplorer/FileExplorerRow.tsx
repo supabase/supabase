@@ -368,11 +368,15 @@ export const FileExplorerRow = ({
                   : []),
               ]
             : []),
-          {
-            name: 'Purge CDN Cache',
-            icon: <RefreshCwIcon size={12} className="text-foreground-light" />,
-            onClick: () => setShowPurgeCDNCacheModal(true),
-          },
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Purge CDN Cache',
+                  icon: <RefreshCwIcon size={12} className="text-foreground-light" />,
+                  onClick: () => setShowPurgeCDNCacheModal(true),
+                },
+              ]
+            : []),
           ...(canUpdateFiles
             ? [
                 { name: 'Separator', icon: undefined, onClick: undefined },
