@@ -14,7 +14,7 @@ import {
   Trash2Icon,
   UploadIcon,
 } from 'lucide-react'
-import { useState, type CSSProperties, type ReactNode } from 'react'
+import { Ref, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Checkbox,
@@ -98,9 +98,17 @@ const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }
   </Tooltip>
 )
 
-const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] }) => (
+const RowActionsMenu = ({
+  name,
+  options,
+  triggerRef,
+}: {
+  name: string
+  options: RowOption[]
+  triggerRef?: Ref<HTMLButtonElement>
+}) => (
   <DropdownMenu>
-    <DropdownMenuTrigger className="focus-ring rounded-sm">
+    <DropdownMenuTrigger className="focus-ring rounded-sm" ref={triggerRef}>
       <div className="storage-row-menu opacity-0">
         <MoreVerticalIcon size={16} />
         <span className="sr-only">{name} actions</span>
@@ -480,6 +488,8 @@ export const FileExplorerRow = ({
         ? `calc(100% - 50px)`
         : '100%'
 
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
+
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
     return (
       <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
@@ -618,13 +628,19 @@ export const FileExplorerRow = ({
               <RowActionsMenu name={item.name} options={archivedRowOptions} />
             )
           ) : (
-            <RowActionsMenu name={item.name} options={rowOptions} />
+            <RowActionsMenu name={item.name} options={rowOptions} triggerRef={menuTriggerRef} />
           )}
         </div>
       </div>
       <PurgeBucketObjectCDNCacheModal
         visible={showPurgeCDNCacheModal}
-        onClose={() => setShowPurgeCDNCacheModal(false)}
+        onClose={() => {
+          setShowPurgeCDNCacheModal(false)
+          setTimeout(() => {
+            if (menuTriggerRef.current == null) return
+            menuTriggerRef.current.focus()
+          })
+        }}
         bucket={selectedBucket}
         path={item.path!}
       />
