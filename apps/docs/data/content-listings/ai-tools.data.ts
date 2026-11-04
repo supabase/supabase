@@ -105,16 +105,23 @@ function hrefFor(agent: AgentEntry): string {
     : `/guides/ai-tools/mcp?${AGENT_CLIENT_PARAM}=${agent.key}`
 }
 
+export const SUPPORTED_AGENTS = buildAgents().map((agent) => ({
+  ...agent,
+  href: hrefFor(agent),
+  icon: ICON_ASSETS[agent.key]?.icon,
+  hasLightIcon: ICON_ASSETS[agent.key]?.hasLightIcon,
+}))
+
 export const aiToolsSupportedAgents: ContentListingGroup = {
   id: 'ai-tools-supported-agents',
   type: 'grid',
   columns: 3,
-  items: buildAgents().map((agent) => ({
+  items: SUPPORTED_AGENTS.map((agent) => ({
     title: agent.label,
-    href: hrefFor(agent),
+    href: agent.href,
     description: TAGLINES[agent.key] ?? 'Connect using the Supabase MCP server or plugin.',
-    icon: ICON_ASSETS[agent.key]?.icon,
-    hasLightIcon: ICON_ASSETS[agent.key]?.hasLightIcon,
+    icon: agent.icon,
+    hasLightIcon: agent.hasLightIcon,
     badge: badgeFor(agent.plugin, agent.mcp),
     badgePosition: 'below',
   })),

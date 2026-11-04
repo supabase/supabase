@@ -1044,13 +1044,57 @@ export interface CopyAsMarkdownClickedEvent {
 }
 
 /**
- * User clicked the sidebar link to set up an AI coding agent with Supabase.
+ * User picked an AI agent in the docs top bar to set it up with Supabase, or clicked the
+ * guide sidebar link to set up an agent when the docs-layout-v2 flag is off.
  *
  * @group Events
  * @source docs
+ * @page /docs/guides, /docs/reference
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
+  properties: {
+    /**
+     * Key of the agent the user picked, as in the AI tools page links, e.g. claude-code.
+     * Absent for the sidebar link, which names no agent
+     */
+    agent?: string
+  }
+}
+
+/**
+ * User copied the URL of a page's Markdown version and the clipboard write succeeded.
+ * Fires on success only
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface MarkdownUrlCopiedEvent {
+  action: 'markdown_url_copied'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
+}
+
+/**
+ * User clicked "View as Markdown" to open a page's Markdown version
+ *
+ * @group Events
+ * @source docs
+ * @page /docs/guides
+ */
+export interface ViewAsMarkdownClickedEvent {
+  action: 'view_as_markdown_clicked'
+  properties: {
+    /**
+     * Page class the affordance sits on.
+     */
+    pageType: MarkdownAffordancePageType
+  }
 }
 
 /**
@@ -4499,6 +4543,8 @@ export type TelemetryEvent =
   | CopyAsMarkdownClickedEvent
   | AgentSetupClickedEvent
   | PreferredSourceClickedEvent
+  | MarkdownUrlCopiedEvent
+  | ViewAsMarkdownClickedEvent
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
