@@ -121,7 +121,7 @@ describe('PurgeBucketObjectCDNCacheModal', () => {
       customRender(<Page onClose={onClose} />, { profileContext: PROFILE_CONTEXT })
 
       await userEvent.click(await screen.findByRole('button', { name: 'Open' }))
-      await screen.findByRole('alertdialog')
+      await screen.findByRole('dialog')
 
       await userEvent.click(await screen.findByRole('button', { name: 'Purge CDN cache' }))
 
@@ -141,7 +141,7 @@ describe('PurgeBucketObjectCDNCacheModal', () => {
     customRender(<Page onClose={onClose} />, { profileContext: PROFILE_CONTEXT })
 
     await userEvent.click(await screen.findByRole('button', { name: 'Open' }))
-    await screen.findByRole('alertdialog')
+    await screen.findByRole('dialog')
 
     await screen.findByRole('link', { name: 'Upgrade to Pro' })
   })
