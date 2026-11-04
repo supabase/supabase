@@ -11,12 +11,18 @@ function AiTools({
   articleId,
   showAgentSetup = false,
   showPreferredSource = false,
+  pageUrl,
+  markdownUrl,
   className,
 }: {
   pageType: MarkdownAffordancePageType
   articleId: string
   showAgentSetup?: boolean
   showPreferredSource?: boolean
+  /** Defaults to the current page; the URL the "Ask" prompts point the assistant at */
+  pageUrl?: string
+  /** Defaults to the current path plus `.md` */
+  markdownUrl?: string
   className?: string
 }) {
   const path = usePathname()
@@ -44,8 +50,8 @@ function AiTools({
 
   return (
     <SharedAiTools
-      pageUrl={`https://supabase.com/docs${path}`}
-      markdownUrl={`/docs${path}.md`}
+      pageUrl={pageUrl ?? `https://supabase.com/docs${path}`}
+      markdownUrl={markdownUrl ?? `/docs${path}.md`}
       markdownFallback={getArticleHtml}
       agentSetupHref={showAgentSetup ? '/docs/guides/ai-tools' : undefined}
       preferredSourceHref={showPreferredSource ? PREFERRED_SOURCE_URL : undefined}

@@ -1,29 +1,32 @@
-import RefSubLayout from '~/layouts/ref/RefSubLayout'
-
-import spec from '~/spec/cli_v1_commands.yaml' with { type: 'yaml' }
 import Param from '~/components/Params'
-import { isFeatureEnabled } from 'common'
+import { getCliSpec } from '~/features/docs/Reference.generated.singleton'
+import RefSubLayout from '~/layouts/ref/RefSubLayout'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { isFeatureEnabled } from 'common'
 
 const { cliDisableCustomProfiles } = isFeatureEnabled(['cli:disable_custom_profiles'])
 
-const CliGlobalFlagsHandler = () => {
+const CliGlobalFlagsHandler = async ({ version }: { version?: string }) => {
+  const spec = await getCliSpec(version)
+
   // Only fetch cliProfile when custom profiles are enabled
   const cliProfile = !cliDisableCustomProfiles
     ? getCustomContent(['cli:profile'] as any).cliProfile
     : undefined
 
   // Transform the flags based on feature flags
-  const processedFlags = spec.flags.map((flag: any) => {
-    if (flag.id === 'profile' && !cliDisableCustomProfiles) {
-      return {
-        id: 'profile',
-        name: `--profile ${cliProfile}`,
-        description: `use ${cliProfile} profile for connecting to Supabase API`,
+  const processedFlags = spec.flags.map(
+    (flag): { id: string; name: string; description: string; required?: boolean } => {
+      if (flag.id === 'profile' && !cliDisableCustomProfiles) {
+        return {
+          id: 'profile',
+          name: `--profile ${cliProfile}`,
+          description: `use ${cliProfile} profile for connecting to Supabase API`,
+        }
       }
+      return flag
     }
-    return flag
-  })
+  )
 
   return (
     <RefSubLayout.EducationRow className="not-prose">
@@ -35,7 +38,7 @@ const CliGlobalFlagsHandler = () => {
               <Param
                 {...flag}
                 key={flag.id}
-                id={`${spec.id}-${flag.id}`}
+                id={`${spec.info.id}-${flag.id}`}
                 isOptional={flag.required === undefined ? true : !flag.required}
               ></Param>
             )

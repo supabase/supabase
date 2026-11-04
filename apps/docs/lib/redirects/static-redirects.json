@@ -2675,13 +2675,8 @@
     "permanent": true
   },
   {
-    "source": "/docs/reference/cli",
-    "destination": "/docs/reference/cli/start",
-    "permanent": true
-  },
-  {
     "source": "/docs/reference/cli/about",
-    "destination": "/docs/reference/cli/introduction",
+    "destination": "/docs/reference/cli",
     "permanent": true
   },
   {
@@ -2696,52 +2691,52 @@
   },
   {
     "source": "/docs/reference/cli/supabase-db-branch-create",
-    "destination": "/docs/reference/cli/supabase-branches-create",
+    "destination": "/docs/reference/cli/branches/create",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-branch-delete",
-    "destination": "/docs/reference/cli/supabase-branches-delete",
+    "destination": "/docs/reference/cli/branches/delete",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-branch-list",
-    "destination": "/docs/reference/cli/supabase-branches-list",
+    "destination": "/docs/reference/cli/branches/list",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-changes",
-    "destination": "/docs/reference/cli/supabase-db-diff",
+    "destination": "/docs/reference/cli/db/diff",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-commit",
-    "destination": "/docs/reference/cli/supabase-db-pull",
+    "destination": "/docs/reference/cli/db/pull",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-remote-changes",
-    "destination": "/docs/reference/cli/supabase-db-diff",
+    "destination": "/docs/reference/cli/db/diff",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-remote-commit",
-    "destination": "/docs/reference/cli/supabase-db-pull",
+    "destination": "/docs/reference/cli/db/pull",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-remote-set",
-    "destination": "/docs/reference/cli/supabase-link",
+    "destination": "/docs/reference/cli/link",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-db-switch",
-    "destination": "/docs/reference/cli/supabase-branches-create",
+    "destination": "/docs/reference/cli/branches/create",
     "permanent": true
   },
   {
     "source": "/docs/reference/cli/supabase-gen-types-typescript",
-    "destination": "/docs/reference/cli/supabase-gen-types",
+    "destination": "/docs/reference/cli/gen/types",
     "permanent": true
   },
   {

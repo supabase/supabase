@@ -230,7 +230,7 @@ const menus: Menu[] = [
     id: MenuId.RefCli,
     type: 'reference',
     path: '/reference/cli',
-    commonSectionsFile: 'common-cli-sections.json',
+    commonSectionsFile: 'common-cli-v3-sections.json',
   },
   {
     id: MenuId.RefApi,

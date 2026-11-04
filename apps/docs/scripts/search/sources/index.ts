@@ -142,8 +142,8 @@ export async function fetchCliLibReferenceSource() {
     'cli',
     '/reference/cli',
     { title: 'CLI Reference', platform: 'cli' },
-    'spec/cli_v1_commands.yaml',
-    'spec/common-cli-sections.json'
+    'spec/cli_v3_commands.yaml',
+    'spec/common-cli-v3-sections.json'
   ).load()
 }
 

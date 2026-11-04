@@ -1,0 +1,269 @@
+/* CLI reference: one page per command (features/docs/Reference.cliPage.tsx). */
+
+@utility cli-crumb {
+  @apply font-mono text-xs text-foreground-lighter;
+  & a:hover {
+    @apply text-foreground;
+  }
+  & b {
+    @apply font-medium text-primary;
+  }
+}
+
+/* Headings in the docs default to the heading font unless they opt into font-mono */
+@utility cli-title {
+  @apply mt-2 mb-3 text-3xl font-semibold text-foreground wrap-anywhere;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+@utility cli-lede {
+  @apply m-0 text-xl text-foreground-light;
+}
+
+@utility cli-heading {
+  @apply font-medium text-foreground;
+  scroll-margin-top: calc(var(--header-height, 60px) + 1.5rem);
+  & > a {
+    @apply text-primary;
+  }
+}
+
+@utility cli-muted {
+  @apply mt-3 text-sm text-foreground-lighter;
+  & a {
+    @apply text-foreground underline decoration-brand underline-offset-[3px];
+  }
+}
+
+@utility cli-links {
+  @apply mt-3 font-mono text-sm leading-7 text-foreground-light;
+  & a {
+    @apply text-foreground-light transition-colors hover:text-primary;
+  }
+}
+
+/* A command, optionally with its output attached below. Lifts on hover. */
+@utility cli-command {
+  @apply my-2 mb-4 rounded-lg;
+  transition:
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 28px -20px color-mix(in oklab, hsl(var(--brand-default)) 70%, transparent);
+  }
+  &:has(> .cli-output) > :first-child {
+    @apply mb-0 rounded-b-none;
+  }
+}
+
+/* Output box attached below a command */
+@utility cli-output {
+  @apply m-0 rounded-b-lg border border-t-0 border-default bg-surface-100;
+  border-top: 1px dashed var(--border-default, currentColor);
+}
+
+/* psql-style output and description tables */
+@utility cli-data-table {
+  @apply overflow-x-auto;
+  scrollbar-width: thin;
+  & table {
+    @apply m-0 w-auto min-w-full border-collapse font-mono text-xs;
+  }
+  & th,
+  & td {
+    @apply border-t border-default px-3.5 py-1.5 text-left whitespace-nowrap;
+  }
+  & th {
+    @apply border-t-0 font-medium text-foreground;
+  }
+  & td:empty::after {
+    @apply text-foreground-lighter;
+    content: '—';
+  }
+}
+
+@utility cli-flags {
+  @apply w-full overflow-hidden rounded-lg border border-default text-sm;
+  border-collapse: separate;
+  border-spacing: 0;
+  & th {
+    @apply bg-surface-100 px-3.5 py-2.5 text-left text-xs font-medium uppercase tracking-wider text-foreground-lighter;
+  }
+  & th:first-child {
+    width: 38%;
+  }
+  & td {
+    @apply border-t border-default px-3.5 py-3 align-top text-foreground-light;
+  }
+  & tbody tr {
+    @apply transition-colors;
+    scroll-margin-top: calc(var(--header-height, 60px) + 1.5rem);
+  }
+  & tbody tr:hover,
+  & tbody tr:target {
+    background: color-mix(in oklab, hsl(var(--brand-default)) 8%, transparent);
+  }
+  & tbody tr:target td:first-child {
+    box-shadow: inset 2px 0 0 hsl(var(--brand-default));
+  }
+  & code {
+    @apply rounded border border-default bg-surface-100 px-1 font-mono text-xs;
+  }
+}
+
+/* Narrow screens: each flag becomes a stacked entry (name, then description) */
+@media (width < 48rem) {
+  .cli-flags-stacked {
+    &,
+    & tbody,
+    & tr,
+    & td {
+      display: block;
+    }
+    & thead {
+      display: none;
+    }
+    & td {
+      @apply border-t-0 px-3.5 py-0;
+    }
+    & tr {
+      @apply border-t border-default px-0 py-3;
+    }
+    & tbody tr:first-child {
+      border-top: 0;
+    }
+    & td.cli-flag-name {
+      @apply pb-1;
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+    & td.cli-flag-name a {
+      overflow-wrap: normal;
+      word-break: normal;
+    }
+  }
+}
+
+@utility cli-flag-name {
+  @apply font-mono text-sm font-medium text-foreground wrap-anywhere;
+  & a:hover {
+    @apply text-primary;
+  }
+}
+
+@utility cli-choices {
+  @apply mt-1.5 flex flex-wrap gap-1.5;
+  & code[data-default] {
+    @apply border-brand text-primary;
+  }
+}
+
+@utility cli-cards {
+  @apply grid gap-3;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+@utility cli-card {
+  @apply flex flex-col gap-1 rounded-lg border border-default bg-surface-100 px-4 py-3.5;
+  transition:
+    border-color 0.25s,
+    transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 0.25s;
+  &:hover {
+    @apply border-brand;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px -18px color-mix(in oklab, hsl(var(--brand-default)) 70%, transparent);
+  }
+}
+
+/* Sidebar: collapsible groups of commands */
+@utility cli-nav-link {
+  @apply block py-1 text-foreground-lighter transition-colors hover:text-foreground;
+  &[aria-current='page'] {
+    @apply text-primary;
+  }
+}
+
+@utility cli-nav-group-toggle {
+  @apply flex w-full cursor-pointer items-center justify-between py-1.5 text-foreground-lighter transition-colors hover:text-foreground;
+  &[aria-expanded='true'] {
+    @apply text-foreground;
+  }
+  & svg {
+    transition: transform 0.25s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  &[aria-expanded='true'] svg {
+    transform: rotate(90deg);
+  }
+}
+
+@utility cli-nav-items {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s cubic-bezier(0.2, 0.8, 0.2, 1);
+  &[data-open] {
+    grid-template-rows: 1fr;
+  }
+  & > div {
+    @apply ml-1 flex flex-col overflow-hidden border-l border-default;
+  }
+  &[data-open] > div {
+    @apply pt-1 pb-2;
+  }
+}
+
+/* Active item: green, underlined, with a guide mark on the group's rule */
+@utility cli-nav-item {
+  @apply -ml-px block border-l border-transparent py-0.5 pl-3.5 font-mono text-sm text-foreground-lighter hover:text-foreground;
+  transition:
+    color 0.2s,
+    border-color 0.2s;
+  & span {
+    padding-bottom: 1px;
+    background: linear-gradient(hsl(var(--brand-default)), hsl(var(--brand-default))) 0 100% / 0 1px
+      no-repeat;
+    transition: background-size 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+  &:hover span,
+  &[aria-current='page'] span {
+    background-size: 100% 1px;
+  }
+  &[aria-current='page'] {
+    @apply border-brand text-primary;
+  }
+}
+
+/*
+ * Below-the-fold content fades in. CliReveal adds these classes only to
+ * sections that start off-screen, so the first paint is never blank and
+ * no-JS readers see everything.
+ */
+.cli-reveal-pending {
+  opacity: 0;
+  transform: translateY(8px);
+  transition:
+    opacity 0.45s,
+    transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.cli-reveal-pending.cli-revealed {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cli-command,
+  .cli-card,
+  .cli-nav-items,
+  .cli-nav-item,
+  .cli-nav-item span,
+  .cli-nav-group-toggle svg,
+  .cli-reveal-pending {
+    transition: none !important;
+  }
+  .cli-command:hover,
+  .cli-card:hover {
+    transform: none;
+  }
+}

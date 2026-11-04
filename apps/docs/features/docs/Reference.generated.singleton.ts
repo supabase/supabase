@@ -1,11 +1,12 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { REFERENCES } from '~/content/navigation.references'
+import { loadCliSpecFile } from '~/features/docs/Reference.cliSpec'
 import { SUPPORTS_NEW_REFERENCE_PROCESS } from '~/features/docs/Reference.constants'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
-import { parse } from 'yaml'
+import type { CliSpec } from '~/generator/types/CliSpec'
 
-import { type Json } from '../helpers.types'
 import { type IApiEndPoint } from './Reference.api.utils'
 
 /**
@@ -70,15 +71,15 @@ export async function getTypeSpec(sdkId: string, version: string, ref: string) {
   return spec.methods[normalizedRef] ?? spec.variables[normalizedRef]
 }
 
-let cliSpec: Json
+const cliSpecs = new Map<string, CliSpec>()
 
-export async function getCliSpec() {
-  if (!cliSpec) {
-    const rawSpec = await readFile(join(process.cwd(), 'spec', 'cli_v1_commands.yaml'), 'utf-8')
-    cliSpec = parse(rawSpec)
+export async function getCliSpec(version: string = REFERENCES.cli.versions[0]) {
+  if (!cliSpecs.has(version)) {
+    const { specFile } = REFERENCES.cli.meta[version]
+    cliSpecs.set(version, await loadCliSpecFile(join(process.cwd(), 'spec'), specFile))
   }
 
-  return cliSpec
+  return cliSpecs.get(version)!
 }
 
 let apiEndpointsById: Map<string, IApiEndPoint>

@@ -1,8 +1,8 @@
 'use client'
 
+import { REFERENCES } from '~/content/navigation.references'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-
 import {
   Badge,
   DropdownMenu,
@@ -12,26 +12,30 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 
-import { REFERENCES } from '~/content/navigation.references'
-
 const RevVersionDropdown = ({
   library,
   currentVersion,
+  hrefs,
 }: {
   library: string
   currentVersion: string
+  /** Per-version targets, to keep the reader on the same page when it exists there */
+  hrefs?: Record<string, string>
 }) => {
   const { push } = useRouter()
 
   const libraryMeta = REFERENCES?.[library] ?? undefined
   const versions = libraryMeta?.versions ?? []
+  const isPrerelease = (version: string) => !!libraryMeta?.meta?.[version]?.prerelease
 
   if (!versions || versions.length <= 1) {
     return null
   }
 
   const onSelectVersion = (version: string) => {
-    if (version === versions[0]) {
+    if (hrefs?.[version]) {
+      push(hrefs[version])
+    } else if (version === versions[0]) {
       push(`/reference/${library}`)
     } else {
       push(`/reference/${library}/${version}`)
@@ -55,7 +59,7 @@ const RevVersionDropdown = ({
           "
         >
           <span className="text-foreground text-sm group-hover:text-foreground transition">
-            {currentVersion}.0
+            {currentVersion}.0{isPrerelease(currentVersion) ? ' (prerelease)' : ''}
           </span>
           <ChevronDown size={14} strokeWidth={2} />
         </div>
@@ -69,7 +73,7 @@ const RevVersionDropdown = ({
             className="justify-between flex"
           >
             <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
-              Version {version}.0
+              Version {version}.0{isPrerelease(version) ? ' (prerelease)' : ''}
             </span>
             {index === 0 && <Badge>Latest</Badge>}
           </DropdownMenuItem>

@@ -1,4 +1,5 @@
 import { clientSdkIds } from '~/content/navigation.references'
+import { cliLegacyRedirect } from '~/features/docs/Reference.cli.utils'
 import { BASE_PATH, PROD_URL } from '~/lib/constants'
 import { MARKDOWN_CONTENT_TYPE } from '~/lib/md-alternates'
 import MARKDOWN_SLUGS from '~/public/markdown/manifest.json'
@@ -8,6 +9,7 @@ import { NextResponse, type NextRequest } from 'next/server'
 
 const REFERENCE_PATH = `${BASE_PATH ?? ''}/reference`
 const GUIDES_PATH = `${BASE_PATH ?? ''}/guides`
+const CLI_PATH = `${REFERENCE_PATH}/cli`
 const GUIDES_MARKDOWN_SLUGS = new Set(MARKDOWN_SLUGS)
 const REFERENCE_MARKDOWN_LIBS = new Set([...clientSdkIds, 'cli', 'api'])
 const LLMS_FILE_NAMES: Record<string, string> = { javascript: 'js' }
@@ -41,9 +43,55 @@ There is no markdown version of \`${BASE_PATH}/${relativePath}\`.
   })
 }
 
+/**
+ * One page per CLI command: old single-page section URLs (and the former v3
+ * prerelease prefix) move permanently, and `<page>.md` serves its Markdown twin.
+ */
+function cliProxy(request: NextRequest, url: URL) {
+  const isMdSuffix = url.pathname.endsWith('.md')
+  const segments = url.pathname
+    .slice(CLI_PATH.length)
+    .replace(/\.md$/, '')
+    .split('/')
+    .filter(Boolean)
+
+  const legacyPath = cliLegacyRedirect(segments)
+  if (legacyPath) {
+    const redirectUrl = new URL(url)
+    redirectUrl.pathname = `${BASE_PATH ?? ''}${legacyPath}${isMdSuffix ? '.md' : ''}`
+    return NextResponse.redirect(redirectUrl, 301)
+  }
+
+  const decision = negotiateMarkdown(
+    { acceptHeader: request.headers.get('accept') ?? '' },
+    { hasMarkdownVariant: true, isMarkdownSuffix: isMdSuffix }
+  )
+  if (decision === 'not-acceptable') {
+    return new NextResponse('Not Acceptable', {
+      status: 406,
+      headers: { 'Cache-Control': 'no-store', Vary: 'Accept' },
+    })
+  }
+  if (decision === 'markdown') {
+    const rewriteUrl = new URL(url)
+    rewriteUrl.pathname = [`${BASE_PATH ?? ''}/api/cli-md`, ...segments].join('/')
+    return NextResponse.rewrite(rewriteUrl)
+  }
+
+  return NextResponse.next()
+}
+
 export function proxy(request: NextRequest) {
   const url = new URL(request.url)
   const { pathname } = url
+
+  if (
+    pathname === CLI_PATH ||
+    pathname.startsWith(`${CLI_PATH}/`) ||
+    pathname === `${CLI_PATH}.md`
+  ) {
+    return cliProxy(request, url)
+  }
 
   if (pathname.startsWith(GUIDES_PATH + '/')) {
     const isMdSuffix = pathname.endsWith('.md')
@@ -67,8 +115,8 @@ export function proxy(request: NextRequest) {
     }
   }
 
-  // Reference pages have no per-page markdown yet, so every reference .md is a guess.
-  // Narrow this when per-page reference markdown ships, or it will 404 those files.
+  // Only CLI reference pages (handled above) have per-page markdown, so every other
+  // reference .md is a guess.
   if (pathname.endsWith('.md')) {
     return markdownNotFound(pathname)
   }
@@ -95,11 +143,6 @@ export function proxy(request: NextRequest) {
   }
 
   const [, lib, maybeVersion] = pathname.replace(REFERENCE_PATH, '').split('/')
-
-  if (lib === 'cli') {
-    const rewritePath = [REFERENCE_PATH, 'cli'].join('/')
-    return NextResponse.rewrite(new URL(rewritePath, request.url))
-  }
 
   // Spike (DOCS-1268): only the bare /reference/api needs normalizing now.
   // /reference/api/<slug> has its own statically generated page — don't

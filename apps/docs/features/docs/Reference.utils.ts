@@ -1,8 +1,18 @@
 import { clientSdkIds, REFERENCES, selfHostingServices } from '~/content/navigation.references'
+import {
+  cliMarkdownUrl,
+  cliPageDescription,
+  cliPageRel,
+  cliPageTitle,
+  getCliStaticParams,
+  resolveCliPage,
+} from '~/features/docs/Reference.cli'
+import { cliPageHref } from '~/features/docs/Reference.cli.utils'
 import { getFlattenedSections } from '~/features/docs/Reference.generated.singleton'
 import { generateOpenGraphImageMeta } from '~/features/seo/openGraph'
 import { BASE_PATH } from '~/lib/constants'
 import { getCustomContent } from '~/lib/custom-content/getCustomContent'
+import { mdAlternateAt } from '~/lib/md-alternates'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
@@ -57,9 +67,12 @@ export function parseReferencePath(slug: Array<string>) {
       path,
     }
   } else if (isCliReference) {
+    const [, maybeVersion, ...rest] = slug
+    const isVersion = /^v\d+$/.test(maybeVersion ?? '')
     return {
       __type: 'cli' as const,
-      path: slug.slice(1),
+      maybeVersion: isVersion ? maybeVersion : null,
+      path: isVersion ? rest : slug.slice(1),
     }
   } else if (isApiReference) {
     return {
@@ -122,11 +135,7 @@ export async function generateReferenceStaticParams() {
       slug: [sdkId, version === REFERENCES[sdkId].versions[0] ? null : version].filter(Boolean),
     }))
 
-  const cliPages = [
-    {
-      slug: ['cli'],
-    },
-  ]
+  const cliPages = await getCliStaticParams()
 
   const apiPages = [
     {
@@ -189,9 +198,33 @@ export async function generateReferenceMetadata(
       },
     }
   } else if (isCliReference) {
+    const version = parsedPath.maybeVersion ?? REFERENCES.cli.versions[0]
+    const page = await resolveCliPage(version, parsedPath.path)
+    if (!page) return {}
+
+    const rel = cliPageRel(page)
+    const title = page.kind === 'command' ? page.command.title : cliPageTitle(page)
+    const url = [BASE_PATH, cliPageHref(version, rel).slice(1)].join('/')
+    const images = generateOpenGraphImageMeta({ type: 'CLI Reference', title })
+
     return {
-      title: 'CLI Reference | Supabase Docs',
-      description: 'CLI reference for the Supabase CLI',
+      title: [
+        page.kind === 'overview' ? null : title,
+        `Supabase CLI${version === REFERENCES.cli.versions[0] ? '' : ` ${version}`} Reference`,
+        metadataTitle || 'Supabase',
+      ]
+        .filter(Boolean)
+        .join(' | '),
+      description: cliPageDescription(page),
+      alternates: {
+        canonical: url,
+        types: mdAlternateAt(cliMarkdownUrl(version, rel)),
+      },
+      openGraph: {
+        ...parentOg,
+        url,
+        images,
+      },
     }
   } else if (isApiReference) {
     const { path } = parsedPath

@@ -202,11 +202,52 @@ describe('docs proxy — reference paths', () => {
     }
   })
 
-  it('links the full markdown reference for cli and api .md guesses', async () => {
-    const cli = await proxy(makeRequest('/docs/reference/cli/supabase-init.md')).text()
-    expect(cli).toContain('<https://supabase.com/llms/cli.txt>')
+  it('links the full markdown reference for api .md guesses', async () => {
     const api = await proxy(makeRequest('/docs/reference/api/v1-list-all-projects.md')).text()
     expect(api).toContain('<https://supabase.com/llms/api.txt>')
+  })
+
+  it('moves old cli section URLs to one page per command', () => {
+    const location = (path: string) => {
+      const res = proxy(makeRequest(path))
+      expect(res.status).toBe(301)
+      return res.headers.get('location')
+    }
+    expect(location('/docs/reference/cli/supabase-db-push')).toBe(
+      'https://supabase.com/docs/reference/cli/db/push'
+    )
+    expect(location('/docs/reference/cli/supabase-inspect-db-long-running-queries.md')).toBe(
+      'https://supabase.com/docs/reference/cli/inspect/db/long-running-queries.md'
+    )
+    expect(location('/docs/reference/cli/v2/supabase-db-push')).toBe(
+      'https://supabase.com/docs/reference/cli/v2/db/push'
+    )
+    // v3 was a prerelease under /v3; it is now the unversioned latest
+    expect(location('/docs/reference/cli/v3/supabase-init')).toBe(
+      'https://supabase.com/docs/reference/cli/init'
+    )
+    expect(location('/docs/reference/cli/v3/db/push')).toBe(
+      'https://supabase.com/docs/reference/cli/db/push'
+    )
+    expect(location('/docs/reference/cli/introduction')).toBe(
+      'https://supabase.com/docs/reference/cli'
+    )
+  })
+
+  it('serves cli pages as is and their markdown twins from the cli markdown route', () => {
+    const page = proxy(makeRequest('/docs/reference/cli/db/push'))
+    expect(page.headers.get(REWRITE_HEADER)).toBeNull()
+    expect(page.headers.get('location')).toBeNull()
+
+    const rewrite = (path: string, accept?: string) =>
+      proxy(makeRequest(path, { accept })).headers.get(REWRITE_HEADER)
+    expect(rewrite('/docs/reference/cli/db/push.md')).toBe(
+      'https://supabase.com/docs/api/cli-md/db/push'
+    )
+    expect(rewrite('/docs/reference/cli/v2/db/push', 'text/markdown')).toBe(
+      'https://supabase.com/docs/api/cli-md/v2/db/push'
+    )
+    expect(rewrite('/docs/reference/cli.md')).toBe('https://supabase.com/docs/api/cli-md')
   })
 
   it('sends the Kotlin root to the crawler renderer for bots', () => {
