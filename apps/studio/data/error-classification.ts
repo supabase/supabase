@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import { ERROR_PATTERNS } from './error-patterns'
 import {
   isStudioError,
@@ -93,15 +95,19 @@ export function classifyError(
   })
 }
 
-const readString = (obj: object, key: string) => {
-  const value = (obj as Record<string, unknown>)[key]
-  return typeof value === 'string' ? value : undefined
-}
+// Each field falls back to undefined on a wrong type, so one bad field doesn't discard the body.
+const optional = <T extends z.ZodTypeAny>(schema: T) => schema.optional().catch(undefined)
 
-const readNumber = (obj: object, key: string) => {
-  const value = (obj as Record<string, unknown>)[key]
-  return typeof value === 'number' ? value : undefined
-}
+const responseErrorBodySchema = z.object({
+  msg: optional(z.string()),
+  message: optional(z.string()),
+  code: optional(z.number()),
+  requestId: optional(z.string()),
+  retryAfter: optional(z.number()),
+  requestPathname: optional(z.string()),
+  metadata: optional(z.record(z.string(), z.unknown())),
+  formattedError: optional(z.string()),
+})
 
 /**
  * Reads the error body the fetch middleware produces for a failed API response. Returns undefined
@@ -112,20 +118,18 @@ export function parseResponseErrorBody(error: unknown): RawResponseError | undef
   if (!error || typeof error !== 'object') return undefined
   if (isStudioError(error) || isAbortError(error) || isFetchFailure(error)) return undefined
 
-  const message = readString(error, 'msg') ?? readString(error, 'message')
-  const code = readNumber(error, 'code')
-  if (!message && code === undefined) return undefined
+  const result = responseErrorBodySchema.safeParse(error)
+  if (!result.success) return undefined
 
-  const metadata = (error as Record<string, unknown>).metadata
+  const { msg, message, code, metadata, ...rest } = result.data
+  const resolvedMessage = msg ?? message
+  if (!resolvedMessage && code === undefined) return undefined
+
   return {
-    message,
+    ...rest,
+    message: resolvedMessage,
     code,
-    requestId: readString(error, 'requestId'),
-    retryAfter: readNumber(error, 'retryAfter'),
-    requestPathname: readString(error, 'requestPathname'),
-    metadata:
-      typeof metadata === 'object' && metadata !== null ? (metadata as ErrorMetadata) : undefined,
-    formattedError: readString(error, 'formattedError'),
+    metadata: metadata as ErrorMetadata | undefined,
     cause: error instanceof Error ? error : undefined,
   }
 }
