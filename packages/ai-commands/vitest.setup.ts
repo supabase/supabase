@@ -12,9 +12,10 @@ if (!process.env.CI) {
 }
 
 // Modify fetch to support wasm file URLs
+const originalFetch = globalThis.fetch
 globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => {
   if (input instanceof Request) {
-    return fetch(input, init)
+    return originalFetch(input, init)
   }
 
   const url = new URL(input)
@@ -22,7 +23,7 @@ globalThis.fetch = async (input: string | URL | Request, init?: RequestInit) => 
     return fetchFileNode(input, 'application/wasm')
   }
 
-  return fetch(input, init)
+  return originalFetch(input, init)
 }
 
 async function fetchFileNode(input: string | URL, type: string) {

@@ -7,7 +7,7 @@ expect.extend({
     const openAiKey = process.env.OPENAI_API_KEY
     const openai = new OpenAI({ apiKey: openAiKey })
 
-    const model = 'gpt-4o-2024-05-13'
+    const model = 'gpt-6-luna'
 
     const completionResponse = await openai.chat.completions.create({
       model,
@@ -35,7 +35,8 @@ expect.extend({
           `,
         },
       ],
-      max_tokens: 256,
+      max_completion_tokens: 256,
+      reasoning_effort: 'none',
       temperature: 0,
       response_format: {
         type: 'json_object',
