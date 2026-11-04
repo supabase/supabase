@@ -3,11 +3,24 @@ import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { DocsSectionsMenu } from './DocsSectionsMenu'
+import { SidebarTopSlotProvider, useSidebarTopSlot } from '~/layouts/SidebarTopSlot'
 
 vi.mock('next/navigation', () => ({ usePathname: () => '/guides/database/overview' }))
 
 const openMenu = () => {
   render(<DocsSectionsMenu />)
+  fireEvent.click(screen.getByRole('button', { name: 'Docs' }))
+}
+
+const SidebarTop = () => <div ref={useSidebarTopSlot().setTarget} />
+
+const openMenuInSidebar = () => {
+  render(
+    <SidebarTopSlotProvider>
+      <DocsSectionsMenu />
+      <SidebarTop />
+    </SidebarTopSlotProvider>
+  )
   fireEvent.click(screen.getByRole('button', { name: 'Docs' }))
 }
 
@@ -49,5 +62,17 @@ describe('DocsSectionsMenu', () => {
 
     expect(queryMenu()).toBeNull()
     expect(document.activeElement).toBe(screen.getByRole('button', { name: 'Docs' }))
+  })
+
+  it('moves tab between the trigger and the menu when the menu opens in the sidebar', () => {
+    openMenuInSidebar()
+    const trigger = screen.getByRole('button', { name: 'Docs' })
+    const firstLink = screen.getByRole('link', { name: 'Docs' })
+
+    fireEvent.keyDown(trigger, { key: 'Tab' })
+    expect(document.activeElement).toBe(firstLink)
+
+    fireEvent.keyDown(firstLink, { key: 'Tab', shiftKey: true })
+    expect(document.activeElement).toBe(trigger)
   })
 })

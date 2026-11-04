@@ -1,3 +1,28 @@
+.group\/docs:has([data-docs-sidebar]) .docs-sections-cell::before,
+.group\/docs:has([data-docs-sidebar]) .docs-sections-cell::after {
+  content: '';
+  position: absolute;
+  inset-inline: 0;
+  top: 100%;
+  pointer-events: none;
+}
+
+.group\/docs:has([data-docs-sidebar]) .docs-sections-cell::before {
+  height: 1px;
+  background-color: var(--color-background);
+}
+
+.group\/docs:has([data-docs-sidebar]) .docs-sections-cell::after {
+  border-bottom-width: 1px;
+  border-bottom-style: solid;
+  transition: transform 150ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.docs-sections-cell:has(> [data-docs-sections-root][data-state='open'])::after {
+  transform: translateY(var(--docs-sections-menu-height));
+  transition-duration: 250ms;
+}
+
 .docs-sections-menu[data-state='open'] {
   animation: collapsible-down 250ms cubic-bezier(0.22, 1, 0.36, 1);
 }
@@ -30,5 +55,9 @@
   .docs-sections-menu,
   .docs-sections-menu > * {
     animation: none !important;
+  }
+
+  .docs-sections-cell::after {
+    transition: none !important;
   }
 }
