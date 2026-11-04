@@ -7,7 +7,7 @@ import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useTheme } from 'next-themes'
-import type { FC, Ref } from 'react'
+import type { Ref } from 'react'
 import { memo, useState } from 'react'
 import { Button, cn } from 'ui'
 import { AuthenticatedDropdownMenu } from 'ui-patterns/AuthenticatedDropdownMenu'
@@ -16,16 +16,14 @@ import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
-import GlobalNavigationMenu from './GlobalNavigationMenu'
+import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
+import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
+import { PageActionButtons } from './PageActionButtons'
 import useDropdownMenu from './useDropdownMenu'
-import { AskAiTrigger, SearchV2Trigger } from '@/features/SearchV2'
-
-const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
-const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
-
-const largeLogo = isFeatureEnabled('branding:large_logo')
+import { AskAiTrigger, SearchV2IconTrigger, SearchV2Trigger } from '@/features/SearchV2'
 
 interface TopNavBarProps {
+  headingSlotRef?: Ref<HTMLLIElement>
   // on pages with a sidebar the burger opens the sidebar drawer, not the global menu
   isMenuOpen?: boolean
   onMenuToggle?: () => void
@@ -34,12 +32,22 @@ interface TopNavBarProps {
   menuButtonRef?: Ref<HTMLButtonElement>
 }
 
-const TopNavBar: FC<TopNavBarProps> = ({
+interface HeaderLogoProps {
+  hasDocsLabel?: boolean
+}
+
+const GlobalMobileMenu = dynamic(() => import('./GlobalMobileMenu'))
+const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
+
+const largeLogo = isFeatureEnabled('branding:large_logo')
+
+const TopNavBar = ({
+  headingSlotRef,
   isMenuOpen = false,
   onMenuToggle,
   scrolledTitle,
   menuButtonRef,
-}) => {
+}: TopNavBarProps) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
@@ -54,37 +62,32 @@ const TopNavBar: FC<TopNavBarProps> = ({
     <>
       <nav
         aria-label="top bar"
-        className="relative w-full z-40 flex flex-col max-lg:subhighlight-border bg-default lg:bg-default/75 lg:backdrop-blur-sm lg:backdrop-filter"
+        className="relative w-full z-40 flex flex-col bg-default lg:bg-default/75 lg:backdrop-blur-sm lg:backdrop-filter"
       >
-        <div className="w-full px-6 lg:pl-10 lg:pr-5 flex justify-between h-(--header-height) gap-3">
-          <div className="hidden lg:flex h-full items-center justify-center gap-2">
-            <HeaderLogo />
-            <GlobalNavigationMenu />
+        <div className="w-full flex h-(--header-height) border-b">
+          <div
+            style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
+            className="docs-sections-cell relative hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
+          >
+            <a
+              href="https://supabase.com"
+              aria-label="Supabase.com"
+              className="flex shrink-0 items-center rounded-md focus-ring"
+            >
+              <HeaderLogoContent hasDocsLabel={false} />
+            </a>
+            <DocsSectionsMenu />
           </div>
-          <div className="w-full grow lg:w-auto flex gap-3 justify-between lg:justify-end items-center h-full">
-            <div className="lg:hidden min-w-0">
-              <MobileHeaderLogo scrolledTitle={scrolledTitle} />
-            </div>
-
-            <div className="flex gap-3 items-center">
-              <DevToolbarTrigger />
-              {onMenuToggle && isOpen ? (
-                <MobileNavThemeButton value={theme} onValueChange={setTheme} />
-              ) : (
-                <>
-                  <SearchV2Trigger placeholder="Search" />
-                  <AskAiTrigger />
-                </>
-              )}
-              <TopNavMenuToggle
-                ref={menuButtonRef}
-                isOpen={isOpen}
-                onClick={handleMenuToggle}
-                className="lg:hidden"
-              />
+          <div className="hidden lg:flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
+            <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />
+            <div className="ml-auto flex shrink-0 items-center gap-2">
+              <PageActionButtons />
             </div>
           </div>
-          <div className="hidden lg:flex items-center justify-end gap-3">
+          <div className="hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6 group-has-[[data-docs-right-rail]]/docs:border-l">
+            <DevToolbarTrigger />
+            <SearchV2IconTrigger />
+            <AskAiTrigger />
             {!isUserLoading && !isLoggedIn ? (
               <Button variant="primary" asChild>
                 <a href="/dashboard" className="h-[30px]" target="_blank" rel="noreferrer noopener">
@@ -103,6 +106,24 @@ const TopNavBar: FC<TopNavBarProps> = ({
               <TopNavDropdown />
             )}
           </div>
+          <div className="flex lg:hidden w-full px-6 gap-3 justify-between items-center">
+            <div className="min-w-0">
+              <MobileHeaderLogo scrolledTitle={scrolledTitle} />
+            </div>
+            <div className="flex gap-3 items-center">
+              <PageActionButtons className="hidden md:flex" />
+              <DevToolbarTrigger />
+              {onMenuToggle && isOpen ? (
+                <MobileNavThemeButton value={theme} onValueChange={setTheme} />
+              ) : (
+                <>
+                  <SearchV2Trigger placeholder="Search" />
+                  <AskAiTrigger />
+                </>
+              )}
+              <TopNavMenuToggle ref={menuButtonRef} isOpen={isOpen} onClick={handleMenuToggle} />
+            </div>
+          </div>
         </div>
       </nav>
       <GlobalMobileMenu open={mobileMenuOpen} setOpen={setMobileMenuOpen} />
@@ -118,7 +139,7 @@ const HeaderLogo = memo(() => (
 
 HeaderLogo.displayName = 'HeaderLogo'
 
-const HeaderLogoContent = () => {
+const HeaderLogoContent = ({ hasDocsLabel = true }: HeaderLogoProps) => {
   const { navigationLogo } = getCustomContent(['navigation:logo'])
 
   return (
@@ -141,7 +162,9 @@ const HeaderLogoContent = () => {
         height={navigationLogo?.height ?? 18}
         alt="Supabase wordmark"
       />
-      <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+      {hasDocsLabel ? (
+        <span className="font-mono text-sm font-medium text-primary mb-px">DOCS</span>
+      ) : null}
     </>
   )
 }
