@@ -83,7 +83,7 @@ describe('RowEditor', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json([]),
+      response: () => HttpResponse.json<unknown[]>([]),
     })
   })
 

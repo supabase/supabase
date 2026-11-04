@@ -85,12 +85,18 @@ export const generateRowFields = (
   })
 }
 
+// SQL value functions that Postgres deparses as bare keywords, without parentheses
+const SQL_VALUE_FUNCTION_DEFAULT =
+  /^(current_(timestamp|date|time|user|role|catalog|schema)|localtime(stamp)?|session_user|user)\b/i
+
 /**
- * A default that calls a function (e.g. `gen_random_uuid()`, `nextval(...)`, `now()`) produces a fresh
- * value per row. Quoted literals are stripped first so `'a(b'::text` isn't mistaken for a function call.
+ * A default that calls a function (e.g. `gen_random_uuid()`, `nextval(...)`, `now()`, `CURRENT_TIMESTAMP`)
+ * produces a fresh value per row. Quoted literals are stripped first so `'a(b'::text` isn't mistaken
+ * for a function call.
  */
 const isGeneratedDefault = (defaultValue: string | null) => {
   if (!defaultValue) return false
+  if (SQL_VALUE_FUNCTION_DEFAULT.test(defaultValue.trim())) return true
   return defaultValue.replace(/'(?:[^']|'')*'/g, "''").includes('(')
 }
 
@@ -115,6 +121,11 @@ export const generateReusedRowFields = ({
 }): RowField[] =>
   fields.map((field) => {
     if (!shouldClearFieldOnReuse(field)) return field
+    // A blank boolean holds its default expression as a string, which would be saved as `false`
+    // instead of letting the database evaluate the default, so leave the value unset
+    if (field.format === 'bool' && isGeneratedDefault(field.defaultValue)) {
+      return { ...field, value: undefined }
+    }
     const blankField = blankFields.find((x) => x.name === field.name)
     return { ...field, value: blankField?.value }
   })

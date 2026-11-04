@@ -844,6 +844,9 @@ describe('generateReusedRowFields', () => {
     ['uuid default', { defaultValue: 'gen_random_uuid()' }],
     ['sequence default', { defaultValue: "nextval('seq'::regclass)" }],
     ['timestamp default', { defaultValue: 'now()' }],
+    ['CURRENT_TIMESTAMP default', { defaultValue: 'CURRENT_TIMESTAMP' }],
+    ['CURRENT_DATE default', { defaultValue: 'CURRENT_DATE' }],
+    ['CURRENT_USER default', { defaultValue: 'CURRENT_USER' }],
   ])('clears %s columns', (_, overrides) => {
     const [field] = reuse([makeField(overrides)])
     expect(field.value).toBeUndefined()
@@ -854,6 +857,22 @@ describe('generateReusedRowFields', () => {
       makeField({ format: 'jsonb', value: '{"a":"' + 'x'.repeat(20000) + '...' }),
     ])
     expect(field.value).toBeUndefined()
+  })
+
+  it('leaves a boolean with a function default unset so the database evaluates it', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'random() > 0.5', value: 'true' })],
+      blankFields: [makeField({ format: 'bool', value: 'random() > 0.5' })],
+    })
+    expect(field.value).toBeUndefined()
+  })
+
+  it('keeps a boolean with a literal default', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'true', value: 'false' })],
+      blankFields: [makeField({ format: 'bool', value: 'true' })],
+    })
+    expect(field.value).toBe('false')
   })
 
   it('uses the blank field value when clearing', () => {
