@@ -68,7 +68,18 @@ export const PurgeBucketCDNCacheModal = ({
           onClose()
         }}
       >
-        <AlertDialogContent size="medium">
+        <AlertDialogContent
+          size="medium"
+          onClick={(event) =>
+            // Avoid triggering the overlay click
+            event.stopPropagation()
+          }
+          dialogOverlayProps={{
+            onClick: () => {
+              onClose()
+            },
+          }}
+        >
           <AlertDialogHeader>
             <AlertDialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</AlertDialogTitle>
             <AlertDialogDescription asChild>
