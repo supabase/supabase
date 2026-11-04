@@ -72,19 +72,23 @@ export const MarketplaceIndex = () => {
 
   const {
     data: availableIntegrations,
-    error,
+    error: availableIntegrationsError,
     isPending: isLoadingAvailable,
-    isError,
+    isError: isErrorAvailableIntegrations,
     isSuccess: isSuccessAvailable,
   } = useAvailableIntegrations()
 
   const {
     installedIntegrations,
+    error: installedError,
     isLoading: isLoadingInstalled,
+    isError: isErrorInstalled,
     isSuccess: isSuccessInstalled,
   } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
+  const error = availableIntegrationsError || installedError
+  const isError = isErrorAvailableIntegrations || isErrorInstalled
   const isLoading = isLoadingAvailable || isLoadingInstalled
   const isSuccess = isSuccessAvailable && isSuccessInstalled
 
@@ -243,9 +247,7 @@ export const MarketplaceIndex = () => {
           </div>
         )}
 
-        {isError && (
-          <AlertError subject="Failed to retrieve available integrations" error={error} />
-        )}
+        {isError && <AlertError subject="Failed to retrieve integrations" error={error} />}
 
         {isSuccess && (
           <>
