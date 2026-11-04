@@ -255,7 +255,13 @@ Use `http://localhost:8000` and the publishable key when initializing a Supabase
 
 ### Access Postgres
 
-To connect with a local `psql` client:
+Use a local `psql` client to connect directly to Postgres or through Supavisor, the connection pooler.
+
+#### Connect directly to Postgres
+
+With the default configuration, port-forwarded connections reach Postgres through the pod's loopback interface and match a `trust` rule in `pg_hba.conf`. These connections do not require a database password. Opening the tunnel requires Kubernetes permission to port-forward to the pod.
+
+Connections from other pods use different authentication rules. The local `trust` rule does not grant password-free access across the cluster.
 
 1. Forward the database Service:
 
@@ -263,25 +269,71 @@ To connect with a local `psql` client:
    kubectl -n supabase port-forward svc/supabase-postgres 54322:5432
    ```
 
-2. In another terminal, retrieve the database password and connect. Enter the password at the `psql` prompt:
+   Leave this terminal running while you use the connection.
+
+2. In another terminal, connect to Postgres:
+
+   ```bash
+   psql -h localhost -p 54322 -U postgres -d postgres
+   ```
+
+#### Connect through Supavisor
+
+Supavisor validates your database password, including when you connect through a port-forward. Its username format is `<database-role>.<tenant-id>`. For this deployment, use `postgres.supabase` and database `postgres`.
+
+The operator uses the project name as the tenant ID by default. If you set `POOLER_TENANT_ID` in `supavisor.config`, use that value after the username's dot instead.
+
+Choose a connection mode based on your client's requirements. The local ports in this table correspond to the port-forward command in this section:
+
+| Mode        | Local port | Service port | Use                                                                                               |
+| ----------- | ---------- | ------------ | ------------------------------------------------------------------------------------------------- |
+| Session     | `54323`    | `5432`       | Persistent connections that need session state or prepared statements                             |
+| Transaction | `6543`     | `6543`       | Short-lived connections from serverless functions or other clients that do not need session state |
+
+Session mode assigns a database connection for the lifetime of the client session. Transaction mode returns the connection to the pool after each transaction. In transaction mode, disable prepared statements in your database driver. Use session mode for features such as `LISTEN/NOTIFY` or temporary tables that must persist across transactions.
+
+1. Wait for Supavisor to become ready:
+
+   ```bash
+   kubectl -n supabase wait --for=condition=Ready \
+     supavisor.core.supabase.io/supabase --timeout=300s
+   ```
+
+2. Retrieve the database password:
 
    ```bash
    kubectl -n supabase get secret supabase-postgres-auth \
      -o go-template='{{.data.password | base64decode}}{{"\n"}}'
-
-   psql -h localhost -p 54322 -U postgres -d postgres -W
    ```
 
-For pooled connections, forward Supavisor instead:
+3. Forward both Supavisor ports:
 
-```bash
-kubectl -n supabase port-forward svc/supabase-supavisor \
-  54323:5432 6543:6543
-```
+   ```bash
+   kubectl -n supabase port-forward svc/supabase-supavisor \
+     54323:5432 6543:6543
+   ```
 
-Use port `54323` for session mode or `6543` for transaction mode, database `postgres`, and username `postgres.supabase`. The suffix is the project name, which is the default Supavisor tenant ID. Use the same database password.
+   Leave this terminal running.
+
+4. In another terminal, run the command for your chosen mode and enter the database password when prompted:
+
+   ```bash
+   # Session mode
+   psql -h localhost -p 54323 -U postgres.supabase -d postgres -W
+
+   # Transaction mode
+   psql -h localhost -p 6543 -U postgres.supabase -d postgres -W
+   ```
+
+#### Connect from inside the cluster
+
+For apps running in the cluster, use host `supabase-supavisor.supabase.svc` with Service port `5432` for session mode or `6543` for transaction mode. Use the same database name, username, and password as in the Supavisor procedure. These connections go directly to the Service and do not need a port-forward.
+
+<Admonition type="danger">
 
 The HTTP Ingress configured in this tutorial does not expose Postgres or Supavisor. Keep database access on a private network or through an authenticated tunnel.
+
+</Admonition>
 
 ## Configuring HTTPS
 
