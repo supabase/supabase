@@ -37,12 +37,6 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     }
   }
 
-  // keepalive lets the request survive a navigation that starts right after
-  // the event (the OAuth redirect after sign_in_submitted, a plain-link click
-  // into the dashboard), but keepalive requests share a ~64KB in-flight quota
-  // page-wide, so it stays scoped to those events. Callers like useTrack
-  // fire-and-forget, so rejections are handled here rather than surfacing
-  // as unhandled promise rejections.
   return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
     headers: { Version: '2' },
     keepalive: KEEPALIVE_ACTIONS.has(event.action),
