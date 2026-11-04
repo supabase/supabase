@@ -247,7 +247,7 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
         message.role === MessageRole.User ? (
           // messages have no id and are only ever appended, so the index is stable
           <li key={index} className="group flex max-w-[80%] flex-col items-end gap-1 self-end">
-            <p className="rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word">
+            <p className="rounded-lg bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word">
               {message.content}
             </p>
             <CodeCopyButton
