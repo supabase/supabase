@@ -85,6 +85,40 @@ export const generateRowFields = (
   })
 }
 
+/**
+ * A default that calls a function (e.g. `gen_random_uuid()`, `nextval(...)`, `now()`) produces a fresh
+ * value per row. Quoted literals are stripped first so `'a(b'::text` isn't mistaken for a function call.
+ */
+const isGeneratedDefault = (defaultValue: string | null) => {
+  if (!defaultValue) return false
+  return defaultValue.replace(/'(?:[^']|'')*'/g, "''").includes('(')
+}
+
+const shouldClearFieldOnReuse = (field: RowField) =>
+  field.isPrimaryKey ||
+  field.isIdentity ||
+  isGeneratedDefault(field.defaultValue) ||
+  // Truncated values can't be copied faithfully, so don't risk saving a corrupted copy
+  isValueTruncated(field.value, field.format)
+
+/**
+ * Prepares fields to seed a new row from existing values (duplicating a row, or keeping values
+ * between inserts). Primary key, identity, function-defaulted, and truncated fields are reset to
+ * their blank state so the database generates fresh values.
+ */
+export const generateReusedRowFields = ({
+  fields,
+  blankFields,
+}: {
+  fields: RowField[]
+  blankFields: RowField[]
+}): RowField[] =>
+  fields.map((field) => {
+    if (!shouldClearFieldOnReuse(field)) return field
+    const blankField = blankFields.find((x) => x.name === field.name)
+    return { ...field, value: blankField?.value }
+  })
+
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {

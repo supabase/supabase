@@ -12,6 +12,7 @@ import { JsonEditor } from './JsonEditor'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
+  generateReusedRowFields,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
@@ -26,6 +27,8 @@ import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
+  /** Seeds a new record from an existing row; primary key, identity, and generated values are cleared */
+  duplicateFrom?: Dictionary<any>
   selectedTable: PGTable
   visible: boolean
   editable?: boolean
@@ -38,6 +41,7 @@ const formId = 'row-editor-panel'
 
 export const RowEditor = ({
   row,
+  duplicateFrom,
   selectedTable,
   visible = false,
   editable = true,
@@ -64,6 +68,7 @@ export const RowEditor = ({
 
   const [loading, setLoading] = useState(false)
   const [createMore, setCreateMore] = useState(false)
+  const [keepValues, setKeepValues] = useState(false)
 
   // Generated columns are always computed by the database, so they are excluded from the form.
   // They remain in rowFields as primary key identifiers may rely on them.
@@ -93,8 +98,16 @@ export const RowEditor = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, foreignKeys)
-      setRowFields(rowFields)
+      if (duplicateFrom !== undefined) {
+        setRowFields(
+          generateReusedRowFields({
+            fields: generateRowFields(duplicateFrom, selectedTable, foreignKeys),
+            blankFields: generateRowFields(undefined, selectedTable, foreignKeys),
+          })
+        )
+      } else {
+        setRowFields(generateRowFields(row, selectedTable, foreignKeys))
+      }
     }
   }, [visible])
 
@@ -154,8 +167,10 @@ export const RowEditor = ({
       saveChanges(payload, isNewRecord, { ...configuration, createMore }, (err?: any) => {
         setLoading(false)
         if (!err && createMore && isNewRecord) {
-          const freshFields = generateRowFields(undefined, selectedTable, foreignKeys)
-          setRowFields(freshFields)
+          const blankFields = generateRowFields(undefined, selectedTable, foreignKeys)
+          setRowFields(
+            keepValues ? generateReusedRowFields({ fields: rowFields, blankFields }) : blankFields
+          )
           setErrors({})
         }
       })
@@ -203,6 +218,17 @@ export const RowEditor = ({
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
               <Label htmlFor="create-more">Create more</Label>
+            </div>
+          )}
+          {isNewRecord && editable && createMore && (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="keep-values"
+                size="small"
+                checked={keepValues}
+                onCheckedChange={(checked) => setKeepValues(checked)}
+              />
+              <Label htmlFor="keep-values">Keep values</Label>
             </div>
           )}
         </ActionBar>
