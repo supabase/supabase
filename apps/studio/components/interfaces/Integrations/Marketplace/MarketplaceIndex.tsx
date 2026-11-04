@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
@@ -41,6 +42,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const MARKETPLACE_VIEW_MODE_STORAGE_KEY = 'supabase.marketplace.viewMode'
 
 export const MarketplaceIndex = () => {
+  const { ref } = useParams()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
@@ -247,7 +249,9 @@ export const MarketplaceIndex = () => {
           </div>
         )}
 
-        {isError && <AlertError subject="Failed to retrieve integrations" error={error} />}
+        {isError && (
+          <AlertError subject="Failed to retrieve integrations" projectRef={ref} error={error} />
+        )}
 
         {isSuccess && (
           <>
