@@ -20,7 +20,7 @@ export const ERROR_ROUTING = {
   NetworkUnreachable: { sentrySampleRate: SAMPLE_OTHER },
   MalformedResponse: { sentrySampleRate: SAMPLE_OTHER },
   PlatformError: { sentrySampleRate: SAMPLE_OTHER },
-  UnclassifiedApiError: { sentrySampleRate: SAMPLE_OTHER },
+  UnclassifiedApiError: { sentrySampleRate: SAMPLE_OWNED },
   DbConnectionTimeout: { sentrySampleRate: SAMPLE_OTHER },
   UnexpectedError: { sentrySampleRate: SAMPLE_OWNED },
 } as const satisfies Record<StudioErrorTag, Routing>

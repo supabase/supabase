@@ -90,8 +90,16 @@ describe('parseResponseErrorBody', () => {
     })
   })
 
-  it('returns undefined without a message', () => {
-    expect(parseResponseErrorBody({ code: 500 })).toBeUndefined()
+  it('keeps the status of a body that has a code but no message', () => {
+    expect(parseResponseErrorBody({ code: 500, retryAfter: 5 })).toMatchObject({
+      message: undefined,
+      code: 500,
+      retryAfter: 5,
+    })
+  })
+
+  it('returns undefined without a message or a code', () => {
+    expect(parseResponseErrorBody({ requestId: 'r1' })).toBeUndefined()
     expect(parseResponseErrorBody(undefined)).toBeUndefined()
   })
 })

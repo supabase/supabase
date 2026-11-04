@@ -239,30 +239,14 @@ async function handleFetchHeadResponse<T>(
 }
 
 async function handleFetchError(response: unknown): Promise<StudioError> {
-  let resJson: any = {}
-
-  if (response instanceof Error) {
-    resJson = response
-  }
+  let error: StudioError
 
   if (response instanceof Response) {
-    resJson = await response.json()
+    error = await classifyFetchResponse(response)
+  } else {
+    // No response to read, e.g. a fetch failure or an aborted request
+    error = classifyError(response)
   }
-
-  const status = response instanceof Response ? response.status : undefined
-
-  const message =
-    resJson.message ??
-    resJson.msg ??
-    resJson.error ??
-    `An error has occurred: ${status ?? 'Unknown error'}`
-  const retryAfterHeader =
-    response instanceof Response
-      ? (response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset'))
-      : null
-  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-  let error = classifyResponseError({ message, code: status, retryAfter })
 
   // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
   // This is a fix to keep those checks working without breaking changes.
@@ -270,6 +254,19 @@ async function handleFetchError(response: unknown): Promise<StudioError> {
   error.error = error
 
   return error
+}
+
+async function classifyFetchResponse(response: Response): Promise<StudioError> {
+  const resJson: any = await response.json()
+  const status = response.status
+
+  const message =
+    resJson.message ?? resJson.msg ?? resJson.error ?? `An error has occurred: ${status}`
+  const retryAfterHeader =
+    response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
+  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+  return classifyResponseError({ message, code: status, retryAfter })
 }
 
 /**

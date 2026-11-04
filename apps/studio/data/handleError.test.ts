@@ -72,6 +72,7 @@ describe('handleError — error classification', () => {
     ['404', { message: 'boom', code: 404 }, 'UnclassifiedApiError', 'studio', false, 'not_found'],
     ['429', { message: 'boom', code: 429 }, 'UnclassifiedApiError', 'studio', true, 'rate_limited'],
     ['no status', { message: 'boom' }, 'UnexpectedError', 'studio', false, 'unexpected'],
+    ['a 502 without a message', { code: 502 }, 'PlatformError', 'platform', true, 'server_error'],
     ['an empty message', { message: '' }, 'UnexpectedError', 'studio', false, 'unexpected'],
     ['null', null, 'UnexpectedError', 'studio', false, 'unexpected'],
     ['a string', 'raw string error', 'UnexpectedError', 'studio', false, 'unexpected'],

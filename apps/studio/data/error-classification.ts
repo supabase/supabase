@@ -105,20 +105,21 @@ const readNumber = (obj: object, key: string) => {
 
 /**
  * Reads the error body the fetch middleware produces for a failed API response. Returns undefined
- * without a message, or for tagged, aborted, and fetch-failure errors that merely carry one, so the
- * caller can fall back to `classifyError`.
+ * when there is neither a message nor a status code, or for tagged, aborted, and fetch-failure
+ * errors that merely carry a message, so the caller can fall back to `classifyError`.
  */
 export function parseResponseErrorBody(error: unknown): RawResponseError | undefined {
   if (!error || typeof error !== 'object') return undefined
   if (isStudioError(error) || isAbortError(error) || isFetchFailure(error)) return undefined
 
   const message = readString(error, 'msg') ?? readString(error, 'message')
-  if (!message) return undefined
+  const code = readNumber(error, 'code')
+  if (!message && code === undefined) return undefined
 
   const metadata = (error as Record<string, unknown>).metadata
   return {
     message,
-    code: readNumber(error, 'code'),
+    code,
     requestId: readString(error, 'requestId'),
     retryAfter: readNumber(error, 'retryAfter'),
     requestPathname: readString(error, 'requestPathname'),
