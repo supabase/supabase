@@ -8,3 +8,7 @@ export const SEARCH_V2_MIN_CHARACTERS = 2
 
 // questions can hold pasted logs, sql or connection strings, so telemetry keeps only their start
 export const ASK_AI_QUESTION_TELEMETRY_LENGTH = 300
+
+export const SEARCH_SHORTCUT_KEY = 'k'
+
+export const ASK_AI_SHORTCUT_KEY = 'i'

@@ -11,7 +11,11 @@ import { flushSync } from 'react-dom'
 
 import { ASK_AI_DIALOG_LABELS, AskAiPanel } from './AskAiPanel'
 import { SearchV2Panel } from './SearchV2Dialog'
-import { ASK_AI_QUESTION_TELEMETRY_LENGTH } from './constants'
+import {
+  ASK_AI_QUESTION_TELEMETRY_LENGTH,
+  ASK_AI_SHORTCUT_KEY,
+  SEARCH_SHORTCUT_KEY,
+} from './constants'
 import { useSearchV2Dialog, type SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
@@ -127,8 +131,8 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
     closeDialog('result_navigated')
   }
 
-  useSearchShortcut(() => showSearch('keyboard_shortcut'))
-  useSearchShortcut(() => showAskAi({ triggerType: 'keyboard_shortcut' }), 'i')
+  useSearchShortcut(() => showSearch('keyboard_shortcut'), SEARCH_SHORTCUT_KEY)
+  useSearchShortcut(() => showAskAi({ triggerType: 'keyboard_shortcut' }), ASK_AI_SHORTCUT_KEY)
 
   return (
     <SearchV2Context value={{ isSearchOpen, isAskAiOpen, showSearch, showAskAi }}>

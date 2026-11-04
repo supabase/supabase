@@ -9,6 +9,7 @@
 @import './ask-ai.css';
 @import './curved-scroll-area.css';
 @import 'docs-search/styles.css';
+@import './header.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
@@ -87,6 +88,7 @@
 :root {
   --sidebar-width: 300px;
   --header-height: 50px;
+  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
 }
 
 :root[data-docs-layout='v2'] {
