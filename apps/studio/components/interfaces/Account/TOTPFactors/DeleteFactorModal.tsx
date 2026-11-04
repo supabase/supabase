@@ -138,11 +138,6 @@ export const DeleteFactorModal = ({
           }
         />
       )}
-      {!canRemove && !recoveryCodesError && (
-        <p role="status" className="mt-4 text-sm text-foreground-light">
-          Checking recovery codes…
-        </p>
-      )}
       {error && (
         <AlertError
           className="mt-4"
