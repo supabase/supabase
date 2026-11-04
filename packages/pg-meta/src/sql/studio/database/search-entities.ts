@@ -12,19 +12,30 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 const CANDIDATE_LIMIT = 50
 
 // Mirrors what the table list endpoints expose: the role owns the table or has
-// some privilege on it (or one of its columns).
-const hasTableAccess = (oid: SafeSqlFragment, owner: SafeSqlFragment) => safeSql`(
+// some privilege on it (or one of its columns). Triggers are listed through
+// information_schema.triggers, which does not count SELECT.
+const hasTableAccess = (
+  oid: SafeSqlFragment,
+  owner: SafeSqlFragment,
+  { includeSelect = true }: { includeSelect?: boolean } = {}
+) => {
+  const tablePrivileges = includeSelect
+    ? safeSql`'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
+    : safeSql`'INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
+  const columnPrivileges = includeSelect
+    ? safeSql`'SELECT, INSERT, UPDATE, REFERENCES'`
+    : safeSql`'INSERT, UPDATE, REFERENCES'`
+  return safeSql`(
   pg_has_role(${owner}, 'USAGE')
-  or has_table_privilege(
-    ${oid},
-    'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
-  )
-  or has_any_column_privilege(${oid}, 'SELECT, INSERT, UPDATE, REFERENCES')
+  or has_table_privilege(${oid}, ${tablePrivileges})
+  or has_any_column_privilege(${oid}, ${columnPrivileges})
 )`
+}
 
-// Name matches rank by policy name. Policies pulled in through a matched table
-// group by that table first (in the table's own order), then by policy name.
-const POLICY_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
+// For things that hang off a table (policies, triggers). Name matches rank by
+// their own name. Ones pulled in through a matched table group by that table
+// first (in the table's own order), then by their own name.
+const TABLE_RELATED_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
 
 export type SearchEntitiesTable = {
   id: number
@@ -43,6 +54,16 @@ export type SearchEntitiesPolicy = {
   table_id: number
 }
 
+export type SearchEntitiesTrigger = {
+  id: number
+  name: string
+  activation: 'BEFORE' | 'AFTER' | 'INSTEAD OF'
+  events: Array<'INSERT' | 'UPDATE' | 'DELETE' | 'TRUNCATE'>
+  schema: string
+  table: string
+  table_id: number
+}
+
 export type SearchEntitiesFunction = {
   id: number
   schema: string
@@ -55,6 +76,7 @@ export type SearchEntitiesResult = {
   tables: SearchEntitiesTable[]
   policies: SearchEntitiesPolicy[]
   functions: SearchEntitiesFunction[]
+  triggers: SearchEntitiesTrigger[]
 }
 
 /**
@@ -114,6 +136,10 @@ export const getSearchEntitiesSql = ({
     ', '
   )
 
+  const triggerNamePattern = literal(`%${escapeIlikeLiteral(query)}%`)
+  const triggerPrefixPattern = literal(`${escapeIlikeLiteral(query)}%`)
+  const triggerExactName = literal(query.toLowerCase())
+
   const policyNamePattern = literal(`%${escapeIlikeLiteral(query)}%`)
   const policyPrefixPattern = literal(`${escapeIlikeLiteral(query)}%`)
   const policyExactName = literal(query.toLowerCase())
@@ -144,6 +170,7 @@ export const getSearchEntitiesSql = ({
     matched_tables as (
       select
         tc.oid,
+        tc.relowner,
         tc.oid::int8 as id,
         tc.nspname as schema,
         tc.relname as name,
@@ -229,7 +256,7 @@ export const getSearchEntitiesSql = ({
         from policy_matches pm
         order by pm.id, pm.source
       ) deduped
-      order by ${POLICY_ORDER}
+      order by ${TABLE_RELATED_ORDER}
       limit ${literal(limit)}
     ),
     -- Built once from the pg_depend reference index (cost follows extension members,
@@ -270,6 +297,85 @@ export const getSearchEntitiesSql = ({
       where pg_has_role(fc.proowner, 'USAGE') or has_function_privilege(fc.oid, 'EXECUTE')
       order by fc.rank, length(fc.proname), fc.proname, fc.nspname
       limit ${literal(limit)}
+    ),
+    trigger_name_candidates as materialized (
+      select
+        t.oid,
+        t.tgname,
+        t.tgtype,
+        t.tgrelid as table_oid,
+        c.relname,
+        c.relowner,
+        nc.nspname,
+        case
+          when lower(t.tgname) = ${triggerExactName} then 0
+          when t.tgname ilike ${triggerPrefixPattern} then 1
+          else 2
+        end as rank
+      from pg_trigger t
+      -- Same per-row pg_class_oid_index probe as the policy candidates above
+      cross join lateral (
+        select c.relname, c.relowner, c.relnamespace
+        from pg_class c
+        where c.oid = t.tgrelid
+        offset 0
+      ) c
+      join pg_namespace nc on nc.oid = c.relnamespace
+      where not t.tgisinternal
+        and t.tgname ilike ${triggerNamePattern}
+        and nc.nspname not in (${excludedSchemas})
+        and not pg_is_other_temp_schema(nc.oid)
+      order by rank, length(t.tgname), t.tgname
+      limit ${literal(CANDIDATE_LIMIT)}
+    ),
+    trigger_matches as (
+      select
+        tnc.oid::int8 as id,
+        tnc.tgname as name,
+        tnc.tgtype,
+        tnc.nspname as schema,
+        tnc.relname as table_name,
+        tnc.table_oid::int8 as table_id,
+        0 as source,
+        tnc.rank,
+        0 as table_sort_length,
+        '' as table_sort_name
+      from trigger_name_candidates tnc
+      where ${hasTableAccess(safeSql`tnc.table_oid`, safeSql`tnc.relowner`, { includeSelect: false })}
+
+      union all
+
+      select
+        trg.oid::int8,
+        trg.tgname,
+        trg.tgtype,
+        mt.schema,
+        mt.name,
+        mt.id,
+        1,
+        mt.rank,
+        length(mt.name),
+        mt.name
+      from matched_tables mt
+      cross join lateral (
+        select t.oid, t.tgname, t.tgtype
+        from pg_trigger t
+        where t.tgrelid = mt.oid
+          and not t.tgisinternal
+        order by t.tgname
+        limit ${literal(limit)}
+      ) trg
+      where ${hasTableAccess(safeSql`mt.oid`, safeSql`mt.relowner`, { includeSelect: false })}
+    ),
+    matched_triggers as (
+      select *
+      from (
+        select distinct on (tm.id) tm.*
+        from trigger_matches tm
+        order by tm.id, tm.source
+      ) deduped
+      order by ${TABLE_RELATED_ORDER}
+      limit ${literal(limit)}
     )
     select
       coalesce(
@@ -305,7 +411,7 @@ export const getSearchEntitiesSql = ({
               'table', p.table_name,
               'table_id', p.table_id
             )
-            order by ${POLICY_ORDER}
+            order by ${TABLE_RELATED_ORDER}
           )
           from matched_policies p
         ),
@@ -326,6 +432,38 @@ export const getSearchEntitiesSql = ({
           from matched_functions f
         ),
         '[]'::jsonb
-      ) as functions
+      ) as functions,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', t.id,
+              'name', t.name,
+              'activation', case
+                when (t.tgtype & 2) <> 0 then 'BEFORE'
+                when (t.tgtype & 64) <> 0 then 'INSTEAD OF'
+                else 'AFTER'
+              end,
+              'events', to_jsonb(
+                array_remove(
+                  array[
+                    case when (t.tgtype & 4) <> 0 then 'INSERT' end,
+                    case when (t.tgtype & 16) <> 0 then 'UPDATE' end,
+                    case when (t.tgtype & 8) <> 0 then 'DELETE' end,
+                    case when (t.tgtype & 32) <> 0 then 'TRUNCATE' end
+                  ],
+                  null
+                )
+              ),
+              'schema', t.schema,
+              'table', t.table_name,
+              'table_id', t.table_id
+            )
+            order by ${TABLE_RELATED_ORDER}
+          )
+          from matched_triggers t
+        ),
+        '[]'::jsonb
+      ) as triggers
   `
 }
