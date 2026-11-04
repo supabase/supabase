@@ -1,4 +1,4 @@
-import { FC, PropsWithChildren } from 'react'
+import { FC, PropsWithChildren, ReactNode } from 'react'
 import { cn } from 'ui'
 
 interface IStep {
@@ -12,7 +12,7 @@ interface IStepHikeCompactSubcomponents {
   Code: FC<PropsWithChildren<ICode>>
 }
 interface IDetails {
-  title?: string
+  title?: ReactNode
   fullWidth?: boolean
 }
 

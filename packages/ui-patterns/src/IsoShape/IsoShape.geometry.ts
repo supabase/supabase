@@ -17,6 +17,13 @@ export interface IsoBox {
 
 export type IsoView = 'iso' | 'front'
 
+type PlanPoint = [number, number]
+
+export interface IsoTurn {
+  yaw: number
+  pivot: PlanPoint
+}
+
 type IsoFace = 'right' | 'left' | 'top'
 
 export interface IsoRing {
@@ -36,6 +43,7 @@ interface ProjectedShape extends ProjectedBox {
 interface ProjectShapeParams {
   box: IsoBox
   view?: IsoView
+  turn?: IsoTurn
 }
 
 interface RecessParams {
@@ -75,6 +83,29 @@ export const VIEW_POINTS: Record<IsoView, (x: number, y: number, z: number) => I
   ],
 }
 
+const rotateVector = ([px, py]: PlanPoint, yaw: number): PlanPoint => [
+  px * Math.cos(yaw) - py * Math.sin(yaw),
+  px * Math.sin(yaw) + py * Math.cos(yaw),
+]
+
+export const turnPoint = ([px, py]: PlanPoint, { yaw, pivot }: IsoTurn): PlanPoint => {
+  const [dx, dy] = rotateVector([px - pivot[0], py - pivot[1]], yaw)
+  return [pivot[0] + dx, pivot[1] + dy]
+}
+
+const turnedView = (view: IsoView, turn?: IsoTurn) => {
+  const point = VIEW_POINTS[view]
+  if (!turn) return point
+  return (x: number, y: number, z: number) => point(...turnPoint([x, y], turn), z)
+}
+
+// the center of the plan footprint, so a turn keeps the composition in place
+export const planCenter = (boxes: IsoBox[]): PlanPoint => {
+  const xs = boxes.flatMap(({ x, w }) => [x, x + w])
+  const ys = boxes.flatMap(({ y, d }) => [y, y + d])
+  return [(Math.min(...xs) + Math.max(...xs)) / 2, (Math.min(...ys) + Math.max(...ys)) / 2]
+}
+
 export const cube = (x: number, y: number, z: number, size: number): IsoBox => ({
   x,
   y,
@@ -84,15 +115,36 @@ export const cube = (x: number, y: number, z: number, size: number): IsoBox => (
   h: size,
 })
 
-export const paintOrder = (boxes: IsoBox[]): IsoBox[] =>
-  [...boxes].sort(
-    (a, b) => a.x + a.w / 2 + a.y + a.d / 2 + a.z - (b.x + b.w / 2 + b.y + b.d / 2 + b.z)
-  )
+export const paintOrder = (boxes: IsoBox[], turn?: IsoTurn): IsoBox[] => {
+  const depth = ({ x, y, z, w, d }: IsoBox) => {
+    const center: PlanPoint = [x + w / 2, y + d / 2]
+    const [cx, cy] = turn ? turnPoint(center, turn) : center
+    return cx + cy + z
+  }
+  return [...boxes].sort((a, b) => depth(a) - depth(b))
+}
 
-const projectBox = (box: IsoBox, p = isoPoint): ProjectedBox => {
+const projectBox = (
+  box: IsoBox,
+  p: (x: number, y: number, z: number) => IsoPoint,
+  isVisible: (normal: PlanPoint) => boolean
+): ProjectedBox & { namedFaces: Record<IsoFace, IsoPoint[]> } => {
   const { x, y, z, w, d, h, inset } = box
   const right = [p(x + w, y, z), p(x + w, y + d, z), p(x + w, y + d, z + h), p(x + w, y, z + h)]
   const left = [p(x, y + d, z), p(x + w, y + d, z), p(x + w, y + d, z + h), p(x, y + d, z + h)]
+  // the far sides show only after a turn moves them into view
+  const sides: [PlanPoint, IsoPoint[]][] = [
+    [[1, 0], right],
+    [[0, 1], left],
+    [
+      [-1, 0],
+      [p(x, y, z), p(x, y + d, z), p(x, y + d, z + h), p(x, y, z + h)],
+    ],
+    [
+      [0, -1],
+      [p(x, y, z), p(x + w, y, z), p(x + w, y, z + h), p(x, y, z + h)],
+    ],
+  ]
   const top = [p(x, y, z + h), p(x + w, y, z + h), p(x + w, y + d, z + h), p(x, y + d, z + h)]
   const back = p(x, y, z)
   const mw = w * INSET_MARGIN
@@ -114,16 +166,19 @@ const projectBox = (box: IsoBox, p = isoPoint): ProjectedBox => {
   const insetFace = { front: frontInset, top: topInset }
 
   return {
+    // a turn changes which sides show, so find the fill face by name, not by its index in faces
+    namedFaces: { right, left, top },
     key: `${x}:${y}:${z}`,
-    faces: [right, left, top],
+    faces: [...sides.filter(([normal]) => isVisible(normal)).map(([, face]) => face), top],
     hiddenEdges: [
       [back, p(x + w, y, z)],
       [back, p(x, y + d, z)],
       [back, p(x, y, z + h)],
     ],
-    insets: inset
-      ? recess({ opening: insetFace[inset](0), floor: insetFace[inset](w * 0.12), inset })
-      : [],
+    insets:
+      inset && (inset === 'top' || isVisible([1, 0]))
+        ? recess({ opening: insetFace[inset](0), floor: insetFace[inset](w * 0.12), inset })
+        : [],
     guides: [
       [p(x - GUIDE_REACH, y + d, z), p(x + w + GUIDE_REACH, y + d, z)],
       [p(x + w, y - GUIDE_REACH, z), p(x + w, y + d + GUIDE_REACH, z)],
@@ -131,10 +186,15 @@ const projectBox = (box: IsoBox, p = isoPoint): ProjectedBox => {
   }
 }
 
-export const projectShape = ({ box, view = 'iso' }: ProjectShapeParams): ProjectedShape => {
+export const projectShape = ({ box, view = 'iso', turn }: ProjectShapeParams): ProjectedShape => {
   const { x, y, z, w, d, h } = box
   if (box.shape !== 'cylinder') {
-    const projected = projectBox(box, VIEW_POINTS[view])
+    const { namedFaces, ...projected } = projectBox(box, turnedView(view, turn), (normal) => {
+      const [nx, ny] = turn ? rotateVector(normal, turn.yaw) : normal
+      // the plan direction toward the viewer, so a side face shows when its normal points along it
+      const [vx, vy] = view === 'iso' ? [1, 1] : [FRONT_TURN_SIN, FRONT_TURN_COS]
+      return nx * vx + ny * vy > 1e-6
+    })
     return {
       ...projected,
       posts: [
@@ -143,12 +203,11 @@ export const projectShape = ({ box, view = 'iso' }: ProjectShapeParams): Project
         [x, y + d],
       ],
       fill: box.fillFace
-        ? // projectBox returns faces in this order
-          projected.faces[{ right: 0, left: 1, top: 2 }[box.fillFace]]
+        ? namedFaces[box.fillFace]
         : (projected.insets.at(-1) ?? convexHull(projected.faces.flat())),
     }
   }
-  const point = VIEW_POINTS[view]
+  const point = turnedView(view, turn)
   const radius = w / 2
   const plan = Array.from({ length: CYLINDER_SEGMENTS }, (_, i): [number, number] => {
     const angle = (i / CYLINDER_SEGMENTS) * Math.PI * 2
