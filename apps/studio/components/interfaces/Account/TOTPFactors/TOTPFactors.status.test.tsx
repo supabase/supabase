@@ -93,7 +93,7 @@ describe('authenticator removal recovery-status guard', () => {
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
   })
 
-  test('disables an open confirmation if a background status check fails', async () => {
+  test('disables an open confirmation during a background status refresh and after failure', async () => {
     const getStatus = vi
       .spyOn(auth.mfa.recoveryCodes, 'getStatus')
       .mockResolvedValue(availableCodes)
@@ -119,9 +119,23 @@ describe('authenticator removal recovery-status guard', () => {
     const confirm = within(dialog).getByRole('button', { name: 'Remove' })
     expect(confirm).not.toBeDisabled()
 
-    getStatus.mockRejectedValue(new Error('Status unavailable'))
+    let rejectRefresh: (error: Error) => void = () => {}
+    getStatus.mockImplementation(
+      () =>
+        new Promise((_, reject) => {
+          rejectRefresh = reject
+        })
+    )
+    let refresh = Promise.resolve()
     await act(async () => {
-      await queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+      refresh = queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+    })
+    await waitFor(() => expect(confirm).toBeDisabled())
+    fireEvent.click(confirm)
+    expect(unenroll).not.toHaveBeenCalled()
+    await act(async () => {
+      rejectRefresh(new Error('Status unavailable'))
+      await refresh
     })
     await waitFor(() => expect(confirm).toBeDisabled())
     fireEvent.click(confirm)

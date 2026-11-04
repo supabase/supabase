@@ -175,7 +175,7 @@ describe('authenticator removal failures', () => {
       .spyOn(auth.mfa.recoveryCodes, 'unenroll')
       .mockResolvedValue({ data: { id: 'codes-a' }, error: null })
     const onClose = vi.fn()
-    customRender(
+    const { rerender } = customRender(
       <DeleteFactorModal
         visible
         factorId="factor-a"
@@ -186,6 +186,22 @@ describe('authenticator removal failures', () => {
     )
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     expect(await screen.findByText(/Authenticator could not be removed/)).toBeInTheDocument()
+    rerender(
+      <DeleteFactorModal
+        visible
+        factorId="factor-a"
+        lastFactorToBeDeleted
+        hasRecoveryCodes={false}
+        onClose={onClose}
+      />
+    )
+    expect(
+      screen.getByText(
+        'Your recovery codes have been removed. Generate new codes if you keep this authenticator.'
+      )
+    ).toBeInTheDocument()
+    expect(screen.queryByText('Your recovery codes will be removed too')).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'contact support' })).toBeInTheDocument()
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(unenrollCodes).toHaveBeenCalledOnce()

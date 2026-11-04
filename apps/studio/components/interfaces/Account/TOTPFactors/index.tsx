@@ -54,7 +54,8 @@ export const TOTPFactors = () => {
 
   // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
   const disableDeleteFactor =
-    shouldVerifyRecoveryCodes && (recoveryCodesIsPending || recoveryCodesIsError || !status)
+    shouldVerifyRecoveryCodes &&
+    (recoveryCodesIsPending || recoveryCodesIsFetching || recoveryCodesIsError || !status)
 
   return (
     <>

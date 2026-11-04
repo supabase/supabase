@@ -107,7 +107,13 @@ export const DeleteFactorModal = ({
             <li>
               You will lose access to any organization that enforces multi-factor authentication
             </li>
-            {hasRecoveryCodes && <li>Your recovery codes will be removed too</li>}
+            {(hasRecoveryCodes || hasRemovedRecoveryCodes) && (
+              <li>
+                {hasRemovedRecoveryCodes
+                  ? 'Your recovery codes have been removed. Generate new codes if you keep this authenticator.'
+                  : 'Your recovery codes will be removed too'}
+              </li>
+            )}
           </>
         ) : (
           <>
@@ -127,7 +133,6 @@ export const DeleteFactorModal = ({
           className="mt-4"
           subject="Unable to remove authenticator"
           error={error}
-          hideContactSupport
           showInstructions={false}
         />
       )}
