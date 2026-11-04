@@ -2,7 +2,6 @@
 id: 'row-level-security-performance'
 title: 'Row Level Security performance'
 description: 'Measure and tune Postgres Row Level Security policies.'
-subtitle: 'Measure and tune Postgres Row Level Security policies.'
 ---
 
 Measure the cost of Row Level Security (RLS) and tune policies that are already correct. To learn how to write correct policies, see [Row Level Security](/docs/guides/database/postgres/row-level-security).
@@ -50,18 +49,20 @@ Execution Time: 171.033 ms
 
 ### Measure through the Data API
 
-PostgREST can return the query plan to a Supabase client. Enable it first:
+PostgREST can return the query plan to a Supabase client.
+
+<Admonition type="caution">
+
+`pgrst.db_plan_enabled` exposes query plans over your Data API. In production, restrict it to your own IP address before you enable it, as described in [Query plans with explain()](/docs/guides/api/query-plans#production-use-with-pre-request-protection).
+
+</Admonition>
+
+Enable it first:
 
 ```sql
 alter role authenticator set pgrst.db_plan_enabled to true;
 notify pgrst, 'reload config';
 ```
-
-<Admonition type="caution">
-
-`pgrst.db_plan_enabled` exposes query plans over your Data API. Don't enable it in production.
-
-</Admonition>
 
 Then add the `.explain()` modifier to a query:
 

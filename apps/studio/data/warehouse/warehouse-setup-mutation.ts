@@ -6,7 +6,8 @@ import { warehouseKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import { replicationKeys } from '@/data/replication/keys'
 import { pipelineIdSchema } from '@/data/replication/pipeline-id'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 
@@ -39,12 +40,12 @@ export const useWarehouseSetupMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WarehouseSetupData, ResponseError, WarehouseSetupVariables>,
+  UseCustomMutationOptions<WarehouseSetupData, StudioError, WarehouseSetupVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WarehouseSetupData, ResponseError, WarehouseSetupVariables>({
+  return useMutation<WarehouseSetupData, StudioError, WarehouseSetupVariables>({
     mutationFn: (vars) => setupWarehouse(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

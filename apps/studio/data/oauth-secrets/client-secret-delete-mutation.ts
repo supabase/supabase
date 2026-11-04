@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { clientSecretKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ClientSecretDeleteVariables = {
   slug: string
@@ -25,12 +26,12 @@ export const useClientSecretDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<boolean, ResponseError, ClientSecretDeleteVariables>,
+  UseCustomMutationOptions<boolean, StudioError, ClientSecretDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<boolean, ResponseError, ClientSecretDeleteVariables>({
+  return useMutation<boolean, StudioError, ClientSecretDeleteVariables>({
     mutationFn: (vars) => deleteClientSecret(vars),
     async onSuccess(data, variables, context) {
       const { slug, appId } = variables

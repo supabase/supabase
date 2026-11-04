@@ -142,7 +142,7 @@ describe('sanitizeContractPart', () => {
 
   it('returns undefined for tools without a contract', () => {
     expect(
-      sanitizeContractPart({ ...part, type: 'tool-list_tables' } as ToolUIPart, 'schema')
+      sanitizeContractPart({ ...part, type: 'tool-search_docs' } as ToolUIPart, 'schema')
     ).toBe(undefined)
   })
 })

@@ -33,12 +33,12 @@ Pass the full `error` object from React Query — not `error.message`. This lets
 
 ## Adding a new error mapping
 
-**1. Add the error class to `types/api-errors.ts`**
+**1. Add the error class to `@/lib/errors/studio-errors.ts`**
 
 ```ts
 export type KnownErrorType = 'connection-timeout' | 'your-error'
 
-export class YourError extends ResponseError {
+export class YourError extends StudioError {
   readonly errorType = 'your-error' as const
 }
 
@@ -48,7 +48,7 @@ export type ClassifiedError = ConnectionTimeoutError | FailedToRetrieveProjectsE
 **2. Add a pattern entry to `data/error-patterns.ts`**
 
 ```ts
-import { YourError } from 'types/api-errors'
+import { YourError } from '@/lib/errors/studio-errors'
 
 export const ERROR_PATTERNS: ErrorPattern[] = [
   // existing...

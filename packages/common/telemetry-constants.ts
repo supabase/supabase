@@ -456,10 +456,10 @@ export interface ProjectCreationSimpleVersionSubmittedEvent {
      */
     freeTierGeneralRegionExperiment?: 'control' | 'test'
     /**
-     * How the submitted region was arrived at. 'auto' = the user never touched the region field
-     * and kept the auto-assigned default. 'general' = the user picked a smart region group (e.g.
-     * Americas). 'specific' = the user picked an exact region (e.g. us-east-1). Only set when
-     * smart regions are enabled for the selected cloud provider.
+     * Which kind of region was submitted. 'auto' = the Auto (best available) region option.
+     * 'general' = a smart region group (e.g. Americas). 'specific' = an exact region (e.g.
+     * us-east-1). An untouched field reports whichever default it holds. Only set when smart
+     * regions are enabled for the selected cloud provider.
      */
     regionSelectionType?: 'general' | 'auto' | 'specific'
     /**
@@ -1023,10 +1023,11 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
-  | 'troubleshooting'
+  | 'ask_ai_answer'
 
 /**
- * User clicked 'Copy as Markdown' on a page and the markdown was copied successfully.
+ * User clicked 'Copy as Markdown' on a page or under a Supabase AI answer, and the markdown was copied
+ * successfully.
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
@@ -1200,6 +1201,145 @@ export interface DocsSearchV2ResultClickedEvent {
  */
 export interface DocsSearchV2ClosedEvent {
   action: 'docs_search_v2_closed'
+  properties: {
+    /**
+     * Why the dialog closed: the user dismissed it, opened a result, or switched to Ask AI.
+     */
+    closeReason: 'dismissed' | 'result_navigated' | 'switched_to_ask_ai'
+  }
+}
+
+/**
+ * User opened Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiOpenedEvent {
+  action: 'docs_search_v2_ask_ai_opened'
+  properties: {
+    /**
+     * The trigger that opened Ask AI: the top bar button, Cmd+I or Ctrl+I, the item shown when a
+     * search has no results, or the button in the search results footer.
+     */
+    triggerType: 'ask_ai_button' | 'keyboard_shortcut' | 'no_results_item' | 'results_footer_button'
+  }
+}
+
+/**
+ * User's question was sent to Ask AI in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiQuestionSubmittedEvent {
+  action: 'docs_search_v2_ask_ai_question_submitted'
+  properties: {
+    /**
+     * The question sent to Ask AI, cut to its first 300 characters.
+     */
+    question: string
+    /**
+     * The length of the full question, in characters.
+     */
+    questionLength: number
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+  }
+}
+
+/**
+ * User clicked a source link under an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiSourceClickedEvent {
+  action: 'docs_search_v2_ask_ai_source_clicked'
+  properties: {
+    /**
+     * The path of the source that was clicked.
+     */
+    sourcePath: string
+  }
+}
+
+/**
+ * User closed Ask AI in the Search V2 dialog, by closing the dialog or by switching to search.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiClosedEvent {
+  action: 'docs_search_v2_ask_ai_closed'
+  properties: {
+    /**
+     * Why Ask AI closed: the user dismissed the dialog, or switched to search.
+     */
+    closeReason: 'dismissed' | 'switched_to_search'
+  }
+}
+
+/**
+ * Ask AI finished streaming an answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerCompletedEvent {
+  action: 'docs_search_v2_ask_ai_answer_completed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the end of the answer, in milliseconds.
+     */
+    durationMs: number
+    /**
+     * The number of source pages listed under the answer.
+     */
+    sourceCount: number
+  }
+}
+
+/**
+ * Ask AI failed to answer a question in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerFailedEvent {
+  action: 'docs_search_v2_ask_ai_answer_failed'
+  properties: {
+    /**
+     * Where the question came from: typed in Ask AI, or carried over from a search.
+     */
+    questionSource: 'typed' | 'search'
+    /**
+     * Time from sending the question to the failure, in milliseconds.
+     */
+    durationMs: number
+  }
+}
+
+/**
+ * User clicked a link inside an Ask AI answer in the Search V2 dialog.
+ *
+ * @group Events
+ * @source docs
+ */
+export interface DocsSearchV2AskAiAnswerLinkClickedEvent {
+  action: 'docs_search_v2_ask_ai_answer_link_clicked'
+  properties: {
+    /**
+     * The link's destination, as written in the answer.
+     */
+    href: string
+  }
 }
 
 /**
@@ -1630,32 +1770,6 @@ export interface StudioPricingSidePanelOpenedEvent {
  */
 export interface ReportsDatabaseGrafanaBannerClickedEvent {
   action: 'reports_database_grafana_banner_clicked'
-  groups: TelemetryGroups
-}
-
-/**
- * The logs.all deprecation banner was rendered, fired once per mount. Acts as the
- * denominator for the dismiss rate. Migration outcome itself is measured via decay in
- * `/v1/projects/:ref/analytics/endpoints/logs.all` traffic in the warehouse, not from this event.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerExposedEvent {
-  action: 'logs_all_deprecation_banner_exposed'
-  groups: TelemetryGroups
-}
-
-/**
- * User dismissed the logs.all deprecation banner.
- *
- * @group Events
- * @source studio
- * @page /project/[ref]/logs/*, /project/[ref]/observability/*
- */
-export interface LogsAllDeprecationBannerDismissButtonClickedEvent {
-  action: 'logs_all_deprecation_banner_dismiss_button_clicked'
   groups: TelemetryGroups
 }
 
@@ -4055,6 +4169,7 @@ export interface UnifiedLogsRowClickedEvent {
       | 'supavisor'
       | 'pgbouncer'
       | 'multigres'
+      | 'pipelines'
       | 'compute'
   }
   groups: TelemetryGroups
@@ -4275,7 +4390,7 @@ export interface WarehouseDisabledEvent {
  * @source Automatic reminder controller
  * @page /organizations, /org/*, /project/*, /new, /new/*
  */
-export interface AccountRecoveryReminderExposed {
+export interface AccountRecoveryReminderExposedEvent {
   action: 'account_recovery_reminder_exposed'
   properties: { gap: 'missing' | 'exhausted' }
   groups: TelemetryGroups
@@ -4286,7 +4401,7 @@ export interface AccountRecoveryReminderExposed {
  * @source User starts a recovery task
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryActionClicked {
+export interface AccountRecoveryActionClickedEvent {
   action: 'account_recovery_action_clicked'
   properties: { actionType: 'generate_codes' | 'regenerate_codes' | 'add_factor' }
   groups: TelemetryGroups
@@ -4297,7 +4412,7 @@ export interface AccountRecoveryActionClicked {
  * @source User saves recovery codes or verifies another authenticator
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryTaskCompleted {
+export interface AccountRecoveryTaskCompletedEvent {
   action: 'account_recovery_task_completed'
   properties: { taskType: 'recovery_codes' | 'authenticator' }
   groups: TelemetryGroups
@@ -4308,7 +4423,7 @@ export interface AccountRecoveryTaskCompleted {
  * @source User skips or continues from the recovery interstitial
  * @page /organizations, /org/*, /project/*, /new
  */
-export interface AccountRecoveryReminderClosed {
+export interface AccountRecoveryReminderClosedEvent {
   action: 'account_recovery_reminder_closed'
   properties: { hasCompletedTask: boolean }
   groups: TelemetryGroups
@@ -4318,10 +4433,10 @@ export interface AccountRecoveryReminderClosed {
  * @hidden
  */
 export type TelemetryEvent =
-  | AccountRecoveryReminderExposed
-  | AccountRecoveryActionClicked
-  | AccountRecoveryTaskCompleted
-  | AccountRecoveryReminderClosed
+  | AccountRecoveryReminderExposedEvent
+  | AccountRecoveryActionClickedEvent
+  | AccountRecoveryTaskCompletedEvent
+  | AccountRecoveryReminderClosedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4391,6 +4506,13 @@ export type TelemetryEvent =
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
   | DocsSearchV2ClosedEvent
+  | DocsSearchV2AskAiOpenedEvent
+  | DocsSearchV2AskAiQuestionSubmittedEvent
+  | DocsSearchV2AskAiSourceClickedEvent
+  | DocsSearchV2AskAiClosedEvent
+  | DocsSearchV2AskAiAnswerCompletedEvent
+  | DocsSearchV2AskAiAnswerFailedEvent
+  | DocsSearchV2AskAiAnswerLinkClickedEvent
   | Docs404RecommendationClickedEvent
   | DocsProjectConfigVariablesCopyButtonClickedEvent
   | HomepageFrameworkQuickstartClickedEvent
@@ -4425,8 +4547,6 @@ export type TelemetryEvent =
   | StudioBillingCancelSubscriptionClickedEvent
   | StudioPricingSidePanelOpenedEvent
   | ReportsDatabaseGrafanaBannerClickedEvent
-  | LogsAllDeprecationBannerExposedEvent
-  | LogsAllDeprecationBannerDismissButtonClickedEvent
   | IndexAdvisorEnableButtonClickedEvent
   | IndexAdvisorBannerDismissButtonClickedEvent
   | IndexAdvisorTabClickedEvent

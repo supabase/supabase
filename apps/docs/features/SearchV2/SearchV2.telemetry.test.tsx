@@ -1,8 +1,11 @@
 // @vitest-environment jsdom
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react'
 import type { DocsSearchV2State } from 'common'
+import { TooltipProvider } from 'ui'
+import { MessageRole, MessageStatus, type Message } from 'ui-patterns/CommandMenu/prepackaged/ai'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { SearchV2Provider } from './SearchV2Provider'
 import { SearchV2Trigger } from './SearchV2Trigger'
 
 const sendTelemetryEvent = vi.fn()
@@ -12,6 +15,17 @@ const resetSearch = vi.fn()
 let searchState: DocsSearchV2State
 
 vi.mock('@/lib/telemetry', () => ({ useSendTelemetryEvent: () => sendTelemetryEvent }))
+const aiMessages: Message[] = []
+vi.mock('ui-patterns/CommandMenu/prepackaged/ai', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('ui-patterns/CommandMenu/prepackaged/ai')>()),
+  useAiChat: () => ({
+    submit: vi.fn(),
+    reset: () => {},
+    messages: aiMessages,
+    isResponding: false,
+    hasError: false,
+  }),
+}))
 vi.mock('next/navigation', () => ({ useRouter: () => ({ push }) }))
 vi.mock('next/link', () => ({
   default: ({
@@ -52,6 +66,7 @@ beforeEach(() => {
   }
   Element.prototype.scrollIntoView ??= () => {}
   searchState = { status: 'initial', key: 0 }
+  aiMessages.length = 0
 })
 
 afterEach(() => {
@@ -59,17 +74,25 @@ afterEach(() => {
   vi.clearAllMocks()
 })
 
+function TriggerWithProvider() {
+  return (
+    <SearchV2Provider>
+      <SearchV2Trigger />
+    </SearchV2Provider>
+  )
+}
+
 const eventActions = () => sendTelemetryEvent.mock.calls.map(([event]) => event.action)
 
 function openDialog() {
-  const view = render(<SearchV2Trigger />)
+  const view = render(<TriggerWithProvider />)
   fireEvent.click(screen.getByRole('button', { name: /search/i }))
   return view
 }
 
 function setSearchState(view: ReturnType<typeof render>, next: DocsSearchV2State) {
   searchState = next
-  act(() => view.rerender(<SearchV2Trigger />))
+  act(() => view.rerender(<TriggerWithProvider />))
 }
 
 describe('SearchV2 telemetry', () => {
@@ -91,7 +114,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('sends docs_search_v2_opened with keyboard_shortcut on Cmd+K', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', metaKey: true })
 
@@ -104,7 +127,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('sends docs_search_v2_opened with keyboard_shortcut on Ctrl+K', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', ctrlKey: true })
 
@@ -122,7 +145,7 @@ describe('SearchV2 telemetry', () => {
   ])('keeps the legacy command menu shortcut from firing on %s', (_name, modifier) => {
     const legacyShortcut = vi.fn()
     document.addEventListener('keydown', legacyShortcut)
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(document.body, { key: 'k', ...modifier })
 
@@ -132,7 +155,7 @@ describe('SearchV2 telemetry', () => {
   })
 
   it('ignores k without Cmd or Ctrl', () => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k' })
 
@@ -146,7 +169,7 @@ describe('SearchV2 telemetry', () => {
     ['Cmd+Shift+K', { metaKey: true, shiftKey: true }],
     ['Cmd+Alt+K', { metaKey: true, altKey: true }],
   ])('ignores %s so browser shortcuts keep working', (_name, modifier) => {
-    render(<SearchV2Trigger />)
+    render(<TriggerWithProvider />)
 
     fireEvent.keyDown(window, { key: 'k', ...modifier })
 
@@ -162,7 +185,10 @@ describe('SearchV2 telemetry', () => {
 
     expect(screen.queryByRole('combobox')).toBeNull()
     expect(sendTelemetryEvent).toHaveBeenCalledTimes(1)
-    expect(sendTelemetryEvent).toHaveBeenCalledWith({ action: 'docs_search_v2_closed' })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_closed',
+      properties: { closeReason: 'dismissed' },
+    })
   })
 
   it('runs the debounced search while typing and resets when the input is cleared', () => {
@@ -373,5 +399,72 @@ describe('SearchV2 telemetry', () => {
         properties: { resultPath: '/guides/auth', query: 'auth' },
       })
     })
+  })
+})
+
+describe('Ask AI telemetry', () => {
+  it('reports a switch between search and Ask AI as its own close reason, not a dismissal', () => {
+    openDialog()
+    sendTelemetryEvent.mockClear()
+
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_closed',
+      properties: { closeReason: 'switched_to_ask_ai' },
+    })
+
+    fireEvent.keyDown(window, { key: 'k', metaKey: true })
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_ask_ai_closed',
+      properties: { closeReason: 'switched_to_search' },
+    })
+  })
+
+  // questions can hold pasted logs or connection strings
+  it('sends only the start of a long question, with its full length', () => {
+    render(<TriggerWithProvider />)
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+    const input = screen.getByRole('textbox', { name: 'Ask Supabase AI a question' })
+
+    fireEvent.change(input, { target: { value: 'a'.repeat(400) } })
+    fireEvent.submit(input.closest('form')!)
+
+    expect(sendTelemetryEvent).toHaveBeenCalledWith({
+      action: 'docs_search_v2_ask_ai_question_submitted',
+      properties: { question: 'a'.repeat(300), questionLength: 400, questionSource: 'typed' },
+    })
+  })
+
+  it('copies an answer as Markdown with full source links', async () => {
+    aiMessages.push(
+      { role: MessageRole.User, content: 'How do I turn on RLS?', status: MessageStatus.Complete },
+      {
+        role: MessageRole.Assistant,
+        content: 'Enable RLS on the table.',
+        status: MessageStatus.Complete,
+        sources: [{ path: '/guides/auth', url: 'https://supabase.com/docs/guides/auth' }],
+      }
+    )
+    const writeText = vi.fn().mockResolvedValue(undefined)
+    Object.defineProperty(navigator, 'clipboard', { configurable: true, value: { writeText } })
+    vi.spyOn(document, 'hasFocus').mockReturnValue(true)
+    render(
+      <TooltipProvider>
+        <TriggerWithProvider />
+      </TooltipProvider>
+    )
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+
+    fireEvent.click(screen.getByRole('button', { name: 'Copy as Markdown' }))
+
+    await waitFor(() =>
+      expect(sendTelemetryEvent).toHaveBeenCalledWith({
+        action: 'copy_as_markdown_clicked',
+        properties: { pageType: 'ask_ai_answer' },
+      })
+    )
+    expect(writeText).toHaveBeenCalledWith(
+      'Enable RLS on the table.\n\n### Sources\n\n- https://supabase.com/docs/guides/auth'
+    )
   })
 })

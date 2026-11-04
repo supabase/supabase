@@ -6,7 +6,8 @@ import { privilegeKeys } from './keys'
 import { invalidateTablePrivilegesQuery } from './table-privileges-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TablePrivilegesGrant = Parameters<
   typeof pgMeta.tablePrivileges.grant
@@ -43,12 +44,12 @@ export const useTablePrivilegesGrantMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TablePrivilegesGrantData, ResponseError, TablePrivilegesGrantVariables>,
+  UseCustomMutationOptions<TablePrivilegesGrantData, StudioError, TablePrivilegesGrantVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TablePrivilegesGrantData, ResponseError, TablePrivilegesGrantVariables>({
+  return useMutation<TablePrivilegesGrantData, StudioError, TablePrivilegesGrantVariables>({
     mutationFn: (vars) => grantTablePrivileges(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

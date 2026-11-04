@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 type SqlTitleGenerateResponse = {
   title: string
@@ -32,7 +33,7 @@ async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw new StudioError(body?.message, response.status)
   }
 
   return body as SqlTitleGenerateResponse
@@ -45,10 +46,10 @@ export const useSqlTitleGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
+  UseCustomMutationOptions<SqlTitleGenerateData, StudioError, SqlTitleGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>({
+  return useMutation<SqlTitleGenerateData, StudioError, SqlTitleGenerateVariables>({
     mutationFn: (vars) => generateSqlTitle(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

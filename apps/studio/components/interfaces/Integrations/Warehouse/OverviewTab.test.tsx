@@ -21,18 +21,8 @@ type WarehouseSetupStatusResponse = components['schemas']['WarehouseSetupStatusR
 type WarehouseDeleteResponse = components['schemas']['WarehouseDeleteResponse_Output']
 type WarehouseSetupResponse = components['schemas']['WarehouseSetupResponse_Output']
 
-// Both integration shells are live, and the flag reads a context plus ConfigCat that
-// `customRender` doesn't provide.
-const mockIsMarketplaceEnabled = vi.fn(() => false)
 const mockTrack = vi.fn()
-vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  useIsMarketplaceEnabled: () => mockIsMarketplaceEnabled(),
-}))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
-
-vi.mock('../Integration/IntegrationOverviewTab', () => ({
-  IntegrationOverviewTab: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
-}))
 
 vi.mock('sonner', () => ({
   toast: { success: vi.fn(), error: vi.fn() },
@@ -205,24 +195,19 @@ const mockReplicatedTableQueries = () => {
 
 describe('WarehouseOverviewTab', () => {
   beforeEach(() => {
-    mockIsMarketplaceEnabled.mockReturnValue(true)
     mockTrack.mockClear()
     addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
   })
 
-  test.each([false, true])(
-    'offers only the picker before setup (marketplace: %s)',
-    async (isMarketplaceEnabled) => {
-      mockIsMarketplaceEnabled.mockReturnValue(isMarketplaceEnabled)
-      mockSetupStatus({ setup_status: 'not_started' })
+  test('offers only the picker before setup', async () => {
+    mockSetupStatus({ setup_status: 'not_started' })
 
-      customRender(<WarehouseOverviewTab />)
+    customRender(<WarehouseOverviewTab />)
 
-      expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
-      expect(screen.queryByText('External access')).not.toBeInTheDocument()
-      expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
-    }
-  )
+    expect(await screen.findByText('Replicated tables picker')).toBeInTheDocument()
+    expect(screen.queryByText('External access')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Disable Warehouse' })).not.toBeInTheDocument()
+  })
 
   test.each(['setting_up', 'copying'] as const)(
     'shows setup progress for %s',
@@ -332,7 +317,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)
@@ -353,7 +338,7 @@ describe('WarehouseOverviewTab', () => {
     addAPIMock({
       method: 'post',
       path: '/platform/warehouse/:ref/setup',
-      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] }),
+      response: () => HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] }),
     })
 
     customRender(<WarehouseOverviewTab />)

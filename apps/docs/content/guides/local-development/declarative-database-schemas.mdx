@@ -218,7 +218,7 @@ supabase link
     <StepHikeCompact.Code>
 
 ```bash name=Terminal
-supabase db push
+supabase db push --remote
 ```
 
     </StepHikeCompact.Code>
@@ -278,10 +278,10 @@ Under the `pg-delta` engine, the `[db.migrations].schema_paths` setting from ear
 To set up declarative schemas on an existing project, export your production schema into declarative files:
 
 ```bash name=Terminal
-supabase db schema declarative generate --linked
+supabase db schema declarative generate --remote
 ```
 
-This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. In scripts, pass the target explicitly (`--local`, `--linked`, or `--db-url`) and add `--overwrite` to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative`. It replaces the schema files without creating a migration or touching migration history.
+This writes per-object SQL files under `supabase/schemas/` (or the directory set by `experimental.pgdelta.declarative_schema_path`), organized by database schema. Without `--remote`, the command exports your local database. Pass `--remote=<project-ref>` or `--remote=<postgres-url>` to export another project or database, and add `--overwrite` in scripts to replace an existing tree without prompting. To later refresh the declarative tree from the remote database (for example, after a change was deployed outside your local workflow), run `supabase db pull --declarative --remote`. It replaces the schema files without creating a migration or touching migration history.
 
 <Admonition type="note" label="Schema files in `supabase/database`">
 
@@ -292,7 +292,7 @@ CLI versions before 2.115.0 wrote the declarative tree to `supabase/database`. V
 
 </Admonition>
 
-`generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
+`generate` writes schema files only. Because `sync` diffs your schema files against your migration history, that history must describe the same database before your first `sync`. If your project has no migrations yet, run `supabase db pull --remote` first to create a baseline migration. Without a baseline, the first `sync` regenerates the entire schema as one migration. That migration can apply cleanly to an empty local database and still fail on `db push`, because the remote database already has those objects.
 
 ### Rolling back a schema change
 
@@ -353,7 +353,7 @@ Two checks gate `sync` on a schema tree the CLI didn't generate:
 
 ## Declarative schemas on the legacy `migra` engine [#declarative-schemas-on-the-legacy-migra-engine]
 
-Projects that haven't enabled `pg-delta` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
+Projects that set `enabled = false` under `[experimental.pgdelta]` can still use declarative schemas. The workflow has the same shape, but the commands differ, and the `db schema declarative` commands aren't available. See [Diff engines](/docs/guides/local-development/diff-engines) for how to check which engine you're on and how the engines compare.
 
 <Admonition type="caution">
 
@@ -404,7 +404,7 @@ schema_paths = [
 `supabase db schema declarative generate` isn't available on the legacy engine. Instead, dump your production schema into a single file and split it into smaller files over time:
 
 ```bash
-supabase db dump > supabase/schemas/prod.sql
+supabase db dump --remote > supabase/schemas/prod.sql
 ```
 
 ### Limitations of the legacy engine [#limitations-of-the-legacy-engine]

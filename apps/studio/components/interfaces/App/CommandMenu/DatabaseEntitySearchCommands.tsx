@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { DatabaseIcon } from 'lucide-react'
+import { DatabaseIcon, ShieldIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   useCommandMenuOpen,
@@ -13,18 +13,24 @@ import {
   ENTITY_SEARCH_DEBOUNCE_MS,
   formatTableSearchDetails,
   getEntitySearchQuery,
+  getPolicyEditorRoute,
   getTableEditorRoute,
   matchesEntitySearch,
+  matchesPolicySearch,
 } from './DatabaseEntitySearch.utils'
 import { orderCommandSectionsByPriority } from './ordering'
 import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
+// Tables and policies are ranked as one unit by the command menu's relevance
+// sort, so a policy that matches better than its table doesn't jump above it
+const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
+
 /**
  * Searches the project's database entities by name as the user types in the
- * command menu, and registers matches as their own section. Filtering happens
- * in the database (see getSearchEntitiesSql), so results are force-mounted to
- * stop cmdk from filtering them a second time.
+ * command menu, and registers matches as their own sections (tables,
+ * policies). Filtering happens in the database (see getSearchEntitiesSql), so
+ * results are force-mounted to stop cmdk from filtering them a second time.
  */
 export function useDatabaseEntitySearchCommands() {
   const { data: project } = useSelectedProjectQuery()
@@ -51,11 +57,12 @@ export function useDatabaseEntitySearchCommands() {
   // `colors`, while refining `blog` to `blog_p` narrows smoothly.
   const canShowResults = isOpen && currentSearch.isSearchable
   const isStale = isPlaceholderData || debouncedSearch.query !== currentSearch.query
-  const results = data?.tables ?? []
-  const visibleResults = isStale
-    ? results.filter((table) => matchesEntitySearch(table, currentSearch.query))
-    : results
-  const tables = canShowResults ? visibleResults : []
+  const getVisibleResults = <T,>(results: T[], matches: (result: T, query: string) => boolean) => {
+    if (!canShowResults) return []
+    return isStale ? results.filter((result) => matches(result, currentSearch.query)) : results
+  }
+  const tables = getVisibleResults(data?.tables ?? [], matchesEntitySearch)
+  const policies = getVisibleResults(data?.policies ?? [], matchesPolicySearch)
   const projectRef = project?.ref ?? '_'
 
   const tableCommands: ICommand[] = tables.map((table) => {
@@ -75,11 +82,37 @@ export function useDatabaseEntitySearchCommands() {
     }
   })
 
+  const policyCommands: ICommand[] = policies.map((policy) => {
+    const tableName = `${policy.schema}.${policy.table}`
+    return {
+      id: `entity-search-policy-${policy.id}`,
+      name: policy.name,
+      value: `entity-search-policy-${policy.id} ${policy.name} ${tableName}`,
+      forceMount: true,
+      icon: () => <ShieldIcon />,
+      badge: () => (
+        <span className="text-xs text-foreground-lighter truncate pl-4 shrink-0">
+          {policy.command} on {tableName}
+        </span>
+      ),
+      route: getPolicyEditorRoute(projectRef, policy),
+    }
+  })
+
   useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_TABLES, tableCommands, {
     deps: [tables, projectRef],
     enabled: tableCommands.length > 0,
     forceMountSection: true,
     orderSection: orderCommandSectionsByPriority,
-    sectionMeta: { priority: 2 },
+    sectionMeta: { priority: 2, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
+  })
+
+  useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_POLICIES, policyCommands, {
+    deps: [policies, projectRef],
+    enabled: policyCommands.length > 0,
+    forceMountSection: true,
+    orderSection: orderCommandSectionsByPriority,
+    // Ranked together with Tables, and listed after it
+    sectionMeta: { priority: 3, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
   })
 }

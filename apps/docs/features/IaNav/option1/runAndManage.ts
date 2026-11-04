@@ -83,8 +83,8 @@ export const runAndManage: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices',
             },
             {
-              name: 'Enterprise-managed auth for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication',
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization',
             },
           ],
         },
@@ -107,7 +107,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
         {
           name: 'Map team members to Postgres roles',
-          url: '/guides/platform/temporary-access#configure-user-access',
+          url: '/guides/platform/team-database-access',
         },
       ],
     },
@@ -135,11 +135,11 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
         {
           name: 'Rotate a leaked API key',
-          url: '/guides/getting-started/api-keys#leaked-key',
+          url: '/guides/security/rotate-leaked-api-keys',
         },
         {
           name: 'Production security checklist',
-          url: '/guides/deployment/going-into-prod#security',
+          url: '/guides/security/production-checklist',
         },
       ],
     },
@@ -316,7 +316,7 @@ export const runAndManage: NavMenuConstant = {
             },
             {
               name: 'Log slow and failing queries',
-              url: '/guides/database/postgres/postgres-log-config#logmindurationstatement',
+              url: '/guides/observability/log-slow-queries',
             },
           ],
         },

@@ -34,5 +34,7 @@
   "get_notebook": [["project_notebooks_read"]],
   "get_cost": [["organization_admin_read", "projects_read"]],
   "confirm_cost": [[]],
-  "search_docs": [[]]
+  "search_docs": [[]],
+  "submit_feedback": [[]],
+  "delete_feedback": [[]]
 }

@@ -9,7 +9,8 @@ import {
   getStaticPatterns,
 } from '@/components/interfaces/EdgeFunctions/EdgeFunctions.utils'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type EdgeFunctionsDeployBodyMetadata = components['schemas']['FunctionDeployBody']['metadata']
 type EdgeFunctionsDeployVariables = {
@@ -70,12 +71,12 @@ export const useEdgeFunctionDeployMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeployData, StudioError, EdgeFunctionsDeployVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeployData, ResponseError, EdgeFunctionsDeployVariables>({
+  return useMutation<EdgeFunctionsDeployData, StudioError, EdgeFunctionsDeployVariables>({
     mutationFn: (vars) => deployEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, slug } = variables

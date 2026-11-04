@@ -138,7 +138,7 @@ export const database: NavMenuConstant = {
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
         {
           name: 'Test RLS policies with pgTAP',
-          url: '/guides/local-development/testing/overview#database-unit-testing-with-pgtap',
+          url: '/guides/database/postgres/testing-row-level-security',
         },
       ],
     },
@@ -164,10 +164,6 @@ export const database: NavMenuConstant = {
           name: 'Query performance',
           items: [
             { name: 'Query optimization', url: '/guides/database/query-optimization' },
-            {
-              name: 'Debugging performance issues',
-              url: '/guides/database/debugging-performance',
-            },
             { name: 'Partitioning your tables', url: '/guides/database/partitions' },
             { name: 'Migrating to pg_partman', url: '/guides/database/migrating-to-pg-partman' },
           ],
