@@ -166,7 +166,7 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
           <CurvedScrollArea
             viewportRef={listRef}
             onScroll={handleListScroll}
-            className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom"
+            className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom motion-safe:scroll-smooth"
           >
             <div ref={followConversation}>
               <AiMessages messages={messages} hasError={hasError} />
