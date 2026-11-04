@@ -122,6 +122,8 @@ The operator chart installs the CRDs by default. A successful controller rollout
 
 ### Create a project
 
+Configure your deployment in a local `values.yaml` file. Helm applies these settings over the chart's defaults. Throughout this guide, update the same file as you configure HTTPS and individual services. For the available settings and their defaults, see the [project chart's values.yaml](https://github.com/supabase-community/supabase-kubernetes/blob/main/charts/supabase-project/values.yaml).
+
 1. Create a directory for your deployment configuration and save this file as `values.yaml`:
 
    ```yaml values.yaml
