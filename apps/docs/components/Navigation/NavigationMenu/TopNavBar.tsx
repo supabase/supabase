@@ -16,13 +16,14 @@ import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
-import { DocsSectionsMenu } from './DocsSectionsMenu'
+import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
 import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
 import { PageActionButtons } from './PageActionButtons'
 import useDropdownMenu from './useDropdownMenu'
 import { AskAiTrigger, SearchV2IconTrigger } from '@/features/SearchV2'
 
 interface TopNavBarProps {
+  headingSlotRef?: Ref<HTMLLIElement>
   // on pages with a sidebar the burger opens the sidebar drawer, not the global menu
   isMenuOpen?: boolean
   onMenuToggle?: () => void
@@ -41,6 +42,7 @@ const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 const largeLogo = isFeatureEnabled('branding:large_logo')
 
 const TopNavBar = ({
+  headingSlotRef,
   isMenuOpen = false,
   onMenuToggle,
   scrolledTitle,
@@ -63,7 +65,10 @@ const TopNavBar = ({
         className="relative w-full z-40 flex flex-col bg-default lg:bg-default/75 lg:backdrop-blur-sm lg:backdrop-filter"
       >
         <div className="w-full flex h-(--header-height) border-b">
-          <div className="relative hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r">
+          <div
+            style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
+            className="docs-sections-cell relative hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
+          >
             <a
               href="https://supabase.com"
               aria-label="Supabase.com"
@@ -74,12 +79,12 @@ const TopNavBar = ({
             <DocsSectionsMenu />
           </div>
           <div className="hidden lg:flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
-            <HeaderBreadcrumbs />
+            <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />
             <div className="ml-auto flex shrink-0 items-center gap-2">
               <PageActionButtons />
             </div>
           </div>
-          <div className="hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6">
+          <div className="hidden lg:flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6 group-has-[[data-docs-right-rail]]/docs:border-l">
             <DevToolbarTrigger />
             <SearchV2IconTrigger />
             <AskAiTrigger />

@@ -4,7 +4,7 @@ import RefVersionDropdown from '~/components/RefVersionDropdown'
 import { getCrumbName, resolveBreadcrumbs, type BreadcrumbItem as Crumb } from '~/lib/breadcrumbs'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import { Fragment } from 'react'
+import { Fragment, type Ref } from 'react'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -18,6 +18,7 @@ import {
 import MenuIconPicker from './MenuIconPicker'
 
 interface HeaderBreadcrumbsProps {
+  headingSlotRef?: Ref<HTMLLIElement>
   className?: string
 }
 
@@ -27,7 +28,7 @@ interface BreadcrumbCrumbProps {
   hasIcon: boolean
 }
 
-export const HeaderBreadcrumbs = ({ className }: HeaderBreadcrumbsProps) => {
+export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrumbsProps) => {
   const pathname = usePathname() ?? ''
   const crumbs = resolveBreadcrumbs(pathname)
 
@@ -54,6 +55,7 @@ export const HeaderBreadcrumbs = ({ className }: HeaderBreadcrumbsProps) => {
             ) : null}
           </Fragment>
         ))}
+        <li ref={headingSlotRef} className="flex shrink-0 items-center gap-2 empty:hidden" />
       </BreadcrumbList>
     </Breadcrumb>
   )
