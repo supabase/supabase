@@ -1,17 +1,12 @@
 import { AuthError } from '@supabase/auth-js'
-import {
-  createMemoryHistory,
-  createRootRoute,
-  createRouter,
-  RouterProvider,
-} from '@tanstack/react-router'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
+import { renderToString } from 'react-dom/server'
 import { beforeEach, expect, test, vi } from 'vitest'
 
 import { SignInRecoveryCodeForm } from './SignInRecoveryCodeForm'
 import { auth } from '@/lib/gotrue'
-import { customRender } from '@/tests/lib/custom-render'
+import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 
 const { push, replace } = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
 vi.mock('next/router', () => ({ useRouter: () => ({ push, replace }) }))
@@ -33,16 +28,11 @@ beforeEach(() => {
 })
 
 const renderForm = () => {
-  const rootRoute = createRootRoute({ component: SignInRecoveryCodeForm })
-  const router = createRouter({
-    routeTree: rootRoute,
-    history: createMemoryHistory({ initialEntries: ['/'] }),
-  })
   return customRender(
     <FeatureFlagContext.Provider
       value={{ configcat: { enableAuthRecoveryCodes: true }, posthog: {}, hasLoaded: true }}
     >
-      <RouterProvider router={router} />
+      <SignInRecoveryCodeForm />
     </FeatureFlagContext.Provider>
   )
 }
@@ -94,4 +84,14 @@ test('an invalid recovery code stays on the form with an inline error', async ()
   fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
   expect(await screen.findByText(/Invalid recovery code/)).toBeInTheDocument()
   expect(push).not.toHaveBeenCalled()
+})
+
+test('prerenders sign-out navigation without a TanStack router', () => {
+  const html = renderToString(
+    <CustomWrapper>
+      <SignInRecoveryCodeForm />
+    </CustomWrapper>
+  )
+  expect(html).toContain('Force sign out and clear cookies')
+  expect(html).toContain('href="/logout"')
 })

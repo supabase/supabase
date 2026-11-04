@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
 import { useAuthError, useFeatureFlags, useFlag } from 'common'
 import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -31,6 +30,7 @@ import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useRecoveryCodesVerifyMutation } from '@/data/recovery-codes/recovery-codes-verify-mutation'
 import { useSignOut } from '@/lib/auth'
+import { BASE_PATH } from '@/lib/constants'
 import { getReturnToPath } from '@/lib/gotrue'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -120,7 +120,7 @@ export const SignInRecoveryCodeForm = () => {
         additionalActions={
           <>
             <Button asChild>
-              <Link to="/sign-in">Back to sign in</Link>
+              <a href={`${BASE_PATH}/sign-in`}>Back to sign in</a>
             </Button>
             <Button asChild>
               <a href={MFA_SUPPORT_EMAIL_HREF}>Email support</a>
@@ -246,12 +246,12 @@ export const SignInRecoveryCodeForm = () => {
           </div>
           <ul className="list-disc pl-6">
             <li>
-              <Link
-                to="/logout"
+              <a
+                href={`${BASE_PATH}/logout`}
                 className="text-sm transition text-foreground-light hover:text-foreground"
               >
                 Force sign out and clear cookies
-              </Link>
+              </a>
             </li>
             <li>
               <a
