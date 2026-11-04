@@ -369,6 +369,46 @@ const { error } = await supabase.storage
 ```
 
 </TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Create a signed upload URL
+final response = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path');
+
+// Upload to the signed URL
+await supabase.storage.from('bucket_name').uploadToSignedUrl('file_path', response.token, file);
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Create a signed upload URL
+let signedUrl = try await supabase.storage.from("bucket_name").createSignedUploadURL(path: "file_path")
+
+// Upload to the signed URL
+try await supabase.storage.from("bucket_name")
+  .uploadToSignedURL(path: "file_path", token: signedUrl.token, data: file)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+// Create a signed upload URL
+val signedUrl = supabase.storage.from("bucket_name").createSignedUploadUrl("file_path")
+
+// Upload to the signed URL
+supabase.storage.from("bucket_name").uploadToSignedUrl("file_path", signedUrl.token, bytes)
+```
+
+</TabPanel>
+</$Show>
 <$Show if="sdk:python">
 <TabPanel id="python" label="Python">
 
@@ -400,6 +440,20 @@ await supabase.Storage.From("bucket_name").UploadToSignedUrl("local_file_path", 
 
 </TabPanel>
 </$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+# Create a signed upload URL
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/upload/sign/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}"
+
+# Upload to the signed URL, using the token returned above
+curl -X PUT "https://{your_project_ref}.supabase.co/storage/v1/object/upload/sign/{bucket_name}/{file_path}?token={token}" \
+  --data-binary "@/local/path/to/your/file.ext"
+```
+
+</TabPanel>
 </Tabs>
 
 ### Revoke signed URLs

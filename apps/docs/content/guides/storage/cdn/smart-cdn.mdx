@@ -52,4 +52,4 @@ This affects how you should think about serving private assets:
 
 Token expiry (`expiresIn`) and the object's response cache TTL (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset, delete the object from the bucket rather than relying on token expiry alone.
 
-For information about revoking signed URLs see [URL Signing Keys](/docs/guides/auth/signing-keys.mdx).
+For information about revoking signed URLs see [URL Signing Keys](/docs/guides/auth/signing-keys).
