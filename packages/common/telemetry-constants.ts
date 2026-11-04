@@ -1210,7 +1210,8 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
- * A knowledge base search returned. Only the query length is sent: the text can hold personal data.
+ * A knowledge base search returned, with or without results. The query text is left out
+ * because it can contain personal data; only its length is sent.
  *
  * @group Events
  * @source kb
@@ -1218,8 +1219,11 @@ export interface DocsSearchV2ResultClickedEvent {
 export interface KbSearchSubmittedEvent {
   action: 'kb_search_submitted'
   properties: {
+    /** Length of the trimmed search term. */
     queryLength: number
+    /** Number of results the search returned. */
     resultCount: number
+    /** Whether the search returned at least one result. */
     hasResults: boolean
   }
 }
@@ -1233,8 +1237,11 @@ export interface KbSearchSubmittedEvent {
 export interface KbSearchResultClickedEvent {
   action: 'kb_search_result_clicked'
   properties: {
+    /** The path of the result that was activated. */
     resultPath: string
+    /** 1-based position of the result in the list. */
     resultPosition: number
+    /** Number of results showing when the result was activated. */
     resultCount: number
   }
 }
