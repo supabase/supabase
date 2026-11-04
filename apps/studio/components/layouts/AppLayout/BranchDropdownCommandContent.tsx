@@ -46,9 +46,9 @@ export function BranchDropdownCommandContent({
   if (embedded) {
     return (
       <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
-        <div className="grid grid-cols-2 gap-2 shrink-0 p-2 border-b">
+        <div className="flex items-center gap-2 shrink-0 border-b p-2">
           <Button
-            variant="text"
+            variant="outline"
             size="small"
             asChild
             block

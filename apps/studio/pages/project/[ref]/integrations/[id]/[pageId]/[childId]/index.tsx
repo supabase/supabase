@@ -16,7 +16,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useAvailableIntegrations } from '@/components/interfaces/Integrations/Landing/useAvailableIntegrations'
 import { useInstalledIntegrations } from '@/components/interfaces/Integrations/Landing/useInstalledIntegrations'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
-import { ProjectIntegrationsLayoutDispatch } from '@/components/layouts/ProjectIntegrationsLayoutDispatch'
+import { ProjectMarketplaceLayout } from '@/components/layouts/ProjectMarketplaceLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const IntegrationPage: NextPageWithLayout = () => {
@@ -98,7 +98,7 @@ const IntegrationPage: NextPageWithLayout = () => {
 
 IntegrationPage.getLayout = (page) => (
   <DefaultLayout>
-    <ProjectIntegrationsLayoutDispatch>{page}</ProjectIntegrationsLayoutDispatch>
+    <ProjectMarketplaceLayout>{page}</ProjectMarketplaceLayout>
   </DefaultLayout>
 )
 

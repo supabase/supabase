@@ -3114,7 +3114,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
 ## Key benefits:
 1. Fully integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
 2. Enhanced scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
-3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in [benchmarks](https://dbarena.com), particularly under high-load and large-scale scenarios.
 4. Reduced maintenance overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
 5. Efficient storage management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
 6. Modern write-ahead logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
@@ -3287,13 +3287,13 @@ Enterprise-Managed Authorization for MCP puts your company in charge of which AI
 1. Approve once: One approval by an owner or admin covers the whole organization. Members never see a consent screen.
 2. Same permissions as the Supabase Dashboard: Access is scoped to the signed-in member. A developer gets developer access and a read-only member gets read-only access.
 3. No tokens to manage: Access follows the member's sign-in and short-lived tokens expire on their own.
-4. Offboard once: Remove a member from your Supabase organization, deprovision them in your identity provider or your Claude organization, or revoke Claude for everyone under Authorized Apps in the Supabase Dashboard.
+4. Revoke in one place: Revoke Claude for the whole organization under Authorized apps in the Supabase Dashboard. To offboard one member, remove them from your Supabase organization and from your identity provider or Claude organization, whichever one issues their access.
 5. No IdP support required: Claude can issue the identity assertion when your IdP cannot.
 6. Standards-based: Supabase implements the MCP Enterprise-Managed Authorization extension on top of OAuth. Your security team reviews one open specification and the same setup works across any identity provider or AI tool that adopts it.
 
 ## When to use it
 - Developers share personal access tokens because every Claude connection needs an owner or admin to approve it
-- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them so that offboarding an employee removes their access everywhere
+- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them
 
 ## How it works
 There are two ways to issue the identity assertion that Claude presents to Supabase:

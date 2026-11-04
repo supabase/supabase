@@ -11,6 +11,21 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 // role can't access doesn't starve the result set.
 const CANDIDATE_LIMIT = 50
 
+// Mirrors what the table list endpoints expose: the role owns the table or has
+// some privilege on it (or one of its columns).
+const hasTableAccess = (oid: SafeSqlFragment, owner: SafeSqlFragment) => safeSql`(
+  pg_has_role(${owner}, 'USAGE')
+  or has_table_privilege(
+    ${oid},
+    'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
+  )
+  or has_any_column_privilege(${oid}, 'SELECT, INSERT, UPDATE, REFERENCES')
+)`
+
+// Name matches rank by policy name. Policies pulled in through a matched table
+// group by that table first (in the table's own order), then by policy name.
+const POLICY_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
+
 export type SearchEntitiesTable = {
   id: number
   schema: string
@@ -19,8 +34,18 @@ export type SearchEntitiesTable = {
   policy_count: number
 }
 
+export type SearchEntitiesPolicy = {
+  id: number
+  name: string
+  command: 'ALL' | 'SELECT' | 'INSERT' | 'UPDATE' | 'DELETE'
+  schema: string
+  table: string
+  table_id: number
+}
+
 export type SearchEntitiesResult = {
   tables: SearchEntitiesTable[]
+  policies: SearchEntitiesPolicy[]
 }
 
 /**
@@ -42,8 +67,8 @@ export type SearchEntitiesResult = {
  * full query is still matched against names too, since names may contain dots.
  *
  * Returns a single row with one JSON array per entity type, so other entity
- * types (policies, functions, triggers) can be added without changing the
- * response shape.
+ * types (functions, triggers) can be added without changing the response
+ * shape.
  */
 export const getSearchEntitiesSql = ({
   query,
@@ -76,6 +101,10 @@ export const getSearchEntitiesSql = ({
     ', '
   )
 
+  const policyNamePattern = literal(`%${escapeIlikeLiteral(query)}%`)
+  const policyPrefixPattern = literal(`${escapeIlikeLiteral(query)}%`)
+  const policyExactName = literal(query.toLowerCase())
+
   return safeSql`
     with table_candidates as materialized (
       select
@@ -101,6 +130,7 @@ export const getSearchEntitiesSql = ({
     ),
     matched_tables as (
       select
+        tc.oid,
         tc.oid::int8 as id,
         tc.nspname as schema,
         tc.relname as name,
@@ -108,14 +138,85 @@ export const getSearchEntitiesSql = ({
         (select count(*) from pg_policy pol where pol.polrelid = tc.oid)::int as policy_count,
         tc.rank
       from table_candidates tc
-      where
-        pg_has_role(tc.relowner, 'USAGE')
-        or has_table_privilege(
-          tc.oid,
-          'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'
-        )
-        or has_any_column_privilege(tc.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
+      where ${hasTableAccess(safeSql`tc.oid`, safeSql`tc.relowner`)}
       order by tc.rank, length(tc.relname), tc.relname
+      limit ${literal(limit)}
+    ),
+    policy_name_candidates as materialized (
+      select
+        pol.oid,
+        pol.polname,
+        pol.polcmd,
+        pol.polrelid as table_oid,
+        c.relname,
+        c.relowner,
+        nc.nspname,
+        case
+          when lower(pol.polname) = ${policyExactName} then 0
+          when pol.polname ilike ${policyPrefixPattern} then 1
+          else 2
+        end as rank
+      from pg_policy pol
+      -- offset 0 keeps this a per-policy probe of pg_class_oid_index. Without it a
+      -- broad search lets the planner hash-join a second full pass of pg_class.
+      cross join lateral (
+        select c.relname, c.relowner, c.relnamespace
+        from pg_class c
+        where c.oid = pol.polrelid
+        offset 0
+      ) c
+      join pg_namespace nc on nc.oid = c.relnamespace
+      where pol.polname ilike ${policyNamePattern}
+        and nc.nspname not in (${excludedSchemas})
+        and not pg_is_other_temp_schema(nc.oid)
+      order by rank, length(pol.polname), pol.polname
+      limit ${literal(CANDIDATE_LIMIT)}
+    ),
+    policy_matches as (
+      select
+        pnc.oid::int8 as id,
+        pnc.polname as name,
+        pnc.polcmd as cmd,
+        pnc.nspname as schema,
+        pnc.relname as table_name,
+        pnc.table_oid::int8 as table_id,
+        0 as source,
+        pnc.rank,
+        0 as table_sort_length,
+        '' as table_sort_name
+      from policy_name_candidates pnc
+      where ${hasTableAccess(safeSql`pnc.table_oid`, safeSql`pnc.relowner`)}
+
+      union all
+
+      select
+        pol.oid::int8,
+        pol.polname,
+        pol.polcmd,
+        mt.schema,
+        mt.name,
+        mt.id,
+        1,
+        mt.rank,
+        length(mt.name),
+        mt.name
+      from matched_tables mt
+      cross join lateral (
+        select p.oid, p.polname, p.polcmd
+        from pg_policy p
+        where p.polrelid = mt.oid
+        order by p.polname
+        limit ${literal(limit)}
+      ) pol
+    ),
+    matched_policies as (
+      select *
+      from (
+        select distinct on (pm.id) pm.*
+        from policy_matches pm
+        order by pm.id, pm.source
+      ) deduped
+      order by ${POLICY_ORDER}
       limit ${literal(limit)}
     )
     select
@@ -134,6 +235,29 @@ export const getSearchEntitiesSql = ({
           from matched_tables t
         ),
         '[]'::jsonb
-      ) as tables
+      ) as tables,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', p.id,
+              'name', p.name,
+              'command', case p.cmd
+                when 'r' then 'SELECT'
+                when 'a' then 'INSERT'
+                when 'w' then 'UPDATE'
+                when 'd' then 'DELETE'
+                else 'ALL'
+              end,
+              'schema', p.schema,
+              'table', p.table_name,
+              'table_id', p.table_id
+            )
+            order by ${POLICY_ORDER}
+          )
+          from matched_policies p
+        ),
+        '[]'::jsonb
+      ) as policies
   `
 }
