@@ -48,8 +48,9 @@ describe('getFunctionEditorRoute', () => {
 describe('formatFunctionSearchDetails', () => {
   it.each([
     [{ type: 'function', args: 'a integer, b text' }, '(a integer, b text)'],
-    [{ type: 'function', args: '' }, '()'],
+    [{ type: 'function', args: '' }, ''],
     [{ type: 'procedure', args: 'id bigint' }, 'procedure (id bigint)'],
+    [{ type: 'procedure', args: '' }, 'procedure'],
   ] as const)('formats %j', (fn, expected) => {
     expect(formatFunctionSearchDetails(fn)).toBe(expected)
   })

@@ -52,6 +52,7 @@ const SEARCH_RESULT: EntitySearchData = {
   functions: [
     { id: 301, schema: 'public', name: 'get_blog_post', type: 'function', args: 'id bigint' },
     { id: 302, schema: 'blog', name: 'archive_blog_posts', type: 'procedure', args: '' },
+    { id: 303, schema: 'public', name: 'touch_blog_post', type: 'function', args: '' },
   ],
 }
 
@@ -144,7 +145,10 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('public.get_blog_post')
     expect(section).toHaveTextContent('(id bigint)')
     expect(section).toHaveTextContent('blog.archive_blog_posts')
-    expect(section).toHaveTextContent('procedure ()')
+    expect(section).toHaveTextContent('procedure')
+    // Functions without parameters have no details to show
+    expect(section).toHaveTextContent('public.touch_blog_post')
+    expect(section).not.toHaveTextContent('()')
     // The functions page lists functions per schema, so the link has to carry it
     expect(section).toHaveTextContent('/project/default/database/functions?schema=public&edit=301')
     expect(section).toHaveTextContent('/project/default/database/functions?schema=blog&edit=302')
@@ -255,7 +259,7 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
     // Matches the `blog.archive_blog_posts` function far better than anything else
     await userEvent.type(screen.getByRole('combobox'), 'archive_blog_posts')
 
-    await screen.findByText('procedure ()')
+    await screen.findByText('procedure')
     const headings = screen.getAllByText(/^(Tables|Policies|Functions)$/)
     expect(headings.map((heading) => heading.textContent)).toEqual([
       'Tables',

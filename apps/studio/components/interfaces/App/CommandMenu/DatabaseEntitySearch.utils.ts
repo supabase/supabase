@@ -84,7 +84,9 @@ export function formatFunctionSearchDetails({
   type,
   args,
 }: Pick<EntitySearchFunction, 'type' | 'args'>) {
-  return `${type === 'procedure' ? 'procedure ' : ''}(${args})`
+  const procedure = type === 'procedure' ? 'procedure' : ''
+  if (args.length === 0) return procedure
+  return `${procedure} (${args})`.trim()
 }
 
 // The functions page lists functions per schema, so the schema must be set for

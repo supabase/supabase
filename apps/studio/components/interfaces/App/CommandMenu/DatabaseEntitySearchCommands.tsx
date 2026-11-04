@@ -105,17 +105,16 @@ export function useDatabaseEntitySearchCommands() {
 
   const functionCommands: ICommand[] = functions.map((fn) => {
     const displayName = `${fn.schema}.${fn.name}`
+    const details = formatFunctionSearchDetails(fn)
     return {
       id: `entity-search-function-${fn.id}`,
       name: displayName,
       value: `entity-search-function-${fn.id} ${displayName}`,
       forceMount: true,
       icon: () => <FunctionSquareIcon />,
-      badge: () => (
-        <span className="text-xs text-foreground-lighter truncate pl-4">
-          {formatFunctionSearchDetails(fn)}
-        </span>
-      ),
+      badge: details
+        ? () => <span className="text-xs text-foreground-lighter truncate pl-4">{details}</span>
+        : undefined,
       route: getFunctionEditorRoute(projectRef, fn),
     }
   })
