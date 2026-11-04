@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { accessTokenKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/access-tokens', { signal })
@@ -13,7 +14,7 @@ export async function getAccessTokens(signal?: AbortSignal) {
 }
 
 export type AccessTokensData = Awaited<ReturnType<typeof getAccessTokens>>
-export type AccessTokensError = ResponseError
+export type AccessTokensError = StudioError
 
 export type AccessToken = AccessTokensData[number]
 

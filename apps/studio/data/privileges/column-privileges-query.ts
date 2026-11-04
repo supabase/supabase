@@ -6,7 +6,8 @@ import { executeSql } from '../sql/execute-sql-mutation'
 import { privilegeKeys } from './keys'
 import type { components } from '@/data/api'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ColumnPrivilegesVariables = {
   projectRef?: string
@@ -48,7 +49,7 @@ export async function getColumnPrivileges(
   return result as ColumnPrivilegesData
 }
 
-export type ColumnPrivilegesError = ResponseError
+export type ColumnPrivilegesError = StudioError
 
 export const useColumnPrivilegesQuery = <TData = ColumnPrivilegesData>(
   vars: ColumnPrivilegesVariables,

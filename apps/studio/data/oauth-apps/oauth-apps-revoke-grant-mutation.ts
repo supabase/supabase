@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { oauthAppsKeys } from './keys'
 import { USE_MOCKS } from './mocks'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthGrantRevokeVariables = {
   slug: string
@@ -25,12 +26,12 @@ export const useOAuthGrantRevokeMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthGrantRevokeData, ResponseError, OAuthGrantRevokeVariables>,
+  UseCustomMutationOptions<OAuthGrantRevokeData, StudioError, OAuthGrantRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthGrantRevokeData, ResponseError, OAuthGrantRevokeVariables>({
+  return useMutation<OAuthGrantRevokeData, StudioError, OAuthGrantRevokeVariables>({
     mutationFn: (vars) => revokeOAuthGrant(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: oauthAppsKeys.grants() })

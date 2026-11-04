@@ -4,14 +4,15 @@ import type { NextApiRequest, NextApiResponse } from 'next'
 
 import { IS_PLATFORM } from '../constants'
 import { apiAuthenticate } from './apiAuthenticate'
-import { ResponseError, ResponseFailure } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import { ResponseFailure } from '@/types'
 
 export function isResponseOk<T>(response: T | ResponseFailure | undefined): response is T {
   if (response === undefined || response === null) {
     return false
   }
 
-  if (response instanceof ResponseError) {
+  if (response instanceof StudioError) {
     return false
   }
 

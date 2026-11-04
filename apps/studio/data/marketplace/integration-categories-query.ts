@@ -3,7 +3,8 @@ import { createMarketplaceClient, type Category } from 'common/marketplace-clien
 
 import { marketplaceIntegrationsKeys } from './keys'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type MarketplaceCategory = Category
 
@@ -18,7 +19,7 @@ export async function getMarketplaceCategories(signal?: AbortSignal) {
 }
 
 export type MarketplaceCategoriesData = Awaited<ReturnType<typeof getMarketplaceCategories>>
-export type MarketplaceCategoriesError = ResponseError
+export type MarketplaceCategoriesError = StudioError
 
 export const useMarketplaceCategoriesQuery = <TData = MarketplaceCategoriesData>({
   enabled = true,

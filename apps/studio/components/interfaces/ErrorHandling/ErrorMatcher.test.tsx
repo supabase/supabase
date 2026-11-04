@@ -2,8 +2,7 @@ import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import { ErrorMatcher } from './ErrorMatcher'
-import { ConnectionTimeoutError } from '@/types/api-errors'
-import { ResponseError } from '@/types/base'
+import { ConnectionTimeoutError, StudioError } from '@/lib/errors/studio-errors'
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 vi.mock('@/state/ai-assistant-state', () => ({
@@ -44,11 +43,11 @@ describe('ErrorMatcher', () => {
     expect(screen.getByText('Debug with AI')).toBeInTheDocument()
   })
 
-  it('renders fallback for plain ResponseError (not a classified subclass)', () => {
+  it('renders fallback for plain StudioError (not a classified subclass)', () => {
     render(
       <ErrorMatcher
         title="Failed to load tables"
-        error={new ResponseError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')}
+        error={new StudioError('CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT')}
         supportFormParams={{}}
       />
     )

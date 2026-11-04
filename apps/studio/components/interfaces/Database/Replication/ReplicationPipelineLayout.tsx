@@ -64,11 +64,11 @@ import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 type LifecycleAction = 'start' | 'stop' | 'restart'
 
@@ -181,7 +181,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         )
       }
     } catch (error) {
-      toast.error(`Failed to ${resolvedAction} pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to ${resolvedAction} pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -202,7 +202,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
       router.push(`/project/${projectRef}/database/pipelines`)
     } catch (error) {
-      toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {
       setIsDeleting(false)
     }

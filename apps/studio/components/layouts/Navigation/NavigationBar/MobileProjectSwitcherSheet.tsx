@@ -2,7 +2,7 @@ import { BoxesIcon, BoxIcon, GitBranchIcon } from 'lucide-react'
 import { cn, SheetHeader, SheetTitle, Tabs, TabsContent, TabsList } from 'ui'
 import MobileSheetNav from 'ui-patterns/MobileSheetNav/MobileSheetNav'
 
-import { ProjectBranchSelectorSheetTabTrigger } from './ProjectBranchSelectorSheetTabTrigger'
+import { MobileProjectSwitcherSheetTabTrigger } from './MobileProjectSwitcherSheetTabTrigger'
 import { BranchDropdown } from '@/components/layouts/AppLayout/BranchDropdown'
 import { OrganizationDropdown } from '@/components/layouts/AppLayout/OrganizationDropdown'
 import { ProjectDropdown } from '@/components/layouts/AppLayout/ProjectDropdown'
@@ -13,7 +13,7 @@ import type { Organization } from '@/types'
 const EMBEDDED_CLASSNAME =
   'bg-transparent border-0 shadow-none min-h-0 flex-1 flex flex-col overflow-hidden rounded-none'
 
-export interface ProjectBranchSelectorSheetProps {
+export interface MobileProjectSwitcherSheetProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   selectedRef: string | undefined
@@ -27,7 +27,7 @@ export interface ProjectBranchSelectorSheetProps {
   isMainBranch?: boolean
 }
 
-export function ProjectBranchSelectorSheet({
+export function MobileProjectSwitcherSheet({
   open,
   onOpenChange,
   selectedRef,
@@ -39,7 +39,7 @@ export function ProjectBranchSelectorSheet({
   selectedProjectName,
   selectedBranchName,
   isMainBranch,
-}: ProjectBranchSelectorSheetProps) {
+}: MobileProjectSwitcherSheetProps) {
   const orgLabel = selectedOrganizationName ?? selectedOrganization?.name
   const projectLabel = selectedProjectName ?? displayProject?.name
   const branchLabel = selectedBranchName ?? selectedBranch?.name ?? 'main'
@@ -92,7 +92,7 @@ export function ProjectBranchSelectorSheet({
             )}
           >
             {tabs.map(({ value, label, icon }, index) => (
-              <ProjectBranchSelectorSheetTabTrigger
+              <MobileProjectSwitcherSheetTabTrigger
                 key={value}
                 value={value}
                 label={label}

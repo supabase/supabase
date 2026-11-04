@@ -6,7 +6,8 @@ import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type SupamonitorEnabledVariables = {
   projectRef?: string
@@ -29,7 +30,7 @@ export async function getSupamonitorEnabled({
 }
 
 export type SupamonitorEnabledData = Awaited<ReturnType<typeof getSupamonitorEnabled>>
-export type SupamonitorEnabledError = ResponseError
+export type SupamonitorEnabledError = StudioError
 
 export const useSupamonitorEnabledQuery = <TData = SupamonitorEnabledData>(
   { projectRef, connectionString }: SupamonitorEnabledVariables,
