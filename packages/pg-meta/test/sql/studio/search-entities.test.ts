@@ -305,16 +305,27 @@ withTestDatabase(
 )
 
 withTestDatabase(
-  'finds the user functions when extension functions match more of the cap',
+  'finds the user functions when extension functions fill the candidate cap',
   async (db) => {
     await db.executeQuery(`
-    create schema ext;
-    create extension pgcrypto schema ext;
-    create function public.pgp_user_function() returns int language sql as 'select 1';
-  `)
+      create schema ext;
+      create extension pgcrypto schema ext;
+      create function public.pgp_user_function_with_a_long_name() returns int language sql as 'select 1';
 
-    // pgcrypto ships well over the 6 `pgp_*` functions that would fill the result
-    expect(await searchFunctions(db, 'pgp_')).toEqual(['public.pgp_user_function()'])
+      -- More extension functions than the 50 candidates, all with shorter names so
+      -- they outrank the user's. Filtering them out after the cap would leave nothing.
+      do $$
+      begin
+        for i in 1..60 loop
+          execute format('create function ext.pgp_a%s() returns int language sql as ''select 1''', i);
+          execute format('alter extension pgcrypto add function ext.pgp_a%s()', i);
+        end loop;
+      end $$;
+    `)
+
+    expect(await searchFunctions(db, 'pgp_')).toEqual([
+      'public.pgp_user_function_with_a_long_name()',
+    ])
   }
 )
 
