@@ -65,6 +65,7 @@ describe('useConnectServerEnv secret reveal', () => {
       isLoading: false,
       reveal: revealMock,
       clear: clearMock,
+      revealGrant: { status: 'granted', grant: {} },
     } as any)
   })
 
@@ -152,6 +153,7 @@ describe('useConnectServerEnv secret reveal', () => {
       isLoading: false,
       reveal: revealMock.mockResolvedValue(SECRET_FULL),
       clear: clearMock,
+      revealGrant: { status: 'granted', grant: {} },
     } as any)
 
     const { result } = renderHook(() => useConnectServerEnv())

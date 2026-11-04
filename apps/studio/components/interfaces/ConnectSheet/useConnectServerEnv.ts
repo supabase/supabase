@@ -80,6 +80,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     isLoading: isRevealing,
     reveal,
     clear,
+    revealGrant,
   } = useRevealedSecret({ projectRef, id: secretKey?.id ?? undefined })
 
   // toggle() and getSecretValue() can both decide to reveal before either
@@ -156,7 +157,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     jwksUrl,
     secret: {
       exists: !!secretKey,
-      canReveal: canReadAPIKeys,
+      canReveal: canReadAPIKeys && revealGrant.status === 'granted',
       isRevealed,
       isRevealing,
       maskedValue,
