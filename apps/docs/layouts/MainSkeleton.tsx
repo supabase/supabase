@@ -382,7 +382,7 @@ function SidebarSkeleton({
               scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
               menuButtonRef={menuButtonRef}
             />
-            <div ref={setTocSlot} className="md:hidden" />
+            <div ref={setTocSlot} className={isLayoutV2 ? undefined : 'md:hidden'} />
           </div>
           <div className="grow">
             <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
