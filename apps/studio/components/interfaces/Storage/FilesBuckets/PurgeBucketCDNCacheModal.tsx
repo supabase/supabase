@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -30,7 +29,6 @@ export const PurgeBucketCDNCacheModal = ({
   onClose,
 }: PurgeBucketCDNCacheModalProps) => {
   const [status, setStatus] = useState('')
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan.id === 'free'
