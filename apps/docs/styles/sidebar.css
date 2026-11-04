@@ -1,0 +1,45 @@
+@property --docs-sidebar-index {
+  syntax: '<integer>';
+  inherits: false;
+  initial-value: 0;
+}
+
+.docs-sidebar-level[data-level-enter] > a,
+.docs-sidebar-level[data-level-enter] nav > *,
+.docs-sidebar-level[data-level-enter] ul:not(ul ul) > li {
+  animation: docs-sidebar-level-enter 400ms cubic-bezier(0.33, 1, 0.68, 1) backwards;
+  animation-delay: calc(40ms * var(--docs-sidebar-index));
+}
+
+.docs-sidebar-level[data-level-enter] :is(nav, ul) > :nth-child(2) {
+  --docs-sidebar-index: 1;
+}
+
+.docs-sidebar-level[data-level-enter] :is(nav, ul) > :nth-child(3) {
+  --docs-sidebar-index: 2;
+}
+
+.docs-sidebar-level[data-level-enter] :is(nav, ul) > :nth-child(4) {
+  --docs-sidebar-index: 3;
+}
+
+.docs-sidebar-level[data-level-enter] :is(nav, ul) > :nth-child(5) {
+  --docs-sidebar-index: 4;
+}
+
+.docs-sidebar-level[data-level-enter] :is(nav, ul) > :nth-child(n + 6) {
+  --docs-sidebar-index: 5;
+}
+
+@keyframes docs-sidebar-level-enter {
+  from {
+    opacity: 0;
+    filter: blur(1px);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .docs-sidebar-level * {
+    animation: none !important;
+  }
+}
