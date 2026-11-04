@@ -49,7 +49,7 @@ export const PurgeBucketObjectCDNCacheModal = ({
         // No need to set a status as we show a toast
         setStatus('')
         toast.error(
-          `Failed to purge CDN cache for “${path} in bucket “${bucket.name}””: ${data.message}`
+          `Failed to purge CDN cache for “${path}” in bucket “${bucket.name}”: ${data.message}`
         )
       },
     })
