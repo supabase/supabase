@@ -331,9 +331,8 @@ describe('DeleteFactorModal identity verification', () => {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    await screen.findByText(
-      /Your recovery codes have been removed\. Retry to remove the authenticator/
-    )
+    await screen.findByText('Remove authenticator')
+    expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(unenroll).toHaveBeenCalledOnce()
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(unenroll).toHaveBeenCalledTimes(2))
