@@ -450,7 +450,7 @@ final response = await http.post(
   Uri.parse('https://<project>.supabase.co/rest/v1/rpc/broadcast'),
   headers: {
     'Content-Type': 'application/json',
-    -H "apikey: <SECRET_KEY>"
+    "apikey: <SECRET_KEY>"
   },
   body: jsonEncode({
     'topic': 'room:lobby:messages',
