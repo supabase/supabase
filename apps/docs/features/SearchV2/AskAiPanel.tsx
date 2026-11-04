@@ -339,8 +339,12 @@ function AiSources({ sources, onSourceClick }: AiSourcesProps) {
   return (
     <nav aria-label="Sources" className="mt-3">
       <ul className="flex flex-wrap gap-1.5">
-        {sources.map((source) => (
-          <li key={source.path}>
+        {sources.map((source, index) => (
+          <li
+            key={source.path}
+            style={{ transitionDelay: `${index * 50}ms` }}
+            className="transition-[opacity,scale,filter] duration-300 ease-out starting:scale-85 starting:opacity-0 starting:blur-xs motion-reduce:transition-none"
+          >
             <Link
               href={source.path}
               target="_blank"
