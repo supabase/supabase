@@ -9,6 +9,7 @@ import {
   getMenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -31,6 +32,9 @@ import { cn } from 'ui'
 import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+const LegacyFooter = dynamic(() =>
+  import('~/components/Navigation/Footer.legacy').then((mod) => mod.LegacyFooter)
+)
 const GlobalMenuDrawerSection = dynamic(() =>
   import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
     (mod) => mod.GlobalMenuDrawerSection
@@ -177,6 +181,8 @@ function TopNavSkeleton({ children }) {
   )
 }
 
+const SkeletonFooter = () => (useDocsLayoutV2() ? <Footer /> : <LegacyFooter />)
+
 function SidebarSkeleton({
   children,
   menuId: _menuId,
@@ -239,7 +245,7 @@ function SidebarSkeleton({
           <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
             {children}
           </MobileHeaderSlotsContext>
-          {!hideFooter && <Footer />}
+          {!hideFooter && <SkeletonFooter />}
         </div>
         <MobileMenuBackdrop />
       </Container>
