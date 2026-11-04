@@ -444,7 +444,11 @@ describe('Ask AI telemetry', () => {
         status: MessageStatus.InProgress,
       }
     )
-    render(<TriggerWithProvider />)
+    render(
+      <TooltipProvider>
+        <TriggerWithProvider />
+      </TooltipProvider>
+    )
     fireEvent.keyDown(window, { key: 'i', metaKey: true })
 
     await screen.findByText('Enable RLS on the table.')

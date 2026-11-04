@@ -246,15 +246,21 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
       {messages.map((message, index) =>
         message.role === MessageRole.User ? (
           // messages have no id and are only ever appended, so the index is stable
-          <li
-            key={index}
-            className="max-w-[80%] self-end rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word"
-          >
-            {message.content}
+          <li key={index} className="group flex max-w-[80%] flex-col items-end gap-1 self-end">
+            <p className="rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word">
+              {message.content}
+            </p>
+            <CodeCopyButton
+              content={message.content}
+              label="Copy question"
+              copiedLabel="Question copied"
+              className="border-transparent bg-transparent opacity-0 hover:border-transparent hover:bg-transparent focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100"
+            />
           </li>
         ) : message.status === MessageStatus.Pending && !isFailedAnswer(message, index) ? null : (
           <li
             key={index}
+            className="group"
             aria-busy={!isFailedAnswer(message, index) && message.status !== MessageStatus.Complete}
           >
             {message.status === MessageStatus.Pending ? null : (
@@ -279,7 +285,7 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
                 label="Copy as Markdown"
                 copiedLabel="Answer copied as Markdown"
                 onCopied={handleAnswerCopy}
-                className="mt-2 border-transparent bg-transparent hover:border-transparent hover:bg-transparent"
+                className="mt-2 border-transparent bg-transparent opacity-0 hover:border-transparent hover:bg-transparent focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100"
               />
             ) : null}
           </li>
