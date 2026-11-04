@@ -295,7 +295,9 @@ const SubPageHarness = () => {
           setQuery(event.target.value)
         }}
       />
-      <button onClick={() => setPage(SUB_PAGE)}>Open sub-page</button>
+      <button tabIndex={0} onClick={() => setPage(SUB_PAGE)}>
+        Open sub-page
+      </button>
     </>
   )
 }
