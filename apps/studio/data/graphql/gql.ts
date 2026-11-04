@@ -1,7 +1,5 @@
 /* eslint-disable */
-import * as types from './graphql';
-
-
+import * as types from './graphql'
 
 /**
  * Map of all GraphQL operations in the project.
@@ -15,18 +13,20 @@ import * as types from './graphql';
  * Learn more about it here: https://the-guild.dev/graphql/codegen/plugins/presets/preset-client#reducing-bundle-size
  */
 type Documents = {
-    "\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n": typeof types.ErrorCodeQueryDocument,
-};
+  '\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n': typeof types.ErrorCodeQueryDocument
+}
 const documents: Documents = {
-    "\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n": types.ErrorCodeQueryDocument,
-};
+  '\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n':
+    types.ErrorCodeQueryDocument,
+}
 
 /**
  * The graphql function is used to parse GraphQL queries into a document that can be used by GraphQL clients.
  */
-export function graphql(source: "\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n"): typeof import('./graphql').ErrorCodeQueryDocument;
-
+export function graphql(
+  source: '\n  query ErrorCodeQuery($code: String!, $service: Service) {\n    errors(code: $code, service: $service) {\n      nodes {\n        code\n        service\n        message\n      }\n    }\n  }\n'
+): typeof import('./graphql').ErrorCodeQueryDocument
 
 export function graphql(source: string) {
-  return (documents as any)[source] ?? {};
+  return (documents as any)[source] ?? {}
 }
