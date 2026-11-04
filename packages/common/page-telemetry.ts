@@ -108,7 +108,7 @@ export function handlePageTelemetry({
       pageData.ph.referrer = firstReferrerData.referrer
       firstReferrerCookieConsumed = true
 
-      const { utms, click_ids, landing_url } = firstReferrerData
+      const { utms, click_ids, landing_url, ts } = firstReferrerData
 
       Object.entries(utms).forEach(([key, value]) => {
         const phKey = key.startsWith('utm_') ? `$${key}` : key
@@ -131,6 +131,10 @@ export function handlePageTelemetry({
         }
       } catch {
         // Skip if landing URL is malformed
+      }
+
+      if (ts !== undefined) {
+        firstTouchAttributionProps.first_touch_timestamp = new Date(ts).toISOString()
       }
     }
 

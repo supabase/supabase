@@ -2,7 +2,7 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { toast } from 'sonner'
 
-import { extractBucketNameFromDefinition } from '@/components/interfaces/Storage/Storage.utils'
+import { getPolicyBucketNames } from '@/components/interfaces/Storage/Storage.utils'
 import { hasVersioningHistory } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useDatabasePoliciesQuery } from '@/data/database-policies/database-policies-query'
@@ -41,12 +41,13 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
 
       if (!project) return console.error('Project is required')
 
-      // Clean up policies from the corresponding bucket that was deleted
+      // Clean up policies that target only the bucket that was deleted. Policies that also
+      // cover other buckets (or negate the bucket condition) are left in place.
       const bucketPolicies = (policies ?? []).filter((policy) => {
         if (policy.table !== 'objects') return false
 
-        const policyBucket = extractBucketNameFromDefinition(policy.definition ?? policy.check)
-        return policyBucket === bucket.name
+        const policyBuckets = getPolicyBucketNames(policy)
+        return policyBuckets.length === 1 && policyBuckets[0] === bucket.name
       })
 
       if (bucketPolicies.length === 0) return

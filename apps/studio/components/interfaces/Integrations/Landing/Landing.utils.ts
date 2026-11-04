@@ -87,7 +87,7 @@ export const useProjectOAuthIntegrationData = (
 
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    apiKeys: useAPIKeysQuery({ projectRef }, sharedOptions),
     edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
     authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),
