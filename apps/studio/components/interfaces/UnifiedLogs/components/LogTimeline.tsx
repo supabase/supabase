@@ -1,5 +1,5 @@
 import { useState, type ReactNode } from 'react'
-import { cn } from 'ui'
+import { Badge, cn } from 'ui'
 
 import { LOG_TYPES_LABELS } from '../UnifiedLogs.constants'
 import { ColumnSchema } from '../UnifiedLogs.schema'
@@ -207,11 +207,6 @@ function TimelineStep({
 }
 
 function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }) {
-  const hasRequest = !!log.method && !!log.pathname
-  const message = hasRequest
-    ? log.pathname
-    : (getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname)
-
   return (
     <span className="flex min-w-0 flex-1 items-center gap-2 font-mono text-xs leading-5 tracking-tight">
       <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
@@ -220,44 +215,52 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
           <DataTableColumnStatusCode value={log.status} level={log.level ?? undefined} />
         )}
       </span>
-      {hasRequest && <span className="shrink-0 text-foreground-lighter">{log.method}</span>}
-      <span className="min-w-0 flex-1 truncate text-foreground-light">{message}</span>
+      {hasRequest(log) && <span className="shrink-0 text-foreground-lighter">{log.method}</span>}
+      <span className="min-w-0 flex-1 truncate text-foreground-light">{getLogMessage(log)}</span>
       <span className="shrink-0 text-foreground-lighter">{timeLabel}</span>
     </span>
   )
 }
 
-export function LogStepSummary({
-  log,
-  timeLabel,
-  className,
-}: {
-  log: ColumnSchema
-  timeLabel?: string
-  className?: string
-}) {
+/** One-line identity of a log: type icon, status, and its request or message. */
+export function LogStepSummary({ log }: { log: ColumnSchema }) {
   return (
-    <span className={cn('flex min-w-0 flex-1 flex-col gap-0.5', className)}>
-      <span className="flex min-w-0 items-center gap-2 text-sm">
-        <LogTypeIcon type={log.log_type} className="shrink-0 text-foreground-lighter" />
-        <span className="truncate text-foreground">{getLogTypeLabel(log.log_type)}</span>
-        {log.status !== null && log.status !== undefined && (
-          <DataTableColumnStatusCode
-            value={log.status}
-            level={log.level ?? undefined}
-            className="shrink-0 text-sm"
-          />
-        )}
-        {timeLabel && (
-          <span className="ml-auto shrink-0 font-mono text-xs text-foreground-lighter">
-            {timeLabel}
+    <div className="flex min-w-0 flex-1 items-center gap-2 text-base font-medium leading-6 text-foreground">
+      <LogTypeIcon
+        type={log.log_type}
+        label={getLogTypeLabel(log.log_type)}
+        className="shrink-0 text-foreground-lighter"
+      />
+      {!!log.status && (
+        <>
+          <Badge
+            variant={log.level ? STATUS_BADGE_VARIANTS[log.level] : 'default'}
+            className="shrink-0 font-mono"
+          >
+            {log.status}
+          </Badge>{' '}
+        </>
+      )}
+      {hasRequest(log) ? (
+        <span className="flex min-w-0 gap-1">
+          <span className="shrink-0">{log.method}</span>{' '}
+          {/* Clip long paths from the start so the most specific segment stays visible */}
+          <span dir="rtl" className="truncate text-left">
+            <bdi dir="ltr">{log.pathname}</bdi>
           </span>
-        )}
-      </span>
-      <span className="truncate font-mono text-xs text-foreground-light">{getLogSummary(log)}</span>
-    </span>
+        </span>
+      ) : (
+        <span className="min-w-0 truncate">{getLogMessage(log)}</span>
+      )}
+    </div>
   )
 }
+
+const STATUS_BADGE_VARIANTS = {
+  success: 'default',
+  warning: 'warning',
+  error: 'destructive',
+} as const
 
 const LOG_TYPE_LABELS: Partial<Record<string, string>> = {
   ...LOG_TYPES_LABELS,
@@ -268,7 +271,11 @@ function getLogTypeLabel(logType: string) {
   return LOG_TYPE_LABELS[logType] ?? logType
 }
 
-function getLogSummary(log: ColumnSchema) {
-  if (log.method && log.pathname) return `${log.method} ${log.pathname}`
-  return getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname ?? ''
+function hasRequest(log: ColumnSchema) {
+  return !!log.method && !!log.pathname
+}
+
+function getLogMessage(log: ColumnSchema) {
+  if (hasRequest(log)) return log.pathname
+  return getEventMessageDisplay(log.log_type, log.event_message).message ?? log.pathname
 }

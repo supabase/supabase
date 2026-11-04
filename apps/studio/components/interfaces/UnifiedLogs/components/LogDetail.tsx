@@ -82,9 +82,9 @@ export function LogDetail({
         />
       )}
       {isLoading && (
-        <div role="status" className="flex items-center gap-3 p-3 text-foreground-light">
-          <Skeleton className="h-4 w-4 rounded-full" />
-          <span className="text-sm">Enriching log...</span>
+        <div role="status" className="flex h-10 items-center gap-2 px-4 text-foreground-light">
+          <Skeleton className="h-3.5 w-3.5 rounded-full" />
+          <span className="text-xs">Enriching log...</span>
         </div>
       )}
       {tab === 'raw-json' && <RawJsonView data={rawData} copyLabel="Copy log as JSON" />}
