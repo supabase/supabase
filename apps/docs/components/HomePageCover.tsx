@@ -40,9 +40,9 @@ const HomePageCover = ({ title, cliCode }: { title: string; cliCode: ReactNode }
   const { homepageHeading } = getCustomContent(['homepage:heading'])
 
   return (
-    <div className="w-full border-b bg-muted/10">
+    <div className="@container w-full border-b bg-muted/10">
       <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-16">
+        <div className="flex flex-col gap-10 lg:flex-row lg:items-start lg:gap-12 xl:gap-16 layout-v2:lg:flex-col layout-v2:lg:items-stretch layout-v2:lg:gap-10 layout-v2:@4xl:flex-row layout-v2:@4xl:items-start layout-v2:@4xl:gap-12 layout-v2:@6xl:gap-16">
           <div className="flex w-full min-w-0 flex-1 items-center gap-4 sm:gap-8 mt-10">
             <DocsCoverLogo aria-hidden="true" className="w-12 shrink-0 sm:w-[60px] md:w-[100px]" />
             <div className="flex min-w-0 flex-col">
@@ -56,7 +56,7 @@ const HomePageCover = ({ title, cliCode }: { title: string; cliCode: ReactNode }
             </div>
           </div>
           {fullGettingStartedEnabled && (
-            <div className="w-full lg:max-w-[478px] lg:shrink-0">
+            <div className="w-full lg:max-w-[478px] lg:shrink-0 layout-v2:lg:max-w-none layout-v2:lg:shrink layout-v2:@4xl:max-w-[478px] layout-v2:@4xl:shrink-0">
               <SetupPrompt cliCode={cliCode} />
             </div>
           )}
