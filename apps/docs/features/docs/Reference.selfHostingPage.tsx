@@ -47,22 +47,23 @@ export async function SelfHostingReferencePage({
 
   const name = REFERENCES[servicePath.replaceAll('-', '_')].name
 
+  const navigationProps = {
+    libraryId: servicePath,
+    name,
+    menuData,
+    libPath: servicePath,
+    version: 'latest',
+    isLatestVersion: true,
+  }
+
   return (
     <ReferenceContentScrollHandler libPath={servicePath} version="latest" isLatestVersion={true}>
       <SidebarSkeleton
         menuId={menuId}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId={servicePath}
-            name={name}
-            menuData={menuData}
-            libPath={servicePath}
-            version="latest"
-            isLatestVersion={true}
-          />
-        }
+        NavigationMenu={<ReferenceNavigation {...navigationProps} />}
+        rightRail={<ReferenceNavigation {...navigationProps} hasActiveCrumb />}
       >
-        <LayoutMainContent>
+        <LayoutMainContent className="layout-v2:pt-6">
           <article className="@container/article">
             <ClientLibIntroduction
               libPath={servicePath}
