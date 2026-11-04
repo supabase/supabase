@@ -156,13 +156,14 @@ export const APIKeys = () => {
                 <p>
                   This key is safe to use in a browser if you have enabled Row Level Security (RLS)
                   for your tables and configured policies. You may also use the{' '}
-                  {hasNewAPIKeys ? 'secret' : 'service'} key which can be found{' '}
+                  {hasNewAPIKeys ? <span>secret</span> : <span>service</span>}{' '}
+                  <span>key which can be found</span>{' '}
                   <InlineLink
                     href={`/project/${projectRef}/settings/api-keys${!hasNewAPIKeys ? '/legacy' : ''}`}
                   >
                     here
                   </InlineLink>{' '}
-                  to bypass RLS.
+                  <span>to bypass RLS.</span>
                 </p>
               }
             >

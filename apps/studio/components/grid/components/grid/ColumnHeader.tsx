@@ -68,7 +68,7 @@ export function ColumnHeader<R>({
 
           <span className="sb-grid-column-header__inner__format">
             {columnFormat}
-            {columnFormat === 'bytea' ? ` (hex)` : ''}
+            {columnFormat === 'bytea' ? <span>{` (hex)`}</span> : ''}
           </span>
           {isEncrypted && (
             <Tooltip>

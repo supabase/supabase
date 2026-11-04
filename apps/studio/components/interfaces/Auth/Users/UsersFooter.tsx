@@ -71,11 +71,14 @@ export const UsersFooter = ({
             <>
               <span>
                 Total:{' '}
-                {countData?.is_estimate
-                  ? formatEstimatedCount(totalUsers)
-                  : totalUsers.toLocaleString()}{' '}
-                user{totalUsers !== 1 ? 's' : ''}
-                {countData?.is_estimate && ' (estimated)'}
+                {countData?.is_estimate ? (
+                  formatEstimatedCount(totalUsers)
+                ) : (
+                  <span>{totalUsers.toLocaleString()}</span>
+                )}{' '}
+                <span>user</span>
+                {totalUsers !== 1 ? <span>s</span> : ''}
+                {countData?.is_estimate && <span>{' (estimated)'}</span>}
               </span>
               {countData?.is_estimate && (
                 <Tooltip>
