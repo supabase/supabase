@@ -6,7 +6,8 @@ import { authKeys } from './keys'
 import { type Filter } from './users-infinite-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type UsersCountVariables = {
   projectRef?: string
@@ -59,7 +60,7 @@ export async function getUsersCount(
 }
 
 export type UsersCountData = Awaited<ReturnType<typeof getUsersCount>>
-export type UsersCountError = ResponseError
+export type UsersCountError = StudioError
 
 /** [Joshen] Be wary of using this as it could potentially cause a huge load on the user's DB */
 export const useUsersCountQuery = <TData = UsersCountData>(

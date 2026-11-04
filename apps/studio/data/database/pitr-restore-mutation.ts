@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PitrRestoreVariables = {
   ref: string
@@ -26,10 +27,10 @@ export const usePitrRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<PitrRestoreData, ResponseError, PitrRestoreVariables>,
+  UseCustomMutationOptions<PitrRestoreData, StudioError, PitrRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<PitrRestoreData, ResponseError, PitrRestoreVariables>({
+  return useMutation<PitrRestoreData, StudioError, PitrRestoreVariables>({
     mutationFn: (vars) => restoreFromPitr(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

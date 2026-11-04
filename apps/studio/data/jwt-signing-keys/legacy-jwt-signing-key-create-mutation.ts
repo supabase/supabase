@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 interface LegacyJWTSigningKeyCreateVariables {
   projectRef?: string
@@ -32,7 +33,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     LegacyJWTSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     LegacyJWTSigningKeyCreateVariables
   >,
   'mutationFn'
@@ -41,7 +42,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
 
   return useMutation<
     LegacyJWTSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     LegacyJWTSigningKeyCreateVariables
   >({
     mutationFn: (vars) => createLegacyJWTSigningKey(vars),

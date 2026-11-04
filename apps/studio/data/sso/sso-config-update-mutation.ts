@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { orgSSOKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateSSOProviderBody =
   operations['SSOProvidersController_updateSSOProvider']['requestBody']['content']['application/json']
@@ -31,12 +32,12 @@ export const useSSOConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>,
+  UseCustomMutationOptions<SSOConfigUpdateData, StudioError, SSOConfigUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSOConfigUpdateData, ResponseError, SSOConfigUpdateVariables>({
+  return useMutation<SSOConfigUpdateData, StudioError, SSOConfigUpdateVariables>({
     mutationFn: (vars) => updateSSOConfig(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

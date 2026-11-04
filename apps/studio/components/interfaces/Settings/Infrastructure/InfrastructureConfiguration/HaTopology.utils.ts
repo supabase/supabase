@@ -137,7 +137,7 @@ export const buildHaTopology = ({
   const poolersByShard = groupBy(
     sortedPoolers,
     (pooler) =>
-      `${pooler.shardKey?.database ?? ''}/${pooler.shardKey?.tableGroup ?? ''}/${pooler.shardKey?.shard ?? ''}`
+      `${pooler.shardRef?.database ?? ''}/${pooler.shardRef?.tableGroup ?? ''}/${pooler.shardRef?.shard ?? ''}`
   )
 
   const shards = Object.entries(poolersByShard)
@@ -186,13 +186,13 @@ const projectRoutingState = (routingState: Multipooler['routingState']) =>
 export const selectTopologyPoolers = (data: HaClusterPoolersData): Multipooler[] =>
   (data.poolers ?? []).map((pooler) => ({
     id: pooler.id === undefined ? undefined : { cell: pooler.id.cell, name: pooler.id.name },
-    shardKey:
-      pooler.shardKey === undefined
+    shardRef:
+      pooler.shardRef === undefined
         ? undefined
         : {
-            database: pooler.shardKey.database,
-            tableGroup: pooler.shardKey.tableGroup,
-            shard: pooler.shardKey.shard,
+            database: pooler.shardRef.database,
+            tableGroup: pooler.shardRef.tableGroup,
+            shard: pooler.shardRef.shard,
           },
     routingState: projectRoutingState(pooler.routingState),
     type: pooler.type,

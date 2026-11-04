@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import { storageKeys } from '../keys'
 import { objectVersionsQueryOptions, type ObjectVersion } from './object-versions-query'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ArchivedObjectPurgeVariables = {
   projectRef: string
@@ -18,7 +18,7 @@ export const useArchivedObjectPurgeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<void, ResponseError, ArchivedObjectPurgeVariables>,
+  UseMutationOptions<void, StudioError, ArchivedObjectPurgeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
@@ -84,7 +84,7 @@ export const useArchivedObjectPurgeMutation = ({
     }
   }
 
-  return useMutation<void, ResponseError, ArchivedObjectPurgeVariables>({
+  return useMutation<void, StudioError, ArchivedObjectPurgeVariables>({
     mutationFn: purgeArchivedObject,
     async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({

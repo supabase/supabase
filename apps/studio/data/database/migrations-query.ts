@@ -5,7 +5,8 @@ import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseMigration = {
   version: string
@@ -34,7 +35,7 @@ export async function getMigrations(
     return result as DatabaseMigration[]
   } catch (error) {
     if (
-      (error as ResponseError).message.includes(
+      (error as StudioError).message.includes(
         'relation "supabase_migrations.schema_migrations" does not exist'
       )
     ) {
@@ -46,7 +47,7 @@ export async function getMigrations(
 }
 
 export type MigrationsData = Awaited<ReturnType<typeof getMigrations>>
-export type MigrationsError = ResponseError
+export type MigrationsError = StudioError
 
 export const useMigrationsQuery = <TData = MigrationsData>(
   { projectRef, projectStatus, connectionString }: MigrationsVariables,

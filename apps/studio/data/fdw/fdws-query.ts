@@ -4,8 +4,9 @@ import { useQuery } from '@tanstack/react-query'
 import { fdwKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 export type FDWColumn = {
   name: string
@@ -49,7 +50,7 @@ export async function getFDWs(
 }
 
 export type FDWsData = Awaited<ReturnType<typeof getFDWs>>
-export type FDWsError = ResponseError
+export type FDWsError = StudioError
 
 export const useFDWsQuery = <TData = FDWsData>(
   { projectRef, connectionString }: FDWsVariables,

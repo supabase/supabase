@@ -7,8 +7,9 @@ import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseExtension = components['schemas']['PostgresExtension_Output'] & {
   default_version_schema: string | null
@@ -38,7 +39,7 @@ export async function getDatabaseExtensions(
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>
-export type DatabaseExtensionsError = ResponseError
+export type DatabaseExtensionsError = StudioError
 
 export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
   { projectRef, connectionString }: DatabaseExtensionsVariables,
