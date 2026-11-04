@@ -38,6 +38,46 @@ describe('buildNavTree', () => {
     ])
   })
 
+  it('gives each Option 1 section its subhead', () => {
+    const tree = buildNavTree('option-1', option1NavItems)
+
+    expect(
+      tree.root.children.map((node) => ({ label: node.label, description: node.description }))
+    ).toEqual([
+      { label: 'Start', description: 'Quickstarts, tutorials, API keys, and moving to Supabase' },
+      {
+        label: 'Build',
+        description: 'Database, Auth, Storage, Edge Functions, APIs, AI, Cron, and Queues',
+      },
+      {
+        label: 'Develop and deploy',
+        description: 'AI tools, CLI, branching, integrations, and Terraform',
+      },
+      {
+        label: 'Run and manage',
+        description: 'Projects, network, team access, security, billing, and logs',
+      },
+      { label: 'Self-Hosting', description: undefined },
+      {
+        label: 'Reference',
+        description: 'Client libraries, CLI commands, Management API, and UI Library',
+      },
+      {
+        label: 'Resources',
+        description: 'Glossary, changelog, status, contributing, and troubleshooting',
+      },
+    ])
+    expect(tree.root.children.find((node) => node.label === 'Self-Hosting')).not.toHaveProperty(
+      'description'
+    )
+  })
+
+  it('gives no subheads to today', () => {
+    const tree = buildNavTree('today', currentNavItems)
+
+    expect(JSON.stringify(tree)).not.toContain('"description"')
+  })
+
   it.each([
     ['today', currentNavItems],
     ['option-1', option1NavItems],

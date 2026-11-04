@@ -7,6 +7,7 @@ import type {
 
 export type NavTreeNode = {
   label: string
+  description?: string
   route?: string
   children?: NavTreeNode[]
 }
@@ -61,10 +62,12 @@ export function buildNavTree(name: string, menus: Record<string, unknown>): NavT
 
   const children = globalMenu.flat().flatMap((item): NavTreeNode[] => {
     if (!isEnabled(item)) return []
-    if (!item.menuItems) return [dropdownItemNode(item, menus)]
+    const description = item.description ? { description: item.description } : {}
+    if (!item.menuItems) return [{ ...dropdownItemNode(item, menus), ...description }]
     return [
       {
         label: item.label,
+        ...description,
         children: item.menuItems
           .flat()
           .filter((child) => isEnabled(child) && child.href)

@@ -72,6 +72,11 @@ const GlobalNavigationMenu: FC = () => {
           return section.menuItems ? (
             <TopNavMenuItem key={section.label} label={label} aria-current={ariaCurrent}>
               <TopNavMenuPanel>
+                {section.description ? (
+                  <p className="col-span-full pb-6 text-sm text-foreground-light">
+                    {section.description}
+                  </p>
+                ) : null}
                 {section.menuItems.map((group, index) => (
                   <GlobalMenuGroup
                     key={group[0].label}
@@ -86,6 +91,7 @@ const GlobalNavigationMenu: FC = () => {
               key={section.label}
               linkAs={Link}
               href={section.href || '#'}
+              title={section.description}
               aria-current={ariaCurrent}
             >
               {label}
@@ -107,6 +113,7 @@ const GlobalMenuPanelsFallback = ({ menuItems }: { menuItems: GlobalMenuItems })
         .map(([section]) => (
           <section key={section.label}>
             <h2>{section.label}</h2>
+            {section.description ? <p>{section.description}</p> : null}
             {section.menuItems?.map((group) => {
               const enabledItems = group.filter((item) => item.enabled !== false)
               const heading = enabledItems.find((item) => !item.href)?.label

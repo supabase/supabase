@@ -30,6 +30,7 @@ type MenuItem = {
 }
 
 export type DropdownMenuItem = MenuItem & {
+  description?: string
   menuItems?: MenuItem[][]
 }
 

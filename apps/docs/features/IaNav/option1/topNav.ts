@@ -30,6 +30,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Start',
+      description: 'Quickstarts, tutorials, API keys, and moving to Supabase',
       icon: 'getting-started',
       href: '/guides/getting-started',
       level: 'gettingstarted',
@@ -39,6 +40,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      description: 'Database, Auth, Storage, Edge Functions, APIs, AI, Cron, and Queues',
       menuItems: [
         [
           {
@@ -70,6 +72,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Develop and deploy',
+      description: 'AI tools, CLI, branching, integrations, and Terraform',
       menuItems: [
         [
           { label: 'AI tools', icon: 'ai-tools', href: '/guides/ai-tools', level: 'ai_tools' },
@@ -106,6 +109,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Run and manage',
+      description: 'Projects, network, team access, security, billing, and logs',
       menuItems: [
         [
           {
@@ -167,6 +171,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Reference',
+      description: 'Client libraries, CLI commands, Management API, and UI Library',
       menuItems: [
         [
           { label: 'Client libraries' },
@@ -234,6 +239,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Resources',
+      description: 'Glossary, changelog, status, contributing, and troubleshooting',
       menuItems: [
         [
           {
