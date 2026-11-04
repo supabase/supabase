@@ -11,7 +11,11 @@ import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryC
 import { AuthenticatorTask } from './AuthenticatorTask'
 import { getRecoveryGap, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
-import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialLayout,
+  InterstitialLogoBadge,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
@@ -194,9 +198,9 @@ export const RecoveryReminder = ({
       logo={
         <div className="relative">
           <SupabaseLogo />
-          <span className="absolute -top-2 -right-2 inline-flex size-5 items-center justify-center rounded-sm bg-warning-600 text-warning-200">
+          <InterstitialLogoBadge className="bg-warning-600 text-warning-200">
             <WarningIcon className="size-3.5" />
-          </span>
+          </InterstitialLogoBadge>
         </div>
       }
       title="Secure your account"

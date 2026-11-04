@@ -24,7 +24,11 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialLayout,
+  InterstitialLogoBadge,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
@@ -69,13 +73,6 @@ export const IdentityVerification = ({
     refetchOnWindowFocus: false,
     queryFn: async () => {
       const data = await getMfaAuthenticatorAssuranceLevel()
-      // Temporary local preview; successful verification still checks real session assurance.
-      if (
-        process.env.NODE_ENV === 'development' &&
-        new URLSearchParams(window.location.search).get('previewRemovalVerification') === '1'
-      ) {
-        return { ...data, currentLevel: 'aal1' as const }
-      }
       return data
     },
   })
@@ -151,7 +148,7 @@ export const IdentityVerification = ({
             logo={
               <div className="relative">
                 <SupabaseLogo />
-                <span className="absolute -top-2 -right-2 inline-flex size-5 items-center justify-center rounded-sm bg-foreground-muted p-0.5 text-background">
+                <InterstitialLogoBadge className="bg-foreground-muted text-background">
                   <svg
                     viewBox="0 0 24 24"
                     fill="currentColor"
@@ -164,7 +161,7 @@ export const IdentityVerification = ({
                       d="M12 1.5 3 5v6c0 5.6 3.6 9.6 9 11.5 5.4-1.9 9-5.9 9-11.5V5L12 1.5Zm5.2 7.3a1 1 0 0 0-1.4 0L10.5 14l-2.3-2.2a1 1 0 0 0-1.4 1.4l3 3a1 1 0 0 0 1.4 0l6-6a1 1 0 0 0 0-1.4Z"
                     />
                   </svg>
-                </span>
+                </InterstitialLogoBadge>
               </div>
             }
             title="Verify your identity"

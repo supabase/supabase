@@ -217,3 +217,17 @@ export const InterstitialActionError = ({ error }: { error?: ReactNode }) => {
     </div>
   )
 }
+
+export const InterstitialLogoBadge = ({
+  children,
+  className,
+}: PropsWithChildren<{ className?: string }>) => (
+  <span
+    className={cn(
+      'absolute -top-2 -right-2 inline-flex size-5 items-center justify-center rounded-sm [&>svg]:size-3.5',
+      className
+    )}
+  >
+    {children}
+  </span>
+)
