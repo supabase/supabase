@@ -96,14 +96,6 @@ export const DeleteFactorModal = ({
           : 'You can no longer use this authenticator to sign in.',
       }}
     >
-      {error && (
-        <AlertError
-          subject="Unable to remove authenticator"
-          error={error}
-          hideContactSupport
-          showInstructions={false}
-        />
-      )}
       <p className="text-sm">Before removing this authenticator, consider:</p>
       <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
         {lastFactorToBeDeleted ? (
@@ -122,6 +114,15 @@ export const DeleteFactorModal = ({
           </>
         )}
       </ul>
+      {error && (
+        <AlertError
+          className="mt-4"
+          subject="Unable to remove authenticator"
+          error={error}
+          hideContactSupport
+          showInstructions={false}
+        />
+      )}
     </ConfirmationModal>
   )
 }
