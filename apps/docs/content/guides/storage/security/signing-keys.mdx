@@ -19,13 +19,7 @@ Signed URLs remain valid until their expiry time regardless of any Auth key chan
 
 ## Revoking signed URLs
 
-<Admonition type="note">
-
-You can't revoke individual signed URLs. To invalidate all signed URLs for single object you must delete or move the underlying object.
-
-</Admonition>
-
-To revoke all signed URLs, rotate the signing key by going to the [URL Signing Keys](/dashboard/project/_/storage/signing-keys) page in the Supabase dashboard.
+To revoke all signed URLs, rotate the signing key and revoke the old key by going to the [URL Signing Keys](/dashboard/project/_/storage/signing-keys) page in the Supabase dashboard.
 
 After revoking the active signing key, all existing signed URLs will return an InvalidJWT error, and new signed URLs created after the rotation will be signed using the updated key.
 

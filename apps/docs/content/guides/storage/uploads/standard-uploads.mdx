@@ -406,7 +406,7 @@ await supabase.Storage.From("bucket_name").UploadToSignedUrl("local_file_path", 
 
 <Admonition type="note">
 
-You can't revoke individual signed URLs. To invalidate all signed URLs for single object you must delete or move the underlying object.
+It is not currently possible to revoke individual signed URLs, but you can revoke all signed URLs for the entire project by rotating the URL signing key.
 
 </Admonition>
 
