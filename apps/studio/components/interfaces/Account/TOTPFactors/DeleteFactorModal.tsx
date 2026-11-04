@@ -1,6 +1,7 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { AlertError } from '@/components/ui/AlertError'
@@ -15,6 +16,9 @@ interface DeleteFactorModalProps {
   lastFactorToBeDeleted: boolean
   hasRecoveryCodes: boolean
   canRemove?: boolean
+  recoveryCodesError?: { message: string } | null
+  isCheckingRecoveryCodes?: boolean
+  onRetryRecoveryCodes?: () => void
   onClose: () => void
 }
 
@@ -24,6 +28,9 @@ export const DeleteFactorModal = ({
   lastFactorToBeDeleted,
   hasRecoveryCodes,
   canRemove = true,
+  recoveryCodesError,
+  isCheckingRecoveryCodes = false,
+  onRetryRecoveryCodes,
   onClose,
 }: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
@@ -116,10 +123,24 @@ export const DeleteFactorModal = ({
           </>
         )}
       </ul>
-      {!canRemove && (
-        <p className="mt-4 text-sm text-foreground-light">
-          Close this dialog and retry the recovery code status check before removing an
-          authenticator.
+      {!canRemove && recoveryCodesError && (
+        <AlertError
+          className="mt-4"
+          subject="Failed to load recovery codes"
+          error={recoveryCodesError}
+          showInstructions={false}
+          additionalActions={
+            onRetryRecoveryCodes && (
+              <Button loading={isCheckingRecoveryCodes} onClick={onRetryRecoveryCodes}>
+                Retry
+              </Button>
+            )
+          }
+        />
+      )}
+      {!canRemove && !recoveryCodesError && (
+        <p role="status" className="mt-4 text-sm text-foreground-light">
+          Checking recovery codes…
         </p>
       )}
       {error && (

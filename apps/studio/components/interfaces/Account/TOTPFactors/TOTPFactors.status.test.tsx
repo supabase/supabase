@@ -139,7 +139,15 @@ describe('authenticator removal recovery-status guard', () => {
       await refresh
     })
     await waitFor(() => expect(confirm).toBeDisabled())
+    expect(await within(dialog).findByText(/Status unavailable/)).toBeInTheDocument()
     fireEvent.click(confirm)
+    expect(unenroll).not.toHaveBeenCalled()
+
+    getStatus.mockResolvedValue(availableCodes)
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Retry' }))
+    await waitFor(() => expect(confirm).not.toBeDisabled())
+    expect(within(dialog).queryByText(/Status unavailable/)).not.toBeInTheDocument()
+    expect(dialog).toBeInTheDocument()
     expect(unenroll).not.toHaveBeenCalled()
   })
 })

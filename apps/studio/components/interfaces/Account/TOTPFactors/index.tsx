@@ -228,6 +228,9 @@ export const TOTPFactors = () => {
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
         canRemove={!disableDeleteFactor}
+        recoveryCodesError={shouldVerifyRecoveryCodes ? recoveryCodesError : null}
+        isCheckingRecoveryCodes={recoveryCodesIsFetching}
+        onRetryRecoveryCodes={() => void refetchRecoveryCodesStatus()}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
         hasRecoveryCodes={status === 'available'}
