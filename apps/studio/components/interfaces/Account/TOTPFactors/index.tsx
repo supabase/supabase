@@ -1,6 +1,7 @@
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { PlusIcon, RectangleEllipsisIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -30,7 +31,10 @@ import { DATETIME_FORMAT } from '@/lib/constants'
 export const TOTPFactors = () => {
   const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
-  const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
+  const [factorToBeDeleted, setFactorToBeDeleted] = useQueryState(
+    'removeAuthenticator',
+    parseAsString
+  )
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
@@ -228,8 +232,8 @@ export const TOTPFactors = () => {
 
       <DeleteFactorModal
         onCheckingIdentity={setIsCheckingIdentity}
-        visible={factorToBeDeleted !== null}
-        factorId={factorToBeDeleted}
+        visible={totpFactors.some((factor) => factor.id === factorToBeDeleted)}
+        factorId={totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null}
         canRemove={!disableDeleteFactor}
         recoveryCodesError={shouldVerifyRecoveryCodes ? recoveryCodesError : null}
         isCheckingRecoveryCodes={recoveryCodesIsFetching}

@@ -1,18 +1,16 @@
 import { SignInRecoveryCodeForm } from '@/components/interfaces/SignIn/SignInRecoveryCodeForm'
-import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInRecoveryCodePage: NextPageWithLayout = () => {
   return (
-    <SignInLayout
-      heading="Recovery code authentication"
-      subheading="Enter a recovery code"
-      logoLinkToMarketingSite={true}
+    <InterstitialLayout
+      logo={<SupabaseLogo />}
+      title="Use a recovery code"
+      description="Enter one of the recovery codes you saved when setting up MFA."
     >
-      <div className="flex flex-col gap-5">
-        <SignInRecoveryCodeForm />
-      </div>
-    </SignInLayout>
+      <SignInRecoveryCodeForm />
+    </InterstitialLayout>
   )
 }
 

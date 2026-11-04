@@ -1,13 +1,15 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { Link } from '@tanstack/react-router'
 import { useAuthError, useFeatureFlags, useFlag } from 'common'
 import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useRef, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import {
   Button,
+  CardContent,
+  CardFooter,
   Form,
   FormControl,
   FormField,
@@ -33,7 +35,7 @@ import { getReturnToPath } from '@/lib/gotrue'
 import { useTrack } from '@/lib/telemetry/track'
 
 const schema = z.object({
-  code: z.string().min(1, 'Recovery Code is required'),
+  code: z.string().min(1, 'Enter a recovery code'),
 })
 
 const formId = 'sign-in-recovery-code-form'
@@ -41,6 +43,8 @@ const formId = 'sign-in-recovery-code-form'
 export const SignInRecoveryCodeForm = () => {
   const router = useRouter()
   const signOut = useSignOut()
+  const isVerification = getReturnToPath().startsWith('/account/security?removeAuthenticator=')
+  const [verificationError, setVerificationError] = useState<{ message: string } | null>(null)
   const queryClient = useQueryClient()
   const { hasLoaded } = useFeatureFlags()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
@@ -66,9 +70,12 @@ export const SignInRecoveryCodeForm = () => {
     isPending: isVerifying,
     isSuccess,
   } = useRecoveryCodesVerifyMutation({
+    onError: setVerificationError,
     onSuccess: async () => {
-      track('sign_in', { category: 'account', method: 'recovery-code' })
-      addLoginEvent({})
+      if (!isVerification) {
+        track('sign_in', { category: 'account', method: 'recovery-code' })
+        addLoginEvent({})
+      }
 
       await queryClient.resetQueries()
 
@@ -78,12 +85,17 @@ export const SignInRecoveryCodeForm = () => {
 
   const onClickLogout = async () => {
     if (isVerifying) return
+    if (isVerification) {
+      await router.replace('/account/security')
+      return
+    }
     await signOut()
     await router.replace('/sign-in')
   }
 
   const onSubmit: SubmitHandler<z.infer<typeof schema>> = async ({ code }) => {
     if (isVerifying) return
+    setVerificationError(null)
     verifyRecoveryCode({ code })
   }
 
@@ -108,7 +120,7 @@ export const SignInRecoveryCodeForm = () => {
         additionalActions={
           <>
             <Button asChild>
-              <Link href="/sign-in">Back to sign in</Link>
+              <Link to="/sign-in">Back to sign in</Link>
             </Button>
             <Button asChild>
               <a href={MFA_SUPPORT_EMAIL_HREF}>Email support</a>
@@ -121,132 +133,137 @@ export const SignInRecoveryCodeForm = () => {
 
   return (
     <>
-      {recoveryCodesStatusIsPending && <GenericSkeletonLoader />}
+      <CardContent className="border-b-0 px-6 pb-6">
+        {recoveryCodesStatusIsPending && <GenericSkeletonLoader />}
 
-      {recoveryCodesStatusIsError && (
-        <AlertError
-          error={recoveryCodesStatusError}
-          subject="Failed to retrieve recovery codes status"
-          description="Try refreshing your browser. If the issue persists, email support@supabase.com."
-          hideContactSupport
-        />
-      )}
+        {recoveryCodesStatusIsError && (
+          <AlertError
+            error={recoveryCodesStatusError}
+            subject="Failed to retrieve recovery codes status"
+            description="Try refreshing your browser. If the issue persists, email support@supabase.com."
+            hideContactSupport
+          />
+        )}
 
-      {recoveryCodesStatus?.status === 'available' && (
-        <Form {...form}>
-          <form
-            ref={formRef}
-            id={formId}
-            method="POST"
-            className="flex flex-col gap-4"
-            onSubmit={form.handleSubmit(onSubmit)}
-          >
-            <FormField
-              key="code"
-              name="code"
-              control={form.control}
-              render={({ field }) => (
-                <FormItemLayout name="code" label="Recovery code">
-                  <InputGroup>
-                    <FormControl>
-                      <FormInputGroupInput
-                        {...field}
-                        className="pl-10 font-mono"
-                        autoFocus
-                        autoComplete="off"
-                        autoCorrect="off"
-                        autoCapitalize="none"
-                        spellCheck="false"
-                        placeholder="****************"
-                        type={isCodeRevealed ? 'text' : 'password'}
-                        onPaste={(event) => {
-                          // If users paste something, it's most probably a valid code so we can safely try submitting it immediately
-                          // onPaste is triggered before the paste operation is complete so we have to emulate it to avoid using an unreliable setTimeout
-                          event.preventDefault()
-                          field.onChange(event.clipboardData.getData('text'))
-                          formRef.current?.dispatchEvent(
-                            new Event('submit', { cancelable: true, bubbles: true })
-                          )
-                        }}
-                      />
-                    </FormControl>
-                    <InputGroupAddon align="inline-start">
-                      <LockIcon />
-                    </InputGroupAddon>
-                    <InputGroupAddon align="inline-end" className="pr-1 has-[>button]:mr-0">
-                      <Tooltip>
-                        <TooltipTrigger asChild>
-                          <InputGroupButton
-                            aria-label={isCodeRevealed ? 'Hide code' : 'Show code'}
-                            aria-describedby={undefined}
-                            onClick={() => setIsCodeRevealed((previous) => !previous)}
-                          >
-                            {isCodeRevealed ? (
-                              <EyeIcon className="size-4" />
-                            ) : (
-                              <EyeOffIcon className="size-4" />
-                            )}
-                          </InputGroupButton>
-                        </TooltipTrigger>
-                        <TooltipContent>
-                          {isCodeRevealed ? 'Hide code' : 'Show code'}
-                        </TooltipContent>
-                      </Tooltip>
-                    </InputGroupAddon>
-                  </InputGroup>
-                </FormItemLayout>
+        {recoveryCodesStatus?.status === 'available' && (
+          <Form {...form}>
+            <form
+              ref={formRef}
+              id={formId}
+              method="POST"
+              className="flex flex-col gap-4"
+              onSubmit={form.handleSubmit(onSubmit)}
+            >
+              <FormField
+                key="code"
+                name="code"
+                control={form.control}
+                render={({ field }) => (
+                  <FormItemLayout name="code" label="Recovery code">
+                    <InputGroup>
+                      <FormControl>
+                        <FormInputGroupInput
+                          {...field}
+                          className="pl-10 font-mono"
+                          autoFocus
+                          autoComplete="off"
+                          autoCorrect="off"
+                          autoCapitalize="none"
+                          spellCheck="false"
+                          placeholder="****************"
+                          type={isCodeRevealed ? 'text' : 'password'}
+                          onPaste={(event) => {
+                            // If users paste something, it's most probably a valid code so we can safely try submitting it immediately
+                            // onPaste is triggered before the paste operation is complete so we have to emulate it to avoid using an unreliable setTimeout
+                            event.preventDefault()
+                            field.onChange(event.clipboardData.getData('text'))
+                            formRef.current?.dispatchEvent(
+                              new Event('submit', { cancelable: true, bubbles: true })
+                            )
+                          }}
+                        />
+                      </FormControl>
+                      <InputGroupAddon align="inline-start">
+                        <LockIcon />
+                      </InputGroupAddon>
+                      <InputGroupAddon align="inline-end" className="pr-1 has-[>button]:mr-0">
+                        <Tooltip>
+                          <TooltipTrigger asChild>
+                            <InputGroupButton
+                              aria-label={isCodeRevealed ? 'Hide code' : 'Show code'}
+                              aria-describedby={undefined}
+                              onClick={() => setIsCodeRevealed((previous) => !previous)}
+                            >
+                              {isCodeRevealed ? (
+                                <EyeIcon className="size-4" />
+                              ) : (
+                                <EyeOffIcon className="size-4" />
+                              )}
+                            </InputGroupButton>
+                          </TooltipTrigger>
+                          <TooltipContent>
+                            {isCodeRevealed ? 'Hide code' : 'Show code'}
+                          </TooltipContent>
+                        </Tooltip>
+                      </InputGroupAddon>
+                    </InputGroup>
+                  </FormItemLayout>
+                )}
+              />
+
+              {verificationError && (
+                <AlertError
+                  subject="Unable to verify recovery code"
+                  error={verificationError}
+                  showInstructions={false}
+                />
               )}
-            />
-
-            <div className="flex items-center justify-between gap-x-2">
-              <Button
-                block
-                variant="outline"
-                size="large"
-                onClick={onClickLogout}
-                disabled={isVerifying || isSuccess}
-                className="opacity-80 hover:opacity-100 transition"
-              >
-                Cancel
-              </Button>
               <Button
                 variant="primary"
                 block
                 form={formId}
                 type="submit"
-                size="large"
                 loading={isVerifying || isSuccess}
               >
                 {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
               </Button>
-            </div>
-          </form>
-        </Form>
-      )}
-
-      <div className="my-8">
-        <div className="text-sm">
-          <span className="text-foreground-light">Unable to sign in?</span>{' '}
+            </form>
+          </Form>
+        )}
+      </CardContent>
+      <CardFooter className="flex-col gap-4 border-t px-6 py-5">
+        <Button
+          variant="text"
+          size="tiny"
+          onClick={onClickLogout}
+          disabled={isVerifying || isSuccess}
+        >
+          Cancel
+        </Button>
+        <div>
+          <div className="text-sm">
+            <span className="text-foreground-light">Unable to sign in?</span>{' '}
+          </div>
+          <ul className="list-disc pl-6">
+            <li>
+              <Link
+                to="/logout"
+                className="text-sm transition text-foreground-light hover:text-foreground"
+              >
+                Force sign out and clear cookies
+              </Link>
+            </li>
+            <li>
+              <a
+                href={MFA_SUPPORT_EMAIL_HREF}
+                className="text-sm transition text-foreground-light hover:text-foreground"
+              >
+                Email support to regain access
+              </a>
+            </li>
+          </ul>
         </div>
-        <ul className="list-disc pl-6">
-          <li>
-            <Link
-              href="/logout"
-              className="text-sm transition text-foreground-light hover:text-foreground"
-            >
-              Force sign out and clear cookies
-            </Link>
-          </li>
-          <li>
-            <a
-              href={MFA_SUPPORT_EMAIL_HREF}
-              className="text-sm transition text-foreground-light hover:text-foreground"
-            >
-              Email support to regain access
-            </a>
-          </li>
-        </ul>
-      </div>
+      </CardFooter>
     </>
   )
 }
