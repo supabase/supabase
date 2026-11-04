@@ -572,9 +572,12 @@ For a small example, mount a ConfigMap containing a `hello` function:
            - name: edge-runtime
              volumeMounts:
                - name: hello-function
-                 mountPath: /home/deno/functions/hello
+                 mountPath: /home/deno/functions/hello/index.ts
+                 subPath: index.ts
                  readOnly: true
    ```
+
+   Mount each function file with `subPath` to avoid the symbolic links created by a ConfigMap directory mount. Edge Runtime cannot resolve these links and fails with `Module not found`.
 
 4. Wait for the runtime and invoke the function:
 
