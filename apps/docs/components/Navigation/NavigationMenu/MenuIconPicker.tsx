@@ -1,4 +1,20 @@
-import { Clock, Heart, ScrollText, Server, SquareStack, Telescope } from 'lucide-react'
+import {
+  Boxes,
+  CircleChevronRight,
+  Clock,
+  Hammer,
+  Heart,
+  Lock,
+  MousePointerClick,
+  Rocket,
+  ScrollText,
+  Server,
+  Settings2,
+  SquareStack,
+  Telescope,
+} from 'lucide-react'
+import type { ComponentType } from 'react'
+import { cn } from 'ui'
 
 import {
   IconBranching,
@@ -33,6 +49,25 @@ import {
   IconUI,
 } from './MenuIcons'
 
+interface MenuIconProps {
+  width: number
+  height: number
+  className?: string
+}
+
+interface LayoutIconProps extends MenuIconProps {
+  legacy: ComponentType<MenuIconProps>
+  icon: ComponentType<MenuIconProps>
+}
+
+// master's icon shows while the docs-layout-v2 flag is off
+const LayoutIcon = ({ legacy: LegacyIcon, icon: Icon, className, ...size }: LayoutIconProps) => (
+  <>
+    <LegacyIcon {...size} className={cn(className, 'layout-v2:hidden')} />
+    <Icon {...size} className={cn(className, 'hidden layout-v2:block')} />
+  </>
+)
+
 function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, className?: string) {
   switch (menuKey) {
     case 'home':
@@ -40,7 +75,15 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
     case 'branching':
       return <IconBranching width={width} height={height} className={className} />
     case 'getting-started':
-      return <IconMenuGettingStarted width={width} height={height} className={className} />
+      return (
+        <LayoutIcon
+          legacy={IconMenuGettingStarted}
+          icon={CircleChevronRight}
+          width={width}
+          height={height}
+          className={className}
+        />
+      )
     case 'database':
       return <IconMenuDatabase width={width} height={height} className={className} />
     case 'rest':
@@ -48,11 +91,27 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
     case 'graphql':
       return <IconMenuGraphQL width={width} height={height} className={className} />
     case 'auth':
-      return <IconMenuAuth width={width} height={height} className={className} />
+      return (
+        <LayoutIcon
+          legacy={IconMenuAuth}
+          icon={Lock}
+          width={width}
+          height={height}
+          className={className}
+        />
+      )
     case 'edge-functions':
       return <IconMenuEdgeFunctions width={width} height={height} className={className} />
     case 'realtime':
-      return <IconMenuRealtime width={width} height={height} className={className} />
+      return (
+        <LayoutIcon
+          legacy={IconMenuRealtime}
+          icon={MousePointerClick}
+          width={width}
+          height={height}
+          className={className}
+        />
+      )
     case 'storage':
       return <IconMenuStorage width={width} height={height} className={className} />
     case 'ai':
@@ -107,6 +166,14 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <SquareStack width={width} height={height} className={className} />
     case 'ui':
       return <IconUI width={width} height={height} className={className} />
+    case 'products':
+      return <Boxes width={width} height={height} className={className} />
+    case 'build':
+      return <Hammer width={width} height={height} className={className} />
+    case 'develop':
+      return <Rocket width={width} height={height} className={className} />
+    case 'manage':
+      return <Settings2 width={width} height={height} className={className} />
     default:
       return <IconMenuPlatform width={width} height={height} className={className} />
   }
