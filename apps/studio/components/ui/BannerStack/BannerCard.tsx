@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button, Card, CardContent, cn } from 'ui'
 
 import { BASE_PATH } from '@/lib/constants'
@@ -35,7 +35,7 @@ export const BannerCard = ({ onDismiss, children, className }: BannerCardProps) 
               variant="text"
               size="tiny"
               type="button"
-              icon={<X size={16} strokeWidth={1.5} />}
+              icon={<XIcon size={16} strokeWidth={1.5} />}
               onClick={(e) => {
                 e.preventDefault()
                 onDismiss()

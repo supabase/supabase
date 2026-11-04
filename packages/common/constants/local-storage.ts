@@ -14,9 +14,9 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECTS_SORT: 'projects-sort',
   FEEDBACK_WIDGET_CONTENT: 'feedback-widget-content',
   FEEDBACK_WIDGET_SCREENSHOT: 'feedback-widget-screenshot',
-  INCIDENT_BANNER_DISMISSED_IDS: 'incident-banner-dismissed-ids',
   STATUS_BANNER_DISMISSED_KEYS: 'status-banner-dismissed-keys',
   DASHBOARD_PREFERENCES: (ref: string) => `dashboard-preferences-${ref}`,
+  HOME_CHART_INTERVAL: (ref: string) => `home-chart-interval-${ref}`,
   UNIFIED_LOGS_DOCK: 'unified-logs-dock',
 
   UI_TIMEZONE: 'supabase-ui-timezone',
@@ -30,8 +30,8 @@ export const LOCAL_STORAGE_KEYS = {
   UI_PREVIEW_PLATFORM_WEBHOOKS: 'supabase-ui-platform-webhooks',
   UI_PREVIEW_JIT_DB_ACCESS: 'supabase-ui-jit-db-access',
   UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE: 'supabase-ui-sql-editor-manual-save',
-  UI_PREVIEW_MARKETPLACE: 'supabase-ui-marketplace',
   UI_PREVIEW_EXPLORER: 'preview-explorer',
+  UI_PREVIEW_PIPELINE_CREATION: 'supabase-ui-pipeline-creation',
   UI_PREVIEW_STORAGE_VERSIONING: 'supabase-ui-storage-versioning',
 
   AI_ASSISTANT_MCP_OPT_IN: 'ai-assistant-mcp-opt-in',
@@ -55,6 +55,7 @@ export const LOCAL_STORAGE_KEYS = {
   SQL_EDITOR_SECTION_STATE: (ref: string) => `sql-editor-section-state-${ref}`,
   SQL_EDITOR_SORT: (ref: string) => `sql-editor-sort-${ref}`,
   SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED: 'sql-editor-manual-save-notice-dismissed',
+  SQL_EDITOR_CONFIRM_UNSAVED_CHANGES: 'sql-editor-confirm-unsaved-changes',
 
   EXPLORER_QUERY_DRAFTS: (ref: string) => `explorer-query-drafts-${ref}`,
   NOTEBOOK_DRAFTS: (ref: string) => `notebook-drafts-${ref}`,
@@ -124,8 +125,6 @@ export const LOCAL_STORAGE_KEYS = {
   PROJECT_UPGRADE_FAILED_BANNER_DISMISSED_AT: (ref: string) =>
     `project-upgrade-failed-banner-dismissed-at-${ref}`,
   UNIFIED_LOGS_SIDEBAR_BANNER_DISMISSED: 'unified-logs-sidebar-banner-dismissed',
-  // Dated so the key retires with the banner; see BannerLogsAllDeprecation
-  LOGS_ALL_DEPRECATION_2026_09_23: 'logs-all-deprecation-2026-09-23-dismissed',
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
@@ -141,6 +140,7 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_ORG: 'docs.ui.user.selected.org',
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
+  IA_NAV_FLAG: 'docs-ia-mvp-v1',
 
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',
 
@@ -167,7 +167,7 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
   LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
   LOCAL_STORAGE_KEYS.SQL_EDITOR_MANUAL_SAVE_NOTICE_DISMISSED,
-  LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
+  LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION,
   LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
   LOCAL_STORAGE_KEYS.LAST_SIGN_IN_METHOD,
   LOCAL_STORAGE_KEYS.HIDE_PROMO_TOAST,
@@ -182,7 +182,8 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 
 export function clearLocalStorage() {
   for (const key of safeLocalStorage.keys()) {
-    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key)) {
+    const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
+    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) && !isRecoveryReminder) {
       safeLocalStorage.removeItem(key)
     }
   }

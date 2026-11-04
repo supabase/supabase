@@ -7,7 +7,7 @@ import { safeNextPath } from '@/registry/default/blocks/safe-next-path/lib/safe-
 import { createClient } from '@/registry/default/clients/tanstack/lib/supabase/server'
 
 const confirmFn = createServerFn({ method: 'GET' })
-  .inputValidator((searchParams: unknown) => {
+  .validator((searchParams: unknown) => {
     if (
       searchParams &&
       typeof searchParams === 'object' &&

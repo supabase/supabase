@@ -1,6 +1,14 @@
 import { getEnableWebhooksSQL } from '@supabase/pg-meta'
 import type { Tables } from 'common/marketplace.types'
-import { Clock5, Code2, Layers, Timer, Vault, Warehouse, Webhook } from 'lucide-react'
+import {
+  Clock5Icon,
+  Code2Icon,
+  LayersIcon,
+  TimerIcon,
+  VaultIcon,
+  WarehouseIcon,
+  WebhookIcon,
+} from 'lucide-react'
 import dynamic from 'next/dynamic'
 import Image from 'next/image'
 import { ComponentType, ReactNode } from 'react'
@@ -138,7 +146,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     missingExtensionsAlert: <UpgradeDatabaseAlert minimumVersion="15.6.1.143" />,
     name: `Queues`,
     icon: ({ className, ...props } = {}) => (
-      <Layers className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <LayersIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Lightweight message queue in Postgres',
     docsUrl: 'https://github.com/tembo-io/pgmq',
@@ -156,7 +164,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Queues',
         hasChild: true,
         childIcon: (
-          <Layers size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
+          <LayersIcon size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
         ),
       },
       {
@@ -200,7 +208,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: ['pg_cron'],
     name: `Cron`,
     icon: ({ className, ...props } = {}) => (
-      <Clock5 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Clock5Icon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Schedule recurring Jobs in Postgres',
     docsUrl: 'https://github.com/citusdata/pg_cron',
@@ -218,7 +226,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
         label: 'Jobs',
         hasChild: true,
         childIcon: (
-          <Timer size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
+          <TimerIcon size={12} strokeWidth={1.5} className={cn('text-foreground w-full h-full')} />
         ),
       },
     ],
@@ -256,7 +264,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     name: `Vault`,
     status: 'beta',
     icon: ({ className, ...props } = {}) => (
-      <Vault className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <VaultIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Application level encryption for your project',
     docsUrl: `${DOCS_URL}/guides/database/vault`,
@@ -300,7 +308,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     source: 'Official' as const,
     name: `Database Webhooks`,
     icon: ({ className, ...props } = {}) => (
-      <Webhook className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <WebhookIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description:
       'Send real-time data from your database to another system when a table event occurs',
@@ -357,7 +365,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: [],
     name: `Data API`,
     icon: ({ className, ...props } = {}) => (
-      <Code2 className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <Code2Icon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Auto-generate an API directly from your database schema',
     docsUrl: `${DOCS_URL}/guides/api`,
@@ -421,7 +429,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
     requiredExtensions: [],
     name: `Warehouse`,
     icon: ({ className, ...props } = {}) => (
-      <Warehouse className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
+      <WarehouseIcon className={cn('inset-0 p-2 text-black w-full h-full', className)} {...props} />
     ),
     description: 'Replicate your database to an analytical endpoint',
     // No Warehouse guide exists yet. Point this at `${DOCS_URL}/guides/warehouse` once one does.

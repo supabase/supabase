@@ -97,6 +97,18 @@ export const FeaturePreviewContextProvider = ({ children }: PropsWithChildren) =
 
 // Helpers
 
+export const usePipelineCreationPreview = () => {
+  const { flags, isInitialized } = useFeaturePreviewContext()
+  const isAvailable = useFlag('pipelineCreationWizard')
+  const isEnabled =
+    IS_PLATFORM &&
+    isInitialized &&
+    isAvailable &&
+    flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_PIPELINE_CREATION] === true
+
+  return { isEnabled, isLoading: !isInitialized }
+}
+
 export const useIsColumnLevelPrivilegesEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_CLS]
@@ -149,12 +161,6 @@ export const useIsSqlEditorManualSaveEnabled = () => {
   return flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]
 }
 
-export const useIsMarketplaceEnabled = () => {
-  const { flags } = useFeaturePreviewContext()
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
-  return isMarketplaceEnabled && flags[LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]
-}
-
 export const useIsExplorerEnabled = () => {
   const { flags } = useFeaturePreviewContext()
   const isExplorerEnabled = useFlag('explorer')
@@ -168,6 +174,7 @@ export const useIsStorageVersioningEnabled = () => {
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
   const { data } = useProjectStorageConfigQuery({ projectRef: ref })
   const isObjectVersioningAvailable = !!data?.capabilities?.object_versioning
+
   return (
     isStorageVersioningEnabled &&
     isObjectVersioningAvailable &&

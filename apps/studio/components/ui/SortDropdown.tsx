@@ -1,4 +1,4 @@
-import { ArrowDownNarrowWide, ArrowDownWideNarrow } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, ArrowDownWideNarrowIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -29,7 +29,9 @@ export const SortDropdown = ({ options, value, setValue }: SortDropdownProps) =>
   return (
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
-        <Button icon={sortOrder === 'desc' ? <ArrowDownWideNarrow /> : <ArrowDownNarrowWide />}>
+        <Button
+          icon={sortOrder === 'desc' ? <ArrowDownWideNarrowIcon /> : <ArrowDownNarrowWideIcon />}
+        >
           Sorted by {columnLabel ?? sortColumn}
         </Button>
       </DropdownMenuTrigger>

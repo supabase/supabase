@@ -1,4 +1,4 @@
-import { FileText, Loader } from 'lucide-react'
+import { FileTextIcon, LoaderIcon } from 'lucide-react'
 import { DragEvent, useCallback, useRef, useState, type ChangeEvent } from 'react'
 import { Button, cn } from 'ui'
 
@@ -118,7 +118,7 @@ function FileDetails({ file, parseProgress, removeFile }: FileDetailsProps) {
       )}
     >
       <div className="flex items-center space-x-2">
-        <FileText size={14} strokeWidth={1.5} />
+        <FileTextIcon size={14} strokeWidth={1.5} />
         <p className="text-sm text-foreground">{file.name}</p>
       </div>
       {parseProgress === 100 ? (
@@ -127,7 +127,7 @@ function FileDetails({ file, parseProgress, removeFile }: FileDetailsProps) {
         </Button>
       ) : (
         <div className="flex w-3/5 items-center space-x-2">
-          <Loader className="h-4 w-4 animate-spin" />
+          <LoaderIcon className="h-4 w-4 animate-spin" />
           <SparkBar
             value={parseProgress}
             max={100}

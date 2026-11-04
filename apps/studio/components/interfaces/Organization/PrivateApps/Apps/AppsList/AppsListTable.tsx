@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ArrowUpCircle, Key, MoreVertical, Trash } from 'lucide-react'
+import { ArrowUpCircleIcon, KeyIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Badge,
   Button,
@@ -80,16 +80,16 @@ export function AppsListTable({
                 <TableCell className="text-right">
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button icon={<MoreVertical size={14} />} className="w-7" />
+                      <Button icon={<MoreVerticalIcon size={14} />} className="w-7" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" side="bottom" className="w-44">
                       <DropdownMenuItem className="gap-x-2" onClick={() => onViewApp(app)}>
-                        <Key size={14} />
+                        <KeyIcon size={14} />
                         View permissions
                       </DropdownMenuItem>
                       {!isInstalled && (
                         <DropdownMenuItem className="gap-x-2" onClick={() => onPromoteApp(app)}>
-                          <ArrowUpCircle size={14} />
+                          <ArrowUpCircleIcon size={14} />
                           Promote to installed
                         </DropdownMenuItem>
                       )}
@@ -98,7 +98,7 @@ export function AppsListTable({
                         className="text-destructive! gap-x-2"
                         onClick={() => onDeleteApp(app)}
                       >
-                        <Trash size={14} />
+                        <TrashIcon size={14} />
                         Delete
                       </DropdownMenuItem>
                     </DropdownMenuContent>

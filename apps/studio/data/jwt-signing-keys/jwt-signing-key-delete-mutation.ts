@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 interface JWTSigningKeyDeleteVariables {
   projectRef?: string
@@ -17,6 +18,7 @@ export async function deleteJWTSigningKey(payload: JWTSigningKeyDeleteVariables)
     params: {
       path: { ref: payload.projectRef, id: payload.keyId },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -30,12 +32,12 @@ export const useJWTSigningKeyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>,
+  UseCustomMutationOptions<JWTSigningKeyDeleteData, StudioError, JWTSigningKeyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyDeleteData, ResponseError, JWTSigningKeyDeleteVariables>({
+  return useMutation<JWTSigningKeyDeleteData, StudioError, JWTSigningKeyDeleteVariables>({
     mutationFn: (vars) => deleteJWTSigningKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

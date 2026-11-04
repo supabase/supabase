@@ -1,7 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { JwtSecretUpdateStatus } from '@supabase/shared-types/out/events'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Loader } from 'lucide-react'
+import { LoaderIcon } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -12,15 +12,18 @@ import { ConnectionIcon } from '@/components/interfaces/Connect/ConnectionIcon'
 import { ConnectButton } from '@/components/interfaces/ConnectButton/ConnectButton'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 
 export const APIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  // Shows the publishable (or anon) key, which `reveal=false` returns in full, so a plain grant is enough
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const isGranted = apiKeysGrant.status === 'granted'
 
   const {
     data: settings,
@@ -30,14 +33,17 @@ export const APIKeys = () => {
   } = useProjectSettingsV2Query({ projectRef })
 
   const { data: legacyAPIKeysStatusData, isPending: isLoadingAPIKeysStatus } =
-    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: isGranted })
 
   const {
     data: apiKeysData,
     error: errorAPIKeys,
     isError: isErrorAPIKeys,
     isPending: isLoadingAPIKeys,
-  } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  } = useQuery({
+    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
   const { anonKey, serviceKey, publishableKey, secretKey } = apiKeysData ?? {}
 
   const hasNewAPIKeys = !!publishableKey && !!secretKey
@@ -54,8 +60,14 @@ export const APIKeys = () => {
     { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
   )
 
-  const isLoading = isLoadingAPIKeys || isLoadingAPIKeysStatus || isProjectSettingsLoading
-  const isError = isErrorAPIKeys || isProjectSettingsError || isJwtSecretUpdateStatusError
+  const isDenied = apiKeysGrant.status === 'denied'
+  const isGrantError = apiKeysGrant.status === 'error'
+  const isLoading =
+    apiKeysGrant.status === 'loading' ||
+    isProjectSettingsLoading ||
+    (isGranted && (isLoadingAPIKeys || isLoadingAPIKeysStatus))
+  const isError =
+    isGrantError || isErrorAPIKeys || isProjectSettingsError || isJwtSecretUpdateStatusError
 
   // Only show JWT loading state if the query is actually enabled
   const showJwtLoading =
@@ -85,24 +97,35 @@ export const APIKeys = () => {
         <CardContent>
           <GenericSkeletonLoader />
         </CardContent>
+      ) : isDenied ? (
+        <CardContent>
+          <NoPermission resourceText="view API keys" />
+        </CardContent>
       ) : isError ? (
         <AlertError
           className="rounded-none border-0"
           subject={
-            isErrorAPIKeys
-              ? 'Failed to retrieve API Keys'
-              : isProjectSettingsError
-                ? 'Failed to retrieve project settings'
-                : isJwtSecretUpdateStatusError
-                  ? 'Failed to update JWT secret'
-                  : ''
+            isGrantError
+              ? 'Failed to check API key permissions'
+              : isErrorAPIKeys
+                ? 'Failed to retrieve API Keys'
+                : isProjectSettingsError
+                  ? 'Failed to retrieve project settings'
+                  : isJwtSecretUpdateStatusError
+                    ? 'Failed to update JWT secret'
+                    : ''
           }
-          error={errorAPIKeys ?? projectSettingsError ?? jwtSecretUpdateError}
+          error={
+            (isGrantError ? apiKeysGrant.error : undefined) ??
+            errorAPIKeys ??
+            projectSettingsError ??
+            jwtSecretUpdateError
+          }
         />
       ) : showJwtLoading ? (
         <CardContent>
           <div className="flex items-center justify-center py-4 space-x-2">
-            <Loader className="animate-spin" size={16} strokeWidth={1.5} />
+            <LoaderIcon className="animate-spin" size={16} strokeWidth={1.5} />
             <p className="text-sm text-foreground-light">JWT secret is being updated</p>
           </div>
         </CardContent>
@@ -145,8 +168,8 @@ export const APIKeys = () => {
                   <div className="space-y-2">
                     <p className="text-sm">API Key</p>
                     <div className="flex items-center space-x-1 -ml-1">
-                      <code className="text-code-inline">{anonKey?.name}</code>
-                      <code className="text-code-inline">public</code>
+                      <code>{anonKey?.name}</code>
+                      <code>public</code>
                     </div>
                   </div>
                 )
@@ -168,16 +191,14 @@ export const APIKeys = () => {
               <Input
                 readOnly
                 className="input-mono"
-                copy={canReadAPIKeys && isNotUpdatingJwtSecret}
-                reveal={anonKey?.name !== 'anon' && canReadAPIKeys && isNotUpdatingJwtSecret}
+                copy={isNotUpdatingJwtSecret}
+                reveal={anonKey?.name !== 'anon' && isNotUpdatingJwtSecret}
                 value={
-                  !canReadAPIKeys
-                    ? 'You need additional permissions to view API keys'
-                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
-                      ? 'JWT secret update failed, new API key may have issues'
-                      : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
-                        ? 'Updating JWT secret...'
-                        : (publishableKey?.api_key ?? anonKey?.api_key)
+                  jwtSecretUpdateStatus === JwtSecretUpdateStatus.Failed
+                    ? 'JWT secret update failed, new API key may have issues'
+                    : jwtSecretUpdateStatus === JwtSecretUpdateStatus.Updating
+                      ? 'Updating JWT secret...'
+                      : (publishableKey?.api_key ?? anonKey?.api_key)
                 }
               />
             </FormItemLayout>

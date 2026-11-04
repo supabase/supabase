@@ -1,7 +1,7 @@
 import { THRESHOLD_COUNT, type OptimizedSearchColumns } from '@supabase/pg-meta'
 import { keepPreviousData } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { HelpCircle, Loader2 } from 'lucide-react'
+import { HelpCircleIcon, Loader2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -65,7 +65,7 @@ export const UsersFooter = ({
         <div className="flex items-center gap-x-2">
           {isLoadingCount || isFetchingCount || countData === undefined ? (
             <span className="flex items-center gap-2">
-              <Loader2 size={14} className="animate-spin" /> Loading...
+              <Loader2Icon size={14} className="animate-spin" /> Loading...
             </span>
           ) : (
             <>
@@ -84,7 +84,7 @@ export const UsersFooter = ({
                       size="tiny"
                       variant="text"
                       className="px-1.5"
-                      icon={<HelpCircle />}
+                      icon={<HelpCircleIcon />}
                       onClick={() => {
                         if (specificFilterColumn === 'freeform') {
                           setShowFetchExactCountModal(true)

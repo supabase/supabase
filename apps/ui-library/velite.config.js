@@ -1,5 +1,5 @@
+import { readFile } from 'node:fs/promises'
 import path from 'path'
-import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
@@ -7,6 +7,10 @@ import { codeImport } from 'remark-code-import'
 import remarkGfm from 'remark-gfm'
 import { visit } from 'unist-util-visit'
 import { defineConfig, s } from 'velite'
+
+const codeTheme = JSON.parse(
+  await readFile(path.join(process.cwd(), 'lib/themes/supabase-2.json'), 'utf8')
+)
 
 const LinksProperties = s.object({
   doc: s.string().optional(),
@@ -103,10 +107,9 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          getHighlighter: async () => {
-            const theme = await loadTheme(path.join(process.cwd(), '/lib/themes/supabase-2.json'))
-            return await getHighlighter({ theme })
-          },
+          // plugin shares one cached highlighter per theme, lazy language loading needs shiki >= 4.5 (shikijs/shiki#1318)
+          theme: codeTheme,
+          keepBackground: false,
           onVisitLine(node) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted
@@ -115,17 +118,18 @@ export default defineConfig({
             }
           },
           onVisitHighlightedLine(node) {
-            node.properties.className.push('line--highlighted')
+            // the plugin strips the `line` class first, leaving className undefined
+            node.properties.className = [...(node.properties.className ?? []), 'line--highlighted']
           },
-          onVisitHighlightedWord(node) {
+          onVisitHighlightedChars(node) {
             node.properties.className = ['word--highlighted']
           },
         },
       ],
       () => (tree) => {
         visit(tree, (node) => {
-          if (node?.type === 'element' && node?.tagName === 'div') {
-            if (!('data-rehype-pretty-code-fragment' in node.properties)) {
+          if (node?.type === 'element' && node?.tagName === 'figure') {
+            if (!('data-rehype-pretty-code-figure' in node.properties)) {
               return
             }
 
@@ -134,7 +138,7 @@ export default defineConfig({
               return
             }
 
-            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'div'
+            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'figcaption'
             preElement.properties['__rawString__'] = node.__rawString__
 
             if (node.__src__) {

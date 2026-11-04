@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import SVG from 'react-inlinesvg'
 import { Badge, Button, cn } from 'ui'
@@ -94,8 +94,8 @@ export const ForeignKeyRow = ({
               >
                 {x.source || '[column_name]'}
               </code>
-              <ArrowRight size={16} />
-              <code className="text-code-inline">
+              <ArrowRightIcon size={16} />
+              <code>
                 {foreignKey.schema}.{foreignKey.table}.{x.target}
               </code>
             </div>

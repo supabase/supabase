@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Database } from 'icons'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { Button, Card, CardContent, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
@@ -98,7 +98,7 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               <Button
                 type="button"
                 variant="primary"
-                icon={<Plus />}
+                icon={<PlusIcon />}
                 onClick={() => setAddReplica(true)}
               >
                 Add read replica
@@ -150,7 +150,7 @@ export const ReadReplicasSection = ({ onRecommendCompute }: ReadReplicasSectionP
               description="All reads and writes currently go to the primary."
             >
               {!isHighAvailability && (
-                <Button type="button" icon={<Plus />} onClick={() => setAddReplica(true)}>
+                <Button type="button" icon={<PlusIcon />} onClick={() => setAddReplica(true)}>
                   Add read replica
                 </Button>
               )}

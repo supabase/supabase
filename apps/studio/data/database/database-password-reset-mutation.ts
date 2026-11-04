@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { handleError, patch } from '@/data/fetchers'
 import { projectKeys } from '@/data/projects/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePasswordResetVariables = {
   ref: string
@@ -29,16 +30,12 @@ export const useDatabasePasswordResetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabasePasswordResetData,
-    ResponseError,
-    DatabasePasswordResetVariables
-  >,
+  UseCustomMutationOptions<DatabasePasswordResetData, StudioError, DatabasePasswordResetVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePasswordResetData, ResponseError, DatabasePasswordResetVariables>({
+  return useMutation<DatabasePasswordResetData, StudioError, DatabasePasswordResetVariables>({
     mutationFn: (vars) => resetDatabasePassword(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: projectKeys.detail(variables.ref) })

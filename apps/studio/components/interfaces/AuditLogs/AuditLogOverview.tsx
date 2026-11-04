@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { Activity, Clock, Copy, Globe, Hash, User } from 'lucide-react'
+import { ActivityIcon, ClockIcon, CopyIcon, GlobeIcon, HashIcon, UserIcon } from 'lucide-react'
 import { Button, cn, copyToClipboard } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -41,7 +41,7 @@ const DetailRow = ({
             aria-label={`Copy ${label}`}
             variant="text"
             className="px-1"
-            icon={<Copy size={12} />}
+            icon={<CopyIcon size={12} />}
             onClick={() => copyToClipboard(String(value))}
           />
         )}
@@ -57,7 +57,7 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
     <div>
       <DetailSectionHeader
         title="Request started"
-        icon={Clock}
+        icon={ClockIcon}
         className="border-b"
         summary={
           <TimestampInfo
@@ -68,7 +68,7 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
       />
       <DetailSectionHeader
         title="Request ID"
-        icon={Hash}
+        icon={HashIcon}
         className="border-b"
         summary={
           <span className="truncate text-right font-mono text-xs text-foreground">
@@ -77,19 +77,19 @@ export const AuditLogOverview = ({ selectedLog }: AuditLogOverviewProps) => {
         }
       />
 
-      <CollapsibleDetailSection defaultOpen className="border-b" title="Target" icon={Globe}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Target" icon={GlobeIcon}>
         <DetailRow label="Organization slug" value={selectedLog.organization_slug} />
         <DetailRow label="Project ref" value={selectedLog.project_ref} />
       </CollapsibleDetailSection>
 
-      <CollapsibleDetailSection defaultOpen className="border-b" title="Actor" icon={User}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Actor" icon={UserIcon}>
         <DetailRow label="Token type" value={selectedLog.actor.token_type} />
         <DetailRow label="Email" value={selectedLog.actor.email} />
         <DetailRow label="User ID" value={selectedLog.actor.user_id} />
         <DetailRow label="IP address" value={selectedLog.actor.ip} />
       </CollapsibleDetailSection>
 
-      <CollapsibleDetailSection defaultOpen className="border-b" title="Action" icon={Activity}>
+      <CollapsibleDetailSection defaultOpen className="border-b" title="Action" icon={ActivityIcon}>
         <DetailRow label="Name" value={selectedLog.action.name} />
         <DetailRow label="Method" value={selectedLog.action.method} />
         <DetailRow label="Route" value={selectedLog.action.route} />

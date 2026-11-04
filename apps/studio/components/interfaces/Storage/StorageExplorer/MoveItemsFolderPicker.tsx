@@ -1,6 +1,6 @@
 import { useInfiniteQuery, useQuery } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ArrowLeft, Search, X } from 'lucide-react'
+import { ArrowLeftIcon, SearchIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -113,14 +113,14 @@ export const MoveItemsFolderPicker = ({
           variant="outline"
           aria-label="Go up one level"
           className="w-7 shrink-0 px-1"
-          icon={<ArrowLeft size={14} />}
+          icon={<ArrowLeftIcon size={14} />}
           disabled={isRoot}
           onClick={() => handleNavigate(pathSegments.slice(0, -1))}
         />
         <Input
           size="tiny"
           className="w-52 shrink-0"
-          icon={<Search />}
+          icon={<SearchIcon />}
           placeholder={`Search folders in ${bucketName}...`}
           type="text"
           value={searchString}
@@ -134,7 +134,7 @@ export const MoveItemsFolderPicker = ({
                     size="tiny"
                     variant="text"
                     aria-label="Clear search"
-                    icon={<X />}
+                    icon={<XIcon />}
                     className="h-5 w-5 p-0"
                     onClick={() => setSearchString('')}
                   />,

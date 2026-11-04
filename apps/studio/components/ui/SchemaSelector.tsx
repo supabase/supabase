@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Alert,
@@ -23,7 +22,7 @@ import {
 
 import { RestartProjectDialog } from '@/components/interfaces/ErrorHandling/RestartProjectDialog'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSchemasFilteredForHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
@@ -72,9 +71,8 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
       if (!isControlled) setInternalOpen(next)
       onOpenChange?.(next)
     }
-    const { can: canCreateSchemas } = useAsyncCheckPermissions(
-      PermissionAction.TENANT_SQL_ADMIN_WRITE,
-      'schemas'
+    const { can: canCreateSchemas } = useAsyncCheckPermissionsV2(
+      FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
     )
 
     const { data: project } = useSelectedProjectQuery()
@@ -192,7 +190,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                         >
                           <span>All schemas</span>
                           {selectedSchemaName === '*' && (
-                            <Check className="text-primary" strokeWidth={2} size={16} />
+                            <CheckIcon className="text-primary" strokeWidth={2} size={16} />
                           )}
                         </CommandItem>
                       )}
@@ -211,7 +209,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                         >
                           <span>{schema.name}</span>
                           {selectedSchemaName === schema.name && (
-                            <Check className="text-primary" strokeWidth={2} size={16} />
+                            <CheckIcon className="text-primary" strokeWidth={2} size={16} />
                           )}
                         </CommandItem>
                       ))}
@@ -232,7 +230,7 @@ export const SchemaSelector = forwardRef<HTMLDivElement, SchemaSelectorProps>(
                             setOpen(false)
                           }}
                         >
-                          <Plus size={12} />
+                          <PlusIcon size={12} />
                           Create a new schema
                         </CommandItem>
                       </CommandGroup>

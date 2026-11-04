@@ -1,4 +1,4 @@
-import { Check, ChevronDown, Copy, X as XIcon } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, CopyIcon, XIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -41,7 +41,7 @@ export function MultiSelectActionBar({
   const aiSnap = useAiAssistantStateSnapshot()
 
   function handleOpenAiAssistant() {
-    const prompt = buildLogsPrompt(selectedRowsData, queryType, sqlQuery)
+    const prompt = buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })
     openSidebar(SIDEBAR_KEYS.AI_ASSISTANT)
     aiSnap.newChat({ initialMessage: prompt })
   }
@@ -63,26 +63,30 @@ export function MultiSelectActionBar({
             <Button
               size="tiny"
               icon={
-                copiedFormat ? <Check size={12} className="text-primary" /> : <Copy size={12} />
+                copiedFormat ? (
+                  <CheckIcon size={12} className="text-primary" />
+                ) : (
+                  <CopyIcon size={12} />
+                )
               }
-              iconRight={<ChevronDown size={11} />}
+              iconRight={<ChevronDownIcon size={11} />}
             >
               {copiedFormat ? 'Copied!' : 'Copy'}
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-60">
             <DropdownMenuItem onClick={() => onCopy('json')} className="gap-x-2">
-              <Copy size={13} />
+              <CopyIcon size={13} />
               <p>Copy as JSON</p>
               <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_JSON} className="ml-auto" />
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onCopy('markdown')} className="gap-x-2">
-              <Copy size={13} />
+              <CopyIcon size={13} />
               <p>Copy as Markdown</p>
               <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_MARKDOWN} className="ml-auto" />
             </DropdownMenuItem>
             <DropdownMenuItem onClick={() => onCopy('csv')} className="gap-x-2">
-              <Copy size={13} />
+              <CopyIcon size={13} />
               <p>Copy as CSV</p>
               <ShortcutBadge shortcutId={SHORTCUT_IDS.RESULTS_COPY_CSV} className="ml-auto" />
             </DropdownMenuItem>
@@ -91,7 +95,7 @@ export function MultiSelectActionBar({
 
         <AiAssistantDropdown
           label="Explain with AI"
-          buildPrompt={() => buildLogsPrompt(selectedRowsData, queryType, sqlQuery)}
+          buildPrompt={() => buildLogsPrompt(selectedRowsData, { queryType, sqlQuery })}
           onOpenAssistant={handleOpenAiAssistant}
           telemetrySource="log_explorer"
         />

@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CpuIcon, Lock, Microchip } from 'lucide-react'
+import { CpuIcon, LockIcon, MicrochipIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
@@ -223,7 +223,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   <div className="flex items-center space-x-1">
                                     {lockedOption && (
                                       <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                        <Lock size={14} />
+                                        <LockIcon size={14} />
                                       </div>
                                     )}
                                     {!lockedOption && showComputePrice && (
@@ -247,7 +247,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 <div className="w-full">
                                   <div className="px-3 text-sm flex flex-col gap-1">
                                     <div className="text-foreground-light flex gap-2 items-center">
-                                      <Microchip
+                                      <MicrochipIcon
                                         strokeWidth={1}
                                         size={14}
                                         className="text-foreground-lighter"
@@ -306,7 +306,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         <div className="w-full">
                           <div className="px-3 text-sm flex flex-col gap-1">
                             <div className="text-foreground-light flex gap-2 items-center">
-                              <Microchip
+                              <MicrochipIcon
                                 strokeWidth={1}
                                 size={14}
                                 className="text-foreground-lighter"

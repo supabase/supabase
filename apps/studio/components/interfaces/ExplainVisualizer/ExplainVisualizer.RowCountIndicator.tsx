@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 interface RowCountIndicatorProps {
@@ -29,11 +29,11 @@ export function RowCountIndicator({
         <TooltipTrigger asChild>
           <div className="flex items-center gap-1.5 cursor-help">
             <span className="text-foreground-light">{formatRowCount(totalRowsScanned)}</span>
-            <ArrowRight size={10} className="text-foreground-muted" />
+            <ArrowRightIcon size={10} className="text-foreground-muted" />
             <span className="text-destructive-600 font-medium">
               -{formatRowCount(rowsRemovedByFilter)}
             </span>
-            <ArrowRight size={10} className="text-foreground-muted" />
+            <ArrowRightIcon size={10} className="text-foreground-muted" />
             <span className="text-primary font-medium">
               {formatRowCount(actualRows)} {actualRows === 1 ? 'row' : 'rows'}
             </span>

@@ -5,8 +5,10 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionCreateVariables = {
   projectRef: string
@@ -26,6 +28,7 @@ export async function createDatabaseFunction({
     connectionString,
     sql,
     queryKey: ['functions', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result as z.infer<typeof zod>
@@ -40,14 +43,14 @@ export const useDatabaseFunctionCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionCreateData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionCreateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionCreateData, ResponseError, DatabaseFunctionCreateVariables>({
+  return useMutation<DatabaseFunctionCreateData, StudioError, DatabaseFunctionCreateVariables>({
     mutationFn: (vars) => createDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

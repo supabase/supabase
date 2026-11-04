@@ -1,4 +1,4 @@
-import { Copy, Expand } from 'lucide-react'
+import { CopyIcon, ExpandIcon } from 'lucide-react'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import DataGrid, { CalculatedColumn, RenderCellProps } from 'react-data-grid'
 import {
@@ -102,7 +102,7 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Copy size={12} />
+                <CopyIcon size={12} />
                 Copy cell content
               </ContextMenuItem>
               <ContextMenuItem
@@ -113,7 +113,7 @@ export const DataGridResults = ({ rows }: { rows: readonly ResultRow[] }) => {
                 }}
                 onFocusCapture={(e) => e.stopPropagation()}
               >
-                <Expand size={12} />
+                <ExpandIcon size={12} />
                 View cell content
               </ContextMenuItem>
             </ContextMenuContent>

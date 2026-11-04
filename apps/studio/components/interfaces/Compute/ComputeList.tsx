@@ -1,4 +1,4 @@
-import { ChevronLeft, ChevronRight, RefreshCw, Terminal } from 'lucide-react'
+import { ChevronLeftIcon, ChevronRightIcon, RefreshCwIcon, TerminalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -136,10 +136,10 @@ export const ComputeList = ({
         </Select>
 
         <div className="flex items-center gap-3 md:ml-auto">
-          <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+          <Button icon={<RefreshCwIcon />} loading={isRefreshing} onClick={onRefresh}>
             Refresh
           </Button>
-          <Button variant="primary" icon={<Terminal />} onClick={onDeploy}>
+          <Button variant="primary" icon={<TerminalIcon />} onClick={onDeploy}>
             Deploy
           </Button>
         </div>
@@ -212,7 +212,7 @@ export const ComputeList = ({
             </p>
             <div className="flex items-center gap-x-2" aria-label="Pagination">
               <ButtonTooltip
-                icon={<ChevronLeft />}
+                icon={<ChevronLeftIcon />}
                 aria-label="Previous page"
                 size="tiny"
                 disabled={currentPage === 1}
@@ -228,7 +228,7 @@ export const ComputeList = ({
                 Page {currentPage} of {totalPages}
               </span>
               <ButtonTooltip
-                icon={<ChevronRight />}
+                icon={<ChevronRightIcon />}
                 aria-label="Next page"
                 size="tiny"
                 disabled={currentPage >= totalPages}

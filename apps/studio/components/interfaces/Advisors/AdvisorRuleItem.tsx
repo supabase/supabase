@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ChevronRight, Trash } from 'lucide-react'
+import { ChevronRightIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -131,7 +131,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                   Create rule
                 </Button>
               </div>
-              <ChevronRight strokeWidth={1.5} size={16} className="transition" />
+              <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
             </CardContent>
           </Card>
         </CollapsibleTrigger>
@@ -186,7 +186,7 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
                           tooltip={{ content: { side: 'bottom', text: 'Edit rule' } }}
                         /> */}
                         <ButtonTooltip
-                          icon={<Trash />}
+                          icon={<TrashIcon />}
                           className="w-7"
                           onClick={() => setSelectedRuleToDelete(rule.id)}
                           tooltip={{ content: { side: 'bottom', text: 'Delete rule' } }}

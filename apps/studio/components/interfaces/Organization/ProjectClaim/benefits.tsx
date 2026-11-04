@@ -1,4 +1,4 @@
-import { CheckCircle2 } from 'lucide-react'
+import { CheckCircle2Icon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { ProjectClaimLayout } from './layout'
@@ -28,7 +28,7 @@ export const ProjectClaimBenefits = ({
           <h3 className="">Why manage your database project on Supabase?</h3>
           <ul className="space-y-3">
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-primary w-5 h-5" />
+              <CheckCircle2Icon className="text-primary w-5 h-5" />
               <span>
                 <span className="text-foreground-light">Excellent Technical Support</span>
                 <span className="block text-foreground-lighter">
@@ -38,7 +38,7 @@ export const ProjectClaimBenefits = ({
               </span>
             </li>
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-primary w-5 h-5" />
+              <CheckCircle2Icon className="text-primary w-5 h-5" />
               <span>
                 <span className="text-foreground-light">Unrestricted usage.</span>
                 <span className="block text-foreground-lighter">
@@ -48,7 +48,7 @@ export const ProjectClaimBenefits = ({
               </span>
             </li>
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-primary w-5 h-5" />
+              <CheckCircle2Icon className="text-primary w-5 h-5" />
               <span>
                 <span className="text-foreground-light">Visibility into your data.</span>
                 <span className="block text-foreground-lighter">
@@ -58,7 +58,7 @@ export const ProjectClaimBenefits = ({
               </span>
             </li>
             <li className="flex space-x-2">
-              <CheckCircle2 className="text-primary w-5 h-5" />
+              <CheckCircle2Icon className="text-primary w-5 h-5" />
               <span>
                 <span className="text-foreground-light">Observability and easy debugging.</span>
                 <span className="block text-foreground-lighter">
@@ -68,7 +68,7 @@ export const ProjectClaimBenefits = ({
             </li>
             <li className="flex space-x-2">
               <div>
-                <CheckCircle2 className="text-primary w-5 h-5" />
+                <CheckCircle2Icon className="text-primary w-5 h-5" />
               </div>
               <span>
                 <span className="text-foreground-light">Easy Compute Scaling.</span>

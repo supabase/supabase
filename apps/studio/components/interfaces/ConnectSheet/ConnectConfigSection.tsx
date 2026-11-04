@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -317,7 +317,7 @@ function ConnectCombobox({
           aria-expanded={isOpen}
           aria-controls={listboxElementId}
           className={cn('w-full justify-between', !selectedOption && 'text-foreground-muted')}
-          iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
+          iconRight={<ChevronsUpDownIcon className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
         >
           <span className="flex min-w-0 items-center gap-x-2">
             {showIcons && selectedOption?.icon && (
@@ -354,7 +354,7 @@ function ConnectCombobox({
                   }}
                   className="gap-x-2"
                 >
-                  <Check
+                  <CheckIcon
                     className={cn(
                       'h-4 w-4 shrink-0',
                       option.value === value ? 'opacity-100' : 'opacity-0'

@@ -153,7 +153,7 @@ const DialogFooter = React.forwardRef<
   <div
     ref={ref}
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2',
+      'flex flex-col-reverse gap-y-2 sm:flex-row sm:justify-end sm:space-x-2',
       'border-t',
       DialogPaddingVariants({ padding }),
       className
@@ -193,11 +193,13 @@ DialogDescription.displayName = DialogPrimitive.Description.displayName
 const DialogClose = React.forwardRef<
   React.ElementRef<typeof DialogPrimitive.Close>,
   React.ComponentPropsWithoutRef<typeof DialogPrimitive.Close>
->(({ className, children, ...props }, ref) => (
+>(({ className, children, asChild, ...props }, ref) => (
   <DialogPrimitive.Close
     ref={ref}
+    asChild={asChild}
     className={cn(
-      'opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
+      !asChild &&
+        'opacity-70 transition-opacity hover:opacity-100 focus-ring disabled:pointer-events-none data-[state=open]:bg-accent data-[state=open]:text-foreground-muted',
       className
     )}
     {...props}

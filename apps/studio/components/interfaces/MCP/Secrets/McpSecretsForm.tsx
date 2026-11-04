@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff, Lock } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, LockIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -81,7 +81,7 @@ export const McpSecretsForm = ({
                 aria-readonly
               />
               <InputGroupAddon align="inline-end" className="pr-2">
-                <Lock size={14} className="text-foreground-muted" aria-hidden />
+                <LockIcon size={14} className="text-foreground-muted" aria-hidden />
               </InputGroupAddon>
             </InputGroup>
           </FormItemLayout>
@@ -121,7 +121,7 @@ export const McpSecretsForm = ({
                         className="size-6 shrink-0 p-0"
                         aria-pressed={isRevealed}
                         aria-label={isRevealed ? 'Hide secret value' : 'Show secret value'}
-                        icon={isRevealed ? <EyeOff /> : <Eye />}
+                        icon={isRevealed ? <EyeOffIcon /> : <EyeIcon />}
                         onClick={() => setIsRevealed(!isRevealed)}
                       />
                     </InputGroupAddon>

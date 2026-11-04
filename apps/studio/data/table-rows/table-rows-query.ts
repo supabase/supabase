@@ -1,26 +1,27 @@
 import { ident, joinSqlFragments, ROLE_IMPERSONATION_NO_RESULTS, safeSql } from '@supabase/pg-meta'
 import { Query, type QueryFilter } from '@supabase/pg-meta/src/query'
-import { getTableRowsSql } from '@supabase/pg-meta/src/query/table-row-query'
+import {
+  formatPatternMatchFilterValue,
+  getTableRowsSql,
+} from '@supabase/pg-meta/src/query/table-row-query'
 import { useQuery, useQueryClient, type QueryClient } from '@tanstack/react-query'
-import { IS_PLATFORM, useFlag } from 'common'
+import { IS_PLATFORM } from 'common'
 
 import { tableRowKeys } from './keys'
-import { formatFilterValue } from './utils'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { handleError } from '@/data/fetchers'
+import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import {
-  PG_META_SCOPED_INTROSPECTION_FLAG,
-  prefetchTableEditor,
-} from '@/data/table-editor/table-editor-query'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { timeout } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 interface GetTableRowsArgs {
   table?: SupaTable
@@ -29,7 +30,6 @@ interface GetTableRowsArgs {
   limit?: number
   page?: number
   roleImpersonationState?: RoleImpersonationState
-  scoped?: boolean
 }
 
 /**
@@ -70,15 +70,15 @@ const getPreferredOrderByColumns = (
 }
 
 function getErrorCode(error: any): number | undefined {
-  // Our custom ResponseError's use 'code' instead of 'status'
-  if (error instanceof ResponseError) {
+  // Our custom StudioError's use 'code' instead of 'status'
+  if (isStudioError(error)) {
     return error.code
   }
   return error.status
 }
 
 function getRetryAfter(error: any): number | undefined {
-  if (error instanceof ResponseError) {
+  if (isStudioError(error)) {
     return error.retryAfter
   }
 
@@ -147,7 +147,7 @@ export const getAllTableRowsSql = ({
   filters
     .filter((filter) => filter.value && filter.value !== '')
     .forEach((filter) => {
-      const value = formatFilterValue(table, filter)
+      const value = formatPatternMatchFilterValue(filter.value, filter.operator)
       queryChains = queryChains.filter(filter.column, filter.operator, value)
     })
 
@@ -258,7 +258,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -290,7 +290,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -320,7 +320,7 @@ type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
 }
 
 export type TableRowsData = TableRows
-type TableRowsError = ResponseError
+type TableRowsError = StudioError
 
 async function getTableRows(
   {
@@ -334,7 +334,6 @@ async function getTableRows(
     limit,
     page,
     preflightCheck = false,
-    scoped,
   }: TableRowsVariables,
   signal?: AbortSignal
 ) {
@@ -342,7 +341,6 @@ async function getTableRows(
     projectRef,
     connectionString,
     id: tableId,
-    scoped,
   })
   if (!entity) {
     throw new Error('Table not found')
@@ -383,6 +381,7 @@ async function getTableRows(
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
         preflightCheck,
+        grant: unguarded.migrating,
       },
       signal
     )
@@ -403,7 +402,6 @@ export const useTableRowsQuery = <TData = TableRowsData>(
 ) => {
   const queryClient = useQueryClient()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
-  const scoped = useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   // [Ali] Exclude preflightCheck from query key — it controls how the query
   // executes (whether an EXPLAIN guard runs first), not what data is returned.
@@ -414,10 +412,9 @@ export const useTableRowsQuery = <TData = TableRowsData>(
       table: { id: tableId },
       readReplicaIdentifier,
       ...queryKeyArgs,
-      scoped,
     }),
     queryFn: ({ signal }) =>
-      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args, scoped }, signal),
+      getTableRows({ queryClient, projectRef, connectionString, tableId, ...args }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&

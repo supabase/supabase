@@ -48,12 +48,28 @@ export const RESTRICTION_MESSAGES = {
     ),
   },
   OVERDUE_INVOICES_FROM_OTHER_ORGS: {
-    title: 'Outstanding invoices in other organization',
-    description: (slug: string): ReactNode => (
-      <>
-        Please <InlineLink href={`/org/${slug}/billing#invoices`}>pay invoices</InlineLink> for
-        other organizations to avoid service disruption
-      </>
-    ),
+    title: 'Outstanding invoices in other organizations',
+    description: (orgs: { name: string; slug: string }[]): ReactNode => {
+      const [firstOrg, ...remainingOrgs] = orgs
+
+      if (!firstOrg) {
+        return (
+          <>
+            <InlineLink href="/organizations">Pay outstanding invoices</InlineLink> to avoid service
+            disruption
+          </>
+        )
+      }
+
+      return (
+        <>
+          Pay invoices for{' '}
+          <InlineLink href={`/org/${firstOrg.slug}/billing#invoices`}>{firstOrg.name}</InlineLink>
+          {remainingOrgs.length > 0 &&
+            ` and ${remainingOrgs.length} other${remainingOrgs.length === 1 ? '' : 's'}`}{' '}
+          to avoid service disruption
+        </>
+      )
+    },
   },
 }

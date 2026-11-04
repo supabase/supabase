@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useRef, useState } from 'react'
 import {
   Button,
@@ -96,7 +96,7 @@ export const Migrations = () => {
                   value={search}
                   className="w-full lg:w-52"
                   onChange={(e) => setSearch(e.target.value)}
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                 />
                 <Card>
                   <Table>

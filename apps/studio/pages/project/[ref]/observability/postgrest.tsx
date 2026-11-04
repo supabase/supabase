@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRight, RefreshCw } from 'lucide-react'
+import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
@@ -132,7 +132,7 @@ const PostgrestReport = () => {
               >
                 <Button
                   disabled={isRefetching}
-                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
+                  icon={<RefreshCwIcon className={isRefetching ? 'animate-spin' : ''} />}
                   className="w-7"
                   onClick={onRefreshReport}
                 />
@@ -158,7 +158,7 @@ const PostgrestReport = () => {
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
                   <p className="text-foreground-light">
-                    <ArrowRight size={12} />
+                    <ArrowRightIcon size={12} />
                   </p>
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}

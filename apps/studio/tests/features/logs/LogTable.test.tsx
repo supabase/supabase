@@ -169,96 +169,23 @@ const LOG_DATA = {
   },
 }
 
-test('can display log data', async () => {
-  render(
-    <>
-      <LogTable projectRef="default" data={[LOG_DATA]} />
-    </>
-  )
-
-  await screen.findAllByText(LOG_DATA.timestamp)
-})
-
-test('Shows total results', async () => {
+test('displays log data and the total result count', async () => {
   render(<LogTable projectRef="default" data={[LOG_DATA]} />)
 
-  await screen.getByText(/results \(1\)/i)
-})
-
-test('can run if no queryType provided', async () => {
-  const mockRun = vi.fn()
-
-  render(
-    <LogTable
-      projectRef="projectRef"
-      data={[
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'some event happened',
-          metadata: {
-            my_key: 'something_value',
-          },
-        },
-      ]}
-      onRun={mockRun}
-    />
-  )
-
-  const run = await screen.findByText('Run')
-  await userEvent.click(run)
-  // expect(mockRun).toBeCalled()
-})
-
-test('can run if no queryType provided', async () => {
-  const mockRun = vi.fn()
-
-  render(
-    <LogTable
-      data={[
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'some event happened',
-          metadata: {
-            my_key: 'something_value',
-          },
-        },
-      ]}
-      projectRef="abcd"
-      onRun={mockRun}
-    />
-  )
-
-  const run = await screen.findByText('Run')
-  await userEvent.click(run)
-  // expect(mockRun).toBeCalled()
+  await screen.findAllByText(LOG_DATA.timestamp)
+  expect(screen.getByText(/results \(1\)/i)).toBeInTheDocument()
 })
 
 test('dedupes log lines with exact id', async () => {
-  // chronological mode requires 4 columns
-  render(
-    <LogTable
-      projectRef="projectRef"
-      data={[
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'some event happened',
-          metadata: {},
-        },
-        {
-          id: 'some-uuid',
-          timestamp: 1621323232312,
-          event_message: 'some event happened',
-          metadata: {},
-        },
-      ]}
-    />
-  )
+  const duplicate = {
+    id: 'some-uuid',
+    timestamp: 1621323232312,
+    event_message: 'some event happened',
+    metadata: {},
+  }
+  render(<LogTable projectRef="projectRef" data={[duplicate, { ...duplicate }]} />)
 
-  // should only have one element, this line will fail if there are >1 element
-  await screen.findByText('timestamp')
+  expect(await screen.findAllByText(/some event happened/)).toHaveLength(1)
 })
 
 test('can display standard preview table columns', async () => {
@@ -269,9 +196,9 @@ test('can display standard preview table columns', async () => {
       data={[{ id: '12345', event_message: 'some event message', timestamp: fakeMicroTimestamp }]}
     />
   )
-  await waitFor(() => screen.getByText(/some event message/))
-  await expect(screen.findByText(/12345/)).rejects.toThrow()
-  await expect(screen.findByText(fakeMicroTimestamp)).rejects.toThrow()
+  await screen.findByText(/some event message/)
+  expect(screen.queryByText(/12345/)).not.toBeInTheDocument()
+  expect(screen.queryByText(fakeMicroTimestamp)).not.toBeInTheDocument()
 })
 
 test("closes the selection if the selected row's data changes", async () => {
@@ -292,8 +219,8 @@ test("closes the selection if the selected row's data changes", async () => {
       data={[{ id: '2', event_message: 'some other message', timestamp: fakeMicroTimestamp }]}
     />
   )
-  await expect(screen.findByText(/some event message/)).rejects.toThrow()
   await screen.findByText(/some other message/)
+  expect(screen.queryByText(/some event message/)).not.toBeInTheDocument()
 })
 
 enum QueryType {
@@ -365,21 +292,14 @@ test.each([
 ])('table col renderer for $queryType', async ({ queryType, data, includes, excludes }) => {
   render(<LogTable projectRef="ref" queryType={queryType} data={data} />)
 
-  await Promise.all([
-    ...includes.map((text) => screen.findByText(text)),
-    ...excludes.map((text) => expect(screen.findByText(text)).rejects.toThrow()),
-  ])
+  await Promise.all(includes.map((text) => screen.findByText(text)))
+  excludes.forEach((text) => expect(screen.queryByText(text)).not.toBeInTheDocument())
 })
 
-test('error message handling', async () => {
-  // Render LogTable with error as a string
+test('displays a string error message', () => {
   render(<LogTable projectRef="ref" error={'some error message'} />)
 
-  expect(screen.getByText(`some error message`)).toBeTruthy()
-
-  // Rerender LogTable with error as null
-  render(<LogTable projectRef="ref" error={null} />)
-  // Add any additional assertions if LogTable behaves differently when error is null
+  expect(screen.getByText('some error message')).toBeInTheDocument()
 })
 
 test('no results message handling', async () => {
@@ -447,20 +367,6 @@ const shiftClick = async (user: ReturnType<typeof userEvent.setup>, element: Ele
   await user.keyboard('{/Shift}')
 }
 
-test('shift-click selects the range between the anchor row and the clicked row', async () => {
-  const user = userEvent.setup()
-  render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
-
-  const checkboxes = getRowCheckboxes()
-  expect(checkboxes).toHaveLength(MULTI_SELECT_LOGS.length)
-
-  await user.click(checkboxes[1])
-  await shiftClick(user, getRowCheckboxes()[4])
-
-  expectCheckedIndexes([1, 2, 3, 4])
-  await screen.findByText('4 rows selected')
-})
-
 test('shift-click without an anchor toggles only the clicked row', async () => {
   const user = userEvent.setup()
   render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
@@ -471,13 +377,15 @@ test('shift-click without an anchor toggles only the clicked row', async () => {
   await screen.findByText('1 row selected')
 })
 
-test('shift-click on a selected row deselects back to the anchor, leaving the anchor checked', async () => {
+test('shift-click selects the range from the anchor, and shift-clicking a selected row deselects back to the anchor', async () => {
   const user = userEvent.setup()
   render(<LogTable projectRef="projectRef" data={MULTI_SELECT_LOGS} />)
 
+  expect(getRowCheckboxes()).toHaveLength(MULTI_SELECT_LOGS.length)
   await user.click(getRowCheckboxes()[1])
   await shiftClick(user, getRowCheckboxes()[4])
   expectCheckedIndexes([1, 2, 3, 4])
+  await screen.findByText('4 rows selected')
 
   // Row 4 is now the anchor and is never modified, so only it stays checked
   await shiftClick(user, getRowCheckboxes()[1])

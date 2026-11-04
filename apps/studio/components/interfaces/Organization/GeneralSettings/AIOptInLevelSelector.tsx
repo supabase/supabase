@@ -1,12 +1,13 @@
 import { ReactNode } from 'react'
 import { Control } from 'react-hook-form'
-import { FormField, RadioGroup, RadioGroupItem } from 'ui'
+import { Badge, cn, FormField, RadioGroup, RadioGroupItem } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { OptInToOpenAIToggle } from './OptInToOpenAIToggle'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { AIOptInFormValues } from '@/hooks/forms/useAIOptInForm'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { DOCS_URL } from '@/lib/constants'
 
 interface AIOptInLevelSelectorProps {
@@ -14,6 +15,9 @@ interface AIOptInLevelSelectorProps {
   disabled?: boolean
   label?: ReactNode
   layout?: 'horizontal' | 'vertical' | 'flex-row-reverse'
+  /** Badge the saved and proposed levels. */
+  currentLevel?: AiOptInLevel
+  proposedLevel?: AiOptInLevel
 }
 
 export const AIOptInLevelSelector = ({
@@ -21,6 +25,8 @@ export const AIOptInLevelSelector = ({
   disabled,
   label,
   layout = 'vertical',
+  currentLevel,
+  proposedLevel,
 }: AIOptInLevelSelectorProps) => {
   const {
     aiOptInLevelDisabled,
@@ -77,6 +83,8 @@ export const AIOptInLevelSelector = ({
       : []),
   ]
 
+  const isComparing = currentLevel !== undefined || proposedLevel !== undefined
+
   return (
     <FormItemLayout
       label={label}
@@ -114,7 +122,14 @@ export const AIOptInLevelSelector = ({
               className="space-y-2 mb-6"
             >
               {AI_OPT_IN_LEVELS.map((item) => (
-                <div key={item.value} className="flex items-start space-x-3">
+                <div
+                  key={item.value}
+                  className={cn(
+                    'flex items-start space-x-3',
+                    isComparing && '-mx-3 rounded-md border border-transparent p-3',
+                    item.value === proposedLevel && 'border-brand-500/40 bg-brand-default/5'
+                  )}
+                >
                   <RadioGroupItem
                     value={item.value}
                     id={`ai-opt-in-${item.value}`}
@@ -124,7 +139,11 @@ export const AIOptInLevelSelector = ({
                     htmlFor={`ai-opt-in-${item.value}`}
                     className="cursor-pointer flex flex-col"
                   >
-                    <span className="text-sm font-medium text-foreground">{item.title}</span>
+                    <span className="flex items-center gap-x-2 text-sm font-medium text-foreground">
+                      {item.title}
+                      {item.value === currentLevel && <Badge variant="warning">Current</Badge>}
+                      {item.value === proposedLevel && <Badge variant="success">Proposed</Badge>}
+                    </span>
                     <span className="text-sm text-foreground-light">{item.description}</span>
                   </label>
                 </div>

@@ -2,7 +2,7 @@
 
 import { useFlag, useParams } from 'common'
 import { Home } from 'icons'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
 import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
@@ -143,7 +143,7 @@ export function MobileMenuContent({
           <Button
             variant="text"
             className="p-1! justify-start"
-            icon={<ChevronLeft size={20} />}
+            icon={<ChevronLeftIcon size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"
             block

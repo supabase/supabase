@@ -3,10 +3,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { tableRowKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowUpdateVariables = {
   projectRef: string
@@ -57,6 +59,7 @@ export async function updateTableRow({
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['table-row-update', table.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -69,12 +72,12 @@ export const useTableRowUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowUpdateData, ResponseError, TableRowUpdateVariables>,
+  UseCustomMutationOptions<TableRowUpdateData, StudioError, TableRowUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowUpdateData, ResponseError, TableRowUpdateVariables>({
+  return useMutation<TableRowUpdateData, StudioError, TableRowUpdateVariables>({
     mutationFn: (vars) => updateTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

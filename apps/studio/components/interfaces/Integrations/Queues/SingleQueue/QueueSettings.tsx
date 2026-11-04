@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { isEqual } from 'lodash'
-import { HelpCircle, Settings } from 'lucide-react'
+import { HelpCircleIcon, SettingsIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
@@ -241,7 +241,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
         <ButtonTooltip
           variant="text"
           className="px-1.5"
-          icon={<Settings />}
+          icon={<SettingsIcon />}
           title="Settings"
           tooltip={{ content: { side: 'bottom', text: 'Queue settings' } }}
         />
@@ -255,7 +255,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
             {isExposed && (
               <>
                 These will also determine access to each function available from the{' '}
-                <code className="text-code-inline">pgmq_public</code> schema.
+                <code>pgmq_public</code> schema.
               </>
             )}
           </SheetDescription>
@@ -298,7 +298,7 @@ export const QueueSettings = ({}: QueueSettingsProps) => {
                       <Tooltip>
                         <TooltipTrigger className="mx-auto flex items-center gap-x-1 capitalize text-foreground-light font-normal">
                           {x}
-                          {isExposed && <HelpCircle size={14} strokeWidth={1.5} />}
+                          {isExposed && <HelpCircleIcon size={14} strokeWidth={1.5} />}
                         </TooltipTrigger>
                         {isExposed && (
                           <TooltipContent side="bottom" className="w-64 flex flex-col gap-y-1">

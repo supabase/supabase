@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { awsAccountKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type AWSAccountCreateVariables = {
   projectRef: string
@@ -43,22 +43,22 @@ export const useAWSAccountCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>,
+  UseMutationOptions<AWSAccountCreateData, StudioError, AWSAccountCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<AWSAccountCreateData, ResponseError, AWSAccountCreateVariables>({
+  return useMutation<AWSAccountCreateData, StudioError, AWSAccountCreateVariables>({
     mutationFn: (vars) => createAWSAccount(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
       await queryClient.invalidateQueries({ queryKey: awsAccountKeys.list(projectRef) })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to create connection: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

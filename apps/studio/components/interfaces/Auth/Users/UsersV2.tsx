@@ -6,11 +6,11 @@ import { LOCAL_STORAGE_KEYS, useFlag, useParams } from 'common'
 import {
   ExternalLinkIcon,
   InfoIcon,
-  RefreshCw,
-  Trash,
-  Users,
+  RefreshCwIcon,
+  TrashIcon,
+  UsersIcon,
   WandSparklesIcon,
-  X,
+  XIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -318,6 +318,10 @@ export const UsersV2 = () => {
     authConfig?.INDEX_WORKER_ENSURE_USER_SEARCH_INDEXES_EXIST === true &&
     indexWorkerStatus?.is_in_progress === true
 
+  // Avoids refetching an identical query when only the filter column changes (column is part of the query key).
+  const shouldUseColumnSearch =
+    filterKeywords.length > 0 && (improvedSearchEnabled || specificFilterColumn !== 'freeform')
+
   const {
     data,
     error,
@@ -343,7 +347,7 @@ export const UsersV2 = () => {
       sort: sortColumn as 'id' | 'created_at' | 'email' | 'phone',
       order: sortOrder as 'asc' | 'desc',
       // improved search will always have a column specified
-      ...(specificFilterColumn !== 'freeform' || improvedSearchEnabled
+      ...(shouldUseColumnSearch
         ? { column: specificFilterColumn as OptimizedSearchColumns }
         : { column: undefined }),
 
@@ -569,7 +573,7 @@ export const UsersV2 = () => {
                 onClick={() => setImprovedSearchDismissed(true)}
                 className="absolute top-3 right-3 opacity-30 hover:opacity-100 transition-opacity"
               >
-                <X size={14} className="text-foreground-light" />
+                <XIcon size={14} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>
@@ -615,11 +619,11 @@ export const UsersV2 = () => {
         <div className="bg-surface-200 py-3 px-4 md:px-6 flex flex-col lg:flex-row lg:items-start justify-between gap-2">
           {selectedUsers.size > 0 ? (
             <div className="flex items-center gap-x-2">
-              <Button icon={<Trash />} onClick={() => setShowDeleteModal(true)}>
+              <Button icon={<TrashIcon />} onClick={() => setShowDeleteModal(true)}>
                 Delete {selectedUsers.size} users
               </Button>
               <ButtonTooltip
-                icon={<X />}
+                icon={<XIcon />}
                 className="px-1.5"
                 onClick={() => setSelectedUsers(new Set([]))}
                 tooltip={{ content: { side: 'bottom', text: 'Cancel selection' } }}
@@ -786,7 +790,7 @@ export const UsersV2 = () => {
               <div className="flex items-center gap-x-2">
                 <ButtonTooltip
                   size="tiny"
-                  icon={<RefreshCw />}
+                  icon={<RefreshCwIcon />}
                   className="w-7"
                   loading={isRefetching && !isFetchingNextPage}
                   onClick={handleRefresh}
@@ -883,7 +887,7 @@ export const UsersV2 = () => {
                     </div>
                   ) : isSuccess ? (
                     <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                      <Users className="text-foreground-lighter" strokeWidth={1} />
+                      <UsersIcon className="text-foreground-lighter" strokeWidth={1} />
                       <div className="text-center">
                         <p className="text-foreground">
                           {filterUserType !== 'all' || filterKeywords.length > 0

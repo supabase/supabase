@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -24,7 +23,7 @@ import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-muta
 import { pickLogsQueryBuilder } from '@/data/logs/logs-endpoint'
 import { safeSql } from '@/data/logs/safe-analytics-sql'
 import { useTablesQuery } from '@/data/tables/tables-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 const schema = z.object({
@@ -64,9 +63,8 @@ export const AuditLogsForm = () => {
   )
   const authAuditLogsUrl = `/project/${projectRef}/logs/explorer?q=${encodeURIComponent(authAuditLogsQuery)}`
 
-  const { can: canUpdateConfig } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'custom_config_gotrue'
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
   )
 
   const { data: tables = [] } = useTablesQuery({
@@ -165,7 +163,7 @@ export const AuditLogsForm = () => {
                             rel="noopener noreferrer"
                             href={`/project/${projectRef}/editor/${auditLogTable?.id}`}
                           >
-                            <code className="text-code-inline">{AUDIT_LOG_ENTRIES_TABLE}</code>
+                            <code>{AUDIT_LOG_ENTRIES_TABLE}</code>
                           </InlineLink>{' '}
                           table.
                           <br />
@@ -194,10 +192,8 @@ export const AuditLogsForm = () => {
                         Future audit logs will only appear in the project’s{' '}
                         <InlineLink href={authAuditLogsUrl}>auth logs</InlineLink>. You are
                         responsible for backing up, copying, or migrating existing data from the{' '}
-                        <code className="text-code-inline break-keep!">
-                          {AUDIT_LOG_ENTRIES_TABLE}
-                        </code>{' '}
-                        table if needed.
+                        <code className="break-keep!">{AUDIT_LOG_ENTRIES_TABLE}</code> table if
+                        needed.
                       </p>
                     }
                   />

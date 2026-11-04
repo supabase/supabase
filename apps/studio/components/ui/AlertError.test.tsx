@@ -65,3 +65,12 @@ test.each([false, true])(
     expect(screen.queryByRole('link', { name: /contact support/i })).not.toBeInTheDocument()
   }
 )
+
+test('support continues the error message inline when instructions are hidden', () => {
+  customRender(
+    <AlertError showInstructions={false} showErrorPrefix={false} error={{ message: 'oh no' }} />
+  )
+  const link = screen.getByRole('link', { name: 'contact support' })
+  expect(link.closest('p')).toHaveTextContent('oh no. If the issue persists, contact support.')
+  expect(screen.queryByRole('link', { name: 'Contact support' })).not.toBeInTheDocument()
+})

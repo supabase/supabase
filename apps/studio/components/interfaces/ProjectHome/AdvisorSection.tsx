@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { Shield } from 'lucide-react'
+import { ShieldIcon } from 'lucide-react'
 import { useCallback, useMemo } from 'react'
 import {
   AiIconAnimation,
@@ -253,7 +253,7 @@ function EmptyState({ canShowHealthAdvisor }: { canShowHealthAdvisor: boolean })
   return (
     <Card className="bg-transparent h-64">
       <CardContent className="flex flex-col items-center justify-center gap-2 p-16 h-full">
-        <Shield size={20} strokeWidth={1.5} className="text-foreground-muted" />
+        <ShieldIcon size={20} strokeWidth={1.5} className="text-foreground-muted" />
         <p className="text-sm text-foreground-light text-center">
           {canShowHealthAdvisor
             ? 'No security, performance or health issues found'

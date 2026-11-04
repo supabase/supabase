@@ -1,4 +1,4 @@
-import { BadgeCheck } from 'lucide-react'
+import { BadgeCheckIcon } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, Card, CardContent, cn } from 'ui'
@@ -92,7 +92,7 @@ export const IntegrationCard = ({
             </div>
             {isInstalled && (
               <div className="flex items-center gap-x-1">
-                <BadgeCheck size={14} className="text-primary" />
+                <BadgeCheckIcon size={14} className="text-primary" />
                 <span className="text-primary text-xs">Installed</span>
               </div>
             )}

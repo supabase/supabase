@@ -38,5 +38,9 @@
   {
     "question": "Can I pause a free project?",
     "answer": "Yes, you can pause a project at any time. Our Free Plan gives you 2 free projects, but you can have as many paused projects as you want. Just pause and unpause them as needed."
+  },
+  {
+    "question": "Can I purchase Supabase through AWS Marketplace?",
+    "answer": "Yes. If your organization has an AWS spend commitment (such as a PPA or EDP), you can buy Pro or Team through AWS Marketplace so eligible Supabase spend counts toward that commitment. Billing details and plan management then run through AWS, and Spend Cap is unavailable for AWS-managed organizations. Learn more on our [AWS Marketplace page](/aws-marketplace), or go straight to the [public listing](https://aws.amazon.com/marketplace/pp/prodview-zjciuce2qsb3q)."
   }
 ]

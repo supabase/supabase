@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import Image from 'next/image'
 import {
   Button,
@@ -58,7 +58,7 @@ export const AddIntegrationDropdown = ({
   return (
     <DropdownMenu open={open} onOpenChange={onOpenChange}>
       <DropdownMenuTrigger asChild>
-        <Button variant={variant} iconRight={<ChevronDown />}>
+        <Button variant={variant} iconRight={<ChevronDownIcon />}>
           Add provider
         </Button>
       </DropdownMenuTrigger>
@@ -70,6 +70,7 @@ export const AddIntegrationDropdown = ({
         <ProviderDropdownItem type="workos" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="auth0" onSelectIntegrationType={onSelectIntegrationType} />
         <ProviderDropdownItem type="awsCognito" onSelectIntegrationType={onSelectIntegrationType} />
+        <ProviderDropdownItem type="custom" onSelectIntegrationType={onSelectIntegrationType} />
       </DropdownMenuContent>
     </DropdownMenu>
   )

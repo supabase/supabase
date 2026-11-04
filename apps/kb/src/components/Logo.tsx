@@ -1,14 +1,16 @@
+import { cn } from 'ui'
+
 // Same wordmark swap apps/docs' HeaderLogo uses (light/dark SVG pair from
 // apps/docs/public), plus the "KB" mono label docs uses "DOCS" for.
 //
 // The SVGs live in public/, which Astro's `base` config doesn't rewrite on
 // its own, so the base is prepended by hand — see
 // https://docs.astro.build/en/reference/configuration-reference/#base
-function Logo() {
+function Logo({ className }: { className?: string }) {
   const base = import.meta.env.BASE_URL
 
   return (
-    <a href={base} className="flex shrink-0 items-center gap-1.5 w-fit">
+    <a href={base} className={cn('flex shrink-0 items-center gap-1.5 w-fit', className)}>
       <img
         className="hidden dark:block"
         src={`${base}/supabase-dark.svg`}

@@ -1,4 +1,4 @@
-import { Loader2, Search } from 'lucide-react'
+import { Loader2Icon, SearchIcon } from 'lucide-react'
 import { ComponentPropsWithoutRef, forwardRef, useMemo, useState } from 'react'
 import {
   Button,
@@ -77,7 +77,7 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
               size={size}
               disabled={disabled}
               data-testid="find-table-selector"
-              icon={<Search size={14} strokeWidth={1.5} className="text-foreground-muted" />}
+              icon={<SearchIcon size={14} strokeWidth={1.5} className="text-foreground-muted" />}
             >
               <span className="text-foreground-lighter">Find table…</span>
             </Button>
@@ -93,7 +93,7 @@ export const FindTableSelector = forwardRef<HTMLDivElement, FindTableSelectorPro
               <CommandList>
                 {isFetching && tables.length === 0 ? (
                   <div className="flex items-center justify-center gap-x-2 py-6 text-xs text-foreground-light">
-                    <Loader2 className="animate-spin" size={14} />
+                    <Loader2Icon className="animate-spin" size={14} />
                     <span>Loading tables</span>
                   </div>
                 ) : (

@@ -1,6 +1,6 @@
 import { useSortable } from '@dnd-kit/sortable'
 import { CSS } from '@dnd-kit/utilities'
-import { GripVertical, Link, Plus, Settings, X } from 'lucide-react'
+import { GripVerticalIcon, LinkIcon, PlusIcon, SettingsIcon, XIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -155,7 +155,7 @@ export const Column = ({
                 {...listeners}
                 tabIndex={0}
                 className="w-6.5 px-0 cursor-grab text-foreground"
-                icon={<GripVertical size={16} strokeWidth={2} />}
+                icon={<GripVerticalIcon size={16} strokeWidth={2} />}
                 aria-label={`Move column ${column.name}`}
               />
             </TooltipTrigger>
@@ -188,7 +188,7 @@ export const Column = ({
                       onClick={() => onEditForeignKey()}
                       aria-label={`Add foreign key for ${column.name}`}
                     >
-                      <Link size={14} strokeWidth={1.5} />
+                      <LinkIcon size={14} strokeWidth={1.5} />
                     </Button>
                   </TooltipTrigger>
                   <TooltipContent side="bottom">Reference a column in another table</TooltipContent>
@@ -204,7 +204,7 @@ export const Column = ({
                           className="w-6.5 px-0 mr-0.5"
                           aria-label={`Edit ${column.name} foreign keys`}
                         >
-                          <Link size={14} strokeWidth={1.5} />
+                          <LinkIcon size={14} strokeWidth={1.5} />
                         </Button>
                       </PopoverTrigger>
                     </TooltipTrigger>
@@ -277,7 +277,7 @@ export const Column = ({
                             onSelect={() => onEditForeignKey()}
                             onClick={() => onEditForeignKey()}
                           >
-                            <Plus size={14} strokeWidth={1.5} />
+                            <PlusIcon size={14} strokeWidth={1.5} />
                             <p>Add foreign key relation</p>
                           </CommandItem>
                         </CommandGroup>
@@ -356,7 +356,7 @@ export const Column = ({
                         </div>
                       )}
                       <div className="text-foreground-light transition-colors group-hover:text-foreground">
-                        <Settings size={16} strokeWidth={1.75} />
+                        <SettingsIcon size={16} strokeWidth={1.75} />
                       </div>
                     </>
                   }
@@ -468,7 +468,7 @@ export const Column = ({
                 aria-label={`Remove column ${column.name}`}
                 className="w-6.5 px-0 cursor-pointer"
                 onClick={() => onRemoveColumn()}
-                icon={<X size={16} strokeWidth={1.75} />}
+                icon={<XIcon size={16} strokeWidth={1.75} />}
               />
             </TooltipTrigger>
             <TooltipContent side="bottom">Remove this column from the table</TooltipContent>

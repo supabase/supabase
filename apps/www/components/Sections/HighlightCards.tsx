@@ -1,7 +1,7 @@
 import SectionContainer from '~/components/Layouts/SectionContainer'
 import Panel from '~/components/Panel'
 import { getAnimation, INITIAL_BOTTOM } from '~/lib/animations'
-import { domAnimation, LazyMotion, m, useInView } from 'framer-motion'
+import { domAnimation, LazyMotion, m, useInView } from 'motion/react'
 import React, { useRef, useState } from 'react'
 
 interface Highlight {

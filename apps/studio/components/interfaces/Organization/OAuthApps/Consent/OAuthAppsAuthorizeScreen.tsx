@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AuthorizeSuccessScreen } from './AuthorizeSuccessScreen'
 import { AuthorizingAsCard } from './AuthorizingAsCard'
@@ -8,6 +9,7 @@ import { NoProjectsNotice } from './NoProjectsNotice'
 import { CONSENT_COPY } from './OAuthAppsAuthorizeScreen.utils'
 import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
+import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { useMemberOrganization } from './useMemberOrganization'
 import {
   DestinationLogo,
@@ -50,6 +52,8 @@ export const OAuthAppsAuthorizeScreen = ({
   projectRef = null,
   navigate,
 }: OAuthAppsAuthorizeScreenProps) => {
+  const signOut = useSignOut()
+
   const grantKind = request.grant_kind
   const isProjectScopingModeEnabled = request.project_scoping_mode
 
@@ -60,41 +64,57 @@ export const OAuthAppsAuthorizeScreen = ({
     null
   )
 
-  const identityQuery = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
-  const memberOrgQuery = useMemberOrganization({
+  const {
+    data: identity,
+    error: identityError,
+    isPending: isPendingIdentity,
+    isError: isErrorIdentity,
+  } = useOAuthAppsAuthorizeOrganizationsQuery({ id: authId })
+
+  const {
+    data: memberOrg,
+    error: memberOrgError,
+    isPending: isPendingMemberOrg,
+    isError: isErrorMemberOrg,
+  } = useMemberOrganization({
     authId,
     organizationSlug,
     projectRef,
     request,
   })
 
-  const projectsQuery = useOAuthAppsAuthorizeOrganizationProjectsQuery(
+  const { data: projects } = useOAuthAppsAuthorizeOrganizationProjectsQuery(
     {
       id: authId,
-      slug: memberOrgQuery.data || '',
+      slug: memberOrg || '',
     },
     {
-      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+      enabled: !isPendingMemberOrg && !!memberOrg,
     }
   )
-  const appDetailsQuery = useOAuthOrgAppDetailsQuery(
+
+  const {
+    data: appDetails,
+    isPending: isPendingAppDetails,
+    isError: isErrorAppDetails,
+    error: errorAppDetails,
+  } = useOAuthOrgAppDetailsQuery(
     {
-      slug: memberOrgQuery.data || '',
+      slug: memberOrg || '',
       appId: request.app_id,
     },
     {
-      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+      enabled: !isPendingMemberOrg && !!memberOrg,
     }
   )
 
   const seeded = useRef(false)
   useEffect(() => {
-    if (seeded.current || !projectsQuery.data || !appDetailsQuery.data || !memberOrgQuery.data)
-      return
+    if (seeded.current || !projects || !appDetails || !memberOrg) return
     seeded.current = true
     if (!isProjectScopingModeEnabled) return
 
-    const grant = appDetailsQuery.data.existing_grant
+    const grant = appDetails.existing_grant
     const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
@@ -104,26 +124,18 @@ export const OAuthAppsAuthorizeScreen = ({
     const refs = getPreselectedProjectRefs({
       existingGrant: grant,
       projectRef,
-      liveProjects: projectsQuery.data,
+      liveProjects: projects,
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
-  }, [
-    appDetailsQuery.data,
-    projectsQuery.data,
-    memberOrgQuery.data,
-    isProjectScopingModeEnabled,
-    projectRef,
-  ])
-
-  const signOut = useSignOut()
+  }, [appDetails, projects, memberOrg, isProjectScopingModeEnabled, projectRef])
 
   const preflightQuery = useOAuthAppsPreflightValidationQuery(
     {
       appId: request.app_id,
-      slug: memberOrgQuery.data!,
+      slug: memberOrg!,
     },
     {
-      enabled: !memberOrgQuery.isPending && !!memberOrgQuery.data,
+      enabled: !isPendingMemberOrg && !!memberOrg,
     }
   )
 
@@ -144,12 +156,12 @@ export const OAuthAppsAuthorizeScreen = ({
   })
 
   const isSubmitting = approveMutation.isPending
-  const hasProjects = (projectsQuery.data?.length ?? 0) > 0
+  const hasProjects = (projects?.length ?? 0) > 0
 
   const isBlockedOnProjects = isProjectScopingModeEnabled && !hasProjects
   const canProceed = !isBlockedOnProjects
 
-  const grantedProjects = (projectsQuery.data ?? []).filter((project) =>
+  const grantedProjects = (projects ?? []).filter((project) =>
     selectedProjectRefs.includes(project.ref)
   )
 
@@ -165,11 +177,11 @@ export const OAuthAppsAuthorizeScreen = ({
   const usesSelectedProjects = isProjectScopingModeEnabled && !allProjectsSelected
   const hasNoSelection = usesSelectedProjects && selectedProjectRefs.length === 0
 
-  if (identityQuery.isPending || memberOrgQuery.isPending) {
+  if (isPendingIdentity || isPendingMemberOrg) {
     return null
   }
 
-  if (identityQuery.isError) {
+  if (isErrorIdentity) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
@@ -177,16 +189,27 @@ export const OAuthAppsAuthorizeScreen = ({
         description="This application wants to access your Supabase Account"
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
-          <AlertError
-            subject="An error occurred while loading your data"
-            error={identityQuery.error}
-          />
+          <AlertError subject="An error occurred while loading your data" error={identityError} />
         </div>
       </InterstitialLayout>
     )
   }
 
-  if (memberOrgQuery.isError) {
+  if (isErrorAppDetails) {
+    return (
+      <InterstitialLayout
+        logo={<DestinationLogo name={request.name} />}
+        title={`Authorize ${request.name}`}
+        description="This application wants to access your Supabase Account"
+      >
+        <div className="flex flex-col gap-6 px-6 pb-6">
+          <AlertError subject="An error occurred while loading your data" error={errorAppDetails} />
+        </div>
+      </InterstitialLayout>
+    )
+  }
+
+  if (isErrorMemberOrg) {
     return (
       <InterstitialLayout
         logo={<DestinationLogo name={request.name} />}
@@ -195,8 +218,8 @@ export const OAuthAppsAuthorizeScreen = ({
       >
         <div className="flex flex-col gap-6 px-6 pb-6">
           <AlertError
+            error={memberOrgError}
             subject="We couldn't find the organization for this application authorization"
-            error={memberOrgQuery.error}
           />
         </div>
       </InterstitialLayout>
@@ -214,8 +237,8 @@ export const OAuthAppsAuthorizeScreen = ({
         <AuthorizeSuccessScreen
           appName={request.name}
           grant={{
-            email: identityQuery.data.email,
-            organization_slug: memberOrgQuery.data,
+            email: identity.email,
+            organization_slug: memberOrg,
             project_refs: usesSelectedProjects ? selectedProjectRefs : null,
             projects: grantedProjects,
             scopes: request.scopes,
@@ -243,11 +266,11 @@ export const OAuthAppsAuthorizeScreen = ({
     const approveBody: OAuthAuthorizeApproveRequest = usesSelectedProjects
       ? { project_refs: selectedProjectRefs }
       : {}
-    approveMutation.mutate({ auth_id: authId, slug: memberOrgQuery.data, body: approveBody })
+    approveMutation.mutate({ auth_id: authId, slug: memberOrg, body: approveBody })
   }
 
   const handleDeny = () => {
-    denyMutation.mutate({ auth_id: authId, slug: memberOrgQuery.data })
+    denyMutation.mutate({ auth_id: authId, slug: memberOrg })
   }
 
   const footerMessage = isSubmitting
@@ -262,14 +285,28 @@ export const OAuthAppsAuthorizeScreen = ({
     <InterstitialLayout
       logo={<LogoPair left={<DestinationLogo name={request.name} />} right={<SupabaseLogo />} />}
       title={`Authorize ${request.name}`}
-      description="This application wants to access your Supabase Account"
+      description={
+        appDetails?.existing_grant ? (
+          <>
+            You authorized {request.name} for this organization on{' '}
+            <TimestampInfo
+              className="text-sm inline-block"
+              utcTimestamp={appDetails.existing_grant.approved_at}
+              labelFormat="D MMM YYYY"
+            />
+            . It's now asking for different access.
+          </>
+        ) : (
+          'This application wants to access your Supabase Account'
+        )
+      }
     >
       <div className="flex flex-col gap-6 px-6 pb-6">
         {preflightQuery.data?.status === 'error' && (
           <Admonition
             type="warning"
             title={CONSENT_COPY.roleFailureAllProjects.title(request.name)}
-            description={CONSENT_COPY.roleFailureAllProjects.description(memberOrgQuery.data)}
+            description={CONSENT_COPY.roleFailureAllProjects.description(memberOrg)}
           />
         )}
         {hasRoleFailure && (
@@ -282,8 +319,8 @@ export const OAuthAppsAuthorizeScreen = ({
 
         <fieldset disabled={isSubmitting} className="contents">
           <AuthorizingAsCard
-            email={identityQuery.data.email}
-            organizationSlug={memberOrgQuery.data}
+            email={identity.email}
+            organizationSlug={memberOrg}
             onSignOut={handleSignOut}
             request={request}
           />
@@ -291,7 +328,7 @@ export const OAuthAppsAuthorizeScreen = ({
           {isBlockedOnProjects && (
             <NoProjectsNotice
               appName={request.name}
-              organizationSlug={memberOrgQuery.data}
+              organizationSlug={memberOrg}
               onSwitchOrg={handleSwitchOrg}
             />
           )}
@@ -299,7 +336,7 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
-                projects={projectsQuery.data ?? []}
+                projects={projects ?? []}
                 selectedRefs={selectedProjectRefs}
                 onChange={setSelectedProjectRefs}
                 maxSelected={MAX_SELECTED_PROJECTS}
@@ -316,7 +353,14 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <section className="flex flex-col gap-3">
                 <p className="text-sm text-foreground">Permissions requested</p>
-                <ScopeGroupCard scopes={request.scopes} />
+                {appDetails?.existing_grant?.approved_scopes ? (
+                  <ScopeGroupCardWithDiff
+                    scopes={request.scopes}
+                    previousScopes={appDetails.existing_grant.approved_scopes}
+                  />
+                ) : (
+                  <ScopeGroupCard scopes={request.scopes} />
+                )}
                 <p className="text-xs text-foreground-lighter">
                   Authorizing {request.name} grants it access to the permissions
                   {isProjectScopingModeEnabled && !allProjectsSelected
@@ -342,7 +386,7 @@ export const OAuthAppsAuthorizeScreen = ({
             <Button
               block
               variant={primaryActionVariant}
-              loading={isSubmitting}
+              loading={isSubmitting || isPendingAppDetails}
               disabled={cannotApprove}
               aria-label={primaryActionLabel}
               onClick={hasRoleFailure ? handleDeselectFlagged : handleApprove}

@@ -2,7 +2,6 @@ import {
   Bot,
   Check,
   File,
-  Github,
   LockKeyhole,
   MoreHorizontal,
   MousePointer2,
@@ -13,6 +12,7 @@ import {
   Workflow,
 } from 'lucide-react'
 import type { ReactNode } from 'react'
+import { GithubIcon } from 'ui'
 
 import type { CatalogPreviewKind } from '@/config/library'
 
@@ -67,7 +67,7 @@ export function CatalogPreview({ kind }: { kind: CatalogPreviewKind }) {
               {kind === 'social' ? (
                 <>
                   <div className="flex items-center justify-center gap-2 rounded border px-2 py-1.5">
-                    <Github className="size-3" />
+                    <GithubIcon className="size-3" />
                     Continue with GitHub
                   </div>
                   <div className="rounded border px-2 py-1.5 text-center">Continue with Google</div>

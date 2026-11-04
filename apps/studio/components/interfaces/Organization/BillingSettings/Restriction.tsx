@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { Alert, AlertDescription, AlertTitle, Button, CriticalIcon, WarningIcon } from 'ui'
@@ -88,7 +88,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/cost-control#spend-cap`}>About spend cap</a>
               </Button>
             </div>
@@ -131,7 +131,7 @@ export const Restriction = () => {
                 </Button>
               )}
 
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -172,7 +172,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>
@@ -212,7 +212,7 @@ export const Restriction = () => {
                   <Link href={`/org/${org?.slug}/usage`}>View usage</Link>
                 </Button>
               )}
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a href={`${DOCS_URL}/guides/platform/billing-faq#fair-use-policy`}>
                   About Fair Use Policy
                 </a>

@@ -5,9 +5,11 @@ import { useCallback } from 'react'
 import { z } from 'zod'
 
 import { tableKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { SafePostgresTable } from '@/lib/postgres-types'
-import type { ResponseError, UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions, UseCustomQueryOptions } from '@/types'
 
 export type TablesVariables = {
   projectRef?: string
@@ -38,7 +40,10 @@ export async function getTables(
   }).sql
   const queryKey = ['tables', schema]
 
-  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    signal
+  )
   // Sort the data if the sortByName option is true
   if (Array.isArray(result) && sortByProperty) {
     return sortBy(result, (t) => t[sortByProperty]) as SafePostgresTable[]
@@ -46,7 +51,7 @@ export async function getTables(
   return result as SafePostgresTable[]
 }
 
-export type TablesError = ResponseError
+export type TablesError = StudioError
 
 export const useTablesQuery = <TData = TablesData>(
   vars: TablesVariables,
@@ -145,6 +150,7 @@ export async function getTablesPage(
         limit ? `page_size:${limit}` : null,
         afterOid ? `after:${afterOid}` : null,
       ],
+      grant: unguarded.migrating,
     },
     signal
   )

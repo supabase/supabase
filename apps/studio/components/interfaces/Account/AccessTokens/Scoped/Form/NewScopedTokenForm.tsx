@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useReducedMotion } from 'common'
-import { ChevronRight, X } from 'lucide-react'
+import { ChevronRightIcon, XIcon } from 'lucide-react'
 import { forwardRef, useEffect, useImperativeHandle, useRef, useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -246,7 +246,7 @@ export const NewScopedTokenForm = forwardRef<
             </Button>
           )}
           {step === 'form' && !isClassicMode && (
-            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRight />}>
+            <Button variant="primary" type="submit" form={FORM_ID} iconRight={<ChevronRightIcon />}>
               Review access
             </Button>
           )}
@@ -277,7 +277,7 @@ export const NewScopedTokenForm = forwardRef<
                 <Button
                   variant="text"
                   size="tiny"
-                  icon={<X />}
+                  icon={<XIcon />}
                   aria-label="Dismiss"
                   className="px-1 text-foreground-lighter"
                   onClick={() => setIsCreateHintDismissed(true)}

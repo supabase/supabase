@@ -2,6 +2,7 @@ import type { Metadata } from 'next'
 
 import PartnersContent from './PartnersContent'
 import pageData from '@/data/partners'
+import { canonicalAlternates } from '@/lib/canonical'
 import { listCatalogPartners } from '@/lib/marketplaceDb'
 
 export const revalidate = 1800
@@ -11,6 +12,7 @@ const FEATURED_PARTNER_LIMIT = 30
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/partners'),
   title: pageData.metaTitle,
   description: pageData.metaDescription,
   openGraph: {

@@ -53,7 +53,7 @@ Each example builds one Fetch handler with `pipeline`. Entries run in array orde
 
     Without `withCors`, `withSupabase` answers every `OPTIONS` request itself with `204` and wildcard CORS headers (`Access-Control-Allow-Origin: *`). That is enough when you do not need an origin allowlist. A layer that owns CORS must sit before `withSupabase` in the array. Placed after it, the preflight reaches the auth gate and gets a `401`.
 
-    The entry form of `withSupabase` is alpha. It needs `@supabase/server` 1.6.0 or later.
+    The entry form of `withSupabase` needs `@supabase/server` 1.6.0 or later.
 
   </RefSubLayout.Details>
 

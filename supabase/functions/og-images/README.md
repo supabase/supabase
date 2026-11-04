@@ -6,7 +6,7 @@ Generate OG Images for the sites at supabase.
 
 To use the og image generator, you will need to visit the site with the following parameters:
 
-`site`: indicating which site you want to generate an image for. Currently, the only available option is docs.
+`site`: indicating which site you want to generate an image for. One of `docs`, `kb`, `customers` or `events`.
 
 `title`: representing the title of the image you want to generate.
 

@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowUpDown, X } from 'lucide-react'
+import { ArrowUpDownIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import {
@@ -172,7 +172,7 @@ export const ChartConfig = ({
               size="tiny"
               onClick={onFlip}
               disabled={!canFlip}
-              icon={<ArrowUpDown size="15" className="text-foreground-lighter" />}
+              icon={<ArrowUpDownIcon size="15" className="text-foreground-lighter" />}
               tooltip={{
                 content: {
                   side: 'bottom',
@@ -195,7 +195,7 @@ export const ChartConfig = ({
                 onClick={() => setAcknowledged(true)}
                 className="absolute top-3 right-3 opacity-30 group-hover:opacity-100 transition-opacity"
               >
-                <X size={14} className="text-foreground-light" />
+                <XIcon size={14} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">Dismiss</TooltipContent>
             </Tooltip>

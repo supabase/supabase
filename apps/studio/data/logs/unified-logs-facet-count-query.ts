@@ -21,7 +21,8 @@ import {
   getFacetCountCTE,
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type UnifiedLogsFacetCountVariables = UnifiedLogsVariables & {
   facet: string
@@ -80,7 +81,7 @@ SELECT dimension, value, count from ${cteName};
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>
-export type UnifiedLogsFacetCountError = ResponseError | z.ZodError
+export type UnifiedLogsFacetCountError = StudioError | z.ZodError
 
 export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>(
   { projectRef, search, facet, facetSearch }: UnifiedLogsFacetCountVariables,
@@ -89,7 +90,7 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
     ...options
   }: UseCustomQueryOptions<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData> = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   const scopedSearch =
     facet === 'pathname'
       ? {
@@ -101,18 +102,17 @@ export const useUnifiedLogsFacetCountQuery = <TData = UnifiedLogsFacetCountData>
       : search
   const facetScope = {
     ...scopedSearch,
-    latency: null,
-    'timing.dns': null,
-    'timing.connection': null,
-    'timing.tls': null,
-    'timing.ttfb': null,
-    'timing.transfer': null,
-    sort: null,
+    latency: undefined,
+    'timing.dns': undefined,
+    'timing.connection': undefined,
+    'timing.tls': undefined,
+    'timing.ttfb': undefined,
+    'timing.transfer': undefined,
+    sort: undefined,
     size: 40,
     start: 0,
     direction: 'next' as const,
     cursor: new Date(0),
-    id: null,
   }
   return useQuery<UnifiedLogsFacetCountData, UnifiedLogsFacetCountError, TData>({
     queryKey: [

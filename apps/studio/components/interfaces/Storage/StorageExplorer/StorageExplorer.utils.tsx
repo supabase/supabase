@@ -4,6 +4,10 @@ import { copyToClipboard } from 'ui'
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES } from '../Storage.constants'
 import { StorageItem, StorageItemMetadata } from '../Storage.types'
 import { inverseValidObjectKeyRegex, validObjectKeyRegex } from '../Storage.utils'
+import {
+  willRetainVersionOnWrite,
+  type BucketVersioningState,
+} from '../StorageVersioning.constants'
 import type { StorageObject } from '@/data/storage/bucket-objects-list-mutation'
 import { BASE_PATH } from '@/lib/constants'
 import type { StorageExplorerState } from '@/state/storage-explorer'
@@ -38,6 +42,15 @@ export function getPathAlongOpenedFolders(
  * Returns the path to the folder at the given index in the openedFolders array,
  * joining all folders from the root up to (but not including) the given index.
  */
+/** The object's full path within the bucket; a row only knows its leaf name and column. */
+export function getStorageItemPath(
+  state: Pick<StorageExplorerState, 'openedFolders'>,
+  item: { name: string; columnIndex: number }
+): string {
+  const folderPath = getPathAlongFoldersToIndex(state, item.columnIndex)
+  return folderPath.length > 0 ? `${folderPath}/${item.name}` : item.name
+}
+
 export function getPathAlongFoldersToIndex(
   state: Pick<StorageExplorerState, 'openedFolders'>,
   index: number
@@ -89,10 +102,16 @@ export function sanitizeNameForDuplicateInColumn(
     name,
     columnIndex,
     autofix = false,
+    reservedNames = [],
   }: {
     name: string
     columnIndex?: number
     autofix?: boolean
+    /**
+     * Names that are taken in the destination but absent from `state.columns` — archived
+     * objects, which only exist in the rendered overlay.
+     */
+    reservedNames?: string[]
   }
 ): string | null {
   const columnIndex_ = columnIndex !== undefined ? columnIndex : state.columns.length - 1
@@ -100,12 +119,15 @@ export function sanitizeNameForDuplicateInColumn(
   const currentColumnItems = currentColumn.items.filter(
     (item) => item.status !== STORAGE_ROW_STATUS.EDITING
   )
+  // One list, so the suffix counter sees everything the clash check does. Counting only
+  // column items would hand back a ` (1)` that an archived object already holds.
+  const takenNames = currentColumnItems.map((item) => item.name).concat(reservedNames)
   // [Joshen] JFYI storage does support folders of the same name with different casing
   // but its an issue with the List V1 endpoint that's causing an issue with fetching contents
   // for folders of the same name with different casing
   // We should remove this check once all projects are on the List V2 endpoint
   const hasSameNameInColumn =
-    currentColumnItems.filter((item) => item.name.toLowerCase() === name.toLowerCase()).length > 0
+    takenNames.filter((takenName) => takenName.toLowerCase() === name.toLowerCase()).length > 0
 
   if (hasSameNameInColumn) {
     if (autofix) {
@@ -114,11 +136,9 @@ export function sanitizeNameForDuplicateInColumn(
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
       const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
-      const itemsWithSameNameInColumn = currentColumnItems.filter((item) =>
-        item.name.match(dupeNameRegex)
-      )
+      const namesWithSuffix = takenNames.filter((takenName) => takenName.match(dupeNameRegex))
 
-      const updatedFileName = fileName + ` (${itemsWithSameNameInColumn.length + 1})`
+      const updatedFileName = fileName + ` (${namesWithSuffix.length + 1})`
       return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
     } else {
       toast.error(
@@ -130,6 +150,41 @@ export function sanitizeNameForDuplicateInColumn(
 
   return name
 }
+
+export type UploadConflictResolution = 'replace' | 'keep-both' | 'cancel'
+
+export type UploadConflicts = {
+  liveNames: string[]
+  archivedNames: string[]
+  isVersioningSuspended: boolean
+}
+
+export function getUploadNameConflicts({
+  fileNames,
+  existingNames,
+}: {
+  fileNames: string[]
+  existingNames: string[]
+}): string[] {
+  const takenNames = new Set(existingNames.map((name) => name.toLowerCase()))
+  return Array.from(new Set(fileNames.filter((name) => takenNames.has(name.toLowerCase()))))
+}
+
+export const getReplaceableFileNames = ({
+  items,
+  versioningState,
+}: {
+  items: readonly StorageItem[]
+  versioningState: BucketVersioningState
+}): string[] =>
+  items
+    .filter(
+      (item) =>
+        item.type === STORAGE_ROW_TYPES.FILE &&
+        item.status !== STORAGE_ROW_STATUS.EDITING &&
+        willRetainVersionOnWrite({ versioningState, isObjectVersioned: item.is_versioned })
+    )
+    .map((item) => item.name)
 
 /** Bucket-relative path to an item */
 export function getStoragePathForItem(
@@ -315,4 +370,27 @@ const readEntriesPromise = async (directoryReader: FileSystemDirectoryReader) =>
   } catch (err) {
     console.error('readEntriesPromise error:', err)
   }
+}
+
+/**
+ * Storage rejects a write that breaks the bucket's own rules with a bare status and no
+ * usable message, so turn the ones a replace can hit into something actionable.
+ */
+export const describeUploadFailure = ({
+  status,
+  fallback,
+  allowedMimeTypes,
+}: {
+  status?: number
+  fallback: string
+  allowedMimeTypes?: string[] | null
+}) => {
+  if (status === 415) {
+    const allowed = allowedMimeTypes?.length
+      ? ` Allowed MIME types: ${allowedMimeTypes.join(', ')}.`
+      : ''
+    return `that file type is not allowed in this bucket.${allowed}`
+  }
+  if (status === 413) return 'the file exceeds the bucket file size limit.'
+  return fallback
 }

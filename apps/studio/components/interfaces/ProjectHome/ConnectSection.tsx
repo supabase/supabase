@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef } from 'react'
@@ -106,7 +106,7 @@ export const ConnectSection = () => {
                   <p className="text-sm">{action.heading}</p>
                   <p className="text-sm text-foreground-lighter">{action.subheading}</p>
                 </div>
-                <ChevronRight
+                <ChevronRightIcon
                   size={16}
                   className="shrink-0 text-foreground-lighter group-hover:text-foreground xl:hidden"
                 />

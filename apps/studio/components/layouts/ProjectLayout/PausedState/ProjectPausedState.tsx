@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { PauseCircle } from 'lucide-react'
+import { PauseCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardFooter } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -48,7 +48,11 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
   return (
     <Card className="w-full max-w-160 mx-auto">
       <CardContent>
-        <PauseCircle size={48} strokeWidth={1} className="text-foreground-lighter shrink-0 mb-4" />
+        <PauseCircleIcon
+          size={48}
+          strokeWidth={1}
+          className="text-foreground-lighter shrink-0 mb-4"
+        />
         <div className="flex-1">
           <div>
             <h2 className="mb-4">Project "{project?.name}" is paused</h2>

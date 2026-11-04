@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { cn, HoverCard, HoverCardContent, HoverCardTrigger, Separator } from 'ui'
 
@@ -48,7 +48,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             className="mt-1 inline-flex items-center gap-1 text-xs text-foreground-lighter transition-colors hover:text-foreground"
           >
             Read more
-            <ArrowRight size={12} strokeWidth={1.5} />
+            <ArrowRightIcon size={12} strokeWidth={1.5} />
           </Link>
         </div>
       </HoverCardContent>

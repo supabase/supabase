@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -8,7 +7,7 @@ import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } fr
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function ApiKeyPill({
   apiKey,
@@ -20,10 +19,9 @@ export function ApiKeyPill({
 
   const isSecret = apiKey.type === 'secret'
 
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2([
+    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
+  ])
 
   const {
     data: revealedKey,
@@ -114,7 +112,7 @@ export function ApiKeyPill({
               aria-label={show ? 'Hide API key' : 'Reveal API key'}
               className="rounded-full px-2 pointer-events-auto"
               loading={show && isLoading}
-              icon={show ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+              icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
               onClick={onToggleShow}
               disabled={isRestricted}
             />

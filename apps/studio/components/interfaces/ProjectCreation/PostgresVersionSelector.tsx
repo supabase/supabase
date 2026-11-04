@@ -15,13 +15,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { smartRegionToExactRegion } from './ProjectCreation.utils'
 import { useProjectCreationPostgresVersionsQuery } from '@/data/config/project-creation-postgres-versions-query'
 import { useProjectUnpausePostgresVersionsQuery } from '@/data/config/project-unpause-postgres-versions-query'
-import { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-
-interface PostgresVersionDetails {
-  postgresEngine?: Exclude<PostgresEngine, '13' | '14'>
-  releaseChannel?: ReleaseChannel
-}
 
 interface PostgresVersionSelectorProps {
   cloudProvider: CloudProvider
@@ -37,9 +31,16 @@ interface PostgresVersionSelectorProps {
    * closes. Create it with useRef('') alongside the form.
    */
   lastValidSelectionRef: { current: string }
+  /**
+   * Used when creating a project. If true, it will filter all versions to only OrioleDB versions (or exclude them if false).
+   *
+   * Defaults to undefined, which is not filtering.
+   */
+  useOrioleDbForCreate?: boolean
   type?: 'create' | 'unpause'
   layout?: 'vertical' | 'horizontal'
   label?: string
+  description?: string
 }
 
 const formatValue = ({
@@ -52,15 +53,6 @@ const formatValue = ({
   return `${postgres_engine}|${release_channel}`
 }
 
-export const extractPostgresVersionDetails = (value: string): PostgresVersionDetails => {
-  if (!value) {
-    return { postgresEngine: undefined, releaseChannel: undefined }
-  }
-
-  const [postgresEngine, releaseChannel] = value.split('|')
-  return { postgresEngine, releaseChannel } as PostgresVersionDetails
-}
-
 export const PostgresVersionSelector = ({
   cloudProvider,
   dbRegion,
@@ -71,8 +63,10 @@ export const PostgresVersionSelector = ({
   form,
   lastValidSelectionRef,
   type = 'create',
+  useOrioleDbForCreate = undefined,
   layout = 'horizontal',
   label = 'Postgres version',
+  description,
 }: PostgresVersionSelectorProps) => {
   const { data: project } = useSelectedProjectQuery()
 
@@ -89,7 +83,19 @@ export const PostgresVersionSelector = ({
       organizationSlug,
       highAvailability,
     },
-    { enabled: type === 'create' }
+    {
+      enabled: type === 'create',
+      select: (data) => {
+        if (useOrioleDbForCreate === undefined) return data
+        return {
+          available_versions: data?.available_versions.filter((version) =>
+            useOrioleDbForCreate
+              ? version.postgres_engine.endsWith('oriole')
+              : !version.postgres_engine.endsWith('oriole')
+          ),
+        }
+      },
+    }
   )
 
   const { data: unpauseVersions, isPending: isLoadingProjectUnpauseVersions } =
@@ -136,7 +142,7 @@ export const PostgresVersionSelector = ({
   }, [isSuccess, availableVersions, postgresVersionSelection, lastValidSelectionRef, form])
 
   return (
-    <FormItemLayout id={field.name} label={label} layout={layout}>
+    <FormItemLayout id={field.name} label={label} layout={layout} description={description}>
       <Select
         value={postgresVersionSelection}
         onValueChange={field.onChange}

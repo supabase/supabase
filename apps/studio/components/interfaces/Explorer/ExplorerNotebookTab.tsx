@@ -15,20 +15,20 @@ import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
-  Check,
-  Copy,
-  Download,
-  FileText,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-  Notebook,
-  NotebookText,
-  Play,
-  Save,
-  SearchX,
-  SquareCode,
-  Trash,
+  CheckIcon,
+  CopyIcon,
+  DownloadIcon,
+  FileTextIcon,
+  KeyboardIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  NotebookIcon,
+  NotebookTextIcon,
+  PlayIcon,
+  SaveIcon,
+  SearchXIcon,
+  SquareCodeIcon,
+  TrashIcon,
 } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -397,7 +397,7 @@ export const ExplorerNotebookTab = () => {
     return (
       <div className="p-4 h-full bg-surface-100">
         <EmptyStatePresentational
-          icon={<SearchX className="text-foreground-lighter" />}
+          icon={<SearchXIcon className="text-foreground-lighter" />}
           title="Notebook not found"
           description="This notebook may have been deleted or does not exist."
           contentClassName="[&>h3]:text-sm [&>p]:text-xs"
@@ -409,7 +409,7 @@ export const ExplorerNotebookTab = () => {
   if (!content) {
     return (
       <div className="flex flex-col h-full items-center justify-center bg-surface-100">
-        <Loader2 className="animate-spin text-foreground-muted" />
+        <Loader2Icon className="animate-spin text-foreground-muted" />
       </div>
     )
   }
@@ -418,7 +418,7 @@ export const ExplorerNotebookTab = () => {
     <div className="flex flex-col h-full bg-surface-100">
       <ExplorerToolbar className="px-4">
         <ExplorerToolbarIcon>
-          <NotebookText size={16} strokeWidth={2} />
+          <NotebookTextIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -444,7 +444,7 @@ export const ExplorerNotebookTab = () => {
           >
             <ExplorerToolbarAction
               aria-label="Save changes"
-              icon={<Save size={16} strokeWidth={2} />}
+              icon={<SaveIcon size={16} strokeWidth={2} />}
               loading={isUpdating}
               onClick={handleSaveNotebook}
             />
@@ -454,7 +454,7 @@ export const ExplorerNotebookTab = () => {
               <DropdownMenuTrigger asChild>
                 <ExplorerToolbarAction
                   aria-label="More options"
-                  icon={<MoreVertical size={16} strokeWidth={2} />}
+                  icon={<MoreVerticalIcon size={16} strokeWidth={2} />}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -463,13 +463,13 @@ export const ExplorerNotebookTab = () => {
                   onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
                 >
                   <div className="flex items-center gap-x-2">
-                    <Keyboard size={14} />
+                    <KeyboardIcon size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
+                  {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   <span>Copy as Markdown</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -478,9 +478,9 @@ export const ExplorerNotebookTab = () => {
                   onClick={handleExportPdf}
                 >
                   {isExportingPdf ? (
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2Icon size={14} className="animate-spin" />
                   ) : (
-                    <Download size={14} />
+                    <DownloadIcon size={14} />
                   )}
                   <span>Export as PDF</span>
                 </DropdownMenuItem>
@@ -489,7 +489,7 @@ export const ExplorerNotebookTab = () => {
                   className="gap-x-2"
                   onClick={() => id && onSelectDelete({ id, type: 'notebook', name: name ?? '' })}
                 >
-                  <Trash size={14} />
+                  <TrashIcon size={14} />
                   <span>Delete notebook</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -501,7 +501,7 @@ export const ExplorerNotebookTab = () => {
             size="tiny"
             className="ml-1"
             aria-label="Run notebook"
-            icon={<Play size={16} strokeWidth={2} />}
+            icon={<PlayIcon size={16} strokeWidth={2} />}
             tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
@@ -516,7 +516,7 @@ export const ExplorerNotebookTab = () => {
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
-              icon={<Notebook className="text-foreground-lighter" />}
+              icon={<NotebookIcon className="text-foreground-lighter" />}
               title="This notebook is empty"
               description="Add a query cell to run SQL against your database or logs."
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
@@ -559,7 +559,7 @@ export const ExplorerNotebookTab = () => {
                 <ButtonTooltip
                   variant="outline"
                   size="small"
-                  icon={<SquareCode />}
+                  icon={<SquareCodeIcon />}
                   className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
                   tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
@@ -567,7 +567,7 @@ export const ExplorerNotebookTab = () => {
                 <ButtonTooltip
                   variant="outline"
                   size="small"
-                  icon={<FileText />}
+                  icon={<FileTextIcon />}
                   className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
                   tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}

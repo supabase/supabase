@@ -2,8 +2,8 @@
 
 import { type Menu } from '~/data/nav'
 import { useIsLoggedIn, useIsUserLoading } from 'common'
-import { AnimatePresence, domAnimation, LazyMotion, m } from 'framer-motion'
 import { ChevronRight } from 'lucide-react'
+import { AnimatePresence, domAnimation, LazyMotion, m } from 'motion/react'
 import Link from 'next/link'
 import { useEffect } from 'react'
 import type { Dispatch, SetStateAction } from 'react'

@@ -22,19 +22,19 @@ describe('BannerStackProvider', () => {
 
     act(() => {
       result.current.addBanner({
-        id: BANNER_ID.LOGS_ALL_DEPRECATION,
+        id: BANNER_ID.EXPLORER,
         isDismissed: false,
         content: null,
       })
     })
 
     act(() => {
-      result.current.dismissBanner(BANNER_ID.LOGS_ALL_DEPRECATION)
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
     })
 
     act(() => {
       result.current.addBanner({
-        id: BANNER_ID.LOGS_ALL_DEPRECATION,
+        id: BANNER_ID.EXPLORER,
         isDismissed: false,
         content: null,
       })
@@ -46,7 +46,7 @@ describe('BannerStackProvider', () => {
 
     expect(result.current.banners).toEqual([
       expect.objectContaining({
-        id: BANNER_ID.LOGS_ALL_DEPRECATION,
+        id: BANNER_ID.EXPLORER,
         isDismissed: false,
       }),
     ])
@@ -57,14 +57,14 @@ describe('BannerStackProvider', () => {
 
     act(() => {
       result.current.addBanner({
-        id: BANNER_ID.LOGS_ALL_DEPRECATION,
+        id: BANNER_ID.EXPLORER,
         isDismissed: false,
         content: null,
       })
     })
 
     act(() => {
-      result.current.dismissBanner(BANNER_ID.LOGS_ALL_DEPRECATION)
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
     })
 
     expect(result.current.banners[0]?.isDismissed).toBe(true)
@@ -74,5 +74,27 @@ describe('BannerStackProvider', () => {
     })
 
     expect(result.current.banners).toEqual([])
+  })
+
+  it('cancels the pending removal when the provider unmounts', () => {
+    const { result, unmount } = renderHook(() => useBannerStack(), { wrapper })
+
+    act(() => {
+      result.current.addBanner({
+        id: BANNER_ID.EXPLORER,
+        isDismissed: false,
+        content: null,
+      })
+    })
+
+    act(() => {
+      result.current.dismissBanner(BANNER_ID.EXPLORER)
+    })
+
+    expect(vi.getTimerCount()).toBe(1)
+
+    unmount()
+
+    expect(vi.getTimerCount()).toBe(0)
   })
 })

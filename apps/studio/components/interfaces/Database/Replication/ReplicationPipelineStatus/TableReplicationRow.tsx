@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { TableEditor } from 'icons'
-import { MoreVertical, RotateCcw } from 'lucide-react'
+import { MoreVerticalIcon, RotateCcwIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -115,7 +115,7 @@ export const TableReplicationRow = ({
                 variant="default"
                 className="px-1.25 hit-area-2"
                 aria-label={`Options for ${tableName}`}
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-44">
@@ -130,7 +130,7 @@ export const TableReplicationRow = ({
                   },
                 }}
               >
-                <RotateCcw size={14} />
+                <RotateCcwIcon size={14} />
                 <span>Reset table</span>
               </DropdownMenuItemTooltip>
               <DropdownMenuItem className="gap-x-2" asChild>

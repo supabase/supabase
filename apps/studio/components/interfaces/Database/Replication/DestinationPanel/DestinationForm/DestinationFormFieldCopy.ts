@@ -23,16 +23,6 @@ export const ANALYTICS_BUCKET_NAMESPACE_FIELD_COPY = {
   description: 'The namespace within the bucket where tables will be organized.',
 } as const
 
-export const DUCKLAKE_CATALOG_PROJECT_FIELD_COPY = {
-  label: 'Catalog project',
-  description: 'Postgres project that stores this DuckLake’s metadata.',
-} as const
-
-export const DUCKLAKE_STORAGE_PROJECT_FIELD_COPY = {
-  label: 'Storage project',
-  description: 'Supabase project that stores the DuckLake data files.',
-} as const
-
 export const DUCKLAKE_BUCKET_FIELD_COPY = {
   label: 'Bucket',
   description: 'Files bucket for DuckLake data.',
@@ -79,3 +69,34 @@ export const CLICKHOUSE_ENGINE_FIELD_COPY = {
   label: 'Table engine',
   description: 'Controls how ClickHouse stores and queries replicated changes.',
 } as const
+
+export const INITIAL_SYNC_LABELS = {
+  include_all_tables: 'All tables',
+  skip_all_tables: 'No tables',
+  include_tables: 'Selected tables only',
+  skip_tables: 'All except selected tables',
+}
+
+export const INITIAL_SYNC_FIELD_COPY = {
+  label: 'Initial sync',
+  description:
+    'Choose which publication tables sync their existing rows. Ongoing replication includes new changes from every publication table, even when initial sync is skipped.',
+}
+
+export const PUBLICATION_FIELD_COPY = {
+  label: 'Publication',
+  description: 'Tables in the selected publication will be replicated to this destination.',
+}
+
+export const getTableSyncSelectionDescription = ({
+  mode,
+  selectedCount,
+  tableCount,
+}: {
+  mode: 'include_tables' | 'skip_tables'
+  selectedCount: number
+  tableCount: number
+}) =>
+  mode === 'skip_tables'
+    ? `${selectedCount} of ${tableCount} publication tables will skip initial sync. Ongoing replication will still include every publication table.`
+    : `${selectedCount} of ${tableCount} publication tables will run initial sync. Ongoing replication will still include every publication table.`

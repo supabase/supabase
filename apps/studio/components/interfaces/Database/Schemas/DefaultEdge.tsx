@@ -7,7 +7,7 @@ import {
   Position,
   useReactFlow,
 } from '@xyflow/react'
-import { ArrowLeft, ArrowRight } from 'lucide-react'
+import { ArrowLeftIcon, ArrowRightIcon } from 'lucide-react'
 import { memo, useCallback, useState } from 'react'
 import { Badge, cn } from 'ui'
 
@@ -159,7 +159,7 @@ const EdgeRelationInfo = ({
                 table={data.sourceName}
                 column={data.sourceColumnName}
               />
-              <ArrowRight size={12} />
+              <ArrowRightIcon size={12} />
               <EdgeNodeData
                 schema={data.targetSchemaName}
                 table={data.targetName}
@@ -173,7 +173,7 @@ const EdgeRelationInfo = ({
                 table={data.targetName}
                 column={data.targetColumnName}
               />
-              <ArrowLeft size={12} />
+              <ArrowLeftIcon size={12} />
               <EdgeNodeData
                 schema={data.sourceSchemaName}
                 table={data.sourceName}

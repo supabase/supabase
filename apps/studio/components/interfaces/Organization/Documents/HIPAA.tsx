@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import {
@@ -32,7 +32,7 @@ export const HIPAA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild iconRight={<ExternalLink />}>
+          <Button asChild iconRight={<ExternalLinkIcon />}>
             <a
               href="https://forms.supabase.com/hipaa2"
               target="_blank"

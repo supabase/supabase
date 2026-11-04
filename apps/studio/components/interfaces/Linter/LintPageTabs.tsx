@@ -1,5 +1,5 @@
 import { InformationCircleIcon } from '@heroicons/react/16/solid'
-import { MessageSquareMore } from 'lucide-react'
+import { MessageSquareMoreIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { cn, Tabs, TabsList, TabsTrigger, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
@@ -96,7 +96,7 @@ const LintPageTabs = ({ currentTab, setCurrentTab, isLoading, activeLints }: Lin
                         : 'text-brand-500'
                   }
                 >
-                  <MessageSquareMore size={14} fill="currentColor" strokeWidth={0} />
+                  <MessageSquareMoreIcon size={14} fill="currentColor" strokeWidth={0} />
                 </span>
 
                 <span className="">{tab.label}</span>

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import {
@@ -153,7 +153,7 @@ function BaseEditor<TRow, TSummaryRow = unknown>({
                       <DropdownMenuTrigger asChild>
                         <Button
                           aria-label="Date options"
-                          icon={<ChevronDown />}
+                          icon={<ChevronDownIcon />}
                           className="px-1 rounded-l-none border-l-0"
                         />
                       </DropdownMenuTrigger>

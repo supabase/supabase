@@ -9,27 +9,24 @@ import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.sche
 import {
   buildBatchConfig,
   buildDestinationConfig,
-  buildDestinationConfigForValidation,
   buildTableSyncCopyConfig,
 } from './DestinationForm.utils'
+import { useDestinationValidation } from './useDestinationValidation'
 import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import type { ReplicationPipelineByIdData } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
-import {
-  useValidateDestinationMutation,
-  type ValidationFailure,
-} from '@/data/replication/validate-destination-mutation'
+import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
 import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
 import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
@@ -46,8 +43,10 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   const { data: sourcesData } = useReplicationSourcesQuery({ projectRef })
   const sourceId = sourcesData?.sources.find((s) => s.name === projectRef)?.id
 
-  const { mutateAsync: validateDestination, isPending: isValidatingDestination } =
-    useValidateDestinationMutation()
+  const { validateDestination, isValidatingDestination } = useDestinationValidation({
+    projectRef,
+    selectedType,
+  })
 
   const { mutateAsync: validatePipeline, isPending: isValidatingPipeline } =
     useValidatePipelineMutation()
@@ -131,12 +130,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     // even if one fails - this makes the validation feel like a single operation
     const results = await Promise.allSettled([
       validateDestination({
-        projectRef,
-        destinationConfig: buildDestinationConfigForValidation({
-          projectRef,
-          selectedType,
-          data,
-        }),
+        data,
         sourceId,
         publicationName: data.publicationName,
         maxFillMs: data.maxFillMs,
@@ -306,7 +300,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           ? 'apply changes and restart pipeline'
           : 'apply changes'
       }
-      toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
+      toast.error(`Failed to ${action}: ${(error as StudioError).message}`)
     }
   }
 

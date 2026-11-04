@@ -1,5 +1,5 @@
 import type { PGPolicy } from '@supabase/pg-meta'
-import { Lock } from 'lucide-react'
+import { LockIcon } from 'lucide-react'
 
 interface LockedCreateQuerySection {
   schema: string
@@ -22,7 +22,7 @@ export const LockedCreateQuerySection = ({
       <div className="flex items-center justify-between px-5 mb-1">
         <div className="flex items-center">
           <div className="pl-0.5 pr-5 flex items-center justify-center">
-            <Lock size={14} className="text-foreground-lighter" />
+            <LockIcon size={14} className="text-foreground-lighter" />
           </div>
           <p className="text-xs text-foreground-lighter font-mono uppercase">
             Use options above to edit
