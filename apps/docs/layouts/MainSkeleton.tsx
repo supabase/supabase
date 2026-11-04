@@ -9,7 +9,8 @@ import {
   getMenuId,
   useCloseMenuOnRouteChange,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
-import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { DesktopTopNavBar, MobileTopNavBar } from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { LegacyTopNavBar } from '~/components/Navigation/NavigationMenu/TopNavBar.legacy'
 import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useDocsPathname, useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
@@ -138,13 +139,12 @@ interface SkeletonProps extends PropsWithChildren {
 }
 
 function TopNavSkeleton({ children }) {
-  // the root layout renders this on every page, so the hook sets the html attribute here
-  useDocsLayoutV2()
+  const isLayoutV2 = useDocsLayoutV2()
 
   return (
     <div className="flex flex-col h-full w-full">
       <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
-        <TopNavBar />
+        {isLayoutV2 ? <DesktopTopNavBar /> : <LegacyTopNavBar />}
       </div>
       {children}
     </div>
@@ -162,6 +162,7 @@ function SidebarSkeleton({
   hideSideNav,
   additionalNavItems,
 }: SkeletonProps) {
+  const isLayoutV2 = useDocsLayoutV2()
   const pathname = useDocsPathname()
   const menuId = _menuId ?? getMenuId(pathname)
 
@@ -187,6 +188,7 @@ function SidebarSkeleton({
   }
 
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const MobileBar = isLayoutV2 ? MobileTopNavBar : LegacyTopNavBar
 
   useCloseMenuOnRouteChange()
 
@@ -210,7 +212,7 @@ function SidebarSkeleton({
       </NavContainer>
       <Container>
         <div className="sticky top-0 z-20 lg:hidden">
-          <TopNavBar
+          <MobileBar
             isMenuOpen={mobileMenuOpen}
             onMenuToggle={handleMenuToggle}
             scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
