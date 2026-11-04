@@ -425,7 +425,7 @@ export const getSearchEntitiesSql = ({
               'schema', f.nspname,
               'name', f.proname,
               'type', case f.prokind when 'p' then 'procedure' else 'function' end,
-              'args', pg_get_function_identity_arguments(f.oid)
+              'args', coalesce(pg_get_function_identity_arguments(f.oid), '')
             )
             order by f.rank, length(f.proname), f.proname, f.nspname
           )
