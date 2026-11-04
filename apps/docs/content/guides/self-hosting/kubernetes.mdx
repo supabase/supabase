@@ -683,6 +683,52 @@ Coordinate database and object backups so restored metadata matches the stored f
 
 Use a separate namespace or cluster to test recovery. Restore the matching data, keys, and configuration, then verify sign-in, database queries, object downloads, and functions before switching traffic. Installing a project with the same name does not automatically adopt retained resources from a previous installation.
 
+### Rotate generated credentials
+
+For the deployment in this tutorial, deleting an operator-managed credential Secret triggers its recreation with new values. The operator updates the workloads that consume the Secret, replacing their pods to load the new credentials.
+
+Choose the Secret for the credentials you want to rotate:
+
+| Secret                   | What changes                                                                                                                                                                                  |
+| ------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `supabase-postgres-auth` | The database password. Postgres restarts, and the operator synchronizes passwords for the built-in database roles. Update external database clients, including connections through Supavisor. |
+| `supabase-envoy-auth`    | The Studio HTTP Basic authentication password. The username resets to `supabase`, and Envoy reloads the credentials.                                                                          |
+| `supabase-jwt`           | All JWT signing keys and API keys in the Secret, including `publishable-key`, `secret-key`, `anon-key`, and `service-key`. Update your apps and integrations with the new API keys.           |
+
+<Admonition type="caution">
+
+Plan for service interruptions while pods restart and credentials are synchronized. For JWT rotation, old API keys and access tokens signed with the previous keys stop working once services load the replacement keys. Update client credentials before resuming traffic.
+
+</Admonition>
+
+This procedure applies to the three Secrets listed here. Preserve `supabase-keys` and other encryption material, which existing encrypted data might depend on. For backup requirements, see [Back up and restore data](#back-up-and-restore-data).
+
+1. Choose the Secret to recreate. This example rotates JWT signing keys and API keys:
+
+   ```bash
+   SECRET_NAME=supabase-jwt
+   ```
+
+2. Delete the selected Secret:
+
+   ```bash
+   kubectl -n supabase delete secret "$SECRET_NAME"
+   ```
+
+   Keep the operator running and the project's custom resources in place so it can recreate the Secret and update dependent workloads.
+
+3. Check that the Secret has been recreated and inspect the workloads:
+
+   ```bash
+   kubectl -n supabase get secret "$SECRET_NAME"
+   kubectl -n supabase get deployments,statefulsets,pods,jobs
+   kubectl -n supabase get projects,singledatabases
+   ```
+
+   Reconciliation is asynchronous. Repeat these checks until the replacement Secret exists, the affected workloads finish rolling out, and the project and database are ready. Database password changes also run the `supabase-sync-password` Job; completed Jobs are cleaned up automatically. If recovery stalls, inspect the resource conditions and Job logs using [Inspect status and logs](#inspect-status-and-logs).
+
+4. Retrieve the new values using [Find your credentials](#find-your-credentials) or [Access Postgres](#access-postgres). Update affected apps, connection strings, and integrations. Repeat the Studio, API, or Supavisor connection checks for the credentials you changed.
+
 ### Update the operator and project
 
 The operator controls service image defaults and applies Supabase database migrations. Updating it can affect every project it manages, even before you update a project chart.
