@@ -5,7 +5,7 @@ description: 'Learn how Supabase Storage signs URLs and how to rotate your signi
 sidebar_label: 'URL Signing Keys'
 ---
 
-URL signing keys are used to create time-limited URLs for private downloads and uploads, such as the URLs returned by `createSignedUrl` and `createSignedUploadUrl`.
+Rotate and revoke the keys that sign Storage URLs. Signed URLs give people time-limited access to private objects, as created with `createSignedUrl` for [downloads](/docs/guides/storage/serving/downloads#signing-urls) and `createSignedUploadUrl` for [uploads](/docs/guides/storage/uploads/standard-uploads#presigned-uploads).
 
 Storage signs URLs with a dedicated internal key, separate from your project's Auth JWT signing key. Each project has its own key.
 
