@@ -3,6 +3,7 @@ import '../styles/globals.css'
 import '../styles/prism-okaidia.css'
 
 import { GlobalProviders } from '~/features/app.providers'
+import { DOCS_LAYOUT_CACHE_SCRIPT } from '~/features/DocsLayout/constants'
 import { IaNavRouteProvider } from '~/features/IaNav'
 import { IA_NAV_CACHE_SCRIPT } from '~/features/IaNav/constants'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
@@ -65,6 +66,7 @@ const RootLayout = ({ children }: { children: React.ReactNode }) => {
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: IA_NAV_CACHE_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: DOCS_LAYOUT_CACHE_SCRIPT }} />
       </head>
       <body>
         <SkipToContent href={`#${DOCS_CONTENT_CONTAINER_ID}`} />

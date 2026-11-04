@@ -10,6 +10,7 @@ import {
   useCloseMenuOnRouteChange,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useDocsPathname, useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -134,6 +135,9 @@ interface SkeletonProps extends PropsWithChildren {
 }
 
 function TopNavSkeleton({ children }) {
+  // the root layout renders this on every page, so the hook sets the html attribute here
+  useDocsLayoutV2()
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
