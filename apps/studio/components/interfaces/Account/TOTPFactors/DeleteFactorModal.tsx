@@ -145,7 +145,7 @@ export const DeleteFactorModal = ({
           error={
             hasRemovedRecoveryCodes
               ? {
-                  message: `Your recovery codes have been removed. Retry to remove the authenticator, or generate new codes if you keep it. ${error.message}`,
+                  message: `Your recovery codes were removed, but your authenticator is still active. Try again to complete removal. ${error.message}`,
                 }
               : error
           }

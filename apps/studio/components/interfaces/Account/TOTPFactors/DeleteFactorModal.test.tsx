@@ -196,7 +196,7 @@ describe('authenticator removal failures', () => {
       />
     )
     expect(
-      screen.getByText(/Your recovery codes have been removed\. Retry to remove the authenticator/)
+      screen.getByText(/Your recovery codes were removed, but your authenticator is still active/)
     ).toBeInTheDocument()
     expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'contact support' })).toBeInTheDocument()
