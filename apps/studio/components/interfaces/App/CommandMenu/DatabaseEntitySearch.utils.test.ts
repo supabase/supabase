@@ -2,12 +2,14 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatFunctionSearchDetails,
+  formatTriggerSearchDetails,
   getFunctionEditorRoute,
   getPolicyEditorRoute,
-  matchesPolicySearch,
+  getTriggerEditorRoute,
+  matchesTableRelatedSearch,
 } from './DatabaseEntitySearch.utils'
 
-describe('matchesPolicySearch', () => {
+describe('matchesTableRelatedSearch', () => {
   const policy = { name: 'Authors can edit', schema: 'public', table: 'blog_posts' }
 
   it.each([
@@ -15,11 +17,11 @@ describe('matchesPolicySearch', () => {
     ['the table name', 'blog_p'],
     ['a schema-qualified table', 'pub.blog_posts'],
   ])('matches on %s', (_, query) => {
-    expect(matchesPolicySearch(policy, query)).toBe(true)
+    expect(matchesTableRelatedSearch(policy, query)).toBe(true)
   })
 
   it('does not match unrelated searches', () => {
-    expect(matchesPolicySearch(policy, 'colors')).toBe(false)
+    expect(matchesTableRelatedSearch(policy, 'colors')).toBe(false)
   })
 })
 
@@ -53,5 +55,34 @@ describe('formatFunctionSearchDetails', () => {
     [{ type: 'procedure', args: '' }, 'procedure'],
   ] as const)('formats %j', (fn, expected) => {
     expect(formatFunctionSearchDetails(fn)).toBe(expected)
+  })
+})
+
+describe('getTriggerEditorRoute', () => {
+  it('links to the list page directly, since the index route drops the query string', () => {
+    expect(getTriggerEditorRoute('abc', { id: 5, schema: 'my schema' })).toBe(
+      '/project/abc/database/triggers/data?schema=my%20schema&edit=5'
+    )
+  })
+})
+
+describe('formatTriggerSearchDetails', () => {
+  const cases: Array<[Parameters<typeof formatTriggerSearchDetails>[0], string]> = [
+    [
+      { activation: 'BEFORE', events: ['INSERT'], schema: 'public', table: 'posts' },
+      'BEFORE INSERT on public.posts',
+    ],
+    [
+      { activation: 'AFTER', events: ['UPDATE', 'DELETE'], schema: 'blog', table: 'posts' },
+      'AFTER UPDATE OR DELETE on blog.posts',
+    ],
+    [
+      { activation: 'INSTEAD OF', events: ['INSERT'], schema: 'public', table: 'posts_view' },
+      'INSTEAD OF INSERT on public.posts_view',
+    ],
+  ]
+
+  it.each(cases)('formats %j', (trigger, expected) => {
+    expect(formatTriggerSearchDetails(trigger)).toBe(expected)
   })
 })
