@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketPurgeCDNCacheVariables = {
   projectRef: string
@@ -28,11 +29,11 @@ type BucketPurgeCDNCacheData = Awaited<ReturnType<typeof purgeBucketCDNCache>>
 
 export const useBucketPurgeCDNCacheMutation = (
   options: Omit<
-    UseCustomMutationOptions<BucketPurgeCDNCacheData, ResponseError, BucketPurgeCDNCacheVariables>,
+    UseCustomMutationOptions<BucketPurgeCDNCacheData, StudioError, BucketPurgeCDNCacheVariables>,
     'mutationFn'
   > = {}
 ) => {
-  return useMutation<BucketPurgeCDNCacheData, ResponseError, BucketPurgeCDNCacheVariables>({
+  return useMutation<BucketPurgeCDNCacheData, StudioError, BucketPurgeCDNCacheVariables>({
     mutationFn: (vars) => purgeBucketCDNCache(vars),
     async onError(data) {
       toast.error(`Failed to purge bucket CDN cache: ${data.message}`)

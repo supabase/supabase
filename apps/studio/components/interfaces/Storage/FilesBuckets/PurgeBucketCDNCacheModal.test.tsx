@@ -2,7 +2,6 @@ import { faker } from '@faker-js/faker'
 import { screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
-import { HttpResponse } from 'msw'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
@@ -84,9 +83,10 @@ describe('PurgeBucketCDNCacheModal', () => {
         status: 'ACTIVE_HEALTHY',
       },
     })
-    // useBucketPurgeCDNCacheMutation
+    // Feature detection used in UpgradePlanButton
     addAPIMock({
       method: 'get',
+      // @ts-expect-error
       path: '/enabled-features-overrides',
       response: {
         // @ts-expect-error

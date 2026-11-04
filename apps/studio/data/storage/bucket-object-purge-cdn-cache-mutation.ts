@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketObjectPurgeCDNCacheVariables = {
   projectRef: string
@@ -37,7 +38,7 @@ export const useBucketObjectPurgeCDNCacheMutation = (
   options: Omit<
     UseCustomMutationOptions<
       BucketObjectPurgeCDNCacheData,
-      ResponseError,
+      StudioError,
       BucketObjectPurgeCDNCacheVariables
     >,
     'mutationFn'
@@ -45,7 +46,7 @@ export const useBucketObjectPurgeCDNCacheMutation = (
 ) => {
   return useMutation<
     BucketObjectPurgeCDNCacheData,
-    ResponseError,
+    StudioError,
     BucketObjectPurgeCDNCacheVariables
   >({
     mutationFn: (vars) => purgeBucketObjectCDNCache(vars),
