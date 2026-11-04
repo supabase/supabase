@@ -82,6 +82,7 @@ export const PurgeBucketCDNCacheModal = ({
           <AlertDialogHeader>
             <AlertDialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</AlertDialogTitle>
             <AlertDialogDescription asChild>
+              {/* No Admonition (that has an alert role) here as we're already in an alertdialog */}
               <div className="space-y-4">
                 <p>Buckets CDN cache purge is not available on your plan.</p>
                 <p>Upgrade your plan to purge buckets CDN cache</p>

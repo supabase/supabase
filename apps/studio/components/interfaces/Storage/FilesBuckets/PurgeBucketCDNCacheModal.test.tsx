@@ -3,7 +3,7 @@ import { screen, waitFor } from '@testing-library/dom'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { useState } from 'react'
-import { toast } from 'sonner'
+import { toast, Toaster } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PurgeBucketCDNCacheModal } from './PurgeBucketCDNCacheModal'
@@ -14,8 +14,6 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 import { routerMock } from '@/tests/lib/route-mock'
-
-vi.mock('sonner', () => ({ toast: { error: vi.fn(), success: vi.fn() } }))
 
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
@@ -59,12 +57,14 @@ const Page = ({ onClose }: { onClose: () => void }) => {
           onClose()
         }}
       />
+      <Toaster />
     </ProjectContextProvider>
   )
 }
 
 describe('PurgeBucketCDNCacheModal', () => {
   beforeEach(() => {
+    toast.dismiss()
     // useParams
     routerMock.setCurrentUrl('/project/default/storage/files/buckets/test')
     // useProjectContext
@@ -125,7 +125,7 @@ describe('PurgeBucketCDNCacheModal', () => {
       await userEvent.click(await screen.findByRole('button', { name: 'Purge CDN cache' }))
 
       await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
-      expect(toast.success).toHaveBeenCalledWith('Successfully purged CDN cache for bucket “test”')
+      await screen.findByText('Successfully purged CDN cache for bucket “test”')
     }
   )
 
