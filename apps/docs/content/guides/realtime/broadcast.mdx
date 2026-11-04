@@ -1255,7 +1255,7 @@ Send to the [single message endpoint](#broadcast-using-the-rest-api) with `priva
 
     {/* prettier-ignore */}
     ```bash
-    curl -v \
+    curl -v --globoff \
     -H 'apikey: <SUPABASE_TOKEN>' \
     -H 'Authorization: Bearer <USER_JWT>' \
     -H 'Content-Type: application/json' \
