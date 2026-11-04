@@ -64,12 +64,13 @@ async function createDiscussion(
 }
 
 async function deleteDiscussion(octokit: RetryOctokitInstance, id: string): Promise<void> {
+  // DeleteDiscussionInput takes `id` (UpdateDiscussionInput is the one with `discussionId`).
   const mutation = `
-    mutation DeleteDiscussionMutation($discussionId: ID!) {
-      deleteDiscussion(input: { discussionId: $discussionId }) { discussion { id } }
+    mutation DeleteDiscussionMutation($id: ID!) {
+      deleteDiscussion(input: { id: $id }) { discussion { id } }
     }
   `
-  await octokit.graphql(mutation, { discussionId: id, request: { retries: 0 } })
+  await octokit.graphql(mutation, { id, request: { retries: 0 } })
 }
 
 async function createGuide(
