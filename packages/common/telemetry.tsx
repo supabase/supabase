@@ -214,7 +214,7 @@ export const PageTelemetry = ({
       const anchor = event.target instanceof Element ? event.target.closest('a') : null
       if (!(anchor instanceof HTMLAnchorElement)) return
 
-      const examplePath = anchor.href.match(EXAMPLE_LINK_PATTERN)?.[1]?.replace(/\/$/, '')
+      const examplePath = anchor.href.match(EXAMPLE_LINK_PATTERN)?.[1].replace(/\/$/, '')
       if (!examplePath) return
 
       sendTelemetryEvent(
