@@ -20,6 +20,9 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/docs-search/src/**/*.{tsx,ts}';
 
+/* useDocsLayoutV2 sets the attribute. the extra specificity lets these classes beat the base ones */
+@custom-variant layout-v2 (&:is([data-docs-layout='v2'] *));
+
 @theme inline {
   --font-sans:
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
@@ -84,11 +87,21 @@
 :root {
   --sidebar-width: 300px;
   --header-height: 50px;
+  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
+}
+
+:root[data-docs-layout='v2'] {
+  --header-height: 56px;
 }
 
 html {
   scroll-behavior: smooth;
   font-weight: 500;
+}
+
+html[data-docs-layout='v2'],
+html[data-docs-layout='v2'] body {
+  overscroll-behavior-y: none;
 }
 
 html[data-theme*='dark'] {
