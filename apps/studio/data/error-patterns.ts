@@ -1,10 +1,7 @@
-import { ConnectionTimeoutError } from '@/types/api-errors'
-import type { ClassifiedError } from '@/types/api-errors'
-import type { ResponseError } from '@/types/base'
+import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
+import type { ClassifiedError, StudioError } from '@/lib/errors/studio-errors'
 
-type ErrorConstructor = new (
-  ...args: ConstructorParameters<typeof ResponseError>
-) => ClassifiedError
+type ErrorConstructor = new (...args: ConstructorParameters<typeof StudioError>) => ClassifiedError
 
 export interface ErrorPattern {
   pattern: RegExp

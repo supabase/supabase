@@ -4,7 +4,7 @@ import { queryOptions } from '@tanstack/react-query'
 import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type DefaultPrivilegesVariables = {
   projectRef?: string
@@ -37,7 +37,7 @@ export async function getDefaultPrivilegesState(
 }
 
 export type DefaultPrivilegesData = Awaited<ReturnType<typeof getDefaultPrivilegesState>>
-export type DefaultPrivilegesError = ResponseError
+export type DefaultPrivilegesError = StudioError
 
 export const defaultPrivilegesQueryOptions = (
   { projectRef, connectionString, schema }: DefaultPrivilegesVariables,

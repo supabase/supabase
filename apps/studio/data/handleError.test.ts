@@ -1,7 +1,10 @@
 import { describe, expect, it, vi } from 'vitest'
 
-import { ConnectionTimeoutError, UnknownAPIResponseError } from '@/types/api-errors'
-import { ResponseError } from '@/types/base'
+import {
+  ConnectionTimeoutError,
+  StudioError,
+  UnknownAPIResponseError,
+} from '@/lib/errors/studio-errors'
 
 vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
@@ -11,11 +14,11 @@ vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
 // Import after mocks are set up
 const { handleError } = await import('./fetchers')
 
-function throwAndCatch(error: unknown): ResponseError {
+function throwAndCatch(error: unknown): StudioError {
   try {
     handleError(error)
   } catch (e) {
-    return e as ResponseError
+    return e as StudioError
   }
   throw new Error('handleError did not throw')
 }
@@ -28,7 +31,7 @@ describe('handleError — error classification', () => {
   ])('classifies a known pattern from the %s field', (_, raw) => {
     const err = throwAndCatch(raw)
     expect(err).toBeInstanceOf(ConnectionTimeoutError)
-    expect(err).toBeInstanceOf(ResponseError)
+    expect(err).toBeInstanceOf(StudioError)
     expect((err as ConnectionTimeoutError).errorType).toBe('connection-timeout')
   })
 
@@ -40,11 +43,11 @@ describe('handleError — error classification', () => {
   ])('throws UnknownAPIResponseError for %s', (_, raw) => {
     const err = throwAndCatch(raw)
     expect(err).toBeInstanceOf(UnknownAPIResponseError)
-    expect(err).toBeInstanceOf(ResponseError)
+    expect(err).toBeInstanceOf(StudioError)
   })
 
   describe('field preservation', () => {
-    it('preserves all ResponseError fields on classified errors', () => {
+    it('preserves all StudioError fields on classified errors', () => {
       const err = throwAndCatch({
         message: 'CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT',
         code: 503,
@@ -59,7 +62,7 @@ describe('handleError — error classification', () => {
       expect(err.requestPathname).toBe('/rest/v1/table')
     })
 
-    it('preserves all ResponseError fields on unclassified errors', () => {
+    it('preserves all StudioError fields on unclassified errors', () => {
       const err = throwAndCatch({ message: 'some error', code: 500, requestId: 'req-xyz' })
       expect(err.code).toBe(500)
       expect(err.requestId).toBe('req-xyz')

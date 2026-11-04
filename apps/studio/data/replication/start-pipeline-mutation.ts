@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type StartPipelineParams = {
   projectRef: string
@@ -34,12 +35,12 @@ export const useStartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<StartPipelineData, ResponseError, StartPipelineParams>,
+  UseCustomMutationOptions<StartPipelineData, StudioError, StartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<StartPipelineData, ResponseError, StartPipelineParams>({
+  return useMutation<StartPipelineData, StudioError, StartPipelineParams>({
     mutationFn: (vars) => startPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

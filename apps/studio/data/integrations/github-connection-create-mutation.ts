@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type GitHubConnectionCreateVariables = {
   organizationId: number
@@ -29,13 +30,13 @@ export const useGitHubConnectionCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     GitHubConnectionCreateData,
-    ResponseError,
+    StudioError,
     GitHubConnectionCreateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<GitHubConnectionCreateData, ResponseError, GitHubConnectionCreateVariables>({
+  return useMutation<GitHubConnectionCreateData, StudioError, GitHubConnectionCreateVariables>({
     mutationFn: (vars) => createGitHubConnection(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { contentKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateSQLSnippetFolderVariables = {
   projectRef: string
@@ -39,7 +40,7 @@ export const useSQLSnippetFolderCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     UpdateSQLSnippetFolderData,
-    ResponseError,
+    StudioError,
     UpdateSQLSnippetFolderVariables
   >,
   'mutationFn'
@@ -48,7 +49,7 @@ export const useSQLSnippetFolderCreateMutation = ({
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateSQLSnippetFolderData, ResponseError, UpdateSQLSnippetFolderVariables>({
+  return useMutation<UpdateSQLSnippetFolderData, StudioError, UpdateSQLSnippetFolderVariables>({
     mutationFn: (args) => updateSQLSnippetFolder(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

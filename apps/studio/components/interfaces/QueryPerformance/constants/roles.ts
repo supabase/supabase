@@ -54,7 +54,7 @@ export const ROLE_INFO: Record<KnownRole, RoleInfo> = {
     displayName: 'Storage Admin',
   },
   supabase_etl_admin: {
-    displayName: 'ETL Admin',
+    displayName: 'Pipelines Admin',
   },
   supabase_realtime_admin: {
     displayName: 'Realtime Admin',

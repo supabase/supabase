@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type TableColumn = {
   schemaname: string
@@ -42,7 +43,7 @@ export async function getTableColumns(
 }
 
 export type TableColumnsData = Awaited<ReturnType<typeof getTableColumns>>
-export type TableColumnsError = ResponseError
+export type TableColumnsError = StudioError
 
 export const useTableColumnsQuery = <TData = TableColumnsData>(
   { projectRef, connectionString, schema, table }: TableColumnsVariables,

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageCredentialsKeys } from './s3-access-key-keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type S3AccessKeyDeleteVariables = {
   projectRef?: string
@@ -20,7 +21,7 @@ const deleteS3AccessKeyCredential = async ({ projectRef, id }: S3AccessKeyDelete
   if (error) {
     // [Joshen] This is only temporary and should be removed once the issue on API (storage) is resolved
     // Currently the API throws a 500 despite the secret getting removed correctly
-    if ((error as ResponseError).message !== 'Failed to delete project storage credential') {
+    if ((error as StudioError).message !== 'Failed to delete project storage credential') {
       handleError(error)
     }
   }
@@ -35,12 +36,12 @@ export function useS3AccessKeyDeleteMutation({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>,
+  UseCustomMutationOptions<S3AccessKeyDeleteData, StudioError, S3AccessKeyDeleteVariables>,
   'mutationFn'
 > = {}) {
   const queryClient = useQueryClient()
 
-  return useMutation<S3AccessKeyDeleteData, ResponseError, S3AccessKeyDeleteVariables>({
+  return useMutation<S3AccessKeyDeleteData, StudioError, S3AccessKeyDeleteVariables>({
     mutationFn: (vars) => deleteS3AccessKeyCredential(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

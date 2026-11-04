@@ -11,7 +11,7 @@ import { timeout } from '@/lib/helpers'
 import '@xyflow/react/dist/style.css'
 
 import { SmoothstepEdge } from './Edges'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
@@ -42,8 +42,8 @@ const ReplicationDiagramContent = () => {
     projectRef,
   })
   const destinations = useMemo(() => data?.destinations ?? [], [data])
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(destinationsError)
-  const skipRenderingDestinations = isErrorDestinations && isLocalETLNotSetUp
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
+  const skipRenderingDestinations = isErrorDestinations && isLocalPipelinesNotSetUp
 
   const nodes = useMemo(() => {
     return [
@@ -66,7 +66,7 @@ const ReplicationDiagramContent = () => {
       target: x.id.toString(),
       type: 'smoothstep',
       className: 'cursor-default!',
-      data: { type: 'etl', identifier: x.id.toString(), shiftEdgeEnd },
+      data: { identifier: x.id.toString(), shiftEdgeEnd },
     }))
   }, [destinations, projectRef])
 

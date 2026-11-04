@@ -6,7 +6,8 @@ import { castOrganizationResponseToOrganization } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, post } from '@/data/fetchers'
 import { permissionKeys } from '@/data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateVariables = {
   name: string
@@ -53,12 +54,12 @@ export const useOrganizationCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OrganizationCreateData, ResponseError, OrganizationCreateVariables>,
+  UseCustomMutationOptions<OrganizationCreateData, StudioError, OrganizationCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationCreateData, ResponseError, OrganizationCreateVariables>({
+  return useMutation<OrganizationCreateData, StudioError, OrganizationCreateVariables>({
     mutationFn: (vars) => createOrganization(vars),
     async onSuccess(data, variables, context) {
       if (data && !('pending_payment_intent_secret' in data)) {
@@ -127,7 +128,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     AwsManagedOrganizationCreateData,
-    ResponseError,
+    StudioError,
     AwsManagedOrganizationCreateVariables
   >,
   'mutationFn'
@@ -136,7 +137,7 @@ export const useAwsManagedOrganizationCreateMutation = ({
 
   return useMutation<
     AwsManagedOrganizationCreateData,
-    ResponseError,
+    StudioError,
     AwsManagedOrganizationCreateVariables
   >({
     mutationFn: (vars) => createAwsManagedOrganization(vars),

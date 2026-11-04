@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateInvitationVariables = {
   slug: string
@@ -45,7 +46,7 @@ export const useOrganizationCreateInvitationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCreateInvitationVariables
   >,
   'mutationFn'
@@ -54,7 +55,7 @@ export const useOrganizationCreateInvitationMutation = ({
 
   return useMutation<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCreateInvitationVariables
   >({
     mutationFn: (vars) => createOrganizationInvitation(vars),

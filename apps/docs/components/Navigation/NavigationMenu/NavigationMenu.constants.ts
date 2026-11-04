@@ -1220,8 +1220,8 @@ export const database: NavMenuConstant = {
           url: '/guides/observability/inspect' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Supavisor',
@@ -1684,8 +1684,8 @@ export const api: NavMenuConstant = {
           url: '/guides/database/full-text-search' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Using custom schemas',
@@ -2515,7 +2515,12 @@ export const local_development: NavMenuConstant = {
   items: [
     { name: 'Overview & quickstart', url: '/guides/local-development' },
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Migrating to CLI v3', url: '/guides/local-development/cli/migrating-to-v3' },
     { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
+    {
+      name: 'Local and hosted projects',
+      url: '/guides/local-development/local-and-hosted-projects',
+    },
     {
       name: 'Guides',
       url: undefined,
@@ -2632,6 +2637,11 @@ export const security: NavMenuConstant = {
         {
           name: 'Production Checklist',
           url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
+        {
+          name: 'Production security checklist',
+          url: '/guides/security/production-checklist' as `/${string}`,
           enabled: productionChecklistEnabled,
         },
         {
@@ -2775,8 +2785,8 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
             {
-              name: 'Enterprise-Managed Authentication for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization' as `/${string}`,
             },
           ],
         },

@@ -4,7 +4,7 @@ import type {
   ComputeInstanceAccess,
   ComputeInstanceBuildState,
 } from './Compute.types'
-import { ResponseError } from '@/types'
+import { StudioError } from '@/lib/errors/studio-errors'
 
 export interface ComputeInstanceFilters {
   search: string
@@ -71,8 +71,8 @@ export const generateComputeInstanceName = (): string => {
 
 // A project outside the alpha allow-list gets a 404, not a 403.
 export const isComputeUnavailable = (error: Error | null): boolean =>
-  error instanceof ResponseError && error.code === 404
+  error instanceof StudioError && error.code === 404
 
 // An enrolled project still answers 403 when the caller lacks the compute permission.
 export const isComputeForbidden = (error: Error | null): boolean =>
-  error instanceof ResponseError && error.code === 403
+  error instanceof StudioError && error.code === 403

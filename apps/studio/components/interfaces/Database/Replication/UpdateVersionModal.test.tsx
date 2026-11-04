@@ -96,7 +96,7 @@ describe('pipeline version updates', () => {
         path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
         response: () =>
           HttpResponse.json<components['schemas']['PipelineVersionResponse_Output']>({
-            pipeline_id: 9,
+            pipeline_id: '9',
             version: { id: 1, name: 'v1' },
             new_version: { id: 2, name: 'v2' },
           }),

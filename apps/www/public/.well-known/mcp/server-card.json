@@ -1,0 +1,31 @@
+{
+  "$schema": "https://static.modelcontextprotocol.io/schemas/v1/server-card.schema.json",
+  "name": "com.supabase/mcp",
+  "title": "Supabase",
+  "version": "0.15.0",
+  "description": "MCP server for interacting with the Supabase platform",
+  "websiteUrl": "https://supabase.com/mcp",
+  "repository": {
+    "url": "https://github.com/supabase/mcp",
+    "source": "github",
+    "subfolder": "packages/mcp-server-supabase"
+  },
+  "icons": [
+    {
+      "src": "https://supabase.com/favicon/android-icon-192x192.png",
+      "mimeType": "image/png",
+      "sizes": ["192x192"]
+    },
+    {
+      "src": "https://supabase.com/images/supabase-logo-icon.svg",
+      "mimeType": "image/svg+xml",
+      "sizes": ["any"]
+    }
+  ],
+  "remotes": [
+    {
+      "type": "streamable-http",
+      "url": "https://mcp.supabase.com/mcp"
+    }
+  ]
+}

@@ -5,7 +5,8 @@ import { useQuery } from '@tanstack/react-query'
 import { foreignTableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ForeignTablesVariables = {
   projectRef?: string
@@ -32,7 +33,7 @@ export async function getForeignTables(
 }
 
 export type ForeignTablesData = Awaited<ReturnType<typeof getForeignTables>>
-export type ForeignTablesError = ResponseError
+export type ForeignTablesError = StudioError
 
 export const useForeignTablesQuery = <TData = ForeignTablesData>(
   { projectRef, connectionString, schemas }: ForeignTablesVariables,

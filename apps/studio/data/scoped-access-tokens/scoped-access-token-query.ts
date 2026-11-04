@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { scopedAccessTokenKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getScopedAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/scoped-access-tokens', { signal })
@@ -27,7 +28,7 @@ export async function getScopedAccessToken({ id }: { id: string }, signal?: Abor
 }
 
 export type ScopedAccessTokensData = Awaited<ReturnType<typeof getScopedAccessTokens>>
-export type ScopedAccessTokensError = ResponseError
+export type ScopedAccessTokensError = StudioError
 
 export type ScopedAccessToken =
   components['schemas']['GetScopedAccessTokensResponse_Output']['tokens'][number]

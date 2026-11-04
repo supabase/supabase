@@ -6,7 +6,8 @@ import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageReadVariables = {
   projectRef: string
@@ -49,18 +50,14 @@ export const useDatabaseQueueMessageReadMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueMessageReadData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageReadVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    DatabaseQueueMessageReadData,
-    ResponseError,
-    DatabaseQueueMessageReadVariables
-  >({
+  return useMutation<DatabaseQueueMessageReadData, StudioError, DatabaseQueueMessageReadVariables>({
     mutationFn: (vars) => readDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables

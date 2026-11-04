@@ -1,7 +1,8 @@
 'use client'
 
+import { FaqAnswer } from '~/components/FaqAnswer'
 import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
+import { Accordion, AccordionItem, AccordionTrigger } from 'ui'
 
 const faqs = [
   {
@@ -54,11 +55,11 @@ export function FAQSection() {
                   <AccordionTrigger>
                     <span className="text-foreground text-left">{faq.question}</span>
                   </AccordionTrigger>
-                  <AccordionContent>
+                  <FaqAnswer>
                     <div className="prose text-foreground-lighter">
                       <ReactMarkdown>{faq.answer}</ReactMarkdown>
                     </div>
-                  </AccordionContent>
+                  </FaqAnswer>
                 </AccordionItem>
               </div>
             ))}

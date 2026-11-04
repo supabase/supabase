@@ -68,7 +68,7 @@ const deferred = () => {
 
 describe('pipeline request state', () => {
   test.each(['1', '003l8j9rxqi6c8rd5mcx1w2ya'])(
-    'shares request state with the route representation of pipeline %s',
+    'tracks request state for pipeline %s',
     async (pipelineId) => {
       const { result } = setup('started', pipelineId)
       const action = deferred()
@@ -80,14 +80,14 @@ describe('pipeline request state', () => {
           () => action.promise
         )
       })
-      expect(result.current.getRequestStatus(String(pipelineId))).toBe(Status.StopRequested)
-      expect(result.current.isRequestPending(String(pipelineId))).toBe(true)
+      expect(result.current.getRequestStatus(pipelineId)).toBe(Status.StopRequested)
+      expect(result.current.isRequestPending(pipelineId)).toBe(true)
       await act(async () => {
         action.resolve()
         await operation
       })
-      expect(result.current.getRequestStatus(String(pipelineId))).toBe(Status.None)
-      expect(result.current.isRequestPending(String(pipelineId))).toBe(false)
+      expect(result.current.getRequestStatus(pipelineId)).toBe(Status.None)
+      expect(result.current.isRequestPending(pipelineId)).toBe(false)
     }
   )
 

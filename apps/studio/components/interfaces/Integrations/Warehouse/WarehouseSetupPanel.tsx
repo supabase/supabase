@@ -14,7 +14,7 @@ import {
 } from './WarehouseTableStatusList'
 import { AlertError } from '@/components/ui/AlertError'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
-import { checkLocalETLNotSetUp } from '@/data/replication/utils'
+import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useWarehouseDisableMutation } from '@/data/warehouse/warehouse-disable-mutation'
 import { useWarehouseSetupMutation } from '@/data/warehouse/warehouse-setup-mutation'
 import { useWarehouseSetupStatusQuery } from '@/data/warehouse/warehouse-setup-status-query'
@@ -128,7 +128,7 @@ const WarehouseSetupPanelContent = ({
 
   // Warehouse rides on the replication API, which isn't wired up in local development. Same
   // treatment Pipelines gives it, so a local dev doesn't read this as a broken build.
-  if (isError && checkLocalETLNotSetUp(error)) {
+  if (isError && checkLocalPipelinesNotSetUp(error)) {
     return (
       <Admonition
         type="default"
