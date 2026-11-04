@@ -87,6 +87,7 @@ describe('authenticator removal recovery-status guard', () => {
     )
     renderFactors()
 
+    expect(await screen.findByText('Checking recovery codes')).toBeInTheDocument()
     const remove = await screen.findByRole('button', { name: 'Delete' })
     expect(remove).toBeAriaDisabled()
     fireEvent.click(remove)

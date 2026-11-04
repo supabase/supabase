@@ -58,8 +58,8 @@ export const TOTPFactors = () => {
     (recoveryCodesIsPending || recoveryCodesIsFetching || recoveryCodesIsError || !status)
 
   const deleteFactorTooltip = recoveryCodesIsError
-    ? 'Unable to delete authenticator because recovery code status could not be retrieved'
-    : 'Wait for recovery code status before deleting this authenticator'
+    ? 'Cannot delete authenticator: recovery code status unavailable'
+    : 'Checking recovery code status before deletion'
 
   return (
     <>
@@ -159,6 +159,19 @@ export const TOTPFactors = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent aria-live="polite">
+            {recoveryCodesIsPending && (
+              <Card>
+                <CardContent role="status">
+                  <span className="sr-only">Checking recovery codes</span>
+                  <GenericSkeletonLoader />
+                </CardContent>
+              </Card>
+            )}
+            {!recoveryCodesIsPending && recoveryCodesIsFetching && (
+              <p role="status" className="text-sm text-foreground-light">
+                Checking recovery codes…
+              </p>
+            )}
             {recoveryCodesIsError && (
               <AlertError
                 subject="Failed to load recovery codes"
