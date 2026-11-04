@@ -6,12 +6,13 @@ import {
   SERVER_ENV_VARS,
   useConnectServerEnv,
 } from '@/components/interfaces/ConnectSheet/useConnectServerEnv'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import CopyButton from '@/components/ui/CopyButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 
 function ServerEnvContent() {
   const { ref } = useParams()
-  const { apiUrl, publishableKey, jwksUrl, secret, buildEnv, canReadAPIKeys } =
+  const { apiUrl, publishableKey, jwksUrl, secret, buildEnv, canReadAPIKeys, apiKeysGrant } =
     useConnectServerEnv()
 
   return (
@@ -60,6 +61,11 @@ function ServerEnvContent() {
           </EnvRow>
         </div>
       </div>
+
+      <ApiKeysAccessNote
+        grant={apiKeysGrant}
+        fallback="You can find your keys in API Keys settings."
+      />
 
       <p className="text-sm text-foreground-lighter">
         On Edge Functions these are injected automatically. For other runtimes, copy the values

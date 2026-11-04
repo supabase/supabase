@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
@@ -15,9 +16,10 @@ import { useConnectSheetParams } from './useConnectSheetParams'
 import { useConnectSheetShortcut } from './useConnectSheetShortcut'
 import { useConnectState } from './useConnectState'
 import { WarehouseTab } from './WarehouseTab'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAppStateSnapshot } from '@/state/app-state'
 
@@ -106,10 +108,11 @@ export const ConnectSheet = () => {
 
   const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
-  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData } = useQuery({
+    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
 
   const projectKeys: ProjectKeys = useMemo(() => {
     const { anonKey, publishableKey } = apiKeysData ?? {}
@@ -175,6 +178,15 @@ export const ConnectSheet = () => {
               onChange={handleModeChange}
             />
           </div>
+
+          {/* The server env tab renders its own note next to the keys it offers to copy. */}
+          {state.mode !== 'warehouse' && state.mode !== 'server' && (
+            <ApiKeysAccessNote
+              grant={apiKeysGrant}
+              fallback="Replace the placeholders with your own keys."
+              className="px-8 py-4"
+            />
+          )}
 
           {state.mode === 'warehouse' ? (
             <WarehouseTab />

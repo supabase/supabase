@@ -1,11 +1,9 @@
-import { queryOptions, skipToken, useQuery } from '@tanstack/react-query'
-import { useCallback } from 'react'
+import { queryOptions, skipToken } from '@tanstack/react-query'
 
 import { apiKeysKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import { useGrant, type GrantFor } from '@/lib/grants'
-import type { UseCustomQueryOptions } from '@/types'
+import type { GrantFor } from '@/lib/grants'
 
 type LegacyKeys = {
   api_key: string
@@ -97,27 +95,6 @@ export const revealedApiKeysQueryOptions = ({ projectRef, grant }: RevealedAPIKe
       projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
   })
 
-type TransitionalVariables = { projectRef?: string }
-
-/**
- * @deprecated Transitional: mints a plain grant internally. Migrate callers to `apiKeysQueryOptions`
- * with `useGrant` (FE-4731), then delete this hook.
- */
-export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef }: TransitionalVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, StudioError, TData> = {}
-) => {
-  const grant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { queryKey, queryFn } = apiKeysQueryOptions({ projectRef, grant: grant.grant })
-
-  return useQuery<APIKeysData, StudioError, TData>({
-    queryKey,
-    queryFn,
-    enabled: enabled && typeof projectRef !== 'undefined',
-    ...options,
-  })
-}
-
 const EmptyKey = {
   anonKey: undefined,
   serviceKey: undefined,
@@ -140,23 +117,4 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
   const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
 
   return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
-}
-
-const PlaceholderData: APIKeysData = []
-
-/** @deprecated Transitional, see `useAPIKeysQuery`. Migrate with FE-4731. */
-export const useAPIKeys = (
-  variables: TransitionalVariables,
-  options: UseCustomQueryOptions<APIKeysData, StudioError, APIKeysData> = {}
-) => {
-  const select = useCallback(
-    (data: APIKeysData) => getKeys(options.enabled ? data : []),
-    [options.enabled]
-  )
-
-  return useAPIKeysQuery(variables, {
-    ...options,
-    placeholderData: PlaceholderData,
-    select,
-  })
 }
