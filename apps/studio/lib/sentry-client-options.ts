@@ -129,6 +129,19 @@ export interface SentryClientOptionsParams {
   release?: string
 }
 
+/**
+ * Applies the `sample_rate` tag set by `reportStudioError`: events tagged with a rate below 1 are
+ * dropped with probability `1 - rate`. Events without the tag are never dropped.
+ */
+export function shouldDropForSampleRate(
+  event: Pick<Sentry.Event, 'tags'>,
+  random: () => number = Math.random
+): boolean {
+  const rate = Number(event.tags?.sample_rate)
+  if (event.tags?.sample_rate === undefined || !Number.isFinite(rate) || rate >= 1) return false
+  return random() >= rate
+}
+
 export function buildSentryClientOptions({
   includeThirdPartyErrorFilter,
   extraIntegrations = [],
@@ -147,6 +160,9 @@ export function buildSentryClientOptions({
 
     // Enable performance monitoring
     tracesSampleRate: 0.02,
+
+    // Leave the error `sampleRate` unset (1.0). Error sampling is per tag in `ERROR_ROUTING` and
+    // applied in `beforeSend`; a global rate would multiply with it and also drop `alwaysCapture`.
 
     // Function form so Sentry's default integrations (browserSession,
     // globalHandlers, breadcrumbs, dedupe, …) are explicitly preserved — this
@@ -220,6 +236,10 @@ export function buildSentryClientOptions({
         return null
       }
       if (isChallengeExpiredError(hint.originalException, event)) {
+        return null
+      }
+
+      if (shouldDropForSampleRate(event)) {
         return null
       }
 

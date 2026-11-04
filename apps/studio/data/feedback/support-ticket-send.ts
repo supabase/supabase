@@ -5,8 +5,9 @@ import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import { classifyResponseError } from '@/data/error-classification'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type sendSupportTicketVariables = {
@@ -82,12 +83,11 @@ export async function sendSupportTicket({
         httpResponse.headers.get('Retry-After') ?? httpResponse.headers.get('X-RateLimit-Reset')
       const parsedReset = resetHeader ? parseInt(resetHeader, 10) : NaN
       const waitSeconds = Number.isFinite(parsedReset) ? parsedReset : RATE_LIMIT_FALLBACK_SECONDS
-      throw new StudioError(
-        `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
-        429,
-        undefined,
-        waitSeconds
-      )
+      throw classifyResponseError({
+        message: `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
+        code: 429,
+        retryAfter: waitSeconds,
+      })
     }
 
     handleError(error, {
