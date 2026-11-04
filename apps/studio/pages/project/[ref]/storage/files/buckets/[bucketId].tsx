@@ -1,5 +1,12 @@
 import { useParams } from 'common'
-import { ChevronDownIcon, FolderOpenIcon, SettingsIcon, ShieldIcon, Trash2Icon } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  FolderOpenIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  ShieldIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, useQueryState } from 'nuqs'
@@ -30,6 +37,7 @@ import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/
 import { EditBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EditBucketModal'
 import { EmptyBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EmptyBucketModal'
 import { PublicBucketWarning } from '@/components/interfaces/Storage/FilesBuckets/PublicBucketWarning'
+import { PurgeBucketCDNCacheModal } from '@/components/interfaces/Storage/FilesBuckets/PurgeBucketCDNCacheModal'
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
@@ -55,6 +63,10 @@ const BucketPage: NextPageWithLayout = () => {
   )
   const [showDeleteModal, setShowDeleteModal] = useQueryState(
     'delete',
+    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  )
+  const [showPurgeCDNCacheModal, setShowPurgeCDNCacheModal] = useQueryState(
+    'purgeCDNCache',
     parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
   )
 
@@ -120,6 +132,13 @@ const BucketPage: NextPageWithLayout = () => {
                   >
                     <FolderOpenIcon size={12} />
                     <p>Empty bucket</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem
+                    className="flex items-center space-x-2"
+                    onClick={() => setShowPurgeCDNCacheModal(true)}
+                  >
+                    <RefreshCwIcon size={12} />
+                    <p>Purge CDN cache</p>
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="flex items-center space-x-2"
@@ -192,6 +211,11 @@ const BucketPage: NextPageWithLayout = () => {
             visible={showDeleteModal}
             bucket={bucket}
             onClose={() => setShowDeleteModal(false)}
+          />
+          <PurgeBucketCDNCacheModal
+            visible={showPurgeCDNCacheModal}
+            bucket={bucket}
+            onClose={() => setShowPurgeCDNCacheModal(false)}
           />
         </>
       )}
