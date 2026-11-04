@@ -8,6 +8,7 @@
 @import './ask-ai.css';
 @import './curved-scroll-area.css';
 @import 'docs-search/styles.css';
+@import './header.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
