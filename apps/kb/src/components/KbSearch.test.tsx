@@ -104,6 +104,29 @@ describe('KbSearch telemetry', () => {
     expect(JSON.stringify(sent()[0].custom_properties)).not.toContain('secret')
   })
 
+  it('posts to the telemetry endpoint with cookies and no auth header', () => {
+    renderWithState(resultsState)
+    const [url, init] = fetchMock.mock.calls[0]
+
+    expect(url).toMatch(/\/platform\/telemetry\/event$/)
+    expect(init).toMatchObject({
+      method: 'POST',
+      credentials: 'include',
+      headers: { 'Content-Type': 'application/json', Version: '2' },
+    })
+    expect(init.headers).not.toHaveProperty('Authorization')
+  })
+
+  it.each<DocsSearchV2State>([
+    { status: 'initial', key: 0 },
+    { status: 'loading', key: 1, staleResults: [], staleQuery: '' },
+    { status: 'error', key: 1, message: 'failed' },
+  ])('sends nothing while the search is $status', (state) => {
+    renderWithState(state)
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
   it('reports a search with no results', () => {
     renderWithState({ status: 'noResults', key: 1, query: 'zzz' })
 
