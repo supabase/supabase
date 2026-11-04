@@ -33,6 +33,17 @@ const entitySearchResultSchema = z.object({
       table_id: z.number(),
     })
   ),
+  triggers: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+      events: z.array(z.enum(['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'])),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+    })
+  ),
   functions: z.array(
     z.object({
       id: z.number(),
@@ -67,6 +78,7 @@ async function getEntitySearch(
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
 export type EntitySearchPolicy = EntitySearchData['policies'][number]
+export type EntitySearchTrigger = EntitySearchData['triggers'][number]
 export type EntitySearchFunction = EntitySearchData['functions'][number]
 export type EntitySearchError = StudioError
 

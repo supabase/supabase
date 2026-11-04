@@ -54,6 +54,26 @@ const SEARCH_RESULT: EntitySearchData = {
       table_id: 102,
     },
   ],
+  triggers: [
+    {
+      id: 401,
+      name: 'audit_blog_changes',
+      activation: 'AFTER',
+      events: ['INSERT', 'UPDATE'],
+      schema: 'public',
+      table: 'blog_posts',
+      table_id: 101,
+    },
+    {
+      id: 402,
+      name: 'set_updated_at',
+      activation: 'BEFORE',
+      events: ['UPDATE'],
+      schema: 'blog',
+      table: 'blog_posts_archive',
+      table_id: 102,
+    },
+  ],
   functions: [
     { id: 301, schema: 'public', name: 'get_blog_post', type: 'function', args: 'id bigint' },
     { id: 302, schema: 'blog', name: 'archive_blog_posts', type: 'procedure', args: '' },
@@ -141,6 +161,24 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('/project/default/database/policies?schema=blog&edit=202')
   })
 
+  it('lists matching triggers with their timing and table, linking to the trigger editor', async () => {
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+
+    const section = await screen.findByRole('region', { name: 'Triggers' })
+    expect(section).toHaveTextContent('audit_blog_changes')
+    expect(section).toHaveTextContent('AFTER INSERT OR UPDATE on public.blog_posts')
+    expect(section).toHaveTextContent('BEFORE UPDATE on blog.blog_posts_archive')
+    // The triggers page lists triggers per schema, so the link has to carry it
+    expect(section).toHaveTextContent(
+      '/project/default/database/triggers/data?schema=public&edit=401'
+    )
+    expect(section).toHaveTextContent(
+      '/project/default/database/triggers/data?schema=blog&edit=402'
+    )
+  })
+
   it('lists matching functions with their arguments, linking to the function editor', async () => {
     customRender(<CommandMenuHarness />)
 
@@ -178,6 +216,7 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Policies' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Triggers' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Functions' })).not.toBeInTheDocument()
   })
 
@@ -253,25 +292,31 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
   })
 
-  it('lists tables, then policies, then functions, even when a function matches best', async () => {
-    addAPIMock({
-      method: 'post',
-      path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json([SEARCH_RESULT]),
-    })
-    customRender(<CommandMenuListHarness />)
+  it.each([
+    ['archive_blog_posts', 'a function'],
+    ['audit_blog', 'a trigger'],
+  ])(
+    'lists tables, policies, triggers, then functions, even when %s matches best',
+    async (search) => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: () => HttpResponse.json([SEARCH_RESULT]),
+      })
+      customRender(<CommandMenuListHarness />)
 
-    // Matches the `blog.archive_blog_posts` function far better than anything else
-    await userEvent.type(screen.getByRole('combobox'), 'archive_blog_posts')
+      await userEvent.type(screen.getByRole('combobox'), search)
 
-    await screen.findByText('procedure')
-    const headings = screen.getAllByText(/^(Tables|Policies|Functions)$/)
-    expect(headings.map((heading) => heading.textContent)).toEqual([
-      'Tables',
-      'Policies',
-      'Functions',
-    ])
-  })
+      await screen.findByText('Functions')
+      const headings = screen.getAllByText(/^(Tables|Policies|Triggers|Functions)$/)
+      expect(headings.map((heading) => heading.textContent)).toEqual([
+        'Tables',
+        'Policies',
+        'Triggers',
+        'Functions',
+      ])
+    }
+  )
 })
 
 const SUB_PAGE = 'Search Database Tables'
