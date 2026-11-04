@@ -48,8 +48,7 @@ describe('Option 1 navigation', () => {
     const todayPages = new Set(navUrls(today).map((url) => page(url)))
     // the migration guides moved to the knowledge base
     const isKbPage = (url: string) => url.startsWith('https://supabase.com/kb/')
-    // today's navigation keeps these topics as sections of their source pages
-    const splitOutPages = new Set([
+    const option1OnlyPages = new Set([
       '/guides/security/rotate-leaked-api-keys',
       '/guides/security/production-checklist',
       '/guides/observability/log-slow-queries',
@@ -58,9 +57,10 @@ describe('Option 1 navigation', () => {
       '/guides/database/postgres/testing-row-level-security',
     ])
 
+    expect([...option1OnlyPages].filter((url) => todayPages.has(url))).toEqual([])
     expect(
       navUrls(option1).filter(
-        (url) => !isKbPage(url) && !splitOutPages.has(page(url)) && !todayPages.has(page(url))
+        (url) => !isKbPage(url) && !option1OnlyPages.has(page(url)) && !todayPages.has(page(url))
       )
     ).toEqual([])
   })
