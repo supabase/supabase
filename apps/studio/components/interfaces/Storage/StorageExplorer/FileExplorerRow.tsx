@@ -9,11 +9,12 @@ import {
   LoaderCircleIcon,
   MoreVerticalIcon,
   MoveIcon,
+  RefreshCwIcon,
   RotateCcwIcon,
   Trash2Icon,
   UploadIcon,
 } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+import { useState, type CSSProperties, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Checkbox,
@@ -46,6 +47,7 @@ import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { pickFile } from './pickFile'
+import { PurgeBucketObjectCDNCacheModal } from './PurgeBucketObjectCDNCacheModal'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
@@ -254,6 +256,7 @@ export const FileExplorerRow = ({
     },
   ]
 
+  const [showPurgeCDNCacheModal, setShowPurgeCDNCacheModal] = useState(false)
   const rowOptions: RowOption[] =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
@@ -361,13 +364,18 @@ export const FileExplorerRow = ({
                         icon: <UploadIcon size={12} className="text-foreground-light" />,
                         onClick: onReplaceFile,
                       },
-                      { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
                   : []),
               ]
             : []),
+          {
+            name: 'Purge CDN Cache',
+            icon: <RefreshCwIcon size={12} className="text-foreground-light" />,
+            onClick: () => setShowPurgeCDNCacheModal(true),
+          },
           ...(canUpdateFiles
             ? [
+                { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   // On a versioned bucket this is a soft delete, so it reads as Archive.
                   name: isActivelyVersioning ? 'Archive' : 'Delete',
@@ -609,6 +617,12 @@ export const FileExplorerRow = ({
           )}
         </div>
       </div>
+      <PurgeBucketObjectCDNCacheModal
+        visible={showPurgeCDNCacheModal}
+        onClose={() => setShowPurgeCDNCacheModal(false)}
+        bucket={selectedBucket}
+        path={item.path!}
+      />
     </div>
   )
 }
