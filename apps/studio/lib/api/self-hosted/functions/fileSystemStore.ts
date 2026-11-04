@@ -9,7 +9,13 @@ export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
 
   async getFunctions(): Promise<FunctionArtifact[]> {
-    const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    let dirEntries
+    try {
+      dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    } catch (error) {
+      if (isNotFound(error)) return []
+      throw error
+    }
 
     const functionsFolders = dirEntries.filter((dir) => dir.isDirectory() && dir.name !== 'main')
     const functionsArtifacts = await Promise.all(
@@ -20,7 +26,13 @@ export class FileSystemFunctionsArtifactStore {
   }
 
   async getFunctionBySlug(slug: string): Promise<FunctionArtifact | undefined> {
-    const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    let dirEntries
+    try {
+      dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    } catch (error) {
+      if (isNotFound(error)) return
+      throw error
+    }
 
     const functionFolder = dirEntries.find(
       (dir) => dir.isDirectory() && dir.name !== 'main' && dir.name === slug
@@ -36,10 +48,16 @@ export class FileSystemFunctionsArtifactStore {
     const functionFolderPath = path.resolve(this.folderPath, slug)
     if (!functionFolderPath.startsWith(path.resolve(this.folderPath) + path.sep)) return []
 
-    const entries = await readdir(functionFolderPath, {
-      recursive: true,
-      withFileTypes: true,
-    })
+    let entries
+    try {
+      entries = await readdir(functionFolderPath, {
+        recursive: true,
+        withFileTypes: true,
+      })
+    } catch (error) {
+      if (isNotFound(error)) return []
+      throw error
+    }
 
     const fileEntries = await Promise.all(
       entries
@@ -77,4 +95,13 @@ async function parseFolderToFunctionArtifact(
     created_at: entrypointStat.birthtimeMs,
     updated_at: entrypointStat.mtimeMs,
   }
+}
+
+function isNotFound(error: unknown): boolean {
+  return (
+    typeof error === 'object' &&
+    error !== null &&
+    'code' in error &&
+    (error as { code?: unknown }).code === 'ENOENT'
+  )
 }
