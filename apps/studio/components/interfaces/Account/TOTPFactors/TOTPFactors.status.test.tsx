@@ -1,4 +1,4 @@
-import type { Factor } from '@supabase/supabase-js'
+import type { AuthMFARecoveryCodesStatusResponse, Factor } from '@supabase/supabase-js'
 import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
@@ -14,7 +14,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
-const factor: Factor = {
+const factor: Factor<'totp', 'verified'> = {
   id: 'authenticator-a',
   friendly_name: 'Phone',
   factor_type: 'totp',
@@ -22,7 +22,10 @@ const factor: Factor = {
   created_at: '2026-10-01T00:00:00Z',
   updated_at: '2026-10-01T00:00:00Z',
 }
-const availableCodes = { data: { remaining: 10, total: 10 }, error: null }
+const availableCodes: AuthMFARecoveryCodesStatusResponse = {
+  data: { id: 'codes-a', type: 'recovery_code', remaining: 10, total: 10 },
+  error: null,
+}
 
 const renderFactors = () => {
   const queryClient = new QueryClient({
@@ -53,7 +56,7 @@ describe('authenticator removal recovery-status guard', () => {
         HttpResponse.json<APIErrorBody>({ message: 'No selected project' }, { status: 404 }),
     })
     vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
-      data: { all: [factor], totp: [factor], phone: [] },
+      data: { all: [factor], totp: [factor], phone: [], webauthn: [], recovery_code: [] },
       error: null,
     })
   })
@@ -65,7 +68,7 @@ describe('authenticator removal recovery-status guard', () => {
     renderFactors()
 
     expect(await screen.findByText('Failed to load recovery codes')).toBeInTheDocument()
-    const remove = screen.getByRole('button', { name: 'Delete', exact: true })
+    const remove = screen.getByRole('button', { name: 'Delete' })
     expect(remove).toBeAriaDisabled()
     fireEvent.click(remove)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -84,7 +87,7 @@ describe('authenticator removal recovery-status guard', () => {
     )
     renderFactors()
 
-    const remove = await screen.findByRole('button', { name: 'Delete', exact: true })
+    const remove = await screen.findByRole('button', { name: 'Delete' })
     expect(remove).toBeAriaDisabled()
     fireEvent.click(remove)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -97,21 +100,23 @@ describe('authenticator removal recovery-status guard', () => {
     vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
       data: {
         all: [factor, { ...factor, id: 'pending-factor', status: 'unverified' }],
-        totp: [factor, { ...factor, id: 'pending-factor', status: 'unverified' }],
+        totp: [factor],
         phone: [],
+        webauthn: [],
+        recovery_code: [],
       },
       error: null,
     })
     const unenroll = vi.spyOn(auth.mfa, 'unenroll')
     const queryClient = renderFactors()
-    const remove = await screen.findByRole('button', { name: 'Delete', exact: true })
+    const remove = await screen.findByRole('button', { name: 'Delete' })
     await waitFor(() => expect(remove).not.toBeAriaDisabled())
     fireEvent.click(remove)
     const dialog = await screen.findByRole('dialog', { name: 'Remove authenticator' })
     expect(
       within(dialog).getByText('Multi-factor authentication will be disabled')
     ).toBeInTheDocument()
-    const confirm = within(dialog).getByRole('button', { name: 'Remove', exact: true })
+    const confirm = within(dialog).getByRole('button', { name: 'Remove' })
     expect(confirm).not.toBeDisabled()
 
     getStatus.mockRejectedValue(new Error('Status unavailable'))
