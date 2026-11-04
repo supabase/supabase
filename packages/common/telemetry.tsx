@@ -24,10 +24,11 @@ import {
   type ClientTelemetryEvent,
   type SessionRecordingOptions,
 } from './posthog-client'
-import { sendTelemetryEvent } from './telemetry-event'
+import { TelemetryEvent } from './telemetry-constants'
+import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
 
-export { handlePageLeaveTelemetry, sendTelemetryEvent }
+export { handlePageLeaveTelemetry }
 
 export {
   buildSessionRecordingConfig,
@@ -234,6 +235,24 @@ export const PageTelemetry = ({
 
 const EXAMPLE_LINK_PATTERN =
   /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
+
+export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
+  const request = buildTelemetryEventRequest(API_URL, event, pathname)
+  if (!request) return
+
+  // keepalive lets the request survive a navigation that starts right after
+  // the event (the OAuth redirect after sign_in_submitted, a plain-link click
+  // into the dashboard), but keepalive requests share a ~64KB in-flight quota
+  // page-wide, so it stays scoped to those events. Callers like useTrack
+  // fire-and-forget, so rejections are handled here rather than surfacing
+  // as unhandled promise rejections.
+  return post(request.url, request.body, {
+    headers: { Version: '2' },
+    keepalive: request.keepalive,
+  }).catch((error) => {
+    console.error('Problem sending telemetry event:', error)
+  })
+}
 
 //---
 // TELEMETRY IDENTIFY

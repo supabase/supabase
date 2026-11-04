@@ -1,8 +1,8 @@
-import { hasConsented } from 'common/consent-state'
 import { IS_PLATFORM } from 'common/constants'
 import { useDocsSearchV2 } from 'common/hooks/useDocsSearchV2'
 import { useMountEffect } from 'common/hooks/useMountEffect'
 import type { TelemetryEvent } from 'common/telemetry-constants'
+import { buildTelemetryEventRequest } from 'common/telemetry-event'
 import {
   getVisibleResults,
   SearchDialog,
@@ -23,12 +23,16 @@ const OPEN_SEARCH_EVENT = 'kb-search:open'
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
 
 const sendKbTelemetryEvent = (event: TelemetryEvent) => {
-  if (!IS_PLATFORM || !hasConsented()) return
-  const { pathname } = window.location
-  // keep this a dynamic import: a static one bundles the auth client into every KB page
-  import('common/telemetry-event').then(({ sendTelemetryEvent }) =>
-    sendTelemetryEvent(API_URL, event, pathname)
-  )
+  if (!IS_PLATFORM) return
+  const request = buildTelemetryEventRequest(API_URL, event, window.location.pathname)
+  if (!request) return
+  fetch(request.url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', Version: '2' },
+    credentials: 'include',
+    keepalive: request.keepalive,
+    body: JSON.stringify(request.body),
+  }).catch(() => {})
 }
 
 const LABELS: Partial<SearchLabels> = {

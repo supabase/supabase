@@ -1,7 +1,6 @@
 import type { components } from 'api-types'
 
 import { hasConsented } from './consent-state'
-import { post } from './fetchWrappers'
 import { ensurePlatformSuffix } from './helpers'
 import type { TelemetryEvent } from './telemetry-constants'
 import { getSharedTelemetryData } from './telemetry-utils'
@@ -17,9 +16,13 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_result_clicked',
 ])
 
-export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent = hasConsented()
-  if (!consent) return
+// no auth imports here: apps without a dashboard session (kb) send events through this
+export function buildTelemetryEventRequest(
+  API_URL: string,
+  event: TelemetryEvent,
+  pathname?: string
+) {
+  if (!hasConsented()) return null
 
   const body: EventBody = {
     ...getSharedTelemetryData(pathname),
@@ -37,10 +40,9 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
     }
   }
 
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
-    headers: { Version: '2' },
+  return {
+    url: `${ensurePlatformSuffix(API_URL)}/telemetry/event`,
+    body,
     keepalive: KEEPALIVE_ACTIONS.has(event.action),
-  }).catch((error) => {
-    console.error('Problem sending telemetry event:', error)
-  })
+  }
 }
