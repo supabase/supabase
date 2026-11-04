@@ -1,9 +1,9 @@
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type OrganizationInviteStatusVariables = {
   data?: OrganizationInviteByToken
-  error?: ResponseError | null
+  error?: StudioError | null
   isErrorInvitation: boolean
   isLoadingInvitation: boolean
   isLoadingProfile: boolean
@@ -64,7 +64,7 @@ export function getOrganizationInviteContent({
   status,
 }: {
   data?: OrganizationInviteByToken
-  error?: ResponseError | null
+  error?: StudioError | null
   isSignUpEnabled: boolean
   status: OrganizationInviteStatus
 }) {

@@ -83,8 +83,8 @@ export const runAndManage: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices',
             },
             {
-              name: 'Enterprise-managed auth for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication',
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization',
             },
           ],
         },
@@ -139,7 +139,7 @@ export const runAndManage: NavMenuConstant = {
         },
         {
           name: 'Production security checklist',
-          url: '/guides/deployment/going-into-prod#security',
+          url: '/guides/security/production-checklist',
         },
       ],
     },

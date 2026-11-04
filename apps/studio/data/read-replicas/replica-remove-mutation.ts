@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicaKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ReadReplicaRemoveVariables = {
   projectRef: string
@@ -32,11 +33,11 @@ export const useReadReplicaRemoveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ReadReplicaRemoveData, ResponseError, ReadReplicaRemoveVariables>,
+  UseCustomMutationOptions<ReadReplicaRemoveData, StudioError, ReadReplicaRemoveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ReadReplicaRemoveData, ResponseError, ReadReplicaRemoveVariables>({
+  return useMutation<ReadReplicaRemoveData, StudioError, ReadReplicaRemoveVariables>({
     mutationFn: (vars) => removeReadReplica(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, invalidateReplicaQueries } = variables

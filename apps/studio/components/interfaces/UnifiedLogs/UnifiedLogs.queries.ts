@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
+  getLogAttributeKey,
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
@@ -179,6 +180,11 @@ const translateFilter = (
       vals.map((v) => lit(v)),
       ','
     )})`
+
+  const attributeKey = getLogAttributeKey(key)
+  if (attributeKey !== undefined) {
+    return safeSql`log_attributes[${lit(attributeKey)}] ${inOp} ${inList(values)}`
+  }
 
   switch (key) {
     case 'pipeline_id':

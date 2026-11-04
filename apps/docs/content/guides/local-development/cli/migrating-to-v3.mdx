@@ -16,6 +16,12 @@ Two smaller changes can affect a production project: `config push` now applies `
 
 A removed command or flag still parses: it exits with code 1 and prints its replacement, so a failing run tells you what to change.
 
+<Admonition type="caution" title="Older projects fail to start until you rename [inbucket]">
+
+v3 can't load a `supabase/config.toml` that has an `[inbucket]` section, so `supabase start`, `stop`, `status`, and the `db` commands fail. Projects created with `supabase init` before v2.108.0 have that section. Rename it to `[local_smtp]` before you upgrade. The keys inside it don't change. v2.108.0 and later already read `[local_smtp]`. See [Rename `[inbucket]` to `[local_smtp]`](#inbucket).
+
+</Admonition>
+
 ## Before you upgrade
 
 1. **Update to the latest v2 release.** v2.122.0 and later warn about removed commands, flags, config keys, and environment variables, and about commands whose default target changes in v3. Run your usual workflows, including CI and deploy scripts, and fix each warning. v2 doesn't warn about the confirmation, config precedence, diff engine, or SMS changes, so read those sections too.
@@ -331,6 +337,32 @@ Removed config keys fail, so you see them on the first run. Some removed environ
 
 If a script reads `INBUCKET_URL` from `supabase status -o env`, it now gets an empty value. The shared `supabase/functions/import_map.json` fallback still works.
 
+### Rename `[inbucket]` to `[local_smtp]` [#inbucket]
+
+Before v2.108.0, `supabase init` wrote an `[inbucket]` section for the local email testing server. v3 no longer reads it. Every command that loads your project config fails, including `supabase start`, `stop`, `status`, and the `db` commands:
+
+```text
+[inbucket] in supabase/config.toml is no longer supported. Use [local_smtp] instead.
+```
+
+Rename the section. The keys inside it, and the email testing server they configure, are unchanged:
+
+```toml
+# Before
+[inbucket]
+enabled = true
+port = 54324
+
+# After
+[local_smtp]
+enabled = true
+port = 54324
+```
+
+- Rename any `[remotes.<name>.inbucket]` block to `[remotes.<name>.local_smtp]`.
+- In `supabase/config.json`, rename the `inbucket` key to `local_smtp`.
+- v2.108.0 and later read `[local_smtp]` and warn about `[inbucket]`. You can rename the section before you upgrade without breaking CI jobs on v2.108.0 or later.
+
 ## Error names and messages
 
 If your scripts match on error names in JSON output, update them:
@@ -374,7 +406,9 @@ v3 ships a single `supabase` executable on every install channel. v2 also instal
 
 ## Try the experimental `supabase stack` commands
 
-v3 includes the experimental `supabase stack` commands. They run a separate local project for each app, git worktree, git branch, or `--stack` name on one machine, so coding agents working in parallel each get their own database. They can also run without Docker: the native runtime runs each service as a process on macOS on Apple silicon and on Linux. See [A local Supabase project per agent, with or without Docker](/blog/local-supabase-project-per-agent-with-or-without-docker) for an overview.
+v3 improves the [`supabase stack` commands](/docs/guides/local-development/running-multiple-local-projects), which were already available in v2.
+
+They run a separate local project for each app, git worktree, git branch, or `--stack` name on one machine, so coding agents working in parallel each get their own database. They can also run without Docker: the native runtime runs each service as a process on macOS on Apple silicon and on Linux. See [A local Supabase project per agent, with or without Docker](/blog/local-supabase-project-per-agent-with-or-without-docker) for an overview.
 
 The stack commands are off by default, so `supabase start` behaves as described in the rest of this guide until you turn them on. To try them in a new app:
 

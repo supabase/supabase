@@ -17,7 +17,8 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
 
@@ -33,7 +34,7 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 }
 
 export type UnifiedLogsData = Awaited<ReturnType<typeof getUnifiedLogs>>
-export type UnifiedLogsError = ResponseError
+export type UnifiedLogsError = StudioError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
 type UnifiedLogsPageVariables = UnifiedLogsVariables & {
   pageSize?: number

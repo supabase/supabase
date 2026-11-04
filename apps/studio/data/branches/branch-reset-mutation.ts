@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantForVariants } from '@/lib/grants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BranchResetGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/reset'>
 
@@ -35,11 +36,11 @@ export const useBranchResetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchResetData, ResponseError, BranchResetVariables>,
+  UseCustomMutationOptions<BranchResetData, StudioError, BranchResetVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchResetData, ResponseError, BranchResetVariables>({
+  return useMutation<BranchResetData, StudioError, BranchResetVariables>({
     mutationFn: (vars) => resetBranch(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

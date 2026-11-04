@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationPaymentMethodDeleteVariables = {
   slug: string
@@ -38,7 +39,7 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationPaymentMethodDeleteData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDeleteVariables
   >,
   'mutationFn'
@@ -47,7 +48,7 @@ export const useOrganizationPaymentMethodDeleteMutation = ({
 
   return useMutation<
     OrganizationPaymentMethodDeleteData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodDeleteVariables
   >({
     mutationFn: (vars) => deletePaymentMethod(vars),

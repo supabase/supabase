@@ -4,7 +4,8 @@ import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type VectorBucketsVariables = { projectRef?: string }
 
@@ -26,7 +27,7 @@ export async function getVectorBuckets(
 }
 
 export type VectorBucketsData = Awaited<ReturnType<typeof getVectorBuckets>>
-export type VectorBucketsError = ResponseError
+export type VectorBucketsError = StudioError
 
 export const useVectorBucketsQuery = <TData = VectorBucketsData>(
   { projectRef }: VectorBucketsVariables,

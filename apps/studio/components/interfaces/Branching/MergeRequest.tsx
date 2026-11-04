@@ -23,6 +23,7 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useGrant } from '@/lib/grants'
@@ -116,10 +117,12 @@ export const MergeSubtitle = () => {
 export const MergeActions = ({
   isWorkflowRunning,
   isSubmitting,
+  canMerge,
   onSelectMerge,
 }: {
   isWorkflowRunning: boolean
   isSubmitting: boolean
+  canMerge: boolean
   onSelectMerge: () => void
 }) => {
   const router = useRouter()
@@ -152,6 +155,10 @@ export const MergeActions = ({
   })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
 
   const {
     diffContent,
@@ -160,6 +167,7 @@ export const MergeActions = ({
     hasChanges: combinedHasChanges,
   } = useBranchMergeDiff({
     currentBranchRef: ref,
+    isCurrentBranchDefault: currentBranch?.is_default,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
     parentBranchConnectionString: parentProject?.connectionString || undefined,
@@ -167,6 +175,7 @@ export const MergeActions = ({
   })
 
   const isMergeDisabled =
+    !canMerge ||
     !combinedHasChanges ||
     isCombinedDiffLoading ||
     isBranchOutOfDateOverall ||
@@ -187,13 +196,15 @@ export const MergeActions = ({
           tooltip={{
             content: {
               side: 'bottom',
-              text: !combinedHasChanges
-                ? 'No changes to merge'
-                : isWorkflowRunning
-                  ? 'Workflow is currently running'
-                  : !!ghConnection && Boolean(mainBranch?.git_branch)
-                    ? 'Deploy to production from GitHub is enabled'
-                    : 'Unable to merge at this time',
+              text: !canMerge
+                ? 'You need additional permissions to merge branches'
+                : !combinedHasChanges
+                  ? 'No changes to merge'
+                  : isWorkflowRunning
+                    ? 'Workflow is currently running'
+                    : !!ghConnection && Boolean(mainBranch?.git_branch)
+                      ? 'Deploy to production from GitHub is enabled'
+                      : 'Unable to merge at this time',
             },
           }}
           variant="primary"
@@ -222,10 +233,12 @@ export const MergeActions = ({
         <DropdownMenuContent side="bottom" align="end" className="w-52">
           <DropdownMenuItem
             className="gap-x-2"
+            disabled={updateBranchGrant.status !== 'granted'}
             onClick={() => {
-              if (!ref || !parentProjectRef) return
+              if (!ref || !parentProjectRef || updateBranchGrant.status !== 'granted') return
               updateBranch(
                 {
+                  grant: updateBranchGrant.grant,
                   branchRef: ref,
                   projectRef: parentProjectRef,
                   requestReview: false,

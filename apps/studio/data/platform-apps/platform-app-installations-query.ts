@@ -3,7 +3,8 @@ import type { components } from 'api-types'
 
 import { platformAppKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppInstallation =
   components['schemas']['ListPlatformAppInstallationsResponse_Output']['installations'][number]
@@ -25,7 +26,7 @@ export async function getPlatformAppInstallations(
 }
 
 export type PlatformAppInstallationsData = Awaited<ReturnType<typeof getPlatformAppInstallations>>
-export type PlatformAppInstallationsError = ResponseError
+export type PlatformAppInstallationsError = StudioError
 
 export const usePlatformAppInstallationsQuery = <TData = PlatformAppInstallationsData>(
   { slug }: { slug?: string },

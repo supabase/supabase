@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type MaxConnectionsVariables = {
   projectRef?: string
@@ -36,7 +37,7 @@ export async function getMaxConnections(
 }
 
 export type MaxConnectionsData = Awaited<ReturnType<typeof getMaxConnections>>
-export type MaxConnectionsError = ResponseError
+export type MaxConnectionsError = StudioError
 
 export const useMaxConnectionsQuery = <TData = MaxConnectionsData>(
   { projectRef, connectionString }: MaxConnectionsVariables,

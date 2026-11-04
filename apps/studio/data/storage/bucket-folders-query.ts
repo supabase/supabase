@@ -2,7 +2,7 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { listBucketObjects } from './bucket-objects-list-mutation'
 import { storageKeys } from './keys'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 /** Number of objects requested per folder listing */
 const PAGE_LIMIT = 1000
@@ -29,7 +29,7 @@ export type BucketFoldersData = {
   isTruncated: boolean
 }
 
-export type BucketFoldersError = ResponseError
+export type BucketFoldersError = StudioError
 
 /** Pages through a single folder, counting each page fetched against the shared `listingsState` */
 const listFolderNames = async (
