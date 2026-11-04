@@ -1,12 +1,14 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 
 import CodeSnippet from './CodeSnippet'
 import { DocSection } from './DocSection'
 import Snippets from './Snippets'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 
 interface AuthenticationProps {
   selectedLang: 'bash' | 'js'
@@ -15,10 +17,11 @@ interface AuthenticationProps {
 
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery({
+    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
   const { anonKey, serviceKey } = apiKeyData ?? {}
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
@@ -77,6 +80,10 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
               </InlineLink>{' '}
               page.
             </p>
+            <ApiKeysAccessNote
+              grant={apiKeysGrant}
+              fallback="You can find your keys in the API Keys Settings page."
+            />
           </>
         }
         snippets={
