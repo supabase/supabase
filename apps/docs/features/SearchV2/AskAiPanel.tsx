@@ -3,6 +3,7 @@
 import type { DocsSearchV2AskAiQuestionSubmittedEvent } from 'common/telemetry-constants'
 import { SearchInputRow, type SearchDialogProps } from 'docs-search/components'
 import { FileText } from 'lucide-react'
+import { useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import {
   useCallback,
@@ -10,17 +11,18 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type ComponentProps,
   type FormEvent,
   type KeyboardEvent,
   type UIEvent,
 } from 'react'
+import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import {
   MessageRole,
   MessageStatus,
   useAiChat,
   type Message,
 } from 'ui-patterns/CommandMenu/prepackaged/ai'
-import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
@@ -37,6 +39,10 @@ interface AskAiPanelProps {
 interface AiMessagesProps {
   messages: Message[]
   hasError: boolean
+}
+
+interface AiAnswerMarkdownProps {
+  content: string
 }
 
 interface AiSourcesProps {
@@ -235,13 +241,6 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
     })
   }
 
-  const handleAnswerLinkClick = (href: string) => {
-    sendTelemetryEvent({
-      action: 'docs_search_v2_ask_ai_answer_link_clicked',
-      properties: { href },
-    })
-  }
-
   return (
     <ol className="flex flex-col gap-4 py-4 pr-4 pl-3">
       {messages.map((message, index) =>
@@ -259,22 +258,7 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
             aria-busy={!isFailedAnswer(message, index) && message.status !== MessageStatus.Complete}
           >
             {message.status === MessageStatus.Pending ? null : (
-              <Markdown
-                codeBlock
-                className="ask-ai-answer prose-sm wrap-break-word"
-                components={{
-                  a: (props) => (
-                    <a
-                      {...props}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => handleAnswerLinkClick(props.href ?? '')}
-                    />
-                  ),
-                }}
-              >
-                {message.content}
-              </Markdown>
+              <AiAnswerMarkdown content={message.content} />
             )}
             {isFailedAnswer(message, index) ? (
               <p className="text-search-dialog text-foreground-lighter">
@@ -303,6 +287,46 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
       )}
     </ol>
   )
+}
+
+function AiAnswerMarkdown({ content }: AiAnswerMarkdownProps) {
+  const [visibleLength, setVisibleLength] = useState(0)
+  const isReducedMotion = useReducedMotion()
+  const isCaughtUp = visibleLength >= content.length
+
+  // exception: chunks arrive in bursts. each animation frame shows 1/12 of the hidden text.
+  // a large backlog drains fast, and a small one shows at a steady rate
+  useEffect(() => {
+    if (isCaughtUp || isReducedMotion) return
+    const frame = requestAnimationFrame(() =>
+      setVisibleLength((length) => length + Math.ceil((content.length - length) / 12))
+    )
+    return () => cancelAnimationFrame(frame)
+  }, [content.length, isCaughtUp, isReducedMotion, visibleLength])
+
+  return (
+    <Markdown
+      codeBlock
+      className="ask-ai-answer prose-sm wrap-break-word"
+      // a link component that changes on each frame makes react replace the link, so a click can get lost
+      components={{ a: AiAnswerLink }}
+    >
+      {isReducedMotion ? content : content.slice(0, visibleLength)}
+    </Markdown>
+  )
+}
+
+function AiAnswerLink(props: ComponentProps<'a'>) {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
+  const handleClick = () => {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_ask_ai_answer_link_clicked',
+      properties: { href: props.href ?? '' },
+    })
+  }
+
+  return <a {...props} target="_blank" rel="noopener noreferrer" onClick={handleClick} />
 }
 
 function AiSources({ sources, onSourceClick }: AiSourcesProps) {
