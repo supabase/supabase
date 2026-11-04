@@ -40,10 +40,7 @@ export const LangSelector = ({
     FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
   )
   const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
-    {
-      projectRef,
-      reveal: false,
-    },
+    { projectRef },
     { enabled: canReadAPIKeys }
   )
 
