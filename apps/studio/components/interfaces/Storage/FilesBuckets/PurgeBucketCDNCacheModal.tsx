@@ -42,7 +42,6 @@ export const PurgeBucketCDNCacheModal = ({
         // No need to set a status as we show a toast
         toast.success(`Successfully purged CDN cache for bucket “${bucket.name}”`)
         onClose()
-        if (bucket.id) router.push(`/project/${projectRef}/storage/files`)
       },
       async onError(data) {
         // No need to set a status as we show a toast
