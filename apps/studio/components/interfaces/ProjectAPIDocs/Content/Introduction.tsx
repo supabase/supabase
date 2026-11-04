@@ -9,7 +9,6 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useGrant } from '@/lib/grants'
@@ -50,10 +49,6 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
               <Input disabled readOnly copy size="small" value={endpoint} className="w-full" />
             </FormItemLayout>
           </div>
-          <ApiKeysAccessNote
-            grant={apiKeysGrant}
-            fallback="You can find your keys in the API Keys settings."
-          />
           <div className="flex flex-col space-x-4">
             <FormItemLayout
               isReactForm={false}

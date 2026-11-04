@@ -1,10 +1,12 @@
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { Introduction } from './Introduction'
+import { ProjectAPIDocs } from './ProjectAPIDocs'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
+import { appState } from '@/state/app-state'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { mockPermissionsError } from '@/tests/lib/msw-permissions'
@@ -82,49 +84,77 @@ const mockSettings = () =>
     },
   })
 
-const renderIntroduction = () =>
-  customRender(
-    <Introduction
-      showKeys
-      language="bash"
-      apikey="SUPABASE_CLIENT_ANON_KEY"
-      endpoint="https://x.co"
-    />,
-    { profileContext }
-  )
-
-describe('Introduction', () => {
-  it('prefills the client key when api-keys are readable', async () => {
-    mockProjectGrantContext({ ref: 'default' })
-    mockApiKeys()
-    mockSettings()
-
-    renderIntroduction()
-
-    await screen.findByText('Client API key')
-    expect(screen.queryByText(/need additional permissions/)).not.toBeInTheDocument()
+const mockAddons = () =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/billing/addons',
+    response: { selected_addons: [], available_addons: [], ref: 'default' },
   })
 
-  it('explains the missing permission and skips the request when denied', async () => {
+const renderDocs = () => customRender(<ProjectAPIDocs />, { profileContext })
+
+describe('ProjectAPIDocs', () => {
+  beforeEach(() => {
+    appState.setActiveDocsSection(['introduction'])
+    appState.setShowProjectApiDocs(true)
+  })
+  afterEach(() => {
+    appState.setShowProjectApiDocs(false)
+  })
+
+  it('shows the client key once keys are shown', async () => {
+    mockProjectGrantContext({ ref: 'default' })
+    const handler = mockApiKeys()
+    mockSettings()
+    mockAddons()
+    const user = userEvent.setup()
+
+    renderDocs()
+
+    const showKeys = await screen.findByRole('button', { name: 'Show keys' })
+    await vi.waitFor(() => expect(showKeys).not.toBeAriaDisabled())
+    await user.click(showKeys)
+
+    expect(
+      (await screen.findAllByDisplayValue(/sb_publishable_abc|anon-jwt/)).length
+    ).toBeGreaterThan(0)
+    expect(handler).toHaveBeenCalled()
+  })
+
+  it('disables "Show keys" with a tooltip and skips the request when denied', async () => {
     mockProjectGrantContext({ ref: 'default', permissions: withoutKeysRead() })
     const handler = mockApiKeys()
     mockSettings()
+    mockAddons()
+    const user = userEvent.setup()
 
-    renderIntroduction()
+    renderDocs()
+
+    const showKeys = await screen.findByRole('button', { name: 'Show keys' })
+    await user.hover(showKeys)
 
     expect(
-      await screen.findByText(/You need additional permissions to view API keys\./)
-    ).toBeVisible()
+      (await screen.findAllByText('You need additional permissions to view API keys')).length
+    ).toBeGreaterThan(0)
+    expect(showKeys).toBeAriaDisabled()
     expect(handler).not.toHaveBeenCalled()
   })
 
-  it('shows an error when permissions fail to load', async () => {
+  it('disables "Show keys" with a tooltip when permissions fail to load', async () => {
     mockProjectGrantContext({ ref: 'default' })
     mockPermissionsError()
     mockSettings()
+    mockAddons()
+    const user = userEvent.setup()
 
-    renderIntroduction()
+    renderDocs()
 
-    expect(await screen.findByText(/Failed to check API key permissions/)).toBeVisible()
+    const showKeys = await screen.findByRole('button', { name: 'Show keys' })
+    await user.hover(showKeys)
+
+    expect(
+      (await screen.findAllByText('Failed to check API key permissions')).length
+    ).toBeGreaterThan(0)
+    expect(showKeys).toBeAriaDisabled()
   })
 })

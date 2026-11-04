@@ -4,7 +4,6 @@ import { useParams } from 'common'
 import CodeSnippet from './CodeSnippet'
 import { DocSection } from './DocSection'
 import Snippets from './Snippets'
-import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
@@ -80,10 +79,6 @@ const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
               </InlineLink>{' '}
               page.
             </p>
-            <ApiKeysAccessNote
-              grant={apiKeysGrant}
-              fallback="You can find your keys in the API Keys Settings page."
-            />
           </>
         }
         snippets={
