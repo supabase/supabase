@@ -57,6 +57,9 @@ describe('Option 1 navigation', () => {
       '/guides/database/postgres/testing-row-level-security',
     ])
 
+    const option1Pages = new Set(navUrls(option1).map((url) => page(url)))
+
+    expect([...option1OnlyPages].filter((url) => !option1Pages.has(url))).toEqual([])
     expect([...option1OnlyPages].filter((url) => todayPages.has(url))).toEqual([])
     expect(
       navUrls(option1).filter(
