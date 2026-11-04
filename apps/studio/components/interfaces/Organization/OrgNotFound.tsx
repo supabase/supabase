@@ -55,11 +55,11 @@ export const OrgNotFound = ({ slug }: { slug?: string }) => {
           />
         )}
         {isOrganizationsSuccess && (
-          <span>
+          <>
             {organizations?.map((org) => (
               <OrganizationCard key={org.slug} organization={org} href={`/new/${org.slug}`} />
             ))}
-          </span>
+          </>
         )}
       </div>
     </>
