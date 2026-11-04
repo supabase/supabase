@@ -45,6 +45,27 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+  --container-docs-content: 731px;
+}
+
+@utility docs-active-bar {
+  &[aria-current]::before {
+    @apply absolute -left-3.25 top-1/2 h-[1em] w-px -translate-y-1/2 bg-brand;
+    content: '';
+  }
+}
+
+@utility docs-rail-sublist {
+  @apply mt-1 ml-px border-l pl-3;
+}
+
+@utility docs-rail-link {
+  @apply relative block py-1 text-sm text-foreground-lighter wrap-anywhere;
+  @apply transition-colors duration-150 hover:text-foreground-light focus-ring;
+  @apply focus-visible:text-foreground-light;
+  &[aria-current] {
+    @apply text-foreground;
+  }
 }
 
 @layer utilities {
