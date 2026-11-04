@@ -225,3 +225,133 @@ withTestDatabase('treats LIKE wildcards in policy searches literally', async (db
   expect(await searchPolicies(db, 'read_posts')).toEqual(['public.posts: read_posts (SELECT)'])
   expect(await searchPolicies(db, '%')).toEqual([])
 })
+
+const searchFunctions = async (
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  query: string,
+  options?: { limit?: number }
+) => {
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query, ...options })
+  )
+  return row.functions.map((f) => `${f.schema}.${f.name}(${f.args})`)
+}
+
+withTestDatabase('ranks function matches exact, then prefix, then substring', async (db) => {
+  await db.executeQuery(`
+    create function public.old_get_user() returns int language sql as 'select 1';
+    create function public.get_user_by_id(id int) returns int language sql as 'select 1';
+    create function public.get_user() returns int language sql as 'select 1';
+  `)
+
+  expect(await searchFunctions(db, 'get_user')).toEqual([
+    'public.get_user()',
+    'public.get_user_by_id(id integer)',
+    'public.old_get_user()',
+  ])
+})
+
+withTestDatabase('returns overloads separately with their identity arguments', async (db) => {
+  await db.executeQuery(`
+    create function public.add_one(a int) returns int language sql as 'select a + 1';
+    create function public.add_one(a text, b text) returns text language sql as 'select a || b';
+  `)
+
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query: 'add_one' })
+  )
+
+  expect(row.functions).toHaveLength(2)
+  expect(new Set(row.functions.map((f) => f.id)).size).toBe(2)
+  expect(row.functions.map((f) => f.args).sort()).toEqual(['a integer', 'a text, b text'])
+})
+
+withTestDatabase('distinguishes procedures and skips aggregates', async (db) => {
+  await db.executeQuery(`
+    create function public.stat_fn() returns int language sql as 'select 1';
+    create procedure public.stat_proc() language sql as 'select 1';
+    create function public.stat_sfunc(state int, v int) returns int language sql as 'select state + v';
+    create aggregate public.stat_agg(int) (sfunc = public.stat_sfunc, stype = int);
+  `)
+
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query: 'stat_' })
+  )
+
+  expect(row.functions.map((f) => `${f.name}:${f.type}`).sort()).toEqual([
+    'stat_fn:function',
+    'stat_proc:procedure',
+    'stat_sfunc:function',
+  ])
+})
+
+withTestDatabase('leaves out system schema functions', async (db) => {
+  // pg_catalog has plenty of pg_get_* functions, so this only passes if they are excluded
+  expect(await searchFunctions(db, 'pg_get_')).toEqual([])
+})
+
+withTestDatabase(
+  'leaves out extension functions without hiding the same-named ones',
+  async (db) => {
+    await db.executeQuery(`
+    create schema ext;
+    create extension pgcrypto schema ext;
+    create function public.crypt_user_function() returns int language sql as 'select 1';
+  `)
+
+    // pgcrypto's own `crypt` is an exact match, and would otherwise rank first
+    expect(await searchFunctions(db, 'crypt')).toEqual(['public.crypt_user_function()'])
+  }
+)
+
+withTestDatabase(
+  'finds the user functions when extension functions match more of the cap',
+  async (db) => {
+    await db.executeQuery(`
+    create schema ext;
+    create extension pgcrypto schema ext;
+    create function public.pgp_user_function() returns int language sql as 'select 1';
+  `)
+
+    // pgcrypto ships well over the 6 `pgp_*` functions that would fill the result
+    expect(await searchFunctions(db, 'pgp_')).toEqual(['public.pgp_user_function()'])
+  }
+)
+
+withTestDatabase('matches schema-qualified function searches', async (db) => {
+  await db.executeQuery(`
+    create schema app;
+    create function app.helper() returns int language sql as 'select 1';
+    create function public.helper() returns int language sql as 'select 1';
+    create function public."v1.helper"() returns int language sql as 'select 1';
+  `)
+
+  expect(await searchFunctions(db, 'app.helper')).toEqual(['app.helper()'])
+  // A partial schema name matches too
+  expect(await searchFunctions(db, 'ap.helper')).toEqual(['app.helper()'])
+  // Function names that themselves contain a dot are still found
+  expect(await searchFunctions(db, 'v1.helper')).toEqual(['public.v1.helper()'])
+})
+
+withTestDatabase('treats LIKE wildcards in function searches literally', async (db) => {
+  await db.executeQuery(`
+    create function public.read_fn() returns int language sql as 'select 1';
+    create function public.readxfn() returns int language sql as 'select 1';
+  `)
+
+  expect(await searchFunctions(db, 'read_fn')).toEqual(['public.read_fn()'])
+  expect(await searchFunctions(db, '%')).toEqual([])
+})
+
+withTestDatabase('caps the number of functions', async (db) => {
+  await db.executeQuery(`
+    create function public.cap_a() returns int language sql as 'select 1';
+    create function public.cap_b() returns int language sql as 'select 1';
+    create function public.cap_c() returns int language sql as 'select 1';
+  `)
+
+  expect(await searchFunctions(db, 'cap_', { limit: 2 })).toEqual([
+    'public.cap_a()',
+    'public.cap_b()',
+  ])
+})
