@@ -74,6 +74,7 @@ const NavContainer = memo(function NavContainer({
   return (
     <nav
       aria-labelledby="main-nav-title"
+      data-docs-nav="sidebar"
       className={cn(
         'fixed lg:relative z-40 lg:z-auto',
         'inset-x-0 top-(--header-height) overflow-hidden',

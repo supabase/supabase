@@ -58,7 +58,7 @@ const BreadcrumbsInternal = ({
   )
 
   return (
-    <Breadcrumb className={cn(className)}>
+    <Breadcrumb data-docs-nav="breadcrumb" className={cn(className)}>
       <BreadcrumbList className="text-foreground-lighter p-0">
         {breadcrumbs.length >= ITEMS_TO_DISPLAY && (
           <>
