@@ -22,6 +22,7 @@ import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
@@ -32,7 +33,7 @@ export const TOTPFactors = () => {
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
-  const totpFactors = data?.totp ?? []
+  const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
   const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
@@ -42,6 +43,8 @@ export const TOTPFactors = () => {
     error: recoveryCodesError,
     isError: recoveryCodesIsError,
     isPending: recoveryCodesIsPending,
+    isFetching: recoveryCodesIsFetching,
+    refetch: refetchRecoveryCodesStatus,
   } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
   })
@@ -50,7 +53,8 @@ export const TOTPFactors = () => {
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
-  const disableDeleteFactor = shouldVerifyRecoveryCodes && recoveryCodesIsPending
+  const disableDeleteFactor =
+    shouldVerifyRecoveryCodes && (recoveryCodesIsPending || recoveryCodesIsError || !status)
 
   return (
     <>
@@ -116,13 +120,21 @@ export const TOTPFactors = () => {
                           />
                         </p>
                       </div>
-                      <Button
+                      <ButtonTooltip
                         size="tiny"
                         onClick={() => setFactorToBeDeleted(factor.id)}
                         disabled={disableDeleteFactor}
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: disableDeleteFactor
+                              ? 'Check recovery code status before removing an authenticator'
+                              : 'Remove authenticator',
+                          },
+                        }}
                       >
                         Delete
-                      </Button>
+                      </ButtonTooltip>
                     </CardContent>
                   ))}
                 </div>
@@ -145,7 +157,19 @@ export const TOTPFactors = () => {
           </PageSectionMeta>
           <PageSectionContent aria-live="polite">
             {recoveryCodesIsError && (
-              <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
+              <AlertError
+                subject="Failed to load recovery codes"
+                error={recoveryCodesError}
+                showInstructions={false}
+                additionalActions={
+                  <Button
+                    loading={recoveryCodesIsFetching}
+                    onClick={() => void refetchRecoveryCodesStatus()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
             )}
             {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
             {status === 'available' && codes && (
@@ -182,6 +206,7 @@ export const TOTPFactors = () => {
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
+        canRemove={!disableDeleteFactor}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
         hasRecoveryCodes={status === 'available'}

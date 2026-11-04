@@ -1,0 +1,125 @@
+import type { Factor } from '@supabase/supabase-js'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
+import { HttpResponse } from 'msw'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
+
+import { TOTPFactors } from './index'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { auth } from '@/lib/gotrue'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+
+mockAnimationsApi()
+
+const factor: Factor = {
+  id: 'authenticator-a',
+  friendly_name: 'Phone',
+  factor_type: 'totp',
+  status: 'verified',
+  created_at: '2026-10-01T00:00:00Z',
+  updated_at: '2026-10-01T00:00:00Z',
+}
+const availableCodes = { data: { remaining: 10, total: 10 }, error: null }
+
+const renderFactors = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  customRender(
+    <FeatureFlagContext.Provider
+      value={{
+        configcat: { enableAuthRecoveryCodes: true, textConfirmationModalClickToCopy: false },
+        posthog: {},
+        hasLoaded: true,
+      }}
+    >
+      <TOTPFactors />
+    </FeatureFlagContext.Provider>,
+    { queryClient }
+  )
+  return queryClient
+}
+
+describe('authenticator removal recovery-status guard', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'No selected project' }, { status: 404 }),
+    })
+    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+      data: { all: [factor], totp: [factor], phone: [] },
+      error: null,
+    })
+  })
+
+  test('keeps removal unavailable after a failed status read and enables it after Retry succeeds', async () => {
+    const getStatus = vi
+      .spyOn(auth.mfa.recoveryCodes, 'getStatus')
+      .mockRejectedValue(new Error('Status unavailable'))
+    renderFactors()
+
+    expect(await screen.findByText('Failed to load recovery codes')).toBeInTheDocument()
+    const remove = screen.getByRole('button', { name: 'Delete', exact: true })
+    expect(remove).toBeAriaDisabled()
+    fireEvent.click(remove)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    getStatus.mockResolvedValue(availableCodes)
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await waitFor(() => expect(remove).not.toBeAriaDisabled())
+    expect(screen.queryByText('Failed to load recovery codes')).not.toBeInTheDocument()
+    fireEvent.click(remove)
+    expect(await screen.findByRole('dialog', { name: 'Remove authenticator' })).toBeInTheDocument()
+  })
+
+  test('keeps removal unavailable while recovery-code status is loading', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockImplementation(
+      () => new Promise<Awaited<ReturnType<typeof auth.mfa.recoveryCodes.getStatus>>>(() => {})
+    )
+    renderFactors()
+
+    const remove = await screen.findByRole('button', { name: 'Delete', exact: true })
+    expect(remove).toBeAriaDisabled()
+    fireEvent.click(remove)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+  })
+
+  test('disables an open confirmation if a background status check fails', async () => {
+    const getStatus = vi
+      .spyOn(auth.mfa.recoveryCodes, 'getStatus')
+      .mockResolvedValue(availableCodes)
+    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+      data: {
+        all: [factor, { ...factor, id: 'pending-factor', status: 'unverified' }],
+        totp: [factor, { ...factor, id: 'pending-factor', status: 'unverified' }],
+        phone: [],
+      },
+      error: null,
+    })
+    const unenroll = vi.spyOn(auth.mfa, 'unenroll')
+    const queryClient = renderFactors()
+    const remove = await screen.findByRole('button', { name: 'Delete', exact: true })
+    await waitFor(() => expect(remove).not.toBeAriaDisabled())
+    fireEvent.click(remove)
+    const dialog = await screen.findByRole('dialog', { name: 'Remove authenticator' })
+    expect(
+      within(dialog).getByText('Multi-factor authentication will be disabled')
+    ).toBeInTheDocument()
+    const confirm = within(dialog).getByRole('button', { name: 'Remove', exact: true })
+    expect(confirm).not.toBeDisabled()
+
+    getStatus.mockRejectedValue(new Error('Status unavailable'))
+    await act(async () => {
+      await queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+    })
+    await waitFor(() => expect(confirm).toBeDisabled())
+    fireEvent.click(confirm)
+    expect(unenroll).not.toHaveBeenCalled()
+  })
+})

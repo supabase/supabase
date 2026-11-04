@@ -14,6 +14,7 @@ interface DeleteFactorModalProps {
   factorId: string | null
   lastFactorToBeDeleted: boolean
   hasRecoveryCodes: boolean
+  canRemove?: boolean
   onClose: () => void
 }
 
@@ -22,6 +23,7 @@ export const DeleteFactorModal = ({
   factorId,
   lastFactorToBeDeleted,
   hasRecoveryCodes,
+  canRemove = true,
   onClose,
 }: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
@@ -74,9 +76,9 @@ export const DeleteFactorModal = ({
       confirmLabelLoading="Removing"
       loading={loading}
       onCancel={handleClose}
-      disabled={!factorId}
+      disabled={!factorId || !canRemove}
       onConfirm={() => {
-        if (!factorId || loading) return
+        if (!factorId || loading || !canRemove) return
         setError(null)
         // If users have recovery codes and this is the last MFA for their account,
         // we must first delete the recovery codes (they don't make sense without any MFA)
@@ -114,6 +116,12 @@ export const DeleteFactorModal = ({
           </>
         )}
       </ul>
+      {!canRemove && (
+        <p className="mt-4 text-sm text-foreground-light">
+          Close this dialog and retry the recovery code status check before removing an
+          authenticator.
+        </p>
+      )}
       {error && (
         <AlertError
           className="mt-4"
