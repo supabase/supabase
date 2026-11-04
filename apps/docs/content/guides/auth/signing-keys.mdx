@@ -72,6 +72,12 @@ Key rotation and revocation are one of the most important processes for maintain
 
 - You may wish to switch signing algorithms due to compatibility problems or to simplify development on your end.
 
+<Admonition type="note">
+
+Storage signed URLs use a separate key for signing and will not be invalidated when the auth signing keys are rotated. For more information see [Storage URL Signing Keys](/docs/guides/auth/signing-keys.mdx)
+
+</Admonition>
+
 ### Lifetime of a signing key
 
 A newly created key starts off as standby, before being rotated into in use (becoming the current key) while the existing current key becomes previously used.
