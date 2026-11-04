@@ -58,13 +58,13 @@ export const localDevelopment: NavMenuConstant = {
       name: 'Testing',
       items: [
         {
-          name: 'Test RLS policies with pgTAP',
-          url: '/guides/database/postgres/testing-row-level-security',
-        },
-        {
-          name: 'Testing overview',
+          name: 'Overview',
           url: '/guides/local-development/testing/overview',
           enabled: localDevelopmentEnabled,
+        },
+        {
+          name: 'Test RLS policies with pgTAP',
+          url: '/guides/database/postgres/testing-row-level-security',
         },
         { name: 'Testing your database', url: '/guides/database/testing' },
         {
