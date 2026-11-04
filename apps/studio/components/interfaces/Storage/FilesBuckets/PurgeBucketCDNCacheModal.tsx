@@ -1,5 +1,4 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,7 +31,6 @@ export const PurgeBucketCDNCacheModal = ({
   onClose,
 }: PurgeBucketCDNCacheModalProps) => {
   const [status, setStatus] = useState('')
-  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan.id === 'free'
@@ -44,7 +42,6 @@ export const PurgeBucketCDNCacheModal = ({
         // No need to set a status as we show a toast
         toast.success(`Successfully purged CDN cache for bucket “${bucket.name}”`)
         onClose()
-        if (bucket.id) router.push(`/project/${projectRef}/storage/files`)
       },
       async onError(data) {
         // No need to set a status as we show a toast
