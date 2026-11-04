@@ -67,7 +67,7 @@ export const selfHostingThirdPartyGuides: ContentListingGroup = {
       icon: { kind: 'server', color: '#64748B', bg: 'rgba(100,116,139,0.1)' },
       subtitle: 'By Pulore',
       description:
-        'What each service in the stack needs in production: upgrades, backups, auth email, storage and a checklist.',
+        'What each service in the stack needs in production: upgrades, backups, auth email, storage, and a checklist.',
     },
   ],
 }
