@@ -380,7 +380,7 @@ response = supabase.storage.from_('bucket_name').create_signed_upload_url('file_
 with open('local_file_path', 'rb') as f:
     supabase.storage.from_('bucket_name').upload_to_signed_url(
         path='file_path',
-        token=response['token'],
+        token=response.token,
         file=f,
     )
 ```
