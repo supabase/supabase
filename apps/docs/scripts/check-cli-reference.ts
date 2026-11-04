@@ -31,7 +31,7 @@ function fetchPage(path: string) {
       path,
       fetch(`${ORIGIN}${path}`, { redirect: 'manual' }).then(async (res) => {
         const html = res.status === 200 ? await res.text() : ''
-        const visible = stripUntilStable(html, /<script\b[\s\S]*?<\/script\s*>/gi)
+        const visible = stripUntilStable(html, /<script\b[\s\S]*?<\/script\b[^>]*>/gi)
         const ids = new Set([...visible.matchAll(/ id="([^"]+)"/g)].map((m) => decode(m[1])))
         return { status: res.status, html: visible, ids }
       })
