@@ -2,7 +2,7 @@ import { ChevronsUpDownIcon, GitBranchIcon } from 'lucide-react'
 import { forwardRef } from 'react'
 import { cn, SidebarMenuButton } from 'ui'
 
-export interface ProjectBranchSelectorTriggerProps {
+export interface MobileProjectSwitcherTriggerProps {
   displayProjectName: string
   selectedOrgInitial: string
   isBranch: boolean
@@ -12,9 +12,9 @@ export interface ProjectBranchSelectorTriggerProps {
   onClick?: () => void
 }
 
-export const ProjectBranchSelectorTrigger = forwardRef<
+export const MobileProjectSwitcherTrigger = forwardRef<
   HTMLButtonElement,
-  ProjectBranchSelectorTriggerProps
+  MobileProjectSwitcherTriggerProps
 >(
   (
     {
@@ -23,7 +23,7 @@ export const ProjectBranchSelectorTrigger = forwardRef<
       isBranch,
       branchDisplayName,
       onClick,
-    }: ProjectBranchSelectorTriggerProps,
+    }: MobileProjectSwitcherTriggerProps,
     ref
   ) => {
     return (
@@ -60,4 +60,4 @@ export const ProjectBranchSelectorTrigger = forwardRef<
   }
 )
 
-ProjectBranchSelectorTrigger.displayName = 'ProjectBranchSelectorTrigger'
+MobileProjectSwitcherTrigger.displayName = 'MobileProjectSwitcherTrigger'

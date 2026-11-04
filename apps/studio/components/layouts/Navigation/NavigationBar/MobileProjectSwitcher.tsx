@@ -1,21 +1,13 @@
 import { useQuery } from '@tanstack/react-query'
-import { useBreakpoint, useParams } from 'common'
+import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-} from 'ui'
+import { SidebarMenu, SidebarMenuButton, SidebarMenuItem } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { getProjectBranchSelectorState } from './ProjectBranchSelector.utils'
-import { ProjectBranchSelectorPopover } from './ProjectBranchSelectorPopover'
-import { ProjectBranchSelectorSheet } from './ProjectBranchSelectorSheet'
-import { ProjectBranchSelectorTrigger } from './ProjectBranchSelectorTrigger'
+import { getMobileProjectSwitcherState } from './MobileProjectSwitcher.utils'
+import { MobileProjectSwitcherSheet } from './MobileProjectSwitcherSheet'
+import { MobileProjectSwitcherTrigger } from './MobileProjectSwitcherTrigger'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -23,7 +15,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
 
-export function ProjectBranchSelector() {
+export function MobileProjectSwitcher() {
   const router = useRouter()
   const { ref } = useParams()
   const { data: selectedOrganization } = useSelectedOrganizationQuery()
@@ -51,7 +43,7 @@ export function ProjectBranchSelector() {
 
   const selectedBranch = branches?.find((b) => b.project_ref === ref)
   const { isMainBranch, branchDisplayName, selectedOrgInitial, organizationHref } =
-    getProjectBranchSelectorState({
+    getMobileProjectSwitcherState({
       selectedBranch,
       isBranchingEnabled,
       selectedOrganization: selectedOrganization ?? undefined,
@@ -61,8 +53,6 @@ export function ProjectBranchSelector() {
     setOpen(false)
     router.push(organizationHref)
   }
-
-  const isMobile = useBreakpoint('md')
 
   if (isLoadingProject || !displayProject)
     return <ShimmeringLoader className="w-[120px] ml-1 md:py-3" />
@@ -88,36 +78,19 @@ export function ProjectBranchSelector() {
     onGoToOrganization: goToOrganization,
   }
 
-  if (isMobile) {
-    return (
-      <>
-        <ProjectBranchSelectorTrigger {...triggerProps} onClick={() => setOpen(true)} />
-        <ProjectBranchSelectorSheet
-          open={open}
-          onOpenChange={setOpen}
-          selectedRef={ref}
-          onClose={() => setOpen(false)}
-          selectedOrganization={selectedOrganization ?? null}
-          displayProject={displayProject ?? null}
-          selectedBranch={selectedBranch ?? null}
-          isMainBranch={isMainBranch}
-        />
-      </>
-    )
-  }
-
   return (
-    <SidebarMenu>
-      <SidebarMenuItem>
-        <Popover open={open} onOpenChange={setOpen} modal={false}>
-          <PopoverTrigger asChild>
-            <ProjectBranchSelectorTrigger {...triggerProps} />
-          </PopoverTrigger>
-          <PopoverContent className="p-0 w-[780px]" side="bottom" align="start">
-            <ProjectBranchSelectorPopover onClose={() => setOpen(false)} />
-          </PopoverContent>
-        </Popover>
-      </SidebarMenuItem>
-    </SidebarMenu>
+    <>
+      <MobileProjectSwitcherTrigger {...triggerProps} onClick={() => setOpen(true)} />
+      <MobileProjectSwitcherSheet
+        open={open}
+        onOpenChange={setOpen}
+        selectedRef={ref}
+        onClose={() => setOpen(false)}
+        selectedOrganization={selectedOrganization ?? null}
+        displayProject={displayProject ?? null}
+        selectedBranch={selectedBranch ?? null}
+        isMainBranch={isMainBranch}
+      />
+    </>
   )
 }
