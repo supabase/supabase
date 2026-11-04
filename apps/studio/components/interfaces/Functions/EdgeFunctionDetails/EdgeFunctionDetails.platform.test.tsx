@@ -1,9 +1,12 @@
+import { QueryClient } from '@tanstack/react-query'
 import { screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { describe, expect, it, vi } from 'vitest'
 
 import { EdgeFunctionDetails } from './EdgeFunctionDetails'
+import { apiKeysKeys } from '@/data/api-keys/keys'
 import { FGA_PERMISSIONS } from '@/hooks/misc/useCheckPermissionsV2'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
@@ -40,6 +43,16 @@ const withoutKeysRead = (): PermissionsV2Response => ({
   ],
 })
 
+const apiKeys: ApiKeyResponse[] = [
+  {
+    type: 'publishable',
+    name: 'default',
+    api_key: 'sb_publishable_abc',
+    id: 'pub-id',
+    inserted_at: '2024-01-01',
+  },
+]
+
 const mockApiKeys = () => {
   const requests = vi.fn()
   addAPIMock({
@@ -47,15 +60,7 @@ const mockApiKeys = () => {
     path: '/v1/projects/:ref/api-keys',
     response: () => {
       requests()
-      return HttpResponse.json<ApiKeyResponse[]>([
-        {
-          type: 'publishable',
-          name: 'default',
-          api_key: 'sb_publishable_abc',
-          id: 'pub-id',
-          inserted_at: '2024-01-01',
-        },
-      ])
+      return HttpResponse.json<ApiKeyResponse[]>(apiKeys)
     },
   })
   return requests
@@ -143,6 +148,23 @@ describe('EdgeFunctionDetails', () => {
       await screen.findByText(/You need additional permissions to view API keys\./)
     ).toBeVisible()
     expect(requests).not.toHaveBeenCalled()
+  })
+
+  it('does not use cached keys when denied', async () => {
+    mockProjectGrantContext({ ref: 'default', permissions: withoutKeysRead() })
+    mockApiKeys()
+    mockFunctionDeps()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData(apiKeysKeys.list('default', false), apiKeys)
+
+    customRender(<EdgeFunctionDetails />, { profileContext, queryClient })
+
+    expect(
+      await screen.findByText(/You need additional permissions to view API keys\./)
+    ).toBeVisible()
+    await userEvent.click(screen.getByRole('button', { name: 'Show anon key' }))
+    expect(await screen.findByText(/YOUR ANON KEY/)).toBeInTheDocument()
+    expect(screen.queryByText(/sb_publishable_abc/)).not.toBeInTheDocument()
   })
 
   it('shows an error when permissions fail to load', async () => {
