@@ -1,8 +1,10 @@
+import { useParams } from 'common'
 import { Trash2Icon } from 'lucide-react'
 
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useGrant } from '@/lib/grants'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
@@ -10,9 +12,9 @@ interface APIKeyDeleteDialogProps {
 }
 
 export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialogProps) => {
-  const { can: canDeleteAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_WRITE
-  )
+  const { ref: projectRef } = useParams()
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
+  const canDeleteAPIKeys = deleteGrant.status === 'granted'
 
   return (
     <DropdownMenuItemTooltip
@@ -26,9 +28,7 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
       tooltip={{
         content: {
           side: 'left',
-          text: !canDeleteAPIKeys
-            ? 'You need additional permissions to delete API keys'
-            : undefined,
+          text: getWriteGrantTooltip(deleteGrant.status, 'delete'),
         },
       }}
     >
