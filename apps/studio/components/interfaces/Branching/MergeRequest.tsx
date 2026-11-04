@@ -117,10 +117,12 @@ export const MergeSubtitle = () => {
 export const MergeActions = ({
   isWorkflowRunning,
   isSubmitting,
+  canMerge,
   onSelectMerge,
 }: {
   isWorkflowRunning: boolean
   isSubmitting: boolean
+  canMerge: boolean
   onSelectMerge: () => void
 }) => {
   const router = useRouter()
@@ -165,6 +167,7 @@ export const MergeActions = ({
     hasChanges: combinedHasChanges,
   } = useBranchMergeDiff({
     currentBranchRef: ref,
+    isCurrentBranchDefault: currentBranch?.is_default,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
     parentBranchConnectionString: parentProject?.connectionString || undefined,
@@ -172,6 +175,7 @@ export const MergeActions = ({
   })
 
   const isMergeDisabled =
+    !canMerge ||
     !combinedHasChanges ||
     isCombinedDiffLoading ||
     isBranchOutOfDateOverall ||
@@ -192,13 +196,15 @@ export const MergeActions = ({
           tooltip={{
             content: {
               side: 'bottom',
-              text: !combinedHasChanges
-                ? 'No changes to merge'
-                : isWorkflowRunning
-                  ? 'Workflow is currently running'
-                  : !!ghConnection && Boolean(mainBranch?.git_branch)
-                    ? 'Deploy to production from GitHub is enabled'
-                    : 'Unable to merge at this time',
+              text: !canMerge
+                ? 'You need additional permissions to merge branches'
+                : !combinedHasChanges
+                  ? 'No changes to merge'
+                  : isWorkflowRunning
+                    ? 'Workflow is currently running'
+                    : !!ghConnection && Boolean(mainBranch?.git_branch)
+                      ? 'Deploy to production from GitHub is enabled'
+                      : 'Unable to merge at this time',
             },
           }}
           variant="primary"

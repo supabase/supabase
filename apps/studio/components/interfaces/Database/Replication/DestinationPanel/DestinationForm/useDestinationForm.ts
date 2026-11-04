@@ -20,11 +20,11 @@ import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 export const useDestinationForm = ({ selectedType }: { selectedType: DestinationType }) => {
   const { ref: projectRef } = useParams()
@@ -269,7 +269,7 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
           ? 'apply changes and restart pipeline'
           : 'apply changes'
       }
-      toast.error(`Failed to ${action}: ${(error as ResponseError).message}`)
+      toast.error(`Failed to ${action}: ${(error as StudioError).message}`)
     }
   }
 

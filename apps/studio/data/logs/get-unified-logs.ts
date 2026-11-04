@@ -8,7 +8,8 @@ import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/Unified
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type getUnifiedLogsVariables = {
   projectRef: string
@@ -55,11 +56,11 @@ export const useGetUnifiedLogsMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>,
+  UseCustomMutationOptions<LogDrainCreateData, StudioError, getUnifiedLogsVariables>,
   'mutationFn'
 > = {}) => {
   const useOtel = useUnifiedLogsBackend()
-  return useMutation<LogDrainCreateData, ResponseError, getUnifiedLogsVariables>({
+  return useMutation<LogDrainCreateData, StudioError, getUnifiedLogsVariables>({
     mutationFn: (vars) => retrieveUnifiedLogs({ ...vars, useOtel: vars.useOtel ?? useOtel }),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

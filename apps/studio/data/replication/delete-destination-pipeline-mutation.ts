@@ -5,7 +5,8 @@ import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-quer
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteDestinationPipelineParams = {
   projectRef?: string
@@ -42,33 +43,31 @@ export const useDeleteDestinationPipelineMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DeleteDestinationPipelineData,
-    ResponseError,
+    StudioError,
     DeleteDestinationPipelineParams
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>(
-    {
-      mutationFn: (vars) => deleteDestinationPipeline(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          invalidateReplicationPipelineQueries(queryClient, projectRef),
-        ])
+  return useMutation<DeleteDestinationPipelineData, StudioError, DeleteDestinationPipelineParams>({
+    mutationFn: (vars) => deleteDestinationPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete destination and pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete destination and pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

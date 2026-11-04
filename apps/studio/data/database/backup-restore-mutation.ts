@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { components } from '@/data/api'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -40,10 +41,10 @@ export const useBackupRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
+  UseCustomMutationOptions<BackupRestoreData, StudioError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({
+  return useMutation<BackupRestoreData, StudioError, BackupRestoreVariables>({
     mutationFn: (vars) => restoreFromBackup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

@@ -3,7 +3,8 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SetupIntentVariables = {
   hcaptchaToken: string
@@ -26,10 +27,10 @@ export const useSetupIntent = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SetupIntentData, ResponseError, SetupIntentVariables>,
+  UseCustomMutationOptions<SetupIntentData, StudioError, SetupIntentVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SetupIntentData, ResponseError, SetupIntentVariables>({
+  return useMutation<SetupIntentData, StudioError, SetupIntentVariables>({
     mutationFn: (vars) => setupIntent(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

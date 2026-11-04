@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type MoveStorageObjectParams = {
   projectRef: string
@@ -42,10 +43,10 @@ export const useGetSignBucketObjectMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<MoveBucketObjectData, ResponseError, MoveStorageObjectParams>,
+  UseCustomMutationOptions<MoveBucketObjectData, StudioError, MoveStorageObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<MoveBucketObjectData, ResponseError, MoveStorageObjectParams>({
+  return useMutation<MoveBucketObjectData, StudioError, MoveStorageObjectParams>({
     mutationFn: (vars) => moveStorageObject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

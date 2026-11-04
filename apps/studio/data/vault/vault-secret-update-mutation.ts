@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { vaultSecretsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions, VaultSecret } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions, VaultSecret } from '@/types'
 
 export type VaultSecretUpdateVariables = {
   projectRef: string
@@ -39,12 +40,12 @@ export const useVaultSecretUpdateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>,
+  UseCustomMutationOptions<VaultSecretUpdateData, StudioError, VaultSecretUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretUpdateData, ResponseError, VaultSecretUpdateVariables>({
+  return useMutation<VaultSecretUpdateData, StudioError, VaultSecretUpdateVariables>({
     mutationFn: (vars) => updateVaultSecret(vars),
     async onSuccess(data, variables, context) {
       const { id, projectRef, skipClearCache = false } = variables

@@ -3,8 +3,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { IntegrationConnectionsCreateVariables } from './integrations.types'
 import { integrationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useIntegrationInstallationSnapshot } from '@/state/integration-installation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export async function createIntegrationVercelConnections({
   organizationIntegrationId,
@@ -36,7 +37,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     IntegrationVercelConnectionsCreateData,
-    ResponseError,
+    StudioError,
     IntegrationConnectionsCreateVariables
   >,
   'mutationFn'
@@ -45,7 +46,7 @@ export const useIntegrationVercelConnectionsCreateMutation = ({
   const snapshot = useIntegrationInstallationSnapshot()
   return useMutation<
     IntegrationVercelConnectionsCreateData,
-    ResponseError,
+    StudioError,
     IntegrationConnectionsCreateVariables
   >({
     mutationFn: (vars) => createIntegrationVercelConnections(vars),
