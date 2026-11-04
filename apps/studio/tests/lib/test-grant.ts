@@ -6,7 +6,7 @@ import type { Grant, VariantOf } from '@/lib/grants'
  * Mints a grant without a permissions check, for unit tests of fetchers and query options that
  * take a grant. Components should get real grants from `useGrant` against mocked permissions.
  */
-export function testGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export function testGrant<E extends FgaGuardedEndpoint, const V extends VariantOf<E> = never>(
   endpoint: E,
   opts: {
     variant?: V

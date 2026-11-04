@@ -88,7 +88,7 @@ function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
  * Pure check of `permissions` against the endpoint's requirements (and the variant's, if given),
  * evaluated against `permissionsProjectRef`. The minted grant records both refs.
  */
-export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export function getGrant<E extends FgaGuardedEndpoint, const V extends VariantOf<E> = never>(
   permissions: PermissionsV2Data | undefined,
   endpoint: E,
   scope: ResolvedGrantScope,
@@ -128,7 +128,7 @@ export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
  * Mints a grant for the current user, resolving organization and project from the URL unless
  * `scope` overrides them. Self-hosted always grants.
  */
-export function useGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export function useGrant<E extends FgaGuardedEndpoint, const V extends VariantOf<E> = never>(
   endpoint: E,
   scope: GrantScope,
   opts?: { variant?: V }
@@ -202,7 +202,10 @@ async function resolveGrantScope(
  * permissions and project details, fetching them otherwise. Pass `permissionsProjectRef` to skip
  * resolving a branch's parent project.
  */
-export async function ensureGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export async function ensureGrant<
+  E extends FgaGuardedEndpoint,
+  const V extends VariantOf<E> = never,
+>(
   queryClient: QueryClient,
   endpoint: E,
   scope: GrantScope & { permissionsProjectRef?: string | null },
