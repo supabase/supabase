@@ -22,7 +22,7 @@ export default async function ContributingPage() {
     <SidebarSkeleton>
       <LayoutMainContent className="pb-0 grid grid-cols-12 relative gap-4">
         <div className="col-span-12 lg:col-span-9">
-          <Breadcrumbs className="mb-2 col-span-full" />
+          <Breadcrumbs className="mb-2 col-span-full layout-v2:lg:hidden" />
           <article
             id="contributing"
             className="prose max-w-none relative transition-all ease-out duration-100"
