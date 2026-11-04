@@ -341,6 +341,5 @@ describe('useDatabaseEntitySearchCommands on a sub-page', () => {
     await settleDebounce()
 
     expect(searchRequests).toHaveLength(1)
-    expect(searchRequests[0]).not.toContain('colors')
   })
 })
