@@ -30,7 +30,10 @@ import {
 import { cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
-const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+const Footer = dynamic(() => import('~/components/Navigation/Footer').then((mod) => mod.Footer))
+const LegacyFooter = dynamic(() =>
+  import('~/components/Navigation/Footer.legacy').then((mod) => mod.LegacyFooter)
+)
 const GlobalMenuDrawerSection = dynamic(() =>
   import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerSection
@@ -148,6 +151,8 @@ function TopNavSkeleton({ children }) {
   )
 }
 
+const SkeletonFooter = () => (useDocsLayoutV2() ? <Footer className="mt-16" /> : <LegacyFooter />)
+
 function SidebarSkeleton({
   children,
   menuId: _menuId,
@@ -217,7 +222,7 @@ function SidebarSkeleton({
           <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
             {children}
           </MobileHeaderSlotsContext>
-          {!hideFooter && <Footer />}
+          {!hideFooter && <SkeletonFooter />}
         </div>
       </Container>
     </div>
