@@ -121,6 +121,10 @@ const footerData = [
         url: '/regions',
       },
       {
+        text: 'dbarena',
+        url: 'https://dbarena.com',
+      },
+      {
         text: 'SOC2',
         url: '/security',
       },
