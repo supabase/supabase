@@ -376,18 +376,12 @@ The example uses `supabase.example.com` for Supabase and `app.example.com` for y
        - name: GOTRUE_SITE_URL
          value: https://app.example.com
        - name: GOTRUE_URI_ALLOW_LIST
-         value: https://app.example.com/**
-       - name: GOTRUE_DISABLE_SIGNUP
-         value: 'false'
-       - name: GOTRUE_EXTERNAL_EMAIL_ENABLED
-         value: 'true'
-       - name: GOTRUE_MAILER_AUTOCONFIRM
-         value: 'false'
-       - name: GOTRUE_EXTERNAL_PHONE_ENABLED
-         value: 'false'
+         value: https://app.example.com/auth/callback,https://app.example.com/account
    ```
 
    Keep `fullnameOverride` and the storage configuration from the original file. `GOTRUE_SITE_URL` is your app's URL. The operator derives Auth's external API URL from `project.publicUrl`.
+
+   Set `GOTRUE_URI_ALLOW_LIST` to your app's allowed redirect URLs, separated by commas. Wildcards use [glob patterns](/docs/guides/auth/redirect-urls#use-wildcards-in-redirect-urls).
 
 4. Apply the configuration and check the gateway rollout:
 
