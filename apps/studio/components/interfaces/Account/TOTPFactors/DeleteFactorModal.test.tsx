@@ -196,11 +196,9 @@ describe('authenticator removal failures', () => {
       />
     )
     expect(
-      screen.getByText(
-        'Your recovery codes have been removed. Generate new codes if you keep this authenticator.'
-      )
+      screen.getByText(/Your recovery codes have been removed\. Retry to remove the authenticator/)
     ).toBeInTheDocument()
-    expect(screen.queryByText('Your recovery codes will be removed too')).not.toBeInTheDocument()
+    expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'contact support' })).toBeInTheDocument()
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())

@@ -57,6 +57,10 @@ export const TOTPFactors = () => {
     shouldVerifyRecoveryCodes &&
     (recoveryCodesIsPending || recoveryCodesIsFetching || recoveryCodesIsError || !status)
 
+  const deleteFactorTooltip = recoveryCodesIsError
+    ? 'Unable to delete authenticator because recovery code status could not be retrieved'
+    : 'Wait for recovery code status before deleting this authenticator'
+
   return (
     <>
       <PageSection>
@@ -128,9 +132,7 @@ export const TOTPFactors = () => {
                         tooltip={{
                           content: {
                             side: 'top',
-                            text: disableDeleteFactor
-                              ? 'Check recovery code status'
-                              : 'Remove authenticator',
+                            text: disableDeleteFactor ? deleteFactorTooltip : undefined,
                           },
                         }}
                       >

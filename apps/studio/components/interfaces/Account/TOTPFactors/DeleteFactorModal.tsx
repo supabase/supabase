@@ -61,10 +61,11 @@ export const DeleteFactorModal = ({
 
   const loading = unenrollMFAMutation.isPending || unenrollRecoveryCodesMutation.isPending
 
-  const lastAuthenticatorDescription =
-    hasRecoveryCodes && !hasRemovedRecoveryCodes
-      ? 'Removing your last authenticator disables MFA and removes your recovery codes.'
-      : 'Removing your last authenticator disables MFA.'
+  const shouldExplainRecoveryCodeRemoval =
+    hasRecoveryCodes || hasRemovedRecoveryCodes || unenrollRecoveryCodesMutation.isPending
+  const lastAuthenticatorDescription = shouldExplainRecoveryCodeRemoval
+    ? 'Removing your last authenticator disables MFA and removes your recovery codes.'
+    : 'Removing your last authenticator disables MFA.'
 
   return (
     <ConfirmationModal
@@ -80,8 +81,7 @@ export const DeleteFactorModal = ({
       onConfirm={() => {
         if (!factorId || loading || !canRemove) return
         setError(null)
-        // If users have recovery codes and this is the last MFA for their account,
-        // we must first delete the recovery codes (they don't make sense without any MFA)
+        // The API requires recovery codes to be removed before the last verified authenticator.
         const shouldDeleteRecoveryCodes =
           lastFactorToBeDeleted && hasRecoveryCodes && !hasRemovedRecoveryCodes
         if (factorId && !shouldDeleteRecoveryCodes) {
@@ -107,13 +107,7 @@ export const DeleteFactorModal = ({
             <li>
               You will lose access to any organization that enforces multi-factor authentication
             </li>
-            {(hasRecoveryCodes || hasRemovedRecoveryCodes) && (
-              <li>
-                {hasRemovedRecoveryCodes
-                  ? 'Your recovery codes have been removed. Generate new codes if you keep this authenticator.'
-                  : 'Your recovery codes will be removed too'}
-              </li>
-            )}
+            {shouldExplainRecoveryCodeRemoval && <li>Your recovery codes will be removed too</li>}
           </>
         ) : (
           <>
@@ -132,7 +126,13 @@ export const DeleteFactorModal = ({
         <AlertError
           className="mt-4"
           subject="Unable to remove authenticator"
-          error={error}
+          error={
+            hasRemovedRecoveryCodes
+              ? {
+                  message: `Your recovery codes have been removed. Retry to remove the authenticator, or generate new codes if you keep it. ${error.message}`,
+                }
+              : error
+          }
           showInstructions={false}
         />
       )}
