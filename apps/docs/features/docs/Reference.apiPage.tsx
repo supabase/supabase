@@ -34,6 +34,16 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
   const section = sectionsBySlug?.get(operationSlug)
   if (!section) notFound()
 
+  const navigationProps = {
+    libraryId: 'api',
+    name: 'Management API',
+    menuData: reference_api,
+    libPath: 'api',
+    version: 'latest',
+    isLatestVersion: true,
+    realNavigation: true,
+  }
+
   const isIntroduction = section.type === 'markdown'
   const additionalLinks = isIntroduction
     ? (((await getRefFrontmatter(`api/${section.id}`)).links as ReferenceLink[] | undefined) ?? [])
@@ -43,19 +53,10 @@ async function ApiOperationPage({ operationSlug }: { operationSlug: string }) {
     <ReferenceContentScrollHandler libPath="api" version="latest" isLatestVersion={true}>
       <SidebarSkeleton
         menuId={MenuId.RefApi}
-        NavigationMenu={
-          <ReferenceNavigation
-            libraryId="api"
-            name="Management API"
-            menuData={reference_api}
-            libPath="api"
-            version="latest"
-            isLatestVersion={true}
-            realNavigation
-          />
-        }
+        NavigationMenu={<ReferenceNavigation {...navigationProps} />}
+        rightRail={<ReferenceNavigation {...navigationProps} hasActiveCrumb />}
       >
-        <LayoutMainContent>
+        <LayoutMainContent className="layout-v2:pt-6">
           {isIntroduction ? (
             <TocAnchorsProvider>
               <div className="grid grid-cols-12 relative gap-4">

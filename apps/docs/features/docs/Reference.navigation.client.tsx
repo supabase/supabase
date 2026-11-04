@@ -7,6 +7,7 @@ import {
 } from '~/components/Navigation/NavSection'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { isElementInViewport } from '~/features/ui/helpers.dom'
+import { HeadingSlotCrumb } from '~/layouts/HeadingSlot'
 import { BASE_PATH } from '~/lib/constants'
 import { debounce } from 'lodash-es'
 import Link from 'next/link'
@@ -24,6 +25,19 @@ import {
   useSyncExternalStore,
 } from 'react'
 import { cn } from 'ui'
+
+export interface ReferenceCrumbHeading {
+  url: string
+  title: string
+}
+
+interface ReferenceActiveCrumbProps {
+  basePath: string
+  headings: ReferenceCrumbHeading[]
+}
+
+export const ACTIVE_BAR_CLASS_NAME =
+  'layout-v2:aria-[current=page]:before:absolute layout-v2:aria-[current=page]:before:-left-[13px] layout-v2:aria-[current=page]:before:top-1/2 layout-v2:aria-[current=page]:before:h-[1em] layout-v2:aria-[current=page]:before:w-px layout-v2:aria-[current=page]:before:-translate-y-1/2 layout-v2:aria-[current=page]:before:bg-brand'
 
 export const ReferenceContentInitiallyScrolledContext = createContext<boolean>(false)
 
@@ -126,38 +140,27 @@ export function ReferenceContentScrollHandler({
 export function ReferenceNavigationScrollHandler({
   children,
   ...rest
-}: PropsWithChildren & HTMLAttributes<HTMLDivElement>) {
-  const parentRef = useRef<HTMLElement | null>(null)
-  const ref = useRef<HTMLDivElement | null>(null)
+}: PropsWithChildren & HTMLAttributes<HTMLElement>) {
+  const ref = useRef<HTMLElement | null>(null)
   const initialScrollHappened = useContext(ReferenceContentInitiallyScrolledContext)
 
-  useEffect(() => {
-    if (!ref.current) return
+  const scrollActiveIntoView = useCallback(() => {
+    if (!ref.current?.offsetParent) return
+
+    const currentLink = ref.current.querySelector<HTMLElement>('[aria-current=page]')
+    if (!currentLink || isElementInViewport(currentLink)) return
 
     let scrollingParent: HTMLElement = ref.current
-
-    while (scrollingParent && !(scrollingParent.scrollHeight > scrollingParent.clientHeight)) {
-      const parent = scrollingParent.parentElement
-      if (!parent) break
-      scrollingParent = parent
+    while (scrollingParent.scrollHeight <= scrollingParent.clientHeight) {
+      if (!scrollingParent.parentElement) return
+      scrollingParent = scrollingParent.parentElement
     }
 
-    parentRef.current = scrollingParent
-  }, [])
-
-  const scrollActiveIntoView = useCallback(() => {
-    const currentLink = ref.current?.querySelector('[aria-current=page]') as HTMLElement
-    if (currentLink && !isElementInViewport(currentLink)) {
-      // Calculate the offset of the current link relative to scrollingParent
-      // and scroll the parent to the top of the link.
-      const offsetTop = currentLink.offsetTop
-      const parentOffsetTop = parentRef.current?.offsetTop ?? 0
-      const scrollPosition = offsetTop - parentOffsetTop
-
-      parentRef.current?.scrollTo({
-        top: scrollPosition - 60 /* space for header + padding */,
-      })
-    }
+    const linkOffset =
+      currentLink.getBoundingClientRect().top - scrollingParent.getBoundingClientRect().top
+    scrollingParent.scrollTo({
+      top: scrollingParent.scrollTop + linkOffset - 60 /* space for header + padding */,
+    })
   }, [])
 
   useEffect(() => {
@@ -174,14 +177,22 @@ export function ReferenceNavigationScrollHandler({
   }, [scrollActiveIntoView])
 
   return (
-    <div ref={ref} {...rest}>
+    <nav ref={ref} {...rest}>
       {children}
-    </div>
+    </nav>
   )
 }
 
 function deriveHref(basePath: string, section: AbbrevApiReferenceSection) {
   return 'slug' in section ? `${basePath}/${section.slug}` : ''
+}
+
+export function ReferenceActiveCrumb({ basePath, headings }: ReferenceActiveCrumbProps) {
+  const pathname = useCurrentPathname()
+  const activePath = pathname === basePath ? `${basePath}/introduction` : pathname
+  const index = headings.findIndex((heading) => heading.url === activePath)
+
+  return <HeadingSlotCrumb heading={headings[index]} index={index} />
 }
 
 function getLinkStyles(isActive: boolean, className?: string) {
@@ -190,6 +201,9 @@ function getLinkStyles(isActive: boolean, className?: string) {
     !isActive && 'hover:text-foreground',
     isActive && 'text-primary',
     'transition-colors',
+    'layout-v2:relative layout-v2:block layout-v2:py-1 layout-v2:wrap-anywhere',
+    'layout-v2:duration-150 layout-v2:hover:text-foreground-light',
+    'layout-v2:aria-[current=page]:text-foreground',
     className
   )
 }
@@ -366,7 +380,7 @@ function CompoundRefLink({
                   <RefLink
                     basePath={basePath}
                     section={item}
-                    className="block py-1.25"
+                    className={`block py-1.25 ${ACTIVE_BAR_CLASS_NAME}`}
                     realNavigation={realNavigation}
                   />
                 </li>
