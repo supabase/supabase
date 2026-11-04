@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -5,6 +6,7 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
+import { EgressDebugButton } from '@/components/interfaces/Organization/Usage/EgressDebugButton'
 import { TopApiRoutesRenderer } from '@/components/interfaces/Reports/renderers/ApiRenderers'
 import {
   CacheHitRateChartRenderer,
@@ -35,6 +37,7 @@ import type { NextPageWithLayout } from '@/types'
 const REPORT_TITLE = 'Egress'
 
 export const EgressReport: NextPageWithLayout = () => {
+  const { ref: projectRef } = useParams()
   const { data: selectedOrg } = useSelectedOrganizationQuery()
   const orgSlug = selectedOrg?.slug
   const { data, error, params, isLoading, mergeParams, refresh } = useEgressReport()
@@ -80,6 +83,7 @@ export const EgressReport: NextPageWithLayout = () => {
       <ReportStickyNav
         content={
           <div className="ml-auto flex items-center gap-2 flex-wrap">
+            <EgressDebugButton projectRef={projectRef} orgSlug={orgSlug} />
             <DocsButton href={OBSERVABILITY_DOCS_HREFS.egress} topic={REPORT_TITLE} />
             <ShortcutTooltip
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_REFRESH}
@@ -87,6 +91,7 @@ export const EgressReport: NextPageWithLayout = () => {
               side="bottom"
             >
               <Button
+                aria-label="Refresh report"
                 disabled={isLoading}
                 icon={<RefreshCwIcon className={isLoading ? 'animate-spin' : ''} />}
                 className="w-7"
