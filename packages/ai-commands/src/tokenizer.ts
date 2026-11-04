@@ -98,6 +98,8 @@ export function getMaxTokenCount(model: string): number {
     case 'gpt-4-0314':
       return 4097
     case 'gpt-6-luna':
+      // Preserve the previous input allowance with the larger completion budget.
+      return 5120
     case 'gpt-4o-mini-2024-07-18':
       return 4097
     default:

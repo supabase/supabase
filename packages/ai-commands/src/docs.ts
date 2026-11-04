@@ -195,7 +195,8 @@ export async function clippy(
   ]
 
   const model = 'gpt-6-luna'
-  const maxCompletionTokenCount = 1024
+  // Allow room for reasoning and code examples while limiting cost on the public endpoint.
+  const maxCompletionTokenCount = 2048
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
     initMessages,
@@ -207,7 +208,7 @@ export async function clippy(
   const completionOptions = {
     model,
     messages: completionMessages,
-    max_completion_tokens: 1024,
+    max_completion_tokens: maxCompletionTokenCount,
     reasoning_effort: 'low',
     stream: true,
   }
