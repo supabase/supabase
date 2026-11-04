@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import { logAttributeFilterId, logsFiltersToUrlParams } from './UnifiedLogs.filters'
 import {
   getFacetCountQuery,
   getLogsChartQuery,
@@ -9,7 +10,11 @@ import {
   getUnifiedLogsQuery,
   isUserFilterUnreachable,
 } from './UnifiedLogs.queries'
-import { getUnifiedLogsQuery as getUnifiedLogsQueryBQ } from './UnifiedLogs.queries.bq'
+import {
+  getLogsChartQuery as getLogsChartQueryBQ,
+  getLogsCountQuery as getLogsCountQueryBQ,
+  getUnifiedLogsQuery as getUnifiedLogsQueryBQ,
+} from './UnifiedLogs.queries.bq'
 import type { UnifiedLogsScope } from './UnifiedLogs.types'
 import { createUnifiedLogsSearch } from './UnifiedLogs.utils'
 
@@ -97,13 +102,13 @@ describe('UnifiedLogs.queries (OTEL flat)', () => {
 
       expect(sql).toContain(`WHEN ${workerCondition} THEN null`)
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.method'], log_attributes['request.method']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition}, null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
+        `if(${workerCondition} OR source = 'etl_replication_logs', null, if(source = 'storage_logs', log_attributes['req.url'], log_attributes['request.path']))`
       )
       expect(sql).toContain(
-        `if(${workerCondition} OR source = 'function_logs', log_attributes, map()) AS metadata`
+        `if(${workerCondition} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()) AS metadata`
       )
     })
 
@@ -619,7 +624,12 @@ describe('request timeline', () => {
 
         { source: 'postgres_logs', attributes: { request_id: 'ignored' } },
       ])
-    ).toEqual({ requestIds: ['8f00aa-IAD', '8f00bb-IAD'], executionIds: ['exec-1'] })
+    ).toEqual({
+      requestIds: ['8f00aa-IAD', '8f00bb-IAD'],
+      executionIds: ['exec-1'],
+      nativeRequestIds: [],
+      traceIds: [],
+    })
   })
 
   it('ignores IDs that are not plain identifiers', () => {
@@ -629,7 +639,57 @@ describe('request timeline', () => {
         { source: 'auth_logs', attributes: { request_id: 42 } },
         { source: 'storage_logs', attributes: null },
       ])
-    ).toEqual({ requestIds: [], executionIds: [] })
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
+  })
+
+  it('keeps native request IDs, traces, and legacy IDs in separate namespaces', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            'request.headers.cf_ray': '01a1880e-a158-7005-9fdf-e9ee66e4b6ad',
+            trace_id: '69110a42ebc24cb5a63d00fc2e8017a4',
+            span_id: '467867d205824e7d',
+          },
+        },
+        {
+          source: 'auth_logs',
+          attributes: { request_id: '01a1880e-a158-7005-9fdf-e9ee66e4b6ad' },
+        },
+        { source: 'unknown_logs', attributes: { trace_id: 'a'.repeat(32) } },
+      ])
+    ).toEqual({
+      requestIds: [],
+      executionIds: [],
+      nativeRequestIds: ['01a1880e-a158-7005-9fdf-e9ee66e4b6ad'],
+      traceIds: ['69110a42ebc24cb5a63d00fc2e8017a4'],
+    })
+  })
+
+  it('ignores malformed traces, standalone spans, and zero placeholders', () => {
+    expect(
+      getRequestCorrelationIds([
+        {
+          source: 'edge_logs',
+          attributes: {
+            request_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: '0'.repeat(32),
+            'request.headers.cf_ray': '0000',
+          },
+        },
+        {
+          source: 'function_logs',
+          attributes: {
+            execution_id: '00000000-0000-0000-0000-000000000000',
+            trace_id: 'bad-trace',
+            span_id: '467867d205824e7d',
+            parent_span_id: 'f3addadfe21d5055',
+          },
+        },
+      ])
+    ).toEqual({ requestIds: [], executionIds: [], nativeRequestIds: [], traceIds: [] })
   })
 
   it('matches each source on its own key and orders oldest first', () => {
@@ -654,6 +714,130 @@ describe('request timeline', () => {
   })
 
   it('refuses to build an unbounded query', () => {
-    expect(() => getRequestTimelineQuery({ requestIds: [], executionIds: [] })).toThrow()
+    expect(() =>
+      getRequestTimelineQuery({
+        requestIds: [],
+        executionIds: [],
+        nativeRequestIds: [],
+        traceIds: [],
+      })
+    ).toThrow()
   })
+})
+
+describe('explicit attribute filters', () => {
+  it.each(['status', 'user', 'date', 'request:header', "key' OR 1=1 --", 'attribute.status'])(
+    'uses the stored %s key in every query surface',
+    (key) => {
+      const filter = logsFiltersToUrlParams([
+        { column: logAttributeFilterId(key), operator: '<>', value: "quoted'value" },
+      ])
+      const search = createUnifiedLogsSearch({ ...baseSearch, filter })
+      const escapedKey = key.replaceAll("'", "''")
+      for (const sql of [
+        getUnifiedLogsQuery(search),
+        getLogsCountQuery(search),
+        getLogsChartQuery(search),
+        getFacetCountQuery({ search, facet: 'pathname' }),
+      ]) {
+        expect(sql).toContain(`log_attributes['${escapedKey}'] NOT IN ('quoted''value')`)
+      }
+      expect(() => getUnifiedLogsQueryBQ(search)).toThrow(
+        'Log attribute filters are only supported on ClickHouse'
+      )
+    }
+  )
+})
+
+describe('Pipelines logs', () => {
+  const pipelineId = '03dg2o5teb2eucxr9ggh3uie6'
+
+  it.each([
+    ['list', getUnifiedLogsQuery],
+    ['counts', getLogsCountQuery],
+    ['chart', getLogsChartQuery],
+  ])('uses the same source and string identity fallback for the %s', (_, buildQuery) => {
+    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+    expect(sql).toContain("source = 'etl_replication_logs'")
+    expect(sql).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id']) IN ('03dg2o5teb2eucxr9ggh3uie6')"
+    )
+  })
+
+  it('limits an identity-only filter to Pipelines logs', () => {
+    const where = getUnifiedLogsQuery(withFilters('pipeline_id:eq:150')).split('WHERE')[1]
+    expect(where).toContain("source = 'etl_replication_logs'")
+    expect(where).not.toContain("source = 'postgres_logs'")
+    expect(where).not.toContain("source = 'edge_logs'")
+  })
+
+  it('searches pipeline ID options using the canonical identity without its own active filter', () => {
+    const sql = getFacetCountQuery({
+      search: withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'),
+      facet: 'pipeline_id',
+      facetSearch: '03dg',
+    })
+    expect(sql).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
+    )
+    expect(sql).toContain("source = 'etl_replication_logs'")
+    expect(sql).toContain("LIKE '%03dg%'")
+    expect(sql).not.toContain("IN ('150')")
+  })
+
+  it('returns pipeline ID choices without restricting them to the selected ID', () => {
+    const sql = getLogsCountQuery(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql
+      .split(/\bUNION ALL\b/)
+      .find((branch) => branch.includes("facet = 'pipeline_id'"))
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain(
+      "coalesce(nullIf(log_attributes['pipeline_id_v2'], ''), log_attributes['pipeline_id'])"
+    )
+    expect(pipelineFacet).toContain("source = 'etl_replication_logs'")
+    expect(pipelineFacet).not.toContain("IN ('150')")
+  })
+
+  it('returns BigQuery pipeline ID choices without their own active filter', () => {
+    const sql = getLogsCountQueryBQ(withFilters('log_type:eq:pipelines', 'pipeline_id:eq:150'))
+    const pipelineFacet = sql.split('pipeline_id_count AS (')[1]?.split('\n)')[0]
+    expect(pipelineFacet).toBeDefined()
+    expect(pipelineFacet).toContain("'pipeline_id' as dimension")
+    expect(pipelineFacet).toContain("`log_type` IN ('pipelines')")
+    expect(pipelineFacet).not.toContain("`pipeline_id` IN ('150')")
+    expect(sql).toContain('SELECT dimension, value, count FROM pipeline_id_count')
+  })
+
+  it('projects the identity and process metadata without HTTP fields', () => {
+    const sql = getUnifiedLogsQuery(withFilters('log_type:eq:pipelines'))
+    expect(sql).toContain("WHEN source = 'etl_replication_logs' THEN 'pipelines'")
+    expect(sql).toContain('AS pipeline_id')
+    expect(sql).toContain("WHEN source = 'etl_replication_logs' THEN null")
+    expect(sql).toContain("upper(coalesce(nullIf(log_attributes['level'], ''), severity_text))")
+    expect(sql).toContain(
+      "source IN ('function_logs', 'etl_replication_logs'), log_attributes, map()"
+    )
+  })
+
+  it.each([
+    ['list', getUnifiedLogsQueryBQ],
+    ['counts', getLogsCountQueryBQ],
+    ['chart', getLogsChartQueryBQ],
+  ])('keeps the BigQuery %s compatible with an endpoint without the v2 column', (_, buildQuery) => {
+    const sql = buildQuery(withFilters('log_type:eq:pipelines', `pipeline_id:eq:${pipelineId}`))
+    expect(sql).toContain('from etl_replication_logs as pl')
+    expect(sql).toContain("json_value(to_json_string(pl), '$.pipeline_id_v2')")
+    expect(sql).toContain('cast(pl.pipeline_id as string)')
+    expect(sql).toContain("`pipeline_id` IN ('03dg2o5teb2eucxr9ggh3uie6')")
+    expect(sql).not.toContain('pl.pipeline_id_v2')
+  })
+
+  it.each([getUnifiedLogsQuery, getUnifiedLogsQueryBQ])(
+    'quotes an opaque identity safely',
+    (buildQuery) => {
+      expect(buildQuery(withFilters("pipeline_id:eq:opaque' OR '1'='1"))).toContain(
+        "'opaque'' OR ''1''=''1'"
+      )
+    }
+  )
 })

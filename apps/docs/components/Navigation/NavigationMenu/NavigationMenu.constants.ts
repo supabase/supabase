@@ -80,6 +80,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       label: 'Products',
       menuItems: [
         [
+          { label: 'Features' },
           {
             label: 'Database',
             icon: 'database',
@@ -1200,6 +1201,10 @@ export const database: NavMenuConstant = {
           name: 'Postgres log configuration',
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         },
+        {
+          name: 'Log slow and failing queries',
+          url: '/guides/observability/log-slow-queries' as `/${string}`,
+        },
       ],
     },
     {
@@ -1215,8 +1220,8 @@ export const database: NavMenuConstant = {
           url: '/guides/observability/inspect' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Supavisor',
@@ -1679,8 +1684,8 @@ export const api: NavMenuConstant = {
           url: '/guides/database/full-text-search' as `/${string}`,
         },
         {
-          name: 'Debugging performance issues',
-          url: '/guides/database/debugging-performance' as `/${string}`,
+          name: 'Query plans with explain()',
+          url: '/guides/api/query-plans' as `/${string}`,
         },
         {
           name: 'Using custom schemas',
@@ -2510,7 +2515,12 @@ export const local_development: NavMenuConstant = {
   items: [
     { name: 'Overview & quickstart', url: '/guides/local-development' },
     { name: 'Install and run the CLI', url: '/guides/local-development/cli/getting-started' },
+    { name: 'Migrating to CLI v3', url: '/guides/local-development/cli/migrating-to-v3' },
     { name: 'Local development workflow', url: '/guides/local-development/cli-workflows' },
+    {
+      name: 'Local and hosted projects',
+      url: '/guides/local-development/local-and-hosted-projects',
+    },
     {
       name: 'Guides',
       url: undefined,
@@ -2627,6 +2637,11 @@ export const security: NavMenuConstant = {
         {
           name: 'Production Checklist',
           url: '/guides/deployment/going-into-prod',
+          enabled: productionChecklistEnabled,
+        },
+        {
+          name: 'Production security checklist',
+          url: '/guides/security/production-checklist' as `/${string}`,
           enabled: productionChecklistEnabled,
         },
         {
@@ -2809,6 +2824,10 @@ export const platform: NavMenuConstant = {
         {
           name: 'Temporary Access',
           url: '/guides/platform/temporary-access' as `/${string}`,
+        },
+        {
+          name: 'Map team members to Postgres roles',
+          url: '/guides/platform/team-database-access' as `/${string}`,
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
@@ -3049,6 +3068,7 @@ export const telemetry: NavMenuConstant = {
       name: 'Configure and export',
       items: [
         { name: 'Configure logging', url: '/guides/observability/configure-logging' },
+        { name: 'Log slow and failing queries', url: '/guides/observability/log-slow-queries' },
         { name: 'Log drains', url: '/guides/observability/log-drains' },
         { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
         { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
@@ -3201,6 +3221,10 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
         { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
+        {
+          name: 'Preview branches on Vercel',
+          url: '/guides/integrations/vercel-preview-branches' as `/${string}`,
+        },
         { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
         { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
@@ -3264,6 +3288,10 @@ export const integrations: NavMenuConstant = {
     {
       name: 'Vercel Marketplace',
       url: '/guides/integrations/vercel-marketplace',
+    },
+    {
+      name: 'Preview branches on Vercel',
+      url: '/guides/integrations/vercel-preview-branches',
     },
     {
       name: 'Stripe Projects',

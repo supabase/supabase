@@ -2,21 +2,18 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { FC, Fragment, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState } from 'react'
+import { Badge, cn } from 'ui'
 import {
-  Badge,
-  cn,
-  MenubarSeparator,
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from 'ui'
+  TopNavMenu,
+  TopNavMenuGroup,
+  TopNavMenuGroupLink,
+  TopNavMenuItem,
+  TopNavMenuLink,
+  TopNavMenuPanel,
+} from 'ui-patterns/TopNav/TopNavMenu'
 
-import type { GlobalMenuItems } from '../Navigation.types'
+import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 import { useIaNavReady, useNavItems } from '@/features/IaNav'
 
@@ -61,109 +58,64 @@ const GlobalNavigationMenu: FC = () => {
   const { GLOBAL_MENU_ITEMS } = useNavItems()
   const isNavReady = useIaNavReady()
   const activeLabel = useActiveMenuLabel(GLOBAL_MENU_ITEMS)
-  const triggerClassName =
-    'h-(--header-height) p-2 bg-transparent border-0 border-b-2 border-transparent font-normal rounded-none text-foreground-light hover:bg-transparent hover:text-foreground data-open:bg-transparent! data-open:text-foreground! focus-ring focus-visible:text-foreground h-full focus-visible:rounded-sm shadow-none!'
 
   return (
-    <div
-      className={cn(
-        'flex relative gap-2 justify-start items-end w-full h-full',
-        !isNavReady && 'invisible noscript:visible'
-      )}
-    >
-      <NavigationMenu
-        delayDuration={0}
-        skipDelayDuration={0}
-        className="w-full flex justify-start h-full"
-        renderViewport={false}
-        viewportClassName="mt-0 max-w-screen overflow-hidden border-0 rounded-none mt-1.5 rounded-md border-x!"
-      >
-        <NavigationMenuList className="px-6 space-x-2 h-(--header-height)">
-          {GLOBAL_MENU_ITEMS.filter((section) => section[0].enabled !== false).map(
-            (section, sectionIdx) =>
-              section[0].menuItems ? (
-                <NavigationMenuItem
-                  key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
-                  className="text-sm relative h-full"
-                >
-                  <NavigationMenuTrigger
-                    className={cn(
-                      navigationMenuTriggerStyle(),
-                      triggerClassName,
-                      activeLabel === section[0].label && 'text-foreground border-foreground'
-                    )}
-                  >
-                    {section[0].label === 'Home' ? (
-                      <MenuIconPicker icon={section[0].icon || ''} />
-                    ) : (
-                      section[0].label
-                    )}
-                  </NavigationMenuTrigger>
-                  <NavigationMenuContent className="top-[calc(100%+4px)]! min-w-56 max-h-[calc(100vh-4rem)] border-y w-screen md:w-64 overflow-hidden overflow-y-auto rounded-none md:rounded-md md:border border-overlay bg-overlay text-foreground-light shadow-md duration-0!">
-                    <div className="p-3 md:p-1">
-                      {section[0].menuItems?.map((menuItem, menuItemIndex) => (
-                        <Fragment
-                          key={`desktop-docs-menu-section-${menuItemIndex}-${menuItemIndex}`}
-                        >
-                          {menuItemIndex !== 0 && <MenubarSeparator className="bg-border-muted" />}
-                          {menuItem
-                            .filter((item) => item.enabled !== false)
-                            .map((item, itemIdx) =>
-                              !item.href ? (
-                                <div
-                                  key={`desktop-docs-menu-section-label-${item.label}-${itemIdx}`}
-                                  className="font-mono tracking-wider flex items-center text-foreground-muted text-xs uppercase rounded-md p-2 leading-none"
-                                >
-                                  {item.label}
-                                </div>
-                              ) : (
-                                <NavigationMenuLink
-                                  key={`desktop-docs-menu-section-label-${item.label}-${itemIdx}`}
-                                  asChild
-                                >
-                                  <MenuItem
-                                    href={item.href}
-                                    title={item.label}
-                                    community={item.community}
-                                    new={item.new}
-                                    experimental={item.experimental}
-                                    icon={item.icon}
-                                  />
-                                </NavigationMenuLink>
-                              )
-                            )}
-                        </Fragment>
-                      ))}
-                    </div>
-                  </NavigationMenuContent>
-                </NavigationMenuItem>
-              ) : (
-                <NavigationMenuItem
-                  key={`desktop-docs-menu-section-${section[0].label}-${sectionIdx}`}
-                  className="text-sm relative h-full"
-                >
-                  <NavigationMenuLink asChild>
-                    <Link
-                      href={section[0].href || '#'}
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        triggerClassName,
-                        activeLabel === section[0].label && 'text-foreground border-foreground'
-                      )}
-                    >
-                      {section[0].label === 'Home' ? (
-                        <MenuIconPicker icon={section[0].icon || ''} />
-                      ) : (
-                        section[0].label
-                      )}
-                    </Link>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              )
-          )}
-        </NavigationMenuList>
-      </NavigationMenu>
-    </div>
+    <TopNavMenu className={cn('ml-3.5', !isNavReady && 'invisible noscript:visible')}>
+      {GLOBAL_MENU_ITEMS.filter(([section]) => section.enabled !== false).map(([section]) => {
+        const label =
+          section.label === 'Home' ? <MenuIconPicker icon={section.icon || ''} /> : section.label
+        const ariaCurrent = activeLabel === section.label ? 'true' : undefined
+
+        return section.menuItems ? (
+          <TopNavMenuItem key={section.label} label={label} aria-current={ariaCurrent}>
+            <TopNavMenuPanel>
+              {section.menuItems.map((group, index) => (
+                <GlobalMenuGroup
+                  key={group[0].label}
+                  items={group}
+                  fallbackLabel={index === 0 ? section.label : undefined}
+                />
+              ))}
+            </TopNavMenuPanel>
+          </TopNavMenuItem>
+        ) : (
+          <TopNavMenuLink
+            key={section.label}
+            linkAs={Link}
+            href={section.href || '#'}
+            aria-current={ariaCurrent}
+          >
+            {label}
+          </TopNavMenuLink>
+        )
+      })}
+    </TopNavMenu>
+  )
+}
+
+// an item without a link is the heading of its group. the first group falls back to the menu name
+const GlobalMenuGroup = ({
+  items,
+  fallbackLabel,
+}: {
+  items: DropdownMenuItem[]
+  fallbackLabel?: string
+}) => {
+  const enabledItems = items.filter((item) => item.enabled !== false)
+
+  return (
+    <TopNavMenuGroup label={enabledItems.find((item) => !item.href)?.label ?? fallbackLabel}>
+      {enabledItems
+        .filter((item) => item.href)
+        .map((item) => (
+          <TopNavMenuGroupLink key={item.href} linkAs={Link} href={item.href}>
+            {item.label}
+            {item.community ? <Badge>Community</Badge> : null}
+            {item.new ? <Badge variant="success">New</Badge> : null}
+            {item.experimental ? <Badge variant="warning">Experimental</Badge> : null}
+          </TopNavMenuGroupLink>
+        ))}
+    </TopNavMenuGroup>
   )
 }
 

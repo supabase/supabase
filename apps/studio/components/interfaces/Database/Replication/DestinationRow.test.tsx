@@ -33,7 +33,7 @@ const DestinationRow = (props: { destinationId: number }) => (
 )
 
 const DESTINATION_ID = 1
-const PIPELINE_ID = 42
+const PIPELINE_ID = '42'
 
 const addSourcesMock = () =>
   addAPIMock({

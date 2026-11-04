@@ -34,6 +34,7 @@ import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectGitHubConnectionQuery } from '@/data/integrations/github-connections-query'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useBranchMergeDiff } from '@/hooks/branches/useBranchMergeDiff'
 import { useWorkflowManagement } from '@/hooks/branches/useWorkflowManagement'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -73,6 +74,10 @@ const MergePage: NextPageWithLayout = () => {
   })
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
 
   const {
     diffContent,
@@ -247,8 +252,9 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleCloseBranch = () => {
-    if (!ref || !parentProjectRef) return
+    if (!ref || !parentProjectRef || deleteBranchGrant.status !== 'granted') return
     deleteBranch({
+      grant: deleteBranchGrant.grant,
       branchRef: ref,
       projectRef: parentProjectRef,
     })
@@ -428,6 +434,7 @@ const MergePage: NextPageWithLayout = () => {
                   ) : hasCurrentWorkflowCompleted ? (
                     <Button
                       onClick={handleCloseBranch}
+                      disabled={deleteBranchGrant.status !== 'granted'}
                       loading={isDeleting}
                       icon={<XIcon size={16} strokeWidth={1.5} />}
                       className="shrink-0"
