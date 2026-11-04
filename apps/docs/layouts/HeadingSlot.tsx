@@ -8,7 +8,7 @@ interface SlotProviderProps extends PropsWithChildren {
   value: HTMLElement | null
 }
 
-interface CrumbHeading {
+export interface CrumbHeading {
   url: string
   title: ReactNode
 }
