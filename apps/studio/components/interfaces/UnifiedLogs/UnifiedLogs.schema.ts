@@ -1,11 +1,6 @@
 import { z } from 'zod'
 
-import {
-  LOG_VISIBILITY_VALUES,
-  METHODS,
-  REGIONS,
-  SEARCH_PARAMS_PARSER,
-} from './UnifiedLogs.constants'
+import { METHODS, REGIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   ARRAY_DELIMITER,
   LEVELS,
@@ -119,5 +114,4 @@ export const querySearchParamsSchema = z.object({
   edge_storage: z.boolean().default(SEARCH_PARAMS_PARSER.edge_storage.defaultValue),
   edge_postgrest: z.boolean().default(SEARCH_PARAMS_PARSER.edge_postgrest.defaultValue),
   user: z.string().optional(),
-  log_visibility: z.enum(LOG_VISIBILITY_VALUES).optional(),
 })

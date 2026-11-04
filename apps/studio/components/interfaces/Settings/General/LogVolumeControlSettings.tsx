@@ -25,19 +25,19 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import {
-  LOG_VISIBILITY_VALUES,
-  type LogVisibility,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
-import { useLogVisibility } from '@/components/interfaces/UnifiedLogs/useLogVisibility'
+  LOG_VOLUME_CONTROL_VALUES,
+  useLogVolumeControl,
+  type LogVolumeControl,
+} from './useLogVolumeControl'
 
-const FORM_ID = 'log-visibility-form'
+const FORM_ID = 'log-volume-control-form'
 
-const FormSchema = z.object({ logVisibility: z.enum(LOG_VISIBILITY_VALUES) })
+const FormSchema = z.object({ logVolumeControl: z.enum(LOG_VOLUME_CONTROL_VALUES) })
 type FormValues = z.infer<typeof FormSchema>
 
-const defaultValues: FormValues = { logVisibility: 'all' }
+const defaultValues: FormValues = { logVolumeControl: 'all' }
 
-const OPTIONS: { value: LogVisibility; label: string; description: string }[] = [
+const OPTIONS: { value: LogVolumeControl; label: string; description: string }[] = [
   { value: 'all', label: 'All', description: 'Show every log' },
   {
     value: 'errors_only',
@@ -46,21 +46,21 @@ const OPTIONS: { value: LogVisibility; label: string; description: string }[] = 
   },
 ]
 
-export const LogVisibilitySettings = () => {
+export const LogVolumeControlSettings = () => {
   const { ref: projectRef } = useParams()
-  const { logVisibility, setLogVisibility, isLoading } = useLogVisibility(projectRef)
+  const { logVolumeControl, setLogVolumeControl, isLoading } = useLogVolumeControl(projectRef)
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
-    values: { logVisibility },
+    values: { logVolumeControl },
   })
   const { isDirty } = form.formState
 
   const onSubmit = (values: FormValues) => {
-    setLogVisibility(values.logVisibility)
+    setLogVolumeControl(values.logVolumeControl)
     form.reset(values)
-    toast.success('Updated log visibility')
+    toast.success('Log volume control updated')
   }
 
   return (
@@ -84,12 +84,12 @@ export const LogVisibilitySettings = () => {
                 <CardContent>
                   <FormField
                     control={form.control}
-                    name="logVisibility"
+                    name="logVolumeControl"
                     render={({ field }) => (
                       <FormItemLayout
                         layout="flex-row-reverse"
-                        label="Log visibility"
-                        description="Controls which logs appear in Unified Logs. Logs are still collected and stored."
+                        label="Log volume control"
+                        description="Show all logs or only errors. Logs are still collected and stored."
                         className="[&>div]:md:w-1/2"
                       >
                         <FormControl>

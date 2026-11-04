@@ -1,4 +1,4 @@
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useFlag } from 'common'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
@@ -8,14 +8,13 @@ import {
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
 
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { subscriptionHasHipaaAddon } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import { ComplianceConfig } from '@/components/interfaces/Settings/General/ComplianceConfig/ProjectComplianceMode'
 import { CustomDomainConfig } from '@/components/interfaces/Settings/General/CustomDomainConfig/CustomDomainConfig'
 import { DeleteBranchPanel } from '@/components/interfaces/Settings/General/DeleteBranchPanel'
 import { DeleteProjectPanel } from '@/components/interfaces/Settings/General/DeleteProjectPanel/DeleteProjectPanel'
 import { General } from '@/components/interfaces/Settings/General/General'
-import { LogVisibilitySettings } from '@/components/interfaces/Settings/General/LogVisibilitySettings'
+import { LogVolumeControlSettings } from '@/components/interfaces/Settings/General/LogVolumeControlSettings'
 import { Project } from '@/components/interfaces/Settings/General/Project'
 import { ServiceVersionsSection } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersionsSection'
 import { TransferProjectPanel } from '@/components/interfaces/Settings/General/TransferProjectPanel/TransferProjectPanel'
@@ -40,7 +39,7 @@ const ProjectSettings: NextPageWithLayout = () => {
     { enabled: IS_PLATFORM }
   )
   const hasHipaaAddon = subscriptionHasHipaaAddon(subscription)
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const isLogVolumeControlsEnabled = useFlag('enableLogVolumeControls')
 
   return (
     <>
@@ -60,7 +59,7 @@ const ProjectSettings: NextPageWithLayout = () => {
           <>
             <Project />
             <ServiceVersionsSection />
-            {isUnifiedLogsEnabled && <LogVisibilitySettings />}
+            {isLogVolumeControlsEnabled && <LogVolumeControlSettings />}
             {/* this is only settable on compliance orgs, currently that means HIPAA orgs */}
             {!isBranch && hasHipaaAddon && <ComplianceConfig />}
             {projectSettingsCustomDomains && <CustomDomainConfig />}
