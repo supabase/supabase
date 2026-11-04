@@ -1,18 +1,17 @@
 import { useParams } from 'common'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
 import {
-  Button,
-  Dialog,
-  DialogClose,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns/Admonition'
 
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { useBucketPurgeCDNCacheMutation } from '@/data/storage/bucket-purge-cdn-cache-mutation'
@@ -31,6 +30,7 @@ export const PurgeBucketCDNCacheModal = ({
   onClose,
 }: PurgeBucketCDNCacheModalProps) => {
   const [status, setStatus] = useState('')
+  const router = useRouter()
   const { ref: projectRef } = useParams()
   const { data: organization } = useSelectedOrganizationQuery()
   const isFreePlan = organization?.plan.id === 'free'
@@ -42,6 +42,7 @@ export const PurgeBucketCDNCacheModal = ({
         // No need to set a status as we show a toast
         toast.success(`Successfully purged CDN cache for bucket “${bucket.name}”`)
         onClose()
+        if (bucket.id) router.push(`/project/${projectRef}/storage/files`)
       },
       async onError(data) {
         // No need to set a status as we show a toast
@@ -59,74 +60,89 @@ export const PurgeBucketCDNCacheModal = ({
 
   if (isFreePlan) {
     return (
-      <Dialog
+      <AlertDialog
         open={visible}
         onOpenChange={(open) => {
           if (open) return
           onClose()
         }}
       >
-        <DialogContent size="medium">
-          <DialogHeader>
-            <DialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <Admonition
-            title="Buckets CDN cache purge is not available on your plan"
-            description="Upgrade your plan to purge buckets CDN cache"
-            className="mb-0 rounded-none border-none"
-          />
-          <DialogFooter>
-            <DialogClose disabled={isPurgingBucketCDNCache} asChild>
-              <Button>Cancel</Button>
-            </DialogClose>
+        <AlertDialogContent
+          size="medium"
+          onClick={(event) =>
+            // Avoid triggering the overlay click
+            event.stopPropagation()
+          }
+          dialogOverlayProps={{
+            onClick: () => {
+              onClose()
+            },
+          }}
+        >
+          <AlertDialogHeader>
+            <AlertDialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</AlertDialogTitle>
+            <AlertDialogDescription asChild>
+              <div className="space-y-4">
+                <p>Buckets CDN cache purge is not available on your plan.</p>
+                <p>Upgrade your plan to purge buckets CDN cache</p>
+              </div>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
             <UpgradePlanButton source="upgrade" featureProposition="purge buckets CDN cache" />
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     )
   }
 
   return (
-    <Dialog
+    <AlertDialog
       open={visible}
       onOpenChange={(open) => {
         if (!open && isPurgingBucketCDNCache) return
         onClose()
       }}
     >
-      <DialogContent size="medium">
-        <DialogHeader>
-          <DialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</DialogTitle>
-        </DialogHeader>
-        <DialogSectionSeparator />
-        <DialogSection className="space-y-4">
-          <p>
-            After purging the cache, it can take{' '}
-            <strong className="font-bold">up to 60 seconds</strong> for the invalidation to
-            propagate across all CDN edge nodes worldwide. During this time, some users may still
-            receive cached content depending on which edge node they are routed to.
-          </p>
-          <p>
-            Keep in mind that purging the CDN cache does not affect browser caches. If users have
-            the asset cached locally in their browser, they will continue to see the cached version
-            until the browser cache expires based on the{' '}
-            <code className="font-mono bg-surface-200 rounded-sm px-1 py-0.5">cacheControl</code>{' '}
-            value set during upload.
-          </p>
-        </DialogSection>
-        <DialogFooter>
-          <DialogClose disabled={isPurgingBucketCDNCache} asChild>
-            <Button>Cancel</Button>
-          </DialogClose>
-          <Button variant="primary" disabled={isPurgingBucketCDNCache} onClick={onConfirm}>
+      <AlertDialogContent
+        size="medium"
+        onClick={(event) =>
+          // Avoid triggering the overlay click
+          event.stopPropagation()
+        }
+        dialogOverlayProps={{
+          onClick: () => {
+            if (isPurgingBucketCDNCache) return
+            onClose()
+          },
+        }}
+      >
+        <AlertDialogHeader>
+          <AlertDialogTitle>{`Purge bucket “${bucket.name}” CDN cache`}</AlertDialogTitle>
+          <AlertDialogDescription asChild>
+            <div className="space-y-4">
+              <p>
+                Invalidation can take <strong className="font-bold">up to 60 seconds</strong>{' '}
+                propagate across all CDN edge nodes worldwide.
+              </p>
+              <p>
+                Purging the CDN cache does not affect browser caches. Users may see the cached
+                version until their browser cache expires.
+              </p>
+            </div>
+          </AlertDialogDescription>
+        </AlertDialogHeader>
+        <AlertDialogFooter>
+          <AlertDialogCancel disabled={isPurgingBucketCDNCache}>Cancel</AlertDialogCancel>
+          <AlertDialogAction disabled={isPurgingBucketCDNCache} onClick={onConfirm}>
             Purge CDN cache
-          </Button>
-        </DialogFooter>
+          </AlertDialogAction>
+        </AlertDialogFooter>
         <div className="sr-only" aria-live="polite">
           {status}
         </div>
-      </DialogContent>
-    </Dialog>
+      </AlertDialogContent>
+    </AlertDialog>
   )
 }
