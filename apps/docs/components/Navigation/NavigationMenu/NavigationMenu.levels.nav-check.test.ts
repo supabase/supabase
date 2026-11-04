@@ -73,6 +73,8 @@ const ALLOWLIST = [
   'Platform > Platform Configuration',
   'Self-Hosting',
   'Self-Hosting > How-to Guides',
+  // the docs-layout-v2 overview row is its 10th item, since the start tab links nowhere
+  'Start with Supabase',
   'Start with Supabase > Framework Quickstarts',
   'Start with Supabase > Web app demos',
   'Storage > File Buckets',
