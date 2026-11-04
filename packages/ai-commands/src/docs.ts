@@ -14,8 +14,20 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
+interface ClippyOpenAI {
+  apiKey: string
+  moderations: {
+    create(body: {
+      input: string
+    }): Promise<{ results: { flagged: boolean; categories: object }[] }>
+  }
+  embeddings: {
+    create(body: { model: string; input: string }): Promise<{ data: { embedding: number[] }[] }>
+  }
+}
+
 export async function clippy(
-  openai: OpenAI,
+  openai: ClippyOpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,
   messages: Message[],
   options?: { useAltSearchIndex?: boolean }

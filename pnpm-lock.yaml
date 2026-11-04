@@ -2321,8 +2321,8 @@ importers:
         specifier: ^3.5.0
         version: 3.5.0
       openai:
-        specifier: ^4.75.1
-        version: 4.104.0(encoding@0.1.13)(ws@8.21.0)(zod@3.25.76)
+        specifier: ^6.22.0
+        version: 6.22.0(ws@8.21.3)(zod@3.25.76)
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -34108,6 +34108,11 @@ snapshots:
   openai@6.22.0(ws@8.21.0)(zod@3.25.76):
     optionalDependencies:
       ws: 8.21.0
+      zod: 3.25.76
+
+  openai@6.22.0(ws@8.21.3)(zod@3.25.76):
+    optionalDependencies:
+      ws: 8.21.3
       zod: 3.25.76
 
   openapi-fetch@0.12.4:

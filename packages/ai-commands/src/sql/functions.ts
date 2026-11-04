@@ -104,36 +104,32 @@ export async function debugSql(
   )
 
   try {
-    const completionResponse = await openai.post<
-      Record<string, unknown>,
-      OpenAI.Chat.Completions.ChatCompletion
-    >('/chat/completions', {
-      body: {
-        model: 'gpt-6-luna',
-        messages: completionMessages,
-        max_completion_tokens: 2048,
-        reasoning_effort: 'none',
-        temperature: 0,
-        tool_choice: {
-          type: 'function',
-          function: {
-            name: completionFunctions.debugSql.name,
-          },
+    const completionResponse = await openai.chat.completions.create({
+      model: 'gpt-6-luna',
+      messages: completionMessages,
+      max_completion_tokens: 2048,
+      reasoning_effort: 'none',
+      temperature: 0,
+      tool_choice: {
+        type: 'function',
+        function: {
+          name: completionFunctions.debugSql.name,
         },
-        tools: [
-          {
-            type: 'function',
-            function: completionFunctions.debugSql,
-          },
-        ],
-        stream: false,
       },
+      tools: [
+        {
+          type: 'function',
+          function: completionFunctions.debugSql,
+        },
+      ],
+      stream: false,
     })
 
     const [firstChoice] = completionResponse.choices
     const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstTool?.function.arguments
+    const sqlResponseString =
+      firstTool?.type === 'function' ? firstTool.function.arguments : undefined
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()
@@ -170,36 +166,32 @@ export async function titleSql(openai: OpenAI, sql: string) {
   ]
 
   try {
-    const completionResponse = await openai.post<
-      Record<string, unknown>,
-      OpenAI.Chat.Completions.ChatCompletion
-    >('/chat/completions', {
-      body: {
-        model: 'gpt-6-luna',
-        messages: completionMessages,
-        max_completion_tokens: 1024,
-        reasoning_effort: 'none',
-        temperature: 0,
-        tool_choice: {
-          type: 'function',
-          function: {
-            name: completionFunctions.generateTitle.name,
-          },
+    const completionResponse = await openai.chat.completions.create({
+      model: 'gpt-6-luna',
+      messages: completionMessages,
+      max_completion_tokens: 1024,
+      reasoning_effort: 'none',
+      temperature: 0,
+      tool_choice: {
+        type: 'function',
+        function: {
+          name: completionFunctions.generateTitle.name,
         },
-        tools: [
-          {
-            type: 'function',
-            function: completionFunctions.generateTitle,
-          },
-        ],
-        stream: false,
       },
+      tools: [
+        {
+          type: 'function',
+          function: completionFunctions.generateTitle,
+        },
+      ],
+      stream: false,
     })
 
     const [firstChoice] = completionResponse.choices
     const [firstTool] = firstChoice.message?.tool_calls ?? []
 
-    const sqlResponseString = firstTool?.function.arguments
+    const sqlResponseString =
+      firstTool?.type === 'function' ? firstTool.function.arguments : undefined
 
     if (!sqlResponseString) {
       throw new EmptyResponseError()

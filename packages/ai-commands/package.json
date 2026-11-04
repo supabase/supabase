@@ -18,7 +18,7 @@
     "common-tags": "^1.8.2",
     "config": "workspace:*",
     "jsonrepair": "^3.5.0",
-    "openai": "^4.75.1",
+    "openai": "^6.22.0",
     "zod": "catalog:"
   },
   "devDependencies": {

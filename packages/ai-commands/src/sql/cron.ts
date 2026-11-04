@@ -72,34 +72,30 @@ export async function generateCron(openai: OpenAI, prompt: string) {
   }
 
   try {
-    const response = await openai.post<
-      Record<string, unknown>,
-      OpenAI.Chat.Completions.ChatCompletion
-    >('/chat/completions', {
-      body: {
-        model: 'gpt-6-luna',
-        messages: initMessages,
-        max_completion_tokens: 1024,
-        reasoning_effort: 'none',
-        temperature: 0,
-        stream: false,
-        tool_choice: {
-          type: 'function',
-          function: {
-            name: completionFunction.name,
-          },
+    const response = await openai.chat.completions.create({
+      model: 'gpt-6-luna',
+      messages: initMessages,
+      max_completion_tokens: 1024,
+      reasoning_effort: 'none',
+      temperature: 0,
+      stream: false,
+      tool_choice: {
+        type: 'function',
+        function: {
+          name: completionFunction.name,
         },
-        tools: [
-          {
-            type: 'function',
-            function: completionFunction,
-          },
-        ],
       },
+      tools: [
+        {
+          type: 'function',
+          function: completionFunction,
+        },
+      ],
     })
 
     // Parse the JSON string in arguments using jsonrepair
-    const functionArgs = response?.choices?.[0]?.message?.tool_calls?.[0]?.function?.arguments
+    const toolCall = response.choices[0]?.message?.tool_calls?.[0]
+    const functionArgs = toolCall?.type === 'function' ? toolCall.function.arguments : undefined
     if (!functionArgs) {
       throw new Error('No cron expression generated')
     }
