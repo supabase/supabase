@@ -111,6 +111,8 @@ export function StickyHeader({
         // Same for bottom
         'pb-8 -mb-3',
         'bg-linear-to-b from-background from-85% to-transparent to-100%',
+        // the docs-layout-v2 header crumb names the section, so the heading stays in the flow
+        'layout-v2:static layout-v2:bg-none layout-v2:py-0 layout-v2:mt-0.5 layout-v2:mb-5',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
         'focus:outline-hidden',
