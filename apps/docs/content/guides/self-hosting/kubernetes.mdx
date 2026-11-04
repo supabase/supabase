@@ -236,22 +236,22 @@ Secret API keys bypass Row Level Security. Keep them, database passwords, and si
 
 2. Open [local Studio](http://localhost:8000) and sign in with the Studio credentials. This HTTP Basic authentication prompt protects Studio; it is separate from your app's Auth users.
 
-3. In another terminal, wait for the REST component and request its API description:
+3. In another terminal, wait for the REST component and request its OpenAPI description. This endpoint requires a secret or `service_role` API key:
 
    ```bash
    kubectl -n supabase wait --for=condition=Ready \
      rest.core.supabase.io/supabase --timeout=300s
 
-   SUPABASE_PUBLISHABLE_KEY=$(kubectl -n supabase get secret supabase-jwt \
-     -o go-template='{{index .data "publishable-key" | base64decode}}')
+   SUPABASE_SECRET_KEY=$(kubectl -n supabase get secret supabase-jwt \
+     -o go-template='{{index .data "secret-key" | base64decode}}')
 
    curl --fail-with-body http://localhost:8000/rest/v1/ \
-     --header "apikey: $SUPABASE_PUBLISHABLE_KEY"
+     --header "apikey: $SUPABASE_SECRET_KEY"
    ```
 
-   A successful request returns the PostgREST API description as JSON. App table access still depends on database privileges and Row Level Security policies.
+   A successful request returns the PostgREST API description as JSON.
 
-Use `http://localhost:8000` and the publishable key when initializing a Supabase client on your machine. REST, Auth, Storage, Realtime, and Edge Functions share the gateway URL.
+Use `http://localhost:8000` and the publishable key when initializing a Supabase client on your machine. Client access to tables depends on database privileges and Row Level Security policies. REST, Auth, Storage, Realtime, and Edge Functions share the gateway URL.
 
 ### Access Postgres
 
@@ -353,7 +353,7 @@ The example uses `supabase.example.com` for Supabase and `app.example.com` for y
 
    ```bash
    curl --fail-with-body https://supabase.example.com/rest/v1/ \
-     --header "apikey: $SUPABASE_PUBLISHABLE_KEY"
+     --header "apikey: $SUPABASE_SECRET_KEY"
    ```
 
 The Ingress forwards `/` to Envoy, preserving the gateway's Studio authentication and API routing. Keep Envoy enabled and preserve its Service port named `envoy` when applying Service overrides. Configure your Ingress Controller to redirect HTTP to HTTPS and support WebSocket connections for Realtime.
