@@ -28,15 +28,20 @@ const handleDelete = async (req: NextApiRequest, res: NextApiResponse) => {
     return res.status(400).json({ error: { message: error.message } })
   }
 
-  factors?.factors.forEach(async (factor: any) => {
-    const { error } = await supabase.auth.admin.mfa.deleteFactor({
-      id: factor.id,
-      userId: id as string,
-    })
-    if (error) {
-      return res.status(400).json({ error: { message: error.message } })
-    }
-  })
+  const deletionResults = await Promise.all(
+    (factors?.factors ?? []).map((factor) =>
+      supabase.auth.admin.mfa.deleteFactor({
+        id: factor.id,
+        userId: id as string,
+      })
+    )
+  )
+
+  const deletionError = deletionResults.find((result) => result.error)?.error
+
+  if (deletionError) {
+    return res.status(400).json({ error: { message: deletionError.message } })
+  }
 
   return res.status(200).json({ data: null, error: null })
 }
