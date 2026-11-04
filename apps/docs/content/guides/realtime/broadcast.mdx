@@ -1135,11 +1135,154 @@ const changes = supabase
   .subscribe()
 ```
 
+## Broadcast persistence
+
+Realtime delivers a Broadcast message to connected clients and then drops it. Set `persist` on a message to also store it in `realtime.messages`. Clients that join later can then get it with [Broadcast replay](#broadcast-replay).
+
+Persistence works only on private channels. Over WebSocket, it needs protocol version 2.0.0.
+
+### Allow users to store messages
+
+A sender needs two RLS policies for `insert` on `realtime.messages`:
+
+- `broadcast` lets the sender send to the private channel. See [Authorization](/docs/guides/realtime/authorization).
+- `persistence` lets Realtime store what the sender sends.
+
+The policy checks `realtime.messages.extension` to tell them apart. One policy can cover both:
+
+Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
+
+```sql
+create policy "authenticated can send and store broadcast on topic"
+on "realtime"."messages"
+for insert
+to authenticated
+with check (
+  (select realtime.topic()) = 'room:1'
+  and realtime.messages.extension in ('broadcast', 'persistence')
+);
+```
+
+Without the `persistence` policy, Realtime still delivers the message but doesn't store it.
+
+### Store a message over WebSocket
+
+<Admonition type="note">
+
+Persistence is available in the Supabase JavaScript client version 2.119.0 and later. For other client libraries, see the [SDK Capability Matrix](https://supabase.github.io/sdk/#area-realtime).
+
+</Admonition>
+
+Pass `persist` to `send()`:
+
+- `persist: true` keeps the message for the maximum retention of 72 hours.
+- `persist: { ttl }` keeps the message available for replay for `ttl` seconds. `ttl` goes from 1 up to the maximum retention.
+
+Set `ack: true` to learn whether Realtime stored the message. Without `ack`, Realtime stores it in the background and doesn't report failures.
+
+{/* prettier-ignore */}
+```js
+import { createClient } from '@supabase/supabase-js'
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+const channel = supabase.channel('room:1', {
+  config: {
+    private: true,
+    broadcast: { ack: true },
+  },
+})
+
+channel.subscribe(async (status) => {
+  if (status !== 'SUBSCRIBED') return
+
+  // Store for the maximum retention
+  const result = await channel.send({
+    type: 'broadcast',
+    event: 'message',
+    payload: { text: 'Hello' },
+    persist: true,
+  })
+  console.log(result) // 'ok' when delivered and stored
+
+  // Keep available for replay for one hour
+  await channel.send({
+    type: 'broadcast',
+    event: 'message',
+    payload: { text: 'Hello again' },
+    persist: { ttl: 3600 },
+  })
+})
+```
+
+With `ack: true`, `send()` resolves to `'ok'` when Realtime delivered and stored the message. Otherwise it resolves to an error code, such as `persistence_unauthorized` when the sender doesn't pass a `persistence` policy. For every code, see [Broadcast errors](/docs/guides/realtime/protocol#broadcast-errors).
+
+`send()` also resolves to `'error'` and sends nothing when the channel is public, or when the WebSocket isn't connected.
+
+### Store a message over REST
+
+Send to the [single message endpoint](#broadcast-using-the-rest-api) with `private=true`. Add `persist=true`, or `persist[ttl]` with a number of seconds. The values mean the same as over WebSocket.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+  <TabPanel id="js" label="JavaScript">
+
+    Pass `persist` to `httpSend()`. You don't need to subscribe to the channel.
+
+    {/* prettier-ignore */}
+    ```js
+    import { createClient } from '@supabase/supabase-js'
+    const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+    // ---cut---
+    const channel = supabase.channel('room:1', { config: { private: true } })
+
+    const result = await channel.httpSend(
+      'message',
+      { text: 'Hello' },
+      { persist: { ttl: 3600 } }
+    )
+    console.log(result) // { success: true } when delivered
+    ```
+
+  </TabPanel>
+  <TabPanel id="curl" label="cURL">
+
+    {/* prettier-ignore */}
+    ```bash
+    curl -v \
+    -H 'apikey: <SUPABASE_TOKEN>' \
+    -H 'Authorization: Bearer <USER_JWT>' \
+    -H 'Content-Type: application/json' \
+    --data-raw '{ "text": "Hello" }' \
+    'https://<PROJECT_REF>.supabase.co/realtime/v1/api/broadcast/room:1/events/message?private=true&persist[ttl]=3600'
+    ```
+
+  </TabPanel>
+</Tabs>
+
+Realtime stores a message sent over REST in the background. The response doesn't say whether Realtime stored it. To find out, send over WebSocket with `ack: true`.
+
+The endpoint returns `422` when the channel is public or `ttl` is out of range. The batch endpoint `POST /realtime/v1/api/broadcast` ignores `persist`.
+
+### How long messages are kept
+
+`ttl` sets how long replay returns a message. After `ttl` seconds, replay filters the message out, but the row stays in `realtime.messages`.
+
+Realtime stores messages in daily partitions and drops a partition once it's older than 72 hours. Because a whole day is dropped at once, a row stays for 72 hours to 4 days after it was sent. Until then, a direct `select` on the table still returns it, even after its `ttl` passes. Don't use `ttl` to delete data.
+
+The `expires_at` column holds the UTC time when replay stops returning a stored message. Broadcast from the Database doesn't support `ttl`, so its messages have no `expires_at`. Replay returns them until Realtime drops their partition, 72 hours to 4 days after they were sent.
+
 ## Broadcast replay
 
 ### How it works [#broadcast-replay-how-it-works]
 
-Broadcast Replay enables **private** channels to access messages that were sent earlier. Only messages published via [Broadcast From the Database](#broadcast-from-the-database) are available for replay.
+Broadcast Replay lets **private** channels get messages sent earlier. Replay returns messages from [Broadcast from the Database](#broadcast-from-the-database) and messages sent with [`persist`](#broadcast-persistence).
 
 You can configure replay with the following options:
 
