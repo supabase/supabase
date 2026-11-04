@@ -65,7 +65,7 @@ export function psqlTable(output: string) {
   const rule = lines.findIndex((line) => /^[\s─-]+[┼+][─\-┼+\s]*$/.test(line))
   if (rule !== 1) return undefined
   const cells = (line: string) =>
-    line.split(/[│|]/).map((cell) => cell.trim().replace(/\|/g, '\\|'))
+    line.split(/[│|]/).map((cell) => cell.trim().replace(/\\/g, '\\\\').replace(/\|/g, '\\|'))
   const head = cells(lines[0])
   const rows = lines.slice(2).map(cells)
   return [

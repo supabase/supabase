@@ -218,7 +218,7 @@ function flagsTable(flags: CliSpec['flags']) {
         required ? 'Required.' : '',
       ]
       // GFM splits cells on every unescaped pipe, even inside code spans
-      const cell = (text: string) => text.replace(/\|/g, '\\|')
+      const cell = (text: string) => text.replace(/\\/g, '\\\\').replace(/\|/g, '\\|')
       return `| \`${cell(label)}\` | ${cell([description, ...extra].filter(Boolean).join(' '))} |`
     }),
   ].join('\n')

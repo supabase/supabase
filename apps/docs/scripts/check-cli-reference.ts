@@ -13,6 +13,16 @@ const issues = new Map<string, string[]>()
 const report = (kind: string, detail: string) =>
   issues.set(kind, [...(issues.get(kind) ?? []), detail])
 
+/** Repeats a removal until nothing matches, so a removal cannot leave a new match behind. */
+function stripUntilStable(text: string, pattern: RegExp) {
+  let previous: string
+  do {
+    previous = text
+    text = text.replace(pattern, '')
+  } while (text !== previous)
+  return text
+}
+
 const pages = new Map<string, Promise<{ status: number; html: string; ids: Set<string> }>>()
 
 function fetchPage(path: string) {
@@ -21,7 +31,7 @@ function fetchPage(path: string) {
       path,
       fetch(`${ORIGIN}${path}`, { redirect: 'manual' }).then(async (res) => {
         const html = res.status === 200 ? await res.text() : ''
-        const visible = html.replace(/<script[\s\S]*?<\/script>/g, '')
+        const visible = stripUntilStable(html, /<script\b[\s\S]*?<\/script\s*>/gi)
         const ids = new Set([...visible.matchAll(/ id="([^"]+)"/g)].map((m) => decode(m[1])))
         return { status: res.status, html: visible, ids }
       })
@@ -79,10 +89,8 @@ async function checkPage(path: string) {
 
   // An h2 with nothing but headings before the next h2
   for (const section of article.split(/(?=<h2[ >])/).slice(1)) {
-    const body = section
-      .replace(/<h[23][\s\S]*?<\/h[23]>/g, '')
-      .replace(/<[^>]+>/g, '')
-      .trim()
+    const withoutHeadings = stripUntilStable(section, /<h[23]\b[\s\S]*?<\/h[23]\s*>/gi)
+    const body = stripUntilStable(withoutHeadings, /<[^>]+>/g).trim()
     if (!body) report('empty section', `${path}: ${section.match(/id="([^"]+)"/)?.[1]}`)
   }
 
