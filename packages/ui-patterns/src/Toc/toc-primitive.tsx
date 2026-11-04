@@ -29,6 +29,12 @@ export function useActiveAnchors(): string[] {
   return useContext(ActiveAnchorContext)
 }
 
+// the topmost visible heading, or -1 before any heading is in view
+export const useTopActiveIndex = (items: { url: string }[]) => {
+  const anchors = new Set(useActiveAnchors())
+  return items.findIndex((item) => anchors.has(item.url.slice(1)))
+}
+
 export interface AnchorProviderProps {
   toc: TableOfContents
   /**

@@ -58,7 +58,7 @@ const BreadcrumbsInternal = ({
   )
 
   return (
-    <Breadcrumb className={cn(className)}>
+    <Breadcrumb className={cn('layout-v2:lg:hidden', className)}>
       <BreadcrumbList className="text-foreground-lighter p-0">
         {breadcrumbs.length >= ITEMS_TO_DISPLAY && (
           <>

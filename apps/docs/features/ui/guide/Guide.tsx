@@ -39,7 +39,8 @@ export function Guide({ meta, children, className }: GuideProps) {
               'relative',
               'transition-all ease-out',
               'duration-100',
-              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-8'
+              hideToc ? 'col-span-12' : 'col-span-12 md:col-span-8',
+              'layout-v2:md:col-span-12 layout-v2:w-full layout-v2:max-w-docs-content layout-v2:mx-auto'
             )}
           >
             {children}

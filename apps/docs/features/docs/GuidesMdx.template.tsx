@@ -104,7 +104,8 @@ const GuideTemplate = ({
             'relative',
             'transition-all ease-out',
             'duration-100',
-            'col-span-12 md:col-span-8'
+            'col-span-12 md:col-span-8',
+            'layout-v2:md:col-span-12 layout-v2:w-full layout-v2:max-w-docs-content layout-v2:mx-auto'
           )}
         >
           {techArticleJsonLd && (
@@ -119,7 +120,12 @@ const GuideTemplate = ({
               dangerouslySetInnerHTML={{ __html: breadcrumbJsonLd }}
             />
           )}
-          <div className="mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm">
+          <div
+            className={cn(
+              'mb-12 flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-sm',
+              'layout-v2:lg:not-has-[>p]:hidden'
+            )}
+          >
             <Breadcrumbs />
             {lastUpdated ? (
               <p className="text-foreground-lighter">
