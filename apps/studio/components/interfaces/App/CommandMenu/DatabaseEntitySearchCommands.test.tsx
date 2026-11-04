@@ -31,6 +31,24 @@ const SEARCH_RESULT: EntitySearchData = {
     { id: 101, schema: 'public', name: 'blog_posts', rls_enabled: true, policy_count: 4 },
     { id: 102, schema: 'blog', name: 'blog_posts_archive', rls_enabled: false, policy_count: 1 },
   ],
+  policies: [
+    {
+      id: 201,
+      name: 'Authors can edit their posts',
+      command: 'UPDATE',
+      schema: 'public',
+      table: 'blog_posts',
+      table_id: 101,
+    },
+    {
+      id: 202,
+      name: 'Anyone can read archived posts',
+      command: 'SELECT',
+      schema: 'blog',
+      table: 'blog_posts_archive',
+      table_id: 102,
+    },
+  ],
 }
 
 /** Renders the registered command sections as a plain list, driven by a text input. */
@@ -100,6 +118,19 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('/project/default/editor/101?schema=public')
   })
 
+  it('lists matching policies with their command and table, linking to the policy editor', async () => {
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+
+    const section = await screen.findByRole('region', { name: 'Policies' })
+    expect(section).toHaveTextContent('Authors can edit their posts')
+    expect(section).toHaveTextContent('UPDATE on public.blog_posts')
+    // The policies page lists policies per schema, so the link has to carry it
+    expect(section).toHaveTextContent('/project/default/database/policies?schema=public&edit=201')
+    expect(section).toHaveTextContent('/project/default/database/policies?schema=blog&edit=202')
+  })
+
   it('debounces typing into a single database query', async () => {
     customRender(<CommandMenuHarness />)
 
@@ -118,6 +149,7 @@ describe('useDatabaseEntitySearchCommands', () => {
     await new Promise((resolve) => setTimeout(resolve, 500))
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Policies' })).not.toBeInTheDocument()
   })
 
   it('does not show results from a previous project while searching another', async () => {
@@ -190,5 +222,27 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
 
     expect(await screen.findByText('4 policies • RLS enabled')).toBeInTheDocument()
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
+  })
+
+  it('lists tables above policies even when a policy matches the search better', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () =>
+        HttpResponse.json([
+          {
+            tables: [SEARCH_RESULT.tables[0]],
+            policies: [{ ...SEARCH_RESULT.policies[0], name: 'blog_posts_owner_update' }],
+          },
+        ]),
+    })
+    customRender(<CommandMenuListHarness />)
+
+    await userEvent.type(screen.getByRole('combobox'), 'blog_posts')
+
+    await screen.findByText('UPDATE on public.blog_posts')
+    const [first, second] = screen.getAllByText(/^(Tables|Policies)$/)
+    expect(first).toHaveTextContent('Tables')
+    expect(second).toHaveTextContent('Policies')
   })
 })
