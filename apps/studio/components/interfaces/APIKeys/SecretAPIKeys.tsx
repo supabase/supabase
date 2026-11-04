@@ -19,6 +19,7 @@ export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
   // Lists keys without their secret values (revealing happens per key), so a plain grant is enough
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
 
   const {
     data: apiKeysData,
@@ -56,7 +57,8 @@ export const SecretAPIKeys = () => {
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'secret' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deleteAPIKey({ projectRef, id: apiKey.id })
+    if (!deleteGrant.grant) return console.error('Missing permission to delete API keys')
+    deleteAPIKey({ projectRef, id: apiKey.id, grant: deleteGrant.grant })
   }
 
   useEffect(() => {

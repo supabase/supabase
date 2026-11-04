@@ -1,10 +1,15 @@
-import { render, screen } from '@testing-library/react'
+import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { customRender as render } from '@/tests/lib/custom-render'
+import { mockPermissionsError } from '@/tests/lib/msw-permissions'
+import { NO_PERMISSIONS } from '@/tests/lib/permissions-fixtures'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
+import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
 
 const { mockSetVisible, mockShortcut, mockUseQueryState } = vi.hoisted(() => ({
   mockSetVisible: vi.fn(),
@@ -32,19 +37,23 @@ vi.mock('@/components/ui/Shortcut', () => ({
   Shortcut: mockShortcut,
 }))
 
-vi.mock('@/data/api-keys/api-key-create-mutation', () => ({
-  useAPIKeyCreateMutation: () => ({ mutate: vi.fn(), isPending: false }),
-}))
+vi.mock('common', async () => {
+  const actual = await vi.importActual<Record<string, unknown>>('common')
+  return { ...actual, useIsLoggedIn: () => true, useParams: () => ({ ref: 'project-ref' }) }
+})
+
+const profileContext = createMockProfileContext()
 
 describe('API key create dialogs', () => {
   beforeEach(() => {
     mockUseQueryState.mockReturnValue(['', mockSetVisible])
+    mockProjectGrantContext({ ref: 'project-ref' })
   })
 
   it('registers and surfaces the publishable key shortcut on the visible trigger', async () => {
     const user = userEvent.setup()
 
-    render(<CreatePublishableAPIKeyDialog />)
+    render(<CreatePublishableAPIKeyDialog />, { profileContext })
 
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -54,7 +63,9 @@ describe('API key create dialogs', () => {
       undefined
     )
 
-    await user.click(screen.getByRole('button', { name: 'New publishable key' }))
+    const trigger = screen.getByRole('button', { name: 'New publishable key' })
+    await waitFor(() => expect(trigger).toBeEnabled())
+    await user.click(trigger)
 
     expect(mockSetVisible).toHaveBeenCalledWith('publishable')
   })
@@ -62,7 +73,7 @@ describe('API key create dialogs', () => {
   it('registers and surfaces the publishable key submit shortcut on the primary action', () => {
     mockUseQueryState.mockReturnValue(['publishable', mockSetVisible])
 
-    render(<CreatePublishableAPIKeyDialog />)
+    render(<CreatePublishableAPIKeyDialog />, { profileContext })
 
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -78,7 +89,7 @@ describe('API key create dialogs', () => {
   it('registers and surfaces the secret key shortcut on the visible trigger', async () => {
     const user = userEvent.setup()
 
-    render(<CreateSecretAPIKeyDialog />)
+    render(<CreateSecretAPIKeyDialog />, { profileContext })
 
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -88,7 +99,9 @@ describe('API key create dialogs', () => {
       undefined
     )
 
-    await user.click(screen.getByRole('button', { name: 'New secret key' }))
+    const trigger = screen.getByRole('button', { name: 'New secret key' })
+    await waitFor(() => expect(trigger).toBeEnabled())
+    await user.click(trigger)
 
     expect(mockSetVisible).toHaveBeenCalledWith('secret')
   })
@@ -96,7 +109,7 @@ describe('API key create dialogs', () => {
   it('registers and surfaces the secret key submit shortcut on the primary action', () => {
     mockUseQueryState.mockReturnValue(['secret', mockSetVisible])
 
-    render(<CreateSecretAPIKeyDialog />)
+    render(<CreateSecretAPIKeyDialog />, { profileContext })
 
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -107,5 +120,40 @@ describe('API key create dialogs', () => {
       undefined
     )
     expect(screen.getByRole('button', { name: 'Create API key' })).toBeInTheDocument()
+  })
+
+  it.each([
+    {
+      name: 'denied',
+      setup: () => mockProjectGrantContext({ ref: 'project-ref', permissions: NO_PERMISSIONS }),
+    },
+    { name: 'a permission-check error', setup: () => mockPermissionsError() },
+  ])('keeps the create triggers disabled when the grant is $name', async ({ setup }) => {
+    mockProjectGrantContext({ ref: 'project-ref' })
+    setup()
+    const user = userEvent.setup()
+
+    render(<CreatePublishableAPIKeyDialog />, { profileContext })
+    render(<CreateSecretAPIKeyDialog />, { profileContext })
+
+    const publishable = screen.getByRole('button', { name: 'New publishable key' })
+    const secret = screen.getByRole('button', { name: 'New secret key' })
+    await waitFor(() => expect(publishable).toBeDisabled())
+    expect(secret).toBeDisabled()
+
+    await user.click(publishable)
+    await user.click(secret)
+    expect(mockSetVisible).not.toHaveBeenCalled()
+  })
+
+  it('disables the submit button when the grant is denied', async () => {
+    mockProjectGrantContext({ ref: 'project-ref', permissions: NO_PERMISSIONS })
+    mockUseQueryState.mockReturnValue(['secret', mockSetVisible])
+
+    render(<CreateSecretAPIKeyDialog />, { profileContext })
+
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Create API key' })).toBeDisabled()
+    )
   })
 })
