@@ -70,6 +70,9 @@ export function useDatabaseEntitySearchCommands() {
   const tables = getVisibleResults(data?.tables ?? [], matchesEntitySearch)
   const policies = getVisibleResults(data?.policies ?? [], matchesTableRelatedSearch)
   const triggers = getVisibleResults(data?.triggers ?? [], matchesTriggerSearch)
+  // Triggers that are only here because of the function they run are a weaker match
+  // than that function itself, so they list after the Functions section
+  const hasDirectTriggerMatch = triggers.some((trigger) => trigger.matched_function === null)
   const functions = getVisibleResults(data?.functions ?? [], matchesEntitySearch)
   const projectRef = project?.ref ?? '_'
 
@@ -159,8 +162,11 @@ export function useDatabaseEntitySearchCommands() {
     enabled: triggerCommands.length > 0,
     forceMountSection: true,
     orderSection: orderCommandSectionsByPriority,
-    // Ranked together with Tables and Policies, and listed after both
-    sectionMeta: { priority: 4, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
+    // Ranked together with the others, and listed after Tables and Policies
+    sectionMeta: {
+      priority: hasDirectTriggerMatch ? 4 : 6,
+      relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP,
+    },
   })
 
   useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_FUNCTIONS, functionCommands, {
