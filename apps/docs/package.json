@@ -141,6 +141,7 @@
     "@babel/core": "*",
     "@graphiql/toolkit": "^0.9.1",
     "@graphql-codegen/cli": "^7.0.0",
+    "@graphql-codegen/typescript": "^6.0.0",
     "@graphql-codegen/typescript-resolvers": "^6.0.0",
     "@redocly/cli": "^2.26.0",
     "@testing-library/react": "^16.3.3",

@@ -613,6 +613,9 @@ importers:
       '@graphql-codegen/cli':
         specifier: ^7.0.0
         version: 7.4.6(@parcel/watcher@2.5.6)(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.5))(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@6.0.2)
+      '@graphql-codegen/typescript':
+        specifier: ^6.0.0
+        version: 6.1.2(graphql@16.11.0)
       '@graphql-codegen/typescript-resolvers':
         specifier: ^6.0.0
         version: 6.1.1(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)

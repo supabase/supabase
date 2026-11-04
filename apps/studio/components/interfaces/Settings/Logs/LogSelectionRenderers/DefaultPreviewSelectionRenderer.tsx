@@ -17,7 +17,6 @@ import { ErrorCodeDialog } from '../ErrorCodeDialog'
 import type { LogSearchCallback, PreviewLogData } from '../Logs.types'
 import { ResponseCodeFormatter } from '../LogsFormatters'
 import { ErrorCodeTooltip } from '@/components/ui/ErrorCodeTooltip/ErrorCodeTooltip'
-import { Service } from '@/data/graphql/graphql'
 import { useLogsUrlState } from '@/hooks/analytics/useLogsUrlState'
 
 const LogRowCodeBlock = ({ value, className }: { value: string; className?: string }) => (
@@ -47,7 +46,7 @@ const PropertyRow = ({
   const { setSearch } = useLogsUrlState()
   const [showErrorInfo, setShowErrorInfo] = useState(false)
 
-  const service = path?.startsWith('/auth/') ? Service.Auth : undefined
+  const service = path?.startsWith('/auth/') ? 'AUTH' : undefined
 
   const handleSearch: LogSearchCallback = async (_event: string, { query }: { query?: string }) => {
     setSearch(query || '')
