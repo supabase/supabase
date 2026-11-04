@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Brooks
 Aaron Byrne
+Adam Howard
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
@@ -23,6 +24,7 @@ Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
+Alpar Torok
 Amir Issaei
 Amogh Rao
 Amy Q
@@ -233,6 +235,7 @@ Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
 Lovro Mažgon
+Lucie Zhao
 Lukas Bernert
 Lukas Klingsbo
 Łukasz Korbasiewicz

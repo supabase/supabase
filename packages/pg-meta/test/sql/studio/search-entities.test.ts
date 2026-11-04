@@ -116,3 +116,112 @@ withTestDatabase('returns RLS status and policy count', async (db) => {
     },
   ])
 })
+
+const searchPolicies = async (
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  query: string,
+  options?: { limit?: number }
+) => {
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query, ...options })
+  )
+  return row.policies.map((p) => `${p.schema}.${p.table}: ${p.name} (${p.command})`)
+}
+
+withTestDatabase(
+  'finds policies by name, ranking name matches before table matches',
+  async (db) => {
+    await db.executeQuery(`
+    create table public.posts (id int);
+    create table public.comments (id int);
+    alter table public.posts enable row level security;
+    alter table public.comments enable row level security;
+    create policy "posts are public" on public.posts for select using (true);
+    create policy "authors write" on public.posts for insert with check (true);
+    create policy "posts moderation" on public.comments for update using (true);
+  `)
+
+    expect(await searchPolicies(db, 'posts')).toEqual([
+      // Name matches, ranked by prefix then length
+      'public.posts: posts are public (SELECT)',
+      'public.comments: posts moderation (UPDATE)',
+      // Policies on the matched `posts` table that didn't match by name
+      'public.posts: authors write (INSERT)',
+    ])
+  }
+)
+
+withTestDatabase('ranks name-matched policies by policy name, not by table', async (db) => {
+  await db.executeQuery(`
+    create table public.a (id int);
+    create table public.bb (id int);
+    create policy "read_everything" on public.a for select using (true);
+    create policy "read_x" on public.bb for select using (true);
+  `)
+
+  expect(await searchPolicies(db, 'read')).toEqual([
+    'public.bb: read_x (SELECT)',
+    'public.a: read_everything (SELECT)',
+  ])
+})
+
+withTestDatabase('returns a policy that matches both ways only once', async (db) => {
+  await db.executeQuery(`
+    create table public.posts (id int);
+    create policy "posts read" on public.posts for select using (true);
+  `)
+
+  expect(await searchPolicies(db, 'posts')).toEqual(['public.posts: posts read (SELECT)'])
+})
+
+withTestDatabase('caps the total number of policies', async (db) => {
+  await db.executeQuery(`
+    create table public.posts (id int);
+    create policy "posts a" on public.posts for select using (true);
+    create policy "posts b" on public.posts for insert with check (true);
+    create policy "posts c" on public.posts for update using (true);
+    create policy "posts d" on public.posts for delete using (true);
+  `)
+
+  expect(await searchPolicies(db, 'posts', { limit: 2 })).toEqual([
+    'public.posts: posts a (SELECT)',
+    'public.posts: posts b (INSERT)',
+  ])
+})
+
+withTestDatabase('maps policy commands and returns ids for linking', async (db) => {
+  await db.executeQuery(`
+    create table public.posts (id int);
+    create policy "everything" on public.posts for all using (true);
+  `)
+
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query: 'everything' })
+  )
+
+  expect(row.policies).toEqual([
+    {
+      id: expect.any(Number),
+      name: 'everything',
+      command: 'ALL',
+      schema: 'public',
+      table: 'posts',
+      table_id: expect.any(Number),
+    },
+  ])
+  expect(row.policies[0].table_id).toEqual(
+    (await db.executeQuery<{ id: number }[]>(`select 'public.posts'::regclass::oid::int8 as id`))[0]
+      .id
+  )
+})
+
+withTestDatabase('treats LIKE wildcards in policy searches literally', async (db) => {
+  await db.executeQuery(`
+    create table public.posts (id int);
+    create policy "read_posts" on public.posts for select using (true);
+    create policy "readxposts" on public.posts for select using (true);
+  `)
+
+  expect(await searchPolicies(db, 'read_posts')).toEqual(['public.posts: read_posts (SELECT)'])
+  expect(await searchPolicies(db, '%')).toEqual([])
+})

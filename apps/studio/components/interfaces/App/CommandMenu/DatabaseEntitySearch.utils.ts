@@ -1,6 +1,6 @@
 import { SEARCH_ENTITIES_MAX_QUERY_LENGTH } from '@supabase/pg-meta'
 
-import type { EntitySearchTable } from '@/data/database/entity-search-query'
+import type { EntitySearchPolicy, EntitySearchTable } from '@/data/database/entity-search-query'
 
 // Each search runs SQL against the user's database, so keep it to queries that
 // are specific enough to be useful: short queries match too broadly to be worth
@@ -38,6 +38,20 @@ export function matchesEntitySearch(
   return schema.toLowerCase().startsWith(schemaPart) && lowerName.includes(namePart)
 }
 
+/**
+ * Client-side mirror of how policies are matched in getSearchEntitiesSql: the
+ * policy name contains the query, or the policy's table matches it. Used to
+ * narrow results from a previous search while the current one is still in
+ * flight.
+ */
+export function matchesPolicySearch(
+  { name, schema, table }: Pick<EntitySearchPolicy, 'name' | 'schema' | 'table'>,
+  query: string
+) {
+  if (name.toLowerCase().includes(query.toLowerCase())) return true
+  return matchesEntitySearch({ schema, name: table }, query)
+}
+
 export function formatTableSearchDetails({
   policy_count,
   rls_enabled,
@@ -51,4 +65,13 @@ export function getTableEditorRoute(
   table: Pick<EntitySearchTable, 'id' | 'schema'>
 ): `/${string}` {
   return `/project/${projectRef}/editor/${table.id}?schema=${encodeURIComponent(table.schema)}`
+}
+
+// The policies page lists policies per schema, so the schema must be set for
+// the policy to be found and opened for editing.
+export function getPolicyEditorRoute(
+  projectRef: string,
+  policy: Pick<EntitySearchPolicy, 'id' | 'schema'>
+): `/${string}` {
+  return `/project/${projectRef}/database/policies?schema=${encodeURIComponent(policy.schema)}&edit=${policy.id}`
 }

@@ -1,7 +1,7 @@
 import type { LucideIcon } from 'lucide-react'
 import { cn, TabsTrigger } from 'ui'
 
-export interface ProjectBranchSelectorSheetTabTriggerProps {
+export interface MobileProjectSwitcherSheetTabTriggerProps {
   value: 'organization' | 'project' | 'branch'
   label: string
   icon: LucideIcon
@@ -9,13 +9,13 @@ export interface ProjectBranchSelectorSheetTabTriggerProps {
   isLast: boolean
 }
 
-export function ProjectBranchSelectorSheetTabTrigger({
+export function MobileProjectSwitcherSheetTabTrigger({
   value,
   label,
   icon: Icon,
   isMainBranch = false,
   isLast,
-}: ProjectBranchSelectorSheetTabTriggerProps) {
+}: MobileProjectSwitcherSheetTabTriggerProps) {
   const isBranch = value === 'branch'
   const isProductionBranch = isBranch && isMainBranch
 
