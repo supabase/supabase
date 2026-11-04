@@ -1423,7 +1423,7 @@ importers:
         version: 10.6.0
       '@graphql-codegen/cli':
         specifier: ^7.0.0
-        version: 7.4.6(@parcel/watcher@2.5.6)(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@6.0.2)
+        version: 7.4.6(@parcel/watcher@2.5.6)(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.5))(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@6.0.2)
       '@graphql-typed-document-node/core':
         specifier: ^3.2.0
         version: 3.2.0(graphql@16.11.0)
@@ -17249,11 +17249,6 @@ packages:
   sql-parser-cst@0.38.2:
     resolution: {integrity: sha512-4SR3cZYMxG4gsmvZQSQYYzzfk20OnbpsnwOVbU6Fw39ORLPpIHCMqoX5li0dz+ZWyF5HeR+mSgbgayKhN4JR9w==}
 
-  srvx@1.0.4:
-    resolution: {integrity: sha512-eZmYaxUfZSo7/8m8UdsHRJNmTLSCTPPom9d7a60vMmuVeZvwhbvflRR+00/CxTCjMOFa5+H8tgBeNDVZ+w7AAQ==}
-    engines: {node: '>=20.16.0'}
-    hasBin: true
-
   srvx@1.0.5:
     resolution: {integrity: sha512-KvSKRpgPG/oaq3cyT614OQ2bAa7DynuGamivCZeoZzIUULOdbQz6wUtnnVuC4+DCx2Zglzo8v5gBYmWIWYhDxA==}
     engines: {node: '>=20.16.0'}
@@ -20947,57 +20942,6 @@ snapshots:
       graphql: 16.11.0
       tslib: 2.8.1
 
-  '@graphql-codegen/cli@7.4.6(@parcel/watcher@2.5.6)(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@6.0.2)':
-    dependencies:
-      '@babel/generator': 7.29.8
-      '@babel/template': 7.29.7
-      '@babel/types': 7.29.11
-      '@graphql-codegen/client-preset': 6.2.3(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)
-      '@graphql-codegen/core': 6.2.2(graphql@16.11.0)
-      '@graphql-codegen/plugin-helpers': 7.4.2(graphql@16.11.0)
-      '@graphql-tools/apollo-engine-loader': 8.0.40(graphql@16.11.0)
-      '@graphql-tools/code-file-loader': 8.1.43(graphql@16.11.0)(supports-color@8.1.1)
-      '@graphql-tools/git-loader': 8.0.46(graphql@16.11.0)(supports-color@8.1.1)
-      '@graphql-tools/github-loader': 9.1.13(@types/node@22.13.14)(graphql@16.11.0)(supports-color@8.1.1)
-      '@graphql-tools/graphql-file-loader': 8.1.24(graphql@16.11.0)
-      '@graphql-tools/json-file-loader': 8.0.38(graphql@16.11.0)
-      '@graphql-tools/load': 8.1.21(graphql@16.11.0)
-      '@graphql-tools/merge': 9.2.8(graphql@16.11.0)
-      '@graphql-tools/url-loader': 9.1.14(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)
-      '@graphql-tools/utils': 12.0.3(graphql@16.11.0)
-      '@inquirer/prompts': 8.7.5(@types/node@22.13.14)
-      '@whatwg-node/fetch': 0.10.6
-      chalk: 5.6.2
-      cosmiconfig: 9.0.0(typescript@6.0.2)
-      debounce: 3.0.0
-      detect-indent: 7.0.2
-      graphql: 16.11.0
-      graphql-config: 5.1.8(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)(typescript@6.0.2)
-      is-glob: 4.0.3
-      jiti: 2.7.0
-      json-to-pretty-yaml: 1.2.2
-      listr2: 10.2.2
-      log-symbols: 7.0.1
-      micromatch: 4.0.8
-      shell-quote: 1.12.0
-      string-env-interpolation: 1.0.1
-      ts-log: 3.0.3
-      tslib: 2.8.1
-      yaml: 2.9.1
-      yargs: 18.2.0
-    optionalDependencies:
-      '@parcel/watcher': 2.5.6
-    transitivePeerDependencies:
-      - '@fastify/websocket'
-      - '@types/node'
-      - bufferutil
-      - cosmiconfig-toml-loader
-      - crossws
-      - graphql-sock
-      - supports-color
-      - typescript
-      - utf-8-validate
-
   '@graphql-codegen/cli@7.4.6(@parcel/watcher@2.5.6)(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.5))(graphql-sock@1.0.1(graphql@16.11.0))(graphql@16.11.0)(supports-color@8.1.1)(typescript@6.0.2)':
     dependencies:
       '@babel/generator': 7.29.8
@@ -21209,22 +21153,6 @@ snapshots:
       '@graphql-tools/utils': 12.0.3(graphql@16.11.0)
       graphql: 16.11.0
 
-  '@graphql-tools/executor-graphql-ws@3.2.0(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)':
-    dependencies:
-      '@graphql-tools/executor-common': 1.1.0(graphql@16.11.0)
-      '@graphql-tools/utils': 12.0.3(graphql@16.11.0)
-      '@whatwg-node/disposablestack': 0.0.6
-      graphql: 16.11.0
-      graphql-ws: 6.4.1(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)(ws@8.22.1)
-      isows: 1.0.7(ws@8.22.1)
-      tslib: 2.8.1
-      ws: 8.22.1
-    transitivePeerDependencies:
-      - '@fastify/websocket'
-      - bufferutil
-      - crossws
-      - utf-8-validate
-
   '@graphql-tools/executor-graphql-ws@3.2.0(crossws@0.4.12(srvx@1.0.5))(graphql@16.11.0)':
     dependencies:
       '@graphql-tools/executor-common': 1.1.0(graphql@16.11.0)
@@ -21372,28 +21300,6 @@ snapshots:
       '@graphql-tools/utils': 12.1.0(graphql@16.11.0)
       graphql: 16.11.0
       tslib: 2.8.1
-
-  '@graphql-tools/url-loader@9.1.14(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)':
-    dependencies:
-      '@graphql-tools/executor-graphql-ws': 3.2.0(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)
-      '@graphql-tools/executor-http': 3.5.0(@types/node@22.13.14)(graphql@16.11.0)
-      '@graphql-tools/executor-legacy-ws': 1.1.39(graphql@16.11.0)
-      '@graphql-tools/utils': 12.1.0(graphql@16.11.0)
-      '@graphql-tools/wrap': 11.2.3(graphql@16.11.0)
-      '@types/ws': 8.18.2
-      '@whatwg-node/fetch': 0.12.1
-      '@whatwg-node/promise-helpers': 2.0.0
-      graphql: 16.11.0
-      isomorphic-ws: 5.0.0(ws@8.22.1)
-      sync-fetch: 0.7.1
-      tslib: 2.8.1
-      ws: 8.22.1
-    transitivePeerDependencies:
-      - '@fastify/websocket'
-      - '@types/node'
-      - bufferutil
-      - crossws
-      - utf-8-validate
 
   '@graphql-tools/url-loader@9.1.14(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.5))(graphql@16.11.0)':
     dependencies:
@@ -28664,10 +28570,6 @@ snapshots:
     dependencies:
       uncrypto: 0.1.3
 
-  crossws@0.4.12(srvx@1.0.4):
-    optionalDependencies:
-      srvx: 1.0.4
-
   crossws@0.4.12(srvx@1.0.5):
     optionalDependencies:
       srvx: 1.0.5
@@ -29264,10 +29166,10 @@ snapshots:
 
   env-runner@0.2.1:
     dependencies:
-      crossws: 0.4.12(srvx@1.0.4)
+      crossws: 0.4.12(srvx@1.0.5)
       exsolve: 1.2.0
       httpxy: 0.5.5
-      srvx: 1.0.4
+      srvx: 1.0.5
 
   environment@1.1.0: {}
 
@@ -30618,28 +30520,6 @@ snapshots:
       - immer
       - use-sync-external-store
 
-  graphql-config@5.1.8(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)(typescript@6.0.2):
-    dependencies:
-      '@graphql-tools/graphql-file-loader': 8.1.24(graphql@16.11.0)
-      '@graphql-tools/json-file-loader': 8.0.38(graphql@16.11.0)
-      '@graphql-tools/load': 8.1.21(graphql@16.11.0)
-      '@graphql-tools/merge': 9.2.8(graphql@16.11.0)
-      '@graphql-tools/url-loader': 9.1.14(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)
-      '@graphql-tools/utils': 12.0.3(graphql@16.11.0)
-      cosmiconfig: 8.3.6(typescript@6.0.2)
-      graphql: 16.11.0
-      jiti: 2.7.0
-      minimatch: 10.2.6
-      string-env-interpolation: 1.0.1
-      tslib: 2.8.1
-    transitivePeerDependencies:
-      - '@fastify/websocket'
-      - '@types/node'
-      - bufferutil
-      - crossws
-      - typescript
-      - utf-8-validate
-
   graphql-config@5.1.8(@types/node@22.13.14)(crossws@0.4.12(srvx@1.0.5))(graphql@16.11.0)(typescript@6.0.2):
     dependencies:
       '@graphql-tools/graphql-file-loader': 8.1.24(graphql@16.11.0)
@@ -30695,13 +30575,6 @@ snapshots:
     dependencies:
       graphql: 16.11.0
 
-  graphql-ws@6.4.1(crossws@0.4.12(srvx@1.0.4))(graphql@16.11.0)(ws@8.22.1):
-    dependencies:
-      graphql: 16.11.0
-    optionalDependencies:
-      crossws: 0.4.12(srvx@1.0.4)
-      ws: 8.22.1
-
   graphql-ws@6.4.1(crossws@0.4.12(srvx@1.0.5))(graphql@16.11.0)(ws@8.22.1):
     dependencies:
       graphql: 16.11.0
@@ -30754,12 +30627,12 @@ snapshots:
       ufo: 1.6.4
       uncrypto: 0.1.3
 
-  h3@2.0.1-rc.31(crossws@0.4.12(srvx@1.0.4))(ocache@0.3.0):
+  h3@2.0.1-rc.31(crossws@0.4.12(srvx@1.0.5))(ocache@0.3.0):
     dependencies:
       rou3: 0.9.2
-      srvx: 1.0.4
+      srvx: 1.0.5
     optionalDependencies:
-      crossws: 0.4.12(srvx@1.0.4)
+      crossws: 0.4.12(srvx@1.0.5)
       ocache: 0.3.0
 
   hachure-fill@0.5.2: {}
@@ -33644,16 +33517,16 @@ snapshots:
   nitro@3.0.260903-beta:
     dependencies:
       consola: 3.4.2
-      crossws: 0.4.12(srvx@1.0.4)
+      crossws: 0.4.12(srvx@1.0.5)
       db0: 0.4.1
       env-runner: 0.2.1
-      h3: 2.0.1-rc.31(crossws@0.4.12(srvx@1.0.4))(ocache@0.3.0)
+      h3: 2.0.1-rc.31(crossws@0.4.12(srvx@1.0.5))(ocache@0.3.0)
       hookable: 6.1.1
       nf3: 0.3.24
       ocache: 0.3.0
       rolldown: 1.2.15
       rou3: 0.9.2
-      srvx: 1.0.4
+      srvx: 1.0.5
       unenv: 2.0.0-rc.24
       unstorage: 2.0.0-alpha.10
 
@@ -36370,8 +36243,6 @@ snapshots:
       nearley: 2.20.1
 
   sql-parser-cst@0.38.2: {}
-
-  srvx@1.0.4: {}
 
   srvx@1.0.5: {}
 
