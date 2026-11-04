@@ -2,7 +2,7 @@
 
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
-import React, { FC, useEffect, useState } from 'react'
+import React, { FC, useEffect, useState, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 import {
   TopNavMenu,
@@ -16,6 +16,14 @@ import {
 import type { DropdownMenuItem, GlobalMenuItems } from '../Navigation.types'
 import MenuIconPicker from './MenuIconPicker'
 import { IA_NAV_PENDING_CLASS, useIaNavReady, useNavItems } from '@/features/IaNav'
+
+interface MenuItemLabelProps {
+  title: ReactNode
+  icon?: string
+  community?: boolean
+  isNew?: boolean
+  experimental?: boolean
+}
 
 /**
  * Get TopNav active label based on current pathname
@@ -126,6 +134,26 @@ const GlobalMenuGroup = ({
   )
 }
 
+export const MenuItemLabel = ({
+  title,
+  icon,
+  community,
+  isNew,
+  experimental,
+}: MenuItemLabelProps) => (
+  <>
+    {icon ? (
+      <span aria-hidden className="contents">
+        <MenuIconPicker icon={icon} className="text-foreground-lighter" />
+      </span>
+    ) : null}
+    <span className="flex-1">{title}</span>
+    {community ? <Badge>Community</Badge> : null}
+    {isNew ? <Badge variant="success">New</Badge> : null}
+    {experimental ? <Badge variant="warning">Experimental</Badge> : null}
+  </>
+)
+
 export const MenuItem = React.forwardRef<
   React.ElementRef<'a'>,
   React.ComponentPropsWithoutRef<'a'> & {
@@ -151,13 +179,13 @@ export const MenuItem = React.forwardRef<
         {...props}
       >
         {children ?? (
-          <>
-            {icon && <MenuIconPicker icon={icon} className="text-foreground-lighter" />}
-            <span className="flex-1">{title}</span>
-            {community && <Badge>Community</Badge>}
-            {isNew && <Badge variant="success">New</Badge>}
-            {experimental && <Badge variant="warning">Experimental</Badge>}
-          </>
+          <MenuItemLabel
+            title={title}
+            icon={icon}
+            community={community}
+            isNew={isNew}
+            experimental={experimental}
+          />
         )}
       </Link>
     )
