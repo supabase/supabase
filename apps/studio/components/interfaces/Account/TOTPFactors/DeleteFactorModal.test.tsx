@@ -332,7 +332,7 @@ describe('DeleteFactorModal identity verification', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
     await screen.findByText(
-      'Your recovery codes have been removed. Generate new codes if you keep this authenticator.'
+      /Your recovery codes have been removed\. Retry to remove the authenticator/
     )
     expect(unenroll).toHaveBeenCalledOnce()
     fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
