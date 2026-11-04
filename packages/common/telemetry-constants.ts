@@ -1141,7 +1141,7 @@ export interface DocsContentListingClickedEvent {
  * User clicked a link to an example in the supabase/supabase GitHub repo's examples/ folder.
  *
  * @group Events
- * @source docs, www, studio
+ * @source PageTelemetry, in every app that mounts it (docs, www, studio, learn, ui-library, kb)
  */
 export interface ExampleLinkClickedEvent {
   action: 'example_link_clicked'
