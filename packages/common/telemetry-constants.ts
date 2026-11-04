@@ -1210,8 +1210,7 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
- * A knowledge base search returned, with or without results. The query text is left out
- * because it can contain personal data; only its length is sent.
+ * A knowledge base search returned. Only the query length is sent: the text can hold personal data.
  *
  * @group Events
  * @source kb
