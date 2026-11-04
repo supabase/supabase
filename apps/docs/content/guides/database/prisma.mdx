@@ -10,6 +10,12 @@ This guide shows how to connect your Prisma application to Supabase Postgres. If
 
 <Admonition type="note">
 
+This guide uses Prisma ORM 7. The `latest` tag of the `prisma` and `@prisma/client` packages on npm now points to the Prisma ORM 8 release candidate, which has a different CLI and client API, so the install commands below pin version 7. For Prisma ORM 8, see the [Prisma ORM 8 docs](https://www.prisma.io/docs/orm).
+
+</Admonition>
+
+<Admonition type="note">
+
 If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), turn it off in the [API Settings](/dashboard/project/_/settings/api).
 
 </Admonition>
@@ -78,8 +84,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="npm_initiate" label="npm">
               ```bash
               npm init -y
-              npm install prisma tsx @types/pg --save-dev
-              npm install @prisma/client @prisma/adapter-pg dotenv pg
+              npm install prisma@7 tsx @types/pg --save-dev
+              npm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               npx tsc --init
 
@@ -89,8 +95,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
               pnpm init
-              pnpm install prisma tsx @types/pg --save-dev
-              pnpm install @prisma/client @prisma/adapter-pg dotenv pg
+              pnpm install prisma@7 tsx @types/pg --save-dev
+              pnpm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               pnpx tsc --init
 
@@ -100,8 +106,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn add prisma tsx @types/pg --save-dev
-              yarn add @prisma/client @prisma/adapter-pg dotenv pg
+              yarn add prisma@7 tsx @types/pg --save-dev
+              yarn add @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               yarn tsc --init
 
@@ -111,8 +117,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="bun_initiate" label="bun">
               ```bash
               bun init -y
-              bun install prisma tsx @types/pg --save-dev
-              bun install @prisma/client @prisma/adapter-pg dotenv pg
+              bun install prisma@7 tsx @types/pg --save-dev
+              bun install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               bunx tsc --init
 
@@ -185,21 +191,21 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   </StepHikeCompact.Step>
 
   <StepHikeCompact.Step step={4}>
-    <StepHikeCompact.Details title="Configure prisma.config.ts">
+    <StepHikeCompact.Details title="Configure prisma7.config.ts">
 
-    Add `import "dotenv/config"` to the generated `prisma.config.ts`. If you are using a serverless environment, change the data source URL to `DIRECT_URL`.
+    Prisma 7.10 and later generate `prisma7.config.ts` (earlier versions name it `prisma.config.ts`) with the `import "dotenv/config"` line already in place. If you are using a serverless environment, change the data source URL to `DIRECT_URL`.
 
     </StepHikeCompact.Details>
 
     <StepHikeCompact.Code>
         <Tabs type="underlined" size="small">
             <TabPanel id="serverful" label="server-based deployments">
-                ```ts prisma.config.ts
+                ```ts prisma7.config.ts
                 import "dotenv/config";
                 import { defineConfig, env } from "prisma/config";
 
                 export default defineConfig({
-                  schema: "prisma/schema",
+                  schema: "prisma/schema.prisma",
                   migrations: {
                     path: "prisma/migrations",
                   },
@@ -210,12 +216,12 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                 ```
             </TabPanel>
             <TabPanel id="serverless" label="serverless deployments">
-                ```ts prisma.config.ts
+                ```ts prisma7.config.ts
                 import "dotenv/config";
                 import { defineConfig, env } from "prisma/config";
 
                 export default defineConfig({
-                  schema: "prisma/schema",
+                  schema: "prisma/schema.prisma",
                   migrations: {
                     path: "prisma/migrations",
                   },
