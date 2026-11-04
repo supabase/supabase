@@ -7,6 +7,7 @@ import {
   getPolicyEditorRoute,
   getTriggerEditorRoute,
   matchesTableRelatedSearch,
+  matchesTriggerSearch,
 } from './DatabaseEntitySearch.utils'
 
 describe('matchesTableRelatedSearch', () => {
@@ -69,20 +70,70 @@ describe('getTriggerEditorRoute', () => {
 describe('formatTriggerSearchDetails', () => {
   const cases: Array<[Parameters<typeof formatTriggerSearchDetails>[0], string]> = [
     [
-      { activation: 'BEFORE', events: ['INSERT'], schema: 'public', table: 'posts' },
+      {
+        activation: 'BEFORE',
+        events: ['INSERT'],
+        schema: 'public',
+        table: 'posts',
+        matched_function: null,
+      },
       'BEFORE INSERT on public.posts',
     ],
     [
-      { activation: 'AFTER', events: ['UPDATE', 'DELETE'], schema: 'blog', table: 'posts' },
+      {
+        activation: 'AFTER',
+        events: ['UPDATE', 'DELETE'],
+        schema: 'blog',
+        table: 'posts',
+        matched_function: null,
+      },
       'AFTER UPDATE OR DELETE on blog.posts',
     ],
     [
-      { activation: 'INSTEAD OF', events: ['INSERT'], schema: 'public', table: 'posts_view' },
+      {
+        activation: 'INSTEAD OF',
+        events: ['INSERT'],
+        schema: 'public',
+        table: 'posts_view',
+        matched_function: null,
+      },
       'INSTEAD OF INSERT on public.posts_view',
+    ],
+    [
+      {
+        activation: 'AFTER',
+        events: ['INSERT'],
+        schema: 'public',
+        table: 'posts',
+        matched_function: 'handle_new_user',
+      },
+      'Runs handle_new_user',
     ],
   ]
 
   it.each(cases)('formats %j', (trigger, expected) => {
     expect(formatTriggerSearchDetails(trigger)).toBe(expected)
+  })
+})
+
+describe('matchesTriggerSearch', () => {
+  const trigger = {
+    name: 'on_author_created',
+    schema: 'public',
+    table: 'authors',
+    matched_function: 'handle_new_user',
+  }
+
+  it.each([
+    ['its own name', 'author_created'],
+    ['its table', 'authors'],
+    ['the function it runs', 'HANDLE_NEW'],
+  ])('matches on %s', (_, query) => {
+    expect(matchesTriggerSearch(trigger, query)).toBe(true)
+  })
+
+  it('does not match unrelated searches, or the function when it was not what matched', () => {
+    expect(matchesTriggerSearch(trigger, 'colors')).toBe(false)
+    expect(matchesTriggerSearch({ ...trigger, matched_function: null }, 'handle_new')).toBe(false)
   })
 })

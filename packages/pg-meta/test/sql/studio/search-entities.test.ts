@@ -476,3 +476,71 @@ withTestDatabase('caps the number of triggers', async (db) => {
     'public.posts: cap_b (BEFORE INSERT)',
   ])
 })
+
+const searchTriggerRows = async (
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  query: string,
+  options?: { limit?: number }
+) => {
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query, ...options })
+  )
+  return row.triggers.map((t) => ({ name: t.name, matchedFunction: t.matched_function }))
+}
+
+withTestDatabase('finds triggers that run a function matching the search', async (db) => {
+  await db.executeQuery(`
+    create function public.handle_new_user() returns trigger language plpgsql as 'begin return new; end';
+    create function public.set_slug() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger on_author_created after insert on public.authors for each row execute function public.handle_new_user();
+    create trigger fill_slug before insert on public.authors for each row execute function public.set_slug();
+  `)
+
+  // Neither the trigger name nor its table matches, only the function it runs
+  expect(await searchTriggerRows(db, 'handle_new_user')).toEqual([
+    { name: 'on_author_created', matchedFunction: 'handle_new_user' },
+  ])
+})
+
+withTestDatabase('lists name matches before triggers found through their function', async (db) => {
+  await db.executeQuery(`
+    create function public.sync_rows() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger zz_one after insert on public.authors for each row execute function public.sync_rows();
+    create trigger zz_two after update on public.authors for each row execute function public.sync_rows();
+    create trigger sync_rows_audit after delete on public.authors for each row execute function public.sync_rows();
+  `)
+
+  expect(await searchTriggerRows(db, 'sync_rows')).toEqual([
+    // Matched by its own name, so it doesn't claim to have matched through the function
+    { name: 'sync_rows_audit', matchedFunction: null },
+    { name: 'zz_one', matchedFunction: 'sync_rows' },
+    { name: 'zz_two', matchedFunction: 'sync_rows' },
+  ])
+})
+
+withTestDatabase('does not find triggers through extension or system functions', async (db) => {
+  await db.executeQuery(`
+    create schema ext;
+    create extension pgcrypto schema ext;
+    create table public.authors (id int primary key);
+    create table public.posts (id int, author_id int references public.authors (id));
+  `)
+
+  // Foreign keys run RI_FKey_* functions from pg_catalog, and pgcrypto has its own
+  expect(await searchTriggerRows(db, 'ri_fkey')).toEqual([])
+  expect(await searchTriggerRows(db, 'crypt')).toEqual([])
+})
+
+withTestDatabase('caps triggers found through a function', async (db) => {
+  await db.executeQuery(`
+    create function public.touch_row() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger t_a before insert on public.authors for each row execute function public.touch_row();
+    create trigger t_b before update on public.authors for each row execute function public.touch_row();
+    create trigger t_c before delete on public.authors for each row execute function public.touch_row();
+  `)
+
+  expect(await searchTriggerRows(db, 'touch_row', { limit: 2 })).toHaveLength(2)
+})

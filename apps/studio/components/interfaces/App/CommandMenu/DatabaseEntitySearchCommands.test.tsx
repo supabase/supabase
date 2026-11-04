@@ -58,6 +58,7 @@ const SEARCH_RESULT: EntitySearchData = {
       schema: 'public',
       table: 'blog_posts',
       table_id: 101,
+      matched_function: null,
     },
     {
       id: 402,
@@ -67,6 +68,17 @@ const SEARCH_RESULT: EntitySearchData = {
       schema: 'blog',
       table: 'blog_posts_archive',
       table_id: 102,
+      matched_function: null,
+    },
+    {
+      id: 403,
+      name: 'fill_audit_fields',
+      activation: 'BEFORE',
+      events: ['INSERT'],
+      schema: 'public',
+      table: 'comments',
+      table_id: 103,
+      matched_function: 'set_audit_fields',
     },
   ],
   functions: [
@@ -165,6 +177,11 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('audit_blog_changes')
     expect(section).toHaveTextContent('AFTER INSERT OR UPDATE on public.blog_posts')
     expect(section).toHaveTextContent('BEFORE UPDATE on blog.blog_posts_archive')
+    // A trigger found through its function says which function it runs, instead of its timing
+    expect(section).toHaveTextContent('fill_audit_fields')
+    expect(section).toHaveTextContent('Runs set_audit_fields')
+    expect(section).not.toHaveTextContent('BEFORE INSERT on public.comments')
+    expect(section.textContent?.match(/Runs /g)).toHaveLength(1)
     // The triggers page lists triggers per schema, so the link has to carry it
     expect(section).toHaveTextContent(
       '/project/default/database/triggers/data?schema=public&edit=401'
@@ -246,6 +263,43 @@ describe('useDatabaseEntitySearchCommands', () => {
     resolveSecondSearch?.()
     const section = await screen.findByRole('region', { name: 'Tables' })
     expect(section).toHaveTextContent('/project/other/editor/101?schema=public')
+  })
+
+  it('keeps a trigger found through its function visible while a refined search loads', async () => {
+    let requests = 0
+    let resolveRefinedSearch: (() => void) | undefined
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async () => {
+        requests += 1
+        // Hold the refined search in flight until the test releases it
+        if (requests === 2) {
+          await new Promise<void>((resolve) => (resolveRefinedSearch = resolve))
+        }
+        return HttpResponse.json([
+          {
+            ...SEARCH_RESULT,
+            tables: [],
+            policies: [],
+            functions: [],
+            triggers: [SEARCH_RESULT.triggers[2]],
+          },
+        ])
+      },
+    })
+    customRender(<CommandMenuHarness />)
+    const input = screen.getByRole('textbox', { name: 'Search' })
+
+    await userEvent.type(input, 'set_audit')
+    expect(await screen.findByText(/Runs set_audit_fields/)).toBeInTheDocument()
+
+    // Neither the trigger's name nor its table match the refined search, only its function
+    await userEvent.type(input, '_fields')
+    await waitFor(() => expect(resolveRefinedSearch).toBeDefined())
+    expect(screen.getByText(/Runs set_audit_fields/)).toBeInTheDocument()
+
+    resolveRefinedSearch?.()
   })
 })
 

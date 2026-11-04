@@ -62,6 +62,8 @@ export type SearchEntitiesTrigger = {
   schema: string
   table: string
   table_id: number
+  // Set only when the trigger was found because its function matched the search
+  matched_function: string | null
 }
 
 export type SearchEntitiesFunction = {
@@ -303,6 +305,7 @@ export const getSearchEntitiesSql = ({
         t.oid,
         t.tgname,
         t.tgtype,
+        t.tgfoid,
         t.tgrelid as table_oid,
         c.relname,
         c.relowner,
@@ -310,7 +313,8 @@ export const getSearchEntitiesSql = ({
         case
           when lower(t.tgname) = ${triggerExactName} then 0
           when t.tgname ilike ${triggerPrefixPattern} then 1
-          else 2
+          when t.tgname ilike ${triggerNamePattern} then 2
+          else 3
         end as rank
       from pg_trigger t
       -- Same per-row pg_class_oid_index probe as the policy candidates above
@@ -321,8 +325,11 @@ export const getSearchEntitiesSql = ({
         offset 0
       ) c
       join pg_namespace nc on nc.oid = c.relnamespace
+      -- pg_trigger has no index on tgfoid, so matching by function shares this single
+      -- pass over pg_trigger instead of adding a second one. Triggers that only match
+      -- through their function (rank 3) sort after the name matches.
       where not t.tgisinternal
-        and t.tgname ilike ${triggerNamePattern}
+        and (t.tgname ilike ${triggerNamePattern} or t.tgfoid in (select oid from matched_functions))
         and nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
       order by rank, length(t.tgname), t.tgname
@@ -333,6 +340,7 @@ export const getSearchEntitiesSql = ({
         tnc.oid::int8 as id,
         tnc.tgname as name,
         tnc.tgtype,
+        tnc.tgfoid,
         tnc.nspname as schema,
         tnc.relname as table_name,
         tnc.table_oid::int8 as table_id,
@@ -349,6 +357,7 @@ export const getSearchEntitiesSql = ({
         trg.oid::int8,
         trg.tgname,
         trg.tgtype,
+        trg.tgfoid,
         mt.schema,
         mt.name,
         mt.id,
@@ -358,7 +367,7 @@ export const getSearchEntitiesSql = ({
         mt.name
       from matched_tables mt
       cross join lateral (
-        select t.oid, t.tgname, t.tgtype
+        select t.oid, t.tgname, t.tgtype, t.tgfoid
         from pg_trigger t
         where t.tgrelid = mt.oid
           and not t.tgisinternal
@@ -457,7 +466,11 @@ export const getSearchEntitiesSql = ({
               ),
               'schema', t.schema,
               'table', t.table_name,
-              'table_id', t.table_id
+              'table_id', t.table_id,
+              'matched_function', case
+                when t.source = 0 and t.rank = 3
+                  then (select p.proname from pg_proc p where p.oid = t.tgfoid)
+              end
             )
             order by ${TABLE_RELATED_ORDER}
           )
