@@ -371,6 +371,31 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
       ])
     }
   )
+
+  it('lists functions before triggers that only match through the function they run', async () => {
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () =>
+        HttpResponse.json([
+          {
+            tables: [],
+            policies: [],
+            triggers: [SEARCH_RESULT.triggers[2]],
+            functions: [
+              { id: 304, schema: 'public', name: 'set_audit_fields', type: 'function', args: '' },
+            ],
+          },
+        ]),
+    })
+    customRender(<CommandMenuListHarness />)
+
+    await userEvent.type(screen.getByRole('combobox'), 'set_audit')
+
+    await screen.findByText('Runs set_audit_fields')
+    const headings = screen.getAllByText(/^(Tables|Policies|Triggers|Functions)$/)
+    expect(headings.map((heading) => heading.textContent)).toEqual(['Functions', 'Triggers'])
+  })
 })
 
 const SUB_PAGE = 'Search Database Tables'
