@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
 import { ERROR_ROUTING, SAMPLE_ALWAYS, SAMPLE_NEVER } from './error-routing'
+import { classifyError } from '@/data/error-classification'
 import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type StudioSentryContext = {
@@ -37,4 +38,28 @@ export function reportStudioError(
     extra: { ...context?.extra, requestId: err.requestId, status: err.code },
   })
   err.errorEventId = eventId
+}
+
+type DeferredReportOptions = { context?: StudioSentryContext; force?: boolean }
+
+// Kept off the error so its fields describe only the error, not how the caller wants it reported.
+const deferredReportOptions = new WeakMap<StudioError, DeferredReportOptions>()
+
+/**
+ * Remembers the reporting options a caller passed to `handleError`, keyed by the error instance, so
+ * the query cache can report with them after the last retry (see `reportQueryError`).
+ */
+export function deferStudioErrorReport(err: StudioError, options: DeferredReportOptions) {
+  deferredReportOptions.set(err, options)
+}
+
+/**
+ * Reports an error that exhausted its React Query retries. Called from the `QueryCache` and
+ * `MutationCache` `onError`. Errors thrown by `handleError` are already classified; anything else
+ * (e.g. a query function that throws its own `Error`) is classified here.
+ */
+export function reportQueryError(error: unknown) {
+  const classified = classifyError(error)
+  const options = deferredReportOptions.get(classified)
+  reportStudioError(classified, options?.context, { force: options?.force })
 }

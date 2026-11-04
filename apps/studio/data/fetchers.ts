@@ -11,7 +11,11 @@ import {
 } from './error-classification'
 import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
-import { reportStudioError, type StudioSentryContext } from '@/lib/errors/report-studio-error'
+import {
+  deferStudioErrorReport,
+  reportStudioError,
+  type StudioSentryContext,
+} from '@/lib/errors/report-studio-error'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -189,17 +193,30 @@ export { unguarded, type Unguarded } from './guarded-fetch'
 type HandleErrorOptions = {
   alwaysCapture?: boolean
   sentryContext?: StudioSentryContext
+  /**
+   * For callers outside React Query. Inside queries and mutations the query cache reports the
+   * error after the last retry, so leave this unset there.
+   */
+  reportImmediately?: boolean
 }
 
 /**
- * Classifies an error (API response bodies by status and pattern), reports it to Sentry according to its routing (or always, with
- * `alwaysCapture`), and throws it. Query and mutation functions call this so React Query receives
- * a tagged error in its `error` state.
+ * Classifies an error (API response bodies by status and pattern) and throws it. Query and mutation
+ * functions call this so React Query receives a tagged error in its `error` state. Reporting to
+ * Sentry follows the error's routing (or always, with `alwaysCapture`). It happens in the query
+ * cache after the last retry, or right away with `reportImmediately`.
  */
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
   const raw = parseResponseErrorBody(error)
   const classified = raw ? classifyResponseError(raw) : classifyError(error)
-  reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
+  if (options.reportImmediately) {
+    reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
+  } else {
+    deferStudioErrorReport(classified, {
+      context: options.sentryContext,
+      force: options.alwaysCapture,
+    })
+  }
   throw classified
 }
 
@@ -219,7 +236,7 @@ async function handleFetchResponse<T>(response: Response): Promise<T | StudioErr
       return resTxt as any
     }
   } catch (e) {
-    return handleError(response) as T | StudioError
+    return handleError(response, { reportImmediately: true }) as T | StudioError
   }
 }
 
@@ -234,7 +251,7 @@ async function handleFetchHeadResponse<T>(
     })
     return res
   } catch (e) {
-    return handleError(response) as T | StudioError
+    return handleError(response, { reportImmediately: true }) as T | StudioError
   }
 }
 

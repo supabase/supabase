@@ -152,7 +152,7 @@ export const onErrorChat = (error: Error) => {
   const parsedError = error ? tryParseJson(error.message) : undefined
 
   try {
-    handleError(parsedError?.error || parsedError || error)
+    handleError(parsedError?.error || parsedError || error, { reportImmediately: true })
   } catch (e: any) {
     if (isStudioError(e)) {
       toast.error(e.message)

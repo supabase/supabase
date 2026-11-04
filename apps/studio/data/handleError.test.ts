@@ -137,18 +137,25 @@ describe('handleError — error classification', () => {
 
     it('reports once with alwaysCapture, then rethrows the same instance', () => {
       const original = new PlatformError({ message: 'boom', code: 500 })
-      expect(throwAndCatch(original, { alwaysCapture: true })).toBe(original)
+      const options = { alwaysCapture: true, reportImmediately: true }
+      expect(throwAndCatch(original, options)).toBe(original)
       expect(captureException).toHaveBeenCalledTimes(1)
       expect(original.errorEventId).toBe('event-123')
 
-      throwAndCatch(original, { alwaysCapture: true })
+      throwAndCatch(original, options)
       expect(captureException).toHaveBeenCalledTimes(1)
     })
   })
 
   describe('reporting', () => {
+    it('does not report by default; the query cache reports after the last retry', () => {
+      throwAndCatch(null)
+      throwAndCatch({ message: 'boom', code: 500 }, { alwaysCapture: true })
+      expect(captureException).not.toHaveBeenCalled()
+    })
+
     it('reports the fallthrough exactly once and records the event id', () => {
-      const err = throwAndCatch(null)
+      const err = throwAndCatch(null, { reportImmediately: true })
       expect(err).toBeInstanceOf(UnexpectedError)
       expect(captureException).toHaveBeenCalledTimes(1)
       expect(err.errorEventId).toBe('event-123')
@@ -156,11 +163,12 @@ describe('handleError — error classification', () => {
 
     it('does not report routed-never tags unless alwaysCapture is set', () => {
       const abort = () => new DOMException('The operation was aborted.', 'AbortError')
-      throwAndCatch(abort())
+      throwAndCatch(abort(), { reportImmediately: true })
       expect(captureException).not.toHaveBeenCalled()
 
       const err = throwAndCatch(abort(), {
         alwaysCapture: true,
+        reportImmediately: true,
         sentryContext: { tags: { feature: 'x' } },
       })
       expect(captureException).toHaveBeenCalledTimes(1)
@@ -179,7 +187,7 @@ describe('handleError — error classification', () => {
     })
 
     it('reports a thrown fetch failure at its routed rate, or at 1 with alwaysCapture', () => {
-      throwAndCatch(new TypeError('Failed to fetch'))
+      throwAndCatch(new TypeError('Failed to fetch'), { reportImmediately: true })
       expect(captureException).toHaveBeenLastCalledWith(
         expect.any(NetworkUnreachableError),
         expect.objectContaining({
@@ -189,7 +197,10 @@ describe('handleError — error classification', () => {
         })
       )
 
-      throwAndCatch(new TypeError('Failed to fetch'), { alwaysCapture: true })
+      throwAndCatch(new TypeError('Failed to fetch'), {
+        alwaysCapture: true,
+        reportImmediately: true,
+      })
       expect(captureException).toHaveBeenLastCalledWith(
         expect.any(NetworkUnreachableError),
         expect.objectContaining({ tags: expect.objectContaining({ sample_rate: 1 }) })
@@ -197,7 +208,12 @@ describe('handleError — error classification', () => {
     })
 
     it('reports an UnexpectedError that has a message, following its routing', () => {
-      const err = throwAndCatch(new TypeError("Cannot read properties of undefined (reading 'x')"))
+      const err = throwAndCatch(
+        new TypeError("Cannot read properties of undefined (reading 'x')"),
+        {
+          reportImmediately: true,
+        }
+      )
       expect(err).toBeInstanceOf(UnexpectedError)
       expect(captureException).toHaveBeenCalledTimes(1)
       expect(captureException).toHaveBeenCalledWith(
