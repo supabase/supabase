@@ -48,9 +48,20 @@ describe('Option 1 navigation', () => {
     const todayPages = new Set(navUrls(today).map((url) => page(url)))
     // the migration guides moved to the knowledge base
     const isKbPage = (url: string) => url.startsWith('https://supabase.com/kb/')
+    // today's navigation keeps these topics as sections of their source pages
+    const splitOutPages = new Set([
+      '/guides/security/rotate-leaked-api-keys',
+      '/guides/security/production-checklist',
+      '/guides/observability/log-slow-queries',
+      '/guides/integrations/vercel-preview-branches',
+      '/guides/platform/team-database-access',
+      '/guides/database/postgres/testing-row-level-security',
+    ])
 
-    expect(navUrls(option1).filter((url) => !isKbPage(url) && !todayPages.has(page(url)))).toEqual(
-      []
-    )
+    expect(
+      navUrls(option1).filter(
+        (url) => !isKbPage(url) && !splitOutPages.has(page(url)) && !todayPages.has(page(url))
+      )
+    ).toEqual([])
   })
 })

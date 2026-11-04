@@ -1201,10 +1201,6 @@ export const database: NavMenuConstant = {
           name: 'Postgres log configuration',
           url: '/guides/database/postgres/postgres-log-config' as `/${string}`,
         },
-        {
-          name: 'Log slow and failing queries',
-          url: '/guides/observability/log-slow-queries' as `/${string}`,
-        },
       ],
     },
     {
@@ -2588,7 +2584,7 @@ export const local_development: NavMenuConstant = {
         { name: 'Database testing', url: '/guides/database/testing' },
         {
           name: 'RLS policies testing',
-          url: '/guides/database/postgres/testing-row-level-security',
+          url: '/guides/database/extensions/pgtap#testing-rls-policies' as `/${string}`,
         },
       ],
     },
@@ -2640,21 +2636,12 @@ export const security: NavMenuConstant = {
           enabled: productionChecklistEnabled,
         },
         {
-          name: 'Production security checklist',
-          url: '/guides/security/production-checklist' as `/${string}`,
-          enabled: productionChecklistEnabled,
-        },
-        {
           name: 'Shared Responsibility Model',
           url: '/guides/deployment/shared-responsibility-model' as `/${string}`,
         },
         { name: 'Row Level Security', url: '/guides/database/postgres/row-level-security' },
         { name: 'Securing your API', url: '/guides/api/securing-your-api' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
-        {
-          name: 'Rotate a leaked API key',
-          url: '/guides/security/rotate-leaked-api-keys',
-        },
       ],
     },
   ],
@@ -2824,10 +2811,6 @@ export const platform: NavMenuConstant = {
         {
           name: 'Temporary Access',
           url: '/guides/platform/temporary-access' as `/${string}`,
-        },
-        {
-          name: 'Map team members to Postgres roles',
-          url: '/guides/platform/team-database-access' as `/${string}`,
         },
         { name: 'Performance Tuning', url: '/guides/platform/performance' as `/${string}` },
         { name: 'SSL Enforcement', url: '/guides/platform/ssl-enforcement' as `/${string}` },
@@ -3068,7 +3051,6 @@ export const telemetry: NavMenuConstant = {
       name: 'Configure and export',
       items: [
         { name: 'Configure logging', url: '/guides/observability/configure-logging' },
-        { name: 'Log slow and failing queries', url: '/guides/observability/log-slow-queries' },
         { name: 'Log drains', url: '/guides/observability/log-drains' },
         { name: 'Client-side tracing', url: '/guides/observability/client-side-tracing' },
         { name: 'Sentry integration', url: '/guides/observability/sentry-monitoring' },
@@ -3221,10 +3203,6 @@ export const deployment: NavMenuConstant = {
         },
         { name: 'Configuration', url: '/guides/deployment/branching/configuration' },
         { name: 'Integrations', url: '/guides/deployment/branching/integrations' },
-        {
-          name: 'Preview branches on Vercel',
-          url: '/guides/integrations/vercel-preview-branches' as `/${string}`,
-        },
         { name: 'Troubleshooting', url: '/guides/deployment/branching/troubleshooting' },
         { name: 'Billing', url: '/guides/platform/manage-your-usage/branching' },
       ],
@@ -3288,10 +3266,6 @@ export const integrations: NavMenuConstant = {
     {
       name: 'Vercel Marketplace',
       url: '/guides/integrations/vercel-marketplace',
-    },
-    {
-      name: 'Preview branches on Vercel',
-      url: '/guides/integrations/vercel-preview-branches',
     },
     {
       name: 'Stripe Projects',
