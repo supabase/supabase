@@ -247,11 +247,6 @@ vi.mock('./useDestinationForm', () => ({
   }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
-  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
-}))
-
 vi.mock('./DestinationNameInput', () => ({ DestinationNameInput: () => null }))
 vi.mock('./PublicationSelection', () => ({
   PublicationSelection: ({ form }: { form: UseFormReturn<DestinationPanelSchemaType> }) => (
