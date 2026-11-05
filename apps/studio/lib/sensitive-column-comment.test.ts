@@ -16,6 +16,11 @@ describe('isSensitiveComment', () => {
     expect(isSensitiveComment('secret [SENSITIVE]')).toBe(true)
   })
 
+  it('detects a marker despite surrounding whitespace', () => {
+    expect(isSensitiveComment('  [SENSITIVE] secret')).toBe(true)
+    expect(isSensitiveComment('email [SENSITIVE] ')).toBe(true)
+  })
+
   it('ignores a marker in the middle of the comment', () => {
     expect(isSensitiveComment('Fields marked [SENSITIVE] are PII')).toBe(false)
   })
@@ -74,11 +79,29 @@ describe('encodeSensitiveComment', () => {
     expect(encodeSensitiveComment('a [SENSITIVE] b', false)).toBe('a [SENSITIVE] b')
   })
 
-  it('does not double-prefix an already-encoded comment', () => {
-    expect(encodeSensitiveComment('[SENSITIVE] secret', true)).toBe('[SENSITIVE] secret')
+  it('preserves decoded text that itself starts with the marker', () => {
+    expect(encodeSensitiveComment('[SENSITIVE] secret', true)).toBe(
+      '[SENSITIVE] [SENSITIVE] secret'
+    )
+  })
+})
+
+describe('decode then encode round trip', () => {
+  it('migrates a legacy trailing marker to a prefix', () => {
+    expect(encodeSensitiveComment(decodeSensitiveComment('secret [SENSITIVE]'), true)).toBe(
+      '[SENSITIVE] secret'
+    )
   })
 
-  it('migrates a legacy trailing marker to a prefix', () => {
-    expect(encodeSensitiveComment('secret [SENSITIVE]', true)).toBe('[SENSITIVE] secret')
+  it('migrates a legacy trailing marker with trailing whitespace', () => {
+    expect(encodeSensitiveComment(decodeSensitiveComment('email [SENSITIVE] '), true)).toBe(
+      '[SENSITIVE] email'
+    )
+  })
+
+  it('does not double-prefix an already-encoded comment', () => {
+    expect(encodeSensitiveComment(decodeSensitiveComment('[SENSITIVE] secret'), true)).toBe(
+      '[SENSITIVE] secret'
+    )
   })
 })
