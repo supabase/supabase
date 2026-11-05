@@ -23,6 +23,7 @@ export const CorrectRestrictionsModal = ({
 }: CorrectRestrictionsModalProps) => (
   <ConfirmationModal
     visible={visible}
+    size="medium"
     title={title}
     description="Entries that aren't valid IP ranges are saved with these corrections."
     confirmLabel={confirmLabel}

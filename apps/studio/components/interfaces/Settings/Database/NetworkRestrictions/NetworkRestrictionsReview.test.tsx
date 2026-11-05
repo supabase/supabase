@@ -1,17 +1,13 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { apiV1Components as components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 
 import { NetworkRestrictionsReview } from './NetworkRestrictionsReview'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
-
-vi.mock('sonner', () => ({
-  toast: Object.assign(vi.fn(), { success: vi.fn(), error: vi.fn() }),
-}))
 
 mockAnimationsApi()
 
@@ -112,6 +108,17 @@ describe('NetworkRestrictionsReview', () => {
 
     await waitFor(() =>
       expect(bodies).toEqual([{ dbAllowedCidrs: ['1.209.170.0/25'], dbAllowedCidrsV6: [] }])
+    )
+  })
+
+  test('explains an invalid entry when its badge receives keyboard focus', async () => {
+    renderReview(['1.209.170.63/25'])
+
+    const badge = await screen.findByText('Invalid')
+    act(() => badge.focus())
+
+    expect(await screen.findByRole('tooltip')).toHaveTextContent(
+      "The address isn't the start of its range. Did you mean 1.209.170.0/25?"
     )
   })
 

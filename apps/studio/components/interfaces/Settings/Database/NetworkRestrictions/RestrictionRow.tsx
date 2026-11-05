@@ -37,7 +37,9 @@ export const RestrictionRow = ({
       {issue !== undefined && (
         <Tooltip>
           <TooltipTrigger asChild>
-            <Badge variant="warning">Invalid</Badge>
+            <Badge variant="warning" className="cursor-default" tabIndex={0}>
+              Invalid
+            </Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-80">
             {issue.message}.
