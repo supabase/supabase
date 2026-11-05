@@ -12,7 +12,6 @@ export interface MobileMenuProps {
   menus: NavMenu[]
   currentPath: string
   toggleRef: RefObject<HTMLElement | null>
-  onClose: () => void
   className?: string
 }
 
@@ -22,7 +21,6 @@ export const MobileMenu = ({
   menus,
   currentPath,
   toggleRef,
-  onClose,
   className,
 }: MobileMenuProps) => {
   const [pickedLabel, setPickedLabel] = useState<string>()
@@ -39,26 +37,14 @@ export const MobileMenu = ({
   const selectedLabel = pickedLabel ?? currentLabel ?? menus[0]?.label
   const selectedMenu = menus.find((menu) => menu.label === selectedLabel)
 
-  // the menu only exists below lg, so close it once the viewport grows past that
-  const bindDesktopClose = (drawer: HTMLDivElement | null) => {
-    if (!drawer) return
-    const desktop = window.matchMedia('(width >= 64rem)')
-    const handleDesktopChange = (event: MediaQueryListEvent) => {
-      if (event.matches) onClose()
-    }
-    desktop.addEventListener('change', handleDesktopChange)
-    return () => desktop.removeEventListener('change', handleDesktopChange)
-  }
-
   return (
     <MobileNavDrawer
-      ref={bindDesktopClose}
       id={id}
       open={open}
       toggleRef={toggleRef}
       className={className}
       footer={
-        <Button variant="primary" size="large" block asChild>
+        <Button variant="primary" block className="h-8 text-sm" asChild>
           <a href={SIGN_UP_URL}>Sign up</a>
         </Button>
       }
@@ -83,7 +69,7 @@ export const MobileMenu = ({
                   <a
                     href={link.href}
                     aria-current={link.href === currentPath ? 'page' : undefined}
-                    className="flex h-10 items-center text-sm text-foreground-light hover:text-foreground focus-ring aria-[current=page]:text-foreground"
+                    className="flex h-8 items-center text-sm text-foreground-light hover:text-foreground focus-ring aria-[current=page]:text-foreground"
                   >
                     {link.label}
                   </a>
@@ -99,7 +85,7 @@ export const MobileMenu = ({
                 href={href}
                 target="_blank"
                 rel="noreferrer noopener"
-                className="flex h-10 items-center gap-2 text-sm text-foreground-light hover:text-foreground focus-ring"
+                className="flex h-8 items-center gap-2 text-sm text-foreground-light hover:text-foreground focus-ring"
               >
                 <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
                 {label}

@@ -1143,5 +1143,19 @@
     "position": "Engineering",
     "author_url": "https://github.com/charislam",
     "author_image_url": "https://github.com/charislam.png"
+  },
+  {
+    "author_id": "kris_talajic",
+    "author": "Kris Talajic",
+    "position": "Sales Lead, East",
+    "author_url": "https://www.linkedin.com/in/ktalajic/",
+    "author_image_url": "/images/blog/avatars/kris-talajic.png"
+  },
+  {
+    "author_id": "harold_gimenez",
+    "author": "Harold Gimenez",
+    "position": "VP of Product, Engineering & Design",
+    "author_url": "https://www.linkedin.com/in/hgmnz/",
+    "author_image_url": "/images/blog/avatars/harold-gimenez.jpg"
   }
 ]

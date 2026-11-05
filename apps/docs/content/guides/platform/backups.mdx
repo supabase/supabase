@@ -85,7 +85,7 @@ Point-in-Time Recovery (PITR) allows you to back up a project at shorter interva
 
 Pro, Team and Enterprise Plan projects can enable PITR as an add-on.
 
-Projects that want to use PITR must also use at least a Small compute add-on to ensure smooth functioning.
+PITR is available on all compute sizes.
 
 </Admonition>
 
@@ -126,6 +126,14 @@ You can access PITR in the [Point in Time](/dashboard/project/_/database/backups
 The latest restore point of the project could be significantly behind the current time. This occurs when the database has had no recent activity, and therefore we have not made any recent WAL file backups. However, the state of the database at the latest recovery point still reflects the current state of the database, given that no transactions have occurred in between.
 
 ### Restoration process [#pitr-restoration-process]
+
+<Admonition type="caution">
+
+Restoring to an earlier point in time replaces the current database state. Any changes made after the selected restore point aren't included.
+
+To preserve your current data, [restore to a new project](#restore-to-a-new-project) first.
+
+</Admonition>
 
 ![PITR: Calendar view](/docs/img/backups-pitr-calendar-view.png)
 
