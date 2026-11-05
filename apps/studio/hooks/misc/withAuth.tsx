@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/nextjs'
 import { useAuth } from 'common'
 import { useRouter } from 'next/router'
 import { ComponentType, useCallback, useEffect, useRef, useState } from 'react'
@@ -72,6 +73,10 @@ export function withAuth<T>(
     const isCorrectLevel = options.useHighestAAL ? isAtHighestAAL : true
     const needsMfaElevation = isLoggedIn && !isCorrectLevel
 
+    // Latest loading state, read when the timeout fires so the report describes what stalled
+    const loadingStateRef = useRef({ isLoading, isAALLoading, isErrorAAL, errorAAL })
+    loadingStateRef.current = { isLoading, isAALLoading, isErrorAAL, errorAAL }
+
     const redirectToSignIn = useCallback(() => {
       let pathname = location.pathname
       if (BASE_PATH) {
@@ -103,6 +108,28 @@ export function withAuth<T>(
     useEffect(() => {
       if (!isFinishedLoading) {
         timeoutIdRef.current = setTimeout(() => {
+          const state = loadingStateRef.current
+          Sentry.captureMessage('Session error detected', {
+            level: 'warning',
+            fingerprint: ['session-timeout-modal'],
+            tags: {
+              sessionTimeout: 'true',
+              authLoading: String(state.isLoading),
+              aalLoading: String(state.isAALLoading),
+              aalError: String(state.isErrorAAL),
+            },
+            contexts: {
+              sessionTimeout: {
+                route: router.pathname,
+                timeoutMs: MAX_TIMEOUT,
+                authLoading: state.isLoading,
+                aalLoading: state.isAALLoading,
+                aalError: state.isErrorAAL,
+                aalErrorMessage: state.errorAAL?.message,
+                useHighestAAL: options.useHighestAAL,
+              },
+            },
+          })
           setIsSessionTimeoutModalOpen(true)
         }, MAX_TIMEOUT)
       } else {
@@ -110,6 +137,8 @@ export function withAuth<T>(
           clearTimeout(timeoutIdRef.current)
           timeoutIdRef.current = null
         }
+        // Loading finished after the dialog opened, so the session is no longer stuck
+        setIsSessionTimeoutModalOpen(false)
       }
 
       return () => {

@@ -1,7 +1,5 @@
-import * as Sentry from '@sentry/nextjs'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { safeLocalStorage, safeSessionStorage } from 'common'
-import { useEffect } from 'react'
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,12 +36,6 @@ export const SessionTimeoutModal = ({
   redirectToSignIn,
   supportContext,
 }: SessionTimeoutModalProps) => {
-  useEffect(() => {
-    if (visible) {
-      Sentry.captureException(new Error('Session error detected'))
-    }
-  }, [visible])
-
   const handleClearStorage = () => {
     safeLocalStorage.clear()
     safeSessionStorage.clear()
