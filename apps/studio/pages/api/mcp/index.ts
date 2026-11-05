@@ -1,5 +1,5 @@
 import { StreamableHTTPServerTransport } from '@modelcontextprotocol/sdk/server/streamableHttp.js'
-import { createSupabaseMcpServer, SupabasePlatform } from '@supabase/mcp-server-supabase'
+import { createSupabaseMcpServer } from '@supabase/mcp-server-supabase'
 import { stripIndent } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
@@ -9,12 +9,7 @@ import {
   fromNodeHeaders,
   zBooleanString,
 } from '@/lib/api/apiHelpers'
-import {
-  getDatabaseOperations,
-  getDebuggingOperations,
-  getDevelopmentOperations,
-  getFeedbackOperations,
-} from '@/lib/api/self-hosted/mcp'
+import { getSelfHostedPlatform } from '@/lib/api/self-hosted/mcp'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
 const supportedFeatureGroupSchema = z.enum([
@@ -65,12 +60,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { features, read_only } = data
   const headers = fromNodeHeaders(req.headers)
 
-  const platform: SupabasePlatform = {
-    database: getDatabaseOperations({ headers }),
-    development: getDevelopmentOperations({ headers }),
-    debugging: getDebuggingOperations({ headers }),
-    feedback: getFeedbackOperations(),
-  }
+  const platform = getSelfHostedPlatform({ headers })
 
   try {
     const server = createSupabaseMcpServer({

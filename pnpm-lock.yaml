@@ -1124,8 +1124,8 @@ importers:
         specifier: ^0.9.0
         version: 0.9.0(babel-plugin-macros@3.1.0)(effect@4.0.0-rc.112)
       '@supabase/mcp-server-supabase':
-        specifier: ^0.15.0
-        version: 0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
+        specifier: ^0.16.0
+        version: 0.16.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)
       '@supabase/pg-meta':
         specifier: workspace:*
         version: link:../../packages/pg-meta
@@ -2313,7 +2313,7 @@ importers:
         version: 1.8.2
       openai:
         specifier: ^6.22.0
-        version: 6.22.0(ws@8.21.3)(zod@3.25.76)
+        version: 6.22.0(ws@8.22.1)(zod@3.25.76)
     devDependencies:
       '@types/common-tags':
         specifier: ^1.8.4
@@ -8596,8 +8596,8 @@ packages:
     resolution: {integrity: sha512-6GuizbP4N5xWaxEVUsI+UQpJdmMmn0t3sYNpObo9gCAldvM22gFjnYzRVmkHxp5ylU21azEYmiWVwk9iDgCMkQ==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/mcp-server-supabase@0.15.0':
-    resolution: {integrity: sha512-+Zhu0iKjgKfN1gJlGuaQmzjiXvlHtN+LHMj22piHgErC/miWsre+TmLtCH2AVse+n0xB2eehyHhhFQOJbjkCGQ==}
+  '@supabase/mcp-server-supabase@0.16.0':
+    resolution: {integrity: sha512-wDOkM4h4hMks9XnFDaiUWtBxNXKjR8vHedTkL9NVuSsg9AE+xt7Tc3JoRclXGiSg3a8RxfGO1W7MfoRJ3dBJHg==}
     hasBin: true
     peerDependencies:
       '@modelcontextprotocol/server': ^2.0.0
@@ -25452,7 +25452,7 @@ snapshots:
     dependencies:
       tslib: 2.8.1
 
-  '@supabase/mcp-server-supabase@0.15.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
+  '@supabase/mcp-server-supabase@0.16.0(@modelcontextprotocol/server@2.4.0)(zod@3.25.76)':
     dependencies:
       '@mjackson/multipart-parser': 0.10.1
       '@modelcontextprotocol/node': 2.1.2(@modelcontextprotocol/server@2.4.0)
@@ -34167,9 +34167,9 @@ snapshots:
       ws: 8.21.0
       zod: 3.25.76
 
-  openai@6.22.0(ws@8.21.3)(zod@3.25.76):
+  openai@6.22.0(ws@8.22.1)(zod@3.25.76):
     optionalDependencies:
-      ws: 8.21.3
+      ws: 8.22.1
       zod: 3.25.76
 
   openapi-fetch@0.12.4:
