@@ -105,12 +105,16 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
     {
       anchor: 'cachedEgress',
       key: PricingMetric.CACHED_EGRESS,
-      attributes: [{ key: PricingMetric.CACHED_EGRESS.toLowerCase(), color: 'white' }],
-      name: 'Cached Egress',
+      attributes: [
+        { key: 'uncached_egress', name: 'Uncached egress', color: 'blue' },
+        { key: 'cached_egress', name: 'Cached egress', color: 'green' },
+      ],
+      name: 'Cached vs uncached egress',
       unit: 'bytes',
       description:
         'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
-      chartDescription: 'The data refreshes every hour.',
+      chartDescription:
+        'Cached and uncached egress for the period. The two stack to your total egress. The data refreshes every hour.',
       links: [
         {
           name: 'Documentation',
