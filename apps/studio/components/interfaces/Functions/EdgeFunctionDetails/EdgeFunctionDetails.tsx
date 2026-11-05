@@ -261,7 +261,7 @@ export const EdgeFunctionDetails = () => {
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
-                      {showKey ? 'Hide' : 'Show'} anon key
+                      {showKey ? <span>Hide</span> : <span>Show</span>} <span>anon key</span>
                     </Button>
                   )}
                 </TabsList>

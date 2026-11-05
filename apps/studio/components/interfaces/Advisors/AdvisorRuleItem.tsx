@@ -223,8 +223,8 @@ export const AdvisorRuleItem = ({ lint }: AdvisorRuleItemProps) => {
             <p className="text-sm text-foreground">
               The selected lint will appear under the{' '}
               <span className="capitalize">{lint.category}</span> Advisor again
-              {!!selectedRuleMeta.assigned_to ? ' for all project members' : ''} once this rule is
-              removed.
+              {!!selectedRuleMeta.assigned_to ? <span>{' for all project members'}</span> : ''}{' '}
+              <span>once this rule is removed.</span>
             </p>
           </>
         )}

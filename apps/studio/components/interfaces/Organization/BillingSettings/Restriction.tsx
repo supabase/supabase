@@ -69,9 +69,13 @@ export const Restriction = () => {
           <AlertDescription>
             <p>
               Your projects can become unresponsive or enter read-only mode.{' '}
-              {org.plan.id === 'free'
-                ? 'Please upgrade to the Pro Plan to ensure that your projects remain available.'
-                : 'Please disable spend cap to ensure that your projects remain available.'}
+              {org.plan.id === 'free' ? (
+                <span>
+                  Please upgrade to the Pro Plan to ensure that your projects remain available.
+                </span>
+              ) : (
+                <span>Please disable spend cap to ensure that your projects remain available.</span>
+              )}
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>
@@ -102,15 +106,26 @@ export const Restriction = () => {
           <AlertDescription>
             <p className="leading-tight">
               Your organization went over its quota in the previous billing cycle
-              {violationLabels && ` ${violationLabels}`}. You can continue with your projects until
-              your grace period ends on{' '}
+              {violationLabels && <span>{` ${violationLabels}`}</span>}
+              <span>
+                . You can continue with your projects until your grace period ends on
+              </span>{' '}
               <span className="text-foreground">
                 {dayjs(org.restriction_data['grace_period_end']).format('DD MMM, YYYY')}
               </span>
-              . After that, the Fair Use Policy will apply. If you plan to maintain this level of
-              usage, {org.plan.id === 'free' ? 'upgrade your plan' : 'disable spend cap'} to avoid
-              any restrictions. If restrictions are applied, requests to your projects will return a
-              402 status code.
+              <span>
+                . After that, the Fair Use Policy will apply. If you plan to maintain this level of
+                usage,
+              </span>{' '}
+              {org.plan.id === 'free' ? (
+                <span>upgrade your plan</span>
+              ) : (
+                <span>disable spend cap</span>
+              )}{' '}
+              <span>
+                to avoid any restrictions. If restrictions are applied, requests to your projects
+                will return a 402 status code.
+              </span>
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button asChild key="upgrade-button">
@@ -152,8 +167,12 @@ export const Restriction = () => {
               </span>
               . Fair Use Policy applies now. If your organization is over its quota, your projects
               can be restricted and requests will respond with a 402 status code.{' '}
-              {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} if you expect to
-              exceed your plan's quota.
+              {org.plan.id === 'free' ? (
+                <span>Upgrade your plan</span>
+              ) : (
+                <span>Disable spend cap</span>
+              )}{' '}
+              <span>if you expect to exceed your plan's quota.</span>
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>
@@ -189,11 +208,18 @@ export const Restriction = () => {
             <p>
               Fair Use Policy applies and your service is restricted. Your projects are not able to
               serve requests and will respond with a 402 status code. You have exceeded your plan's
-              quota{violationLabels && ` ${violationLabels}`}.{' '}
-              {org.plan.id === 'free' ? 'Upgrade your plan' : 'Disable spend cap'} to lift
-              restrictions immediately, or wait until the start of your next billing period. Note
-              that there may be a short delay after your billing period resets before restrictions
-              are fully lifted.
+              quota{violationLabels && <span>{` ${violationLabels}`}</span>}
+              <span>.</span>{' '}
+              {org.plan.id === 'free' ? (
+                <span>Upgrade your plan</span>
+              ) : (
+                <span>Disable spend cap</span>
+              )}{' '}
+              <span>
+                to lift restrictions immediately, or wait until the start of your next billing
+                period. Note that there may be a short delay after your billing period resets before
+                restrictions are fully lifted.
+              </span>
             </p>
             <div className="flex items-center gap-x-2 mt-3">
               <Button key="upgrade-button" asChild>

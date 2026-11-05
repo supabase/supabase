@@ -52,8 +52,9 @@ const AddNewWrapperCTA = () => {
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
             {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
-            disabling and enabling the <code>wrappers</code> extension to create this wrapper.
+            {databaseNeedsUpgrading && <span>{'upgrade your database then '}</span>}
+            <span>update the extension by disabling and enabling the</span> <code>wrappers</code>{' '}
+            <span>extension to create this wrapper.</span>
           </p>
           <p className="text-warning">
             Warning: Before reinstalling the wrapper extension, you must first remove all existing

@@ -394,7 +394,12 @@ export const ForeignKeySelector = ({
                     </label>
                     <div className="grid grid-cols-10 gap-y-2">
                       <div className="col-span-5 text-xs">
-                        {selectedSchema}.{table.name.length > 0 ? table.name : '[unnamed table]'}
+                        {selectedSchema}.
+                        {table.name.length > 0 ? (
+                          <span>{table.name}</span>
+                        ) : (
+                          <span>[unnamed table]</span>
+                        )}
                       </div>
                       <div className="col-span-4 text-xs text-right">
                         {fk.schema}.{fk.table}
