@@ -7,14 +7,12 @@ import react from '@astrojs/react'
 import sitemap from '@astrojs/sitemap'
 import tailwindcss from '@tailwindcss/vite'
 import { defineConfig } from 'astro/config'
-import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
-
-import './scripts/utils/dotenv.js'
 
 import { BASE_PATH } from './src/lib/constants.ts'
 import rehypeAdmonitions from './src/lib/mdx/rehype-admonitions.js'
 import { sharedCodeBlock } from './src/lib/mdx/shiki-code-block.ts'
 import { getSitemapLastmods } from './src/lib/sitemap-lastmod.ts'
+import { codeBlockTheme } from 'ui-patterns/CodeBlock/CodeBlock.theme'
 
 // Absolute dir of lodash-es, for the lodash alias below (same fix
 // apps/studio/vite.config.ts uses). `packages/ui`'s clipboard util does
