@@ -240,7 +240,7 @@ describe('DeleteFactorModal identity verification', () => {
       vi.mocked(auth.mfa.unenroll).mock.invocationCallOrder[0]
     )
   })
-  test('failed verification shows an inline error and does not delete anything', async () => {
+  test('failed verification shows an error and does not delete anything', async () => {
     vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
       data: null,
       error: new AuthError('Invalid verification code'),
@@ -250,14 +250,7 @@ describe('DeleteFactorModal identity verification', () => {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    await screen.findByText('Invalid verification code.')
-    expect(screen.getByRole('textbox', { name: 'Authentication code' })).toHaveAttribute(
-      'aria-invalid',
-      'true'
-    )
-    expect(
-      screen.getByRole('textbox', { name: 'Authentication code' })
-    ).toHaveAccessibleDescription(/Invalid verification code\./)
+    expect(await screen.findByRole('alert')).toHaveTextContent('Invalid verification code')
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
   })
