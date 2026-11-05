@@ -126,9 +126,14 @@ describe('API key create dialogs', () => {
     {
       name: 'denied',
       setup: () => mockProjectGrantContext({ ref: 'project-ref', permissions: NO_PERMISSIONS }),
+      tooltip: 'You need additional permissions to create API keys',
     },
-    { name: 'a permission-check error', setup: () => mockPermissionsError() },
-  ])('keeps the create triggers disabled when the grant is $name', async ({ setup }) => {
+    {
+      name: 'a permission-check error',
+      setup: () => mockPermissionsError(),
+      tooltip: 'Failed to check permissions to create API keys',
+    },
+  ])('keeps the create triggers disabled when the grant is $name', async ({ setup, tooltip }) => {
     mockProjectGrantContext({ ref: 'project-ref' })
     setup()
     const user = userEvent.setup()
@@ -138,8 +143,15 @@ describe('API key create dialogs', () => {
 
     const publishable = screen.getByRole('button', { name: 'New publishable key' })
     const secret = screen.getByRole('button', { name: 'New secret key' })
-    await waitFor(() => expect(publishable).toBeDisabled())
-    expect(secret).toBeDisabled()
+
+    // Wait for the grant to settle: the trigger is also disabled while loading
+    for (const trigger of [publishable, secret]) {
+      await user.hover(trigger)
+      expect((await screen.findAllByText(tooltip)).length).toBeGreaterThan(0)
+      await user.unhover(trigger)
+    }
+    expect(publishable).toBeAriaDisabled()
+    expect(secret).toBeAriaDisabled()
 
     await user.click(publishable)
     await user.click(secret)

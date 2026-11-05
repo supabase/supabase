@@ -1,4 +1,5 @@
 import { screen, waitFor } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
@@ -50,7 +51,12 @@ describe('APIKeyDeleteDialog grants', () => {
     mockProjectGrantContext({ ref: 'default', permissions: NO_PERMISSIONS })
     const setKeyToDelete = renderDialog()
 
-    await waitFor(() => expect(item()).toHaveAttribute('data-disabled'))
+    // Wait for the grant to settle: the item is also disabled while loading
+    await userEvent.hover(item())
+    expect(
+      (await screen.findAllByText('You need additional permissions to delete API keys')).length
+    ).toBeGreaterThan(0)
+    expect(item()).toHaveAttribute('data-disabled')
     item().click()
 
     expect(setKeyToDelete).not.toHaveBeenCalled()
@@ -61,7 +67,12 @@ describe('APIKeyDeleteDialog grants', () => {
     mockPermissionsError()
     const setKeyToDelete = renderDialog()
 
-    await waitFor(() => expect(item()).toHaveAttribute('data-disabled'))
+    // Wait for the grant to settle: the item is also disabled while loading
+    await userEvent.hover(item())
+    expect(
+      (await screen.findAllByText('Failed to check permissions to delete API keys')).length
+    ).toBeGreaterThan(0)
+    expect(item()).toHaveAttribute('data-disabled')
     item().click()
 
     expect(setKeyToDelete).not.toHaveBeenCalled()
