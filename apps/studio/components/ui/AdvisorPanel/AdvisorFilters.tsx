@@ -107,7 +107,7 @@ export const AdvisorFilters = ({
           className="w-7 h-7 p-0 mr-3"
           icon={<XIcon strokeWidth={1.5} />}
           onClick={onClose}
-          tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
+          tooltip={{ content: { side: 'bottom', text: 'Close Issues' } }}
         />
       </div>
     </div>

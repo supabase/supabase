@@ -1,4 +1,4 @@
-import { LightbulbIcon } from 'lucide-react'
+import { CircleDotIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -61,11 +61,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         onClick={handleClick}
         tooltip={{
           content: {
-            text: 'Advisor Center',
+            text: 'Issues',
           },
         }}
       >
-        <LightbulbIcon
+        <CircleDotIcon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -73,7 +73,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
-        <span className="sr-only">Advisor Center</span>
+        <span className="sr-only">Issues</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span
