@@ -32,7 +32,8 @@ export const TOTPFactors = () => {
   const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [resumeFactorId, setResumeFactorId] = useQueryState('removeAuthenticator', parseAsString)
-  const [factorToBeDeleted, setFactorToBeDeleted] = useState(resumeFactorId)
+  const [selectedFactorId, setSelectedFactorId] = useState<string | null | undefined>(undefined)
+  const factorToBeDeleted = selectedFactorId === undefined ? resumeFactorId : selectedFactorId
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
@@ -130,7 +131,7 @@ export const TOTPFactors = () => {
                       </div>
                       <ButtonTooltip
                         size="tiny"
-                        onClick={() => setFactorToBeDeleted(factor.id)}
+                        onClick={() => setSelectedFactorId(factor.id)}
                         loading={isCheckingIdentity && factorToBeDeleted === factor.id}
                         disabled={disableDeleteFactor || isCheckingIdentity}
                         tooltip={{
@@ -238,7 +239,7 @@ export const TOTPFactors = () => {
         onRetryRecoveryCodes={() => void refetchRecoveryCodesStatus()}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => {
-          setFactorToBeDeleted(null)
+          setSelectedFactorId(null)
           void setResumeFactorId(null)
         }}
         hasRecoveryCodes={status === 'available'}

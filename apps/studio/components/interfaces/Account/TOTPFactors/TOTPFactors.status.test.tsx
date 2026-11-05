@@ -4,6 +4,7 @@ import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { parseAsString, useQueryState } from 'nuqs'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { TOTPFactors } from './index'
@@ -27,6 +28,11 @@ const availableCodes: AuthMFARecoveryCodesStatusResponse = {
   error: null,
 }
 
+const ReturnNavigation = () => {
+  const [, setTarget] = useQueryState('removeAuthenticator', parseAsString)
+  return <button onClick={() => void setTarget('authenticator-a')}>Resume removal</button>
+}
+
 const renderFactors = (searchParams = '') => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
@@ -39,9 +45,10 @@ const renderFactors = (searchParams = '') => {
         hasLoaded: true,
       }}
     >
+      <ReturnNavigation />
       <TOTPFactors />
     </FeatureFlagContext.Provider>,
-    { queryClient, nuqs: { searchParams } }
+    { queryClient, nuqs: { searchParams, hasMemory: true } }
   )
   return queryClient
 }
@@ -104,6 +111,19 @@ describe('authenticator removal recovery-status guard', () => {
     const remove = vi.spyOn(auth.mfa, 'unenroll')
     renderFactors('?removeAuthenticator=authenticator-a')
     expect(await screen.findByRole('dialog', { name: 'Remove authenticator' })).toBeInTheDocument()
+    expect(remove).not.toHaveBeenCalled()
+  })
+
+  test('resumes a removal target supplied after first render and keeps Cancel closed', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
+    const remove = vi.spyOn(auth.mfa, 'unenroll')
+    renderFactors()
+    await screen.findByRole('button', { name: 'Delete' })
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Resume removal' }))
+    const dialog = await screen.findByRole('dialog', { name: 'Remove authenticator' })
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(remove).not.toHaveBeenCalled()
   })
 
