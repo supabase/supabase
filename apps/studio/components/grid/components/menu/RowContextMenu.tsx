@@ -1,4 +1,4 @@
-import { CopyIcon, EditIcon, ListFilterIcon, TrashIcon } from 'lucide-react'
+import { CopyIcon, CopyPlusIcon, EditIcon, ListFilterIcon, TrashIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { toast } from 'sonner'
 import { copyToClipboard, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator } from 'ui'
@@ -34,6 +34,10 @@ export const RowContextMenuContent = ({
 
   const onEditRowClick = useCallback(() => {
     tableEditorSnap.onEditRow(row)
+  }, [row, tableEditorSnap])
+
+  const onDuplicateRowClick = useCallback(() => {
+    tableEditorSnap.onDuplicateRow(row)
   }, [row, tableEditorSnap])
 
   const onCopyCellContent = useCallback(() => {
@@ -119,6 +123,10 @@ export const RowContextMenuContent = ({
           <DropdownMenuItem className="gap-x-2" onSelect={onEditRowClick}>
             <EditIcon size={12} />
             <span className="text-xs">Edit row</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="gap-x-2" onSelect={onDuplicateRowClick}>
+            <CopyPlusIcon size={12} />
+            <span className="text-xs">Duplicate row</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="gap-x-2" onSelect={onDeleteRow}>
