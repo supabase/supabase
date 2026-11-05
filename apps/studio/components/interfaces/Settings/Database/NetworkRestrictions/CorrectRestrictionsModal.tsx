@@ -33,7 +33,7 @@ export const CorrectRestrictionsModal = ({
     <ul className="space-y-1 text-sm">
       {corrections.map(({ entry, replacement }) => (
         <li key={entry} className="font-mono">
-          {entry} {replacement === undefined ? '(removed)' : `→ ${replacement}`}
+          {entry} <span>{replacement === undefined ? '(removed)' : `→ ${replacement}`}</span>
         </li>
       ))}
     </ul>

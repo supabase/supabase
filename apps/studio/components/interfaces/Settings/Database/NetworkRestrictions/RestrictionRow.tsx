@@ -40,7 +40,8 @@ export const RestrictionRow = ({
             <Badge variant="warning">Invalid</Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-80">
-            {issue.message}.{issue.suggestion !== undefined && ` Did you mean ${issue.suggestion}?`}
+            {issue.message}.
+            {issue.suggestion !== undefined && <span>{` Did you mean ${issue.suggestion}?`}</span>}
           </TooltipContent>
         </Tooltip>
       )}
