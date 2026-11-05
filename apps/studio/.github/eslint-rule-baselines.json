@@ -1000,7 +1000,7 @@
       "components/interfaces/UnifiedLogs/components/UserLogFilterControl.tsx": 2,
       "components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar.tsx": 2,
       "components/layouts/Navigation/NavigationBar/MobileNavigationBar.tsx": 1,
-      "components/layouts/Navigation/NavigationBar/ProjectBranchSelectorSheetTabTrigger.tsx": 2,
+      "components/layouts/Navigation/NavigationBar/MobileProjectSwitcherSheetTabTrigger.tsx": 2,
       "components/layouts/ProjectLayout/LogicalBackupCliInstructions.tsx": 1,
       "components/layouts/SignInLayout/SignInLayout.tsx": 1,
       "components/ui/AIEditor/AskAIWidget.tsx": 1,

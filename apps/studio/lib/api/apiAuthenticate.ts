@@ -1,7 +1,6 @@
 import type { JwtPayload } from '@supabase/supabase-js'
 import type { NextApiRequest, NextApiResponse } from 'next'
 
-import type { StudioError } from '@/lib/errors/studio-errors'
 import { getUserClaims } from '@/lib/gotrue'
 
 /**
@@ -17,7 +16,7 @@ import { getUserClaims } from '@/lib/gotrue'
 export async function apiAuthenticate(
   req: NextApiRequest,
   _res: NextApiResponse
-): Promise<JwtPayload | { error: StudioError }> {
+): Promise<JwtPayload | { error: Error }> {
   try {
     const claims = await fetchUserClaims(req)
     if (!claims) {
@@ -26,7 +25,7 @@ export async function apiAuthenticate(
 
     return claims
   } catch (error) {
-    return { error: error as StudioError }
+    return { error: error as Error }
   }
 }
 

@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { describe, expect, it, vi } from 'vitest'
 
 import { captureCriticalError } from './error-reporting'
-import { StudioError } from '@/lib/errors/studio-errors'
+import { classifyResponseError } from '@/data/error-classification'
 
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
@@ -28,10 +28,17 @@ describe('captureCriticalError', () => {
     ],
     ['a whitelisted TOTP error', new Error('Invalid TOTP code entered')],
     ['a whitelisted project name error', new Error('name should not contain a . string')],
-    ['a 4XX StudioError', new StudioError('Not found', 404, undefined, undefined, '/api/test')],
+    [
+      'a 4XX StudioError',
+      classifyResponseError({ message: 'Not found', code: 404, requestPathname: '/api/test' }),
+    ],
     [
       'a StudioError at the 4XX boundary (499)',
-      new StudioError('Client closed request', 499, undefined, undefined, '/api/test'),
+      classifyResponseError({
+        message: 'Client closed request',
+        code: 499,
+        requestPathname: '/api/test',
+      }),
     ],
   ])('does not capture %s', (_, error) => {
     captureCriticalError(error, 'context')
@@ -49,17 +56,25 @@ describe('captureCriticalError', () => {
     ['an unknown object with a message', { message: 'Custom error object' }, 'Custom error object'],
     [
       'a StudioError at the 5XX boundary (500)',
-      new StudioError('Internal server error', 500, undefined, undefined, '/api/test'),
+      classifyResponseError({
+        message: 'Internal server error',
+        code: 500,
+        requestPathname: '/api/test',
+      }),
       'requestPathname /api/test w/ message: Internal server error',
     ],
     [
       'a 5XX StudioError',
-      new StudioError('Gateway timeout', 504, undefined, undefined, '/api/gateway'),
+      classifyResponseError({
+        message: 'Gateway timeout',
+        code: 504,
+        requestPathname: '/api/gateway',
+      }),
       'requestPathname /api/gateway w/ message: Gateway timeout',
     ],
     [
       'a StudioError without code or requestPathname',
-      new StudioError('Unknown error'),
+      classifyResponseError({ message: 'Unknown error' }),
       'Response Error (no code or requestPathname) w/ message: Unknown error',
     ],
   ])('captures %s', (_, error, message) => {

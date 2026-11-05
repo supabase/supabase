@@ -14,6 +14,7 @@ import {
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
@@ -119,8 +120,13 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
+  const {
+    mutateAsync: createIcebergWrapper,
+    isPending: isCreatingIcebergWrapper,
+    apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
+  } = useIcebergWrapperCreateMutation()
 
   const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
@@ -136,6 +142,7 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
+    if (!isApiKeyReady) return
 
     const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
@@ -200,6 +207,13 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
               )}
             />
 
+            <ApiKeysAccessNote
+              className="px-5 pb-5"
+              grant={apiKeysGrant}
+              keyState={apiKeyState}
+              fallback="They're needed to set up the Iceberg Wrapper, so you can't create an Analytics bucket."
+            />
+
             {wrappersExtensionNeedsUpgrading ? (
               <Admonition
                 type="warning"
@@ -242,7 +256,7 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
           form={formId}
           type="submit"
           loading={isCreating}
-          disabled={wrappersExtensionNeedsUpgrading || isCreating}
+          disabled={wrappersExtensionNeedsUpgrading || isCreating || !isApiKeyReady}
         >
           Create bucket
         </Button>

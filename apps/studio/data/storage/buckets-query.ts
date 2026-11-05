@@ -14,7 +14,8 @@ import { get, handleError } from '@/data/fetchers'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { type UseCustomInfiniteQueryOptions, type UseCustomQueryOptions } from '@/types'
 
 export type BucketsVariables = { projectRef?: string }
@@ -222,7 +223,7 @@ export const useBucketInfoQueryPreferCached = (bucketId?: string, projectRef?: s
 }
 
 const shouldRetryBucketsQuery = (failureCount: number, error: unknown) => {
-  if (error instanceof StudioError) {
+  if (isStudioError(error)) {
     // If the bucket doesn't exist or was deleted, don't retry — it will never succeed.
     if (error.code === 404) {
       return false

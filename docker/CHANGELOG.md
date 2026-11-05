@@ -24,9 +24,14 @@ If you depend on any of these overrides, plan to migrate before they are removed
 
 ## Unreleased
 
+### API gateway
+
+- ⚠️ Changed the `/functions/v1/` route to leave CORS to the function, as on the platform. The gateway no longer answers preflight requests or adds CORS headers to function responses, so the function's own CORS policy applies. Functions called from a browser must handle CORS themselves, see [CORS support for Edge Functions](https://supabase.com/docs/guides/functions/cors) (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#52709](https://github.com/supabase/supabase/pull/52709)
+
 ### Edge Functions
 
 - Changed: the functions container now has a default memory limit of 2 GiB, shared by all workers. This also applies to existing deployments when updating `docker-compose.yml`. Set `FUNCTIONS_MEMORY_LIMIT` in `.env` to a suitable value before recreating the container. If memory exhaustion terminates the runtime, all functions are interrupted until the container restarts - PR [#51957](https://github.com/supabase/supabase/pull/51957)
+- Added CORS headers to the main worker's own error responses, such as `404 NOT_FOUND` and the `401` from JWT verification, so browsers can read them (requires `volumes/functions/main/index.ts` update) - PR [#52710](https://github.com/supabase/supabase/pull/52710)
 
 ---
 

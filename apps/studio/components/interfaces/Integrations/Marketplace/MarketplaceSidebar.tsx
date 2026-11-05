@@ -53,7 +53,7 @@ const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> 
   },
 ]
 
-export const MarketplaceSidebar = () => {
+export const MarketplaceProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -65,7 +65,7 @@ export const MarketplaceSidebar = () => {
   const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
   return (
-    <aside className="grow flex h-full w-full flex-col gap-y-0.5 overflow-y-auto p-4 text-sm">
+    <div className="flex flex-col gap-y-0.5 overflow-y-auto my-4 xl:px-4 w-full">
       <SidebarLink
         href={baseHref}
         active={isDiscoverActive}
@@ -98,7 +98,7 @@ export const MarketplaceSidebar = () => {
                   isActive && 'bg-surface-200 text-foreground'
                 )}
               >
-                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border bg-white">
+                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-xs border bg-white">
                   {integration.icon({ className: 'p-0.5' })}
                 </span>
                 <span className="truncate">{integration.name}</span>
@@ -124,6 +124,6 @@ export const MarketplaceSidebar = () => {
           <ArrowUpRightIcon size={11} className="opacity-50" />
         </a>
       ))}
-    </aside>
+    </div>
   )
 }

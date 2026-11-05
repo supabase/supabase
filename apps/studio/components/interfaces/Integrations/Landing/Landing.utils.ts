@@ -22,7 +22,8 @@ import {
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
 import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   const stripeSchema = findStripeSchema(schemas)
@@ -39,7 +40,7 @@ export type ProjectOAuthIntegrationData = {
 }
 
 const isPermissionError = (error: unknown): error is StudioError =>
-  error instanceof StudioError && error.code === 403
+  isStudioError(error) && error.code === 403
 
 /**
  * Reinterprets a 403 from an existing query as a fallback value, for graceful degradation of the
@@ -87,7 +88,7 @@ export const useProjectOAuthIntegrationData = (
 
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    apiKeys: useAPIKeysQuery({ projectRef }, sharedOptions),
     edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
     authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),
