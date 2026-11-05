@@ -104,19 +104,31 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters active hours, computes and instances against what the plan includes', async () => {
+  it('meters vCPU, memory, deployments and instances against what the plan includes', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
     expect(await screen.findByText('Plan usage')).toBeInTheDocument()
-    expect(await screen.findByText('Active hours')).toBeInTheDocument()
+    expect(await screen.findByText('vCPU-hours')).toBeInTheDocument()
+    expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Deployments')).toBeInTheDocument()
     expect(await screen.findByText('Instances')).toBeInTheDocument()
     // Pro includes 10 computes and 25 instances; one compute running one instance is deployed.
     expect(await screen.findByText('1 of 10')).toBeInTheDocument()
     expect(await screen.findByText('1 of 25')).toBeInTheDocument()
+    expect(await screen.findByText(/vCPU-hrs of 1,000 vCPU-hrs/)).toBeInTheDocument()
+    expect(await screen.findByText(/GB-hrs of 2,000 GB-hrs/)).toBeInTheDocument()
+  })
+
+  it('shows how much of the reserved vCPU did work', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText(/^\d+% CPU used$/)).toBeInTheDocument()
   })
 
   it('counts computes separately from the instances they run', async () => {
@@ -210,14 +222,14 @@ describe('ComputePlanUsage in private alpha', () => {
     expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
   })
 
-  it('does not meter active hours or deployments', async () => {
+  it('does not meter vCPU, memory or deployments', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
     await waitFor(() => {
-      expect(screen.getAllByText('Not metered during private alpha')).toHaveLength(2)
+      expect(screen.getAllByText('Not metered during private alpha')).toHaveLength(3)
     })
   })
 

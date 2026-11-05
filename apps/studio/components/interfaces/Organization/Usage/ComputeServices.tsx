@@ -24,7 +24,9 @@ import {
   formatComputeHours,
   formatComputeRequests,
   formatGbHours,
+  formatPercentage,
   formatVcpuHours,
+  getCpuUtilization,
   getUsageConcentration,
   sumBy,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
@@ -41,7 +43,12 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 const USAGE_WINDOW_DAYS = 30
 
 const burndownConfig = {
-  usedHours: { label: 'Active hours used' },
+  used: { label: 'vCPU-hours reserved' },
+} satisfies ChartConfig
+
+const utilizationConfig = {
+  usedVcpuHours: { label: 'CPU used' },
+  idleVcpuHours: { label: 'Reserved, idle' },
 } satisfies ChartConfig
 
 export interface ComputeServicesProps {
@@ -67,15 +74,29 @@ export const ComputeServices = ({
   const bySize = aggregateUsageBySize(data?.instanceRows ?? [])
   const burndown = buildComputeBurndown(
     points,
-    limits.activeHours,
+    (point) => point.reservedVcpuHours,
+    limits.vcpuHours,
+    COMPUTE_ALLOWANCE_WARNING_THRESHOLD
+  )
+  const memoryBurndown = buildComputeBurndown(
+    points,
+    (point) => point.gbHours,
+    limits.gbHours,
     COMPUTE_ALLOWANCE_WARNING_THRESHOLD
   )
 
   const isEmpty = !isPending && points.length === 0
-  const totalVcpuHours = sumBy(points, (point) => point.vcpuHours)
-  const totalGbHours = sumBy(points, (point) => point.gbHours)
+  const totalRunningHours = sumBy(points, (point) => point.runningHours)
+  const totalReservedVcpuHours = sumBy(points, (point) => point.reservedVcpuHours)
+  const totalUsedVcpuHours = sumBy(points, (point) => point.usedVcpuHours)
   const totalRequests = sumBy(points, (point) => point.requests)
-  const concentration = getUsageConcentration(byProject)
+  const cpuUtilization = getCpuUtilization(totalUsedVcpuHours, totalReservedVcpuHours)
+  const concentration = getUsageConcentration(byProject.map((row) => row.reservedVcpuHours))
+  const utilizationData = points.map((point) => ({
+    timestamp: point.timestamp,
+    usedVcpuHours: point.usedVcpuHours,
+    idleVcpuHours: Number(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours).toFixed(2)),
+  }))
 
   const burndownStatus =
     burndown.status === 'exhausted'
@@ -95,26 +116,25 @@ export const ComputeServices = ({
         section={{
           name: 'Compute',
           description:
-            'Usage across every compute in the organization. Each compute runs one or more instances, and usage is counted on the instances: how long they stay alive, and the vCPU and memory their size reserves while they do.\nSuspended instances do not accrue usage. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
+            'Usage across every compute in the organization, counted on the vCPU and memory instances reserve while running.\nSuspended instances reserve nothing. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
           links: [],
         }}
       >
         <div className="space-y-6">
-          {/* Active hours burn-down, with the plan allowance and its warning threshold */}
           <Chart isLoading={isPending} isErrored={isError}>
             <ChartCard>
               <ChartHeader align="start">
                 <div className="flex flex-col gap-1">
                   <ChartTitle
                     className="text-sm"
-                    tooltip="Active hours consumed so far this period, against the plan allowance."
+                    tooltip="vCPU reserved by running instances this period, against the plan allowance."
                   >
-                    Active hours
+                    vCPU-hours
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
-                    {burndown.allowanceHours === null
-                      ? `${formatComputeHours(burndown.usedHours)} used`
-                      : `${formatComputeHours(burndown.usedHours)} of ${formatComputeHours(burndown.allowanceHours)} used`}
+                    {burndown.allowance === null
+                      ? `${formatVcpuHours(burndown.used)} used`
+                      : `${formatVcpuHours(burndown.used)} of ${formatVcpuHours(burndown.allowance)} used`}
                   </p>
                 </div>
                 <ChartMetric
@@ -122,9 +142,7 @@ export const ComputeServices = ({
                   label="Remaining"
                   status={burndownStatus}
                   value={
-                    burndown.remainingHours === null
-                      ? 'No limit'
-                      : formatComputeHours(burndown.remainingHours)
+                    burndown.remaining === null ? 'No limit' : formatVcpuHours(burndown.remaining)
                   }
                 />
               </ChartHeader>
@@ -142,7 +160,7 @@ export const ComputeServices = ({
                   <ChartEmptyState
                     icon={<BarChart2Icon size={16} />}
                     title="No Compute usage yet"
-                    description="Deploy an instance to start tracking active hours"
+                    description="Deploy an instance to start tracking usage"
                   />
                 }
               >
@@ -172,7 +190,7 @@ export const ComputeServices = ({
                       domain={[
                         0,
                         (dataMax: number) =>
-                          Math.ceil(Math.max(dataMax, burndown.allowanceHours ?? 0) * 1.1),
+                          Math.ceil(Math.max(dataMax, burndown.allowance ?? 0) * 1.1),
                       ]}
                     />
                     <ChartTooltip
@@ -182,18 +200,18 @@ export const ComputeServices = ({
                         />
                       }
                     />
-                    {burndown.warningHours !== null && (
+                    {burndown.warningAt !== null && (
                       <ReferenceLine
-                        y={burndown.warningHours}
+                        y={burndown.warningAt}
                         stroke="var(--chart-status-warning)"
                         strokeDasharray="4 4"
                       />
                     )}
-                    {burndown.allowanceHours !== null && (
-                      <ReferenceLine y={burndown.allowanceHours} stroke="var(--chart-reference)" />
+                    {burndown.allowance !== null && (
+                      <ReferenceLine y={burndown.allowance} stroke="var(--chart-reference)" />
                     )}
                     <Area
-                      dataKey="usedHours"
+                      dataKey="used"
                       type="monotone"
                       className={burndownInkClassName}
                       fillOpacity={0.15}
@@ -205,10 +223,107 @@ export const ComputeServices = ({
                 <ComputeBurndownLegend burndown={burndown} noLimitLabel={noLimitLabel} />
 
                 <ComputeAllowanceBreakdown
-                  burndown={burndown}
+                  rows={[
+                    { label: 'vCPU-hours', burndown, format: formatVcpuHours },
+                    { label: 'GB-hours', burndown: memoryBurndown, format: formatGbHours },
+                  ]}
                   limitsLabel={limitsLabel}
                   currentBillingCycleSelected={currentBillingCycleSelected}
                 />
+              </ChartContent>
+            </ChartCard>
+          </Chart>
+
+          <Chart isLoading={isPending} isErrored={isError}>
+            <ChartCard>
+              <ChartHeader align="start">
+                <div className="flex flex-col gap-1">
+                  <ChartTitle
+                    className="text-sm"
+                    tooltip="CPU instances actually used, against the vCPU they reserved while running."
+                  >
+                    CPU utilization
+                  </ChartTitle>
+                  <p className="text-sm text-foreground-light">
+                    {formatVcpuHours(totalUsedVcpuHours)} used of{' '}
+                    {formatVcpuHours(totalReservedVcpuHours)} reserved
+                  </p>
+                </div>
+                <ChartMetric
+                  align="end"
+                  label="Idle"
+                  value={formatVcpuHours(Math.max(0, totalReservedVcpuHours - totalUsedVcpuHours))}
+                  tooltip="Reserved vCPU-hours that did no work. Active-CPU billing would not charge for these."
+                />
+              </ChartHeader>
+              <ChartContent
+                isEmpty={isEmpty}
+                loadingState={<ChartLoadingState />}
+                errorState={
+                  <ChartEmptyState
+                    icon={<BarChart2Icon size={16} />}
+                    title="Usage unavailable"
+                    description="Unable to load CPU utilization"
+                  />
+                }
+                emptyState={
+                  <ChartEmptyState
+                    icon={<BarChart2Icon size={16} />}
+                    title="No CPU usage yet"
+                    description="Deploy an instance to see how much of its vCPU it uses"
+                  />
+                }
+              >
+                <ChartContainer config={utilizationConfig} className="h-44 w-full">
+                  <AreaChart
+                    data={utilizationData}
+                    margin={{ top: 8, right: 8, left: 0, bottom: 0 }}
+                  >
+                    <CartesianGrid
+                      vertical={false}
+                      strokeDasharray="3 3"
+                      className="stroke-border-stronger"
+                    />
+                    <XAxis
+                      dataKey="timestamp"
+                      tickLine={false}
+                      axisLine={false}
+                      minTickGap={32}
+                      tickFormatter={(value) => dayjs(value).format('DD MMM')}
+                      className="text-xs"
+                    />
+                    <YAxis tickLine={false} axisLine={false} width={48} className="text-xs" />
+                    <ChartTooltip
+                      content={
+                        <ChartTooltipContent
+                          labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
+                        />
+                      }
+                    />
+                    <Area
+                      dataKey="usedVcpuHours"
+                      type="monotone"
+                      stackId="cpu"
+                      className="fill-foreground stroke-foreground"
+                      fillOpacity={0.25}
+                      strokeWidth={2}
+                    />
+                    <Area
+                      dataKey="idleVcpuHours"
+                      type="monotone"
+                      stackId="cpu"
+                      className="fill-foreground-muted stroke-foreground-muted"
+                      fillOpacity={0.1}
+                      strokeWidth={1}
+                      strokeDasharray="4 4"
+                    />
+                  </AreaChart>
+                </ChartContainer>
+                <p className="mt-3 text-xs text-foreground-lighter">
+                  {cpuUtilization === null
+                    ? 'No vCPU reserved in this period.'
+                    : `${formatPercentage(cpuUtilization)} of reserved vCPU did work. Billing is on reserved vCPU during alpha.`}
+                </p>
               </ChartContent>
             </ChartCard>
           </Chart>
@@ -220,12 +335,12 @@ export const ComputeServices = ({
                 <div className="flex flex-col gap-1">
                   <ChartTitle
                     className="text-sm"
-                    tooltip="Active hours split by instance size. Larger sizes reserve more vCPU and memory per hour."
+                    tooltip="Running hours split by instance size. Larger sizes reserve more vCPU and memory per hour."
                   >
-                    Instance hours by size
+                    Running hours by size
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
-                    {formatVcpuHours(totalVcpuHours)} · {formatGbHours(totalGbHours)} this period
+                    {formatComputeHours(totalRunningHours)} this period
                   </p>
                 </div>
               </ChartHeader>
@@ -236,13 +351,13 @@ export const ComputeServices = ({
                   <ChartEmptyState
                     icon={<BarChart2Icon size={16} />}
                     title="Usage unavailable"
-                    description="Unable to load instance hours"
+                    description="Unable to load running hours"
                   />
                 }
                 emptyState={
                   <ChartEmptyState
                     icon={<BarChart2Icon size={16} />}
-                    title="No instance hours yet"
+                    title="No running hours yet"
                     description="Deploy a compute to see usage by size"
                   />
                 }
@@ -259,7 +374,7 @@ export const ComputeServices = ({
                 <div className="flex flex-col gap-1">
                   <ChartTitle
                     className="text-sm"
-                    tooltip="Computes, instances and active hours attributed to each project."
+                    tooltip="Computes, instances and reserved vCPU attributed to each project."
                   >
                     Usage by project
                   </ChartTitle>
@@ -300,41 +415,53 @@ export const ComputeServices = ({
   )
 }
 
+interface AllowanceRow {
+  label: string
+  burndown: ComputeBurndown
+  format: (value: number) => string
+}
+
 const ComputeAllowanceBreakdown = ({
-  burndown,
+  rows,
   limitsLabel,
   currentBillingCycleSelected,
 }: {
-  burndown: ComputeBurndown
+  rows: AllowanceRow[]
   limitsLabel: string
   currentBillingCycleSelected: boolean
-}) => {
-  const hasAllowance = burndown.allowanceHours !== null
-  const overageHours = hasAllowance ? Math.max(0, burndown.usedHours - burndown.allowanceHours!) : 0
+}) => (
+  <div className="mt-4 divide-y">
+    {rows.map(({ label, burndown, format }) => {
+      const overage =
+        burndown.allowance === null ? null : Math.max(0, burndown.used - burndown.allowance)
 
-  return (
-    <div className="mt-4">
-      <div className="flex items-center justify-between border-b py-1">
-        <p className="text-xs text-foreground-light">Included in {limitsLabel}</p>
-        <p className="text-xs">
-          {hasAllowance ? formatComputeHours(burndown.allowanceHours!) : 'Unlimited'}
-        </p>
-      </div>
-      {currentBillingCycleSelected && (
-        <div className="flex items-center justify-between py-1">
-          <p className="text-xs text-foreground-light">Used in period</p>
-          <p className="text-xs">{formatComputeHours(burndown.usedHours)}</p>
+      return (
+        <div key={label} className="py-1">
+          <div className="flex items-center justify-between py-1">
+            <p className="text-xs text-foreground-light">
+              {label} included in {limitsLabel}
+            </p>
+            <p className="text-xs">
+              {burndown.allowance === null ? 'Unlimited' : format(burndown.allowance)}
+            </p>
+          </div>
+          {currentBillingCycleSelected && (
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-foreground-light">{label} used in period</p>
+              <p className="text-xs">{format(burndown.used)}</p>
+            </div>
+          )}
+          {currentBillingCycleSelected && overage !== null && (
+            <div className="flex items-center justify-between py-1">
+              <p className="text-xs text-foreground-light">{label} overage in period</p>
+              <p className="text-xs">{format(overage)}</p>
+            </div>
+          )}
         </div>
-      )}
-      {currentBillingCycleSelected && hasAllowance && (
-        <div className="flex items-center justify-between border-t py-1">
-          <p className="text-xs text-foreground-light">Overage in period</p>
-          <p className="text-xs">{formatComputeHours(overageHours)}</p>
-        </div>
-      )}
-    </div>
-  )
-}
+      )
+    })}
+  </div>
+)
 
 const ComputeBurndownLegend = ({
   burndown,
@@ -343,10 +470,10 @@ const ComputeBurndownLegend = ({
   burndown: ComputeBurndown
   noLimitLabel: string
 }) => {
-  if (burndown.allowanceHours === null) {
+  if (burndown.allowance === null) {
     return (
       <p className="mt-3 text-xs text-foreground-lighter">
-        Active hours used over the period. {noLimitLabel}.
+        vCPU-hours reserved over the period. {noLimitLabel}.
       </p>
     )
   }
@@ -354,16 +481,16 @@ const ComputeBurndownLegend = ({
   return (
     <div className="mt-3 flex flex-wrap justify-center items-center gap-x-4 gap-y-1.5">
       <LegendItem className="bg-foreground" label="Used" />
-      {burndown.warningHours !== null && (
+      {burndown.warningAt !== null && (
         <LegendItem
           className="bg-warning"
           isDashed
-          label={`80% threshold · ${formatComputeHours(burndown.warningHours)}`}
+          label={`${formatPercentage(COMPUTE_ALLOWANCE_WARNING_THRESHOLD)} threshold · ${formatVcpuHours(burndown.warningAt)}`}
         />
       )}
       <LegendItem
         className="bg-foreground-muted"
-        label={`Plan limit · ${formatComputeHours(burndown.allowanceHours)}`}
+        label={`Plan limit · ${formatVcpuHours(burndown.allowance)}`}
       />
     </div>
   )
@@ -392,9 +519,8 @@ const LegendItem = ({
   </span>
 )
 
-/** Each size as a share of the period's active hours, using the page's standard h-1 meter. */
 const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
-  const totalActiveHours = sumBy(rows, (row) => row.activeHours)
+  const totalRunningHours = sumBy(rows, (row) => row.runningHours)
 
   return (
     <div className="flex flex-col gap-4">
@@ -404,10 +530,10 @@ const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
           type="horizontal"
           barClass="bg-foreground-light"
           bgClass="bg-surface-300"
-          value={row.activeHours}
-          max={totalActiveHours || 1}
+          value={row.runningHours}
+          max={totalRunningHours || 1}
           labelBottom={formatSize(row.size)}
-          labelTop={formatComputeHours(row.activeHours)}
+          labelTop={formatComputeHours(row.runningHours)}
         />
       ))}
     </div>
@@ -415,31 +541,37 @@ const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
 }
 
 const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
-  const totalActiveHours = sumBy(rows, (row) => row.activeHours)
+  const totalReservedVcpuHours = sumBy(rows, (row) => row.reservedVcpuHours)
 
   return (
     <div className="divide-y">
       <div className="grid grid-cols-12 gap-2 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
         <span className="col-span-3">Project</span>
-        <span className="col-span-2 text-right">Computes</span>
-        <span className="col-span-2 text-right">Instances</span>
-        <span className="col-span-2 text-right">Active hours</span>
+        <span className="col-span-1 text-right">Computes</span>
+        <span className="col-span-1 text-right">Instances</span>
+        <span className="col-span-2 text-right">vCPU-hrs</span>
+        <span className="col-span-2 text-right">CPU used</span>
         <span className="col-span-1 text-right">Requests</span>
         <span className="col-span-2 text-right">Share</span>
       </div>
       {rows.map((row) => {
-        const share = totalActiveHours <= 0 ? 0 : row.activeHours / totalActiveHours
+        const share =
+          totalReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / totalReservedVcpuHours
+        const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)
         return (
           <div key={row.projectRef} className="grid grid-cols-12 items-center gap-2 px-card py-2.5">
             <span className="col-span-3 truncate text-sm text-foreground">{row.projectName}</span>
-            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
               {row.deployments}
             </span>
-            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
               {row.instances}
             </span>
             <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-              {formatComputeHours(row.activeHours)}
+              {formatVcpuHours(row.reservedVcpuHours)}
+            </span>
+            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+              {cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
             </span>
             <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
               {formatComputeRequests(row.requests)}

@@ -12,7 +12,7 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 
 const USAGE_WINDOW_DAYS = 30
 
-export interface ComputeActiveHoursMetricProps {
+export interface ComputeVcpuHoursMetricProps {
   slug: string
   projectRef?: string | null
   subscription: OrgSubscription | undefined
@@ -20,27 +20,19 @@ export interface ComputeActiveHoursMetricProps {
   className?: string
 }
 
-/**
- * Compute's headline figure in the Usage Summary.
- *
- * Active hours rather than requests: a compute accrues usage for as long as its instances
- * stay alive, whether or not anything calls them, so request counts under-report an
- * always-on service. Active hours is also what the plan allowance is denominated in, which
- * is what lets this render a used/included ratio like every other metric here.
- */
-export const ComputeActiveHoursMetric = ({
+export const ComputeVcpuHoursMetric = ({
   slug,
   projectRef,
   subscription,
   relativeToSubscription,
   className,
-}: ComputeActiveHoursMetricProps) => {
+}: ComputeVcpuHoursMetricProps) => {
   const { data, isPending } = useQuery(
     computeOrgUsageQueryOptions({ orgSlug: slug, projectRef, days: USAGE_WINDOW_DAYS })
   )
 
   const { limits } = useComputeLimits(subscription?.plan)
-  const allowanceHours = limits.activeHours
+  const vcpuAllowance = limits.vcpuHours
   const deploymentAllowance = limits.deployments
 
   if (isPending) {
@@ -51,21 +43,21 @@ export const ComputeActiveHoursMetric = ({
     )
   }
 
-  const activeHours = sumBy(data?.points ?? [], (point) => point.activeHours)
+  const vcpuHours = sumBy(data?.points ?? [], (point) => point.reservedVcpuHours)
   const deployments = data?.deployments ?? 0
 
-  const hasLimit = allowanceHours !== null && allowanceHours > 0
-  const usageRatio = hasLimit ? activeHours / allowanceHours : 0
+  const hasLimit = vcpuAllowance !== null && vcpuAllowance > 0
+  const usageRatio = hasLimit ? vcpuHours / vcpuAllowance : 0
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
   const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
 
   const usageLabel =
     hasLimit && relativeToSubscription
-      ? `${Math.round(activeHours).toLocaleString()} / ${allowanceHours.toLocaleString()} hours`
-      : `${Math.round(activeHours).toLocaleString()} hours`
+      ? `${Math.round(vcpuHours).toLocaleString()} / ${vcpuAllowance.toLocaleString()} vCPU-hrs`
+      : `${Math.round(vcpuHours).toLocaleString()} vCPU-hrs`
 
   const percentageLabel =
-    !hasLimit || activeHours === 0
+    !hasLimit || vcpuHours === 0
       ? ''
       : usageRatio < 0.01
         ? '(<1%)'
@@ -81,7 +73,7 @@ export const ComputeActiveHoursMetric = ({
       <Link href={`/org/${slug}/usage#compute-services`} className="block w-full group">
         <div className="group flex items-center gap-1">
           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-            Compute Active Hours
+            Compute vCPU Hours
           </p>
           <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
             <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />

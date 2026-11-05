@@ -29,15 +29,18 @@ import {
   formatComputeHours,
   formatComputeRequests,
   formatGbHours,
+  formatPercentage,
   formatVcpuHours,
+  getCpuUtilization,
   sumBy,
 } from '../ComputeUsage.utils'
 import { computeInstanceUsageQueryOptions } from '@/data/compute/compute-usage-query'
 
 const USAGE_WINDOW_DAYS = 30
 
-const activeHoursConfig = {
-  activeHours: { label: 'Active hours' },
+const cpuConfig = {
+  usedVcpuHours: { label: 'CPU used' },
+  idleVcpuHours: { label: 'Reserved, idle' },
 } satisfies ChartConfig
 
 const instancesConfig = {
@@ -64,14 +67,17 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
   const points = data?.points ?? []
   const isEmpty = !isPending && points.length === 0
 
-  const totalActiveHours = sumBy(points, (point) => point.activeHours)
-  const totalVcpuHours = sumBy(points, (point) => point.vcpuHours)
+  const totalRunningHours = sumBy(points, (point) => point.runningHours)
+  const totalReservedVcpuHours = sumBy(points, (point) => point.reservedVcpuHours)
+  const totalUsedVcpuHours = sumBy(points, (point) => point.usedVcpuHours)
   const totalGbHours = sumBy(points, (point) => point.gbHours)
   const totalRequests = sumBy(points, (point) => point.requests)
+  const cpuUtilization = getCpuUtilization(totalUsedVcpuHours, totalReservedVcpuHours)
 
   const chartData = points.map((point) => ({
     timestamp: point.timestamp,
-    activeHours: point.activeHours,
+    usedVcpuHours: point.usedVcpuHours,
+    idleVcpuHours: Number(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours).toFixed(2)),
     instances: point.instances,
   }))
 
@@ -89,26 +95,33 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
       <PageSectionContent>
         <div className="space-y-4">
           <Chart isLoading={isPending}>
-            <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-4 sm:divide-y-0">
+            <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-3 lg:grid-cols-5 lg:divide-y-0">
               <div className="px-5 py-4">
                 <ChartMetric
-                  label="Active hours"
-                  value={formatComputeHours(totalActiveHours)}
-                  tooltip="Hours this compute's instances spent serving traffic rather than suspended."
+                  label="Running hours"
+                  value={formatComputeHours(totalRunningHours)}
+                  tooltip="Hours this compute's instances were running, busy or idle, rather than suspended."
                 />
               </div>
               <div className="px-5 py-4">
                 <ChartMetric
                   label="vCPU-hours"
-                  value={formatVcpuHours(totalVcpuHours)}
-                  tooltip="Active hours multiplied by the vCPU each instance size reserves."
+                  value={formatVcpuHours(totalReservedVcpuHours)}
+                  tooltip="Running hours multiplied by the vCPU each instance size reserves."
+                />
+              </div>
+              <div className="px-5 py-4">
+                <ChartMetric
+                  label="CPU used"
+                  value={cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
+                  tooltip="Share of reserved vCPU that did work. The rest was idle, e.g. waiting on I/O."
                 />
               </div>
               <div className="px-5 py-4">
                 <ChartMetric
                   label="GB-hours"
                   value={formatGbHours(totalGbHours)}
-                  tooltip="Active hours multiplied by the memory each instance size reserves."
+                  tooltip="Running hours multiplied by the memory each instance size reserves."
                 />
               </div>
               <div className="px-5 py-4">
@@ -121,15 +134,12 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             </div>
           </Chart>
 
-          {/* Active hours and instance counts are different measures, so they get a chart each
-              rather than sharing one y-axis. Both use the neutral ink the other usage
-              charts use — nothing here is a status, so nothing is coloured. */}
           <div className="grid gap-4 lg:grid-cols-2">
             <Chart isLoading={isPending} isErrored={isError}>
               <ChartCard>
                 <ChartHeader align="start">
-                  <ChartTitle tooltip="Hours instances spent serving traffic each day.">
-                    Active hours
+                  <ChartTitle tooltip="vCPU-hours reserved each day, split into CPU used and idle.">
+                    vCPU-hours
                   </ChartTitle>
                 </ChartHeader>
                 <ChartContent
@@ -150,7 +160,7 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
                     />
                   }
                 >
-                  <ChartContainer config={activeHoursConfig} className="h-44 w-full">
+                  <ChartContainer config={cpuConfig} className="h-44 w-full">
                     <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
                       <CartesianGrid
                         vertical={false}
@@ -173,7 +183,13 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
                           />
                         }
                       />
-                      <Bar dataKey="activeHours" className="fill-foreground" />
+                      <Bar dataKey="usedVcpuHours" stackId="cpu" className="fill-foreground" />
+                      <Bar
+                        dataKey="idleVcpuHours"
+                        stackId="cpu"
+                        className="fill-foreground-muted"
+                        fillOpacity={0.4}
+                      />
                     </BarChart>
                   </ChartContainer>
                 </ChartContent>

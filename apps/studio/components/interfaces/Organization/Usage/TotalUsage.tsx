@@ -5,8 +5,8 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
-import { ComputeActiveHoursMetric } from '../BillingSettings/BillingBreakdown/ComputeActiveHoursMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
+import { ComputeVcpuHoursMetric } from '../BillingSettings/BillingBreakdown/ComputeVcpuHoursMetric'
 import { SectionContent } from './SectionContent'
 import { AlertError } from '@/components/ui/AlertError'
 import {
@@ -258,7 +258,7 @@ export const TotalUsage = ({
                     : 'md:pl-4'
                 )}
               >
-                <ComputeActiveHoursMetric
+                <ComputeVcpuHoursMetric
                   slug={orgSlug}
                   projectRef={projectRef}
                   subscription={subscription}

@@ -25,9 +25,9 @@ describe('ComputeInstanceUsageSection', () => {
   it('renders the usage metrics for the instance', async () => {
     customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
-    // "Active hours" labels both the metric and its chart.
-    expect(await screen.findAllByText('Active hours')).not.toHaveLength(0)
-    expect(await screen.findByText('vCPU-hours')).toBeInTheDocument()
+    expect(await screen.findByText('Running hours')).toBeInTheDocument()
+    expect(await screen.findAllByText('vCPU-hours')).not.toHaveLength(0)
+    expect(await screen.findByText('CPU used')).toBeInTheDocument()
     expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Requests')).toBeInTheDocument()
   })
@@ -43,7 +43,7 @@ describe('ComputeInstanceUsageSection', () => {
   it('renders non-zero usage figures rather than empty placeholders', async () => {
     const { container } = customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
-    await screen.findAllByText('Active hours')
+    await screen.findByText('Running hours')
     await waitFor(() => {
       const values = [...container.querySelectorAll('.tabular-nums')]
         .map((node) => Number(node.textContent?.replace(/[^0-9.]/g, '')))

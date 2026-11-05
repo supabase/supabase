@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { COMPUTE_ALPHA_LIMITS, COMPUTE_PLAN_LIMITS, getComputeLimits } from './Compute.limits'
 import type { OrgPlan } from '@/data/subscriptions/types'
 
-const HOURS_PER_MONTH_ALWAYS_ON = 730
+const ALWAYS_ON_VCPU_HOURS_PER_MONTH = 730
 const PAID_PLANS = ['pro', 'team', 'platform'] as const
 
 describe('getComputeLimits', () => {
@@ -26,18 +26,18 @@ describe('getComputeLimits', () => {
 })
 
 describe('plan limit magnitudes', () => {
-  it('gives every paid plan room for at least one always-on instance', () => {
+  it('gives every paid plan room for one always-on 1 vCPU instance', () => {
     for (const plan of PAID_PLANS) {
-      expect(COMPUTE_PLAN_LIMITS[plan].activeHours).toBeGreaterThanOrEqual(
-        HOURS_PER_MONTH_ALWAYS_ON
+      expect(COMPUTE_PLAN_LIMITS[plan].vcpuHours).toBeGreaterThanOrEqual(
+        ALWAYS_ON_VCPU_HOURS_PER_MONTH
       )
     }
   })
 
-  it('never offers more instances than the hours could feed', () => {
-    for (const { activeHours, instances } of Object.values(COMPUTE_PLAN_LIMITS)) {
-      if (activeHours === null || instances === null) continue
-      expect(instances).toBeLessThanOrEqual(activeHours)
+  it('includes at least 2 GB of memory per included vCPU', () => {
+    for (const { vcpuHours, gbHours } of Object.values(COMPUTE_PLAN_LIMITS)) {
+      if (vcpuHours === null || gbHours === null) continue
+      expect(gbHours).toBeGreaterThanOrEqual(vcpuHours * 2)
     }
   })
 })

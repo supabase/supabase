@@ -6,7 +6,7 @@ import type {
   ComputeUsageByProject,
   ComputeUsagePoint,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
-import { toGbHours, toVcpuHours } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { sumBy, toGbHours, toVcpuHours } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { IS_PLATFORM } from '@/lib/constants'
 
 /**
@@ -57,10 +57,13 @@ interface GenerateUsageParams {
   days: number
   size: string
   instances: number
-  /** Share of the day the instance is serving traffic rather than suspended. */
+  /** Share of the day the instance is running rather than suspended. */
   dutyCycle: number
-  requestsPerActiveHour: number
+  requestsPerRunningHour: number
 }
+
+const MIN_CPU_UTILIZATION = 0.1
+const MAX_CPU_UTILIZATION = 0.6
 
 const generateUsagePoints = ({
   seed,
@@ -68,9 +71,11 @@ const generateUsagePoints = ({
   size,
   instances,
   dutyCycle,
-  requestsPerActiveHour,
+  requestsPerRunningHour,
 }: GenerateUsageParams): ComputeUsagePoint[] => {
   const random = createRandom(hashSeed(seed))
+  const baseUtilization =
+    MIN_CPU_UTILIZATION + random() * (MAX_CPU_UTILIZATION - MIN_CPU_UTILIZATION)
   const start = dayjs()
     .utc()
     .subtract(days - 1, 'day')
@@ -80,19 +85,47 @@ const generateUsagePoints = ({
     const day = start.add(index, 'day')
     const variation = 0.75 + random() * 0.5
     const dailyDuty = Math.min(1, dutyCycle * variation * dayOfWeekWeight(day))
-    const activeHours = Number((24 * dailyDuty * instances).toFixed(2))
+    const runningHours = Number((24 * dailyDuty * instances).toFixed(2))
     const liveInstances = Number((instances * Math.min(1, dailyDuty * 1.4)).toFixed(2))
+    const reservedVcpuHours = toVcpuHours(runningHours, size)
+    const utilization = Math.min(
+      MAX_CPU_UTILIZATION,
+      Math.max(MIN_CPU_UTILIZATION, baseUtilization * (0.8 + random() * 0.4))
+    )
 
     return {
       timestamp: day.toISOString(),
-      activeHours,
-      vcpuHours: Number(toVcpuHours(activeHours, size).toFixed(2)),
-      gbHours: Number(toGbHours(activeHours, size).toFixed(2)),
+      runningHours,
+      reservedVcpuHours: Number(reservedVcpuHours.toFixed(2)),
+      usedVcpuHours: Number((reservedVcpuHours * utilization).toFixed(2)),
+      gbHours: Number(toGbHours(runningHours, size).toFixed(2)),
       instances: liveInstances,
-      requests: Math.round(activeHours * requestsPerActiveHour * (0.7 + random() * 0.6)),
+      requests: Math.round(runningHours * requestsPerRunningHour * (0.7 + random() * 0.6)),
     }
   })
 }
+
+const round2 = (value: number) => Number(value.toFixed(2))
+
+type ComputeUsageTotals = Omit<ComputeUsagePoint, 'timestamp' | 'instances'>
+
+const sumUsage = (points: ComputeUsagePoint[]): ComputeUsageTotals => ({
+  runningHours: round2(sumBy(points, (point) => point.runningHours)),
+  reservedVcpuHours: round2(sumBy(points, (point) => point.reservedVcpuHours)),
+  usedVcpuHours: round2(sumBy(points, (point) => point.usedVcpuHours)),
+  gbHours: round2(sumBy(points, (point) => point.gbHours)),
+  requests: sumBy(points, (point) => point.requests),
+})
+
+const mergeSeries = (series: ComputeUsagePoint[][], days: number): ComputeUsagePoint[] =>
+  Array.from({ length: days }, (_, index) => {
+    const bucket = series.map((points) => points[index]).filter(Boolean)
+    return {
+      timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
+      instances: round2(sumBy(bucket, (point) => point.instances)),
+      ...sumUsage(bucket),
+    }
+  })
 
 /* ------------------------------------------------------------------ *
  * Per-instance usage                                                  *
@@ -130,7 +163,7 @@ export const computeInstanceUsageQueryOptions = ({
         // Private instances never suspend, but exposure isn't known here; a high duty
         // cycle keeps the series representative of a steadily-used instance.
         dutyCycle: 0.55,
-        requestsPerActiveHour: 820,
+        requestsPerRunningHour: 820,
       }),
     }),
     enabled: IS_PLATFORM && projectRef !== undefined && name !== undefined,
@@ -148,14 +181,8 @@ export interface ComputeProjectUsageVariables {
   days?: number
 }
 
-export interface ComputeProjectUsage {
+export interface ComputeProjectUsage extends ComputeUsageTotals {
   points: ComputeUsagePoint[]
-  activeHours: number
-  vcpuHours: number
-  gbHours: number
-  requests: number
-  /** Instance-hours: instances x hours alive, the figure a rollup would bill on. */
-  instanceHours: number
 }
 
 /** Sums each instance's generated series into one project-level total. */
@@ -174,30 +201,12 @@ export const computeProjectUsageQueryOptions = ({
           size: instance.size,
           instances: instance.declaredInstances,
           dutyCycle: 0.55,
-          requestsPerActiveHour: 820,
+          requestsPerRunningHour: 820,
         })
       )
 
-      const points: ComputeUsagePoint[] = Array.from({ length: days }, (_, index) => {
-        const bucket = perInstance.map((series) => series[index]).filter(Boolean)
-        return {
-          timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
-          activeHours: Number(bucket.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          vcpuHours: Number(bucket.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
-          gbHours: Number(bucket.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
-          instances: Number(bucket.reduce((sum, p) => sum + p.instances, 0).toFixed(2)),
-          requests: bucket.reduce((sum, p) => sum + p.requests, 0),
-        }
-      })
-
-      return {
-        points,
-        activeHours: Number(points.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-        vcpuHours: Number(points.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
-        gbHours: Number(points.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
-        requests: points.reduce((sum, p) => sum + p.requests, 0),
-        instanceHours: Number(points.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-      }
+      const points = mergeSeries(perInstance, days)
+      return { points, ...sumUsage(points) }
     },
     enabled: IS_PLATFORM && projectRef !== undefined && instances.length > 0,
     staleTime: Infinity,
@@ -216,8 +225,7 @@ export interface ComputeOrgUsageVariables {
 export interface ComputeOrgUsage {
   points: ComputeUsagePoint[]
   byProject: ComputeUsageByProject[]
-  /** Flattened instance rows, for the by-size breakdown. */
-  instanceRows: { size: string; activeHours: number }[]
+  instanceRows: { size: string; runningHours: number }[]
   deployments: number
   instances: number
 }
@@ -286,44 +294,38 @@ export const computeOrgUsageQueryOptions = ({
           size: project.size,
           instances: project.instances,
           dutyCycle: project.dutyCycle,
-          requestsPerActiveHour: 640,
+          requestsPerRunningHour: 640,
         }),
       }))
 
-      // Collapse every project's daily series into one org-wide series.
-      const points: ComputeUsagePoint[] = Array.from({ length: days }, (_, index) => {
-        const bucket = perProject.map((entry) => entry.points[index]).filter(Boolean)
-        return {
-          timestamp: bucket[0]?.timestamp ?? dayjs().utc().toISOString(),
-          activeHours: Number(bucket.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          vcpuHours: Number(bucket.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
-          gbHours: Number(bucket.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
-          instances: Number(bucket.reduce((sum, p) => sum + p.instances, 0).toFixed(2)),
-          requests: bucket.reduce((sum, p) => sum + p.requests, 0),
-        }
-      })
+      const points = mergeSeries(
+        perProject.map((entry) => entry.points),
+        days
+      )
 
-      const byProject: ComputeUsageByProject[] = perProject
-        .map(({ project, points: projectPoints }) => ({
+      const projectRows = perProject.map(({ project, points: projectPoints }) => ({
+        size: project.size,
+        usage: {
           projectRef: project.projectRef,
           projectName: project.projectName,
           deployments: project.deployments,
           instances: project.instances,
-          activeHours: Number(projectPoints.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
-          vcpuHours: Number(projectPoints.reduce((sum, p) => sum + p.vcpuHours, 0).toFixed(2)),
-          gbHours: Number(projectPoints.reduce((sum, p) => sum + p.gbHours, 0).toFixed(2)),
-          requests: projectPoints.reduce((sum, p) => sum + p.requests, 0),
-        }))
-        .sort((a, b) => b.activeHours - a.activeHours)
+          ...sumUsage(projectPoints),
+        } satisfies ComputeUsageByProject,
+      }))
+
+      const byProject = projectRows
+        .map((row) => row.usage)
+        .sort((a, b) => b.reservedVcpuHours - a.reservedVcpuHours)
 
       return {
         points,
         byProject,
-        deployments: byProject.reduce((sum, row) => sum + row.deployments, 0),
-        instances: byProject.reduce((sum, row) => sum + row.instances, 0),
-        instanceRows: perProject.map(({ project, points: projectPoints }) => ({
-          size: project.size,
-          activeHours: Number(projectPoints.reduce((sum, p) => sum + p.activeHours, 0).toFixed(2)),
+        deployments: sumBy(byProject, (row) => row.deployments),
+        instances: sumBy(byProject, (row) => row.instances),
+        instanceRows: projectRows.map((row) => ({
+          size: row.size,
+          runningHours: row.usage.runningHours,
         })),
       }
     },

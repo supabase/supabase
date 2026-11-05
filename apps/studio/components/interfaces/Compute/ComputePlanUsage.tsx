@@ -7,7 +7,12 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
-import { formatComputeHours } from './ComputeUsage.utils'
+import {
+  formatGbHours,
+  formatPercentage,
+  formatVcpuHours,
+  getCpuUtilization,
+} from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
@@ -47,16 +52,27 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
   )
   const formatCount = (value: number) => value.toLocaleString()
 
+  const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
+
   const meters: MeterDefinition[] = [
     {
-      label: 'Active hours',
-      description:
-        'Hours instances spend serving traffic. Suspended instances do not accrue usage.',
-      used: usage?.activeHours ?? 0,
-      included: limits.activeHours,
+      label: 'vCPU-hours',
+      description: 'vCPU reserved while instances run. Suspended instances reserve nothing.',
+      used: usage?.reservedVcpuHours ?? 0,
+      included: limits.vcpuHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatComputeHours,
+      format: formatVcpuHours,
+      detail: cpuUtilization === null ? undefined : `${formatPercentage(cpuUtilization)} CPU used`,
+    },
+    {
+      label: 'GB-hours',
+      description: 'Memory reserved while instances run. Suspended instances reserve nothing.',
+      used: usage?.gbHours ?? 0,
+      included: limits.gbHours,
+      limitKind: 'allowance',
+      isLoading: isPending,
+      format: formatGbHours,
     },
     {
       label: 'Deployments',
@@ -111,7 +127,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       </div>
 
       {!isCollapsed && (
-        <div className="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+        <div className="grid grid-cols-1 divide-y lg:grid-cols-4 lg:divide-x lg:divide-y-0">
           {meters.map((meter) => (
             <UsageMeter key={meter.label} {...meter} noLimitLabel={noLimitLabel} />
           ))}
@@ -133,6 +149,7 @@ interface MeterDefinition {
   limitKind: 'allowance' | 'capacity'
   isLoading: boolean
   format: (value: number) => string
+  detail?: string
 }
 
 const getMeterStatus = ({ used, included, limitKind }: MeterDefinition) => {
@@ -196,7 +213,11 @@ const CompactUsageMeter = (meter: MeterDefinition) => {
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-64">
         <p>{meter.description}</p>
-        {value && <p className="mt-1 tabular-nums text-foreground-light">{value}</p>}
+        {value && (
+          <p className="mt-1 tabular-nums text-foreground-light">
+            {meter.detail ? `${value} · ${meter.detail}` : value}
+          </p>
+        )}
       </TooltipContent>
     </Tooltip>
   )
@@ -221,6 +242,9 @@ const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel
 
       <MeterBar meter={meter} hasLimit={hasLimit} barClass={barClass} />
 
+      {meter.detail && !isLoading && (
+        <p className="text-xs tabular-nums text-foreground-lighter">{meter.detail}</p>
+      )}
       {isExceeded && <p className="text-xs text-destructive">Over limit</p>}
       {isAtCapacity && <p className="text-xs text-warning">At limit</p>}
       {isApproaching && <p className="text-xs text-warning">Approaching limit</p>}
