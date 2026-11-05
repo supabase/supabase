@@ -1,4 +1,3 @@
-import { useHydrated } from '@tanstack/react-router'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
@@ -11,6 +10,7 @@ import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useHydratedQuery } from '@/hooks/misc/useHydratedQuery'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -19,7 +19,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
-  const isHydrated = useHydrated()
+  const query = useHydratedQuery()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
   const {
@@ -85,9 +85,6 @@ const SignInPage: NextPageWithLayout = () => {
       </div>
     )
   }
-
-  // Search params aren't in the prerendered HTML.
-  const query = isHydrated ? router.query : {}
 
   return (
     <>

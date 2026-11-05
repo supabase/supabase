@@ -1,10 +1,8 @@
 import HCaptcha from '@hcaptcha/react-hcaptcha'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
-import { useHydrated } from '@tanstack/react-router'
 import { LockIcon } from 'lucide-react'
 import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { useRef, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -14,6 +12,7 @@ import z from 'zod'
 
 import { LastSignInWrapper } from './LastSignInWrapper'
 import { resolveCaptchaToken } from './SignIn.utils'
+import { useHydratedQuery } from '@/hooks/misc/useHydratedQuery'
 import { useLastSignIn } from '@/hooks/misc/useLastSignIn'
 import { BASE_PATH } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
@@ -144,9 +143,7 @@ export const SignInSSOForm = () => {
 }
 
 export const SignInWithSSOButton = () => {
-  const router = useRouter()
-  // Search params aren't in the prerendered HTML.
-  const query = useHydrated() ? router.query : {}
+  const query = useHydratedQuery()
 
   return (
     <LastSignInWrapper type="sso">
