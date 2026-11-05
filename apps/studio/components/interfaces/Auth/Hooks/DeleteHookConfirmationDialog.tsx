@@ -102,8 +102,10 @@ export const DeleteHookConfirmationDialog = ({
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>
-                  The {willLockTemplates ? 'default' : 'built-in'} email templates will be used when
-                  sending authentication-related emails.
+                  The {willLockTemplates ? <span>default</span> : <span>built-in</span>}{' '}
+                  <span>
+                    email templates will be used when sending authentication-related emails.
+                  </span>
                 </p>
                 {willLockTemplates && (
                   <p>Email templates cannot be edited on the Free plan without custom SMTP.</p>

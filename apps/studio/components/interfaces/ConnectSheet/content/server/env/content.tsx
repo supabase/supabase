@@ -70,7 +70,7 @@ function ServerEnvContent() {
             <InlineLink href={`/project/${ref}/settings/api-keys`}>API Keys settings</InlineLink>.
           </>
         ) : (
-          '.'
+          <span>.</span>
         )}
       </p>
     </div>

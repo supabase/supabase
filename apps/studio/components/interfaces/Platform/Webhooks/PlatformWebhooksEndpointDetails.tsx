@@ -415,8 +415,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 <ShimmeringLoader className="w-28" />
               ) : (
                 <p className="text-foreground-muted text-sm">
-                  Showing {deliveryRows.length}{' '}
-                  {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
+                  {`Showing ${deliveryRows.length} ${deliveryRows.length === 1 ? 'delivery' : 'deliveries'}`}
                 </p>
               )}
               <div className="flex items-center gap-x-2" aria-label="Pagination">

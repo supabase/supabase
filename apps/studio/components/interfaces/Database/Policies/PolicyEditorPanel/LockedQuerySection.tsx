@@ -33,7 +33,14 @@ export const LockedCreateQuerySection = ({
         <p className="px-6 font-mono text-sm text-foreground-light select-none">1</p>
         <p className="font-mono tracking-tighter">
           <span className="text-[#569cd6]">{isEditing ? 'alter' : 'create'}</span> policy "
-          {isRenamingPolicy ? selectedPolicy?.name : name.length === 0 ? 'policy_name' : name}"
+          {isRenamingPolicy ? (
+            <span>{selectedPolicy?.name}</span>
+          ) : name.length === 0 ? (
+            <span>policy_name</span>
+          ) : (
+            name
+          )}
+          <span>"</span>
         </p>
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
@@ -62,7 +69,8 @@ export const LockedCreateQuerySection = ({
       <div className="flex items-start" style={{ fontSize: '14px' }}>
         <p className="px-6 font-mono text-sm text-foreground-light select-none">5</p>
         <p className="font-mono tracking-tighter">
-          <span className="text-[#569cd6]">to</span> {roles.length === 0 ? 'public' : roles}
+          <span className="text-[#569cd6]">to</span>{' '}
+          {roles.length === 0 ? <span>public</span> : roles}
         </p>
       </div>
       <div className="flex items-start" style={{ fontSize: '14px' }}>
