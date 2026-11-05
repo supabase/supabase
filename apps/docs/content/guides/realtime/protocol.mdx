@@ -975,11 +975,11 @@ Note that the JS client (`send()`) resolves to the string `'error'` and does not
 
 When `ack` is `true`, a persistence failure replies with one of the following codes in `response.error`:
 
-| Error code                 | Description                                                                |
-| -------------------------- | -------------------------------------------------------------------------- |
-| `persistence_unauthorized` | Delivered but not stored: no RLS policy allows the `persistence` extension |
-| `persistence_failed`       | Delivered but not stored: writing to `realtime.messages` failed            |
-| `persistence_invalid_ttl`  | Not delivered or stored: the `persist` value or its `ttl` is not valid     |
+| Error code                 | Description                                                            |
+| -------------------------- | ---------------------------------------------------------------------- |
+| `persistence_unauthorized` | Delivered but not stored: RLS doesn't allow the sender to persist      |
+| `persistence_failed`       | Delivered but not stored: writing to `realtime.messages` failed        |
+| `persistence_invalid_ttl`  | Not delivered or stored: the `persist` value or its `ttl` is not valid |
 
 To allow persistence, create an `insert` policy on `realtime.messages` where `realtime.messages.extension` is `persistence`. See [Realtime Authorization](/docs/guides/realtime/authorization) for how these policies work.
 
