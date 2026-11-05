@@ -11,6 +11,8 @@ server {
     server_name ${PROXY_DOMAIN};
     server_tokens off;
 
+    client_max_body_size 0;
+
     proxy_http_version 1.1;
 
     proxy_set_header Host $host;
