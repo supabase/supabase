@@ -5,6 +5,7 @@ import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { parseAsString, useQueryState } from 'nuqs'
+import { Button } from 'ui'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { TOTPFactors } from './index'
@@ -30,7 +31,7 @@ const availableCodes: AuthMFARecoveryCodesStatusResponse = {
 
 const ReturnNavigation = () => {
   const [, setTarget] = useQueryState('removeAuthenticator', parseAsString)
-  return <button onClick={() => void setTarget('authenticator-a')}>Resume removal</button>
+  return <Button onClick={() => void setTarget('authenticator-a')}>Resume removal</Button>
 }
 
 const renderFactors = (searchParams = '') => {
