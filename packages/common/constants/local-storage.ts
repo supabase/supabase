@@ -66,6 +66,7 @@ export const LOCAL_STORAGE_KEYS = {
   ALPHA_NOTICE_COLLAPSED: (entity: string) =>
     `alpha-notice-collapsed-${entity.toLowerCase().replace(/\s+/g, '-')}`,
   COMPUTE_PLAN_USAGE_COLLAPSED: 'compute-plan-usage-collapsed',
+  COMPUTE_LIMITS_MODE: 'compute-limits-mode',
   CLS_DIFF_WARNING: 'cls-diff-warning-dismissed',
   CLS_SELECT_STAR_WARNING: 'cls-select-star-warning-dismissed',
   QUERY_PERF_SHOW_BOTTOM_SECTION: 'supabase-query-perf-show-bottom-section',

@@ -16,11 +16,8 @@ import {
 } from 'ui-patterns/Chart'
 
 import { SectionContent } from './SectionContent'
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from '@/components/interfaces/Compute/Compute.limits'
 import { formatSize } from '@/components/interfaces/Compute/Compute.utils'
-import {
-  COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
-  getComputeActiveHoursAllowance,
-} from '@/components/interfaces/Compute/ComputeUsage.constants'
 import {
   aggregateUsageBySize,
   buildComputeBurndown,
@@ -36,6 +33,7 @@ import type {
   ComputeUsageByProject,
   ComputeUsageBySize,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -63,11 +61,15 @@ export const ComputeServices = ({
     computeOrgUsageQueryOptions({ orgSlug, projectRef, days: USAGE_WINDOW_DAYS })
   )
 
-  const allowanceHours = getComputeActiveHoursAllowance(subscription?.plan.id)
+  const { limits, limitsLabel, noLimitLabel } = useComputeLimits(subscription?.plan)
   const points = data?.points ?? []
   const byProject = data?.byProject ?? []
   const bySize = aggregateUsageBySize(data?.instanceRows ?? [])
-  const burndown = buildComputeBurndown(points, allowanceHours, COMPUTE_ALLOWANCE_WARNING_THRESHOLD)
+  const burndown = buildComputeBurndown(
+    points,
+    limits.activeHours,
+    COMPUTE_ALLOWANCE_WARNING_THRESHOLD
+  )
 
   const isEmpty = !isPending && points.length === 0
   const totalVcpuHours = sumBy(points, (point) => point.vcpuHours)
@@ -111,7 +113,7 @@ export const ComputeServices = ({
                   </ChartTitle>
                   <p className="text-sm text-foreground-light">
                     {burndown.allowanceHours === null
-                      ? `${formatComputeHours(burndown.usedHours)} used · no fixed allowance on this plan`
+                      ? `${formatComputeHours(burndown.usedHours)} used`
                       : `${formatComputeHours(burndown.usedHours)} of ${formatComputeHours(burndown.allowanceHours)} used`}
                   </p>
                 </div>
@@ -200,11 +202,11 @@ export const ComputeServices = ({
                   </AreaChart>
                 </ChartContainer>
 
-                <ComputeBurndownLegend burndown={burndown} />
+                <ComputeBurndownLegend burndown={burndown} noLimitLabel={noLimitLabel} />
 
                 <ComputeAllowanceBreakdown
                   burndown={burndown}
-                  planName={subscription?.plan.name}
+                  limitsLabel={limitsLabel}
                   currentBillingCycleSelected={currentBillingCycleSelected}
                 />
               </ChartContent>
@@ -298,18 +300,13 @@ export const ComputeServices = ({
   )
 }
 
-/**
- * The included / used / overage rows every other usage section renders, so Compute reads
- * the same way. Active hours is the only Compute measure with an allowance behind it, so
- * it is the only one that can show these.
- */
 const ComputeAllowanceBreakdown = ({
   burndown,
-  planName,
+  limitsLabel,
   currentBillingCycleSelected,
 }: {
   burndown: ComputeBurndown
-  planName: string | undefined
+  limitsLabel: string
   currentBillingCycleSelected: boolean
 }) => {
   const hasAllowance = burndown.allowanceHours !== null
@@ -318,7 +315,7 @@ const ComputeAllowanceBreakdown = ({
   return (
     <div className="mt-4">
       <div className="flex items-center justify-between border-b py-1">
-        <p className="text-xs text-foreground-light">Included in {planName} Plan</p>
+        <p className="text-xs text-foreground-light">Included in {limitsLabel}</p>
         <p className="text-xs">
           {hasAllowance ? formatComputeHours(burndown.allowanceHours!) : 'Unlimited'}
         </p>
@@ -339,12 +336,17 @@ const ComputeAllowanceBreakdown = ({
   )
 }
 
-/** Names what each line in the burn-down means, below the plot rather than on top of it. */
-const ComputeBurndownLegend = ({ burndown }: { burndown: ComputeBurndown }) => {
+const ComputeBurndownLegend = ({
+  burndown,
+  noLimitLabel,
+}: {
+  burndown: ComputeBurndown
+  noLimitLabel: string
+}) => {
   if (burndown.allowanceHours === null) {
     return (
       <p className="mt-3 text-xs text-foreground-lighter">
-        Active hours used over the period. This plan has no fixed allowance.
+        Active hours used over the period. {noLimitLabel}.
       </p>
     )
   }

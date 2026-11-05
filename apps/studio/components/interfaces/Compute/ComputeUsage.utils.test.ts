@@ -1,15 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
 import { parseComputeSize } from './Compute.utils'
-import {
-  COMPUTE_ACTIVE_HOURS_ALLOWANCE,
-  COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
-  COMPUTE_DEPLOYMENT_ALLOWANCE,
-  COMPUTE_INSTANCE_ALLOWANCE,
-  getComputeActiveHoursAllowance,
-  getComputeDeploymentAllowance,
-  getComputeInstanceAllowance,
-} from './ComputeUsage.constants'
 import {
   aggregateUsageBySize,
   buildComputeBurndown,
@@ -22,7 +14,6 @@ import {
   toVcpuHours,
   type ComputeUsagePoint,
 } from './ComputeUsage.utils'
-import type { OrgPlan } from '@/data/subscriptions/types'
 
 const point = (activeHours: number, timestamp = '2026-10-01T00:00:00.000Z'): ComputeUsagePoint => ({
   timestamp,
@@ -63,92 +54,6 @@ describe('resource-hours', () => {
   it('contributes nothing for an unparseable size rather than inventing a figure', () => {
     expect(toVcpuHours(10, 'something-new')).toBe(0)
     expect(toGbHours(10, 'something-new')).toBe(0)
-  })
-})
-
-describe('plan allowances', () => {
-  it('returns the configured allowance per plan', () => {
-    expect(getComputeActiveHoursAllowance('free')).toBe(300)
-    expect(getComputeActiveHoursAllowance('pro')).toBe(3000)
-    expect(getComputeActiveHoursAllowance('team')).toBe(12000)
-  })
-
-  it('returns null for enterprise, which has no fixed allowance', () => {
-    expect(getComputeActiveHoursAllowance('enterprise')).toBeNull()
-  })
-
-  it('falls back to the free allowance for a missing plan', () => {
-    expect(getComputeActiveHoursAllowance(undefined)).toBe(300)
-  })
-
-  it('falls back to the free allowance for a plan id the table does not know', () => {
-    // The plan union is closed at compile time, but the API can start returning a new id
-    // before this table is updated. The cast reproduces that case deliberately.
-    const unknownPlan = 'some-future-plan' as OrgPlan['id']
-    expect(getComputeActiveHoursAllowance(unknownPlan)).toBe(300)
-    expect(getComputeDeploymentAllowance(unknownPlan)).toBe(1)
-    expect(getComputeInstanceAllowance(unknownPlan)).toBe(1)
-  })
-
-  it('covers every plan the API can return, so none silently falls back', () => {
-    const plans: OrgPlan['id'][] = ['free', 'pro', 'team', 'platform', 'enterprise']
-    for (const plan of plans) {
-      expect(COMPUTE_ACTIVE_HOURS_ALLOWANCE).toHaveProperty(plan)
-      expect(COMPUTE_DEPLOYMENT_ALLOWANCE).toHaveProperty(plan)
-      expect(COMPUTE_INSTANCE_ALLOWANCE).toHaveProperty(plan)
-    }
-  })
-})
-
-describe('allowance magnitudes', () => {
-  // One instance that never suspends burns ~730 hours a month. An allowance below that
-  // cannot cover a single always-on compute, which is most of what the product is for.
-  const HOURS_PER_MONTH_ALWAYS_ON = 730
-
-  it('gives every paid plan room for at least one always-on instance', () => {
-    for (const plan of ['pro', 'team', 'platform'] as const) {
-      const allowance = getComputeActiveHoursAllowance(plan)
-      expect(allowance).not.toBeNull()
-      expect(allowance!).toBeGreaterThanOrEqual(HOURS_PER_MONTH_ALWAYS_ON)
-    }
-  })
-
-  it('keeps instance limits consistent with the hours on offer', () => {
-    for (const plan of ['free', 'pro', 'team', 'platform'] as const) {
-      const allowance = getComputeActiveHoursAllowance(plan)
-      const instances = getComputeInstanceAllowance(plan)
-      if (allowance === null || instances === null) continue
-      // Never advertise more instances than a month of hours could ever feed.
-      expect(instances).toBeLessThanOrEqual(allowance)
-    }
-  })
-})
-
-describe('plan deployment allowances', () => {
-  it('returns the configured compute limit per plan', () => {
-    expect(getComputeDeploymentAllowance('free')).toBe(1)
-    expect(getComputeDeploymentAllowance('pro')).toBe(10)
-    expect(getComputeDeploymentAllowance('team')).toBe(30)
-  })
-
-  it('returns null for enterprise, which has no fixed limit', () => {
-    expect(getComputeDeploymentAllowance('enterprise')).toBeNull()
-  })
-})
-
-describe('plan instance allowances', () => {
-  it('returns the configured instance limit per plan', () => {
-    expect(getComputeInstanceAllowance('free')).toBe(1)
-    expect(getComputeInstanceAllowance('pro')).toBe(25)
-    expect(getComputeInstanceAllowance('team')).toBe(75)
-  })
-
-  it('returns null for enterprise, which has no fixed limit', () => {
-    expect(getComputeInstanceAllowance('enterprise')).toBeNull()
-  })
-
-  it('falls back to the free limit for a missing plan', () => {
-    expect(getComputeInstanceAllowance(undefined)).toBe(1)
   })
 })
 

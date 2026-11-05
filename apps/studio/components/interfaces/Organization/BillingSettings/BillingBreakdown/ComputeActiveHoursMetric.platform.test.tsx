@@ -1,5 +1,6 @@
 import { screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ComputeActiveHoursMetric } from './ComputeActiveHoursMetric'
 import type { OrgPlan, OrgSubscription } from '@/data/subscriptions/types'
@@ -22,7 +23,19 @@ const render = (plan: OrgPlan['id'], relativeToSubscription = true) =>
     />
   )
 
+const setComputeLimitsMode = (mode: 'alpha' | 'plans') => {
+  vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'local')
+  localStorage.setItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE, JSON.stringify(mode))
+}
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE)
+})
+
 describe('ComputeActiveHoursMetric', () => {
+  beforeEach(() => setComputeLimitsMode('plans'))
+
   it('leads with active hours against the plan allowance', async () => {
     render('pro')
 
@@ -65,5 +78,16 @@ describe('ComputeActiveHoursMetric', () => {
 
     render('team')
     expect(await screen.findByText(/\/ 12,000 hours/)).toBeInTheDocument()
+  })
+})
+
+describe('ComputeActiveHoursMetric in private alpha', () => {
+  beforeEach(() => setComputeLimitsMode('alpha'))
+
+  it('shows hours and computes without a plan denominator', async () => {
+    render('pro')
+
+    expect(await screen.findByText(/^\d[\d,]* hours$/)).toBeInTheDocument()
+    expect(await screen.findByText('7 computes')).toBeInTheDocument()
   })
 })

@@ -1,18 +1,14 @@
 import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon } from 'lucide-react'
+import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
-import {
-  COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
-  getComputeActiveHoursAllowance,
-  getComputeDeploymentAllowance,
-  getComputeInstanceAllowance,
-} from './ComputeUsage.constants'
 import { formatComputeHours } from './ComputeUsage.utils'
+import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
@@ -25,15 +21,9 @@ interface ComputePlanUsageProps {
   instances: ComputeInstance[]
 }
 
-/**
- * Compares what the plan includes against what the project is using. Counts the two entities
- * separately: computes are the deployments, instances are what each one runs. Figures are
- * estimates while Compute is in alpha — nothing here is billed yet.
- */
 export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const planId = organization?.plan?.id
-  const planName = organization?.plan?.name
+  const { limits, limitsLabel, noLimitLabel } = useComputeLimits(organization?.plan)
   const [isCollapsed, setIsCollapsed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.COMPUTE_PLAN_USAGE_COLLAPSED,
     false
@@ -51,9 +41,6 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     })
   )
 
-  const activeHoursAllowance = getComputeActiveHoursAllowance(planId)
-  const deploymentAllowance = getComputeDeploymentAllowance(planId)
-  const instanceAllowance = getComputeInstanceAllowance(planId)
   const declaredInstances = instances.reduce(
     (total, instance) => total + instance.declaredInstances,
     0
@@ -64,13 +51,11 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       <div className="flex items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
         <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
           <h3 className="text-sm text-foreground">Plan usage</h3>
-          <p className="text-xs text-foreground-lighter">
-            {planName === undefined ? 'Last 30 days' : `${planName} Plan · last 30 days`}
-          </p>
+          <p className="text-xs text-foreground-lighter">{`${limitsLabel} · last 30 days`}</p>
         </div>
         <div className="flex items-center gap-x-2">
           {organization?.slug && (
-            <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
+            <Button asChild>
               <Link href={`/org/${organization.slug}/usage#compute-services`}>View usage</Link>
             </Button>
           )}
@@ -91,33 +76,33 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
             label="Active hours"
             description="Hours instances spend serving traffic. Suspended instances do not accrue usage."
             used={usage?.activeHours ?? 0}
-            included={activeHoursAllowance}
+            included={limits.activeHours}
             limitKind="allowance"
             isLoading={isPending}
             format={formatComputeHours}
-            planName={planName}
+            noLimitLabel={noLimitLabel}
           />
 
           <UsageMeter
             label="Deployments"
             description="Deployments in this project. Each one runs its own instances."
             used={instances.length}
-            included={deploymentAllowance}
+            included={limits.deployments}
             limitKind="capacity"
             isLoading={false}
             format={(value) => value.toLocaleString()}
-            planName={planName}
+            noLimitLabel={noLimitLabel}
           />
 
           <UsageMeter
             label="Instances"
             description="Instances declared across every compute in this project."
             used={declaredInstances}
-            included={instanceAllowance}
+            included={limits.instances}
             limitKind="capacity"
             isLoading={false}
             format={(value) => value.toLocaleString()}
-            planName={planName}
+            noLimitLabel={noLimitLabel}
           />
         </div>
       )}
@@ -129,7 +114,6 @@ interface UsageMeterProps {
   label: string
   description: string
   used: number
-  /** `null` when the plan carries no fixed limit. */
   included: number | null
   /**
    * An allowance is consumed, so spending all of it is exhaustion. Capacity is occupied, so
@@ -138,7 +122,7 @@ interface UsageMeterProps {
   limitKind: 'allowance' | 'capacity'
   isLoading: boolean
   format: (value: number) => string
-  planName: string | undefined
+  noLimitLabel: string
 }
 
 const UsageMeter = ({
@@ -149,7 +133,7 @@ const UsageMeter = ({
   limitKind,
   isLoading,
   format,
-  planName,
+  noLimitLabel,
 }: UsageMeterProps) => {
   const hasLimit = included !== null && included > 0
   const usageRatio = hasLimit ? used / included : 0
@@ -193,11 +177,7 @@ const UsageMeter = ({
       {isAtCapacity && <p className="text-xs text-warning">At limit</p>}
       {isApproaching && <p className="text-xs text-warning">Approaching limit</p>}
 
-      {!hasLimit && !isLoading && (
-        <p className="text-xs text-foreground-lighter">
-          No fixed limit on the {planName ?? 'current'} Plan
-        </p>
-      )}
+      {!hasLimit && !isLoading && <p className="text-xs text-foreground-lighter">{noLimitLabel}</p>}
     </div>
   )
 }

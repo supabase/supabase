@@ -1,5 +1,6 @@
 import { screen, waitFor, within } from '@testing-library/react'
-import { describe, expect, it } from 'vitest'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ComputeServices } from './ComputeServices'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -16,7 +17,19 @@ const PLAN_NAMES: Record<string, string> = {
 const subscriptionOnPlan = (id: string) =>
   ({ plan: { id, name: PLAN_NAMES[id] } }) as unknown as OrgSubscription
 
+const setComputeLimitsMode = (mode: 'alpha' | 'plans') => {
+  vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'local')
+  localStorage.setItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE, JSON.stringify(mode))
+}
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE)
+})
+
 describe('ComputeServices', () => {
+  beforeEach(() => setComputeLimitsMode('plans'))
+
   it('renders the three Compute usage charts', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
 
@@ -83,7 +96,7 @@ describe('ComputeServices', () => {
   it('says there is no allowance rather than showing an empty legend on enterprise', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('enterprise')} />)
 
-    expect(await screen.findByText(/This plan has no fixed allowance/)).toBeInTheDocument()
+    expect(await screen.findByText(/No fixed limit on the Enterprise Plan/)).toBeInTheDocument()
     expect(screen.queryByText(/Plan limit ·/)).not.toBeInTheDocument()
   })
 
@@ -118,7 +131,7 @@ describe('ComputeServices', () => {
   it('reports no fixed allowance on enterprise rather than inventing a limit', async () => {
     customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('enterprise')} />)
 
-    expect(await screen.findByText(/no fixed allowance on this plan/)).toBeInTheDocument()
+    expect(await screen.findByText(/No fixed limit on the Enterprise Plan/)).toBeInTheDocument()
     expect(await screen.findByText('No limit')).toBeInTheDocument()
   })
 
@@ -153,5 +166,18 @@ describe('ComputeServices', () => {
     expect(
       await screen.findByText(/Compute is in alpha and these figures are estimates/)
     ).toBeInTheDocument()
+  })
+})
+
+describe('ComputeServices in private alpha', () => {
+  beforeEach(() => setComputeLimitsMode('alpha'))
+
+  it('labels the allowance as private alpha and drops the overage row', async () => {
+    customRender(<ComputeServices orgSlug="acme" subscription={subscriptionOnPlan('pro')} />)
+
+    expect(await screen.findByText('Included in Private alpha')).toBeInTheDocument()
+    expect(await screen.findByText('Unlimited')).toBeInTheDocument()
+    expect(screen.queryByText('Overage in period')).not.toBeInTheDocument()
+    expect(await screen.findByText(/Not metered during private alpha/)).toBeInTheDocument()
   })
 })

@@ -5,11 +5,8 @@ import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import {
-  getComputeActiveHoursAllowance,
-  getComputeDeploymentAllowance,
-} from '@/components/interfaces/Compute/ComputeUsage.constants'
 import { sumBy } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
 import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 
@@ -42,9 +39,9 @@ export const ComputeActiveHoursMetric = ({
     computeOrgUsageQueryOptions({ orgSlug: slug, projectRef, days: USAGE_WINDOW_DAYS })
   )
 
-  const planId = subscription?.plan.id
-  const allowanceHours = getComputeActiveHoursAllowance(planId)
-  const deploymentAllowance = getComputeDeploymentAllowance(planId)
+  const { limits } = useComputeLimits(subscription?.plan)
+  const allowanceHours = limits.activeHours
+  const deploymentAllowance = limits.deployments
 
   if (isPending) {
     return (

@@ -1,7 +1,8 @@
 import { screen, waitFor, within } from '@testing-library/react'
 import { platformComponents } from 'api-types'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
-import { describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import type { ComputeInstance } from './Compute.types'
 import { ComputePlanUsage } from './ComputePlanUsage'
@@ -89,7 +90,19 @@ const mockOrganizationOnPlan = (id: OrgPlan['id'], name: string) => {
   })
 }
 
+const setComputeLimitsMode = (mode: 'alpha' | 'plans') => {
+  vi.stubEnv('NEXT_PUBLIC_ENVIRONMENT', 'local')
+  localStorage.setItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE, JSON.stringify(mode))
+}
+
+afterEach(() => {
+  vi.unstubAllEnvs()
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE)
+})
+
 describe('ComputePlanUsage', () => {
+  beforeEach(() => setComputeLimitsMode('plans'))
+
   it('meters active hours, computes and instances against what the plan includes', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
@@ -136,12 +149,12 @@ describe('ComputePlanUsage', () => {
     // Free includes one compute and one instance: the single compute fills its limit,
     // while two instances exceed theirs.
     const computes = await meter('Deployments')
-    expect(computes.getByText('1 of 1')).toBeInTheDocument()
+    expect(await computes.findByText('1 of 1')).toBeInTheDocument()
     expect(computes.getByText('At limit')).toBeInTheDocument()
     expect(computes.queryByText('Over limit')).not.toBeInTheDocument()
 
     const instanceMeter = await meter('Instances')
-    expect(instanceMeter.getByText('2 of 1')).toBeInTheDocument()
+    expect(await instanceMeter.findByText('2 of 1')).toBeInTheDocument()
     expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
   })
 
@@ -165,5 +178,45 @@ describe('ComputePlanUsage', () => {
     expect(await screen.findByText(/Team Plan · last 30 days/)).toBeInTheDocument()
     expect(await screen.findByText('1 of 30')).toBeInTheDocument()
     expect(await screen.findByText('1 of 75')).toBeInTheDocument()
+  })
+})
+
+describe('ComputePlanUsage in private alpha', () => {
+  beforeEach(() => setComputeLimitsMode('alpha'))
+
+  it('measures instances against the alpha cap', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByText(/Private alpha · last 30 days/)).toBeInTheDocument()
+    expect(await screen.findByText('1 of 2')).toBeInTheDocument()
+  })
+
+  it('flags instances over the alpha cap', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(
+      <ComputePlanUsage
+        projectRef="default"
+        instances={[instance({ name: 'a', declaredInstances: 3 })]}
+      />,
+      { profileContext: PROFILE_CONTEXT }
+    )
+
+    const instanceMeter = await meter('Instances')
+    expect(instanceMeter.getByText('3 of 2')).toBeInTheDocument()
+    expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
+  })
+
+  it('does not meter active hours or deployments', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    await waitFor(() => {
+      expect(screen.getAllByText('Not metered during private alpha')).toHaveLength(2)
+    })
   })
 })

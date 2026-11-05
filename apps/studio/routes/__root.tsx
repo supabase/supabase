@@ -190,6 +190,14 @@ const MetricsTab = IS_DEV_TOOLBAR_ENABLED
     )
   : () => null
 
+const ComputeLimitsTab = IS_DEV_TOOLBAR_ENABLED
+  ? lazy(() =>
+      import('@/components/ui/DevToolbar/ComputeLimitsTab').then((m) => ({
+        default: m.ComputeLimitsTab,
+      }))
+    )
+  : () => null
+
 const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
   ? [
       {
@@ -216,6 +224,15 @@ const devToolbarExtraTabs: ExtraTab[] = IS_DEV_TOOLBAR_ENABLED
         content: (
           <Suspense fallback={null}>
             <ProjectStatusTab />
+          </Suspense>
+        ),
+      },
+      {
+        id: 'compute-limits',
+        label: 'Compute',
+        content: (
+          <Suspense fallback={null}>
+            <ComputeLimitsTab />
           </Suspense>
         ),
       },
