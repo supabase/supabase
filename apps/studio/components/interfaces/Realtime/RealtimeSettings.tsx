@@ -40,6 +40,7 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { IS_PLATFORM } from '@/lib/constants'
 
 const formId = 'realtime-configuration-form'
 
@@ -309,6 +310,17 @@ export const RealtimeSettings = () => {
       ),
       suspend: values.suspend,
     })
+  }
+
+  // The realtime config endpoint is platform-only, so the query never runs self-hosted
+  if (!IS_PLATFORM) {
+    return (
+      <Admonition
+        type="default"
+        title="Realtime settings are not available for self-hosted projects"
+        description="Realtime settings are only available for Supabase Platform projects."
+      />
+    )
   }
 
   if (isLoading) {

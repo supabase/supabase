@@ -19,12 +19,14 @@ const {
   mockUseSelectedOrganizationQuery,
   mockUseSelectedProjectQuery,
   mockUseDatabasePoliciesQuery,
+  mockIsPlatform,
 } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
   mockUseMaxConnectionsQuery: vi.fn(),
   mockUseSelectedOrganizationQuery: vi.fn(),
   mockUseSelectedProjectQuery: vi.fn(),
   mockUseDatabasePoliciesQuery: vi.fn(),
+  mockIsPlatform: { value: true },
 }))
 
 vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
@@ -50,7 +52,12 @@ vi.mock('@/data/database-policies/database-policies-query', () => ({
 
 vi.mock('@/lib/constants', async (importOriginal) => {
   const actual = await importOriginal<Record<string, unknown>>()
-  return { ...actual, IS_PLATFORM: true }
+  return {
+    ...actual,
+    get IS_PLATFORM() {
+      return mockIsPlatform.value
+    },
+  }
 })
 
 const REALTIME_CONFIG = {
@@ -95,6 +102,7 @@ const REALTIME_ENTITLEMENTS: Entitlement[] = buildRealtimeEntitlements()
 
 describe('RealtimeSettings', () => {
   beforeEach(() => {
+    mockIsPlatform.value = true
     mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseSelectedProjectQuery.mockReturnValue({
       data: { ref: 'default', connectionString: 'postgresql://example' },
@@ -126,6 +134,17 @@ describe('RealtimeSettings', () => {
     expect(
       screen.queryByText('Supabase has suspended Realtime for this project')
     ).not.toBeInTheDocument()
+  })
+
+  test('shows an unavailable notice instead of loading when self-hosted', () => {
+    mockIsPlatform.value = false
+
+    customRender(<RealtimeSettings />)
+
+    expect(
+      screen.getByText('Realtime settings are not available for self-hosted projects')
+    ).toBeInTheDocument()
+    expect(screen.queryByLabelText('Postgres Changes connection pool size')).not.toBeInTheDocument()
   })
 
   test('falls back to the default postgres changes pool value when omitted', async () => {
