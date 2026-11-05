@@ -217,6 +217,12 @@
 /* Active item: green, underlined, with a guide mark on the group's rule */
 @utility cli-nav-item {
   @apply -ml-px block border-l border-transparent py-0.5 pl-3.5 font-mono text-sm text-foreground-lighter hover:text-foreground;
+  &[data-depth='1'] {
+    @apply pl-7;
+  }
+  &[data-depth='2'] {
+    @apply pl-10;
+  }
   transition:
     color 0.2s,
     border-color 0.2s;

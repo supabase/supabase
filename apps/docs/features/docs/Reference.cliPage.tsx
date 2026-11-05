@@ -51,6 +51,14 @@ import ReactMarkdown from 'react-markdown'
 import remarkGfm from 'remark-gfm'
 import { Badge, cn, Heading } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { highlightCode } from 'ui-patterns/CodeBlock/CodeBlock.highlight'
+import { getTokenClassName } from 'ui-patterns/CodeBlock/CodeBlock.tokens'
+import { CodeBlockControls } from 'ui-patterns/CodeBlock/CodeBlockControls'
+import {
+  CodeBlockFrame,
+  CodeBlockTokens,
+  type CodeToken,
+} from 'ui-patterns/CodeBlock/CodeBlockFrame'
 
 export async function CliReferencePage({ version, path }: { version: string; path: string[] }) {
   const page = await resolveCliPage(version, path)
@@ -140,6 +148,8 @@ function CliNavigation({
           href: cliPageHref(version, cliCommandRel(command.title)),
           label: shortLabel(cliCommandName(command.title), names),
           title: command.title,
+          depth: names.filter((name) => cliCommandName(command.title).startsWith(`${name} `))
+            .length,
         }))
         // Sorting by the full path puts each parent right before its own subcommands.
         .sort((a, b) => a.title.localeCompare(b.title)),
@@ -266,6 +276,31 @@ function CliMarkdown({ source, className }: { source: string; className?: string
       <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>
         {psqlTables(source)}
       </ReactMarkdown>
+    </div>
+  )
+}
+
+/** Bash grammar splits `<name>` as a redirect, so each placeholder's inner text is recolored as one word. */
+async function Usage({ code }: { code: string }) {
+  const { tokens } = await highlightCode(code, 'bash')
+  const lines = tokens.map((line) => {
+    let placeholderClass: string | undefined
+    return line.map(({ content, color, fontStyle }, index): CodeToken => {
+      const className = getTokenClassName(color, fontStyle)
+      if (content === '<' || content === '>') placeholderClass = undefined
+      else if (line[index - 1]?.content === '<') placeholderClass = className
+      return [content, placeholderClass ?? className]
+    })
+  })
+  return (
+    <div className="cli-command">
+      <CodeBlockFrame
+        lang="bash"
+        lineCount={lines.length}
+        controls={<CodeBlockControls content={code} />}
+      >
+        <CodeBlockTokens lineNumbers={false} lines={lines} />
+      </CodeBlockFrame>
     </div>
   )
 }
@@ -414,7 +449,7 @@ function CliCommandPage({ model, command }: { model: CliModel; command: CliComma
       ))}
       {showFirst && <CliMarkdown source={first} />}
       <Section id="usage" title="Usage">
-        <Command code={command.usage ?? command.title} />
+        <Usage code={command.usage ?? command.title} />
       </Section>
       {subcommands.length > 0 && (
         <Section id="subcommands" title="Subcommands">

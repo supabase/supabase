@@ -14,6 +14,8 @@ export interface CliNavLink {
   href: string
   label: string
   title: string
+  /** Number of ancestor commands listed in the same group. */
+  depth?: number
 }
 
 export interface CliNavGroup {
@@ -127,6 +129,7 @@ export function CliNavigationLinks({
                     onClick={closeMobileMenu}
                     aria-current={item.href === activeHref ? 'page' : undefined}
                     className="cli-nav-item"
+                    data-depth={item.depth || undefined}
                   >
                     <span>{item.label}</span>
                   </Link>
