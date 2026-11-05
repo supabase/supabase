@@ -191,8 +191,9 @@ export const ConnectSheet = () => {
                 />
               </div>
 
-              {/* The server env tab renders its own note next to the keys it offers to copy. */}
-              {state.mode !== 'warehouse' && state.mode !== 'server' && (
+              {/* Only framework snippets embed API keys. The server env tab renders its own note
+                  next to the keys it offers to copy. */}
+              {state.mode === 'framework' && (
                 <ApiKeysAccessNote
                   grant={apiKeysGrant}
                   fallback="Replace the placeholders with your own keys."
