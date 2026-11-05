@@ -1,4 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { Link } from '@tanstack/react-router'
+import { useFlag } from 'common'
 import { PropsWithChildren, useEffect, useId, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -37,19 +39,23 @@ const VerificationSchema = z.object({
 type VerificationValues = z.infer<typeof VerificationSchema>
 
 interface IdentityVerificationProps {
+  canUseRecoveryCodes?: boolean
+  returnTo?: string
   factorToAvoidId?: string
   onCancel: () => void
   onCheckingChange?: (isChecking: boolean) => void
 }
 
 export const IdentityVerification = ({
+  canUseRecoveryCodes = false,
+  returnTo = '/account/security',
   factorToAvoidId,
   onCancel,
   onCheckingChange,
   children,
 }: PropsWithChildren<IdentityVerificationProps>) => {
   const verificationId = useId()
-
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const [restoreFocusTo] = useState(() =>
     typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
       ? document.activeElement
@@ -152,6 +158,8 @@ export const IdentityVerification = ({
                   error={error}
                   onVerified={handleVerified}
                   onCancel={onCancel}
+                  canUseRecoveryCodes={enableAuthRecoveryCodes && canUseRecoveryCodes}
+                  returnTo={returnTo}
                 />
               )}
               {(readError || factors.isPending) && (
@@ -170,12 +178,16 @@ export const IdentityVerification = ({
 const VerificationForm = ({
   verifiedFactors,
   factorToAvoidId,
+  canUseRecoveryCodes,
+  returnTo,
   error,
   onVerified,
   onCancel,
 }: {
   verifiedFactors: MFAFactor[]
   factorToAvoidId?: string
+  canUseRecoveryCodes: boolean
+  returnTo: string
   error: { message: string } | null
   onCancel: () => void
   onVerified: () => Promise<void>
@@ -284,6 +296,13 @@ const VerificationForm = ({
           >
             Verify
           </Button>
+          {canUseRecoveryCodes && (
+            <Button asChild block variant="text">
+              <Link to="/sign-in-recovery-code" search={{ returnTo }}>
+                Use recovery code instead
+              </Link>
+            </Button>
+          )}
           <Button block type="button" variant="text" onClick={onCancel}>
             Cancel
           </Button>

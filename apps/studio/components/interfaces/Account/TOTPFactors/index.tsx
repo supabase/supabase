@@ -242,6 +242,9 @@ export const TOTPFactors = () => {
           void setResumeFactorId(null)
         }}
         hasRecoveryCodes={status === 'available'}
+        canUseRecoveryCodes={
+          enableAuthRecoveryCodes && status === 'available' && !!codes && codes.remaining > 0
+        }
       />
     </>
   )
