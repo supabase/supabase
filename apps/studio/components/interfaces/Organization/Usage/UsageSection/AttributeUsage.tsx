@@ -1,9 +1,11 @@
+import { useFlag } from 'common'
 import { AlertTriangleIcon, BarChart2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { LogVolumeControlHint } from '../LogVolumeControlHint'
 import { SectionContent } from '../SectionContent'
 import { CategoryAttribute } from '../Usage.constants'
 import {
@@ -16,6 +18,7 @@ import { ChartMeta } from './UsageSection'
 import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { SparkBar } from '@/components/ui/SparkBar'
+import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
@@ -53,6 +56,7 @@ const AttributeUsage = ({
   isSuccess,
   currentBillingCycleSelected,
 }: AttributeUsageProps) => {
+  const isLogVolumeControlsEnabled = useFlag('enableLogVolumeControls')
   const upgradeUrl = useGetUpgradeUrl(slug ?? '', subscription, attribute.key)
   const usageRatio = (usageMeta?.usage ?? 0) / (usageMeta?.pricing_free_units ?? 0)
   const usageExcess = (usageMeta?.usage ?? 0) - (usageMeta?.pricing_free_units ?? 0)
@@ -79,7 +83,15 @@ const AttributeUsage = ({
 
   return (
     <div id={attribute.anchor} className="scroll-my-12">
-      <SectionContent section={attribute}>
+      <SectionContent
+        section={attribute}
+        descriptionFooter={
+          isLogVolumeControlsEnabled &&
+          attribute.key === PricingMetric.LOG_INGESTION && (
+            <LogVolumeControlHint projectRef={projectRef} />
+          )
+        }
+      >
         {isLoading && (
           <div className="space-y-2">
             <ShimmeringLoader />

@@ -1,6 +1,3 @@
-import { useFlag } from 'common'
-import Link from 'next/link'
-
 import { dailyUsageToDataPoints } from './Usage.utils'
 import UsageSection from './UsageSection/UsageSection'
 import { DataPoint } from '@/data/analytics/constants'
@@ -26,7 +23,6 @@ const OrgLogUsage = ({
   orgDailyStats,
   isLoadingOrgDailyStats,
 }: OrgLogUsageProps) => {
-  const isLogVolumeControlsEnabled = useFlag('enableLogVolumeControls')
   const chartMeta: {
     [key: string]: { data: DataPoint[]; margin: number; isLoading: boolean }
   } = {
@@ -68,24 +64,6 @@ const OrgLogUsage = ({
       chartMeta={chartMeta}
       subscription={subscription}
       currentBillingCycleSelected={currentBillingCycleSelected}
-      headerContent={
-        isLogVolumeControlsEnabled && (
-          <p className="text-sm text-foreground-light">
-            Want to reduce log volume and save costs? Find log volume controls in your{' '}
-            {projectRef ? (
-              <Link
-                href={`/project/${projectRef}/settings/general#logs`}
-                className="text-foreground underline"
-              >
-                project settings
-              </Link>
-            ) : (
-              'project settings'
-            )}
-            .
-          </p>
-        )
-      }
     />
   )
 }

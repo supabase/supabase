@@ -1,5 +1,3 @@
-import type { ReactNode } from 'react'
-
 import SectionHeader from '../SectionHeader'
 import { CategoryMetaKey, USAGE_CATEGORIES } from '../Usage.constants'
 import AttributeUsage from './AttributeUsage'
@@ -24,7 +22,6 @@ export interface UsageSectionProps {
   currentBillingCycleSelected: boolean
   startDate?: string
   endDate?: string
-  headerContent?: ReactNode
 }
 
 const UsageSection = ({
@@ -36,7 +33,6 @@ const UsageSection = ({
   currentBillingCycleSelected,
   startDate,
   endDate,
-  headerContent,
 }: UsageSectionProps) => {
   const {
     data: usage,
@@ -63,9 +59,7 @@ const UsageSection = ({
           title={categoryMeta.name}
           description={categoryMeta.description}
           className="pb-0"
-        >
-          {headerContent}
-        </SectionHeader>
+        />
       </ScaffoldContainer>
 
       {categoryMeta.attributes.map((attribute) =>
