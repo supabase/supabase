@@ -41,6 +41,8 @@ describe('resolveChartInterval', () => {
   it('falls back to the default when nothing is stored', () => {
     expect(resolveChartInterval(undefined, 7)).toBe('1day')
     expect(resolveChartInterval(undefined, 1)).toBe('1hr')
+    expect(resolveChartInterval(null, 7)).toBe('1day')
+    expect(resolveChartInterval(null, 1)).toBe('1hr')
   })
 
   it('falls back to the default when the stored value is invalid', () => {
