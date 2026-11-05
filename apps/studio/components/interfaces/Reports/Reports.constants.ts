@@ -572,6 +572,36 @@ group by log_attributes['request.path'], log_attributes['request.search']
 order by count desc
 limit 12`,
       },
+      egressTopStoragePaths: {
+        queryType: 'logs',
+        safeSql: (filters) => safeLogSql`
+        -- reports-egress-top-storage-paths
+SELECT
+  r.path as path,
+  count(id) as count
+from edge_logs f
+  cross join unnest(f.metadata) as m
+  cross join unnest(m.request) as r
+where starts_with(r.path, '/storage/v1/object')
+  and r.method = 'GET'
+  ${generateRegexpWhereSafe(filters, false)}
+group by path
+order by count desc
+limit 20
+    `,
+        safeSqlOtel: (filters) => safeLogSql`
+select
+  log_attributes['request.path'] as path,
+  toFloat64(count()) as count
+from logs
+where source = 'edge_logs'
+  and startsWith(log_attributes['request.path'], '/storage/v1/object')
+  and log_attributes['request.method'] = 'GET'
+  ${generateOtelWhereSafe(filters, false)}
+group by log_attributes['request.path']
+order by count desc
+limit 20`,
+      },
     },
   },
   [Presets.QUERY_PERFORMANCE]: {
