@@ -1,5 +1,12 @@
 # Docker image version updates in docker-compose.yml
 
+## 2026-11-05
+- supabase/studio:2026.11.02-sha-a05e7ec (prev supabase/studio:2026.10.12-sha-3699278)
+- supabase/realtime:v2.148.3 (prev supabase/realtime:v2.143.3)
+- supabase/storage-api:v1.89.12 (prev supabase/storage-api:v1.81.0)
+- darthsim/imgproxy:v4.0.21 (prev darthsim/imgproxy:v3.31.4)
+- supabase/edge-runtime:v1.77.9 (prev supabase/edge-runtime:v1.77.4)
+
 ## 2026-10-16
 - supabase/studio:2026.10.12-sha-3699278 (prev supabase/studio:2026.09.07-sha-7996410)
 - supabase/gotrue:v2.197.0 (prev supabase/gotrue:v2.196.0)
