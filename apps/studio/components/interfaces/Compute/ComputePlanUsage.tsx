@@ -7,12 +7,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
-import {
-  formatGbHours,
-  formatPercentage,
-  formatVcpuHours,
-  getCpuUtilization,
-} from './ComputeUsage.utils'
+import { formatPercentage, getCpuUtilization } from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
@@ -50,7 +45,8 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     (total, instance) => total + instance.declaredInstances,
     0
   )
-  const formatCount = (value: number) => value.toLocaleString()
+  const formatCount = (value: number) =>
+    value.toLocaleString(undefined, { maximumFractionDigits: 0 })
 
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
 
@@ -62,7 +58,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       included: limits.vcpuHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatVcpuHours,
+      format: formatCount,
       detail: cpuUtilization === null ? undefined : `${formatPercentage(cpuUtilization)} CPU used`,
     },
     {
@@ -72,7 +68,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       included: limits.gbHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatGbHours,
+      format: formatCount,
     },
     {
       label: 'Instances',
@@ -221,7 +217,7 @@ const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
-      <div className="flex items-baseline justify-between gap-3">
+      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
         <div className="flex items-center gap-x-1.5">
           <p className="text-sm text-foreground">{label}</p>
           <InfoTooltip side="top">{description}</InfoTooltip>

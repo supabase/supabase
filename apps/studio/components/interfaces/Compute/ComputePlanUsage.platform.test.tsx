@@ -104,7 +104,7 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters vCPU, memory, deployments and instances against what the plan includes', async () => {
+  it('meters vCPU, memory and instances against what the plan includes', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
@@ -116,8 +116,8 @@ describe('ComputePlanUsage', () => {
     expect(await screen.findByText('Instances')).toBeInTheDocument()
     expect(screen.queryByText('Deployments')).not.toBeInTheDocument()
     expect(await screen.findByText('1 of 25')).toBeInTheDocument()
-    expect(await screen.findByText(/vCPU-hrs of 1,000 vCPU-hrs/)).toBeInTheDocument()
-    expect(await screen.findByText(/GB-hrs of 2,000 GB-hrs/)).toBeInTheDocument()
+    expect(await screen.findByText(/^[\d,]+ of 1,000$/)).toBeInTheDocument()
+    expect(await screen.findByText(/^[\d,]+ of 2,000$/)).toBeInTheDocument()
   })
 
   it('shows how much of the reserved vCPU did work', async () => {
