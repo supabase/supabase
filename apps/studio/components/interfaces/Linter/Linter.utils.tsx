@@ -300,11 +300,11 @@ export const lintInfoMap: LintInfo[] = [
   },
   {
     name: 'auth_third_party_shared_ci_issuer',
-    title: 'Shared CI/CD Issuer in Third-Party Auth',
+    title: 'Third-party auth trusts a CI/CD workflow issuer',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/third-party`,
     linkText: 'View settings',
-    docsLink: `${DOCS_URL}/guides/auth/third-party/custom-oidc#public-cicd-issuers`,
+    docsLink: `${DOCS_URL}/guides/auth/third-party/custom-oidc#cicd-workflow-identity-issuers`,
     category: 'security',
   },
   {

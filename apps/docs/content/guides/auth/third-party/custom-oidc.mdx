@@ -86,7 +86,7 @@ Here `user_id` must be a `text` column.
 
 ### Restrict access by issuer
 
-Your project trusts every issuer you add, and `sub` values from different issuers can collide. If you use more than one issuer, or you also use Supabase Auth, add a restrictive policy that checks the `iss` claim. For an issuer that signs tokens for many organizations, such as GitHub Actions, an `iss` check is not enough. See [Public CI/CD issuers](#public-cicd-issuers).
+Your project trusts every issuer you add, and `sub` values from different issuers can collide. If you use more than one issuer, or you also use Supabase Auth, add a restrictive policy that checks the `iss` claim. For a CI/CD workflow identity issuer, such as GitHub Actions, an `iss` check is not enough. See [CI/CD workflow identity issuers](#cicd-workflow-identity-issuers).
 
 ```sql
 create policy "Restrict access to trusted issuers"
@@ -108,17 +108,30 @@ Postgres has two types of policies: permissive and restrictive. This example use
 
 For more on restrictive policies and on sharing the check across tables, Storage and Realtime, see the [Firebase Auth guide](/docs/guides/auth/third-party/firebase-auth#adding-an-extra-layer-of-security-to-your-projects-rls-policies-self-hosting-only).
 
-### Public CI/CD issuers
+### CI/CD workflow identity issuers
 
-Some CI/CD services run one OIDC issuer for all of their customers. Examples are GitHub Actions (`https://token.actions.githubusercontent.com`) and GitLab.com (`https://gitlab.com`). Unlike a per-project issuer, these issuers sign tokens for every account on the service.
+Third-party auth is for signing in your end users. CI/CD services also run OIDC issuers, but their tokens identify a workflow or a machine, not a person. Don't add these issuers as a third-party auth provider. To let a pipeline reach your project, keep a [secret API key](/docs/guides/getting-started/api-keys) in your pipeline's secrets instead. Secret keys bypass RLS, so store them with care.
 
-<Admonition type="danger" title="A shared issuer trusts every tenant">
+<Admonition type="danger" title="CI/CD tokens are not scoped to your project">
 
-If you add a public CI/CD issuer, a token from any other organization's pipeline passes your project's signature and issuer checks. Whatever Postgres role your project assigns to these tokens, any account on the service can get it, unless your RLS policies also check a claim that identifies your organization or repository. An `iss` check alone does not do this.
+Some of these issuers sign tokens for every account on the service, so a token from any other organization's pipeline passes your project's signature and issuer checks. Whatever Postgres role your project assigns to these tokens, any account on the service can get it, unless your RLS policies also check a claim that identifies your organization or repository. An `iss` check alone does not do this.
 
 </Admonition>
 
-To keep other tenants out, require a claim that only your pipelines carry. For GitHub Actions, `repository` holds the owner and repository name, and `repository_owner` holds the owner. Their numeric counterparts, `repository_id` and `repository_owner_id`, don't change when you rename or transfer a repository, so prefer them when you can.
+These services run workflow identity issuers:
+
+| Service           | Issuer URL                                                      | Scope of the issuer         |
+| ----------------- | --------------------------------------------------------------- | --------------------------- |
+| GitHub Actions    | `https://token.actions.githubusercontent.com`                   | Shared by all accounts      |
+| GitHub Enterprise | `https://token.actions.githubusercontent.com/<enterprise-slug>` | One per enterprise          |
+| GitLab.com        | `https://gitlab.com`                                            | Shared by all accounts      |
+| Buildkite         | `https://agent.buildkite.com`                                   | Shared by all organizations |
+| HCP Terraform     | `https://app.terraform.io`                                      | Shared by all organizations |
+| CircleCI          | `https://oidc.circleci.com/org/<organization-id>`               | One per organization        |
+
+Bitbucket Pipelines, Azure DevOps, Bitrise, Codefresh, Semaphore, Harness, and Spacelift also issue workflow tokens. Check your service's documentation for its issuer URL and for the claims it signs.
+
+To keep other accounts out when you do use one of these issuers, require a claim that only your pipelines carry. For GitHub Actions, `repository` holds the owner and repository name, and `repository_owner` holds the owner. Their numeric counterparts, `repository_id` and `repository_owner_id`, don't change when you rename or transfer a repository, so prefer them when you can.
 
 This restrictive policy lets Supabase Auth users through, and accepts GitHub Actions tokens only from one repository:
 
@@ -140,6 +153,6 @@ Replace `123456789` with your repository's ID. To check by name instead, compare
 
 You can also check the `sub` claim, which GitHub builds from the repository and the workflow context. A default `sub` looks like `repo:my-org/my-repo:ref:refs/heads/main`, or `repo:my-org/my-repo:environment:production` for a job that uses an environment. Use `starts_with((select auth.jwt()->>'sub'), 'repo:my-org/my-repo:')` to match every job in one repository, or match the full value to limit access to one branch or environment. Repositories created after July 15, 2026 use a `sub` that includes IDs, such as `repo:my-org@123456/my-repo@456789:ref:refs/heads/main`. Check a token from your own workflow before you write the pattern. See GitHub's [OIDC reference](https://docs.github.com/en/actions/reference/security/oidc) for the claim list.
 
-Other CI/CD services work the same way. GitLab.com tokens carry `namespace_path`, `project_path`, `namespace_id`, and `project_id`. Check your service's documentation for the claims it signs, and use stable IDs where it offers them.
+Other services work the same way. GitLab.com tokens carry `namespace_path`, `project_path`, `namespace_id`, and `project_id`. Check your service's documentation for the claims it signs, and use stable IDs where it offers them.
 
-The Security Advisor flags projects that trust a shared CI/CD issuer with the `auth_third_party_shared_ci_issuer` check.
+When you enter one of these issuer URLs in the Dashboard, a warning appears in the **Add custom OIDC provider** dialog. The warning doesn't block you from adding the provider. After you add one, the Security Advisor flags it with the `auth_third_party_shared_ci_issuer` check.
