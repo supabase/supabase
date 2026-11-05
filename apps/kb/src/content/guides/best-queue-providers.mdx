@@ -25,7 +25,7 @@ Queues are pull-based, so consumers fetch messages when they're ready, including
 
 Amazon SQS is AWS's fully managed message queue service, with Standard queues for high throughput and FIFO queues for ordered, deduplicated delivery.
 
-SQS includes has a free tier, then charges for quantities of specific requests, with separate rates for Standard and FIFO queues.
+SQS has a free tier, then charges for quantities of specific requests, with separate rates for Standard and FIFO queues.
 
 Choose SQS when your stack is already on AWS and you want a queue that integrates with Lambda, SNS, and IAM.
 
@@ -33,7 +33,7 @@ Choose SQS when your stack is already on AWS and you want a queue that integrate
 
 Cloudflare Queues sends and receives messages with guaranteed delivery, integrated with Cloudflare Workers. It supports batching, retries, delays, dead letter queues, and pull consumers over HTTP.
 
-Cloudflare Queues bills per operation and queues above your current Workers plan. It has no charges for egress bandwidth.
+Cloudflare Queues charges for operations and for queues above the included amount on your current Workers plan. It has no charges for egress bandwidth.
 
 Choose Cloudflare Queues when your app already runs on Workers and you want a queue close to your edge code.
 
@@ -41,7 +41,7 @@ Choose Cloudflare Queues when your app already runs on Workers and you want a qu
 
 Upstash QStash is a serverless messaging and scheduling service that delivers messages to your HTTP endpoints, with retries, delays, and cron-style schedules.
 
-QStash has a free tier, and its paid plans are pay-as-you-go by message volume.
+QStash has a free tier, usage-based pricing, and fixed monthly plans.
 
 Choose QStash when you run on serverless or edge platforms and want a queue that calls your HTTP endpoints, so you don't run any long-lived workers.
 
