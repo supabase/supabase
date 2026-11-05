@@ -9,6 +9,7 @@ import {
   getMenuId,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { LegacyTopNavBar } from '~/components/Navigation/NavigationMenu/TopNavBar.legacy'
 import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
@@ -171,7 +172,7 @@ function TopNavSkeleton({ children }) {
   return (
     <div className="flex flex-col h-full w-full">
       <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
-        <TopNavBar />
+        {useDocsLayoutV2() ? <TopNavBar /> : <LegacyTopNavBar />}
       </div>
       {children}
     </div>
@@ -189,6 +190,7 @@ function SidebarSkeleton({
   hideSideNav,
   additionalNavItems,
 }: SkeletonProps) {
+  const isLayoutV2 = useDocsLayoutV2()
   const pathname = usePathname()
   const menuId = _menuId ?? getMenuId(pathname)
 
@@ -209,6 +211,7 @@ function SidebarSkeleton({
   }
 
   const menuButtonRef = useRef<HTMLButtonElement>(null)
+  const MobileTopNavBar = isLayoutV2 ? TopNavBar : LegacyTopNavBar
 
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
@@ -230,7 +233,7 @@ function SidebarSkeleton({
       )}
       <Container>
         <div className="sticky top-0 z-20 lg:hidden">
-          <TopNavBar
+          <MobileTopNavBar
             isMenuOpen={mobileMenuOpen}
             onMenuToggle={hideSideNav ? undefined : handleMenuToggle}
             scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
