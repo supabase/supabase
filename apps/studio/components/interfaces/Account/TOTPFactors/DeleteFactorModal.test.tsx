@@ -1,5 +1,6 @@
 import { AuthApiError, AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -198,6 +199,27 @@ describe('DeleteFactorModal identity verification', () => {
       error: null,
     })
   })
+  test('recovery-code fallback is a usable link without a router provider', async () => {
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{ configcat: { enableAuthRecoveryCodes: true }, posthog: {}, hasLoaded: true }}
+      >
+        <DeleteFactorModal
+          visible
+          factorId="some_id"
+          lastFactorToBeDeleted
+          hasRecoveryCodes
+          canUseRecoveryCodes
+          onClose={vi.fn()}
+        />
+      </FeatureFlagContext.Provider>
+    )
+    expect(await screen.findByRole('link', { name: 'Use recovery code instead' })).toHaveAttribute(
+      'href',
+      '/sign-in-recovery-code?returnTo=%2Faccount%2Fsecurity%3FremoveAuthenticator%3Dsome_id'
+    )
+  })
+
   test('AAL1 prompts verification without deleting anything', async () => {
     renderDeletion()
     await screen.findByText('Verify your identity')
