@@ -413,7 +413,6 @@ withTestDatabase(
   }
 )
 
-
 withTestDatabase(
   'update function with complex config_params roundtrip (hyphens, spaces, quoted scalars, search_path)',
   async ({ executeQuery }) => {
@@ -461,6 +460,49 @@ withTestDatabase(
     expect(updatedFunc!.config_params).toEqual(retrievedFunc!.config_params)
 
     // 5. Cleanup
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updatedFunc!))
+    await executeQuery(removeSql)
+  }
+)
+
+withTestDatabase(
+  'update function keeps scalar config_params that look like sentinels',
+  async ({ executeQuery }) => {
+    // Scalar values `""` and `FROM CURRENT` are real saved values, not the
+    // empty-string and FROM CURRENT sentinels used by create(). An empty
+    // search_path is stored as `""` and must still round-trip as empty.
+    await executeQuery(safeSql`
+      create function public.test_config_sentinel_values()
+      returns integer
+      language sql
+      set application_name to '""'
+      set "app.mode" to 'FROM CURRENT'
+      set search_path to ''
+      as 'select 1';
+    `)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_config_sentinel_values',
+      schema: 'public',
+      args: [],
+    })
+    const retrievedFunc = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+
+    expect(retrievedFunc!.config_params).toEqual({
+      application_name: '""',
+      'app.mode': 'FROM CURRENT',
+      search_path: '""',
+    })
+
+    const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(retrievedFunc!), {
+      definition: 'select 2',
+    })
+    await executeQuery(updateSql)
+
+    const updatedFunc = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updatedFunc!.definition).toBe('select 2')
+    expect(updatedFunc!.config_params).toEqual(retrievedFunc!.config_params)
+
     const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updatedFunc!))
     await executeQuery(removeSql)
   }

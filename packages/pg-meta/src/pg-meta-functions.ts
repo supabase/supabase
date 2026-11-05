@@ -345,9 +345,6 @@ export function update(
   const requotedConfigParams = currentFunc.config_params
     ? Object.fromEntries(
         Object.entries(currentFunc.config_params).map(([param, value]) => {
-          if (value === 'FROM CURRENT' || value === '""') {
-            return [param, value]
-          }
           if (GUC_LIST_QUOTE.has(param.toLowerCase())) {
             return [param, value]
           }
