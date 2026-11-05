@@ -307,56 +307,54 @@ const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
   )
 }
 
+const pluralize = (count: number, singular: string) =>
+  `${count.toLocaleString()} ${singular}${count === 1 ? '' : 's'}`
+
 const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
   const totalReservedVcpuHours = sumBy(rows, (row) => row.reservedVcpuHours)
 
   return (
     <div className="divide-y">
-      <div className="grid grid-cols-12 gap-2 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
-        <span className="col-span-3">Project</span>
-        <span className="col-span-1 text-right">Computes</span>
-        <span className="col-span-1 text-right">Instances</span>
-        <span className="col-span-2 text-right">vCPU-hrs</span>
+      <div className="grid grid-cols-12 gap-4 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
+        <span className="col-span-6">Project</span>
+        <span className="col-span-4 text-right">vCPU-hrs</span>
         <span className="col-span-2 text-right">CPU used</span>
-        <span className="col-span-1 text-right">Requests</span>
-        <span className="col-span-2 text-right">Share</span>
       </div>
       {rows.map((row) => {
         const share =
           totalReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / totalReservedVcpuHours
         const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)
+
         return (
-          <div key={row.projectRef} className="grid grid-cols-12 items-center gap-2 px-card py-2.5">
-            <span className="col-span-3 truncate text-sm text-foreground">{row.projectName}</span>
-            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
-              {row.deployments}
-            </span>
-            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
-              {row.instances}
-            </span>
-            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-              {formatVcpuHours(row.reservedVcpuHours)}
-            </span>
-            <span className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
-              {cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
-            </span>
-            <span className="col-span-1 text-right text-sm tabular-nums text-foreground-light">
-              {formatComputeRequests(row.requests)}
-            </span>
-            <span className="col-span-2 flex items-center justify-end gap-2">
-              <span
-                aria-hidden
-                className="hidden h-1.5 w-12 overflow-hidden rounded-full bg-surface-300 sm:block"
+          <div key={row.projectRef} className="grid grid-cols-12 items-center gap-4 px-card py-2.5">
+            <div className="col-span-6 min-w-0">
+              <p className="truncate text-sm text-foreground">{row.projectName}</p>
+              <p className="truncate text-xs text-foreground-lighter">
+                {pluralize(row.deployments, 'compute')} · {pluralize(row.instances, 'instance')}
+              </p>
+            </div>
+            <div className="col-span-4 flex flex-col items-end gap-1">
+              <p className="text-sm tabular-nums text-foreground-light">
+                {formatVcpuHours(row.reservedVcpuHours)}
+              </p>
+              <div
+                className="flex items-center gap-2"
+                aria-label={`${formatPercentage(share)} of org vCPU-hours`}
               >
-                <span
-                  className="block h-full rounded-full bg-foreground"
-                  style={{ width: `${Math.round(share * 100)}%` }}
-                />
-              </span>
-              <span className="text-sm tabular-nums text-foreground-light">
-                {Math.round(share * 100)}%
-              </span>
-            </span>
+                <span aria-hidden className="h-1 w-12 overflow-hidden rounded-full bg-surface-400">
+                  <span
+                    className="block h-full rounded-full bg-foreground-light"
+                    style={{ width: formatPercentage(share) }}
+                  />
+                </span>
+                <span className="text-xs tabular-nums text-foreground-lighter">
+                  {formatPercentage(share)}
+                </span>
+              </div>
+            </div>
+            <p className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
+              {cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
+            </p>
           </div>
         )
       })}

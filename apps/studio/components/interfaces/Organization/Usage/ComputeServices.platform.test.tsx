@@ -137,7 +137,9 @@ describe('ComputeServices', () => {
     renderOnPlan('pro')
 
     expect(await screen.findByText('Production API')).toBeInTheDocument()
+    expect(await screen.findByText('2 computes · 3 instances')).toBeInTheDocument()
     expect(await screen.findByText('Sandbox')).toBeInTheDocument()
+    expect(await screen.findAllByText('1 compute · 1 instance')).not.toHaveLength(0)
     await waitFor(() => {
       expect(screen.getByText(/% from the largest project/)).toBeInTheDocument()
     })
