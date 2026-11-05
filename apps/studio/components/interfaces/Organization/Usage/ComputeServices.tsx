@@ -168,13 +168,7 @@ export const ComputeServices = ({
                 from the largest project
               </p>
             </div>
-            {byProject.length > 0 ? (
-              <div className="rounded-md border">
-                <ComputeProjectTable rows={byProject} />
-              </div>
-            ) : (
-              <NoComputeUsage />
-            )}
+            {byProject.length > 0 ? <ComputeProjectTable rows={byProject} /> : <NoComputeUsage />}
           </>
         )}
       </SectionContent>
@@ -314,8 +308,8 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
   const totalReservedVcpuHours = sumBy(rows, (row) => row.reservedVcpuHours)
 
   return (
-    <div className="divide-y">
-      <div className="grid grid-cols-12 gap-4 px-card py-2 text-xs font-mono uppercase text-foreground-lighter">
+    <div className="divide-y border-b">
+      <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
         <span className="col-span-6">Project</span>
         <span className="col-span-4 text-right">vCPU-hrs</span>
         <span className="col-span-2 text-right">CPU used</span>
@@ -326,7 +320,7 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
         const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)
 
         return (
-          <div key={row.projectRef} className="grid grid-cols-12 items-center gap-4 px-card py-2.5">
+          <div key={row.projectRef} className="grid grid-cols-12 items-center gap-4 py-1.5">
             <div className="col-span-6 min-w-0">
               <p className="truncate text-sm text-foreground">{row.projectName}</p>
               <p className="truncate text-xs text-foreground-lighter">
