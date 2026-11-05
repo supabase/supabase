@@ -20,27 +20,14 @@ interface DeleteFactorModalProps {
   recoveryCodesError?: { message: string } | null
   isCheckingRecoveryCodes?: boolean
   onRetryRecoveryCodes?: () => void
-  canUseRecoveryCodes?: boolean
   onClose: () => void
 }
 
 export const DeleteFactorModal = (props: DeleteFactorModalProps) => {
   if (!props.visible) return null
-
   return (
-    <IdentityVerification
-      factorToAvoidId={props.factorId ?? undefined}
-      canUseRecoveryCodes={props.canUseRecoveryCodes}
-      returnTo="/account/security"
-      onCancel={props.onClose}
-    >
-      {({ isVerified, requireVerification }) => (
-        <RemoveAuthenticatorConfirmation
-          {...props}
-          visible={isVerified}
-          onVerificationRequired={requireVerification}
-        />
-      )}
+    <IdentityVerification factorToAvoidId={props.factorId ?? undefined} onCancel={props.onClose}>
+      {(isVerified) => <RemoveAuthenticatorConfirmation {...props} visible={isVerified} />}
     </IdentityVerification>
   )
 }
@@ -55,8 +42,7 @@ const RemoveAuthenticatorConfirmation = ({
   isCheckingRecoveryCodes = false,
   onRetryRecoveryCodes,
   onClose,
-  onVerificationRequired,
-}: DeleteFactorModalProps & { onVerificationRequired: () => void }) => {
+}: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
   const [error, setError] = useState<{ message: string } | null>(null)
   const [hasRemovedRecoveryCodes, setHasRemovedRecoveryCodes] = useState(false)
@@ -68,17 +54,8 @@ const RemoveAuthenticatorConfirmation = ({
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
-  const handleRemovalError = (error: { message: string; code?: string }) => {
-    if (error.code === 'insufficient_aal') {
-      setError(null)
-      onVerificationRequired()
-    } else {
-      setError(error)
-    }
-  }
-
   const unenrollMFAMutation = useMfaUnenrollMutation({
-    onError: handleRemovalError,
+    onError: setError,
     onSuccess: async () => {
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
@@ -91,7 +68,7 @@ const RemoveAuthenticatorConfirmation = ({
   })
 
   const unenrollRecoveryCodesMutation = useRecoveryCodesUnenrollMutation({
-    onError: handleRemovalError,
+    onError: setError,
     onSuccess: () => {
       setHasRemovedRecoveryCodes(true)
       if (!factorId) return // Should never happen

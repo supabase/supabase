@@ -309,50 +309,6 @@ describe('DeleteFactorModal identity verification', () => {
     expect(listFactors).toHaveBeenCalledTimes(2)
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
   })
-  test('reverification preserves completed code removal and still requires confirmation', async () => {
-    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
-      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
-      error: null,
-    })
-    const unenroll = vi
-      .spyOn(auth.mfa, 'unenroll')
-      .mockResolvedValueOnce({
-        data: null,
-        error: new AuthError('AAL2 required', 403, 'insufficient_aal'),
-      })
-      .mockResolvedValueOnce({ data: { id: 'some_id' }, error: null })
-    vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
-      data: verifyResponse,
-      error: null,
-    })
-    renderDeletion()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
-    fireEvent.change(await screen.findByRole('textbox', { name: 'Authentication code' }), {
-      target: { value: '123456' },
-    })
-    fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    await screen.findByText('Remove authenticator')
-    expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
-    expect(unenroll).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Remove' }))
-    await waitFor(() => expect(unenroll).toHaveBeenCalledTimes(2))
-    expect(auth.mfa.recoveryCodes.unenroll).toHaveBeenCalledOnce()
-  })
-  test('insufficient assurance from the backend returns to verification without raw AAL copy', async () => {
-    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
-      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
-      error: null,
-    })
-    vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
-      data: null,
-      error: new AuthError('AAL2 required', 403, 'insufficient_aal'),
-    })
-    renderDeletion()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
-    await screen.findByText('Verify your identity')
-    expect(screen.queryByText(/AAL2 required/)).toBeNull()
-    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
-  })
 })
 
 describe('authenticator removal failures', () => {

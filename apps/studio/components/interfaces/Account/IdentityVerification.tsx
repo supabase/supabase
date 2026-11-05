@@ -1,7 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { Link } from '@tanstack/react-router'
-import { useFlag } from 'common'
 import { useId, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -24,11 +22,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import {
-  InterstitialLayout,
-  InterstitialLogoBadge,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
@@ -42,26 +36,21 @@ type VerificationValues = z.infer<typeof VerificationSchema>
 
 interface IdentityVerificationProps {
   factorToAvoidId?: string
-  canUseRecoveryCodes?: boolean
-  returnTo: string
   onCancel: () => void
-  children: (verification: { isVerified: boolean; requireVerification: () => void }) => ReactNode
+  children: (isVerified: boolean) => ReactNode
 }
 
 export const IdentityVerification = ({
   factorToAvoidId,
-  canUseRecoveryCodes = false,
-  returnTo,
   onCancel,
   children,
 }: IdentityVerificationProps) => {
-  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const [restoreFocusTo] = useState(() =>
     typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
       ? document.activeElement
       : null
   )
-  const [verification, setVerification] = useState<'required' | 'verified' | null>(null)
+  const [hasVerified, setHasVerified] = useState(false)
   const [error, setError] = useState<{ message: string } | null>(null)
   const [isCheckingSession, setIsCheckingSession] = useState(false)
   const verificationId = useId()
@@ -77,15 +66,10 @@ export const IdentityVerification = ({
     },
   })
   const isVerified =
-    verification === 'verified' ||
-    (verification === null &&
-      assurance.isFetchedAfterMount &&
-      !assurance.isError &&
-      assurance.data?.currentLevel === 'aal2')
+    hasVerified ||
+    (assurance.isFetchedAfterMount && !assurance.isError && assurance.data?.currentLevel === 'aal2')
   const needsCode =
-    !isVerified &&
-    (verification === 'required' ||
-      (assurance.isFetchedAfterMount && !assurance.isError && !assurance.isFetching))
+    !isVerified && assurance.isFetchedAfterMount && !assurance.isError && !assurance.isFetching
   const factors = useMfaListFactorsQuery({ enabled: needsCode })
   const verifiedFactors = (factors.data?.totp ?? []).filter(
     (factor) => factor.status === 'verified'
@@ -103,7 +87,7 @@ export const IdentityVerification = ({
           return
         }
         setError(null)
-        setVerification('verified')
+        setHasVerified(true)
       } catch (error) {
         setError({
           message:
@@ -124,13 +108,7 @@ export const IdentityVerification = ({
 
   return (
     <>
-      {children({
-        isVerified,
-        requireVerification: () => {
-          setError(null)
-          setVerification('required')
-        },
-      })}
+      {children(isVerified)}
       <Dialog open={!isVerified} onOpenChange={(open) => !open && onCancel()}>
         <DialogContent
           hideClose
@@ -145,25 +123,7 @@ export const IdentityVerification = ({
         >
           <DialogTitle className="sr-only">Identity verification</DialogTitle>
           <InterstitialLayout
-            logo={
-              <div className="relative">
-                <SupabaseLogo />
-                <InterstitialLogoBadge className="bg-foreground-muted text-background">
-                  <svg
-                    viewBox="0 0 24 24"
-                    fill="currentColor"
-                    aria-hidden="true"
-                    className="size-3.5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      clipRule="evenodd"
-                      d="M12 1.5 3 5v6c0 5.6 3.6 9.6 9 11.5 5.4-1.9 9-5.9 9-11.5V5L12 1.5Zm5.2 7.3a1 1 0 0 0-1.4 0L10.5 14l-2.3-2.2a1 1 0 0 0-1.4 1.4l3 3a1 1 0 0 0 1.4 0l6-6a1 1 0 0 0 0-1.4Z"
-                    />
-                  </svg>
-                </InterstitialLogoBadge>
-              </div>
-            }
+            logo={<SupabaseLogo />}
             title="Verify your identity"
             description="We need to make sure it’s you before making sensitive changes."
           >
@@ -195,8 +155,6 @@ export const IdentityVerification = ({
                 <VerificationForm
                   verifiedFactors={verifiedFactors}
                   factorToAvoidId={factorToAvoidId}
-                  canUseRecoveryCodes={enableAuthRecoveryCodes && canUseRecoveryCodes}
-                  returnTo={returnTo}
                   loading={loading}
                   error={error}
                   onVerify={handleVerify}
@@ -218,16 +176,12 @@ export const IdentityVerification = ({
 const VerificationForm = ({
   verifiedFactors,
   factorToAvoidId,
-  canUseRecoveryCodes,
-  returnTo,
   loading,
   error,
   onVerify,
 }: {
   verifiedFactors: MFAFactor[]
   factorToAvoidId?: string
-  canUseRecoveryCodes: boolean
-  returnTo: string
   loading: boolean
   error: { message: string } | null
   onVerify: (values: VerificationValues) => void
@@ -297,13 +251,6 @@ const VerificationForm = ({
           >
             Verify
           </Button>
-          {canUseRecoveryCodes && (
-            <Button asChild block variant="text">
-              <Link to="/sign-in-recovery-code" search={{ returnTo }}>
-                Use recovery code instead
-              </Link>
-            </Button>
-          )}
         </div>
       </form>
     </Form>

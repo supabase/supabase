@@ -3,7 +3,7 @@ import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, CardFooter } from 'ui'
-import { WarningIcon } from 'ui-patterns/Admonition'
+import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
@@ -11,11 +11,7 @@ import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryC
 import { AuthenticatorTask } from './AuthenticatorTask'
 import { getRecoveryGap, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
-import {
-  InterstitialLayout,
-  InterstitialLogoBadge,
-  SupabaseLogo,
-} from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
@@ -198,9 +194,9 @@ export const RecoveryReminder = ({
       logo={
         <div className="relative">
           <SupabaseLogo />
-          <InterstitialLogoBadge className="bg-warning-600 text-warning-200">
-            <WarningIcon className="size-3.5" />
-          </InterstitialLogoBadge>
+          <span className="absolute -top-2 -right-2 scale-80">
+            <AdmonitionTypeIcon type="warning" />
+          </span>
         </div>
       }
       title="Secure your account"
