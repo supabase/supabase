@@ -3,6 +3,7 @@ import type { GoPageInput } from 'marketing'
 import accentureContest from './events/accenture-reinvention-2026/contest'
 import aiEngineerEuropeContest from './events/ai-engineer-europe-2026/contest'
 import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/contest-thank-you'
+import awsReinventSchedule from './events/aws-reinvent-2026/schedule'
 import datadogContest from './events/dash-2026/contest'
 import datadogDinner from './events/dash-2026/exec-dinner'
 import datadogContestThankYou from './events/dash-2026/exec-dinner-thank-you'
@@ -57,6 +58,7 @@ const pages: GoPageInput[] = [
   stripeMeetingScheduler, // remove after May 31, 2026
   stripeSessionsContest, // remove after May 31, 2026
   stripeParty, // remove after May 31, 2026
+  awsReinventSchedule, // remove after Dec 31, 2026
   accentureContest, // remove after May 31, 2026
   postgresconfContest, // remove after May 31, 2026
   postgresconfContestThankYou, // remove after May 31, 2026
