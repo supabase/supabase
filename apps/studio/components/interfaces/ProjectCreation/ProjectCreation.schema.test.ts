@@ -24,8 +24,8 @@ const validProject: CreateProjectForm = {
 }
 
 describe('project creation region validation', () => {
-  test.each([undefined, '', '   '])('rejects a missing region (%j)', (dbRegion) => {
-    const result = FormSchema.safeParse({ ...validProject, dbRegion })
+  test.each([undefined, '', '   '])('rejects a missing region (%j)', async (dbRegion) => {
+    const result = await FormSchema.safeParseAsync({ ...validProject, dbRegion })
 
     expect(result.success).toBe(false)
     if (result.success) throw new Error('Expected region validation to fail')
@@ -36,8 +36,8 @@ describe('project creation region validation', () => {
 
   test.each(['Americas', 'East US (North Virginia)'])(
     'accepts a selected region (%s)',
-    (dbRegion) => {
-      expect(FormSchema.safeParse({ ...validProject, dbRegion }).success).toBe(true)
+    async (dbRegion) => {
+      expect((await FormSchema.safeParseAsync({ ...validProject, dbRegion })).success).toBe(true)
     }
   )
 })

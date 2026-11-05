@@ -1,6 +1,7 @@
 import { z } from 'zod'
 
 import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
+import { passwordStrength } from '@/lib/password-strength'
 
 export const FormSchema = z
   .object({
@@ -52,10 +53,9 @@ export const FormSchema = z
     shouldRunMigrations: z.boolean(),
   })
   .superRefine(
-    (
+    async (
       {
-        dbPassStrength,
-        dbPassStrengthWarning,
+        dbPass,
         highAvailability,
         cloudProvider,
         useOrioleDb,
@@ -64,12 +64,22 @@ export const FormSchema = z
       },
       ctx
     ) => {
-      if (dbPassStrength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
-        ctx.addIssue({
-          code: z.ZodIssueCode.custom,
-          path: ['dbPass'],
-          message: dbPassStrengthWarning || 'Password not secure enough',
-        })
+      // DatabasePasswordInput sets dbPassStrength after an async check, so it can still hold an
+      // earlier password's score. Score dbPass here instead. Empty passwords already fail .min(1)
+      // and skip this, so zxcvbn loads only once a password is entered. A failed load counts as
+      // weak, because a rejected promise would leave the form stuck submitting.
+      if (dbPass) {
+        const { strength, warning } = await passwordStrength(dbPass).catch(() => ({
+          strength: 0,
+          warning: '',
+        }))
+        if (strength < DEFAULT_MINIMUM_PASSWORD_STRENGTH) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            path: ['dbPass'],
+            message: warning || 'Password not secure enough',
+          })
+        }
       }
       if (highAvailability && cloudProvider !== 'AWS_K8S') {
         ctx.addIssue({
