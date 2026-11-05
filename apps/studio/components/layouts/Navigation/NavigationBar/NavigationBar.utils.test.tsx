@@ -120,9 +120,9 @@ describe('generateProductRoutes', () => {
 })
 
 describe('generateOtherRoutes', () => {
-  it('always includes advisors, logs, and integrations', () => {
+  it('always includes issues, logs, and integrations', () => {
     const routes = generateOtherRoutes(REF, activeProject)
-    expect(keys(routes)).toContain('advisors')
+    expect(keys(routes)).toContain('issues')
     expect(keys(routes)).toContain('logs')
     expect(keys(routes)).toContain('integrations')
   })
@@ -169,20 +169,14 @@ describe('generateOtherRoutes', () => {
 
   it('marks routes as disabled when project is not active', () => {
     const routes = generateOtherRoutes(REF, inactiveProject)
-    const advisorsRoute = routes.find((r) => r.key === 'advisors')
-    expect(advisorsRoute?.disabled).toBe(true)
+    const issuesRoute = routes.find((r) => r.key === 'issues')
+    expect(issuesRoute?.disabled).toBe(true)
   })
 
-  it('links advisors to the security advisor page by default', () => {
+  it('links the Issues route to the project issues page, where advisor findings now live', () => {
     const routes = generateOtherRoutes(REF, activeProject)
-    const advisorsRoute = routes.find((r) => r.key === 'advisors')
-    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/security`)
-  })
-
-  it('links advisors to the health advisor page when health advisor is enabled', () => {
-    const routes = generateOtherRoutes(REF, activeProject, { isHealthAdvisorEnabled: true })
-    const advisorsRoute = routes.find((r) => r.key === 'advisors')
-    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/health`)
+    const issuesRoute = routes.find((r) => r.key === 'issues')
+    expect(issuesRoute?.link).toBe(`/project/${REF}/issues`)
   })
 })
 
