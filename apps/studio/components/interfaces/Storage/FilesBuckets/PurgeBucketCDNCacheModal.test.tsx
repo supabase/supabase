@@ -10,6 +10,7 @@ import { PurgeBucketCDNCacheModal } from './PurgeBucketCDNCacheModal'
 import { ProjectContextProvider } from '@/components/layouts/ProjectLayout/ProjectContext'
 import { Bucket } from '@/data/storage/buckets-query'
 import { createMockOrganizationResponse } from '@/tests/helpers'
+import { createMockAuthContext } from '@/tests/lib/auth-helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -18,14 +19,7 @@ import { routerMock } from '@/tests/lib/route-mock'
 type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 
 const PROFILE_CONTEXT = createMockProfileContext()
-
-const { mockUseSelectedOrganizationQuery } = vi.hoisted(() => ({
-  mockUseSelectedOrganizationQuery: vi.fn(),
-}))
-
-vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
-  useSelectedOrganizationQuery: mockUseSelectedOrganizationQuery,
-}))
+const AUTH_CONTEXT = createMockAuthContext()
 
 const bucket: Bucket = {
   id: 'test',
@@ -112,12 +106,16 @@ describe('PurgeBucketCDNCacheModal', () => {
   ] as Array<OrganizationResponse['plan']>)(
     'renders a confirmation dialog for users on $name plans',
     async ({ id, name }) => {
-      mockUseSelectedOrganizationQuery.mockReturnValue({
-        data: createMockOrganizationResponse({ slug: 'org-a', plan: { id, name } }),
-        isSuccess: true,
+      addAPIMock({
+        method: 'get',
+        path: '/platform/organizations',
+        response: [createMockOrganizationResponse({ id: 1, slug: 'org-a', plan: { id, name } })],
       })
       const onClose = vi.fn()
-      customRender(<Page onClose={onClose} />, { profileContext: PROFILE_CONTEXT })
+      customRender(<Page onClose={onClose} />, {
+        profileContext: PROFILE_CONTEXT,
+        authContext: AUTH_CONTEXT,
+      })
 
       await userEvent.click(await screen.findByRole('button', { name: 'Open' }))
       await screen.findByRole('alertdialog')
@@ -130,12 +128,22 @@ describe('PurgeBucketCDNCacheModal', () => {
   )
 
   it('renders a dialog requesting users to upgrade their plan when they are on free plans', async () => {
-    mockUseSelectedOrganizationQuery.mockReturnValue({
-      data: createMockOrganizationResponse({ slug: 'org-a', plan: { id: 'free', name: 'Free' } }),
-      isSuccess: true,
+    addAPIMock({
+      method: 'get',
+      path: '/platform/organizations',
+      response: [
+        createMockOrganizationResponse({
+          id: 1,
+          slug: 'org-a',
+          plan: { id: 'free', name: 'Free' },
+        }),
+      ],
     })
     const onClose = vi.fn()
-    customRender(<Page onClose={onClose} />, { profileContext: PROFILE_CONTEXT })
+    customRender(<Page onClose={onClose} />, {
+      profileContext: PROFILE_CONTEXT,
+      authContext: AUTH_CONTEXT,
+    })
 
     await userEvent.click(await screen.findByRole('button', { name: 'Open' }))
     await screen.findByRole('alertdialog')
