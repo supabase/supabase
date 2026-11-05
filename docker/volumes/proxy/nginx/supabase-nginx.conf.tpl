@@ -12,6 +12,7 @@ server {
     server_tokens off;
 
     client_max_body_size 0;
+    proxy_request_buffering off;
 
     proxy_http_version 1.1;
 
