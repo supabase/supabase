@@ -75,15 +75,6 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       format: formatGbHours,
     },
     {
-      label: 'Deployments',
-      description: 'Deployments in this project. Each one runs its own instances.',
-      used: instances.length,
-      included: limits.deployments,
-      limitKind: 'capacity',
-      isLoading: false,
-      format: formatCount,
-    },
-    {
       label: 'Instances',
       description: 'Instances declared across every compute in this project.',
       used: declaredInstances,
@@ -91,6 +82,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       limitKind: 'capacity',
       isLoading: false,
       format: formatCount,
+      detail: `Across ${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'}`,
     },
   ]
 
@@ -127,7 +119,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       </div>
 
       {!isCollapsed && (
-        <div className="grid grid-cols-1 divide-y lg:grid-cols-4 lg:divide-x lg:divide-y-0">
+        <div className="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
           {meters.map((meter) => (
             <UsageMeter key={meter.label} {...meter} noLimitLabel={noLimitLabel} />
           ))}
