@@ -85,7 +85,7 @@ export const IdentityVerification = ({
       setIsCheckingSession(true)
       try {
         const session = await getMfaAuthenticatorAssuranceLevel()
-        if (session.currentLevel !== 'aal2') {
+        if (session?.currentLevel !== 'aal2') {
           setError({
             message: 'Verification did not update your session. Enter a new code and try again.',
           })
