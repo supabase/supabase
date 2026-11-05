@@ -30,7 +30,14 @@ export const CreateNewAPIKeysButton = () => {
   const { mutateAsync: createAPIKey } = useAPIKeyCreateMutation({ onError: () => {} })
 
   const handleCreateNewApiKeys = async () => {
-    if (!projectRef || !createGrant.grant) return
+    if (!projectRef) return
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantTooltip(createGrant.status, 'create') ??
+          'Still checking permissions to create API keys. Try again in a moment.'
+      )
+      return
+    }
 
     try {
       setError(null)

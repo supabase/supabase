@@ -7,6 +7,7 @@ import { Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
@@ -57,7 +58,13 @@ export const SecretAPIKeys = () => {
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'secret' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    if (!deleteGrant.grant) return console.error('Missing permission to delete API keys')
+    if (!deleteGrant.grant) {
+      toast.error(
+        getWriteGrantTooltip(deleteGrant.status, 'delete') ??
+          'Still checking permissions to delete API keys. Try again in a moment.'
+      )
+      return
+    }
     deleteAPIKey({ projectRef, id: apiKey.id, grant: deleteGrant.grant })
   }
 
