@@ -32,6 +32,7 @@ import { checkIfRelationChanged } from './ForeignKeysManagement/ForeignKeysManag
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { encodeSensitiveComment } from '@/lib/sensitive-column-comment'
 import { EMPTY_ARR, EMPTY_OBJ } from '@/lib/void'
 
 /**
@@ -115,17 +116,11 @@ export const Column = ({
   const activeRelations = relations.filter((relation) => !relation.toRemove)
 
   const onToggleSensitiveData = () => {
-    const marker = '[SENSITIVE]'
     const isSensitiveData = !column.isSensitiveData
-    let updatedComment = column.comment || ''
-
-    if (isSensitiveData && !updatedComment.includes(marker)) {
-      updatedComment = `${updatedComment} ${marker}`.trim()
-    } else if (!isSensitiveData) {
-      updatedComment = updatedComment.replace(marker, '').trim()
-    }
-
-    onUpdateColumn({ isSensitiveData, comment: updatedComment })
+    onUpdateColumn({
+      isSensitiveData,
+      comment: encodeSensitiveComment(column.comment, isSensitiveData) ?? '',
+    })
   }
 
   const { attributes, listeners, setNodeRef, setActivatorNodeRef, transform, transition } =
