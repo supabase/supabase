@@ -114,5 +114,14 @@ describe('ColumnEditor.utils - sensitivity marker handling', () => {
         '[SENSITIVE] Fields marked [SENSITIVE] are PII'
       )
     })
+    it('preserves leading [SENSITIVE] in decoded form comments when commentIsDecoded is true', () => {
+      expect(
+        encodeCommentWithSensitivityFlag('[SENSITIVE] user entered comment', false, true)
+      ).toBe('[SENSITIVE] user entered comment')
+
+      expect(
+        encodeCommentWithSensitivityFlag('[SENSITIVE] user entered comment', true, true)
+      ).toBe('[SENSITIVE] [SENSITIVE] user entered comment')
+    })
   })
 })
