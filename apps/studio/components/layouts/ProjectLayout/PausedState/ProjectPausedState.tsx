@@ -105,7 +105,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                           />
                         </>
                       ) : null}
-                      , but inaccessible while paused.
+                      <span>, but inaccessible while paused.</span>
                     </p>
                     <p className="text-sm mt-2">
                       Once resumed, usage will be billed by compute size and hours active.
@@ -122,7 +122,7 @@ export const ProjectPausedState = ({ product }: ProjectPausedStateProps) => {
                       <span className="text-primary">{product}</span> page.
                     </>
                   ) : !isRestoreDisabled ? (
-                    'Resume this project and get back to building!'
+                    <span>Resume this project and get back to building!</span>
                   ) : null}
                 </p>
               ) : null}

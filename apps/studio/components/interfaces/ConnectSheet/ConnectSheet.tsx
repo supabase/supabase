@@ -2,7 +2,17 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef } from 'react'
-import { cn, Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from 'ui'
+import {
+  cn,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from 'ui'
 
 import type { ConnectMode, ProjectKeys } from './Connect.types'
 import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
@@ -170,43 +180,52 @@ export const ConnectSheet = () => {
           <SheetDescription>Choose how you want to use Supabase</SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-w-0 flex-1 flex-col overflow-y-auto overflow-x-hidden divide-y">
-          <div className="p-8">
-            <ModeSelector
-              modes={availableModes}
-              selected={state.mode}
-              onChange={handleModeChange}
-            />
-          </div>
+        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <ScrollViewport className="[&>div]:block!">
+            <div className="flex min-w-0 flex-col divide-y">
+              <div className="p-8">
+                <ModeSelector
+                  modes={availableModes}
+                  selected={state.mode}
+                  onChange={handleModeChange}
+                />
+              </div>
 
-          {/* The server env tab renders its own note next to the keys it offers to copy. */}
-          {state.mode !== 'warehouse' && state.mode !== 'server' && (
-            <ApiKeysAccessNote
-              grant={apiKeysGrant}
-              fallback="Replace the placeholders with your own keys."
-              className="px-8 py-4"
-            />
-          )}
-
-          {state.mode === 'warehouse' ? (
-            <WarehouseTab />
-          ) : (
-            <>
-              {activeFields.length > 0 && (
-                <div className="p-8">
-                  <ConnectConfigSection
-                    state={state}
-                    activeFields={activeFields}
-                    onFieldChange={handleFieldChange}
-                    getFieldOptions={getFieldOptions}
-                  />
-                </div>
+              {/* The server env tab renders its own note next to the keys it offers to copy. */}
+              {state.mode !== 'warehouse' && state.mode !== 'server' && (
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholders with your own keys."
+                  className="px-8 py-4"
+                />
               )}
 
-              <ConnectStepsSection steps={resolvedSteps} state={state} projectKeys={projectKeys} />
-            </>
-          )}
-        </div>
+              {state.mode === 'warehouse' ? (
+                <WarehouseTab />
+              ) : (
+                <>
+                  {activeFields.length > 0 && (
+                    <div className="p-8">
+                      <ConnectConfigSection
+                        state={state}
+                        activeFields={activeFields}
+                        onFieldChange={handleFieldChange}
+                        getFieldOptions={getFieldOptions}
+                      />
+                    </div>
+                  )}
+
+                  <ConnectStepsSection
+                    steps={resolvedSteps}
+                    state={state}
+                    projectKeys={projectKeys}
+                  />
+                </>
+              )}
+            </div>
+          </ScrollViewport>
+          <ScrollBar />
+        </ScrollRoot>
       </SheetContent>
     </Sheet>
   )

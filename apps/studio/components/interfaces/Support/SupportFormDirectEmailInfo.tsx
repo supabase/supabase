@@ -45,7 +45,7 @@ export function SupportFormDirectEmailContent({ projectRef }: SupportFormDirectE
             </span>
           </>
         )}
-        .
+        <span>.</span>
       </p>
     </div>
   )

@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { useEffect, useState } from 'react'
@@ -7,12 +7,17 @@ import {
   CommandMenuInput,
   CommandMenuList,
   CommandWrapper,
+  PageType,
   useCommands,
+  usePageComponent,
+  useRegisterPage,
   useSetCommandMenuOpen,
+  useSetPage,
   useSetQuery,
 } from 'ui-patterns/CommandMenu'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ENTITY_SEARCH_DEBOUNCE_MS } from './DatabaseEntitySearch.utils'
 import { useDatabaseEntitySearchCommands } from './DatabaseEntitySearchCommands'
 import type { EntitySearchData } from '@/data/database/entity-search-query'
 import { customRender } from '@/tests/lib/custom-render'
@@ -48,6 +53,11 @@ const SEARCH_RESULT: EntitySearchData = {
       table: 'blog_posts_archive',
       table_id: 102,
     },
+  ],
+  functions: [
+    { id: 301, schema: 'public', name: 'get_blog_post', type: 'function', args: 'id bigint' },
+    { id: 302, schema: 'blog', name: 'archive_blog_posts', type: 'procedure', args: '' },
+    { id: 303, schema: 'public', name: 'touch_blog_post', type: 'function', args: '' },
   ],
 }
 
@@ -131,6 +141,24 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('/project/default/database/policies?schema=blog&edit=202')
   })
 
+  it('lists matching functions with their arguments, linking to the function editor', async () => {
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_post')
+
+    const section = await screen.findByRole('region', { name: 'Functions' })
+    expect(section).toHaveTextContent('public.get_blog_post')
+    expect(section).toHaveTextContent('(id bigint)')
+    expect(section).toHaveTextContent('blog.archive_blog_posts')
+    expect(section).toHaveTextContent('procedure')
+    // Functions without parameters have no details to show
+    expect(section).toHaveTextContent('public.touch_blog_post')
+    expect(section).not.toHaveTextContent('()')
+    // The functions page lists functions per schema, so the link has to carry it
+    expect(section).toHaveTextContent('/project/default/database/functions?schema=public&edit=301')
+    expect(section).toHaveTextContent('/project/default/database/functions?schema=blog&edit=302')
+  })
+
   it('debounces typing into a single database query', async () => {
     customRender(<CommandMenuHarness />)
 
@@ -150,6 +178,7 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Policies' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Functions' })).not.toBeInTheDocument()
   })
 
   it('does not show results from a previous project while searching another', async () => {
@@ -224,25 +253,117 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
   })
 
-  it('lists tables above policies even when a policy matches the search better', async () => {
+  it('lists tables, then policies, then functions, even when a function matches best', async () => {
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () =>
-        HttpResponse.json([
-          {
-            tables: [SEARCH_RESULT.tables[0]],
-            policies: [{ ...SEARCH_RESULT.policies[0], name: 'blog_posts_owner_update' }],
-          },
-        ]),
+      response: () => HttpResponse.json([SEARCH_RESULT]),
     })
     customRender(<CommandMenuListHarness />)
 
-    await userEvent.type(screen.getByRole('combobox'), 'blog_posts')
+    // Matches the `blog.archive_blog_posts` function far better than anything else
+    await userEvent.type(screen.getByRole('combobox'), 'archive_blog_posts')
 
-    await screen.findByText('UPDATE on public.blog_posts')
-    const [first, second] = screen.getAllByText(/^(Tables|Policies)$/)
-    expect(first).toHaveTextContent('Tables')
-    expect(second).toHaveTextContent('Policies')
+    await screen.findByText('procedure')
+    const headings = screen.getAllByText(/^(Tables|Policies|Functions)$/)
+    expect(headings.map((heading) => heading.textContent)).toEqual([
+      'Tables',
+      'Policies',
+      'Functions',
+    ])
+  })
+})
+
+const SUB_PAGE = 'Search Database Tables'
+
+/** Mirrors a context search sub-page: its own input, which also sets the shared query. */
+const SubPageSearch = () => {
+  const setQuery = useSetQuery()
+  const [value, setValue] = useState('')
+
+  return (
+    <input
+      aria-label="Search database tables"
+      value={value}
+      onChange={(event) => {
+        setValue(event.target.value)
+        setQuery(event.target.value)
+      }}
+    />
+  )
+}
+
+/** Mirrors PageSwitch, where a sub-page replaces the command list entirely. */
+const SubPageHarness = () => {
+  useDatabaseEntitySearchCommands()
+  const setQuery = useSetQuery()
+  const setOpen = useSetCommandMenuOpen()
+  const setPage = useSetPage()
+  const PageComponent = usePageComponent()
+  const [value, setValue] = useState('')
+
+  useRegisterPage(SUB_PAGE, { type: PageType.Component, component: SubPageSearch })
+  useEffect(() => setOpen(true), [setOpen])
+
+  if (PageComponent) return <PageComponent />
+
+  return (
+    <>
+      <input
+        aria-label="Search"
+        value={value}
+        onChange={(event) => {
+          setValue(event.target.value)
+          setQuery(event.target.value)
+        }}
+      />
+      <button tabIndex={0} onClick={() => setPage(SUB_PAGE)}>
+        Open sub-page
+      </button>
+    </>
+  )
+}
+
+describe('useDatabaseEntitySearchCommands on a sub-page', () => {
+  let searchRequests: string[]
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    searchRequests = []
+    mockUseSelectedProjectQuery.mockReturnValue({
+      data: { id: 1, ref: 'default', name: 'default', connectionString: 'encrypted' },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        searchRequests.push(query)
+        return HttpResponse.json([SEARCH_RESULT])
+      },
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('does not search the database while a sub-page shows its own results', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    const settleDebounce = () =>
+      act(() => vi.advanceTimersByTimeAsync(ENTITY_SEARCH_DEBOUNCE_MS * 2))
+    customRender(<SubPageHarness />)
+
+    // Searching from the top level does reach the database
+    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+    await settleDebounce()
+    expect(searchRequests).toHaveLength(1)
+
+    // The sub-page runs its own search, so typing there must not send a second request
+    await user.click(screen.getByRole('button', { name: 'Open sub-page' }))
+    await user.type(screen.getByRole('textbox', { name: 'Search database tables' }), 'colors')
+    await settleDebounce()
+
+    expect(searchRequests).toHaveLength(1)
   })
 })

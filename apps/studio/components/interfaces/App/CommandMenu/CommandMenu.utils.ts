@@ -8,6 +8,7 @@ export const COMMAND_MENU_SECTIONS = {
   DATABASE: 'Database',
   DATABASE_TABLES: 'Tables',
   DATABASE_POLICIES: 'Policies',
+  DATABASE_FUNCTIONS: 'Functions',
   INTEGRATIONS: 'Integrations',
   SHORTCUTS: 'Shortcuts',
 } as const

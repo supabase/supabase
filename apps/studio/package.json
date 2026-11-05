@@ -212,6 +212,7 @@
     "date-fns": "^2.30.0",
     "eslint-config-supabase": "workspace:*",
     "eslint-plugin-barrel-files": "^2.0.7",
+    "eslint-plugin-react-google-translate": "^1.1.0",
     "eslint-plugin-react-hook-form": "^0.3.1",
     "eslint-plugin-valtio": "^0.8.0",
     "graphql-ws": "5.14.1",

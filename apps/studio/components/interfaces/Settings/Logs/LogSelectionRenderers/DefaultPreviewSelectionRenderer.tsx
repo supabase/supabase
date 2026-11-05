@@ -194,7 +194,7 @@ const PropertyRow = ({
                 setIsExpanded(!isExpanded)
               }}
             >
-              {isExpanded ? 'Collapse' : 'Expand'} value
+              {isExpanded ? <span>Collapse</span> : <span>Expand</span>} <span>value</span>
             </DropdownMenuItem>
           )}
           {(isMethod || isUserAgent || isStatus || isPath) && (
