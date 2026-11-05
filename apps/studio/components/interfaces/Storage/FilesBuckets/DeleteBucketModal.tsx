@@ -36,8 +36,6 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // policy cleanup below (which can be slow) doesn't hold the loading state or block
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
-      // On the bucket's page, navigating away unmounts the modal. Calling onClose as well
-      // would push the bucket URL again and race this navigation.
       if (bucketId) {
         await router.push(`/project/${projectRef}/storage/files`)
       } else {
