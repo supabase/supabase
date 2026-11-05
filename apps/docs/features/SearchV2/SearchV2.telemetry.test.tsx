@@ -435,6 +435,25 @@ describe('Ask AI telemetry', () => {
     })
   })
 
+  it('shows the whole answer once the reveal catches up', async () => {
+    aiMessages.push(
+      { role: MessageRole.User, content: 'How do I turn on RLS?', status: MessageStatus.Complete },
+      {
+        role: MessageRole.Assistant,
+        content: 'Enable RLS on the table.',
+        status: MessageStatus.InProgress,
+      }
+    )
+    render(
+      <TooltipProvider>
+        <TriggerWithProvider />
+      </TooltipProvider>
+    )
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+
+    await screen.findByText('Enable RLS on the table.')
+  })
+
   it('copies an answer as Markdown with full source links', async () => {
     aiMessages.push(
       { role: MessageRole.User, content: 'How do I turn on RLS?', status: MessageStatus.Complete },
