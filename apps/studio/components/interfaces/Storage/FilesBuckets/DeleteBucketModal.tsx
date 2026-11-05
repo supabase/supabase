@@ -36,8 +36,14 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // policy cleanup below (which can be slow) doesn't hold the loading state or block
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
-      onClose()
-      if (bucketId) router.push(`/project/${projectRef}/storage/files`)
+      if (bucketId) {
+        // On the deleted bucket's own page, leave it instead of closing the modal: closing
+        // updates the page's URL state, which can race with this navigation and land back
+        // on the deleted bucket. Unmounting the page closes the modal anyway.
+        await router.push(`/project/${projectRef}/storage/files`)
+      } else {
+        onClose()
+      }
 
       if (!project) return console.error('Project is required')
 
