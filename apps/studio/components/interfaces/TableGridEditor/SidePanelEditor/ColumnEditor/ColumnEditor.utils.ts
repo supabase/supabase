@@ -26,28 +26,34 @@ export const normalizeFormatSchema = (schema: string | undefined): string | unde
   isImplicitTypeSchema(schema) ? undefined : schema
 
 // Helper functions to encode/decode sensitivity flag in column comments
-const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
+export const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
 
-const isSensitiveDataInComment = (comment: string | null | undefined): boolean => {
-  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
+export const isSensitiveDataInComment = (comment: string | null | undefined): boolean => {
+  return comment ? comment.trim().startsWith(SENSITIVE_DATA_MARKER) : false
 }
 
-const encodeCommentWithSensitivityFlag = (
+export const decodeCommentWithoutSensitivityFlag = (
+  comment: string | null | undefined
+): string | null => {
+  if (!comment) return null
+  const trimmed = comment.trim()
+  if (trimmed.startsWith(SENSITIVE_DATA_MARKER)) {
+    return trimmed.slice(SENSITIVE_DATA_MARKER.length).trim() || null
+  }
+  return trimmed || null
+}
+
+export const encodeCommentWithSensitivityFlag = (
   comment: string | null | undefined,
   isSensitive: boolean
 ): string | null => {
-  let cleanComment = comment?.replace(SENSITIVE_DATA_MARKER, '').trim() ?? ''
+  const cleanComment = decodeCommentWithoutSensitivityFlag(comment) ?? ''
   if (isSensitive && cleanComment) {
     return `${SENSITIVE_DATA_MARKER} ${cleanComment}`
   } else if (isSensitive) {
     return SENSITIVE_DATA_MARKER
   }
   return cleanComment || null
-}
-
-const decodeCommentWithoutSensitivityFlag = (comment: string | null | undefined): string | null => {
-  if (!comment) return null
-  return comment.replace(SENSITIVE_DATA_MARKER, '').trim() || null
 }
 
 export const displayColumnType = (
