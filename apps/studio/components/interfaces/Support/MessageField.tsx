@@ -15,11 +15,7 @@ const SUPPORT_REQUEST_TIPS_URL =
 
 const MESSAGE_MAX_LENGTH = 2500
 
-const MESSAGE_PLACEHOLDER = [
-  'Trying to: sign users in with Google OAuth',
-  'What happens: /auth/v1/callback returns 500 since 21 Oct, request ID abc123',
-  'Tried: rotated client secret, checked redirect URLs',
-].join('\n')
+const MESSAGE_PLACEHOLDER = 'What are you trying to do? What happened instead? What have you tried?'
 
 interface MessageFieldProps {
   form: UseFormReturn<SupportFormValues>
@@ -39,12 +35,8 @@ export function MessageField({ form, originalError }: MessageFieldProps) {
           description={
             <div className="flex flex-col gap-y-3">
               <p>
-                Short, specific requests get faster answers. Tell us what you were trying to do,
-                what happened instead, and what you've already tried. If an AI tool drafted this,
-                trim it to what you actually need from us.{' '}
-                <InlineLink href={SUPPORT_REQUEST_TIPS_URL}>
-                  Tips for writing a request we can act on
-                </InlineLink>
+                Short, specific requests get faster answers.{' '}
+                <InlineLink href={SUPPORT_REQUEST_TIPS_URL}>Learn more</InlineLink>
               </p>
               {IPV4_MIGRATION_STRINGS.some((str) => field.value.includes(str)) && (
                 <IPV4SuggestionAlert />
