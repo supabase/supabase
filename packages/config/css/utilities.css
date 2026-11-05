@@ -38,26 +38,6 @@
   }
 }
 
-/* the ring is the last layer, so it paints under the drop layers and the edge blends into the shadow */
-@utility floating-surface-shadow {
-  --floating-shadow-strength: 1;
-  --floating-ring-strength: calc(var(--contrast-border, 0.275625) / 0.275625);
-  --floating-ring-color: hsl(var(--colors-black) / calc(0.05 * var(--floating-ring-strength)));
-  box-shadow:
-    0 18px 47px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
-    0 7.5px 19px 0 hsl(var(--colors-black) / calc(0.02 * var(--floating-shadow-strength))),
-    0 4px 10.5px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
-    0 2.3px 5.8px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
-    0 1.2px 3.1px 0 hsl(var(--colors-black) / calc(0.03 * var(--floating-shadow-strength))),
-    0 0.5px 1.3px 0 hsl(var(--colors-black) / calc(0.02 * var(--floating-shadow-strength))),
-    0 0 0 1px var(--floating-ring-color);
-
-  @variant dark {
-    --floating-shadow-strength: 5;
-    --floating-ring-color: hsl(var(--colors-white) / calc(0.18 * var(--floating-ring-strength)));
-  }
-}
-
 @utility raised-control-surface {
   @apply text-foreground bg-card shadow-[var(--button-shadow-default)];
 
