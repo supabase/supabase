@@ -11,11 +11,11 @@ Serverless functions run your backend code on demand, without you managing serve
 
 [Supabase Edge Functions](/docs/guides/functions) are server-side TypeScript functions that run on the [Deno runtime](https://deno.com/) and are deployed globally. They live in the same project as your [database](/docs/guides/database/overview), [Auth](/docs/guides/auth), and [Storage](/docs/guides/storage), so you can read and write data with the same [Row Level Security policies](/docs/guides/database/postgres/row-level-security) that protect the rest of your app.
 
-Choose Supabase Edge Functions if your project already uses Supabase and needs server-side logic next to your data, or if you're starting a new project that also needs a [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), or [Auth](/docs/guides/auth).
+Choose Supabase Edge Functions if your project already uses Supabase and needs server-side logic, or if you're starting a new project that also needs a [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), or [Auth](/docs/guides/auth).
 
 ## Vercel
 
-[Vercel Functions](https://vercel.com/docs/functions) run Node.js, Python, and other runtimes alongside your frontend. Vercel is a common host for Next.js apps, and its functions run as part of the same deployment as your pages and API routes.
+[Vercel Functions](https://vercel.com/docs/functions) run Node.js, Python, and other runtimes alongside your frontend. Vercel is a common host for Next.js apps, and its functions run as part of the same deployment as your pages and Route Handlers.
 
 Vercel is compatible with Supabase. You can connect to Supabase Postgres from Vercel functions using the [serverless drivers guide](/docs/guides/database/connecting-to-postgres/serverless-drivers), which includes a Vercel-specific setup with the Supabase pooler. The [Vercel integration for Supabase](https://vercel.com/integrations/supabase) also configures your connection strings as environment variables on your Vercel project.
 
@@ -46,7 +46,7 @@ Any platform that can run HTTPS requests or open a Postgres connection can work 
 If you already use Supabase or are starting a new project, Supabase Edge Functions are the default choice. Otherwise, use this list to narrow down your options:
 
 - **Your project already uses Supabase, or you are starting a new project using Supabase:** [Supabase Edge Functions](/docs/guides/functions)
-- **You host a Next.js app and want its API routes in the same deployment:** [Vercel Functions](https://vercel.com/docs/functions)
+- **You host a Next.js app and want its Route Handlers in the same deployment:** [Vercel Functions](https://vercel.com/docs/functions)
 - **You want lightweight logic that runs close to users worldwide, and you can work within the Workers runtime:** [Cloudflare Workers](https://developers.cloudflare.com/workers/)
 - **Your infrastructure already runs on AWS and you need fine-grained control over resources:** [AWS Lambda](https://aws.amazon.com/lambda/)
 - **You host a static or front-end site on Netlify and need a little server-side logic:** [Netlify Functions](https://docs.netlify.com/build/functions/overview/)
