@@ -11,7 +11,12 @@ export const RowCreationOptions = ({ keepValues, onKeepValuesChange }: RowCreati
   return (
     <Popover>
       <PopoverTrigger asChild>
-        <Button className="px-1.5" icon={<SettingsIcon />} aria-label="Row creation options" />
+        <Button
+          variant="text"
+          className="px-1.5"
+          icon={<SettingsIcon />}
+          aria-label="Row creation options"
+        />
       </PopoverTrigger>
       <PopoverContent
         align="start"
