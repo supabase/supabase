@@ -98,6 +98,7 @@ const setComputeLimitsMode = (mode: 'alpha' | 'plans') => {
 afterEach(() => {
   vi.unstubAllEnvs()
   localStorage.removeItem(LOCAL_STORAGE_KEYS.COMPUTE_LIMITS_MODE)
+  localStorage.removeItem(LOCAL_STORAGE_KEYS.COMPUTE_PLAN_USAGE_COLLAPSED)
 })
 
 describe('ComputePlanUsage', () => {
@@ -218,5 +219,16 @@ describe('ComputePlanUsage in private alpha', () => {
     await waitFor(() => {
       expect(screen.getAllByText('Not metered during private alpha')).toHaveLength(2)
     })
+  })
+
+  it('shows compact meters in the header when collapsed', async () => {
+    localStorage.setItem(LOCAL_STORAGE_KEYS.COMPUTE_PLAN_USAGE_COLLAPSED, 'true')
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    expect(await screen.findByLabelText('Instances: 1 of 2')).toBeInTheDocument()
+    expect(screen.queryByText(/last 30 days/)).not.toBeInTheDocument()
   })
 })

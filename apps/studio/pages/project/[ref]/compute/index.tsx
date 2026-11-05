@@ -119,9 +119,7 @@ const ComputePage: NextPageWithLayout = () => {
             {isSuccess && instances.length === 0 && (
               <ComputeEmptyState onDeploy={() => setIsDeployInstructionsOpen(true)} />
             )}
-            {isSuccess && instances.length > 0 && ref && (
-              <ComputePlanUsage projectRef={ref} instances={instances} />
-            )}
+            {ref && <ComputePlanUsage projectRef={ref} instances={[]} />}
             {isSuccess && instances.length > 0 && ref && (
               <ComputeList
                 projectRef={ref}

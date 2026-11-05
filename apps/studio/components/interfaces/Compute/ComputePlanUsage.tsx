@@ -2,7 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card } from 'ui'
+import { Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
@@ -45,13 +45,53 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     (total, instance) => total + instance.declaredInstances,
     0
   )
+  const formatCount = (value: number) => value.toLocaleString()
+
+  const meters: MeterDefinition[] = [
+    {
+      label: 'Active hours',
+      description:
+        'Hours instances spend serving traffic. Suspended instances do not accrue usage.',
+      used: usage?.activeHours ?? 0,
+      included: limits.activeHours,
+      limitKind: 'allowance',
+      isLoading: isPending,
+      format: formatComputeHours,
+    },
+    {
+      label: 'Deployments',
+      description: 'Deployments in this project. Each one runs its own instances.',
+      used: instances.length,
+      included: limits.deployments,
+      limitKind: 'capacity',
+      isLoading: false,
+      format: formatCount,
+    },
+    {
+      label: 'Instances',
+      description: 'Instances declared across every compute in this project.',
+      used: declaredInstances,
+      included: limits.instances,
+      limitKind: 'capacity',
+      isLoading: false,
+      format: formatCount,
+    },
+  ]
 
   return (
-    <Card className="divide-y">
+    <Card className="divide-y -my-4">
       <div className="flex items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
-        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+        <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <h3 className="text-sm text-foreground">Plan usage</h3>
-          <p className="text-xs text-foreground-lighter">{`${limitsLabel} · last 30 days`}</p>
+          {isCollapsed ? (
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
+              {meters.map((meter) => (
+                <CompactUsageMeter key={meter.label} {...meter} />
+              ))}
+            </div>
+          ) : (
+            <p className="text-xs text-foreground-lighter">{`${limitsLabel} · last 30 days`}</p>
+          )}
         </div>
         <div className="flex items-center gap-x-2">
           {organization?.slug && (
@@ -72,45 +112,16 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
 
       {!isCollapsed && (
         <div className="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
-          <UsageMeter
-            label="Active hours"
-            description="Hours instances spend serving traffic. Suspended instances do not accrue usage."
-            used={usage?.activeHours ?? 0}
-            included={limits.activeHours}
-            limitKind="allowance"
-            isLoading={isPending}
-            format={formatComputeHours}
-            noLimitLabel={noLimitLabel}
-          />
-
-          <UsageMeter
-            label="Deployments"
-            description="Deployments in this project. Each one runs its own instances."
-            used={instances.length}
-            included={limits.deployments}
-            limitKind="capacity"
-            isLoading={false}
-            format={(value) => value.toLocaleString()}
-            noLimitLabel={noLimitLabel}
-          />
-
-          <UsageMeter
-            label="Instances"
-            description="Instances declared across every compute in this project."
-            used={declaredInstances}
-            included={limits.instances}
-            limitKind="capacity"
-            isLoading={false}
-            format={(value) => value.toLocaleString()}
-            noLimitLabel={noLimitLabel}
-          />
+          {meters.map((meter) => (
+            <UsageMeter key={meter.label} {...meter} noLimitLabel={noLimitLabel} />
+          ))}
         </div>
       )}
     </Card>
   )
 }
 
-interface UsageMeterProps {
+interface MeterDefinition {
   label: string
   description: string
   used: number
@@ -122,19 +133,9 @@ interface UsageMeterProps {
   limitKind: 'allowance' | 'capacity'
   isLoading: boolean
   format: (value: number) => string
-  noLimitLabel: string
 }
 
-const UsageMeter = ({
-  label,
-  description,
-  used,
-  included,
-  limitKind,
-  isLoading,
-  format,
-  noLimitLabel,
-}: UsageMeterProps) => {
+const getMeterStatus = ({ used, included, limitKind }: MeterDefinition) => {
   const hasLimit = included !== null && included > 0
   const usageRatio = hasLimit ? used / included : 0
   const isExceeded = hasLimit && (limitKind === 'allowance' ? usageRatio >= 1 : used > included)
@@ -142,12 +143,68 @@ const UsageMeter = ({
   const isApproaching =
     hasLimit && !isExceeded && !isAtCapacity && usageRatio >= COMPUTE_ALLOWANCE_WARNING_THRESHOLD
 
-  // Neutral by default; colour only once the number means something.
   const barClass = isExceeded
     ? 'bg-destructive'
     : isApproaching || isAtCapacity
       ? 'bg-warning'
       : 'bg-foreground-light'
+
+  return { hasLimit, isExceeded, isAtCapacity, isApproaching, barClass }
+}
+
+const formatMeterValue = ({ used, included, format }: MeterDefinition, hasLimit: boolean) =>
+  hasLimit && included !== null ? `${format(used)} of ${format(included)}` : `${format(used)} used`
+
+const MeterBar = ({
+  meter,
+  hasLimit,
+  barClass,
+}: {
+  meter: MeterDefinition
+  hasLimit: boolean
+  barClass: string
+}) => {
+  const canFill = hasLimit && !meter.isLoading && meter.included !== null
+
+  return (
+    <SparkBar
+      type="horizontal"
+      barClass={barClass}
+      bgClass="bg-surface-400"
+      value={canFill ? meter.used : 0}
+      max={canFill && meter.included !== null ? meter.included : 1}
+    />
+  )
+}
+
+const CompactUsageMeter = (meter: MeterDefinition) => {
+  const { hasLimit, barClass } = getMeterStatus(meter)
+  const value = meter.isLoading ? undefined : formatMeterValue(meter, hasLimit)
+
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <div
+          className="flex items-center gap-x-2 cursor-default"
+          aria-label={`${meter.label}: ${value}`}
+        >
+          <span className="text-xs text-foreground-light">{meter.label}</span>
+          <div className="w-12">
+            <MeterBar meter={meter} hasLimit={hasLimit} barClass={barClass} />
+          </div>
+        </div>
+      </TooltipTrigger>
+      <TooltipContent side="bottom" className="max-w-64">
+        <p>{meter.description}</p>
+        {value && <p className="mt-1 tabular-nums text-foreground-light">{value}</p>}
+      </TooltipContent>
+    </Tooltip>
+  )
+}
+
+const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel: string }) => {
+  const { label, description, isLoading } = meter
+  const { hasLimit, isExceeded, isAtCapacity, isApproaching, barClass } = getMeterStatus(meter)
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
@@ -158,20 +215,11 @@ const UsageMeter = ({
         </div>
         <p className="text-sm tabular-nums text-foreground-light">
           {isLoading && '—'}
-          {!isLoading && !hasLimit && `${format(used)} used`}
-          {!isLoading && hasLimit && `${format(used)} of ${format(included)}`}
+          {!isLoading && formatMeterValue(meter, hasLimit)}
         </p>
       </div>
 
-      {hasLimit && !isLoading && (
-        <SparkBar
-          type="horizontal"
-          barClass={barClass}
-          bgClass="bg-surface-300"
-          value={used}
-          max={included}
-        />
-      )}
+      <MeterBar meter={meter} hasLimit={hasLimit} barClass={barClass} />
 
       {isExceeded && <p className="text-xs text-destructive">Over limit</p>}
       {isAtCapacity && <p className="text-xs text-warning">At limit</p>}
