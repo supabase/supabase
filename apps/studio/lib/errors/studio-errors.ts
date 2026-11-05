@@ -14,7 +14,6 @@ export type StudioErrorInput = {
   code?: number
   requestId?: string
   retryAfter?: number
-  requestPathname?: string
   metadata?: ErrorMetadata
   formattedError?: string
   reason?: string
@@ -62,7 +61,7 @@ function studioError<const Tag extends string, F extends Fault, C extends Classi
         ...input,
         message: input.message || DEFAULT_ERROR_MESSAGE,
         reason: input.reason ?? config.defaultReason,
-        service: input.service ?? getServiceForEndpoint(input.endpoint ?? input.requestPathname),
+        service: input.service ?? getServiceForEndpoint(input.endpoint),
       })
       this.fault = typeof config.fault === 'function' ? config.fault(input) : config.fault
       this.retryable = config.retryable(input)
