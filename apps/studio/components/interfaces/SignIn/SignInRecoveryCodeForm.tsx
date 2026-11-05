@@ -174,7 +174,7 @@ export const SignInRecoveryCodeForm = () => {
                       <FormControl>
                         <FormInputGroupInput
                           {...field}
-                          className="pl-10 font-mono"
+                          className="pl-10"
                           autoFocus
                           autoComplete="off"
                           autoCorrect="off"
