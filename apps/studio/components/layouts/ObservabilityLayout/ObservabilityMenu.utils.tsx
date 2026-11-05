@@ -5,6 +5,7 @@ import { useMemo } from 'react'
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery, type Content, type ContentBase } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS, type ShortcutId } from '@/state/shortcuts/registry'
 import { type Dashboards } from '@/types'
@@ -49,6 +50,7 @@ export const useGenerateObservabilityMenu = () => {
 
   const showOverview = useFlag('observabilityOverview')
   const storageSupported = useIsFeatureEnabled('project_storage:all')
+  const isWarehouseEnabled = useIsWarehouseEnabled()
 
   const baseUrl = `/project/${ref}/observability`
 
@@ -139,6 +141,16 @@ export const useGenerateObservabilityMenu = () => {
       url: `${baseUrl}/realtime${preservedQueryParams}`,
       shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     },
+    ...(isWarehouseEnabled
+      ? [
+          {
+            name: 'Warehouse',
+            key: 'warehouse',
+            url: `${baseUrl}/warehouse${preservedQueryParams}`,
+            shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_WAREHOUSE,
+          },
+        ]
+      : []),
   ]
 
   const sections: ObservabilityMenuSection[] = [

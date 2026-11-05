@@ -7,6 +7,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { isWarehouseSettingUp, type WarehouseSetupTarget } from './Warehouse.utils'
 import { WarehouseConnectSection } from './WarehouseConnectSection'
 import { WarehouseDisableCard } from './WarehouseDisableCard'
+import { WarehouseObservabilitySection } from './WarehouseObservabilitySection'
 import { WarehouseSchemaTablePicker } from './WarehouseSchemaTablePicker'
 import {
   WarehouseEnablingProgress,
@@ -291,6 +292,7 @@ const WarehouseSetupPanelContent = ({
         error={setupMutation.error}
       />
       <WarehouseConnectSection />
+      <WarehouseObservabilitySection />
       <WarehouseDisableCard />
     </>
   )
