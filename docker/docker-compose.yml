@@ -69,7 +69,7 @@ services:
   # See: https://github.com/orgs/supabase/discussions/48048
   api-gw:
     container_name: supabase-envoy
-    image: envoyproxy/envoy:v1.39.1
+    image: envoyproxy/envoy:v1.39.6
     restart: unless-stopped
     networks:
       default:

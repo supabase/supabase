@@ -37,6 +37,10 @@ If you depend on any of these overrides, plan to migrate before they are removed
 ### API gateway
 - ⚠️ Changed the `/functions/v1/` route to leave CORS to the function, as on the platform. The gateway no longer answers preflight requests or adds CORS headers to function responses, so the function's own CORS policy applies. Functions called from a browser must handle CORS themselves, see [CORS support for Edge Functions](https://supabase.com/docs/guides/functions/cors) (requires `volumes/api/envoy/lds.template.yaml` and `volumes/api/kong.yml` update) - PR [#52709](https://github.com/supabase/supabase/pull/52709)
 - Fixed requests failing with a 503 for up to about 30 seconds after `docker compose up -d` recreates a service that gets a new IP address: Envoy now drops removed hosts at the next DNS refresh (requires `volumes/api/envoy/cds.yaml` update) - PR [#52968](https://github.com/supabase/supabase/pull/52968)
+- Updated Envoy to `v1.39.6` - [Release](https://github.com/envoyproxy/envoy/releases/tag/v1.39.6)
+  - Fixed **security** issues in Envoy filters and its TLS library; the bundled configuration doesn't use the affected filters (OAuth2, API key authentication, Brotli decompression) - [GHSA-3wvj-j6qm-62mr](https://github.com/envoyproxy/envoy/security/advisories/GHSA-3wvj-j6qm-62mr), [GHSA-8vc2-jrm4-835w](https://github.com/envoyproxy/envoy/security/advisories/GHSA-8vc2-jrm4-835w), [GHSA-47vj-9r25-wv5j](https://github.com/envoyproxy/envoy/security/advisories/GHSA-47vj-9r25-wv5j)
+- Updated [nginx-certbot](https://github.com/JonasAlfredsson/docker-nginx-certbot) to `6.2.0-nginx1.31.8` (requires `docker-compose.nginx.yml` update)
+  - Fixed **security** issues in nginx, including a buffer overflow when evaluating variables (CVE-2026-93479) - [nginx changes](https://nginx.org/en/CHANGES)
 
 ### Studio
 - Updated to `2026.11.02-sha-a05e7ec`
@@ -54,6 +58,7 @@ If you depend on any of these overrides, plan to migrate before they are removed
   - Fixed a **security** issue: signed S3 protocol requests and presigned URLs could be replayed after their intended lifetime by someone who captured them - [GHSA-2p28-q2vx-mw6w](https://github.com/supabase/storage/security/advisories/GHSA-2p28-q2vx-mw6w), [storage#1578](https://github.com/supabase/storage/pull/1578)
   - Changed: uploads, copies, moves and deletes blocked by a trigger on `storage.objects` now fail with `AccessDenied` instead of a 500, 409 or 404 - [storage#1600](https://github.com/supabase/storage/pull/1600)
   - Changed: resumable (TUS) uploads that receive no data for 60 seconds are now aborted, releasing their lock (`TUS_BODY_IDLE_TIMEOUT_MS`) - [storage#1478](https://github.com/supabase/storage/pull/1478)
+- Updated RustFS to `1.0.4` (requires `docker-compose.rustfs.yml` update)
 
 ### imgproxy
 - Updated to `v4.0.21` - [Changelog](https://github.com/imgproxy/imgproxy/blob/master/CHANGELOG.md) | [Release](https://github.com/imgproxy/imgproxy/releases/tag/v4.0.21)
