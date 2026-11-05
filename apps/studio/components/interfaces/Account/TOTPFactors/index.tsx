@@ -42,12 +42,13 @@ type TOTPFactorsProps = {
 }
 
 export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
-  const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
-  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
-  const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
-  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
+  const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
+  const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+
+  const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
@@ -60,8 +61,10 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
   } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
   })
+
   const { data: codes, status } = recoveryCodesStatus ?? {}
   const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
+
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   const disableDeleteFactor =
@@ -153,7 +156,7 @@ export const TOTPFactors = ({ findings, primaryAction }: TOTPFactorsProps) => {
                       size="tiny"
                       icon={<TrashIcon size={14} />}
                       aria-label={`Remove ${factor.friendly_name ?? 'unnamed'} authenticator`}
-                      tooltip={{ content: { side: 'top', text: 'Remove authenticator' } }}
+                      tooltip={{ content: { side: 'bottom', text: 'Remove authenticator' } }}
                       onClick={() => setFactorToBeDeleted(factor.id)}
                       disabled={disableDeleteFactor}
                     />

@@ -1,6 +1,12 @@
-import type { AuthMFARecoveryCodesStatusResponseData, Factor, User } from '@supabase/supabase-js'
+import type {
+  AuthMFARecoveryCodesStatusResponseData,
+  Factor,
+  Session,
+  User,
+} from '@supabase/supabase-js'
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
+import { AuthContext, FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
@@ -16,23 +22,6 @@ mockAnimationsApi()
 vi.hoisted(() => {
   vi.stubEnv('NEXT_PUBLIC_GOTRUE_URL', 'http://localhost:8000/auth/v1')
 })
-vi.mock('common', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('common')>()),
-  useFlag: () => true,
-  useUser: () => ({ id: 'user-a' }),
-}))
-vi.mock('./AddNewFactorModal', () => ({
-  AddNewFactorModal: ({ visible, onClose }: { visible: boolean; onClose: () => void }) =>
-    visible ? (
-      <div role="dialog" aria-label="Add authenticator">
-        <button tabIndex={0} onClick={onClose}>
-          Cancel setup
-        </button>
-      </div>
-    ) : null,
-}))
-vi.mock('./DeleteFactorModal', () => ({ DeleteFactorModal: () => null }))
-
 type AuthUserResponse = Omit<User, 'factors'> & {
   factors: (Omit<Factor, 'status'> & { status: 'verified' | 'unverified' })[]
 }
@@ -45,12 +34,41 @@ const factor: Factor = {
   created_at: '2026-10-01T00:00:00Z',
   updated_at: '2026-10-01T00:00:00Z',
 }
+const user: User = {
+  id: 'user-a',
+  aud: 'authenticated',
+  role: 'authenticated',
+  email: 'test@example.com',
+  app_metadata: {},
+  user_metadata: {},
+  created_at: '2026-10-01T00:00:00Z',
+}
+const session: Session = {
+  access_token: 'test-access',
+  refresh_token: 'test-refresh',
+  expires_in: 3600,
+  token_type: 'bearer',
+  user,
+}
+
 const renderSection = (finding?: AccountRecoveryFinding, searchParams = '') =>
   customRender(
-    <TOTPFactors
-      findings={finding ? [finding] : []}
-      primaryAction={finding?.action ?? 'enable-mfa'}
-    />,
+    <AuthContext.Provider
+      value={{ session, error: null, isLoading: false, refreshSession: async () => session }}
+    >
+      <FeatureFlagContext.Provider
+        value={{
+          configcat: { enableAuthRecoveryCodes: true, textConfirmationModalClickToCopy: false },
+          posthog: {},
+          hasLoaded: true,
+        }}
+      >
+        <TOTPFactors
+          findings={finding ? [finding] : []}
+          primaryAction={finding?.action ?? 'enable-mfa'}
+        />
+      </FeatureFlagContext.Provider>
+    </AuthContext.Provider>,
     { nuqs: { searchParams } }
   )
 
@@ -106,7 +124,8 @@ describe('account security MFA and recovery sections', () => {
     renderSection()
     expect(await screen.findByText('Set up multi-factor authentication')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Set up MFA' }))
-    expect(await screen.findByRole('dialog', { name: 'Add authenticator' })).toBeInTheDocument()
+    expect(await screen.findByText('Add a new authenticator app as a factor')).toBeInTheDocument()
+    expect(screen.getByLabelText('Authenticator app name')).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes')).not.toBeInTheDocument()
   })
 
