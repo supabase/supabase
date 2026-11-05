@@ -963,13 +963,13 @@ The `ids` array on incoming `postgres_changes` payloads must match the subscript
 
 ### Broadcast errors
 
-Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped. RLS write denials are silent even when `ack` is `true`. A denial by the `persistence` policy is the exception: with `ack`, it returns `persistence_unauthorized`.
-
-When `ack` is `true`, the server replies on error with `response.error` (an atom string), not `response.reason`:
+When `config.broadcast.ack` is `false` (the default), the server drops a failed push without a reply. When `ack` is `true`, it replies with the error in `response.error` (an atom string), not `response.reason`:
 
 ```json
 { "status": "error", "response": { "error": "payload_size_exceeded" } }
 ```
+
+On public channels, the only error is `payload_size_exceeded`. Private channels can also return authorization errors, such as `unauthorized` when no RLS policy allows the sender to write, and the persistence errors below.
 
 Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers. The exception is a `send()` with `persist`: it resolves to the `error` code, such as `persistence_unauthorized`.
 
