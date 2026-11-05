@@ -78,6 +78,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Products',
+      icon: 'products',
       menuItems: [
         [
           { label: 'Features' },
@@ -151,6 +152,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Build',
+      icon: 'build',
       menuItems: [
         [
           {
@@ -194,6 +196,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
   [
     {
       label: 'Manage',
+      icon: 'manage',
       menuItems: [
         [
           {
@@ -358,6 +361,7 @@ export const gettingstarted: NavMenuConstant = {
   title: 'Start with Supabase',
   url: '/guides/getting-started',
   items: [
+    { name: 'Getting started', url: '/guides/getting-started', isLayoutV2Only: true },
     { name: 'Build with AI tools', url: '/guides/ai-tools' },
     { name: 'The Supabase way to build', url: '/guides/getting-started/the-supabase-way-to-build' },
     { name: 'API Keys', url: '/guides/getting-started/api-keys' },
@@ -1048,6 +1052,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (basics)',
+      shortName: 'Basics',
       url: undefined,
       items: [
         {
@@ -1072,6 +1077,7 @@ export const database: NavMenuConstant = {
     },
     {
       name: 'Working with your database (intermediate)',
+      shortName: 'Intermediate',
       url: undefined,
       items: [
         {
