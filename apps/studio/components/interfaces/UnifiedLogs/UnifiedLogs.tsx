@@ -547,6 +547,13 @@ export const UnifiedLogs = ({
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              {isError && flatData.length > 0 && (
+                <AlertError
+                  error={error}
+                  subject="Failed to refresh logs"
+                  projectRef={projectRef}
+                />
+              )}
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
                 {hasFilterSideBar && (
                   <>

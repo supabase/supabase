@@ -7,6 +7,7 @@ import DefaultNavigationMenu, {
 import {
   getMenuGroupLabel,
   getMenuId,
+  useCloseMenuOnRouteChange,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
 import { useNavItems } from '~/features/IaNav'
@@ -20,7 +21,6 @@ import dynamic from 'next/dynamic'
 import { usePathname } from 'next/navigation'
 import {
   memo,
-  useEffect,
   useRef,
   useState,
   type PropsWithChildren,
@@ -32,49 +32,17 @@ import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
 const Footer = dynamic(() => import('~/components/Navigation/Footer'))
 const GlobalMenuDrawerSection = dynamic(() =>
-  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+  import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerSection
   )
 )
 const GlobalMenuDrawerFooter = dynamic(() =>
-  import('~/components/Navigation/NavigationMenu/GlobalMobileMenu').then(
+  import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerFooter
   )
 )
 
 const footerEnabled = isFeatureEnabled('docs:footer')
-
-const MobileMenuBackdrop = memo(function MobileMenuBackdrop() {
-  const mobileMenuOpen = useMenuMobileOpen()
-
-  useEffect(() => {
-    window.addEventListener('resize', (e: UIEvent) => {
-      const w = e.target as Window
-      if (mobileMenuOpen && w.innerWidth >= 1024) {
-        menuState.setMenuMobileOpen(!mobileMenuOpen)
-      }
-    })
-    return () => {
-      window.removeEventListener('resize', () => {})
-    }
-  }, [mobileMenuOpen])
-
-  return (
-    <div
-      className={cn(
-        'h-full',
-        'left-0',
-        'right-0',
-        'z-10',
-        'bg-alternative/90',
-        mobileMenuOpen ? 'absolute h-full w-full top-0 left-0' : 'hidden h-0',
-        // always hide on desktop
-        'lg:hidden'
-      )}
-      onClick={() => menuState.setMenuMobileOpen(!mobileMenuOpen)}
-    ></div>
-  )
-})
 
 const Container = memo(function Container({
   children,
@@ -100,7 +68,8 @@ const Container = memo(function Container({
 const NavContainer = memo(function NavContainer({
   children,
   toggleRef,
-}: PropsWithChildren<{ toggleRef: RefObject<HTMLElement | null> }>) {
+  className,
+}: PropsWithChildren<{ toggleRef: RefObject<HTMLElement | null>; className?: string }>) {
   const mobileMenuOpen = useMenuMobileOpen()
 
   return (
@@ -116,7 +85,8 @@ const NavContainer = memo(function NavContainer({
         'lg:h-[calc(100vh-var(--header-height))]',
         'flex flex-col ml-0',
         'lg:border-r',
-        'lg:overflow-y-auto'
+        'lg:overflow-y-auto',
+        className
       )}
     >
       {mobileMenuOpen ? <MobileNavLock toggleRef={toggleRef} /> : null}
@@ -191,8 +161,13 @@ function SidebarSkeleton({
   const [scrolledTitle, setScrolledTitle] = useState<string | null>(null)
   const [pickedGroupLabel, setPickedGroupLabel] = useState<string>()
   const { GLOBAL_MENU_ITEMS } = useNavItems()
-  const currentGroupLabel = getMenuGroupLabel(menuId, GLOBAL_MENU_ITEMS)
-  const selectedGroupLabel = pickedGroupLabel ?? currentGroupLabel
+  // getMenuId falls back to the getting started group, but a page without a sidebar is in no group
+  const currentGroupLabel = hideSideNav ? undefined : getMenuGroupLabel(menuId, GLOBAL_MENU_ITEMS)
+  // a page without a sidebar opens the drawer on the first group, so the drawer is never empty
+  const defaultGroupLabel = hideSideNav
+    ? GLOBAL_MENU_ITEMS.find(([section]) => section.enabled !== false)?.[0].label
+    : currentGroupLabel
+  const selectedGroupLabel = pickedGroupLabel ?? defaultGroupLabel
   // a page outside every group keeps its own nav, whichever group is picked
   const isSideNavShown = !currentGroupLabel || selectedGroupLabel === currentGroupLabel
 
@@ -204,29 +179,31 @@ function SidebarSkeleton({
 
   const menuButtonRef = useRef<HTMLButtonElement>(null)
 
+  useCloseMenuOnRouteChange()
+
   return (
     <div className={cn('flex flex-row h-full relative', className)}>
-      {!hideSideNav && (
-        <NavContainer toggleRef={menuButtonRef}>
-          <GlobalMenuDrawerSection
-            selectedLabel={selectedGroupLabel}
-            currentLabel={currentGroupLabel}
-            currentLevel={menuId}
-            onGroupPick={setPickedGroupLabel}
-            className={cn('lg:hidden', isSideNavShown && 'mb-6 border-b pb-6')}
-          />
+      <NavContainer toggleRef={menuButtonRef} className={cn(hideSideNav && 'lg:hidden')}>
+        <GlobalMenuDrawerSection
+          selectedLabel={selectedGroupLabel}
+          currentLabel={currentGroupLabel}
+          currentLevel={menuId}
+          onGroupPick={setPickedGroupLabel}
+          className={cn('lg:hidden', !hideSideNav && isSideNavShown && 'mb-6 border-b pb-6')}
+        />
+        {hideSideNav ? null : (
           <div className={cn('lg:contents', !isSideNavShown && 'max-lg:hidden')}>
             {NavigationMenu ?? (
               <DefaultNavigationMenu menuId={menuId} additionalNavItems={additionalNavItems} />
             )}
           </div>
-        </NavContainer>
-      )}
+        )}
+      </NavContainer>
       <Container>
         <div className="sticky top-0 z-20 lg:hidden">
           <TopNavBar
             isMenuOpen={mobileMenuOpen}
-            onMenuToggle={hideSideNav ? undefined : handleMenuToggle}
+            onMenuToggle={handleMenuToggle}
             scrolledTitle={mobileMenuOpen ? null : scrolledTitle}
             menuButtonRef={menuButtonRef}
           />
@@ -238,7 +215,6 @@ function SidebarSkeleton({
           </MobileHeaderSlotsContext>
           {!hideFooter && <Footer />}
         </div>
-        <MobileMenuBackdrop />
       </Container>
     </div>
   )

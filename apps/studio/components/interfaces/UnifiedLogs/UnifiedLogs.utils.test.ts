@@ -423,11 +423,12 @@ describe('getUniqueLogRows', () => {
 
 describe('getLogRowClassName', () => {
   it('distinguishes errors and dims logs received before live mode started', () => {
-    const errorRow = { level: 'error' as const, timestamp: 1000 }
+    const errorRow = { level: 'error' as const, timestamp: 1_000_000, date: new Date(1000) }
 
     expect(getLogRowClassName(errorRow)).toContain('bg-destructive/5')
     expect(getLogRowClassName(errorRow)).toContain('opacity-100')
     expect(getLogRowClassName(errorRow, 2000)).toContain('opacity-50')
+    expect(getLogRowClassName(errorRow, 500)).toContain('opacity-100')
   })
 })
 
