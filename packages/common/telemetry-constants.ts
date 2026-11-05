@@ -3390,7 +3390,7 @@ type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ * @page /dashboard/project/{ref}/issues or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -3425,7 +3425,7 @@ export interface AdvisorDetailOpenedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/issues/{id} (issue detail)
  */
 export interface AdvisorAssistantButtonClickedEvent {
   action: 'advisor_assistant_button_clicked'

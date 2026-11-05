@@ -350,12 +350,13 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SidebarMenu>
           {otherRoutes.map((route) => {
-            if (route.key === 'advisors') {
+            if (route.key === 'issues') {
               return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  active={activeRoute === route.key}
+                  // Check settings still live under /advisors
+                  active={activeRoute === route.key || activeRoute === 'advisors'}
                   isLoading={isProjectPending}
                 >
                   {route.icon}

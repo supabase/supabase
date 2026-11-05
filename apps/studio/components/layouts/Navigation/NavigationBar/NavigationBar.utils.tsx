@@ -1,4 +1,4 @@
-import { useFlag, useParams } from 'common'
+import { useParams } from 'common'
 import {
   Auth,
   Compute,
@@ -9,7 +9,7 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
+import { BlocksIcon, CircleDotIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -46,7 +46,6 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
-  isHealthAdvisorEnabled?: boolean
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -208,19 +207,14 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
-  const isHealthAdvisorEnabled = features?.isHealthAdvisorEnabled ?? false
 
   return [
     {
-      key: 'advisors',
-      label: 'Advisors',
+      key: 'issues',
+      label: 'Issues',
       disabled: !isProjectActive,
-      icon: <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link:
-        ref &&
-        (isProjectBuilding
-          ? buildingUrl
-          : `/project/${ref}/advisors/${isHealthAdvisorEnabled ? 'health' : 'security'}`),
+      icon: <CircleDotIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/issues`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled
@@ -273,13 +267,11 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
-  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   return generateOtherRoutes(ref, project, {
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
-    isHealthAdvisorEnabled,
   })
 }
 
