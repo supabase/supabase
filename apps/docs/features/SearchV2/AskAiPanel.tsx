@@ -208,9 +208,10 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
             {isLoading && !question ? (
               <span
                 aria-hidden
-                className="shimmer pointer-events-none absolute inset-y-0 left-0 flex items-center text-search-dialog text-foreground-lighter"
+                className="shimmer pointer-events-none absolute inset-y-0 left-0 flex items-center text-search-dialog text-foreground-lighter motion-reduce:text-foreground-light"
               >
                 Searching the docs
+                <span className="hidden motion-reduce:inline">…</span>
               </span>
             ) : null}
           </span>
