@@ -1,9 +1,13 @@
+import { safeSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
 import { FeatureFlagContext, useFlag, useParams } from 'common'
 import { useContext, useEffect, useState } from 'react'
 
 import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
 import { getLogsSql, queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
 import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { IS_PLATFORM } from '@/lib/constants'
 
 /**
@@ -61,4 +65,39 @@ export const useEgressReport = (projectRefOverride?: string) => {
     refresh: handleRefresh,
     mergeParams: handleSetParams,
   }
+}
+
+export interface EgressTopQueryRow {
+  query: string
+  calls: number
+  avg_rows: number
+}
+
+// Most frequent queries from pg_stat_statements with the average rows each
+// returns — a high avg_rows on a frequent query is a common egress driver.
+const EGRESS_TOP_QUERIES_SQL = safeSql`
+select
+  query,
+  calls,
+  round((rows::numeric / nullif(calls, 0)), 1) as avg_rows
+from pg_stat_statements
+order by calls desc
+limit 20;`
+
+/**
+ * Top database queries for a single project, scoped by the passed ref so it can
+ * run on the org usage page (which has no project route). Runs only when the
+ * caller mounts it (the breakdown is collapsed by default).
+ */
+export const useEgressTopQueries = (projectRef?: string) => {
+  return useQuery({
+    queryKey: ['egress-top-queries', projectRef],
+    queryFn: ({ signal }) =>
+      executeSql<EgressTopQueryRow[]>(
+        { projectRef, sql: EGRESS_TOP_QUERIES_SQL, grant: unguarded.migrating },
+        signal
+      ).then((res) => res.result),
+    enabled: typeof projectRef === 'string',
+    retry: false,
+  })
 }
