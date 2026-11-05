@@ -154,11 +154,6 @@ export const IdentityVerification = ({
                   }
                 />
               )}
-              {!readError && (!needsCode || factors.isPending) && (
-                <p role="status" className="text-sm text-center text-foreground-light">
-                  Checking your session…
-                </p>
-              )}
               {!readError && needsCode && factors.isSuccess && (
                 <VerificationForm
                   verifiedFactors={verifiedFactors}
