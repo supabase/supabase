@@ -3,6 +3,7 @@ import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import { type Branch } from '@/data/branches/branches-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 
 interface SwitchToPreviewModalProps {
   open: boolean
@@ -11,6 +12,10 @@ interface SwitchToPreviewModalProps {
 }
 
 export const SwitchToPreviewModal = ({ open, branch, onClose }: SwitchToPreviewModalProps) => {
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef: branch?.parent_project_ref,
+    isDefault: branch?.is_default,
+  })
   const { mutate: updateBranch, isPending: isUpdatingBranch } = useBranchUpdateMutation({
     onSuccess() {
       toast.success('Successfully updated branch')
@@ -19,8 +24,9 @@ export const SwitchToPreviewModal = ({ open, branch, onClose }: SwitchToPreviewM
   })
 
   const onSwitchToPreview = () => {
-    if (branch === undefined) return
+    if (branch === undefined || updateBranchGrant.status !== 'granted') return
     updateBranch({
+      grant: updateBranchGrant.grant,
       branchRef: branch.project_ref,
       projectRef: branch.parent_project_ref,
       persistent: false,
@@ -34,7 +40,7 @@ export const SwitchToPreviewModal = ({ open, branch, onClose }: SwitchToPreviewM
       confirmLabel="Switch to preview"
       title="Switch branch to preview before deleting"
       loading={isUpdatingBranch}
-      disabled={branch === undefined}
+      disabled={branch === undefined || updateBranchGrant.status !== 'granted'}
       onCancel={() => onClose()}
       onConfirm={onSwitchToPreview}
     >

@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePolicyDeleteVariables = {
   projectRef: string
@@ -31,6 +33,7 @@ export async function deleteDatabasePolicy({
     connectionString,
     sql,
     queryKey: ['policy', 'delete', originalPolicy.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -43,12 +46,12 @@ export const useDatabasePolicyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabasePolicyDeleteData, ResponseError, DatabasePolicyDeleteVariables>,
+  UseCustomMutationOptions<DatabasePolicyDeleteData, StudioError, DatabasePolicyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyDeleteData, ResponseError, DatabasePolicyDeleteVariables>({
+  return useMutation<DatabasePolicyDeleteData, StudioError, DatabasePolicyDeleteVariables>({
     mutationFn: (vars) => deleteDatabasePolicy(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

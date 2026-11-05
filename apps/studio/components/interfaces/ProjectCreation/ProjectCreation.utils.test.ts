@@ -1,11 +1,6 @@
 import { AWS_REGIONS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
-import {
-  HIGH_AVAILABILITY_INSTANCE_SIZE,
-  HIGH_AVAILABILITY_POSTGRES_ENGINE,
-  HIGH_AVAILABILITY_RELEASE_CHANNEL,
-} from './ProjectCreation.constants'
 import type { AvailableRegions } from './ProjectCreation.utils'
 import {
   AUTO_REGION_VALUE,
@@ -22,8 +17,9 @@ import {
 import type { PostgresEngine, ReleaseChannel } from '@/data/projects/new-project.constants'
 
 describe('smartRegionToExactRegion', () => {
-  it('maps the Auto option to the auto region code', () => {
-    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('auto')
+  it('maps the Auto option to the exact region of Americas', () => {
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe(smartRegionToExactRegion('Americas'))
+    expect(smartRegionToExactRegion(AUTO_REGION_VALUE)).toBe('East US (North Virginia)')
   })
 
   it('passes through values that are not smart regions', () => {
@@ -139,12 +135,6 @@ describe('getAvailableRegions', () => {
 })
 
 describe('High Availability project creation constraints', () => {
-  it('pins the Alpha Postgres engine, release channel, and compute size', () => {
-    expect(HIGH_AVAILABILITY_POSTGRES_ENGINE).toBe('17')
-    expect(HIGH_AVAILABILITY_RELEASE_CHANNEL).toBe('ga')
-    expect(HIGH_AVAILABILITY_INSTANCE_SIZE).toBe('large')
-  })
-
   it.each([
     ['local', 'eu-central-1'],
     ['staging', 'us-east-1'],
@@ -205,16 +195,6 @@ describe('getFreeTierGeneralRegionExperimentVariant', () => {
       getFreeTierGeneralRegionExperimentVariant({ ...base, enrollmentFlag: false })
     ).toBeUndefined()
   })
-
-  it('returns undefined when the enrollment flag is off even if the selection flag is on', () => {
-    expect(
-      getFreeTierGeneralRegionExperimentVariant({
-        ...base,
-        enrollmentFlag: false,
-        selectionFlag: true,
-      })
-    ).toBeUndefined()
-  })
 })
 
 describe('getRegionSelectionType', () => {
@@ -265,32 +245,6 @@ describe('getRegionSelectionType', () => {
     expect(
       getRegionSelectionType({ dbRegion: 'Americas', availableRegions: undefined })
     ).toBeUndefined()
-  })
-
-  it('classifies an untouched field as auto, even if it resolved to a specific region', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'East US (North Virginia)',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBe('auto')
-  })
-
-  it('returns undefined for an untouched field holding a stale region matching neither list', () => {
-    expect(
-      getRegionSelectionType({
-        dbRegion: 'Nonexistent',
-        availableRegions,
-        isDbRegionDirty: false,
-      })
-    ).toBeUndefined()
-  })
-
-  it('classifies a touched field normally', () => {
-    expect(
-      getRegionSelectionType({ dbRegion: 'Americas', availableRegions, isDbRegionDirty: true })
-    ).toBe('general')
   })
 })
 

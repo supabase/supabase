@@ -2,14 +2,14 @@ import { queryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { keys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ThirdPartyAuthIntegrationsVariables = {
   projectRef?: string
 }
 
-export type ThirdPartyAuthIntegrationsError = ResponseError
+export type ThirdPartyAuthIntegrationsError = StudioError
 
 export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth_Output']
 
@@ -22,6 +22,7 @@ async function getThirdPartyAuthIntegrations(
   const { data, error } = await get('/v1/projects/{ref}/config/auth/third-party-auth', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

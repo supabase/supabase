@@ -148,7 +148,7 @@ export const PolicyDetailsV2 = ({
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>
                   Table
-                  <code className="text-code-inline">on</code> clause
+                  <code>on</code> clause
                 </FormLabel>
                 {authContext === 'database' && (
                   <FormControl>
@@ -233,7 +233,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-6 flex flex-col gap-y-1">
                 <FormLabel>
-                  Policy Behavior <code className="text-code-inline">as</code> clause
+                  Policy Behavior <code>as</code> clause
                 </FormLabel>
                 <FormControl>
                   <Select
@@ -270,7 +270,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
                 <FormLabel>
-                  Policy Command <code className="text-code-inline">for</code> clause
+                  Policy Command <code>for</code> clause
                 </FormLabel>
                 <FormControl>
                   <RadioGroup
@@ -308,7 +308,7 @@ export const PolicyDetailsV2 = ({
             render={({ field }) => (
               <FormItem className="col-span-12 flex flex-col gap-y-1">
                 <FormLabel htmlFor="roles">
-                  Target Roles <code className="text-code-inline">to</code> clause
+                  Target Roles <code>to</code> clause
                 </FormLabel>
                 <FormControl>
                   <MultiSelector

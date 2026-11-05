@@ -9,7 +9,7 @@ import type { ToolContext, ToolContract } from './types'
  */
 export function toolFromContract<TInput, TOutput>(
   contract: ToolContract<TInput, TOutput>,
-  { aiOptInLevel = 'schema' }: ToolContext,
+  ctx: ToolContext,
   execute: (input: TInput, options: ToolExecutionOptions<unknown>) => PromiseLike<TOutput> | TOutput
 ): Tool<TInput, TOutput> {
   const { toModelOutput } = contract
@@ -19,12 +19,12 @@ export function toolFromContract<TInput, TOutput>(
   // annotation checks the concrete types instead.
   return {
     description: contract.description,
-    inputSchema: contract.inputSchema,
+    inputSchema: contract.createInputSchema?.(ctx) ?? contract.inputSchema,
     needsApproval: contract.needsApproval,
     execute,
     toModelOutput: ({ output }: { output: TOutput }) => ({
       type: 'json' as const,
-      value: toModelOutput(output, aiOptInLevel),
+      value: toModelOutput(output, ctx.aiOptInLevel),
     }),
   } as unknown as Tool<TInput, TOutput>
 }

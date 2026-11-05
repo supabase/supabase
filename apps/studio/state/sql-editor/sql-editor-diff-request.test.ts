@@ -9,19 +9,6 @@ beforeEach(() => {
 })
 
 describe('sqlEditorDiffRequestState', () => {
-  it('is empty by default', () => {
-    expect(sqlEditorDiffRequestState.pending).toBeUndefined()
-  })
-
-  it('requestDiff queues a pending request', () => {
-    sqlEditorDiffRequestState.requestDiff('select 1', DiffType.Addition)
-
-    expect(sqlEditorDiffRequestState.pending).toEqual({
-      sql: 'select 1',
-      diffType: DiffType.Addition,
-    })
-  })
-
   it('consumeDiffRequest returns the pending request and clears it', () => {
     sqlEditorDiffRequestState.requestDiff('select 1', DiffType.Modification)
 

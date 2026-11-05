@@ -52,14 +52,19 @@ describe('slot health', () => {
 })
 
 describe('getTableSyncLagLabel', () => {
-  test('does not infer unlimited retention from missing headroom', () => {
+  // Missing or invalid headroom must not be reported as unlimited (or any) retention
+  test.each([
+    ['null', { safe_wal_size_bytes: null }],
+    ['omitted', {}],
+    ['NaN', { safe_wal_size_bytes: Number.NaN }],
+  ])('omits WAL retention when headroom is %s', (_, headroom) => {
     expect(
       getTableSyncLagLabel({
         active: true,
         wal_status: 'reserved',
         restart_lsn_bytes: 0,
         confirmed_flush_lsn_bytes: 0,
-        safe_wal_size_bytes: null,
+        ...headroom,
       })
     ).toEqual([])
   })
@@ -99,29 +104,6 @@ describe('getTableSyncLagLabel', () => {
         safe_wal_size_bytes: 0,
       })
     ).toEqual(['0 bytes WAL retention remaining', 'Some changes at risk'])
-  })
-
-  test('omits WAL retention when the API does not provide it', () => {
-    expect(
-      getTableSyncLagLabel({
-        active: true,
-        wal_status: 'reserved',
-        restart_lsn_bytes: 0,
-        confirmed_flush_lsn_bytes: 0,
-      })
-    ).toEqual([])
-  })
-
-  test('omits an invalid WAL retention value', () => {
-    expect(
-      getTableSyncLagLabel({
-        active: true,
-        wal_status: 'reserved',
-        restart_lsn_bytes: 0,
-        confirmed_flush_lsn_bytes: 0,
-        safe_wal_size_bytes: Number.NaN,
-      })
-    ).toEqual([])
   })
 
   test('reports an exceeded WAL retention budget', () => {

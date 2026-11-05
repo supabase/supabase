@@ -392,8 +392,8 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
                         // @ts-ignore
                         title={
                           <span>
-                            Enable <code className="text-code-inline w-min">pg_net</code> for HTTP
-                            requests or Edge Functions
+                            Enable <code className="w-min">pg_net</code> for HTTP requests or Edge
+                            Functions
                           </span>
                         }
                         description={

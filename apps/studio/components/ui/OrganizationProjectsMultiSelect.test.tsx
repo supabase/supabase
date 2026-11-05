@@ -1,4 +1,4 @@
-import { screen, waitFor, within } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { mockIntersectionObserver } from 'jsdom-testing-mocks'
@@ -119,25 +119,19 @@ async function openDropdown() {
 }
 
 describe('OrganizationProjectsMultiSelect', () => {
-  test('lists every project as an unchecked option when nothing is selected', async () => {
-    setupProjectsMock([makeProject('ref-1', 'Alpha'), makeProject('ref-2', 'Beta')])
-    renderHarness()
-
-    await openDropdown()
-
-    const alpha = await screen.findByRole('option', { name: /Alpha/ })
-    const beta = screen.getByRole('option', { name: /Beta/ })
-    expect(within(alpha).getByRole('checkbox')).not.toBeChecked()
-    expect(within(beta).getByRole('checkbox')).not.toBeChecked()
-  })
-
   test('selecting a project checks it and reports the new selection', async () => {
     setupProjectsMock([makeProject('ref-1', 'Alpha'), makeProject('ref-2', 'Beta')])
     const onChange = vi.fn()
     renderHarness({ onChange })
 
     await openDropdown()
-    await userEvent.click(await screen.findByRole('option', { name: /Alpha/ }))
+    const alpha = await screen.findByRole('option', { name: /Alpha/ })
+    expect(within(alpha).getByRole('checkbox')).not.toBeChecked()
+    expect(
+      within(screen.getByRole('option', { name: /Beta/ })).getByRole('checkbox')
+    ).not.toBeChecked()
+
+    await userEvent.click(alpha)
 
     expect(onChange).toHaveBeenCalledWith(['ref-1'], [{ ref: 'ref-1', name: 'Alpha' }])
     await waitFor(() => {
@@ -196,23 +190,27 @@ describe('OrganizationProjectsMultiSelect', () => {
       makeProject('ref-1', 'Alpha'),
       makeProject('ref-2', 'Beta'),
     ])
-    renderHarness()
+    // Fake clock (still ticking for findBy/waitFor) so the 500ms search debounce can be skipped
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    try {
+      renderHarness()
 
-    await openDropdown()
-    await screen.findByRole('option', { name: /Alpha/ })
+      await openDropdown()
+      await screen.findByRole('option', { name: /Alpha/ })
 
-    await userEvent.type(screen.getByPlaceholderText('Search project...'), 'Bet')
+      fireEvent.change(screen.getByPlaceholderText('Search project...'), {
+        target: { value: 'Bet' },
+      })
+      await act(() => vi.advanceTimersByTimeAsync(500))
 
-    await waitFor(
-      () => {
-        expect(requestedSearches).toContain('Bet')
-      },
-      { timeout: 2000 }
-    )
-    await waitFor(() => {
-      expect(screen.queryByRole('option', { name: /Alpha/ })).not.toBeInTheDocument()
-      expect(screen.getByRole('option', { name: /Beta/ })).toBeInTheDocument()
-    })
+      await waitFor(() => expect(requestedSearches).toContain('Bet'))
+      await waitFor(() => {
+        expect(screen.queryByRole('option', { name: /Alpha/ })).not.toBeInTheDocument()
+        expect(screen.getByRole('option', { name: /Beta/ })).toBeInTheDocument()
+      })
+    } finally {
+      vi.useRealTimers()
+    }
   })
 
   test('a disabled (permission-locked) project cannot be deselected', async () => {

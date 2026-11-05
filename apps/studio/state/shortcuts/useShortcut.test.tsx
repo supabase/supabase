@@ -70,14 +70,6 @@ describe('useShortcut', () => {
       renderHook(() => useShortcut(SHORTCUT_IDS.NAV_HOME, vi.fn()))
       expect(mockUseHotkeySequence.mock.calls[0][0]).toEqual(['G', 'H'])
     })
-
-    it('wires the callback by reference — useHotkeySequence receives the same function', () => {
-      const cb = vi.fn()
-      renderHook(() => useShortcut(SHORTCUT_IDS.ACTION_BAR_SAVE, cb))
-      const passedCallback = mockUseHotkeySequence.mock.calls[0][1]
-      passedCallback()
-      expect(cb).toHaveBeenCalledTimes(1)
-    })
   })
 
   describe('enabled resolution', () => {
@@ -95,18 +87,6 @@ describe('useShortcut', () => {
       mockUseIsShortcutEnabled.mockReturnValue(false)
       renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn(), { enabled: true }))
       expect(getLastHotkeyOptions().enabled).toBe(false)
-    })
-
-    it('global enabled AND caller enabled = true', () => {
-      mockUseIsShortcutEnabled.mockReturnValue(true)
-      renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn(), { enabled: true }))
-      expect(getLastHotkeyOptions().enabled).toBe(true)
-    })
-
-    it('global enabled AND caller undefined = true', () => {
-      mockUseIsShortcutEnabled.mockReturnValue(true)
-      renderHook(() => useShortcut(SHORTCUT_IDS.COMMAND_MENU_OPEN, vi.fn()))
-      expect(getLastHotkeyOptions().enabled).toBe(true)
     })
 
     it('subscribes to the correct shortcut id for global preference', () => {

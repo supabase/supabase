@@ -13,7 +13,7 @@ import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 const values: Record<string, number> = {
   avg_cpu_usage: 25,
   ram_usage: 60,
-  disk_io_consumption: 40,
+  disk_io_budget: 99,
   disk_fs_used_system: 10,
   disk_fs_used_wal: 5,
   pg_database_size: 35,
@@ -91,24 +91,22 @@ function card(label: string) {
 }
 
 describe('DatabaseInfrastructureSection batched metrics', () => {
-  it.each([false, true])(
-    'renders all metrics from one request (errors field: %s)',
-    async (includeErrors) => {
-      const requests = mockMetrics(undefined, includeErrors)
-      renderMetrics()
+  // Responses with an `errors` field are exercised by the isolation cases below
+  it('renders all metrics from one request without an errors field', async () => {
+    const requests = mockMetrics(undefined, false)
+    renderMetrics()
 
-      expect(await card('CPU').findByText('25%')).toBeInTheDocument()
-      expect(await card('Memory').findByText('60%')).toBeInTheDocument()
-      expect(await card('Disk IO').findByText('40%')).toBeInTheDocument()
-      expect(await card('Disk Usage').findByText('50%')).toBeInTheDocument()
-      expect(await card('Peak Connections').findByText('12/100')).toBeInTheDocument()
-      expect(requests).toHaveLength(1)
-      expect(requests[0].sort()).toEqual(Object.keys(values).sort())
-    }
-  )
+    expect(await card('CPU').findByText('25%')).toBeInTheDocument()
+    expect(await card('Memory').findByText('60%')).toBeInTheDocument()
+    expect(await card('Disk IO balance').findByText('99%')).toBeInTheDocument()
+    expect(await card('Disk Usage').findByText('50%')).toBeInTheDocument()
+    expect(await card('Peak Connections').findByText('12/100')).toBeInTheDocument()
+    expect(requests).toHaveLength(1)
+    expect(requests[0].sort()).toEqual(Object.keys(values).sort())
+  })
 
   it.each([
-    ['disk_io_consumption', 'Disk IO'],
+    ['disk_io_budget', 'Disk IO balance'],
     ['disk_fs_used_wal', 'Disk Usage'],
     ['pg_stat_database_num_backends', 'Peak Connections'],
   ])('isolates a failed %s result to %s', async (attribute, label) => {
@@ -131,9 +129,9 @@ describe('DatabaseInfrastructureSection batched metrics', () => {
   })
 
   it('does not display missing series as zero', async () => {
-    mockMetrics('disk_io_consumption', false)
+    mockMetrics('disk_io_budget', false)
     renderMetrics()
-    expect(await card('Disk IO').findByText('Error loading data')).toBeInTheDocument()
+    expect(await card('Disk IO balance').findByText('Error loading data')).toBeInTheDocument()
     expect(await card('CPU').findByText('25%')).toBeInTheDocument()
   })
 

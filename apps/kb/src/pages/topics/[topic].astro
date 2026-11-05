@@ -5,13 +5,14 @@ import { Breadcrumb, BreadcrumbItem, BreadcrumbLink, BreadcrumbList } from 'ui'
 import { GuideBrowser } from '../../components/GuideBrowser'
 import { TopicHero } from '../../components/Hero'
 import Layout from '../../layouts/Layout.astro'
-import { toSummary, toTroubleshootingSummary } from '../../lib/guides'
+import { toFaqSummary, toSummary, toTroubleshootingSummary } from '../../lib/guides'
 import { breadcrumbListSchema, canonicalUrl, KB_BASE_URL } from '../../lib/json-ld'
 import { isInTopic, TOPICS, topicToSlug } from '../../lib/topics'
 
 export async function getStaticPaths() {
 	const guides = (await getCollection('guides')).map(toSummary)
 	const troubleshooting = (await getCollection('troubleshooting')).map(toTroubleshootingSummary)
+	const faqs = (await getCollection('faqs')).map(toFaqSummary)
 
 	// One page per topic in TOPICS — not just topics a guide already uses —
 	// so every link on the "Topics" nav resolves instead of 404ing.
@@ -26,11 +27,14 @@ export async function getStaticPaths() {
 			troubleshooting: troubleshooting.filter((entry) =>
 				isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
 			),
+			faqs: faqs.filter((entry) =>
+				isInTopic({ collection: 'faqs', topics: entry.topics, topic: topic.name })
+			),
 		},
 	}))
 }
 
-const { topic, description, guides, troubleshooting } = Astro.props
+const { topic, description, guides, troubleshooting, faqs } = Astro.props
 const url = canonicalUrl(Astro.url.pathname)
 const jsonLd = breadcrumbListSchema([
 	{ name: 'Knowledge Base', url: KB_BASE_URL },
@@ -39,7 +43,7 @@ const jsonLd = breadcrumbListSchema([
 ---
 
 <Layout title={topic} description={description} jsonLd={jsonLd}>
-	<TopicHero client:load topic={topic} description={description} guides={[...guides, ...troubleshooting]}>
+	<TopicHero client:load topic={topic} description={description}>
 		<Breadcrumb slot="breadcrumb">
 			<BreadcrumbList>
 				<BreadcrumbItem>
@@ -50,7 +54,7 @@ const jsonLd = breadcrumbListSchema([
 	</TopicHero>
 	<div class="flex flex-col gap-20 pb-24 pt-16 sm:gap-24 sm:pt-20">
 		{
-			guides.length === 0 && troubleshooting.length === 0 ? (
+			guides.length === 0 && troubleshooting.length === 0 && faqs.length === 0 ? (
 				<p class="mx-auto max-w-6xl px-6 text-sm text-foreground-light">No guides for this topic yet.</p>
 			) : null
 		}
@@ -58,6 +62,11 @@ const jsonLd = breadcrumbListSchema([
 		{
 			troubleshooting.length > 0 ? (
 				<GuideBrowser client:load title="Troubleshooting" guides={troubleshooting} param="troubleshooting" />
+			) : null
+		}
+		{
+			faqs.length > 0 ? (
+				<GuideBrowser client:load title="FAQs" guides={faqs} param="faqs" />
 			) : null
 		}
 	</div>

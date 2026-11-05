@@ -4,7 +4,8 @@ import { configKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectSettingsVariables = { projectRef?: string }
 
@@ -34,7 +35,7 @@ export async function getProjectSettings(
 }
 
 type ProjectSettingsData = Awaited<ReturnType<typeof getProjectSettings>>
-type ProjectSettingsError = ResponseError
+type ProjectSettingsError = StudioError
 
 export const useProjectSettingsV2Query = <TData = ProjectSettingsData>(
   { projectRef }: ProjectSettingsVariables,

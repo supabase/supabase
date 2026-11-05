@@ -164,7 +164,7 @@ export const AwsMarketplaceOnboardingScreen = ({ buyerId }: { buyerId?: string }
             description={
               <p>
                 Open the onboarding link from AWS Marketplace again. The link must include a{' '}
-                <code className="text-code-inline">buyer_id</code> parameter.
+                <code>buyer_id</code> parameter.
               </p>
             }
           />

@@ -1,6 +1,6 @@
 import { PropsWithChildren } from 'react'
 
-import { MarketplaceSidebar } from '@/components/interfaces/Integrations/Marketplace/MarketplaceSidebar'
+import { MarketplaceProductMenu } from '@/components/interfaces/Integrations/Marketplace/MarketplaceSidebar'
 import { ProjectLayout } from '@/components/layouts/ProjectLayout'
 import { withAuth } from '@/hooks/misc/withAuth'
 
@@ -10,8 +10,7 @@ export const ProjectMarketplaceLayout = withAuth(({ children }: PropsWithChildre
       product="Integrations"
       browserTitle={{ section: 'Integrations' }}
       isBlocking={false}
-      productMenu={<MarketplaceSidebar />}
-      productMenuClassName="p-0"
+      productMenu={<MarketplaceProductMenu />}
     >
       {children}
     </ProjectLayout>

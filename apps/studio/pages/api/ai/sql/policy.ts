@@ -11,6 +11,7 @@ import { isExplorerEnabled } from '@/lib/ai/is-explorer-enabled'
 import { getModel } from '@/lib/ai/model'
 import { DEFAULT_COMPLETION_MODEL } from '@/lib/ai/model.utils'
 import { RLS_PROMPT } from '@/lib/ai/prompts'
+import { withoutApprovalTools } from '@/lib/ai/tool-filter'
 import { getTools } from '@/lib/ai/tools'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { trustedUserEmail } from '@/lib/server/configcat'
@@ -112,7 +113,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
     // Fires when the response finishes or the connection drops.
     res.on('close', () => toolsAbortController.abort())
     try {
-      const tools = await getTools({
+      const allTools = await getTools({
         projectRef,
         connectionString,
         authorization,
@@ -122,7 +123,7 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse, clai
         signal: toolsAbortController.signal,
       })
       // One-shot generateText can't answer an approval request
-      delete tools.update_opt_in_level
+      const tools = withoutApprovalTools(allTools)
 
       const { output } = await generateText({
         ...modelParams,

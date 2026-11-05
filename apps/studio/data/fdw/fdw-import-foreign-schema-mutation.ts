@@ -5,10 +5,12 @@ import { toast } from 'sonner'
 
 import { fdwKeys } from './keys'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWImportForeignSchemaVariables = {
   projectRef?: string
@@ -25,7 +27,12 @@ export async function importForeignSchema({
   ...rest
 }: FDWImportForeignSchemaVariables) {
   const sql = wrapWithTransaction(getImportForeignSchemaSql(rest))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -36,12 +43,12 @@ export const useFDWImportForeignSchemaMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ImportForeignSchemaData, ResponseError, FDWImportForeignSchemaVariables>,
+  UseCustomMutationOptions<ImportForeignSchemaData, StudioError, FDWImportForeignSchemaVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ImportForeignSchemaData, ResponseError, FDWImportForeignSchemaVariables>({
+  return useMutation<ImportForeignSchemaData, StudioError, FDWImportForeignSchemaVariables>({
     mutationFn: (vars) => importForeignSchema(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

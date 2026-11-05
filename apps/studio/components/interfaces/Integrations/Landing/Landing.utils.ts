@@ -1,4 +1,5 @@
 import { parseSchemaComment } from '@stripe/sync-engine/supabase'
+import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useMemo } from 'react'
 
 import { type WrapperMeta } from '../Wrappers/Wrappers.types'
@@ -19,9 +20,10 @@ import {
   usePartnerIntegrationsQuery,
 } from '@/data/partners/integration-status-query'
 import { useSecretsQuery, type ProjectSecret } from '@/data/secrets/secrets-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export const isStripeSyncEngineInstalled = (schemas: Schema[]) => {
   const stripeSchema = findStripeSchema(schemas)
@@ -37,8 +39,8 @@ export type ProjectOAuthIntegrationData = {
   oauthApps: AuthorizedApp[]
 }
 
-const isPermissionError = (error: unknown): error is ResponseError =>
-  error instanceof ResponseError && error.code === 403
+const isPermissionError = (error: unknown): error is StudioError =>
+  isStudioError(error) && error.code === 403
 
 /**
  * Reinterprets a 403 from an existing query as a fallback value, for graceful degradation of the
@@ -46,7 +48,7 @@ const isPermissionError = (error: unknown): error is ResponseError =>
  */
 function permissionSafeData<TData, TDefault>(
   data: TData | undefined,
-  error: ResponseError | null,
+  error: StudioError | null,
   defaultVal: TDefault
 ): TData | TDefault {
   if (isPermissionError(error)) return defaultVal
@@ -61,7 +63,7 @@ export const useProjectOAuthIntegrationData = (
   { enabled = true } = {}
 ): {
   data: ProjectOAuthIntegrationData
-  error: ResponseError | null
+  error: StudioError | null
   isError: boolean
   isLoading: boolean
   isPending: boolean
@@ -74,8 +76,10 @@ export const useProjectOAuthIntegrationData = (
   // `isLoading` remount on each refetch, which loops. Transient failures still recover: the retry
   // policy gives 5xx three attempts, and refetch-on-focus/reconnect are staleness-driven, so they
   // are unaffected by this.
-  const { can: canReadOAuthApps } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ,
+  const { can: canReadOAuthApps } = useAsyncCheckPermissions(
+    PermissionAction.READ,
+    'oauth_apps',
+    undefined,
     {
       organizationSlug: org?.slug,
       projectRef: null,
@@ -84,7 +88,7 @@ export const useProjectOAuthIntegrationData = (
 
   const sharedOptions = { enabled, retryOnMount: false }
   const queries = {
-    apiKeys: useAPIKeysQuery({ projectRef, reveal: false }, sharedOptions),
+    apiKeys: useAPIKeysQuery({ projectRef }, sharedOptions),
     edgeFunctionSecrets: useSecretsQuery({ projectRef }, sharedOptions),
     authConfig: useAuthConfigQuery({ projectRef }, sharedOptions),
     partnerIntegrations: usePartnerIntegrationsQuery({ projectRef }, sharedOptions),

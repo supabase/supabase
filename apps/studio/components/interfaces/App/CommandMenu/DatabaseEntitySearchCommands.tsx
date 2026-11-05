@@ -1,0 +1,118 @@
+import { useQuery } from '@tanstack/react-query'
+import { useDebounce } from '@uidotdev/usehooks'
+import { DatabaseIcon, ShieldIcon } from 'lucide-react'
+import type { ICommand } from 'ui-patterns/CommandMenu'
+import {
+  useCommandMenuOpen,
+  useQuery as useCommandMenuQuery,
+  useRegisterCommands,
+} from 'ui-patterns/CommandMenu'
+
+import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
+import {
+  ENTITY_SEARCH_DEBOUNCE_MS,
+  formatTableSearchDetails,
+  getEntitySearchQuery,
+  getPolicyEditorRoute,
+  getTableEditorRoute,
+  matchesEntitySearch,
+  matchesPolicySearch,
+} from './DatabaseEntitySearch.utils'
+import { orderCommandSectionsByPriority } from './ordering'
+import { entitySearchQueryOptions } from '@/data/database/entity-search-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+
+// Tables and policies are ranked as one unit by the command menu's relevance
+// sort, so a policy that matches better than its table doesn't jump above it
+const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
+
+/**
+ * Searches the project's database entities by name as the user types in the
+ * command menu, and registers matches as their own sections (tables,
+ * policies). Filtering happens in the database (see getSearchEntitiesSql), so
+ * results are force-mounted to stop cmdk from filtering them a second time.
+ */
+export function useDatabaseEntitySearchCommands() {
+  const { data: project } = useSelectedProjectQuery()
+  const isOpen = useCommandMenuOpen()
+  const commandMenuQuery = useCommandMenuQuery()
+  const debouncedQuery = useDebounce(commandMenuQuery, ENTITY_SEARCH_DEBOUNCE_MS)
+  const currentSearch = getEntitySearchQuery(commandMenuQuery)
+  const debouncedSearch = getEntitySearchQuery(debouncedQuery)
+
+  const { data, isPlaceholderData } = useQuery(
+    entitySearchQueryOptions(
+      {
+        projectRef: project?.ref,
+        connectionString: project?.connectionString,
+        query: debouncedSearch.query,
+      },
+      { enabled: isOpen && debouncedSearch.isSearchable }
+    )
+  )
+
+  // Results lag behind the input (debounce, request in flight, placeholder data
+  // from the previous search). Until they catch up, only keep the ones that
+  // still match what's typed, so e.g. `blog_posts` results never show for
+  // `colors`, while refining `blog` to `blog_p` narrows smoothly.
+  const canShowResults = isOpen && currentSearch.isSearchable
+  const isStale = isPlaceholderData || debouncedSearch.query !== currentSearch.query
+  const getVisibleResults = <T,>(results: T[], matches: (result: T, query: string) => boolean) => {
+    if (!canShowResults) return []
+    return isStale ? results.filter((result) => matches(result, currentSearch.query)) : results
+  }
+  const tables = getVisibleResults(data?.tables ?? [], matchesEntitySearch)
+  const policies = getVisibleResults(data?.policies ?? [], matchesPolicySearch)
+  const projectRef = project?.ref ?? '_'
+
+  const tableCommands: ICommand[] = tables.map((table) => {
+    const displayName = `${table.schema}.${table.name}`
+    return {
+      id: `entity-search-table-${table.id}`,
+      name: displayName,
+      value: `entity-search-table-${table.id} ${displayName}`,
+      forceMount: true,
+      icon: () => <DatabaseIcon />,
+      badge: () => (
+        <span className="text-xs text-foreground-lighter truncate pl-4 shrink-0">
+          {formatTableSearchDetails(table)}
+        </span>
+      ),
+      route: getTableEditorRoute(projectRef, table),
+    }
+  })
+
+  const policyCommands: ICommand[] = policies.map((policy) => {
+    const tableName = `${policy.schema}.${policy.table}`
+    return {
+      id: `entity-search-policy-${policy.id}`,
+      name: policy.name,
+      value: `entity-search-policy-${policy.id} ${policy.name} ${tableName}`,
+      forceMount: true,
+      icon: () => <ShieldIcon />,
+      badge: () => (
+        <span className="text-xs text-foreground-lighter truncate pl-4 shrink-0">
+          {policy.command} on {tableName}
+        </span>
+      ),
+      route: getPolicyEditorRoute(projectRef, policy),
+    }
+  })
+
+  useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_TABLES, tableCommands, {
+    deps: [tables, projectRef],
+    enabled: tableCommands.length > 0,
+    forceMountSection: true,
+    orderSection: orderCommandSectionsByPriority,
+    sectionMeta: { priority: 2, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
+  })
+
+  useRegisterCommands(COMMAND_MENU_SECTIONS.DATABASE_POLICIES, policyCommands, {
+    deps: [policies, projectRef],
+    enabled: policyCommands.length > 0,
+    forceMountSection: true,
+    orderSection: orderCommandSectionsByPriority,
+    // Ranked together with Tables, and listed after it
+    sectionMeta: { priority: 3, relevanceGroup: ENTITY_SEARCH_RELEVANCE_GROUP },
+  })
+}

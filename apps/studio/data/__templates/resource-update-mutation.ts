@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { resourceKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ResourceUpdateVariables = {
   projectRef: string
@@ -29,12 +30,12 @@ export const useResourceUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ResourceUpdateData, ResponseError, ResourceUpdateVariables>,
+  UseCustomMutationOptions<ResourceUpdateData, StudioError, ResourceUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ResourceUpdateData, ResponseError, ResourceUpdateVariables>({
+  return useMutation<ResourceUpdateData, StudioError, ResourceUpdateVariables>({
     mutationFn: (vars) => updateResource(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables

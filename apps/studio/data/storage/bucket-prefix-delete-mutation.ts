@@ -1,5 +1,6 @@
 import { getDeleteBucketPrefixSQL } from '@supabase/pg-meta'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 /**
@@ -28,7 +29,13 @@ export const deleteBucketPrefix = async (
   const sql = getDeleteBucketPrefixSQL({ bucketId, prefix })
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['delete-bucket-prefix'] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['delete-bucket-prefix'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

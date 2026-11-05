@@ -14,7 +14,7 @@ export const healthAdvisors = [
 
 ### How to Resolve
 
-Pull up to five recent 5xx responses on \`/rest/v1\` paths from \`edge_logs\` with their IDs, timestamps, and status. You can use [Logs](/dashboard/project/_/logs/edge-logs) in Studio, the MCP [\`query_logs\`](/docs/guides/observability/advanced-log-filtering#mcp) tool, or the [Management API](/docs/guides/observability/advanced-log-filtering#api). Then follow [API error troubleshooting](/docs/guides/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9).`,
+Pull up to five recent 5xx responses on \`/rest/v1\` paths from \`edge_logs\` with their IDs, timestamps, and status. You can use [Logs](/dashboard/project/_/logs/edge-logs) in Studio, the MCP [\`query_logs\`](/docs/guides/observability/advanced-log-filtering#mcp) tool, or the [Management API](/docs/guides/observability/advanced-log-filtering#api). Then follow [API error troubleshooting](/kb/troubleshooting/discovering-and-interpreting-api-errors-in-the-logs-7xREI9).`,
   },
   {
     path: 'log_auth_error_rate_high',

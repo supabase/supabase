@@ -3,7 +3,6 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { PublicationsAvailability } from '@/components/interfaces/Database/Publications/PublicationsAvailability'
 import { PublicationsTables } from '@/components/interfaces/Database/Publications/PublicationsTables'
 import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
@@ -53,11 +52,7 @@ const DatabasePublicationsContent = () => {
   )
 }
 
-const DatabasePublications: NextPageWithLayout = () => (
-  <PublicationsAvailability>
-    <DatabasePublicationsContent />
-  </PublicationsAvailability>
-)
+const DatabasePublications: NextPageWithLayout = () => <DatabasePublicationsContent />
 
 DatabasePublications.getLayout = (page) => (
   <DefaultLayout>

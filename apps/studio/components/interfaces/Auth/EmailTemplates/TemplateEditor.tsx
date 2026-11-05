@@ -394,8 +394,7 @@ export const TemplateEditor = ({ template, isReadOnly = false }: TemplateEditorP
                             {variable.name === 'Token' &&
                               template.variables.some((x) => x.name === 'ConfirmationURL') && (
                                 <>
-                                  , which can be used instead of{' '}
-                                  <code className="text-code-inline">ConfirmationURL</code>
+                                  , which can be used instead of <code>ConfirmationURL</code>
                                 </>
                               )}
 

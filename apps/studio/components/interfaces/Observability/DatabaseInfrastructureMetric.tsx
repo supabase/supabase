@@ -32,9 +32,10 @@ const METRICS = {
     attributes: ['disk_fs_used_system', 'disk_fs_used_wal', 'pg_database_size', 'disk_fs_size'],
   },
   diskIo: {
-    label: 'Disk IO',
-    tooltip: 'Disk I/O consumption percentage. High values may indicate disk bottlenecks',
-    attributes: ['disk_io_consumption'],
+    label: 'Disk IO balance',
+    tooltip:
+      'Average remaining disk IO burst balance in the selected window, using the lower of throughput and IOPS balances; 100% is full and 0% is exhausted.',
+    attributes: ['disk_io_budget'],
   },
   ram: {
     label: 'Memory',
@@ -99,7 +100,8 @@ export const DatabaseInfrastructureMetric = ({
       if (connections.max > 0) value = `${connections.peak}/${connections.max}`
     } else {
       const metrics = parseInfrastructureMetrics(data)
-      if (metrics) value = `${metrics[metric].current.toFixed(0)}%`
+      const current = metrics?.[metric].current
+      if (current !== undefined) value = `${current.toFixed(0)}%`
     }
   }
 

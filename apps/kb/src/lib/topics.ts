@@ -83,11 +83,17 @@ export const TOPICS = [
     pinned: false,
     visible: true,
   },
+  {
+    name: 'FAQs',
+    description: 'Frequently asked questions and their answers.',
+    pinned: false,
+    visible: true,
+  },
 ] as const
 
 export type Topic = (typeof TOPICS)[number]['name']
 
-type ContentCollection = 'guides' | 'troubleshooting'
+type ContentCollection = 'guides' | 'troubleshooting' | 'faqs'
 
 interface ListedTopicsParams {
   guides: { topics: readonly string[] }[]
@@ -116,7 +122,7 @@ export const FORMAT_TOPICS: Topic[] = [
 export const pickCoverTopic = (topics: Topic[]): Topic | null =>
   topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
 
-// the topic pages and scripts/generate-markdown.mjs both use this, so they list the same entries
+// the topic pages and scripts/generate-markdown.ts both use this, so they list the same entries
 export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boolean => {
   if (collection !== 'troubleshooting') return topics.includes(topic)
   // troubleshooting is a content type. other type topics never list it

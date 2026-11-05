@@ -4089,6 +4089,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -5563,6 +5567,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
     }
@@ -5641,6 +5649,9 @@ export interface components {
           | 'log_auth_error_rate_high'
           | 'log_storage_error_rate_high'
           | 'log_edge_function_error_rate_high'
+          | 'realtime_authorization_timeouts'
+          | 'realtime_postgres_changes_spike'
+          | 'realtime_concurrent_users_near_limit'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
@@ -5920,6 +5931,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -8007,6 +8020,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description API key not found for project */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -8052,6 +8072,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -8107,6 +8134,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }

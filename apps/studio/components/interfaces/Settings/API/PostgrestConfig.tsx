@@ -47,6 +47,7 @@ import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-
 import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
 import { authenticatorRoleConfigQueryOptions } from '@/data/database/authenticator-role-config-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
+import { unguarded } from '@/data/fetchers'
 import { defaultPrivilegesQueryOptions } from '@/data/privileges/default-privileges-query'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { useUpdateDefaultPrivilegesMutation } from '@/data/privileges/update-default-privileges-mutation'
@@ -56,8 +57,8 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { noop } from '@/lib/void'
-import type { ResponseError } from '@/types'
 
 const resetAuthenticatorDbSchemasSql = safeSql`alter role authenticator reset pgrst.db_schemas`
 
@@ -273,7 +274,7 @@ export const PostgrestConfig = () => {
         functionNamesToRemove: [],
       })
     } catch (error) {
-      toast.error('Failed to save settings: ' + (error as ResponseError).message || 'Unknown error')
+      toast.error('Failed to save settings: ' + (error as StudioError).message || 'Unknown error')
     } finally {
       setIsUpdating(false)
     }
@@ -702,6 +703,7 @@ export const PostgrestConfig = () => {
             projectRef,
             connectionString: project?.connectionString,
             sql: resetAuthenticatorDbSchemasSql,
+            grant: unguarded.migrating,
           })
         }}
       >

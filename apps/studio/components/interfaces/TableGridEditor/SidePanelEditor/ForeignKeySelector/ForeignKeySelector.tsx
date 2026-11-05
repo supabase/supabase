@@ -387,7 +387,7 @@ export const ForeignKeySelector = ({
                   <div className="flex flex-col gap-y-3">
                     <label className="text-foreground-light text-sm">
                       Select columns from{' '}
-                      <code className="text-code-inline">
+                      <code>
                         {fk.schema}.{fk.table}
                       </code>{' '}
                       to reference to
@@ -497,13 +497,13 @@ export const ForeignKeySelector = ({
                               if (x === undefined) return null
                               return (
                                 <li key={`type-error-${idx}`}>
-                                  <code className="text-code-inline">{x.source}</code> (
+                                  <code>{x.source}</code> (
                                   {displayColumnType(
                                     x.sourceType,
                                     x.sourceTypeSchema,
                                     x.sourceIsArray
                                   )}
-                                  ) and <code className="text-code-inline">{x.target}</code>(
+                                  ) and <code>{x.target}</code>(
                                   {displayColumnType(
                                     x.targetType,
                                     x.targetTypeSchema,
@@ -529,8 +529,7 @@ export const ForeignKeySelector = ({
                               return (
                                 <li key={`type-error-${idx}`}>
                                   <div className="flex items-center gap-x-1">
-                                    <code className="text-code-inline">{x.source}</code>{' '}
-                                    <ArrowRightIcon size={14} />{' '}
+                                    <code>{x.source}</code> <ArrowRightIcon size={14} />{' '}
                                     {displayColumnType(
                                       x.targetType,
                                       x.targetTypeSchema,
@@ -562,19 +561,17 @@ export const ForeignKeySelector = ({
                           </p>
                           <ul className="mt-2 list-disc pl-4 space-y-1">
                             <li>
-                              <code className="text-code-inline">Cascade</code>: if the referencing
-                              table represents something that is a component of what is represented
-                              by the referenced table and cannot exist independently
+                              <code>Cascade</code>: if the referencing table represents something
+                              that is a component of what is represented by the referenced table and
+                              cannot exist independently
                             </li>
                             <li>
-                              <code className="text-code-inline">Restrict</code> or{' '}
-                              <code className="text-code-inline">No action</code>: if the two tables
+                              <code>Restrict</code> or <code>No action</code>: if the two tables
                               represent independent objects
                             </li>
                             <li>
-                              <code className="text-code-inline">Set NULL</code> or{' '}
-                              <code className="text-code-inline">Set default</code>: if a
-                              foreign-key relationship represents optional information
+                              <code>Set NULL</code> or <code>Set default</code>: if a foreign-key
+                              relationship represents optional information
                             </li>
                           </ul>
                           <p className="mt-2">

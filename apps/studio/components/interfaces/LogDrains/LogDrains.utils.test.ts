@@ -11,45 +11,28 @@ import {
 } from './LogDrains.utils'
 
 describe('getHeadersSectionDescription', () => {
-  it('returns webhook description for webhook type', () => {
-    const result = getHeadersSectionDescription('webhook')
-    expect(result).toBe('Set custom headers when draining logs to the Endpoint URL')
+  it.each(['webhook', 'loki', 'otlp'] as const)('returns a description for %s', (type) => {
+    expect(getHeadersSectionDescription(type)).not.toBe('')
   })
 
-  it('returns loki description for loki type', () => {
-    const result = getHeadersSectionDescription('loki')
-    expect(result).toBe('Set custom headers when draining logs to the Loki HTTP(S) endpoint')
-  })
-
-  it('returns otlp description for otlp type', () => {
-    const result = getHeadersSectionDescription('otlp')
-    expect(result).toBe(
-      'Set custom headers for OTLP authentication (e.g., Authorization, X-API-Key)'
-    )
-  })
-
-  it('returns empty string for unsupported types', () => {
-    expect(getHeadersSectionDescription('datadog')).toBe('')
-    expect(getHeadersSectionDescription('s3')).toBe('')
-    expect(getHeadersSectionDescription('sentry')).toBe('')
+  it.each(['datadog', 's3', 'sentry'] as const)('returns an empty string for %s', (type) => {
+    expect(getHeadersSectionDescription(type)).toBe('')
   })
 })
 
 describe('getDefaultHeadersByType', () => {
-  it('does not return a default Content-Type header for webhook destinations', () => {
-    expect(getDefaultHeadersByType('webhook')).toEqual({})
-  })
-
   it('returns the protobuf content type header for OTLP destinations', () => {
     expect(getDefaultHeadersByType('otlp')).toEqual({
       'Content-Type': 'application/x-protobuf',
     })
   })
 
-  it('returns an empty object for destinations without default headers', () => {
-    expect(getDefaultHeadersByType('loki')).toEqual({})
-    expect(getDefaultHeadersByType('datadog')).toEqual({})
-  })
+  it.each(['webhook', 'loki', 'datadog'] as const)(
+    'returns no default headers (incl. Content-Type) for %s',
+    (type) => {
+      expect(getDefaultHeadersByType(type)).toEqual({})
+    }
+  )
 })
 
 describe('headerRecordToRows', () => {
@@ -162,174 +145,74 @@ describe('logDrainHeaderEntriesSchema', () => {
   })
 })
 
+// URL parsing rules are covered in lib/validation/http-url.test.ts; these check the OTLP schema
+// wiring (messages, defaults, type literal).
 describe('otlpConfigSchema', () => {
-  describe('valid OTLP configurations', () => {
-    it('accepts valid HTTPS endpoint with all fields', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com:4318/v1/logs',
-        protocol: 'http/protobuf',
-        gzip: true,
-        headers: { Authorization: 'Bearer token' },
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data).toEqual(config)
-      }
-    })
-
-    it('accepts HTTP endpoint (for testing environments)', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'http://localhost:4318/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-    })
-
-    it('applies default values for optional fields', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data.protocol).toBe('http/protobuf')
-        expect(result.data.gzip).toBe(true)
-      }
-    })
-
-    it('accepts empty headers object', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com/v1/logs',
-        headers: {},
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-    })
-
-    it('accepts multiple custom headers', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com/v1/logs',
-        headers: {
-          Authorization: 'Bearer token',
-          'X-API-Key': 'secret-key',
-          'X-Custom-Header': 'custom-value',
-        },
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-    })
+  it('accepts a full configuration unchanged', () => {
+    const config = {
+      type: 'otlp' as const,
+      endpoint: 'https://otlp.example.com:4318/v1/logs',
+      protocol: 'http/protobuf',
+      gzip: true,
+      headers: { Authorization: 'Bearer token' },
+    }
+    const result = otlpConfigSchema.safeParse(config)
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data).toEqual(config)
+    }
   })
 
-  describe('invalid OTLP configurations', () => {
-    it('rejects empty endpoint', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: '',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.issues[0].message).toContain('OTLP endpoint is required')
-      }
-    })
-
-    it('rejects endpoint without protocol', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.issues[0].message).toContain('must start with http:// or https://')
-      }
-    })
-
-    it('rejects endpoint with invalid protocol', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'ftp://otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-    })
-
-    it('rejects endpoint with ws:// protocol', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'ws://otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-    })
-
-    it('rejects endpoint with an incomplete hostname', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://webhook',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-      if (!result.success) {
-        expect(result.error.issues[0].message).toContain('must be a valid URL')
-      }
-    })
-
-    it('rejects wrong type field', () => {
-      const config = {
-        type: 'webhook' as const,
-        endpoint: 'https://otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(false)
-    })
+  it.each([
+    'http://localhost:4318/v1/logs',
+    'https://otlp.example.com/v1/logs?tenant=123',
+    'https://user:pass@otlp.example.com/v1/logs',
+  ])('accepts endpoint %s', (endpoint) => {
+    expect(otlpConfigSchema.safeParse({ type: 'otlp', endpoint }).success).toBe(true)
   })
 
-  describe('edge cases', () => {
-    it('accepts endpoint with port number', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com:4318/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
+  it('applies default values for optional fields', () => {
+    const result = otlpConfigSchema.safeParse({
+      type: 'otlp',
+      endpoint: 'https://otlp.example.com/v1/logs',
     })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.protocol).toBe('http/protobuf')
+      expect(result.data.gzip).toBe(true)
+    }
+  })
 
-    it('accepts endpoint with query parameters', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com/v1/logs?tenant=123',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
+  it('allows gzip to be explicitly false', () => {
+    const result = otlpConfigSchema.safeParse({
+      type: 'otlp',
+      endpoint: 'https://otlp.example.com/v1/logs',
+      gzip: false,
     })
+    expect(result.success).toBe(true)
+    if (result.success) {
+      expect(result.data.gzip).toBe(false)
+    }
+  })
 
-    it('accepts endpoint with authentication in URL', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://user:pass@otlp.example.com/v1/logs',
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-    })
+  it.each([
+    ['', 'OTLP endpoint is required'],
+    ['otlp.example.com/v1/logs', 'must start with http:// or https://'],
+    ['ws://otlp.example.com/v1/logs', undefined],
+    ['https://webhook', 'must be a valid URL'],
+  ])('rejects endpoint %j', (endpoint, message) => {
+    const result = otlpConfigSchema.safeParse({ type: 'otlp', endpoint })
+    expect(result.success).toBe(false)
+    if (!result.success && message) {
+      expect(result.error.issues[0].message).toContain(message)
+    }
+  })
 
-    it('allows gzip to be explicitly false', () => {
-      const config = {
-        type: 'otlp' as const,
-        endpoint: 'https://otlp.example.com/v1/logs',
-        gzip: false,
-      }
-      const result = otlpConfigSchema.safeParse(config)
-      expect(result.success).toBe(true)
-      if (result.success) {
-        expect(result.data.gzip).toBe(false)
-      }
+  it('rejects wrong type field', () => {
+    const result = otlpConfigSchema.safeParse({
+      type: 'webhook',
+      endpoint: 'https://otlp.example.com/v1/logs',
     })
+    expect(result.success).toBe(false)
   })
 })

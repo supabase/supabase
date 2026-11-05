@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { waitFor } from '@testing-library/react'
 import { HttpResponse } from 'msw'
 import { describe, expect, it } from 'vitest'

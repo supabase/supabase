@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { logDrainsKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LogDrainDeleteVariables = {
   projectRef: string
@@ -11,8 +12,9 @@ export type LogDrainDeleteVariables = {
 }
 
 export async function deleteLogDrain({ projectRef, token }: LogDrainDeleteVariables) {
-  const { data, error } = await del('/v2/projects/{ref}/analytics/log-drains/{id}', {
-    params: { path: { ref: projectRef, id: token } },
+  // @ts-ignore Just sample, TS lint will validate if the endpoint is valid
+  const { data, error } = await del('/platform/projects/{ref}/analytics/log-drains/{token}', {
+    params: { path: { ref: projectRef, token } },
   })
 
   if (error) handleError(error)
@@ -26,12 +28,12 @@ export const useDeleteLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LogDrainDeleteData, ResponseError, LogDrainDeleteVariables>,
+  UseCustomMutationOptions<LogDrainDeleteData, StudioError, LogDrainDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<LogDrainDeleteData, ResponseError, LogDrainDeleteVariables>({
+  return useMutation<LogDrainDeleteData, StudioError, LogDrainDeleteVariables>({
     mutationFn: (vars) => deleteLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

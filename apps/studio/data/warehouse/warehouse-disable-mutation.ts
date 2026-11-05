@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { warehouseKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
 import { replicationKeys } from '@/data/replication/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WarehouseDisableVariables = {
   projectRef: string
@@ -34,12 +35,12 @@ export const useWarehouseDisableMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WarehouseDisableData, ResponseError, WarehouseDisableVariables>,
+  UseCustomMutationOptions<WarehouseDisableData, StudioError, WarehouseDisableVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WarehouseDisableData, ResponseError, WarehouseDisableVariables>({
+  return useMutation<WarehouseDisableData, StudioError, WarehouseDisableVariables>({
     mutationFn: (vars) => disableWarehouse(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

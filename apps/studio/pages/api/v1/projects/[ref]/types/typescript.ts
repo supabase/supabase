@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { constructHeaders } from '@/lib/api/apiHelpers'
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { generateTypescriptTypes } from '@/lib/api/self-hosted/generate-types'
-import { ResponseError } from '@/types'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export default (req: NextApiRequest, res: NextApiResponse) =>
   apiWrapper(req, res, handler, { withAuth: true })
@@ -25,7 +25,7 @@ const handleGetAll = async (req: NextApiRequest, res: NextApiResponse) => {
 
   const response = await generateTypescriptTypes({ headers })
 
-  if (response instanceof ResponseError) {
+  if (isStudioError(response)) {
     return res.status(response.code ?? 500).json({ message: response.message })
   }
 

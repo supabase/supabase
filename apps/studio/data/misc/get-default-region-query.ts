@@ -8,8 +8,9 @@ import { COUNTRY_LAT_LON } from '@/components/interfaces/ProjectCreation/Project
 import { getAvailableRegions } from '@/components/interfaces/ProjectCreation/ProjectCreation.utils'
 import { AWS_REGIONS_COORDINATES } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration.constants'
 import { fetchHandler } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { getDistanceLatLonKM, tryParseJson } from '@/lib/helpers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DefaultRegionVariables = {
   cloudProvider?: CloudProvider
@@ -75,7 +76,7 @@ export async function getDefaultRegionOption({
 }
 
 export type DefaultRegionData = Awaited<ReturnType<typeof getDefaultRegionOption>>
-export type DefaultRegionError = ResponseError
+export type DefaultRegionError = StudioError
 
 export const useDefaultRegionQuery = <TData = DefaultRegionData>(
   { cloudProvider, useRestrictedPool }: DefaultRegionVariables,

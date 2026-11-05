@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { User } from './users-infinite-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserSendOTPVariables = {
   projectRef: string
@@ -28,10 +29,10 @@ export const useUserSendOTPMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserSendOTPData, ResponseError, UserSendOTPVariables>,
+  UseCustomMutationOptions<UserSendOTPData, StudioError, UserSendOTPVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserSendOTPData, ResponseError, UserSendOTPVariables>({
+  return useMutation<UserSendOTPData, StudioError, UserSendOTPVariables>({
     mutationFn: (vars) => sendOTP(vars),
     async onSuccess(data, variables, context) {
       // [Joshen] If we need to invalidate any queries

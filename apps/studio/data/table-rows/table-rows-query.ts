@@ -11,15 +11,17 @@ import { tableRowKeys } from './keys'
 import { parseSupaTable } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort, SupaRow, SupaTable } from '@/components/grid/types'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
-import { handleError } from '@/data/fetchers'
+import { handleError, unguarded } from '@/data/fetchers'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { timeout } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 interface GetTableRowsArgs {
   table?: SupaTable
@@ -68,15 +70,15 @@ const getPreferredOrderByColumns = (
 }
 
 function getErrorCode(error: any): number | undefined {
-  // Our custom ResponseError's use 'code' instead of 'status'
-  if (error instanceof ResponseError) {
+  // Our custom StudioError's use 'code' instead of 'status'
+  if (isStudioError(error)) {
     return error.code
   }
   return error.status
 }
 
 function getRetryAfter(error: any): number | undefined {
-  if (error instanceof ResponseError) {
+  if (isStudioError(error)) {
     return error.retryAfter
   }
 
@@ -256,7 +258,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -288,7 +290,7 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query })
+          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -318,7 +320,7 @@ type TableRowsVariables = Omit<GetTableRowsArgs, 'table'> & {
 }
 
 export type TableRowsData = TableRows
-type TableRowsError = ResponseError
+type TableRowsError = StudioError
 
 async function getTableRows(
   {
@@ -379,6 +381,7 @@ async function getTableRows(
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
         preflightCheck,
+        grant: unguarded.migrating,
       },
       signal
     )

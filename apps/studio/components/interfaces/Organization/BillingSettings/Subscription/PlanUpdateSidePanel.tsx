@@ -63,8 +63,7 @@ const PartnerManagedPlanNotice = ({
         title="Organization plans are managed through Stripe."
         details={
           <>
-            Run <code className="text-code-inline">{stripeProjectsUpgradeCommand}</code> in your
-            project directory.
+            Run <code>{stripeProjectsUpgradeCommand}</code> in your project directory.
           </>
         }
         cta={{
@@ -231,6 +230,15 @@ export const PlanUpdateSidePanel = () => {
     />
   )
 
+  // Fail closed until subscription succeeds: unresolved plan ids look eligible.
+  const showAwsMarketplacePurchase =
+    isSuccessSubscription &&
+    canUpdateSubscription &&
+    selectedOrganization?.managed_by === MANAGED_BY.SUPABASE &&
+    !isPartnerBilledOrganization &&
+    subscription.billing_via_partner === false &&
+    !['enterprise', 'platform'].includes(subscription.plan.id)
+
   const planCards = (
     <PlanCards
       availablePlans={availablePlans}
@@ -242,6 +250,7 @@ export const PlanUpdateSidePanel = () => {
       hasOrioleProjects={hasOrioleProjects}
       selectedOrganization={selectedOrganization}
       entryDelay={contentDelay}
+      showAwsMarketplacePurchase={showAwsMarketplacePurchase}
       onSelectTier={setSelectedTier}
     />
   )

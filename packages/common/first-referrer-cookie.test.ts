@@ -49,6 +49,24 @@ describe('first-referrer-cookie', () => {
       ).toBe(true)
     })
 
+    it.each([
+      'https://accounts.google.com.br/',
+      'https://accounts.google.co.uk/',
+      'https://accounts.youtube.com/',
+      'https://auth.openai.com/',
+      'https://appleid.apple.com/',
+    ])('returns true for sign-in page %s', (referrer) => {
+      expect(isOAuthRedirectReferrer(referrer)).toBe(true)
+    })
+
+    it('returns false for chatgpt.com', () => {
+      expect(isOAuthRedirectReferrer('https://chatgpt.com/')).toBe(false)
+    })
+
+    it('returns false for a lookalike of accounts.google.com', () => {
+      expect(isOAuthRedirectReferrer('https://accounts.google.com.example.org/')).toBe(false)
+    })
+
     // GitHub OAuth — block bare domain only
     it('returns true for bare github.com/', () => {
       expect(isOAuthRedirectReferrer('https://github.com/')).toBe(true)

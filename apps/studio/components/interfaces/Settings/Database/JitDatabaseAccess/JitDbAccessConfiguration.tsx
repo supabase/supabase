@@ -308,7 +308,7 @@ export const JitDbAccessConfiguration = () => {
 
   const projectReference = ref ? (
     <>
-      This project <code className="text-code-inline">{ref}</code>
+      This project <code>{ref}</code>
     </>
   ) : (
     'This project'
