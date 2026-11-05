@@ -697,7 +697,7 @@ Choose the Secret for the credentials you want to rotate:
 
 <Admonition type="caution">
 
-Plan for service interruptions while pods restart and credentials are synchronized. For JWT rotation, old API keys and access tokens signed with the previous keys stop working once services load the replacement keys. Update client credentials before resuming traffic.
+Plan for service interruptions while pods restart and credentials are synchronized. For JWT rotation, old API keys and access tokens signed with the previous keys stop working after services load the replacement keys. Update client credentials before resuming traffic.
 
 </Admonition>
 
