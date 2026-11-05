@@ -13,8 +13,9 @@ import { IS_PLATFORM } from '@/lib/constants'
  * Note: API gateway logs do not yet include response byte data, so these tables
  * rank by request count, not GB. For GB totals by service, see the usage page.
  */
-export const useEgressReport = () => {
-  const { ref: projectRef } = useParams()
+export const useEgressReport = (projectRefOverride?: string) => {
+  const { ref } = useParams()
+  const projectRef = projectRefOverride ?? ref
   const desiredUseOtel = useFlag('otelReports')
   const { hasLoaded: hasLoadedFlags } = useContext(FeatureFlagContext)
   const [appliedUseOtel, setAppliedUseOtel] = useState<boolean | null>(null)

@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { EgressBreakdownPanel } from './EgressBreakdownPanel'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -95,6 +96,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         'Egress is the data your project sent to clients this billing period. Every Supabase service that returns data adds to it: REST API, Storage, Auth, Realtime, Edge Functions, Connection Pooler, and Log Drains.\nSupabase bills the total uncached egress in GB for the period.\nCached egress is billed separately.',
       chartDescription:
         'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
+      additionalInfo: () => <EgressBreakdownPanel kind="rest" />,
       links: [
         {
           name: 'Documentation',
@@ -111,6 +113,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
       description:
         'Cached egress is data the Supabase CDN delivered from a cache hit. It covers API, Storage, and Edge Functions.\nA cache hit does not make this traffic free. Cached egress has its own quota and a lower per-GB price than uncached egress.\nSupabase bills the total cached egress in GB for the period.',
       chartDescription: 'The data refreshes every hour.',
+      additionalInfo: () => <EgressBreakdownPanel kind="cache" />,
       links: [
         {
           name: 'Documentation',
