@@ -122,7 +122,7 @@ The operator chart installs the CRDs by default. A successful controller rollout
 
 ### Create a project
 
-Configure your deployment in a local `values.yaml` file. Helm applies these settings over the chart's defaults. Throughout this guide, update the same file as you configure HTTPS and individual services. For the available settings and their defaults, see the [project chart's values.yaml](https://github.com/supabase-community/supabase-kubernetes/blob/main/charts/supabase-project/values.yaml).
+Configure your deployment in a local `values.yaml` file. Helm applies these settings over the chart's defaults. Throughout this guide, update the same file as you configure HTTPS and individual services. For the available settings and their defaults, see the [project chart's values.yaml](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/values.yaml).
 
 1. Create a directory for your deployment configuration and save this file as `values.yaml`:
 
@@ -549,7 +549,7 @@ Changing the backend does not copy existing objects. Plan the object transfer be
 
 4. Apply the configuration, then upload and download a test object through the Storage API.
 
-AWS S3 resolves its endpoint from the region. For S3-compatible services, use the operator repository's [Storage examples](https://github.com/supabase-community/supabase-kubernetes/tree/main/charts/supabase-project/examples) to configure the endpoint and path-style behavior.
+AWS S3 resolves its endpoint from the region. For S3-compatible services, use the operator repository's [Storage examples](https://github.com/supabase-community/supabase-kubernetes/tree/v0.8.3/charts/supabase-project/examples) to configure the endpoint and path-style behavior.
 
 ### Edge Functions
 
@@ -609,7 +609,7 @@ Anyone can invoke this example function without authentication. With `VERIFY_JWT
 
 </Admonition>
 
-For a collection of functions, use the operator repository's [Git synchronization example](https://github.com/supabase-community/supabase-kubernetes/blob/main/charts/supabase-project/examples/functions-git-sync.yaml). It mounts code into both Edge Runtime and Studio. Mounting code only into Edge Runtime does not make the source visible in Studio.
+For a collection of functions, use the operator repository's [Git synchronization example](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/examples/functions-git-sync.yaml). It mounts code into both Edge Runtime and Studio. Mounting code only into Edge Runtime does not make the source visible in Studio.
 
 Preserve the operator-managed `main/index.ts` and `deno.jsonc` files. Store function source in version control; the default Deno dependency cache is temporary.
 
@@ -828,4 +828,4 @@ Start with the failing resource's `Ready` condition, then inspect its events and
 | Auth redirects to localhost or the wrong app         | Check `project.publicUrl`, `GOTRUE_SITE_URL`, and `GOTRUE_URI_ALLOW_LIST` in your values | Apply the corrected values and verify the Auth rollout. Update the OAuth provider callback when the Supabase domain changes.                              |
 | A function returns `NOT_FOUND` or a boot error       | Inspect `deployment/supabase-edge-runtime` logs                                          | Check the function's mounted directory, `index.ts`, and dependency downloads. Keep the operator's router and import map intact.                           |
 
-For configuration fields beyond this tutorial, inspect the operator repository's [project chart values](https://github.com/supabase-community/supabase-kubernetes/blob/main/charts/supabase-project/values.yaml) and the [custom resource types](https://github.com/supabase-community/supabase-kubernetes/tree/main/api/v1alpha1) for your release.
+For configuration fields beyond this tutorial, inspect the operator repository's [project chart values](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/values.yaml) and the [custom resource types](https://github.com/supabase-community/supabase-kubernetes/tree/main/api/v1alpha1) for your release.
