@@ -50,6 +50,8 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return 'Project is hibernating'
     case 'x86_architecture':
       return 'Project is running on x86 architecture'
+    case 'table_using_reg_type':
+      return `${error.schema_name}.${error.table_name}.${error.column_name}`
   }
 }
 
@@ -75,6 +77,8 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return 'The project is currently hibernating and will wake on next supported request'
     case 'x86_architecture':
       return 'The project is running on x86 architecture and cannot be upgraded'
+    case 'table_using_reg_type':
+      return `Change the column type from ${error.type_name} or drop the column`
   }
 }
 
@@ -93,6 +97,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
       case 'indexes_referencing_ll_to_earth':
         return `/project/${projectRef}/database/indexes?schema=${encode(error.schema_name)}&search=${encode(error.index_name)}`
       case 'unlogged_table_with_persistent_sequence':
+      case 'table_using_reg_type':
         return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.table_name)}`
       case 'user_defined_objects_in_internal_schemas':
         if (error.obj_type === 'function') {
