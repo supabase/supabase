@@ -5,7 +5,8 @@ import { z } from 'zod'
 import { databaseRoleKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseRolesVariables = {
   projectRef?: string
@@ -35,7 +36,7 @@ export async function getDatabaseRoles(
 }
 
 export type DatabaseRolesData = z.infer<typeof pgMetaRolesList.zod>
-export type DatabaseRolesError = ResponseError
+export type DatabaseRolesError = StudioError
 
 export const useDatabaseRolesQuery = <TData = DatabaseRolesData>(
   { projectRef, connectionString }: DatabaseRolesVariables,

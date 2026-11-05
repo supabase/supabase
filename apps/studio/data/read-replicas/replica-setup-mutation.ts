@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicaKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type Region =
   | 'us-east-1'
@@ -47,11 +48,11 @@ export const useReadReplicaSetUpMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>,
+  UseCustomMutationOptions<ReadReplicaSetUpData, StudioError, ReadReplicaSetUpVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ReadReplicaSetUpData, ResponseError, ReadReplicaSetUpVariables>({
+  return useMutation<ReadReplicaSetUpData, StudioError, ReadReplicaSetUpVariables>({
     mutationFn: (vars) => setUpReadReplica(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

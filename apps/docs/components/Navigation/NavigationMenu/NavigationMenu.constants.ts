@@ -2105,6 +2105,10 @@ export const storage: NavMenuConstant = {
               name: 'Access Control',
               url: '/guides/storage/security/access-control' as `/${string}`,
             },
+            {
+              name: 'URL Signing Keys',
+              url: '/guides/storage/security/signing-keys' as `/${string}`,
+            },
           ],
         },
         {
@@ -2785,8 +2789,8 @@ export const platform: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices' as `/${string}`,
             },
             {
-              name: 'Enterprise-Managed Authentication for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication' as `/${string}`,
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization' as `/${string}`,
             },
           ],
         },

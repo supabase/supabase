@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
 import { handleError, patch, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 interface JWTSigningKeyUpdateVariables {
   projectRef?: string
@@ -35,12 +36,12 @@ export const useJWTSigningKeyUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JWTSigningKeyUpdateData, ResponseError, JWTSigningKeyUpdateVariables>,
+  UseCustomMutationOptions<JWTSigningKeyUpdateData, StudioError, JWTSigningKeyUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JWTSigningKeyUpdateData, ResponseError, JWTSigningKeyUpdateVariables>({
+  return useMutation<JWTSigningKeyUpdateData, StudioError, JWTSigningKeyUpdateVariables>({
     mutationFn: (vars) => updateJWTSigningKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

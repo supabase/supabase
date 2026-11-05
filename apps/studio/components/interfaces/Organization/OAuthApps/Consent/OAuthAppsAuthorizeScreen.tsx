@@ -363,10 +363,12 @@ export const OAuthAppsAuthorizeScreen = ({
                 )}
                 <p className="text-xs text-foreground-lighter">
                   Authorizing {request.name} grants it access to the permissions
-                  {isProjectScopingModeEnabled && !allProjectsSelected
-                    ? ' and selected projects '
-                    : ' '}
-                  above.
+                  {isProjectScopingModeEnabled && !allProjectsSelected ? (
+                    <span>{' and selected projects '}</span>
+                  ) : (
+                    ' '
+                  )}
+                  <span>above.</span>
                 </p>
               </section>
 
@@ -411,9 +413,10 @@ export const OAuthAppsAuthorizeScreen = ({
           ) : (
             <>
               <p>
-                {grantKind === 'member_bound' &&
-                  'No admin approval is needed if your role permits this access. '}
-                This authorization will appear in Authorized apps.
+                {grantKind === 'member_bound' && (
+                  <span>{'No admin approval is needed if your role permits this access. '}</span>
+                )}
+                <span>This authorization will appear in Authorized apps.</span>
               </p>
               <p>
                 Authorizing will redirect you to{' '}

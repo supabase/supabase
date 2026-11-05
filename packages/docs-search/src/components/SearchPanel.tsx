@@ -2,7 +2,16 @@
 
 import { Search } from 'lucide-react'
 import { useRef, useState, type KeyboardEvent, type ReactNode } from 'react'
-import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList } from 'ui'
+import {
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandList,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+} from 'ui'
 
 import { resolveSearchLabels } from './labels'
 import { LoadingBeam } from './LoadingBeam'
@@ -145,38 +154,45 @@ export function SearchPanel({
       <div role="status" aria-live="polite" className="sr-only">
         {getStatusMessage()}
       </div>
-      <CommandList
-        label={copy.resultsLabel}
-        className="h-(--cmdk-list-height) max-h-[min(477px,70dvh)] outline-hidden inset-shadow-2xs inset-shadow-border mx-px transition-all duration-150 ease-enter motion-reduce:transition-none scroll-fade-bottom"
-      >
-        {searchState.status === 'noResults' ? (
-          renderNoResults ? (
-            <div className="py-6 text-center text-sm">
-              {renderNoResults({ query: highlightQuery })}
-            </div>
-          ) : (
-            <CommandEmpty className="text-sm">{copy.noResults}</CommandEmpty>
-          )
-        ) : null}
-        {searchState.status === 'error' && (
-          <CommandEmpty className="text-sm">{copy.error}</CommandEmpty>
-        )}
-        {results.length > 0 && (
-          <CommandGroup className="pt-1.25">
-            {results.map((result) => (
-              <SearchResultItem
-                key={result.path}
-                result={result}
-                highlightQuery={highlightQuery}
-                renderLink={renderLink}
-                onActivate={(activated) => onResultActivate?.(activated, { query: highlightQuery })}
-                onNavigate={(path) => onResultNavigate(path)}
-                onLinkNavigate={() => onResultLinkNavigate?.()}
-              />
-            ))}
-          </CommandGroup>
-        )}
-      </CommandList>
+      <ScrollRoot className="mx-px flex flex-col">
+        <ScrollViewport className="max-h-[min(477px,70dvh)] outline-hidden inset-shadow-2xs inset-shadow-border scroll-fade-bottom">
+          <CommandList
+            label={copy.resultsLabel}
+            className="h-(--cmdk-list-height) max-h-none overflow-visible transition-all duration-150 ease-enter motion-reduce:transition-none"
+          >
+            {searchState.status === 'noResults' ? (
+              renderNoResults ? (
+                <div className="py-6 text-center text-sm">
+                  {renderNoResults({ query: highlightQuery })}
+                </div>
+              ) : (
+                <CommandEmpty className="text-sm">{copy.noResults}</CommandEmpty>
+              )
+            ) : null}
+            {searchState.status === 'error' && (
+              <CommandEmpty className="text-sm">{copy.error}</CommandEmpty>
+            )}
+            {results.length > 0 && (
+              <CommandGroup className="pt-1.25">
+                {results.map((result) => (
+                  <SearchResultItem
+                    key={result.path}
+                    result={result}
+                    highlightQuery={highlightQuery}
+                    renderLink={renderLink}
+                    onActivate={(activated) =>
+                      onResultActivate?.(activated, { query: highlightQuery })
+                    }
+                    onNavigate={(path) => onResultNavigate(path)}
+                    onLinkNavigate={() => onResultLinkNavigate?.()}
+                  />
+                ))}
+              </CommandGroup>
+            )}
+          </CommandList>
+        </ScrollViewport>
+        <ScrollBar />
+      </ScrollRoot>
       {results.length > 0 ? (
         <SearchFooter labels={copy}>
           {renderFooterStart ? (

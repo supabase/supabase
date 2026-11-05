@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { keys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteThirdPartyAuthIntegrationVariables = {
   projectRef: string
@@ -36,7 +37,7 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DeleteThirdPartyAuthIntegrationData,
-    ResponseError,
+    StudioError,
     DeleteThirdPartyAuthIntegrationVariables
   >,
   'mutationFn'
@@ -44,7 +45,7 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     DeleteThirdPartyAuthIntegrationData,
-    ResponseError,
+    StudioError,
     DeleteThirdPartyAuthIntegrationVariables
   >({
     mutationFn: (vars) => deleteThirdPartyIntegration(vars),

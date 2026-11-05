@@ -207,6 +207,27 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
+  useEffect(() => {
+    if (!enabled) return
+
+    const handleExampleLinkClick = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest('a') : null
+      if (!(anchor instanceof HTMLAnchorElement)) return
+
+      const examplePath = anchor.href.match(EXAMPLE_LINK_PATTERN)?.[1].replace(/\/$/, '')
+      if (!examplePath) return
+
+      sendTelemetryEvent(
+        API_URL,
+        { action: 'example_link_clicked', properties: { examplePath } },
+        pathnameRef.current
+      )
+    }
+
+    document.addEventListener('click', handleExampleLinkClick, { capture: true })
+    return () => document.removeEventListener('click', handleExampleLinkClick, { capture: true })
+  }, [API_URL, enabled])
+
   useTelemetryIdentify(API_URL)
 
   return null
@@ -219,7 +240,11 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'sign_in_button_clicked',
   'start_project_button_clicked',
   'www_pricing_plan_cta_clicked',
+  'example_link_clicked',
 ])
+
+const EXAMPLE_LINK_PATTERN =
+  /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
   const consent = hasConsented()

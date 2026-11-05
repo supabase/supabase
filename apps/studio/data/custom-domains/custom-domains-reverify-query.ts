@@ -3,7 +3,8 @@ import { useEffect } from 'react'
 
 import { customDomainKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CustomDomainReverifyVariables = {
   projectRef?: string
@@ -22,7 +23,7 @@ export async function reverifyCustomDomain({ projectRef }: CustomDomainReverifyV
 }
 
 export type CustomDomainReverifyData = Awaited<ReturnType<typeof reverifyCustomDomain>>
-export type CustomDomainReverifyError = ResponseError
+export type CustomDomainReverifyError = StudioError
 
 export const useCustomDomainReverifyQuery = (
   { projectRef }: CustomDomainReverifyVariables,

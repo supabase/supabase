@@ -623,10 +623,19 @@ export const ExplorerNotebookTab = () => {
         onConfirm={handleConfirmRunNotebook}
       >
         <p className="text-sm">
-          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? 0}{' '}
-          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'query' : 'queries'} that{' '}
-          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'modifies' : 'modify'} data or schema
-          and cannot be undone once run:
+          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? <span>{0}</span>}{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? (
+            <span>query</span>
+          ) : (
+            <span>queries</span>
+          )}{' '}
+          <span>that</span>{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? (
+            <span>modifies</span>
+          ) : (
+            <span>modify</span>
+          )}{' '}
+          <span>data or schema and cannot be undone once run:</span>
         </p>
         <ul className="text-sm list-disc pl-4 mt-2">
           {pendingQueryMatches?.mutatingQueries.map((cell) => (

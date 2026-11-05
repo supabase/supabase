@@ -1,9 +1,11 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, skipToken, useQuery } from '@tanstack/react-query'
 import { useCallback } from 'react'
 
 import { apiKeysKeys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { useGrant, type GrantFor } from '@/lib/grants'
+import type { UseCustomQueryOptions } from '@/types'
 
 type LegacyKeys = {
   api_key: string
@@ -44,20 +46,30 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-interface APIKeysVariables {
-  projectRef?: string
-  reveal?: boolean
-}
-
 export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
 
-async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
-  if (!projectRef) throw new Error('projectRef is required')
+export type APIKeysGrant = GrantFor<'get', '/v1/projects/{ref}/api-keys'>
+export type RevealedAPIKeysGrant = GrantFor<'get', '/v1/projects/{ref}/api-keys', 'reveal'>
 
+export type APIKeysVariables = {
+  projectRef?: string
+  grant?: APIKeysGrant
+}
+
+export type RevealedAPIKeysVariables = {
+  projectRef?: string
+  grant?: RevealedAPIKeysGrant
+}
+
+/** The wrapper sets the `reveal` query param from the grant's variant. */
+async function getAPIKeys(
+  { projectRef, grant }: { projectRef: string; grant: APIKeysGrant | RevealedAPIKeysGrant },
+  signal?: AbortSignal
+) {
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal: reveal ? 'true' : 'false' } },
+    params: { path: { ref: projectRef } },
     signal,
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
@@ -67,14 +79,40 @@ async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: Abo
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
+export type APIKeysError = StudioError
 
+/** Keys without their secret values (`reveal=false`). Needs a plain grant. */
+export const apiKeysQueryOptions = ({ projectRef, grant }: APIKeysVariables) =>
+  queryOptions<APIKeysData, APIKeysError>({
+    queryKey: apiKeysKeys.list(projectRef, false),
+    queryFn:
+      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
+  })
+
+/** Keys with their secret values (`reveal=true`). Needs the `reveal` grant. */
+export const revealedApiKeysQueryOptions = ({ projectRef, grant }: RevealedAPIKeysVariables) =>
+  queryOptions<APIKeysData, APIKeysError>({
+    queryKey: apiKeysKeys.list(projectRef, true),
+    queryFn:
+      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
+  })
+
+type TransitionalVariables = { projectRef?: string }
+
+/**
+ * @deprecated Transitional: mints a plain grant internally. Migrate callers to `apiKeysQueryOptions`
+ * with `useGrant` (FE-4731), then delete this hook.
+ */
 export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal = false }: APIKeysVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, ResponseError, TData> = {}
+  { projectRef }: TransitionalVariables,
+  { enabled = true, ...options }: UseCustomQueryOptions<APIKeysData, StudioError, TData> = {}
 ) => {
-  return useQuery<APIKeysData, ResponseError, TData>({
-    queryKey: apiKeysKeys.list(projectRef, reveal),
-    queryFn: ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
+  const grant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { queryKey, queryFn } = apiKeysQueryOptions({ projectRef, grant: grant.grant })
+
+  return useQuery<APIKeysData, StudioError, TData>({
+    queryKey,
+    queryFn,
     enabled: enabled && typeof projectRef !== 'undefined',
     ...options,
   })
@@ -106,9 +144,10 @@ export const getKeys = (apiKeys: APIKey[] = []) => {
 
 const PlaceholderData: APIKeysData = []
 
+/** @deprecated Transitional, see `useAPIKeysQuery`. Migrate with FE-4731. */
 export const useAPIKeys = (
-  variables: APIKeysVariables,
-  options: UseCustomQueryOptions<APIKeysData, ResponseError, APIKeysData> = {}
+  variables: TransitionalVariables,
+  options: UseCustomQueryOptions<APIKeysData, StudioError, APIKeysData> = {}
 ) => {
   const select = useCallback(
     (data: APIKeysData) => getKeys(options.enabled ? data : []),

@@ -216,9 +216,14 @@ async function generate() {
     return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
   })()
 
-  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
-  // so it has no page file for the globs above to find. Hardcode it here.
-  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
+  // /evals and the public /dashboard auth pages are served by other apps proxied onto
+  // supabase.com via rewrites in lib/rewrites.js, so they have no page file for the globs
+  // above to find. Hardcode them here.
+  const proxiedAppUrls = [
+    urlEntry('https://supabase.com/evals'),
+    urlEntry('https://supabase.com/dashboard/sign-in'),
+    urlEntry('https://supabase.com/dashboard/sign-up'),
+  ]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>

@@ -8,9 +8,10 @@ import type { Filter } from '@/components/grid/types'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowDeleteAllVariables = {
   projectRef: string
@@ -69,12 +70,12 @@ export const useTableRowDeleteAllMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowDeleteAllData, ResponseError, TableRowDeleteAllVariables>,
+  UseCustomMutationOptions<TableRowDeleteAllData, StudioError, TableRowDeleteAllVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowDeleteAllData, ResponseError, TableRowDeleteAllVariables>({
+  return useMutation<TableRowDeleteAllData, StudioError, TableRowDeleteAllVariables>({
     mutationFn: (vars) => deleteAllTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

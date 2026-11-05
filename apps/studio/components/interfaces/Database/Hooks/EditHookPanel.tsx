@@ -12,7 +12,6 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { FormSchema, WebhookFormValues } from './EditHookPanel.constants'
 import { FormContents } from './FormContents'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
@@ -74,7 +73,6 @@ const parseParameters = (selectedHook?: PGTrigger): HTTPArgument[] => {
 export const EditHookPanel = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [isLoadingTable, setIsLoadingTable] = useState(false)
 
@@ -92,10 +90,8 @@ export const EditHookPanel = () => {
   const { mutateAsync: enableHooks } = useHooksEnableMutation({ onError: () => {} })
 
   const needsWebhooksEnabled =
-    isMarketplaceEnabled &&
-    isSchemasLoaded &&
-    !schemas.some((schema) => schema.name === 'supabase_functions')
-  const isExtensionDataLoading = isExtensionsLoading || (isMarketplaceEnabled && !isSchemasLoaded)
+    isSchemasLoaded && !schemas.some((schema) => schema.name === 'supabase_functions')
+  const isExtensionDataLoading = isExtensionsLoading || !isSchemasLoaded
 
   const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
     projectRef: project?.ref,
@@ -367,18 +363,16 @@ export const EditHookPanel = () => {
       >
         <Form {...form}>
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
-            {isMarketplaceEnabled && (
-              <div className="flex flex-col gap-y-4 border-b px-5 py-5">
-                {(needsExtensions || needsWebhooksEnabled) && (
-                  <Admonition
-                    type="warning"
-                    title="Database webhooks will be set up"
-                    description="Proceeding will also install the required extensions and enable database webhooks on your project."
-                  />
-                )}
-                <RequiredExtensionsSection hideSeparator />
-              </div>
-            )}
+            <div className="flex flex-col gap-y-4 border-b px-5 py-5">
+              {(needsExtensions || needsWebhooksEnabled) && (
+                <Admonition
+                  type="warning"
+                  title="Database webhooks will be set up"
+                  description="Proceeding will also install the required extensions and enable database webhooks on your project."
+                />
+              )}
+              <RequiredExtensionsSection hideSeparator />
+            </div>
             <FormContents form={form} selectedHook={selectedHook} />
           </form>
         </Form>

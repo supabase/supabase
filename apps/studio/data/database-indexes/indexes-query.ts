@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseIndexesKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type GetIndexesArgs = {
   schema?: string
@@ -48,7 +49,7 @@ export async function getIndexes(
 }
 
 export type IndexesData = Awaited<ReturnType<typeof getIndexes>>
-export type IndexesError = ResponseError
+export type IndexesError = StudioError
 
 export const useIndexesQuery = <TData = IndexesData>(
   { projectRef, connectionString, schema }: IndexesVariables,

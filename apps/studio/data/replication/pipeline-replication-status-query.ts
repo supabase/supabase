@@ -5,14 +5,15 @@ import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationPipelineReplicationStatusVariables = {
   projectRef?: string
   pipelineId?: string
 }
 
-export type ReplicationPipelineReplicationStatusError = ResponseError
+export type ReplicationPipelineReplicationStatusError = StudioError
 
 export type ReplicationPipelineTableStatus =
   components['schemas']['PipelineReplicationStatusResponse_Output']['table_statuses'][number]

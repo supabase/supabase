@@ -607,7 +607,7 @@ const MultiSelectorContent = React.forwardRef<HTMLDivElement, PopoverContentProp
         ref={ref}
         sideOffset={DROPDOWN_GAP}
         className={cn(
-          'bg-overlay shadow-md z-50 border rounded-md p-0',
+          'bg-overlay floating-surface-shadow-md z-50 rounded-md p-0',
           'w-(--radix-popper-anchor-width)',
           className
         )}
