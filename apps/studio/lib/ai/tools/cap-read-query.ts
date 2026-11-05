@@ -1,21 +1,10 @@
 import { literal, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 
-import { applyAutoLimit, trimTrailingSemicolons } from '@/data/sql/utils'
+import { applyAutoLimit, stripLiteralsAndComments, trimTrailingSemicolons } from '@/data/sql/utils'
 
 const WRAPPABLE_START = /^\s*(\(|select\b|with\b|values\b|table\b)/i
 // Statements that can't live inside a subquery (or that write), so they're left untouched
-// applyAutoLimit doesn't recognise `LIMIT ALL` and would append a second LIMIT
-const HAS_LIMIT_ALL = /\blimit\s+all\b/i
 const UNWRAPPABLE = /\b(insert|update|delete|merge|into|for\s+(no\s+key\s+)?(update|share))\b/i
-
-// Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
-// can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
-// -- line comments and /* */ block comments
-const LITERALS_AND_COMMENTS =
-  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
-
-/** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */
-const stripLiteralsAndComments = (sql: string) => sql.replace(LITERALS_AND_COMMENTS, ' ')
 
 /**
  * Caps a read query at `limit` rows inside the database. Falls back to wrapping the query in a
@@ -28,10 +17,8 @@ export function capReadQuery(
   sql: SafeSqlFragment,
   limit: number
 ): { sql: SafeSqlFragment; isCappedInDatabase: boolean } {
-  const auto = HAS_LIMIT_ALL.test(stripLiteralsAndComments(sql))
-    ? undefined
-    : applyAutoLimit(sql, limit)
-  if (auto?.appendAutoLimit) return { sql: auto.sql, isCappedInDatabase: true }
+  const auto = applyAutoLimit(sql, limit)
+  if (auto.appendAutoLimit) return { sql: auto.sql, isCappedInDatabase: true }
 
   const core = trimTrailingSemicolons(sql.trim() as SafeSqlFragment)
   const tokens = stripLiteralsAndComments(core)

@@ -111,47 +111,38 @@ describe('generateTableChangeKey', () => {
 })
 
 describe('rowMatchesIdentifiers', () => {
-  test('should return false for empty row identifiers', () => {
-    const result = rowMatchesIdentifiers({ id: 1 }, {})
-    expect(result).toBe(false)
+  test.each([
+    { desc: 'single identifier', row: { id: 1 }, identifiers: { id: 1 } },
+    {
+      desc: 'multiple identifiers',
+      row: { id: 1, email: 'test@test.com' },
+      identifiers: { id: 1, email: 'test@test.com' },
+    },
+    {
+      desc: 'extra keys on the row',
+      row: { id: 1, name: 'John', age: 30 },
+      identifiers: { id: 1 },
+    },
+    { desc: 'null values', row: { id: null }, identifiers: { id: null } },
+  ])('matches with $desc', ({ row, identifiers }) => {
+    expect(rowMatchesIdentifiers(row, identifiers)).toBe(true)
   })
 
-  test('should match row with single identifier', () => {
-    const result = rowMatchesIdentifiers({ id: 1 }, { id: 1 })
-    expect(result).toBe(true)
-  })
-
-  test('should match row with multiple identifiers', () => {
-    const result = rowMatchesIdentifiers(
-      { id: 1, email: 'test@test.com' },
-      { id: 1, email: 'test@test.com' }
-    )
-    expect(result).toBe(true)
-  })
-
-  test('should not match row with different values', () => {
-    const result = rowMatchesIdentifiers({ id: 2 }, { id: 1 })
-    expect(result).toBe(false)
-  })
-
-  test('should not match row with missing identifier keys', () => {
-    const result = rowMatchesIdentifiers({ id: 1 }, { id: 1, email: 'test@test.com' })
-    expect(result).toBe(false)
-  })
-
-  test('should match row with extra keys', () => {
-    const result = rowMatchesIdentifiers({ id: 1, name: 'John', age: 30 }, { id: 1 })
-    expect(result).toBe(true)
-  })
-
-  test('should match with null values', () => {
-    const result = rowMatchesIdentifiers({ id: null }, { id: null })
-    expect(result).toBe(true)
-  })
-
-  test('should not match with undefined values in row', () => {
-    const result = rowMatchesIdentifiers({ id: undefined, name: 'test' }, { id: 1 })
-    expect(result).toBe(false)
+  test.each([
+    { desc: 'empty identifiers', row: { id: 1 }, identifiers: {} },
+    { desc: 'different values', row: { id: 2 }, identifiers: { id: 1 } },
+    {
+      desc: 'missing identifier keys',
+      row: { id: 1 },
+      identifiers: { id: 1, email: 'test@test.com' },
+    },
+    {
+      desc: 'undefined values in the row',
+      row: { id: undefined, name: 'test' },
+      identifiers: { id: 1 },
+    },
+  ])('does not match with $desc', ({ row, identifiers }) => {
+    expect(rowMatchesIdentifiers(row, identifiers)).toBe(false)
   })
 })
 

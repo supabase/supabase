@@ -99,6 +99,7 @@ const CommandMenuItem = forwardRef<
       ref={ref}
       onSelect={handleCommandSelect}
       value={command.value ?? command.name}
+      keywords={command.keywords && [...command.keywords]}
       forceMount={command.forceMount}
       className={cn(
         generateCommandClassNames(isRouteCommand(command)),

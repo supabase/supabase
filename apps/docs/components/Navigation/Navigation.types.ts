@@ -25,6 +25,7 @@ type MenuItem = {
   hasLightIcon?: boolean
   community?: boolean
   new?: boolean
+  experimental?: boolean
   enabled?: boolean
 }
 

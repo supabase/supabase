@@ -14,11 +14,7 @@ import { safeSql, type SafeSqlFragment } from '../pg-format'
  * relationships filter keeps BOTH directions (conrelid OR confrelid), matching
  * the outgoing/incoming FK rows the unscoped query would have matched by name.
  *
- * When `targetOid` is omitted the injected fragments are empty and the rendered
- * SQL is the full-catalog query used by existing consumers. Shared correctness
- * fixes belong in this builder so scoped and unscoped consumers stay
- * behaviorally equivalent; execution-based tests in test/tables.test.ts enforce
- * that equivalence.
+ * Omit `targetOid` for the full-catalog listing used by `tables.list`.
  */
 export const getTablesSql = (targetOid?: SafeSqlFragment) => {
   const mainScope = targetOid
@@ -33,10 +29,9 @@ export const getTablesSql = (targetOid?: SafeSqlFragment) => {
     ? safeSql`
       and (c.conrelid = ${targetOid} or c.confrelid = ${targetOid})`
     : safeSql``
-  // Scoped path only: deterministic relationships order (plan-order dependent
+  // retrieve only: deterministic relationships order (plan-order dependent
   // otherwise). A composite FK expands to one entry per ordinal column pair
-  // sharing constraint_name, so tie-break on the column names. Empty for
-  // unscoped consumers, preserving their existing plan-dependent order.
+  // sharing constraint_name, so tie-break on the column names.
   const relOrder = targetOid
     ? safeSql` order by relationships.constraint_name, relationships.source_column_name, relationships.target_column_name`
     : safeSql``
@@ -141,7 +136,4 @@ group by
 `
 }
 
-// Unscoped full-catalog rendering served while the pgMetaScopedIntrospection
-// flag is off. Scope-specific changes belong behind targetOid; shared
-// correctness fixes apply to both this path and scoped tables.retrieve.
 export const TABLES_SQL = getTablesSql()

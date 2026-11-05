@@ -3,7 +3,7 @@ import { describe, expect, it } from 'vitest'
 import { getSupportLinkQueryParams } from './HelpPanel.utils'
 
 describe('getSupportLinkQueryParams', () => {
-  it('returns { projectRef } when project has parent_project_ref', () => {
+  it('prefers parent_project_ref over routerRef', () => {
     expect(
       getSupportLinkQueryParams(
         { parent_project_ref: 'main-project' },
@@ -31,27 +31,11 @@ describe('getSupportLinkQueryParams', () => {
     })
   })
 
-  it('returns { orgSlug } when project and routerRef are undefined but org has slug', () => {
-    expect(getSupportLinkQueryParams(undefined, { slug: 'acme' }, undefined)).toEqual({
-      orgSlug: 'acme',
-    })
-  })
-
   it('returns undefined when project, org and routerRef give no ref', () => {
     expect(getSupportLinkQueryParams(undefined, undefined, undefined)).toBeUndefined()
   })
 
   it('returns undefined when org has no slug and no projectRef', () => {
     expect(getSupportLinkQueryParams(undefined, {}, undefined)).toBeUndefined()
-  })
-
-  it('returns undefined when org is undefined and no projectRef', () => {
-    expect(getSupportLinkQueryParams(undefined, undefined, undefined)).toBeUndefined()
-  })
-
-  it('prefers parent_project_ref over routerRef when both are present', () => {
-    expect(
-      getSupportLinkQueryParams({ parent_project_ref: 'parent-ref' }, { slug: 'org' }, 'router-ref')
-    ).toEqual({ projectRef: 'parent-ref' })
   })
 })

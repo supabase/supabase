@@ -43,7 +43,6 @@ export const DetailRow = ({
       table={table}
       disabled={isLoading}
       truncateLabel={!wrap}
-      alignOffset={38}
       // Indent past the section header icon
       className="pl-[38px]"
     >
@@ -65,7 +64,11 @@ interface FieldValueProps {
 
 const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode => {
   if (value === null || value === undefined || value === '') {
-    return <span className="font-mono text-sm leading-5 text-foreground-muted">—</span>
+    return (
+      <code data-code-style="plain" className="text-foreground-muted">
+        -
+      </code>
+    )
   }
 
   if (config.id === 'status') {
@@ -80,14 +83,12 @@ const FieldValue = ({ config, value, wrap, level }: FieldValueProps): ReactNode 
 
   if (typeof value === 'string' || typeof value === 'number') {
     return (
-      <span
-        className={cn(
-          'font-mono text-sm leading-5 text-foreground min-w-0',
-          wrap ? 'break-all text-right' : 'truncate text-right'
-        )}
+      <code
+        data-code-style="plain"
+        className={cn('text-xs', wrap ? 'break-all text-right' : 'truncate text-right')}
       >
         {value}
-      </span>
+      </code>
     )
   }
 

@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { BookOpenIcon, Loader2Icon, SendIcon } from 'lucide-react'
 import { useState } from 'react'
@@ -40,11 +40,12 @@ import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
 import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 import { prettifyJSON } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -84,11 +85,15 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
   const errorDocs = response ? getEdgeFunctionErrorDocs(response.headers) : undefined
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys }
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef },
+    { variant: 'reveal' }
   )
+  const { data: apiKeysData } = useQuery({
+    ...revealedApiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
   const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -271,6 +276,10 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                       addLabel="Add header"
                       addActions={headerAddActions}
                       disabled={isPending}
+                    />
+                    <ApiKeysAccessNote
+                      grant={apiKeysGrant}
+                      fallback="The key shortcuts insert a placeholder you can replace."
                     />
                   </div>
                   <div className="space-y-2">

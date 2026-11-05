@@ -22,7 +22,8 @@ import {
   QuerySearchParamsType,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
 const LIVE_LOGS_OVERLAP_MS = 2 * 60 * 1000
@@ -49,12 +50,16 @@ export const UNIFIED_LOGS_QUERY_OPTIONS = {
 }
 
 export type UnifiedLogsData = Awaited<ReturnType<typeof getUnifiedLogs>>
-export type UnifiedLogsError = ResponseError
+export type UnifiedLogsError = StudioError
 export type UnifiedLogsVariables = { projectRef?: string; search: QuerySearchParamsType }
+type UnifiedLogsPageVariables = UnifiedLogsVariables & {
+  pageSize?: number
+}
 
-export const useUnifiedLogsBackend = () => {
+export const useUnifiedLogsBackend = (search?: QuerySearchParamsType) => {
   const { otelUnifiedLogs = true } = useFeatureFlags().configcat
-  return typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+  const isOtelEnabled = typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
+  return isOtelEnabled || !!search?.scope
 }
 
 export const getUnifiedLogsISOStartEnd = (
@@ -84,10 +89,11 @@ export async function getUnifiedLogs(
     projectRef,
     search,
     pageParam,
+    pageSize = LOGS_PAGE_LIMIT,
     useOtel = false,
     refreshThrough = pageParam?.refreshThrough,
     refreshBudget = createRefreshBudget(),
-  }: UnifiedLogsVariables & {
+  }: UnifiedLogsPageVariables & {
     pageParam: UnifiedLogsPageParam
     useOtel?: boolean
     refreshThrough?: RefreshBoundary
@@ -152,7 +158,7 @@ export async function getUnifiedLogs(
         ? safeSql`${paginationFilter} AND ${boundaryFilter}`
         : boundaryFilter
     }
-    const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(LOGS_PAGE_LIMIT)}`
+    const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(pageSize)}`
     const data = await executeAnalyticsSql({
       projectRef,
       endpoint,
@@ -171,7 +177,7 @@ export async function getUnifiedLogs(
   const rows = [...page]
 
   if (cursorDirection === 'prev' || refreshThrough) {
-    while (page.length === LOGS_PAGE_LIMIT) {
+    while (page.length === pageSize) {
       page = await fetchPage(page[page.length - 1])
       rows.push(...page)
     }
@@ -180,7 +186,7 @@ export async function getUnifiedLogs(
 
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const lastQueryRow = rows.length > 0 ? rows[rows.length - 1] : pageParam?.row
-  const hasMore = refreshThrough?.hasMore ?? result.length >= LOGS_PAGE_LIMIT - 1
+  const hasMore = refreshThrough?.hasMore ?? result.length >= pageSize
 
   const nextCursor = lastRow ? lastRow.date.getTime() : (pageParam?.cursor ?? null)
   const prevCursor = new Date(timestampEnd).getTime()
@@ -194,7 +200,7 @@ export async function getUnifiedLogs(
 }
 
 export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
-  { projectRef, search }: UnifiedLogsVariables,
+  { projectRef, search, pageSize }: UnifiedLogsPageVariables,
   {
     enabled = true,
     ...options
@@ -206,9 +212,12 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
     UnifiedLogsPageParam
   > = {}
 ) => {
-  const useOtel = useUnifiedLogsBackend()
+  const useOtel = useUnifiedLogsBackend(search)
   const queryClient = useQueryClient()
-  const queryKey = [...logsKeys.unifiedLogsInfinite(projectRef, search), { otel: useOtel }]
+  const queryKey = [
+    ...logsKeys.unifiedLogsInfinite(projectRef, search),
+    { otel: useOtel, pageSize },
+  ]
   const getCachedPages = () =>
     queryClient.getQueryData<InfiniteData<UnifiedLogsData>>(queryKey)?.pages ?? []
   const getLoadedPages = () =>
@@ -244,6 +253,7 @@ export const useUnifiedLogsInfiniteQuery = <TData = UnifiedLogsData>(
           projectRef,
           search,
           pageParam: effectivePageParam,
+          pageSize,
           useOtel,
           refreshThrough,
           refreshBudget: refreshBudgets.get(signal),

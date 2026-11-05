@@ -3,9 +3,10 @@ import { QueryClient, useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { privilegeKeys } from './keys'
-import { isScopedIntrospection, scopedIntrospectionReady } from '@/data/scoped-introspection'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type TablePrivilegesVariables = {
   projectRef?: string
@@ -17,21 +18,21 @@ export type PgTablePrivileges = z.infer<typeof pgMeta.tablePrivileges.zod>
 
 const pgMetaTablePrivilegesList = pgMeta.tablePrivileges.list()
 export type TablePrivilegesData = z.infer<typeof pgMetaTablePrivilegesList.zod>
-export type TablePrivilegesError = ResponseError
+export type TablePrivilegesError = StudioError
 
 async function getTablePrivileges(
   { projectRef, connectionString, includedSchemas }: TablePrivilegesVariables,
   signal?: AbortSignal
 ) {
-  // Cold-load race guard -- see the module comment on scoped-introspection.ts.
-  await scopedIntrospectionReady()
   const sql = pgMeta.tablePrivileges.list({
     includedSchemas,
-    scoped: isScopedIntrospection(),
   }).sql
   const queryKey = ['table-privileges', includedSchemas?.join(',')]
 
-  const { result } = await executeSql({ projectRef, connectionString, sql, queryKey }, signal)
+  const { result } = await executeSql(
+    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    signal
+  )
 
   return result as TablePrivilegesData
 }

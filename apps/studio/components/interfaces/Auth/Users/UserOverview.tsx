@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import {
@@ -20,7 +19,7 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
-import { UserHeader } from './UserHeader'
+import { UserFields } from './UserFields'
 import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -32,7 +31,7 @@ import { useUserSendMagicLinkMutation } from '@/data/auth/user-send-magic-link-m
 import { useUserSendOTPMutation } from '@/data/auth/user-send-otp-mutation'
 import { useUserUpdateMutation } from '@/data/auth/user-update-mutation'
 import { User } from '@/data/auth/users-infinite-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { BASE_PATH } from '@/lib/constants'
 import { timeout } from '@/lib/helpers'
@@ -73,23 +72,21 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     }
   )
 
-  const { can: canUpdateUser } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
-  const { can: canSendMagicLink } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_magic_link'
+  const { can: canUpdateUser } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canSendRecovery } = useAsyncCheckPermissions(
-    PermissionAction.AUTH_EXECUTE,
-    'send_recovery'
+  const { can: canSendMagicLink } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canSendOtp } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, 'send_otp')
-  const { can: canRemoveUser } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_DELETE,
-    'auth.users'
+  const { can: canSendRecovery } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
-  const { can: canRemoveMFAFactors } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_DELETE,
-    'auth.mfa_factors'
+  const { can: canSendOtp } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE)
+  const { can: canRemoveUser } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
+  )
+  const { can: canRemoveMFAFactors } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_USERS_WRITE
   )
 
   const [successAction, setSuccessAction] = useState<
@@ -184,44 +181,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
   return (
     <>
       <div>
-        <UserHeader user={user} />
-
-        {isBanned ? (
+        {isBanned && (
           <Admonition
             type="warning"
             description={`User banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`}
-            className="border-r-0 border-l-0 rounded-none -mt-px [&_svg]:ml-0.5"
+            className="border-r-0 border-l-0 border-t-0 rounded-none [&_svg]:ml-0.5"
           />
-        ) : (
-          <Separator />
         )}
 
-        <div className={cn('flex flex-col gap-y-1', PANEL_PADDING)}>
-          <RowData property="User UID" value={user.id} />
-          <RowData
-            property="Created at"
-            value={user.created_at ? dayjs(user.created_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData
-            property="Updated at"
-            value={user.updated_at ? dayjs(user.updated_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData property="Invited at" value={user.invited_at} />
-          <RowData property="Confirmation sent at" value={user.confirmation_sent_at} />
-          <RowData
-            property="Confirmed at"
-            value={user.confirmed_at ? dayjs(user.confirmed_at).format(DATE_FORMAT) : undefined}
-          />
-          <RowData
-            property="Last signed in"
-            value={
-              user.last_sign_in_at ? dayjs(user.last_sign_in_at).format(DATE_FORMAT) : undefined
-            }
-          />
-          <RowData property="SSO" value={user.is_sso_user} />
-        </div>
+        <UserFields user={user} className="pt-3" />
 
-        <div className={cn('flex flex-col pt-0!', PANEL_PADDING)}>
+        <Separator />
+
+        <div className={cn('flex flex-col', PANEL_PADDING)}>
           <p>Provider Information</p>
           <p className="text-sm text-foreground-light">The user has the following providers</p>
         </div>

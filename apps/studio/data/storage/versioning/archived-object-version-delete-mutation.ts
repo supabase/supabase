@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ArchivedObjectVersionDeleteVariables = {
   projectRef: string
@@ -41,22 +41,22 @@ export const useArchivedObjectVersionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<void, ResponseError, ArchivedObjectVersionDeleteVariables>,
+  UseMutationOptions<void, StudioError, ArchivedObjectVersionDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<void, ResponseError, ArchivedObjectVersionDeleteVariables>({
+  return useMutation<void, StudioError, ArchivedObjectVersionDeleteVariables>({
     mutationFn: deleteArchivedObjectVersion,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.archivedObjects(variables.projectRef, variables.bucketId),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to delete version: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })

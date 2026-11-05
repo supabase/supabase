@@ -6,6 +6,8 @@ import { AVAILABLE_REPLICA_REGIONS } from './InstanceConfiguration.constants'
 import { haClusterPoolersQueryOptions } from '@/data/ha-admin/ha-cluster-poolers-query'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 
 /**
  * Subscribes to a single pooler's live state from the shared poolers query, so
@@ -23,9 +25,9 @@ export const useHaPooler = ({ cell, name }: { cell?: string; name?: string }) =>
 
 /**
  * Everything a pooler node card displays. Region and compute size aren't in
- * multiadmin — they come from the primary database row. HA locks compute to
- * one project-level size, so the primary's size is correct for every node in
- * the cluster.
+ * multiadmin — region comes from the primary database row and compute size
+ * from the project. HA locks compute to one project-level size, so the
+ * project's size is correct for every node in the cluster.
  */
 export const useHaPoolerCard = ({ cell, name }: { cell?: string; name?: string }) => {
   const { ref: projectRef } = useParams()
@@ -35,11 +37,14 @@ export const useHaPoolerCard = ({ cell, name }: { cell?: string; name?: string }
 
   const { database: primary } = usePrimaryDatabase({ projectRef })
   const { data: pooler } = useHaPooler({ cell, name })
+  const { data: project } = useSelectedProjectQuery()
 
   return {
     status: pooler !== undefined ? getPoolerStatus(pooler) : undefined,
     availabilityZone: formatCellAsAvailabilityZone(cell),
-    computeSize: projectHomepageShowInstanceSize ? primary?.size : undefined,
+    computeSize: projectHomepageShowInstanceSize
+      ? getComputeSizeLabel(project?.infra_compute_size)
+      : undefined,
     primaryRegion: AVAILABLE_REPLICA_REGIONS.find((r) => primary?.region.includes(r.region)),
   }
 }

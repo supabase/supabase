@@ -3,14 +3,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import { buildSecretsSignInPath, parseSecretsParams } from './McpSecrets.params'
 
 describe('parseSecretsParams', () => {
-  it('reads the project ref and secret name', () => {
-    const params = parseSecretsParams({ ref: 'abcdefghijklmnopqrst', name: 'OPENAI_API_KEY' })
-
-    expect(params.ref).toBe('abcdefghijklmnopqrst')
-    expect(params.name).toBe('OPENAI_API_KEY')
-  })
-
-  it('ignores params it has never seen rather than rejecting them', () => {
+  it('reads the project ref and secret name, ignoring params it has never seen', () => {
     const params = parseSecretsParams({
       ref: 'abcdefghijklmnopqrst',
       name: 'OPENAI_API_KEY',

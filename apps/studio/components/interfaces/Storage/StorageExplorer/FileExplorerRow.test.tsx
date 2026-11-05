@@ -54,8 +54,13 @@ vi.mock('@/components/interfaces/Storage/StorageExplorer/StorageExplorerNavigati
     clearPreviewedFile: vi.fn(),
   }),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      STORAGE_WRITE: 'storage_write',
+    },
+  },
 }))
 vi.mock('@/components/interfaces/Storage/StorageExplorer/useCopyUrl', () => ({
   useCopyUrl: () => ({ onCopyUrl: vi.fn() }),
@@ -91,32 +96,23 @@ beforeEach(() => {
 })
 
 describe('FileExplorerRow', () => {
-  it('offers both the relative path and the dashboard URL for a file', async () => {
+  it.each([
+    { kind: 'file', rowItem: item({ id: 'f1' }) },
+    {
+      kind: 'folder',
+      rowItem: item({ name: 'avatars', type: STORAGE_ROW_TYPES.FOLDER, metadata: null }),
+    },
+  ])('offers both the relative path and the dashboard URL for a $kind', async ({ rowItem }) => {
     render(
       <FileExplorerRow
-        item={item({ id: 'f1' })}
+        item={rowItem}
         index={0}
         view={STORAGE_VIEWS.COLUMNS}
         columnIndex={0}
         selectedItems={[]}
       />
     )
-    await userEvent.click(screen.getByRole('button', { name: 'photo.png actions' }))
-    expect(await screen.findByText('Copy relative path')).toBeInTheDocument()
-    expect(screen.getByText('Copy link')).toBeInTheDocument()
-  })
-
-  it('offers both the relative path and the dashboard URL for a folder', async () => {
-    render(
-      <FileExplorerRow
-        item={item({ name: 'avatars', type: STORAGE_ROW_TYPES.FOLDER, metadata: null })}
-        index={0}
-        view={STORAGE_VIEWS.COLUMNS}
-        columnIndex={0}
-        selectedItems={[]}
-      />
-    )
-    await userEvent.click(screen.getByRole('button', { name: 'avatars actions' }))
+    await userEvent.click(screen.getByRole('button', { name: `${rowItem.name} actions` }))
     expect(await screen.findByText('Copy relative path')).toBeInTheDocument()
     expect(screen.getByText('Copy link')).toBeInTheDocument()
     expect(screen.queryByText('Copy path to folder')).not.toBeInTheDocument()
@@ -204,34 +200,24 @@ describe('FileExplorerRow', () => {
       expect(screen.getByText('Delete permanently')).toBeInTheDocument()
     })
 
-    it('deletes rather than archives on a suspended bucket', async () => {
-      versioningEnabled.current = true
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
+    // A file that predates the suspension (is_versioned) does retain one last version on
+    // write, but the label names the action taken, not the retention behind it.
+    it.each([false, true])(
+      'deletes rather than archives and replaces in place on a suspended bucket (is_versioned: %s)',
+      async (isVersioned) => {
+        versioningEnabled.current = true
+        selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
 
-      await openFileMenu({ is_versioned: false })
+        await openFileMenu({ is_versioned: isVersioned })
 
-      // Suspended can't archive, so there is no soft delete and nothing to purge from here.
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-      expect(screen.queryByText('Archive')).not.toBeInTheDocument()
-      expect(screen.queryByText('Delete permanently')).not.toBeInTheDocument()
-      // The write overwrites in place, so it is not a new version.
-      expect(screen.getByText('Replace file')).toBeInTheDocument()
-      expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
-    })
-
-    it('still reads "Replace file" for a file that predates the suspension', async () => {
-      versioningEnabled.current = true
-      selectedBucket.current = { ...selectedBucket.current, versioning_status: 'SUSPENDED' }
-
-      await openFileMenu({ is_versioned: true })
-
-      // This write does retain one last version, but the label names the action taken,
-      // not the retention behind it. The version history is where that gets explained.
-      expect(screen.getByText('Replace file')).toBeInTheDocument()
-      expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
-      expect(screen.getByText('Delete')).toBeInTheDocument()
-      expect(screen.queryByText('Archive')).not.toBeInTheDocument()
-    })
+        // Suspended can't archive, so there is no soft delete and nothing to purge from here.
+        expect(screen.getByText('Delete')).toBeInTheDocument()
+        expect(screen.queryByText('Archive')).not.toBeInTheDocument()
+        expect(screen.queryByText('Delete permanently')).not.toBeInTheDocument()
+        expect(screen.getByText('Replace file')).toBeInTheDocument()
+        expect(screen.queryByText('Upload new version')).not.toBeInTheDocument()
+      }
+    )
 
     it('ignores is_versioned on a disabled bucket', async () => {
       versioningEnabled.current = true

@@ -4,10 +4,10 @@ import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { SupportLink } from '../Support/SupportLink'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface StorageBucketsErrorProps {
-  error: ResponseError
+  error: StudioError
 }
 
 const StorageBucketsError = ({ error }: StorageBucketsErrorProps) => {

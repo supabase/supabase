@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type GitHubConnectionUpdateVariables = {
   connectionId: string | number
@@ -33,11 +34,11 @@ export const useGitHubConnectionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>,
+  UseCustomMutationOptions<UpdateContentData, StudioError, GitHubConnectionUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<UpdateContentData, ResponseError, GitHubConnectionUpdateVariables>({
+  return useMutation<UpdateContentData, StudioError, GitHubConnectionUpdateVariables>({
     mutationFn: (args) => updateConnection(args),
     async onSuccess(data, variables, context) {
       await Promise.all([

@@ -54,18 +54,19 @@ Each content collection renders through a matching catch-all page — e.g. `src/
 (`src/pages/topics/[topic].astro`) are generated from the `TOPICS` list in `src/lib/topics.ts`, not from
 content files, and read from every collection.
 
-Separately, `scripts/generate-markdown.mjs` runs as a `prebuild` step and exports every content file — plus
-one page per topic, listing its guides — as a plain `.md` file under the gitignored `public/markdown/`,
+Separately, `scripts/generate-markdown.ts` runs as a `prebuild` step and exports every content file — plus
+one page per topic, listing its guides, and a root `sitemap.md` linking every topic, guide, FAQ, and troubleshooting article — as a plain `.md` file under the gitignored `public/markdown/`,
 mirroring the page's URL with a `.md` extension. `vercel.json` permanently redirects `<page>.md` requests to
 these generated files, one redirect entry per route section (`guides`, `topics`, `troubleshooting`). It also
-rewrites guide, topic, and troubleshooting page requests that send `Accept: text/markdown` to the same files
-(content negotiation), and sets `Vary: Accept` on those pages. The negotiated rewrites must stay above the generic
+rewrites guide, topic, troubleshooting, and FAQ page requests that send `Accept: text/markdown` to the same files
+(content negotiation), rewrites homepage (`/kb`) requests with that header to `sitemap.md`, and sets `Vary: Accept` on those pages.
+Requests to `/` are redirected to `/kb` before rewrites run, so the homepage rule only needs to match `/kb`. The negotiated rewrites must stay above the generic
 `/kb/:path*` rewrite, since Vercel uses the first match.
 
 If you add a new content collection or top-level route, add a matching redirect, negotiated rewrite, and
 `Vary: Accept` header in `vercel.json` (`/kb/<section>/:path+.md` → `/kb/markdown/<section>/:path+.md`, the
 `Accept` rewrite to `/markdown/<section>/:path+.md`, and a `headers` entry for `/kb/<section>/:path+`), and
-check whether `generate-markdown.mjs` needs updating too — the content export falls out of its generic
+check whether `generate-markdown.ts` needs updating too — the content export falls out of its generic
 `src/content/**` walk automatically, but per-topic-style listing pages don't.
 
 ## Topic-specific guidance
@@ -95,6 +96,10 @@ Syncing guides to GitHub Discussions (`scripts/federated-content/sync-troublesho
 `sync-troubleshooting-updates.ts`) is a separate concern from fetching — see `.github/workflows/kb-troubleshooting-sync.yml`
 and the README's "Workflows" section. Those scripts are CI-only, never part of `prebuild`.
 
-`backfill-legacy-slugs.ts` is a one-time migration aid for the 278 pre-existing (apps/docs-origin) rows in
-`troubleshooting_entries` — safe to delete (with its JSON file, package.json script, and workflow step) once
-those rows are all backfilled; see the comment at the top of that file.
+How the sync scripts match guides to rows: a guide's key is its file name without the extension, hash suffix
+included (`foo-bar-94a76b.mdx` -> `foo-bar-94a76b`), and that exact string is `troubleshooting_entries.slug`.
+Never strip or normalize it — a slug that doesn't match makes a guide look new and creates a duplicate
+discussion. Both scripts take `--dry-run` (read-only: prints the discussions/rows they would create or update).
+`sync-troubleshooting-entries.ts` also refuses to create a discussion whose title already exists in the category
+without a slugged row, and the workflow's `concurrency` group keeps runs from overlapping. Shared logic
+(including the checksum definition) lives in `troubleshooting-sync-shared.ts`.

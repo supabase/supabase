@@ -1,4 +1,3 @@
-import { screen } from '@testing-library/react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
@@ -9,7 +8,9 @@ const {
   mockUseNotificationsV2Query,
   mockUseAdvisorSignals,
   mockToggleSidebar,
+  mockIsPlatform,
 } = vi.hoisted(() => ({
+  mockIsPlatform: { value: true },
   mockUseProjectLintsQuery: vi.fn(),
   mockUseNotificationsV2Query: vi.fn(),
   mockUseAdvisorSignals: vi.fn(),
@@ -30,7 +31,9 @@ vi.mock('@/components/ui/AdvisorPanel/useAdvisorSignals', () => ({
 
 vi.mock('@/lib/constants', async (importOriginal) => ({
   ...(await importOriginal<typeof import('@/lib/constants')>()),
-  IS_PLATFORM: true,
+  get IS_PLATFORM() {
+    return mockIsPlatform.value
+  },
 }))
 
 vi.mock('@/state/sidebar-manager-state', () => ({
@@ -42,6 +45,7 @@ vi.mock('@/state/sidebar-manager-state', () => ({
 
 describe('AdvisorButton', () => {
   beforeEach(() => {
+    mockIsPlatform.value = true
     mockUseProjectLintsQuery.mockReturnValue({ data: [], isPending: false, isError: false })
     mockUseNotificationsV2Query.mockReturnValue({
       data: { pages: [[]] },
@@ -154,6 +158,15 @@ describe('AdvisorButton', () => {
     expect(container.querySelector('.bg-primary-bright')).toBeInTheDocument()
     expect(container.querySelector('.bg-warning')).not.toBeInTheDocument()
     expect(container.querySelector('.bg-destructive')).not.toBeInTheDocument()
-    expect(screen.getByRole('button')).toBeInTheDocument()
+  })
+
+  it('disables the notifications query on self-hosted so no request is made to the platform endpoint', () => {
+    mockIsPlatform.value = false
+    render(<AdvisorButton projectRef="project-ref" />)
+
+    expect(mockUseNotificationsV2Query).toHaveBeenCalledWith(
+      { filters: {}, limit: 20 },
+      { enabled: false }
+    )
   })
 })

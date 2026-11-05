@@ -29,6 +29,10 @@ describe('ProjectMultiSelect', () => {
     customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
 
     expect(screen.getByRole('combobox')).toHaveTextContent('Select projects...')
+    expect(
+      screen.queryByText('Must select at least one project to authorize.')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('0/10')).not.toBeInTheDocument()
   })
 
   test('renders a single selected project by name in the trigger', () => {
@@ -92,14 +96,6 @@ describe('ProjectMultiSelect', () => {
     expect(onChange).toHaveBeenCalledWith([])
   })
 
-  test('does not render an error message by default', () => {
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
-
-    expect(
-      screen.queryByText('Must select at least one project to authorize.')
-    ).not.toBeInTheDocument()
-  })
-
   test('renders the error message when the error prop is set', () => {
     customRender(
       <ProjectMultiSelect
@@ -111,6 +107,7 @@ describe('ProjectMultiSelect', () => {
     )
 
     expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
+    expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
   })
 
   test('search filters the visible project rows', () => {
@@ -136,27 +133,23 @@ describe('ProjectMultiSelect', () => {
     expect(screen.queryByText(/select all/i)).not.toBeInTheDocument()
   })
 
-  test('hides the counter until something is selected', () => {
-    customRender(<ProjectMultiSelect projects={PROJECTS} selectedRefs={[]} onChange={vi.fn()} />)
+  test.each([
+    { count: 7, isCounterShown: false },
+    { count: 8, isCounterShown: true },
+  ])(
+    'shows the counter from eight selected onward ($count selected)',
+    ({ count, isCounterShown }) => {
+      customRender(
+        <ProjectMultiSelect
+          projects={MANY_PROJECTS}
+          selectedRefs={refsUpTo(count)}
+          onChange={vi.fn()}
+        />
+      )
 
-    expect(screen.queryByText('0/10')).not.toBeInTheDocument()
-  })
-
-  test('hides the counter below eight selected', () => {
-    customRender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(7)} onChange={vi.fn()} />
-    )
-
-    expect(screen.queryByText('7/10')).not.toBeInTheDocument()
-  })
-
-  test('shows the counter from eight selected onward', () => {
-    customRender(
-      <ProjectMultiSelect projects={MANY_PROJECTS} selectedRefs={refsUpTo(8)} onChange={vi.fn()} />
-    )
-
-    expect(screen.getByText('8/10')).toBeInTheDocument()
-  })
+      expect(screen.queryByText(`${count}/10`) !== null).toBe(isCounterShown)
+    }
+  )
 
   test('at nine selected the cap is not yet reached and a tenth can be added', () => {
     const onChange = vi.fn()
@@ -225,19 +218,5 @@ describe('ProjectMultiSelect', () => {
       'aria-disabled',
       'true'
     )
-  })
-
-  test('the required-selection error still renders at the cap boundary', () => {
-    customRender(
-      <ProjectMultiSelect
-        projects={PROJECTS}
-        selectedRefs={[]}
-        onChange={vi.fn()}
-        error="Must select at least one project to authorize."
-      />
-    )
-
-    expect(screen.getByText('Must select at least one project to authorize.')).toBeInTheDocument()
-    expect(screen.queryByText(CAP_HELPER_TEXT)).not.toBeInTheDocument()
   })
 })

@@ -176,7 +176,7 @@ services:
       GOTRUE_EXTERNAL_PHONE_ENABLED: ${ENABLE_PHONE_SIGNUP}
       GOTRUE_SMS_AUTOCONFIRM: ${ENABLE_PHONE_AUTOCONFIRM}
 
-      # Uncomment to enable OAuth / social login providers.
+      # Uncomment to enable OAuth / social sign-in providers.
       # GOTRUE_EXTERNAL_GOOGLE_ENABLED: ${GOOGLE_ENABLED}
       # GOTRUE_EXTERNAL_GOOGLE_CLIENT_ID: ${GOOGLE_CLIENT_ID}
       # GOTRUE_EXTERNAL_GOOGLE_SECRET: ${GOOGLE_SECRET}
@@ -434,6 +434,7 @@ services:
   functions:
     container_name: supabase-edge-functions
     image: supabase/edge-runtime:v1.77.4
+    mem_limit: ${FUNCTIONS_MEMORY_LIMIT:-2g}
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:z

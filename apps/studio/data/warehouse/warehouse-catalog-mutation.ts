@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { warehouseKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateWarehouseCatalogBody = components['schemas']['UpdateWarehouseCatalogBody']
 
@@ -36,14 +37,14 @@ export const useUpdateWarehouseCatalogMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     UpdateWarehouseCatalogData,
-    ResponseError,
+    StudioError,
     UpdateWarehouseCatalogVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateWarehouseCatalogData, ResponseError, UpdateWarehouseCatalogVariables>({
+  return useMutation<UpdateWarehouseCatalogData, StudioError, UpdateWarehouseCatalogVariables>({
     mutationFn: (vars) => updateWarehouseCatalog(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   Auth,
   Compute,
@@ -46,6 +46,7 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
+  isHealthAdvisorEnabled?: boolean
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -207,6 +208,7 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+  const isHealthAdvisorEnabled = features?.isHealthAdvisorEnabled ?? false
 
   return [
     {
@@ -214,7 +216,11 @@ export const generateOtherRoutes = (
       label: 'Advisors',
       disabled: !isProjectActive,
       icon: <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/advisors/${isHealthAdvisorEnabled ? 'health' : 'security'}`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled
@@ -267,11 +273,13 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   return generateOtherRoutes(ref, project, {
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
+    isHealthAdvisorEnabled,
   })
 }
 

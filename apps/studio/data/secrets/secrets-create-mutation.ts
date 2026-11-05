@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { secretsKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SecretsCreateVariables = {
   projectRef?: string
@@ -16,6 +17,7 @@ export async function createSecrets({ projectRef, secrets }: SecretsCreateVariab
   const { data, error } = await post('/v1/projects/{ref}/secrets', {
     params: { path: { ref: projectRef } },
     body: secrets,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -29,11 +31,11 @@ export const useSecretsCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SecretsCreateData, ResponseError, SecretsCreateVariables>,
+  UseCustomMutationOptions<SecretsCreateData, StudioError, SecretsCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsCreateData, ResponseError, SecretsCreateVariables>({
+  return useMutation<SecretsCreateData, StudioError, SecretsCreateVariables>({
     mutationFn: (vars) => createSecrets(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

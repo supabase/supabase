@@ -9,6 +9,7 @@
     "e2e:docs:a11y": "node --experimental-strip-types scripts/run-e2e-docs.ts --grep @a11y",
     "e2e:ui": "node --experimental-strip-types scripts/run-e2e-docs.ts --ui",
     "e2e:docs:local-smoke": "playwright test --config=playwright.local-smoke.config.ts",
+    "test": "node --test --experimental-strip-types 'utils/*.test.ts'",
     "resolve-docs-scope": "node --experimental-strip-types scripts/resolve-docs-scope.ts"
   },
   "dependencies": {

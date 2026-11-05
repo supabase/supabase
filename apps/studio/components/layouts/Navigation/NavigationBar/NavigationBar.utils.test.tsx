@@ -70,16 +70,6 @@ describe('useGenerateToolRoutes', () => {
 })
 
 describe('generateProductRoutes', () => {
-  it('includes all product routes when all features are enabled', () => {
-    const routes = generateProductRoutes(REF, activeProject, {
-      auth: true,
-      storage: true,
-      edgeFunctions: true,
-      realtime: true,
-    })
-    expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
-  })
-
   it('includes all product routes by default (features default to true)', () => {
     const routes = generateProductRoutes(REF, activeProject)
     expect(keys(routes)).toEqual(['database', 'auth', 'storage', 'functions', 'realtime'])
@@ -95,27 +85,15 @@ describe('generateProductRoutes', () => {
     expect(routes.filter((r) => !r.shortcutId)).toEqual([])
   })
 
-  it('excludes auth when auth feature is disabled', () => {
-    const routes = generateProductRoutes(REF, activeProject, { auth: false })
-    expect(keys(routes)).not.toContain('auth')
-
+  it.each([
+    ['auth', 'auth'],
+    ['storage', 'storage'],
+    ['edgeFunctions', 'functions'],
+    ['realtime', 'realtime'],
+  ] as const)('excludes %s when its feature is disabled', (feature, key) => {
+    const routes = generateProductRoutes(REF, activeProject, { [feature]: false })
+    expect(keys(routes)).not.toContain(key)
     expect(keys(routes)).toContain('database')
-    expect(keys(routes)).toContain('storage')
-  })
-
-  it('excludes storage when storage feature is disabled', () => {
-    const routes = generateProductRoutes(REF, activeProject, { storage: false })
-    expect(keys(routes)).not.toContain('storage')
-  })
-
-  it('excludes edge functions when edgeFunctions feature is disabled', () => {
-    const routes = generateProductRoutes(REF, activeProject, { edgeFunctions: false })
-    expect(keys(routes)).not.toContain('functions')
-  })
-
-  it('excludes realtime when realtime feature is disabled', () => {
-    const routes = generateProductRoutes(REF, activeProject, { realtime: false })
-    expect(keys(routes)).not.toContain('realtime')
   })
 
   it('links auth to overview page when authOverviewPage is enabled', () => {
@@ -193,6 +171,18 @@ describe('generateOtherRoutes', () => {
     const routes = generateOtherRoutes(REF, inactiveProject)
     const advisorsRoute = routes.find((r) => r.key === 'advisors')
     expect(advisorsRoute?.disabled).toBe(true)
+  })
+
+  it('links advisors to the security advisor page by default', () => {
+    const routes = generateOtherRoutes(REF, activeProject)
+    const advisorsRoute = routes.find((r) => r.key === 'advisors')
+    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/security`)
+  })
+
+  it('links advisors to the health advisor page when health advisor is enabled', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { isHealthAdvisorEnabled: true })
+    const advisorsRoute = routes.find((r) => r.key === 'advisors')
+    expect(advisorsRoute?.link).toBe(`/project/${REF}/advisors/health`)
   })
 })
 

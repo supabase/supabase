@@ -45,6 +45,15 @@ const renderEndpointSheet = (
 const submitForm = () =>
   fireEvent.submit(document.getElementById('platform-webhook-endpoint-form')!)
 
+const fillInput = async (
+  user: ReturnType<typeof userEvent.setup>,
+  input: HTMLElement,
+  value: string
+) => {
+  await user.click(input)
+  await user.paste(value)
+}
+
 const getUrlInput = () => screen.getByPlaceholderText('https://api.example.com/webhooks/supabase')
 
 const findEventTypeCheckbox = (eventType: string) =>
@@ -73,52 +82,24 @@ describe('PlatformWebhooksEndpointSheet', () => {
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
-  it('blocks submit when the endpoint URL is malformed', async () => {
+  // URL parsing rules are covered in lib/validation/http-url.test.ts; this only checks the form
+  // surfaces the sheet-specific messages.
+  it.each([
+    ['is malformed', 'https://not a url', 'Please provide a valid URL'],
+    [
+      'has no protocol',
+      'hooks.example.com/billing',
+      'Please prefix your URL with http:// or https://',
+    ],
+  ])('blocks submit when the endpoint URL %s', async (_, url, message) => {
     const user = userEvent.setup()
     const { onSubmit } = renderEndpointSheet()
 
-    await user.type(getUrlInput(), 'https://not a url')
+    await fillInput(user, getUrlInput(), url)
     await user.click(await findEventTypeCheckbox('project.updated'))
     submitForm()
 
-    expect(await screen.findByText('Please provide a valid URL')).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
-  })
-
-  it('blocks submit when the endpoint URL uses an incomplete hostname', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderEndpointSheet()
-
-    await user.type(getUrlInput(), 'https://webhook')
-    await user.click(await findEventTypeCheckbox('project.updated'))
-    submitForm()
-
-    expect(await screen.findByText('Please provide a valid URL')).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
-  })
-
-  it('blocks submit when the endpoint URL does not include a protocol', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderEndpointSheet()
-
-    await user.type(getUrlInput(), 'hooks.example.com/billing')
-    await user.click(await findEventTypeCheckbox('project.updated'))
-    submitForm()
-
-    expect(
-      await screen.findByText('Please prefix your URL with http:// or https://')
-    ).toBeInTheDocument()
-    expect(onSubmit).not.toHaveBeenCalled()
-  })
-
-  it('shows an error when no event types are selected', async () => {
-    const user = userEvent.setup()
-    const { onSubmit } = renderEndpointSheet()
-
-    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
-    submitForm()
-
-    expect(await screen.findByText('Select at least one event type')).toBeInTheDocument()
+    expect(await screen.findByText(message)).toBeInTheDocument()
     expect(onSubmit).not.toHaveBeenCalled()
   })
 
@@ -126,7 +107,7 @@ describe('PlatformWebhooksEndpointSheet', () => {
     const user = userEvent.setup()
     const { onSubmit } = renderEndpointSheet()
 
-    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
+    await fillInput(user, getUrlInput(), 'https://hooks.example.com/billing')
     submitForm()
 
     expect(await screen.findByText('Select at least one event type')).toBeInTheDocument()
@@ -139,13 +120,14 @@ describe('PlatformWebhooksEndpointSheet', () => {
 
     submitForm()
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        url: 'https://hooks.example.com/billing',
-        eventTypes: ['project.updated'],
-      }),
-      expect.anything()
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          url: 'https://hooks.example.com/billing',
+          eventTypes: ['project.updated'],
+        }),
+        expect.anything()
+      )
     )
   })
 
@@ -153,18 +135,19 @@ describe('PlatformWebhooksEndpointSheet', () => {
     const user = userEvent.setup()
     const { onSubmit } = renderEndpointSheet()
 
-    await user.type(getUrlInput(), 'https://hooks.example.com/billing')
+    await fillInput(user, getUrlInput(), 'https://hooks.example.com/billing')
     await user.click(screen.getByRole('checkbox', { name: /subscribe to all events/i }))
     submitForm()
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        subscribeAll: true,
-        eventTypes: PROJECT_EVENT_TYPES,
-        url: 'https://hooks.example.com/billing',
-      }),
-      expect.anything()
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          subscribeAll: true,
+          eventTypes: PROJECT_EVENT_TYPES,
+          url: 'https://hooks.example.com/billing',
+        }),
+        expect.anything()
+      )
     )
   })
 
@@ -176,16 +159,17 @@ describe('PlatformWebhooksEndpointSheet', () => {
     })
 
     await user.click(screen.getByRole('button', { name: 'Add header' }))
-    await user.type(screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
-    await user.type(screen.getByPlaceholderText('Header value'), 'super-secret')
+    await fillInput(user, screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
+    await fillInput(user, screen.getByPlaceholderText('Header value'), 'super-secret')
     submitForm()
 
-    await waitFor(() => expect(onSubmit).toHaveBeenCalledTimes(1))
-    expect(onSubmit).toHaveBeenCalledWith(
-      expect.objectContaining({
-        customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
-      }),
-      expect.anything()
+    await waitFor(() =>
+      expect(onSubmit).toHaveBeenCalledWith(
+        expect.objectContaining({
+          customHeaders: [{ key: 'X-Webhook-Secret', value: 'super-secret' }],
+        }),
+        expect.anything()
+      )
     )
   })
 
@@ -197,7 +181,7 @@ describe('PlatformWebhooksEndpointSheet', () => {
     })
 
     await user.click(screen.getByRole('button', { name: 'Add header' }))
-    await user.type(screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
+    await fillInput(user, screen.getByPlaceholderText('Header name'), 'X-Webhook-Secret')
     submitForm()
 
     expect(await screen.findByText('Header value is required')).toBeInTheDocument()

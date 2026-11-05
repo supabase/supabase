@@ -5,6 +5,7 @@ import { source } from 'common-tags'
 import { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
@@ -50,7 +51,7 @@ async function fetchSchemas(
   if (!includeSchema) return { schemas: [], error: false }
   try {
     const { result } = await executeSql<Schemas>(
-      { projectRef, connectionString, sql: pgMetaSchemasList.sql },
+      { projectRef, connectionString, sql: pgMetaSchemasList.sql, grant: unguarded.migrating },
       undefined,
       headers,
       IS_PLATFORM ? undefined : executeQuery
@@ -68,7 +69,12 @@ async function fetchSchemaDDL(
   if (schemas.length === 0) return { error: false, sqlDefinitions: [] }
   try {
     const { result } = await executeSql<EntityDefinitionRow[]>(
-      { projectRef, connectionString, sql: getEntityDefinitionsSql({ schemas }) },
+      {
+        projectRef,
+        connectionString,
+        sql: getEntityDefinitionsSql({ schemas }),
+        grant: unguarded.migrating,
+      },
       undefined,
       headers,
       IS_PLATFORM ? undefined : executeQuery

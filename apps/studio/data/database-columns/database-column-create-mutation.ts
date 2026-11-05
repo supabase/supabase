@@ -3,8 +3,10 @@ import type { ColumnTypeRef } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateColumnBody = {
   schema: string
@@ -54,6 +56,7 @@ export async function createDatabaseColumn({
     connectionString,
     sql,
     queryKey: ['column', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -66,10 +69,10 @@ export const useDatabaseColumnCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>,
+  UseCustomMutationOptions<DatabaseColumnCreateData, StudioError, DatabaseColumnCreateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnCreateData, ResponseError, DatabaseColumnCreateVariables>({
+  return useMutation<DatabaseColumnCreateData, StudioError, DatabaseColumnCreateVariables>({
     mutationFn: (vars) => createDatabaseColumn(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

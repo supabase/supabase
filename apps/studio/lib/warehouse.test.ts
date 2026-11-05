@@ -1,10 +1,18 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import {
   getDuckLakeSetupScript,
   parseWarehouseCatalogUrl,
   type WarehouseCatalogConnection,
 } from './warehouse'
+
+const environment = vi.hoisted(() => ({ isStagingOrLocal: false }))
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  get IS_STAGING_OR_LOCAL() {
+    return environment.isStagingOrLocal
+  },
+}))
 
 const CREDENTIALS = {
   data_path: 's3://warehouse/',
@@ -145,5 +153,24 @@ describe('getDuckLakeSetupScript', () => {
   test('binds the metadata secret into the DuckLake secret', () => {
     expect(script).toContain("'SECRET': 'ducklake_metadata'")
     expect(script).toContain("METADATA_PATH ''")
+  })
+})
+
+describe('Warehouse Flight SQL connections', () => {
+  test.each([
+    { isStagingOrLocal: false, domain: 'supabase.co' },
+    { isStagingOrLocal: true, domain: 'supabase.red' },
+  ])('uses $domain for every connection format', async ({ isStagingOrLocal, domain }) => {
+    environment.isStagingOrLocal = isStagingOrLocal
+    vi.resetModules()
+    const warehouse = await import('./warehouse')
+    const hostname = `project-ref.warehouse.${domain}`
+    expect(warehouse.getWarehouseFlightSqlEndpoint('project-ref')).toBe(hostname)
+    expect(warehouse.getWarehouseFlightSqlConnectionString('project-ref')).toBe(
+      `flightsql://postgres:[YOUR-PASSWORD]@${hostname}:443?tls=enabled`
+    )
+    expect(warehouse.getWarehouseUsqlCommand('project-ref')).toBe(
+      `usql -X -W 'flightsql://postgres@${hostname}:443?tls=enabled'`
+    )
   })
 })

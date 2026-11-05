@@ -163,7 +163,7 @@ When using the Supabase hosted platform, following this step is optional.
 
 </Admonition>
 
-Firebase Auth uses a single set of JWT signing keys for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project.
+Firebase Auth uses a single set of [JWT signing keys](/docs/guides/auth/signing-keys) for all projects. This means that JWTs issued from an unrelated Firebase project to yours could access data in your Supabase project.
 
 When using the Supabase hosted platform, JWTs coming from Firebase project IDs you have not registered will be rejected before they reach your database. When self-hosting implementing this mechanism is your responsibility. An easy way to guard against this is to create and maintain the following RLS policies for **all of your tables in the `public` schema**. You should also attach this policy to [Storage](/docs/guides/storage/security/access-control) buckets or [Realtime](/docs/guides/realtime/authorization) channels.
 
@@ -333,10 +333,10 @@ Note that these functions are only called on new sign-ups and sign-ins. Existing
 You need to run a script that will assign the `role: 'authenticated'` custom claim to all of your existing Firebase Authentication users. You can do this by combining the [list users](https://firebase.google.com/docs/auth/admin/manage-users#list_all_users) and [set custom user claims](https://firebase.google.com/docs/auth/admin/create-custom-tokens) admin APIs. An example script is provided below:
 
 ```javascript
-'use strict';
-const { initializeApp } = require('firebase-admin/app');
-const { getAuth } = require('firebase-admin/auth');
-initializeApp();
+'use strict'
+const { initializeApp } = require('firebase-admin/app')
+const { getAuth } = require('firebase-admin/auth')
+initializeApp()
 
 async function setRoleCustomClaim() {
   let nextPageToken = undefined
@@ -346,17 +346,19 @@ async function setRoleCustomClaim() {
 
     nextPageToken = listUsersResult.pageToken
 
-    await Promise.all(listUsersResult.users.map(async (userRecord) => {
-      try {
-        await getAuth().setCustomUserClaims(userRecord.id, {
-          role: 'authenticated'
-        })
-      } catch (error) {
-        console.error('Failed to set custom role for user', userRecord.id)
-      }
-    })
-  } while (nextPageToken);
-};
+    await Promise.all(
+      listUsersResult.users.map(async (userRecord) => {
+        try {
+          await getAuth().setCustomUserClaims(userRecord.uid, {
+            role: 'authenticated',
+          })
+        } catch (error) {
+          console.error('Failed to set custom role for user', userRecord.uid)
+        }
+      })
+    )
+  } while (nextPageToken)
+}
 
 setRoleCustomClaim().then(() => process.exit(0))
 ```

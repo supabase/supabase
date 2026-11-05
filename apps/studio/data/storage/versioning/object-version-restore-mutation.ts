@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ObjectVersionRestoreVariables = {
   projectRef: string
@@ -38,14 +38,14 @@ export const useObjectVersionRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<void, ResponseError, ObjectVersionRestoreVariables>,
+  UseMutationOptions<void, StudioError, ObjectVersionRestoreVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<void, ResponseError, ObjectVersionRestoreVariables>({
+  return useMutation<void, StudioError, ObjectVersionRestoreVariables>({
     mutationFn: restoreObjectVersion,
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({
         queryKey: storageKeys.objectVersions(
           variables.projectRef,
@@ -53,11 +53,11 @@ export const useObjectVersionRestoreMutation = ({
           variables.path
         ),
       })
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(error, variables, context) {
+    async onError(error, variables, context, mutationContext) {
       if (onError === undefined) toast.error(`Failed to restore version: ${error.message}`)
-      else onError(error, variables, context)
+      else onError(error, variables, context, mutationContext)
     },
     ...options,
   })

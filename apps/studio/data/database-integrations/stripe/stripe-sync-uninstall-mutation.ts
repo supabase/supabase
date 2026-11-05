@@ -5,8 +5,8 @@ import { toast } from 'sonner'
 import { stripeSyncKeys } from './keys'
 import { databaseKeys } from '@/data/database/keys'
 import { BASE_PATH } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
-import type { ResponseError } from '@/types'
 
 export type StripeSyncUninstallVariables = {
   projectRef: string
@@ -52,15 +52,15 @@ export const useStripeSyncUninstallMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<StripeSyncUninstallData, ResponseError, StripeSyncUninstallVariables>,
+  UseMutationOptions<StripeSyncUninstallData, StudioError, StripeSyncUninstallVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const track = useTrack()
 
-  return useMutation<StripeSyncUninstallData, ResponseError, StripeSyncUninstallVariables>({
+  return useMutation<StripeSyncUninstallData, StudioError, StripeSyncUninstallVariables>({
     mutationFn: (vars) => uninstallStripeSync(vars),
-    async onSuccess(data, variables, context) {
+    async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables
 
       track('integration_uninstall_submitted', {
@@ -77,13 +77,13 @@ export const useStripeSyncUninstallMutation = ({
         queryKey: stripeSyncKeys.all,
       })
 
-      await onSuccess?.(data, variables, context)
+      await onSuccess?.(data, variables, context, mutationContext)
     },
-    async onError(data, variables, context) {
+    async onError(data, variables, context, mutationContext) {
       if (onError === undefined) {
         toast.error(`Failed to uninstall Stripe Sync: ${data.message}`)
       } else {
-        onError(data, variables, context)
+        onError(data, variables, context, mutationContext)
       }
     },
     ...options,

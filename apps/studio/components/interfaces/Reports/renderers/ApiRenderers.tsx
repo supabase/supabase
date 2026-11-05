@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { geoCentroid } from 'd3-geo'
 import sumBy from 'lodash/sumBy'
 import { ChevronRightIcon } from 'lucide-react'
@@ -42,7 +43,7 @@ import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableCo
 import { useFillTimeseriesSorted } from '@/hooks/analytics/useFillTimeseriesSorted'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const NetworkTrafficRenderer = (
   props: ReportWidgetProps<{
@@ -50,6 +51,7 @@ export const NetworkTrafficRenderer = (
     ingress: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const { data: organization } = useSelectedOrganizationQuery({ enabled: IS_PLATFORM })
   const { data, error, isError } = useFillTimeseriesSorted({
     data: props.data,
@@ -69,7 +71,7 @@ export const NetworkTrafficRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve network traffic" error={error} />
   } else if (isError) {
     return (
@@ -84,6 +86,7 @@ export const NetworkTrafficRenderer = (
   return (
     <div className="flex flex-col gap-12 w-full">
       <BarChart
+        chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
         size="small"
         title="Ingress"
         highlightedValue={sumBy(props.data, 'ingress_mb')}
@@ -119,6 +122,7 @@ export const TotalRequestsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -134,7 +138,7 @@ export const TotalRequestsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve total requests" error={error} />
   } else if (isError) {
     return (
@@ -148,6 +152,7 @@ export const TotalRequestsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       highlightedValue={total}
@@ -248,6 +253,7 @@ export const ErrorCountsChartRenderer = (
     count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const total = props.data.reduce((acc, datum) => {
     return acc + datum.count
   }, 0)
@@ -264,7 +270,7 @@ export const ErrorCountsChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve request errors" error={error} />
   } else if (isError) {
     return (
@@ -278,6 +284,7 @@ export const ErrorCountsChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       minimalHeader
       className="w-full"
@@ -296,6 +303,7 @@ export const ResponseSpeedChartRenderer = (
     avg: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const transformedData = props.data.map((datum) => ({
     timestamp: datum.timestamp,
     avg: datum.avg,
@@ -315,7 +323,7 @@ export const ResponseSpeedChartRenderer = (
   if (!!props.error) {
     const error = (
       typeof props.error === 'string' ? { message: props.error } : props.error
-    ) as ResponseError
+    ) as StudioError
     return <AlertError subject="Failed to retrieve response speeds" error={error} />
   } else if (isError) {
     return (
@@ -329,6 +337,7 @@ export const ResponseSpeedChartRenderer = (
 
   return (
     <BarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       size="small"
       highlightedValue={lastAvg}
       format="ms"

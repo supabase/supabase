@@ -14,12 +14,9 @@ const getComputePrice = (targetComputeSize: InfraInstanceSize, planId: PlanId) =
   }).computePrice
 
 describe('projectSpecToMonthlyPrice', () => {
-  it('prices nano at the micro rate on paid plans', () => {
+  it('prices nano and pico at the micro rate on paid plans', () => {
     expect(getComputePrice('nano', 'pro')).toBe(9.68)
     expect(getComputePrice('nano', 'team')).toBe(9.68)
-  })
-
-  it('prices pico at the micro rate on paid plans', () => {
     expect(getComputePrice('pico', 'pro')).toBe(9.68)
   })
 

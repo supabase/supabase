@@ -1,5 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-
 import {
   getAnalyticsBucketPublicationName,
   getAnalyticsBucketS3KeyName,
@@ -15,7 +13,7 @@ import { useReplicationPublicationQuery } from '@/data/replication/publication-q
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useS3AccessKeyDeleteMutation } from '@/data/storage/s3-access-key-delete-mutation'
 import { useStorageCredentialsQuery } from '@/data/storage/s3-access-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
@@ -26,9 +24,8 @@ export const useAnalyticsBucketAssociatedEntities = (
   { projectRef, bucketId }: { projectRef?: string; bucketId?: string },
   options: { enabled: boolean } = { enabled: true }
 ) => {
-  const { can: canReadS3Credentials } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_READ,
-    '*'
+  const { can: canReadS3Credentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_READ
   )
 
   const {
