@@ -379,6 +379,18 @@ The example uses `supabase.example.com` for Supabase and `app.example.com` for y
          value: https://app.example.com
        - name: GOTRUE_URI_ALLOW_LIST
          value: https://app.example.com/auth/callback,https://app.example.com/account
+       - name: GOTRUE_DISABLE_SIGNUP
+         value: "false"
+       - name: GOTRUE_EXTERNAL_EMAIL_ENABLED
+         value: "true"
+       - name: GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED
+         value: "false"
+       - name: GOTRUE_MAILER_AUTOCONFIRM
+         value: "false"
+       - name: GOTRUE_EXTERNAL_PHONE_ENABLED
+         value: "true"
+       - name: GOTRUE_SMS_AUTOCONFIRM
+         value: "true"
    ```
 
    Keep `fullnameOverride` and the storage configuration from the original file. `GOTRUE_SITE_URL` is your app's URL. The operator derives Auth's external API URL from `project.publicUrl`.
