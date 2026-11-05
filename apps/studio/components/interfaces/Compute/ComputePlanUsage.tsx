@@ -86,7 +86,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     <Card className="divide-y">
       <div className="flex items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
-          <h3 className="text-sm text-foreground">Plan usage</h3>
+          <h3 className="text-sm text-foreground">Usage</h3>
           {isCollapsed ? (
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
               {meters.map((meter) => (
