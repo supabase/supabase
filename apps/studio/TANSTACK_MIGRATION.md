@@ -297,6 +297,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 - [x] `routes/project/$ref/issues.tsx` — IssuesLayout (issue list in the product sidebar).
 - [x] A `routes/project/$ref/issues/index.tsx` ← `pages/project/[ref]/issues/index.tsx`
+- [x] A `routes/project/$ref/issues/$id.tsx` ← `pages/project/[ref]/issues/[id].tsx`
 
 ### Project shell — `/advisors/*`
 
