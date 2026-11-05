@@ -26,6 +26,7 @@ import z from 'zod'
 
 import { MFA_SUPPORT_EMAIL_HREF } from './SignInMfa.utils'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useAddLoginEvent } from '@/data/misc/audit-login-mutation'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useRecoveryCodesVerifyMutation } from '@/data/recovery-codes/recovery-codes-verify-mutation'
@@ -70,7 +71,16 @@ export const SignInRecoveryCodeForm = () => {
     isPending: isVerifying,
     isSuccess,
   } = useRecoveryCodesVerifyMutation({
-    onError: setVerificationError,
+    onError: (error) => {
+      if (error.code === 'mfa_verification_failed') {
+        form.setError('code', {
+          type: 'server',
+          message: 'This recovery code is invalid or has already been used. Try another code.',
+        })
+      } else {
+        setVerificationError(error)
+      }
+    },
     onSuccess: async () => {
       if (!isVerification) {
         track('sign_in', { category: 'account', method: 'recovery-code' })
@@ -218,51 +228,37 @@ export const SignInRecoveryCodeForm = () => {
                   showInstructions={false}
                 />
               )}
-              <Button
-                variant="primary"
-                block
-                form={formId}
-                type="submit"
-                loading={isVerifying || isSuccess}
-              >
-                {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
-              </Button>
+              <div className="space-y-2.5">
+                <Button
+                  variant="primary"
+                  block
+                  form={formId}
+                  type="submit"
+                  loading={isVerifying || isSuccess}
+                >
+                  {isVerifying ? 'Verifying' : isSuccess ? 'Signing in' : 'Verify'}
+                </Button>
+                <Button
+                  type="button"
+                  block
+                  variant="text"
+                  size="tiny"
+                  onClick={onClickLogout}
+                  disabled={isVerifying || isSuccess}
+                >
+                  Cancel
+                </Button>
+              </div>
             </form>
           </Form>
         )}
       </CardContent>
       <CardFooter className="flex-col gap-4 border-t px-6 py-5">
-        <Button
-          variant="text"
-          size="tiny"
-          onClick={onClickLogout}
-          disabled={isVerifying || isSuccess}
-        >
-          Cancel
-        </Button>
-        <div>
-          <div className="text-sm">
-            <span className="text-foreground-light">Unable to sign in?</span>{' '}
-          </div>
-          <ul className="list-disc pl-6">
-            <li>
-              <a
-                href={`${BASE_PATH}/logout`}
-                className="text-sm transition text-foreground-light hover:text-foreground"
-              >
-                Force sign out and clear cookies
-              </a>
-            </li>
-            <li>
-              <a
-                href={MFA_SUPPORT_EMAIL_HREF}
-                className="text-sm transition text-foreground-light hover:text-foreground"
-              >
-                Email support to regain access
-              </a>
-            </li>
-          </ul>
-        </div>
+        <p className="w-full text-balance text-center text-xs text-foreground-lighter">
+          Having trouble?{' '}
+          <InlineLink href={`${BASE_PATH}/logout`}>Sign out and clear cookies</InlineLink> to try
+          again, or <InlineLink href={MFA_SUPPORT_EMAIL_HREF}>email support</InlineLink> for help.
+        </p>
       </CardFooter>
     </>
   )

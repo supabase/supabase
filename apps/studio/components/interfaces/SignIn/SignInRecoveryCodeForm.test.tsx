@@ -1,4 +1,4 @@
-import { AuthError } from '@supabase/auth-js'
+import { AuthApiError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import { FeatureFlagContext } from 'common'
 import { renderToString } from 'react-dom/server'
@@ -77,12 +77,18 @@ test('cancelling action verification returns to Security without signing out', a
 test('an invalid recovery code stays on the form with an inline error', async () => {
   vi.spyOn(auth.mfa.recoveryCodes, 'verify').mockResolvedValue({
     data: null,
-    error: new AuthError('Invalid recovery code'),
+    error: new AuthApiError('Invalid recovery code', 422, 'mfa_verification_failed'),
   })
   renderForm()
   fireEvent.change(await screen.findByLabelText('Recovery code'), { target: { value: 'invalid' } })
   fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-  expect(await screen.findByText(/Invalid recovery code/)).toBeInTheDocument()
+  expect(
+    await screen.findByText(
+      'This recovery code is invalid or has already been used. Try another code.'
+    )
+  ).toBeInTheDocument()
+  expect(screen.getByLabelText('Recovery code')).toHaveAttribute('aria-invalid', 'true')
+  expect(screen.queryByText('Unable to verify recovery code')).not.toBeInTheDocument()
   expect(push).not.toHaveBeenCalled()
 })
 
@@ -92,6 +98,20 @@ test('prerenders sign-out navigation without a TanStack router', () => {
       <SignInRecoveryCodeForm />
     </CustomWrapper>
   )
-  expect(html).toContain('Force sign out and clear cookies')
+  expect(html).toContain('Sign out and clear cookies')
   expect(html).toContain('href="/logout"')
+})
+
+test('service failures remain in an admonition rather than marking the code invalid', async () => {
+  vi.spyOn(auth.mfa.recoveryCodes, 'verify').mockResolvedValue({
+    data: null,
+    error: new AuthApiError('Service unavailable', 503, 'unexpected_failure'),
+  })
+  renderForm()
+  fireEvent.change(await screen.findByLabelText('Recovery code'), {
+    target: { value: 'sample-code' },
+  })
+  fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
+  expect(await screen.findByText('Unable to verify recovery code')).toBeInTheDocument()
+  expect(screen.getByLabelText('Recovery code')).toHaveAttribute('aria-invalid', 'false')
 })
