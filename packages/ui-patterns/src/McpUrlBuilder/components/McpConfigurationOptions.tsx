@@ -49,8 +49,8 @@ export function McpConfigurationOptions({
         <div className="flex items-center gap-2">
           <Label className="text-sm">Feature Groups</Label>
           <InfoTooltip>
-            Choose which MCP tools to include. Storage is off by default to keep tool counts
-            manageable.
+            Choose which MCP tools to include. Storage and Notebooks are off by default to keep tool
+            counts manageable.
           </InfoTooltip>
         </div>
 
