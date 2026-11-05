@@ -115,6 +115,19 @@ export async function CliReferencePage({ version, path }: { version: string; pat
   )
 }
 
+/** A parent command with nothing of its own to document: the sidebar lists only its subcommands. */
+function isEmptyNamespace(command: CliCommand) {
+  const [first = '', ...rest] = (command.description ?? '').trim().split(/\n\n+/)
+  return (
+    command.subcommands.length > 0 &&
+    command.flags.length === 0 &&
+    (command.examples?.length ?? 0) === 0 &&
+    (command.breaking_changes?.length ?? 0) === 0 &&
+    rest.length === 0 &&
+    (first.trim() === '' || restatesSummary(command.summary, first))
+  )
+}
+
 function CliNavigation({
   model,
   activeHref,
@@ -139,11 +152,12 @@ function CliNavigation({
     },
   ]
   const groups: CliNavGroup[] = model.categories.map((category) => {
-    const names = category.commands.map((command) => cliCommandName(command.title))
+    const listed = category.commands.filter((command) => !isEmptyNamespace(command))
+    const names = listed.map((command) => cliCommandName(command.title))
     return {
       id: category.id,
       title: category.title,
-      items: category.commands
+      items: listed
         .map((command) => ({
           href: cliPageHref(version, cliCommandRel(command.title)),
           label: shortLabel(cliCommandName(command.title), names),
@@ -419,12 +433,26 @@ function CliCommandPage({ model, command }: { model: CliModel; command: CliComma
     .map((id) => model.byId.get(id))
     .filter((sub): sub is CliCommand => !!sub)
   const related = cliRelatedCommands(model, command)
+  const namespace = category?.commands.find(
+    (candidate) =>
+      isEmptyNamespace(candidate) && name.startsWith(`${cliCommandName(candidate.title)} `)
+  )
 
   return (
     <>
       <PageHeader
         version={version}
-        crumbs={[category?.title, <b key="name">{name}</b>].filter(Boolean)}
+        crumbs={[
+          category &&
+            (namespace && namespace !== command ? (
+              <Link key="category" href={cliPageHref(version, cliCommandRel(namespace.title))}>
+                {category.title}
+              </Link>
+            ) : (
+              category.title
+            )),
+          <b key="name">{name}</b>,
+        ].filter(Boolean)}
         title={name}
         lede={sentence(command.summary)}
       />
