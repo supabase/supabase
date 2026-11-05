@@ -6,39 +6,37 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useEgressReport } from '@/data/reports/egress-report-query'
+import { useEgressReport, useEgressTopQueries } from '@/data/reports/egress-report-query'
 
 interface TopPathRow {
   path: string
   count: number
 }
 
+const BreakdownLoader = () => (
+  <div className="space-y-2">
+    <ShimmeringLoader />
+    <ShimmeringLoader className="w-3/4" />
+    <ShimmeringLoader className="w-1/2" />
+  </div>
+)
+
+const headerClasses = 'text-xs! py-2! font-bold bg-surface-200!'
+const cellClasses = 'text-xs! py-2!'
+
 const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
   const { data, error, isLoading } = useEgressReport(projectRef)
   const rows = (data.topPaths ?? []) as unknown as TopPathRow[]
 
-  if (isLoading) {
-    return (
-      <div className="space-y-2">
-        <ShimmeringLoader />
-        <ShimmeringLoader className="w-3/4" />
-        <ShimmeringLoader className="w-1/2" />
-      </div>
-    )
-  }
-
+  if (isLoading) return <BreakdownLoader />
   if (error) {
     return (
       <p className="text-sm text-foreground-light">Could not load the top API paths right now.</p>
     )
   }
-
   if (rows.length === 0) {
     return <p className="text-sm text-foreground-light">No REST API requests in this period.</p>
   }
-
-  const headerClasses = 'text-xs! py-2! font-bold bg-surface-200!'
-  const cellClasses = 'text-xs! py-2!'
 
   return (
     <Table
@@ -55,6 +53,47 @@ const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
             <span className="font-mono text-foreground-light">{row.path}</span>
           </Table.td>
           <Table.td className={`${cellClasses} text-right`}>{row.count.toLocaleString()}</Table.td>
+        </Table.tr>
+      ))}
+    />
+  )
+}
+
+const EgressTopQueries = ({ projectRef }: { projectRef: string }) => {
+  const { data, error, isLoading } = useEgressTopQueries(projectRef)
+  const rows = data ?? []
+
+  if (isLoading) return <BreakdownLoader />
+  if (error) {
+    return (
+      <p className="text-sm text-foreground-light">
+        Could not load the top queries. This needs the `pg_stat_statements` extension enabled.
+      </p>
+    )
+  }
+  if (rows.length === 0) {
+    return <p className="text-sm text-foreground-light">No query statistics available yet.</p>
+  }
+
+  return (
+    <Table
+      containerClassName="overflow-x-auto"
+      head={
+        <>
+          <Table.th className={headerClasses}>Query</Table.th>
+          <Table.th className={`${headerClasses} text-right`}>Calls</Table.th>
+          <Table.th className={`${headerClasses} text-right`}>Avg rows</Table.th>
+        </>
+      }
+      body={rows.map((row, i) => (
+        <Table.tr key={i}>
+          <Table.td className={cellClasses}>
+            <p className="font-mono text-foreground-light truncate max-w-md">{row.query}</p>
+          </Table.td>
+          <Table.td className={`${cellClasses} text-right`}>
+            {Number(row.calls).toLocaleString()}
+          </Table.td>
+          <Table.td className={`${cellClasses} text-right`}>{row.avg_rows}</Table.td>
         </Table.tr>
       ))}
     />
@@ -80,7 +119,7 @@ export const EgressBreakdownPanel = () => {
           content: { side: 'bottom', text: 'Select a single project to view the breakdown' },
         }}
       >
-        Show top API paths
+        Show egress breakdown
       </ButtonTooltip>
     )
   }
@@ -89,10 +128,23 @@ export const EgressBreakdownPanel = () => {
     <Collapsible open={open} onOpenChange={setOpen} className="space-y-3">
       <CollapsibleTrigger asChild>
         <Button icon={open ? <ChevronDownIcon /> : <ChevronRightIcon />}>
-          {open ? 'Hide top API paths' : 'Show top API paths'}
+          {open ? 'Hide egress breakdown' : 'Show egress breakdown'}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent>{open && <EgressTopPaths projectRef={projectRef} />}</CollapsibleContent>
+      <CollapsibleContent className="space-y-6">
+        {open && (
+          <>
+            <div className="space-y-2">
+              <p className="text-sm">Top API paths by requests</p>
+              <EgressTopPaths projectRef={projectRef} />
+            </div>
+            <div className="space-y-2">
+              <p className="text-sm">Top queries</p>
+              <EgressTopQueries projectRef={projectRef} />
+            </div>
+          </>
+        )}
+      </CollapsibleContent>
     </Collapsible>
   )
 }
