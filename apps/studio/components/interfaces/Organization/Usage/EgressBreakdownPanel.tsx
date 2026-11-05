@@ -3,6 +3,7 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
+import { EGRESS_LOG_SQL, EgressLogsButtons } from './EgressLogsButtons'
 import { TopApiRoutesRenderer } from '@/components/interfaces/Reports/renderers/ApiRenderers'
 import {
   CacheHitRateChartRenderer,
@@ -13,6 +14,11 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEgressReport } from '@/data/reports/egress-report-query'
 
 export type EgressBreakdownKind = 'rest' | 'cache'
+
+const LOG_CONTEXT: Record<EgressBreakdownKind, { logType: string; sql: string }> = {
+  rest: { logType: 'edge', sql: EGRESS_LOG_SQL.rest },
+  cache: { logType: 'storage', sql: EGRESS_LOG_SQL.storage },
+}
 
 const EgressBreakdownChart = ({
   projectRef,
@@ -80,8 +86,17 @@ export const EgressBreakdownPanel = ({ kind }: { kind: EgressBreakdownKind }) =>
           {open ? 'Hide request breakdown' : 'Show request breakdown'}
         </Button>
       </CollapsibleTrigger>
-      <CollapsibleContent>
-        {open && <EgressBreakdownChart projectRef={projectRef} kind={kind} />}
+      <CollapsibleContent className="space-y-3">
+        {open && (
+          <>
+            <EgressBreakdownChart projectRef={projectRef} kind={kind} />
+            <EgressLogsButtons
+              projectRef={projectRef}
+              logType={LOG_CONTEXT[kind].logType}
+              sql={LOG_CONTEXT[kind].sql}
+            />
+          </>
+        )}
       </CollapsibleContent>
     </Collapsible>
   )

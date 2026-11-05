@@ -7,6 +7,10 @@ import { Admonition } from 'ui-patterns/Admonition'
 
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import { EgressDebugButton } from '@/components/interfaces/Organization/Usage/EgressDebugButton'
+import {
+  EGRESS_LOG_SQL,
+  EgressLogsButtons,
+} from '@/components/interfaces/Organization/Usage/EgressLogsButtons'
 import { TopApiRoutesRenderer } from '@/components/interfaces/Reports/renderers/ApiRenderers'
 import {
   CacheHitRateChartRenderer,
@@ -146,6 +150,10 @@ export const EgressReport: NextPageWithLayout = () => {
               </p>
             )}
           </Admonition>
+
+          {projectRef !== undefined && (
+            <EgressLogsButtons projectRef={projectRef} logType="edge" sql={EGRESS_LOG_SQL.rest} />
+          )}
 
           <ReportWidget
             isLoading={isLoading}
