@@ -73,6 +73,8 @@ const ComputePage: NextPageWithLayout = () => {
           <PageSectionContent className="flex flex-col gap-y-8">
             <AlphaNotice
               entity="Compute"
+              isCollapsible
+              className="-my-4"
               feedbackUrl="https://github.com/orgs/supabase/discussions"
             />
 
