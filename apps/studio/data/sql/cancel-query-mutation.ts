@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, type UseCustomMutationOptions } from '@/types'
+import { UnexpectedError, type StudioError } from '@/lib/errors/studio-errors'
+import { type UseCustomMutationOptions } from '@/types'
 
 type QueryCancelVariables = {
   pid: number
@@ -30,9 +31,9 @@ async function cancelQuery({
     grant: unguarded.migrating,
   })
   if (backendStart !== undefined && result.length === 0) {
-    throw new ResponseError(
-      `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`
-    )
+    throw new UnexpectedError({
+      message: `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`,
+    })
   }
   return result
 }
@@ -44,11 +45,11 @@ export const useQueryCancelMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<QueryCancelData, ResponseError, QueryCancelVariables>,
+  UseCustomMutationOptions<QueryCancelData, StudioError, QueryCancelVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<QueryCancelData, ResponseError, QueryCancelVariables>({
+  return useMutation<QueryCancelData, StudioError, QueryCancelVariables>({
     mutationFn: (vars) => cancelQuery(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

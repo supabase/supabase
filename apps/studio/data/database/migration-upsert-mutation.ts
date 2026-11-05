@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { databaseKeys } from './keys'
 import { handleError, put, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type MigrationUpsertVariables = {
   projectRef: string
@@ -46,11 +47,11 @@ export const useMigrationUpsertMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<MigrationUpsertData, ResponseError, MigrationUpsertVariables>,
+  UseCustomMutationOptions<MigrationUpsertData, StudioError, MigrationUpsertVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<MigrationUpsertData, ResponseError, MigrationUpsertVariables>({
+  return useMutation<MigrationUpsertData, StudioError, MigrationUpsertVariables>({
     mutationFn: (vars) => upsertMigration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -534,8 +534,9 @@ export default defineConfig(({ command, mode }) => {
   // ends up with a bare `process.env` reference.
   publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
 
-  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
-  // these at runtime in the browser. When a var is unset it gets no define
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) and the
+  // error sample rates (lib/errors/error-routing.ts) read these at runtime in
+  // the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built
   // bundle — and an undeclared `process` throws in the browser. Inline
   // `undefined` as the fallback, mirroring how Next inlines unset
@@ -544,6 +545,8 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_SENTRY_DSN',
     'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
@@ -755,6 +758,10 @@ export default defineConfig(({ command, mode }) => {
             }
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
+            }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
+            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
+              return 'ui-avatar'
             }
             return undefined
           },

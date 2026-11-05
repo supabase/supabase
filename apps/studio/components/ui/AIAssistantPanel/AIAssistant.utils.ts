@@ -16,9 +16,9 @@ import { enumeratedTypesKeys } from '@/data/enumerated-types/keys'
 import { handleError } from '@/data/fetchers'
 import { tableKeys } from '@/data/tables/keys'
 import { isManualApprovalRequested } from '@/lib/ai/message-utils'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { tryParseJson } from '@/lib/helpers'
 import type { SqlSnippet } from '@/state/ai-assistant-state'
-import { ResponseError } from '@/types'
 
 export type MutationCategory = 'functions' | 'rls-policies'
 
@@ -152,9 +152,9 @@ export const onErrorChat = (error: Error) => {
   const parsedError = error ? tryParseJson(error.message) : undefined
 
   try {
-    handleError(parsedError?.error || parsedError || error)
+    handleError(parsedError?.error || parsedError || error, { reportImmediately: true })
   } catch (e: any) {
-    if (e instanceof ResponseError) {
+    if (isStudioError(e)) {
       toast.error(e.message)
     } else if (e instanceof Error) {
       toast.error(e.message)

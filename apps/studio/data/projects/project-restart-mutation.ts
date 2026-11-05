@@ -3,7 +3,8 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectRestartVariables = {
   ref: string
@@ -32,10 +33,10 @@ export const useProjectRestartMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectRestartData, ResponseError, ProjectRestartVariables>,
+  UseCustomMutationOptions<ProjectRestartData, StudioError, ProjectRestartVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ProjectRestartData, ResponseError, ProjectRestartVariables>({
+  return useMutation<ProjectRestartData, StudioError, ProjectRestartVariables>({
     mutationFn: (vars) => restartProject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

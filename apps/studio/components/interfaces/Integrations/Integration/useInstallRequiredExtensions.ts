@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getExtensionDefaultSchema } from '@/components/interfaces/Integrations/Integration/IntegrationOverviewTabV2/IntegrationOverviewTabV2.utils'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import { getRequiredExtensionsToInstall } from '@/components/interfaces/Integrations/Wrappers/Wrappers.utils'
@@ -10,10 +9,9 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 /**
  * Tracks which of the current integration's required extensions are not yet installed, and
- * exposes a function to install them. Only active when the marketplace flag is on.
+ * exposes a function to install them.
  */
 export const useInstallRequiredExtensions = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
   const { integration } = useIntegrationDetail()
   const { data: project } = useSelectedProjectQuery()
 
@@ -28,8 +26,8 @@ export const useInstallRequiredExtensions = () => {
     [extensions, integration?.requiredExtensions]
   )
 
-  const needsExtensions = isMarketplaceEnabled && (requiredExtensionsToInstall?.length ?? 0) > 0
-  const isExtensionDataLoading = isMarketplaceEnabled && requiredExtensionsToInstall === null
+  const needsExtensions = (requiredExtensionsToInstall?.length ?? 0) > 0
+  const isExtensionDataLoading = requiredExtensionsToInstall === null
 
   const { mutateAsync: enableExtension } = useDatabaseExtensionEnableMutation({ onError: () => {} })
 

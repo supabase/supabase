@@ -4,10 +4,10 @@ import { computeInstanceRefetchInterval, parseComputeInstance } from './compute.
 import { computeKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ComputeInstanceVariables = { projectRef?: string; name?: string }
-export type ComputeInstanceError = ResponseError
+export type ComputeInstanceError = StudioError
 
 async function getComputeInstance(
   { projectRef, name }: ComputeInstanceVariables,

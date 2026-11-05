@@ -34,7 +34,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { DELIVERIES_PAGE_SIZE, PLATFORM_WEBHOOK_EVENT_TYPES } from './PlatformWebhooks.constants'
 import type { WebhookEndpoint, WebhookScope } from './PlatformWebhooks.types'
 import {
-  filterWebhookDeliveries,
   filterWebhookEndpoints,
   generateSigningSecret,
   getTestWebhookEventType,
@@ -116,10 +115,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
   const [panel, setPanel] = useQueryState('panel', parseAsStringLiteral(PANEL_VALUES))
   const [search, setSearch] = useQueryState(
     'search',
-    parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
-  )
-  const [deliverySearch, setDeliverySearch] = useQueryState(
-    'deliverySearch',
     parseAsString.withDefault('').withOptions({ history: 'replace', clearOnDefault: true })
   )
 
@@ -290,11 +285,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     return filterWebhookEndpoints(endpoints, search)
   }, [endpoints, search])
 
-  const filteredDeliveries = useMemo(() => {
-    if (!selectedEndpoint) return []
-    return filterWebhookDeliveries(deliveries, deliverySearch)
-  }, [deliveries, deliverySearch, selectedEndpoint])
-
   const deliveryEventPayload = useMemo(() => {
     if (!selectedDelivery) return ''
     return JSON.stringify(
@@ -333,7 +323,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
     }
     if (endpointPendingDelete.id === endpointId) {
       router.push(webhooksHref)
-      setDeliverySearch('')
     }
     setEndpointIdPendingDelete(null)
     toast.success('Endpoint deleted')
@@ -579,8 +568,7 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 deliveriesError={fetchedDeliveries?.length ? null : deliveriesError}
                 orgSlug={scope === 'organization' ? slug : undefined}
                 projectRef={scope === 'project' ? ref : undefined}
-                deliverySearch={deliverySearch}
-                filteredDeliveries={filteredDeliveries}
+                deliveries={deliveries}
                 hasNextPage={hasNextPage}
                 hasPreviousPage={hasPreviousPage}
                 // The rows are kept when a refresh fails, so tell the user they may be out of date
@@ -592,7 +580,6 @@ export const PlatformWebhooksPage = ({ scope, endpointId }: PlatformWebhooksPage
                 onRefetchDeliveries={refetchDeliveries}
                 selectedEndpoint={selectedEndpoint}
                 onCopyUrl={() => handleCopy(selectedEndpoint.url, 'endpoint URL')}
-                onDeliverySearchChange={setDeliverySearch}
                 onNextPage={handleNextPage}
                 onPreviousPage={handlePreviousPage}
                 onOpenDelivery={(id) => {

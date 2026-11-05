@@ -13,7 +13,7 @@ export const contract = {
   outputSchema: z.string(),
   minOptInLevel: 'schema',
   availability: {
-    environments: new Set(['platform']),
+    environments: new Set(['platform', 'self-hosted']),
   },
   needsApproval: false,
   toModelOutput: (output: string) => output,

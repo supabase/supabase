@@ -2,6 +2,7 @@ import dayjs from 'dayjs'
 
 import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
 import {
+  getLogAttributeKey,
   groupLogsFiltersByColumn,
   parseLogsFilterUrlParams,
   type LogsFilterOperator,
@@ -9,6 +10,7 @@ import {
 import { unifiedLogsScopeSchema } from './UnifiedLogs.schema'
 import { QuerySearchParamsType, SearchParamsType, UnifiedLogsScope } from './UnifiedLogs.types'
 import { wrapIlikePattern } from './UnifiedLogs.utils'
+import { PIPELINE_ID_OTEL_SQL } from '@/data/logs/pipeline-logs'
 import {
   joinSqlFragments,
   analyticsLiteral as lit,
@@ -29,7 +31,7 @@ const NOT_ILIKE_OP = safeSql`NOT ILIKE`
 // Facets the count query is allowed to be invoked for. Reject anything else
 // at the entry point rather than letting an unsupported value reach
 // `log_attributes[…]` lookups.
-const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname'] as const
+const FACET_FIELDS = ['log_type', 'level', 'method', 'status', 'pathname', 'pipeline_id'] as const
 
 // OTEL log_attributes keys for HTTP-style fields. Centralized so they can be
 // adjusted in one place if the backend conventions change.
@@ -102,6 +104,7 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN source = 'supavisor_logs' THEN 'supavisor'
       WHEN source = 'pgbouncer_logs' THEN 'pgbouncer'
       WHEN source = 'multigres_logs' THEN 'multigres'
+      WHEN source = 'etl_replication_logs' THEN 'pipelines'
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN 'compute'
       ELSE source
     END`
@@ -111,16 +114,22 @@ const LOG_TYPE_EXPR: SafeLogSqlFragment = safeSql`CASE
 // `parsed.sql_state_code` (e.g. `42P01`) for postgres rows.
 const STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
+      WHEN source = 'etl_replication_logs' THEN null
       WHEN source = 'postgres_logs' THEN toString(log_attributes['parsed.sql_state_code'])
       ELSE toString((${HTTP_STATUS_EXPR}))
     END`
 
-const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_METHOD_EXPR})`
-const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION}, null, ${HTTP_PATH_EXPR})`
-const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'function_logs', log_attributes, map())`
+const METHOD_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'etl_replication_logs', null, ${HTTP_METHOD_EXPR})`
+const PATHNAME_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source = 'etl_replication_logs', null, ${HTTP_PATH_EXPR})`
+const METADATA_EXPR: SafeLogSqlFragment = safeSql`if(${COMPUTE_SUBSERVICE_CONDITION} OR source IN ('function_logs', 'etl_replication_logs'), log_attributes, map())`
 
 const LEVEL_EXPR: SafeLogSqlFragment = safeSql`CASE
       WHEN ${COMPUTE_SUBSERVICE_CONDITION} THEN null
+      WHEN source = 'etl_replication_logs' THEN multiIf(
+        upper(coalesce(nullIf(log_attributes['level'], ''), severity_text)) IN ('ERROR','FATAL','PANIC','CRITICAL','ALERT','EMERGENCY'), 'error',
+        upper(coalesce(nullIf(log_attributes['level'], ''), severity_text)) IN ('WARN','WARNING'), 'warning',
+        'success'
+      )
       WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('error','fatal') THEN 'error'
       WHEN source = 'function_logs' AND lower(log_attributes['level']) IN ('warn','warning') THEN 'warning'
       WHEN (${HTTP_STATUS_EXPR}) != '' AND toInt32OrZero((${HTTP_STATUS_EXPR})) >= 500 THEN 'error'
@@ -172,7 +181,14 @@ const translateFilter = (
       ','
     )})`
 
+  const attributeKey = getLogAttributeKey(key)
+  if (attributeKey !== undefined) {
+    return safeSql`log_attributes[${lit(attributeKey)}] ${inOp} ${inList(values)}`
+  }
+
   switch (key) {
+    case 'pipeline_id':
+      return safeSql`(source = 'etl_replication_logs' AND ${PIPELINE_ID_OTEL_SQL} ${inOp} ${inList(values)})`
     case 'log_type': {
       const branches = values.map((t) => {
         const condition = LOG_TYPE_CONDITION[t] ?? safeSql`source = ${lit(t)}`
@@ -345,6 +361,7 @@ const ROW_PROJECTION: SafeLogSqlFragment = safeSql`
     event_message,
     ${METHOD_EXPR} AS method,
     ${AUTH_USER_EXPR} AS auth_user,
+    if(source = 'etl_replication_logs', ${PIPELINE_ID_OTEL_SQL}, null) AS pipeline_id,
     ${METADATA_EXPR} AS metadata,
     null AS log_count,
     null AS logs
@@ -365,6 +382,8 @@ const buildBaseWhere = (
       if (!search.scope && logTypeFilter.operator === '<>') {
         parts.push(safeSql`NOT (${LOG_TYPE_CONDITION['edge function runtime']})`)
       }
+    } else if (grouped.pipeline_id) {
+      parts.push(safeSql`source = 'etl_replication_logs'`)
     } else if (!search.scope && !userFilterValue(search)) {
       // Skip the default (postgres|edge) source restriction while the user filter is
       // active — the user clause governs which sources are eligible (auth + postgres),
@@ -533,7 +552,9 @@ export const getFacetCountQuery = ({
             ? STATUS_EXPR
             : facet === 'pathname'
               ? PATHNAME_EXPR
-              : safeSql`log_attributes[${lit(facet)}]`
+              : facet === 'pipeline_id'
+                ? PIPELINE_ID_OTEL_SQL
+                : safeSql`log_attributes[${lit(facet)}]`
 
   const conditions: SafeLogSqlFragment[] = [
     ...buildBaseWhere(search, facet),
@@ -573,6 +594,7 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     level: LEVEL_EXPR,
     method: METHOD_EXPR,
     status: STATUS_EXPR,
+    pipeline_id: safeSql`if(source = 'etl_replication_logs', ${PIPELINE_ID_OTEL_SQL}, null)`,
   }
 
   const scanBlock = (
@@ -603,7 +625,7 @@ HAVING value != ''
   // A filtered facet gets its own scan so it can exclude its own filter and
   // still count its other values; the rest share the base scan.
   const baseFacets: (keyof typeof VALUE_EXPR)[] = ['total']
-  for (const facet of ['level', 'method', 'status'] as const) {
+  for (const facet of ['level', 'method', 'status', 'pipeline_id'] as const) {
     if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
     else baseFacets.push(facet)
   }
@@ -646,30 +668,54 @@ export const REQUEST_CORRELATION_KEYS = {
     function_edge_logs: ['execution_id'],
     function_logs: ['execution_id'],
   },
-} as const satisfies Record<'requestId' | 'executionId', Record<string, readonly string[]>>
+  nativeRequestId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['request_id']])
+  ),
+  traceId: Object.fromEntries(
+    Object.values(LOG_TYPE_TO_SOURCE).map((source) => [source, ['trace_id']])
+  ),
+} as const satisfies Record<string, Record<string, readonly string[]>>
 
-export type RequestCorrelationIds = { requestIds: string[]; executionIds: string[] }
+export type RequestCorrelationIds = {
+  requestIds: string[]
+  executionIds: string[]
+  nativeRequestIds: string[]
+  traceIds: string[]
+}
 
 export const REQUEST_TIMELINE_LIMIT = 200
 
 const CORRELATION_ID_PATTERN = /^[0-9A-Za-z-]{1,64}$/
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+const TRACE_ID_PATTERN = /^[0-9a-f]{32}$/i
+const ZERO_ID_PATTERN = /^0+(?:-0+)*$/
 
 export const getRequestCorrelationIds = (
   logs: { source: string; attributes: Record<string, unknown> | null | undefined }[]
 ): RequestCorrelationIds => {
-  const collect = (keysBySource: Record<string, readonly string[]>) => {
+  const collect = (
+    keysBySource: Record<string, readonly string[]>,
+    pattern = CORRELATION_ID_PATTERN,
+    isLegacyRequest = false
+  ) => {
     const ids = new Set<string>()
     for (const { source, attributes } of logs) {
       for (const key of keysBySource[source] ?? []) {
         const value = attributes?.[key]
-        if (typeof value === 'string' && CORRELATION_ID_PATTERN.test(value)) ids.add(value)
+        if (typeof value !== 'string' || !pattern.test(value) || ZERO_ID_PATTERN.test(value)) {
+          continue
+        }
+        if (isLegacyRequest && UUID_PATTERN.test(value)) continue
+        ids.add(value)
       }
     }
     return [...ids].sort()
   }
   return {
-    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId),
+    requestIds: collect(REQUEST_CORRELATION_KEYS.requestId, CORRELATION_ID_PATTERN, true),
     executionIds: collect(REQUEST_CORRELATION_KEYS.executionId),
+    nativeRequestIds: collect(REQUEST_CORRELATION_KEYS.nativeRequestId, UUID_PATTERN),
+    traceIds: collect(REQUEST_CORRELATION_KEYS.traceId, TRACE_ID_PATTERN),
   }
 }
 
@@ -704,10 +750,15 @@ LIMIT 1
 export const getRequestTimelineQuery = ({
   requestIds,
   executionIds,
-}: RequestCorrelationIds): SafeLogSqlFragment => {
+  nativeRequestIds = [],
+  traceIds = [],
+}: Pick<RequestCorrelationIds, 'requestIds' | 'executionIds'> &
+  Partial<Pick<RequestCorrelationIds, 'nativeRequestIds' | 'traceIds'>>): SafeLogSqlFragment => {
   const conditions = [
     ...correlationConditions(REQUEST_CORRELATION_KEYS.requestId, requestIds),
     ...correlationConditions(REQUEST_CORRELATION_KEYS.executionId, executionIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.nativeRequestId, nativeRequestIds),
+    ...correlationConditions(REQUEST_CORRELATION_KEYS.traceId, traceIds),
   ]
   if (conditions.length === 0) throw new Error('A request or execution ID is required')
 

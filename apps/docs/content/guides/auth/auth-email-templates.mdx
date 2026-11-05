@@ -135,7 +135,7 @@ For mobile applications, you might need to link or redirect to a specific page w
 ### Email prefetching
 
 Certain email providers may have spam detection or other security features that prefetch URL links from incoming emails (e.g. [Safe Links in Microsoft Defender for Office 365](https://learn.microsoft.com/en-us/microsoft-365/security/office-365-security/safe-links-about?view=o365-worldwide)).
-In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "Token has expired or is invalid" error.
+In this scenario, the `{{ .ConfirmationURL }}` sent will be consumed instantly which leads to a "[Token has expired or is invalid](/kb/troubleshooting/otp-verification-failures-token-has-expired-or-otp_expired-errors)" error.
 To guard against this there are the options below:
 
 **Option 1**

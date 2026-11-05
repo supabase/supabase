@@ -138,21 +138,4 @@ You can't revoke individual signed URLs. To invalidate a specific one, delete, m
 
 </Admonition>
 
-Storage signs URLs with a dedicated internal key, separate from your project's Auth JWT signing key. Each project has its own key.
-
-Because of this, signed URLs are not affected by:
-
-- Rotating or revoking the Auth JWT legacy secret or signing key
-- Disabling legacy keys in the Supabase Dashboard
-- Switching from a shared secret (HS256) to an asymmetric (ES256) signing key
-
-Signed URLs remain valid until their expiry time regardless of any Auth key changes.
-
-To revoke all signed URLs, [contact Supabase support](/dashboard/support/new?projectRef=) to coordinate the internal key rotation.
-
-Supabase then:
-
-- Rotates the internal key, which invalidates all signed URLs (upload and download).
-- Clears the CDN cache so the server validates every signed URL request directly before serving the object.
-
-As a result, all existing signed URLs return a 404 error, and new signed URLs created after the rotation use the updated key.
+To revoke all signed URLs, rotate your project's URL signing key, and then revoke the previous key. For more information, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).

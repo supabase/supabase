@@ -3,10 +3,10 @@ import { queryOptions } from '@tanstack/react-query'
 import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type UrlSigningKeysVariables = { projectRef?: string }
-export type UrlSigningKeysError = ResponseError
+export type UrlSigningKeysError = StudioError
 
 async function getUrlSigningKeys({ projectRef }: UrlSigningKeysVariables, signal?: AbortSignal) {
   if (!projectRef) throw new Error('projectRef is required')

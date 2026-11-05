@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { configKeys } from './keys'
 import { handleError, put, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PostgresConfigurationUpdateVariables = {
   projectRef: string
@@ -36,7 +37,7 @@ export const usePostgresConfigurationUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     PostgresConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     PostgresConfigurationUpdateVariables
   >,
   'mutationFn'
@@ -45,7 +46,7 @@ export const usePostgresConfigurationUpdateMutation = ({
 
   return useMutation<
     PostgresConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     PostgresConfigurationUpdateVariables
   >({
     mutationFn: (vars) => updatePostgresConfiguration(vars),

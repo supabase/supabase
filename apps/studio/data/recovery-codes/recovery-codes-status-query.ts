@@ -3,8 +3,9 @@ import { useUser } from 'common'
 
 import { recoveryCodeKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { auth } from '@/lib/gotrue'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getRecoveryCodesStatus() {
   const { data, error } = await auth.mfa.recoveryCodes.getStatus()
@@ -19,7 +20,7 @@ export async function getRecoveryCodesStatus() {
 }
 
 export type RecoveryCodesStatusData = Awaited<ReturnType<typeof getRecoveryCodesStatus>>
-export type RecoveryCodesError = ResponseError
+export type RecoveryCodesError = StudioError
 
 export const useRecoveryCodesStatusQuery = <TData = RecoveryCodesStatusData>({
   enabled = true,

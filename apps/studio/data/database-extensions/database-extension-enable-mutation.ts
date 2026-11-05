@@ -6,7 +6,8 @@ import { databaseExtensionsKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseExtensionEnableVariables = {
   projectRef: string
@@ -51,14 +52,14 @@ export const useDatabaseExtensionEnableMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseExtensionEnableData,
-    ResponseError,
+    StudioError,
     DatabaseExtensionEnableVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseExtensionEnableData, ResponseError, DatabaseExtensionEnableVariables>({
+  return useMutation<DatabaseExtensionEnableData, StudioError, DatabaseExtensionEnableVariables>({
     mutationFn: (vars) => enableDatabaseExtension(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

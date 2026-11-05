@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
@@ -185,8 +185,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       <TooltipProvider>
         <PlatformWebhooksEndpointDetails
           deliveriesError={null}
-          deliverySearch=""
-          filteredDeliveries={allDeliveries.slice(0, 5)}
+          deliveries={allDeliveries.slice(0, 5)}
           hasNextPage={false}
           hasPreviousPage={false}
           hasRefreshError={false}
@@ -196,7 +195,6 @@ describe('PlatformWebhooksEndpointDetails', () => {
           selectedEndpoint={selectedEndpoint}
           onCopyUrl={vi.fn()}
           onLiveChange={vi.fn()}
-          onDeliverySearchChange={vi.fn()}
           onNextPage={vi.fn()}
           onPreviousPage={vi.fn()}
           onOpenDelivery={vi.fn()}
@@ -235,14 +233,14 @@ describe('PlatformWebhooksEndpointDetails', () => {
     expect(onPreviousPage).toHaveBeenCalledTimes(1)
   })
 
-  it('keeps the pagination controls when search filters the current page to nothing', () => {
-    renderComponent({ filteredDeliveries: [], hasNextPage: true })
+  it('keeps the pagination controls when the current page has no deliveries', () => {
+    renderComponent({ deliveries: [], hasNextPage: true })
 
     expect(screen.getByLabelText('Next page')).toBeEnabled()
   })
 
   it('shows five skeleton rows instead of the empty state while deliveries load', () => {
-    const { container } = renderComponent({ filteredDeliveries: [], isLoadingDeliveries: true })
+    const { container } = renderComponent({ deliveries: [], isLoadingDeliveries: true })
 
     // 5 skeleton rows in the table body plus 1 in the footer
     expect(container.querySelectorAll('.shimmering-loader')).toHaveLength(6)
@@ -252,8 +250,8 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('shows an error instead of the empty state when deliveries fail to load', () => {
     renderComponent({
-      filteredDeliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
     })
 
     expect(screen.getByText(/Failed to retrieve deliveries/)).toBeInTheDocument()
@@ -262,8 +260,8 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('passes the project to the error so the support link is pre-filled', () => {
     renderComponent({
-      filteredDeliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
       projectRef: 'abcdefghijklmnopqrst',
     })
 
@@ -278,8 +276,8 @@ describe('PlatformWebhooksEndpointDetails', () => {
     const onRefetchDeliveries = vi.fn()
 
     renderComponent({
-      filteredDeliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveries: [],
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
       onRefetchDeliveries,
     })
 
@@ -357,7 +355,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {
-    renderComponent({ deliveriesError: { message: 'Something went wrong' } as ResponseError })
+    renderComponent({ deliveriesError: { message: 'Something went wrong' } as StudioError })
 
     expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
     expect(screen.queryByText(/Failed to retrieve deliveries/)).not.toBeInTheDocument()
@@ -390,7 +388,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'failure',
     })
 
-    renderComponent({ filteredDeliveries: [pending, finished], onOpenDelivery })
+    renderComponent({ deliveries: [pending, finished], onOpenDelivery })
 
     await user.click(screen.getByText('event.pending'))
     expect(onOpenDelivery).not.toHaveBeenCalled()
@@ -408,7 +406,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'pending',
     })
 
-    renderComponent({ filteredDeliveries: [pending], onOpenDelivery })
+    renderComponent({ deliveries: [pending], onOpenDelivery })
 
     screen.getByText('event.pending').closest('tr')?.focus()
     await user.keyboard('{Enter}')
@@ -425,7 +423,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
       status: 'pending',
     })
 
-    renderComponent({ filteredDeliveries: [pending], onRetryDelivery })
+    renderComponent({ deliveries: [pending], onRetryDelivery })
 
     await user.click(screen.getByLabelText('Retry pending-delivery'))
 
@@ -434,7 +432,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
   it('renders a zero response code instead of the placeholder', () => {
     renderComponent({
-      filteredDeliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
+      deliveries: [{ ...allDeliveries[0], id: 'org-delivery-zero', responseCode: 0 }],
     })
 
     expect(screen.getByText('0')).toBeInTheDocument()

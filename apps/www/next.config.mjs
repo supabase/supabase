@@ -157,6 +157,13 @@ const nextConfig = {
         ],
       },
       {
+        source: '/schemas/:path*',
+        headers: [
+          { key: 'access-control-allow-origin', value: '*' },
+          { key: 'cache-control', value: 'public, max-age=3600' },
+        ],
+      },
+      {
         source: '/favicon/:slug*',
         headers: [{ key: 'cache-control', value: 'public, max-age=86400' }],
       },
@@ -182,7 +189,8 @@ const nextConfig = {
         ],
       },
       {
-        source: '/dashboard/:path*',
+        // Public auth pages are indexable; every other dashboard path stays noindex
+        source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
         headers: [
           {
             key: 'X-Robots-Tag',
