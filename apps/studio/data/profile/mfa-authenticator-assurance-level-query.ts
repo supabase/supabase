@@ -13,6 +13,7 @@ export async function getMfaAuthenticatorAssuranceLevel() {
   const { error, data } = await auth.mfa.getAuthenticatorAssuranceLevel()
 
   if (error) throw error
+  // return { ...data, currentLevel: 'aal1' }
   return data
 }
 

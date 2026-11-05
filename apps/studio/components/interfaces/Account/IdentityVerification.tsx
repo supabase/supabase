@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { useId, useMemo, useState, type ReactNode } from 'react'
+import { PropsWithChildren, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -37,7 +37,6 @@ interface IdentityVerificationProps {
   factorToAvoidId?: string
   onCancel: () => void
   onCheckingChange?: (isChecking: boolean) => void
-  children: (isVerified: boolean) => ReactNode
 }
 
 export const IdentityVerification = ({
@@ -45,7 +44,9 @@ export const IdentityVerification = ({
   onCancel,
   onCheckingChange,
   children,
-}: IdentityVerificationProps) => {
+}: PropsWithChildren<IdentityVerificationProps>) => {
+  const verificationId = useId()
+
   const [restoreFocusTo] = useState(() =>
     typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
       ? document.activeElement
@@ -54,7 +55,7 @@ export const IdentityVerification = ({
   const [hasVerified, setHasVerified] = useState(false)
   const [error, setError] = useState<{ message: string } | null>(null)
   const [isCheckingSession, setIsCheckingSession] = useState(false)
-  const verificationId = useId()
+
   const assurance = useQuery({
     queryKey: ['identity-verification', verificationId],
     staleTime: 0,
@@ -70,6 +71,7 @@ export const IdentityVerification = ({
       }
     },
   })
+
   const isVerified =
     hasVerified ||
     (assurance.isFetchedAfterMount && !assurance.isError && assurance.data?.currentLevel === 'aal2')
@@ -113,7 +115,7 @@ export const IdentityVerification = ({
 
   return (
     <>
-      {children(isVerified)}
+      {isVerified && children}
       <Dialog
         open={!isVerified && (needsCode || !!readError)}
         onOpenChange={(open) => !open && onCancel()}
