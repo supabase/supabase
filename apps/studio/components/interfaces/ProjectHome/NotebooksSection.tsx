@@ -103,7 +103,7 @@ function NotebookCard({
         <>
           {cellCount !== undefined && (
             <Badge className="w-fit">
-              {cellCount} {cellCount === 1 ? 'CELL' : 'CELLS'}
+              {cellCount} {cellCount === 1 ? <span>CELL</span> : <span>CELLS</span>}
             </Badge>
           )}
           <ButtonTooltip

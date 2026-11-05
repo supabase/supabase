@@ -133,7 +133,7 @@ export const AssistantNotebookPreview = ({
               )}
               onClick={() => setIsShowingAllEntries(true)}
             >
-              Show {hiddenCount} more cell{hiddenCount === 1 ? '' : 's'}
+              {`Show ${hiddenCount} more ${hiddenCount === 1 ? 'cell' : 'cells'}`}
             </Button>
           )}
         </div>

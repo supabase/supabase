@@ -14,6 +14,20 @@ export function compareSemver(a: string, b: string): number {
   return 0
 }
 
+/**
+ * Reinstalls from the current lockfile so node_modules matches it again after a revert.
+ * Without this, the next `pnpm <script>` call runs its own install first and prints it to stdout.
+ */
+export function syncNodeModules(): void {
+  try {
+    execSync('pnpm install --frozen-lockfile --silent', { stdio: 'pipe', encoding: 'utf-8' })
+  } catch (error: any) {
+    console.error(
+      `WARNING: could not reinstall from the reverted lockfile: ${error.message ?? error}`
+    )
+  }
+}
+
 function escapeRegex(str: string): string {
   return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 }
@@ -159,6 +173,7 @@ export async function bumpPackage(
     console.log('\nReverting pnpm-workspace.yaml and pnpm-lock.yaml...')
     fs.writeFileSync(WORKSPACE_YAML_PATH, originalYaml, 'utf-8')
     fs.writeFileSync(LOCKFILE_PATH, originalLockfile, 'utf-8')
+    syncNodeModules()
     console.log('Reverted to original state.')
   }
 

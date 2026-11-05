@@ -11,6 +11,9 @@
 
 /apps/docs/ @supabase/docs
 
+# intentionally blank so anyone with write access can approve here
+/apps/docs/public/humans.txt
+
 /apps/kb/ @supabase/knowledgebase
 
 /apps/www/ @supabase/marketing

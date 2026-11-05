@@ -9,8 +9,7 @@ export const URL_SIGNING_KEY_KIND = {
 export const URL_SIGNING_KEYS_PAGE = {
   displayName: 'URL Signing Keys',
   description: 'Keys that sign and validate signed URLs for private objects',
-  // TODO: point to the dedicated URL signing keys guide once it's published
-  docsUrl: `${DOCS_URL}/guides/storage/serving/downloads#signing-urls`,
+  docsUrl: `${DOCS_URL}/guides/storage/security/signing-keys`,
 }
 
 export const URL_SIGNING_KEY_ALGORITHMS: Record<

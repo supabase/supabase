@@ -30,7 +30,6 @@ import {
   getWrapperCreationFormSchema,
   hasForeignSchemaSupport,
 } from './Wrappers.utils'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { RequiredExtensionsSection } from '@/components/interfaces/Integrations/Integration/RequiredExtensionsSection'
 import { useInstallRequiredExtensions } from '@/components/interfaces/Integrations/Integration/useInstallRequiredExtensions'
 import {
@@ -62,7 +61,6 @@ export const CreateWrapperSheet = ({
   onCloseWithConfirmation,
 }: CreateWrapperSheetProps) => {
   const queryClient = useQueryClient()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const { data: project } = useSelectedProjectQuery()
   const track = useTrack()
@@ -216,18 +214,16 @@ export const CreateWrapperSheet = ({
             </SheetHeader>
 
             <div className="grow overflow-y-auto">
-              {isMarketplaceEnabled && (
-                <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
-                  {needsExtensions && (
-                    <Admonition
-                      type="warning"
-                      title="Required extensions will be installed"
-                      description="Proceeding will also install the extensions required by this wrapper."
-                    />
-                  )}
-                  <RequiredExtensionsSection hideSeparator />
-                </div>
-              )}
+              <div className="px-5 py-5 flex flex-col gap-y-4 border-b">
+                {needsExtensions && (
+                  <Admonition
+                    type="warning"
+                    title="Required extensions will be installed"
+                    description="Proceeding will also install the extensions required by this wrapper."
+                  />
+                )}
+                <RequiredExtensionsSection hideSeparator />
+              </div>
 
               <FormSection
                 className="p-5!"

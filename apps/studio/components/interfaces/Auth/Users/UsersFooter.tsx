@@ -65,17 +65,12 @@ export const UsersFooter = ({
         <div className="flex items-center gap-x-2">
           {isLoadingCount || isFetchingCount || countData === undefined ? (
             <span className="flex items-center gap-2">
-              <Loader2Icon size={14} className="animate-spin" /> Loading...
+              <Loader2Icon size={14} className="animate-spin" /> <span>Loading...</span>
             </span>
           ) : (
             <>
               <span>
-                Total:{' '}
-                {countData?.is_estimate
-                  ? formatEstimatedCount(totalUsers)
-                  : totalUsers.toLocaleString()}{' '}
-                user{totalUsers !== 1 ? 's' : ''}
-                {countData?.is_estimate && ' (estimated)'}
+                {`Total: ${countData?.is_estimate ? formatEstimatedCount(totalUsers) : totalUsers.toLocaleString()} ${totalUsers !== 1 ? 'users' : 'user'}${countData?.is_estimate ? ' (estimated)' : ''}`}
               </span>
               {countData?.is_estimate && (
                 <Tooltip>

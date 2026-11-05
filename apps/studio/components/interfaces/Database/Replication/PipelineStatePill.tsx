@@ -83,7 +83,9 @@ export const PipelineStatePill = ({
         </TooltipTrigger>
         <TooltipContent side="bottom" className="max-w-64">
           {tooltipMessage}
-          {isError && isRequestPending && ` Unable to refresh status: ${error?.message}.`}
+          {isError && isRequestPending && (
+            <span>{` Unable to refresh status: ${error?.message}.`}</span>
+          )}
         </TooltipContent>
       </Tooltip>
     </span>

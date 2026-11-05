@@ -3,6 +3,8 @@ import type { GoPageInput } from 'marketing'
 import accentureContest from './events/accenture-reinvention-2026/contest'
 import aiEngineerEuropeContest from './events/ai-engineer-europe-2026/contest'
 import aiEngineerEuropeContestThankYou from './events/ai-engineer-europe-2026/contest-thank-you'
+import awsReinventSpagoDinner from './events/aws-reinvent/spago-dinner'
+import awsReinventSpagoDinnerThankYou from './events/aws-reinvent/spago-dinner-thank-you'
 import datadogContest from './events/dash-2026/contest'
 import datadogDinner from './events/dash-2026/exec-dinner'
 import datadogContestThankYou from './events/dash-2026/exec-dinner-thank-you'
@@ -71,6 +73,8 @@ const pages: GoPageInput[] = [
   datadogDinner, // remove after June 30, 2026
   aiEngineerEuropeContest,
   aiEngineerEuropeContestThankYou,
+  awsReinventSpagoDinner, // remove after December 31, 2026
+  awsReinventSpagoDinnerThankYou, // remove after December 31, 2026
   selectVipDinner, // remove after Select 2026
   selectVipDinnerThankYou, // remove after Select 2026
   selectCisoDinner, // remove after Select 2026

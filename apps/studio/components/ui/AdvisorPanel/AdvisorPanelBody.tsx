@@ -170,7 +170,7 @@ export const AdvisorPanelBody = ({
       {severityFilters.length > 0 && hiddenItemsCount > 0 && (
         <div className="px-4 py-3">
           <Button variant="text" className="w-full" onClick={onShowHiddenItems}>
-            Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
+            Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? <span>s</span> : ''}
           </Button>
         </div>
       )}

@@ -85,6 +85,51 @@ export const generateRowFields = (
   })
 }
 
+// SQL value functions that Postgres deparses as bare keywords, without parentheses
+const SQL_VALUE_FUNCTION_DEFAULT =
+  /^(current_(timestamp|date|time|user|role|catalog|schema)|localtime(stamp)?|session_user|user)\b/i
+
+/**
+ * A default that calls a function (e.g. `gen_random_uuid()`, `nextval(...)`, `now()`, `CURRENT_TIMESTAMP`)
+ * produces a fresh value per row. Quoted literals are stripped first so `'a(b'::text` isn't mistaken
+ * for a function call.
+ */
+const isGeneratedDefault = (defaultValue: string | null) => {
+  if (!defaultValue) return false
+  if (SQL_VALUE_FUNCTION_DEFAULT.test(defaultValue.trim())) return true
+  return defaultValue.replace(/'(?:[^']|'')*'/g, "''").includes('(')
+}
+
+const shouldClearFieldOnReuse = (field: RowField) =>
+  field.isPrimaryKey ||
+  field.isIdentity ||
+  isGeneratedDefault(field.defaultValue) ||
+  // Truncated values can't be copied faithfully, so don't risk saving a corrupted copy
+  isValueTruncated(field.value, field.format)
+
+/**
+ * Prepares fields to seed a new row from existing values (duplicating a row, or keeping values
+ * between inserts). Primary key, identity, function-defaulted, and truncated fields are reset to
+ * their blank state so the database generates fresh values.
+ */
+export const generateReusedRowFields = ({
+  fields,
+  blankFields,
+}: {
+  fields: RowField[]
+  blankFields: RowField[]
+}): RowField[] =>
+  fields.map((field) => {
+    if (!shouldClearFieldOnReuse(field)) return field
+    // A blank boolean holds its default expression as a string, which would be saved as `false`
+    // instead of letting the database evaluate the default, so leave the value unset
+    if (field.format === 'bool' && isGeneratedDefault(field.defaultValue)) {
+      return { ...field, value: undefined }
+    }
+    const blankField = blankFields.find((x) => x.name === field.name)
+    return { ...field, value: blankField?.value }
+  })
+
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {

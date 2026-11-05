@@ -134,11 +134,11 @@ export const DeleteProjectModal = ({
             {shouldShowExitSurvey
               ? 'All project data will be lost, and cannot be undone. '
               : `This will permanently delete the ${project?.name} project and all of its data. `}
-            Read the{' '}
+            <span>Read the</span>{' '}
             <InlineLink href={`${DOCS_URL}/guides/platform/delete-project`}>
               documentation
             </InlineLink>{' '}
-            for prerequisites, implications, and recovery information.
+            <span>for prerequisites, implications, and recovery information.</span>
           </>
         ),
       }}

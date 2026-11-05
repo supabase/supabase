@@ -93,7 +93,7 @@ export async function executeSql<T = any>(
   fetcherOverride?: (options: {
     query: string
     headers?: HeadersInit
-  }) => Promise<{ data: T } | { error: StudioError }>
+  }) => Promise<{ data: T } | { error: Error }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 
