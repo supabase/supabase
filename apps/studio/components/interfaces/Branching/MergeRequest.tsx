@@ -63,7 +63,7 @@ export const MergeTitle = () => {
         <Link href={`/project/${mainBranch?.project_ref}`} className="font-mono inline-flex gap-4">
           <code className="flex items-center font-mono gap-x-1.5 px-2 py-1 border border-border">
             <ShieldIcon strokeWidth={1.5} size={14} className="text-warning" />
-            {mainBranch?.name || 'main'}
+            {mainBranch?.name || <span>main</span>}
           </code>
         </Link>
       </div>

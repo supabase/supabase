@@ -595,7 +595,8 @@ export const EditorPanel = () => {
             )}
             <div className="text-xs text-foreground-light border-t py-2 px-5 flex items-center justify-between">
               <span className="font-mono">
-                {results.length} rows{results.length >= 100 && ` (Limited to only 100 rows)`}
+                {results.length} rows
+                {results.length >= 100 && <span>{` (Limited to only 100 rows)`}</span>}
               </span>
               <Button size="tiny" className="ml-2" onClick={() => setShowResults((prev) => !prev)}>
                 {showResults ? 'Hide Results' : 'Show Results'}

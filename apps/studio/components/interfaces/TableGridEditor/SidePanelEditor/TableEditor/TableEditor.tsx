@@ -510,8 +510,8 @@ export const TableEditor = ({
             title="You are allowing anonymous access to your table"
             description={
               <>
-                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'} will be publicly
-                writable and readable
+                {tableFields.name ? `The table ${tableFields.name}` : 'Your table'}{' '}
+                <span>will be publicly writable and readable</span>
               </>
             }
           >

@@ -190,9 +190,11 @@ export const CreateKeyDialog = ({
         <div className="flex flex-col gap-4">
           <Label htmlFor="byok" className="flex items-center gap-x-2">
             <Checkbox id="byok" checked={isBYOK} onCheckedChange={(value) => setBYOK(!!value)} />
-            {newKeyAlgorithm === 'HS256'
-              ? 'Import an existing secret'
-              : 'Import an existing private key'}
+            {newKeyAlgorithm === 'HS256' ? (
+              <span>Import an existing secret</span>
+            ) : (
+              <span>Import an existing private key</span>
+            )}
           </Label>
           {isBYOK && (
             <div className="flex flex-col gap-2">

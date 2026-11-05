@@ -192,7 +192,7 @@ export const AutoScaleFields = ({ form, disableInput = false }: AutoScaleFieldPr
             {String(formattedGrowValue).length > 4
               ? formattedGrowValue.toFixed(2)
               : formattedGrowValue}{' '}
-            GB
+            <span>GB</span>
           </span>{' '}
           to a total of <span className="text-foreground">{formattedTotalSizeAfterGrowth} GB</span>{' '}
           when the database reaches 90% of the disk size
