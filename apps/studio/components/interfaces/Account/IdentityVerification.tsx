@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useQuery } from '@tanstack/react-query'
-import { PropsWithChildren, useId, useMemo, useState } from 'react'
+import { PropsWithChildren, useEffect, useId, useMemo, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -23,7 +22,11 @@ import { z } from 'zod'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
-import { getMfaAuthenticatorAssuranceLevel } from '@/data/profile/mfa-authenticator-assurance-level-query'
+import { profileKeys } from '@/data/profile/keys'
+import {
+  getMfaAuthenticatorAssuranceLevel,
+  useAuthenticatorAssuranceLevelQuery,
+} from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery, type MFAFactor } from '@/data/profile/mfa-list-factors-query'
 
@@ -56,21 +59,14 @@ export const IdentityVerification = ({
   const [error, setError] = useState<{ message: string } | null>(null)
   const [isCheckingSession, setIsCheckingSession] = useState(false)
 
-  const assurance = useQuery({
-    queryKey: ['identity-verification', verificationId],
+  const assurance = useAuthenticatorAssuranceLevelQuery({
+    queryKey: profileKeys.identityVerification(verificationId),
     staleTime: 0,
     retry: false,
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
-    queryFn: async () => {
-      onCheckingChange?.(true)
-      try {
-        return await getMfaAuthenticatorAssuranceLevel()
-      } finally {
-        onCheckingChange?.(false)
-      }
-    },
   })
+  const isCheckingAssurance = assurance.isFetching
 
   const isVerified =
     hasVerified ||
@@ -113,9 +109,15 @@ export const IdentityVerification = ({
   }
   const readError = assurance.error ?? (needsCode ? factors.error : null)
 
+  useEffect(() => {
+    onCheckingChange?.(isCheckingAssurance)
+    return () => onCheckingChange?.(false)
+  }, [isCheckingAssurance, onCheckingChange])
+
   return (
     <>
       {isVerified && children}
+
       <Dialog
         open={!isVerified && (needsCode || !!readError)}
         onOpenChange={(open) => !open && onCancel()}
@@ -196,17 +198,12 @@ const VerificationForm = ({
 }) => {
   const preferredFactor =
     verifiedFactors.find((factor) => factor.id !== factorToAvoidId) ?? verifiedFactors[0]
-  const isCodeError =
-    !!error && /invalid.*(?:code|totp)|(?:code|totp).*invalid/i.test(error.message)
-  const serverErrors = useMemo(() => {
-    if (!error || !/invalid.*(?:code|totp)|(?:code|totp).*invalid/i.test(error.message)) return {}
-    return { code: { type: 'server', message: `${error.message.replace(/[.!?]+$/, '')}.` } }
-  }, [error])
+
   const form = useForm<VerificationValues>({
     resolver: zodResolver(VerificationSchema),
     defaultValues: { code: '', factorId: preferredFactor?.id ?? '' },
-    errors: serverErrors,
   })
+
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onVerify)} className="space-y-4">
@@ -249,11 +246,13 @@ const VerificationForm = ({
             </FormItemLayout>
           )}
         />
-        {error && !isCodeError && (
+
+        {error && (
           <p role="alert" className="text-sm text-destructive">
             {error.message}
           </p>
         )}
+
         <div className="space-y-2.5">
           <Button
             block

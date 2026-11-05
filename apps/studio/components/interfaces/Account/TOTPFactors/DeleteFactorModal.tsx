@@ -24,17 +24,20 @@ interface DeleteFactorModalProps {
   onClose: () => void
 }
 
-export const DeleteFactorModal = (props: DeleteFactorModalProps) => {
-  const { visible, factorId, onClose, onCheckingIdentity } = props
+export const DeleteFactorModal = ({
+  visible,
+  onCheckingIdentity,
+  ...confirmationProps
+}: DeleteFactorModalProps) => {
   if (!visible) return null
 
   return (
     <IdentityVerification
-      factorToAvoidId={factorId ?? undefined}
-      onCancel={onClose}
+      factorToAvoidId={confirmationProps.factorId ?? undefined}
+      onCancel={confirmationProps.onClose}
       onCheckingChange={onCheckingIdentity}
     >
-      <RemoveAuthenticatorConfirmation {...props} />
+      <RemoveAuthenticatorConfirmation {...confirmationProps} />
     </IdentityVerification>
   )
 }
@@ -48,7 +51,7 @@ const RemoveAuthenticatorConfirmation = ({
   isCheckingRecoveryCodes = false,
   onRetryRecoveryCodes,
   onClose,
-}: DeleteFactorModalProps) => {
+}: Omit<DeleteFactorModalProps, 'visible' | 'onCheckingIdentity'>) => {
   const queryClient = useQueryClient()
   const [error, setError] = useState<{ message: string } | null>(null)
   const [hasRemovedRecoveryCodes, setHasRemovedRecoveryCodes] = useState(false)
