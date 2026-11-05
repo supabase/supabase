@@ -299,6 +299,15 @@ export const lintInfoMap: LintInfo[] = [
     category: 'security',
   },
   {
+    name: 'auth_third_party_shared_ci_issuer',
+    title: 'Shared CI/CD Issuer in Third-Party Auth',
+    icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/auth/third-party`,
+    linkText: 'View settings',
+    docsLink: `${DOCS_URL}/guides/auth/third-party/custom-oidc#public-cicd-issuers`,
+    category: 'security',
+  },
+  {
     name: 'leaked_service_key',
     title: 'Leaked Service Key Detected',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
