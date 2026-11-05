@@ -149,7 +149,7 @@ The two special message types have a well defined binary format where the first 
 - **Topic**: Variable length string
 - **User Event**: Variable length string
 - **Metadata**: Variable length JSON string. Optional keys:
-  - `persist`: Stores the broadcast for [replay](#phx_join). Use `true` to keep it for 72 hours, or `{"ttl": <seconds>}` with a value from 1 to 259200. This option works only on private channels.
+  - `persist`: Stores the broadcast for [replay](#phx_join). Use `true` to keep it for 72 hours, or `{"ttl": <seconds>}` with a value from 1 to 259200. This option works only on private channels and only in binary frames. Text-frame broadcasts don't support it.
 - **User Payload**: Variable length payload data
 
 #### User Broadcast
@@ -604,7 +604,7 @@ When a channel is joined with `config.broadcast.replication_ready` set to `true`
 ]
 ```
 
-#### broadcast (text frame)
+#### broadcast (text frame) [#server-broadcast-text-frame]
 
 This is the structure of broadcast events received by all clients subscribed to a channel. The `payload` field contains the event name and data that was broadcasted.
 
@@ -651,7 +651,7 @@ Example on protocol version `2.0.0`:
 ]
 ```
 
-#### broadcast (binary frame)
+#### broadcast (binary frame) [#server-broadcast-binary-frame]
 
 See the [User Broadcast](#user-broadcast) section for the binary frame structure.
 
@@ -971,13 +971,17 @@ When `ack` is `true`, the server replies on error with `response.error` (an atom
 { "status": "error", "response": { "error": "payload_size_exceeded" } }
 ```
 
+Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers. The exception is a `send()` with `persist`: it resolves to the `error` code, such as `persistence_unauthorized`.
+
+When `ack` is `true`, a persistence failure replies with one of the following codes in `response.error`:
+
 | Error code                 | Description                                                                |
 | -------------------------- | -------------------------------------------------------------------------- |
 | `persistence_unauthorized` | Delivered but not stored: no RLS policy allows the `persistence` extension |
 | `persistence_failed`       | Delivered but not stored: writing to `realtime.messages` failed            |
 | `persistence_invalid_ttl`  | Not delivered or stored: the `persist` value or its `ttl` is not valid     |
 
-Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers.
+To allow persistence, create an `insert` policy on `realtime.messages` where `realtime.messages.extension` is `persistence`. See [Realtime Authorization](/docs/guides/realtime/authorization) for how these policies work.
 
 ### Presence errors
 
