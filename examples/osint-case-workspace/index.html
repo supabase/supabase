@@ -1,0 +1,385 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="A case workspace prototype with a relationship graph and illustrative scenario analysis."
+    />
+    <title>Fieldnote — Case workspace</title>
+    <link rel="stylesheet" href="./styles.css" />
+    <script src="./app.js" defer></script>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" aria-label="Main navigation">
+        <a class="brand" href="#" aria-label="Fieldnote home">
+          <span class="brand-mark" aria-hidden="true">
+            <svg viewBox="0 0 32 32" fill="none">
+              <path d="M7 23.5 15.9 7l9.1 16.5H7Z" stroke="currentColor" stroke-width="2.2" />
+              <circle cx="16" cy="19" r="3" fill="currentColor" />
+            </svg>
+          </span>
+          <span>fieldnote</span>
+        </a>
+
+        <div class="workspace-switcher">
+          <span class="workspace-avatar" aria-hidden="true">NW</span>
+          <span class="workspace-copy">
+            <span class="eyebrow">Workspace</span>
+            <strong>Northwind Research</strong>
+          </span>
+          <span class="chevron" aria-hidden="true">⌄</span>
+        </div>
+
+        <nav class="primary-nav">
+          <p class="nav-label">Workspace</p>
+          <button class="nav-item active" type="button" data-nav="cases">
+            <span class="nav-icon" aria-hidden="true">▦</span>
+            <span>Cases</span>
+            <span class="nav-count">8</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="evidence">
+            <span class="nav-icon" aria-hidden="true">▤</span>
+            <span>Evidence library</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="scenarios">
+            <span class="nav-icon" aria-hidden="true">⌁</span>
+            <span>Scenario planner</span>
+            <span class="new-badge">BETA</span>
+          </button>
+
+          <p class="nav-label nav-label-spaced">Manage</p>
+          <button class="nav-item" type="button" data-nav="team">
+            <span class="nav-icon" aria-hidden="true">♧</span>
+            <span>Team</span>
+          </button>
+          <button class="nav-item" type="button" data-nav="settings">
+            <span class="nav-icon" aria-hidden="true">⚙</span>
+            <span>Settings</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-bottom">
+          <div class="privacy-note">
+            <span class="privacy-icon" aria-hidden="true">◇</span>
+            <div>
+              <strong>Prototype workspace</strong>
+              <span>Sample data only. No sign-in or storage is connected.</span>
+            </div>
+          </div>
+          <button class="profile-button" type="button">
+            <span class="profile-avatar" aria-hidden="true">JD</span>
+            <span class="profile-copy">
+              <strong>Jordan Davis</strong>
+              <span>Analyst</span>
+            </span>
+            <span class="chevron" aria-hidden="true">···</span>
+          </button>
+        </div>
+      </aside>
+
+      <main class="main-content">
+        <header class="topbar">
+          <div class="breadcrumbs">
+            <span>Northwind Research</span>
+            <span class="breadcrumb-divider">/</span>
+            <strong>Cases</strong>
+          </div>
+          <div class="topbar-actions">
+            <label class="global-search">
+              <span aria-hidden="true">⌕</span>
+              <input id="case-search" type="search" placeholder="Search cases" aria-label="Search cases" />
+              <kbd>/</kbd>
+            </label>
+            <button class="icon-button notification-button" type="button" aria-label="Notifications">
+              <span aria-hidden="true">♧</span>
+              <i></i>
+            </button>
+            <span class="profile-avatar top-avatar" aria-label="Jordan Davis">JD</span>
+          </div>
+        </header>
+
+        <div class="page-content">
+          <section class="page-heading">
+            <div>
+              <p class="eyebrow">MONDAY, OCTOBER 26, 2026</p>
+              <h1>Good morning, Jordan <span aria-hidden="true">✳</span></h1>
+              <p class="page-subtitle">A clear view of your team's open research.</p>
+            </div>
+            <button class="button button-primary" id="create-case-button" type="button">
+              <span aria-hidden="true">＋</span>
+              Create case
+            </button>
+          </section>
+
+          <section class="stats-grid" aria-label="Workspace summary">
+            <article class="stat-card">
+              <div class="stat-topline">
+                <span>Cases in workspace</span>
+                <span class="stat-icon indigo" aria-hidden="true">▦</span>
+              </div>
+              <strong id="active-case-count">06</strong>
+              <span class="stat-foot">Across all statuses</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-topline">
+                <span>Evidence items</span>
+                <span class="stat-icon mint" aria-hidden="true">▤</span>
+              </div>
+              <strong>128</strong>
+              <span class="stat-foot">Across all active cases</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-topline">
+                <span>Open questions</span>
+                <span class="stat-icon amber" aria-hidden="true">?</span>
+              </div>
+              <strong>14</strong>
+              <span class="stat-foot">Need review from your team</span>
+            </article>
+            <article class="stat-card">
+              <div class="stat-topline">
+                <span>Team members</span>
+                <span class="stat-icon rose" aria-hidden="true">♧</span>
+              </div>
+              <strong>04</strong>
+              <span class="stat-foot">Across 2 research teams</span>
+            </article>
+          </section>
+
+          <section class="cases-section">
+            <div class="section-heading">
+              <div>
+                <h2>Your cases</h2>
+                <p>Review evidence, map relationships, and track open questions.</p>
+              </div>
+              <div class="case-controls">
+                <label class="filter-control">
+                  <span class="sr-only">Filter cases by status</span>
+                  <select id="status-filter">
+                    <option value="all">All cases</option>
+                    <option value="In progress">In progress</option>
+                    <option value="Needs review">Needs review</option>
+                    <option value="Complete">Complete</option>
+                  </select>
+                </label>
+                <button class="button button-secondary" id="sort-cases" type="button">
+                  <span aria-hidden="true">↕</span>
+                  Recently updated
+                </button>
+              </div>
+            </div>
+
+            <div class="case-layout">
+              <div class="case-list-panel">
+                <div class="case-list-heading">
+                  <span>Case name</span>
+                  <span>Updated</span>
+                </div>
+                <div id="case-list" class="case-list" aria-live="polite"></div>
+                <div id="no-cases" class="empty-state" hidden>
+                  <span class="empty-icon" aria-hidden="true">⌕</span>
+                  <strong>No matching cases</strong>
+                  <span>Change your search or status filter.</span>
+                </div>
+                <button class="all-cases-button" type="button" id="show-all-cases">
+                  View all cases <span aria-hidden="true">→</span>
+                </button>
+              </div>
+
+              <section class="case-detail" aria-labelledby="selected-case-title">
+                <div class="case-detail-header">
+                  <div class="case-title-block">
+                    <span class="case-kicker"><span class="status-dot"></span> <span id="case-status">IN PROGRESS</span></span>
+                    <h2 id="selected-case-title">Northstar supply chain review</h2>
+                    <p id="selected-case-description">Reviewing reported shipment delays across a fictional vendor network.</p>
+                  </div>
+                  <button class="icon-button more-button" type="button" aria-label="More case actions">···</button>
+                </div>
+                <div class="case-meta-row">
+                  <span><span class="meta-icon" aria-hidden="true">♧</span> Jordan Davis</span>
+                  <span><span class="meta-icon" aria-hidden="true">◷</span> Updated 2 hours ago</span>
+                  <span class="meta-tag">DEMO DATA</span>
+                </div>
+
+                <div class="tab-row" role="tablist" aria-label="Case sections">
+                  <button class="case-tab active" type="button" role="tab" aria-selected="true" data-tab="graph">Relationship map</button>
+                  <button class="case-tab" type="button" role="tab" aria-selected="false" data-tab="evidence">Evidence <span>12</span></button>
+                  <button class="case-tab" type="button" role="tab" aria-selected="false" data-tab="scenarios">Scenarios <span>3</span></button>
+                </div>
+
+                <div class="tab-panel graph-panel" data-panel="graph">
+                  <div class="graph-toolbar">
+                    <div class="graph-caption">
+                      <strong>Connections</strong>
+                      <span>7 entities <i></i> 8 relationships</span>
+                    </div>
+                    <div class="graph-actions">
+                      <button class="graph-tool-button" type="button" id="zoom-out" aria-label="Zoom out">−</button>
+                      <span id="zoom-level">100%</span>
+                      <button class="graph-tool-button" type="button" id="zoom-in" aria-label="Zoom in">＋</button>
+                      <span class="toolbar-divider"></span>
+                      <button class="graph-tool-button fit-button" type="button" id="fit-graph">Fit map</button>
+                    </div>
+                  </div>
+                  <div class="graph-canvas" id="graph-canvas" aria-label="Relationship map of fictional organizations, shipments, and documents">
+                    <div class="graph-content">
+                      <svg class="graph-lines" viewBox="0 0 720 380" aria-hidden="true">
+                        <path d="M174 120 316 184M174 120 128 270M316 184 483 111M316 184 492 263M128 270 316 184M483 111 594 194M492 263 594 194M316 184 483 111" />
+                        <path class="line-dashed" d="M174 120 492 263M128 270 483 111" />
+                      </svg>
+                      <button class="graph-node org-node node-northstar selected" data-entity="Northstar Components" type="button">
+                        <span class="node-symbol" aria-hidden="true">▦</span>
+                        <span class="node-label">Northstar Components</span>
+                        <span class="node-type">ORGANIZATION</span>
+                      </button>
+                      <button class="graph-node shipment-node node-shipment" data-entity="Shipment 04" type="button">
+                        <span class="node-symbol" aria-hidden="true">↗</span>
+                        <span class="node-label">Shipment 04</span>
+                        <span class="node-type">SHIPMENT</span>
+                      </button>
+                      <button class="graph-node document-node node-invoice" data-entity="Invoice 182" type="button">
+                        <span class="node-symbol" aria-hidden="true">▤</span>
+                        <span class="node-label">Invoice 182</span>
+                        <span class="node-type">DOCUMENT</span>
+                      </button>
+                      <button class="graph-node org-node node-meridian" data-entity="Meridian Freight" type="button">
+                        <span class="node-symbol" aria-hidden="true">▦</span>
+                        <span class="node-label">Meridian Freight</span>
+                        <span class="node-type">ORGANIZATION</span>
+                      </button>
+                      <button class="graph-node location-node node-port" data-entity="Port West" type="button">
+                        <span class="node-symbol" aria-hidden="true">⌖</span>
+                        <span class="node-label">Port West</span>
+                        <span class="node-type">LOCATION</span>
+                      </button>
+                      <button class="graph-node document-node node-manifest" data-entity="Manifest 07" type="button">
+                        <span class="node-symbol" aria-hidden="true">▤</span>
+                        <span class="node-label">Manifest 07</span>
+                        <span class="node-type">DOCUMENT</span>
+                      </button>
+                      <button class="graph-node event-node node-delay" data-entity="Reported delay" type="button">
+                        <span class="node-symbol" aria-hidden="true">◷</span>
+                        <span class="node-label">Reported delay</span>
+                        <span class="node-type">EVENT</span>
+                      </button>
+                    </div>
+                    <div class="graph-legend">
+                      <span><i class="legend-dot organization"></i> Organization</span>
+                      <span><i class="legend-dot document"></i> Evidence</span>
+                      <span><i class="legend-line"></i> Relationship</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="tab-panel evidence-panel" data-panel="evidence" hidden>
+                  <div class="panel-intro">
+                    <div>
+                      <h3>Evidence register</h3>
+                      <p>Items entered by the case team. Demo entries are fictional.</p>
+                    </div>
+                    <button class="button button-secondary" type="button" id="add-evidence-button">＋ Add evidence</button>
+                  </div>
+                  <div class="evidence-list">
+                    <article class="evidence-item">
+                      <span class="evidence-file-icon">PDF</span>
+                      <div><strong>Invoice 182</strong><span>Uploaded by Jordan Davis · Oct 24</span></div>
+                      <span class="confidence-label">Verified</span>
+                    </article>
+                    <article class="evidence-item">
+                      <span class="evidence-file-icon image-icon">IMG</span>
+                      <div><strong>Shipment status report</strong><span>Uploaded by Casey Lee · Oct 23</span></div>
+                      <span class="confidence-label review-label">Needs review</span>
+                    </article>
+                    <article class="evidence-item">
+                      <span class="evidence-file-icon note-icon">TXT</span>
+                      <div><strong>Port West meeting notes</strong><span>Uploaded by Jordan Davis · Oct 21</span></div>
+                      <span class="confidence-label">Verified</span>
+                    </article>
+                    <article class="evidence-item">
+                      <span class="evidence-file-icon image-icon">CSV</span>
+                      <div><strong>Manifest 07</strong><span>Uploaded by Casey Lee · Oct 20</span></div>
+                      <span class="confidence-label review-label">Needs review</span>
+                    </article>
+                  </div>
+                </div>
+
+                <div class="tab-panel scenarios-panel" data-panel="scenarios" hidden>
+                  <div class="panel-intro">
+                    <div>
+                      <h3>Scenario planner</h3>
+                      <p>Compare assumptions to guide the next research step.</p>
+                    </div>
+                    <span class="illustrative-badge">ILLUSTRATIVE ONLY</span>
+                  </div>
+                  <div class="scenario-content">
+                    <label class="scenario-select-label" for="scenario-select">Working assumption</label>
+                    <select id="scenario-select" class="scenario-select">
+                      <option value="delay">Shipment delay is temporary</option>
+                      <option value="record">Records are incomplete</option>
+                      <option value="route">Route change explains the mismatch</option>
+                    </select>
+                    <button class="button button-primary run-scenario" type="button" id="run-scenario">Compare scenario</button>
+                    <div class="scenario-result" id="scenario-result" aria-live="polite">
+                      <div class="result-icon" aria-hidden="true">✳</div>
+                      <div>
+                        <strong>Scenario output is not a forecast</strong>
+                        <p>Choose an assumption and compare what evidence would support or weaken it. The result is a planning aid, not a verified conclusion.</p>
+                      </div>
+                    </div>
+                    <div class="scenario-footer">Use independent sources and human review before making decisions.</div>
+                  </div>
+                </div>
+              </section>
+            </div>
+          </section>
+
+          <footer class="page-footer">
+            <span>Fieldnote workspace</span>
+            <span>All names and evidence in this prototype are fictional.</span>
+          </footer>
+        </div>
+      </main>
+    </div>
+
+    <dialog id="create-case-dialog" class="modal">
+      <form id="create-case-form">
+        <div class="modal-header">
+          <div>
+            <p class="eyebrow">NEW WORKSPACE CASE</p>
+            <h2>Create a case</h2>
+          </div>
+          <button class="icon-button close-modal" type="button" id="close-create-case" aria-label="Close dialog">×</button>
+        </div>
+        <label class="form-field">
+          <span>Case name</span>
+          <input id="new-case-name" name="name" required maxlength="70" placeholder="For example, vendor review" />
+        </label>
+        <label class="form-field">
+          <span>Research question</span>
+          <textarea id="new-case-description" name="description" rows="3" maxlength="180" placeholder="What are you trying to understand?"></textarea>
+        </label>
+        <div class="demo-notice">This prototype stores new cases in this browser session only.</div>
+        <div class="modal-actions">
+          <button class="button button-secondary" type="button" id="cancel-create-case">Cancel</button>
+          <button class="button button-primary" type="submit" id="save-case-button">Create case</button>
+        </div>
+      </form>
+    </dialog>
+
+    <dialog id="message-dialog" class="modal small-modal">
+      <form method="dialog">
+        <div class="modal-header">
+          <h2 id="message-title">Action unavailable</h2>
+          <button class="icon-button close-modal" type="submit" aria-label="Close dialog">×</button>
+        </div>
+        <p id="message-body"></p>
+        <div class="modal-actions">
+          <button class="button button-primary" type="submit">Close</button>
+        </div>
+      </form>
+    </dialog>
+  </body>
+</html>
