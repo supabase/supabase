@@ -73,10 +73,15 @@ export async function generateCron(openai: OpenAI, prompt: string) {
 
   try {
     const response = await openai.chat.completions.create({
-      model: 'gpt-4o-mini-2024-07-18',
+      model: 'gpt-6-luna',
       messages: initMessages,
       max_tokens: 1024,
       temperature: 0,
+      // GPT-6 models only accept Chat Completions function calling with
+      // `reasoning_effort: 'none'`. The installed `openai@4` types predate that
+      // value, so they reject it.
+      // @ts-expect-error - valid at runtime, the SDK type is outdated
+      reasoning_effort: 'none',
       stream: false,
       tool_choice: {
         type: 'function',
