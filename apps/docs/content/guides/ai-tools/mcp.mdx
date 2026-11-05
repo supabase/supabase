@@ -132,7 +132,7 @@ Elicitations require your MCP client to support the corresponding mode for the r
 
 Support for one mode does not imply support for the other. Check your client's documentation for the modes it supports. The MCP specification revision alone does not determine which flows your connection uses.
 
-Your client shows the confirmation on the device where its session runs. If you control that session from another device or a remote view, the confirmation might not appear there. The tool call waits until you answer in the client that shows it. If you answer after the confirmation expires, nothing runs, and the agent can call the tool again. If you can't answer confirmations from where you work, skip them for the affected tools with [`skip_elicitations`](#skip-form-confirmations). Skipping SQL confirmations removes this guardrail for those tools.
+Your client shows the confirmation on the device where its session runs. If you control that session from another device or a remote view, the confirmation might not appear there. The tool call waits until you answer in the client that shows it. If you answer after the confirmation expires, nothing runs, and the agent can call the tool again. On a hosted connection where you can't answer confirmations from where you work, skip them for the affected tools with [`skip_elicitations`](#skip-form-confirmations). Skipping SQL confirmations removes this guardrail for those tools.
 
 ### Cost confirmation
 
