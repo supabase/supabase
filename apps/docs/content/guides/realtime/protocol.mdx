@@ -149,7 +149,7 @@ The two special message types have a well defined binary format where the first 
 - **Topic**: Variable length string
 - **User Event**: Variable length string
 - **Metadata**: Variable length JSON string. Optional keys:
-  - `persist`: Stores the broadcast for [replay](#phx_join). Use `true` for the maximum retention or `{"ttl": <seconds>}`. Private channels only.
+  - `persist`: Stores the broadcast for [replay](#phx_join). Use `true` to keep it for 72 hours, or `{"ttl": <seconds>}` with a value from 1 to 259200. This option works only on private channels.
 - **User Payload**: Variable length payload data
 
 #### User Broadcast
@@ -405,7 +405,7 @@ user-event                // User Event
 
 The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
 
-The same broadcast with `persist` metadata. `{"persist":{"ttl":3600}}` is 24 bytes, so the Metadata Size is `0x18`:
+The following frame sends the same broadcast with `persist` metadata. The metadata `{"persist":{"ttl":3600}}` is 24 bytes, so the Metadata Size is `0x18`:
 
 ```
 0x03                      // Type
