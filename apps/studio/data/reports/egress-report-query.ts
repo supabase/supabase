@@ -27,3 +27,22 @@ export const useEgressReport = (projectRef: string) => {
     options: { useOtel },
   })
 }
+
+/**
+ * Top consumers (user-agent + IP) for one project, ranked by request count over the last 24 hours.
+ */
+export const useEgressConsumersReport = (projectRef: string) => {
+  const useOtel = useFlag('otelReports')
+  const { hasLoaded } = useContext(FeatureFlagContext)
+  const isoTimestampStart = dayjs().subtract(1, 'day').startOf('hour').toISOString()
+
+  return useLogsQuery({
+    projectRef,
+    enabled: hasLoaded,
+    initialParams: {
+      sql: getLogsSql(PRESET_CONFIG.api.queries.egressTopConsumers, [], useOtel),
+      iso_timestamp_start: isoTimestampStart,
+    },
+    options: { useOtel },
+  })
+}
