@@ -313,6 +313,33 @@ export const PRESET_CONFIG: Record<Presets, PresetConfig> = {
         order by count desc
         limit 20`,
       },
+      egressTopConsumers: {
+        queryType: 'logs',
+        safeSql: () => safeLogSql`
+        -- reports-egress-top-consumers
+        select
+          headers.user_agent as user_agent,
+          headers.cf_connecting_ip as ip,
+          count(t.id) as count
+        from edge_logs t
+          cross join unnest(metadata) as m
+          cross join unnest(m.request) as request
+          cross join unnest(request.headers) as headers
+        where request.path like '/rest/v1/%'
+        group by user_agent, ip
+        order by count desc
+        limit 20`,
+        safeSqlOtel: () => safeLogSql`
+        select
+          log_attributes['request.headers.user_agent'] as user_agent,
+          log_attributes['request.headers.cf_connecting_ip'] as ip,
+          toFloat64(count()) as count
+        from logs
+        where source = 'edge_logs' and log_attributes['request.path'] like '/rest/v1/%'
+        group by user_agent, ip
+        order by count desc
+        limit 20`,
+      },
       errorCounts: {
         queryType: 'logs',
         safeSql: (filters) => safeLogSql`

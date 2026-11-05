@@ -32,13 +32,17 @@ export const useEgressReport = (projectRefOverride?: string) => {
     areQueriesReady
   )
   const topPaths = queryHooks.egressTopPaths()
+  const topConsumers = queryHooks.egressTopConsumers()
+  const activeHooks = [topPaths, topConsumers]
 
   const handleRefresh = async () => {
     if (!areQueriesReady) return
-    topPaths.runQuery()
+    activeHooks.forEach((hook) => hook.runQuery())
   }
   const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    topPaths.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
+    activeHooks.forEach((hook) =>
+      hook.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
+    )
   }
 
   useEffect(() => {
@@ -47,6 +51,11 @@ export const useEgressReport = (projectRefOverride?: string) => {
     if (topPaths.changeQuery) {
       topPaths.changeQuery(getLogsSql(PRESET_CONFIG.api.queries.egressTopPaths, [], nextUseOtel))
     }
+    if (topConsumers.changeQuery) {
+      topConsumers.changeQuery(
+        getLogsSql(PRESET_CONFIG.api.queries.egressTopConsumers, [], nextUseOtel)
+      )
+    }
     setAppliedUseOtel(nextUseOtel)
     // Query hooks from queriesFactory are re-created each render; including them
     // would loop. Mirror the established report-hook pattern and omit them.
@@ -54,10 +63,10 @@ export const useEgressReport = (projectRefOverride?: string) => {
   }, [desiredUseOtel, hasLoadedFlags])
 
   return {
-    data: { topPaths: topPaths.logData },
-    params: { topPaths: topPaths.params },
-    error: { topPaths: topPaths.error },
-    isLoading: !areQueriesReady || topPaths.isLoading,
+    data: { topPaths: topPaths.logData, topConsumers: topConsumers.logData },
+    params: { topPaths: topPaths.params, topConsumers: topConsumers.params },
+    error: { topPaths: topPaths.error, topConsumers: topConsumers.error },
+    isLoading: !areQueriesReady || activeHooks.some((hook) => hook.isLoading),
     refresh: handleRefresh,
     mergeParams: handleSetParams,
   }
