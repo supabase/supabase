@@ -4,16 +4,21 @@ import { Button } from 'ui'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
-// Example egress query: top REST API paths by request count. The user can edit
-// it in the Logs Explorer. Mirrors what an agent would run via MCP `query_logs`.
+// Example egress query: top REST API paths by request count, with the
+// user-agent and client IP so you can see WHO is calling, not just what. The
+// user can edit it in the Logs Explorer. Mirrors what an agent would run via
+// MCP `query_logs`.
 const EGRESS_LOGS_SQL = `select
   request.path as path,
+  headers.user_agent as user_agent,
+  headers.cf_connecting_ip as ip,
   count(*) as count
 from edge_logs
   cross join unnest(metadata) as m
   cross join unnest(m.request) as request
+  cross join unnest(request.headers) as headers
 where request.path like '/rest/v1/%'
-group by path
+group by path, user_agent, ip
 order by count desc
 limit 20`
 
