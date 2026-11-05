@@ -14,9 +14,9 @@ import { useState, type MouseEvent, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { cn } from 'ui'
 import { getMcpClientIconSrc } from 'ui-patterns/McpUrlBuilder'
+import { PromptCode } from 'ui-patterns/PromptPanel'
 
 import { AiPrompt } from './AiPrompt'
-import { PromptCode } from './PromptPanel'
 import { TabPanel } from './Tabs'
 import { useTabsWithQueryParams } from './useTabsWithQueryParams'
 

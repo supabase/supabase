@@ -3509,6 +3509,7 @@ export type AiAssistantSource =
   | 'sql_debug'
   | 'lint_detail'
   | 'advisor_section'
+  | 'issues_overview'
   | 'advisor_widget'
   | 'branch_review'
   | 'log_explorer'

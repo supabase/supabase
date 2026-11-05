@@ -4,6 +4,7 @@ import Link from 'next/link'
 import { cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { IssueAgentPrompt } from './IssueAgentPrompt'
 import {
   CATEGORY_ICONS,
   CATEGORY_LABELS,
@@ -99,6 +100,7 @@ export const IssuesOverview = () => {
             </section>
           </>
         )}
+        {ref && <IssueAgentPrompt projectRef={ref} />}
       </div>
     </div>
   )

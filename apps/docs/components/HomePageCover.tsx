@@ -1,5 +1,8 @@
 'use client'
 
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { isFeatureEnabled } from 'common'
+import { type ReactNode } from 'react'
 import {
   Prompt,
   PromptContent,
@@ -7,9 +10,7 @@ import {
   PromptMarkdown,
   PromptPanel,
   PromptTitle,
-} from '~/features/ui/PromptPanel'
-import { isFeatureEnabled } from 'common'
-import { type ReactNode } from 'react'
+} from 'ui-patterns/PromptPanel'
 
 import { getCustomContent } from '../lib/custom-content/getCustomContent'
 import DocsCoverLogo from './DocsCoverLogo'
@@ -18,8 +19,16 @@ import { setupCommands, setupPrompt } from './HomePageCover.constants'
 const fullGettingStartedEnabled = isFeatureEnabled('docs:full_getting_started')
 
 function SetupPrompt({ cliCode }: { cliCode: ReactNode }) {
+  const sendTelemetryEvent = useSendTelemetryEvent()
   return (
-    <PromptPanel telemetry={{ source: 'homepage' }}>
+    <PromptPanel
+      onCopied={(tab) =>
+        sendTelemetryEvent({
+          action: 'docs_ai_prompt_copied',
+          properties: { source: 'homepage', tab },
+        })
+      }
+    >
       <Prompt value="prompt" expandable>
         <PromptTitle>Agent Prompt</PromptTitle>
         <PromptCopy>{setupPrompt}</PromptCopy>
