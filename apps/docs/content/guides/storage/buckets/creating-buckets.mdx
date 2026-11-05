@@ -60,11 +60,13 @@ values
 void main() async {
   final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  await supabase.storage.createBucket('avatars');
+  final storageResponse = await supabase
+      .storage
+      .createBucket('avatars');
 }
 ```
 
-[Reference.](/docs/reference/dart/file-buckets-createbucket)
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
 </$Show>

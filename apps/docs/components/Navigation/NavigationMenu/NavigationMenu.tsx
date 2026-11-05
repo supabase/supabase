@@ -180,12 +180,12 @@ const menus: Menu[] = [
   {
     id: MenuId.RefDartV2,
     type: 'reference',
-    path: '/reference/dart/v2',
+    path: '/reference/dart',
   },
   {
     id: MenuId.RefDartV3,
     type: 'reference',
-    path: '/reference/dart',
+    path: '/reference/dart/v3',
   },
   {
     id: MenuId.RefCSharpV0,

@@ -4,6 +4,12 @@ title: 'Introduction'
 
 This reference documents every object and method available in Supabase's Flutter library, [supabase_flutter](https://pub.dev/packages/supabase_flutter). You can use it to query your Postgres database, listen to database changes, invoke Edge Functions, sign users in and manage them, and store large files.
 
+<Admonition type="caution" title="Beta">
+
+`supabase_flutter` v3 is in beta. Its API can still change before the stable 3.0.0 release. Install it with the prerelease constraint shown under [Installing](/docs/reference/dart/v3/installing), because `flutter pub add supabase_flutter` without a version installs v2. For the stable version, see the [v2 reference](/docs/reference/dart/introduction).
+
+</Admonition>
+
 ### Use the typed table API
 
 Generate Dart types from your database schema with the Supabase CLI and query every table through `table()`. This is the recommended way to use the database from Dart and Flutter, and the rest of this reference leads with it. Compared to untyped queries:
@@ -26,7 +32,7 @@ final List<CountriesRow> countries = await supabase
     .where(Countries.name.eq('Denmark'));
 ```
 
-Only use `from()`, the untyped fallback, for a table the generated file does not cover. Run the generator again after every migration so the types follow the schema. See [Installing](/docs/reference/dart/installing) and [Generating types](/docs/guides/api/rest/generating-types) for the setup.
+Only use `from()`, the untyped fallback, for a table the generated file does not cover. Run the generator again after every migration so the types follow the schema. See [Installing](/docs/reference/dart/v3/installing) and [Generating types](/docs/guides/api/rest/generating-types) for the setup.
 
 ### Packages
 

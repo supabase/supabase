@@ -117,11 +117,9 @@ When your user signs in, call [`signInWithOAuth()`](/docs/reference/dart/auth-si
 Future<void> signInWithSlack() async {
   await supabase.auth.signInWithOAuth(
     OAuthProvider.slack,
-    // Brings the user back to the app through a deep link.
-    redirectTo: kIsWeb ? null : 'my.scheme://my-host',
-    // Opens the sign-in page in the browser app on mobile.
+    redirectTo: kIsWeb ? null : 'my.scheme://my-host', // Optionally set the redirect link to bring back the user via deeplink.
     authScreenLaunchMode:
-        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication,
+        kIsWeb ? LaunchMode.platformDefault : LaunchMode.externalApplication, // Launch the auth screen in a new webview on mobile.
   );
 }
 ```

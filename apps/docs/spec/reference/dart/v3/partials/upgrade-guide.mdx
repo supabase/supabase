@@ -4,12 +4,18 @@ title: 'Upgrade guide'
 
 `supabase_flutter` v3 adds a typed table API, turns realtime callbacks into streams and returns more precise types from auth and storage. This page covers the changes most apps run into. The [full migration guide](https://github.com/supabase/supabase-flutter/blob/main/MIGRATION.md#migrating-from-v2-to-v3) lists every breaking change.
 
+<Admonition type="caution" title="Beta">
+
+`supabase_flutter` v3 is in beta. Its API can still change before the stable 3.0.0 release.
+
+</Admonition>
+
 ## Upgrade the client library
 
 <RefSubLayout.EducationRow>
   <RefSubLayout.Details>
 
-    Depend on v3 of the client library in your `pubspec.yaml` file.
+    Depend on v3 of the client library in your `pubspec.yaml` file. While v3 is in beta, the `-0` suffix lets pub pick its prereleases.
 
     If you depend on a service package directly, note that four of them are renamed: `gotrue` is now `supabase_auth`, `storage_client` is `supabase_storage`, `realtime_client` is `supabase_realtime` and `functions_client` is `supabase_functions`. `GoTrueClient` is now `AuthClient`.
 
@@ -17,7 +23,7 @@ title: 'Upgrade guide'
   <RefSubLayout.Examples>
 
     ```yaml
-    supabase_flutter: ^3.0.0
+    supabase_flutter: ^3.0.0-0
     ```
 
   </RefSubLayout.Examples>
@@ -47,7 +53,7 @@ title: 'Upgrade guide'
 
     `anonKey` is replaced by the required `publishableKey`. A legacy anon key is still a valid value. `realtimeClientOptions` is renamed to `realtimeOptions`.
 
-    The `debug` flag is gone and the SDK never prints logs. Listen to the `supabase` loggers of [package:logging](https://pub.dev/packages/logging) instead, see [Initializing](/docs/reference/dart/initializing).
+    The `debug` flag is gone and the SDK never prints logs. Listen to the `supabase` loggers of [package:logging](https://pub.dev/packages/logging) instead, see [Initializing](/docs/reference/dart/v3/initializing).
 
   </RefSubLayout.Details>
   <RefSubLayout.Examples>

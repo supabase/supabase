@@ -237,13 +237,11 @@ const { data, error } = await supabase
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final scores = await supabase
-    .table(Leaderboard.table)
-    .select()
-    .order(Leaderboard.score.desc());
+final data = await supabase
+  .from('leaderboard')
+  .select('*')
+  .order('score', ascending: false);
 ```
-
-`Leaderboard` comes from the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types).
 
 </TabPanel>
 </$Show>

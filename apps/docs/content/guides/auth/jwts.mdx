@@ -114,8 +114,9 @@ const supabase = createClient(
 await Supabase.initialize(
   url: supabaseUrl,
   publishableKey: supabaseKey,
+  debug: false,
   accessToken: () async {
-    return '<your JWT here>';
+    return "<your JWT here>";
   },
 );
 ```

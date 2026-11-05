@@ -9,6 +9,8 @@ title: 'Installing'
 
     Install [supabase_flutter](https://pub.dev/packages/supabase_flutter) from pub.dev in a Flutter app, or [supabase](https://pub.dev/packages/supabase) in any other Dart project.
 
+    v3 is in beta, so pub only installs it when the version constraint allows prereleases. `^3.0.0-0` picks the newest v3 prerelease and moves to the stable 3.x releases once they are out.
+
   </RefSubLayout.Details>
 
   <RefSubLayout.Examples>
@@ -22,14 +24,14 @@ title: 'Installing'
       <TabPanel id="flutter" label="Flutter">
 
         ```sh Terminal
-        flutter pub add supabase_flutter
+        flutter pub add 'supabase_flutter:^3.0.0-0'
         ```
 
       </TabPanel>
       <TabPanel id="dart" label="Other Dart Project">
 
         ```sh Terminal
-        dart pub add supabase
+        dart pub add 'supabase:^3.0.0-0'
         ```
 
       </TabPanel>

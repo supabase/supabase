@@ -6,7 +6,7 @@
     {
       "id": "applying-filters",
       "name": "Applying filters",
-      "description": "Filters come after `select()`, `update()`, `delete()` or a database\nfunction call, and before [modifiers](/docs/reference/dart/using-modifiers).\n",
+      "description": "Filters come after `select()`, `update()`, `delete()` or a database\nfunction call, and before [modifiers](/docs/reference/dart/v3/using-modifiers).\n",
       "code": "```dart\nfinal data = await supabase\n    .table(Cities.table)\n    .selectOnly([Cities.name, Cities.countryId])\n    .where(Cities.name.eq('The Shire'));\n```\n"
     },
     {
@@ -34,7 +34,7 @@
     {
       "id": "filter-referenced-tables",
       "name": "Filter referenced tables",
-      "description": "[`requiring()`](/docs/reference/dart/requiring) filters the rows of an\nembedded table and drops the parent rows without a match.\n[`embedded()`](/docs/reference/dart/embedded) takes the same filter\nbut keeps every parent row.\n",
+      "description": "[`requiring()`](/docs/reference/dart/v3/requiring) filters the rows of an\nembedded table and drops the parent rows without a match.\n[`embedded()`](/docs/reference/dart/v3/embedded) takes the same filter\nbut keeps every parent row.\n",
       "code": "```dart\nfinal data = await supabase\n    .table(OrchestralSections.table)\n    .selectOnly([\n      OrchestralSections.name,\n      OrchestralSections.instruments.select([Instruments.name]),\n    ])\n    .requiring(\n      OrchestralSections.instruments,\n      (instruments) => instruments.where(Instruments.name.eq('flute')),\n    );\n```\n",
       "data": {
         "sql": "```sql\ncreate table\n  orchestral_sections (id int8 primary key, name text);\ncreate table\n  instruments (\n    id int8 primary key,\n    section_id int8 not null references orchestral_sections,\n    name text\n  );\n\ninsert into\n  orchestral_sections (id, name)\nvalues\n  (1, 'strings'),\n  (2, 'woodwinds');\ninsert into\n  instruments (id, section_id, name)\nvalues\n  (1, 2, 'flute'),\n  (2, 1, 'violin');\n```\n"

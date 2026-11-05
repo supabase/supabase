@@ -79,11 +79,13 @@ const { data, error } = await supabase.storage.createBucket('avatars')
 void main() async {
   final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  await supabase.storage.createBucket('avatars');
+  final storageResponse = await supabase
+      .storage
+      .createBucket('avatars');
 }
 ```
 
-[Reference.](/docs/reference/dart/file-buckets-createbucket)
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
 </$Show>
@@ -163,14 +165,14 @@ void main() async {
   // Create file `example.txt` and upload it in `public` bucket
   final file = File('example.txt');
   file.writeAsStringSync('File content');
-  final uploadResponse = await supabase.storage
+  final storageResponse = await supabase
+      .storage
       .from('public')
       .upload('example.txt', file);
-  print(uploadResponse.fullPath);
 }
 ```
 
-[Reference.](/docs/reference/dart/file-buckets-upload)
+[Reference.](https://pub.dev/documentation/storage_client/latest/storage_client/SupabaseStorageClient/createBucket.html)
 
 </TabPanel>
 </$Show>
@@ -228,7 +230,10 @@ const { data, error } = await supabase.storage.from('avatars').download('public/
 void main() async {
   final supabase = SupabaseClient('supabaseUrl', 'supabaseKey');
 
-  final bytes = await supabase.storage.from('public').download('example.txt');
+  final storageResponse = await supabase
+      .storage
+      .from('public')
+      .download('example.txt');
 }
 ```
 

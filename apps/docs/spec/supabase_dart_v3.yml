@@ -534,7 +534,7 @@ functions:
       - If you're using an email, you can configure whether you want the user to receive a magic link or an OTP.
       - If you're using phone, you can configure whether you want the user to receive an OTP.
       - The magic link's destination URL is determined by the [`SITE_URL`](https://supabase.com/docs/guides/auth/redirect-urls). You can modify the `SITE_URL` or add additional redirect URLs in [your project](https://supabase.com/dashboard/project/_/auth/url-configuration).
-      - Returns a `SignInWithOtpResponse`. For phone sign-ins, its `messageId` holds the ID of the message the SMS provider sent. The session arrives later, through the magic link or [`verifyOTP()`](/docs/reference/dart/auth-verifyotp).
+      - Returns a `SignInWithOtpResponse`. For phone sign-ins, its `messageId` holds the ID of the message the SMS provider sent. The session arrives later, through the magic link or [`verifyOTP()`](/docs/reference/dart/v3/auth-verifyotp).
     params:
       - name: email
         isOptional: true
@@ -767,7 +767,7 @@ functions:
       Signs the user in using third-party OAuth providers.
     notes: |
       - Supabase supports many different [third-party providers](https://supabase.com/docs/guides/auth#providers).
-      - Opens the sign-in page of the provider and returns whether it launched. The user signs in outside the app, so `true` does not mean the sign-in succeeded. Listen to [`onAuthStateChange`](/docs/reference/dart/auth-onauthstatechange) for `AuthSignedIn`. A failed code exchange arrives as an `AuthException` error on that stream.
+      - Opens the sign-in page of the provider and returns whether it launched. The user signs in outside the app, so `true` does not mean the sign-in succeeded. Listen to [`onAuthStateChange`](/docs/reference/dart/v3/auth-onauthstatechange) for `AuthSignedIn`. A failed code exchange arrives as an `AuthException` error on that stream.
       - The page is opened by the `OAuthLauncher` set in `FlutterAuthClientOptions.oauthLauncher`. The default, `UrlLauncherOAuthLauncher`, opens it with `url_launcher`, and always in an external browser for Google on Android.
       - To run the flow in a system web authentication session (`ASWebAuthenticationSession` on iOS and macOS, Custom Tabs on Android) that closes itself once the redirect arrives, add the [`supabase_flutter_web_auth`](https://pub.dev/packages/supabase_flutter_web_auth) package and pass `FlutterWebAuth2OAuthLauncher()` as the `oauthLauncher`. With it, the method returns `false` when the user closes the page without signing in.
       - The redirect URL must be in the redirect URL allow list of your project, and the app has to handle it as a deep link. Leave `redirectTo` null on web to return to the current page.
@@ -903,7 +903,7 @@ functions:
       - In case you need to use a different way to start the authentication flow with an identity provider, you can use the `providerId` property. For example:
           - Mapping specific user email addresses with an identity provider.
           - Using different hints to identify the correct identity provider, like a company-specific page, IP address or other tracking information.
-      - Like [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth), it opens the page through the configured `OAuthLauncher` and returns whether it launched. Listen to `onAuthStateChange` for the result.
+      - Like [`signInWithOAuth()`](/docs/reference/dart/v3/auth-signinwithoauth), it opens the page through the configured `OAuthLauncher` and returns whether it launched. Listen to `onAuthStateChange` for the result.
       - To get the URL as a `Uri` without opening it, use `getSSOSignInUrl()`.
     params:
       - name: providerId
@@ -1011,7 +1011,7 @@ functions:
       - Does not require an existing session. On success the session is persisted and `AuthSignedIn` is emitted on `onAuthStateChange`.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator`.
       - Rethrows whatever the authenticator throws when the platform ceremony fails or is cancelled, and throws an `AuthException` when the server rejects the credential.
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/v3/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
       - Platform setup the library cannot perform (Associated Domains on iOS and macOS, Digital Asset Links on Android, the `passkeys` web SDK on web) is documented in the `supabase_flutter` package README.
     params:
@@ -1045,7 +1045,7 @@ functions:
       - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, calls the `authenticator` you supply to create a credential on the device, and verifies it with the server.
       - Requires a signed in, non-anonymous user. If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator`.
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/v3/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
     params:
       - name: authenticator
@@ -1078,7 +1078,7 @@ functions:
     notes: |
       - An extension on `AuthClient` from `supabase_flutter`. Restore Credentials only exist on Android, so guard the call with `defaultTargetPlatform == TargetPlatform.android`.
       - Call it right after a non-anonymous user signs in, and on a later launch if the user is signed in and has no restore key yet.
-      - Android keeps one restore key per app. Store the returned `Passkey.id` and delete the previous key with [`passkey.delete()`](/docs/reference/dart/auth-passkey-delete) before creating a new one.
+      - Android keeps one restore key per app. Store the returned `Passkey.id` and delete the previous key with [`passkey.delete()`](/docs/reference/dart/v3/auth-passkey-delete) before creating a new one.
       - When the user signs out, delete the key on both sides: the passkey with `passkey.delete()` and the key on the device with `clearRestoreCredential()` of the `RestoreCredentialInterface`. Otherwise the user is signed in again on the next launch.
       - Requires passkeys to be enabled for your project and Digital Asset Links for the relying party ID, as for passkeys.
     params:
@@ -1342,7 +1342,7 @@ functions:
     description: |
       Returns the user data, if there is a signed-in user.
     notes: |
-      - `currentUser` is read from the stored session without a request. To fetch the latest user data from the server, use [`getUser()`](/docs/reference/dart/auth-getuser).
+      - `currentUser` is read from the stored session without a request. To fetch the latest user data from the server, use [`getUser()`](/docs/reference/dart/v3/auth-getuser).
     examples:
       - name: Get the signed-in user
         isSpotlight: true
@@ -1393,7 +1393,7 @@ functions:
     notes: |
       - Sends a request to the Auth server every time, so the result reflects changes made on the server, such as an email change or a ban.
       - Throws an `AuthSessionMissingException` when no JWT is passed and nobody is signed in.
-      - To read the claims of the access token without a request, use [`getClaims()`](/docs/reference/dart/auth-getclaims).
+      - To read the claims of the access token without a request, use [`getClaims()`](/docs/reference/dart/v3/auth-getclaims).
     params:
       - name: jwt
         isOptional: true
@@ -1583,7 +1583,7 @@ functions:
           ```
       - id: update-password-with-reauthentication
         name: Update the user's password with a nonce
-        description: If **Secure password change** is enabled, updating the user's password requires a nonce. Send it to the user's email or phone number with [`reauthenticate()`](/docs/reference/dart/auth-reauthenticate).
+        description: If **Secure password change** is enabled, updating the user's password requires a nonce. Send it to the user's email or phone number with [`reauthenticate()`](/docs/reference/dart/v3/auth-reauthenticate).
         isSpotlight: true
         code: |
           ```dart
@@ -1636,7 +1636,7 @@ functions:
       - The **Enable Manual Linking** option must be enabled from your [project's authentication settings](/dashboard/project/_/auth/providers).
       - The user needs to be signed in to call `linkIdentity()`. Otherwise it throws an `AuthSessionMissingException`.
       - If the candidate identity is already linked to the existing user or another user, `linkIdentity()` will fail.
-      - Like [`signInWithOAuth()`](/docs/reference/dart/auth-signinwithoauth), it opens the page through the configured `OAuthLauncher` and returns whether it launched. Listen to `onAuthStateChange` for the result.
+      - Like [`signInWithOAuth()`](/docs/reference/dart/v3/auth-signinwithoauth), it opens the page through the configured `OAuthLauncher` and returns whether it launched. Listen to `onAuthStateChange` for the result.
       - To get the URL as a `Uri` without opening it, use `getLinkIdentityUrl()`.
     params:
       - name: provider
@@ -1734,7 +1734,7 @@ functions:
         name: Link Apple identity
         isSpotlight: true
         description: |
-          Link an Apple identity to the signed-in user using native Apple Sign In. Getting the ID token works as for [`signInWithIdToken()`](/docs/reference/dart/auth-signinwithidtoken), which also shows Google and Facebook.
+          Link an Apple identity to the signed-in user using native Apple Sign In. Getting the ID token works as for [`signInWithIdToken()`](/docs/reference/dart/v3/auth-signinwithidtoken), which also shows Google and Facebook.
         code: |
           ```dart
           import 'dart:convert';
@@ -2119,9 +2119,9 @@ functions:
       The user has to enter the code from their authenticator app to verify it.
       - Enrolling a phone factor does not send an SMS. Call `mfa.challenge()` to send the code.
       - Use the returned `id` to create a challenge.
-      - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge).
-      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
-      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/auth-mfa-challengeandverify).
+      - To create a challenge, see [`mfa.challenge()`](/docs/reference/dart/v3/auth-mfa-challenge).
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/v3/auth-mfa-verify).
+      - To create and verify a challenge in a single step, see [`mfa.challengeAndVerify()`](/docs/reference/dart/v3/auth-mfa-challengeandverify).
     params:
       - name: factorType
         isOptional: true
@@ -2186,8 +2186,8 @@ functions:
     title: 'mfa.challenge()'
     notes: |
       Prepares a challenge used to verify that a user has access to a MFA factor.
-      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before creating a challenge.
-      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify).
+      - An [enrolled factor](/docs/reference/dart/v3/auth-mfa-enroll) is required before creating a challenge.
+      - To verify a challenge, see [`mfa.verify()`](/docs/reference/dart/v3/auth-mfa-verify).
     params:
       - name: factorId
         isOptional: false
@@ -2229,9 +2229,9 @@ functions:
     title: 'mfa.verify()'
     notes: |
       Verifies a code against a challenge and returns the upgraded `aal2` `Session`, which also becomes the current one. The verification code is provided by the user by entering a code seen in their authenticator app.
-      - To verify a challenge, please [create a challenge](/docs/reference/dart/auth-mfa-challenge) first.
+      - To verify a challenge, please [create a challenge](/docs/reference/dart/v3/auth-mfa-challenge) first.
       - Emits `AuthMfaChallengeVerified` on `onAuthStateChange`.
-      - A user who lost their factors can reach `aal2` with a recovery code through `mfa.recoveryCodes.verify()`, see [`mfa.recoveryCodes.generate()`](/docs/reference/dart/auth-mfa-generate).
+      - A user who lost their factors can reach `aal2` with a recovery code through `mfa.recoveryCodes.verify()`, see [`mfa.recoveryCodes.generate()`](/docs/reference/dart/v3/auth-mfa-generate).
     params:
       - name: factorId
         isOptional: false
@@ -2323,8 +2323,8 @@ functions:
     title: 'mfa.challengeAndVerify()'
     notes: |
       Helper method which creates a challenge and immediately uses the given code to verify against it thereafter. Returns the upgraded `aal2` `Session`. The verification code is provided by the user by entering a code seen in their authenticator app.
-      - An [enrolled factor](/docs/reference/dart/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
-      - Executes [`mfa.challenge()`](/docs/reference/dart/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify) in a single step.
+      - An [enrolled factor](/docs/reference/dart/v3/auth-mfa-enroll) is required before invoking `challengeAndVerify()`.
+      - Executes [`mfa.challenge()`](/docs/reference/dart/v3/auth-mfa-challenge) and [`mfa.verify()`](/docs/reference/dart/v3/auth-mfa-verify) in a single step.
     params:
       - name: factorId
         isOptional: false
@@ -2508,8 +2508,8 @@ functions:
       Generates the user's set of MFA recovery codes. Recovery codes are single-use backup codes that let a user reach `aal2` when they cannot use their other factors.
       - The codes are returned exactly once in `codes`. Show them to the user and ask them to store them safely.
       - The session must be at `aal2` and the user must already have another verified factor. Recovery codes can never be the only factor.
-      - A user has one set of recovery codes. Use [`mfa.recoveryCodes.regenerate()`](/docs/reference/dart/auth-mfa-regenerate) to replace it.
-      - Verify a code with `mfa.recoveryCodes.verify()`, see [`mfa.verify()`](/docs/reference/dart/auth-mfa-verify). Remove the codes with `mfa.recoveryCodes.unenroll()`, see [`mfa.unenroll()`](/docs/reference/dart/auth-mfa-unenroll).
+      - A user has one set of recovery codes. Use [`mfa.recoveryCodes.regenerate()`](/docs/reference/dart/v3/auth-mfa-regenerate) to replace it.
+      - Verify a code with `mfa.recoveryCodes.verify()`, see [`mfa.verify()`](/docs/reference/dart/v3/auth-mfa-verify). Remove the codes with `mfa.recoveryCodes.unenroll()`, see [`mfa.unenroll()`](/docs/reference/dart/v3/auth-mfa-unenroll).
       - Recovery codes are an experimental feature and must be enabled on the Supabase Auth server.
     params:
       - name: friendlyName
@@ -2585,7 +2585,7 @@ functions:
 
       These methods expose the server side of the WebAuthn ceremony. The client side (the Face ID, Touch ID or security key prompt) has to be performed with a platform passkey API: `navigator.credentials.create()` and `get()` on web, or a passkey plugin on iOS, Android and macOS. Options and credentials are exchanged as `Map<String, dynamic>` in the W3C WebAuthn Level 3 JSON format.
 
-      For a one-call alternative that runs the full ceremony, see [`signInWithPasskey()`](/docs/reference/dart/auth-signinwithpasskey) and [`registerPasskey()`](/docs/reference/dart/auth-registerpasskey) on `supabase_flutter`. Android restore keys, created with [`createRestoreKey()`](/docs/reference/dart/auth-createrestorekey), are stored as passkeys too.
+      For a one-call alternative that runs the full ceremony, see [`signInWithPasskey()`](/docs/reference/dart/v3/auth-signinwithpasskey) and [`registerPasskey()`](/docs/reference/dart/v3/auth-registerpasskey) on `supabase_flutter`. Android restore keys, created with [`createRestoreKey()`](/docs/reference/dart/v3/auth-createrestorekey), are stored as passkeys too.
 
       The methods that manage the passkeys of the signed-in user throw an `AuthSessionMissingException` when nobody is signed in.
 
@@ -2651,7 +2651,7 @@ functions:
     notes: |
       Starts the registration of a new passkey for the signed-in user.
       - Requires a signed in, non-anonymous user.
-      - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/auth-passkey-verifyregistration) with the result.
+      - Pass the returned `options` to the platform's passkey API to create the credential, then call [`passkey.verifyRegistration()`](/docs/reference/dart/v3/auth-passkey-verifyregistration) with the result.
       - When the server omits `user.name` and `displayName` in the registration options, they are filled with `friendlyName`, or a generic `Passkey` default, before the platform ceremony.
     params:
       - name: friendlyName
@@ -2699,7 +2699,7 @@ functions:
     notes: |
       Starts a passkey sign in.
       - Does not require an existing session.
-      - Pass the returned `options` to the platform's passkey API to obtain an assertion, then call [`passkey.verifyAuthentication()`](/docs/reference/dart/auth-passkey-verifyauthentication) with the result.
+      - Pass the returned `options` to the platform's passkey API to obtain an assertion, then call [`passkey.verifyAuthentication()`](/docs/reference/dart/v3/auth-passkey-verifyauthentication) with the result.
     params:
       - name: captchaToken
         isOptional: true
@@ -2940,7 +2940,7 @@ functions:
       - Returns a `ListUsersResponse` with the users of the page in `users`.
       - `total` is the number of users across all pages, `nextPage` is the page to request next and `null` on the last page, and `lastPage` is the number of the last page.
       - The server returns 50 users per page when `perPage` is not given.
-      - To go through every user without tracking pages yourself, use [`listAllUsers()`](/docs/reference/dart/auth-admin-listallusers).
+      - To go through every user without tracking pages yourself, use [`listAllUsers()`](/docs/reference/dart/v3/auth-admin-listallusers).
     params:
       - name: page
         isOptional: true
@@ -3029,7 +3029,7 @@ functions:
     notes: |
       Creates a new user.
       - To confirm the user's email address or phone number, set `emailConfirm` or `phoneConfirm` to `true`. Both default to `false`.
-      - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/dart/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
+      - `createUser()` will not send a confirmation email to the user. You can use [`inviteUserByEmail()`](/docs/reference/dart/v3/auth-admin-inviteuserbyemail) if you want to send them an email invite instead.
       - If you are sure that the created user's email or phone number is legitimate and verified, you can set `emailConfirm` or `phoneConfirm` to `true`.
     params:
       - name: attributes
@@ -3467,7 +3467,7 @@ functions:
     title: 'admin.sso.listProviders()'
     notes: |
       Lists the SAML 2.0 single sign-on identity providers registered on the project.
-      - The listed providers leave out `saml.metadataXml`. Use [`admin.sso.getProvider()`](/docs/reference/dart/auth-admin-getprovider) to read it.
+      - The listed providers leave out `saml.metadataXml`. Use [`admin.sso.getProvider()`](/docs/reference/dart/v3/auth-admin-getprovider) to read it.
       - When both `resourceId` and `resourceIdPrefix` are given, the server filters by `resourceId` alone.
     params:
       - name: resourceId
@@ -3492,7 +3492,7 @@ functions:
   - id: admin-sso-create-provider
     title: 'admin.sso.createProvider()'
     notes: |
-      Registers a new SAML 2.0 identity provider. Users whose email domain is in `domains` can then sign in with [`signInWithSSO()`](/docs/reference/dart/auth-signinwithsso).
+      Registers a new SAML 2.0 identity provider. Users whose email domain is in `domains` can then sign in with [`signInWithSSO()`](/docs/reference/dart/v3/auth-signinwithsso).
     params:
       - name: options
         isOptional: false
@@ -3998,9 +3998,9 @@ functions:
     title: 'Fetch data: select()'
     notes: |
       - By default, Supabase projects return a maximum of 1,000 rows. This setting can be changed in Project API Settings. It's recommended that you keep it low to limit the payload size of accidental or malicious requests. You can use `range()` queries to paginate through your data.
-      - `select()` can be combined with [Filters](/docs/reference/dart/using-filters)
-      - `select()` can be combined with [Modifiers](/docs/reference/dart/using-modifiers)
-      - On a typed table, `select()` takes no columns. Use [`selectOnly()`](/docs/reference/dart/selectonly) to read some columns or related rows.
+      - `select()` can be combined with [Filters](/docs/reference/dart/v3/using-filters)
+      - `select()` can be combined with [Modifiers](/docs/reference/dart/v3/using-modifiers)
+      - On a typed table, `select()` takes no columns. Use [`selectOnly()`](/docs/reference/dart/v3/selectonly) to read some columns or related rows.
       - `apikey` is a reserved keyword if you're using the [Supabase Platform](/docs/guides/platform) and [should be avoided as a column name](https://github.com/supabase/supabase/issues/5465).
     params:
       - name: columns
@@ -4225,7 +4225,7 @@ functions:
       - The rows come back as `PostgrestPartialRow`s. Read each value with `read()` and the same constant you selected, so it has the type of its column. Reading something that was not selected throws a `StateError`.
       - Every foreign key between two generated tables becomes a relation constant on both sides, named after the table on the other side. A to-one relation reads back as a nullable partial row, a to-many relation as a list of them.
       - Select a relation with one column, `Instruments.orchestralSections(OrchestralSections.name)`, or with several, `Instruments.orchestralSections.select([...])`.
-      - Filter, sort and limit the related rows with [`embedded()`](/docs/reference/dart/embedded), or drop the rows without a match with [`requiring()`](/docs/reference/dart/requiring).
+      - Filter, sort and limit the related rows with [`embedded()`](/docs/reference/dart/v3/embedded), or drop the rows without a match with [`requiring()`](/docs/reference/dart/v3/requiring).
       - After a write, `selectOnly()` returns some columns of the written rows.
     params:
       - name: columns
@@ -4504,7 +4504,7 @@ functions:
     notes: |
       - The relation has to be in the `selectOnly()` list.
       - The callback receives a scope typed against the related table. It offers `where()`, `order()`, `limit()`, `range()` and a nested `embedded()` or `requiring()`.
-      - A filter in the scope narrows the related rows only. A parent row without a match still comes back, with an empty list or `null`. Use [`requiring()`](/docs/reference/dart/requiring) to drop such parent rows.
+      - A filter in the scope narrows the related rows only. A parent row without a match still comes back, with an empty list or `null`. Use [`requiring()`](/docs/reference/dart/v3/requiring) to drop such parent rows.
     params:
       - name: relation
         isOptional: false
@@ -4749,7 +4749,7 @@ functions:
       - A required column is a required parameter of the generated insert type. A column the database always generates is not a parameter at all.
       - Passing `null` leaves the column out, so its database default applies. Write SQL `NULL` with the generated `set…ToNull()` methods.
       - The insert resolves to `void`. Chain `select()` to get the inserted row back.
-      - Use [`insertAll()`](/docs/reference/dart/insertall) to insert several rows in one request.
+      - Use [`insertAll()`](/docs/reference/dart/v3/insertall) to insert several rows in one request.
     params:
       - name: row
         isOptional: false
@@ -5044,7 +5044,7 @@ functions:
     notes: |
       - Primary keys must be included in the row to upsert on them.
       - The upsert resolves to `void`. Chain `select()` to get the upserted row back.
-      - Use [`upsertAll()`](/docs/reference/dart/upsertall) to upsert several rows in one request.
+      - Use [`upsertAll()`](/docs/reference/dart/v3/upsertall) to upsert several rows in one request.
     params:
       - name: row
         isOptional: false
@@ -5361,7 +5361,7 @@ functions:
       Functions are useful when the logic rarely changes, like for password resets and updates.
     notes: |
       - Type generation adds a method on `supabase.rpc` for every function, named after it in camel case. It takes the arguments as typed parameters and resolves to a typed result.
-      - A function that returns rows of a table can be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers), using the column constants of that table.
+      - A function that returns rows of a table can be combined with [Filters](/docs/reference/dart/v3/using-filters) and [Modifiers](/docs/reference/dart/v3/using-modifiers), using the column constants of that table.
       - `supabase.rpc('function_name', params: {...})` calls a function without generated types, for example one the generated file has no method for. The generated file explains in a comment why a function has none.
     params:
       - name: fn
@@ -5467,7 +5467,7 @@ functions:
           }
           ```
         description: |
-          Postgres functions that return rows of a table can also be combined with [Filters](/docs/reference/dart/using-filters) and [Modifiers](/docs/reference/dart/using-modifiers).
+          Postgres functions that return rows of a table can also be combined with [Filters](/docs/reference/dart/v3/using-filters) and [Modifiers](/docs/reference/dart/v3/using-modifiers).
         hideCodeBlock: true
       - id: call-a-postgres-function-without-generated-types
         name: Call a Postgres function without generated types
@@ -6460,7 +6460,7 @@ functions:
       - Returns an `UploadResponse` with the `id` of the stored object, its `path` within the bucket and its `fullPath`, prefixed with the bucket id.
       - `upload()` streams a `File` from disk. `uploadBinary()` uploads a `Uint8List` and works on the web. `uploadStream()` uploads a `Stream<List<int>>` as it arrives and is never retried, since a stream can only be read once.
       - Failed uploads are not retried unless retries are configured in `StorageClientOptions.retryOptions` or passed as `retryOptions`.
-      - For large files that should survive a lost connection or an app restart, use [`resumableUpload()`](/docs/reference/dart/file-buckets-resumableupload).
+      - For large files that should survive a lost connection or an app restart, use [`resumableUpload()`](/docs/reference/dart/v3/file-buckets-resumableupload).
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `insert`
@@ -7041,7 +7041,7 @@ functions:
       Creates a signed upload URL. Signed upload URLs can be used to upload files to a bucket without further authentication.
     title: 'from.createSignedUploadUrl()'
     notes: |
-      - Returns a `SignedUploadUrlResponse` with the `path`, the `signedUrl` and the `token` to pass to [`uploadToSignedUrl()`](/docs/reference/dart/file-buckets-uploadtosignedurl).
+      - Returns a `SignedUploadUrlResponse` with the `path`, the `signedUrl` and the `token` to pass to [`uploadToSignedUrl()`](/docs/reference/dart/v3/file-buckets-uploadtosignedurl).
       - The storage server decides how long the URL stays valid. It is 2 hours by default.
       - Policy permissions required:
         - `buckets` permissions: none
@@ -7080,7 +7080,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/file-buckets-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/v3/file-buckets-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Builds the URL without a request, so it returns a `String` directly.
       - Policy permissions required:
         - `buckets` permissions: none
@@ -7294,7 +7294,7 @@ functions:
     notes: |
       - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
       - An abort through `abortSignal` surfaces as a `RequestAbortedException` error on the stream, which then closes.
-      - Takes the same parameters as [`download()`](/docs/reference/dart/file-buckets-download), including `range` and `onProgress`.
+      - Takes the same parameters as [`download()`](/docs/reference/dart/v3/file-buckets-download), including `range` and `onProgress`.
       - Prefer this over `download()` for large files to keep memory usage low.
       - Policy permissions required:
         - `buckets` permissions: none
@@ -8323,7 +8323,7 @@ functions:
         name: On a referenced table
         description: |
           Order the rows of an embedded table inside
-          [`embedded()`](/docs/reference/dart/embedded). The parent rows keep
+          [`embedded()`](/docs/reference/dart/v3/embedded). The parent rows keep
           their order.
         code: |
           ```dart
@@ -8489,7 +8489,7 @@ functions:
         name: On a referenced table
         description: |
           Limit the rows of an embedded table inside
-          [`embedded()`](/docs/reference/dart/embedded).
+          [`embedded()`](/docs/reference/dart/v3/embedded).
         code: |
           ```dart
           final data = await supabase
@@ -8606,7 +8606,7 @@ functions:
         name: On a referenced table
         description: |
           Page through the rows of an embedded table inside
-          [`embedded()`](/docs/reference/dart/embedded). On `from()`, pass
+          [`embedded()`](/docs/reference/dart/v3/embedded). On `from()`, pass
           `referencedTable` instead.
         code: |
           ```dart
@@ -9064,7 +9064,7 @@ functions:
         name: Applying filters
         description: |
           Filters come after `select()`, `update()`, `delete()` or a database
-          function call, and before [modifiers](/docs/reference/dart/using-modifiers).
+          function call, and before [modifiers](/docs/reference/dart/v3/using-modifiers).
         code: |
           ```dart
           final data = await supabase
@@ -9146,9 +9146,9 @@ functions:
       - id: filter-referenced-tables
         name: Filter referenced tables
         description: |
-          [`requiring()`](/docs/reference/dart/requiring) filters the rows of an
+          [`requiring()`](/docs/reference/dart/v3/requiring) filters the rows of an
           embedded table and drops the parent rows without a match.
-          [`embedded()`](/docs/reference/dart/embedded) takes the same filter
+          [`embedded()`](/docs/reference/dart/v3/embedded) takes the same filter
           but keeps every parent row.
         code: |
           ```dart

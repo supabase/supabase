@@ -100,10 +100,9 @@ Reference: [`rpc()`](../../reference/javascript/rpc)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final greeting = await supabase.rpc.helloWorld();
+final data = await supabase
+  .rpc('hello_world');
 ```
-
-Every function gets a typed method on `rpc` in the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types).
 
 Reference: [`rpc()`](../../reference/dart/rpc)
 
@@ -265,7 +264,9 @@ const { data, error } = supabase.rpc('get_planets').eq('id', 1)
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final planets = await supabase.rpc.getPlanets().where(Planets.id.eq(1));
+final data = await supabase
+  .rpc('get_planets')
+  .eq('id', 1);
 ```
 
 </TabPanel>
@@ -351,7 +352,8 @@ const { data, error } = await supabase.rpc('add_planet', { name: 'Jakku' })
 <TabPanel id="dart" label="Dart">
 
 ```dart
-final planetId = await supabase.rpc.addPlanet(name: 'Jakku');
+final data = await supabase
+  .rpc('add_planet', params: { 'name': 'Jakku' });
 ```
 
 </TabPanel>

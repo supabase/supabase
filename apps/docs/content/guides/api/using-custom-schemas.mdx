@@ -76,18 +76,12 @@ await Supabase.initialize(
 final supabase = Supabase.instance.client;
 
 // Make a request
-final todos = await supabase.from('todos').select();
+final data = await supabase.from('todos').select();
 
 // You can also change the target schema on a per-query basis
-final otherTodos = await supabase.schema('myschema').from('todos').select();
-
-// Generated types carry their schema
-final typedTodos = await supabase.table(MyschemaTodos.table).select();
+final data = await supabase.schema('myschema').from('todos').select();
 
 ````
-
-Tables of the [generated Dart types](/docs/guides/api/rest/generating-types#generating-dart-types) carry their schema, so `supabase.table(MyschemaTodos.table)` queries `myschema` without either option.
-
 </TabPanel>
 </$Show>
 <$Show if="sdk:csharp">

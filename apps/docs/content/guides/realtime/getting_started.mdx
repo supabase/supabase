@@ -115,10 +115,9 @@ const supabase = createClient('https://<project>.supabase.co', '<sb_publishable_
 <TabPanel id="dart" label="Flutter">
 
 ```dart
-import 'package:flutter/material.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
-Future<void> main() async {
+void main() async {
   await Supabase.initialize(
     url: 'https://<project>.supabase.co',
     publishableKey: '<sb_publishable_key>',
@@ -299,13 +298,15 @@ channel.send({
 
 ```dart
 // Listen for messages
-channel.onBroadcast(event: 'message_sent').listen((message) {
-  print('New message: ${message['payload']}');
-});
-channel.subscribe();
+channel.onBroadcast(
+  event: 'message_sent',
+  callback: (payload) {
+    print('New message: ${payload['payload']}');
+  },
+).subscribe();
 
 // Send a message
-await channel.sendBroadcastMessage(
+channel.sendBroadcastMessage(
   event: 'message_sent',
   payload: {
     'text': 'Hello, world!',
@@ -447,7 +448,10 @@ import 'dart:convert';
 // Send message via REST API
 final response = await http.post(
   Uri.parse('https://<project>.supabase.co/rest/v1/rpc/broadcast'),
-  headers: {'Content-Type': 'application/json', 'apikey': '<SECRET_KEY>'},
+  headers: {
+    'Content-Type': 'application/json',
+    -H "apikey: <SECRET_KEY>"
+  },
   body: jsonEncode({
     'topic': 'room:lobby:messages',
     'event': 'message_sent',
@@ -644,7 +648,7 @@ useEffect(() => {
 ```dart
 // Flutter example
 class _MyWidgetState extends State<MyWidget> {
-  late final RealtimeChannel _channel;
+  RealtimeChannel? _channel;
 
   @override
   void initState() {
@@ -654,7 +658,7 @@ class _MyWidgetState extends State<MyWidget> {
 
   @override
   void dispose() {
-    supabase.removeChannel(_channel);
+    _channel?.unsubscribe();
     super.dispose();
   }
 }
