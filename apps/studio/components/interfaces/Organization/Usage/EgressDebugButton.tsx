@@ -36,26 +36,29 @@ export const buildEgressDebugPrompt = ({
 
   return [
     'I need help understanding and reducing egress (bandwidth) usage on my Supabase project.',
-    'Diagnose before changing anything. The cause may be in my code or in my Supabase configuration. Do not assume.',
+    'Diagnose with real data before changing anything. The cause may be in my code or in my Supabase configuration. Do not assume.',
     '',
     `Project ref: ${ref}`,
     highestEgressType ? `Largest egress source: ${highestEgressType}` : null,
     '',
-    'My data:',
-    `- Egress report: ${dashboard}/observability/egress`,
-    `- Logs Explorer: ${dashboard}/logs/explorer`,
-    `- Query Performance: ${dashboard}/database/query-performance`,
-    orgSlug
-      ? `- Usage and billing: https://supabase.com/dashboard/org/${orgSlug}/usage#egress`
-      : null,
+    'Use the Supabase MCP to inspect my project directly. If it is not connected, set it up first: https://supabase.com/docs/guides/getting-started/mcp',
     '',
-    'Please:',
-    '1. Read the egress guide: https://supabase.com/docs/guides/platform/manage-your-usage/egress.md',
-    '2. If the Supabase MCP is connected, query my logs and Query Performance to confirm what drives egress. If not, set it up: https://supabase.com/docs/guides/getting-started/mcp',
-    '3. Review my code for how I call these paths. Compare what I request against what I use.',
-    '4. Recommend fixes. Say whether each fix is in my code or my Supabase config, based on the data.',
+    'Investigate with the MCP tools:',
+    '- query_logs / Logs Explorer: rank API and Storage paths by request count, and find cache misses. Dashboard: ' +
+      `${dashboard}/logs/explorer`,
+    '- execute_sql: inspect pg_stat_statements for the most frequent queries and the average rows they return (this is what Query Performance shows). Dashboard: ' +
+      `${dashboard}/database/query-performance`,
+    '- execute_sql: inspect my schema and data for likely sources — large or unoptimized objects in storage.objects, wide tables returned without column scoping, and queries reaching the auth or storage schemas.',
     '',
+    'Then review MY application code: find where these paths and queries originate (direct Postgres connection or the PostgREST/Data API), and compare what I request against what I actually render or use.',
+    '',
+    'Recommend fixes and say whether each is in my code (scope columns, paginate, fewer calls, image transforms on fetch) or in my Supabase config (Smart CDN, Cache-Control headers, image transformations), based on the evidence.',
+    '',
+    'Read the egress guide for current best practice: https://supabase.com/docs/guides/platform/manage-your-usage/egress.md',
     'If the Supabase skill is installed, follow its guidance. Install it with: npx skills add supabase/agent-skills',
+    orgSlug
+      ? `Usage and billing for context: https://supabase.com/dashboard/org/${orgSlug}/usage#egress`
+      : null,
   ]
     .filter((line) => line !== null)
     .join('\n')

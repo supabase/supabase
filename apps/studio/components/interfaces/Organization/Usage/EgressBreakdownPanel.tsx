@@ -1,4 +1,4 @@
-import { ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
+import { ArrowRightIcon, ChevronDownIcon, ChevronRightIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -15,9 +15,22 @@ import { useEgressReport } from '@/data/reports/egress-report-query'
 
 export type EgressBreakdownKind = 'rest' | 'cache'
 
-const LOG_CONTEXT: Record<EgressBreakdownKind, { logType: string; sql: string }> = {
-  rest: { logType: 'edge', sql: EGRESS_LOG_SQL.rest },
-  cache: { logType: 'storage', sql: EGRESS_LOG_SQL.storage },
+const LOG_CONTEXT: Record<
+  EgressBreakdownKind,
+  { logType: string; sql: string; configPath: string; configLabel: string }
+> = {
+  rest: {
+    logType: 'edge',
+    sql: EGRESS_LOG_SQL.rest,
+    configPath: 'database/query-performance',
+    configLabel: 'Query Performance',
+  },
+  cache: {
+    logType: 'storage',
+    sql: EGRESS_LOG_SQL.storage,
+    configPath: 'storage/buckets',
+    configLabel: 'Storage',
+  },
 }
 
 const EgressBreakdownChart = ({
@@ -90,11 +103,18 @@ export const EgressBreakdownPanel = ({ kind }: { kind: EgressBreakdownKind }) =>
         {open && (
           <>
             <EgressBreakdownChart projectRef={projectRef} kind={kind} />
-            <EgressLogsButtons
-              projectRef={projectRef}
-              logType={LOG_CONTEXT[kind].logType}
-              sql={LOG_CONTEXT[kind].sql}
-            />
+            <div className="flex items-center gap-2 flex-wrap">
+              <EgressLogsButtons
+                projectRef={projectRef}
+                logType={LOG_CONTEXT[kind].logType}
+                sql={LOG_CONTEXT[kind].sql}
+              />
+              <Button asChild icon={<ArrowRightIcon />}>
+                <a href={`/project/${projectRef}/${LOG_CONTEXT[kind].configPath}`}>
+                  {LOG_CONTEXT[kind].configLabel}
+                </a>
+              </Button>
+            </div>
           </>
         )}
       </CollapsibleContent>
