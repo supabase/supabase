@@ -123,7 +123,11 @@ describe('RowEditor', () => {
       await user.paste(title)
 
       await user.click(screen.getByLabelText('Create more'))
-      if (keepValues) await user.click(await screen.findByLabelText('Keep values'))
+      if (keepValues) {
+        await user.click(screen.getByRole('button', { name: 'Row creation options' }))
+        await user.click(await screen.findByLabelText('Keep values for the next row'))
+        await user.keyboard('{Escape}')
+      }
 
       fireEvent.click(screen.getByRole('button', { name: 'Save' }))
       await waitFor(() => expect(saveChanges).toHaveBeenCalled())
@@ -142,14 +146,17 @@ describe('RowEditor', () => {
       expect(titleInput).toHaveValue('First post')
     })
 
-    it('only shows "Keep values" while "Create more" is on', async () => {
+    it('shows the row creation options only while Create more is on', async () => {
       const user = userEvent.setup()
       renderRowEditor()
       await getInput('title')
 
-      expect(screen.queryByLabelText('Keep values')).not.toBeInTheDocument()
+      expect(screen.queryByRole('button', { name: 'Row creation options' })).not.toBeInTheDocument()
       await user.click(screen.getByLabelText('Create more'))
-      expect(await screen.findByLabelText('Keep values')).toBeInTheDocument()
+      expect(screen.queryByText('Row creation options')).not.toBeInTheDocument()
+      await user.click(await screen.findByRole('button', { name: 'Row creation options' }))
+      expect(await screen.findByText('Row creation options')).toBeInTheDocument()
+      expect(screen.getByLabelText('Keep values for the next row')).not.toBeChecked()
     })
   })
 })

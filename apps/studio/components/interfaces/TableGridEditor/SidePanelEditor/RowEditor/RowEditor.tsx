@@ -9,6 +9,7 @@ import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
 import { HeaderTitle } from './HeaderTitle'
 import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
+import { RowCreationOptions } from './RowCreationOptions'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
@@ -218,17 +219,9 @@ export const RowEditor = ({
                 onCheckedChange={(checked) => setCreateMore(checked)}
               />
               <Label htmlFor="create-more">Create more</Label>
-            </div>
-          )}
-          {isNewRecord && editable && createMore && (
-            <div className="flex items-center space-x-2">
-              <Switch
-                id="keep-values"
-                size="small"
-                checked={keepValues}
-                onCheckedChange={(checked) => setKeepValues(checked)}
-              />
-              <Label htmlFor="keep-values">Keep values</Label>
+              {createMore && (
+                <RowCreationOptions keepValues={keepValues} onKeepValuesChange={setKeepValues} />
+              )}
             </div>
           )}
         </ActionBar>
