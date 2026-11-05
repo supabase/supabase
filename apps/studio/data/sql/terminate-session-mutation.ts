@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { StudioError } from '@/lib/errors/studio-errors'
+import { UnexpectedError, type StudioError } from '@/lib/errors/studio-errors'
 import { type UseCustomMutationOptions } from '@/types'
 
 type SessionTerminateVariables = {
@@ -31,9 +31,9 @@ export async function terminateSession({
     grant: unguarded.migrating,
   })
   if (backendStart !== undefined && result.length === 0) {
-    throw new StudioError(
-      `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`
-    )
+    throw new UnexpectedError({
+      message: `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`,
+    })
   }
   return result
 }

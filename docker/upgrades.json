@@ -44,5 +44,14 @@
       "Storage database migrations in this release are one-way: once Storage v1.81.0 has started, going back to an older Storage image makes every file upload fail. Back up your database before running 'docker compose up'.",
       "If this instance ever ran Storage v1.72.0-v1.72.3 (only possible with a manually pinned image), apply the SQL fix from https://github.com/supabase/storage/issues/1394 first, or uploads will fail after the update."
     ]
+  },
+  "0.8.4": {
+    "breaking": false,
+    "gate": null,
+    "migration_guide_url": null,
+    "requires": [
+      "The API gateway no longer adds CORS headers or answers preflight requests on /functions/v1/. Edge Functions called from a browser must set their own CORS headers (https://supabase.com/docs/guides/functions/cors), or browser calls to them will fail after the update.",
+      "The functions container now has a 2 GiB memory limit shared by all workers. If your functions need more, set FUNCTIONS_MEMORY_LIMIT in .env before running 'docker compose up'."
+    ]
   }
 }

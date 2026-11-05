@@ -36,8 +36,11 @@ export const DeleteBucketModal = ({ visible, bucket, onClose }: DeleteBucketModa
       // policy cleanup below (which can be slow) doesn't hold the loading state or block
       // the success feedback.
       toast.success(`Successfully deleted bucket ${bucket.id}`)
-      onClose()
-      if (bucketId) router.push(`/project/${projectRef}/storage/files`)
+      if (bucketId) {
+        await router.push(`/project/${projectRef}/storage/files`)
+      } else {
+        onClose()
+      }
 
       if (!project) return console.error('Project is required')
 

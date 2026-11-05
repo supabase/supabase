@@ -23,7 +23,8 @@ export async function getAPIKeysById(
   })
 
   if (error) {
-    handleError(error)
+    // Called directly by useRevealedSecret, not through a query
+    handleError(error, { reportImmediately: true })
   }
 
   return data

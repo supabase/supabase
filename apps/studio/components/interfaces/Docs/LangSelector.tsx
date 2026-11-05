@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { EyeOffIcon, KeyIcon } from 'lucide-react'
 import { useMemo } from 'react'
@@ -16,8 +17,8 @@ import {
 } from 'ui'
 
 import type { ShowApiKey } from '@/components/interfaces/Docs/Docs.types'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { apiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
+import { useGrant } from '@/lib/grants'
 
 const DEFAULT_KEY = { name: 'hide', key: 'SUPABASE_KEY' }
 
@@ -36,16 +37,12 @@ export const LangSelector = ({
 }: LangSelectorProps) => {
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  // Without access, the key picker is hidden and the commands keep their placeholder key
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant })
   )
-  const { data: apiKeys = [], isPending: isLoadingAPIKeys } = useAPIKeysQuery(
-    {
-      projectRef,
-      reveal: false,
-    },
-    { enabled: canReadAPIKeys }
-  )
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
 
   const legacyKeys = useMemo(() => apiKeys.filter(({ type }) => type === 'legacy'), [apiKeys])
   const publishableKeys = useMemo(

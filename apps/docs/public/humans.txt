@@ -49,6 +49,7 @@ Barry Roodt
 Ben Fritsch
 Beng Eu
 Benjamin Coenen
+Benoit Ammermann
 Beth Long
 Bobbie Soedirgo
 Brad Deam
@@ -189,6 +190,7 @@ Joey Freeland
 Joey Lei
 John Fitzgerald
 John Jarvis
+John Kerry
 John Murret
 Joel Martin
 Johan Bergström
@@ -363,6 +365,7 @@ Terry Sutton
 Terry Wilcox
 Thanya Nitithatsanakul
 Thomas E
+Thomas Krennwallner
 Tim Frietas
 Tim Palmer
 Timothy Lim

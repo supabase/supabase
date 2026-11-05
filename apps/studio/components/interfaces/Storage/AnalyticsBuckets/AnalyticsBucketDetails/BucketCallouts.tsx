@@ -6,6 +6,7 @@ import { SimpleConfigurationDetails } from './SimpleConfigurationDetails'
 import { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldSection } from '@/components/layouts/Scaffold'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
 import { useIcebergWrapperCreateMutation } from '@/data/storage/iceberg-wrapper-create-mutation'
@@ -114,11 +115,17 @@ export const ExtensionNeedsUpgrade = ({
 }
 
 export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
+  const {
+    mutateAsync: createIcebergWrapper,
+    isPending: isCreatingIcebergWrapper,
+    apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
+  } = useIcebergWrapperCreateMutation()
 
   const onSetupWrapper = async () => {
     if (!bucketName) return console.error('Bucket name is required')
+    if (!isApiKeyReady) return
     await createIcebergWrapper({ bucketName })
   }
 
@@ -127,9 +134,22 @@ export const WrapperMissing = ({ bucketName }: { bucketName?: string }) => {
       <ScaffoldSection isFullWidth>
         <Admonition type="warning" title="Missing integration">
           <p>The Iceberg Wrapper integration is required in order to query analytics tables.</p>
-          <Button loading={isCreatingIcebergWrapper} onClick={onSetupWrapper}>
+          <Button
+            loading={
+              isCreatingIcebergWrapper ||
+              (apiKeysGrant.status === 'granted' && apiKeyState === 'loading')
+            }
+            disabled={!isApiKeyReady}
+            onClick={onSetupWrapper}
+          >
             Install wrapper
           </Button>
+          <ApiKeysAccessNote
+            className="mt-2"
+            grant={apiKeysGrant}
+            keyState={apiKeyState}
+            fallback="They're needed to set up the Iceberg Wrapper."
+          />
         </Admonition>
       </ScaffoldSection>
       <SimpleConfigurationDetails bucketName={bucketName} />

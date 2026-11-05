@@ -112,3 +112,37 @@ export async function buildStressCatalog(
 
   await db.executeQuery(`analyze;`)
 }
+
+/**
+ * Build `count` user functions plus `count` extension-owned ones, so function
+ * search runs against a large pg_proc. The extension functions are members of
+ * pgcrypto (installed in its own schema), as in real projects where extension
+ * functions outnumber the user's own, and share names with the user ones to
+ * check they are excluded.
+ *
+ * Kept out of `buildStressCatalog` on purpose: growing pg_proc/pg_depend there
+ * shifts the plans of unrelated guarded queries. Build it on top of the stress
+ * catalog in its own database, so the rest of the query sees realistic stats.
+ */
+export async function buildStressFunctions(
+  db: TestDatabase,
+  count: number = STRESS_TABLE_COUNT
+): Promise<void> {
+  await db.executeQuery(`
+    create schema if not exists stress;
+    create schema stress_ext;
+    create extension pgcrypto schema stress_ext;
+
+    create procedure stress.build_functions(n int) language plpgsql as $$
+    begin
+      for i in 0..n-1 loop
+        execute format('create function stress.fn_%s(a int) returns int language sql as ''select a''', i);
+        execute format('create function stress_ext.fn_%s() returns int language sql as ''select 1''', i);
+        execute format('alter extension pgcrypto add function stress_ext.fn_%s()', i);
+        if i % 100 = 99 then commit; end if;
+      end loop;
+    end $$;
+  `)
+  await db.executeQuery(`call stress.build_functions(${count});`)
+  await db.executeQuery(`analyze;`)
+}

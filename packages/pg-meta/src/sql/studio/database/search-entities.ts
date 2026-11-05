@@ -43,9 +43,18 @@ export type SearchEntitiesPolicy = {
   table_id: number
 }
 
+export type SearchEntitiesFunction = {
+  id: number
+  schema: string
+  name: string
+  type: 'function' | 'procedure'
+  args: string
+}
+
 export type SearchEntitiesResult = {
   tables: SearchEntitiesTable[]
   policies: SearchEntitiesPolicy[]
+  functions: SearchEntitiesFunction[]
 }
 
 /**
@@ -72,7 +81,7 @@ export type SearchEntitiesResult = {
  */
 export const getSearchEntitiesSql = ({
   query,
-  limit = 6,
+  limit = 5,
 }: {
   query: string
   limit?: number
@@ -81,17 +90,21 @@ export const getSearchEntitiesSql = ({
   const schemaPart = dotIndex === -1 ? undefined : query.slice(0, dotIndex)
   const namePart = dotIndex === -1 ? query : query.slice(dotIndex + 1)
 
-  const nameFilter = safeSql`c.relname ilike ${literal(`%${escapeIlikeLiteral(query)}%`)}`
-  const matchFilter =
-    schemaPart === undefined
-      ? nameFilter
-      : safeSql`(
+  // `schema.name` queries match a schema prefix and a name substring, and the
+  // full query is still matched against the name alone since names may contain dots
+  const getMatchFilter = (nameColumn: SafeSqlFragment, schemaColumn: SafeSqlFragment) => {
+    const nameFilter = safeSql`${nameColumn} ilike ${literal(`%${escapeIlikeLiteral(query)}%`)}`
+    if (schemaPart === undefined) return nameFilter
+    return safeSql`(
           ${nameFilter}
           or (
-            nc.nspname ilike ${literal(`${escapeIlikeLiteral(schemaPart)}%`)}
-            and c.relname ilike ${literal(`%${escapeIlikeLiteral(namePart)}%`)}
+            ${schemaColumn} ilike ${literal(`${escapeIlikeLiteral(schemaPart)}%`)}
+            and ${nameColumn} ilike ${literal(`%${escapeIlikeLiteral(namePart)}%`)}
           )
         )`
+  }
+  const tableMatchFilter = getMatchFilter(safeSql`c.relname`, safeSql`nc.nspname`)
+  const functionMatchFilter = getMatchFilter(safeSql`p.proname`, safeSql`n.nspname`)
 
   // Rank on the name part, so `public.colors` ranks the `colors` table first
   const prefixPattern = literal(`${escapeIlikeLiteral(namePart)}%`)
@@ -124,7 +137,7 @@ export const getSearchEntitiesSql = ({
         and not c.relispartition
         and nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
-        and ${matchFilter}
+        and ${tableMatchFilter}
       order by rank, length(c.relname), c.relname
       limit ${literal(CANDIDATE_LIMIT)}
     ),
@@ -218,6 +231,45 @@ export const getSearchEntitiesSql = ({
       ) deduped
       order by ${POLICY_ORDER}
       limit ${literal(limit)}
+    ),
+    -- Built once from the pg_depend reference index (cost follows extension members,
+    -- not matches). A per-row not exists probe is slower and can seq scan pg_depend.
+    extension_functions as materialized (
+      select d.objid
+      from pg_depend d
+      where d.refclassid = 'pg_extension'::regclass
+        and d.refobjid in (select e.oid from pg_extension e)
+        and d.classid = 'pg_proc'::regclass
+        and d.deptype = 'e'
+    ),
+    function_candidates as materialized (
+      select
+        p.oid,
+        p.proname,
+        p.proowner,
+        p.prokind,
+        n.nspname,
+        case
+          when lower(p.proname) = ${exactName} then 0
+          when p.proname ilike ${prefixPattern} then 1
+          else 2
+        end as rank
+      from pg_proc p
+      join pg_namespace n on n.oid = p.pronamespace
+      where p.prokind in ('f', 'p')
+        and n.nspname not in (${excludedSchemas})
+        and not pg_is_other_temp_schema(n.oid)
+        and p.oid not in (select objid from extension_functions)
+        and ${functionMatchFilter}
+      order by rank, length(p.proname), p.proname
+      limit ${literal(CANDIDATE_LIMIT)}
+    ),
+    matched_functions as (
+      select fc.oid, fc.nspname, fc.proname, fc.prokind, fc.rank
+      from function_candidates fc
+      where pg_has_role(fc.proowner, 'USAGE') or has_function_privilege(fc.oid, 'EXECUTE')
+      order by fc.rank, length(fc.proname), fc.proname, fc.nspname
+      limit ${literal(limit)}
     )
     select
       coalesce(
@@ -258,6 +310,22 @@ export const getSearchEntitiesSql = ({
           from matched_policies p
         ),
         '[]'::jsonb
-      ) as policies
+      ) as policies,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', f.oid::int8,
+              'schema', f.nspname,
+              'name', f.proname,
+              'type', case f.prokind when 'p' then 'procedure' else 'function' end,
+              'args', coalesce(pg_get_function_identity_arguments(f.oid), '')
+            )
+            order by f.rank, length(f.proname), f.proname, f.nspname
+          )
+          from matched_functions f
+        ),
+        '[]'::jsonb
+      ) as functions
   `
 }

@@ -1,7 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
 import type { WebhookEndpoint } from './PlatformWebhooks.types'
-import { filterWebhookEndpoints, getWebhookEndpointDisplayName } from './PlatformWebhooks.utils'
+import {
+  filterWebhookEndpoints,
+  getWebhookEndpointDisplayName,
+  isTestDelivery,
+} from './PlatformWebhooks.utils'
 
 const createEndpoint = (overrides: Partial<WebhookEndpoint> = {}): WebhookEndpoint => ({
   id: 'endpoint-1',
@@ -47,5 +51,12 @@ describe('PlatformWebhooks.utils', () => {
     expect(filterWebhookEndpoints(endpoints, 'billing')).toEqual([endpoints[0]])
     expect(filterWebhookEndpoints(endpoints, 'slack')).toEqual([endpoints[1]])
     expect(filterWebhookEndpoints(endpoints, 'alerts')).toEqual([endpoints[1]])
+  })
+
+  it('treats a delivery as a test only when is_test is exactly true', () => {
+    expect(isTestDelivery({ eventPayload: { is_test: true } })).toBe(true)
+    expect(isTestDelivery({ eventPayload: { is_test: false } })).toBe(false)
+    expect(isTestDelivery({ eventPayload: { is_test: 'true' } })).toBe(false)
+    expect(isTestDelivery({ eventPayload: {} })).toBe(false)
   })
 })

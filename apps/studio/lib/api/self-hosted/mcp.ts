@@ -23,7 +23,7 @@ import { retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -111,7 +111,7 @@ export function getDevelopmentOperations({
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })
 
-      if (response instanceof StudioError) {
+      if (isStudioError(response)) {
         throw response
       }
 
