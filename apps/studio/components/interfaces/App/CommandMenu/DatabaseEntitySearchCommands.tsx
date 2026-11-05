@@ -5,6 +5,7 @@ import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   useCommandMenuOpen,
   useQuery as useCommandMenuQuery,
+  useCurrentPage,
   useRegisterCommands,
 } from 'ui-patterns/CommandMenu'
 
@@ -38,11 +39,14 @@ const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
 export function useDatabaseEntitySearchCommands() {
   const { data: project } = useSelectedProjectQuery()
   const isOpen = useCommandMenuOpen()
+
+  const isRootLevel = useCurrentPage() === undefined
   const commandMenuQuery = useCommandMenuQuery()
   const debouncedQuery = useDebounce(commandMenuQuery, ENTITY_SEARCH_DEBOUNCE_MS)
   const currentSearch = getEntitySearchQuery(commandMenuQuery)
   const debouncedSearch = getEntitySearchQuery(debouncedQuery)
 
+  // [Joshen] Skip entity search while in a sub page as its not relevant
   const { data, isPlaceholderData } = useQuery(
     entitySearchQueryOptions(
       {
@@ -50,7 +54,7 @@ export function useDatabaseEntitySearchCommands() {
         connectionString: project?.connectionString,
         query: debouncedSearch.query,
       },
-      { enabled: isOpen && debouncedSearch.isSearchable }
+      { enabled: isOpen && isRootLevel && debouncedSearch.isSearchable }
     )
   )
 
@@ -58,7 +62,7 @@ export function useDatabaseEntitySearchCommands() {
   // from the previous search). Until they catch up, only keep the ones that
   // still match what's typed, so e.g. `blog_posts` results never show for
   // `colors`, while refining `blog` to `blog_p` narrows smoothly.
-  const canShowResults = isOpen && currentSearch.isSearchable
+  const canShowResults = isOpen && isRootLevel && currentSearch.isSearchable
   const isStale = isPlaceholderData || debouncedSearch.query !== currentSearch.query
   const getVisibleResults = <T,>(results: T[], matches: (result: T, query: string) => boolean) => {
     if (!canShowResults) return []

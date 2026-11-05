@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { HttpResponse } from 'msw'
 import { useEffect, useState } from 'react'
@@ -7,12 +7,17 @@ import {
   CommandMenuInput,
   CommandMenuList,
   CommandWrapper,
+  PageType,
   useCommands,
+  usePageComponent,
+  useRegisterPage,
   useSetCommandMenuOpen,
+  useSetPage,
   useSetQuery,
 } from 'ui-patterns/CommandMenu'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
+import { ENTITY_SEARCH_DEBOUNCE_MS } from './DatabaseEntitySearch.utils'
 import { useDatabaseEntitySearchCommands } from './DatabaseEntitySearchCommands'
 import type { EntitySearchData } from '@/data/database/entity-search-query'
 import { customRender } from '@/tests/lib/custom-render'
@@ -266,5 +271,99 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
       'Policies',
       'Functions',
     ])
+  })
+})
+
+const SUB_PAGE = 'Search Database Tables'
+
+/** Mirrors a context search sub-page: its own input, which also sets the shared query. */
+const SubPageSearch = () => {
+  const setQuery = useSetQuery()
+  const [value, setValue] = useState('')
+
+  return (
+    <input
+      aria-label="Search database tables"
+      value={value}
+      onChange={(event) => {
+        setValue(event.target.value)
+        setQuery(event.target.value)
+      }}
+    />
+  )
+}
+
+/** Mirrors PageSwitch, where a sub-page replaces the command list entirely. */
+const SubPageHarness = () => {
+  useDatabaseEntitySearchCommands()
+  const setQuery = useSetQuery()
+  const setOpen = useSetCommandMenuOpen()
+  const setPage = useSetPage()
+  const PageComponent = usePageComponent()
+  const [value, setValue] = useState('')
+
+  useRegisterPage(SUB_PAGE, { type: PageType.Component, component: SubPageSearch })
+  useEffect(() => setOpen(true), [setOpen])
+
+  if (PageComponent) return <PageComponent />
+
+  return (
+    <>
+      <input
+        aria-label="Search"
+        value={value}
+        onChange={(event) => {
+          setValue(event.target.value)
+          setQuery(event.target.value)
+        }}
+      />
+      <button tabIndex={0} onClick={() => setPage(SUB_PAGE)}>
+        Open sub-page
+      </button>
+    </>
+  )
+}
+
+describe('useDatabaseEntitySearchCommands on a sub-page', () => {
+  let searchRequests: string[]
+
+  beforeEach(() => {
+    vi.useFakeTimers({ shouldAdvanceTime: true })
+    searchRequests = []
+    mockUseSelectedProjectQuery.mockReturnValue({
+      data: { id: 1, ref: 'default', name: 'default', connectionString: 'encrypted' },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        searchRequests.push(query)
+        return HttpResponse.json([SEARCH_RESULT])
+      },
+    })
+  })
+
+  afterEach(() => {
+    vi.useRealTimers()
+  })
+
+  it('does not search the database while a sub-page shows its own results', async () => {
+    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime })
+    const settleDebounce = () =>
+      act(() => vi.advanceTimersByTimeAsync(ENTITY_SEARCH_DEBOUNCE_MS * 2))
+    customRender(<SubPageHarness />)
+
+    // Searching from the top level does reach the database
+    await user.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+    await settleDebounce()
+    expect(searchRequests).toHaveLength(1)
+
+    // The sub-page runs its own search, so typing there must not send a second request
+    await user.click(screen.getByRole('button', { name: 'Open sub-page' }))
+    await user.type(screen.getByRole('textbox', { name: 'Search database tables' }), 'colors')
+    await settleDebounce()
+
+    expect(searchRequests).toHaveLength(1)
   })
 })
