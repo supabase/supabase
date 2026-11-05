@@ -7,7 +7,6 @@ vi.mock('common', () => ({ IS_PLATFORM: true }))
 
 vi.mock('./mcp-tools', () => ({ getMcpTools: vi.fn() }))
 vi.mock('./registry.server', () => ({ buildLocalTools: vi.fn(() => ({ local_tool: {} })) }))
-vi.mock('./fallback-tools', () => ({ getFallbackTools: vi.fn(() => ({ fallback_tool: {} })) }))
 // Identity filter so assertions can check the raw merged tool set
 vi.mock('../tool-filter', async (importOriginal) => ({
   ...(await importOriginal<typeof import('../tool-filter')>()),
@@ -88,7 +87,7 @@ describe('ai/tools getTools', () => {
     expect(tools).not.toHaveProperty('list_tables')
   })
 
-  it('uses fallback tools and skips MCP when self-hosted', async () => {
+  it('skips MCP when self-hosted', async () => {
     const { buildLocalTools } = await import('./registry.server')
     const common = await import('common')
     vi.spyOn(common, 'IS_PLATFORM', 'get').mockReturnValue(false)
@@ -101,7 +100,6 @@ describe('ai/tools getTools', () => {
       expect.objectContaining({ environment: 'self-hosted' })
     )
     expect(tools).toHaveProperty('local_tool')
-    expect(tools).toHaveProperty('fallback_tool')
     expect(tools).not.toHaveProperty('list_tables')
   })
 

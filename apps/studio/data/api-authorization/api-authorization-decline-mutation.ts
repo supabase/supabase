@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ApiAuthorizationDeclineVariables = {
   id: string
@@ -31,13 +32,13 @@ export const useApiAuthorizationDeclineMutation = (
   options: Omit<
     UseCustomMutationOptions<
       ApiAuthorizationDeclineData,
-      ResponseError,
+      StudioError,
       ApiAuthorizationDeclineVariables
     >,
     'mutationFn'
   > = {}
 ) => {
-  return useMutation<ApiAuthorizationDeclineData, ResponseError, ApiAuthorizationDeclineVariables>({
+  return useMutation<ApiAuthorizationDeclineData, StudioError, ApiAuthorizationDeclineVariables>({
     mutationFn: (vars) => declineApiAuthorization(vars),
     ...options,
   })

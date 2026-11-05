@@ -60,37 +60,137 @@ export const UNGROUPED_POLICY_SYMBOL = createWrappedSymbol('ungrouped-policy', '
 
 const formatStoragePolicies = (buckets: Bucket[], policies: Policy[]) => {
   const availableBuckets = buckets.map((bucket) => bucket.name)
-  const formattedPolicies = policies.map((policy) => {
-    const { definition: policyDefinition, check: policyCheck } = policy
 
-    const bucketName =
-      policyDefinition !== null
-        ? extractBucketNameFromDefinition(policyDefinition)
-        : extractBucketNameFromDefinition(policyCheck)
+  return policies.flatMap((policy) => {
+    const bucketNames = getPolicyBucketNames(policy)
 
-    if (bucketName) {
-      const isBucketLoaded = availableBuckets.includes(bucketName)
+    if (bucketNames.length === 0) return [{ ...policy, bucket: UNGROUPED_POLICY_SYMBOL }]
 
-      return {
-        ...policy,
-        bucket: isBucketLoaded ? bucketName : UNKNOWN_BUCKET_SYMBOL,
-      }
-    }
-
-    return { ...policy, bucket: UNGROUPED_POLICY_SYMBOL }
+    // A policy can cover several buckets, so it is listed once under each of them
+    const groups = bucketNames.map((bucketName) =>
+      availableBuckets.includes(bucketName) ? bucketName : UNKNOWN_BUCKET_SYMBOL
+    )
+    return Array.from(new Set(groups)).map((bucket) => ({ ...policy, bucket }))
   })
-
-  return formattedPolicies
 }
 
-export const extractBucketNameFromDefinition = (definition: string | null) => {
-  if (!definition) return null
+const STRING_LITERAL = "'((?:[^']|'')*)'"
+const EQUALS_BUCKET_REGEX = new RegExp(`\\bbucket_id\\s*=\\s*${STRING_LITERAL}`, 'g')
+const ANY_ARRAY_BUCKET_REGEX = /\bbucket_id\s*=\s*ANY\s*\(\s*(?:ARRAY\s*)?\[([^\]]*)\]/g
+const NEGATED_BUCKET_REGEX = /\bbucket_id\s*(?:<>|!=)|\bNOT\s*\(*\s*bucket_id\b/i
 
-  const definitionSegments = definition?.split(' AND ') ?? []
-  const [bucketDefinition] = definitionSegments.filter((segment: string) =>
-    segment.includes('bucket_id')
-  )
-  return bucketDefinition ? bucketDefinition.split("'")[1] : null
+/** Splits on a boolean keyword at parenthesis depth 0, ignoring string literals */
+const splitTopLevel = (expression: string, keyword: 'AND' | 'OR') => {
+  const parts: string[] = []
+  const keywordRegex = new RegExp(`^\\s+${keyword}\\s+`, 'i')
+  let depth = 0
+  let isInString = false
+  let start = 0
+
+  for (let i = 0; i < expression.length; i++) {
+    const char = expression[i]
+    if (char === "'") isInString = !isInString
+    if (isInString) continue
+    if (char === '(') depth++
+    if (char === ')') depth--
+    if (depth !== 0) continue
+
+    const match = expression.slice(i).match(keywordRegex)
+    if (match) {
+      parts.push(expression.slice(start, i))
+      i += match[0].length - 1
+      start = i + 1
+    }
+  }
+  parts.push(expression.slice(start))
+  return parts
+}
+
+const stripOuterParentheses = (expression: string): string => {
+  const trimmed = expression.trim()
+  if (!trimmed.startsWith('(') || !trimmed.endsWith(')')) return trimmed
+
+  // Only strip when the opening paren closes at the very end, i.e. `(a) OR (b)` is untouched
+  let depth = 0
+  let isInString = false
+  for (let i = 0; i < trimmed.length; i++) {
+    if (trimmed[i] === "'") isInString = !isInString
+    if (isInString) continue
+    if (trimmed[i] === '(') depth++
+    if (trimmed[i] === ')') depth--
+    if (depth === 0 && i < trimmed.length - 1) return trimmed
+  }
+  return stripOuterParentheses(trimmed.slice(1, -1))
+}
+
+const unquoteLiteral = (literal: string) => literal.replace(/''/g, "'")
+
+const extractBucketNamesFromExpression = (expression: string): string[] => {
+  const unwrapped = stripOuterParentheses(expression)
+
+  // Every OR branch has to be limited to specific buckets, otherwise the policy also
+  // applies to rows in other buckets (e.g. `bucket_id = 'a' OR auth.uid() IS NOT NULL`)
+  const orBranches = splitTopLevel(unwrapped, 'OR')
+  if (orBranches.length > 1) {
+    const branchNames = orBranches.map(extractBucketNamesFromExpression)
+    if (branchNames.some((names) => names.length === 0)) return []
+    return Array.from(new Set(branchNames.flat()))
+  }
+
+  // AND only narrows access, so one bucket-limited condition is enough
+  const andBranches = splitTopLevel(unwrapped, 'AND')
+  if (andBranches.length > 1) {
+    return Array.from(new Set(andBranches.flatMap(extractBucketNamesFromExpression)))
+  }
+
+  const names = new Set<string>()
+  for (const [, name] of unwrapped.matchAll(EQUALS_BUCKET_REGEX)) names.add(unquoteLiteral(name))
+  for (const [, list] of unwrapped.matchAll(ANY_ARRAY_BUCKET_REGEX)) {
+    for (const [, name] of list.matchAll(new RegExp(STRING_LITERAL, 'g'))) {
+      names.add(unquoteLiteral(name))
+    }
+  }
+  return Array.from(names)
+}
+
+/**
+ * Returns the names of the buckets a policy expression restricts access to, e.g. from
+ * `bucket_id = 'a'` or `bucket_id = ANY (ARRAY['a', 'b'])` (how Postgres renders `IN`).
+ *
+ * Returns no buckets when the expression negates the bucket condition (`<>`, `NOT IN`,
+ * `NOT (...)`) or has an `OR` branch that isn't limited to specific buckets, because such a
+ * policy also applies to other buckets. Callers treat that as "not tied to a specific
+ * bucket", which is the safe default for both listing and deleting.
+ */
+export const extractBucketNamesFromDefinition = (definition: string | null): string[] => {
+  if (!definition || NEGATED_BUCKET_REGEX.test(definition)) return []
+  return extractBucketNamesFromExpression(definition)
+}
+
+/**
+ * All buckets a storage.objects policy targets. Shared by the policies page, per-bucket
+ * counts, and bucket deletion so they agree on which buckets a policy belongs to.
+ *
+ * Every expression the policy's command evaluates (`using` for SELECT/DELETE, `with check`
+ * for INSERT, both for UPDATE/ALL) has to be limited to specific buckets. Otherwise the
+ * policy also reaches other buckets (negated, an unrestricted `OR` branch, or no `bucket_id`
+ * condition at all), so it isn't tied to any bucket, even when another expression names one.
+ */
+export const getPolicyBucketNames = (
+  policy: Pick<Policy, 'definition' | 'check' | 'command'>
+): string[] => {
+  const { definition, check, command } = policy
+
+  const getAppliedExpressions = () => {
+    if (command === 'INSERT') return [check]
+    if (command === 'SELECT' || command === 'DELETE') return [definition]
+    // For UPDATE/ALL a missing `with check` falls back to the `using` expression
+    return [definition, check ?? definition]
+  }
+
+  const expressionNames = getAppliedExpressions().map(extractBucketNamesFromDefinition)
+  if (expressionNames.some((names) => names.length === 0)) return []
+  return Array.from(new Set(expressionNames.flat()))
 }
 
 const groupPoliciesByBucket = (policies: (Policy & { bucket: string | Symbol })[]) => {

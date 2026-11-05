@@ -10,8 +10,8 @@ import type { RemoteToolContract } from './types'
  * The system prompt is cached, so the output must depend only on the tool set, never on
  * per-request data. A change to the tool set already invalidates the cached system prompt
  * because providers cache tools first; see `generateAssistantResponse`. Tools the opt-in level
- * blocks are still listed, since they stay registered as stubs. Tools without a contract, such
- * as the self-hosted fallback tools, aren't listed.
+ * blocks are still listed, since they stay registered as stubs. Names without a contract, such as
+ * the legacy ones, aren't listed.
  */
 export function buildToolsPrompt(toolNames: Iterable<string>): string {
   // A local contract wins over a remote one of the same name, as in `getTools`.

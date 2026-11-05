@@ -53,8 +53,8 @@ and is gitignored. See `AGENTS.md` for how it works and what's intentionally lef
 
 ## Workflows
 
-`.github/workflows/kb-troubleshooting-sync.yml` runs on every push to `master`: it fetches troubleshooting
-content, creates a GitHub Discussion for any guide that doesn't have one yet
+`.github/workflows/kb-troubleshooting-sync.yml` runs on pushes to `master` that touch `apps/kb/**` (or can be
+triggered manually): it fetches troubleshooting content, creates a GitHub Discussion for any guide that doesn't have one yet
 (`sync:troubleshooting-entries`), and pushes title/content updates to discussions whose guide has since
 changed (`sync:troubleshooting-updates`). This is separate from kb's own build — it has real side effects
 (creating/updating Discussions, writing DB rows), so it never runs as part of `pnpm build`/`prebuild`.

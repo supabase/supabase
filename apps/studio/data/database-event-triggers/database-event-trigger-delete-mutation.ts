@@ -6,7 +6,8 @@ import type { DatabaseEventTrigger } from './database-event-triggers-query'
 import { databaseEventTriggerKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseEventTriggerDeleteVariables = {
   trigger: DatabaseEventTrigger
@@ -41,7 +42,7 @@ export const useDatabaseEventTriggerDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseEventTriggerDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerDeleteVariables
   >,
   'mutationFn'
@@ -50,7 +51,7 @@ export const useDatabaseEventTriggerDeleteMutation = ({
 
   return useMutation<
     DatabaseEventTriggerDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerDeleteVariables
   >({
     mutationFn: (vars) => deleteDatabaseEventTrigger(vars),

@@ -101,7 +101,7 @@ const destinationData: DestinationResponse = {
 }
 let pipelineTableIds = [101, 999]
 const getPipelineData = (): PipelineResponse => ({
-  id: 8,
+  id: '8',
   tenant_id: 'tenant',
   source_id: 42,
   source_name: 'postgres',
@@ -222,12 +222,12 @@ vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
   FormItemLayout: ({ children }: PropsWithChildren) => <div>{children}</div>,
 }))
 
-vi.mock('../../useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => true,
-  useIsETLClickHousePrivateAlpha: () => false,
-  useIsETLDucklakePrivateAlpha: () => true,
-  useIsETLIcebergPrivateAlpha: () => false,
-  useIsETLSnowflakePrivateAlpha: () => false,
+vi.mock('../../useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => true,
+  useIsPipelinesClickHouseEnabled: () => false,
+  useIsPipelinesDuckLakeEnabled: () => true,
+  useIsPipelinesIcebergEnabled: () => false,
+  useIsPipelinesSnowflakeEnabled: () => false,
 }))
 
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
@@ -245,16 +245,6 @@ vi.mock('./useDestinationForm', () => ({
     pipelineValidationFailures: [],
     resetValidation: mocks.resetValidation,
   }),
-}))
-
-vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
-  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
-  FGA_PERMISSIONS: {
-    PROJECT: {
-      API_GATEWAY_KEYS_READ: 'api_gateway_keys_read',
-      API_GATEWAY_KEYS_SECRET_READ: 'api_gateway_keys_secret_read',
-    },
-  },
 }))
 
 vi.mock('./DestinationNameInput', () => ({ DestinationNameInput: () => null }))

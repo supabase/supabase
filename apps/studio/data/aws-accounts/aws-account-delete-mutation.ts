@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { awsAccountKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type AWSAccountDeleteVariables = {
   projectRef: string
@@ -50,11 +50,11 @@ export const useAWSAccountDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AWSAccountDeleteData, ResponseError, AWSAccountDeleteVariables>,
+  UseMutationOptions<AWSAccountDeleteData, StudioError, AWSAccountDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<AWSAccountDeleteData, ResponseError, AWSAccountDeleteVariables>({
+  return useMutation<AWSAccountDeleteData, StudioError, AWSAccountDeleteVariables>({
     mutationFn: (vars) => deleteAWSAccount(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables

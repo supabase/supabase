@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { authKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserCreateVariables = {
   projectRef: string
@@ -34,12 +35,12 @@ export const useUserCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserCreateData, ResponseError, UserCreateVariables>,
+  UseCustomMutationOptions<UserCreateData, StudioError, UserCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UserCreateData, ResponseError, UserCreateVariables>({
+  return useMutation<UserCreateData, StudioError, UserCreateVariables>({
     mutationFn: (vars) => createUser(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

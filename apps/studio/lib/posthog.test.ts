@@ -51,6 +51,9 @@ describe('trackFeatureFlag', () => {
 
     await trackFeatureFlag({ foo: 'bar' } as any)
 
-    expect(fetchers.handleError).toHaveBeenCalledWith({ message: 'fail' })
+    expect(fetchers.handleError).toHaveBeenCalledWith(
+      { message: 'fail' },
+      { reportImmediately: true }
+    )
   })
 })

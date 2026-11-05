@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelineVersionParams = { projectRef?: string; pipelineId?: string }
 type ReplicationPipelineVersionResponse = Awaited<
@@ -36,9 +37,9 @@ export const useReplicationPipelineVersionQuery = <TData = ReplicationPipelineVe
     refetchOnMount = false,
     refetchOnWindowFocus = false,
     ...options
-  }: UseCustomQueryOptions<ReplicationPipelineVersionData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationPipelineVersionData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineVersionData, ResponseError, TData>({
+  useQuery<ReplicationPipelineVersionData, StudioError, TData>({
     queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
     queryFn: ({ signal }) => fetchReplicationPipelineVersion({ projectRef, pipelineId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof pipelineId !== 'undefined',

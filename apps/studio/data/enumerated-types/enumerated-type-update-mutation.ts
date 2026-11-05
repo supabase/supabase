@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { enumeratedTypesKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
@@ -41,12 +42,12 @@ export const useEnumeratedTypeUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EnumeratedTypeUpdateData, ResponseError, EnumeratedTypeUpdateVariables>,
+  UseCustomMutationOptions<EnumeratedTypeUpdateData, StudioError, EnumeratedTypeUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EnumeratedTypeUpdateData, ResponseError, EnumeratedTypeUpdateVariables>({
+  return useMutation<EnumeratedTypeUpdateData, StudioError, EnumeratedTypeUpdateVariables>({
     mutationFn: (vars) => updateEnumeratedType(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

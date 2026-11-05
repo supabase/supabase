@@ -1,7 +1,5 @@
 import { Badge, Card, CardContent, cn, Separator } from 'ui'
 
-import { useIsMarketplaceEnabled } from '../../App/FeaturePreview/FeaturePreviewContext'
-import { MissingExtensionAlert } from './MissingExtensionAlert'
 import { useIntegrationDetail } from '@/components/interfaces/Integrations/Landing/useIntegrationDetail'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -21,7 +19,6 @@ export const RequiredExtensionsSection = ({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
   })
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const requiredExtensions = integration?.requiredExtensions ?? []
 
@@ -57,13 +54,9 @@ export const RequiredExtensionsSection = ({
 
                     <div className="shrink-0">
                       {extension ? (
-                        isInstalled ? (
-                          <Badge variant="secondary">Installed</Badge>
-                        ) : isMarketplaceEnabled ? (
-                          <Badge variant="warning">Required</Badge>
-                        ) : (
-                          <MissingExtensionAlert extension={extension} />
-                        )
+                        <Badge variant={isInstalled ? 'secondary' : 'warning'}>
+                          {isInstalled ? 'Installed' : 'Required'}
+                        </Badge>
                       ) : (
                         <span className="text-foreground-muted">Unavailable</span>
                       )}

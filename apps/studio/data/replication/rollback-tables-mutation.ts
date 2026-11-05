@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type RollbackTablesTarget = components['schemas']['RollbackTablesBody']['target']
 
@@ -43,12 +44,12 @@ export const useRollbackTablesMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<RollbackTablesData, ResponseError, RollbackTablesParams>,
+  UseCustomMutationOptions<RollbackTablesData, StudioError, RollbackTablesParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RollbackTablesData, ResponseError, RollbackTablesParams>({
+  return useMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

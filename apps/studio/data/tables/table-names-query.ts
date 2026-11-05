@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { tableKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type TableName = {
   id: number
@@ -53,7 +54,7 @@ export async function getTableNames(
 }
 
 export type TableNamesData = Awaited<ReturnType<typeof getTableNames>>
-export type TableNamesError = ResponseError
+export type TableNamesError = StudioError
 
 export const useTableNamesQuery = <TData = TableNamesData>(
   { projectRef, connectionString }: TableNamesVariables,

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
 import { handleError, put, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ToggleLegacyAPIKeysVariables = {
   projectRef?: string
@@ -32,12 +33,12 @@ export const useToggleLegacyAPIKeysMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
+  UseCustomMutationOptions<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>({
+  return useMutation<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>({
     mutationFn: (vars) => toggleLegacyAPIKeys(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

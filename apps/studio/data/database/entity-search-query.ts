@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type EntitySearchVariables = {
   projectRef?: string
@@ -21,6 +21,25 @@ const entitySearchResultSchema = z.object({
       name: z.string(),
       rls_enabled: z.boolean(),
       policy_count: z.number(),
+    })
+  ),
+  policies: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      command: z.enum(['ALL', 'SELECT', 'INSERT', 'UPDATE', 'DELETE']),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+    })
+  ),
+  functions: z.array(
+    z.object({
+      id: z.number(),
+      schema: z.string(),
+      name: z.string(),
+      type: z.enum(['function', 'procedure']),
+      args: z.string(),
     })
   ),
 })
@@ -47,7 +66,9 @@ async function getEntitySearch(
 
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
-export type EntitySearchError = ResponseError
+export type EntitySearchPolicy = EntitySearchData['policies'][number]
+export type EntitySearchFunction = EntitySearchData['functions'][number]
+export type EntitySearchError = StudioError
 
 export const entitySearchQueryOptions = (
   { projectRef, connectionString, query }: EntitySearchVariables,

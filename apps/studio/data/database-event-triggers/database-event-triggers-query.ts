@@ -5,7 +5,8 @@ import { databaseEventTriggerKeys } from './keys'
 import type { EventTrigger } from '@/components/interfaces/Database/Triggers/EventTriggersList/EventTriggerList.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseEventTriggersVariables = {
   projectRef?: string
@@ -69,7 +70,7 @@ export async function getDatabaseEventTriggers(
 }
 
 export type DatabaseEventTriggersData = Awaited<ReturnType<typeof getDatabaseEventTriggers>>
-export type DatabaseEventTriggersError = ResponseError
+export type DatabaseEventTriggersError = StudioError
 
 function markSavedEventTriggerSafe(trigger: DatabaseEventTrigger): EventTrigger {
   return trigger as EventTrigger

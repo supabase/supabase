@@ -96,6 +96,10 @@ Syncing guides to GitHub Discussions (`scripts/federated-content/sync-troublesho
 `sync-troubleshooting-updates.ts`) is a separate concern from fetching — see `.github/workflows/kb-troubleshooting-sync.yml`
 and the README's "Workflows" section. Those scripts are CI-only, never part of `prebuild`.
 
-`backfill-legacy-slugs.ts` is a one-time migration aid for the 278 pre-existing (apps/docs-origin) rows in
-`troubleshooting_entries` — safe to delete (with its JSON file, package.json script, and workflow step) once
-those rows are all backfilled; see the comment at the top of that file.
+How the sync scripts match guides to rows: a guide's key is its file name without the extension, hash suffix
+included (`foo-bar-94a76b.mdx` -> `foo-bar-94a76b`), and that exact string is `troubleshooting_entries.slug`.
+Never strip or normalize it — a slug that doesn't match makes a guide look new and creates a duplicate
+discussion. Both scripts take `--dry-run` (read-only: prints the discussions/rows they would create or update).
+`sync-troubleshooting-entries.ts` also refuses to create a discussion whose title already exists in the category
+without a slugged row, and the workflow's `concurrency` group keeps runs from overlapping. Shared logic
+(including the checksum definition) lives in `troubleshooting-sync-shared.ts`.

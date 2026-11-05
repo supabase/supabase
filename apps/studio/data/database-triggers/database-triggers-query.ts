@@ -5,7 +5,8 @@ import { executeSql } from '../sql/execute-sql-mutation'
 import { databaseTriggerKeys } from './keys'
 import type { PostgresTrigger } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 function markSavedTriggerSafe(trigger: DatabaseTriggersData[number]): PostgresTrigger {
   return trigger as PostgresTrigger
@@ -39,7 +40,7 @@ export async function getDatabaseTriggers(
 }
 
 export type DatabaseTriggersData = Awaited<ReturnType<typeof getDatabaseTriggers>>
-export type DatabaseTriggersError = ResponseError
+export type DatabaseTriggersError = StudioError
 
 export const useDatabaseHooksQuery = <TData = DatabaseTriggersData>(
   { projectRef, connectionString, schemas }: DatabaseTriggersVariables,

@@ -5,7 +5,7 @@ import { privilegeKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { INTERNAL_SCHEMAS } from '@/hooks/useProtectedSchemas'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const IGNORED_SCHEMAS = [...INTERNAL_SCHEMAS, 'pg_catalog']
 
@@ -44,7 +44,7 @@ export async function getExposedTableCounts(
 }
 
 export type ExposedTableCountsData = Awaited<ReturnType<typeof getExposedTableCounts>>
-export type ExposedTableCountsError = ResponseError
+export type ExposedTableCountsError = StudioError
 
 export const exposedTableCountsQueryOptions = (
   { projectRef, connectionString, selectedSchemas }: ExposedTableCountsVariables,

@@ -3,7 +3,8 @@ import type { components } from 'api-types'
 
 import { platformAppKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppsVariables = {
   slug?: string
@@ -25,7 +26,7 @@ export async function getPlatformApps({ slug }: PlatformAppsVariables, signal?: 
 }
 
 export type PlatformAppsData = Awaited<ReturnType<typeof getPlatformApps>>
-export type PlatformAppsError = ResponseError
+export type PlatformAppsError = StudioError
 
 export const usePlatformAppsQuery = <TData = PlatformAppsData>(
   { slug }: PlatformAppsVariables,

@@ -5,7 +5,8 @@ import { sslEnforcementKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
 import { handleError, put, unguarded } from '@/data/fetchers'
 import { jitDbAccessKeys } from '@/data/jit-db-access/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SSLEnforcementUpdateVariables = {
   projectRef: string
@@ -41,12 +42,12 @@ export const useSSLEnforcementUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>,
+  UseCustomMutationOptions<SSLEnforcementUpdateData, StudioError, SSLEnforcementUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<SSLEnforcementUpdateData, ResponseError, SSLEnforcementUpdateVariables>({
+  return useMutation<SSLEnforcementUpdateData, StudioError, SSLEnforcementUpdateVariables>({
     mutationFn: (vars) => updateSSLEnforcement(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

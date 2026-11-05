@@ -9,9 +9,9 @@ import { EventGallery } from './EventGallery'
 import { EventsContainer } from './EventsContainer'
 
 function EventBannerSection() {
-  const { isLoading, featuredEvent, selectedCategories } = useEvents()
+  const { featuredEvent, selectedCategories } = useEvents()
   if (selectedCategories.includes('on-demand')) return null
-  if (!isLoading && !featuredEvent) return null
+  if (!featuredEvent) return null
 
   return (
     <EventsContainer className="border-x border-b flex-1 py-8 bg-surface-200">
@@ -34,16 +34,19 @@ function EventsPageSubtitle() {
 
 export function EventClientRenderer({
   notionEvents,
+  lumaEvents,
   mdxEvents,
   onDemandMdxEvents,
 }: {
   notionEvents: SupabaseEvent[]
+  lumaEvents: SupabaseEvent[]
   mdxEvents: SupabaseEvent[]
   onDemandMdxEvents: SupabaseEvent[]
 }) {
   return (
     <EventsProvider
       notionEvents={notionEvents}
+      lumaEvents={lumaEvents}
       mdxEvents={mdxEvents}
       onDemandMdxEvents={onDemandMdxEvents}
     >
