@@ -233,7 +233,6 @@ Laurence Isla
 Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
-Leonardo Santiago
 Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
@@ -289,6 +288,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Patrick Knight
 Paul Bauer
 Paul Copplestone
 Paul Ibeabuchi
@@ -316,6 +316,7 @@ Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
+Roman Gruhn
 Roman Hernandez
 Ronan Lehane
 Rory Hunter
