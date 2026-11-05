@@ -293,6 +293,11 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] A `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
 - [x] A `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
 
+### Project shell — `/issues/*`
+
+- [x] `routes/project/$ref/issues.tsx` — IssuesLayout (issue list in the product sidebar).
+- [x] A `routes/project/$ref/issues/index.tsx` ← `pages/project/[ref]/issues/index.tsx`
+
 ### Project shell — `/advisors/*`
 
 - [x] A `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
