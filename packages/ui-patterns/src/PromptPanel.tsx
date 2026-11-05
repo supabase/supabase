@@ -1,14 +1,12 @@
 'use client'
 
-import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { type DocsAiPromptSource } from 'common/telemetry-constants'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Children, isValidElement, useId, useState, type ReactElement, type ReactNode } from 'react'
 import ReactMarkdown from 'react-markdown'
 // shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
 import { cn, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
-import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
+import { CodeCopyButton } from './CodeBlock/CodeBlockControls'
 
 type PromptTitleProps = {
   children: ReactNode
@@ -32,21 +30,11 @@ type PromptProps = {
   expandable?: boolean
 }
 
-type PromptPanelTelemetry = {
-  /** Surface the panel renders on. */
-  source: DocsAiPromptSource
-  /** Prompt identifier, when the panel wraps a known prompt. */
-  promptId?: string
-}
-
 type PromptPanelProps = {
   children: ReactNode
   className?: string
-  /**
-   * Sends `docs_ai_prompt_copied` on a successful copy. Omit to leave the panel
-   * untracked.
-   */
-  telemetry?: PromptPanelTelemetry
+  /** Runs after a successful copy with the active prompt's value. */
+  onCopied?: (value: string) => void
 }
 
 type CollectedPrompt = {
@@ -138,7 +126,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
     >
       <div
         className={cn(
-          'overflow-hidden [interpolate-size:allow-keywords] transition-[max-height] duration-300 ease-out motion-reduce:transition-none',
+          'overflow-hidden [interpolate-size:allow-keywords] transition-all duration-300 ease-out motion-reduce:transition-none',
           isExpanded ? 'max-h-max' : 'max-h-28'
         )}
       >
@@ -162,7 +150,7 @@ function ExpandableContent({ children }: { children: ReactNode }) {
           className={cn(
             'inline-flex cursor-pointer items-center gap-1.5 rounded-full pl-2.5 pr-3 py-1 text-xs text-foreground',
             'bg-surface-200/90 shadow-sm ring-1 ring-foreground/10 backdrop-blur-sm',
-            'transition-[opacity,translate,background-color,scale] duration-200 ease-out',
+            'transition duration-200 ease-out',
             'hover:bg-surface-300 active:scale-[0.96] focus-ring',
             !isExpanded &&
               'translate-y-1 opacity-0 focus-visible:translate-y-0 focus-visible:opacity-100 pointer-coarse:translate-y-0 pointer-coarse:opacity-100 motion-reduce:translate-y-0',
@@ -172,7 +160,11 @@ function ExpandableContent({ children }: { children: ReactNode }) {
           )}
           aria-expanded={isExpanded}
         >
-          <ChevronDown aria-hidden="true" size={14} className={cn(isExpanded && 'rotate-180')} />
+          <ChevronDownIcon
+            aria-hidden="true"
+            size={14}
+            className={cn(isExpanded && 'rotate-180')}
+          />
           {isExpanded ? 'Show less' : 'Show more'}
         </button>
       </div>
@@ -254,13 +246,12 @@ const tabTriggerClassName = cn(
  * </PromptPanel>
  * ```
  */
-function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
+function PromptPanel({ children, className, onCopied }: PromptPanelProps) {
   const fallbackId = useId()
   const titleId = useId()
   const prompts = collectPrompts(children)
   const [activeTab, setActiveTab] = useState(prompts[0]?.value ?? fallbackId)
   const [shimmerEnabled, setShimmerEnabled] = useState(true)
-  const sendTelemetryEvent = useSendTelemetryEvent()
 
   if (prompts.length === 0) return null
 
@@ -269,21 +260,9 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
   const dismissShimmer = () => setShimmerEnabled(false)
 
   const copyTarget = typeof activePrompt.title === 'string' ? activePrompt.title : 'content'
-  const handleCopied = telemetry
-    ? () => {
-        sendTelemetryEvent({
-          action: 'docs_ai_prompt_copied',
-          properties: {
-            source: telemetry.source,
-            tab: activePrompt.value,
-            promptId: telemetry.promptId,
-          },
-        })
-      }
-    : undefined
 
   const header = (
-    <div className="flex h-11 items-center justify-between pl-4 pr-2 shadow-[inset_0_-1px_0_0_var(--border-default)] [--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]">
+    <div className="flex h-11 items-center justify-between pl-4 pr-2 border-b [--btn-active:color-mix(in_srgb,var(--foreground)_4%,var(--background-200))]">
       {hasTabs ? (
         <TabsList className="h-full gap-5 border-0 [--tab-track:transparent]">
           {prompts.map((prompt) => (
@@ -309,7 +288,7 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
         content={activePrompt.copyValue}
         label={`Copy ${copyTarget}`}
         copiedLabel={`${copyTarget} copied`}
-        onCopied={handleCopied}
+        onCopied={() => onCopied?.(activePrompt.value)}
       />
     </div>
   )
@@ -322,7 +301,7 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
         onFocusCapture={dismissShimmer}
         onPointerEnter={dismissShimmer}
         className={cn(
-          'w-full overflow-hidden rounded-lg border border-default shadow-codeblock',
+          'w-full overflow-hidden rounded-lg border border-default shadow-(--shadow-codeblock)',
           className
         )}
       >
@@ -341,7 +320,7 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
       onFocusCapture={dismissShimmer}
       onPointerEnter={dismissShimmer}
       className={cn(
-        'w-full overflow-hidden rounded-lg border border-default shadow-codeblock',
+        'w-full overflow-hidden rounded-lg border border-default shadow-(--shadow-codeblock)',
         className
       )}
     >
@@ -372,11 +351,4 @@ function PromptPanel({ children, className, telemetry }: PromptPanelProps) {
 }
 
 export { Prompt, PromptCode, PromptContent, PromptCopy, PromptMarkdown, PromptPanel, PromptTitle }
-export type {
-  PromptContentProps,
-  PromptCopyProps,
-  PromptPanelProps,
-  PromptPanelTelemetry,
-  PromptProps,
-  PromptTitleProps,
-}
+export type { PromptContentProps, PromptCopyProps, PromptPanelProps, PromptProps, PromptTitleProps }

@@ -637,6 +637,10 @@
       "import": "./src/PromoToast/styles.css",
       "types": "./src/PromoToast/styles.css"
     },
+    "./PromptPanel": {
+      "import": "./src/PromptPanel.tsx",
+      "types": "./src/PromptPanel.tsx"
+    },
     "./Row/Row.utils": {
       "import": "./src/Row/Row.utils.ts",
       "types": "./src/Row/Row.utils.ts"
