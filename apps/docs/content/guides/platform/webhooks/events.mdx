@@ -292,7 +292,7 @@ Fires when a leaked credential belonging to the project is detected.
 }
 ```
 
-`secret.kind` is one of `secret_api_key` or `scoped_personal_access_token`. `leak_source` is `null` when the location of the leak is unknown. `member` identifies the user the token belongs to and is `null` when it cannot be determined. The full token value is never included, only its prefix.
+`secret.kind` is one of `secret_api_key` or `scoped_personal_access_token`. `leak_source` is `null` when the location of the leak is unknown. `member` identifies the user the token belongs to and is `null` when it cannot be determined. The payload includes the token prefix but never the full token value.
 
 ## Organization events
 
@@ -483,4 +483,4 @@ Fires when a leaked credential belonging to the organization is detected.
 }
 ```
 
-`secret.kind` is `scoped_personal_access_token`. `member` identifies the user the token belongs to and is `null` when it cannot be determined. The full token value is never included, only its prefix.
+`secret.kind` is `scoped_personal_access_token`. `member` identifies the user the token belongs to and is `null` when it cannot be determined. The payload includes the token prefix but never the full token value.
