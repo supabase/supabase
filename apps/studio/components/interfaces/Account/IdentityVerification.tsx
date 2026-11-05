@@ -5,7 +5,6 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   CardContent,
-  CardFooter,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -37,12 +36,14 @@ type VerificationValues = z.infer<typeof VerificationSchema>
 interface IdentityVerificationProps {
   factorToAvoidId?: string
   onCancel: () => void
+  onCheckingChange?: (isChecking: boolean) => void
   children: (isVerified: boolean) => ReactNode
 }
 
 export const IdentityVerification = ({
   factorToAvoidId,
   onCancel,
+  onCheckingChange,
   children,
 }: IdentityVerificationProps) => {
   const [restoreFocusTo] = useState(() =>
@@ -61,8 +62,12 @@ export const IdentityVerification = ({
     refetchOnMount: 'always',
     refetchOnWindowFocus: false,
     queryFn: async () => {
-      const data = await getMfaAuthenticatorAssuranceLevel()
-      return data
+      onCheckingChange?.(true)
+      try {
+        return await getMfaAuthenticatorAssuranceLevel()
+      } finally {
+        onCheckingChange?.(false)
+      }
     },
   })
   const isVerified =
@@ -109,7 +114,10 @@ export const IdentityVerification = ({
   return (
     <>
       {children(isVerified)}
-      <Dialog open={!isVerified} onOpenChange={(open) => !open && onCancel()}>
+      <Dialog
+        open={!isVerified && (needsCode || !!readError)}
+        onOpenChange={(open) => !open && onCancel()}
+      >
         <DialogContent
           hideClose
           aria-describedby={undefined}
@@ -158,14 +166,15 @@ export const IdentityVerification = ({
                   loading={loading}
                   error={error}
                   onVerify={handleVerify}
+                  onCancel={onCancel}
                 />
               )}
+              {(readError || factors.isPending) && (
+                <Button block onClick={onCancel} variant="text">
+                  Cancel
+                </Button>
+              )}
             </CardContent>
-            <CardFooter className="justify-center border-t px-6 py-5">
-              <Button onClick={onCancel} variant="text" size="tiny">
-                Cancel
-              </Button>
-            </CardFooter>
           </InterstitialLayout>
         </DialogContent>
       </Dialog>
@@ -179,11 +188,13 @@ const VerificationForm = ({
   loading,
   error,
   onVerify,
+  onCancel,
 }: {
   verifiedFactors: MFAFactor[]
   factorToAvoidId?: string
   loading: boolean
   error: { message: string } | null
+  onCancel: () => void
   onVerify: (values: VerificationValues) => void
 }) => {
   const preferredFactor =
@@ -250,6 +261,9 @@ const VerificationForm = ({
             disabled={verifiedFactors.length === 0}
           >
             Verify
+          </Button>
+          <Button block type="button" variant="text" onClick={onCancel}>
+            Cancel
           </Button>
         </div>
       </form>

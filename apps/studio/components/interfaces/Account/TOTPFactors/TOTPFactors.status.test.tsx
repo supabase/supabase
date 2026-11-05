@@ -85,6 +85,20 @@ describe('authenticator removal recovery-status guard', () => {
     expect(await screen.findByRole('dialog', { name: 'Remove MFA method' })).toBeInTheDocument()
   })
 
+  test('keeps the session check on Delete without showing an interstitial', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockImplementation(
+      () => new Promise(() => {})
+    )
+    renderFactors()
+    const remove = await screen.findByRole('button', { name: 'Delete' })
+    await waitFor(() => expect(remove).not.toBeAriaDisabled())
+    fireEvent.click(remove)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled())
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByText('Verify your identity')).not.toBeInTheDocument()
+  })
+
   test('keeps removal unavailable while recovery-code status is loading', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockImplementation(
       () => new Promise<Awaited<ReturnType<typeof auth.mfa.recoveryCodes.getStatus>>>(() => {})
