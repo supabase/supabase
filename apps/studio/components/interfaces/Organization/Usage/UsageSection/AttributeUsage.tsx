@@ -206,7 +206,7 @@ const AttributeUsage = ({
                   </div>
                 )}
 
-                {attribute.additionalInfo?.(usage)}
+                {attribute.additionalInfo?.(usage, usageMeta)}
 
                 <div className="space-y-1">
                   <p className="text-sm">
