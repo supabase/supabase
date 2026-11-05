@@ -250,7 +250,14 @@ describe('DeleteFactorModal identity verification', () => {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    await screen.findByText(/Invalid verification code/)
+    await screen.findByText('Invalid verification code.')
+    expect(screen.getByRole('textbox', { name: 'Authentication code' })).toHaveAttribute(
+      'aria-invalid',
+      'true'
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Authentication code' })
+    ).toHaveAccessibleDescription(/Invalid verification code\./)
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
   })

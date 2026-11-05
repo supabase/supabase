@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQuery } from '@tanstack/react-query'
-import { useId, useState, type ReactNode } from 'react'
+import { useId, useMemo, useState, type ReactNode } from 'react'
 import { useForm } from 'react-hook-form'
 import {
   Button,
@@ -199,9 +199,16 @@ const VerificationForm = ({
 }) => {
   const preferredFactor =
     verifiedFactors.find((factor) => factor.id !== factorToAvoidId) ?? verifiedFactors[0]
+  const isCodeError =
+    !!error && /invalid.*(?:code|totp)|(?:code|totp).*invalid/i.test(error.message)
+  const serverErrors = useMemo(() => {
+    if (!error || !/invalid.*(?:code|totp)|(?:code|totp).*invalid/i.test(error.message)) return {}
+    return { code: { type: 'server', message: `${error.message.replace(/[.!?]+$/, '')}.` } }
+  }, [error])
   const form = useForm<VerificationValues>({
     resolver: zodResolver(VerificationSchema),
     defaultValues: { code: '', factorId: preferredFactor?.id ?? '' },
+    errors: serverErrors,
   })
   return (
     <Form {...form}>
@@ -245,12 +252,10 @@ const VerificationForm = ({
             </FormItemLayout>
           )}
         />
-        {error && (
-          <AlertError
-            subject="Unable to verify your identity"
-            error={error}
-            showInstructions={false}
-          />
+        {error && !isCodeError && (
+          <p role="alert" className="text-sm text-destructive">
+            {error.message}
+          </p>
         )}
         <div className="space-y-2.5">
           <Button
