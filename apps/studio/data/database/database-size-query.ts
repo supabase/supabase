@@ -22,6 +22,7 @@ export async function getDatabaseSize(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['database-size'],
       grant: unguarded.migrating,

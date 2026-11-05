@@ -80,6 +80,7 @@ export async function createIndexes({
     await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: safeSql`${joinSqlFragments(indexStatements, ';\n')};`,
       grant: unguarded.migrating,
     })

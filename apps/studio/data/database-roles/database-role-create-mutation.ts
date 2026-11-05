@@ -28,6 +28,7 @@ export async function createDatabaseRole({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['roles', 'create'],
     grant: unguarded.migrating,

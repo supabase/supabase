@@ -318,6 +318,7 @@ export const WithStatements = ({
             await executeSql({
               projectRef: project?.ref,
               connectionString,
+              sqlOrigin: 'studio',
               sql: safeSql`SELECT pg_stat_statements_reset();`,
               grant: unguarded.migrating,
             })

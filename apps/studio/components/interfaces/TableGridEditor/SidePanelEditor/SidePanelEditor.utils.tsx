@@ -97,6 +97,7 @@ const addPrimaryKey = async (
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
     sql: query,
     queryKey: ['primary-keys'],
     grant: unguarded.migrating,
@@ -114,6 +115,7 @@ const dropConstraint = async (
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
     sql: query,
     queryKey: ['drop-constraint'],
     grant: unguarded.migrating,
@@ -135,6 +137,7 @@ const addForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -156,6 +159,7 @@ const removeForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -177,6 +181,7 @@ const updateForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -366,6 +371,7 @@ export const duplicateTable = async (
   await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: getDuplicateTableSQL({
       sourceTableName,
       sourceTableSchema,
@@ -391,6 +397,7 @@ export const duplicateTable = async (
     await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: getDuplicateRowsSQL({
         sourceTableName,
         sourceTableSchema,
@@ -406,6 +413,7 @@ export const duplicateTable = async (
       await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
         sql: getDuplicateIdentitySequenceSQL({
           sourceTableName,
           sourceTableSchema,
@@ -540,6 +548,7 @@ export const createTable = async ({
       await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
         sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
         grant: unguarded.migrating,
@@ -666,6 +675,7 @@ export const createTable = async ({
           await executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
             grant: unguarded.migrating,
@@ -982,6 +992,7 @@ export async function insertRowsViaSpreadsheet({
             executeSql({
               projectRef,
               connectionString,
+              sqlOrigin: 'studio',
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
               grant: unguarded.migrating,
@@ -1031,6 +1042,7 @@ export async function insertRowsViaSpreadsheet({
           executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
             grant: unguarded.migrating,
@@ -1088,6 +1100,7 @@ export async function insertTableRows({
             await executeSql({
               projectRef,
               connectionString,
+              sqlOrigin: 'studio',
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
               grant: unguarded.migrating,
@@ -1145,6 +1158,7 @@ export async function insertTableRows({
     await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: updateSequenceSQL,
       queryKey: ['sequences', 'update-batch'],
       grant: unguarded.migrating,

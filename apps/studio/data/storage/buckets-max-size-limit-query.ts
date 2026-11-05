@@ -27,6 +27,7 @@ export const getBucketNumberEstimate = async ({
       projectRef,
       connectionString,
       queryKey,
+      sqlOrigin: 'studio',
       sql,
       grant: unguarded.migrating,
     })
@@ -56,6 +57,7 @@ const getBucketsWithLargestSizeLimit = async ({
     projectRef,
     connectionString,
     queryKey: key,
+    sqlOrigin: 'studio',
     sql,
     grant: unguarded.migrating,
   })

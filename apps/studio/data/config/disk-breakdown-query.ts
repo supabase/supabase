@@ -28,6 +28,7 @@ export async function getDiskBreakdown(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: safeSql`
     SELECT
   (

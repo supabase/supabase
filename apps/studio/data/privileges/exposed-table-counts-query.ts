@@ -33,6 +33,7 @@ export async function getExposedTableCounts(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['exposed-table-counts', selectedSchemas],
       grant: unguarded.migrating,

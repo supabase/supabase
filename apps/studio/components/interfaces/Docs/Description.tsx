@@ -62,6 +62,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
         await executeSql({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
+          sqlOrigin: 'studio',
           sql: query,
           grant: unguarded.migrating,
         })

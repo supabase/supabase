@@ -33,9 +33,10 @@ export async function searchAuthUsers(
       })
       return executeSql<
         { id: string; email: string | null; created_at: string; last_sign_in_at: string | null }[]
-      >({ projectRef, connectionString, sql, grant: unguarded.migrating }, signal).then(
-        (res) => res.result
-      )
+      >(
+        { projectRef, connectionString, sql, sqlOrigin: 'studio', grant: unguarded.migrating },
+        signal
+      ).then((res) => res.result)
     },
   })
   return result.map((row) => ({

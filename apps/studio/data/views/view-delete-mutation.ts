@@ -32,6 +32,7 @@ export async function deleteView({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['view', 'delete', id],
     grant: unguarded.migrating,

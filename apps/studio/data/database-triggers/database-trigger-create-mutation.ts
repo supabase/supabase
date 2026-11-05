@@ -25,6 +25,7 @@ export async function createDatabaseTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['trigger', 'create'],
     grant: unguarded.migrating,

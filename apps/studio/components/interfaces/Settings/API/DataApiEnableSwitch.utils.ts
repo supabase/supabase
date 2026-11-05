@@ -32,6 +32,7 @@ export async function queryUnsafeEntitiesInApi({
   const { result } = await executeSql<Array<ExposedEntity>>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: getUnsafeEntitiesInApiSql({ schemas }),
     queryKey: ['unsafe-entities-in-api'],
     grant: unguarded.migrating,

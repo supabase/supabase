@@ -48,6 +48,7 @@ export async function getExposedTables(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['exposed-tables', page],
       grant: unguarded.migrating,

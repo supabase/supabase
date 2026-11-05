@@ -30,6 +30,7 @@ export async function updateDatabaseRole({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['roles', 'update'],
     grant: unguarded.migrating,

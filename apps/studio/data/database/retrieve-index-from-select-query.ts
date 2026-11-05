@@ -34,6 +34,7 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-explain-query'],
+      sqlOrigin: 'studio',
       sql: safeSql`
         create or replace function pg_temp.explain_query(query text) returns jsonb
         language plpgsql
@@ -117,6 +118,7 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-names'],
+      sqlOrigin: 'studio',
       sql: safeSql`select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${joinSqlFragments(involvedIndexes.map(literal), ', ')});`,
       grant: unguarded.migrating,
     })

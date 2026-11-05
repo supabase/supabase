@@ -19,7 +19,14 @@ export async function getKeywords(
   const sql = getKeywordsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['keywords'], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey: ['keywords'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

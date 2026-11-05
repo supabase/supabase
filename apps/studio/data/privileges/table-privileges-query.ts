@@ -30,7 +30,14 @@ async function getTablePrivileges(
   const queryKey = ['table-privileges', includedSchemas?.join(',')]
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey,
+      grant: unguarded.migrating,
+    },
     signal
   )
 

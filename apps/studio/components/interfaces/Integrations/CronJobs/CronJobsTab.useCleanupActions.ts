@@ -83,6 +83,7 @@ export const useCronJobsCleanupActions = ({
         const pageCountResult = await executeSql({
           projectRef,
           connectionString,
+          sqlOrigin: 'studio',
           sql: getJobRunDetailsPageCountSql(),
           queryKey: getJobRunDetailsPageCountKey(projectRef),
           grant: unguarded.migrating,
@@ -132,6 +133,7 @@ export const useCronJobsCleanupActions = ({
           const deleteResult = await executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
             sql: getDeleteOldCronJobRunDetailsByCtidSql(interval, startPage, endPage),
             queryKey: getDeleteOldCronJobRunDetailsByCtidKey(projectRef, interval, startPage),
             grant: unguarded.migrating,

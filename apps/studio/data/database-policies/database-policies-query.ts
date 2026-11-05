@@ -28,6 +28,7 @@ export async function getDatabasePolicies(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['policies', schemas],
       grant: unguarded.migrating,

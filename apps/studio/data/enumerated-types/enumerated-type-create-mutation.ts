@@ -29,6 +29,7 @@ export async function createEnumeratedType({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     grant: unguarded.migrating,
   })

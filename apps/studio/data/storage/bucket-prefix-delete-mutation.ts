@@ -32,6 +32,7 @@ export const deleteBucketPrefix = async (
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['delete-bucket-prefix'],
       grant: unguarded.migrating,

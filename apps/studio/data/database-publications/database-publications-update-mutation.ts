@@ -40,6 +40,7 @@ export async function updateDatabasePublication({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['publication', 'update', id],
     grant: unguarded.migrating,

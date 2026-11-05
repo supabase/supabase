@@ -29,6 +29,7 @@ export async function purgeDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`select * from pgmq.purge_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
     grant: unguarded.migrating,

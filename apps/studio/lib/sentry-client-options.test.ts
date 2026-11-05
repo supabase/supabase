@@ -519,6 +519,20 @@ describe('which errors Studio sends to Sentry', () => {
     expect(Math.random).not.toHaveBeenCalled()
   })
 
+  it('drops user SQL errors even when something else captured them', async () => {
+    const { UserSqlError } = await import('@/lib/errors/studio-errors')
+    const event: Parameters<typeof beforeSend>[0] = {
+      type: undefined,
+      exception: {
+        values: [
+          { value: 'Failed to run sql query', stacktrace: { frames: [{ filename: 'app.js' }] } },
+        ],
+      },
+    }
+    const hint = { originalException: new UserSqlError({ message: 'Failed to run sql query' }) }
+    expect(await beforeSend(event, hint)).toBeNull()
+  })
+
   it('drops errors with no code location when they did not crash the page', async () => {
     expect(
       await beforeSend({ type: undefined, exception: { values: [{ value: 'No stack' }] } }, {})

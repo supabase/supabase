@@ -21,6 +21,7 @@ export async function getDatabaseCronTimezone({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
     grant: unguarded.migrating,
   })

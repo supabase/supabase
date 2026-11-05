@@ -44,6 +44,7 @@ export const getDecryptedValue = async (
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: vaultSecretsKeys.getDecryptedValue(projectRef, id),
       grant: unguarded.migrating,
@@ -91,7 +92,14 @@ export const getDecryptedValues = async (
 ) => {
   const sql = vaultSecretDecryptedValuesQuery(ids)
   const { result } = await executeSql<{ id: string; decrypted_secret: string }[]>(
-    { projectRef, connectionString, sql, queryKey: ['decrypt-secret'], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey: ['decrypt-secret'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return result.reduce(

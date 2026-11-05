@@ -7,6 +7,7 @@ import {
   MetaQueryResponse,
   ReportQueryDb,
 } from '@/components/interfaces/Reports/Reports.types'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -30,11 +31,13 @@ export interface DbQueryHook<T = any> {
 // [Joshen] Atm this is being used only in query performance
 const useDbQuery = ({
   sql,
+  sqlOrigin,
   params = DEFAULT_QUERY_PARAMS,
   where,
   orderBy,
 }: {
   sql: ReportQueryDb['safeSql'] | SafeSqlFragment
+  sqlOrigin: SqlOrigin
   params?: BaseReportParams
   where?: string
   orderBy?: string
@@ -78,6 +81,7 @@ const useDbQuery = ({
           projectRef: project?.ref,
           connectionString: effectiveConnectionString,
           sql: resolvedSql,
+          sqlOrigin,
           grant: unguarded.migrating,
         },
         signal

@@ -39,6 +39,7 @@ export async function getUsersCount(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['users-count'],
       grant: unguarded.migrating,

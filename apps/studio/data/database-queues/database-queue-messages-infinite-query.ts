@@ -99,6 +99,7 @@ export async function getDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     grant: unguarded.migrating,
   })

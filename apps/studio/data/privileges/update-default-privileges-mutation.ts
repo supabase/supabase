@@ -23,6 +23,7 @@ export async function updateDefaultPrivileges({
   await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['update-default-privileges'],
     grant: unguarded.migrating,

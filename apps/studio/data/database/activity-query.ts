@@ -95,7 +95,14 @@ export async function getDatabaseActivity(
   const sql = getPgStatActivitySql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['activity'], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey: ['activity'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

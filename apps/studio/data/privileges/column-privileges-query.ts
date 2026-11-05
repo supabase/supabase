@@ -43,7 +43,14 @@ export async function getColumnPrivileges(
   }).sql
   const queryKey = ['column-privileges', schema, table]
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey, grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey,
+      grant: unguarded.migrating,
+    },
     signal
   )
   return result as ColumnPrivilegesData

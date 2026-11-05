@@ -24,6 +24,7 @@ export async function getDatabasePublications(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['publications'].filter(Boolean),
       grant: unguarded.migrating,

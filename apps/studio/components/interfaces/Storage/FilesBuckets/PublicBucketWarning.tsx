@@ -66,6 +66,7 @@ export function PublicBucketWarning({ projectRef, bucketId }: PublicBucketWarnin
       await executeSql({
         projectRef,
         connectionString: project?.connectionString,
+        sqlOrigin: 'studio',
         sql: generatePolicyRemovalSql(policyName),
         grant: unguarded.migrating,
       })

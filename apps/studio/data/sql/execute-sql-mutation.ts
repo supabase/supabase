@@ -11,6 +11,7 @@ import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+import { classifySqlResponseError, type SqlOrigin } from '@/data/error-classification'
 import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
@@ -52,6 +53,13 @@ type ExecuteSqlVariables = {
   grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'> | Unguarded
   connectionString?: string | null
   sql: SafeSqlFragment
+  /**
+   * Who wrote the SQL. `'user'` for SQL the user or an AI agent wrote, in whole or in part (SQL
+   * editor, AI tools, policy and function editors): its errors are never sent to Sentry. `'studio'`
+   * for SQL Studio composes: its errors are reported without the Postgres message, which can
+   * contain user data.
+   */
+  sqlOrigin: SqlOrigin
   queryKey?: QueryKey
   handleError?: (error: StudioError) => { result: any }
   isRoleImpersonationEnabled?: boolean
@@ -81,6 +89,7 @@ export async function executeSql<T = any>(
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
     grant,
     queryKey,
     handleError,
@@ -209,8 +218,12 @@ export async function executeSql<T = any>(
       error = updatedError as any
     }
 
-    if (handleError !== undefined) return handleError(error as any)
-    else handleErrorFetchers(error)
+    const classified = classifySqlResponseError(error, {
+      origin: sqlOrigin,
+      queryKey: queryKeyForReporting(queryKey, projectRef),
+    })
+    if (handleError !== undefined) return handleError(classified)
+    handleErrorFetchers(classified)
   }
 
   if (
@@ -222,6 +235,14 @@ export async function executeSql<T = any>(
   }
 
   return { result: data as T }
+}
+
+/** The query key without the project ref, so errors group across projects. */
+function queryKeyForReporting(queryKey: QueryKey | undefined, projectRef: string) {
+  const segments = queryKey?.filter(
+    (seg) => (typeof seg === 'string' || typeof seg === 'number') && seg !== projectRef
+  )
+  return segments?.length ? segments.join('-') : undefined
 }
 
 type ExecuteSqlData = Awaited<ReturnType<typeof executeSql<any[]>>>

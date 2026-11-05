@@ -54,6 +54,7 @@ async function getEntitySearch(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
       grant: unguarded.migrating,

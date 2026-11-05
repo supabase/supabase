@@ -26,6 +26,7 @@ export async function deleteDatabaseIndex({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['indexes'],
     grant: unguarded.migrating,

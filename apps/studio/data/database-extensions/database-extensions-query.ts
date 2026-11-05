@@ -29,6 +29,7 @@ export async function getDatabaseExtensions(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['database-extensions'],
       grant: unguarded.migrating,

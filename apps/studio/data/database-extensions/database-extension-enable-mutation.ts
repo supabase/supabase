@@ -35,6 +35,7 @@ export async function enableDatabaseExtension({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['extension', 'create'],
     grant: unguarded.migrating,

@@ -29,6 +29,7 @@ export async function getSchemaComment(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['pg-graphql', 'schema-comment', schema],
       grant: unguarded.migrating,

@@ -41,6 +41,7 @@ function useCustomizeAccessToken(
       const result = await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
         sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
         queryKey: ['customize-access-token', projectRef],
         grant: unguarded.migrating,

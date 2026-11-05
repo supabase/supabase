@@ -30,6 +30,7 @@ export async function deleteFDW({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['delete-fdw'],
     grant: unguarded.migrating,

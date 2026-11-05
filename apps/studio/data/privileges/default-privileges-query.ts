@@ -24,6 +24,7 @@ export async function getDefaultPrivilegesState(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['default-privileges-state'],
       grant: unguarded.migrating,

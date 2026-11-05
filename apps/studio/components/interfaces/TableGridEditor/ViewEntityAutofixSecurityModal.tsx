@@ -57,6 +57,7 @@ export const ViewEntityAutofixSecurityModal = ({
     execute({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      sqlOrigin: 'studio',
       sql,
       grant: unguarded.migrating,
     })

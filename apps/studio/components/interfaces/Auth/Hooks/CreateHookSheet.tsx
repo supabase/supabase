@@ -219,6 +219,7 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
+          sqlOrigin: 'studio',
           sql: joinSqlFragments(statements, '\n'),
           grant: unguarded.migrating,
         })

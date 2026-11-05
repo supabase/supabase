@@ -19,6 +19,7 @@ export async function createSchema({ name, projectRef, connectionString }: Schem
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['schema', 'create'],
     grant: unguarded.migrating,

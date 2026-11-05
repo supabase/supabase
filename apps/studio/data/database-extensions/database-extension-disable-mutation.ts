@@ -29,6 +29,7 @@ export async function disableDatabaseExtension({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['extension', 'delete', id],
     grant: unguarded.migrating,

@@ -205,6 +205,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         {
           projectRef,
           connectionString,
+          sqlOrigin: 'studio',
           sql: pgMetaSchemasList.sql,
           grant: unguarded.migrating,
         },

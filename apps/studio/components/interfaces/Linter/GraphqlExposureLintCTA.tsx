@@ -92,6 +92,7 @@ export const GraphqlExposureLintCTA = ({
     executeSql({
       projectRef,
       connectionString: project?.connectionString,
+      sqlOrigin: 'studio',
       sql: revokeSql,
       grant: unguarded.migrating,
     })

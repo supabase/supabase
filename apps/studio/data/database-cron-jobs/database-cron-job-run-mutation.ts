@@ -25,6 +25,7 @@ export async function runDatabaseCronJobCommand({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`DO $$
 DECLARE
   job_command text;

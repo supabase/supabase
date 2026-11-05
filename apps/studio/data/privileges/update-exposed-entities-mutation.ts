@@ -48,6 +48,7 @@ export async function updateExposedEntities({
   await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: joinSqlFragments(sqlParts, '\n'),
     queryKey: ['update-exposed-entities'],
     grant: unguarded.migrating,

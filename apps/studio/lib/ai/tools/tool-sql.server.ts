@@ -32,6 +32,7 @@ export async function runPgMetaQuery<TRows>(
     {
       projectRef: ctx.projectRef,
       connectionString: ctx.connectionString,
+      sqlOrigin: 'studio',
       sql: query.sql,
       grant: unguarded.migrating,
     },

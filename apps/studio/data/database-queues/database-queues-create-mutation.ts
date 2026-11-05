@@ -68,6 +68,7 @@ export async function createDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`${createFragment}${rlsFragment}`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,

@@ -39,6 +39,7 @@ export async function updateTable({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['table', 'update', id],
     grant: unguarded.migrating,

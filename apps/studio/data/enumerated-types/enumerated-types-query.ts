@@ -27,6 +27,7 @@ export async function getEnumeratedTypes(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['types'],
       grant: unguarded.migrating,

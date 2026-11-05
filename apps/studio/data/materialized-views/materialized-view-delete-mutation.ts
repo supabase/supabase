@@ -32,6 +32,7 @@ export async function deleteMaterializedView({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['materialized-view', 'delete', id],
     grant: unguarded.migrating,

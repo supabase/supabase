@@ -26,6 +26,7 @@ export async function getAuthenticatorRoleConfig(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: getAuthenticatorRoleConfigSql,
       queryKey: ['authenticator-role-config'],
       grant: unguarded.migrating,

@@ -3,14 +3,19 @@ import { describe, expect, it, vi } from 'vitest'
 import {
   classifyError,
   classifyResponseError,
+  classifySqlResponseError,
   parseResponseErrorBody,
 } from './error-classification'
 import {
+  ConnectionTimeoutError,
   getServiceForEndpoint,
+  isNeverReportedError,
   NetworkUnreachableError,
   PlatformError,
   RequestAbortedError,
+  StudioSqlError,
   UnexpectedError,
+  UserSqlError,
 } from '@/lib/errors/studio-errors'
 
 describe('classifyError', () => {
@@ -113,5 +118,65 @@ describe('getServiceForEndpoint', () => {
     [undefined, 'unknown'],
   ])('maps %s to %s', (endpoint, service) => {
     expect(getServiceForEndpoint(endpoint)).toBe(service)
+  })
+})
+
+describe('classifySqlResponseError', () => {
+  const sqlBody = {
+    message: 'Failed to run sql query: ERROR:  42702: column reference "schemaname" is ambiguous',
+    formattedError: 'ERROR:  42702: column reference "schemaname" is ambiguous\nLINE 32: ...',
+    code: 400,
+    endpoint: '/platform/pg-meta/{ref}/query',
+  }
+
+  it('classifies a Postgres error from user SQL as UserSqlError, which is never reported', () => {
+    const err = classifySqlResponseError(sqlBody, { origin: 'user' })
+    expect(err).toBeInstanceOf(UserSqlError)
+    expect(err).toMatchObject({ fault: 'user', reason: 'user_sql', message: sqlBody.message })
+    expect(isNeverReportedError(err)).toBe(true)
+  })
+
+  it('classifies a Postgres error from Studio SQL as StudioSqlError with the query key', () => {
+    const err = classifySqlResponseError(sqlBody, {
+      origin: 'studio',
+      queryKey: 'projects-abc-tables',
+    })
+    expect(err).toBeInstanceOf(StudioSqlError)
+    expect(err).toMatchObject({
+      fault: 'studio',
+      reason: 'studio_sql',
+      queryKey: 'projects-abc-tables',
+      formattedError: sqlBody.formattedError,
+    })
+    expect(isNeverReportedError(err)).toBe(false)
+  })
+
+  it.each([
+    ['a 5xx', { message: 'boom', code: 500 }, PlatformError],
+    [
+      'a connection timeout',
+      { message: 'Connection terminated due to connection timeout', code: 400 },
+      ConnectionTimeoutError,
+    ],
+  ])('keeps the usual classification for %s', (_, body, ErrorClass) => {
+    expect(classifySqlResponseError(body, { origin: 'user' })).toBeInstanceOf(ErrorClass)
+  })
+
+  it('classifies non-response errors with classifyError', () => {
+    const thrown = new TypeError('Failed to fetch')
+    expect(classifySqlResponseError(thrown, { origin: 'user' })).toBeInstanceOf(
+      NetworkUnreachableError
+    )
+  })
+
+  it('reads the SQLSTATE and keeps the Postgres position for the editor', () => {
+    const err = classifySqlResponseError({ ...sqlBody, position: '8' }, { origin: 'user' })
+    expect(err).toMatchObject({ sqlState: '42702', position: '8' })
+  })
+
+  it('sends Sentry only the SQLSTATE and query key for Studio SQL', () => {
+    const err = classifySqlResponseError(sqlBody, { origin: 'studio', queryKey: 'tables-list' })
+    expect(err.message).toBe(sqlBody.message)
+    expect(err.sentryMessage).toBe('Postgres error 42702 in query tables-list')
   })
 })

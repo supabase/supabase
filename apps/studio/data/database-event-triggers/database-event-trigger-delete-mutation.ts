@@ -25,6 +25,7 @@ export async function deleteDatabaseEventTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['event-trigger', 'delete', trigger.oid],
     grant: unguarded.migrating,

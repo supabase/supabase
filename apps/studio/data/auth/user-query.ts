@@ -25,7 +25,14 @@ export async function getUser(
   const sql = getUserSQL(userId)
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: [`user-${userId}`], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryKey: [`user-${userId}`],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

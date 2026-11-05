@@ -60,6 +60,7 @@ export const useSetIntrospection = ({
     mutate({
       projectRef: project.ref,
       connectionString: project.connectionString,
+      sqlOrigin: 'studio',
       sql,
       grant: unguarded.migrating,
     })

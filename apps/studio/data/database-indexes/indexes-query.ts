@@ -38,6 +38,7 @@ export async function getIndexes(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['indexes', schema],
       grant: unguarded.migrating,

@@ -33,6 +33,7 @@ export async function readDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`select * from pgmq.set_vt(${literal(queueName)}, ${literal(messageId)}, ${literal(duration)})`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,

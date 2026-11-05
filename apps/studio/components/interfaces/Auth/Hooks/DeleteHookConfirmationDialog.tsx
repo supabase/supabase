@@ -53,6 +53,7 @@ export const DeleteHookConfirmationDialog = ({
           await executeSql({
             projectRef,
             connectionString: project!.connectionString,
+            sqlOrigin: 'studio',
             sql: joinSqlFragments(revokeStatements, '\n'),
             grant: unguarded.migrating,
           })

@@ -22,6 +22,12 @@ export type StudioErrorInput = {
   /** OpenAPI path pattern, never a concrete URL */
   endpoint?: string
   method?: string
+  /** Query key of the Studio query that ran the SQL, joined with `-`, without the project ref */
+  queryKey?: string
+  /** Postgres SQLSTATE code (e.g. `42702`), for SQL errors */
+  sqlState?: string
+  /** 1-based character offset of the Postgres error in the SQL, for SQL errors */
+  position?: string
   cause?: unknown
 }
 
@@ -36,6 +42,11 @@ type StudioErrorConfig<F extends Fault, C extends ClassifiedBy> = {
   classifiedBy: C
   defaultReason: string
   retryable: (input: StudioErrorInput) => boolean
+  /**
+   * What Sentry shows instead of `message`, for classes whose message can contain user data. Built
+   * only from fields that can't. `message` stays intact for the UI.
+   */
+  sentryMessage?: (input: StudioErrorInput) => string
 }
 
 export function getServiceForEndpoint(endpoint?: string): StudioService {
@@ -54,6 +65,8 @@ function studioError<const Tag extends string, F extends Fault, C extends Classi
     readonly fault: F
     readonly classifiedBy: C = config.classifiedBy
     readonly retryable: boolean
+    /** The message sent to Sentry. Equal to `message` unless the class redacts it. */
+    readonly sentryMessage: string
     /** Set by `reportStudioError` when the error is sent to Sentry. Assigned before `beforeSend`, so it may refer to an event that was sampled out. */
     errorEventId?: string
 
@@ -66,6 +79,7 @@ function studioError<const Tag extends string, F extends Fault, C extends Classi
       })
       this.fault = typeof config.fault === 'function' ? config.fault(input) : config.fault
       this.retryable = config.retryable(input)
+      this.sentryMessage = config.sentryMessage?.(input) ?? this.message
     }
   }
 }
@@ -119,6 +133,28 @@ export class ConnectionTimeoutError extends studioError('DbConnectionTimeout', {
   retryable: () => true,
 }) {}
 
+// Postgres rejected SQL the user (or an AI agent acting for them) wrote. The message can echo
+// the user's SQL and data, so this error is never sent to Sentry (see `ERROR_ROUTING` and
+// `isNeverReportedError`).
+export class UserSqlError extends studioError('UserSqlError', {
+  fault: 'user',
+  classifiedBy: 'rule',
+  defaultReason: 'user_sql',
+  retryable: () => false,
+}) {}
+
+// Postgres rejected SQL that Studio wrote. The Postgres message can still echo user data (row
+// values in a constraint violation, a schema name), so Sentry gets only the SQLSTATE and the query
+// key.
+export class StudioSqlError extends studioError('StudioSqlError', {
+  fault: 'studio',
+  classifiedBy: 'rule',
+  defaultReason: 'studio_sql',
+  retryable: () => false,
+  sentryMessage: ({ sqlState, queryKey }) =>
+    `Postgres error ${sqlState ?? 'without SQLSTATE'} in query ${queryKey ?? 'without key'}`,
+}) {}
+
 export class UnexpectedError extends studioError('UnexpectedError', {
   fault: 'studio',
   classifiedBy: 'default',
@@ -133,6 +169,8 @@ export type StudioError =
   | PlatformError
   | UnclassifiedApiError
   | ConnectionTimeoutError
+  | UserSqlError
+  | StudioSqlError
   | UnexpectedError
 
 export type StudioErrorTag = StudioError['_tag']
@@ -147,6 +185,8 @@ const STUDIO_ERROR_TAGS: Record<StudioErrorTag, true> = {
   PlatformError: true,
   UnclassifiedApiError: true,
   DbConnectionTimeout: true,
+  UserSqlError: true,
+  StudioSqlError: true,
   UnexpectedError: true,
 }
 
@@ -158,4 +198,12 @@ export function isStudioError(error: unknown): error is StudioError {
     typeof error._tag === 'string' &&
     Object.hasOwn(STUDIO_ERROR_TAGS, error._tag)
   )
+}
+
+/**
+ * True for errors that must never reach Sentry, even with `alwaysCapture` or when a third-party
+ * integration captures them. `beforeSend` drops them as a backstop.
+ */
+export function isNeverReportedError(error: unknown): boolean {
+  return isStudioError(error) && error._tag === 'UserSqlError'
 }

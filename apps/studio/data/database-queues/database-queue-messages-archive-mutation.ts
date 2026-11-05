@@ -30,6 +30,7 @@ export async function archiveDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql: safeSql`SELECT * FROM pgmq.archive(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,

@@ -27,6 +27,7 @@ export async function getTableDefinition(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['table-definition', id],
       grant: unguarded.migrating,

@@ -28,7 +28,14 @@ export async function getMigrations(
 
   try {
     const { result } = await executeSql(
-      { projectRef, connectionString, sql, queryKey: ['migrations'], grant: unguarded.migrating },
+      {
+        projectRef,
+        connectionString,
+        sql,
+        sqlOrigin: 'studio',
+        queryKey: ['migrations'],
+        grant: unguarded.migrating,
+      },
       signal
     )
 

@@ -25,6 +25,7 @@ export async function getDatabaseRoles(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql: pgMetaRolesList.sql,
       queryKey: ['database-roles'],
       grant: unguarded.migrating,

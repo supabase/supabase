@@ -26,6 +26,7 @@ export async function getIndexWorkerStatus(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
       sql,
       queryKey: ['index-worker-status'],
       grant: unguarded.migrating,

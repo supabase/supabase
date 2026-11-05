@@ -27,6 +27,7 @@ export async function deleteDatabaseRole({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['roles', 'delete'],
     grant: unguarded.migrating,

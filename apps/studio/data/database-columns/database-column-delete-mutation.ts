@@ -28,6 +28,7 @@ export async function deleteDatabaseColumn({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
     sql,
     queryKey: ['column', 'delete', column.id],
     grant: unguarded.migrating,
