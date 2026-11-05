@@ -92,8 +92,8 @@ export function resolveDefaultDbRegion({
  *
  * Needs to be in the API in the future [kevin]
  */
-export const monthlyInstancePrice = (instance: string | undefined): number | undefined => {
-  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly
+export const monthlyInstancePrice = (instance: string | undefined): number | null => {
+  return instanceSizeSpecs[instance as DesiredInstanceSize]?.priceMonthly ?? null
 }
 
 export const instanceLabel = (instance: string | undefined): string => {

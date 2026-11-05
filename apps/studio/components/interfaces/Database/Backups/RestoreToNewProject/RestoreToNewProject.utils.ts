@@ -55,10 +55,10 @@ export function projectSpecToMonthlyPrice({
   }
 }
 
-function getComputeHourlyPrice(computeSize: InfraInstanceSize, planId: PlanId): number {
+function getComputeHourlyPrice(computeSize: InfraInstanceSize, planId: PlanId): number | null {
   if (computeSize === 'pico' || computeSize === 'nano') {
-    return planId === 'free' ? 0 : instanceSizeSpecs.micro.priceHourly
+    return planId === 'free' ? 0 : instanceSizeSpecs.micro.priceHourly!
   }
 
-  return instanceSizeSpecs[computeSize]?.priceHourly
+  return instanceSizeSpecs[computeSize]?.priceHourly ?? null
 }

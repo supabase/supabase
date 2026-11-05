@@ -2766,6 +2766,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     BranchResponse_Output: {
       /** Format: date-time */
@@ -2805,6 +2806,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -3995,6 +3997,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponseV1_Output: {
@@ -5709,6 +5712,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
@@ -5764,6 +5768,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     /** @example {
      *       "query": "select * from pg_stat_activity limit 1;"

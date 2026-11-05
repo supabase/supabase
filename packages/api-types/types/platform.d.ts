@@ -6375,8 +6375,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -6737,8 +6737,8 @@ export interface components {
     }
     CreatePipelineResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
     }
@@ -7041,6 +7041,7 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -8195,8 +8196,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -10562,6 +10563,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponse_Output: {
@@ -11047,8 +11049,8 @@ export interface components {
         write_lag?: number | null
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Table statuses */
@@ -11291,8 +11293,8 @@ export interface components {
        */
       destination_name: string
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
       /**
@@ -11440,8 +11442,8 @@ export interface components {
          */
         destination_name: string
         /**
-         * @description Pipeline id
-         * @example 1012
+         * @description Pipeline ID
+         * @example 03dg2o5teb2eucxr9ggh3uie6
          */
         id: string
         /**
@@ -11468,8 +11470,8 @@ export interface components {
     }
     PipelineStatusResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Pipeline status */
@@ -11496,8 +11498,8 @@ export interface components {
         name: string
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Current pipeline version */
@@ -11907,6 +11909,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
       billed_via_partner: boolean
       breakdown: {
@@ -11953,6 +11956,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -12200,6 +12204,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       subscription_id: string
       updated_at: string
       volumeSizeGb?: number | null
@@ -12740,8 +12745,8 @@ export interface components {
     }
     RollbackTablesResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Rolled back tables */
@@ -13280,6 +13285,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -13429,6 +13435,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13552,6 +13559,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13759,6 +13767,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13882,6 +13891,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -17085,8 +17095,8 @@ export interface components {
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse disable has been requested
-       * @example 101
+       * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string | null
       /** @description Tables with Warehouse copies */
@@ -17176,8 +17186,8 @@ export interface components {
         wrapper_installed: boolean
       } | null
       /**
-       * @description Warehouse replication pipeline id when it exists
-       * @example 101
+       * @description Warehouse replication pipeline ID when it exists
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id?: string
       /**
@@ -30950,6 +30960,7 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
+          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -31173,8 +31184,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31239,8 +31250,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31676,8 +31687,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31729,8 +31740,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31793,8 +31804,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31867,8 +31878,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31920,8 +31931,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31987,8 +31998,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32053,8 +32064,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32113,8 +32124,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32166,8 +32177,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32226,8 +32237,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32279,8 +32290,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }

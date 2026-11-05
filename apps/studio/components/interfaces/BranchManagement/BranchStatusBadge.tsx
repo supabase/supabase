@@ -47,6 +47,7 @@ const STATUS_TO_LABEL: Record<Status, string> = {
   RESTARTING: 'Restarting',
   RESTORE_FAILED: 'Failed to restore',
   PAUSE_FAILED: 'Failed to pause',
+  PROMOTING: 'Promoting',
 }
 
 const BranchStatusBadge = ({ status }: BranchStatusBadgeProps) => {

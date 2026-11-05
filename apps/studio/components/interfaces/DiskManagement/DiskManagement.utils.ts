@@ -53,7 +53,7 @@ export const calculateComputeSizePrice = ({
 }: {
   availableOptions: {
     identifier: string
-    price: number
+    price: number | null
   }[]
   oldComputeSize: string
   newComputeSize: string

@@ -2351,6 +2351,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
         }
         /**
          * @description Project ref
