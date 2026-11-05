@@ -19,7 +19,7 @@ export default function CategoryClient({ posts, initialView }: Props) {
 
   return (
     <>
-      <div className="sticky top-[65px] z-10 bg-background/80 backdrop-blur-sm border-b border-border">
+      <div className="sticky top-(--header-height) z-10 bg-background/80 backdrop-blur-sm border-b border-border">
         <SectionContainer className="py-3!">
           <Suspense fallback={null}>
             <BlogFilters view={view} setView={setView} onSearch={setSearchTerm} />

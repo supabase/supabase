@@ -46,8 +46,8 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
     const tabsEl = tabsRef.current
     if (!tabsEl) return
 
-    // Sticky bar sticks at top-16 (4rem), so show it once the tabs scroll past that point.
-    const handleScroll = () => setShowStickyBar(tabsEl.getBoundingClientRect().bottom <= 64)
+    // Sticky bar sticks at the 56px header height, so show it once the tabs scroll past that point.
+    const handleScroll = () => setShowStickyBar(tabsEl.getBoundingClientRect().bottom <= 56)
 
     handleScroll()
     window.addEventListener('scroll', handleScroll, { passive: true })
@@ -269,7 +269,7 @@ export default function PartnerCatalogDetail({ partner, serializedListings }: Pr
           <div className="absolute h-full w-full inset-0 z-20 pointer-events-none">
             <div
               className={cn(
-                'transition-all border-b bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs sticky top-16 z-20',
+                'transition-all border-b bg-background/90 -translate-y-3/4 dark:bg-background/95 backdrop-blur-xs sticky top-(--header-height) z-20',
                 showStickyBar
                   ? 'opacity-100 pointer-events-auto translate-y-0'
                   : 'opacity-0 pointer-events-none'
