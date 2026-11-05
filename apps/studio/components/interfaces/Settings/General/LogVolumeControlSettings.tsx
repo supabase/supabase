@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
+  Badge,
   Button,
   Card,
   CardContent,
@@ -98,7 +99,14 @@ export const LogVolumeControlSettings = () => {
                               <RadioGroupStackedItem
                                 key={option.value}
                                 value={option.value}
-                                label={option.label}
+                                label={
+                                  <span className="flex items-center gap-x-2">
+                                    {option.label}
+                                    {option.value === defaultValues.logVolumeControl && (
+                                      <Badge>Default</Badge>
+                                    )}
+                                  </span>
+                                }
                                 description={option.description}
                               />
                             ))}
