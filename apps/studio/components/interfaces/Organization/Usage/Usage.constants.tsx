@@ -5,7 +5,7 @@ import { EgressBreakdownPanel } from './EgressBreakdownPanel'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
-import type { OrgUsageResponse } from '@/data/usage/org-usage-query'
+import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export const COLOR_MAP = {
@@ -62,7 +62,7 @@ export interface CategoryAttribute {
   chartPrefix?: 'Max' | 'Average' | 'Cumulative'
   chartSuffix?: string
   chartDescription: string
-  additionalInfo?: (usage?: OrgUsageResponse) => ReactNode | null
+  additionalInfo?: (usage?: OrgUsageResponse, usageMeta?: OrgMetricsUsage) => ReactNode | null
 }
 
 export type CategoryMetaKey = 'egress' | 'sizeCount' | 'activity' | 'compute' | 'logs' | 'pipelines'
@@ -96,7 +96,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         'Contains any outgoing traffic including Database, Storage, Realtime, Auth, API, Edge Functions, Pooler and Log Drains.\nBilling is based on the total sum of uncached egress in GB throughout your billing period.\nEgress via cache hits is billed separately.',
       chartDescription:
         'The breakdown of different egress types is inclusive of cached egress, even though it is billed separately. The data refreshes every hour.',
-      additionalInfo: () => <EgressBreakdownPanel />,
+      additionalInfo: (_usage, usageMeta) => <EgressBreakdownPanel usageMeta={usageMeta} />,
       links: [
         {
           name: 'Documentation',
