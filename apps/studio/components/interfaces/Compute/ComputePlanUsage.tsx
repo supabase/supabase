@@ -1,5 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
-import { Card } from 'ui'
+import { LOCAL_STORAGE_KEYS } from 'common'
+import { ChevronDownIcon, ChevronUpIcon, ExternalLinkIcon } from 'lucide-react'
+import Link from 'next/link'
+import { Button, Card } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import type { ComputeInstance } from './Compute.types'
 import {
@@ -11,6 +15,7 @@ import {
 import { formatComputeHours } from './ComputeUsage.utils'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const USAGE_WINDOW_DAYS = 30
@@ -29,6 +34,10 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
   const { data: organization } = useSelectedOrganizationQuery()
   const planId = organization?.plan?.id
   const planName = organization?.plan?.name
+  const [isCollapsed, setIsCollapsed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.COMPUTE_PLAN_USAGE_COLLAPSED,
+    false
+  )
 
   const { data: usage, isPending } = useQuery(
     computeProjectUsageQueryOptions({
@@ -52,45 +61,66 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
 
   return (
     <Card className="divide-y">
-      <div className="flex items-baseline justify-between gap-2 px-5 py-3">
-        <h3 className="text-sm text-foreground">Plan usage</h3>
-        <p className="text-xs text-foreground-lighter">
-          {planName === undefined ? 'Last 30 days' : `${planName} Plan · last 30 days`}
-        </p>
+      <div className="flex items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
+        <div className="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+          <h3 className="text-sm text-foreground">Plan usage</h3>
+          <p className="text-xs text-foreground-lighter">
+            {planName === undefined ? 'Last 30 days' : `${planName} Plan · last 30 days`}
+          </p>
+        </div>
+        <div className="flex items-center gap-x-2">
+          {organization?.slug && (
+            <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
+              <Link href={`/org/${organization.slug}/usage#compute-services`}>View usage</Link>
+            </Button>
+          )}
+          <Button
+            variant="text"
+            className="px-1.5"
+            aria-label={isCollapsed ? 'Expand plan usage' : 'Collapse plan usage'}
+            aria-expanded={!isCollapsed}
+            icon={isCollapsed ? <ChevronDownIcon /> : <ChevronUpIcon />}
+            onClick={() => setIsCollapsed(!isCollapsed)}
+          />
+        </div>
       </div>
 
-      <UsageMeter
-        label="Active hours"
-        description="Hours instances spend serving traffic. Suspended instances do not accrue usage."
-        used={usage?.activeHours ?? 0}
-        included={activeHoursAllowance}
-        limitKind="allowance"
-        isLoading={isPending}
-        format={formatComputeHours}
-        planName={planName}
-      />
+      {!isCollapsed && (
+        <div className="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+          <UsageMeter
+            label="Active hours"
+            description="Hours instances spend serving traffic. Suspended instances do not accrue usage."
+            used={usage?.activeHours ?? 0}
+            included={activeHoursAllowance}
+            limitKind="allowance"
+            isLoading={isPending}
+            format={formatComputeHours}
+            planName={planName}
+          />
 
-      <UsageMeter
-        label="Computes"
-        description="Deployments in this project. Each one runs its own instances."
-        used={instances.length}
-        included={deploymentAllowance}
-        limitKind="capacity"
-        isLoading={false}
-        format={(value) => value.toLocaleString()}
-        planName={planName}
-      />
+          <UsageMeter
+            label="Deployments"
+            description="Deployments in this project. Each one runs its own instances."
+            used={instances.length}
+            included={deploymentAllowance}
+            limitKind="capacity"
+            isLoading={false}
+            format={(value) => value.toLocaleString()}
+            planName={planName}
+          />
 
-      <UsageMeter
-        label="Instances"
-        description="Instances declared across every compute in this project."
-        used={declaredInstances}
-        included={instanceAllowance}
-        limitKind="capacity"
-        isLoading={false}
-        format={(value) => value.toLocaleString()}
-        planName={planName}
-      />
+          <UsageMeter
+            label="Instances"
+            description="Instances declared across every compute in this project."
+            used={declaredInstances}
+            included={instanceAllowance}
+            limitKind="capacity"
+            isLoading={false}
+            format={(value) => value.toLocaleString()}
+            planName={planName}
+          />
+        </div>
+      )}
     </Card>
   )
 }
@@ -138,7 +168,10 @@ const UsageMeter = ({
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
       <div className="flex items-baseline justify-between gap-3">
-        <p className="text-sm text-foreground">{label}</p>
+        <div className="flex items-center gap-x-1.5">
+          <p className="text-sm text-foreground">{label}</p>
+          <InfoTooltip side="top">{description}</InfoTooltip>
+        </div>
         <p className="text-sm tabular-nums text-foreground-light">
           {isLoading && '—'}
           {!isLoading && !hasLimit && `${format(used)} used`}
@@ -156,12 +189,9 @@ const UsageMeter = ({
         />
       )}
 
-      <div className="flex items-baseline justify-between gap-3">
-        <p className="text-xs text-foreground-lighter">{description}</p>
-        {isExceeded && <p className="shrink-0 text-xs text-destructive">Over limit</p>}
-        {isAtCapacity && <p className="shrink-0 text-xs text-warning">At limit</p>}
-        {isApproaching && <p className="shrink-0 text-xs text-warning">Approaching limit</p>}
-      </div>
+      {isExceeded && <p className="text-xs text-destructive">Over limit</p>}
+      {isAtCapacity && <p className="text-xs text-warning">At limit</p>}
+      {isApproaching && <p className="text-xs text-warning">Approaching limit</p>}
 
       {!hasLimit && !isLoading && (
         <p className="text-xs text-foreground-lighter">

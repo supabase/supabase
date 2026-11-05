@@ -46,7 +46,7 @@ const PROFILE_CONTEXT: ProfileContextType = {
 /** Each meter is a block headed by its label; scope assertions to the one under test. */
 const meter = async (label: string) => {
   const heading = await screen.findByText(label)
-  const block = heading.closest('div')?.parentElement
+  const block = heading.closest('div')?.parentElement?.parentElement
   if (block === null || block === undefined) throw new Error(`No meter block for ${label}`)
   return within(block)
 }
@@ -98,7 +98,7 @@ describe('ComputePlanUsage', () => {
 
     expect(await screen.findByText('Plan usage')).toBeInTheDocument()
     expect(await screen.findByText('Active hours')).toBeInTheDocument()
-    expect(await screen.findByText('Computes')).toBeInTheDocument()
+    expect(await screen.findByText('Deployments')).toBeInTheDocument()
     expect(await screen.findByText('Instances')).toBeInTheDocument()
     // Pro includes 10 computes and 25 instances; one compute running one instance is deployed.
     expect(await screen.findByText('1 of 10')).toBeInTheDocument()
@@ -135,7 +135,7 @@ describe('ComputePlanUsage', () => {
 
     // Free includes one compute and one instance: the single compute fills its limit,
     // while two instances exceed theirs.
-    const computes = await meter('Computes')
+    const computes = await meter('Deployments')
     expect(computes.getByText('1 of 1')).toBeInTheDocument()
     expect(computes.getByText('At limit')).toBeInTheDocument()
     expect(computes.queryByText('Over limit')).not.toBeInTheDocument()
