@@ -300,7 +300,7 @@ export const lintInfoMap: LintInfo[] = [
   },
   {
     name: 'auth_third_party_shared_ci_issuer',
-    title: 'Third-party auth trusts a CI/CD workflow issuer',
+    title: 'Third-party auth trusts a CI/CD workload identity issuer',
     icon: <LockIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
     link: ({ projectRef }) => `/project/${projectRef}/auth/third-party`,
     linkText: 'View settings',

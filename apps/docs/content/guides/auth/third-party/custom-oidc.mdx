@@ -118,18 +118,22 @@ Some of these issuers sign tokens for every account on the service, so a token f
 
 </Admonition>
 
-These services run workflow identity issuers:
+These services run workload identity issuers:
 
-| Service           | Issuer URL                                                      | Scope of the issuer         |
-| ----------------- | --------------------------------------------------------------- | --------------------------- |
-| GitHub Actions    | `https://token.actions.githubusercontent.com`                   | Shared by all accounts      |
-| GitHub Enterprise | `https://token.actions.githubusercontent.com/<enterprise-slug>` | One per enterprise          |
-| GitLab.com        | `https://gitlab.com`                                            | Shared by all accounts      |
-| Buildkite         | `https://agent.buildkite.com`                                   | Shared by all organizations |
-| HCP Terraform     | `https://app.terraform.io`                                      | Shared by all organizations |
-| CircleCI          | `https://oidc.circleci.com/org/<organization-id>`               | One per organization        |
+| Service                           | Issuer URL                                                                            | Scope of the issuer         |
+| --------------------------------- | ------------------------------------------------------------------------------------- | --------------------------- |
+| GitHub Actions                    | `https://token.actions.githubusercontent.com`                                         | Shared by all accounts      |
+| GitHub Actions, enterprise        | `https://token.actions.githubusercontent.com/<enterprise-slug>`                       | One per enterprise          |
+| GitHub Enterprise Cloud (GHE.com) | `https://token.actions.<subdomain>.ghe.com`, or with `/<enterprise-slug>`             | One per tenant              |
+| GitHub Enterprise Server          | `https://<host>/_services/token`                                                      | One per server              |
+| GitLab.com                        | `https://gitlab.com`                                                                  | Shared by all accounts      |
+| CircleCI                          | `https://oidc.circleci.com/org/<organization-id>`, or `https://oidc.circleci.com`     | One per organization        |
+| Bitbucket Pipelines               | `https://api.bitbucket.org/2.0/workspaces/<workspace>/pipelines-config/identity/oidc` | One per workspace           |
+| Buildkite                         | `https://agent.buildkite.com`                                                         | Shared by all organizations |
+| HCP Terraform                     | `https://app.terraform.io`                                                            | Shared by all organizations |
+| Semaphore                         | `https://<organization>.semaphoreci.com`                                              | One per organization        |
 
-Bitbucket Pipelines, Azure DevOps, Bitrise, Codefresh, Semaphore, Harness, and Spacelift also issue workflow tokens. Check your service's documentation for its issuer URL and for the claims it signs.
+Azure DevOps, Bitrise, Codefresh, Harness, and Spacelift also issue workload tokens. Check your service's documentation for its issuer URL and for the claims it signs.
 
 To keep other accounts out when you do use one of these issuers, require a claim that only your pipelines carry. For GitHub Actions, `repository` holds the owner and repository name, and `repository_owner` holds the owner. Their numeric counterparts, `repository_id` and `repository_owner_id`, don't change when you rename or transfer a repository, so prefer them when you can.
 
