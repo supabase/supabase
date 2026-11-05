@@ -1,6 +1,7 @@
 import { ReactNode } from 'react'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { EgressStorageDrilldownPanel } from './EgressStorageDrilldownPanel'
 import { USAGE_APPROACHING_THRESHOLD } from '@/components/interfaces/Billing/Billing.constants'
 import { EgressType, PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -115,6 +116,7 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
         'Contains any outgoing traffic that is served from a cache hit. Includes API, Storage and Edge Functions.\nBilling is based on the total sum of cached egress in GB throughout your billing period.',
       chartDescription:
         'Cached and uncached egress for the period. The two stack to your total egress. The data refreshes every hour.',
+      additionalInfo: () => <EgressStorageDrilldownPanel />,
       links: [
         {
           name: 'Documentation',
