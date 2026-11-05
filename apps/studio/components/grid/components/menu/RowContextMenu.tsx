@@ -36,6 +36,10 @@ export const RowContextMenuContent = ({
     tableEditorSnap.onEditRow(row)
   }, [row, tableEditorSnap])
 
+  const onDuplicateRowClick = useCallback(() => {
+    tableEditorSnap.onDuplicateRow(row)
+  }, [row, tableEditorSnap])
+
   const onCopyCellContent = useCallback(() => {
     if (!activeCellPosition) return
 
@@ -119,6 +123,10 @@ export const RowContextMenuContent = ({
           <DropdownMenuItem className="gap-x-2" onSelect={onEditRowClick}>
             <EditIcon size={12} />
             <span className="text-xs">Edit row</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem className="gap-x-2" onSelect={onDuplicateRowClick}>
+            <CopyIcon size={12} />
+            <span className="text-xs">Duplicate row</span>
           </DropdownMenuItem>
           <DropdownMenuSeparator />
           <DropdownMenuItem className="gap-x-2" onSelect={onDeleteRow}>

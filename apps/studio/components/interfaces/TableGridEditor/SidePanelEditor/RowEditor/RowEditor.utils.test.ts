@@ -4,10 +4,16 @@ import { describe, expect, it, vi } from 'vitest'
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
+  generateDuplicateRowObject,
+  generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getDuplicatePrimaryKeyMatch,
+  getTruncatedFieldErrors,
+  getTruncatedFieldNames,
   isValueTruncated,
   parseValue,
+  prepareRowForDuplication,
   validateFields,
 } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
 
@@ -797,5 +803,207 @@ describe('generateUpdateRowPayload', () => {
     ]
     const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
     expect(payload).toEqual({ price: '90' })
+  })
+})
+
+describe('prepareRowForDuplication', () => {
+  const sourceRow = {
+    idx: 4,
+    __tempId: 'tmp-1',
+    id: 12,
+    name: 'Paris',
+    timezone: 'Europe/Paris',
+    user_id: 'user-1',
+    created_at: '2026-06-12 07:00:01+00',
+    is_discounted: true,
+  }
+
+  it('copies regular and foreign-key columns', () => {
+    expect(
+      prepareRowForDuplication(sourceRow, {
+        primary_keys: [{ name: 'id' }],
+        columns: [
+          { name: 'id', is_identity: true, is_generated: false },
+          { name: 'name' },
+          { name: 'timezone' },
+          { name: 'user_id' },
+          { name: 'created_at' },
+        ],
+      })
+    ).toEqual({
+      name: 'Paris',
+      timezone: 'Europe/Paris',
+      user_id: 'user-1',
+      created_at: '2026-06-12 07:00:01+00',
+      is_discounted: true,
+    })
+  })
+
+  it('drops every column in a composite primary key', () => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 1, org_id: 'org-1', item_id: 'item-1', quantity: 3 },
+        {
+          primary_keys: [{ name: 'org_id' }, { name: 'item_id' }],
+          columns: [{ name: 'org_id' }, { name: 'item_id' }, { name: 'quantity' }],
+        }
+      )
+    ).toEqual({ quantity: 3 })
+  })
+
+  it('drops identity and generated columns that are not primary keys', () => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 1, id: 9, sku: 'abc', total: 40, is_discounted: true },
+        {
+          primary_keys: [{ name: 'id' }],
+          columns: [
+            { name: 'id', is_identity: true },
+            { name: 'sku' },
+            { name: 'total' },
+            { name: 'is_discounted', is_generated: true },
+          ],
+        }
+      )
+    ).toEqual({ sku: 'abc', total: 40 })
+  })
+
+  it('preserves null and empty string values on copied columns', () => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 0, id: 1, notes: null, label: '' },
+        {
+          primary_keys: [{ name: 'id' }],
+          columns: [{ name: 'id' }, { name: 'notes' }, { name: 'label' }],
+        }
+      )
+    ).toEqual({ notes: null, label: '' })
+  })
+
+  it('returns an empty object when every column is excluded', () => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 2, __isDeleted: true, id: 1 },
+        {
+          primary_keys: [{ name: 'id' }],
+          columns: [{ name: 'id', is_identity: true }],
+        }
+      )
+    ).toEqual({})
+  })
+
+  it('copies all data columns when the table has no primary key', () => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 8, name: 'logs', value: 1 },
+        { primary_keys: [], columns: [{ name: 'name' }, { name: 'value' }] }
+      )
+    ).toEqual({ name: 'logs', value: 1 })
+  })
+
+  it.each([
+    ['missing', {}],
+    ['null', { primary_keys: null, columns: null }],
+  ])('copies data columns and drops grid metadata when table metadata is %s', (_, table) => {
+    expect(
+      prepareRowForDuplication(
+        { idx: 1, __tempId: 'tmp-1', __isDeleted: false, id: 2, name: 'Paris' },
+        table
+      )
+    ).toEqual({ id: 2, name: 'Paris' })
+  })
+})
+
+describe('generateDuplicateRowObject', () => {
+  const makeColumn = (name: string, format: string, default_value: string | null = null) =>
+    ({
+      name,
+      format,
+      data_type: format,
+      default_value,
+      is_nullable: true,
+      is_identity: false,
+      is_generated: false,
+    }) as any
+  const makeTable = (columns: any[]) => ({ columns, primary_keys: [{ name: 'id' }] }) as any
+  const duplicate = (row: Record<string, any>, table: any) => {
+    const fields = generateRowFields(prepareRowForDuplication(row, table), table, [])
+    return { fields, payload: generateDuplicateRowObject(row, fields) }
+  }
+
+  it.each(['timestamp', 'timestamptz', 'date', 'time', 'timetz'])(
+    'keeps a NULL %s through the duplicate pipeline',
+    (format) => {
+      const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', format)])
+      expect(duplicate({ id: 1, at: null }, table).payload).toEqual({ at: null })
+    }
+  )
+
+  it('keeps a NULL instead of applying the column default', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamptz', 'now()')])
+    expect(duplicate({ id: 1, at: null }, table).payload).toEqual({ at: null })
+  })
+
+  it('copies a set datetime value', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp')])
+    expect(duplicate({ id: 1, at: '2024-01-02T03:04:05' }, table).payload).toEqual({
+      at: '2024-01-02T03:04:05',
+    })
+  })
+
+  it('uses a value typed over a copied NULL', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp')])
+    const { fields } = duplicate({ id: 1, at: null }, table)
+    const edited = fields.map((field) =>
+      field.name === 'at' ? { ...field, value: '2024-01-02T03:04:05' } : field
+    )
+    expect(generateDuplicateRowObject({ id: 1, at: null }, edited)).toEqual({
+      at: '2024-01-02T03:04:05',
+    })
+  })
+
+  it('leaves an empty value alone when the source was not NULL', () => {
+    const table = makeTable([makeColumn('id', 'int8'), makeColumn('at', 'timestamp', 'now()')])
+    const { fields } = duplicate({ id: 1, at: '2024-01-02T03:04:05' }, table)
+    const cleared = fields.map((field) => (field.name === 'at' ? { ...field, value: '' } : field))
+    expect(generateDuplicateRowObject({ id: 1, at: '2024-01-02T03:04:05' }, cleared)).toEqual({})
+  })
+})
+
+describe('getDuplicatePrimaryKeyMatch', () => {
+  it('reads every primary key from the source row', () => {
+    expect(
+      getDuplicatePrimaryKeyMatch(
+        { org: 1, id: 2, name: 'Paris' },
+        { primary_keys: [{ name: 'org' }, { name: 'id' }] }
+      )
+    ).toEqual({ org: 1, id: 2 })
+  })
+
+  it('returns undefined without a complete primary key', () => {
+    expect(getDuplicatePrimaryKeyMatch({ id: 2 }, { primary_keys: [] })).toBeUndefined()
+    expect(getDuplicatePrimaryKeyMatch({ id: 2 }, {})).toBeUndefined()
+    expect(
+      getDuplicatePrimaryKeyMatch({ id: 2 }, { primary_keys: [{ name: 'id' }, { name: 'org' }] })
+    ).toBeUndefined()
+  })
+})
+
+describe('getTruncatedFieldErrors', () => {
+  const field = (name: string, value: string) => ({ name, value, format: 'text' }) as RowField
+  const preview = 'x'.repeat(10240) + '...'
+
+  it('rejects a preview that would otherwise reach the insert payload', () => {
+    const fields = [field('body', preview), field('title', 'short')]
+
+    expect(generateRowObjectFromFields({ fields })).toMatchObject({ body: preview })
+    expect(getTruncatedFieldNames(fields)).toEqual(['body'])
+    expect(Object.keys(getTruncatedFieldErrors(fields))).toEqual(['body'])
+  })
+
+  it('accepts complete values, including long ones', () => {
+    expect(
+      getTruncatedFieldErrors([field('body', 'x'.repeat(12000)), field('title', 'short...')])
+    ).toEqual({})
   })
 })

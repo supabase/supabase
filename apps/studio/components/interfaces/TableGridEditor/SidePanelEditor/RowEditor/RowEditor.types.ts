@@ -1,5 +1,7 @@
 import type { PGTableRelationship } from '@supabase/pg-meta'
 
+export type RowEditorMode = 'new' | 'edit' | 'duplicate'
+
 export interface EditValue {
   row?: any
   column: string
