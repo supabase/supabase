@@ -70,6 +70,13 @@ export const fgaRefinements = {
     },
     ownedQuery: { reveal: (variant) => (variant === 'reveal' ? 'true' : 'false') },
   },
+  'GET /v1/projects/{ref}/api-keys/{id}': {
+    base: [['api_gateway_keys_read'], ['api_gateway_keys_read', 'api_gateway_keys_secret_read']],
+    variants: {
+      reveal: { requires: [['api_gateway_keys_secret_read']] },
+    },
+    ownedQuery: { reveal: (variant) => (variant === 'reveal' ? 'true' : 'false') },
+  },
 } as const satisfies FgaRefinementMap
 
 export type FgaRefinements = typeof fgaRefinements
