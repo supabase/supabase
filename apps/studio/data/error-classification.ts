@@ -82,6 +82,17 @@ export function isAbortError(err: unknown): err is { name: 'AbortError'; message
   return typeof err === 'object' && err !== null && 'name' in err && err.name === 'AbortError'
 }
 
+/**
+ * True for a raw abort or for the tagged `RequestAborted` error the fetch layer turns it into.
+ * Use this instead of checking `error.name === 'AbortError'`.
+ */
+export function isRequestAborted(err: unknown): boolean {
+  return isAbortError(err) || (isStudioError(err) && err._tag === 'RequestAborted')
+}
+
+export const NETWORK_UNREACHABLE_MESSAGE =
+  'Unable to reach the server. Please check your network or try again later.'
+
 // Browsers reject fetch with a TypeError on network failure, but TypeError also covers
 // ordinary programming bugs, so match only the fetch-failure messages (Chrome, Firefox, Safari)
 const FETCH_FAILURE_MESSAGES = [
@@ -105,7 +116,7 @@ export function isFetchFailure(err: unknown): err is TypeError {
  */
 export function classifyError(
   error: unknown,
-  context?: Pick<StudioErrorInput, 'endpoint' | 'method' | 'requestPathname'>
+  context?: Pick<StudioErrorInput, 'endpoint' | 'method'>
 ): StudioError {
   if (isStudioError(error)) return error
 
@@ -117,7 +128,7 @@ export function classifyError(
     const isOffline = typeof navigator !== 'undefined' && navigator.onLine === false
     return new NetworkUnreachableError({
       ...context,
-      message: error.message,
+      message: NETWORK_UNREACHABLE_MESSAGE,
       reason: isOffline ? 'offline' : undefined,
       cause: error,
     })
@@ -139,14 +150,101 @@ const responseErrorBodySchema = z.object({
   code: optional(z.number()),
   requestId: optional(z.string()),
   retryAfter: optional(z.number()),
-  requestPathname: optional(z.string()),
+  endpoint: optional(z.string()),
+  method: optional(z.string()),
   metadata: optional(z.record(z.string(), z.unknown())),
   formattedError: optional(z.string()),
   position: optional(z.string()),
 })
 
+const MAX_TEXT_MESSAGE_LENGTH = 500
+
+const jsonErrorBodySchema = z.object({
+  msg: optional(z.string()),
+  message: optional(z.string()),
+  error: optional(z.string()),
+  metadata: optional(z.record(z.string(), z.unknown())),
+  formattedError: optional(z.string()),
+})
+
+/** Parses `text` as JSON and returns it only when it is a plain object. */
+export function parseJsonObject(text: string): Record<string, unknown> | undefined {
+  try {
+    const parsed: unknown = JSON.parse(text)
+    if (typeof parsed === 'object' && parsed !== null && !Array.isArray(parsed)) {
+      return parsed as Record<string, unknown>
+    }
+  } catch {
+    // not JSON
+  }
+  return undefined
+}
+
 /**
- * Reads the error body the fetch middleware produces for a failed API response. Returns undefined
+ * The single place that turns an HTTP error response into a `RawResponseError`. A JSON object body
+ * supplies the message and extra fields. A short `text/plain` body becomes the message. Other
+ * bodies (HTML error pages, empty bodies, JSON arrays) yield no message, so classification falls
+ * back to the status.
+ */
+export function readResponseError({
+  status,
+  headers,
+  text,
+  requestId,
+  endpoint,
+  method,
+}: {
+  status: number
+  headers: Headers
+  text: string
+  requestId?: string
+  endpoint?: string
+  method?: string
+}): RawResponseError {
+  const parsed = parseJsonObject(text)
+
+  let message: string | undefined
+  let metadata: ErrorMetadata | undefined
+  let formattedError: string | undefined
+
+  if (parsed) {
+    const body = jsonErrorBodySchema.parse(parsed)
+    message = body.msg ?? body.message ?? body.error
+    metadata = body.metadata as ErrorMetadata | undefined
+    formattedError = body.formattedError
+  } else {
+    const trimmed = text.trim()
+    const contentType = headers.get('Content-Type') ?? ''
+    if (
+      trimmed.length > 0 &&
+      trimmed.length <= MAX_TEXT_MESSAGE_LENGTH &&
+      contentType.toLowerCase().startsWith('text/plain')
+    ) {
+      message = trimmed
+    }
+  }
+
+  const retryAfterHeader = headers.get('Retry-After') ?? headers.get('X-RateLimit-Reset')
+  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+
+  const raw: RawResponseError = {
+    message,
+    code: status,
+    retryAfter: Number.isNaN(retryAfter) ? undefined : retryAfter,
+    requestId,
+    endpoint,
+    method,
+    metadata,
+    formattedError,
+  }
+  return Object.fromEntries(
+    Object.entries(raw).filter(([, value]) => value !== undefined)
+  ) as RawResponseError
+}
+
+/**
+ * Validates the `RawResponseError` shape of the value `handleError` receives (a body from
+ * `readResponseError` or a hand-built `{ message, code }` object). Returns undefined
  * when there is neither a message nor a status code, or for tagged, aborted, and fetch-failure
  * errors that merely carry a message, so the caller can fall back to `classifyError`.
  */

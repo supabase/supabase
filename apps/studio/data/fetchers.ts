@@ -7,7 +7,9 @@ import { refetchWithoutCache, reportEmptyBodyResponse } from './empty-body-diagn
 import {
   classifyError,
   classifyResponseError,
+  parseJsonObject,
   parseResponseErrorBody,
+  readResponseError,
 } from './error-classification'
 import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
@@ -23,15 +25,19 @@ import { uuidv4 } from '@/lib/helpers'
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
+// The OpenAPI path pattern of each in-flight request, recorded by `onRequest` (which receives
+// `schemaPath`) and read by `fetchHandler`, which only sees the `Request`.
+const requestEndpoints = new WeakMap<Request, string>()
+
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
-  } catch (err: any) {
-    if (err instanceof TypeError && err.message === 'Failed to fetch') {
-      console.error(err)
-      throw new Error('Unable to reach the server. Please check your network or try again later.')
-    }
-    throw err
+  } catch (err) {
+    const request = typeof Request !== 'undefined' && input instanceof Request ? input : undefined
+    throw classifyError(err, {
+      endpoint: request ? requestEndpoints.get(request) : undefined,
+      method: request?.method ?? init?.method,
+    })
   }
 }
 
@@ -150,7 +156,7 @@ export async function normalizeEmptyBodyResponse(
   })
 }
 
-function pgMetaGuard(request: Request) {
+function pgMetaGuard(request: Request, schemaPath: string) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
@@ -162,6 +168,8 @@ function pgMetaGuard(request: Request) {
         code: 400,
         requestId: request.headers.get('X-Request-Id') ?? undefined,
         retryAfter: retryAfterHeader ? parseInt(retryAfterHeader) : undefined,
+        endpoint: schemaPath,
+        method: request.method,
       })
     }
     if (!request.headers.get('x-pg-application-name')) {
@@ -171,14 +179,59 @@ function pgMetaGuard(request: Request) {
   return request
 }
 
+async function readBodyText(response: Response): Promise<string> {
+  try {
+    return await response.text()
+  } catch {
+    // unreadable body: classify by status alone
+    return ''
+  }
+}
+
+/**
+ * Turns every non-OK response into a JSON object body that `parseResponseErrorBody` can read.
+ * openapi-fetch builds `error` only from the returned body, so the fields extracted by
+ * `readResponseError` are serialized over the original JSON object body (some callers read
+ * other fields from it directly).
+ */
+async function buildErrorResponse(
+  response: Response,
+  { request, schemaPath }: { request: Request; schemaPath: string }
+): Promise<Response> {
+  const text = await readBodyText(response.clone())
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text,
+    requestId: request.headers.get('X-Request-Id') ?? undefined,
+    endpoint: schemaPath,
+    method: request.method,
+  })
+
+  // Keep the original body's other fields: some callers read the openapi-fetch `error` directly
+  const original = parseJsonObject(text)
+
+  const headers = new Headers(response.headers)
+  // The old length no longer matches, and `Content-Length: 0` makes openapi-fetch skip the body
+  headers.delete('Content-Length')
+  headers.set('Content-Type', 'application/json')
+
+  return new Response(JSON.stringify({ ...original, ...raw }), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 // Middleware
 client.use(
   {
     // Middleware to add authorization headers to the request
-    async onRequest({ request }) {
+    async onRequest({ request, schemaPath }) {
+      requestEndpoints.set(request, schemaPath)
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-      return pgMetaGuard(request)
+      return pgMetaGuard(request, schemaPath)
     },
   },
   {
@@ -188,33 +241,7 @@ client.use(
         return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
-      // handle errors
-      try {
-        // attempt to parse the response body as JSON
-        let body = await response.clone().json()
-
-        // add code field to body
-        body.code = response.status
-
-        body.requestId = request.headers.get('X-Request-Id')
-
-        const retryAfterHeader =
-          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
-        body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-        const requestUrl = new URL(request.url)
-        body.requestPathname = requestUrl.pathname
-
-        return new Response(JSON.stringify(body), {
-          headers: response.headers,
-          status: response.status,
-          statusText: response.statusText,
-        })
-      } catch {
-        // noop
-      }
-
-      return response
+      return buildErrorResponse(response, { request, schemaPath })
     },
   }
 )
@@ -312,16 +339,15 @@ async function handleFetchError(response: unknown): Promise<StudioError> {
 }
 
 async function classifyFetchResponse(response: Response): Promise<StudioError> {
-  const resJson: any = await response.json()
-  const status = response.status
-
-  const message =
-    resJson.message ?? resJson.msg ?? resJson.error ?? `An error has occurred: ${status}`
-  const retryAfterHeader =
-    response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
-  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-  return classifyResponseError({ message, code: status, retryAfter })
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text: await readBodyText(response),
+  })
+  return classifyResponseError({
+    ...raw,
+    message: raw.message ?? `An error has occurred: ${response.status}`,
+  })
 }
 
 /**
@@ -345,7 +371,7 @@ export async function fetchGet<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -377,7 +403,7 @@ export async function fetchPost<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -410,7 +436,7 @@ export async function fetchHeadWithTimeout<T = any>(
       signal: AbortSignal.timeout(timeout),
     })
 
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
     return handleFetchError(error)
