@@ -40,7 +40,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
   defaultColumnVisibility = {},
   fetchNextPage,
   hasNextPage,
-  totalRows = 0,
+  totalRows,
   filterRows = 0,
   totalRowsFetched = 0,
   setColumnOrder,
@@ -252,10 +252,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         <span className="font-mono font-medium">
                           {formatCompactNumber(totalRowsFetched)}
                         </span>{' '}
-                        of{' '}
-                        <span className="font-mono font-medium">
-                          {formatCompactNumber(totalRows)}
-                        </span>{' '}
+                        {totalRows !== undefined && (
+                          <>
+                            of{' '}
+                            <span className="font-mono font-medium">
+                              {formatCompactNumber(totalRows)}
+                            </span>{' '}
+                          </>
+                        )}
                         rows
                       </p>
                     </>
@@ -266,10 +270,14 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                         <span className="font-mono font-medium">
                           {formatCompactNumber(filterRows)}
                         </span>{' '}
-                        of{' '}
-                        <span className="font-mono font-medium">
-                          {formatCompactNumber(totalRows)}
-                        </span>{' '}
+                        {totalRows !== undefined && (
+                          <>
+                            of{' '}
+                            <span className="font-mono font-medium">
+                              {formatCompactNumber(totalRows)}
+                            </span>{' '}
+                          </>
+                        )}
                         rows)
                       </p>
                     )

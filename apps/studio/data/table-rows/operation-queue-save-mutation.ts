@@ -10,6 +10,7 @@ import { getTableRowUpdateSql } from './table-row-update-mutation'
 import type { PendingAddRow } from '@/components/grid/types'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
 import {
@@ -18,7 +19,7 @@ import {
   QueuedOperationType,
   type EditCellContentOperation,
 } from '@/state/table-editor-operation-queue.types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 function getEditCellOperationRowKey(operation: EditCellContentOperation): string {
   const rowIdentifiersKey = JSON.stringify(
@@ -183,12 +184,12 @@ export const useOperationQueueSaveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OperationQueueSaveData, ResponseError, OperationQueueSaveVariables>,
+  UseCustomMutationOptions<OperationQueueSaveData, StudioError, OperationQueueSaveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OperationQueueSaveData, ResponseError, OperationQueueSaveVariables>({
+  return useMutation<OperationQueueSaveData, StudioError, OperationQueueSaveVariables>({
     mutationFn: (vars) => saveOperationQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, operations } = variables

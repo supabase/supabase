@@ -6,7 +6,8 @@ import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { viewKeys } from '@/data/views/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableDeleteVariables = {
   projectRef: string
@@ -45,12 +46,12 @@ export const useTableDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableDeleteData, ResponseError, TableDeleteVariables>,
+  UseCustomMutationOptions<TableDeleteData, StudioError, TableDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableDeleteData, ResponseError, TableDeleteVariables>({
+  return useMutation<TableDeleteData, StudioError, TableDeleteVariables>({
     mutationFn: (vars) => deleteTable(vars),
     async onSuccess(data, variables, context) {
       const { id, projectRef, schema, name } = variables

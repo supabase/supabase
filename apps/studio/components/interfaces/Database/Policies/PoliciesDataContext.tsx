@@ -2,7 +2,7 @@ import type { PropsWithChildren } from 'react'
 import { createContext, useCallback, useContext, useMemo } from 'react'
 
 import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTableRow/PolicyTableRow.utils'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type TableKey = `${string}.${string}`
 
@@ -10,7 +10,7 @@ type PoliciesDataContextValue = {
   getPoliciesForTable: (schema: string, table: string) => Array<Policy>
   isPoliciesLoading: boolean
   isPoliciesError: boolean
-  policiesError?: ResponseError | Error
+  policiesError?: StudioError | Error
   exposedSchemas: Set<string>
 }
 
@@ -26,7 +26,7 @@ type PoliciesDataProviderProps = {
   policies: Array<Policy>
   isPoliciesLoading: boolean
   isPoliciesError: boolean
-  policiesError?: ResponseError | Error
+  policiesError?: StudioError | Error
   exposedSchemas: string[]
 }
 

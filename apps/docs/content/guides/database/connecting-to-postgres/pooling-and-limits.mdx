@@ -32,17 +32,15 @@ There are two kinds, and they work together.
 
 **Application-side poolers** are built into connection libraries and API servers, such as Prisma, SQLAlchemy, and Postgres.js. They keep a few connections open and reuse them. On a persistent backend, such as a long-running container or VM, an application-side pooler is enough on its own.
 
-**Server-side poolers**, such as Supavisor in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or edge functions, or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
-
-For more on when each is needed and how to size them, see the [Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI).
+**Server-side poolers**, such as the shared pooler in transaction mode, run in front of the database and serve many clients. Use one when connections come from serverless or edge functions, or from anything that scales horizontally. These environments open many short-lived connections, which is the case an application-side pooler can't cover.
 
 ### Shared and dedicated poolers [#shared-pooler]
 
-Supabase offers two poolers. The shared pooler, [Supavisor](https://github.com/supabase/supavisor), is multi-tenant, available on every project, and IPv4-only. The dedicated pooler, [PgBouncer](https://www.pgbouncer.org/), is available on paid plans and runs alongside your Postgres instance. Like the direct connection, it is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
+Supabase offers two poolers. The shared pooler ([Supavisor](https://github.com/supabase/supavisor)) is multi-tenant, available on every project, and IPv4-only. The dedicated pooler ([PgBouncer](https://www.pgbouncer.org/)) is available on the Pro Plan and above and runs alongside your Postgres instance. Like the direct connection, it is on IPv6, or on IPv4 if the project has the [IPv4 add-on](/docs/guides/platform/ipv4-address).
 
-The dedicated pooler runs on the same machine as your database, so it connects with lower latency than the shared pooler, which runs on a separate server. It also uses more of your project's compute resources. If your network supports IPv6, or you have the IPv4 add-on, use the dedicated pooler instead of the shared pooler. Direct connections have no pooler overhead, but they require IPv6 unless you have the IPv4 add-on.
+The dedicated pooler runs on the same machine as your database, so it connects with lower latency than the shared pooler, which runs on a separate server. It also uses more of your project's compute resources. Use it for high-load applications, on IPv6 or with the IPv4 add-on. For other cases, see [Which connection method do you use?](/docs/guides/database/connecting-to-postgres#choose-a-connection-method). Direct connections have no pooler overhead, but they require IPv6 unless you have the IPv4 add-on.
 
-In most cases, choose either PgBouncer or Supavisor for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and shared pooler session mode is the alternative when those sessions need IPv4. Run both poolers at once only when you need to raise the total number of concurrent client connections, and expect a higher risk of hitting your database's maximum connection limit on smaller compute sizes.
+In most cases, choose either the dedicated pooler or the shared pooler for pooled or transaction-based traffic. Direct connections remain the best choice for long-lived sessions, and shared pooler session mode is the alternative when those sessions need IPv4. Run both poolers at once only when you need to raise the total number of concurrent client connections, and expect a higher risk of hitting your database's maximum connection limit on smaller compute sizes.
 
 ## Connection limits
 
@@ -50,9 +48,9 @@ In most cases, choose either PgBouncer or Supavisor for pooled or transaction-ba
 
 Pool size sets how many connections a pooler is allowed to open to Postgres. You can adjust it in [Database settings](/dashboard/project/_/database/settings) in the Supabase Dashboard.
 
-Supavisor and PgBouncer read the same setting but apply it independently, so raising it raises the ceiling for both.
+The shared pooler and the dedicated pooler read the same setting but apply it independently, so raising it raises the ceiling for both.
 
-For what the setting counts, and how it interacts with the user, database, and mode combinations connecting to your project, see [the Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI).
+For what the setting counts in the shared pooler, and how it interacts with the user, database, and mode combinations connecting to your project, see [the Supavisor FAQ](/kb/troubleshooting/supavisor-faq-YyP5tI).
 
 ### Client connections and backend connections [#client-connections-and-backend-connections]
 
@@ -63,26 +61,26 @@ There are two limits to understand when working with poolers.
 | Client connections  | How many clients can connect to a pooler at the same time | Your [compute size's max pooler clients limit](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections) |
 | Backend connections | How many active connections a pooler opens to Postgres    | The pool size for that pooler                                                                                                                 |
 
-Both limits apply independently to Supavisor and PgBouncer. One pooler reaching its client limit doesn't affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones close.
+Both limits apply independently to the shared pooler and the dedicated pooler. One pooler reaching its client limit doesn't affect the other. When a pooler reaches this limit, it stops accepting new client connections until existing ones close.
 
 ```txt
 Direct connections +
- Supavisor backend connections +
- PgBouncer backend connections
+ Shared pooler backend connections +
+ Dedicated pooler backend connections
 < Postgres max connections for your compute instance
 ```
 
 Stay below the maximum rather than at it. Supabase services hold their own connections, including Auth, Storage, PostgREST, and the health checker, and those come out of the same total. [Managing connections](/docs/guides/database/connection-management) covers how much headroom to leave.
 
-For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For the terminology, see [Supavisor and connection terminology explained](/kb/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
+For the connection counts that come with each compute size, see [compute and disk](/docs/guides/platform/compute-and-disk#postgres-replication-slots-wal-senders-and-connections). For how these terms apply to the shared pooler, see [Supavisor and connection terminology explained](/kb/troubleshooting/supavisor-and-connection-terminology-explained-9pr_ZO).
 
 ### Monitor connection usage [#monitor-connection-usage]
 
 Track connection usage in the [Observability](/dashboard/project/_/observability/database) section of the Supabase Dashboard. There are three reports:
 
 - **Database Connections:** total active connections by role, including direct and pooled connections.
-- **Dedicated Pooler Client Connections:** active client connections to PgBouncer.
-- **Shared Pooler (Supavisor) Client Connections:** active client connections to Supavisor.
+- **Dedicated Pooler Client Connections:** active client connections to the dedicated pooler.
+- **Shared Pooler (Supavisor) Client Connections:** active client connections to the shared pooler.
 
 These reports are not real-time. They show the connection count from the last refresh. For up-to-the-second data, query `pg_stat_activity`. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 

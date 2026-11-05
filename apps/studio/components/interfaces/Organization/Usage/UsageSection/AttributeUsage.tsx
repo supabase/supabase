@@ -19,7 +19,7 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface AttributeUsageProps {
   slug: string
@@ -30,7 +30,7 @@ export interface AttributeUsageProps {
   chartMeta: ChartMeta
   subscription?: OrgSubscription
 
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean

@@ -76,11 +76,13 @@ import { ShellFallback } from '@/components/interfaces/App/ShellFallback'
 import { MainScrollContainerProvider } from '@/components/layouts/MainScrollContainerContext'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
 import { GlobalErrorBoundaryState } from '@/components/ui/ErrorBoundary/GlobalErrorBoundaryState'
+import { useChunkLoadReload } from '@/components/ui/ErrorBoundary/useChunkLoadReload'
 import { GlobalShortcuts } from '@/components/ui/GlobalShortcuts/GlobalShortcuts'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedOrganizationCreatedAtQuery } from '@/hooks/misc/useSelectedOrganizationCreatedAt'
 import { AuthProvider } from '@/lib/auth'
+import { getChunkLoadReloadDecision, isChunkLoadError } from '@/lib/chunk-load-error'
 import { getCLIFaviconRoute } from '@/lib/cli-favicon'
 import { toUnixSecondsString } from '@/lib/configcat-attributes'
 import { configureMonacoLoader } from '@/lib/configure-monaco-loader'
@@ -267,8 +269,16 @@ function DynamicTitle() {
 }
 
 const errorBoundaryHandler = (error: Error, _info: ErrorInfo) => {
+  // A chunk failure a reload recovers from isn't worth reporting; one that
+  // recurs inside the reload guard window is reported below
+  if (getChunkLoadReloadDecision(error)) {
+    window.location.reload()
+    return
+  }
+
   Sentry.withScope(function (scope) {
     scope.setTag('globalErrorBoundary', true)
+    if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
     const eventId = Sentry.captureException(error)
     // Attach the Sentry event ID to the error object so it can be accessed by the error boundary
     if (eventId && error && typeof error === 'object') {
@@ -288,17 +298,23 @@ function ErrorBoundaryRoute({ error }: ErrorComponentProps) {
   // `react-error-boundary`) — TanStack's `errorComponent` covers
   // errors thrown during route load/render before the in-tree
   // boundary mounts, so we report from both layers.
+  const { isReloading } = useChunkLoadReload(error)
+
   useEffect(() => {
+    if (isReloading) return
+
     Sentry.withScope((scope) => {
       scope.setTag('routerErrorComponent', true)
+      if (isChunkLoadError(error)) scope.setTag('chunkLoadError', true)
       const eventId = Sentry.captureException(error)
       if (eventId && error && typeof error === 'object') {
         Object.assign(error, { sentryId: eventId })
       }
     })
     console.error(error instanceof Error ? error.stack : error)
-  }, [error])
+  }, [error, isReloading])
 
+  if (isReloading) return null
   return <Error500 />
 }
 

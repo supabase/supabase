@@ -3,18 +3,26 @@ import { toast } from 'sonner'
 
 import { BranchesData } from './branches-query'
 import { branchKeys } from './keys'
-import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type BranchDeleteGrant = GrantForVariants<'delete', '/v1/branches/{branch_id_or_ref}'>
 
 export type BranchDeleteVariables = {
+  grant: BranchDeleteGrant
   branchRef: string
   projectRef: string
 }
 
-export async function deleteBranch({ branchRef }: Pick<BranchDeleteVariables, 'branchRef'>) {
+export async function deleteBranch({
+  branchRef,
+  grant,
+}: Pick<BranchDeleteVariables, 'branchRef' | 'grant'>) {
   const { data, error } = await del('/v1/branches/{branch_id_or_ref}', {
     params: { path: { branch_id_or_ref: branchRef } },
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
@@ -28,11 +36,11 @@ export const useBranchDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BranchDeleteData, ResponseError, BranchDeleteVariables>,
+  UseCustomMutationOptions<BranchDeleteData, StudioError, BranchDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchDeleteData, ResponseError, BranchDeleteVariables>({
+  return useMutation<BranchDeleteData, StudioError, BranchDeleteVariables>({
     mutationFn: (vars) => deleteBranch(vars),
     async onSuccess(data, variables, context) {
       const { branchRef, projectRef } = variables

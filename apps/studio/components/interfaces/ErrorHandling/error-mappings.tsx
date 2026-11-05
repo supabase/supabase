@@ -1,18 +1,18 @@
 import { ComponentType } from 'react'
 
 import { ConnectionTimeoutTroubleshooting } from './errorMappings/ConnectionTimeout'
-import { ConnectionTimeoutError } from '@/types/api-errors'
-import type { ClassifiedError, KnownErrorType } from '@/types/api-errors'
-import type { ResponseError } from '@/types/base'
+import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
+import type { ClassifiedError, StudioErrorInput } from '@/lib/errors/studio-errors'
+
+/** Mapping ID, also sent as `errorType` in troubleshooter telemetry. */
+type ErrorMappingId = 'connection-timeout'
 
 export interface ErrorMapping {
-  id: KnownErrorType
+  id: ErrorMappingId
   Troubleshooting: ComponentType
 }
 
-type ErrorConstructor = new (
-  ...args: ConstructorParameters<typeof ResponseError>
-) => ClassifiedError
+type ErrorConstructor = new (input: StudioErrorInput) => ClassifiedError
 
 export const ERROR_MAPPINGS = new Map<ErrorConstructor, ErrorMapping>([
   [

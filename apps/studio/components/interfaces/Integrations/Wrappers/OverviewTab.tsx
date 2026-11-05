@@ -3,13 +3,11 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { AddWrapperButton } from './AddWrapperButton'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
@@ -116,16 +114,4 @@ export const WrapperContent = () => {
   )
 }
 
-export const WrapperOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
-
-  return (
-    <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
-      <div className="mx-10">
-        <WrapperOverviewContent />
-      </div>
-    </IntegrationOverviewTab>
-  )
-}
+export const WrapperOverviewTab = () => <RequiredExtensionsSection />

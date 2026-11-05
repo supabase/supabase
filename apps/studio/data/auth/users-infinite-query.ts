@@ -7,11 +7,12 @@ import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomInfiniteQueryOptions } from '@/types'
 
 const USERS_PAGE_LIMIT = 50
 type UsersData = { result: User[] }
-type UsersError = ResponseError
+type UsersError = StudioError
 type UsersVariables = {
   projectRef?: string
   connectionString?: string | null

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { GitMergeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -5,8 +6,10 @@ import { toast } from 'sonner'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const MergeRequestButton = () => {
@@ -17,7 +20,11 @@ export const MergeRequestButton = () => {
 
   const projectRef = projectDetails?.parent_project_ref || ref
 
-  const { data: branches } = useBranchesQuery({ projectRef }, { enabled: Boolean(projectDetails) })
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
+    enabled: Boolean(projectDetails),
+  })
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
@@ -26,6 +33,10 @@ export const MergeRequestButton = () => {
   })
 
   const selectedBranch = branches?.find((branch) => branch.project_ref === ref)
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: selectedBranch?.is_default,
+  })
 
   if (!projectRef || !selectedBranch || selectedBranch.is_default || selectedBranch.git_branch)
     return null
@@ -33,13 +44,21 @@ export const MergeRequestButton = () => {
   const hasReviewRequested = !!selectedBranch.review_requested_at
   const buttonLabel = hasReviewRequested ? 'Review merge request' : 'Open merge request'
 
+  const canOpenMergeRequest = updateBranchGrant.status === 'granted'
+  const isDisabled = !hasReviewRequested && !canOpenMergeRequest
+  const tooltipText = isDisabled
+    ? 'You need additional permissions to open merge requests'
+    : buttonLabel
+
   const handleClick = () => {
     track('header_merge_request_button_clicked', { hasReviewRequested })
     if (hasReviewRequested) {
       router.push(`/project/${selectedBranch.project_ref}/merge`)
     } else {
+      if (updateBranchGrant.status !== 'granted') return
       updateBranch(
         {
+          grant: updateBranchGrant.grant,
           branchRef: selectedBranch.project_ref,
           projectRef,
           requestReview: true,
@@ -63,9 +82,10 @@ export const MergeRequestButton = () => {
       className="rounded-full w-[26px] h-[26px]"
       onClick={handleClick}
       loading={isUpdating}
+      disabled={isDisabled}
       tooltip={{
         content: {
-          text: buttonLabel,
+          text: tooltipText,
           side: 'bottom',
           align: 'center',
         },

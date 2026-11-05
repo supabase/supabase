@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -20,12 +21,13 @@ import { AVAILABLE_REPLICA_REGIONS } from '../Infrastructure/InfrastructureConfi
 import { ProjectAccessSection } from './ProjectAccessSection'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useBranchesQuery } from '@/data/branches/branches-query'
+import { branchesQueryOptions } from '@/data/branches/branches-query'
 import { useProjectUpdateMutation } from '@/data/projects/project-update-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const General = () => {
   const { ref } = useParams()
@@ -33,10 +35,16 @@ export const General = () => {
   const isBranch = Boolean(project?.parent_project_ref)
   const entityLabel = isBranch ? 'Branch' : 'Project'
 
-  const { data: branches } = useBranchesQuery(
-    { projectRef: project?.parent_project_ref },
-    { enabled: isBranch }
-  )
+  const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
+    projectRef: project?.parent_project_ref,
+  })
+  const { data: branches } = useQuery({
+    ...branchesQueryOptions({
+      projectRef: project?.parent_project_ref,
+      grant: branchesGrant.grant,
+    }),
+    enabled: isBranch,
+  })
   const branch = branches?.find((x) => x.project_ref === ref)
   const projectName = isBranch ? branch?.name : project?.name
 
