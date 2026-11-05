@@ -42,9 +42,9 @@ export const MOBILE_PRODUCT_MENU_REGISTRY: Record<string, ComponentType | null> 
       default: m.RealtimeProductMenu,
     }))
   ),
-  advisors: React.lazy(() =>
-    import('@/components/layouts/AdvisorsLayout/AdvisorsSidebarMenu').then((m) => ({
-      default: m.AdvisorsSidebarMenu,
+  issues: React.lazy(() =>
+    import('@/components/layouts/IssuesLayout/IssuesSidebar').then((m) => ({
+      default: m.IssuesSidebar,
     }))
   ),
   observability: React.lazy(() =>

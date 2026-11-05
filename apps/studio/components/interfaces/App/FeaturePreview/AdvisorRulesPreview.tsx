@@ -12,9 +12,8 @@ export const AdvisorRulesPreview = () => {
   return (
     <div>
       <p className="text-sm text-foreground-light mb-4">
-        Disable specific Advisor categories or rules to prevent them from showing up in Advisor
-        reports or email notifications. This could be useful for rules that might not be applicable
-        to your project.
+        Turn off specific checks or categories to stop them showing up in Issues or email
+        notifications. This could be useful for checks that might not apply to your project.
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
@@ -32,10 +31,10 @@ export const AdvisorRulesPreview = () => {
               href={
                 isAdvisorRulesEnabled
                   ? `/project/${ref}/advisors/rules/security`
-                  : `/project/${ref}/advisors/security`
+                  : `/project/${ref}/issues?category=security`
               }
             >
-              Advisors section.
+              Issues section.
             </InlineLink>
           </li>
         </ul>

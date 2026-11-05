@@ -44,7 +44,7 @@ export const EmptyAdvisor = ({
     if (hasFilters) {
       return {
         heading: 'No items found',
-        message: 'No advisor items match your current filters',
+        message: 'No issues match your current filters',
       }
     }
 

@@ -26,8 +26,8 @@ const NoProjectNotice = () => {
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
           {isHealthAdvisorEnabled
-            ? 'Select a project to view its security, performance and health advisories'
-            : 'Select a project to view its security and performance advisories'}
+            ? 'Select a project to view its security, performance and health issues'
+            : 'Select a project to view its security and performance issues'}
         </p>
       </div>
     </div>
@@ -84,7 +84,7 @@ export const AdvisorPanelBody = ({
       <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
         <AlertTriangleIcon className="text-destructive" />
         <div className="flex flex-col items-center justify-center">
-          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
+          <h4 className="text-base font-normal text-foreground-light">Error loading issues</h4>
           <p className="text-sm text-foreground-lighter">Please try again later.</p>
         </div>
       </div>
