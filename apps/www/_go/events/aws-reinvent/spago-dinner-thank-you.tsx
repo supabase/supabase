@@ -8,12 +8,12 @@ const page: GoPageInput = {
   metadata: {
     title: "You're confirmed | Supabase Spago Dinner",
     description:
-      'Your RSVP for the Supabase dinner at Spago in Las Vegas on December 1, 2026 has been confirmed. Dinner runs from 7:30 PM to 10:00 PM.',
+      'Your RSVP for the Supabase dinner at Spago in Las Vegas on December 1, 2026 has been confirmed. Cocktails begin at 7:30 PM and dinner starts at 8:00 PM.',
   },
   hero: {
     title: "You're confirmed",
     description:
-      "We'll see you at Spago in Las Vegas on December 1, 2026. Dinner runs from 7:30 PM to 10:00 PM. We look forward to seeing you.",
+      "We'll see you at Spago in Las Vegas on December 1, 2026. Cocktails begin at 7:30 PM and dinner starts at 8:00 PM. We look forward to seeing you.",
   },
   sections: [
     {

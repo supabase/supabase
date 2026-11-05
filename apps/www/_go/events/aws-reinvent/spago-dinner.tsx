@@ -15,14 +15,19 @@ const page: GoPageInput = {
   metadata: {
     title: 'Spago Dinner | Supabase at AWS re:Invent 2026',
     description:
-      'Join Supabase leaders for an intimate dinner at Spago in Las Vegas on December 1, 2026, during AWS re:Invent. Dinner runs 7:30 PM to 10:00 PM.',
+      'Join Supabase leaders for an intimate dinner at Spago in Las Vegas on December 1, 2026, during AWS re:Invent. Cocktails at 7:30 PM, dinner at 8:00 PM.',
   },
   hero: {
-    title: 'The future of scalable databases',
-    subtitle: 'An intimate dinner hosted by Supabase',
+    title: 'Building for the agentic future',
+    subtitle: 'Dinner with Supabase at AWS re:Invent',
     description:
-      'Join Supabase product and engineering leaders for a dinner conversation about where Postgres is headed -- from scaling beyond single-node limits to managing globally distributed workloads. Expect sharp perspectives, good food, and the opportunity to connect with other engineering leaders.',
-    // TODO: add hero image of Spago once supplied
+      "Join Supabase leaders for dinner at Spago while you're in Las Vegas for AWS re:Invent. Kris Talajic and Harold Gimenez will host a conversation about building agentic apps on Postgres, from scaling past single-node limits to running globally distributed workloads.",
+    image: {
+      src: '/images/landing-pages/aws-reinvent/spago.jpg',
+      alt: 'Patio at Spago at Bellagio, Las Vegas, at sunset',
+      width: 600,
+      height: 400,
+    },
     ctas: [
       {
         label: 'Reserve your seat',
@@ -43,7 +48,8 @@ const page: GoPageInput = {
           <p>Spago</p>
           <p>Las Vegas, NV</p>
           <p className="mt-4 text-lg font-medium text-foreground">Schedule</p>
-          <p>7:30 PM - 10:00 PM</p>
+          <p>7:30 PM — Cocktails and introductions</p>
+          <p>8:00 PM — Dinner and discussion</p>
         </div>
       ),
     },
