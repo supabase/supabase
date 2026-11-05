@@ -20,11 +20,20 @@
         "DOCS_GITHUB_APP_PRIVATE_KEY",
       ],
     },
+    // Same as build:federated-content, for the listings <FederatedContentListing> reads.
+    "build:federated-content-listing": {
+      "cache": false,
+      "env": [
+        "DOCS_GITHUB_APP_ID",
+        "DOCS_GITHUB_APP_INSTALLATION_ID",
+        "DOCS_GITHUB_APP_PRIVATE_KEY",
+      ],
+    },
     // Generates the guide/reference .md files and manifest.json under public/markdown/.
     // Declaring outputs lets Turbo restore these artifacts on a cache hit; without it a
     // cached run would skip the script and leave the generated markdown missing for `next build`.
     "build:markdown": {
-      "dependsOn": ["build:federated-content"],
+      "dependsOn": ["build:federated-content", "build:federated-content-listing"],
       "outputs": ["public/markdown/**", "public/markdown/manifest.json"],
     },
     "test": {
