@@ -82,8 +82,6 @@ export const ComputeServices = ({
         ? ('warning' as const)
         : ('default' as const)
 
-  // The series is neutral until usage actually crosses the warning threshold, so colour
-  // only ever appears when it means something.
   const isOverThreshold = burndown.status === 'warning' || burndown.status === 'exhausted'
   const burndownInkClassName = isOverThreshold
     ? 'fill-warning stroke-warning'
