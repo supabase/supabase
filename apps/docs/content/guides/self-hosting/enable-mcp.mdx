@@ -4,9 +4,9 @@ description: 'Configure secure access to the MCP server in your self-hosted Supa
 subtitle: 'Configure secure access to the MCP server in your self-hosted Supabase instance.'
 ---
 
-The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/self-hosting/docker) runs behind the internal API. Currently, it does not offer OAuth 2.1 authentication, and is not intended to be exposed to the Internet. The corresponding API route has to be protected by restricting network connections from the outside. By default, all connections to the MCP server are denied.
+The MCP (Model Context Protocol) server in [self-hosted Supabase](/docs/guides/self-hosting/docker) runs behind the API gateway. It does not offer OAuth 2.1. Studio runs a tool only when the request sends `Authorization: Bearer` set to the value of `MCP_ACCESS_TOKEN`. The gateway denies `/mcp` and `/api/mcp` until you allow a private network path.
 
-This guide explains how to securely enable access to your self-hosted MCP server.
+This guide explains how to enable access from your own machine.
 
 ## Security considerations
 
@@ -179,7 +179,23 @@ Add the IP address you discovered to the Kong configuration by editing the follo
 
 </Tabs>
 
-### Step 3: Restart API gateway
+### Step 3: Set the MCP access token
+
+Studio rejects every MCP request until `MCP_ACCESS_TOKEN` is a random string of at least 32 characters.
+
+```sh
+openssl rand -base64 24
+```
+
+Add that output as `MCP_ACCESS_TOKEN` in `.env` in the Docker directory. A shorter value is rejected.
+
+Recreate Studio so the container picks up the variable. `restart` keeps the previous environment.
+
+```sh
+sh run.sh recreate studio
+```
+
+### Step 4: Restart API gateway
 
 After you've added the local IP address as above, restart your gateway:
 
@@ -187,7 +203,7 @@ After you've added the local IP address as above, restart your gateway:
 sh run.sh restart api-gw
 ```
 
-### Step 4: Create the SSH tunnel
+### Step 5: Create the SSH tunnel
 
 From your local machine, create an SSH tunnel to your Supabase host:
 
@@ -197,23 +213,26 @@ ssh -L localhost:8080:localhost:8000 you@your-supabase-host
 
 This command forwards local port `8080` to port `8000` on your Supabase host.
 
-### Step 5: Configure your MCP client
+### Step 6: Configure your MCP client
 
-Edit the settings for your MCP client and add the following to `"mcpServers": {}` or `"servers": {}`:
+Edit the settings for your MCP client and add the following to `"mcpServers": {}` or `"servers": {}`. Replace `<MCP_ACCESS_TOKEN>` with the value from `.env`.
 
 ```json
 {
   "mcpServers": {
     "supabase-self-hosted": {
-      "url": "http://localhost:8080/mcp"
+      "url": "http://localhost:8080/mcp",
+      "headers": {
+        "Authorization": "Bearer <MCP_ACCESS_TOKEN>"
+      }
     }
   }
 }
 ```
 
-### Step 6: Start using the self-hosted MCP server
+### Step 7: Start using the self-hosted MCP server
 
-From your local machine, check that the MCP server is reachable:
+From your local machine, export `MCP_ACCESS_TOKEN` with the value from `.env`, then check that the server is reachable:
 
 ```sh
 curl http://localhost:8080/mcp \
@@ -221,6 +240,7 @@ curl http://localhost:8080/mcp \
   -H "Content-Type: application/json" \
   -H "Accept: application/json, text/event-stream" \
   -H "MCP-Protocol-Version: 2025-06-18" \
+  -H "Authorization: Bearer $MCP_ACCESS_TOKEN" \
   -d '{
     "jsonrpc": "2.0",
     "id": 1,
@@ -248,3 +268,5 @@ If you are unable to connect to the MCP server:
 1. Confirm the Docker bridge gateway IP is correctly added to the API gateway configuration
 2. Check the API gateway's logs for errors: `docker compose logs api-gw`
 3. Make sure your SSH tunnel is active
+4. Confirm `MCP_ACCESS_TOKEN` is set to at least 32 characters and recreate Studio after changing it. A `401` means the bearer token is missing or does not match. A `503` means Studio has no usable token configured.
+5. Send the token on every request: `Authorization: Bearer <MCP_ACCESS_TOKEN>`

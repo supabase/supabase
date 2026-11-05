@@ -15,6 +15,8 @@ import {
   getDevelopmentOperations,
   getFeedbackOperations,
 } from '@/lib/api/self-hosted/mcp'
+import { authorizeMcpRequest } from '@/lib/api/self-hosted/mcp-auth'
+import { IS_PLATFORM } from '@/lib/constants'
 import { DEFAULT_PROJECT } from '@/lib/constants/api'
 
 const supportedFeatureGroupSchema = z.enum([
@@ -46,6 +48,10 @@ const mcpQuerySchema = z.object({
 })
 
 const handler = async (req: NextApiRequest, res: NextApiResponse) => {
+  if (IS_PLATFORM) {
+    return res.status(404).json({ error: { message: 'Not found' } })
+  }
+
   switch (req.method) {
     case 'POST':
       return handlePost(req, res)
@@ -56,6 +62,19 @@ const handler = async (req: NextApiRequest, res: NextApiResponse) => {
 }
 
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
+  const authorization = authorizeMcpRequest({
+    isPlatform: IS_PLATFORM,
+    authorizationHeader: req.headers.authorization,
+    configuredToken: process.env.MCP_ACCESS_TOKEN,
+  })
+
+  if (!authorization.isAuthorized) {
+    if (authorization.status === 401) {
+      res.setHeader('WWW-Authenticate', 'Bearer')
+    }
+    return res.status(authorization.status).json({ error: { message: authorization.message } })
+  }
+
   const { error, data } = mcpQuerySchema.safeParse(req.query)
 
   if (error) {
@@ -64,6 +83,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
 
   const { features, read_only } = data
   const headers = fromNodeHeaders(req.headers)
+  // The bearer token authorizes this route. Do not forward it to pg-meta.
+  headers.delete('authorization')
 
   const platform: SupabasePlatform = {
     database: getDatabaseOperations({ headers }),

@@ -91,6 +91,7 @@ The image tags below are pinned in `docker-compose.yml` at the time of this docu
 | `POSTGRES_PASSWORD` | string | Both | Postgres password for the `POSTGRES_USER_READ_WRITE` role. | Supports `_FILE` suffix for Docker secrets. |
 | `POSTGRES_PORT` | integer | Self-hosted | Postgres TCP port. | Default: `5432`. |
 | `POSTGRES_USER_READ_ONLY` | string | | Postgres role used by the local MCP server when running in read-only mode. | Default: `supabase_read_only_user`. This role has no password by default, so read-only MCP will fail to connect. To enable, assign a password matching `POSTGRES_PASSWORD`. |
+| `MCP_ACCESS_TOKEN` | string | Self-hosted | Bearer token Studio requires on `/api/mcp` before it will run a tool. Requests are rejected when this is unset or shorter than 32 characters. | Generate with `openssl rand -base64 24`. Not a `NEXT_PUBLIC_` variable. The API gateway still denies `/mcp` until you allow a private network path. |
 | `POSTGRES_USER_READ_WRITE` | string | Both | Postgres role used for read/write queries from the SQL editor. | Default: `postgres`. |
 | `STUDIO_PG_META_URL` | URL | Both | URL of the `postgres-meta` service used for schema introspection. | E.g. `http://meta:8080`. Required. |
 | `SUPABASE_PUBLIC_URL` | URL | Both | Public URL of the Supabase stack (Kong gateway) as seen by end users. | Used to construct REST API URLs and connection strings shown in the dashboard. |

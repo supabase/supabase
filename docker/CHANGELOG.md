@@ -10,6 +10,13 @@ See per-service updates below for details. Only the most important changes relev
 
 ---
 
+## Unreleased
+
+### Studio
+- ⚠️ The self-hosted MCP endpoint now requires `Authorization: Bearer` set to `MCP_ACCESS_TOKEN` (at least 32 characters). Studio rejects the request when the token is missing, and hosted Studio does not serve the route. Recreate the Studio container after setting the variable. Network denial of `/mcp` at the API gateway is unchanged. See [Enabling MCP Server Access](https://supabase.com/docs/guides/self-hosting/enable-mcp) (requires `docker-compose.yml` and `.env` update)
+
+---
+
 ## Upcoming deprecations
 
 ⚠️ The following optional Compose override files and their associated services will be removed in a future release:

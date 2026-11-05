@@ -251,7 +251,7 @@ case "$CMD" in
             echo "ERROR: .env not found in $(pwd)" >&2
             exit 1
         fi
-        for var in POSTGRES_PASSWORD DASHBOARD_PASSWORD \
+        for var in POSTGRES_PASSWORD DASHBOARD_PASSWORD MCP_ACCESS_TOKEN \
                    SUPABASE_PUBLISHABLE_KEY SUPABASE_SECRET_KEY \
                    S3_PROTOCOL_ACCESS_KEY_ID S3_PROTOCOL_ACCESS_KEY_SECRET; do
             line=$(grep "^${var}=" .env | head -n1)

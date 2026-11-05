@@ -132,7 +132,7 @@ Routes are matched in the order declared. The first matching prefix wins. Protec
 
 <Admonition type="note">
 
-MCP routes are denied at the gateway by default. Allowing local access requires editing the RBAC rule on the `/mcp` route. See the inline comments in `lds.template.yaml` for the allowed pattern, and [Enabling MCP Server Access](/docs/guides/self-hosting/enable-mcp) for the security model.
+MCP routes are denied at the gateway by default. Allowing local access requires editing the RBAC rule on the `/mcp` route. Studio also requires `Authorization: Bearer` set to `MCP_ACCESS_TOKEN` before it will run a tool. See the inline comments in `lds.template.yaml` for the allowed pattern, and [Enabling MCP Server Access](/docs/guides/self-hosting/enable-mcp) for the security model.
 
 </Admonition>
 
