@@ -7,7 +7,7 @@ import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 const STRETCHED_TARGET_CLASS =
   'block w-full truncate text-left outline-hidden after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-1 focus-visible:after:ring-foreground-muted'
 
-type HomeCardTarget = { href: string; onClick?: never } | { onClick: () => void; href?: never }
+type HomeCardTarget = { href: string; onClick?: () => void } | { onClick: () => void; href?: never }
 
 type HomeCardProps = HomeCardTarget & {
   icon: ReactNode
@@ -43,7 +43,7 @@ export const HomeCard = ({
     <CardContent className="pt-0 flex flex-col justify-end flex-1 min-h-0">
       <h3 className="mb-1">
         {href !== undefined ? (
-          <Link href={href} className={STRETCHED_TARGET_CLASS}>
+          <Link href={href} onClick={onClick} className={STRETCHED_TARGET_CLASS}>
             {title}
           </Link>
         ) : (
