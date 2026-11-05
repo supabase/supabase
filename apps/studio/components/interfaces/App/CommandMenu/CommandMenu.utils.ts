@@ -1,5 +1,6 @@
 export const COMMAND_MENU_SECTIONS = {
   ACTIONS: 'Actions',
+  RELATED_RESOURCES: 'Related resources',
   NAVIGATE: 'Navigate',
   QUERY: 'Queries',
   SUPPORT: 'Support',
