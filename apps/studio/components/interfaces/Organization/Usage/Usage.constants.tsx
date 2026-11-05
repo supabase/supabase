@@ -20,6 +20,7 @@ export const COLOR_MAP = {
   red: { bar: 'fill-red-800', marker: 'bg-red-800' },
   'dark-red': { bar: 'fill-red-1000', marker: 'bg-red-1000' },
   purple: { bar: 'fill-purple-900', marker: 'bg-purple-900' },
+  muted: { bar: 'fill-foreground-muted', marker: 'bg-foreground-muted' },
 }
 
 export const USAGE_STATUS = {
@@ -41,6 +42,7 @@ export type AttributeColor =
   | 'dark-yellow'
   | 'dark-green'
   | 'teal'
+  | 'muted'
 
 export interface Attribute {
   key: string
