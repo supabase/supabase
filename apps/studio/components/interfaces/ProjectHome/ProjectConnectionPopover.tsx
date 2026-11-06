@@ -71,7 +71,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
 
   const { data, isLoading: isLoadingKeys } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: open ? apiKeysGrant.grant : undefined }),
+    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    enabled: open,
     select: getKeys,
   })
   const { publishableKey } = data ?? {}
