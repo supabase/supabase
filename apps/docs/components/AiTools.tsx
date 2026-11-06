@@ -23,7 +23,7 @@ function AiTools({
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   function handleAgentSetupClick() {
-    sendTelemetryEvent({ action: 'agent_setup_clicked' })
+    sendTelemetryEvent({ action: 'agent_setup_clicked', properties: {} })
   }
 
   function handleMarkdownCopy() {
