@@ -1309,9 +1309,6 @@ importers:
       papaparse:
         specifier: ^5.3.1
         version: 5.4.1
-      path-to-regexp:
-        specifier: ^8.0.0
-        version: 8.4.1
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)

@@ -138,7 +138,6 @@
     "openapi-fetch": "0.12.4",
     "openapi-typescript-helpers": "0.0.14",
     "papaparse": "^5.3.1",
-    "path-to-regexp": "^8.0.0",
     "radix-ui": "catalog:",
     "randombytes": "^2.1.0",
     "react": "catalog:",
