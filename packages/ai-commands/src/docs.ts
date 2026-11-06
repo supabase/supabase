@@ -14,8 +14,20 @@ interface PageSection {
   rag_ignore?: boolean
 }
 
+interface ClippyOpenAI {
+  apiKey: string
+  moderations: {
+    create(body: {
+      input: string
+    }): Promise<{ results: { flagged: boolean; categories: object }[] }>
+  }
+  embeddings: {
+    create(body: { model: string; input: string }): Promise<{ data: { embedding: number[] }[] }>
+  }
+}
+
 export async function clippy(
-  openai: OpenAI,
+  openai: ClippyOpenAI,
   supabaseClient: SupabaseClient<any, 'public', any>,
   messages: Message[],
   options?: { useAltSearchIndex?: boolean }
@@ -182,8 +194,9 @@ export async function clippy(
     },
   ]
 
-  const model = 'gpt-4o-mini-2024-07-18'
-  const maxCompletionTokenCount = 1024
+  const model = 'gpt-6-luna'
+  // Allow room for reasoning and code examples while limiting cost on the public endpoint.
+  const maxCompletionTokenCount = 2048
 
   const completionMessages: OpenAI.Chat.Completions.ChatCompletionMessageParam[] = capMessages(
     initMessages,
@@ -195,8 +208,8 @@ export async function clippy(
   const completionOptions = {
     model,
     messages: completionMessages,
-    max_tokens: 1024,
-    temperature: 0,
+    max_completion_tokens: maxCompletionTokenCount,
+    reasoning_effort: 'low',
     stream: true,
   }
 

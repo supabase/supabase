@@ -1,6 +1,6 @@
 'use client'
 
-import type { HTMLAttributes, ReactNode, Ref, RefObject } from 'react'
+import type { HTMLAttributes, ReactNode, RefObject } from 'react'
 import { cn } from 'ui'
 
 import { MobileNavLock } from './MobileNavLock'
@@ -10,7 +10,6 @@ export interface MobileNavDrawerProps extends HTMLAttributes<HTMLDivElement> {
   footer?: ReactNode
   // the button that opens and closes the drawer, so the open drawer can lock the page
   toggleRef: RefObject<HTMLElement | null>
-  ref?: Ref<HTMLDivElement>
 }
 
 export const MobileNavDrawer = ({

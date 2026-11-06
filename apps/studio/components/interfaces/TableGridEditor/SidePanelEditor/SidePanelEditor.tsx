@@ -892,6 +892,7 @@ export const SidePanelEditor = ({
         <RowEditor
           row={snap.sidePanel?.type === 'row' ? snap.sidePanel.row : undefined}
           selectedTable={selectedTable}
+          duplicateFrom={snap.sidePanel?.type === 'row' ? snap.sidePanel.duplicateFrom : undefined}
           visible={snap.sidePanel?.type === 'row'}
           editable={editable}
           closePanel={onClosePanel}

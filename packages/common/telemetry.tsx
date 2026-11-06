@@ -25,8 +25,8 @@ import {
   type SessionRecordingOptions,
 } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
+import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
-import { getSharedTelemetryData } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -207,39 +207,38 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
+  useEffect(() => {
+    if (!enabled) return
+
+    const handleExampleLinkClick = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest('a') : null
+      if (!(anchor instanceof HTMLAnchorElement)) return
+
+      const examplePath = anchor.href.match(EXAMPLE_LINK_PATTERN)?.[1].replace(/\/$/, '')
+      if (!examplePath) return
+
+      sendTelemetryEvent(
+        API_URL,
+        { action: 'example_link_clicked', properties: { examplePath } },
+        pathnameRef.current
+      )
+    }
+
+    document.addEventListener('click', handleExampleLinkClick, { capture: true })
+    return () => document.removeEventListener('click', handleExampleLinkClick, { capture: true })
+  }, [API_URL, enabled])
+
   useTelemetryIdentify(API_URL)
 
   return null
 }
 
-type EventBody = components['schemas']['TelemetryEventBodyV2']
-
-const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
-  'sign_in_submitted',
-  'sign_in_button_clicked',
-  'start_project_button_clicked',
-  'www_pricing_plan_cta_clicked',
-])
+const EXAMPLE_LINK_PATTERN =
+  /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent = hasConsented()
-  if (!consent) return
-
-  const body: EventBody = {
-    ...getSharedTelemetryData(pathname),
-    action: event.action,
-    custom_properties: 'properties' in event ? event.properties : {},
-    groups: 'groups' in event ? { ...event.groups } : {},
-  }
-
-  if (event.action.startsWith('explorer_')) body.page_title = 'Explorer'
-
-  if (body.groups?.project === 'Unknown') {
-    delete body.groups.project
-    if (body.groups?.organization === 'Unknown') {
-      delete body.groups
-    }
-  }
+  const request = buildTelemetryEventRequest(API_URL, event, pathname)
+  if (!request) return
 
   // keepalive lets the request survive a navigation that starts right after
   // the event (the OAuth redirect after sign_in_submitted, a plain-link click
@@ -247,9 +246,9 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
   // page-wide, so it stays scoped to those events. Callers like useTrack
   // fire-and-forget, so rejections are handled here rather than surfacing
   // as unhandled promise rejections.
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
+  return post(request.url, request.body, {
     headers: { Version: '2' },
-    keepalive: KEEPALIVE_ACTIONS.has(event.action),
+    keepalive: request.keepalive,
   }).catch((error) => {
     console.error('Problem sending telemetry event:', error)
   })

@@ -442,7 +442,8 @@ const PreviewBranchActions = ({
                   },
                 }}
               >
-                <RedoIcon size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+                <RedoIcon size={14} />{' '}
+                {branch.git_branch ? <span>Resync branch</span> : <span>Rebase branch</span>}
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
@@ -586,7 +587,8 @@ const PreviewBranchActions = ({
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to switch the branch "{branch.name}" to{' '}
-          {branch.persistent ? 'preview' : 'persistent'}?
+          {branch.persistent ? <span>preview</span> : <span>persistent</span>}
+          <span>?</span>
         </p>
       </ConfirmationModal>
 

@@ -3,6 +3,7 @@
 import type { DocsSearchV2AskAiQuestionSubmittedEvent } from 'common/telemetry-constants'
 import { SearchInputRow, type SearchDialogProps } from 'docs-search/components'
 import { FileText } from 'lucide-react'
+import { useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import {
   useCallback,
@@ -10,17 +11,18 @@ import {
   useRef,
   useState,
   type ChangeEvent,
+  type ComponentProps,
   type FormEvent,
   type KeyboardEvent,
   type UIEvent,
 } from 'react'
+import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import {
   MessageRole,
   MessageStatus,
   useAiChat,
   type Message,
 } from 'ui-patterns/CommandMenu/prepackaged/ai'
-import { CodeCopyButton } from 'ui-patterns/CodeBlock/CodeBlockControls'
 import { Markdown } from 'ui-patterns/Markdown'
 
 import { AskAiIcon } from './AskAiIcon'
@@ -37,6 +39,10 @@ interface AskAiPanelProps {
 interface AiMessagesProps {
   messages: Message[]
   hasError: boolean
+}
+
+interface AiAnswerMarkdownProps {
+  content: string
 }
 
 interface AiSourcesProps {
@@ -160,7 +166,7 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
           <CurvedScrollArea
             viewportRef={listRef}
             onScroll={handleListScroll}
-            className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom"
+            className="max-h-[min(477px,70dvh)] mx-px scroll-fade-bottom motion-safe:scroll-smooth"
           >
             <div ref={followConversation}>
               <AiMessages messages={messages} hasError={hasError} />
@@ -202,9 +208,10 @@ export function AskAiPanel({ initialQuestion }: AskAiPanelProps) {
             {isLoading && !question ? (
               <span
                 aria-hidden
-                className="shimmer pointer-events-none absolute inset-y-0 left-0 flex items-center text-search-dialog text-foreground-lighter"
+                className="shimmer pointer-events-none absolute inset-y-0 left-0 flex items-center text-search-dialog text-foreground-lighter motion-reduce:text-foreground-light"
               >
                 Searching the docs
+                <span className="hidden motion-reduce:inline">…</span>
               </span>
             ) : null}
           </span>
@@ -235,46 +242,30 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
     })
   }
 
-  const handleAnswerLinkClick = (href: string) => {
-    sendTelemetryEvent({
-      action: 'docs_search_v2_ask_ai_answer_link_clicked',
-      properties: { href },
-    })
-  }
-
   return (
     <ol className="flex flex-col gap-4 py-4 pr-4 pl-3">
       {messages.map((message, index) =>
         message.role === MessageRole.User ? (
           // messages have no id and are only ever appended, so the index is stable
-          <li
-            key={index}
-            className="max-w-[80%] self-end rounded-2xl bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word"
-          >
-            {message.content}
+          <li key={index} className="group flex max-w-[80%] flex-col items-end gap-1 self-end">
+            <p className="rounded-lg bg-surface-400 px-3 py-1.5 text-search-dialog text-foreground wrap-break-word">
+              {message.content}
+            </p>
+            <CodeCopyButton
+              content={message.content}
+              label="Copy question"
+              copiedLabel="Question copied"
+              className="border-transparent bg-transparent opacity-0 hover:border-transparent hover:bg-transparent focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100"
+            />
           </li>
         ) : message.status === MessageStatus.Pending && !isFailedAnswer(message, index) ? null : (
           <li
             key={index}
+            className="group"
             aria-busy={!isFailedAnswer(message, index) && message.status !== MessageStatus.Complete}
           >
             {message.status === MessageStatus.Pending ? null : (
-              <Markdown
-                codeBlock
-                className="ask-ai-answer prose-sm wrap-break-word"
-                components={{
-                  a: (props) => (
-                    <a
-                      {...props}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={() => handleAnswerLinkClick(props.href ?? '')}
-                    />
-                  ),
-                }}
-              >
-                {message.content}
-              </Markdown>
+              <AiAnswerMarkdown content={message.content} />
             )}
             {isFailedAnswer(message, index) ? (
               <p className="text-search-dialog text-foreground-lighter">
@@ -295,7 +286,7 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
                 label="Copy as Markdown"
                 copiedLabel="Answer copied as Markdown"
                 onCopied={handleAnswerCopy}
-                className="mt-2 border-transparent bg-transparent hover:border-transparent hover:bg-transparent"
+                className="mt-2 border-transparent bg-transparent opacity-0 hover:border-transparent hover:bg-transparent focus-visible:opacity-100 group-hover:opacity-100 pointer-coarse:opacity-100"
               />
             ) : null}
           </li>
@@ -305,12 +296,56 @@ function AiMessages({ messages, hasError }: AiMessagesProps) {
   )
 }
 
+function AiAnswerMarkdown({ content }: AiAnswerMarkdownProps) {
+  const [visibleLength, setVisibleLength] = useState(0)
+  const isReducedMotion = useReducedMotion()
+  const isCaughtUp = visibleLength >= content.length
+
+  // exception: chunks arrive in bursts. each animation frame shows 1/12 of the hidden text.
+  // a large backlog drains fast, and a small one shows at a steady rate
+  useEffect(() => {
+    if (isCaughtUp || isReducedMotion) return
+    const frame = requestAnimationFrame(() =>
+      setVisibleLength((length) => length + Math.ceil((content.length - length) / 12))
+    )
+    return () => cancelAnimationFrame(frame)
+  }, [content.length, isCaughtUp, isReducedMotion, visibleLength])
+
+  return (
+    <Markdown
+      codeBlock
+      className="ask-ai-answer prose-sm wrap-break-word"
+      // a link component that changes on each frame makes react replace the link, so a click can get lost
+      components={{ a: AiAnswerLink }}
+    >
+      {isReducedMotion ? content : content.slice(0, visibleLength)}
+    </Markdown>
+  )
+}
+
+function AiAnswerLink(props: ComponentProps<'a'>) {
+  const sendTelemetryEvent = useSendTelemetryEvent()
+
+  const handleClick = () => {
+    sendTelemetryEvent({
+      action: 'docs_search_v2_ask_ai_answer_link_clicked',
+      properties: { href: props.href ?? '' },
+    })
+  }
+
+  return <a {...props} target="_blank" rel="noopener noreferrer" onClick={handleClick} />
+}
+
 function AiSources({ sources, onSourceClick }: AiSourcesProps) {
   return (
     <nav aria-label="Sources" className="mt-3">
       <ul className="flex flex-wrap gap-1.5">
-        {sources.map((source) => (
-          <li key={source.path}>
+        {sources.map((source, index) => (
+          <li
+            key={source.path}
+            style={{ transitionDelay: `${index * 50}ms` }}
+            className="transition-[opacity,scale,filter] duration-300 ease-out starting:scale-85 starting:opacity-0 starting:blur-xs motion-reduce:transition-none"
+          >
             <Link
               href={source.path}
               target="_blank"

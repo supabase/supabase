@@ -11,6 +11,10 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
+// Use the real `useParams` (backed by the router mock) instead of the global stub, so the
+// modal sees the `bucketId` of the current URL.
+vi.mock('common', async (importOriginal) => importOriginal<typeof import('common')>())
+
 const bucket: Bucket = {
   id: 'test',
   name: 'test',
@@ -126,5 +130,20 @@ describe(`DeleteBucketModal`, () => {
 
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`)
+  })
+
+  it(`navigates from the deleted bucket's page to the buckets list`, async () => {
+    routerMock.setCurrentUrl(`/project/default/storage/files/buckets/${bucket.id}?delete=true`)
+    const onClose = vi.fn()
+    customRender(<Page onClose={onClose} />)
+
+    await userEvent.click(screen.getByRole(`button`, { name: `Open` }))
+    await screen.findByRole(`dialog`)
+
+    await userEvent.type(screen.getByPlaceholderText(`Type bucket name`), bucket.id)
+    fireEvent.click(screen.getByRole(`button`, { name: `Delete bucket` }))
+
+    await waitFor(() => expect(routerMock.asPath).toStrictEqual(`/project/default/storage/files`))
+    expect(onClose).not.toHaveBeenCalled()
   })
 })
