@@ -65,7 +65,7 @@ Supabase は[ホスティングされたプラットフォーム](https://supaba
 - [PostgREST](http://postgrest.org/)は、PostgreSQL データベースを RESTful API に直接変換するウェブサーバです。
 - [Storage](https://github.com/supabase/storage-api)は、S3 に保存されたファイルを管理するための RESTful なインターフェイスで、パーミッションの管理には Postgres を使用しています。
 - [postgres-meta](https://github.com/supabase/postgres-meta) は、Postgres を管理するための RESTful API で、テーブルの取得、ロールの追加、クエリの実行などを行うことができます。
-- [GoTrue](https://github.com/netlify/gotrue) は、ユーザー管理と SWT トークン発行のための SWT ベースの API です。
+- [GoTrue](https://github.com/supabase/gotrue) は、ユーザー管理と JWT トークン発行のための JWT ベースの API です。
 - [Kong](https://github.com/Kong/kong) は、クラウドネイティブな API ゲートウェイです。
 
 #### クライアント・ライブラリ
