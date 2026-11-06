@@ -122,6 +122,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Twitter</span>
@@ -132,6 +134,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://github.com/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">GitHub</span>
@@ -142,6 +146,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Discord</span>
@@ -152,6 +158,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Youtube</span>
@@ -162,6 +170,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">TikTok</span>
@@ -172,6 +182,8 @@ const Footer = (props: Props) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
                 <span className="sr-only">Instagram</span>
