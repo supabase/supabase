@@ -435,6 +435,24 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/database/{ref}/db-integrity/operations/{op}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Reads the current db-integrity task for an operation on the project primary. */
+    get: operations['DatabaseDbIntegrityController_status']
+    put?: never
+    /** Submits a db-integrity operation on the project primary. */
+    post: operations['DatabaseDbIntegrityController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/database/{ref}/hook-enable': {
     parameters: {
       query?: never
@@ -1279,6 +1297,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/billing/credits/burndown': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Retrieves the burndown of prepaid credit blocks for an organization */
+    get: operations['OrgCreditsController_getBurndown']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/billing/credits/preview': {
     parameters: {
       query?: never
@@ -1657,7 +1692,7 @@ export interface paths {
     options?: never
     head?: never
     /** Assign organization member with new role */
-    patch: operations['MembersController_assignMemberRoleV2']
+    patch: operations['MembersController_assignMemberRoleV2_2']
     trace?: never
   }
   '/platform/organizations/{slug}/members/{gotrue_id}/roles/{role_id}': {
@@ -1795,7 +1830,7 @@ export interface paths {
     get: operations['OAuthAppClientSecretsController_listClientSecrets']
     put?: never
     /** Create oauth app client secret */
-    post: operations['OAuthAppClientSecretsController_CreateClientSecret']
+    post: operations['OAuthAppClientSecretsController_createClientSecret']
     delete?: never
     options?: never
     head?: never
@@ -1813,7 +1848,7 @@ export interface paths {
     put?: never
     post?: never
     /** Remove oauth app client secret */
-    delete: operations['OAuthAppClientSecretsController_RemoveClientSecret']
+    delete: operations['OAuthAppClientSecretsController_removeClientSecret']
     options?: never
     head?: never
     patch?: never
@@ -1950,6 +1985,23 @@ export interface paths {
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/restrictions/recheck': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Re-evaluates a restricted organization and lifts the restriction if it is now within its plan limits */
+    post: operations['OrgRestrictionsController_recheck']
     delete?: never
     options?: never
     head?: never
@@ -2417,6 +2469,23 @@ export interface paths {
     }
     /** Gets all the user's permissions */
     get: operations['PermissionsController_getPermissions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/permissions/v2': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the user's role and effective permissions per organization and project */
+    get: operations['getPermissionsV2']
     put?: never
     post?: never
     delete?: never
@@ -4332,23 +4401,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/status': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /** Get infrastructure status */
-    get: operations['StatusController_getStatus']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
   '/platform/storage/{ref}/analytics-buckets': {
     parameters: {
       query?: never
@@ -5003,6 +5055,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/support/csat': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Submit a support CSAT survey response
+     * @description Called by the Supabase dashboard when a customer answers the satisfaction survey linked from a resolved support ticket. Records the answer on the Front conversation as custom fields and a tag. One answer per conversation.
+     */
+    post: operations['CsatController_submit']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/support/verify-email': {
     parameters: {
       query?: never
@@ -5193,6 +5265,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/warehouse/{ref}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Disable Warehouse
+     * @description Asynchronously stop and delete Warehouse replication, remove its publication, FDW, and reader group, and revoke external catalog access. Optionally delete the DuckLake catalog schema and managed Storage bucket with delete_data=true, requiring SQL and Storage admin write permissions on the configured destination. Poll setup-status for completion. Source tables are preserved.
+     */
+    delete: operations['WarehouseController_deleteWarehouse']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/warehouse/{ref}/catalog': {
     parameters: {
       query?: never
@@ -5202,7 +5294,7 @@ export interface paths {
     }
     /**
      * Get Warehouse catalog access
-     * @description Return whether external Warehouse catalog access is enabled and credentials when enabled.
+     * @description Return whether external Warehouse catalog access is enabled and a connection template with secret placeholders when enabled.
      */
     get: operations['WarehouseController_getCatalog']
     put?: never
@@ -5248,7 +5340,7 @@ export interface paths {
     put?: never
     /**
      * Set up Warehouse
-     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. An empty targets array stops and deletes the Warehouse pipeline and publication, disables external catalog access, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection.
+     * @description Replace the Warehouse publication with the complete requested selection and start syncing. Optionally select another Supabase project for both the DuckLake PostgreSQL catalog and Storage using destination_project_ref; SQL and Storage admin write permissions are required on that project. The configured destination is reused on subsequent requests and cannot be changed through setup. Schema targets include the currently eligible tables in that schema. For backward compatibility, an empty targets array asynchronously stops and deletes the Warehouse pipeline and publication, disables external catalog access, removes the Warehouse reader group, and uninstalls the Warehouse FDW and its dependent foreign tables. Warehouse FDW installation is opt-in, remains on the source project, and is ignored for an empty selection. Prefer DELETE to disable Warehouse and optionally delete its data; poll setup-status for completion.
      */
     post: operations['WarehouseController_setup']
     delete?: never
@@ -5266,7 +5358,7 @@ export interface paths {
     }
     /**
      * Get Warehouse setup status
-     * @description Return the async Warehouse setup status for the project. Overall completion follows the replication pipeline and table copy state; project database FDW markers are informational.
+     * @description Return Warehouse setup or disable status. During and after teardown, persisted lifecycle state is returned without querying ETL or inspecting the project FDW. Otherwise completion follows replication and table copy state.
      */
     get: operations['WarehouseController_getSetupStatus']
     put?: never
@@ -5440,6 +5532,16 @@ export interface components {
             status: string
           }
       result?: unknown[]
+    }
+    /** @default {} */
+    ApproveAuthorizationBody: {
+      /**
+       * @description Allows creation of partial grants, i.e. those where the user is missing permissions for some requested scopes. Ignored if not supported by the app.
+       * @default false
+       */
+      partial?: boolean
+      /** @description The projects that the authorization will be scoped to; if omitted, all of the organization projects will be in scope. */
+      project_refs?: string[]
     }
     ApproveAuthorizationResponse_Output: {
       url: string
@@ -5812,19 +5914,7 @@ export interface components {
       description?: string
       name: string
       /** @enum {string} */
-      type:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
-        | 'webhook'
-        | 'datadog'
-        | 'loki'
-        | 'sentry'
-        | 's3'
-        | 'axiom'
-        | 'last9'
-        | 'otlp'
-        | 'syslog'
+      type: 'webhook' | 'datadog' | 'loki' | 'sentry' | 's3' | 'axiom' | 'last9' | 'otlp' | 'syslog'
     }
     CreateBucketIndexBody: {
       /** @enum {string} */
@@ -6307,10 +6397,10 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
     }
     CreateDestinationResponse_Output: {
       /**
@@ -6360,11 +6450,11 @@ export interface components {
           }[]
           require_sso?: boolean
           /**
-           * @description Role name to assign. Must be on a Team or Enterprise plan to use the read-only role.
+           * @description Role name to assign. Must be on a Team, Platform, or Enterprise plan to use the read-only or no-access roles. no-access grants no project visibility until project-scoped roles are assigned separately.
            * @example developer
            * @enum {string}
            */
-          role?: 'owner' | 'administrator' | 'developer' | 'read-only'
+          role?: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
           role_id?: number
         }
       }[]
@@ -6669,10 +6759,10 @@ export interface components {
     }
     CreatePipelineResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      id: number
+      id: string
     }
     CreatePlatformAppBody: {
       description?: string
@@ -6684,6 +6774,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -6704,8 +6799,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -6749,6 +6848,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -6806,6 +6906,7 @@ export interface components {
             | 't4g.nano'
             | 't3a.nano'
             | 't3.nano'
+            | 't8i.nano'
             | 't4g.micro'
             | 't3a.micro'
             | 't3.micro'
@@ -6820,6 +6921,8 @@ export interface components {
             | 'm8g.medium'
             | 'm9g.medium'
             | 'c6g.medium'
+            | 'c7g.medium'
+            | 'c8g.medium'
             | 'm6g.large'
             | 'm6a.large'
             | 'm6i.large'
@@ -6827,6 +6930,7 @@ export interface components {
             | 'm8i.large'
             | 'm7a.large'
             | 'm8a.large'
+            | 'c6a.large'
             | 'm6g.xlarge'
             | 'm6a.xlarge'
             | 'm6i.xlarge'
@@ -6870,13 +6974,48 @@ export interface components {
             | 'm7a.16xlarge'
             | 'm8a.16xlarge'
             | 'm8g.24xlarge'
+            | 'm6a.24xlarge'
+            | 'm6i.24xlarge'
+            | 'm7i.24xlarge'
+            | 'm8i.24xlarge'
+            | 'm7a.24xlarge'
+            | 'm8a.24xlarge'
             | 'c8g.24xlarge'
+            | 'c6a.24xlarge'
+            | 'c6i.24xlarge'
+            | 'c7i.24xlarge'
+            | 'c8i.24xlarge'
+            | 'c7a.24xlarge'
+            | 'c8a.24xlarge'
             | 'r8g.24xlarge'
+            | 'r6a.24xlarge'
+            | 'r6i.24xlarge'
+            | 'r7i.24xlarge'
+            | 'r8i.24xlarge'
+            | 'r7a.24xlarge'
+            | 'r8a.24xlarge'
             | 'x8g.24xlarge'
+            | 'x8i.24xlarge'
             | 'm8g.48xlarge'
+            | 'm6a.48xlarge'
+            | 'm7i.48xlarge'
+            | 'm8i.48xlarge'
+            | 'm7a.48xlarge'
+            | 'm8a.48xlarge'
             | 'c8g.48xlarge'
+            | 'c6a.48xlarge'
+            | 'c7i.48xlarge'
+            | 'c8i.48xlarge'
+            | 'c7a.48xlarge'
+            | 'c8a.48xlarge'
             | 'r8g.48xlarge'
+            | 'r6a.48xlarge'
+            | 'r7i.48xlarge'
+            | 'r8i.48xlarge'
+            | 'r7a.48xlarge'
+            | 'r8a.48xlarge'
             | 'x8g.48xlarge'
+            | 'x8i.48xlarge'
           /**
            * @description Preferred architecture for WPP projects. Soft hint — the worker selects the cheapest region-available type for this arch and may cross to the other arch if no ODCR capacity is available. Cannot be set together with instance_type. Only for internal use.
            * @enum {string}
@@ -6924,6 +7063,7 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -6993,6 +7133,12 @@ export interface components {
             code: 'americas' | 'emea' | 'apac'
             /** @enum {string} */
             type: 'smartGroup'
+          }
+        | {
+            /** @enum {string} */
+            code: 'auto'
+            /** @enum {string} */
+            type: 'auto'
           }
       /**
        * @description Release channel. If not provided, GA will be used.
@@ -7641,6 +7787,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -7661,8 +7812,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -7706,6 +7861,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -7885,6 +8041,7 @@ export interface components {
       code: string
     }
     CreditRedemptionResponse_Output: {
+      already_redeemed_partner_credits: number
       amount_cents: number
       credits_expire_at: string | null
     }
@@ -7918,6 +8075,15 @@ export interface components {
         | 'requires_confirmation'
         | 'requires_payment_method'
         | 'succeeded'
+    }
+    CsatBody: {
+      comment?: string
+      conversation_id: string
+      satisfied: boolean
+    }
+    CsatResponse_Output: {
+      /** @enum {string} */
+      result: 'success'
     }
     CustomerResponse_Output: {
       additional_emails: string[] | null
@@ -8021,6 +8187,22 @@ export interface components {
         | 'RESTARTING'
         | 'RESIZING'
     }
+    DbIntegritySubmitBody: {
+      idempotency_key?: string
+      metadata?: {
+        [key: string]: string
+      }
+      parameters?: {
+        [key: string]: unknown
+      }
+      rerun?: boolean
+    }
+    DbIntegrityTaskResponse_Output: {
+      error?: string
+      host_lock_yield?: unknown
+      result?: unknown
+      status: string
+    }
     DeclineAuthorizationResponse_Output: {
       id: string
     }
@@ -8036,10 +8218,10 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
     }
     DeleteOAuthAppResponse_Output: {
       client_id: string
@@ -8782,6 +8964,17 @@ export interface components {
       private: number
       shared: number
     }
+    GetCreditBurndownResponse_Output: {
+      data: {
+        amount_cents: number
+        breakdown: {
+          amount_cents: number
+          item: string
+        }[]
+        day: string
+        ending_balance_cents: number
+      }[]
+    }
     GetGitHubConnectionConfigResponse_Output: {
       /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
       config: {
@@ -8948,6 +9141,8 @@ export interface components {
       private_link_associations: {
         account_name?: string
         aws_account_id: string
+        /** @description The custom DNS name configured on the AWS VPC Lattice resource configuration. */
+        custom_dns_name: string
         /** @description Identifier of the database this PrivateLink share targets - the project ref for the primary, or the read replica identifier. */
         database_identifier: string
         /**
@@ -9055,6 +9250,9 @@ export interface components {
         | 'log_auth_error_rate_high'
         | 'log_storage_error_rate_high'
         | 'log_edge_function_error_rate_high'
+        | 'realtime_authorization_timeouts'
+        | 'realtime_postgres_changes_spike'
+        | 'realtime_concurrent_users_near_limit'
         | 'project_not_active'
         | 'advisor_check_unavailable'
       /** Format: date-time */
@@ -9732,6 +9930,7 @@ export interface components {
       payment_attempted: boolean
       payment_is_processing: boolean
       period_end: number
+      prepaid_credits_applied_cents: number
       status: string
       subscription: string | null
       subtotal: number
@@ -10203,14 +10402,18 @@ export interface components {
       unread_count: number
     }
     OAuthAppResponse_Output: {
+      allow_partial_grants?: boolean
       app_id?: string
       authorized_at?: string
       client_id?: string
       created_at?: string
       created_by?: string
+      /** @enum {string} */
+      grant_kind?: 'organization_bound' | 'member_bound'
       icon?: string
       id: string
       name: string
+      project_scoping_mode?: boolean
       redirect_uris?: string[]
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
@@ -10241,6 +10444,61 @@ export interface components {
         | 'storage:write'
       )[]
       website: string
+    }
+    OAuthRoleValidationFailureResponse: {
+      /** @enum {string} */
+      error_code: 'role_validation_failed'
+      message: string
+      /** @description Why the role cannot authorize the OAuth app */
+      validation:
+        | {
+            /** @description The highest-privilege organization role of the user, which is not an owner or administrator */
+            role: {
+              /**
+               * @description The role level; `no-access` means the user has no role at the level that was checked
+               * @enum {string}
+               */
+              name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+            }
+            /** @enum {string} */
+            scope_target: 'organization'
+          }
+        | {
+            /** @description Scopes requested by the OAuth app that the role does not allow */
+            failed_scopes: string[]
+            /** @description The highest-privilege organization role of the user */
+            role: {
+              /**
+               * @description The role level; `no-access` means the user has no role at the level that was checked
+               * @enum {string}
+               */
+              name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+            }
+            /** @enum {string} */
+            scope_target: 'all_projects'
+          }
+        | {
+            /** @description The requested projects for which the user lacks the requested scopes */
+            failures: {
+              /** @description Scopes requested by the OAuth app that the role does not allow */
+              failed_scopes: string[]
+              /**
+               * @description Project ref
+               * @example abcdefghijklmnopqrst
+               */
+              ref: string
+              /** @description The highest-privilege role of the user that applies to the project */
+              role: {
+                /**
+                 * @description The role level; `no-access` means the user has no role at the level that was checked
+                 * @enum {string}
+                 */
+                name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+              }
+            }[]
+            /** @enum {string} */
+            scope_target: 'projects'
+          }
     }
     OnboardingSurveyBody: {
       building?: string
@@ -10331,6 +10589,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponse_Output: {
@@ -10405,7 +10664,7 @@ export interface components {
     }
     OrganizationRoleResponse_Output: {
       org_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10419,7 +10678,7 @@ export interface components {
         }[]
       }[]
       project_scoped_roles: {
-        base_role_id: number
+        base_role_id: number | null
         description: string | null
         id: number
         name: string
@@ -10434,6 +10693,7 @@ export interface components {
       }[]
     }
     OrganizationSlugAvailableVersionsBody: {
+      high_availability?: boolean
       /** @enum {string} */
       provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
       region: string
@@ -10451,6 +10711,8 @@ export interface components {
       billing_email: string | null
       /** @enum {string|null} */
       billing_partner: 'aws_marketplace' | 'vercel_marketplace' | null
+      /** Format: date-time */
+      created_at: string
       has_oriole_project: boolean
       id: number
       integration_source: string | null
@@ -10776,10 +11038,10 @@ export interface components {
          */
         active: boolean
         /**
-         * @description Bytes between the current WAL location and the confirmed flush LSN.
+         * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
          * @example 2048
          */
-        confirmed_flush_lsn_bytes: number
+        confirmed_flush_lsn_bytes?: number | null
         /**
          * @description Flush lag expressed in milliseconds.
          * @example 1200
@@ -10791,10 +11053,10 @@ export interface components {
          */
         reply_time_lag?: number | null
         /**
-         * @description Bytes between the current WAL location and the slot restart LSN.
+         * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
          * @example 1024
          */
-        restart_lsn_bytes: number
+        restart_lsn_bytes?: number | null
         /**
          * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
          * @example 8192
@@ -10813,10 +11075,10 @@ export interface components {
         write_lag?: number | null
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
       /** @description Table statuses */
       table_statuses: {
         /**
@@ -10896,10 +11158,10 @@ export interface components {
            */
           active: boolean
           /**
-           * @description Bytes between the current WAL location and the confirmed flush LSN.
+           * @description Flushed WAL on a primary, or replayed WAL on a standby, minus the slot's confirmed flush position. Includes feedback delay after ETL's local progress. Null when unavailable, including lost slots.
            * @example 2048
            */
-          confirmed_flush_lsn_bytes: number
+          confirmed_flush_lsn_bytes?: number | null
           /**
            * @description Flush lag expressed in milliseconds.
            * @example 1200
@@ -10911,10 +11173,10 @@ export interface components {
            */
           reply_time_lag?: number | null
           /**
-           * @description Bytes between the current WAL location and the slot restart LSN.
+           * @description WAL retained for the slot, measured from the primary WAL write position. Null on standbys, for lost slots, or without a restart position.
            * @example 1024
            */
-          restart_lsn_bytes: number
+          restart_lsn_bytes?: number | null
           /**
            * @description How many bytes of WAL are still safe to build up before the limit of the slot is reached. `null` means Postgres reports unlimited slot WAL retention.
            * @example 8192
@@ -11057,10 +11319,10 @@ export interface components {
        */
       destination_name: string
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      id: number
+      id: string
       /**
        * @description Replicator id
        * @example 9001
@@ -11206,10 +11468,10 @@ export interface components {
          */
         destination_name: string
         /**
-         * @description Pipeline id
-         * @example 1012
+         * @description Pipeline ID
+         * @example 03dg2o5teb2eucxr9ggh3uie6
          */
-        id: number
+        id: string
         /**
          * @description Replicator id
          * @example 9001
@@ -11234,10 +11496,10 @@ export interface components {
     }
     PipelineStatusResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
       /** @description Pipeline status */
       status: {
         /**
@@ -11262,10 +11524,10 @@ export interface components {
         name: string
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
       /** @description Current pipeline version */
       version: {
         /**
@@ -11673,6 +11935,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
       billed_via_partner: boolean
       breakdown: {
@@ -11719,6 +11982,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -11966,6 +12230,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       subscription_id: string
       updated_at: string
       volumeSizeGb?: number | null
@@ -12290,6 +12555,11 @@ export interface components {
       }[]
     }
     RealtimeConfigResponse_Output: {
+      /**
+       * Format: date-time
+       * @description If set, the Realtime service has been suspended by an admin.
+       */
+      admin_suspended_at?: string | null
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool?: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -12315,8 +12585,58 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean | null
     }
-    RegionsInfo_Output: {
+    RecheckRestrictionsResponse_Output: {
+      billing_period_end: string | null
+      /** Format: date-time */
+      checked_at: string
+      message: string | null
+      /** @enum {string} */
+      result: 'lifted' | 'still_restricted' | 'not_restricted' | 'not_eligible' | 'not_recheckable'
+      /** @description Set with `not_recheckable`: recorded violations only support can review. Empty when the organization usage cannot be measured; `message` says so. */
+      unrecheckable_violations: (
+        | 'exceed_db_size_quota'
+        | 'exceed_egress_quota'
+        | 'exceed_cached_egress_quota'
+        | 'exceed_edge_functions_count_quota'
+        | 'exceed_edge_functions_invocations_quota'
+        | 'exceed_monthly_active_users_quota'
+        | 'exceed_realtime_connection_count_quota'
+        | 'exceed_realtime_message_count_quota'
+        | 'exceed_storage_size_quota'
+        | 'exceed_log_query_quota'
+        | 'overdue_payment'
+      )[]
+      violations: {
+        /** @enum {string} */
+        aggregation: 'sum' | 'period_average' | 'period_max'
+        current: number
+        limit: number
+        /** @enum {string} */
+        type:
+          | 'exceed_db_size_quota'
+          | 'exceed_egress_quota'
+          | 'exceed_cached_egress_quota'
+          | 'exceed_edge_functions_count_quota'
+          | 'exceed_edge_functions_invocations_quota'
+          | 'exceed_monthly_active_users_quota'
+          | 'exceed_realtime_connection_count_quota'
+          | 'exceed_realtime_message_count_quota'
+          | 'exceed_storage_size_quota'
+          | 'exceed_log_query_quota'
+          | 'overdue_payment'
+        /** @enum {string} */
+        unit: 'gigabyte' | 'count'
+      }[]
+    }
+    RegionsInfoPlatform_Output: {
       all: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
         smartGroup: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
@@ -12355,14 +12675,21 @@ export interface components {
         }[]
       }
       recommendations: {
-        smartGroup: {
+        auto?: {
+          /** @enum {string} */
+          code: 'auto'
+          name: string
+          /** @enum {string} */
+          type: 'auto'
+        }
+        smartGroup?: {
           /** @enum {string} */
           code: 'americas' | 'emea' | 'apac'
           name: string
           /** @enum {string} */
           type: 'smartGroup'
         }
-        specific: {
+        specific?: {
           /** @enum {string} */
           code:
             | 'us-east-1'
@@ -12487,10 +12814,10 @@ export interface components {
     }
     RollbackTablesResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number
+      pipeline_id: string
       /** @description Rolled back tables */
       tables: {
         /** @description Table replication state */
@@ -13027,6 +13354,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -13110,6 +13438,683 @@ export interface components {
       } | null
       /** @enum {string} */
       tax_status: 'calculated' | 'not_applicable' | 'failed'
+      upcomingInvoice: {
+        appliedCustomerBalance: number
+        billing_cycle_end: string
+        billing_cycle_start: string
+        currency: string
+        currentCosts: {
+          actualInElapsedCycle: number
+          fixedFees: {
+            lineItems: {
+              /** @enum {string} */
+              category: 'fixed_fee'
+              description: string
+              name: string
+              period: {
+                end: string
+                start: string
+              }
+              pre_tax_amount: number
+              pre_tax_amount_before_discount: number
+            }[]
+          }
+          usage: {
+            lineItems: (
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                      | 'PROMOTING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  compute_credits_used: number | null
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  /** @enum {string} */
+                  schema: 'compute'
+                  /** @enum {string} */
+                  type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                      | 'PROMOTING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  description: string
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  quantity: number | null
+                  /** @enum {string} */
+                  schema: 'generic'
+                  unit_price: number | null
+                  unit_price_desc: string | null
+                  /** @enum {string} */
+                  usage_metric?:
+                    | 'EGRESS'
+                    | 'CACHED_EGRESS'
+                    | 'DATABASE_SIZE'
+                    | 'STORAGE_SIZE'
+                    | 'MONTHLY_ACTIVE_USERS'
+                    | 'MONTHLY_ACTIVE_SSO_USERS'
+                    | 'FUNCTION_INVOCATIONS'
+                    | 'FUNCTION_CPU_MILLISECONDS'
+                    | 'STORAGE_IMAGES_TRANSFORMED'
+                    | 'REALTIME_MESSAGE_COUNT'
+                    | 'REALTIME_PEAK_CONNECTIONS'
+                    | 'DISK_SIZE_GB_HOURS_GP3'
+                    | 'DISK_SIZE_GB_HOURS_IO2'
+                    | 'AUTH_MFA_PHONE'
+                    | 'AUTH_MFA_WEB_AUTHN'
+                    | 'LOG_DRAIN_EVENTS'
+                    | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                    | 'DISK_THROUGHPUT_GP3'
+                    | 'DISK_IOPS_GP3'
+                    | 'DISK_IOPS_IO2'
+                    | 'COMPUTE_HOURS_BRANCH'
+                    | 'COMPUTE_HOURS_XS'
+                    | 'COMPUTE_HOURS_SM'
+                    | 'COMPUTE_HOURS_MD'
+                    | 'COMPUTE_HOURS_L'
+                    | 'COMPUTE_HOURS_XL'
+                    | 'COMPUTE_HOURS_2XL'
+                    | 'COMPUTE_HOURS_4XL'
+                    | 'COMPUTE_HOURS_8XL'
+                    | 'COMPUTE_HOURS_12XL'
+                    | 'COMPUTE_HOURS_16XL'
+                    | 'COMPUTE_HOURS_24XL'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                    | 'COMPUTE_HOURS_48XL'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                    | 'CUSTOM_DOMAIN'
+                    | 'PITR_7'
+                    | 'PITR_14'
+                    | 'PITR_28'
+                    | 'IPV4'
+                    | 'LOG_DRAIN'
+                    | 'ETL_PIPELINE'
+                    | 'ETL_REPLICATED_DATA'
+                    | 'ETL_COPY_BACKFILL_DATA'
+                    | 'LOG_INGESTION'
+                    | 'LOG_QUERYING'
+                    | 'LOG_STORAGE'
+                    | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+            )[]
+          }
+        }
+        /** @enum {string} */
+        fixed_fees_billing_mode: 'in_advance' | 'in_arrears'
+        minimum_fee: {
+          expectedAtEndOfCycle: number
+          floorPrice: number | null
+          prorated: boolean
+        }
+        prepaidCredits:
+          | {
+              actualWithdrawnInElapsedCycle: number
+              currentBalance: number
+              expectedBalanceAtEndOfCycle: number
+              expectedWithdrawnAtEndOfCycle: number
+              /** @enum {string} */
+              kind: 'with_forecast'
+              projectedWithdrawnInRemainingCycle: number
+            }
+          | {
+              actualWithdrawnInElapsedCycle: number
+              /** @enum {string} */
+              kind: 'without_forecast'
+            }
+        projectedCosts: {
+          projectedInRemainingCycle: number
+          usage: {
+            lineItems: (
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                      | 'PROMOTING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  compute_credits_used: number | null
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  /** @enum {string} */
+                  schema: 'compute'
+                  /** @enum {string} */
+                  type: 'compute' | 'branch' | 'replica'
+                  /** @enum {string} */
+                  usage_unit: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+              | {
+                  breakdown: {
+                    /** @enum {string} */
+                    project_db_instance_size?:
+                      | 'pico'
+                      | 'nano'
+                      | 'micro'
+                      | 'small'
+                      | 'medium'
+                      | 'large'
+                      | 'xlarge'
+                      | '2xlarge'
+                      | '4xlarge'
+                      | '8xlarge'
+                      | '12xlarge'
+                      | '16xlarge'
+                      | '24xlarge'
+                      | '24xlarge_optimized_memory'
+                      | '24xlarge_optimized_cpu'
+                      | '24xlarge_high_memory'
+                      | '48xlarge'
+                      | '48xlarge_optimized_memory'
+                      | '48xlarge_optimized_cpu'
+                      | '48xlarge_high_memory'
+                    project_name: string
+                    project_ref: string
+                    /** @enum {string} */
+                    project_status?:
+                      | 'INACTIVE'
+                      | 'ACTIVE_HEALTHY'
+                      | 'ACTIVE_UNHEALTHY'
+                      | 'COMING_UP'
+                      | 'UNKNOWN'
+                      | 'GOING_DOWN'
+                      | 'INIT_FAILED'
+                      | 'REMOVED'
+                      | 'RESTORING'
+                      | 'UPGRADING'
+                      | 'PAUSING'
+                      | 'RESTORE_FAILED'
+                      | 'RESTARTING'
+                      | 'PAUSE_FAILED'
+                      | 'RESIZING'
+                      | 'PROMOTING'
+                    total_pre_tax_amount?: number
+                    total_usage: number
+                    variants: {
+                      is_active_variant: boolean
+                      name: string
+                      pre_tax_amount: number
+                      pre_tax_amount_before_discount: number
+                      unit_price_desc: string | null
+                      usage: number
+                      /** @enum {string} */
+                      usage_metric:
+                        | 'EGRESS'
+                        | 'CACHED_EGRESS'
+                        | 'DATABASE_SIZE'
+                        | 'STORAGE_SIZE'
+                        | 'MONTHLY_ACTIVE_USERS'
+                        | 'MONTHLY_ACTIVE_SSO_USERS'
+                        | 'FUNCTION_INVOCATIONS'
+                        | 'FUNCTION_CPU_MILLISECONDS'
+                        | 'STORAGE_IMAGES_TRANSFORMED'
+                        | 'REALTIME_MESSAGE_COUNT'
+                        | 'REALTIME_PEAK_CONNECTIONS'
+                        | 'DISK_SIZE_GB_HOURS_GP3'
+                        | 'DISK_SIZE_GB_HOURS_IO2'
+                        | 'AUTH_MFA_PHONE'
+                        | 'AUTH_MFA_WEB_AUTHN'
+                        | 'LOG_DRAIN_EVENTS'
+                        | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                        | 'DISK_THROUGHPUT_GP3'
+                        | 'DISK_IOPS_GP3'
+                        | 'DISK_IOPS_IO2'
+                        | 'COMPUTE_HOURS_BRANCH'
+                        | 'COMPUTE_HOURS_XS'
+                        | 'COMPUTE_HOURS_SM'
+                        | 'COMPUTE_HOURS_MD'
+                        | 'COMPUTE_HOURS_L'
+                        | 'COMPUTE_HOURS_XL'
+                        | 'COMPUTE_HOURS_2XL'
+                        | 'COMPUTE_HOURS_4XL'
+                        | 'COMPUTE_HOURS_8XL'
+                        | 'COMPUTE_HOURS_12XL'
+                        | 'COMPUTE_HOURS_16XL'
+                        | 'COMPUTE_HOURS_24XL'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                        | 'COMPUTE_HOURS_48XL'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                        | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                        | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                        | 'CUSTOM_DOMAIN'
+                        | 'PITR_7'
+                        | 'PITR_14'
+                        | 'PITR_28'
+                        | 'IPV4'
+                        | 'LOG_DRAIN'
+                        | 'ETL_PIPELINE'
+                        | 'ETL_REPLICATED_DATA'
+                        | 'ETL_COPY_BACKFILL_DATA'
+                        | 'LOG_INGESTION'
+                        | 'LOG_QUERYING'
+                        | 'LOG_STORAGE'
+                        | 'ACTIVE_COMPUTE_HOURS'
+                    }[]
+                  }[]
+                  description: string
+                  name: string
+                  period: {
+                    end: string
+                    start: string
+                  }
+                  pre_tax_amount: number
+                  pre_tax_amount_before_discount: number
+                  quantity: number | null
+                  /** @enum {string} */
+                  schema: 'generic'
+                  unit_price: number | null
+                  unit_price_desc: string | null
+                  /** @enum {string} */
+                  usage_metric?:
+                    | 'EGRESS'
+                    | 'CACHED_EGRESS'
+                    | 'DATABASE_SIZE'
+                    | 'STORAGE_SIZE'
+                    | 'MONTHLY_ACTIVE_USERS'
+                    | 'MONTHLY_ACTIVE_SSO_USERS'
+                    | 'FUNCTION_INVOCATIONS'
+                    | 'FUNCTION_CPU_MILLISECONDS'
+                    | 'STORAGE_IMAGES_TRANSFORMED'
+                    | 'REALTIME_MESSAGE_COUNT'
+                    | 'REALTIME_PEAK_CONNECTIONS'
+                    | 'DISK_SIZE_GB_HOURS_GP3'
+                    | 'DISK_SIZE_GB_HOURS_IO2'
+                    | 'AUTH_MFA_PHONE'
+                    | 'AUTH_MFA_WEB_AUTHN'
+                    | 'LOG_DRAIN_EVENTS'
+                    | 'MONTHLY_ACTIVE_THIRD_PARTY_USERS'
+                    | 'DISK_THROUGHPUT_GP3'
+                    | 'DISK_IOPS_GP3'
+                    | 'DISK_IOPS_IO2'
+                    | 'COMPUTE_HOURS_BRANCH'
+                    | 'COMPUTE_HOURS_XS'
+                    | 'COMPUTE_HOURS_SM'
+                    | 'COMPUTE_HOURS_MD'
+                    | 'COMPUTE_HOURS_L'
+                    | 'COMPUTE_HOURS_XL'
+                    | 'COMPUTE_HOURS_2XL'
+                    | 'COMPUTE_HOURS_4XL'
+                    | 'COMPUTE_HOURS_8XL'
+                    | 'COMPUTE_HOURS_12XL'
+                    | 'COMPUTE_HOURS_16XL'
+                    | 'COMPUTE_HOURS_24XL'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_24XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_24XL_HIGH_MEMORY'
+                    | 'COMPUTE_HOURS_48XL'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_CPU'
+                    | 'COMPUTE_HOURS_48XL_OPTIMIZED_MEMORY'
+                    | 'COMPUTE_HOURS_48XL_HIGH_MEMORY'
+                    | 'CUSTOM_DOMAIN'
+                    | 'PITR_7'
+                    | 'PITR_14'
+                    | 'PITR_28'
+                    | 'IPV4'
+                    | 'LOG_DRAIN'
+                    | 'ETL_PIPELINE'
+                    | 'ETL_REPLICATED_DATA'
+                    | 'ETL_COPY_BACKFILL_DATA'
+                    | 'LOG_INGESTION'
+                    | 'LOG_QUERYING'
+                    | 'LOG_STORAGE'
+                    | 'ACTIVE_COMPUTE_HOURS'
+                  /** @enum {string} */
+                  usage_unit?: 'byte' | 'gigabyte' | 'count' | 'hour' | 'gbhr' | 'mbpshr' | 'iopshr'
+                }
+            )[]
+          }
+        }
+        subscription_id: string
+        taxes: {
+          expectedAtEndOfCycle: number
+          percentage: number
+          /** @enum {string} */
+          status: 'calculated' | 'not_applicable' | 'failed'
+        }
+        total: {
+          gross: {
+            expectedAtEndOfCycle: number
+          }
+          net: {
+            expectedAtEndOfCycle: number
+          }
+        }
+      } | null
     }
     UpdateAddonBody: {
       /** @enum {string} */
@@ -13221,9 +14226,6 @@ export interface components {
       name?: string
       /** @enum {string} */
       type?:
-        | 'postgres'
-        | 'bigquery'
-        | 'clickhouse'
         | 'webhook'
         | 'datadog'
         | 'loki'
@@ -14235,6 +15237,11 @@ export interface components {
         | 'snippets_read'
         | 'organization_admin_read'
         | 'organization_admin_write'
+        | 'audit_logs_read'
+        | 'billing_read'
+        | 'billing_write'
+        | 'organization_config_read'
+        | 'organization_config_write'
         | 'members_read'
         | 'members_write'
         | 'organization_projects_read'
@@ -14255,8 +15262,12 @@ export interface components {
         | 'api_gateway_keys_write'
         | 'auth_config_read'
         | 'auth_config_write'
+        | 'auth_hooks_read'
+        | 'auth_hooks_write'
         | 'auth_signing_keys_read'
         | 'auth_signing_keys_write'
+        | 'auth_users_read'
+        | 'auth_users_write'
         | 'backups_read'
         | 'backups_write'
         | 'branching_development_create'
@@ -14300,6 +15311,7 @@ export interface components {
         | 'infra_add_ons_write'
         | 'infra_disk_config_read'
         | 'infra_disk_config_write'
+        | 'project_operations_write'
         | 'infra_read_replicas_read'
         | 'infra_read_replicas_write'
         | 'project_snippets_read'
@@ -14354,6 +15366,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -14363,6 +15377,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
     }
@@ -15298,6 +16316,20 @@ export interface components {
       role?: string
       updated_at?: string
     }
+    UserPermissionsResponse_Output: {
+      organizations: {
+        permissions: string[]
+        projects: {
+          permissions: string[]
+          ref: string
+          /** @enum {string} */
+          role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        }[]
+        /** @enum {string} */
+        role: 'member' | 'readonly' | 'developer' | 'administrator' | 'owner'
+        slug: string
+      }[]
+    }
     ValidateDestinationBody: {
       /** @description Destination configuration */
       config:
@@ -16042,11 +17074,11 @@ export interface components {
       result: 'success'
     }
     WarehouseCatalogResponse_Output: {
-      /** @description External catalog credentials. Present only when enabled. */
+      /** @description External catalog connection template with secret placeholders. Present only when enabled. */
       credentials?: {
         /**
-         * @description DuckLake catalog Postgres URL
-         * @example postgres://postgres:<pwd>@db.example.supabase.co:5432/postgres
+         * @description DuckLake catalog Postgres URL with a database password placeholder
+         * @example postgres://postgres:[YOUR_DATABASE_PASSWORD]@db.example.supabase.co:5432/postgres
          */
         catalog_url: string
         /**
@@ -16059,7 +17091,10 @@ export interface components {
          * @example ducklake
          */
         metadata_schema: string
-        /** @description S3 access key id */
+        /**
+         * @description S3 access key ID placeholder; supply your own authorized storage credentials
+         * @example [YOUR_S3_ACCESS_KEY_ID]
+         */
         s3_access_key_id: string
         /**
          * @description S3-compatible storage endpoint without protocol
@@ -16071,11 +17106,18 @@ export interface components {
          * @example us-east-1
          */
         s3_region: string
-        /** @description S3 secret access key */
+        /**
+         * @description S3 secret access key placeholder; no secret is returned
+         * @example [YOUR_S3_SECRET_ACCESS_KEY]
+         */
         s3_secret_access_key: string
       }
       /** @description Whether external catalog access is enabled */
       enabled: boolean
+    }
+    WarehouseDeleteResponse_Output: {
+      /** @enum {string} */
+      status: 'accepted'
     }
     WarehouseSetupBody: {
       /**
@@ -16088,7 +17130,7 @@ export interface components {
        * @example false
        */
       install_fdw?: boolean
-      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array disables Warehouse replication and external catalog access and uninstalls the Warehouse FDW. */
+      /** @description Complete selection of schemas and individual tables to copy, replacing the previous selection. Schema targets expand to the eligible tables present when the request is processed. An empty array asynchronously disables Warehouse while retaining its data. Prefer DELETE to disable Warehouse; poll setup-status for completion. */
       targets: (
         | {
             /**
@@ -16114,13 +17156,18 @@ export interface components {
             type: 'table'
           }
       )[]
+      /**
+       * @description Optional Warehouse compute region, independent of the source and catalog regions. Defaults to the existing assignment, or ap-southeast-1 in staging and eu-west-1 in production for a new assignment. DNS routing requires a registered cluster in that environment. Unsupported regions and changes to an existing assignment are rejected. Ignored when targets is empty.
+       * @example ap-southeast-1
+       */
+      warehouse_region?: string
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse is disabled
-       * @example 101
+       * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id: number | null
+      pipeline_id: string | null
       /** @description Tables with Warehouse copies */
       tables: {
         /**
@@ -16163,7 +17210,18 @@ export interface components {
       }[]
     }
     WarehouseSetupStatusResponse_Output: {
-      /** @description Project database FDW setup markers used to derive the Warehouse FDW phase */
+      /** @description Whether the current disable request deletes DuckLake data. */
+      delete_data?: boolean
+      /** @description Warehouse DNS delivery status. Ready means the DNS API accepted the route; client DNS caches may still be updating. */
+      dns?: {
+        hostname: string
+        region: string
+        /** @enum {string} */
+        status: 'pending' | 'ready' | 'error' | 'removed'
+      }
+      /** @description Warehouse cleanup failure, when present. */
+      error?: string
+      /** @description Project database FDW setup markers; null during or after teardown, when setup inspection is inapplicable. */
       fdw_status: {
         /**
          * @description Whether fdw_warehouse is available to install on the project database instance
@@ -16195,18 +17253,26 @@ export interface components {
          * @example true
          */
         wrapper_installed: boolean
-      }
+      } | null
       /**
-       * @description Warehouse replication pipeline id when it exists
-       * @example 101
+       * @description Warehouse replication pipeline ID when it exists
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
-      pipeline_id?: number
+      pipeline_id?: string
       /**
-       * @description Overall Warehouse setup status derived from replication state
+       * @description Overall Warehouse lifecycle status, using persisted state during teardown and replication state during setup
        * @example copying
        * @enum {string}
        */
-      setup_status: 'not_started' | 'setting_up' | 'copying' | 'complete' | 'error'
+      setup_status:
+        | 'not_started'
+        | 'setting_up'
+        | 'copying'
+        | 'complete'
+        | 'error'
+        | 'disabling'
+        | 'disabled'
+        | 'deletion_failed'
       /** @description Warehouse setup phases in execution order */
       steps: {
         /**
@@ -17734,6 +18800,96 @@ export interface operations {
       }
     }
   }
+  DatabaseDbIntegrityController_status: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  DatabaseDbIntegrityController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        op: 'collation' | 'collation_check'
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DbIntegritySubmitBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DbIntegrityTaskResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   HooksController_enableHooks: {
     parameters: {
       query?: never
@@ -17804,6 +18960,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['UpdateConversationCustomFieldsResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to update conversation custom fields */
       500: {
@@ -17975,6 +19152,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['SendFeedbackResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
       /** @description Failed to send feedback */
       500: {
@@ -19104,6 +20302,27 @@ export interface operations {
         content: {
           'application/json': components['schemas']['GetOAuthAuthorizationResponse_Output']
         }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
       }
     }
   }
@@ -20433,6 +21652,59 @@ export interface operations {
       }
     }
   }
+  OrgCreditsController_getBurndown: {
+    parameters: {
+      query?: {
+        end_date?: string
+        start_date?: string
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetCreditBurndownResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to retrieve prepaid credit block burndown */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrgCreditsController_previewTopUp: {
     parameters: {
       query?: never
@@ -20863,7 +22135,9 @@ export interface operations {
   }
   OrgInvoicesController_getUpcomingInvoice: {
     parameters: {
-      query?: never
+      query?: {
+        enable_v2?: string
+      }
       header?: never
       path: {
         /** @description Organization slug */
@@ -21715,7 +22989,7 @@ export interface operations {
       }
     }
   }
-  MembersController_assignMemberRoleV2: {
+  MembersController_assignMemberRoleV2_2: {
     parameters: {
       query?: never
       header?: never
@@ -22392,7 +23666,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_CreateClientSecret: {
+  OAuthAppClientSecretsController_createClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -22436,7 +23710,7 @@ export interface operations {
       }
     }
   }
-  OAuthAppClientSecretsController_RemoveClientSecret: {
+  OAuthAppClientSecretsController_removeClientSecret: {
     parameters: {
       query?: never
       header?: never
@@ -22627,7 +23901,11 @@ export interface operations {
       }
       cookie?: never
     }
-    requestBody?: never
+    requestBody?: {
+      content: {
+        'application/json': components['schemas']['ApproveAuthorizationBody']
+      }
+    }
     responses: {
       201: {
         headers: {
@@ -22644,12 +23922,14 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Forbidden action */
+      /** @description Forbidden action. When the failure is an insufficient organization role, the body is `role_validation_failed` with the missing role details. */
       403: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['OAuthRoleValidationFailureResponse']
+        }
       }
       /** @description Rate limit exceeded */
       429: {
@@ -22689,12 +23969,14 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Forbidden action */
+      /** @description Forbidden action. When the failure is an insufficient organization role, the body is `role_validation_failed` with the missing role details. */
       403: {
         headers: {
           [name: string]: unknown
         }
-        content?: never
+        content: {
+          'application/json': components['schemas']['OAuthRoleValidationFailureResponse']
+        }
       }
       /** @description Rate limit exceeded */
       429: {
@@ -22916,7 +24198,7 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
-        /** @description Search projects by name */
+        /** @description Search projects by name, or by exact project ref */
         search?: string
         /** @description Sort order for projects */
         sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
@@ -22944,6 +24226,63 @@ export interface operations {
       }
       /** @description Failed to retrieve projects */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgRestrictionsController_recheck: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RecheckRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to recheck restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage could not be measured */
+      503: {
         headers: {
           [name: string]: unknown
         }
@@ -23028,7 +24367,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23044,7 +24388,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -23097,7 +24446,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -23113,7 +24467,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -23137,7 +24496,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23153,7 +24517,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -23206,7 +24575,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file: string
               /** Format: uri */
@@ -23222,7 +24596,12 @@ export interface operations {
               idjag_issuer_url?: string | null
               join_org_on_signup_enabled: boolean
               /** @enum {string} */
-              join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+              join_org_on_signup_role?:
+                | 'Administrator'
+                | 'Developer'
+                | 'Owner'
+                | 'Read-only'
+                | 'None'
               last_name_mapping?: string[]
               metadata_xml_file?: string
               metadata_xml_url: string
@@ -23246,7 +24625,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file: string
                 /** Format: uri */
@@ -23262,7 +24646,12 @@ export interface operations {
                 idjag_issuer_url?: string | null
                 join_org_on_signup_enabled: boolean
                 /** @enum {string} */
-                join_org_on_signup_role?: 'Administrator' | 'Developer' | 'Owner' | 'Read-only'
+                join_org_on_signup_role?:
+                  | 'Administrator'
+                  | 'Developer'
+                  | 'Owner'
+                  | 'Read-only'
+                  | 'None'
                 last_name_mapping?: string[]
                 metadata_xml_file?: string
                 metadata_xml_url: string
@@ -24670,6 +26059,25 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+    }
+  }
+  getPermissionsV2: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['UserPermissionsResponse_Output']
+        }
       }
     }
   }
@@ -29678,6 +31086,7 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
+          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -29696,6 +31105,7 @@ export interface operations {
           | '48xlarge_optimized_memory'
           | '48xlarge_optimized_cpu'
           | '48xlarge_high_memory'
+        high_availability?: string
         organization_slug: string
       }
       header?: never
@@ -29709,7 +31119,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoPlatform_Output']
         }
       }
     }
@@ -29900,8 +31310,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -29966,8 +31376,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30403,8 +31813,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30456,8 +31866,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30520,8 +31930,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30594,8 +32004,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30647,8 +32057,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30714,8 +32124,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30780,8 +32190,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30840,8 +32250,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30893,8 +32303,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30953,8 +32363,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31006,8 +32416,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32137,30 +33547,6 @@ export interface operations {
     }
     responses: {
       201: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-    }
-  }
-  StatusController_getStatus: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content?: never
-      }
-      /** @description Failed to retrieve infrastructure status */
-      500: {
         headers: {
           [name: string]: unknown
         }
@@ -34705,6 +36091,30 @@ export interface operations {
       }
     }
   }
+  CsatController_submit: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['CsatBody']
+      }
+    }
+    responses: {
+      /** @description Survey response recorded */
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['CsatResponse_Output']
+        }
+      }
+    }
+  }
   VerifyEmailController_verifyEmail: {
     parameters: {
       query?: never
@@ -34984,6 +36394,83 @@ export interface operations {
         }
       }
       /** @description Failed to get Vercel redirect url */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  WarehouseController_deleteWarehouse: {
+    parameters: {
+      query?: {
+        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        delete_data?: 'true' | 'false'
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      /** @description Warehouse disable accepted. Poll setup-status for completion. */
+      202: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['WarehouseDeleteResponse_Output']
+        }
+      }
+      /** @description Invalid deletion option or unmanaged Warehouse destination. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description This feature requires the Pro, Team, or Enterprise organization plan. */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Another Warehouse mutation is running or the cleanup policy cannot be changed. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to request Warehouse disable. */
       500: {
         headers: {
           [name: string]: unknown

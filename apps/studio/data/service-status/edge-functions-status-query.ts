@@ -1,7 +1,8 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { serviceStatusKeys } from './keys'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionServiceStatusVariables = {
   projectRef?: string
@@ -21,7 +22,7 @@ export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
 }
 
 export type EdgeFunctionServiceStatusData = Awaited<ReturnType<typeof getEdgeFunctionServiceStatus>>
-export type EdgeFunctionServiceStatusError = ResponseError
+export type EdgeFunctionServiceStatusError = StudioError
 
 export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceStatusData>(
   { projectRef }: EdgeFunctionServiceStatusVariables,

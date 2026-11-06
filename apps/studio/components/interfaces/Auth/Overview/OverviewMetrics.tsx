@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { BarChart2, ChevronRight, ExternalLink, Telescope } from 'lucide-react'
+import { BarChart2Icon, ChevronRightIcon, ExternalLinkIcon, TelescopeIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { AiIconAnimation, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -72,7 +72,7 @@ const StatCard = ({
   const actions = [
     {
       label: 'Go to Auth Report',
-      icon: <ExternalLink size={12} />,
+      icon: <ExternalLinkIcon size={12} />,
       onClick: href ? () => router.push(href) : undefined,
     },
   ]
@@ -105,7 +105,7 @@ const LogsLink = ({ href }: { href: string }) => (
         asChild
       >
         <Link href={href} aria-label="Go to Logs">
-          <ChevronRight size={12} />
+          <ChevronRightIcon size={12} />
         </Link>
       </Button>
     </TooltipTrigger>
@@ -217,9 +217,9 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                 href={`/project/${ref}/reports/auth?its=${startDate}&ite=${endDate}&isHelper=true&helperText=Last+24+hours`}
                 className="text-foreground underline underline-offset-2 decoration-foreground-muted hover:decoration-foreground transition-all text-sm inline-flex items-center gap-x-1.5"
               >
-                <Telescope size={14} className="text-foreground-lighter" />
+                <TelescopeIcon size={14} className="text-foreground-lighter" />
                 <span>Go to observability</span>
-                <ChevronRight size={14} className="text-foreground-lighter" />
+                <ChevronRightIcon size={14} className="text-foreground-lighter" />
               </Link>
             </div>
           </PageSectionSummary>
@@ -294,7 +294,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />
@@ -366,7 +366,7 @@ export const OverviewMetrics = ({ metrics, isLoading, error }: OverviewMetricsPr
                   emptyState={
                     <div className="p-6">
                       <ChartEmptyState
-                        icon={<BarChart2 size={16} />}
+                        icon={<BarChart2Icon size={16} />}
                         title="No data to show"
                         description="It may take up to 24 hours for data to refresh"
                       />

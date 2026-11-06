@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag } from 'common'
-import { ChevronDown, RefreshCw } from 'lucide-react'
+import { ChevronDownIcon, RefreshCwIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -18,11 +17,11 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useProjectRestartMutation } from '@/data/projects/project-restart-mutation'
 import { useProjectRestartServicesMutation } from '@/data/projects/project-restart-services-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { type ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const RestartServerButton = () => {
   const router = useRouter()
@@ -45,9 +44,8 @@ export const RestartServerButton = () => {
   const projectRegion = project?.region ?? ''
 
   const projectRestartDisabled = useFlag('disableProjectRestarts')
-  const { can: canRestartProject } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'reboot'
+  const { can: canRestartProject } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE
   )
 
   const { mutate: restartProject, isPending: isRestartingProject } = useProjectRestartMutation({
@@ -85,7 +83,7 @@ export const RestartServerButton = () => {
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: ResponseError, type: string) => {
+  const onRestartFailed = (error: StudioError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }
@@ -133,7 +131,7 @@ export const RestartServerButton = () => {
                   type="button"
                   aria-label="Choose restart type"
                   className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-                  icon={<ChevronDown />}
+                  icon={<ChevronDownIcon />}
                   disabled={!canRestartProject}
                 />
               </DropdownMenuTrigger>
@@ -159,7 +157,7 @@ export const RestartServerButton = () => {
         </div>
       ) : (
         <Button
-          icon={<RefreshCw />}
+          icon={<RefreshCwIcon />}
           className="w-full @lg:w-auto"
           disabled={isLoading}
           onClick={() => {

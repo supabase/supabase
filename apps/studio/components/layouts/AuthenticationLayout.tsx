@@ -5,7 +5,7 @@ import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 export const AuthenticationLayout = ({ children }: PropsWithChildren<{}>) => {
   return (
     <div className="flex flex-col min-h-screen w-screen">
-      <AppBannerWrapper />
+      <AppBannerWrapper signedOut />
       <div className="flex flex-1 w-full overflow-y-hidden">
         <div className="grow h-full overflow-y-auto">{children}</div>
       </div>

@@ -1,9 +1,15 @@
-import { Children, isValidElement, type PropsWithChildren } from 'react'
+import { Children, isValidElement, type PropsWithChildren, type ReactNode } from 'react'
 import { cn, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
 
 interface CodeTabPanelProps {
   id: string
   label?: string
+  icon?: ReactNode
+}
+
+interface CodeTabsProps {
+  value?: string
+  onValueChange?: (value: string) => void
 }
 
 export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: string }>) {
@@ -31,12 +37,14 @@ export function NamedCodeBlock({ name, children }: PropsWithChildren<{ name: str
   )
 }
 
-export function CodeTabs({ children }: PropsWithChildren) {
+export function CodeTabs({ children, value, onValueChange }: PropsWithChildren<CodeTabsProps>) {
   const tabs = Children.toArray(children).filter(isValidElement<CodeTabPanelProps>)
 
   return (
     <TabsRoot
       defaultValue={tabs[0]?.props.id}
+      value={value}
+      onValueChange={onValueChange}
       className="group/code-tabs shiki-wrapper w-full isolate [&_.shiki]:my-0!"
     >
       <TabsList
@@ -51,7 +59,10 @@ export function CodeTabs({ children }: PropsWithChildren) {
             value={tab.props.id}
             className="relative z-1 rounded-md py-2 text-xs data-[state=active]:shadow-none"
           >
-            <span className="px-3">{tab.props.label ?? tab.props.id}</span>
+            <span className="flex items-center gap-2 px-3 [&_img]:size-3.5">
+              {tab.props.icon}
+              {tab.props.label ?? tab.props.id}
+            </span>
           </TabsTrigger>
         ))}
         <TabsIndicator

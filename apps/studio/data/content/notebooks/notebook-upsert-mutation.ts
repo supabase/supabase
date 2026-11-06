@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { upsertContent, type UpsertContentPayload } from '../content-upsert-mutation'
 import { contentKeys } from '../keys'
 import { writableNotebookSchema, type WritableNotebook } from './notebook-schema'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 function buildNotebookUpsertPayload({
   id,
@@ -69,17 +70,17 @@ export async function upsertNotebook(
 
 export type UpdateNotebookData = Awaited<ReturnType<typeof upsertNotebook>>
 
-export const useUpsertNotebookMutation = ({
+export const useUpsertNotebookMutation = <TContext = unknown>({
   onError,
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdateNotebookData, ResponseError, UpsertNotebookVariables>,
+  UseCustomMutationOptions<UpdateNotebookData, StudioError, UpsertNotebookVariables, TContext>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateNotebookData, ResponseError, UpsertNotebookVariables>({
+  return useMutation<UpdateNotebookData, StudioError, UpsertNotebookVariables, TContext>({
     mutationFn: (args) => upsertNotebook(args),
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables

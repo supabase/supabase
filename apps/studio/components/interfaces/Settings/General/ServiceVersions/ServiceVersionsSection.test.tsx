@@ -11,6 +11,7 @@ const {
   mockUseReadReplicas,
   mockUseServiceVersions,
   mockUseUpgradeEligibility,
+  mockIsAwsK8sCloudProvider,
 } = vi.hoisted(() => ({
   mockUseFeatures: vi.fn(),
   mockUseIsOrioleDb: vi.fn(),
@@ -18,6 +19,7 @@ const {
   mockUseReadReplicas: vi.fn(),
   mockUseServiceVersions: vi.fn(),
   mockUseUpgradeEligibility: vi.fn(),
+  mockIsAwsK8sCloudProvider: vi.fn(),
 }))
 
 vi.mock('common', () => ({
@@ -56,10 +58,19 @@ vi.mock('ui-patterns/Admonition', () => ({
 }))
 
 vi.mock('ui-patterns/form/FormItemLayout/FormItemLayout', () => ({
-  FormItemLayout: ({ label, children }: { label: ReactNode; children: ReactNode }) => (
+  FormItemLayout: ({
+    label,
+    description,
+    children,
+  }: {
+    label: ReactNode
+    description?: ReactNode
+    children: ReactNode
+  }) => (
     <label>
       {label}
       {children}
+      {description && <div>{description}</div>}
     </label>
   ),
 }))
@@ -99,6 +110,12 @@ vi.mock('@/components/ui/AlertError', () => ({
   AlertError: ({ subject }: { subject: string }) => <div>{subject}</div>,
 }))
 
+vi.mock('@/components/ui/InlineLink', () => ({
+  InlineLink: ({ href, children }: { href: string; children: ReactNode }) => (
+    <a href={href}>{children}</a>
+  ),
+}))
+
 vi.mock('@/data/config/project-upgrade-eligibility-query', () => ({
   useProjectUpgradeEligibilityQuery: mockUseUpgradeEligibility,
 }))
@@ -118,7 +135,24 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
   useIsOrioleDb: mockUseIsOrioleDb,
   useSelectedProjectQuery: mockUseProject,
+  useIsAwsK8sCloudProvider: mockIsAwsK8sCloudProvider,
 }))
+
+const LATEST_VERSION_HINT = 'This project is already on the latest version of Postgres'
+
+const latestVersionEligibility = {
+  data: {
+    current_app_version: 'supabase-postgres-17.4.1.060',
+    latest_app_version: 'supabase-postgres-17.4.1.060',
+    eligible: false,
+    validation_errors: [],
+    warnings: [],
+  },
+  error: undefined,
+  isPending: false,
+  isError: false,
+  isSuccess: true,
+}
 
 describe('ServiceVersionsSection', () => {
   beforeEach(() => {
@@ -128,6 +162,7 @@ describe('ServiceVersionsSection', () => {
     })
     mockUseIsOrioleDb.mockReturnValue(false)
     mockUseProject.mockReturnValue({ data: { status: 'ACTIVE_HEALTHY' } })
+    mockIsAwsK8sCloudProvider.mockReturnValue(false)
     mockUseReadReplicas.mockReturnValue({ data: [{ identifier: 'project-ref' }] })
     mockUseUpgradeEligibility.mockReturnValue({
       data: {
@@ -205,6 +240,7 @@ describe('ServiceVersionsSection', () => {
 
     expect(screen.getByText('Read replicas block upgrade to 17.4.1.060')).toBeInTheDocument()
     expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 
   it('renders upgrade validation errors and warnings for an ineligible project', () => {
@@ -229,6 +265,7 @@ describe('ServiceVersionsSection', () => {
       screen.getByText('Validation warnings: Review extension compatibility')
     ).toBeInTheDocument()
     expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 
   it('preserves eligibility and service-version loading and error states', () => {
@@ -275,5 +312,54 @@ describe('ServiceVersionsSection', () => {
 
     rerender(<ServiceVersionsSection />)
     expect(screen.getByText('Failed to retrieve versions')).toBeInTheDocument()
+  })
+
+  it('shows the latest-version description with a docs link when on the latest version', () => {
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.getByText(LATEST_VERSION_HINT, { exact: false })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
+      'href',
+      expect.stringContaining('/guides/platform/upgrading')
+    )
+  })
+
+  it('hides the latest-version description when database upgrades are disabled', () => {
+    mockUseFeatures.mockReturnValue({
+      projectAuthAll: true,
+      projectSettingsDatabaseUpgrades: false,
+    })
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
+  })
+
+  it.each([
+    ['an eligible upgrade', { eligible: true }],
+    ['a validation error', { validation_errors: ['Remove read replicas'] }],
+    ['a warning', { warnings: ['Review extension compatibility'] }],
+  ])('hides the latest-version description when eligibility reports %s', (_, overrides) => {
+    mockUseUpgradeEligibility.mockReturnValue({
+      ...latestVersionEligibility,
+      data: { ...latestVersionEligibility.data, ...overrides },
+    })
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
+  })
+
+  it('does not offer upgrade for v3 projects', () => {
+    mockIsAwsK8sCloudProvider.mockReturnValue(true)
+    mockUseUpgradeEligibility.mockReturnValue(latestVersionEligibility)
+
+    render(<ServiceVersionsSection />)
+
+    expect(screen.queryByText('Project upgrade available')).not.toBeInTheDocument()
+    expect(screen.queryByText(LATEST_VERSION_HINT, { exact: false })).not.toBeInTheDocument()
   })
 })

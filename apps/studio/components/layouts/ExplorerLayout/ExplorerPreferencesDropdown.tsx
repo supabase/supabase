@@ -1,4 +1,4 @@
-import { MoreVertical } from 'lucide-react'
+import { MoreVerticalIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -25,7 +25,7 @@ export const ExplorerPreferencesDropdown = () => {
           variant="outline"
           aria-label="Explorer preferences"
           className="size-7 shrink-0 px-0"
-          icon={<MoreVertical size={14} strokeWidth={1.5} />}
+          icon={<MoreVerticalIcon size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'Explorer preferences' } }}
         />
       </DropdownMenuTrigger>

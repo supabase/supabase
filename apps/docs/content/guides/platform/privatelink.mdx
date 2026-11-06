@@ -24,7 +24,7 @@ Supabase PrivateLink is an organisation level configuration. It works by sharing
 
 The connection architecture changes from public internet routing to a dedicated private path through AWS's secure network backbone.
 
-Supabase PrivateLink supports direct database connections on port `5432` and PgBouncer connections on port `6543`. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
+Supabase PrivateLink supports direct database connections on port `5432` and dedicated pooler (PgBouncer) connections on port `6543`. It does not support other Supabase services like API, Storage, Auth, or Realtime. These services will continue to operate over public internet connections.
 
 ## Requirements
 
@@ -80,8 +80,8 @@ Ensure your security groups allow traffic on the appropriate ports:
 3. Give your security group a descriptive name and select the appropriate VPC
 4. Add inbound rule(s) for the connection mode you use:
    - Direct connection: Postgres (TCP, port `5432`)
-   - PgBouncer connection: Custom TCP (port `6543`)
-   - If you use both direct and PgBouncer connections, add both rules
+   - Dedicated pooler connection: Custom TCP (port `6543`)
+   - If you use both direct and dedicated pooler connections, add both rules
    - Set the destination appropriate for your network (for example, your VPC subnet or your application instances' security group)
 5. Finish creating the security group by clicking **Create security group**
 
@@ -104,11 +104,16 @@ In your AWS account, you have two options to establish connectivity:
    - AWS will provision a private ENI for you in each selected subnet
    - IP address type should be set to IPv4
 9. Choose the security group you created in Step 3.
-10. Click **Create endpoint**
-11. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
-12. For connectivity:
+10. Optionally, select **Enable private DNS name** to use a Supabase hostname instead of the endpoint DNS name
+    - The private DNS name is `db.[project_ref].privatelink.supabase.co`
+    - It resolves only to the endpoint from within the selected VPC
+    - Your VPC must have **DNS resolution** and **DNS hostnames** enabled
+11. Click **Create endpoint**
+12. After creation, you will see the endpoint in the [Endpoints](https://console.aws.amazon.com/vpcconsole/home#Endpoints:) section with a status of "Available"
+13. For connectivity:
     - The IP addresses of the endpoint will be listed in the **Subnets** section of the endpoint details
     - The DNS record will be in the **Associations** section of the endpoint details in the **DNS Name** field
+    - If you enabled a private DNS name, use `db.[project_ref].privatelink.supabase.co`
 
 #### Option B: Attach resource configuration to an existing VPC lattice service network
 
@@ -135,7 +140,7 @@ Verify the private connection is working correctly from your VPC:
 # Direct connection (Postgres)
 psql "postgresql://[username]:[password]@[private-endpoint]:5432/postgres"
 
-# PgBouncer connection
+# Dedicated pooler connection
 psql "postgresql://[username]:[password]@[private-endpoint]:6543/postgres"
 ```
 
@@ -160,12 +165,18 @@ postgresql://user:pass@db.[project-ref].supabase.co:5432/postgres
 # After (private)
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:5432/postgres
 
-# PgBouncer connection
+# After (private, with private DNS name enabled)
+postgresql://user:pass@db.[project-ref].privatelink.supabase.co:5432/postgres
+
+# Dedicated pooler connection
 # Before (public)
 postgresql://user:pass@db.[project-ref].supabase.co:6543/postgres
 
 # After (private)
 postgresql://user:pass@your-private-endpoint.vpce.amazonaws.com:6543/postgres
+
+# After (private, with private DNS name enabled)
+postgresql://user:pass@db.[project-ref].privatelink.supabase.co:6543/postgres
 ```
 
 ### Step 7: Restrict public database access (optional)
@@ -178,7 +189,7 @@ For maximum security, you can restrict public database access in your project se
 
 ## Limitations
 
-- **Service Scope**: PrivateLink only supports database connections (Postgres and PgBouncer). Other Supabase services (API, Storage, Auth, Realtime) will continue to operate over public internet connections.
+- **Service Scope**: PrivateLink only supports database connections (Postgres and the dedicated pooler). Other Supabase services (API, Storage, Auth, Realtime) will continue to operate over public internet connections.
 - **Feature Evolution**: The setup process and capabilities may evolve as we refine the offering
 
 ## Compatibility

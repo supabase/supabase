@@ -1,5 +1,5 @@
 import { debounce } from 'lodash'
-import { Check, Code, Loader } from 'lucide-react'
+import { CheckIcon, CodeIcon, LoaderIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Alert,
@@ -83,9 +83,9 @@ const TableSelector = ({
             variant="outline"
             disabled={isLoading}
             className={`w-full [&>span]:w-full ${size === 'small' ? 'py-1.5' : ''}`}
-            icon={isLoading ? <Loader className="animate-spin" size={12} /> : null}
+            icon={isLoading ? <LoaderIcon className="animate-spin" size={12} /> : null}
             iconRight={
-              <Code className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
+              <CodeIcon className="text-foreground-light rotate-90" strokeWidth={2} size={12} />
             }
           >
             {initiallyLoaded ? (
@@ -106,7 +106,7 @@ const TableSelector = ({
             <CommandList>
               {isLoading && (
                 <div className="flex items-center justify-center space-x-2 px-3 py-2">
-                  <Loader className="animate-spin" size={12} />
+                  <LoaderIcon className="animate-spin" size={12} />
                   <p className="flex text-xs text-light">Loading tables...</p>
                 </div>
               )}
@@ -143,7 +143,7 @@ const TableSelector = ({
                         >
                           <span>All tables</span>
                           {selectedSchemaName === '*' && (
-                            <Check className="text-primary" strokeWidth={2} />
+                            <CheckIcon className="text-primary" strokeWidth={2} />
                           )}
                         </CommandItem>
                       )}
@@ -162,7 +162,7 @@ const TableSelector = ({
                         >
                           <span>{table.name}</span>
                           {selectedSchemaName === table.name && (
-                            <Check className="text-primary" strokeWidth={2} />
+                            <CheckIcon className="text-primary" strokeWidth={2} />
                           )}
                         </CommandItem>
                       ))}

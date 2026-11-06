@@ -1,6 +1,13 @@
 import { type Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlignLeft, Check, Keyboard, Loader2, MoreVertical, SquareCode } from 'lucide-react'
+import {
+  AlignLeftIcon,
+  CheckIcon,
+  KeyboardIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  SquareCodeIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
@@ -84,7 +91,7 @@ export const ExplorerQueryTab = () => {
         aria-label="Loading query"
         className="flex h-full items-center justify-center bg-surface-100"
       >
-        <Loader2 className="animate-spin text-foreground-muted" size={18} />
+        <Loader2Icon className="animate-spin text-foreground-muted" size={18} />
       </div>
     )
   }
@@ -92,7 +99,7 @@ export const ExplorerQueryTab = () => {
   if (!id || !draft) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 bg-surface-100">
-        <SquareCode className="text-foreground-muted" size={24} />
+        <SquareCodeIcon className="text-foreground-muted" size={24} />
         <div className="text-center">
           <p className="text-sm font-medium">Query draft not found</p>
           <p className="text-sm text-foreground-lighter">
@@ -133,6 +140,7 @@ export const ExplorerQueryTab = () => {
     <QueryEditor
       ref={queryEditorRef}
       id={id}
+      location={{ surface: 'query_tab', queryId: id }}
       variant="viewport"
       title={draft.name}
       query={query}
@@ -172,7 +180,7 @@ export const ExplorerQueryTab = () => {
           />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<MoreVertical size={16} strokeWidth={2} />} />
+              <ExplorerToolbarAction icon={<MoreVerticalIcon size={16} strokeWidth={2} />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent className="w-48" align="end">
               <DropdownMenuItem
@@ -180,10 +188,10 @@ export const ExplorerQueryTab = () => {
                 onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
               >
                 <div className="flex items-center gap-x-2">
-                  <Keyboard size={14} />
+                  <KeyboardIcon size={14} />
                   <span>Intellisense enabled</span>
                 </div>
-                {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
+                {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem
@@ -191,7 +199,7 @@ export const ExplorerQueryTab = () => {
                 onClick={() => queryEditorRef.current?.prettify()}
               >
                 <span className="flex items-center gap-x-2">
-                  <AlignLeft size={14} />
+                  <AlignLeftIcon size={14} />
                   Prettify SQL
                 </span>
                 {formatKeys && <KeyboardShortcut keys={formatKeys} />}

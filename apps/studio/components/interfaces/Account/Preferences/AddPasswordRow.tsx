@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -117,7 +117,7 @@ const AddPasswordForm = ({ email, onClose }: { email: string; onClose: () => voi
                     autoComplete="new-password"
                     actions={
                       <Button
-                        icon={passwordHidden ? <Eye /> : <EyeOff />}
+                        icon={passwordHidden ? <EyeIcon /> : <EyeOffIcon />}
                         aria-label={passwordHidden ? 'Show password' : 'Hide Password'}
                         className="w-7"
                         onClick={() => setPasswordHidden((prev) => !prev)}

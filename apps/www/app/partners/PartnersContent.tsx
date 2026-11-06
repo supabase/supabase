@@ -4,9 +4,10 @@ import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, Button } from 'ui'
+import { Accordion, AccordionItem, AccordionTrigger, Button } from 'ui'
 
 import BackgroundPattern from '../../components/Partners/BackgroundPattern'
+import { FaqAnswer } from '@/components/FaqAnswer'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import SectionHeading from '@/components/Layouts/SectionHeading'
@@ -14,6 +15,7 @@ import Panel from '@/components/Panel'
 import BecomeAPartner from '@/components/Partners/BecomeAPartner'
 import ProductHeaderCentered from '@/components/Sections/ProductHeaderCentered'
 import pageData, { type PARTNER_TIER } from '@/data/partners'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
@@ -31,11 +33,11 @@ const FaqList = ({ items }: { items: { question: string; answer: string }[] }) =
               <AccordionTrigger>
                 <span className="text-foreground">{faq.question}</span>
               </AccordionTrigger>
-              <AccordionContent>
+              <FaqAnswer>
                 <div className="prose text-foreground-lighter">
                   <ReactMarkdown>{faq.answer}</ReactMarkdown>
                 </div>
-              </AccordionContent>
+              </FaqAnswer>
             </AccordionItem>
           </div>
         )
@@ -156,8 +158,8 @@ export default function PartnersContent({ featuredPartners }: Props) {
             description="Open to companies building real integrations on Postgres."
           />
           <ul role="list" className="flex flex-col gap-3">
-            {pageData.benefits.items.map((item: any) => (
-              <li key={item} className="flex items-start gap-3">
+            {pageData.benefits.items.map((item, index) => (
+              <li key={index} className="flex items-start gap-3">
                 <span
                   aria-hidden="true"
                   className="bg-surface-200 text-foreground-light mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-full"
@@ -264,14 +266,8 @@ export default function PartnersContent({ featuredPartners }: Props) {
         <SectionContainer className="grid gap-4 xl:grid-cols-3 xl:gap-12 items-start">
           <SectionHeading eyebrow="Integration points" title={pageData.integrationOptions.title} />
           <dl className="col-span-2 grid gap-2 lg:grid-cols-2 xl:grid-cols-3">
-            {pageData.integrationOptions.options.map((option) => (
-              <Link
-                key={option.title}
-                href={option.href}
-                className="group block"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+            {pageData.integrationOptions.options.map((option) => {
+              const panelContent = (
                 <Panel
                   outerClassName="h-full"
                   innerClassName="flex items-start gap-4 p-4 h-full"
@@ -294,8 +290,29 @@ export default function PartnersContent({ featuredPartners }: Props) {
                     </span>
                   </div>
                 </Panel>
-              </Link>
-            ))}
+              )
+              return isCrossZoneHref(option.href) ? (
+                <a
+                  key={option.title}
+                  href={option.href}
+                  className="group block"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {panelContent}
+                </a>
+              ) : (
+                <Link
+                  key={option.title}
+                  href={option.href}
+                  className="group block"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                >
+                  {panelContent}
+                </Link>
+              )
+            })}
           </dl>
         </SectionContainer>
       </div>

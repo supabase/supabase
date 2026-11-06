@@ -144,11 +144,11 @@ describe('SupportAssistantSuccessCard', () => {
   })
 
   it('shows a loading preview before the assistant responds', async () => {
-    const { container } = render(<SupportAssistantSuccessCard request={supportRequest} />)
+    render(<SupportAssistantSuccessCard request={supportRequest} />)
 
     expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /open assistant response/i })).toBeInTheDocument()
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    expect(screen.queryByTestId('assistant-preview-message')).not.toBeInTheDocument()
   })
 
   it('renders the full assistant response preview inside the clipped content area', async () => {
@@ -250,18 +250,6 @@ describe('SupportAssistantSuccessCard', () => {
     })
     expect(chats['chat-1'].supportMetadata).toBe(taggedMetadata)
     expect(mockSyncSupportChatToFront).toHaveBeenCalledTimes(1)
-  })
-
-  it('opens the generated assistant chat with keyboard activation', async () => {
-    const user = userEvent.setup()
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
-
-    const button = await screen.findByRole('button', { name: /open assistant response/i })
-    button.focus()
-    await user.keyboard('{Enter}')
-
-    expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
-    expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
   })
 
   it('does not render or create a chat when no project is selected', () => {

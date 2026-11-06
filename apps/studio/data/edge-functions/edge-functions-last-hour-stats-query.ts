@@ -12,7 +12,8 @@ import {
   safeSql,
   type SafeLogSqlFragment,
 } from '@/data/logs/safe-analytics-sql'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionsLastHourStatsVariables = {
   projectRef?: string
@@ -132,7 +133,7 @@ export async function getEdgeFunctionsLastHourStats(
 export type EdgeFunctionsLastHourStatsData = Awaited<
   ReturnType<typeof getEdgeFunctionsLastHourStats>
 >
-export type EdgeFunctionsLastHourStatsError = ResponseError
+export type EdgeFunctionsLastHourStatsError = StudioError
 
 export const useEdgeFunctionsLastHourStatsQuery = <TData = EdgeFunctionsLastHourStatsData>(
   { projectRef, functionIds = [] }: EdgeFunctionsLastHourStatsVariables,

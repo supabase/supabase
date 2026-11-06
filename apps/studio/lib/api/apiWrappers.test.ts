@@ -5,7 +5,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import { apiAuthenticate } from './apiAuthenticate'
 import { apiWrapper } from './apiWrapper'
-import { ResponseError } from '@/types'
+import { classifyResponseError } from '@/data/error-classification'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: true,
@@ -53,7 +53,7 @@ describe('apiWrapper', () => {
   })
 
   it('should return 401 when authentication fails', async () => {
-    const mockError = { error: new ResponseError('Invalid token') }
+    const mockError = { error: classifyResponseError({ message: 'Invalid token' }) }
     vi.mocked(apiAuthenticate).mockResolvedValue(mockError)
 
     await apiWrapper(mockReq, mockRes, mockHandler, { withAuth: true })

@@ -63,6 +63,8 @@ parameters:
     description: |
       A string used to distinguish different Supabase projects on the same host. Defaults to the working directory name when running `supabase init`.
 
+      Local projects started with the experimental `supabase stack` commands are identified by their project directory, git branch, and `--stack` name instead. See [Running multiple local projects](https://supabase.com/docs/guides/local-development/running-multiple-local-projects).
+
   - id: 'api.enabled'
     title: 'api.enabled'
     tags: ['api']
@@ -151,6 +153,16 @@ parameters:
     links:
       - name: 'PostgreSQL configuration'
         link: 'https://postgrest.org/en/stable/configuration.html'
+
+  - id: 'db.orioledb_version'
+    title: 'db.orioledb_version'
+    tags: ['database']
+    required: false
+    description: |
+      OrioleDB version of the Postgres image to use for the local database. Leave empty to use the default storage engine. Requires `db.major_version` 15 or 17. `supabase init --use-orioledb` sets this value.
+    links:
+      - name: 'OrioleDB'
+        link: 'https://supabase.com/docs/guides/database/orioledb'
 
   - id: 'db.pooler.enabled'
     title: 'db.pooler.enabled'
@@ -456,7 +468,7 @@ parameters:
     default: '[]'
     description: |
       An ordered list of schema files, directories, or glob patterns describing your database, relative to the `supabase` directory. For example: `["./schemas/*.sql"]`.
-      Only the legacy `migra` diff engine uses this setting, where it controls the order in which declarative schema files are applied. The `pg-delta` diff engine (see `experimental.pgdelta.enabled`) ignores it and orders declarative files automatically based on the dependencies between statements.
+      Only the legacy `migra` diff engine uses this setting, where it controls the order in which declarative schema files are applied. On that engine, `supabase db pull --declarative` sets it to the declarative schema directory automatically. The `pg-delta` diff engine (see `experimental.pgdelta.enabled`) ignores it and orders declarative files by the dependencies between statements. It warns when the setting lists any paths.
     links:
       - name: 'Declarative database schemas'
         link: 'https://supabase.com/docs/guides/local-development/declarative-database-schemas'
@@ -538,19 +550,25 @@ parameters:
       - name: 'OpenAI API Keys'
         link: 'https://platform.openai.com/api-keys'
 
-  - id: 'inbucket.enabled'
-    title: 'inbucket.enabled'
+  - id: 'local_smtp.enabled'
+    title: 'local_smtp.enabled'
     tags: ['local']
     required: false
     default: 'true'
     description: |
-      Enable the local InBucket service.
-    links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      Enable the local SMTP testing server.
 
-  - id: 'inbucket.port'
-    title: 'inbucket.port'
+      <Admonition type="note">
+
+      Supabase CLI versions before v2.108.0 use `[inbucket]` instead of `[local_smtp]`. Newer versions still accept `[inbucket]` but print a deprecation warning, so rename the section after you upgrade.
+
+      </Admonition>
+    links:
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
+
+  - id: 'local_smtp.port'
+    title: 'local_smtp.port'
     tags: ['local']
     required: false
     default: '54324'
@@ -559,11 +577,11 @@ parameters:
 
       Emails sent with the local dev setup are not actually sent - rather, they are monitored, and you can view the emails that would have been sent from the web interface.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.smtp_port'
-    title: 'inbucket.smtp_port'
+  - id: 'local_smtp.smtp_port'
+    title: 'local_smtp.smtp_port'
     tags: ['local']
     required: false
     default: '54325'
@@ -574,11 +592,11 @@ parameters:
 
       If set, you can access the SMTP server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.pop3_port'
-    title: 'inbucket.pop3_port'
+  - id: 'local_smtp.pop3_port'
+    title: 'local_smtp.pop3_port'
     tags: ['local']
     required: false
     default: '54326'
@@ -589,19 +607,19 @@ parameters:
 
       If set, you can access the POP3 server from this port.
     links:
-      - name: 'Inbucket documentation'
-        link: 'https://www.inbucket.org'
+      - name: 'Mailpit documentation'
+        link: 'https://mailpit.axllent.org'
 
-  - id: 'inbucket.admin_email'
-    title: 'inbucket.admin_email'
+  - id: 'local_smtp.admin_email'
+    title: 'local_smtp.admin_email'
     tags: ['local']
     required: false
     default: 'admin@email.com'
     description: |
       Email used as the sender for emails sent from the application.
 
-  - id: 'inbucket.sender_name'
-    title: 'inbucket.sender_name'
+  - id: 'local_smtp.sender_name'
+    title: 'local_smtp.sender_name'
     tags: ['local']
     required: false
     default: 'Admin'
@@ -923,7 +941,6 @@ parameters:
     title: 'auth.email.smtp.host'
     tags: ['auth']
     required: false
-    default: 'inbucket'
     description: |
       Hostname or IP address of the SMTP server.
 
@@ -1748,6 +1765,19 @@ parameters:
       - name: Self-hosted Logflare Configuration
         link: https://supabase.com/docs/reference/self-hosting-analytics/list-endpoints#getting-started
 
+  - id: 'experimental.stack'
+    title: 'experimental.stack'
+    tags: ['experimental']
+    required: false
+    default: 'false'
+    description: |
+      Turns on the experimental `supabase stack` commands, and makes the top-level `supabase start`, `supabase status`, and `supabase stop` commands run `supabase stack start`, `supabase stack status`, and `supabase stack stop`. The local targets of the `db`, `migration`, `test`, `gen`, `inspect`, `pull`, `storage`, `seed`, and `services` commands, and `functions serve`, also use the stack. With this setting, several local projects can run at the same time on one machine. On supported platforms a local project can also run without Docker.
+      Local projects started this way keep their own data, separate from local projects started with the default `supabase start`. The environment variable `SUPABASE_EXPERIMENTAL_STACK=1` or `0` overrides this value.
+      Note: This is an experimental feature and may change in future releases.
+    links:
+      - name: 'Running multiple local projects'
+        link: 'https://supabase.com/docs/guides/local-development/running-multiple-local-projects'
+
   - id: 'experimental.webhooks.enabled'
     title: 'experimental.webhooks.enabled'
     tags: ['experimental']
@@ -1763,8 +1793,7 @@ parameters:
     tags: ['experimental']
     required: false
     description: |
-      Configures Postgres storage engine to use OrioleDB with S3 support.
-      Note: This is an experimental feature and may change in future releases.
+      Deprecated. Use `db.orioledb_version` instead. The CLI still reads this setting and prints a deprecation warning when it is set.
     links: []
 
   - id: 'experimental.s3_host'
@@ -1831,6 +1860,7 @@ parameters:
     default: './schemas'
     description: |
       The directory where the `pg-delta` engine reads and writes declarative schema files. Relative paths resolve from the `supabase` directory.
+      CLI versions before 2.115.0 defaulted to `./database`. If that directory still holds schema files, `./schemas` is empty, and this setting is unset, the CLI warns and reads `./schemas` instead. To keep that tree, set `./database` here.
       Note: This is an experimental feature and may change in future releases.
     links:
       - name: 'Declarative database schemas'

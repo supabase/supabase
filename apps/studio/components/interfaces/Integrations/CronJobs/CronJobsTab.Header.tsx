@@ -1,4 +1,4 @@
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import type { KeyboardEvent, Ref } from 'react'
 import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -41,7 +41,7 @@ export const CronJobsTabHeader = ({
         size="tiny"
         className="w-52"
         placeholder="Search for a job"
-        icon={<Search />}
+        icon={<SearchIcon />}
         value={search}
         onChange={(e) => onSearchChange(e.target.value)}
         onKeyDown={handleKeyDown}
@@ -53,7 +53,7 @@ export const CronJobsTabHeader = ({
                   key="clear-search"
                   size="tiny"
                   variant="text"
-                  icon={<X />}
+                  icon={<XIcon />}
                   onClick={onClearSearch}
                   className="p-0 h-5 w-5"
                   aria-label="Clear search"
@@ -69,7 +69,7 @@ export const CronJobsTabHeader = ({
 
       <div className="flex items-center gap-x-2">
         <EnableCleanupButton onScheduled={onRefresh} />
-        <Button icon={<RefreshCw />} loading={isRefreshing} onClick={onRefresh}>
+        <Button icon={<RefreshCwIcon />} loading={isRefreshing} onClick={onRefresh}>
           Refresh
         </Button>
         <Button variant="primary" onClick={onCreateJob}>

@@ -20,7 +20,9 @@ function SkipToContent({ href, children = 'Skip to content', className }: SkipTo
     <FloatingPlate
       className={cn(
         'fixed top-0 left-[10px] z-[100] w-fit',
-        '-translate-y-full focus-within:translate-y-[10px]',
+        // Extra offset clears the raised Button drop shadow (0 1px 3px), which
+        // otherwise peeks into the viewport when parked at exactly -100%.
+        '-translate-y-[calc(100%+8px)] focus-within:translate-y-[10px]',
         'transition-transform duration-200 ease-out',
         className
       )}

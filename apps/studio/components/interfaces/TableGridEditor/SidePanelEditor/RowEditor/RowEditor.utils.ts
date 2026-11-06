@@ -85,6 +85,51 @@ export const generateRowFields = (
   })
 }
 
+// SQL value functions that Postgres deparses as bare keywords, without parentheses
+const SQL_VALUE_FUNCTION_DEFAULT =
+  /^(current_(timestamp|date|time|user|role|catalog|schema)|localtime(stamp)?|session_user|user)\b/i
+
+/**
+ * A default that calls a function (e.g. `gen_random_uuid()`, `nextval(...)`, `now()`, `CURRENT_TIMESTAMP`)
+ * produces a fresh value per row. Quoted literals are stripped first so `'a(b'::text` isn't mistaken
+ * for a function call.
+ */
+const isGeneratedDefault = (defaultValue: string | null) => {
+  if (!defaultValue) return false
+  if (SQL_VALUE_FUNCTION_DEFAULT.test(defaultValue.trim())) return true
+  return defaultValue.replace(/'(?:[^']|'')*'/g, "''").includes('(')
+}
+
+const shouldClearFieldOnReuse = (field: RowField) =>
+  field.isPrimaryKey ||
+  field.isIdentity ||
+  isGeneratedDefault(field.defaultValue) ||
+  // Truncated values can't be copied faithfully, so don't risk saving a corrupted copy
+  isValueTruncated(field.value, field.format)
+
+/**
+ * Prepares fields to seed a new row from existing values (duplicating a row, or keeping values
+ * between inserts). Primary key, identity, function-defaulted, and truncated fields are reset to
+ * their blank state so the database generates fresh values.
+ */
+export const generateReusedRowFields = ({
+  fields,
+  blankFields,
+}: {
+  fields: RowField[]
+  blankFields: RowField[]
+}): RowField[] =>
+  fields.map((field) => {
+    if (!shouldClearFieldOnReuse(field)) return field
+    // A blank boolean holds its default expression as a string, which would be saved as `false`
+    // instead of letting the database evaluate the default, so leave the value unset
+    if (field.format === 'bool' && isGeneratedDefault(field.defaultValue)) {
+      return { ...field, value: undefined }
+    }
+    const blankField = blankFields.find((x) => x.name === field.name)
+    return { ...field, value: blankField?.value }
+  })
+
 export const validateFields = (fields: RowField[]) => {
   const errors = {} as any
   fields.forEach((field) => {
@@ -278,6 +323,29 @@ export const generateUpdateRowPayload = (originalRow: any, fields: RowField[]) =
 }
 
 /**
+ * Truncated multi-dimensional arrays are cut to their first MAX_ARRAY_SIZE entries, with an extra last entry
+ * filled with the "..." (or {"truncated":true} for json) marker, see getTableRowsSql
+ */
+const isTruncatedMultiDimArray = (value: string) => {
+  if (!value.startsWith('[[')) return false
+  try {
+    const parsed: unknown = JSON.parse(value)
+    if (!Array.isArray(parsed) || !Array.isArray(parsed[0])) return false
+
+    const lastEntry: unknown = parsed[parsed.length - 1]
+    if (!Array.isArray(lastEntry)) return false
+
+    // `every` is vacuously true for empty arrays (e.g. `[[1],[]]`), so require at least one marker
+    const flattened = lastEntry.flat(Infinity)
+    return (
+      flattened.length > 0 && flattened.every((x) => x === '...' || isEqual(x, { truncated: true }))
+    )
+  } catch {
+    return false
+  }
+}
+
+/**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
 export const isValueTruncated = (value: string | null | undefined, format?: string | null) => {
@@ -294,7 +362,7 @@ export const isValueTruncated = (value: string | null | undefined, format?: stri
       // If the array have MAX_ARRAY_SIZE elements in it
       // its a large truncated array
       (value.match(/","/g) || []).length === MAX_ARRAY_SIZE) ||
-    (typeof value === 'string' && isArrayColumn && value.startsWith('[["')) ||
+    (typeof value === 'string' && isArrayColumn && isTruncatedMultiDimArray(value)) ||
     // [Joshen] For json arrays, refer to getTableRowsSql from table-row-query
     // for array types, we're adding {"truncated": true} as the last item of the JSON to
     // maintain the JSON array structure

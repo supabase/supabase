@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
 import { useEffect, useState } from 'react'
@@ -27,7 +26,7 @@ import { useProjectAddonUpdateMutation } from '@/data/subscriptions/project-addo
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import type { AddonVariantId } from '@/data/subscriptions/types'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
@@ -64,9 +63,8 @@ const PITRSidePanel = () => {
   const [selectedCategory, setSelectedCategory] = useState<'on' | 'off'>('off')
   const [selectedOption, setSelectedOption] = useState<string>('pitr_0')
 
-  const { can: canUpdatePitr } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_WRITE,
-    'stripe.subscriptions'
+  const { can: canUpdatePitr } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE
   )
   const isBranchingEnabled =
     project?.is_branch_enabled === true || project?.parent_project_ref !== undefined
@@ -115,6 +113,11 @@ const PITRSidePanel = () => {
       // If the project is HIPAA, we don't allow the user to downgrade below 28 days
       selectedPitr?.identifier !== 'pitr_28')
 
+  // HIPAA projects can't disable PITR, so don't offer the option at all
+  const categoryOptions = hasHipaaAddon
+    ? PITR_CATEGORY_OPTIONS.filter((option) => option.id !== 'off')
+    : PITR_CATEGORY_OPTIONS
+
   const onConfirm = async () => {
     if (!projectRef) return console.error('Project ref is required')
 
@@ -130,6 +133,9 @@ const PITRSidePanel = () => {
       if (subscriptionPitr !== undefined) {
         setSelectedCategory('on')
         setSelectedOption(subscriptionPitr.variant.identifier)
+      } else if (hasHipaaAddon) {
+        setSelectedCategory('on')
+        setSelectedOption('pitr_28')
       } else {
         setSelectedCategory('off')
         setSelectedOption('pitr_0')
@@ -178,7 +184,7 @@ const PITRSidePanel = () => {
 
           <div className="mt-8! pb-4">
             <div className="flex gap-3">
-              {PITR_CATEGORY_OPTIONS.map((option) => {
+              {categoryOptions.map((option) => {
                 const isSelected = selectedCategory === option.id
                 return (
                   <div
@@ -305,11 +311,12 @@ const PITRSidePanel = () => {
                   />
                 ))}
               </RadioGroupCard>
-              <TaxDisclaimer className="mt-3" />
+
+              {availableOptions.some((it) => it.price > 0) && <TaxDisclaimer className="mt-3" />}
             </div>
           )}
 
-          {hasChanges && selectedOption !== 'pitr_0' && (
+          {hasChanges && selectedOption !== 'pitr_0' && selectedPitr?.price !== 0 && (
             <p className="text-sm text-foreground-light">
               There are no immediate charges. The add-on is billed at the end of your billing cycle
               based on your usage and prorated to the hour.

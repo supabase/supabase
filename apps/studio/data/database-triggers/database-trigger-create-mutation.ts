@@ -4,8 +4,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerCreateVariables = {
   projectRef: string
@@ -25,6 +27,7 @@ export async function createDatabaseTrigger({
     connectionString,
     sql,
     queryKey: ['trigger', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -37,16 +40,12 @@ export const useDatabaseTriggerCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseTriggerCreateData,
-    ResponseError,
-    DatabaseTriggerCreateVariables
-  >,
+  UseCustomMutationOptions<DatabaseTriggerCreateData, StudioError, DatabaseTriggerCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerCreateData, ResponseError, DatabaseTriggerCreateVariables>({
+  return useMutation<DatabaseTriggerCreateData, StudioError, DatabaseTriggerCreateVariables>({
     mutationFn: (vars) => createDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

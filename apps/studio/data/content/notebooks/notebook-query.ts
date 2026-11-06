@@ -2,11 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { getContentById } from '../content-id-query'
 import { contentKeys } from '../keys'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { Notebooks, UseCustomQueryOptions } from '@/types'
-import { ResponseError } from '@/types'
 
 export type NotebookVariables = { projectRef?: string; id?: string }
-export type NotebookError = ResponseError
+export type NotebookError = StudioError
 
 export async function getNotebook(
   { projectRef, id }: NotebookVariables,

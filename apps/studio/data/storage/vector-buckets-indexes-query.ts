@@ -5,7 +5,8 @@ import { storageKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type VectorBucketIndex =
   components['schemas']['StorageVectorBucketListIndexesResponse_Output']['indexes'][number]
@@ -28,7 +29,7 @@ export async function getVectorBucketsIndexes(
 }
 
 export type VectorBucketsIndexesData = Awaited<ReturnType<typeof getVectorBucketsIndexes>>
-export type VectorBucketsIndexesError = ResponseError
+export type VectorBucketsIndexesError = StudioError
 
 export const useVectorBucketsIndexesQuery = <TData = VectorBucketsIndexesData>(
   { projectRef, vectorBucketName }: GetVectorBucketsIndexesVariables,

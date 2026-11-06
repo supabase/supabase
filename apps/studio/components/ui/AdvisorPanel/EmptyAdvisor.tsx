@@ -1,4 +1,4 @@
-import { TextSearch } from 'lucide-react'
+import { TextSearchIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import type { AdvisorCategory } from '@/state/advisor-state'
@@ -57,7 +57,7 @@ export const EmptyAdvisor = ({
 
   return (
     <div className="h-full px-6 flex flex-col items-center justify-center w-full gap-y-2">
-      <TextSearch className="text-foreground-muted" strokeWidth={1} />
+      <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
       <div className="flex flex-col items-center gap-y-0.5 text-center">
         <h3 className="heading-default">{heading}</h3>
         <p className="text-foreground-light text-sm text-balance">{message}</p>

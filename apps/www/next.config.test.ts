@@ -14,15 +14,42 @@ describe('next.config.mjs', () => {
     expect(headers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          source: '/(docs|blog)/:path*',
+          source: '/(docs|blog|kb)/:path*',
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
-          source: '/dashboard/:path*',
+          source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
           headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
         }),
       ])
     )
+  })
+
+  it('keeps sign-in and sign-up indexable while other dashboard paths stay noindex', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+    const noindexRule = headers.find((header) => header.source.startsWith('/dashboard/'))
+    const matches = getPathMatch(noindexRule!.source)
+
+    expect(matches('/dashboard/sign-in')).toBe(false)
+    expect(matches('/dashboard/sign-up')).toBe(false)
+    expect(matches('/dashboard/org')).toBeTruthy()
+    expect(matches('/dashboard/project/abc')).toBeTruthy()
+  })
+
+  it('serves the published CLI schemas with CORS and a short cache', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+
+    const schemasHeaders = headers.find((header) => header.source === '/schemas/:path*')
+
+    expect(schemasHeaders?.headers).toEqual(
+      expect.arrayContaining([
+        { key: 'access-control-allow-origin', value: '*' },
+        { key: 'cache-control', value: 'public, max-age=3600' },
+      ])
+    )
+    expect(getPathMatch(schemasHeaders!.source)('/schemas/config/v1.json')).toBeTruthy()
   })
 
   it('routes the library and permanently redirects the legacy UI URLs', async () => {
@@ -60,6 +87,25 @@ describe('next.config.mjs', () => {
     expect(
       redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
+  })
+
+  it('proxies the InstantDB migration app with its basePath prefix intact', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
+
+    expect(afterFiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/migrate/instantdb',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+        }),
+        expect.objectContaining({
+          source: '/migrate/instantdb/:path*',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
+        }),
+      ])
+    )
   })
 
   it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {

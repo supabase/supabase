@@ -2,10 +2,11 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import type { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
-import { useIsOrioleDbInAws } from '@/hooks/misc/useSelectedProject'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import { useIsOrioleDbInAws, useOrioleDbReleaseStage } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type BackupsVariables = {
   projectRef?: string
@@ -20,6 +21,7 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
   const { data, error } = await get(`/platform/database/{ref}/backups`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -27,7 +29,7 @@ export async function getBackups({ projectRef }: BackupsVariables, signal?: Abor
 }
 
 export type BackupsData = Awaited<ReturnType<typeof getBackups>>
-export type BackupsError = ResponseError
+export type BackupsError = StudioError
 
 export const useBackupsQuery = <TData = BackupsData>(
   { projectRef, projectStatus }: BackupsVariables,
@@ -35,13 +37,14 @@ export const useBackupsQuery = <TData = BackupsData>(
 ) => {
   // [Joshen] Check for specifically false to account for project not loaded yet
   const isOrioleDbInAws = useIsOrioleDbInAws()
+  const orioleDbReleaseStage = useOrioleDbReleaseStage()
 
   return useQuery<BackupsData, BackupsError, TData>({
     queryKey: databaseKeys.backups(projectRef),
     queryFn: ({ signal }) => getBackups({ projectRef }, signal),
     enabled:
       enabled &&
-      !isOrioleDbInAws &&
+      !(isOrioleDbInAws && orioleDbReleaseStage === 'alpha') &&
       typeof projectRef !== 'undefined' &&
       projectStatus !== PROJECT_STATUS.COMING_UP &&
       projectStatus !== PROJECT_STATUS.UNKNOWN,

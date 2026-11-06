@@ -114,7 +114,7 @@ const blockMetadata: Record<string, Pick<LibraryBlock, 'description' | 'category
     category: 'Messaging',
     preview: 'chat',
   },
-  'mcp-server': {
+  mcp: {
     description: 'Add a user-scoped MCP server to your product.',
     category: 'AI & APIs',
     preview: 'mcp',

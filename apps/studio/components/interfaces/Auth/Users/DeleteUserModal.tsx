@@ -52,7 +52,8 @@ export const DeleteUserModal = ({
     >
       <p className="text-sm text-foreground-light">
         This is permanent! Are you sure you want to delete the user{' '}
-        {selectedUser?.email ?? selectedUser?.phone ?? 'this user'}?
+        {selectedUser?.email ?? selectedUser?.phone ?? <span>this user</span>}
+        <span>?</span>
       </p>
     </ConfirmationModal>
   )

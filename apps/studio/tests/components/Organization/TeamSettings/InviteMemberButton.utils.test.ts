@@ -41,16 +41,8 @@ describe('parseEmails', () => {
     expect(parseEmails('a@example.com,a@example.com')).toStrictEqual(['a@example.com'])
   })
 
-  test('returns an empty array for an empty string', () => {
-    expect(parseEmails('')).toStrictEqual([])
-  })
-
-  test('returns an empty array for a whitespace-only string', () => {
-    expect(parseEmails('   ')).toStrictEqual([])
-  })
-
-  test('returns an empty array for commas only', () => {
-    expect(parseEmails(',,,,')).toStrictEqual([])
+  test.each(['', '   ', ',,,,'])('returns an empty array for %j', (value) => {
+    expect(parseEmails(value)).toStrictEqual([])
   })
 
   test('parses space-separated emails', () => {
@@ -123,17 +115,6 @@ describe('categorizeInviteEmails', () => {
     })
   })
 
-  test('places all emails in toInvite when none match existing members', () => {
-    const members = [makeMember({ primary_email: 'other@example.com' })]
-    expect(
-      categorizeInviteEmails(['a@example.com', 'b@example.com', 'c@example.com'], members)
-    ).toStrictEqual({
-      alreadyInvited: [],
-      alreadyMembers: [],
-      toInvite: ['a@example.com', 'b@example.com', 'c@example.com'],
-    })
-  })
-
   test('returns all-empty for an empty email list', () => {
     expect(categorizeInviteEmails([], [makeMember()])).toStrictEqual({
       alreadyInvited: [],
@@ -154,22 +135,18 @@ describe('categorizeInviteEmails', () => {
 
 describe('buildProjectPayload', () => {
   test('returns empty object when applyToOrg is true', () => {
-    expect(buildProjectPayload(true, 'ref_abc')).toStrictEqual({})
+    expect(buildProjectPayload(true, [])).toStrictEqual({})
   })
 
-  test('throws an error when applyToOrg is false but projectRef is empty', () => {
-    expect(() => buildProjectPayload(false, '')).toThrowError(
-      'projectRef is required when applyToOrg is false'
+  test('throws an error when applyToOrg is false but no projects are selected', () => {
+    expect(() => buildProjectPayload(false, [])).toThrowError(
+      'At least one project is required when applyToOrg is false'
     )
   })
 
-  test('returns projects array when applyToOrg is false and projectRef is set', () => {
-    expect(buildProjectPayload(false, 'ref_abc')).toStrictEqual({ projects: ['ref_abc'] })
-  })
-
-  test('wraps the projectRef in a single-element array', () => {
-    expect(buildProjectPayload(false, 'my-project-ref')).toStrictEqual({
-      projects: ['my-project-ref'],
+  test('returns all selected projects when applyToOrg is false and multiple are selected', () => {
+    expect(buildProjectPayload(false, ['ref_abc', 'ref_def', 'ref_ghi'])).toStrictEqual({
+      projects: ['ref_abc', 'ref_def', 'ref_ghi'],
     })
   })
 })

@@ -1,4 +1,4 @@
-import { Edit, MoreVertical, Search, Trash } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, SearchIcon, TrashIcon } from 'lucide-react'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -159,7 +159,7 @@ export const EnumeratedTypes = () => {
             onChange={(e) => setSearch(e.target.value)}
             onKeyDown={onSearchInputEscape(search, setSearch)}
             placeholder="Search for a type"
-            icon={<Search />}
+            icon={<SearchIcon />}
           />
         </div>
 
@@ -237,7 +237,7 @@ export const EnumeratedTypes = () => {
                                   <DropdownMenuTrigger asChild>
                                     <Button
                                       className="px-1"
-                                      icon={<MoreVertical />}
+                                      icon={<MoreVerticalIcon />}
                                       aria-label={`${type.name} actions`}
                                     />
                                   </DropdownMenuTrigger>
@@ -249,14 +249,14 @@ export const EnumeratedTypes = () => {
                                   className="space-x-2"
                                   onClick={() => setSelectedTypeIdToEdit(type.id.toString())}
                                 >
-                                  <Edit size={14} />
+                                  <EditIcon size={14} />
                                   <p>Update type</p>
                                 </DropdownMenuItem>
                                 <DropdownMenuItem
                                   className="space-x-2"
                                   onClick={() => setSelectedTypeIdToDelete(type.id.toString())}
                                 >
-                                  <Trash size={14} />
+                                  <TrashIcon size={14} />
                                   <p>Delete type</p>
                                 </DropdownMenuItem>
                               </DropdownMenuContent>

@@ -1,6 +1,6 @@
 import { safeSql } from '@supabase/pg-meta/src/pg-format'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { RefreshCw, RotateCcw, X } from 'lucide-react'
+import { RefreshCwIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { parseAsString, useQueryStates } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -18,6 +18,7 @@ import { transformStatementDataToRows } from './WithStatements.utils'
 import { PresetHookResult } from '@/components/interfaces/Reports/Reports.utils'
 import { DownloadResultsButton } from '@/components/ui/DownloadResultsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import { unguarded } from '@/data/fetchers'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
@@ -212,7 +213,7 @@ export const WithStatements = ({
               <Button
                 aria-label="Refresh"
                 size="tiny"
-                icon={<RefreshCw />}
+                icon={<RefreshCwIcon />}
                 onClick={handleRefresh}
                 className="w-[26px]"
               />
@@ -225,7 +226,7 @@ export const WithStatements = ({
               <Button
                 aria-label="Reset report"
                 size="tiny"
-                icon={<RotateCcw />}
+                icon={<RotateCcwIcon />}
                 onClick={() => setShowResetgPgStatStatements(true)}
                 className="w-[26px]"
               />
@@ -266,7 +267,7 @@ export const WithStatements = ({
           size="tiny"
           onClick={() => setShowBottomSection(false)}
         >
-          <X size="14" />
+          <XIcon size="14" />
         </Button>
         <div className="w-[33%] flex flex-col gap-y-1 text-sm">
           <p>Reset report</p>
@@ -318,6 +319,7 @@ export const WithStatements = ({
               projectRef: project?.ref,
               connectionString,
               sql: safeSql`SELECT pg_stat_statements_reset();`,
+              grant: unguarded.migrating,
             })
             handleRefresh()
             setShowResetgPgStatStatements(false)

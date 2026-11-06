@@ -13,6 +13,7 @@ import React, { useEffect, useRef } from 'react'
 import MenuIconPicker from './MenuIconPicker'
 
 type NavAccordionItem = {
+  name?: string
   url?: string
   enabled?: boolean
   items?: NavAccordionItem[]
@@ -29,6 +30,15 @@ function isRenderable(item: NavAccordionItem): boolean {
   if (item.url) return true
 
   return item.items?.some(isRenderable) ?? false
+}
+
+function groupLinks(item: NavAccordionItem): Array<{ name: string; url: string }> {
+  return (item.items ?? [])
+    .filter((child) => isRenderable(child))
+    .flatMap((child) => [
+      ...(child.url && child.name ? [{ name: child.name, url: child.url }] : []),
+      ...groupLinks(child),
+    ])
 }
 
 const HeaderLink = React.memo(function HeaderLink(props: {
@@ -164,6 +174,13 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
                 </NavSectionList>
               </NavSectionContent>
             </Accordion.Content>
+            <ul hidden>
+              {groupLinks(props.subItem).map((child) => (
+                <li key={`${child.name}-${child.url}`}>
+                  <Link href={child.url}>{child.name}</Link>
+                </li>
+              ))}
+            </ul>
           </Accordion.Item>
         </Accordion.Root>
       ) : (
@@ -227,7 +244,7 @@ const Content = (props) => {
 
   return (
     <div className="relative w-full flex flex-col gap-0 pb-5">
-      <Link href={menu.url ?? ''}>
+      <Link href={menu.url ?? ''} className="max-lg:hidden">
         <div className="flex items-center gap-3 my-3 text-primary">
           <MenuIconPicker icon={menu.icon} />
           <HeaderLink title={menu.title} url={menu.url} id={id} />

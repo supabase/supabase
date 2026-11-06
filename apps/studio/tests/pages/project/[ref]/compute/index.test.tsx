@@ -1,14 +1,15 @@
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
-import { HttpResponse } from 'msw'
+import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { computeQueryOptions } from '@/data/compute/compute-query'
+import { API_URL } from '@/lib/constants'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
 import ComputePage from '@/pages/project/[ref]/compute/index'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
 
 type ListComputeInstancesResponse = components['schemas']['V2ListComputeInstancesResponse_Output']
@@ -101,12 +102,29 @@ describe('/project/[ref]/compute', () => {
     expect(await screen.findByRole('link', { name: 'embed' })).toBeVisible()
   })
 
-  it('explains that a project outside the alpha is not enrolled', async () => {
-    mockComputeInstancesListFailure(404)
+  it('points a project outside the alpha to the waitlist', async () => {
+    mswServer.use(
+      http.get(`${API_URL}/v2/projects/:ref/compute`, () =>
+        HttpResponse.json(
+          {
+            error: {
+              code: 'not_found.compute.not_enabled',
+              message: 'Compute is not available for this project',
+            },
+          },
+          { status: 404 }
+        )
+      )
+    )
 
     await renderComputePage()
 
-    expect(screen.getByText(`${PRODUCT_NAME} is not enabled for this project`)).toBeVisible()
+    expect(screen.getByText(`You don't have access to ${PRODUCT_NAME} yet`)).toBeVisible()
+    expect(screen.getByRole('link', { name: 'Join waitlist' })).toHaveAttribute(
+      'href',
+      'https://supabase.com/compute'
+    )
+    expect(screen.queryByText('Failed to retrieve compute instances')).not.toBeInTheDocument()
     expect(screen.queryByRole('table')).not.toBeInTheDocument()
   })
 

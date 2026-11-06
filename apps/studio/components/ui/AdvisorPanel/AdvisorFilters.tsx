@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { z } from 'zod'
 
 import { advisorCategoryLabels } from './AdvisorPanel.utils'
@@ -105,7 +105,7 @@ export const AdvisorFilters = ({
         <ButtonTooltip
           variant="text"
           className="w-7 h-7 p-0 mr-3"
-          icon={<X strokeWidth={1.5} />}
+          icon={<XIcon strokeWidth={1.5} />}
           onClick={onClose}
           tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
         />

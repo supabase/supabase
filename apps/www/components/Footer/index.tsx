@@ -24,6 +24,7 @@ import { ThemeToggle } from 'ui-patterns/ThemeToggle'
 
 import useDarkLaunchWeeks from '../../hooks/useDarkLaunchWeeks'
 import SectionContainer from '../Layouts/SectionContainer'
+import { isCrossZoneHref } from '@/lib/cross-zone'
 
 interface Props {
   className?: string
@@ -118,6 +119,8 @@ const Footer = (props: Props) => {
             </Link>
             <div className="flex space-x-5">
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://twitter.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -126,6 +129,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://github.com/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -134,6 +139,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://discord.supabase.com/"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -142,6 +149,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://youtube.com/c/supabase"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -150,6 +159,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.tiktok.com/@supabase.com"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -158,6 +169,8 @@ const Footer = (props: Props) => {
               </a>
 
               <a
+                target="_blank"
+                rel="noopener noreferrer"
                 href="https://www.instagram.com/supabasecom"
                 className="text-foreground-lighter hover:text-foreground transition"
               >
@@ -231,7 +244,7 @@ const Footer = (props: Props) => {
                         return (
                           <li key={`${segment.title}_link_${idx}`}>
                             {link.url ? (
-                              link.url.startsWith('https') ? (
+                              link.url.startsWith('https') || isCrossZoneHref(link.url) ? (
                                 <a href={link.url}>{children}</a>
                               ) : (
                                 <Link href={link.url}>{children}</Link>

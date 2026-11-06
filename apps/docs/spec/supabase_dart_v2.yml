@@ -948,7 +948,7 @@ functions:
       - Drives the full WebAuthn ceremony end to end: starts the challenge with the Supabase server, calls the `authenticator` you supply to prompt the user for biometrics or a security key, and verifies the credential with the server.
       - Does not require an existing session. On success the session is persisted and an `AuthChangeEvent.signedIn` event is fired.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
       - Platform setup the library cannot perform (Associated Domains on iOS/macOS, Digital Asset Links on Android, the `passkeys` web SDK on web) is documented in the `supabase_flutter` package README.
     params:
@@ -982,7 +982,7 @@ functions:
       - Drives the full WebAuthn ceremony end to end: starts the registration with the Supabase server, calls the `authenticator` you supply to create a credential on the device, and verifies it with the server.
       - Requires a signed in (non-anonymous) user. If the user has verified MFA factors, the session has to be at `aal2` to manage passkeys.
       - `supabase_flutter` does not depend on a passkey plugin directly. Pass an implementation of `PasskeyAuthenticatorInterface`, such as the [`passkeys`](https://pub.dev/packages/passkeys) plugin's `PasskeyAuthenticator` (since `passkeys` `2.21.0`).
-      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey-api) namespace instead.
+      - For native flows or custom UI, use the lower-level [`auth.passkey`](/docs/reference/dart/auth-passkey) namespace instead.
       - Passkeys are a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.
     params:
       - name: authenticator
@@ -2379,7 +2379,7 @@ functions:
   - id: passkey-verify-registration
     title: 'passkey.verifyRegistration()'
     notes: |
-      Completes the registration of a new passkey and returns the stored [`Passkey`](/docs/reference/dart/auth-passkey-api).
+      Completes the registration of a new passkey and returns the stored [`Passkey`](/docs/reference/dart/auth-passkey).
     params:
       - name: challengeId
         isOptional: false
@@ -5329,7 +5329,7 @@ functions:
       Retrieve URLs for assets in public buckets
     title: 'from.getPublicUrl()'
     notes: |
-      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/storage-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
+      - The bucket needs to be set to public, either via [updateBucket()](/docs/reference/dart/file-buckets-updatebucket) or by going to Storage on [supabase.com/dashboard](https://supabase.com/dashboard), clicking the overflow menu on a bucket and choosing "Make public"
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: none
@@ -5537,7 +5537,7 @@ functions:
     title: 'from.downloadStream()'
     notes: |
       - The request is sent when the stream is listened to. A non-success response surfaces as a `StorageException` on the stream before any bytes are emitted.
-      - Prefer this over [`download()`](/docs/reference/dart/storage-from-download) for large files to keep memory usage low.
+      - Prefer this over [`download()`](/docs/reference/dart/file-buckets-download) for large files to keep memory usage low.
       - Policy permissions required:
         - `buckets` permissions: none
         - `objects` permissions: `select`

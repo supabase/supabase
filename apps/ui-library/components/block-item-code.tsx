@@ -1,14 +1,31 @@
 'use client'
 
 import { File } from 'lucide-react'
-import { useState } from 'react'
-import { flattenTree, TreeView, TreeViewItem } from 'ui'
-import { CodeBlock, type CodeBlockLang } from 'ui-patterns/CodeBlock'
+import dynamic from 'next/dynamic'
+import { createContext, useContext, useState } from 'react'
+import { cn, flattenTree, TreeView, TreeViewItem } from 'ui'
+import type { CodeBlockLang } from 'ui-patterns/CodeBlock'
 
 import { RegistryNode } from '@/lib/process-registry'
 
+// next/dynamic passes no props to `loading`, so the fallback reads the code from context.
+const PendingCodeContext = createContext('')
+
+function PendingCode() {
+  const code = useContext(PendingCodeContext)
+  return (
+    <pre className="w-full min-h-0 min-w-0 flex-1 overflow-auto p-4 font-mono text-xs">{code}</pre>
+  )
+}
+
+const CodeBlock = dynamic(
+  () => import('ui-patterns/CodeBlock').then((module) => module.CodeBlock),
+  { ssr: false, loading: () => <PendingCode /> }
+)
+
 interface BlockItemCodeProps {
   files: RegistryNode[]
+  embedded?: boolean
 }
 
 interface TreeNode {
@@ -63,13 +80,13 @@ const findFirstFile = (nodes: RegistryNode[]): RegistryNode | null => {
   return null
 }
 
-export function BlockItemCode({ files }: BlockItemCodeProps) {
+export function BlockItemCode({ files, embedded = false }: BlockItemCodeProps) {
   // Find the first file to select by default
   const [selectedFile, setSelectedFile] = useState<RegistryNode | null>(findFirstFile(files))
   const flattenedData = flattenTree({ name: '', children: flattenChildren(files) })
 
   // Handle file selection from the TreeView
-  const handleNodeSelect = (element: any) => {
+  const handleNodeSelect = (filePath: string) => {
     const findFileByPath = (nodes: RegistryNode[], path: string): RegistryNode | null => {
       for (const node of nodes) {
         if (node.path === path) {
@@ -85,7 +102,6 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
       return null
     }
 
-    const filePath = element.metadata.path
     const foundFile = findFileByPath(files, filePath)
 
     if (foundFile?.type === 'directory') return
@@ -94,9 +110,14 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
   }
 
   return (
-    <div className="flex mt-4 border rounded-lg overflow-hidden h-[652px] not-prose">
+    <div
+      className={cn(
+        'flex flex-col sm:flex-row overflow-hidden not-prose',
+        embedded ? 'h-full' : 'mt-4 border rounded-lg h-[652px]'
+      )}
+    >
       {/* File browser sidebar */}
-      <div className="w-64 py-2 border-r bg-muted/30 overflow-y-auto">
+      <div className="h-44 w-full shrink-0 overflow-auto border-b bg-muted/30 py-2 sm:h-full sm:w-64 sm:border-b-0 sm:border-r">
         <TreeView
           data={flattenedData}
           aria-label="file browser"
@@ -105,7 +126,11 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
           defaultSelectedIds={flattenedData
             .filter((n) => n.metadata?.path === selectedFile?.path)
             .map((n) => n.id)}
-          onNodeSelect={({ element }) => handleNodeSelect(element)}
+          onNodeSelect={({ element }) => {
+            if (typeof element.metadata?.path === 'string') {
+              handleNodeSelect(element.metadata.path)
+            }
+          }}
           nodeRenderer={({ element, isBranch, isExpanded, getNodeProps, level, isSelected }) => (
             <TreeViewItem
               {...getNodeProps()}
@@ -123,13 +148,15 @@ export function BlockItemCode({ files }: BlockItemCodeProps) {
 
       {/* Code display area */}
       {selectedFile?.content ? (
-        <CodeBlock
-          wrapperClassName="w-full"
-          className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
-          language={languageFor(selectedFile.name)}
-        >
-          {selectedFile?.content}
-        </CodeBlock>
+        <PendingCodeContext.Provider value={selectedFile.content}>
+          <CodeBlock
+            wrapperClassName="w-full min-h-0 min-w-0 flex-1"
+            className="h-full max-w-none w-full! flex-1 font-mono text-xs rounded-none border-none"
+            language={languageFor(selectedFile.name)}
+          >
+            {selectedFile?.content}
+          </CodeBlock>
+        </PendingCodeContext.Provider>
       ) : (
         <div className="flex items-center justify-center h-full text-muted-foreground">
           <div className="flex flex-col items-center gap-2">

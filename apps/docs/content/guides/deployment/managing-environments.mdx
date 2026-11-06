@@ -22,7 +22,7 @@ height={933}
 
 ## Set up a local environment
 
-The first step is to set up your local repository with the Supabase CLI:
+The first step is to set up your local repository with the Supabase CLI. Each developer, and each feature branch or git worktree, can have its own local database. To run several local projects at the same time on one machine, see [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects).
 
 ```bash
 supabase init
@@ -45,7 +45,7 @@ If you're using an existing Supabase project, you might have made schema changes
 Run the following command to pull these changes before making local schema changes from the CLI:
 
 ```sql
-supabase db pull
+supabase db pull --remote
 ```
 
 This command creates a new migration in `supabase/migrations/<timestamp>_remote_schema.sql` which reflects the schema changes you have made previously.
@@ -161,9 +161,11 @@ You need a _new_ project for staging. A project which has already been modified 
 
 The Supabase CLI requires a few environment variables to run in non-interactive mode.
 
-- `SUPABASE_ACCESS_TOKEN` is your personal access token
+- `SUPABASE_ACCESS_TOKEN` is a [personal access token](/docs/guides/platform/personal-access-tokens) scoped to the projects this workflow deploys to
 - `SUPABASE_DB_PASSWORD` is your project specific database password
 - `SUPABASE_PROJECT_ID` is your project specific reference string
+
+The workflows below run `supabase link`, so grant the token **Project Settings**, **API Keys**, and **API Key Secrets**, all with **Read** access.
 
 We recommend adding these as [encrypted secrets](https://docs.github.com/en/actions/security-guides/encrypted-secrets) to your GitHub Actions runners.
 
@@ -204,7 +206,7 @@ jobs:
 
       - name: Verify generated types are checked in
         run: |
-          supabase gen types typescript --local > types.gen.ts
+          supabase gen types typescript > types.gen.ts
           if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
@@ -243,7 +245,7 @@ jobs:
           version: latest
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - run: supabase db push --yes --remote
 ```
 
 </TabPanel>
@@ -275,7 +277,7 @@ jobs:
           version: latest
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - run: supabase db push --yes --remote
 ```
 
 </TabPanel>
@@ -334,13 +336,13 @@ The GitHub Actions runner will deploy your existing migrations to the staging pr
 Alternatively, you can also apply migrations through your local CLI to a linked remote database.
 
 ```sql
-supabase db push
+supabase db push --remote
 ```
 
 Once pushed, check that the migration version is up to date for both local and remote databases.
 
 ```sql
-supabase migration list
+supabase migration list --remote
 ```
 
 ### Permission denied on `db pull`
@@ -353,7 +355,7 @@ Error: Error running pg_dump on remote database: pg_dump: error: query failed: E
 pg_dump: error: query was: LOCK TABLE "graphql"."_type" IN ACCESS SHARE MODE
 ```
 
-To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. You can do that by running the following query from Supabase dashboard's SQL Editor.
+To resolve this error, you need to grant `postgres` role permissions to `graphql` schema. Run the following SQL using the [SQL Editor](/dashboard/project/_/sql) in the Supabase Dashboard or with `psql` over a direct connection. To connect with `psql`, see [Direct connection](/docs/guides/database/connecting-to-postgres#direct-connection).
 
 ```sql
 grant all on all tables in schema graphql to postgres, anon, authenticated, service_role;

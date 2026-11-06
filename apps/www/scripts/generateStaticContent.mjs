@@ -136,22 +136,11 @@ const validateBlogFrontmatterImages = (frontmatter, filePath) => {
 }
 
 /**
- * Fixes Safari dates sorting bug
+ * Sort posts by their full publish timestamp to keep same-day posts in the correct order
  */
 const sortDates = (a, b, direction = 'desc') => {
-  const isAsc = direction === 'asc'
-  var reg = /-|:|T|\+/ //The regex on which matches the string should be split (any used delimiter) -> could also be written like /[.:T\+]/
-  var parsed = [
-    //an array which holds the date parts for a and b
-    a.date.split(reg), //Split the datestring by the regex to get an array like [Year,Month,Day]
-    b.date.split(reg),
-  ]
-  var dates = [
-    //Create an array of dates for a and b
-    new Date(parsed[0][0], parsed[0][1], parsed[0][2]), //Constructs an date of the above parsed parts (Year,Month...
-    new Date(parsed[1][0], parsed[1][1], parsed[1][2]),
-  ]
-  return isAsc ? dates[0] - dates[1] : dates[1] - dates[0] //Returns the difference between the date (if b > a then a - b < 0)
+  const diff = new Date(a.date).getTime() - new Date(b.date).getTime()
+  return direction === 'asc' ? diff : -diff
 }
 
 /**
@@ -319,7 +308,6 @@ try {
     const encodedDescription = xmlEncode(post.description)
     const formattedDate = dayjs(post.date)
       .utcOffset(0, true)
-      .startOf('day')
       .format('ddd, DD MMM YYYY HH:mm:ss [-0700]')
 
     return `<item>

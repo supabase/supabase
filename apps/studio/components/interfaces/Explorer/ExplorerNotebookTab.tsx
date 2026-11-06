@@ -15,20 +15,20 @@ import { acceptUntrustedSql } from '@supabase/pg-meta'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import {
-  Check,
-  Copy,
-  Download,
-  FileText,
-  Keyboard,
-  Loader2,
-  MoreVertical,
-  Notebook,
-  NotebookText,
-  Play,
-  Save,
-  SearchX,
-  SquareCode,
-  Trash,
+  CheckIcon,
+  CopyIcon,
+  DownloadIcon,
+  FileTextIcon,
+  KeyboardIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  NotebookIcon,
+  NotebookTextIcon,
+  PlayIcon,
+  SaveIcon,
+  SearchXIcon,
+  SquareCodeIcon,
+  TrashIcon,
 } from 'lucide-react'
 import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -54,6 +54,7 @@ import {
   notebookToMarkdown,
   type QueryCellSummary,
 } from './ExplorerNotebookTab.utils'
+import { ExplorerPreviewSuggestion } from './ExplorerPreviewSuggestion'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -83,6 +84,7 @@ import { useUpsertNotebookMutation } from '@/data/content/notebooks/notebook-ups
 import { acceptUntrustedLogsSql } from '@/data/logs/safe-analytics-sql'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useTrack } from '@/lib/telemetry/track'
 import {
   getNotebooksStateSnapshot,
   useCurrentNotebook,
@@ -109,6 +111,7 @@ export const ExplorerNotebookTab = () => {
   const { name, content } = currentNotebook?.notebook ?? {}
   const { isNotFound } = useLoadNotebook({ id, projectRef: ref })
   const { data: project } = useSelectedProjectQuery()
+  const track = useTrack()
   const cells = content?.cells ?? []
   const queryCellIds = cells.filter(isQueryCell).map((cell) => cell._id)
 
@@ -121,12 +124,31 @@ export const ExplorerNotebookTab = () => {
   } | null>(null)
   const [skipMutatingCells, setSkipMutatingCells] = useState(false)
   const [isExportingPdf, setIsExportingPdf] = useState(false)
+
   const queryCellRefs = useRef(new Map<string, QueryEditorHandle>())
   const savedContentRef = useRef<typeof content>(undefined)
+  const confirmedCreatedNotebookIdsRef = useRef(new Set<string>())
   const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation({
-    onSuccess: (data) => {
+  const { mutate: updateNotebook, isPending: isUpdating } = useUpsertNotebookMutation<{
+    isCreation: boolean
+  }>({
+    onMutate: (variables) => ({
+      isCreation:
+        (currentNotebook?.status === 'new' ||
+          snap.serverDivergedWhileDirty.get(variables.id) === 'deleted') &&
+        !confirmedCreatedNotebookIdsRef.current.has(variables.id),
+    }),
+    onSuccess: (data, variables, context) => {
+      const { isCreation } = context
+      if (isCreation) confirmedCreatedNotebookIdsRef.current.add(variables.id)
+
+      track(
+        isCreation ? 'explorer_notebook_created' : 'explorer_notebook_updated',
+        { notebookId: variables.id },
+        { project: variables.projectRef }
+      )
+
       if (id && content === savedContentRef.current) {
         snap.markSaved({ id, updatedAt: data?.updated_at })
         toast.success('Successfully saved notebook!')
@@ -376,7 +398,7 @@ export const ExplorerNotebookTab = () => {
     return (
       <div className="p-4 h-full bg-surface-100">
         <EmptyStatePresentational
-          icon={<SearchX className="text-foreground-lighter" />}
+          icon={<SearchXIcon className="text-foreground-lighter" />}
           title="Notebook not found"
           description="This notebook may have been deleted or does not exist."
           contentClassName="[&>h3]:text-sm [&>p]:text-xs"
@@ -388,7 +410,7 @@ export const ExplorerNotebookTab = () => {
   if (!content) {
     return (
       <div className="flex flex-col h-full items-center justify-center bg-surface-100">
-        <Loader2 className="animate-spin text-foreground-muted" />
+        <Loader2Icon className="animate-spin text-foreground-muted" />
       </div>
     )
   }
@@ -397,7 +419,7 @@ export const ExplorerNotebookTab = () => {
     <div className="flex flex-col h-full bg-surface-100">
       <ExplorerToolbar className="px-4">
         <ExplorerToolbarIcon>
-          <NotebookText size={16} strokeWidth={2} />
+          <NotebookTextIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle onSaveTitle={handleSaveTitle}>{name ?? ''}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -423,7 +445,7 @@ export const ExplorerNotebookTab = () => {
           >
             <ExplorerToolbarAction
               aria-label="Save changes"
-              icon={<Save size={16} strokeWidth={2} />}
+              icon={<SaveIcon size={16} strokeWidth={2} />}
               loading={isUpdating}
               onClick={handleSaveNotebook}
             />
@@ -433,7 +455,7 @@ export const ExplorerNotebookTab = () => {
               <DropdownMenuTrigger asChild>
                 <ExplorerToolbarAction
                   aria-label="More options"
-                  icon={<MoreVertical size={16} strokeWidth={2} />}
+                  icon={<MoreVerticalIcon size={16} strokeWidth={2} />}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-48">
@@ -442,13 +464,13 @@ export const ExplorerNotebookTab = () => {
                   onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
                 >
                   <div className="flex items-center gap-x-2">
-                    <Keyboard size={14} />
+                    <KeyboardIcon size={14} />
                     <span>Intellisense enabled</span>
                   </div>
-                  {isIntellisenseEnabled && <Check className="text-primary" size={16} />}
+                  {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
                 </DropdownMenuItem>
                 <DropdownMenuItem className="gap-x-2" onClick={handleCopyAsMarkdown}>
-                  <Copy size={14} />
+                  <CopyIcon size={14} />
                   <span>Copy as Markdown</span>
                 </DropdownMenuItem>
                 <DropdownMenuItem
@@ -457,9 +479,9 @@ export const ExplorerNotebookTab = () => {
                   onClick={handleExportPdf}
                 >
                   {isExportingPdf ? (
-                    <Loader2 size={14} className="animate-spin" />
+                    <Loader2Icon size={14} className="animate-spin" />
                   ) : (
-                    <Download size={14} />
+                    <DownloadIcon size={14} />
                   )}
                   <span>Export as PDF</span>
                 </DropdownMenuItem>
@@ -468,7 +490,7 @@ export const ExplorerNotebookTab = () => {
                   className="gap-x-2"
                   onClick={() => id && onSelectDelete({ id, type: 'notebook', name: name ?? '' })}
                 >
-                  <Trash size={14} />
+                  <TrashIcon size={14} />
                   <span>Delete notebook</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>
@@ -480,7 +502,7 @@ export const ExplorerNotebookTab = () => {
             size="tiny"
             className="ml-1"
             aria-label="Run notebook"
-            icon={<Play size={16} strokeWidth={2} />}
+            icon={<PlayIcon size={16} strokeWidth={2} />}
             tooltip={{ content: { side: 'bottom', text: 'Run notebook' } }}
             loading={isRunningNotebook}
             disabled={queryCellIds.length === 0}
@@ -491,11 +513,13 @@ export const ExplorerNotebookTab = () => {
         </ExplorerToolbarActions>
       </ExplorerToolbar>
 
+      <ExplorerPreviewSuggestion className="mx-4 mt-4 w-auto shrink-0" />
+
       <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4 pb-10">
           {cells.length === 0 && (
             <EmptyStatePresentational
-              icon={<Notebook className="text-foreground-lighter" />}
+              icon={<NotebookIcon className="text-foreground-lighter" />}
               title="This notebook is empty"
               description="Add a query cell to run SQL against your database or logs."
               contentClassName="[&>h3]:text-sm [&>p]:text-xs"
@@ -538,7 +562,7 @@ export const ExplorerNotebookTab = () => {
                 <ButtonTooltip
                   variant="outline"
                   size="small"
-                  icon={<SquareCode />}
+                  icon={<SquareCodeIcon />}
                   className="w-[34px]"
                   onClick={() => onSelectAddCell('query')}
                   tooltip={{ content: { side: 'bottom', text: 'Add query' } }}
@@ -546,7 +570,7 @@ export const ExplorerNotebookTab = () => {
                 <ButtonTooltip
                   variant="outline"
                   size="small"
-                  icon={<FileText />}
+                  icon={<FileTextIcon />}
                   className="w-[34px]"
                   onClick={() => onSelectAddCell('markdown')}
                   tooltip={{ content: { side: 'bottom', text: 'Add markdown' } }}
@@ -602,10 +626,19 @@ export const ExplorerNotebookTab = () => {
         onConfirm={handleConfirmRunNotebook}
       >
         <p className="text-sm">
-          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? 0}{' '}
-          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'query' : 'queries'} that{' '}
-          {pendingQueryMatches?.mutatingQueries.length === 1 ? 'modifies' : 'modify'} data or schema
-          and cannot be undone once run:
+          This notebook has {pendingQueryMatches?.mutatingQueries.length ?? <span>{0}</span>}{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? (
+            <span>query</span>
+          ) : (
+            <span>queries</span>
+          )}{' '}
+          <span>that</span>{' '}
+          {pendingQueryMatches?.mutatingQueries.length === 1 ? (
+            <span>modifies</span>
+          ) : (
+            <span>modify</span>
+          )}{' '}
+          <span>data or schema and cannot be undone once run:</span>
         </p>
         <ul className="text-sm list-disc pl-4 mt-2">
           {pendingQueryMatches?.mutatingQueries.map((cell) => (

@@ -147,6 +147,27 @@ describe('serializeContentListingGroupToMarkdown', () => {
     )
   })
 
+  it('renders items without href as unlinked list entries', () => {
+    const markdown = serializeContentListingGroupToMarkdown(
+      {
+        id: 'what-you-get',
+        heading: 'What you get',
+        items: [
+          {
+            title: 'Automatic failover',
+            description: 'Another node is promoted if a node goes down.',
+          },
+        ],
+      },
+      'https://supabase.com'
+    )
+
+    expect(markdown).toContain(
+      '- **Automatic failover:** Another node is promoted if a node goes down.'
+    )
+    expect(markdown).not.toContain('](')
+  })
+
   it('omits heading line when heading is not set', () => {
     const markdown = serializeContentListingGroupToMarkdown(
       {
@@ -236,6 +257,17 @@ describe('serializeContentListingGroupToMarkdown', () => {
 })
 
 describe('ContentListings markdown handler', () => {
+  it.each([
+    'getting-started-use-cases',
+    'getting-started-framework-quickstarts',
+    'getting-started-web-app-demos',
+    'getting-started-mobile-tutorials',
+  ])('renders %s as a second-level section under the page title', (id) => {
+    const markdown = ContentListingsMarkdownHandler({ props: { id } })
+
+    expect(markdown).toMatch(/^## [^\n]+\n/)
+  })
+
   it('serializes the group looked up by id', () => {
     const markdown = ContentListingsMarkdownHandler({ props: { id: 'storage-get-started' } })
 
@@ -260,9 +292,11 @@ describe('dashboard content listing hrefs', () => {
   // Root-relative /dashboard hrefs get the docs basePath and 404; use absolute URLs.
   it('uses absolute https://supabase.com dashboard URLs', () => {
     const dashboardLinks = Object.values(CONTENT_LISTINGS).flatMap((group) =>
-      group.items
-        .filter((item) => isDashboardHref(item.href))
-        .map((item) => ({ listingId: group.id, title: item.title, href: item.href }))
+      group.items.flatMap((item) =>
+        item.href && isDashboardHref(item.href)
+          ? [{ listingId: group.id, title: item.title, href: item.href }]
+          : []
+      )
     )
 
     expect(dashboardLinks.length).toBeGreaterThan(0)
@@ -272,6 +306,16 @@ describe('dashboard content listing hrefs', () => {
     )
 
     expect(relativeOrNonCanonical).toEqual([])
+  })
+})
+
+describe('contentListingItemSchema href', () => {
+  it('accepts an item without href', () => {
+    const result = contentListingItemSchema.safeParse({
+      title: 'Automatic failover',
+      description: 'Another node is promoted if a node goes down.',
+    })
+    expect(result.success).toBe(true)
   })
 })
 

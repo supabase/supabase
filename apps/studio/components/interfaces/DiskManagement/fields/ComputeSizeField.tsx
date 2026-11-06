@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CpuIcon, Lock, Microchip } from 'lucide-react'
+import { CpuIcon, LockIcon, MicrochipIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
@@ -223,7 +223,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   <div className="flex items-center space-x-1">
                                     {lockedOption && (
                                       <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                        <Lock size={14} />
+                                        <LockIcon size={14} />
                                       </div>
                                     )}
                                     {!lockedOption && showComputePrice && (
@@ -237,7 +237,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         <span className="text-foreground-light translate-y-px">
                                           {' '}
                                           /{' '}
-                                          {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                          {compute.price_interval === 'monthly' ? (
+                                            <span>month</span>
+                                          ) : (
+                                            <span>hour</span>
+                                          )}
                                         </span>
                                       </>
                                     )}
@@ -247,14 +251,17 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 <div className="w-full">
                                   <div className="px-3 text-sm flex flex-col gap-1">
                                     <div className="text-foreground-light flex gap-2 items-center">
-                                      <Microchip
+                                      <MicrochipIcon
                                         strokeWidth={1}
                                         size={14}
                                         className="text-foreground-lighter"
                                       />
                                       <span>
-                                        {compute.identifier === 'ci_nano' && 'Up to '}
-                                        {compute.meta?.memory_gb ?? 0} GB memory
+                                        {compute.identifier === 'ci_nano' && (
+                                          <span>{'Up to '}</span>
+                                        )}
+                                        {compute.meta?.memory_gb ?? <span>{0}</span>}{' '}
+                                        <span>GB memory</span>
                                       </span>
                                     </div>
                                     <div className="text-foreground-light flex gap-2 items-center">
@@ -306,7 +313,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         <div className="w-full">
                           <div className="px-3 text-sm flex flex-col gap-1">
                             <div className="text-foreground-light flex gap-2 items-center">
-                              <Microchip
+                              <MicrochipIcon
                                 strokeWidth={1}
                                 size={14}
                                 className="text-foreground-lighter"

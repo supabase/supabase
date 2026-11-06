@@ -2,6 +2,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createSupabaseMCPClient } from '../supabase-mcp'
 import { getMcpTools } from './mcp-tools'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 
 vi.mock('../supabase-mcp', () => ({
   createSupabaseMCPClient: vi.fn(),
@@ -15,7 +16,7 @@ const BASE_PARAMS = {
   signal: new AbortController().signal,
 }
 
-// A realistic remote tool set: all expected read tools plus the UI-executed ones
+// A realistic remote tool set: all expected read tools plus write tools Studio must not expose
 const FULL_REMOTE_TOOLS = {
   search_docs: { description: 'docs' },
   list_tables: { description: 'list tables' },
@@ -26,6 +27,8 @@ const FULL_REMOTE_TOOLS = {
   query_logs: { description: 'query logs' },
   execute_sql: { description: 'execute sql' },
   deploy_edge_function: { description: 'deploy' },
+  apply_migration: { description: 'migrate' },
+  create_branch: { description: 'branch' },
 }
 
 describe('ai/tools/mcp-tools getMcpTools', () => {
@@ -44,13 +47,29 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     consoleErrorSpy.mockRestore()
   })
 
-  it('returns MCP tools and strips UI-executed tools handled locally', async () => {
+  it('returns only tools with a remote contract', async () => {
     const result = await getMcpTools(BASE_PARAMS)
 
     expect(result).toHaveProperty('list_tables')
     expect(result).toHaveProperty('query_logs')
-    expect(result).not.toHaveProperty('execute_sql')
-    expect(result).not.toHaveProperty('deploy_edge_function')
+    // MCP's versions lose to Studio's own, and write tools never get through
+    for (const name of [
+      'execute_sql',
+      'deploy_edge_function',
+      'apply_migration',
+      'create_branch',
+    ]) {
+      expect(result).not.toHaveProperty(name)
+    }
+    expect(Object.keys(result).sort()).toEqual(Object.keys(REMOTE_TOOL_CONTRACTS).sort())
+  })
+
+  it('takes needsApproval from the contract', async () => {
+    const result = await getMcpTools(BASE_PARAMS)
+
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      expect(result[contract.name]?.needsApproval).toBe(contract.needsApproval)
+    }
   })
 
   it('warns when the remote server is missing an expected tool (contract drift)', async () => {
@@ -115,6 +134,15 @@ describe('ai/tools/mcp-tools getMcpTools', () => {
     tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
 
     await expect(getMcpTools(BASE_PARAMS)).rejects.toThrow('MCP tools validation failed')
+    expect(close).toHaveBeenCalledTimes(1)
+  })
+
+  it('rejects a malformed contract tool even when the opt-in level would stub it', async () => {
+    tools.mockResolvedValueOnce({ ...FULL_REMOTE_TOOLS, list_tables: 'not-an-object' })
+
+    await expect(getMcpTools({ ...BASE_PARAMS, aiOptInLevel: 'disabled' })).rejects.toThrow(
+      'MCP tools validation failed'
+    )
     expect(close).toHaveBeenCalledTimes(1)
   })
 })

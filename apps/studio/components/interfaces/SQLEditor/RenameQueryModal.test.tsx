@@ -60,6 +60,11 @@ const mockUpsert = () => {
 
 const getNameInput = () => screen.getByLabelText('Name')
 
+const enterName = async (name: string) => {
+  await userEvent.clear(getNameInput())
+  await userEvent.paste(name)
+}
+
 describe('RenameQueryModal', () => {
   test('submits the new name for the selected snippet', async () => {
     mockOpenAIKeyCheck()
@@ -70,8 +75,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={vi.fn()} onComplete={onComplete} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Renamed query')
+    await enterName('Renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
 
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
@@ -87,8 +91,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={vi.fn()} onComplete={onComplete} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Renamed query')
+    await enterName('Renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
 
@@ -119,8 +122,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={UNTITLED_A} visible onCancel={vi.fn()} onComplete={onComplete} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Renamed query')
+    await enterName('Renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
     await waitFor(() => expect(onComplete).toHaveBeenCalledOnce())
 
@@ -140,8 +142,7 @@ describe('RenameQueryModal', () => {
 
     await waitFor(() => expect(getNameInput()).toHaveValue('Untitled query'))
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Second renamed query')
+    await enterName('Second renamed query')
     fireEvent.click(screen.getByRole('button', { name: 'Rename query' }))
 
     await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(2))
@@ -159,8 +160,7 @@ describe('RenameQueryModal', () => {
       <RenameQueryModal snippet={SNIPPET_A} visible onCancel={onCancel} onComplete={vi.fn()} />
     )
 
-    await userEvent.clear(getNameInput())
-    await userEvent.type(getNameInput(), 'Half-typed name')
+    await enterName('Half-typed name')
     await userEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onCancel).toHaveBeenCalledOnce()
 

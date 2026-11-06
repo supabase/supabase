@@ -1,4 +1,4 @@
-import { ArrowRight } from 'lucide-react'
+import { ArrowRightIcon } from 'lucide-react'
 import { useState, type ComponentType } from 'react'
 import { Badge, Button, cn } from 'ui'
 
@@ -98,7 +98,7 @@ export const ExplorerOnboarding = () => {
               <Button
                 type="button"
                 variant="primary"
-                iconRight={<ArrowRight />}
+                iconRight={<ArrowRightIcon />}
                 onClick={completeOnboarding}
                 disabled={!isReady}
               >
@@ -108,7 +108,7 @@ export const ExplorerOnboarding = () => {
               <Button
                 type="button"
                 variant="primary"
-                iconRight={<ArrowRight />}
+                iconRight={<ArrowRightIcon />}
                 onClick={() => setStepIndex(stepIndex + 1)}
               >
                 Next

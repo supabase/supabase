@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerDeleteVariables = {
   trigger: {
@@ -29,6 +31,7 @@ export async function deleteDatabaseTrigger({
     connectionString,
     sql,
     queryKey: ['trigger', 'delete', trigger.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -41,16 +44,12 @@ export const useDatabaseTriggerDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseTriggerDeleteData,
-    ResponseError,
-    DatabaseTriggerDeleteVariables
-  >,
+  UseCustomMutationOptions<DatabaseTriggerDeleteData, StudioError, DatabaseTriggerDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerDeleteData, ResponseError, DatabaseTriggerDeleteVariables>({
+  return useMutation<DatabaseTriggerDeleteData, StudioError, DatabaseTriggerDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

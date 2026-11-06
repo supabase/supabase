@@ -1,4 +1,4 @@
-import { AlertCircle, LoaderCircle } from 'lucide-react'
+import { AlertCircleIcon, LoaderCircleIcon } from 'lucide-react'
 import type { CSSProperties, MouseEvent } from 'react'
 import { Checkbox, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -101,7 +101,7 @@ export const BucketFilePickerRow = ({
           {item.isCorrupted && (
             <Tooltip>
               <TooltipTrigger>
-                <AlertCircle size={18} strokeWidth={2} className="text-foreground-light" />
+                <AlertCircleIcon size={18} strokeWidth={2} className="text-foreground-light" />
               </TooltipTrigger>
               <TooltipContent side="bottom">
                 File is corrupted, please delete and reupload again.
@@ -129,7 +129,7 @@ export const BucketFilePickerRow = ({
           }
         >
           {item.status === STORAGE_ROW_STATUS.LOADING && (
-            <LoaderCircle
+            <LoaderCircleIcon
               className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
               size={14}
               strokeWidth={2}

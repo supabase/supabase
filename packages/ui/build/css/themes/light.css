@@ -2,7 +2,8 @@
 .light {
   --helpers-os-appearance: Light;
   --hue: 157.5;
-  --surface-hue: 34;
+  /* Complementary canvas tint relative to --primary-hue (157.5° → ≈337.5°). */
+  --surface-hue-offset: 180;
   --chroma: 0;
   /*
    * Soft-gray canvas (not pure white) so elevated surfaces have headroom to

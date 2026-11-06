@@ -1,276 +1,142 @@
-import { render, screen } from '@testing-library/react'
-import type { ReactNode } from 'react'
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
+import { QueryClient } from '@tanstack/react-query'
+import { act, screen } from '@testing-library/react'
+import { HttpResponse } from 'msw'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import { ComputeAndDiskUsageCharts } from './ComputeAndDiskUsageCharts'
 import type { InfraMonitoringMultiResponse } from '@/data/analytics/infra-monitoring-query'
+import { analyticsKeys } from '@/data/analytics/keys'
+import { projectKeys } from '@/data/projects/keys'
+import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const { mockGetInfraMonitoringAttributes, mockUseInfraMonitoringAttributesQuery, mockUseProject } =
-  vi.hoisted(() => ({
-    mockGetInfraMonitoringAttributes: vi.fn(),
-    mockUseInfraMonitoringAttributesQuery: vi.fn(),
-    mockUseProject: vi.fn(),
-  }))
-
-vi.mock('common', () => ({
-  useParams: () => ({ ref: 'project-ref' }),
-}))
-
-vi.mock('ui', () => ({
-  cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
-}))
-
-vi.mock('ui-patterns/Chart', async () => {
-  const React = await vi.importActual<typeof import('react')>('react')
-  const ChartStateContext = React.createContext({ isLoading: false, isErrored: false })
-
-  return {
-    Chart: ({
-      children,
-      isLoading,
-      isErrored,
-    }: {
-      children: ReactNode
-      isLoading: boolean
-      isErrored: boolean
-    }) => (
-      <ChartStateContext.Provider value={{ isLoading, isErrored }}>
-        {children}
-      </ChartStateContext.Provider>
-    ),
-    ChartCard: ({ children, className }: { children: ReactNode; className?: string }) => (
-      <div className={className}>{children}</div>
-    ),
-    ChartContent: ({
-      children,
-      isEmpty,
-      loadingState,
-      errorState,
-      emptyState,
-    }: {
-      children: ReactNode
-      isEmpty: boolean
-      loadingState: ReactNode
-      errorState: ReactNode
-      emptyState: ReactNode
-    }) => {
-      const { isLoading, isErrored } = React.useContext(ChartStateContext)
-
-      if (isLoading) return loadingState
-      if (isErrored) return errorState
-      if (isEmpty) return emptyState
-      return children
+function renderUsage(
+  balances: Array<string | undefined>,
+  computeSize = 'micro',
+  options: { hasError?: boolean; responseReady?: Promise<void> } = {}
+) {
+  const windows: Array<{ startDate: string | null; endDate: string | null }> = []
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/infra-monitoring',
+    response: async ({ request }) => {
+      await options.responseReady
+      if (options.hasError) {
+        return HttpResponse.json<APIErrorBody>({ message: 'Usage unavailable' }, { status: 500 })
+      }
+      const params = new URL(request.url).searchParams
+      windows.push({ startDate: params.get('startDate'), endDate: params.get('endDate') })
+      const attributes = new URL(request.url).searchParams.get('attributes')?.split(',') ?? []
+      const data = balances.map((balance, index) => ({
+        period_start: `2026-10-${10 + index}T00:00:00.000Z`,
+        values: {
+          max_cpu_usage: '40',
+          ram_usage: '60',
+          disk_io_budget: attributes.includes('disk_io_budget') ? balance : undefined,
+          disk_io_consumption: balance === undefined ? undefined : String(100 - Number(balance)),
+          pg_database_size: '40',
+          disk_fs_used_wal: '5',
+          disk_fs_used_system: '5',
+          disk_fs_size: '100',
+        },
+      }))
+      return HttpResponse.json<InfraMonitoringMultiResponse>({ series: {}, data })
     },
-    ChartEmptyState: ({ title, description }: { title: string; description?: string }) => (
-      <div>
-        <span>{title}</span>
-        {description && <span>{description}</span>}
-      </div>
-    ),
-    ChartHeader: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    ChartLine: ({ dataKey, dataKeys }: { dataKey: string; dataKeys: string[] }) => (
-      <div data-testid={`chart-line-${dataKey}`} data-keys={dataKeys.join(',')} />
-    ),
-    ChartLoadingState: () => <div>Loading chart</div>,
-    ChartMetric: ({
-      label,
-      value,
-      status,
-      tooltip,
-    }: {
-      label: string
-      value: ReactNode
-      status?: string
-      tooltip?: ReactNode
-    }) => (
-      <div
-        data-testid={`metric-${label}`}
-        data-status={status}
-        data-has-tooltip={tooltip !== undefined}
-      >
-        {label}: {value}
-      </div>
-    ),
-  }
-})
-
-vi.mock('@/data/analytics/infra-monitoring-query', () => ({
-  getInfraMonitoringAttributes: mockGetInfraMonitoringAttributes,
-  useInfraMonitoringAttributesQuery: mockUseInfraMonitoringAttributesQuery,
-}))
-
-vi.mock('@/hooks/misc/useSelectedProject', () => ({
-  useSelectedProjectQuery: mockUseProject,
-}))
-
-vi.mock('@/lib/helpers', () => ({
-  formatBytes: (bytes: number) => `${bytes} bytes`,
-}))
-
-const buildUsageResponse = ({
-  cpu = 40,
-  memory = 50,
-  diskIo = 60,
-  database = 40,
-  wal = 5,
-  system = 5,
-  diskSize = 100,
-}: {
-  cpu?: number
-  memory?: number
-  diskIo?: number
-  database?: number
-  wal?: number
-  system?: number
-  diskSize?: number
-} = {}): InfraMonitoringMultiResponse => ({
-  series: {},
-  data: [
-    {
-      period_start: '2026-07-20T00:00:00.000Z',
-      values: {
-        max_cpu_usage: String(cpu),
-        ram_usage: String(memory),
-        disk_io_consumption: String(diskIo),
-        pg_database_size: String(database),
-        disk_fs_used_wal: String(wal),
-        disk_fs_used_system: String(system),
-        disk_fs_size: String(diskSize),
-      },
-    },
-  ],
-})
-
-describe('ComputeAndDiskUsageCharts', () => {
-  beforeEach(() => {
-    mockUseProject.mockReturnValue({ data: { infra_compute_size: 'micro' } })
-    mockUseInfraMonitoringAttributesQuery.mockReturnValue({
-      data: buildUsageResponse(),
-      isLoading: false,
-      isError: false,
-    })
-    mockGetInfraMonitoringAttributes.mockResolvedValue(buildUsageResponse())
+  })
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  })
+  queryClient.setQueryData(projectKeys.detail('default'), {
+    ref: 'default',
+    status: 'ACTIVE_HEALTHY',
+    infra_compute_size: computeSize,
   })
 
+  const rendered = customRender(<ComputeAndDiskUsageCharts />, { queryClient })
+  return { ...rendered, queryClient, windows }
+}
+
+describe('ComputeAndDiskUsageCharts', () => {
   afterEach(() => {
     vi.useRealTimers()
   })
 
-  it('renders warning and critical summaries and all chart data', () => {
-    mockUseInfraMonitoringAttributesQuery.mockReturnValue({
-      data: buildUsageResponse({
-        cpu: 80,
-        memory: 91,
-        diskIo: 70,
-        database: 80,
-        wal: 5,
-        system: 5,
-      }),
-      isLoading: false,
-      isError: false,
-    })
+  it('shows empty states without presenting missing disk metrics as zero', async () => {
+    renderUsage([])
 
-    const { container } = render(<ComputeAndDiskUsageCharts />)
-
-    expect(screen.getByTestId('metric-Compute')).toHaveTextContent('91%')
-    expect(screen.getByTestId('metric-Compute')).toHaveAttribute('data-status', 'negative')
-    expect(screen.getByTestId('metric-CPU')).toHaveAttribute('data-status', 'warning')
-    expect(screen.getByTestId('metric-Memory')).toHaveAttribute('data-status', 'negative')
-    expect(screen.getByTestId('metric-Disk IO')).toHaveAttribute('data-status', 'default')
-    expect(screen.getByTestId('metric-Compute')).toHaveAttribute('data-has-tooltip', 'true')
-    expect(screen.getByTestId('metric-Disk')).toHaveAttribute('data-has-tooltip', 'true')
-    for (const label of ['CPU', 'Memory', 'Disk IO', 'Database', 'WAL', 'System']) {
-      expect(screen.getByTestId(`metric-${label}`)).toHaveAttribute('data-has-tooltip', 'false')
-    }
-    expect(screen.getByTestId('metric-Disk')).toHaveTextContent('90%')
-    expect(screen.getByTestId('metric-Disk')).toHaveAttribute('data-status', 'negative')
-    expect(screen.getByTestId('chart-line-maxCpuUsage')).toHaveAttribute(
-      'data-keys',
-      'maxCpuUsage,ramUsage,diskIoConsumption'
-    )
-    expect(container.firstElementChild).toHaveClass(
-      'grid-cols-1',
-      '@[680px]:grid-cols-2',
-      '@[680px]:items-stretch'
-    )
-    expect(container.querySelector('#cpu')).toBeInTheDocument()
-    expect(container.querySelector('#ram')).toBeInTheDocument()
-    expect(container.querySelector('#disk_io')).toBeInTheDocument()
-    expect(container.querySelector('#disk')).toBeInTheDocument()
-  })
-
-  it('hides burst-only disk IO and excludes it from status on dedicated-I/O compute', () => {
-    mockUseProject.mockReturnValue({ data: { infra_compute_size: '4xlarge' } })
-    mockUseInfraMonitoringAttributesQuery.mockReturnValue({
-      data: buildUsageResponse({ cpu: 40, memory: 50, diskIo: 95 }),
-      isLoading: false,
-      isError: false,
-    })
-
-    render(<ComputeAndDiskUsageCharts />)
-
-    expect(screen.getByTestId('metric-Compute')).toHaveTextContent('50%')
-    expect(screen.getByTestId('metric-Compute')).toHaveAttribute('data-status', 'default')
-    expect(screen.queryByTestId('metric-Disk IO')).not.toBeInTheDocument()
-    expect(screen.getByTestId('chart-line-maxCpuUsage')).toHaveAttribute(
-      'data-keys',
-      'maxCpuUsage,ramUsage'
-    )
-  })
-
-  it('renders empty states without presenting missing disk metrics as zero', () => {
-    mockUseInfraMonitoringAttributesQuery.mockReturnValue({
-      data: undefined,
-      isLoading: false,
-      isError: false,
-    })
-
-    render(<ComputeAndDiskUsageCharts />)
-
-    expect(screen.getByText('No compute data')).toBeInTheDocument()
+    expect(await screen.findByText('No compute data')).toBeInTheDocument()
     expect(screen.getByText('No disk data')).toBeInTheDocument()
-    expect(screen.getByTestId('metric-Database')).toHaveTextContent('—')
-    expect(screen.getByTestId('metric-WAL')).toHaveTextContent('—')
-    expect(screen.getByTestId('metric-System')).toHaveTextContent('—')
+    expect(screen.queryByText('0%')).not.toBeInTheDocument()
   })
 
-  it.each([
-    {
-      state: 'loading',
-      queryState: { data: undefined, isLoading: true, isError: false },
-      expectedText: 'Loading chart',
-    },
-    {
-      state: 'error',
-      queryState: { data: undefined, isLoading: false, isError: true },
-      expectedText: 'Failed to load usage data',
-    },
-  ])('renders both $state states', ({ queryState, expectedText }) => {
-    mockUseInfraMonitoringAttributesQuery.mockReturnValue(queryState)
+  it('shows both chart errors when the usage request fails', async () => {
+    renderUsage([], 'micro', { hasError: true })
 
-    render(<ComputeAndDiskUsageCharts />)
-
-    expect(screen.getAllByText(expectedText)).toHaveLength(2)
+    expect(await screen.findAllByText('Failed to load usage data')).toHaveLength(2)
   })
 
-  it('uses a fresh rolling seven-day window when the query refetches', async () => {
-    vi.useFakeTimers()
-    vi.setSystemTime(new Date('2026-07-20T12:00:00.000Z'))
+  it('waits for loaded data before showing metrics or empty states', async () => {
+    const { promise: responseReady, resolve } = Promise.withResolvers<void>()
+    renderUsage(['99'], 'micro', { responseReady })
 
-    render(<ComputeAndDiskUsageCharts />)
+    expect(screen.queryByText('99%')).not.toBeInTheDocument()
+    expect(screen.queryByText('No compute data')).not.toBeInTheDocument()
+    expect(screen.queryByText('No disk data')).not.toBeInTheDocument()
+    resolve()
+    expect(await screen.findByText('99%')).toBeInTheDocument()
+  })
 
-    const [, options] = mockUseInfraMonitoringAttributesQuery.mock.calls[0]
-    vi.setSystemTime(new Date('2026-07-27T12:00:00.000Z'))
-    await options.queryFn({ signal: undefined })
+  it('refreshes the request window after seven days without remounting', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] })
+    vi.setSystemTime(new Date('2026-10-12T12:00:00.000Z'))
+    const { queryClient, windows } = renderUsage(['99'])
+    expect(await screen.findByText('99%')).toBeInTheDocument()
 
-    expect(mockGetInfraMonitoringAttributes).toHaveBeenCalledWith(
-      expect.objectContaining({
-        projectRef: 'project-ref',
-        startDate: '2026-07-20T12:00:00.000Z',
-        endDate: '2026-07-27T12:00:00.000Z',
-        interval: '1d',
-      }),
-      undefined
+    vi.setSystemTime(new Date('2026-10-19T12:00:00.000Z'))
+    await act(() =>
+      queryClient.refetchQueries({
+        queryKey: analyticsKeys.infraMonitoringGroup('default', {}).slice(0, -1),
+      })
     )
+
+    expect(windows).toEqual([
+      { startDate: '2026-10-05T12:00:00.000Z', endDate: '2026-10-12T12:00:00.000Z' },
+      { startDate: '2026-10-12T12:00:00.000Z', endDate: '2026-10-19T12:00:00.000Z' },
+    ])
+  })
+
+  it('displays remaining balance without inflating healthy compute usage', async () => {
+    renderUsage(['99'])
+
+    expect(await screen.findByText('99%')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Disk IO balance' })).toBeInTheDocument()
+    expect(screen.getAllByText('60%')).toHaveLength(2)
+    expect(screen.queryByText('1%')).not.toBeInTheDocument()
+  })
+
+  it('displays the lowest sampled balance and scores its consumed amount', async () => {
+    renderUsage(['99', '5', '90'])
+
+    expect(await screen.findByText('5%')).toBeInTheDocument()
+    expect(screen.getByText('95%')).toBeInTheDocument()
+  })
+
+  it('hides burst balance and excludes it from compute usage on dedicated IO compute', async () => {
+    renderUsage(['5'], '4xlarge')
+
+    expect(await screen.findByText('40%')).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Disk IO balance' })).not.toBeInTheDocument()
+    expect(screen.getAllByText('60%')).toHaveLength(2)
+    expect(screen.queryByText('95%')).not.toBeInTheDocument()
+  })
+
+  it('displays missing balance as unavailable without inflating compute usage', async () => {
+    renderUsage([undefined])
+
+    expect(await screen.findByText('40%')).toBeInTheDocument()
+    expect(screen.getByText('—')).toBeInTheDocument()
+    expect(screen.getAllByText('60%')).toHaveLength(2)
+    expect(screen.queryByText('0%')).not.toBeInTheDocument()
+    expect(screen.queryByText('100%')).not.toBeInTheDocument()
   })
 })

@@ -127,14 +127,14 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
   <StepHikeCompact.Step step={3}>
     <StepHikeCompact.Details title="Add your connection information to your .env file">
     - On your project dashboard, click [Connect](/dashboard/project/_?showConnect=true)
-    - Find your Supavisor Session pooler string. It should end with 5432. It will be used in your `.env` file.
+    - Find your Session pooler string. It should end with 5432. It will be used in your `.env` file.
     <Admonition type="note">
 
-      If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of Supavisor in Session mode.
+      If you're in an [IPv6 environment](https://github.com/orgs/supabase/discussions/27034) or have the IPv4 Add-On, you can use the direct connection string instead of the Session pooler.
 
     </Admonition>
 
-    - If you plan on deploying Prisma to a serverless or auto-scaling environment, you'll also need your Supavisor transaction mode string.
+    - If you plan on deploying Prisma to a serverless or auto-scaling environment, you'll also need your Transaction pooler string.
     - The string is identical to the session mode string but uses port 6543 at the end.
 
 
@@ -144,7 +144,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <Tabs type="underlined" size="small">
                 <TabPanel id="serverful" label="server-based deployments">
                   In your .env file, set the DATABASE_URL variable to your connection string
-                    ```text .env
+                    ```dotenv .env
                     # Used for Prisma Migrations and within your application
                     DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@[DB-REGION].pooler.supabase.com:5432/postgres"
                     ```
@@ -156,11 +156,11 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
                 </TabPanel>
                 <TabPanel id="serverless" label="serverless deployments">
 
-                    Assign the connection string for Supavisor Transaction Mode (using port 6543) to the DATABASE_URL variable in your .env file. Make sure to append "pgbouncer=true" to the end of the string to work with Supavisor.
+                    Assign the Transaction pooler connection string (using port 6543) to the DATABASE_URL variable in your .env file. Make sure to append "pgbouncer=true" to the end of the string, which turns off prepared statements.
 
                     Next, create a DIRECT_URL variable in your .env file and assign the connection string that ends with port 5432 to it.
 
-                    ```text .env # Used in your application (use transaction mode)
+                    ```dotenv .env # Used in your application (use transaction mode)
                     DATABASE_URL="postgres://[DB-USER].[PROJECT-REF]:[PRISMA-PASSWORD]@aws-0-us-east-1.pooler.supabase.com:6543/postgres?pgbouncer=true"
 
                     # Used for Prisma Migrations (use session mode or direct connection)

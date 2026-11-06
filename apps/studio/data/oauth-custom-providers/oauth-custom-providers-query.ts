@@ -5,8 +5,9 @@ import { oAuthCustomProvidersKeys } from './keys'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthCustomProvidersVariables = {
   projectRef: string | undefined
@@ -38,7 +39,7 @@ export async function getOAuthCustomProviders({
 }
 
 export type OAuthCustomProvidersData = Awaited<ReturnType<typeof getOAuthCustomProviders>>
-export type OAuthCustomProvidersError = ResponseError
+export type OAuthCustomProvidersError = StudioError
 
 export const useOAuthCustomProvidersQuery = <TData = OAuthCustomProvidersData>(
   { projectRef }: OAuthCustomProvidersVariables,

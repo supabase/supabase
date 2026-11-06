@@ -177,7 +177,7 @@ const partnersPageData = {
       {
         title: 'Auth provider',
         description: 'Act as a third-party identity provider over OIDC or SAML.',
-        href: 'https://supabase.com/docs/guides/auth/sso',
+        href: 'https://supabase.com/docs/guides/auth/enterprise-sso',
         icon: <Plug size={18} strokeWidth={1.5} />,
       },
       {

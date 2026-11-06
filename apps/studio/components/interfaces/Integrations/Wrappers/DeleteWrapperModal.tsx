@@ -82,7 +82,7 @@ export const DeleteWrapperModal = () => {
       open={selectedWrapper !== undefined}
       onOpenChange={() => setSelectedWrapperToDelete(null)}
     >
-      <AlertDialogContent size="medium">
+      <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>{`Delete connection ${selectedWrapper?.server_name}?`}</AlertDialogTitle>
           <AlertDialogDescription>

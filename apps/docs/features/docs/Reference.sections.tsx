@@ -8,7 +8,7 @@ import {
   getSelfHostedApiEndpointById,
   getTypeSpec,
 } from '~/features/docs/Reference.generated.singleton'
-import { getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
+import { getRefFrontmatter, getRefMarkdown, MDXRemoteRefs } from '~/features/docs/Reference.mdx'
 import type { MethodTypes, VariableTypes } from '~/features/docs/Reference.typeSpec'
 import { formatMethodSignature } from '~/features/docs/Reference.typeSpec'
 import {
@@ -19,6 +19,7 @@ import {
   RefSubLayout,
   ReturnTypeDetails,
   StickyHeader,
+  type HeadingTag,
 } from '~/features/docs/Reference.ui'
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
@@ -80,9 +81,10 @@ type SectionSwitchProps = {
   libraryId: string
   version: string
   section: AbbrevApiReferenceSection
+  tag?: HeadingTag
 }
 
-export function SectionSwitch({ libraryId, version, section }: SectionSwitchProps) {
+export function SectionSwitch({ libraryId, version, section, tag }: SectionSwitchProps) {
   const libPath = REFERENCES[libraryId.replaceAll('-', '_')].libPath
   const allAvailableVersions = REFERENCES[libraryId.replaceAll('-', '_')].versions
   const isLatestVersion = allAvailableVersions.length === 0 || version === allAvailableVersions[0]
@@ -98,6 +100,7 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
           isLatestVersion={isLatestVersion}
           link={sectionLink}
           section={section}
+          tag={tag}
         />
       )
     case 'function':
@@ -113,9 +116,16 @@ export function SectionSwitch({ libraryId, version, section }: SectionSwitchProp
     case 'cli-command':
       return <CliCommandSection link={sectionLink} section={section} />
     case 'operation':
-      return <ApiEndpointSection link={sectionLink} section={section} />
+      return <ApiEndpointSection link={sectionLink} section={section} tag={tag} />
     case 'self-hosted-operation':
-      return <ApiEndpointSection servicePath={libraryId} link={sectionLink} section={section} />
+      return (
+        <ApiEndpointSection
+          servicePath={libraryId}
+          link={sectionLink}
+          section={section}
+          tag={tag}
+        />
+      )
     default:
       console.error(`Unhandled type in reference sections: ${section.type}`)
       return null
@@ -128,6 +138,7 @@ interface MarkdownSectionProps {
   isLatestVersion: boolean
   link: string
   section: AbbrevApiReferenceSection
+  tag?: HeadingTag
 }
 
 async function MarkdownSection({
@@ -136,16 +147,20 @@ async function MarkdownSection({
   isLatestVersion,
   link,
   section,
+  tag,
 }: MarkdownSectionProps) {
-  const content = await getRefMarkdown(
-    section.meta?.shared
-      ? `shared/${section.id}`
-      : `${libPath}/${isLatestVersion ? '' : `${version}/`}${section.id}`
-  )
+  const refPath = section.meta?.shared
+    ? `shared/${section.id}`
+    : `${libPath}/${isLatestVersion ? '' : `${version}/`}${section.id}`
+  const [content, frontmatter] = await Promise.all([
+    getRefMarkdown(refPath),
+    getRefFrontmatter(refPath),
+  ])
 
   return (
     <RefSubLayout.EducationSection link={link} {...section}>
-      <StickyHeader {...section} />
+      {/* Pages with `hideTitle` already render their own title in the MDX */}
+      {!frontmatter.hideTitle && <StickyHeader {...section} tag={tag} />}
       <MDXRemoteRefs source={content} />
     </RefSubLayout.EducationSection>
   )
@@ -267,9 +282,10 @@ interface ApiEndpointSectionProps {
   link: string
   section: AbbrevApiReferenceSection
   servicePath?: string
+  tag?: HeadingTag
 }
 
-async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSectionProps) {
+async function ApiEndpointSection({ link, section, servicePath, tag }: ApiEndpointSectionProps) {
   const endpointDetails = servicePath
     ? await getSelfHostedApiEndpointById(servicePath, section.id)
     : await getApiEndpointById(section.id)
@@ -297,15 +313,22 @@ async function ApiEndpointSection({ link, section, servicePath }: ApiEndpointSec
     .filter((code) => code.startsWith('2'))
     .sort()[0]
 
+  const stabilityLabel = endpointDetails.deprecated
+    ? 'deprecated'
+    : endpointDetails['x-scalar-stability'] === 'experimental'
+      ? 'experimental'
+      : undefined
+
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader
+        tag={tag}
         title={
           <>
             {endpointDetails.summary}
-            {endpointDetails.deprecated && (
+            {stabilityLabel && (
               <Badge variant="warning" className="ml-2">
-                deprecated
+                {stabilityLabel}
               </Badge>
             )}
           </>

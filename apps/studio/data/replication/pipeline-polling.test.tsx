@@ -14,12 +14,12 @@ import {
 import { customRenderHook } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const variables = { projectRef: 'default', pipelineId: 1 }
-const statusKey = replicationKeys.pipelinesStatus('default', 1)
+const variables = { projectRef: 'default', pipelineId: '1' }
+const statusKey = replicationKeys.pipelinesStatus('default', '1')
 type StatusResponse = components['schemas']['PipelineStatusResponse_Output']
 type MetricsResponse = components['schemas']['PipelineReplicationStatusResponse_Output']
-const stopped: StatusResponse = { pipeline_id: 1, status: { name: 'stopped' } }
-const stopping: StatusResponse = { pipeline_id: 1, status: { name: 'stopping' } }
+const stopped: StatusResponse = { pipeline_id: '1', status: { name: 'stopped' } }
+const stopping: StatusResponse = { pipeline_id: '1', status: { name: 'stopping' } }
 const deferred = <T,>() => {
   let resolve!: (value: T) => void
   const promise = new Promise<T>((complete) => {
@@ -55,7 +55,7 @@ describe('pipeline polling', () => {
           }
           return endpoint === 'status'
             ? HttpResponse.json<StatusResponse>(stopped)
-            : HttpResponse.json<MetricsResponse>({ pipeline_id: 1, table_statuses: [] })
+            : HttpResponse.json<MetricsResponse>({ pipeline_id: '1', table_statuses: [] })
         },
       })
       const useResource =
@@ -101,7 +101,7 @@ describe('pipeline polling', () => {
           return endpoint === 'status'
             ? HttpResponse.json<StatusResponse>(stopped)
             : HttpResponse.json<MetricsResponse>({
-                pipeline_id: 1,
+                pipeline_id: '1',
                 apply_lag: null,
                 table_statuses: [],
               })
@@ -113,7 +113,7 @@ describe('pipeline polling', () => {
       queryClient.setQueryData(
         endpoint === 'status'
           ? statusKey
-          : replicationKeys.pipelinesReplicationStatus('default', 1),
+          : replicationKeys.pipelinesReplicationStatus('default', '1'),
         endpoint === 'status' ? stopped : { pipeline_id: 1, apply_lag: null, table_statuses: [] }
       )
       const useResource =
@@ -137,7 +137,7 @@ describe('pipeline polling', () => {
             queryKey:
               endpoint === 'status'
                 ? statusKey
-                : replicationKeys.pipelinesReplicationStatus('default', 1),
+                : replicationKeys.pipelinesReplicationStatus('default', '1'),
           },
           { cancelRefetch: false }
         )

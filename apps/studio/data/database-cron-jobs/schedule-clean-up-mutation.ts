@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys, getScheduleDeleteCronJobRunDetailsKey } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ScheduleCronJobRunDetailsCleanupVariables = {
   projectRef: string
@@ -22,6 +24,7 @@ export async function scheduleCronJobRunDetailsCleanup({
     connectionString,
     sql: getScheduleDeleteCronJobRunDetailsSql(interval),
     queryKey: getScheduleDeleteCronJobRunDetailsKey(projectRef, interval),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -38,7 +41,7 @@ export const useScheduleCronJobRunDetailsCleanupMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >,
   'mutationFn'
@@ -47,7 +50,7 @@ export const useScheduleCronJobRunDetailsCleanupMutation = ({
 
   return useMutation<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >({
     mutationFn: (vars) => scheduleCronJobRunDetailsCleanup(vars),

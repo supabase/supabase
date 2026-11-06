@@ -1,18 +1,19 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { getAccessToken, useFlag } from 'common'
-import { useTheme } from 'next-themes'
+import { getAccessToken } from 'common'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useEffect, useState } from 'react'
 import { tweets } from 'shared-data'
 import { cn } from 'ui'
 
+import { useStatusBanner } from '@/components/layouts/AppLayout/useStatusBanner'
 import {
   DestinationLogo,
   InterstitialLayout,
   LogoPair,
   SupabaseLogo,
 } from '@/components/layouts/InterstitialLayout'
+import { DisabledUntilHydrated } from '@/components/ui/DisabledUntilHydrated'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
@@ -41,6 +42,12 @@ type SignInLayoutProps = {
    * ("Sign in" vs "Sign up").
    */
   inboundFlow?: 'sign-in' | 'sign-up'
+  /**
+   * Set only on pages wrapped in `AuthenticationLayout`, which is the only place that actually
+   * mounts the status banner above this layout. Elsewhere there's nothing rendered to reserve
+   * space for, so the nav shouldn't shift down even if an incident is ongoing.
+   */
+  hasStatusBanner?: boolean
 }
 
 const TermsText = () => (
@@ -58,19 +65,18 @@ export const SignInLayout = ({
   showDisclaimer = true,
   logoLinkToMarketingSite = false,
   inboundFlow,
+  hasStatusBanner = false,
   children,
 }: PropsWithChildren<SignInLayoutProps>) => {
   const router = useRouter()
-  const { resolvedTheme } = useTheme()
   const queryClient = useQueryClient()
-  const ongoingIncident = useFlag('ongoingIncident')
+  const statusBanner = useStatusBanner({ signedOut: true })
+  const showIncidentBanner = hasStatusBanner && statusBanner.type !== 'hidden'
 
   const { destination, focusProvider } = useInboundBranding(inboundFlow)
   const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
   const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
 
-  // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
-  const [mounted, setMounted] = useState(false)
   const [quote, setQuote] = useState<Quote | null>(null)
 
   const verb = inboundFlow === 'sign-up' ? 'Sign up' : 'Sign in'
@@ -87,6 +93,8 @@ export const SignInLayout = ({
 
   // This useEffect redirects the user to MFA if they're already halfway signed in
   useEffect(() => {
+    let isUnmounted = false
+
     auth
       .initialize()
       .then(async ({ error }) => {
@@ -103,6 +111,7 @@ export const SignInLayout = ({
             // if there was a problem signing in via the url, don't redirect
             return
           }
+          if (isUnmounted) return
 
           if (data) {
             // we're already where we need to be
@@ -121,15 +130,17 @@ export const SignInLayout = ({
           }
 
           await queryClient.resetQueries()
-          router.push(getReturnToPath())
+          if (!isUnmounted) router.push(getReturnToPath())
         }
       })
       .catch(() => {}) // catch all errors thrown by auth methods
+
+    return () => {
+      isUnmounted = true
+    }
   }, [])
 
   useEffect(() => {
-    setMounted(true)
-
     // Weighted random selection
     // Calculate total weight (default weight is fallbackWeight for tweets without weight specified)
     const fallbackWeight = 1
@@ -188,7 +199,9 @@ export const SignInLayout = ({
           ) : undefined
         }
       >
-        <div className="px-6 pb-6">{children}</div>
+        <div className="px-6 pb-6">
+          <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
+        </div>
       </InterstitialLayout>
     )
   }
@@ -205,7 +218,7 @@ export const SignInLayout = ({
         <div
           className={cn(
             'absolute top-0 w-full px-8 mx-auto sm:px-6 lg:px-8',
-            ongoingIncident ? 'mt-14' : 'mt-6'
+            showIncidentBanner ? 'mt-14' : 'mt-6'
           )}
         >
           <nav className="relative flex items-center justify-between sm:h-10">
@@ -213,13 +226,14 @@ export const SignInLayout = ({
               <div className="flex items-center justify-between w-full md:w-auto">
                 <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
                   <img
-                    src={
-                      mounted && resolvedTheme?.includes('dark')
-                        ? `${BASE_PATH}/img/supabase-dark.svg`
-                        : `${BASE_PATH}/img/supabase-light.svg`
-                    }
+                    src={`${BASE_PATH}/img/supabase-light.svg`}
                     alt="Supabase Logo"
-                    className={largeLogo ? 'h-[48px]' : 'h-[24px]'}
+                    className={cn('dark:hidden', largeLogo ? 'h-[48px]' : 'h-[24px]')}
+                  />
+                  <img
+                    src={`${BASE_PATH}/img/supabase-dark.svg`}
+                    alt="Supabase Logo"
+                    className={cn('hidden dark:block', largeLogo ? 'h-[48px]' : 'h-[24px]')}
                   />
                 </Link>
               </div>
@@ -254,7 +268,7 @@ export const SignInLayout = ({
                 </div>
               )}
 
-              {children}
+              <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
             </div>
 
             {showDisclaimer && showTos && (

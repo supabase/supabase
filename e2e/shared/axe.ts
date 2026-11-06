@@ -45,7 +45,10 @@ export async function settleForAxe(page: Page): Promise<void> {
 
 // Legacy mode keeps cross-origin embeds out of the scan. Rules and tags are
 // mutually exclusive in one axe run, so `rules` wins when both are given.
-export async function scan(page: Page, options: ScanOptions): Promise<Result[]> {
+export async function scanResults(
+  page: Page,
+  options: ScanOptions
+): Promise<{ violations: Result[]; incomplete: Result[] }> {
   let builder = new AxeBuilder({ page }).setLegacyMode(true)
 
   if (options.include) builder = builder.include(options.include)
@@ -53,8 +56,12 @@ export async function scan(page: Page, options: ScanOptions): Promise<Result[]> 
   else if (options.tags) builder = builder.withTags(options.tags)
   if (options.excludeRules?.length) builder = builder.disableRules(options.excludeRules)
 
-  const { violations } = await builder.analyze()
-  return violations
+  const { violations, incomplete } = await builder.analyze()
+  return { violations, incomplete }
+}
+
+export async function scan(page: Page, options: ScanOptions): Promise<Result[]> {
+  return (await scanResults(page, options)).violations
 }
 
 export function violationIds(violations: Result[]): string[] {

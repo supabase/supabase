@@ -1,27 +1,29 @@
 ---
 title: Dropzone (File Upload)
 description: Displays a control for easier uploading of files directly to Supabase Storage
+preview: |-
+  <BlockOverview name="dropzone-nuxtjs" showFiles>
+    <ComponentPreview
+      name="dropzone-demo"
+      description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
+      showCode={false}
+    />
+  </BlockOverview>
 ---
-
-<ComponentPreview
-  name="dropzone-demo"
-  description="A file upload dropzone component that allows users to drag-and-drop files or select them manually. It supports multiple files, displays upload progress, previews images, and shows validation errors."
-  showCode={false}
-/>
 
 ## Installation
 
-<BlockItem
-  name="dropzone-nuxtjs"
-  description="Displays a control for easier uploading of files directly to Supabase Storage"
-  framework="vue"
-/>
+### Set up the Supabase client
 
-## Folder structure
+This block requires a Supabase client for Nuxt.js. If your project already has one, reuse it and update the block's imports to match your client. Otherwise, install the client:
 
-This block assumes that you have already installed a Supabase client for Nuxt from the previous step.
+<BlockItem name="supabase-client-nuxtjs" framework="vue" showOpenInV0={false} />
 
-<RegistryBlock itemName="dropzone-nuxtjs" />
+Configure the environment variables described in the [Nuxt.js client guide](/library/docs/nuxtjs/client#getting-started) before using the block.
+
+### Install the block
+
+<BlockItem name="dropzone-nuxtjs" framework="vue" />
 
 ## Introduction
 

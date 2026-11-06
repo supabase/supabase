@@ -2,7 +2,8 @@ import type { Metadata } from 'next'
 
 import PartnersContent from './PartnersContent'
 import pageData from '@/data/partners'
-import supabase from '@/lib/supabaseMisc'
+import { canonicalAlternates } from '@/lib/canonical'
+import { listCatalogPartners } from '@/lib/marketplaceDb'
 
 export const revalidate = 1800
 
@@ -11,6 +12,7 @@ const FEATURED_PARTNER_LIMIT = 30
 type FeaturedPartner = { slug: string; title: string; logo: string }
 
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/partners'),
   title: pageData.metaTitle,
   description: pageData.metaDescription,
   openGraph: {
@@ -22,14 +24,12 @@ export const metadata: Metadata = {
 }
 
 export default async function PartnersPage() {
-  const { data: partners } = await supabase
-    .from('partners')
-    .select('slug,title,logo')
-    .eq('approved', true)
-    .eq('type', 'technology')
-    .order('title')
+  const partners = await listCatalogPartners()
 
-  const all = (partners ?? []) as FeaturedPartner[]
+  const all: FeaturedPartner[] = partners
+    .filter((p) => p.type === 'technology')
+    .map(({ slug, title, logo }) => ({ slug, title, logo }))
+    .sort((a, b) => a.title.localeCompare(b.title))
   const leadSlugs = pageData.featuredPartners.leadSlugs
   const lead = leadSlugs
     .map((slug) => all.find((p) => p.slug === slug))

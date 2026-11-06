@@ -260,6 +260,10 @@ official product term.
 
 Write _data type_, not _datatype_.
 
+### dedicated pooler
+
+Lowercase. Runs on PgBouncer. Not _Dedicated Pooler_ or _PgBouncer pooler_.
+
 ### deprecate
 
 Use _deprecated_ when use is discouraged, usually because support will end. Don't
@@ -539,6 +543,10 @@ Write _microservices_, not _micro-services_.
 
 Use _might_ for possibility or an uncertain outcome.
 
+### Multigres
+
+Use _Multigres_ for the product name. Don't write _multi-gres_ or _MultiGres_.
+
 ### must
 
 Use _must_ or _need to_ for a requirement. Don't use _must_ for a recommendation.
@@ -597,6 +605,10 @@ Use _after_ if that is what you mean. Use _once_ only to mean one time.
 Write _on-premises_, not _on-premise_, _on premise_, or _on prem_.
 
 ## P
+
+### paid plan
+
+Name the lowest plan: _Pro Plan and above_, not _paid plans_.
 
 ### performant
 
@@ -699,6 +711,10 @@ Use _setup_ as a noun or adjective and _set up_ as a verb.
 - **Recommended**: Complete the setup to set up authentication.
 - **Not recommended**: Setup authentication.
 
+### shared pooler
+
+Lowercase. Runs on Supavisor. Not _Shared Pooler_ or _Supavisor pooler_.
+
 ### sign in and sign-in
 
 Use _sign in_, _sign out_, and _sign up_ as verbs. Use the hyphenated forms
@@ -706,8 +722,10 @@ _sign-in_, _sign-out_, and _sign-up_ as nouns or adjectives. Match the product U
 labels **Sign in**, **Sign out**, and **Sign up**.
 
 Keep _login_, _log in_, _logout_, _log out_, and `logOut` when quoting
-third-party UI or when they are part of code, routes, URL slugs, CLI commands, or
-established feature names such as _social login_.
+third-party UI or when they are part of code, routes, URL slugs, or CLI commands.
+
+Feature names follow the same rule: _social sign-in_, _phone sign-in_, and
+_anonymous sign-in_.
 
 ### singular they
 
@@ -977,6 +995,10 @@ Don't use these phrases:
 
 Don't use _tl;dr_, _ymmv_, _rtfm_, _imo_, or _fwiw_. Write out the
 meaning or remove the aside.
+
+## Further reference
+
+- [Microsoft Writing Style Guide](https://learn.microsoft.com/style-guide/welcome/)
 
 ## Attribution
 

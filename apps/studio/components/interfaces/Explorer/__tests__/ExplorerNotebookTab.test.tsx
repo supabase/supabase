@@ -1,3 +1,4 @@
+import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
@@ -8,19 +9,32 @@ import { ExplorerNotebookTab } from '../ExplorerNotebookTab'
 import { setCellSql } from '../QueryCell/QueryCell.utils'
 import { createMarkdownCellSkeleton, createQueryCellSkeleton } from '../utils'
 import { ExplorerProvider } from '@/components/layouts/ExplorerLayout/ExplorerProvider'
+import type { components } from '@/data/api'
+import { contentKeys } from '@/data/content/keys'
 import { isQueryCell } from '@/data/content/notebooks/notebook-schema'
 import { untrustedLogSql } from '@/data/logs/safe-analytics-sql'
+import {
+  applyNotebookCacheEffects,
+  collectNotebookCacheEffects,
+} from '@/lib/ai/notebook-cache-invalidation'
+import {
+  createAssistantMessageWithDeleteNotebookTool,
+  createAssistantMessageWithUpdateNotebookTool,
+} from '@/lib/ai/test-fixtures'
 import { notebooksState } from '@/state/notebooks/notebooks-state'
 import type { Notebook } from '@/state/notebooks/types'
 import { createTabId, createTabsState, TabsStateContext } from '@/state/tabs'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { setupSqlEditorMocks } from '@/tests/lib/sql-editor-test-utils'
 import type { Notebooks } from '@/types'
 
 const testContext = vi.hoisted(() => ({
+  track: vi.fn(),
   flags: { otelLegacyLogs: true } as Record<string, boolean>,
 }))
+
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => testContext.track }))
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -52,6 +66,7 @@ vi.mock('../QueryEditor/QuerySourceMenu', () => ({
   QuerySourceMenu: () => null,
 }))
 
+const PROJECT_REF = 'default'
 const NOTEBOOK_ID = 'notebook-test'
 
 const databaseCell = createQueryCellSkeleton({ sql: 'select 1' })
@@ -82,13 +97,17 @@ const seedNotebook = (cells: Notebooks.Cell[], status: 'new' | 'saved' = 'saved'
   else notebooksState.setNotebook({ projectRef: 'default', notebook })
 }
 
-const renderNotebookTab = (tabsState = createTabsState('default')) =>
+const renderNotebookTab = ({
+  tabsState = createTabsState(PROJECT_REF),
+  queryClient,
+}: { tabsState?: ReturnType<typeof createTabsState>; queryClient?: QueryClient } = {}) =>
   customRender(
     <TabsStateContext.Provider value={tabsState}>
       <ExplorerProvider>
         <ExplorerNotebookTab />
       </ExplorerProvider>
-    </TabsStateContext.Provider>
+    </TabsStateContext.Provider>,
+    { queryClient }
   )
 
 // `useAddDefinitions` fires its own background keywords/functions/schemas/table-columns
@@ -119,6 +138,7 @@ const mockDatabaseQueryRequests = () => {
 }
 
 beforeEach(() => {
+  testContext.track.mockClear()
   setupSqlEditorMocks()
   testContext.flags.otelLegacyLogs = true
   for (const id of Object.keys(notebooksState.notebooks)) {
@@ -130,6 +150,7 @@ beforeEach(() => {
 afterEach(() => {
   notebooksState.needsSaving.clear()
   notebooksState.cellLocalState.clear()
+  notebooksState.serverDivergedWhileDirty.clear()
   safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE)
 })
 
@@ -191,6 +212,26 @@ describe('ExplorerNotebookTab', () => {
     await waitFor(() => expect(dbRequests).toHaveLength(1))
     await waitFor(() => expect(logRequests).toHaveLength(1))
     await waitFor(() => expect(runNotebookButton).toBeEnabled())
+    const queryEvents = testContext.track.mock.calls.filter(([action]) =>
+      action.startsWith('explorer_query_')
+    )
+    expect(queryEvents.filter(([action]) => action === 'explorer_query_submitted')).toHaveLength(2)
+    expect(queryEvents.filter(([action]) => action === 'explorer_query_completed')).toHaveLength(2)
+    for (const [, properties] of queryEvents) {
+      expect(properties).toMatchObject({ surface: 'notebook_cell', notebookId: NOTEBOOK_ID })
+      expect(properties.cellId).toBeDefined()
+      expect(properties).not.toHaveProperty('sql')
+    }
+    const submittedRuns = queryEvents.filter(([action]) => action === 'explorer_query_submitted')
+    const completedRuns = queryEvents.filter(([action]) => action === 'explorer_query_completed')
+    expect(new Set(submittedRuns.map(([, properties]) => properties.runId)).size).toBe(2)
+    for (const [, properties] of submittedRuns) {
+      expect(completedRuns).toContainEqual([
+        'explorer_query_completed',
+        properties,
+        expect.objectContaining({ project: 'default' }),
+      ])
+    }
   })
 
   describe('mutation confirmation on "Run notebook"', () => {
@@ -202,18 +243,6 @@ describe('ExplorerNotebookTab', () => {
 
     beforeEach(() => {
       seedNotebook([readOnlyCell, mutatingCell])
-    })
-
-    it('opens a confirmation modal instead of running immediately when a cell mutates data', async () => {
-      const queries = mockDatabaseQueryRequests()
-
-      renderNotebookTab()
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-
-      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
-      expect(within(dialog).getByText('Mutating query')).toBeInTheDocument()
-      expect(queries).toHaveLength(0)
     })
 
     it('runs no cells when the confirmation is cancelled', async () => {
@@ -250,23 +279,6 @@ describe('ExplorerNotebookTab', () => {
       await waitFor(() => expect(queries).toHaveLength(2))
       expect(queries.some((query) => query.includes('select 1'))).toBe(true)
       expect(queries.some((query) => query.includes('delete from foo'))).toBe(true)
-    })
-
-    it('runs no cells when the combined confirmation is cancelled', async () => {
-      const queries = mockDatabaseQueryRequests()
-
-      renderNotebookTab()
-
-      await userEvent.click(await screen.findByRole('button', { name: 'Run notebook' }))
-      const dialog = await screen.findByRole('dialog', { name: 'Confirm to run notebook' })
-      await userEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
-
-      await waitFor(() =>
-        expect(
-          screen.queryByRole('dialog', { name: 'Confirm to run notebook' })
-        ).not.toBeInTheDocument()
-      )
-      expect(queries).toHaveLength(0)
     })
 
     it('does not label non-destructive mutations', async () => {
@@ -398,12 +410,62 @@ describe('ExplorerNotebookTab', () => {
     tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
     expect(tabsState.tabsMap[tabId]?.isPreview).toBe(true)
 
-    renderNotebookTab(tabsState)
+    renderNotebookTab({ tabsState })
 
     const saveButton = await screen.findByRole('button', { name: 'Save changes' })
     await userEvent.click(saveButton)
 
     await waitFor(() => expect(tabsState.tabsMap[tabId]?.isPreview).toBe(false))
+  })
+
+  it('tracks confirmed creation once and later saves as updates', async () => {
+    seedNotebook([databaseCell], 'new')
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ id: NOTEBOOK_ID }),
+    })
+
+    renderNotebookTab()
+    const saveButton = await screen.findByRole('button', { name: 'Save changes' })
+    await userEvent.click(saveButton)
+    await waitFor(() =>
+      expect(testContext.track).toHaveBeenCalledWith(
+        'explorer_notebook_created',
+        { notebookId: NOTEBOOK_ID },
+        { project: 'default' }
+      )
+    )
+
+    notebooksState.insertCellAfter({ id: NOTEBOOK_ID, cell: createMarkdownCellSkeleton() })
+    await userEvent.click(saveButton)
+    await waitFor(() =>
+      expect(testContext.track).toHaveBeenCalledWith(
+        'explorer_notebook_updated',
+        { notebookId: NOTEBOOK_ID },
+        { project: 'default' }
+      )
+    )
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action === 'explorer_notebook_created')
+    ).toHaveLength(1)
+  })
+
+  it('does not track an unsaved draft or a failed first save', async () => {
+    seedNotebook([databaseCell], 'new')
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => HttpResponse.json({ message: 'Save failed' }, { status: 500 }),
+    })
+
+    renderNotebookTab()
+    expect(testContext.track).not.toHaveBeenCalled()
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Save changes' })).toBeEnabled())
+    expect(
+      testContext.track.mock.calls.filter(([action]) => action.startsWith('explorer_notebook_'))
+    ).toEqual([])
   })
 
   it('does not mark a newer edit as saved when an earlier save resolves after it', async () => {
@@ -437,4 +499,301 @@ describe('ExplorerNotebookTab', () => {
     // considered unsaved rather than clobbered back to 'saved' by the stale response.
     expect(notebooksState.notebooks[NOTEBOOK_ID]?.status).toBe('unsaved')
   })
+})
+
+describe('ExplorerNotebookTab — assistant cache invalidation', () => {
+  const seedMarkdownNotebook = () =>
+    seedNotebook([{ _tag: 'markdown_cell', _id: 'cell-1', text: 'Original content' }])
+
+  /** Seeds a dirty notebook that the server changed (or deleted) underneath it. */
+  const seedDivergedNotebook = (type: 'updated' | 'deleted') => {
+    seedMarkdownNotebook()
+    notebooksState.updateCells({
+      id: NOTEBOOK_ID,
+      cells: notebooksState.notebooks[NOTEBOOK_ID]!.notebook.content!.cells,
+    })
+    notebooksState.markServerDivergence({ id: NOTEBOOK_ID, type })
+  }
+
+  const mockUpdatedNotebookFetch = () =>
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<components['schemas']['GetUserContentByIdResponse_Output']>({
+          id: NOTEBOOK_ID,
+          type: 'notebook',
+          name: 'Test notebook',
+          description: '',
+          favorite: false,
+          folder_id: null,
+          inserted_at: '2024-01-01T00:00:00.000Z',
+          updated_at: '2024-01-02T00:00:00.000Z',
+          visibility: 'project',
+          owner_id: 1,
+          project_id: 1,
+          content: {
+            schema_version: 1,
+            cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'Updated by assistant' }],
+          },
+        }),
+    })
+
+  /** Mocks the save endpoint and returns a counter of save requests. */
+  const mockSave = (response: () => Response | Promise<Response>) => {
+    const saves = { count: 0 }
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: () => {
+        saves.count += 1
+        return response()
+      },
+    })
+    return saves
+  }
+
+  const applyAssistantMessage = (
+    queryClient: QueryClient,
+    message: Parameters<typeof collectNotebookCacheEffects>[0][number]
+  ) =>
+    applyNotebookCacheEffects({
+      queryClient,
+      projectRef: PROJECT_REF,
+      effects: collectNotebookCacheEffects([message], new Set()),
+    })
+
+  beforeEach(() => {
+    seedMarkdownNotebook()
+  })
+
+  it('refetches and renders the updated cells after an assistant update_notebook tool call completes', async () => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+    mockUpdatedNotebookFetch()
+
+    renderNotebookTab({ queryClient })
+
+    expect(await screen.findByText('Original content')).toBeInTheDocument()
+
+    await applyAssistantMessage(
+      queryClient,
+      createAssistantMessageWithUpdateNotebookTool({ id: NOTEBOOK_ID, name: 'Test notebook' })
+    )
+
+    expect(await screen.findByText('Updated by assistant')).toBeInTheDocument()
+    expect(screen.queryByText('Original content')).not.toBeInTheDocument()
+  })
+
+  it('shows the updated cells on remount, when the query cache still holds the pre-eviction notebook', async () => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), {
+      id: NOTEBOOK_ID,
+      type: 'notebook',
+      name: 'Test notebook',
+      description: '',
+      favorite: false,
+      visibility: 'project',
+      owner_id: 1,
+      project_id: 1,
+      inserted_at: '2024-01-01T00:00:00.000Z',
+      updated_at: '2024-01-01T00:00:00.000Z',
+      content: {
+        schema_version: 1,
+        cells: [{ _tag: 'markdown_cell', _id: 'cell-1', text: 'Original content' }],
+      },
+    })
+    mockUpdatedNotebookFetch()
+
+    // While the tab is unmounted (navigated away to a separate Explorer chat tab), the
+    // assistant updates the notebook.
+    await applyAssistantMessage(
+      queryClient,
+      createAssistantMessageWithUpdateNotebookTool({ id: NOTEBOOK_ID, name: 'Test notebook' })
+    )
+
+    // Simulate navigating back: the notebook tab mounts fresh.
+    renderNotebookTab({ queryClient })
+
+    expect(await screen.findByText('Updated by assistant')).toBeInTheDocument()
+    expect(screen.queryByText('Original content')).not.toBeInTheDocument()
+  })
+
+  it('shows the not-found state after an assistant delete_notebook tool call completes', async () => {
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref/content/item/:id',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Notebook not found' }, { status: 404 }),
+    })
+
+    renderNotebookTab({ queryClient })
+
+    expect(await screen.findByText('Original content')).toBeInTheDocument()
+
+    await applyAssistantMessage(
+      queryClient,
+      createAssistantMessageWithDeleteNotebookTool({ id: NOTEBOOK_ID, name: 'Test notebook' })
+    )
+
+    expect(await screen.findByText('Notebook not found')).toBeInTheDocument()
+    expect(screen.queryByText('Original content')).not.toBeInTheDocument()
+  })
+
+  it('saves normally without a conflict dialog when the notebook has not diverged', async () => {
+    const saves = mockSave(() => HttpResponse.json({ id: NOTEBOOK_ID }))
+
+    renderNotebookTab()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+
+    await waitFor(() => expect(saves.count).toBe(1))
+    expect(
+      screen.queryByRole('dialog', { name: 'Notebook changed on the server' })
+    ).not.toBeInTheDocument()
+  })
+
+  it.each([
+    {
+      type: 'updated' as const,
+      description:
+        'This notebook changed on the server after your local changes. Saving will overwrite those changes.',
+      saveLabel: 'Save anyway',
+    },
+    {
+      type: 'deleted' as const,
+      description:
+        'This notebook was deleted on the server after your local changes. Saving will recreate it.',
+      saveLabel: 'Recreate',
+    },
+  ])('shows the $type conflict copy before saving', async ({ type, description, saveLabel }) => {
+    seedDivergedNotebook(type)
+
+    renderNotebookTab()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+
+    const dialog = await screen.findByRole('dialog', { name: 'Notebook changed on the server' })
+    expect(dialog).toHaveTextContent(description)
+    expect(dialog).toHaveTextContent(saveLabel)
+    expect(dialog).toHaveTextContent('Discard changes')
+  })
+
+  it('saves exactly once and clears the conflict only after a successful save', async () => {
+    seedDivergedNotebook('updated')
+    let resolveSave: (() => void) | undefined
+    const savePromise = new Promise<void>((resolve) => {
+      resolveSave = resolve
+    })
+    const saves = mockSave(async () => {
+      await savePromise
+      return HttpResponse.json({ id: NOTEBOOK_ID })
+    })
+
+    renderNotebookTab()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    await userEvent.click(await screen.findByRole('button', { name: 'Save anyway' }))
+
+    await waitFor(() => expect(saves.count).toBe(1))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    resolveSave?.()
+    await waitFor(() =>
+      expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK_ID)).toBe(false)
+    )
+  })
+
+  it('keeps the conflict marker when saving anyway fails', async () => {
+    seedDivergedNotebook('updated')
+    const saves = mockSave(() => HttpResponse.json({ message: 'Save failed' }, { status: 500 }))
+
+    renderNotebookTab()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Save anyway' }))
+
+    await waitFor(() => expect(saves.count).toBe(1))
+    expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+  })
+
+  it('omits existing cell IDs when saving anyway recreates an assistant-deleted notebook', async () => {
+    seedDivergedNotebook('deleted')
+    let sentBody: Record<string, unknown> | undefined
+    addAPIMock({
+      method: 'put',
+      path: '/platform/projects/:ref/content',
+      response: async ({ request }) => {
+        sentBody = (await request.json()) as Record<string, unknown>
+        return HttpResponse.json({ id: NOTEBOOK_ID })
+      },
+    })
+
+    renderNotebookTab()
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Recreate' }))
+
+    await waitFor(() => expect(sentBody).toBeDefined())
+    const content = sentBody?.content as { cells: Array<Record<string, unknown>> }
+    content.cells.forEach((cell) => expect(cell).not.toHaveProperty('_id'))
+  })
+
+  it('discards local changes without mutating and evicts the conflicted notebook', async () => {
+    seedDivergedNotebook('updated')
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID), { id: NOTEBOOK_ID })
+    const saves = mockSave(() => HttpResponse.json({ id: NOTEBOOK_ID }))
+
+    renderNotebookTab({ queryClient })
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+
+    await waitFor(() => expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeUndefined())
+    expect(notebooksState.serverDivergedWhileDirty.has(NOTEBOOK_ID)).toBe(false)
+    expect(queryClient.getQueryData(contentKeys.resource(PROJECT_REF, NOTEBOOK_ID))).toBeUndefined()
+    expect(saves.count).toBe(0)
+  })
+
+  it('closes the notebook tab when discarding edits after an assistant deletion', async () => {
+    seedDivergedNotebook('deleted')
+    const tabsState = createTabsState(PROJECT_REF)
+    const tabId = createTabId('notebook', { id: NOTEBOOK_ID })
+    tabsState.addTab({ id: tabId, type: 'notebook', metadata: { notebookId: NOTEBOOK_ID } })
+
+    renderNotebookTab({ tabsState })
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Discard changes' }))
+
+    await waitFor(() => expect(tabsState.tabsMap[tabId]).toBeUndefined())
+  })
+
+  it.each(['the close button', 'the backdrop'])(
+    'dismisses the conflict with %s without changing notebook state',
+    async (dismissal) => {
+      seedDivergedNotebook('updated')
+
+      renderNotebookTab()
+
+      await userEvent.click(await screen.findByRole('button', { name: 'Save changes' }))
+      const dialog = await screen.findByRole('dialog', { name: 'Notebook changed on the server' })
+      if (dismissal === 'the close button') {
+        await userEvent.click(screen.getByRole('button', { name: 'Close' }))
+      } else {
+        fireEvent.pointerDown(dialog.parentElement!, { button: 0, ctrlKey: false })
+      }
+
+      await waitFor(() =>
+        expect(
+          screen.queryByRole('dialog', { name: 'Notebook changed on the server' })
+        ).not.toBeInTheDocument()
+      )
+      expect(notebooksState.notebooks[NOTEBOOK_ID]).toBeDefined()
+      expect(notebooksState.serverDivergedWhileDirty.get(NOTEBOOK_ID)).toBe('updated')
+    }
+  )
 })

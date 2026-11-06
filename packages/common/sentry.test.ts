@@ -51,6 +51,30 @@ describe('which errors get sent to Sentry', () => {
     expect(filterSentryEvent(event, enabled) === event).toBe(isSent)
   })
 
+  it.each([true, 'true'])(
+    'sends every Studio empty-body diagnostic without sampling: %s',
+    (tag) => {
+      const random = vi.spyOn(Math, 'random').mockReturnValue(0.99)
+      const event = { tags: { empty_body_diagnostic: tag } }
+      expect(filterSentryEvent(event, enabled)).toBe(event)
+      expect(event.tags).toEqual({ empty_body_diagnostic: tag, codeSampleRate: '1' })
+      expect(random).not.toHaveBeenCalled()
+    }
+  )
+
+  it.each([false, 'false', null])(
+    'still samples events whose empty-body diagnostic tag is not set: %s',
+    (tag) => {
+      vi.spyOn(Math, 'random').mockReturnValue(0.99)
+      expect(filterSentryEvent({ tags: { empty_body_diagnostic: tag } }, enabled)).toBeNull()
+    }
+  )
+
+  it('drops empty-body diagnostics when reporting is turned off', () => {
+    const tags = { empty_body_diagnostic: 'true' }
+    expect(filterSentryEvent({ tags }, { isPlatform: true, hasConsent: false })).toBeNull()
+  })
+
   it.each([undefined, false, 'false', null, 1])(
     'drops errors from outside the app unless marked as a page crash: %s',
     (tag) => {

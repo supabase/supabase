@@ -24,9 +24,10 @@ export const FormSchema = z
       .transform((value) => (value === '' ? undefined : value))
       .optional(),
     kubernetesClusterForce: z.boolean().optional(),
-    dbRegion: z.string({
-      required_error: 'Please select a region.',
-    }),
+    dbRegion: z
+      .string({ required_error: 'Please select a region.' })
+      .trim()
+      .min(1, 'Please select a region.'),
     cloudProvider: z.string({
       required_error: 'Please select a cloud provider.',
     }),

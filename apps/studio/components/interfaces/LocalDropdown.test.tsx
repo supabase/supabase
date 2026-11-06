@@ -137,7 +137,7 @@ vi.mock('ui', async () => {
       checked?: boolean
       onCheckedChange?: (checked: boolean) => void
     }) => (
-      <button tabIndex={0} aria-checked={checked} onClick={() => onCheckedChange?.(!checked)}>
+      <button tabIndex={0} onClick={() => onCheckedChange?.(!checked)}>
         {children}
       </button>
     ),

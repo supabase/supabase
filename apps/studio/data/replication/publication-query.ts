@@ -4,7 +4,8 @@ import type { components } from 'api-types'
 import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPublicationParams = {
   projectRef?: string
@@ -37,7 +38,7 @@ async function fetchReplicationPublication(
 export type ReplicationPublicationData = Awaited<ReturnType<typeof fetchReplicationPublication>>
 
 type ReplicationPublicationQueryOptions<TData> = Omit<
-  UseCustomQueryOptions<ReplicationPublicationData, ResponseError, TData>,
+  UseCustomQueryOptions<ReplicationPublicationData, StudioError, TData>,
   'enabled'
 > & { enabled?: boolean }
 
@@ -45,7 +46,7 @@ export const replicationPublicationQueryOptions = <TData = ReplicationPublicatio
   { projectRef, sourceId, publicationName }: ReplicationPublicationParams,
   { enabled = true, ...options }: ReplicationPublicationQueryOptions<TData> = {}
 ) =>
-  queryOptions<ReplicationPublicationData, ResponseError, TData>({
+  queryOptions<ReplicationPublicationData, StudioError, TData>({
     queryKey: replicationKeys.publication(projectRef, sourceId, publicationName),
     queryFn: ({ signal }) =>
       fetchReplicationPublication({ projectRef, sourceId, publicationName }, signal),

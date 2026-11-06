@@ -51,7 +51,7 @@ jobs:
       - run: pnpm --filter library build:registry
       - name: Check generated registry
         run: |
-          registry_changes="$(git status --porcelain --untracked-files=all -- apps/ui-library/public/r)"
+          registry_changes="$(git status --porcelain --untracked-files=all -- apps/ui-library/public/r apps/ui-library/__registry__)"
           if [ -n "$registry_changes" ]; then
             printf '%s\n' "$registry_changes"
             echo 'Run pnpm --filter library build:registry and commit the generated registry files.'

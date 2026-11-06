@@ -1,5 +1,13 @@
 import { useParams } from 'common'
-import { Copy, Download, Edit, Globe, Lock, MoreVertical, Trash } from 'lucide-react'
+import {
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  GlobeIcon,
+  LockIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { toast } from 'sonner'
@@ -23,7 +31,7 @@ import {
 } from 'ui'
 
 import { useExportAllRowsAsCsv, useExportAllRowsAsSql } from './ExportAllRows'
-import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
+import { useUrlTableFilters } from '@/components/grid/hooks/useTableFilter'
 import { buildTableEditorUrl } from '@/components/grid/SupabaseGrid.utils'
 import { getEntityLintDetails } from '@/components/interfaces/TableGridEditor/TableEntity.utils'
 import { EntityTypeIcon } from '@/components/ui/EntityTypeIcon'
@@ -86,7 +94,7 @@ export const EntityListItem = ({
   const isActive = Number(id) === entity.id
   const canEdit = isActive && !isLocked
 
-  const { filters } = useTableFilter()
+  const filters = useUrlTableFilters(entity.id)
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
   const { data: countData } = useTableRowsCountQuery(
     {
@@ -97,7 +105,7 @@ export const EntityListItem = ({
       roleImpersonationState: roleImpersonationState as RoleImpersonationState,
     },
     {
-      enabled: isTableLikeEntityListItem(entity) && isActive,
+      enabled: isTableLikeEntityListItem(entity) && isActive && filters !== undefined,
     }
   )
   const rowCount = countData?.count
@@ -243,7 +251,7 @@ export const EntityListItem = ({
                   <Button
                     variant="text"
                     className="w-6 h-6"
-                    icon={<MoreVertical size={14} strokeWidth={2} />}
+                    icon={<MoreVerticalIcon size={14} strokeWidth={2} />}
                     onClick={(e) => e.preventDefault()}
                     aria-label={`More options for ${entity.name}`}
                   />
@@ -260,7 +268,7 @@ export const EntityListItem = ({
                   copyToClipboard(entity.name)
                 }}
               >
-                <Copy size={12} className="shrink-0" />
+                <CopyIcon size={12} className="shrink-0" />
                 <span>Copy name</span>
               </DropdownMenuItem>
 
@@ -296,7 +304,7 @@ export const EntityListItem = ({
                     }
                   }}
                 >
-                  <Copy size={12} className="shrink-0" />
+                  <CopyIcon size={12} className="shrink-0" />
                   <span>Copy table schema</span>
                 </DropdownMenuItem>
               )}
@@ -338,7 +346,7 @@ export const EntityListItem = ({
                     }
                   }}
                 >
-                  <Copy size={12} className="shrink-0" />
+                  <CopyIcon size={12} className="shrink-0" />
                   <span>Copy definition</span>
                 </DropdownMenuItem>
               )}
@@ -355,7 +363,7 @@ export const EntityListItem = ({
                       snap.onEditTable()
                     }}
                   >
-                    <Edit size={12} className="shrink-0" />
+                    <EditIcon size={12} className="shrink-0" />
                     <span>Edit table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem
@@ -366,7 +374,7 @@ export const EntityListItem = ({
                       snap.onDuplicateTable()
                     }}
                   >
-                    <Copy size={12} className="shrink-0" />
+                    <CopyIcon size={12} className="shrink-0" />
                     <span>Duplicate table</span>
                   </DropdownMenuItem>
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
@@ -374,14 +382,14 @@ export const EntityListItem = ({
                       key="view-policies"
                       href={`/project/${projectRef}/database/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
                     >
-                      <Lock size={12} className="shrink-0" />
+                      <LockIcon size={12} className="shrink-0" />
                       <span>View policies</span>
                     </Link>
                   </DropdownMenuItem>
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} className="shrink-0" />
+                      <DownloadIcon size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -427,7 +435,7 @@ export const EntityListItem = ({
                       snap.onDeleteTable()
                     }}
                   >
-                    <Trash size={12} className="shrink-0" />
+                    <TrashIcon size={12} className="shrink-0" />
                     <span>Delete table</span>
                   </DropdownMenuItem>
                 </>
@@ -439,7 +447,7 @@ export const EntityListItem = ({
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} className="shrink-0" />
+                      <DownloadIcon size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -475,7 +483,7 @@ export const EntityListItem = ({
                       snap.onDeleteView()
                     }}
                   >
-                    <Trash size={12} className="shrink-0" />
+                    <TrashIcon size={12} className="shrink-0" />
                     <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
@@ -487,7 +495,7 @@ export const EntityListItem = ({
 
                   <DropdownMenuSub>
                     <DropdownMenuSubTrigger className="gap-x-2">
-                      <Download size={12} className="shrink-0" />
+                      <DownloadIcon size={12} className="shrink-0" />
                       Export data
                     </DropdownMenuSubTrigger>
                     <DropdownMenuSubContent>
@@ -523,7 +531,7 @@ export const EntityListItem = ({
                       snap.onDeleteMaterializedView()
                     }}
                   >
-                    <Trash size={12} className="shrink-0" />
+                    <TrashIcon size={12} className="shrink-0" />
                     <span>Delete view</span>
                   </DropdownMenuItem>
                 </>
@@ -630,7 +638,7 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
-          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+          <GlobeIcon size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
         <TooltipContent side="right" className="max-w-52">
           This table can be accessed via the Data API but no RLS policies exist so no data will be
@@ -646,7 +654,7 @@ const EntityTooltipTrigger = ({
     return (
       <Tooltip>
         <TooltipTrigger className="min-w-4" aria-label="Table exposed via Data API">
-          <Globe size={14} strokeWidth={1} className="text-foreground-lighter" />
+          <GlobeIcon size={14} strokeWidth={1} className="text-foreground-lighter" />
         </TooltipTrigger>
         <TooltipContent side="right">This table can be accessed via the Data API</TooltipContent>
       </Tooltip>

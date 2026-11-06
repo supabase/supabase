@@ -1,4 +1,4 @@
-import { ArrowUpRight } from 'lucide-react'
+import { ArrowUpRightIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 import {
   AiIconAnimation,
@@ -60,7 +60,7 @@ function SupportAssistantSuccessCardLoadingShell({ className }: { className?: st
             <CardDescription>Assistant may be able to help</CardDescription>
           </div>
         </div>
-        <ArrowUpRight
+        <ArrowUpRightIcon
           size={14}
           strokeWidth={1.5}
           className="shrink-0 text-foreground-lighter transition-colors group-hover:text-foreground"
