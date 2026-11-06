@@ -8,7 +8,16 @@ import {
   type HTMLAttributes,
   type ReactNode,
 } from 'react'
-import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import {
+  Button,
+  cn,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import {
   PageSection,
@@ -97,13 +106,21 @@ export const BucketsPolicies = ({
                   icon={<SearchIcon />}
                   actions={
                     search ? (
-                      <Button
-                        size="tiny"
-                        variant="text"
-                        className="p-0 h-5 w-5"
-                        icon={<XIcon />}
-                        onClick={() => setSearch('')}
-                      />
+                      <Tooltip>
+                        <TooltipTrigger asChild>
+                          <Button
+                            size="tiny"
+                            variant="text"
+                            className="p-0 h-5 w-5"
+                            icon={<XIcon />}
+                            onClick={() => setSearch('')}
+                            aria-label="Clear search"
+                            // Tooltip repeats the label; screen readers would read it twice
+                            aria-describedby={undefined}
+                          />
+                        </TooltipTrigger>
+                        <TooltipContent side="bottom">Clear search</TooltipContent>
+                      </Tooltip>
                     ) : null
                   }
                 />

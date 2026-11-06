@@ -21,7 +21,7 @@ const TemplatePreview = ({ selectedTemplate }: TemplatePreviewProps) => {
               </div>
             </div>
             <div className="space-y-2">
-              <label className="text-foreground-light text-sm">Policy SQL template:</label>
+              <span className="text-foreground-light text-sm">Policy SQL template:</span>
               <div className="h-64">
                 <CodeEditor isReadOnly id={id} language="pgsql" defaultValue={statement} />
               </div>

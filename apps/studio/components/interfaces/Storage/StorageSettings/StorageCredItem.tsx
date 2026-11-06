@@ -8,6 +8,9 @@ import {
   DropdownMenuTrigger,
   TableCell,
   TableRow,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -58,13 +61,21 @@ export const StorageCredItem = ({
       <TableCell className="text-right">
         {canRemoveAccessKey && (
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                icon={<MoreVerticalIcon size={14} strokeWidth={1} />}
-                variant="text"
-                className="px-1.5 text-foreground-lighter hover:text-foreground"
-              />
-            </DropdownMenuTrigger>
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <DropdownMenuTrigger asChild>
+                  <Button
+                    icon={<MoreVerticalIcon size={14} strokeWidth={1} />}
+                    variant="text"
+                    className="px-1.5 text-foreground-lighter hover:text-foreground"
+                    aria-label="Manage access key"
+                    // Tooltip repeats the label; screen readers would read it twice
+                    aria-describedby={undefined}
+                  />
+                </DropdownMenuTrigger>
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Manage access key</TooltipContent>
+            </Tooltip>
             <DropdownMenuContent className="max-w-40" align="end">
               <DropdownMenuItem
                 className="flex gap-1.5 "

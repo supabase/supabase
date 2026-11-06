@@ -99,7 +99,12 @@ const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] 
   <DropdownMenu>
     <DropdownMenuTrigger className="focus-ring rounded-sm">
       <div className="storage-row-menu opacity-0">
-        <MoreVerticalIcon size={16} />
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <MoreVerticalIcon size={16} />
+          </TooltipTrigger>
+          <TooltipContent side="bottom">{name} actions</TooltipContent>
+        </Tooltip>
         <span className="sr-only">{name} actions</span>
       </div>
     </DropdownMenuTrigger>
