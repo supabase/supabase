@@ -1,12 +1,6 @@
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import {
-  LockKeyholeIcon,
-  PlusIcon,
-  RectangleEllipsisIcon,
-  ShieldCheckIcon,
-  TrashIcon,
-} from 'lucide-react'
+import { LockKeyholeIcon, PlusIcon, ShieldCheckIcon, TrashIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent } from 'ui'
@@ -179,7 +173,7 @@ export const TOTPFactors = ({
         </PageSectionContent>
       </PageSection>
 
-      {enableAuthRecoveryCodes && !isError && (
+      {enableAuthRecoveryCodes && hasVerifiedFactors && !isError && (
         <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
@@ -192,17 +186,6 @@ export const TOTPFactors = ({
           <PageSectionContent aria-live="polite" className="flex flex-col gap-4">
             {(isLoading || (shouldVerifyRecoveryCodes && recoveryCodesIsPending)) && (
               <GenericSkeletonLoader />
-            )}
-            {isSuccess && !hasVerifiedFactors && (
-              <EmptyStatePresentational
-                icon={RectangleEllipsisIcon}
-                title="Set up recovery codes"
-                description="Enable multi-factor authentication first, then generate codes to recover access if you lose your authenticator."
-              >
-                <Button variant="default" icon={<PlusIcon />} onClick={handleAddNewApp}>
-                  Set up MFA first
-                </Button>
-              </EmptyStatePresentational>
             )}
             {recoveryCodesIsError && (
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
