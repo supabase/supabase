@@ -2,9 +2,9 @@ import { isFeatureEnabled } from 'common/enabled-features'
 
 import type { NavMenuConstant } from '@/components/Navigation/Navigation.types'
 
-const { docsLocalDevelopment: localDevelopmentEnabled } = isFeatureEnabled([
-  'docs:local_development',
-])
+const { docsLocalDevelopment: localDevelopmentEnabled, docsPgtap: pgTapEnabled } = isFeatureEnabled(
+  ['docs:local_development', 'docs:pgtap']
+)
 
 export const localDevelopment: NavMenuConstant = {
   icon: 'dev-cli',
@@ -51,6 +51,26 @@ export const localDevelopment: NavMenuConstant = {
           name: 'Customizing email templates',
           url: '/guides/local-development/customizing-email-templates',
           enabled: localDevelopmentEnabled,
+        },
+      ],
+    },
+    {
+      name: 'Testing',
+      items: [
+        {
+          name: 'Overview',
+          url: '/guides/local-development/testing/overview',
+          enabled: localDevelopmentEnabled,
+        },
+        {
+          name: 'Test RLS policies with pgTAP',
+          url: '/guides/database/postgres/testing-row-level-security',
+        },
+        { name: 'Testing your database', url: '/guides/database/testing' },
+        {
+          name: 'pgTAP advanced guide',
+          url: '/guides/local-development/testing/pgtap-extended',
+          enabled: pgTapEnabled,
         },
       ],
     },
