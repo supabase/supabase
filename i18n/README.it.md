@@ -7,21 +7,26 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) è un'alternativa open source a Firebase. Stiamo costruendo le funzionalità di Firebase utilizzando strumenti open source di livello enterprise.
+[Supabase](https://supabase.com) è la piattaforma di sviluppo Postgres. Stiamo costruendo le funzionalità di Firebase utilizzando strumenti open source di livello enterprise.
 
-- Database Postgres ospitato. [Documenti](https://supabase.com/docs/guides/database)
-- [x] Autenticazione e autorizzazione. [Documenti](https://supabase.com/docs/guides/auth)
+- [x] Database Postgres ospitato. [Docs](https://supabase.com/docs/guides/database)
+- [x] Autenticazione e autorizzazione. [Docs](https://supabase.com/docs/guides/auth)
 - [x] API generate automaticamente.
-  - [x] REST. [Documenti](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Documenti](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Sottoscrizioni in tempo reale. [Documenti](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/graphql)
+  - [x] Sottoscrizioni in tempo reale. [Docs](https://supabase.com/docs/guides/realtime)
 - [x] Funzioni.
   - [x] Funzioni di database. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Funzioni Edge [Docs](https://supabase.com/docs/guides/functions)
-- [x] Memorizzazione dei file. [Docs](https://supabase.com/docs/guides/storage)
-- [x] Cruscotto
+  - [x] Funzioni Edge. [Docs](https://supabase.com/docs/guides/functions)
+- [x] Archiviazione dei file. [Docs](https://supabase.com/docs/guides/storage)
+- [x] Toolkit per AI, vettori ed embedding. [Docs](https://supabase.com/docs/guides/ai)
+- [x] Dashboard.
 
-![Cruscotto Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+![Dashboard di Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
+
+Guardate le "Releases" di questo repo per essere avvisati dei principali aggiornamenti.
+
+<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ## Documentazione
 
@@ -35,17 +40,6 @@ Per vedere come contribuire, visitate [Getting Started](../DEVELOPERS.md)
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Ideale per: bug ed errori riscontrati nell'uso di Supabase.
 - [Supporto via e-mail](https://supabase.com/docs/support#business-support). Ideale per: problemi con il database o l'infrastruttura.
 - [Discord](https://discord.supabase.com). Ideale per: condividere le proprie applicazioni e stare insieme alla comunità.
-
-## Stato
-
-- [Alfa: Stiamo testando Supabase con un gruppo chiuso di clienti
-- [x] Alfa pubblica: Chiunque può iscriversi all'indirizzo [supabase.com/dashboard](https://supabase.com/dashboard). Ma andateci piano, ci sono alcuni problemi
-- [x] Beta pubblica: Abbastanza stabile per la maggior parte degli usi non aziendali
-- [ ] Pubblico: Disponibilità generale [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
-
-Siamo attualmente in Beta pubblica. Guardate i "rilasci" di questo repo per essere avvisati dei principali aggiornamenti.
-
-<kbd><img src="https://raw.githubusercontent.com/supabase/supabase/d5f7f413ab356dc1a92075cb3cee4e40a957d5b1/web/static/watch-repo.gif" alt="Watch this repo"/></kbd>
 
 ---
 
@@ -63,11 +57,11 @@ Supabase è una [piattaforma hosted](https://supabase.com/dashboard). È possibi
 - [PostgreSQL](https://www.postgresql.org/) è un sistema di database relazionale a oggetti con oltre 30 anni di sviluppo attivo con una solida reputazione in termini di affidabilità, robustezza e prestazioni.
 - [Realtime](https://github.com/supabase/realtime) è un server Elixir che consente di ascoltare gli inserimenti, gli aggiornamenti e le cancellazioni di PostgreSQL tramite websocket. Realtime controlla la funzionalità di replica integrata di Postgres per le modifiche al database, converte le modifiche in JSON e trasmette il JSON tramite websocket ai client autorizzati.
 - [PostgREST](http://postgrest.org/) è un server web che trasforma il database PostgreSQL direttamente in un'API REST
-- [pg_graphql](http://github.com/supabase/pg_graphql/) un'estensione di PostgreSQL che espone un'API GraphQL
-- [Storage](https://github.com/supabase/storage-api) fornisce un'interfaccia RESTful per la gestione dei file memorizzati in S3, utilizzando Postgres per gestire i permessi.
+- [GoTrue](https://github.com/supabase/gotrue) è un'API di autenticazione basata su JWT che semplifica la registrazione, l'accesso e la gestione delle sessioni degli utenti nelle vostre applicazioni.
+- [Storage](https://github.com/supabase/storage-api) è un'API RESTful per la gestione dei file archiviati in S3, con Postgres che gestisce i permessi.
+- [pg_graphql](http://github.com/supabase/pg_graphql/) è un'estensione di PostgreSQL che espone un'API GraphQL.
 - [postgres-meta](https://github.com/supabase/postgres-meta) è un'API RESTful per la gestione di Postgres, che consente di recuperare tabelle, aggiungere ruoli, eseguire query, ecc.
-- [GoTrue](https://github.com/netlify/gotrue) è un'API basata su SWT per la gestione degli utenti e l'emissione di token SWT.
-- [Kong](https://github.com/Kong/kong) è un gateway API cloud-native.
+- [Envoy](https://github.com/envoyproxy/envoy) è un proxy edge e di servizio cloud-native ad alte prestazioni.
 
 #### Librerie client
 
@@ -75,8 +69,8 @@ Il nostro approccio alle librerie client è modulare. Ogni sotto-libreria è un'
 
 <table style="table-layout:fixed; white-space: nowrap;">
   <tr>
-    <th>Lingua</th>
-    <th>Cliente</th>
+    <th>Linguaggio</th>
+    <th>Client</th>
     <th colspan="5">Feature-Clients (in bundle con il client Supabase)</th>
   </tr>
   
