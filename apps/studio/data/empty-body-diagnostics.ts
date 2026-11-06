@@ -3,8 +3,6 @@ import { IS_PLATFORM } from 'common'
 
 import { uuidv4 } from '@/lib/helpers'
 
-const PROBE_TIMEOUT_MS = 10_000
-
 const PARAM_AFTER_SEGMENT = new Map([
   ['projects', '{ref}'],
   ['organizations', '{slug}'],
@@ -97,36 +95,69 @@ function readResourceTiming(url: string) {
   }
 }
 
-async function probe(request: Request) {
-  const headers = new Headers(request.headers)
-  const probeRequestId = uuidv4()
-  headers.set('X-Request-Id', probeRequestId)
-  const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
+export type RefetchSummary = {
+  requestId: string
+  status?: number
+  bodyLength?: number
+  contentLength?: string | null
+  contentType?: string | null
+  error?: string
+}
 
+export type RecoveredBy = 'original_body' | 'refetch' | 'none'
+
+// DOMException (e.g. AbortError) is not an `Error` instance in every runtime
+function errorName(error: unknown) {
+  return typeof error === 'object' && error && 'name' in error ? String(error.name) : 'unknown'
+}
+
+/**
+ * Re-fetches a request bypassing the HTTP cache: the empty bodies we see on successful GETs
+ * look like a browser cache revalidation bug, and a no-store request skips that path.
+ * Uses plain fetch so the openapi-fetch middleware can't recurse. Never throws.
+ */
+export async function refetchWithoutCache(
+  request: Request
+): Promise<{ summary: RefetchSummary; response?: Response; body?: string }> {
+  const requestId = uuidv4()
   try {
-    // Plain fetch so the probe skips the openapi-fetch middleware (and can't recurse)
-    const response = await fetch(
-      new Request(request, { cache: 'no-store', headers, signal: controller.signal })
-    )
-    // Only the length: these endpoints can return API keys and secrets
-    const bodyLength = (await response.arrayBuffer()).byteLength
+    const headers = new Headers(request.headers)
+    headers.set('X-Request-Id', requestId)
+    const response = await fetch(new Request(request, { cache: 'no-store', headers }))
+    const buffer = await response.arrayBuffer()
     return {
-      probe_has_body: bodyLength > 0 ? 'true' : 'false',
-      probe_request_id: probeRequestId,
-      probe_status: response.status,
-      probe_body_length: bodyLength,
-      probe_content_length: response.headers.get('content-length'),
-      probe_content_type: response.headers.get('content-type'),
+      response,
+      body: new TextDecoder().decode(buffer),
+      summary: {
+        requestId,
+        status: response.status,
+        bodyLength: buffer.byteLength,
+        contentLength: response.headers.get('content-length'),
+        contentType: response.headers.get('content-type'),
+      },
     }
   } catch (error) {
     return {
-      probe_has_body: 'error',
-      probe_request_id: probeRequestId,
-      probe_error: error instanceof Error ? error.name : 'unknown',
+      summary: { requestId, error: errorName(error) },
     }
-  } finally {
-    clearTimeout(timeout)
+  }
+}
+
+function probeTags(refetch?: RefetchSummary) {
+  if (!refetch) return {}
+  if (refetch.error) return { probe_has_body: 'error' }
+  return { probe_has_body: (refetch.bodyLength ?? 0) > 0 ? 'true' : 'false' }
+}
+
+function probeExtra(refetch?: RefetchSummary) {
+  if (!refetch) return {}
+  return {
+    probe_request_id: refetch.requestId,
+    probe_status: refetch.status,
+    probe_body_length: refetch.bodyLength,
+    probe_content_length: refetch.contentLength,
+    probe_content_type: refetch.contentType,
+    probe_error: refetch.error,
   }
 }
 
@@ -134,10 +165,14 @@ export async function reportEmptyBodyResponse({
   request,
   response,
   schemaPath,
+  recoveredBy,
+  refetch,
 }: {
   request: Request
   response: Response
   schemaPath: string
+  recoveredBy: RecoveredBy
+  refetch?: RefetchSummary
 }): Promise<void> {
   try {
     if (!IS_PLATFORM || request.method !== 'GET') return
@@ -156,13 +191,17 @@ export async function reportEmptyBodyResponse({
       ...readBrowserContext(),
       ...readResourceTiming(response.url || request.url),
     }
-    const { probe_has_body, ...probeContext } = await probe(request)
 
     Sentry.captureMessage('Empty response body on successful API request', {
       level: 'warning',
       fingerprint: ['empty-body-response', endpoint],
-      tags: { endpoint, probe_has_body, empty_body_diagnostic: 'true' },
-      extra: { ...context, ...probeContext },
+      tags: {
+        endpoint,
+        recovered_by: recoveredBy,
+        ...probeTags(refetch),
+        empty_body_diagnostic: 'true',
+      },
+      extra: { ...context, ...probeExtra(refetch) },
     })
   } catch (error) {
     console.error('Failed to report empty response body', error)
