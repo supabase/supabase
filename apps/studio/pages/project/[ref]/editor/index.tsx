@@ -36,7 +36,8 @@ const TableEditorPage: NextPageWithLayout = () => {
       const lastTableTab = lastTableTabId ? tabStore.tabsMap[lastTableTabId] : undefined
       const lastTabId = lastTableTab?.metadata?.tableId
 
-      // Handle redirect to last opened table tab, or last table tab
+      // Redirect to the last opened table tab, or last table tab. Replace so Back skips this
+      // index rather than landing on it and redirecting again.
       if (Number.isInteger(lastOpenedTableId)) {
         // Tabs are keyed by a prefixed id (e.g. "r-293522"), but history only stores
         // the bare table id, so look up the tab by its metadata instead of by key.
@@ -45,7 +46,7 @@ const TableEditorPage: NextPageWithLayout = () => {
             editorEntityTypes.table.includes(tab.type) &&
             tab.metadata?.tableId === lastOpenedTableId
         )
-        router.push(
+        router.replace(
           buildTableEditorUrl({
             projectRef,
             tableId: lastOpenedTableId,
@@ -53,7 +54,7 @@ const TableEditorPage: NextPageWithLayout = () => {
           })
         )
       } else if (lastTabId !== undefined) {
-        router.push(
+        router.replace(
           buildTableEditorUrl({
             projectRef,
             tableId: lastTabId,

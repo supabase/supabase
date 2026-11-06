@@ -1,4 +1,4 @@
-import { useLocation, useNavigate, type AnyRouter } from '@tanstack/react-router'
+import { useLocation, useNavigate, useRouter, type AnyRouter } from '@tanstack/react-router'
 import { unstable_createAdapterProvider } from 'nuqs/adapters/custom'
 import { startTransition, useCallback, useMemo } from 'react'
 
@@ -25,7 +25,7 @@ import { searchParamsToRecord, type SearchRecord } from './router-search-params'
 type AdapterOptions = { history: 'push' | 'replace'; scroll: boolean; shallow: boolean }
 
 // Compose the nuqs-updated URLSearchParams into TanStack navigate args:
-// `to` is the current pathname (from TanStack's parsed location, already
+// `to` is the current pathname (from TanStack's latest parsed location, already
 // basepath-stripped; guard against a trailing slash anyway — root stays `/`)
 // and `search` is the FULL desired search state as a record ({} correctly
 // clears every param). Exported for unit tests — not part of the adapter
@@ -44,7 +44,7 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
     select: (state) =>
       Object.fromEntries(Object.entries(state.search).filter(([key]) => watchKeys.includes(key))),
   })
-  const pathname = useLocation({ select: (state) => state.pathname })
+  const router = useRouter()
   const navigate = useNavigate()
 
   const searchParams = useMemo(
@@ -62,7 +62,10 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
 
   const updateUrl = useCallback(
     (search: URLSearchParams, options: AdapterOptions) => {
-      const args = buildSearchUpdateArgs(pathname, search)
+      // nuqs flushes on a later tick and builds `search` from the live URL, so read the pathname
+      // live too: a render-time pathname would replace away any navigation made in between (e.g.
+      // a redirect pushed in the same commit as a queued nuqs write).
+      const args = buildSearchUpdateArgs(router.latestLocation.pathname, search)
       startTransition(() => {
         // The `<AnyRouter, string>` type arguments opt out of the registered
         // route tree's strict typing: the current pathname is a free-form
@@ -78,7 +81,7 @@ function useNuqsTanStackRouterAdapter(watchKeys: string[]) {
         })
       })
     },
-    [navigate, pathname]
+    [navigate, router]
   )
 
   return {
