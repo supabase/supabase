@@ -52,10 +52,28 @@ describe('getIntegrationType', () => {
     expect(getIntegrationType(buildIntegration('https://login.example.com'))).toBe('custom')
     expect(getIntegrationType(undefined)).toBe('custom')
   })
+
+  it.each([
+    ['https://scalekit.com', 'scalekit'],
+    ['https://yourorg.scalekit.com', 'scalekit'],
+    ['https://yourorg.scalekit.cloud', 'scalekit'],
+    ['https://yourorg.scalekit.dev', 'scalekit'],
+    ['https://auth.yourapp.ai', 'custom'],
+    ['https://evilscalekit.com', 'custom'],
+    ['https://scalekit.com.attacker.com', 'custom'],
+    ['', 'custom'],
+    ['not a url', 'custom'],
+  ])('classifies %s as %s', (issuerUrl, expected) => {
+    expect(getIntegrationType(buildIntegration(issuerUrl))).toBe(expected)
+  })
 })
 
 describe('getIntegrationTypeLabel', () => {
   it('labels custom issuers as Custom OIDC', () => {
     expect(getIntegrationTypeLabel('custom')).toBe('Custom OIDC')
+  })
+
+  it('labels a Scalekit environment host as Scalekit', () => {
+    expect(getIntegrationTypeLabel('scalekit')).toBe('Scalekit')
   })
 })
