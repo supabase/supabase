@@ -254,7 +254,8 @@ const StripeSyncContent = () => {
             >
               <SheetHeader>
                 <SheetTitle>
-                  {upgradeAvailable ? 'Upgrade' : 'Install'} Stripe Sync Engine
+                  {upgradeAvailable ? <span>Upgrade</span> : <span>Install</span>}{' '}
+                  <span>Stripe Sync Engine</span>
                 </SheetTitle>
               </SheetHeader>
               <SheetSection className="flex-1 flex flex-col gap-y-6">

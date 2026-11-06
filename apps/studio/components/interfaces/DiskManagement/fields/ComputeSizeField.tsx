@@ -237,7 +237,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         <span className="text-foreground-light translate-y-px">
                                           {' '}
                                           /{' '}
-                                          {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                          {compute.price_interval === 'monthly' ? (
+                                            <span>month</span>
+                                          ) : (
+                                            <span>hour</span>
+                                          )}
                                         </span>
                                       </>
                                     )}
@@ -253,8 +257,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         className="text-foreground-lighter"
                                       />
                                       <span>
-                                        {compute.identifier === 'ci_nano' && 'Up to '}
-                                        {compute.meta?.memory_gb ?? 0} GB memory
+                                        {compute.identifier === 'ci_nano' && (
+                                          <span>{'Up to '}</span>
+                                        )}
+                                        {compute.meta?.memory_gb ?? <span>{0}</span>}{' '}
+                                        <span>GB memory</span>
                                       </span>
                                     </div>
                                     <div className="text-foreground-light flex gap-2 items-center">

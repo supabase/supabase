@@ -28,6 +28,12 @@ export type FeaturePreview = {
    * feature has no single destination (e.g. a global layout change).
    */
   getRoute?: (ref?: string) => string
+  /**
+   * Set when nested routes under `getRoute` also surface the feature, so being
+   * on one of them counts as already being at the destination. Otherwise only
+   * an exact match of `getRoute` does.
+   */
+  matchesSubroutes?: boolean
   bannerId?: BannerId
 }
 
@@ -61,6 +67,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isPlatformOnly: true,
         isDefaultOptIn: false,
         getRoute: (ref?: string) => `/project/${ref}/explorer`,
+        matchesSubroutes: true,
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,

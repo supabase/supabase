@@ -114,7 +114,7 @@ export const PublishAppSidePanel = ({
 }: PublishAppSidePanelProps) => {
   const { slug } = useParams()
   const uploadButtonRef = useRef<HTMLInputElement | null>(null)
-  const areOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants') && USE_MOCKS
+  const areOAuthAppScopedGrantsEnabled = useFlag('enableScopedOAuthPublish') && USE_MOCKS
 
   const { mutateAsync: createOAuthApp } = useOAuthAppCreateMutation({
     onSuccess: (res, variables) => {
