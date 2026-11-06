@@ -10,6 +10,7 @@ import type {
   IFunctionExample,
   ISpec,
 } from '../../../components/reference/Reference.types.js'
+import { cliCommandRel } from '../../../features/docs/Reference.cli.utils.js'
 import { getApiEndpointById } from '../../../features/docs/Reference.generated.singleton.js'
 import type { CliCommand, CliSpec } from '../../../generator/types/CliSpec.js'
 import { flattenSections } from '../../../lib/helpers.js'
@@ -388,6 +389,15 @@ export class CliReferenceLoader extends ReferenceLoader<CliCommand> {
   ) {
     super(source, path, meta, specFilePath, sectionsFilePath)
     this.sourceConstructor = (...args) => new CliReferenceSource(...args)
+  }
+
+  /** One page per command: `/reference/cli/db/push`, not the section slug. */
+  async load(): Promise<BaseSource[]> {
+    const sources = (await super.load()) as CliReferenceSource[]
+    for (const source of sources) {
+      source.path = `${this.path}/${cliCommandRel(source.specSection.title)}`
+    }
+    return sources
   }
 
   getSpecSections(specContents: string): CliCommand[] {

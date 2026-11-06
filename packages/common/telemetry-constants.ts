@@ -1023,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'reference'
   | 'ask_ai_answer'
 
 /**
