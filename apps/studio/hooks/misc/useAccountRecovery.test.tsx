@@ -9,7 +9,6 @@ import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-code
 
 const mock = vi.hoisted(() => ({
   userId: 'user-a',
-  hasSecuritySettings: true,
   recoveryCodesEnabled: true,
   passwordEnabled: true,
   listFactors: vi.fn(),
@@ -21,10 +20,6 @@ vi.mock('common', () => ({
   useFlag: (name: string) =>
     name === 'enableAuthRecoveryCodes' ? mock.recoveryCodesEnabled : mock.passwordEnabled,
   useUser: () => (mock.userId ? { id: mock.userId } : null),
-}))
-
-vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
-  useIsFeatureEnabled: () => mock.hasSecuritySettings,
 }))
 
 vi.mock('@/lib/gotrue', () => ({
@@ -51,7 +46,6 @@ describe('useAccountRecovery', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     mock.userId = 'user-a'
-    mock.hasSecuritySettings = true
     mock.recoveryCodesEnabled = true
     mock.passwordEnabled = true
     mock.listFactors.mockResolvedValue({
@@ -76,18 +70,6 @@ describe('useAccountRecovery', () => {
     await waitFor(() => expect(result.current.findings[0]?.id).toBe('recovery-codes-exhausted'))
     expect(result.current.isPending).toBe(false)
     expect(result.current.isFactorsSuccess).toBe(true)
-  })
-
-  it('keeps the password finding independent of unavailable Security settings', async () => {
-    mock.hasSecuritySettings = false
-    mock.getUser.mockResolvedValue({
-      data: { user: { identities: [{ provider: 'github' }], email: 'person@example.com' } },
-      error: null,
-    })
-    const { result } = renderRecovery()
-    await waitFor(() => expect(result.current.findings[0]?.id).toBe('single-oauth-identity'))
-    expect(mock.listFactors).not.toHaveBeenCalled()
-    expect(mock.getStatus).not.toHaveBeenCalled()
   })
 
   it('does not treat a failed code read as missing codes', async () => {

@@ -31,24 +31,21 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './AccountIdentities.utils'
 import { AddPasswordRow } from './AddPasswordRow'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import {
-  evaluateAccountRecovery,
-  type AccountRecoveryFinding,
-} from '@/lib/account-recovery/evaluate-account-recovery'
+import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
+import { isSingleOAuthIdentity } from '@/lib/account-recovery/single-oauth-identity'
 import { captureCriticalError } from '@/lib/error-reporting'
 import {
   buildProviderAuthRedirect,
@@ -58,14 +55,12 @@ import {
 import { getErrorMessage } from '@/lib/get-error-message'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
 
-export const AccountIdentities = ({
+export const SignInMethods = ({
   primaryAction,
 }: {
   primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
 } = {}) => {
   const router = useRouter()
-  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const settingsPath = hasSecuritySettings ? '/account/security' : '/account/me'
 
   const { data, isPending: isLoading, isSuccess, isError, error } = useProfileIdentitiesQuery()
 
@@ -79,17 +74,7 @@ export const AccountIdentities = ({
 
   const identities = data?.identities ?? []
   const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
-  const passwordFinding = evaluateAccountRecovery({
-    identities,
-    email: data?.email,
-    verifiedFactorCount: 0,
-    recoveryCodes: { status: 'unknown' },
-    features: {
-      hasSecuritySettings: false,
-      recoveryCodesEnabled: false,
-      passwordEnabled: isAddAccountPasswordEnabled,
-    },
-  }).find((finding) => finding.id === 'single-oauth-identity')
+  const hasSingleOAuthIdentity = isSingleOAuthIdentity({ identities, email: data?.email })
   const showAddPasswordRow =
     isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
@@ -131,7 +116,9 @@ export const AccountIdentities = ({
     setLinkingProviderId(provider.id)
 
     try {
-      const redirectTo = buildPathWithParams(buildProviderAuthRedirect(provider.id, settingsPath))
+      const redirectTo = buildPathWithParams(
+        buildProviderAuthRedirect(provider.id, '/account/security')
+      )
 
       const { error } = await auth.linkIdentity({
         provider: provider.authProvider as Provider,
@@ -169,7 +156,9 @@ export const AccountIdentities = ({
         {isSuccess && showAddPasswordRow && !!data.email && (
           <AddPasswordRow
             email={data.email}
-            providerName={passwordFinding ? getProviderName(identities[0]?.provider) : undefined}
+            providerName={
+              hasSingleOAuthIdentity ? getProviderName(identities[0]?.provider) : undefined
+            }
             isPrimary={primaryAction === 'set-password'}
           />
         )}

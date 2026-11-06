@@ -48,10 +48,6 @@ vi.mock('@/components/interfaces/Account/Preferences/ProfileInformation', () => 
   ProfileInformation: () => <div>ProfileInformation</div>,
 }))
 
-vi.mock('@/components/interfaces/Account/Preferences/AccountIdentities', () => ({
-  AccountIdentities: () => <div>AccountIdentities</div>,
-}))
-
 vi.mock('@/components/interfaces/Account/Preferences/AccountConnections', () => ({
   AccountConnections: () => <div>AccountConnections</div>,
 }))
@@ -97,7 +93,6 @@ describe('/account/me', () => {
       profileShowInformation: true,
       profileShowAnalyticsAndMarketing: true,
       profileShowAccountDeletion: true,
-      accountShowSecuritySettings: true,
     })
     mockUseProfile.mockReturnValue({
       error: null,
@@ -113,7 +108,6 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
-    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
@@ -121,12 +115,6 @@ describe('/account/me', () => {
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
-  })
-
-  it('keeps sign-in methods in Preferences when Security is unavailable', () => {
-    mockUseIsFeatureEnabled.mockReturnValue({ accountShowSecuritySettings: false })
-    render(<PreferencesPage dehydratedState={{}} />)
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
   })
 
   it('forwards a legacy confirmation message to Security with its query and fragment intact', () => {
@@ -168,16 +156,6 @@ describe('/account/me', () => {
     expect(mockRouter.replace).not.toHaveBeenCalled()
   })
 
-  it('keeps legacy confirmation handling in Preferences when Security is unavailable', () => {
-    mockUseIsFeatureEnabled.mockReturnValue({ accountShowSecuritySettings: false })
-    mockRouter.asPath = '/account/me#message=Confirmation+link+accepted&sb='
-
-    render(<PreferencesPage dehydratedState={{}} />)
-
-    expect(mockRouter.replace).not.toHaveBeenCalled()
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
-  })
-
   it('renders only local preferences on self-hosted', () => {
     mockIsPlatform.value = false
 
@@ -188,7 +166,6 @@ describe('/account/me', () => {
     expect(screen.getByText('HotkeySettings')).toBeInTheDocument()
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.queryByText('ProfileInformation')).not.toBeInTheDocument()
-    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.queryByText('AccountConnections')).not.toBeInTheDocument()
     expect(screen.queryByText('AnalyticsSettings')).not.toBeInTheDocument()
     expect(screen.queryByText('AccountDeletion')).not.toBeInTheDocument()
