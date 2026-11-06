@@ -52,7 +52,7 @@ export const DeleteFactorModal = ({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
-      toast.success('Authenticator removed')
+      toast.success('MFA method removed')
       handleClose()
     },
   })
@@ -71,15 +71,15 @@ export const DeleteFactorModal = ({
   const shouldExplainRecoveryCodeRemoval =
     hasRecoveryCodes || hasRemovedRecoveryCodes || unenrollRecoveryCodesMutation.isPending
   const lastAuthenticatorDescription = shouldExplainRecoveryCodeRemoval
-    ? 'Removing your last authenticator disables MFA and removes your recovery codes.'
-    : 'Removing your last authenticator disables MFA.'
+    ? 'Removing your last MFA method disables MFA and removes your recovery codes.'
+    : 'Removing your last MFA method disables MFA.'
 
   return (
     <ConfirmationModal
       size="medium"
       visible={visible}
       variant={'destructive'}
-      title="Remove authenticator"
+      title="Remove MFA method"
       confirmLabel="Remove"
       confirmLabelLoading="Removing"
       loading={loading}
@@ -102,14 +102,14 @@ export const DeleteFactorModal = ({
           : 'This action cannot be undone',
         description: lastFactorToBeDeleted
           ? lastAuthenticatorDescription
-          : 'You can no longer use this authenticator to sign in.',
+          : 'You can no longer use this MFA method to sign in.',
       }}
     >
-      <p className="text-sm">Before removing this authenticator, consider:</p>
+      <p className="text-sm">Before removing this MFA method, consider:</p>
       <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
         {lastFactorToBeDeleted ? (
           <>
-            <li>Add another authenticator on a different device first</li>
+            <li>Set up another authenticator app on a different device first</li>
             <li>Check that you no longer need MFA</li>
             <li>
               You will lose access to any organization that enforces multi-factor authentication
@@ -118,8 +118,8 @@ export const DeleteFactorModal = ({
           </>
         ) : (
           <>
-            <li>Your backup authenticator app is still available to use</li>
-            <li>Add another authenticator on a different device as a backup</li>
+            <li>Your other MFA method is still available to use</li>
+            <li>Set up another authenticator app on a different device as a backup</li>
           </>
         )}
       </ul>
@@ -141,11 +141,11 @@ export const DeleteFactorModal = ({
       {error && (
         <AlertError
           className="mt-4"
-          subject="Unable to remove authenticator"
+          subject="Unable to remove MFA method"
           error={
             hasRemovedRecoveryCodes
               ? {
-                  message: `Your recovery codes were removed, but your authenticator is still active. Try again to complete removal. ${error.message}`,
+                  message: `Your recovery codes were removed, but your MFA method is still active. Try again to complete removal. ${error.message}`,
                 }
               : error
           }

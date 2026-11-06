@@ -35,7 +35,7 @@ describe('DeleteFactorModal', () => {
         hasRecoveryCodes
       />
     )
-    await screen.findByText('Remove authenticator')
+    await screen.findByText('Remove MFA method')
     expect(screen.queryByText('Multi-factor authentication will be disabled')).toBeNull()
     expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
@@ -67,7 +67,7 @@ describe('DeleteFactorModal', () => {
         hasRecoveryCodes={false}
       />
     )
-    await screen.findByText('Remove authenticator')
+    await screen.findByText('Remove MFA method')
     await screen.findByText('Multi-factor authentication will be disabled')
     expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
@@ -99,7 +99,7 @@ describe('DeleteFactorModal', () => {
         hasRecoveryCodes
       />
     )
-    await screen.findByText('Remove authenticator')
+    await screen.findByText('Remove MFA method')
     await screen.findByText('Multi-factor authentication will be disabled')
     await screen.findByText('Your recovery codes will be removed too')
     fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
@@ -131,7 +131,7 @@ describe('DeleteFactorModal', () => {
         hasRecoveryCodes
       />
     )
-    await screen.findByText('Remove authenticator')
+    await screen.findByText('Remove MFA method')
     expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
     fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(onClose).toHaveBeenCalled())
@@ -196,7 +196,7 @@ describe('authenticator removal failures', () => {
       />
     )
     expect(
-      screen.getByText(/Your recovery codes were removed, but your authenticator is still active/)
+      screen.getByText(/Your recovery codes were removed, but your MFA method is still active/)
     ).toBeInTheDocument()
     expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'contact support' })).toBeInTheDocument()
