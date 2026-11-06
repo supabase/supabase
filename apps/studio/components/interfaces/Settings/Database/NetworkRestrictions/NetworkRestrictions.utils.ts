@@ -162,22 +162,32 @@ export const getRestrictionIssues = (entries: string[]) => {
 
 export type RestrictionChange = 'adding' | 'removing' | 'unchanged'
 
-export type ReviewedRestriction = { entry: string; change: RestrictionChange }
+export type ReviewedRestriction = {
+  entry: string
+  change: RestrictionChange
+  issue?: RestrictionIssue
+}
 
-// The enforced entries, marking those the pending list drops, followed by the entries the pending list adds
+// The enforced entries, marking those the pending list drops, followed by the entries the pending list adds. Each
+// entry's issue comes from its position in its own list, so only the second of two identical entries is a duplicate.
 export const getRestrictionsDiff = (enforced: string[], pending: string[]) => {
   const enforcedKeys = new Set(enforced.map(getNetworkKey))
   const pendingKeys = new Set(pending.map(getNetworkKey))
+  const enforcedIssues = getRestrictionIssues(enforced)
+  const pendingIssues = getRestrictionIssues(pending)
   return [
     ...enforced.map(
-      (entry): ReviewedRestriction => ({
+      (entry, index): ReviewedRestriction => ({
         entry,
         change: pendingKeys.has(getNetworkKey(entry)) ? 'unchanged' : 'removing',
+        issue: enforcedIssues[index],
       })
     ),
-    ...pending
-      .filter((entry) => !enforcedKeys.has(getNetworkKey(entry)))
-      .map((entry): ReviewedRestriction => ({ entry, change: 'adding' })),
+    ...pending.flatMap((entry, index): ReviewedRestriction[] =>
+      enforcedKeys.has(getNetworkKey(entry))
+        ? []
+        : [{ entry, change: 'adding', issue: pendingIssues[index] }]
+    ),
   ]
 }
 

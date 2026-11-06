@@ -1,6 +1,7 @@
 import { GlobeIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Badge, cn } from 'ui'
+import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import type { RestrictionChange, RestrictionIssue } from './NetworkRestrictions.utils'
 
@@ -35,17 +36,13 @@ export const RestrictionRow = ({
       {change === 'adding' && <Badge variant="success">Adding</Badge>}
       {change === 'removing' && <Badge variant="destructive">Removing</Badge>}
       {issue !== undefined && (
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Badge variant="warning" className="cursor-default" tabIndex={0}>
-              Invalid
-            </Badge>
-          </TooltipTrigger>
-          <TooltipContent side="bottom" className="max-w-80">
+        <div className="flex items-center gap-x-1.5">
+          <Badge variant="warning">Invalid</Badge>
+          <InfoTooltip side="bottom" className="max-w-80" label={`Why ${entry} is invalid`}>
             {issue.message}.
             {issue.suggestion !== undefined && <span>{` Did you mean ${issue.suggestion}?`}</span>}
-          </TooltipContent>
-        </Tooltip>
+          </InfoTooltip>
+        </div>
       )}
     </div>
     {actions}

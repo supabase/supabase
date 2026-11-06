@@ -371,7 +371,7 @@ export const NetworkRestrictions = () => {
                       <div className="divide-y">
                         {restrictedIps.map((ip, index) => (
                           <RestrictionRow
-                            key={ip}
+                            key={`${ip}-${index}`}
                             entry={ip}
                             type={ipv4Restrictions.includes(ip) ? 'IPv4' : 'IPv6'}
                             issue={restrictionIssues[index]}

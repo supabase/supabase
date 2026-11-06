@@ -3,9 +3,8 @@ import { toast } from 'sonner'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { CorrectRestrictionsModal } from './CorrectRestrictionsModal'
-import { getCorrectedRestrictions } from './NetworkRestrictions.utils'
+import { useApplyCorrectedRestrictions } from './useApplyCorrectedRestrictions'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 
 interface InvalidRestrictionsNoticeProps {
   projectRef: string
@@ -21,12 +20,8 @@ export const InvalidRestrictionsNotice = ({
   disabledReason,
 }: InvalidRestrictionsNoticeProps) => {
   const [isConfirming, setIsConfirming] = useState(false)
-  const { mutate: applyNetworkRestrictions, isPending: isApplying } =
-    useNetworkRestrictionsApplyMutation()
-
-  const corrected = getCorrectedRestrictions({ ipv4, ipv6 })
-  const hasCorrectedEntries =
-    corrected.dbAllowedCidrs.length > 0 || corrected.dbAllowedCidrsV6.length > 0
+  const { corrected, hasCorrectedEntries, applyCorrected, isApplyingCorrected } =
+    useApplyCorrectedRestrictions({ projectRef, ipv4, ipv6 })
 
   // Saving an empty list would block all access, which isn't a correction
   const getFixDisabledReason = () => {
@@ -39,19 +34,10 @@ export const InvalidRestrictionsNotice = ({
   const fixDisabledReason = getFixDisabledReason()
 
   const handleFix = () =>
-    applyNetworkRestrictions(
-      {
-        projectRef,
-        dbAllowedCidrs: corrected.dbAllowedCidrs,
-        dbAllowedCidrsV6: corrected.dbAllowedCidrsV6,
-      },
-      {
-        onSuccess: () => {
-          setIsConfirming(false)
-          toast.success('Network restrictions fixed')
-        },
-      }
-    )
+    applyCorrected(() => {
+      setIsConfirming(false)
+      toast.success('Network restrictions fixed')
+    })
 
   return (
     <>
@@ -59,7 +45,7 @@ export const InvalidRestrictionsNotice = ({
         type="warning"
         layout="responsive"
         title="Some restrictions aren't valid IP ranges"
-        description="Adding or removing restrictions fails until these entries are fixed. Hover over an entry marked Invalid to see why."
+        description="Adding or removing restrictions fails until these entries are fixed."
         actions={
           <ButtonTooltip
             variant="default"
@@ -76,7 +62,7 @@ export const InvalidRestrictionsNotice = ({
         title="Fix invalid entries"
         confirmLabel="Fix entries"
         corrections={corrected.corrections}
-        loading={isApplying}
+        loading={isApplyingCorrected}
         onConfirm={handleFix}
         onCancel={() => setIsConfirming(false)}
       />

@@ -111,11 +111,11 @@ describe('NetworkRestrictionsReview', () => {
     )
   })
 
-  test('explains an invalid entry when its badge receives keyboard focus', async () => {
+  test('explains why an entry is invalid from the info button next to it', async () => {
     renderReview(['1.209.170.63/25'])
 
-    const badge = await screen.findByText('Invalid')
-    act(() => badge.focus())
+    const info = await screen.findByRole('button', { name: 'Why 1.209.170.63/25 is invalid' })
+    act(() => info.focus())
 
     expect(await screen.findByRole('tooltip')).toHaveTextContent(
       "The address isn't the start of its range. Did you mean 1.209.170.0/25?"

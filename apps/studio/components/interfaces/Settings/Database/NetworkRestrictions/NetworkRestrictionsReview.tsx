@@ -6,17 +6,11 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { CorrectRestrictionsModal } from './CorrectRestrictionsModal'
-import {
-  getCorrectedRestrictions,
-  getRestrictionIssues,
-  getRestrictionsDiff,
-  type RestrictionIssue,
-  type ReviewedRestriction,
-} from './NetworkRestrictions.utils'
+import { getRestrictionIssues, getRestrictionsDiff } from './NetworkRestrictions.utils'
 import { RestrictionRow } from './RestrictionRow'
+import { useApplyCorrectedRestrictions } from './useApplyCorrectedRestrictions'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useNetworkRestrictionsReviewMutation } from '@/data/network-restrictions/network-restrictions-review-mutation'
-import { useNetworkRestrictionsApplyMutation } from '@/data/network-restrictions/network-retrictions-apply-mutation'
 import { useGrant } from '@/lib/grants'
 
 type RestrictionLists = { ipv4: string[]; ipv6: string[] }
@@ -29,15 +23,8 @@ interface NetworkRestrictionsReviewProps {
   disabledReason?: string
 }
 
-const getIssuesByEntry = (entries: string[]) => {
-  const issues = getRestrictionIssues(entries)
-  const issuesByEntry = new Map<string, RestrictionIssue>()
-  entries.forEach((entry, index) => {
-    const issue = issues[index]
-    if (issue !== undefined) issuesByEntry.set(entry, issue)
-  })
-  return issuesByEntry
-}
+const hasRestrictionIssue = (entries: string[]) =>
+  getRestrictionIssues(entries).some((issue) => issue !== undefined)
 
 export const NetworkRestrictionsReview = ({
   projectRef,
@@ -58,8 +45,8 @@ export const NetworkRestrictionsReview = ({
     isPending: isReviewing,
     variables: reviewVariables,
   } = useNetworkRestrictionsReviewMutation()
-  const { mutate: applyNetworkRestrictions, isPending: isApplyingCorrected } =
-    useNetworkRestrictionsApplyMutation()
+  const { corrected, hasCorrectedEntries, applyCorrected, isApplyingCorrected } =
+    useApplyCorrectedRestrictions({ projectRef, ipv4: pending.ipv4, ipv6: pending.ipv6 })
 
   const rows = [
     ...getRestrictionsDiff(enforced.ipv4, pending.ipv4).map((row) => ({
@@ -73,18 +60,12 @@ export const NetworkRestrictionsReview = ({
   ]
 
   const pendingEntries = [...pending.ipv4, ...pending.ipv6]
-  const enforcedIssues = getIssuesByEntry([...enforced.ipv4, ...enforced.ipv6])
-  const pendingIssues = getIssuesByEntry(pendingEntries)
-  const getIssue = ({ entry, change }: ReviewedRestriction) =>
-    change === 'adding' ? pendingIssues.get(entry) : enforcedIssues.get(entry)
 
   // The review endpoint refuses a change when either list has an entry that isn't a valid range, so such a change is
   // saved as a new, corrected list instead, which also ends the review
-  const hasIssues = enforcedIssues.size > 0 || pendingIssues.size > 0
-  const corrected = getCorrectedRestrictions(pending)
+  const hasIssues =
+    hasRestrictionIssue([...enforced.ipv4, ...enforced.ipv6]) || hasRestrictionIssue(pendingEntries)
   const hasCorrections = corrected.corrections.length > 0
-  const hasCorrectedEntries =
-    corrected.dbAllowedCidrs.length > 0 || corrected.dbAllowedCidrsV6.length > 0
   const canApplyCorrected = hasCorrectedEntries || pendingEntries.length === 0
 
   const isAllowingAll = pendingEntries.includes('0.0.0.0/0') && pendingEntries.includes('::/0')
@@ -113,19 +94,10 @@ export const NetworkRestrictionsReview = ({
   const applyDisabledReason = getApplyDisabledReason()
 
   const handleApplyCorrected = () =>
-    applyNetworkRestrictions(
-      {
-        projectRef,
-        dbAllowedCidrs: corrected.dbAllowedCidrs,
-        dbAllowedCidrsV6: corrected.dbAllowedCidrsV6,
-      },
-      {
-        onSuccess: () => {
-          setIsConfirmingCorrections(false)
-          toast.success('Network restrictions change applied')
-        },
-      }
-    )
+    applyCorrected(() => {
+      setIsConfirmingCorrections(false)
+      toast.success('Network restrictions change applied')
+    })
 
   const handleApply = () => {
     if (hasCorrections) return setIsConfirmingCorrections(true)
@@ -164,11 +136,7 @@ export const NetworkRestrictionsReview = ({
             </p>
             {isAllowingAll && <p>Applying it allows access from all IP addresses.</p>}
             {isBlockingAll && <p>Applying it blocks all external access to your database.</p>}
-            {hasIssues && (
-              <p>
-                Some entries aren't valid IP ranges. Hover over an entry marked Invalid to see why.
-              </p>
-            )}
+            {hasIssues && <p>Some entries aren't valid IP ranges.</p>}
           </div>
         }
         actions={
@@ -197,13 +165,13 @@ export const NetworkRestrictionsReview = ({
       <Card>
         <CardContent className="py-0">
           <div className="divide-y">
-            {rows.map((row) => (
+            {rows.map((row, index) => (
               <RestrictionRow
-                key={`${row.type}-${row.entry}`}
+                key={`${row.type}-${row.entry}-${index}`}
                 entry={row.entry}
                 type={row.type}
                 change={row.change}
-                issue={getIssue(row)}
+                issue={row.issue}
               />
             ))}
           </div>

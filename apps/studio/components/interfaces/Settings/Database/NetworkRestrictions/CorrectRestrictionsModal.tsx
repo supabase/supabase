@@ -32,8 +32,8 @@ export const CorrectRestrictionsModal = ({
     onCancel={onCancel}
   >
     <ul className="space-y-1 text-sm">
-      {corrections.map(({ entry, replacement }) => (
-        <li key={entry} className="font-mono">
+      {corrections.map(({ entry, replacement }, index) => (
+        <li key={`${entry}-${index}`} className="font-mono">
           {entry} <span>{replacement === undefined ? '(removed)' : `→ ${replacement}`}</span>
         </li>
       ))}

@@ -114,6 +114,17 @@ describe('getRestrictionsDiff', () => {
       { entry: '2001:db8::/32', change: 'unchanged' },
     ])
   })
+
+  test('marks only the second of two identical entries as a duplicate', () => {
+    expect(getRestrictionsDiff([], ['192.0.2.0/24', '192.0.2.0/24'])).toEqual([
+      { entry: '192.0.2.0/24', change: 'adding' },
+      {
+        entry: '192.0.2.0/24',
+        change: 'adding',
+        issue: { message: 'Duplicates 192.0.2.0/24' },
+      },
+    ])
+  })
 })
 
 describe('getCorrectedRestrictions', () => {
