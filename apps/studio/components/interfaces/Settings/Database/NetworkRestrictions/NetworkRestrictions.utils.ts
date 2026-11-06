@@ -1,4 +1,4 @@
-import { collapseIPv6Number, IPv4CidrRange, IPv6CidrRange, Validator } from 'ip-num'
+import { collapseIPv6Number, IPv4CidrRange, IPv6, IPv6CidrRange, Validator } from 'ip-num'
 
 const privateIPv4Ranges = [
   IPv4CidrRange.fromCidr('10.0.0.0/8'),
@@ -86,7 +86,7 @@ export const isApplyingRestrictions = (
 
 export type RestrictionIssue = { message: string; suggestion?: string }
 
-const IPV4_MAPPED_IPV6_PREFIX = /^::ffff:/i
+const DOTTED_IPV4_TAIL = /^(.*:)(\d{1,3}(?:\.\d{1,3}){3})$/
 
 const isValidRange = (entry: string) =>
   Validator.isValidIPv4CidrRange(entry)[0] || Validator.isValidIPv6CidrRange(entry)[0]
@@ -95,23 +95,33 @@ const isValidRange = (entry: string) =>
 // matches itself.
 export const getNetworkKey = (entry: string) => (isValidRange(entry) ? normalize(entry) : entry)
 
-export const isIPv4MappedIPv6 = (address: string) => IPV4_MAPPED_IPV6_PREFIX.test(address)
-
-// The IPv4 address embedded in an IPv4-mapped IPv6 address, in dotted (::ffff:1.2.3.4) or hex (::ffff:102:304) form
-export const getMappedIPv4 = (address: string) => {
-  const embedded = address.replace(IPV4_MAPPED_IPV6_PREFIX, '')
-  if (Validator.isValidIPv4String(embedded)[0]) return embedded
-
-  const groups = embedded.split(':')
-  if (groups.length !== 2 || !groups.every((group) => /^[0-9a-f]{1,4}$/i.test(group)))
-    return undefined
-  const bytes =
-    groups
-      .map((group) => group.padStart(4, '0'))
-      .join('')
-      .match(/../g) ?? []
-  return bytes.map((byte) => parseInt(byte, 16)).join('.')
+// The address's eight 16-bit groups, reading a dotted IPv4 tail (::ffff:1.2.3.4) as the last two
+const getIPv6Groups = (address: string) => {
+  const dotted = DOTTED_IPV4_TAIL.exec(address)
+  let hexAddress = address
+  if (dotted !== null) {
+    const [, head, ipv4] = dotted
+    if (!Validator.isValidIPv4String(ipv4)[0]) return undefined
+    const [a, b, c, d] = ipv4.split('.').map(Number)
+    hexAddress = `${head}${((a << 8) | b).toString(16)}:${((c << 8) | d).toString(16)}`
+  }
+  if (!Validator.isValidIPv6String(hexAddress)[0]) return undefined
+  return IPv6.fromString(hexAddress)
+    .getHexadecatet()
+    .map((group) => group.getValue())
 }
+
+// The IPv4 address embedded in an IPv4-mapped IPv6 address (::ffff:0:0/96), however the address is spelled
+export const getMappedIPv4 = (address: string) => {
+  const groups = getIPv6Groups(address)
+  if (groups === undefined) return undefined
+  const isMapped = groups.slice(0, 5).every((group) => group === 0) && groups[5] === 0xffff
+  if (!isMapped) return undefined
+  const [high, low] = groups.slice(6)
+  return [high >> 8, high & 0xff, low >> 8, low & 0xff].join('.')
+}
+
+export const isIPv4MappedIPv6 = (address: string) => getMappedIPv4(address) !== undefined
 
 // Why the API refuses to store an entry, with the range it most likely meant. Mirrors the API's validation.
 export const getRestrictionIssue = (entry: string): RestrictionIssue | undefined => {
@@ -119,13 +129,13 @@ export const getRestrictionIssue = (entry: string): RestrictionIssue | undefined
   const hasNumericPrefix = prefix !== undefined && /^\d+$/.test(prefix)
   const prefixLength = Number(prefix)
 
-  if (isIPv4MappedIPv6(address)) {
-    const ipv4 = getMappedIPv4(address)
-    const ipv4Prefix =
-      hasNumericPrefix && prefixLength >= 96 && prefixLength <= 128 ? prefixLength - 96 : 32
+  const ipv4 = getMappedIPv4(address)
+  if (ipv4 !== undefined) {
+    // A prefix below /96 also covers addresses that aren't mapped, so no IPv4 range matches it
+    const ipv4Prefix = hasNumericPrefix && prefixLength <= 128 ? prefixLength - 96 : 32
     return {
       message: "IPv4-mapped IPv6 addresses aren't supported",
-      suggestion: ipv4 === undefined ? undefined : normalize(`${ipv4}/${ipv4Prefix}`),
+      suggestion: ipv4Prefix < 0 ? undefined : normalize(`${ipv4}/${ipv4Prefix}`),
     }
   }
   if (isValidRange(entry)) return undefined

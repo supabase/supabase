@@ -63,6 +63,13 @@ describe('getRestrictionIssue', () => {
     })
     expect(getRestrictionIssue('::ffff:72.62.177.61/128')?.suggestion).toBe('72.62.177.61/32')
     expect(getRestrictionIssue('::ffff:1.2.3.4/120')?.suggestion).toBe('1.2.3.0/24')
+    expect(getRestrictionIssue('0:0:0:0:0:ffff:c000:0201/128')?.suggestion).toBe('192.0.2.1/32')
+  })
+
+  test('has no suggestion for an IPv4-mapped prefix shorter than /96', () => {
+    expect(getRestrictionIssue('::ffff:102:304/80')).toEqual({
+      message: "IPv4-mapped IPv6 addresses aren't supported",
+    })
   })
 
   test('has no suggestion for something that is not an IP address', () => {
@@ -71,10 +78,19 @@ describe('getRestrictionIssue', () => {
 })
 
 describe('getMappedIPv4', () => {
-  test('reads the embedded IPv4 address in dotted and hex form', () => {
+  test('reads the embedded IPv4 address however the address is spelled', () => {
     expect(getMappedIPv4('::ffff:1.2.3.4')).toBe('1.2.3.4')
     expect(getMappedIPv4('::ffff:102:304')).toBe('1.2.3.4')
+    expect(getMappedIPv4('::FFFF:102:304')).toBe('1.2.3.4')
+    expect(getMappedIPv4('0:0:0:0:0:ffff:c000:0201')).toBe('192.0.2.1')
+    expect(getMappedIPv4('0:0:0:0:0:ffff:192.0.2.1')).toBe('192.0.2.1')
+  })
+
+  test('ignores addresses that are not IPv4-mapped', () => {
     expect(getMappedIPv4('::ffff:zz')).toBeUndefined()
+    expect(getMappedIPv4('2001:db8::1')).toBeUndefined()
+    expect(getMappedIPv4('::1.2.3.4')).toBeUndefined()
+    expect(getMappedIPv4('::ffff:1.2.3.999')).toBeUndefined()
   })
 })
 
