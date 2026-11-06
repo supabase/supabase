@@ -216,11 +216,12 @@ async function generate() {
     return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
   })()
 
-  // /evals and the public /dashboard auth pages are served by other apps proxied onto
-  // supabase.com via rewrites in lib/rewrites.js, so they have no page file for the globs
-  // above to find. Hardcode them here.
+  // /evals, /migrate/instantdb, and the public /dashboard auth pages are served by other apps
+  // proxied onto supabase.com via rewrites in lib/rewrites.js, so they have no page file for the
+  // globs above to find. Hardcode them here.
   const proxiedAppUrls = [
     urlEntry('https://supabase.com/evals'),
+    urlEntry('https://supabase.com/migrate/instantdb'),
     urlEntry('https://supabase.com/dashboard/sign-in'),
     urlEntry('https://supabase.com/dashboard/sign-up'),
   ]
