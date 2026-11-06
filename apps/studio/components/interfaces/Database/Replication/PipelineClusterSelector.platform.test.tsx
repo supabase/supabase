@@ -5,7 +5,7 @@ import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Button } from 'ui'
-import { describe, expect, it, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { PipelineRegionReadonly } from './DestinationPanel/DestinationForm/PipelineRegionField'
 import { PipelineClusterScope } from './PipelineClusterScope'
@@ -89,7 +89,121 @@ const mockClusters = () =>
       }),
   })
 
+const mockProject = (region = 'ap-southeast-1', ready = Promise.resolve()) =>
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: async () => {
+      await ready
+      return HttpResponse.json<components['schemas']['ProjectDetailResponse_Output']>({
+        cloud_provider: 'AWS',
+        connectionString: 'postgresql://postgres:password@localhost:5432/postgres',
+        db_host: 'localhost',
+        dbVersion: 'supabase-postgres-15.1.0',
+        high_availability: false,
+        id: 1,
+        infra_compute_size: 'micro',
+        inserted_at: '2026-01-01T00:00:00Z',
+        integration_source: null,
+        is_branch_enabled: false,
+        is_physical_backups_enabled: false,
+        name: 'Project',
+        organization_id: 1,
+        ref: 'default',
+        region,
+        restUrl: 'https://default.supabase.co',
+        status: 'ACTIVE_HEALTHY',
+        subscription_id: 'subscription-1',
+        updated_at: '2026-01-01T00:00:00Z',
+      })
+    },
+  })
+
+beforeEach(() => mockProject())
+
 describe('pipeline cluster selection', () => {
+  it('waits for the database region and prefills its matching cluster for creation', async () => {
+    mockClusters()
+    let finishProject = () => {}
+    const ready = new Promise<void>((resolve) => {
+      finishProject = resolve
+    })
+    mockProject('eu-central-1', ready)
+    const reads: string[] = []
+    const writes: string[] = []
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines',
+      response: ({ request }) => {
+        const id = new URL(request.url).searchParams.get('cluster_id') ?? 'missing'
+        reads.push(id)
+        return HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+          pipelines: [pipeline(id)],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations-pipelines',
+      response: ({ request }) => {
+        writes.push(new URL(request.url).searchParams.get('cluster_id') ?? 'missing')
+        return HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>(
+          { pipeline_id: '42', destination_id: 2 }
+        )
+      },
+    })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    customRender(
+      <PipelineClusterScope>
+        <Resources />
+      </PipelineClusterScope>,
+      { queryClient, nuqs: { hasMemory: true } }
+    )
+    try {
+      await waitFor(() =>
+        expect(queryClient.getQueryData(replicationKeys.clusters())).toBeDefined()
+      )
+      expect(screen.queryByRole('button', { name: 'Create pipeline' })).not.toBeInTheDocument()
+    } finally {
+      finishProject()
+    }
+    expect(await screen.findByRole('combobox', { name: 'Pipeline cluster' })).toHaveTextContent(
+      'Frankfurt'
+    )
+    expect(await screen.findByText('Frankfurt pipeline')).toBeInTheDocument()
+    expect(screen.getByText('eu-central-1')).toBeInTheDocument()
+    expect(reads).toEqual(['2'])
+    fireEvent.click(screen.getByRole('button', { name: 'Create pipeline' }))
+    await waitFor(() => expect(writes).toEqual(['2']))
+  })
+
+  it('uses the first region when the database region is unavailable, regardless of the API default', async () => {
+    mockProject('eu-west-3')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/regions',
+      response: () =>
+        HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+          default_cluster_id: '2',
+          regions: [
+            { cluster_id: '1', region: 'ap-southeast-1', name: 'Singapore' },
+            { cluster_id: '2', region: 'eu-central-1', name: 'Frankfurt' },
+          ],
+        }),
+    })
+    customRender(
+      <PipelineClusterScope>
+        <PipelineClusterSelector />
+        <PipelineRegionReadonly />
+      </PipelineClusterScope>,
+      { nuqs: { hasMemory: true } }
+    )
+    expect(await screen.findByRole('combobox', { name: 'Pipeline cluster' })).toHaveTextContent(
+      'Singapore'
+    )
+    expect(screen.getByText('ap-southeast-1')).toBeInTheDocument()
+  })
+
   it('keeps the current cluster usable when discovery refresh fails', async () => {
     mockClusters()
     addAPIMock({
