@@ -22,6 +22,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
+import { parseRedirectMessage } from '@/components/interfaces/Account/Preferences/AccountIdentities.utils'
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
@@ -63,22 +64,34 @@ const PreferencesPageHeader = ({ description }: { description: string }) => (
 )
 
 const PlatformPreferences = () => {
-  const router = useRouter()
+  const { asPath, query, replace } = useRouter()
 
-  const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
-    useIsFeatureEnabled([
-      'profile:show_information',
-      'profile:show_analytics_and_marketing',
-      'profile:show_account_deletion',
-    ])
+  const {
+    profileShowInformation,
+    profileShowAnalyticsAndMarketing,
+    profileShowAccountDeletion,
+    accountShowSecuritySettings,
+  } = useIsFeatureEnabled([
+    'profile:show_information',
+    'profile:show_analytics_and_marketing',
+    'profile:show_account_deletion',
+    'account:show_security_settings',
+  ])
   const { error, isLoading, isError } = useProfile()
 
   useEffect(() => {
-    const hash = router.asPath.split('#')[1]
+    const hash = asPath.split('#')[1]
+    const isEmailConfirmation = !!parseRedirectMessage(asPath)
+    // Email-change links already sent still return to Preferences (account/me).
+    // Now that sign-in methods are in Security, we need to redirect them there instead.
+    if (accountShowSecuritySettings && isEmailConfirmation) {
+      void replace({ pathname: '/account/security', query, hash })
+      return
+    }
     if (isLoading || !hash) return
 
     document.getElementById(hash)?.scrollIntoView({ block: 'start' })
-  }, [isLoading, router.asPath])
+  }, [accountShowSecuritySettings, asPath, isLoading, query, replace])
 
   return (
     <>
@@ -95,11 +108,14 @@ const PlatformPreferences = () => {
         {!isError && (
           <>
             {isLoading ? (
-              <ProfileLoadingSections showProfileInformation={profileShowInformation} />
+              <ProfileLoadingSections
+                showProfileInformation={profileShowInformation}
+                showSignInMethods={!accountShowSecuritySettings}
+              />
             ) : (
               <>
                 {profileShowInformation ? <ProfileInformation /> : null}
-                <AccountIdentities />
+                {!accountShowSecuritySettings && <AccountIdentities />}
               </>
             )}
 
@@ -125,7 +141,9 @@ const PlatformPreferences = () => {
 
 const ProfileLoadingSections = ({
   showProfileInformation,
+  showSignInMethods,
 }: {
+  showSignInMethods: boolean
   showProfileInformation: boolean
 }) => (
   <>
@@ -158,23 +176,25 @@ const ProfileLoadingSections = ({
       </PageSection>
     )}
 
-    <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Sign-in methods</PageSectionTitle>
-          <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
-          </PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent>
-        <Card>
-          <CardContent>
-            <ShimmeringLoader />
-          </CardContent>
-        </Card>
-      </PageSectionContent>
-    </PageSection>
+    {showSignInMethods && (
+      <PageSection>
+        <PageSectionMeta>
+          <PageSectionSummary>
+            <PageSectionTitle>Sign-in methods</PageSectionTitle>
+            <PageSectionDescription>
+              Manage the providers linked to your Supabase account and update their details.
+            </PageSectionDescription>
+          </PageSectionSummary>
+        </PageSectionMeta>
+        <PageSectionContent>
+          <Card>
+            <CardContent>
+              <ShimmeringLoader />
+            </CardContent>
+          </Card>
+        </PageSectionContent>
+      </PageSection>
+    )}
   </>
 )
 

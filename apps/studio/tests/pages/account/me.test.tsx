@@ -4,11 +4,14 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import PreferencesPage from '@/pages/account/me'
 
-const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile } = vi.hoisted(() => ({
+const { mockIsPlatform, mockUseIsFeatureEnabled, mockUseProfile, mockRouter } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
   mockUseIsFeatureEnabled: vi.fn(),
   mockUseProfile: vi.fn(),
+  mockRouter: { asPath: '/account/me', query: {}, replace: vi.fn() },
 }))
+
+vi.mock('next/router', () => ({ useRouter: () => mockRouter }))
 
 vi.mock('@/lib/constants', async () => {
   const actual = await vi.importActual<Record<string, unknown>>('@/lib/constants')
@@ -83,12 +86,18 @@ vi.mock('@/components/ui/AlertError', () => ({
 
 describe('/account/me', () => {
   beforeEach(() => {
+    mockIsPlatform.value = true
+    mockRouter.asPath = '/account/me'
+    mockRouter.query = {}
+    mockRouter.replace.mockReset()
+    mockRouter.replace.mockResolvedValue(true)
     mockUseIsFeatureEnabled.mockClear()
     mockUseProfile.mockClear()
     mockUseIsFeatureEnabled.mockReturnValue({
       profileShowInformation: true,
       profileShowAnalyticsAndMarketing: true,
       profileShowAccountDeletion: true,
+      accountShowSecuritySettings: true,
     })
     mockUseProfile.mockReturnValue({
       error: null,
@@ -104,7 +113,7 @@ describe('/account/me', () => {
     render(<PreferencesPage dehydratedState={{}} />)
 
     expect(screen.getByText('ProfileInformation')).toBeInTheDocument()
-    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
+    expect(screen.queryByText('AccountIdentities')).not.toBeInTheDocument()
     expect(screen.getByText('AccountConnections')).toBeInTheDocument()
     expect(screen.getByText('ThemeSettings')).toBeInTheDocument()
     expect(screen.getByText('TimezoneSettings')).toBeInTheDocument()
@@ -112,6 +121,61 @@ describe('/account/me', () => {
     expect(screen.getByText('DashboardSettings')).toBeInTheDocument()
     expect(screen.getByText('AnalyticsSettings')).toBeInTheDocument()
     expect(screen.getByText('AccountDeletion')).toBeInTheDocument()
+  })
+
+  it('keeps sign-in methods in Preferences when Security is unavailable', () => {
+    mockUseIsFeatureEnabled.mockReturnValue({ accountShowSecuritySettings: false })
+    render(<PreferencesPage dehydratedState={{}} />)
+    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
+  })
+
+  it('forwards a legacy confirmation message to Security with its query and fragment intact', () => {
+    const hash = 'message=Confirmation+link+accepted.+Confirm+the+other+email&sb='
+    mockRouter.asPath = `/account/me?keep=yes#${hash}`
+    mockRouter.query = { keep: 'yes' }
+
+    render(<PreferencesPage dehydratedState={{}} />)
+
+    expect(mockRouter.replace).toHaveBeenCalledWith({
+      pathname: '/account/security',
+      query: { keep: 'yes' },
+      hash,
+    })
+  })
+
+  it('handles a confirmation message that arrives after the first render', () => {
+    const { rerender } = render(<PreferencesPage dehydratedState={{}} />)
+    expect(mockRouter.replace).not.toHaveBeenCalled()
+
+    mockRouter.asPath = '/account/me#message=Confirmation+link+accepted&sb='
+    rerender(<PreferencesPage dehydratedState={{}} />)
+
+    expect(mockRouter.replace).toHaveBeenCalledWith({
+      pathname: '/account/security',
+      query: {},
+      hash: 'message=Confirmation+link+accepted&sb=',
+    })
+  })
+
+  it.each([
+    '/account/me',
+    '/account/me#dashboard',
+    '/account/me#type=recovery',
+    '/account/me#access_token=test-access&refresh_token=test-refresh&type=email_change',
+  ])('keeps an ordinary Preferences visit at %s', (asPath) => {
+    mockRouter.asPath = asPath
+    render(<PreferencesPage dehydratedState={{}} />)
+    expect(mockRouter.replace).not.toHaveBeenCalled()
+  })
+
+  it('keeps legacy confirmation handling in Preferences when Security is unavailable', () => {
+    mockUseIsFeatureEnabled.mockReturnValue({ accountShowSecuritySettings: false })
+    mockRouter.asPath = '/account/me#message=Confirmation+link+accepted&sb='
+
+    render(<PreferencesPage dehydratedState={{}} />)
+
+    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(screen.getByText('AccountIdentities')).toBeInTheDocument()
   })
 
   it('renders only local preferences on self-hosted', () => {
