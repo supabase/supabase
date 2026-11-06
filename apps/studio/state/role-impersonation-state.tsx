@@ -41,7 +41,8 @@ function useCustomizeAccessToken(
       const result = await executeSql({
         projectRef,
         connectionString,
-        sqlOrigin: 'studio',
+        // The hook is the user's own function, so its errors are user SQL
+        sqlOrigin: 'user',
         queryName: 'customize-access-token-hook',
         sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
         queryKey: ['customize-access-token', projectRef],

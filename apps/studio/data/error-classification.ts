@@ -52,9 +52,13 @@ export type SqlOrigin = 'user' | 'studio'
 
 /**
  * Classifies an error from the pg-meta query endpoint. Postgres rejecting the SQL comes back as a
- * 400, which becomes `UserSqlError` or `StudioSqlError` depending on who wrote the SQL. Pattern
- * rules (e.g. connection timeouts) and other statuses keep their usual classification, and
- * anything that isn't a response body goes through `classifyError`.
+ * 400, which becomes `UserSqlError` or `StudioSqlError` depending on who wrote the SQL.
+ *
+ * A 400 whose message carries a SQLSTATE came from Postgres, so it is a SQL error before any
+ * message-pattern rule runs: user SQL can raise any text, including a pattern's. Other 400s go
+ * through the pattern rules first (a connection timeout has no SQLSTATE) and are SQL errors only
+ * when no rule matches. Other statuses keep their usual classification, and anything that isn't
+ * a response body goes through `classifyError`.
  */
 export function classifySqlResponseError(
   error: unknown,
@@ -63,10 +67,12 @@ export function classifySqlResponseError(
   const raw = parseResponseErrorBody(error)
   if (!raw) return classifyError(error)
 
-  const classified = classifyResponseError(raw)
-  if (classified._tag !== 'UnclassifiedApiError' || classified.code !== 400) return classified
+  const sqlState = raw.code === 400 ? raw.message?.match(SQLSTATE_IN_MESSAGE)?.[1] : undefined
+  if (!sqlState) {
+    const classified = classifyResponseError(raw)
+    if (classified._tag !== 'UnclassifiedApiError' || classified.code !== 400) return classified
+  }
 
-  const sqlState = raw.message?.match(SQLSTATE_IN_MESSAGE)?.[1]
   const input = { ...raw, ...(queryName && { queryName }), ...(sqlState && { sqlState }) }
   return origin === 'user' ? new UserSqlError(input) : new StudioSqlError(input)
 }

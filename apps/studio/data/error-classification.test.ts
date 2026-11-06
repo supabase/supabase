@@ -162,6 +162,26 @@ describe('classifySqlResponseError', () => {
     expect(classifySqlResponseError(body, { origin: 'user' })).toBeInstanceOf(ErrorClass)
   })
 
+  it('classifies Postgres errors as SQL errors even when the text matches a pattern rule', () => {
+    const body = {
+      message:
+        'Failed to run sql query: ERROR:  P0001: Connection terminated due to connection timeout',
+      code: 400,
+    }
+    expect(classifySqlResponseError(body, { origin: 'user' })).toBeInstanceOf(UserSqlError)
+    expect(classifySqlResponseError(body, { origin: 'studio', queryName: 'x' })).toBeInstanceOf(
+      StudioSqlError
+    )
+  })
+
+  it('keeps a 400 without a SQLSTATE as a SQL error when no pattern matches', () => {
+    const body = {
+      message: 'Failed to run sql query: ERROR: could not determine which collation to use',
+      code: 400,
+    }
+    expect(classifySqlResponseError(body, { origin: 'user' })).toBeInstanceOf(UserSqlError)
+  })
+
   it('classifies non-response errors with classifyError', () => {
     const thrown = new TypeError('Failed to fetch')
     expect(classifySqlResponseError(thrown, { origin: 'user' })).toBeInstanceOf(
