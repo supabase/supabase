@@ -13,7 +13,10 @@ import { generateReferencePages } from './files/reference-lib'
 async function generate() {
   const referencePages = await generateReferencePages()
 
-  const contentFiles = await globby(['content/guides/**/!(_)*.mdx'])
+  const contentFiles = await globby([
+    'content/guides/**/!(_)*.mdx',
+    '!content/guides/ai-tools/compute-private-alpha.mdx',
+  ])
   const contentPages = await Promise.all(
     contentFiles.map(async (filePath) => {
       const fileContents = await fs.promises.readFile(filePath, 'utf8')
