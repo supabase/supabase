@@ -1,15 +1,9 @@
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import {
-  LockKeyholeIcon,
-  PlusIcon,
-  RectangleEllipsisIcon,
-  ShieldCheckIcon,
-  TrashIcon,
-} from 'lucide-react'
+import { LockKeyholeIcon, PlusIcon, ShieldCheckIcon, TrashIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
-import { Button, Card, CardContent, cn } from 'ui'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
@@ -26,9 +20,8 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
 import { DeleteFactorModal } from './DeleteFactorModal'
-import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
-import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
-import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
+import { RecoveryCodesAvailable } from './RecoveryCodesAvailable'
+import { RecoveryCodesSetup } from './RecoveryCodesSetup'
 import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -74,6 +67,13 @@ export const TOTPFactors = () => {
 
   const { data: codes, status } = recoveryCodesStatus ?? {}
   const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
+  const codeFinding = findings.find(
+    (finding) => finding.action === 'generate-codes' || finding.action === 'regenerate-codes'
+  )
+  const isCodeActionPrimary =
+    primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
+
+  const canShowRecoveryCodes = shouldVerifyRecoveryCodes && !recoveryCodesIsError
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
@@ -178,43 +178,32 @@ export const TOTPFactors = () => {
         </PageSectionContent>
       </PageSection>
 
-      {shouldVerifyRecoveryCodes && (
-        <PageSection>
+      {enableAuthRecoveryCodes && hasVerifiedFactors && !isError && (
+        <PageSection id="recovery-codes" className="scroll-mt-6">
           <PageSectionMeta>
             <PageSectionSummary>
               <PageSectionTitle>Recovery codes</PageSectionTitle>
               <PageSectionDescription>
-                Recovery codes allow you to recover your account in case you lost access to your MFA
-                apps.
+                Recover your account in case you lose access to your MFA methods.
               </PageSectionDescription>
             </PageSectionSummary>
           </PageSectionMeta>
-          <PageSectionContent aria-live="polite">
+          <PageSectionContent aria-live="polite" className="flex flex-col gap-4">
+            {(isLoading || (shouldVerifyRecoveryCodes && recoveryCodesIsPending)) && (
+              <GenericSkeletonLoader />
+            )}
             {recoveryCodesIsError && (
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
             )}
-            {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
-            {status === 'available' && codes && (
-              <Card>
-                <CardContent className="flex items-center justify-between">
-                  <div className="flex items-center gap-x-4">
-                    <div className="w-9 h-9 rounded-full bg-selection flex items-center justify-center">
-                      <RectangleEllipsisIcon size={18} className="text-foreground-lighter" />
-                    </div>
-                    <div className="text-sm">
-                      <p className={cn(codes.remaining < 2 ? 'text-warning' : '')}>
-                        {codes.remaining}/{codes.total} recovery codes available
-                      </p>
-                      <p className="text-foreground-lighter">Each code can only be used once</p>
-                    </div>
-                  </div>
-
-                  <div className="flex gap-2 ml-auto">
-                    <RegenerateRecoveryCodesModal />
-                    <UnenrollRecoveryCodesModal />
-                  </div>
-                </CardContent>
-              </Card>
+            {canShowRecoveryCodes && status === 'unenrolled' && (
+              <RecoveryCodesSetup finding={codeFinding} isPrimary={isCodeActionPrimary} />
+            )}
+            {canShowRecoveryCodes && status === 'available' && codes && (
+              <RecoveryCodesAvailable
+                codes={codes}
+                finding={codeFinding}
+                isPrimary={isCodeActionPrimary}
+              />
             )}
           </PageSectionContent>
         </PageSection>

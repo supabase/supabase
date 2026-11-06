@@ -7,33 +7,37 @@ import { RecoveryCodesModal } from './RecoveryCodesModal'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useRecoveryCodesRegenerateMutation } from '@/data/recovery-codes/recovery-codes-regenerate-mutation'
 
+interface RegenerateRecoveryCodesModalProps extends GenerateRecoveryCodesModalProps {
+  showIcon?: boolean
+}
+
 export const RegenerateRecoveryCodesModal = ({
-  children,
+  label = 'Regenerate',
+  showIcon = true,
+  variant,
+  size,
   onComplete,
   onStart,
   showSecurityLink,
-}: GenerateRecoveryCodesModalProps = {}) => {
+}: RegenerateRecoveryCodesModalProps) => {
   const mutation = useRecoveryCodesRegenerateMutation()
   const [stage, setStage] = useState<'idle' | 'confirm' | 'codes'>('idle')
   const handleStart = () => {
     onStart?.()
     setStage('confirm')
   }
-  const triggerProps = { onClick: handleStart, isPending: mutation.isPending }
 
   return (
     <>
-      {children ? (
-        children(triggerProps)
-      ) : (
-        <Button
-          icon={<RefreshCwIcon />}
-          onClick={triggerProps.onClick}
-          loading={triggerProps.isPending}
-        >
-          Regenerate
-        </Button>
-      )}
+      <Button
+        variant={variant}
+        size={size}
+        icon={showIcon ? <RefreshCwIcon /> : undefined}
+        onClick={handleStart}
+        loading={mutation.isPending}
+      >
+        {label}
+      </Button>
       <TextConfirmModal
         visible={stage === 'confirm'}
         size="small"

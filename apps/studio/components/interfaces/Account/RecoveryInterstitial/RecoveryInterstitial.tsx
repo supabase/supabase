@@ -184,7 +184,8 @@ export const RecoveryReminder = ({
       onAction?.(isExhausted ? 'regenerate_codes' : 'generate_codes')
     },
     onComplete: handleCodesSaved,
-    children: getRecoveryCodeTrigger(isExhausted, areCodesSaved),
+    variant: 'primary' as const,
+    size: 'tiny' as const,
   }
   let codesTitle = isExhausted ? 'Recovery codes used up' : 'No recovery codes'
   if (areCodesSaved) codesTitle = 'Recovery codes saved'
@@ -211,8 +212,16 @@ export const RecoveryReminder = ({
           description={getCodesDescription(isExhausted, areCodesSaved)}
           isComplete={areCodesSaved}
         >
-          {isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
-          {!isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
+          {!areCodesSaved && isExhausted && (
+            <RegenerateRecoveryCodesModal
+              {...flowProps}
+              label="Regenerate codes"
+              showIcon={false}
+            />
+          )}
+          {!areCodesSaved && !isExhausted && (
+            <GenerateRecoveryCodesModal {...flowProps} label="Generate codes" />
+          )}
         </RecoveryTaskRow>
         {(startedHasAuthenticatorTask ?? hasAuthenticatorTask) && (
           <AuthenticatorTask
@@ -256,21 +265,4 @@ function getCodesDescription(isExhausted: boolean, areCodesSaved: boolean) {
   return isExhausted
     ? 'Generate a new set for future use.'
     : 'Save codes in case you lose access to your MFA methods.'
-}
-
-function getRecoveryCodeTrigger(isExhausted: boolean, areCodesSaved: boolean) {
-  return function RecoveryCodeTrigger({
-    onClick,
-    isPending,
-  }: {
-    onClick: () => void
-    isPending: boolean
-  }) {
-    if (areCodesSaved) return null
-    return (
-      <Button variant="primary" size="tiny" onClick={onClick} loading={isPending}>
-        {isExhausted ? 'Regenerate codes' : 'Generate codes'}
-      </Button>
-    )
-  }
 }
