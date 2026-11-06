@@ -16,6 +16,7 @@ import { MetricsStackCards } from '~/components/MetricsStackCards'
 import { NavData } from '~/components/NavData'
 import { Price } from '~/components/Price'
 import { ProjectConfigVariables } from '~/components/ProjectConfigVariables'
+import { QueryParamAnchor } from '~/components/QueryParamAnchor'
 import { RealtimeLimitsEstimator } from '~/components/RealtimeLimitsEstimator'
 import { RegionsList, SmartRegionsList } from '~/components/RegionsList'
 import { SharedData } from '~/components/SharedData'
@@ -106,6 +107,7 @@ const components = {
   NamedCodeBlock,
   NavData,
   ProjectConfigVariables,
+  QueryParamAnchor,
   RealtimeLimitsEstimator,
   RegionsList,
   SmartRegionsList,
