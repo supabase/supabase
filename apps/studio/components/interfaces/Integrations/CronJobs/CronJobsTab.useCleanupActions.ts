@@ -110,7 +110,7 @@ export const useCronJobsCleanupActions = ({
           // Check for cancellation
           if (cancelledRef.current) {
             setCleanupState({ status: 'idle' })
-            toast.info('Deletion cancelled.')
+            toast.info('Deletion canceled.')
             return
           }
 
@@ -142,7 +142,7 @@ export const useCronJobsCleanupActions = ({
 
           if (cancelledRef.current) {
             setCleanupState({ status: 'idle' })
-            toast.info('Deletion cancelled.')
+            toast.info('Deletion canceled.')
             return
           }
 
