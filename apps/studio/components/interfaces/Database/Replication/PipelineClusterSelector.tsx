@@ -26,8 +26,7 @@ export const PipelineClusterSelector = () => {
         <SelectContent>
           {data.regions.map((cluster) => (
             <SelectItem key={cluster.cluster_id} value={cluster.cluster_id}>
-              {cluster.name}
-              {cluster.aws_region ? ` (${cluster.aws_region})` : ''}
+              <span>{cluster.region ? `${cluster.name} (${cluster.region})` : cluster.name}</span>
             </SelectItem>
           ))}
         </SelectContent>

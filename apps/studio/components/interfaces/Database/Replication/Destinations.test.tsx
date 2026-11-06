@@ -294,6 +294,7 @@ test.each([false, true])('opens the wizard with the shortcut (TanStack: %s)', as
     expect(options.navigate).toHaveBeenCalledWith({
       to: '/project/$ref/database/pipelines/new',
       params: { ref: 'default' },
+      search: { cluster_id: undefined },
     })
   else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
 })

@@ -1,19 +1,21 @@
-import { fireEvent, screen, waitFor, within } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { components } from 'api-types'
 import { HttpResponse } from 'msw'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Button } from 'ui'
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { PipelineRegionReadonly } from './DestinationPanel/DestinationForm/PipelineRegionField'
 import { PipelineClusterScope } from './PipelineClusterScope'
 import { PipelineClusterSelector } from './PipelineClusterSelector'
 import { useCreateDestinationPipelineMutation } from '@/data/replication/create-destination-pipeline-mutation'
 import { useCreateTenantSourceMutation } from '@/data/replication/create-tenant-source-mutation'
+import { replicationKeys } from '@/data/replication/keys'
 import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 type Pipeline = components['schemas']['PipelinesResponse_Output']['pipelines'][number]
 const pipeline = (clusterId: string): Pipeline => ({
@@ -28,16 +30,18 @@ const pipeline = (clusterId: string): Pipeline => ({
   config: { publication_name: 'publication' },
 })
 
-const Resources = () => {
-  const { data } = useReplicationPipelinesQuery({ projectRef: 'default' })
+const Resources = ({ onCreated }: { onCreated?: () => void }) => {
+  const { data } = useReplicationPipelinesQuery({ projectRef: 'default' }, { staleTime: Infinity })
   const source = useCreateTenantSourceMutation()
-  const create = useCreateDestinationPipelineMutation()
+  const create = useCreateDestinationPipelineMutation({ onSuccess: onCreated })
   const [selectedCluster] = useQueryState('cluster_id', parseAsString)
   return (
     <>
       <PipelineClusterSelector />
       <PipelineRegionReadonly />
-      <p>Selected: {selectedCluster ?? 'environment default'}</p>
+      <p>
+        <span>{`Selected: ${selectedCluster ?? 'environment default'}`}</span>
+      </p>
       {data?.pipelines.map((item) => (
         <p key={item.id}>{item.destination_name}</p>
       ))}
@@ -78,14 +82,43 @@ const mockClusters = () =>
       HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
         default_cluster_id: '1',
         regions: [
-          { cluster_id: '1', aws_region: 'ap-southeast-1', name: 'Singapore' },
-          { cluster_id: '2', aws_region: 'eu-central-1', name: 'Frankfurt' },
-          { cluster_id: '3', aws_region: 'us-east-1', name: 'Virginia' },
+          { cluster_id: '1', region: 'ap-southeast-1', name: 'Singapore' },
+          { cluster_id: '2', region: 'eu-central-1', name: 'Frankfurt' },
+          { cluster_id: '3', region: 'us-east-1', name: 'Virginia' },
         ],
       }),
   })
 
 describe('pipeline cluster selection', () => {
+  it('keeps the current cluster usable when discovery refresh fails', async () => {
+    mockClusters()
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines',
+      response: () =>
+        HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+          pipelines: [pipeline('1')],
+        }),
+    })
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    customRender(
+      <PipelineClusterScope>
+        <Resources />
+      </PipelineClusterScope>,
+      { queryClient, nuqs: { hasMemory: true } }
+    )
+    await screen.findByText('Singapore pipeline')
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/regions',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Temporarily unavailable' }, { status: 503 }),
+    })
+    await act(() => queryClient.invalidateQueries({ queryKey: replicationKeys.clusters() }))
+    expect(await screen.findByText('Failed to load pipeline clusters')).toBeInTheDocument()
+    expect(screen.getByText('Singapore pipeline')).toBeInTheDocument()
+  })
+
   it('uses the sole discovered cluster without showing a selector', async () => {
     addAPIMock({
       method: 'get',
@@ -93,7 +126,7 @@ describe('pipeline cluster selection', () => {
       response: () =>
         HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
           default_cluster_id: '1',
-          regions: [{ cluster_id: '1', aws_region: 'ap-southeast-1', name: 'Singapore' }],
+          regions: [{ cluster_id: '1', region: 'ap-southeast-1', name: 'Singapore' }],
         }),
     })
     addAPIMock({
@@ -199,5 +232,69 @@ describe('pipeline cluster selection', () => {
     expect(screen.getByRole('combobox', { name: 'Pipeline cluster' })).toHaveTextContent(
       'Frankfurt'
     )
+  })
+
+  it('completes a pending create in its original cluster after selection changes', async () => {
+    mockClusters()
+    const onCreated = vi.fn()
+    const reads: string[] = []
+    const writes: string[] = []
+    let finishCreate = () => {}
+    const pendingCreate = new Promise<void>((resolve) => {
+      finishCreate = resolve
+    })
+    let hasCreatedPipeline = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines',
+      response: ({ request }) => {
+        const clusterId = new URL(request.url).searchParams.get('cluster_id') ?? 'missing'
+        reads.push(clusterId)
+        const item = pipeline(clusterId)
+        if (clusterId === '1' && hasCreatedPipeline) item.destination_name = 'Created in Singapore'
+        return HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+          pipelines: [item],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/replication/:ref/destinations-pipelines',
+      response: async ({ request }) => {
+        writes.push(new URL(request.url).searchParams.get('cluster_id') ?? 'missing')
+        await pendingCreate
+        hasCreatedPipeline = true
+        return HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>(
+          { pipeline_id: 'created-in-one', destination_id: 2 }
+        )
+      },
+    })
+    customRender(
+      <PipelineClusterScope>
+        <Resources onCreated={onCreated} />
+      </PipelineClusterScope>,
+      { nuqs: { hasMemory: true } }
+    )
+    await screen.findByText('Singapore pipeline')
+    fireEvent.click(screen.getByRole('button', { name: 'Create pipeline' }))
+    await waitFor(() => expect(writes).toEqual(['1']))
+    await userEvent.click(screen.getByRole('combobox', { name: 'Pipeline cluster' }))
+    await userEvent.click(
+      within(await screen.findByRole('listbox')).getByRole('option', {
+        name: 'Frankfurt (eu-central-1)',
+      })
+    )
+    await screen.findByText('Frankfurt pipeline')
+    finishCreate()
+    await waitFor(() => expect(onCreated).toHaveBeenCalledOnce())
+    expect(reads.filter((id) => id === '2')).toHaveLength(1)
+    expect(screen.getByText('Frankfurt pipeline')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('combobox', { name: 'Pipeline cluster' }))
+    await userEvent.click(
+      within(await screen.findByRole('listbox')).getByRole('option', {
+        name: 'Singapore (ap-southeast-1)',
+      })
+    )
+    expect(await screen.findByText('Created in Singapore')).toBeInTheDocument()
   })
 })

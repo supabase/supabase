@@ -5455,7 +5455,7 @@ export interface paths {
     }
     /**
      * List available pipeline regions
-     * @description Returns the clusters available in this environment, their AWS region codes, and display names.
+     * @description Returns the clusters available in this environment, their region codes, and display names.
      */
     get: operations['PipelineRegionsController_getRegions']
     put?: never
@@ -17380,12 +17380,12 @@ export interface components {
       /** @description Cluster used when a request omits cluster_id. */
       default_cluster_id: string
       regions: {
-        /** @description AWS region code, or null for local development. */
-        aws_region: string | null
         /** @description Stable cluster identity used by the API and placement directory. */
         cluster_id: string
-        /** @description Display name; independent of the cluster identity and AWS region code. */
+        /** @description Display name; independent of the cluster identity and region code. */
         name: string
+        /** @description Region code, or null for local development. */
+        region: string | null
       }[]
     }
   }
@@ -31202,6 +31202,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Pipeline placement conflicts or the cluster pipeline limit is reached. */
+      409: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -31345,7 +31352,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown
@@ -31924,7 +31931,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Pipeline is still active. */
+      /** @description Pipeline is active or another operation is in progress. */
       409: {
         headers: {
           [name: string]: unknown

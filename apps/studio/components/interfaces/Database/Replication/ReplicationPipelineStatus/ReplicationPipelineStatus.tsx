@@ -271,32 +271,34 @@ export const ReplicationPipelineStatus = () => {
               />
             )}
 
-            {hasErroredTables && !showDisabledState && (
-              <Admonition
-                type="destructive"
-                layout="responsive"
-                title={
-                  erroredTables.length === 1
-                    ? '1 table stopped replicating'
-                    : `${erroredTables.length} tables stopped replicating`
-                }
-                description="The rest of the pipeline keeps running. Open a table’s error to see what went wrong, then reset it to resume."
-                actions={
-                  <Button
-                    variant="default"
-                    icon={<RotateCcwIcon />}
-                    disabled={isPipelineBusy || isPipelineError}
-                    loading={isPipelineBusy}
-                    onClick={() => {
-                      setBatchRestartMode('errored')
-                      setShowBatchRestartDialog(true)
-                    }}
-                  >
-                    Reset failed tables
-                  </Button>
-                }
-              />
-            )}
+            {hasErroredTables &&
+              statusName === PipelineStatusName.STARTED &&
+              !showDisabledState && (
+                <Admonition
+                  type="destructive"
+                  layout="responsive"
+                  title={
+                    erroredTables.length === 1
+                      ? '1 table stopped replicating'
+                      : `${erroredTables.length} tables stopped replicating`
+                  }
+                  description="The rest of the pipeline keeps running. Open a table’s error to see what went wrong, then reset it to resume."
+                  actions={
+                    <Button
+                      variant="default"
+                      icon={<RotateCcwIcon />}
+                      disabled={isPipelineBusy || isPipelineError}
+                      loading={isPipelineBusy}
+                      onClick={() => {
+                        setBatchRestartMode('errored')
+                        setShowBatchRestartDialog(true)
+                      }}
+                    >
+                      Reset failed tables
+                    </Button>
+                  }
+                />
+              )}
 
             {isSlotDisconnected && (
               <Admonition
@@ -306,7 +308,7 @@ export const ReplicationPipelineStatus = () => {
               />
             )}
 
-            {isStatusError && (
+            {isStatusError && statusName !== PipelineStatusName.STOPPED && (
               <Admonition
                 type="warning"
                 title="Live updates paused"

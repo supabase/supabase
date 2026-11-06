@@ -49,6 +49,7 @@ import {
   getRestartRequestStatus,
   getStatusName,
 } from './Pipeline.utils'
+import { PipelineId } from './PipelineId'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
@@ -280,6 +281,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                   (pipeline?.destination_name ?? 'Pipeline')
                 )}
               </PageHeaderTitle>
+              {pipeline && <PipelineId pipelineId={pipeline.id} className="w-fit" />}
               <PageHeaderDescription className="flex flex-row flex-wrap items-center gap-x-1.5 gap-y-1 text-sm!">
                 <PipelineStatePill
                   pipelineStatus={pipelineStatusData?.status}

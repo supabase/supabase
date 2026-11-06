@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
 import { DetailSubtext } from './DetailSubtext'
+import { PipelineId } from './PipelineId'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
 import {
@@ -19,7 +20,6 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
-import CopyButton from '@/components/ui/CopyButton'
 import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
@@ -179,7 +179,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
           </TableCell>
 
-          <TableCell className="max-w-[250px]">
+          <TableCell className="min-w-64 max-w-xs">
             {isPipelineLoading && !destinationName ? (
               <ShimmeringLoader />
             ) : (
@@ -189,28 +189,14 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                 </p>
                 {pipeline && (
                   <DetailSubtext className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
-                    <CopyButton
-                      text={pipeline.id}
-                      aria-label="Copy pipeline ID"
-                      title={pipeline.id}
-                      variant="text"
-                      className="h-auto min-w-0 max-w-full p-0 font-mono text-xs text-foreground-lighter hover:text-foreground"
-                      onClick={(event) => event.stopPropagation()}
-                      onKeyDown={(event) => event.stopPropagation()}
-                      onAuxClick={(event) => event.stopPropagation()}
-                    >
-                      #
-                      {pipeline.id.length > 16
-                        ? `${pipeline.id.slice(0, 6)}…${pipeline.id.slice(-6)}`
-                        : pipeline.id}
-                    </CopyButton>
+                    <PipelineId pipelineId={pipeline.id} />
                     <span aria-hidden>&middot;</span>
                     <span>{type}</span>
                     {hasTableErrors && (
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                          {`${errorCount} table error${errorCount === 1 ? '' : 's'}`}
                         </span>
                       </>
                     )}

@@ -53,7 +53,7 @@ export const PipelineRegionReadonly = ({ className }: { className?: string }) =>
   const { data } = useQuery(replicationClustersQueryOptions())
   const clusterId = selectedClusterId ?? data?.default_cluster_id
   const cluster = data?.regions.find((item) => item.cluster_id === clusterId)
-  const region = cluster ? cluster.aws_region : PIPELINE_REGION.code
+  const region = cluster ? cluster.region : PIPELINE_REGION.code
 
   return (
     <div

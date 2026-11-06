@@ -315,7 +315,7 @@ describe('DestinationRow', () => {
 
     const row = (await screen.findByText('supabase_realtime')).closest('tr')
     expect(row).not.toBeNull()
-    expect(screen.getByText('#03h6pe…my5nx2')).toBeVisible()
+    expect(screen.getByText(`#${PIPELINE_ID}`)).toBeVisible()
     expect(screen.getByRole('button', { name: 'Copy pipeline ID' })).toHaveAttribute(
       'title',
       PIPELINE_ID

@@ -6,6 +6,7 @@ import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { DestinationLogo } from '../DestinationLogo'
 import { getStatusName } from '../Pipeline.utils'
+import { PipelineId } from '../PipelineId'
 import { getReplicationDestinationType } from './Nodes.utils'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
@@ -75,7 +76,7 @@ export const ReplicationNode = ({ id }: { id: string }) => {
 
   return (
     <NodeContainer>
-      <div className="text-sm flex flex-col gap-y-0.5">
+      <div className="text-sm flex min-w-0 flex-1 flex-col gap-y-0.5">
         <div className="flex items-center">
           <p>{type}</p>
           {(statusName === 'started' || statusName === 'failed') && (
@@ -96,8 +97,10 @@ export const ReplicationNode = ({ id }: { id: string }) => {
             </Tooltip>
           )}
         </div>
-        <p className="text-foreground-light">{destination?.name}</p>
-        <p className="text-foreground-light">ID: {destination?.id}</p>
+        <p className="truncate text-foreground-light" title={destination?.name}>
+          {destination?.name}
+        </p>
+        {pipeline && <PipelineId pipelineId={pipeline.id} className="self-start" />}
       </div>
       {type ? <DestinationLogo type={type} /> : null}
       <Handle type="target" position={Position.Left} className="opacity-25" />
