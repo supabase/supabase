@@ -1,5 +1,5 @@
 import * as NavItems from '~/components/Navigation/NavigationMenu/NavigationMenu.constants'
-import { REFERENCES } from '~/content/navigation.references'
+import { isBetaVersion, REFERENCES } from '~/content/navigation.references'
 import { ClientLibHeader } from '~/features/docs/Reference.header'
 import { ClientLibIntroduction, OldVersionAlert } from '~/features/docs/Reference.introduction'
 import { ReferenceNavigation } from '~/features/docs/Reference.navigation'
@@ -40,7 +40,7 @@ export async function ClientSdkReferencePage({ sdkId, libVersion }: ClientSdkRef
         }
       >
         <LayoutMainContent>
-          {!isLatestVersion && (
+          {!isLatestVersion && !isBetaVersion(sdkId, libVersion) && (
             <OldVersionAlert
               libPath={libraryMeta.libPath}
               className="z-20 fixed top-[calc(var(--header-height)+1rem)] right-4 w-84 max-w-[calc(100vw-2rem)]"

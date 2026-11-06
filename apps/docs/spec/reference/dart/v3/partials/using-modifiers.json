@@ -1,0 +1,5 @@
+{
+  "id": "using-modifiers",
+  "title": "Using modifiers",
+  "description": "Filters work on the row level: they return only the rows that match\ncertain conditions without changing the shape of the rows. Modifiers are\neverything else. They sort the rows, limit how many come back, or change\nthe format of the response, for example to a CSV string.\n\nModifiers come after filters. Some modifiers only apply to queries that\nreturn rows, such as `select()` or a database function that returns a\ntable.\n\nThe examples use the typed `table()` API with types\n[generated from your database schema](/docs/guides/api/rest/generating-types).\nWhere a modifier takes a column, the column is a generated constant, such\nas `Countries.name`. On `from()` the same modifiers take column names as\nstrings.\n"
+}

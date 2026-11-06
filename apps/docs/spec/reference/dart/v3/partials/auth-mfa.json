@@ -1,0 +1,5 @@
+{
+  "id": "auth-mfa",
+  "title": "Auth MFA",
+  "notes": "This section contains methods commonly used for Multi-Factor Authentication (MFA) and are invoked behind the `supabase.auth.mfa` namespace.\n\nCurrently, Supabase supports time-based one-time passwords (TOTP) and phone verification codes as the second factor. Users can enroll multiple factors, with an upper limit of 10. Recovery codes, behind `supabase.auth.mfa.recoveryCodes`, let a user who lost their factors reach `aal2`. They are an experimental feature and must be enabled on the Supabase Auth server.\n\nVerifying a factor returns the upgraded `aal2` `Session` and emits `AuthMfaChallengeVerified` on `onAuthStateChange`. The methods act on the signed-in user and throw an `AuthSessionMissingException` when nobody is signed in.\n\nLearn more about implementing MFA on your application on our guide [here](https://supabase.com/docs/guides/auth/auth-mfa#overview).\n"
+}

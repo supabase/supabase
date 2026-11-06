@@ -1,0 +1,5 @@
+{
+  "id": "passkey-admin",
+  "title": "Passkey Admin",
+  "notes": "Contains passkey administration methods, accessed under the `supabase.auth.admin.passkey` namespace. Requires a `secret` key.\n\nPasskey support is a BETA feature and must be enabled for your project in the Supabase Dashboard under Authentication > Configuration > Passkeys.\n"
+}

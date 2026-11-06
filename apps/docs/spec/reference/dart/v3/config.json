@@ -1,0 +1,9 @@
+{
+  "categoryOrder": ["Database", "Auth", "Edge Functions", "Realtime", "Storage"],
+  "partialsOrder": ["introduction", "installing", "initializing", "upgrade-guide"],
+  "navigationPrefixes": {
+    "Database": false,
+    "Realtime": false,
+    "Edge Functions": "functions"
+  }
+}
