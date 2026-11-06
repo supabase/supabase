@@ -71,7 +71,7 @@ The ETL container requested 0.25 CPU and had a CPU limit of 0.5. The request aff
 
 ETL already supported concurrent table copies, multiple destination writes in flight, and splitting large tables into physical ranges for multiple copy tasks. Its BigQuery client also spawns connection and request tasks. These are async tasks, not dedicated runtime worker threads.
 
-ETL [builds a multithreaded Tokio runtime](https://github.com/supabase/etl/blob/681396ea4de9ab788a172c1581510e1b2ccc1eec/crates/etl-replicator/src/main.rs#L116-L125) without setting its worker-thread count. Unless `TOKIO_WORKER_THREADS` overrides it, Tokio chooses that count at startup using Rust’s [`available_parallelism`](https://doc.rust-lang.org/stable/std/thread/fn.available_parallelism.html). On Linux, readable cgroup quotas inform that estimate. With a visible 0.5-CPU quota, it returns one: the estimate is a whole number, with a minimum of one. Our staging metrics were consistent with that default, showing only `worker 0`.
+ETL uses Tokio, Rust’s asynchronous runtime, to schedule tasks on worker threads. It [builds a multithreaded runtime](https://github.com/supabase/etl/blob/681396ea4de9ab788a172c1581510e1b2ccc1eec/crates/etl-replicator/src/main.rs#L116-L125) without setting its worker-thread count. Unless `TOKIO_WORKER_THREADS` overrides it, Tokio chooses that count at startup using Rust’s [`available_parallelism`](https://doc.rust-lang.org/stable/std/thread/fn.available_parallelism.html). On Linux, readable cgroup quotas inform that estimate. With a visible 0.5-CPU quota, it returns one: the estimate is a whole number, with a minimum of one. Our staging metrics were consistent with that default, showing only `worker 0`.
 
 Many tasks could therefore keep requests in flight, while their CPU work shared one Tokio runtime worker in these runs. The process could still have other background or blocking threads. In the original copy, the container consumed about 0.45 CPU and the runtime worker was 86–90% busy during steady copying. Adding more tasks would not increase the container’s CPU budget, so we investigated the work those tasks were already doing.
 
@@ -100,6 +100,10 @@ Next, we looked at the work done before a batch reached the BigQuery client. Eve
 The old parser first validated UTF-8, then walked the row one character at a time. For each ordinary character, it checked parser state and appended the character to a temporary string. A 50,000-character text field required 50,000 character iterations even when it contained no tabs, newlines, or backslashes.
 
 Those three bytes are what matter to the row scanner: tab separates fields, newline terminates a row, and backslash introduces an escape. Instead of handling each ordinary character individually, the new parser searches for the next special byte and handles everything before it as one _literal span_.
+
+The [first parser rewrite (PR #878)](https://github.com/supabase/etl/pull/878) bulk-copied literal spans into the scratch string. A [follow-up (PR #889)](https://github.com/supabase/etl/pull/889) avoided that copy for unescaped fields by passing a borrowed slice directly to type conversion. This removes **an intermediate allocation and copy**; the resulting text cell still owns its string.
+
+The illustration shows the parser after the borrowing follow-up. The staging comparison measures the first rewrite; the local benchmarks include the follow-up.
 
 <div className="hidden lg:block">
   <Img
@@ -130,7 +134,7 @@ Those three bytes are what matter to the row scanner: tab separates fields, newl
   />
 </div>
 
-For longer inputs, it uses [`memchr3`](https://docs.rs/memchr/latest/memchr/fn.memchr3.html), which can search for three possible bytes using vector instructions. The dispatch is small:
+For longer inputs, it uses [`memchr3`](https://docs.rs/memchr/latest/memchr/fn.memchr3.html) to search for three possible bytes. It can use single instruction, multiple data (SIMD) instructions to inspect many bytes at once. The dispatch is small:
 
 ```rust
 const MEMCHR_MIN_LEN: usize = 32;
@@ -148,8 +152,6 @@ At each call, `haystack` is the remaining row slice. Below 32 bytes, we use a si
 
 The parser **validates the complete row as UTF-8 before scanning**. In valid UTF-8, [ASCII byte values cannot occur inside a multibyte code point](https://www.rfc-editor.org/rfc/rfc3629). Finding an ASCII delimiter therefore gives us a valid string boundary. We still inspect the input, but do less branching and copying in the parser’s inner loop.
 
-The [first parser rewrite (PR #878)](https://github.com/supabase/etl/pull/878) bulk-copied literal spans into the scratch string. A [follow-up (PR #889)](https://github.com/supabase/etl/pull/889) avoided that copy for unescaped fields by passing a borrowed slice directly to type conversion. This removes **an intermediate allocation and copy**; the resulting text cell still owns its string.
-
 AI helped us explore byte scanning, temporary buffers, and vectorized search. It also gave us more assumptions to check: whether byte scanning could split a Unicode character, where borrowing was possible, and when a vectorized search would actually pay off. The format specification and measurements decided the answers.
 
 Correctness checks covered invalid UTF-8, missing row terminators, dangling escapes, multibyte text, escaped delimiters, and column-count mismatches. The follow-up also tightened null handling: the raw `\N` marker means `NULL`, while an escaped backslash followed by `N` is literal text. The parser must distinguish them before unescaping. Performance work was also an opportunity to check those boundaries carefully.
@@ -160,7 +162,7 @@ We first measured complete table copies in staging. The runs were performed in t
 
 1. The original implementation.
 2. The tuned BigQuery client with GZIP disabled.
-3. The tuned client plus the byte-oriented COPY parser.
+3. The tuned client plus the first COPY parser rewrite from PR #878.
 
 Each run copied the same table with the same resource limits. The results compare these three versions within that staging setup. They measure the combined changes in each version, not the contribution of every individual edit.
 
@@ -195,11 +197,11 @@ Each run copied the same table with the same resource limits. The results compar
 
 The first set of changes reduced the copy from 114.6 minutes to 26.0 minutes. Adding the parser rewrite brought it down to 18.8 minutes. Dividing the complete-copy times, `114.6 / 18.8`, gives an end-to-end speedup of **about 6.1×**.
 
-Throughput rose from about 17.5 MB/s to 110–115 MB/s, measured as source `COPY` bytes consumed per second. That is a different quantity from compressed network traffic or destination storage size. Both source-byte counters in the original dashboard are incremented from the same raw row length during table copy; they are not independent measurements of delivery to BigQuery.
+Throughput rose from about 17.5 MB/s to 110–115 MB/s, measured as source `COPY` bytes consumed per second. That is a different quantity from compressed network traffic or destination storage size.
 
 The worker also became much less busy: 25–28% in the final run, compared with 86–90% originally. [Tokio’s busy-duration metric](https://docs.rs/tokio/latest/tokio/runtime/struct.RuntimeMetrics.html#method.worker_total_busy_duration) measures elapsed time while a worker processes work. It is distinct from CPU utilization and can include time when the OS deschedules or throttles that thread. Container CPU consumption fell separately, from about 0.45 to 0.26 CPU.
 
-The copy finished sooner and used less CPU, with the same resource limits. **The 6.1× result applies to this staging comparison.**
+The copy finished sooner and used less CPU, with the same resource limits.
 
 Other workloads can benefit differently. Network latency and bandwidth affect transfer time. CPU allocation limits how much parsing, encoding, and compression the process can do per second. For smaller tables, setup can account for more of the total copy time. Row size, column types, and the number of escape sequences also affect the work needed to parse and encode each row. These factors can change both the bottleneck and the overall speedup.
 
@@ -218,7 +220,7 @@ The active copy periods show the same three runs, from left to right: the origin
   height={762}
   src="/images/blog/supabase-etl-initial-copy/grafana-batch-send-duration.png"
   alt="Original Grafana panel showing p50 and p99 batch send duration falling across the three staging copies."
-  caption="Yellow: estimated median (p50). Green: estimated 99th percentile (p99)."
+  caption="Yellow: estimated median (p50). Green: estimated 99th percentile (p99). The dashboard shows the highest reported estimate in each rolling five-minute window."
 />
 
 Parsing happens before this timer starts. The third run’s lower send duration is consistent with less contention on the runtime worker; it is not a direct measurement of parser speed.
@@ -264,7 +266,7 @@ After the staging comparison, we benchmarked the COPY parser separately while pr
 
 These local benchmarks include the allocation follow-up and later UTF-8 optimization, which are outside the staging comparison’s 6.1× result.
 
-While preparing this post, we compared the parser paths independently using [Criterion](https://bheisler.github.io/criterion.rs/book/). Once scanning and temporary copying were cheaper, UTF-8 validation became a substantial part of the cost for large non-ASCII fields. We then [replaced the standard validator with `simdutf8` (PR #927)](https://github.com/supabase/etl/pull/927), which uses SIMD instructions on supported targets. Every row is still validated before parsing.
+We used [Criterion](https://bheisler.github.io/criterion.rs/book/) to compare the parser paths independently. Once scanning and temporary copying were faster, UTF-8 validation became a substantial part of the cost for large non-ASCII fields. We then [replaced the standard validator with `simdutf8` (PR #927)](https://github.com/supabase/etl/pull/927), which uses SIMD instructions on supported targets. Every row is still validated before parsing.
 
 On that same MacBook Pro, we compared three parser paths, shown from left to right in the table:
 
@@ -299,18 +301,24 @@ This is why we benchmark different row shapes. A large literal field exposes sca
 
 ## Lessons from optimizing the initial copy
 
-AI helped us inspect a larger portion of the system and explore alternatives step by step. Its suggestions were _hypotheses to test_, including suggestions that did not justify their added complexity. We started with an observed symptom and traced it through the code. For each proposed change, we checked correctness, ran benchmarks, and measured the complete pipeline again.
+The investigation depended on understanding the whole execution environment: the machine and container limits, Tokio’s workers and task scheduling, and the client and application code. A few principles guided the changes.
 
-Several lessons carried through the investigation:
+- **Understand the execution model and its environment.** Know where CPU time goes, where memory is allocated and copied, and which work runs synchronously on a runtime worker. More tasks can overlap I/O, but they cannot create more CPU capacity. In our staging setup, more CPU-heavy tasks would still share one worker and the same half-CPU budget, potentially adding scheduling overhead.
+- **Revisit reasonable defaults under real constraints.** Compression saved network bytes but cost throughput under our CPU limit. Runtime worker counts also need to be understood in the context of the machine and container limits. A default can be reasonable in general and still deserve investigation in a particular deployment.
+- **Remove unnecessary work from frequent paths.** In systems that perform the same operations continuously, even a small amount of unnecessary work can accumulate into a substantial cost. Look for repeated calculations, allocations, and copies that can be avoided. In ETL, encoding values once and borrowing unescaped fields removed work from frequently executed paths.
+- **Optimize the complete system.** Faster code and fewer allocations can reduce resource use, but their effect on overall performance depends on the bottleneck. When network latency or another external constraint dominates, a large local speedup may produce a smaller improvement across the system. Measure the outcome you care about and weigh the gain against added complexity. For Pipelines, that meant checking complete-copy time alongside parser benchmarks.
+- **Expect the next limit to become visible.** Faster scanning changed the cost breakdown and made UTF-8 validation worth revisiting. Measure again after each improvement; the next useful change may be somewhere else, and different inputs can expose different limits.
 
-- **Know what each metric measures.** Destination send time can include local CPU work. Worker busy time and container CPU usage answer different questions.
-- **Revisit reasonable defaults under real constraints.** Compression can save bandwidth while costing throughput in a CPU-limited process.
-- **Remove repeated work before adding machinery.** Encoding values once and copying literal spans avoided costs paid for every row or character.
-- **Expect the next limit to become visible.** Faster scanning made UTF-8 validation worth revisiting. Different inputs still favored different paths.
-- **Keep suggestions testable.** AI helped propose alternatives; specifications, regression tests, and benchmarks determined what we kept.
+Observability made this investigation possible. Batch duration, throughput, worker busy time, and container CPU metrics gave us enough evidence to form hypotheses and inspect the relevant code. Understanding each metric’s boundary mattered as much as collecting it. We did not need a function-level CPU or memory profile to find these improvements. Profiling remains useful when metrics and code inspection cannot explain the remaining cost.
+
+## Using AI to investigate the system
+
+AI helped us follow those leads across a larger portion of the system. It helped us inspect library internals, trace runtime settings, and compare implementation alternatives. With guidance, it can also help design tests for overlooked edge cases, run benchmark comparisons, and inspect generated machine code when an explanation needs that level of detail. This lets us compare several approaches before committing to an implementation and makes deeper investigations practical. As the codebase and its dependencies grow, the ability to follow a question across components becomes increasingly useful.
+
+One of its most useful roles is challenging the engineer’s own assumptions. Familiarity with a system you designed can bias your investigation toward how you expect it to work. That can make simpler alternatives harder to see. AI can help widen the search beyond the paths you would instinctively investigate, including alternatives to a design you have invested time in.
+
+AI can also confidently propose incorrect explanations or tests that reinforce the same assumption as the implementation. Its suggestions remain hypotheses to test. You need to understand each change and validate it against the format specification, regression tests, benchmarks, and observable behavior, especially in a replication engine.
 
 For the staging workload, reducing work in the BigQuery client and COPY parser shortened the initial copy with the same resource limits. The client changes also reduce work during ongoing replication, while the parser improvements apply to initial sync across destinations using the COPY path.
-
-The broader lesson is the process: measure the complete copy, trace the bottleneck through the code, test the change, and measure again. Each improvement changes where the next investigation should start.
 
 You can [set up Supabase Pipelines](/docs/guides/database/replication/pipelines) to replicate your Postgres data, or [explore Supabase ETL](https://github.com/supabase/etl) to see how the engine works.
