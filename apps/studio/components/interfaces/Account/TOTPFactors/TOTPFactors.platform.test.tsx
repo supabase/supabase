@@ -4,7 +4,8 @@ import type {
   Session,
   User,
 } from '@supabase/supabase-js'
-import { screen } from '@testing-library/react'
+import { QueryClient } from '@tanstack/react-query'
+import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { AuthContext, FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -12,6 +13,7 @@ import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TOTPFactors } from './index'
+import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
@@ -56,7 +58,7 @@ const SecurityFactors = () => {
   return <TOTPFactors findings={findings} primaryAction={undefined} />
 }
 
-const renderSection = (searchParams = '') =>
+const renderSection = (searchParams = '', queryClient?: QueryClient) =>
   customRender(
     <AuthContext.Provider
       value={{ session, error: null, isLoading: false, refreshSession: async () => session }}
@@ -75,7 +77,7 @@ const renderSection = (searchParams = '') =>
         <SecurityFactors />
       </FeatureFlagContext.Provider>
     </AuthContext.Provider>,
-    { nuqs: { searchParams } }
+    { nuqs: { searchParams }, queryClient }
   )
 
 describe('account security MFA and recovery sections', () => {
@@ -244,6 +246,44 @@ describe('account security MFA and recovery sections', () => {
       screen.queryByText('Multi-factor authentication will be disabled')
     ).not.toBeInTheDocument()
     expect(screen.queryByText('Your recovery codes will be deleted too')).not.toBeInTheDocument()
+  })
+
+  it('disables removal while cached recovery-code status is being refreshed', async () => {
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    renderSection('', queryClient)
+    await screen.findByText('10 of 10 recovery codes available')
+    const removeButton = screen.getByRole('button', { name: 'Remove MFA method: Phone' })
+    expect(removeButton).not.toHaveAttribute('aria-disabled', 'true')
+
+    let finishStatus = () => {}
+    const statusReady = new Promise<void>((resolve) => {
+      finishStatus = resolve
+    })
+    mswServer.use(
+      http.get('*/auth/v1/factors/recovery-codes', async () => {
+        await statusReady
+        return HttpResponse.json<AuthMFARecoveryCodesStatusResponseData>({
+          id: 'codes-a',
+          type: 'recovery_code',
+          remaining: 1,
+          total: 10,
+        })
+      })
+    )
+    let refetch = Promise.resolve()
+    act(() => {
+      refetch = queryClient.invalidateQueries({ queryKey: recoveryCodeKeys.status() })
+    })
+    await waitFor(() => expect(removeButton).toHaveAttribute('aria-disabled', 'true'))
+    await userEvent.click(removeButton)
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+
+    await act(async () => {
+      finishStatus()
+      await refetch
+    })
+    await waitFor(() => expect(removeButton).not.toHaveAttribute('aria-disabled', 'true'))
+    expect(await screen.findByText('1 of 10 recovery codes available')).toBeInTheDocument()
   })
 
   it('does not infer missing codes or allow removal when the status check fails', async () => {
