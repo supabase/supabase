@@ -1,4 +1,10 @@
-export const DEFAULT_SECTION_ORDER = ['connect', 'usage', 'advisor', 'custom-report']
+export const DEFAULT_SECTION_ORDER = [
+  'connect',
+  'usage',
+  'advisor',
+  'database-health',
+  'custom-report',
+]
 
 /**
  * Reconciles a stored section order with the canonical list.
