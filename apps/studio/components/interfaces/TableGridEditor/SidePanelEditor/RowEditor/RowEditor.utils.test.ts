@@ -254,6 +254,22 @@ describe('generateRowObjectFromFields', () => {
 })
 
 describe('isValueTruncated', () => {
+  describe('multibyte text', () => {
+    it('detects a value cut by characters that is shorter than MAX_CHARACTERS characters', () => {
+      // 5,000 three-byte characters is 15,000 bytes, so the query truncates it but `left()` keeps it whole
+      const original = '日'.repeat(5000)
+      expect(isValueTruncated(original + '...')).toBe(true)
+    })
+
+    it('does not flag a genuine multibyte value ending in an ellipsis', () => {
+      expect(isValueTruncated('日'.repeat(100) + '...')).toBe(false)
+    })
+
+    it('does not flag a short ASCII value ending in an ellipsis', () => {
+      expect(isValueTruncated('loading...')).toBe(false)
+    })
+  })
+
   it('should verify coordination with table-row-query.ts truncation patterns', () => {
     // Test the exact patterns that table-row-query.ts generates to ensure isValueTruncated stays in sync
 

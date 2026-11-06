@@ -345,6 +345,8 @@ const isTruncatedMultiDimArray = (value: string) => {
   }
 }
 
+const getByteLength = (value: string) => new TextEncoder().encode(value).length
+
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
@@ -352,7 +354,10 @@ export const isValueTruncated = (value: string | null | undefined, format?: stri
   const isArrayColumn = typeof format === 'string' && format.startsWith('_')
 
   return (
-    (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
+    // The query truncates when the value exceeds MAX_CHARACTERS bytes but cuts by characters, so a value of
+    // multibyte characters can end up shorter than MAX_CHARACTERS characters. Measuring bytes still tells
+    // truncated values from genuine ones: an untruncated value is at most MAX_CHARACTERS bytes.
+    (typeof value === 'string' && value.endsWith('...') && getByteLength(value) > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
     // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
     (typeof value === 'string' &&
