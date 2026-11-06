@@ -70,7 +70,6 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
     id: 'notebooks',
     name: 'Notebooks',
     description: 'Create, run, and manage project notebooks',
-    defaultDisabled: true,
   },
 ]
 

@@ -481,7 +481,7 @@ describe('useConnectState', () => {
         expect(result.current.state.mcpFeatures).toEqual(['docs', 'database'])
       })
 
-      test('platform offers opt-in groups without enabling them by default', () => {
+      test('platform enables notebooks but not storage by default', () => {
         Object.assign(deploymentModeMock, PLATFORM)
         const { result } = renderHook(() => useConnectState({ mode: 'framework' }))
         act(() => {
@@ -491,10 +491,10 @@ describe('useConnectState', () => {
         const features = result.current.state.mcpFeatures
         expect(features).toContain('database')
         expect(features).not.toContain('storage')
-        expect(features).not.toContain('notebooks')
+        expect(features).toContain('notebooks')
 
         const options = result.current.getFieldOptions('mcpFeatures').map((o) => o.value)
-        expect(options).toEqual(expect.arrayContaining(['storage', 'notebooks']))
+        expect(options).toContain('storage')
       })
     })
   })

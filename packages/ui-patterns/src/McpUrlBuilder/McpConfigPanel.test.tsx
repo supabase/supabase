@@ -34,33 +34,14 @@ describe('McpConfigPanel default feature groups', () => {
     expect(container.textContent).not.toMatch(/features=[^&\s"]*feedback/)
   })
 
-  it('keeps notebooks opt-in and hosted-only', () => {
+  it('enables notebooks by default only for hosted connections', () => {
     const { container, rerender } = render(<McpConfigPanel {...props} />, {
       wrapper: TooltipProvider,
     })
-    expect(container.textContent).not.toMatch(/features=[^&\s"]*notebooks/)
-
-    rerender(<McpConfigPanel {...props} isPlatform={false} />)
-    fireEvent.click(screen.getByRole('combobox', { name: 'Select features' }))
-    expect(screen.queryByRole('option', { name: /^Notebooks/ })).toBeNull()
-  })
-})
-
-describe('McpConfigPanel notebook opt-outs', () => {
-  it('offers notebook skips only while the notebooks group is enabled', () => {
-    const { container } = render(<McpConfigPanel {...props} />, { wrapper: TooltipProvider })
-    const featuresCombobox = screen.getByRole('combobox', { name: 'Select features' })
-    fireEvent.click(featuresCombobox)
-    fireEvent.click(screen.getByRole('option', { name: /^Notebooks/ }))
-    fireEvent.keyDown(featuresCombobox, { key: 'Escape' })
     expect(container.textContent).toMatch(/features=[^&\s"]*notebooks/)
 
-    selectOptOut('delete_notebook')
-    expect(container.textContent).toContain('skip_elicitations=delete_notebook')
-
-    fireEvent.click(featuresCombobox)
-    fireEvent.click(screen.getByRole('option', { name: /^Notebooks/ }))
-    expect(container.textContent).not.toContain('skip_elicitations=')
+    rerender(<McpConfigPanel {...props} isPlatform={false} />)
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*notebooks/)
   })
 })
 
@@ -109,6 +90,7 @@ describe('McpConfigPanel opt-out transitions', () => {
     { feature: 'Database', tool: 'execute_sql' },
     { feature: 'Account', tool: 'create_branch' },
     { feature: 'Branching', tool: 'create_branch' },
+    { feature: 'Notebooks', tool: 'delete_notebook' },
   ])('does not restore $tool after removing and readding $feature', ({ feature, tool }) => {
     const { container } = render(<McpConfigPanel {...props} />, { wrapper: TooltipProvider })
     selectOptOut(tool)
