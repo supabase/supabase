@@ -1,9 +1,10 @@
-import { useQuery } from '@tanstack/react-query'
+import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthOwnGrants, USE_MOCKS } from './mocks'
 import type { ListOwnGrantsResponse } from './types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthGrantsVariables = {
   cursor?: string
@@ -20,18 +21,26 @@ export async function getOAuthGrants({
 }
 
 export type OAuthGrantsData = Awaited<ReturnType<typeof getOAuthGrants>>
-export type OAuthGrantsError = ResponseError
+export type OAuthGrantsError = StudioError
 
 export const useOAuthGrantsQuery = <TData = OAuthGrantsData>(
   { cursor }: OAuthGrantsVariables = {},
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<OAuthGrantsData, OAuthGrantsError, TData> = {}
+  }: UseCustomInfiniteQueryOptions<
+    OAuthGrantsData,
+    OAuthGrantsError,
+    InfiniteData<TData>,
+    readonly unknown[],
+    string | undefined
+  > = {}
 ) =>
-  useQuery<OAuthGrantsData, OAuthGrantsError, TData>({
+  useInfiniteQuery({
     queryKey: oauthAppsKeys.grants(cursor),
-    queryFn: () => getOAuthGrants({ cursor }),
+    queryFn: ({ pageParam }) => getOAuthGrants({ cursor: pageParam }),
+    initialPageParam: cursor,
+    getNextPageParam: (lastPage) => lastPage.pagination.next_cursor,
     enabled: enabled && USE_MOCKS,
     ...options,
   })

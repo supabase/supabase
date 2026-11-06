@@ -2,7 +2,7 @@ import { useMonaco } from '@monaco-editor/react'
 import { acceptUntrustedSql, untrustedSql, type UntrustedSqlFragment } from '@supabase/pg-meta'
 import { useFlag } from 'common'
 import type { ExplorerQueryLocation } from 'common/telemetry-constants'
-import { CodeSquare, Eye, EyeOff } from 'lucide-react'
+import { CodeSquareIcon, EyeIcon, EyeOffIcon } from 'lucide-react'
 import type { editor as monacoEditor, Selection } from 'monaco-editor'
 import {
   forwardRef,
@@ -55,7 +55,7 @@ import {
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
   acceptUntrustedLogsSql,
@@ -340,6 +340,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant: unguarded.migrating,
     }).then(
       (data) => {
         trackRunResult()
@@ -576,7 +577,7 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       <Shell className={className}>
         <ExplorerToolbar className={cn(variant === 'viewport' && 'px-4')}>
           <ExplorerToolbarIcon>
-            <CodeSquare size={16} strokeWidth={2} />
+            <CodeSquareIcon size={16} strokeWidth={2} />
           </ExplorerToolbarIcon>
           {variant === 'viewport' ? (
             <ExplorerToolbarTitle className="text-muted text-xs italic">
@@ -611,7 +612,11 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
             )}
             <ExplorerToolbarAction
               icon={
-                showQuery ? <EyeOff size={16} strokeWidth={2} /> : <Eye size={16} strokeWidth={2} />
+                showQuery ? (
+                  <EyeOffIcon size={16} strokeWidth={2} />
+                ) : (
+                  <EyeIcon size={16} strokeWidth={2} />
+                )
               }
               disabled={pendingProposal !== null}
               tooltip={showQuery ? 'Hide query' : 'Show query'}

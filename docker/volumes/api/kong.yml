@@ -77,6 +77,26 @@ services:
           - /auth/v1/.well-known/jwks.json
     plugins:
       - name: cors
+  - name: auth-v1-open-well-known-oauth
+    _comment: 'Auth: /auth/v1/.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    url: http://auth:9999/.well-known/oauth-authorization-server
+    routes:
+      - name: auth-v1-open-well-known-oauth
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/oauth-authorization-server
+    plugins:
+      - name: cors
+  - name: auth-v1-open-well-known-openid
+    _comment: 'Auth: /auth/v1/.well-known/openid-configuration -> http://auth:9999/.well-known/openid-configuration'
+    url: http://auth:9999/.well-known/openid-configuration
+    routes:
+      - name: auth-v1-open-well-known-openid
+        strip_path: true
+        paths:
+          - /auth/v1/.well-known/openid-configuration
+    plugins:
+      - name: cors
 
   - name: auth-v1-open-sso-acs
     url: "http://auth:9999/sso/saml/acs"
@@ -356,6 +376,9 @@ services:
   ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
   ## and re-adds the translated value; on no match the Lua expression yields nil
   ## (an empty header) which the post-function then removes.
+  ##
+  ## No `cors`: functions handle CORS themselves, as on the platform. Preflights
+  ## reach the function and its responses pass through unchanged.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -367,7 +390,6 @@ services:
         paths:
           - /functions/v1/
     plugins:
-      - name: cors
       - name: request-transformer
         config:
           remove:
@@ -387,13 +409,13 @@ services:
 
   ## OAuth 2.0 Authorization Server Metadata (RFC 8414)
   - name: well-known-oauth
-    _comment: 'Auth: /.well-known/oauth-authorization-server -> http://auth:9999/.well-known/oauth-authorization-server'
+    _comment: 'Auth: /.well-known/oauth-authorization-server/auth/v1 -> http://auth:9999/.well-known/oauth-authorization-server'
     url: http://auth:9999/.well-known/oauth-authorization-server
     routes:
       - name: well-known-oauth
         strip_path: true
         paths:
-          - /.well-known/oauth-authorization-server
+          - /.well-known/oauth-authorization-server/auth/v1
     plugins:
       - name: cors
 

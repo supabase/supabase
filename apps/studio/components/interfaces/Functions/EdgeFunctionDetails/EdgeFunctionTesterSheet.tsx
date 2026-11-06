@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { BookOpen, Loader2, Send } from 'lucide-react'
+import { BookOpenIcon, Loader2Icon, SendIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
@@ -40,11 +40,12 @@ import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
 import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useEdgeFunctionTestMutation } from '@/data/edge-functions/edge-function-test-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 import { prettifyJSON } from '@/lib/helpers'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -84,11 +85,15 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const [error, setError] = useState<string | null>(null)
   const errorDocs = response ? getEdgeFunctionErrorDocs(response.headers) : undefined
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys }
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef },
+    { variant: 'reveal' }
   )
+  const { data: apiKeysData } = useQuery({
+    ...revealedApiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
   const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 
@@ -272,6 +277,10 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                       addActions={headerAddActions}
                       disabled={isPending}
                     />
+                    <ApiKeysAccessNote
+                      grant={apiKeysGrant}
+                      fallback="The key shortcuts insert a placeholder you can replace."
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label className="text-foreground text-sm">Query Parameters</Label>
@@ -324,7 +333,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                                   asChild
                                   variant="text"
                                   size="tiny"
-                                  icon={<BookOpen size={14} />}
+                                  icon={<BookOpenIcon size={14} />}
                                 >
                                   <a
                                     href={errorDocs.href}
@@ -362,12 +371,12 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
                     </div>
                   ) : isPending ? (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Loader2 size={24} className="text-foreground-muted animate-spin" />
+                      <Loader2Icon size={24} className="text-foreground-muted animate-spin" />
                       <p className="text-sm text-foreground-light">Sending request...</p>
                     </div>
                   ) : (
                     <div className="h-full flex flex-col items-center justify-center gap-2">
-                      <Send size={24} className="text-foreground-muted" />
+                      <SendIcon size={24} className="text-foreground-muted" />
                       <p className="text-sm text-foreground-light">Send your first test request</p>
                     </div>
                   )}

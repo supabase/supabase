@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { enumeratedTypesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EnumeratedTypeDeleteVariables = {
   projectRef: string
@@ -20,7 +22,12 @@ export async function deleteEnumeratedType({
   schema,
 }: EnumeratedTypeDeleteVariables) {
   const sql = getDeleteEnumeratedTypeSQL({ schema, name })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -31,12 +38,12 @@ export const useEnumeratedTypeDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EnumeratedTypeDeleteData, ResponseError, EnumeratedTypeDeleteVariables>,
+  UseCustomMutationOptions<EnumeratedTypeDeleteData, StudioError, EnumeratedTypeDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EnumeratedTypeDeleteData, ResponseError, EnumeratedTypeDeleteVariables>({
+  return useMutation<EnumeratedTypeDeleteData, StudioError, EnumeratedTypeDeleteVariables>({
     mutationFn: (vars) => deleteEnumeratedType(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

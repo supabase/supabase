@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { ExternalLink, RefreshCw, Search, X } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsString, parseAsStringLiteral, useQueryState } from 'nuqs'
 import React, { useMemo, useRef, type PropsWithChildren } from 'react'
@@ -137,7 +137,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                             <Input
                               ref={searchInputRef}
                               placeholder="Search function names"
-                              icon={<Search />}
+                              icon={<SearchIcon />}
                               size="tiny"
                               className="w-32 md:w-64"
                               value={search}
@@ -150,7 +150,7 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                                     key="clear"
                                     size="tiny"
                                     variant="text"
-                                    icon={<X />}
+                                    icon={<XIcon />}
                                     onClick={() => setSearch('')}
                                     className="p-0 h-5 w-5"
                                   />
@@ -167,7 +167,11 @@ const EdgeFunctionsPage: NextPageWithLayout = () => {
                         shortcutId={SHORTCUT_IDS.FUNCTIONS_LIST_REFRESH}
                         side="bottom"
                       >
-                        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
+                        <Button
+                          icon={<RefreshCwIcon />}
+                          loading={isFetching}
+                          onClick={() => refetch()}
+                        >
                           Refresh
                         </Button>
                       </ShortcutTooltip>
@@ -237,7 +241,7 @@ export const EdgeFunctionsIndexPageWrapper = ({ children }: PropsWithChildren) =
           </PageHeaderSummary>
           <PageHeaderAside>
             <DocsButton href={`${DOCS_URL}/guides/functions`} />
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <a
                 target="_blank"
                 rel="noreferrer"

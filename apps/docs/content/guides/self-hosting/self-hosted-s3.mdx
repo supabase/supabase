@@ -148,7 +148,7 @@ storage:
 
 You can authenticate to Supabase's S3-compatible storage using a user’s JWT to enforce Row-Level Security (RLS) across S3 operations. This is useful when initializing the S3 client on the server for a specific user session, or when using the client directly from the frontend.
 
-All operations performed with a session token are scoped to the authenticated user, and any RLS policies defined in the storage schema will be applied.
+All operations performed with a session token are scoped to the authenticated user, and any RLS policies defined in the [storage schema](/docs/guides/storage/schema/design) will be applied.
 
 To authenticate with S3 using a session token, provide the following credentials:
 
@@ -192,7 +192,7 @@ If resumable (TUS) uploads fail with HTTP 500 and a message about `x-amz-tagging
 
 ### Permission denied on uploads
 
-Setting a bucket to "Public" only allows unauthenticated **downloads**. Uploads are always blocked unless you create an RLS policy on the `storage.objects` table. Go to **Storage** > **Files** > **Policies** in Studio and create a policy that allows `INSERT` for the appropriate roles.
+Setting a bucket to "Public" only allows unauthenticated **downloads**. [Uploads are always blocked](/kb/troubleshooting/storage-error-403-forbidden-new-row-violates-row-level-security-policy-on-upload) unless you create an RLS policy on the `storage.objects` table. Go to **Storage** > **Files** > **Policies** in Studio and create a policy that allows `INSERT` for the appropriate roles.
 
 ### Upload URLs point to localhost
 

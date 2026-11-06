@@ -46,6 +46,23 @@ function changelogLastmod(pubDate, link) {
   return instant.toISOString().slice(0, 10)
 }
 
+// Next writes prerendered HTML to a different place depending on how it builds (with an
+// adapter, as on Vercel, it is not under .next/server/pages), so read prerendered paths
+// for a dynamic route from the manifest instead of globbing the output directory.
+function prerenderedPaths(srcRoute) {
+  let manifest
+  try {
+    manifest = JSON.parse(readFileSync('.next/prerender-manifest.json', 'utf-8'))
+  } catch (error) {
+    if (error.code === 'ENOENT') return []
+    throw error
+  }
+  return Object.entries(manifest.routes ?? {})
+    .filter(([, route]) => route.srcRoute === srcRoute)
+    .map(([path]) => path)
+    .sort((a, b) => a.localeCompare(b))
+}
+
 function urlEntry(loc, lastmod) {
   return `
         <url>
@@ -75,10 +92,6 @@ async function generate() {
     '!pages/_*.tsx',
     '!pages/api',
     '!pages/404.tsx',
-    '.next/server/pages/partners/integrations/*.html',
-    '.next/server/pages/partners/catalog/*.html',
-    '.next/server/pages/partners/experts/*.html',
-    '.next/server/pages/features/*.html',
   ])
 
   const pages = unsortedPages.sort((a, b) => a.localeCompare(b))
@@ -99,9 +112,7 @@ async function generate() {
       }
 
       const path = page
-        .replace('.next/server/pages', '')
         .replace(/^pages/, '')
-        .replace('.html', '')
         // add a `/` for blog posts
         .replace('_blog', `/${blogUrl}`)
         .replace('_case-studies', `/${caseStudiesUrl}`)
@@ -177,6 +188,14 @@ async function generate() {
     })
     .filter(Boolean)
 
+  const featurePaths = prerenderedPaths('/features/[slug]')
+  if (process.env.VERCEL && featurePaths.length === 0) {
+    throw new Error(
+      'No prerendered /features/[slug] pages found in .next/prerender-manifest.json; refusing to write a sitemap without them'
+    )
+  }
+  const featureUrls = featurePaths.map((path) => urlEntry(`https://supabase.com${path}`))
+
   // Changelog detail pages are dynamic routes; include them from generated changelog RSS links.
   const changelogDetailUrls = (() => {
     let rss
@@ -197,14 +216,19 @@ async function generate() {
     return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
   })()
 
-  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
-  // so it has no page file for the globs above to find. Hardcode it here.
-  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
+  // /evals and the public /dashboard auth pages are served by other apps proxied onto
+  // supabase.com via rewrites in lib/rewrites.js, so they have no page file for the globs
+  // above to find. Hardcode them here.
+  const proxiedAppUrls = [
+    urlEntry('https://supabase.com/evals'),
+    urlEntry('https://supabase.com/dashboard/sign-in'),
+    urlEntry('https://supabase.com/dashboard/sign-up'),
+  ]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-        ${[...staticUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
+        ${[...staticUrls, ...featureUrls, ...changelogDetailUrls, ...proxiedAppUrls].join('')}
     </urlset>
     `
 
@@ -216,7 +240,7 @@ async function generate() {
   /**
    * generate sitemap router
    *
-   * this points to www and docs sitemaps
+   * this points to www, docs, kb, and library sitemaps
    */
   const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -225,6 +249,12 @@ async function generate() {
   </sitemap>
   <sitemap>
     <loc>https://supabase.com/docs/sitemap.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/kb/sitemap-index.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/library/sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
 `

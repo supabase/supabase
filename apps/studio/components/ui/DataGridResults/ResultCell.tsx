@@ -1,4 +1,4 @@
-import { Expand } from 'lucide-react'
+import { ExpandIcon } from 'lucide-react'
 import { Button, FloatingPlate, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatCellValue, isLargeValue } from './DataGridResults.utils'
@@ -30,7 +30,7 @@ export const ResultCell = ({ column, value, onContextMenu, onExpand }: ResultCel
               <Button
                 size="tiny"
                 className="px-1"
-                icon={<Expand size={10} />}
+                icon={<ExpandIcon size={10} />}
                 aria-label="View full cell content"
                 onClick={(e) => {
                   e.stopPropagation()

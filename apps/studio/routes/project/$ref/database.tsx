@@ -7,6 +7,13 @@ export const Route = createFileRoute('/project/$ref/database')({
 })
 
 function DatabaseShell() {
+  const shouldSkipLayout = useMatches({
+    select: (matches) =>
+      matches.some(
+        (match) =>
+          (match.staticData as { skipDatabaseLayout?: boolean } | undefined)?.skipDatabaseLayout
+      ),
+  })
   // useMatches() returns a fresh array reference on every router tick, which
   // re-renders the shell (and its subtree, e.g. DatabaseLayout → ProjectLayout
   // → the route content) even when the leaf staticData hasn't changed. The
@@ -27,6 +34,8 @@ function DatabaseShell() {
       return ''
     },
   })
+
+  if (shouldSkipLayout) return <Outlet />
 
   return (
     <DatabaseLayout title={title}>

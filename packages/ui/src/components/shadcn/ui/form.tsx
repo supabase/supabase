@@ -1,6 +1,6 @@
 'use client'
 
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { Label as LabelPrimitive, Slot as SlotPrimitive } from 'radix-ui'
 import * as React from 'react'
 import {

@@ -1,5 +1,13 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Check, ChevronDown, Copy, Database, KeyRound, Link2, Terminal } from 'lucide-react'
+import { useQuery } from '@tanstack/react-query'
+import {
+  CheckIcon,
+  ChevronDownIcon,
+  CopyIcon,
+  DatabaseIcon,
+  KeyRoundIcon,
+  Link2Icon,
+  TerminalIcon,
+} from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -16,12 +24,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { pluckObjectFields } from '@/lib/helpers'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
@@ -30,6 +38,21 @@ const EMPTY_CONNECTION_INFO = {
   db_host: '',
   db_port: '',
   db_name: '',
+}
+
+const getPublishableKeyDisplay = ({
+  grantStatus,
+  isLoadingKeys,
+  publishableKey,
+}: {
+  grantStatus: 'loading' | 'granted' | 'denied' | 'error'
+  isLoadingKeys: boolean
+  publishableKey?: string
+}) => {
+  if (grantStatus === 'loading' || isLoadingKeys) return 'Loading publishable key...'
+  if (grantStatus === 'denied') return "You don't have permission to view API keys."
+  if (grantStatus === 'error') return 'Failed to check API key permissions'
+  return publishableKey ?? 'Publishable key unavailable'
 }
 
 interface ProjectConnectionPopoverProps {
@@ -41,17 +64,16 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const isLoadingPermissions = apiKeysGrant.status === 'loading'
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
 
-  const { data, isLoading: isLoadingKeys } = useAPIKeys(
-    { projectRef },
-    { enabled: open && canReadAPIKeys }
-  )
+  const { data, isLoading: isLoadingKeys } = useQuery({
+    ...apiKeysQueryOptions({ projectRef, grant: open ? apiKeysGrant.grant : undefined }),
+    select: getKeys,
+  })
   const { publishableKey } = data ?? {}
 
   const { data: databases, isLoading: isLoadingDatabases } = useReadReplicasQuery(
@@ -103,25 +125,24 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
           ? 'Loading project URL...'
           : (projectUrl ?? 'Project URL unavailable'),
         disabled: isLoadingApiUrl || !projectUrl,
-        icon: Link2,
+        icon: Link2Icon,
       },
       ...(showPublishableKey
         ? [
             {
               label: 'Publishable key',
               value: publishableKey?.api_key ?? '',
-              displayValue:
-                isLoadingPermissions || isLoadingKeys
-                  ? 'Loading publishable key...'
-                  : canReadAPIKeys
-                    ? (publishableKey?.api_key ?? 'Publishable key unavailable')
-                    : "You don't have permission to view API keys.",
+              displayValue: getPublishableKeyDisplay({
+                grantStatus: apiKeysGrant.status,
+                isLoadingKeys,
+                publishableKey: publishableKey?.api_key,
+              }),
               disabled:
                 isLoadingPermissions ||
                 isLoadingKeys ||
                 !canReadAPIKeys ||
                 !publishableKey?.api_key,
-              icon: KeyRound,
+              icon: KeyRoundIcon,
             },
           ]
         : []),
@@ -134,19 +155,20 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                 ? 'Loading connection string...'
                 : directConnectionString || 'Connection string unavailable',
               disabled: isLoadingDatabases || !directConnectionString,
-              icon: Database,
+              icon: DatabaseIcon,
             },
             {
               label: 'CLI setup commands',
               value: cliCommands,
               displayValue: cliCommands.replace(/\n/g, ' - '),
               disabled: !projectRef,
-              icon: Terminal,
+              icon: TerminalIcon,
             },
           ]
         : []),
     ],
     [
+      apiKeysGrant.status,
       canReadAPIKeys,
       cliCommands,
       directConnectionString,
@@ -183,7 +205,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             <Button
               size="tiny"
               iconRight={
-                <ChevronDown
+                <ChevronDownIcon
                   size={14}
                   className={cn('transition-transform', open && 'rotate-180')}
                 />
@@ -228,7 +250,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                       copiedItem === item.label && 'opacity-100 text-primary'
                     )}
                   >
-                    {copiedItem === item.label ? <Check size={14} /> : <Copy size={14} />}
+                    {copiedItem === item.label ? <CheckIcon size={14} /> : <CopyIcon size={14} />}
                   </div>
                 </DropdownMenuItem>
               )

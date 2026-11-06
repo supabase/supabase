@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { Fragment } from 'react'
 
 import { safeDecodeURIComponent } from '../Reports.utils'
@@ -13,6 +14,7 @@ export const CacheHitRateChartRenderer = (
     miss_count: number
   }>
 ) => {
+  const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
   const stackedData = props.data.flatMap((datum) => [
     {
       timestamp: +datum.timestamp / 1000,
@@ -28,6 +30,7 @@ export const CacheHitRateChartRenderer = (
 
   return (
     <StackedBarChart
+      chartStyle={shouldDefaultToLineCharts ? 'line' : 'bar'}
       hideHeader
       variant="percentages"
       data={stackedData}

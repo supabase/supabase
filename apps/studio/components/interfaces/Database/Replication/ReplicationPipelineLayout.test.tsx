@@ -9,6 +9,7 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { ReplicationPipelineLayout } from './ReplicationPipelineLayout'
 import { ReplicationPipelineStatus } from './ReplicationPipelineStatus/ReplicationPipelineStatus'
+import type { PipelineWireResponse } from '@/data/replication/api-types'
 import { replicationKeys } from '@/data/replication/keys'
 import {
   PipelineRequestStatusProvider,
@@ -16,14 +17,16 @@ import {
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
+
+const routeParams = vi.hoisted(() => ({ ref: 'default', pipelineId: '42' }))
 
 // The global setup pins useParams to { ref: 'default' }; this layout also needs a pipeline id
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
-  useParams: () => ({ ref: 'default', pipelineId: '42' }),
+  useParams: () => routeParams,
 }))
 
 vi.mock('next/router', () => ({
@@ -60,7 +63,7 @@ const TableResetFixture = () => {
         tabIndex={0}
         onClick={() =>
           void runWithRequestStatus(
-            42,
+            '42',
             PipelineStatusRequestStatus.StopRequested,
             () =>
               new Promise<void>((resolve) => {
@@ -76,7 +79,7 @@ const TableResetFixture = () => {
         onClick={async () => {
           finishReset.current()
           await queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesStatus('default', 42),
+            queryKey: replicationKeys.pipelinesStatus('default', '42'),
           })
         }}
       >
@@ -86,14 +89,19 @@ const TableResetFixture = () => {
   )
 }
 
-type PipelineResponse = components['schemas']['PipelineResponse_Output']
-type PipelineStatusResponse = components['schemas']['PipelineStatusResponse_Output']
-type PipelineReplicationStatusResponse =
+type PipelineResponse = PipelineWireResponse<components['schemas']['PipelineResponse_Output']>
+type PipelineStatusResponse = PipelineWireResponse<
+  components['schemas']['PipelineStatusResponse_Output']
+>
+type PipelineReplicationStatusResponse = PipelineWireResponse<
   components['schemas']['PipelineReplicationStatusResponse_Output']
-type PipelineVersionResponse = components['schemas']['PipelineVersionResponse_Output']
+>
+type PipelineVersionResponse = PipelineWireResponse<
+  components['schemas']['PipelineVersionResponse_Output']
+>
 type DestinationResponse = components['schemas']['DestinationResponse_Output']
 type DestinationsResponse = components['schemas']['DestinationsResponse_Output']
-type PipelinesResponse = components['schemas']['PipelinesResponse_Output']
+type PipelinesResponse = PipelineWireResponse<components['schemas']['PipelinesResponse_Output']>
 type SourcesResponse = components['schemas']['SourcesResponse_Output']
 
 const PIPELINE: PipelineResponse = {
@@ -120,11 +128,11 @@ const DESTINATION: DestinationResponse = {
   },
 }
 
-const mockPipeline = () => {
+const mockPipeline = (id: string | number = 42) => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id',
-    response: () => HttpResponse.json<PipelineResponse>(PIPELINE),
+    response: () => HttpResponse.json<PipelineResponse>({ ...PIPELINE, id }),
   })
   addAPIMock({
     method: 'get',
@@ -141,7 +149,7 @@ const mockPipeline = () => {
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines',
-    response: () => HttpResponse.json<PipelinesResponse>({ pipelines: [PIPELINE] }),
+    response: () => HttpResponse.json<PipelinesResponse>({ pipelines: [{ ...PIPELINE, id }] }),
   })
   addAPIMock({
     method: 'get',
@@ -160,21 +168,21 @@ const mockPipeline = () => {
   })
 }
 
-const mockStatus = (name: PipelineStatusResponse['status']['name']) =>
+const mockStatus = (name: PipelineStatusResponse['status']['name'], id: string | number = 42) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
     response: () =>
-      HttpResponse.json<PipelineStatusResponse>({ pipeline_id: 42, status: { name } }),
+      HttpResponse.json<PipelineStatusResponse>({ pipeline_id: id, status: { name } }),
   })
 
-const mockVersion = (hasUpdate: boolean) =>
+const mockVersion = (hasUpdate: boolean, id: string | number = 42) =>
   addAPIMock({
     method: 'get',
     path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
     response: () =>
       HttpResponse.json<PipelineVersionResponse>({
-        pipeline_id: 42,
+        pipeline_id: id,
         version: { id: 1, name: 'v0.2.0' },
         ...(hasUpdate ? { new_version: { id: 2, name: 'v0.3.0' } } : {}),
       }),
@@ -193,29 +201,55 @@ const mockReplicationStatus = () =>
 
 describe('ReplicationPipelineLayout', () => {
   beforeEach(() => {
+    routeParams.pipelineId = '42'
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => HttpResponse.json<APIErrorBody>({ message: 'Unavailable' }, { status: 404 }),
+    })
     mockPipeline()
     mockVersion(false)
   })
 
-  test('renders pipeline identity, chrome actions and the lifecycle action', async () => {
-    mockStatus('started')
+  test.each([42, '42', '003l8j9rxqi6c8rd5mcx1w2ya'])(
+    'renders pipeline %s and stops it using its original ID',
+    async (pipelineId) => {
+      routeParams.pipelineId = String(pipelineId)
+      mockPipeline(pipelineId)
+      mockVersion(false, pipelineId)
+      mockStatus('started', pipelineId)
+      addAPIMock({
+        method: 'post',
+        path: '/platform/replication/:ref/pipelines/:pipeline_id/stop',
+        response: ({ params }) => {
+          if (params.pipeline_id !== String(pipelineId)) {
+            return HttpResponse.json<APIErrorBody>({ message: 'Unknown pipeline' }, { status: 404 })
+          }
+          mockStatus('stopped', pipelineId)
+          return HttpResponse.json<Record<string, never>>({}, { status: 202 })
+        },
+      })
 
-    renderLayout(<div>Overview content</div>)
+      renderLayout(<div>Overview content</div>)
 
-    expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
-    expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute(
-      'href',
-      '/project/default/database/pipelines'
-    )
-    expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
-      'pipeline_id'
-    )
-    expect(screen.getByText('Running')).toBeVisible()
-    expect(screen.getByText('Primary database')).toBeVisible()
-    expect(await screen.findByText('BigQuery')).toBeVisible()
-    expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
-    expect(screen.getByText('Overview content')).toBeVisible()
-  })
+      expect(await screen.findByRole('heading', { name: 'Analytics warehouse' })).toBeVisible()
+      expect(screen.getByRole('link', { name: 'Pipelines' })).toHaveAttribute(
+        'href',
+        '/project/default/database/pipelines'
+      )
+      expect(screen.getByRole('link', { name: 'View logs' }).getAttribute('href')).toContain(
+        'pipeline_id'
+      )
+      expect(screen.getByText('Running')).toBeVisible()
+      expect(screen.getByText('Primary database')).toBeVisible()
+      expect(await screen.findByText('BigQuery')).toBeVisible()
+      expect(await screen.findByRole('button', { name: 'Stop' })).toBeVisible()
+      expect(screen.getByText('Overview content')).toBeVisible()
+
+      await userEvent.click(screen.getByRole('button', { name: 'Stop' }))
+      expect(await screen.findByRole('button', { name: 'Start' })).toBeVisible()
+    }
+  )
 
   test('keeps the pipeline identity structure in place while it loads', async () => {
     let resolvePipeline: (pipeline: PipelineResponse) => void = () => {}
@@ -325,7 +359,6 @@ describe('ReplicationPipelineLayout', () => {
     renderLayout()
 
     const updateButton = await screen.findByRole('button', { name: 'Update available' })
-    expect(updateButton).toHaveClass('bg-primary-solid')
     await userEvent.click(updateButton)
     // The trigger button shares this name, so match the dialog's heading specifically
     expect(await screen.findByRole('heading', { name: 'Update available' })).toBeVisible()

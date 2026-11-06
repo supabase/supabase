@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { VectorBucket as VectorBucketIcon } from 'icons'
-import { ChevronRight, Search } from 'lucide-react'
+import { ChevronRightIcon, SearchIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -81,7 +81,7 @@ export const VectorsBuckets = () => {
                         placeholder="Search for a bucket"
                         value={filterString}
                         onChange={(e) => setFilterString(e.target.value)}
-                        icon={<Search />}
+                        icon={<SearchIcon />}
                       />
 
                       <CreateBucketButton onClick={() => setVisible(true)} />
@@ -152,7 +152,7 @@ export const VectorsBuckets = () => {
                                   </TableCell>
                                   <TableCell>
                                     <div className="flex justify-end items-center h-full">
-                                      <ChevronRight
+                                      <ChevronRightIcon
                                         size={14}
                                         className="text-foreground-muted/60"
                                       />

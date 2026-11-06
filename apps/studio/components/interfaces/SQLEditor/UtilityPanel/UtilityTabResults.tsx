@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink, Loader2 } from 'lucide-react'
+import { ExternalLinkIcon, Loader2Icon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { forwardRef } from 'react'
 import { Button, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -41,7 +41,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
     if (isExecuting) {
       return (
         <div className="flex items-center gap-x-4 px-6 py-4 bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark">
-          <Loader2 size={14} className="animate-spin" />
+          <Loader2Icon size={14} className="animate-spin" />
           <p className="m-0 border-0 font-mono text-sm">Running...</p>
         </div>
       )
@@ -114,7 +114,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
                       className={cn(InlineLinkClassName, 'flex items-center gap-x-1')}
                     >
                       connecting to your database directly
-                      <ExternalLink size={12} />
+                      <ExternalLinkIcon size={12} />
                     </span>
                     .
                   </p>
@@ -160,7 +160,7 @@ export const UtilityTabResults = forwardRef<HTMLDivElement, UtilityTabResultsPro
       return (
         <div className="bg-table-header-light in-data-[theme*=dark]:bg-table-header-dark overflow-y-auto">
           <p className="m-0 border-0 px-4 py-4 text-sm text-foreground-light">
-            Click <code className="text-code-inline">Run</code> to execute your query
+            Click <code>Run</code> to execute your query
           </p>
         </div>
       )

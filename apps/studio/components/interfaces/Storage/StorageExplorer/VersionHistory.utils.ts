@@ -14,6 +14,7 @@ export interface ComputeVersionFateOptions {
   expiryDays: number | null
   cap: number | null
   mode: ExpirationMode
+  willRetainVersionOnWrite: boolean
 }
 
 const toActiveBound = (value: number | null) => (value !== null && value > 0 ? value : null)
@@ -26,6 +27,7 @@ export const computeVersionFate = ({
   expiryDays,
   cap,
   mode,
+  willRetainVersionOnWrite,
 }: ComputeVersionFateOptions): VersionFate => {
   const activeExpiryDays = toActiveBound(expiryDays)
   const activeCap = toActiveBound(cap)
@@ -56,6 +58,8 @@ export const computeVersionFate = ({
       ? { type: 'expiry-due' }
       : { type: 'expires-in', days: MIN_NONCURRENT_DAYS - daysOld }
   }
-  if (isAtCapBoundary) return { type: 'expires-on-next-upload', daysRemaining }
+  if (isAtCapBoundary && willRetainVersionOnWrite) {
+    return { type: 'expires-on-next-upload', daysRemaining }
+  }
   return { type: 'expires-in', days: daysRemaining }
 }

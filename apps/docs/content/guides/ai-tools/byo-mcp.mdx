@@ -186,7 +186,7 @@ The function imports a `Database` type so the Supabase client inside the tools k
 
 ```bash
 supabase start
-supabase gen types typescript --local > supabase/functions/mcp/database.types.ts
+supabase gen types typescript > supabase/functions/mcp/database.types.ts
 ```
 
 Replace the contents of `supabase/functions/mcp/index.ts`. Compared with the public server, the handler moves inside a `pipeline` so it receives the caller's Supabase client, and the tools query a table instead of adding numbers:

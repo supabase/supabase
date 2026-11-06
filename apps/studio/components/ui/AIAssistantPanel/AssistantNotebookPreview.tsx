@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { NotebookText } from 'lucide-react'
+import { NotebookTextIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, cn } from 'ui'
 
@@ -86,7 +86,7 @@ export const AssistantNotebookPreview = ({
     <div className={cn('flex w-full min-w-0 max-w-3xl mx-auto flex-col', className)}>
       <ExplorerToolbar aria-label="Notebook toolbar">
         <ExplorerToolbarIcon>
-          <NotebookText size={16} strokeWidth={2} />
+          <NotebookTextIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{title ?? FALLBACK_TITLE[mode]}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -133,7 +133,7 @@ export const AssistantNotebookPreview = ({
               )}
               onClick={() => setIsShowingAllEntries(true)}
             >
-              Show {hiddenCount} more cell{hiddenCount === 1 ? '' : 's'}
+              {`Show ${hiddenCount} more ${hiddenCount === 1 ? 'cell' : 'cells'}`}
             </Button>
           )}
         </div>

@@ -1,4 +1,4 @@
-import { Loader2, Search } from 'lucide-react'
+import { Loader2Icon, SearchIcon } from 'lucide-react'
 import { Checkbox, cn, Label } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
@@ -31,22 +31,30 @@ export function DataTableFilterCheckboxAsync<TData>({
     <div className="grid gap-2">
       <InputWithAddons
         placeholder="Search"
-        leading={<Search size={14} className="text-foreground-lighter" />}
+        leading={<SearchIcon size={14} className="text-foreground-lighter" />}
         containerClassName="h-8 rounded-sm"
         value={inputValue}
-        trailing={isFetching ? <Loader2 size={12} className="animate-spin" /> : undefined}
+        trailing={isFetching ? <Loader2Icon size={12} className="animate-spin" /> : undefined}
         onChange={(e) => setInputValue(e.target.value)}
         onKeyDown={onSearchInputEscape(inputValue, setInputValue)}
       />
 
       {isError && (
-        <AlertError error={error} subject="Failed to retrieve pathnames" projectRef={projectRef} />
+        <AlertError
+          error={error}
+          subject={
+            value === 'pipeline_id'
+              ? 'Failed to retrieve pipeline IDs'
+              : 'Failed to retrieve pathnames'
+          }
+          projectRef={projectRef}
+        />
       )}
 
       <div className="max-h-[215px] overflow-y-auto rounded-sm border border-border empty:border-none">
         {filterOptions.length === 0 && isLoading ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
-            <Loader2 size={14} className="animate-spin" />
+            <Loader2Icon size={14} className="animate-spin" />
           </div>
         ) : filterOptions.length === 0 && !isError ? (
           <div className="flex items-center justify-center px-2 py-3 text-center">
@@ -81,7 +89,7 @@ export function DataTableFilterCheckboxAsync<TData>({
                 />
                 <Label
                   htmlFor={`${value}-${option.value}`}
-                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-[0.8rem] min-w-0"
+                  className="flex w-full items-center justify-between gap-2 text-foreground/70 group-hover:text-accent-foreground text-sm min-w-0"
                 >
                   <div className="flex-1 min-w-0 overflow-hidden">
                     {Component ? (

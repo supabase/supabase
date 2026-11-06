@@ -1,9 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { screen, waitFor } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import { fireEvent, screen, waitFor } from '@testing-library/react'
+import type { components } from 'api-types'
+import { HttpResponse } from 'msw'
 import { useForm } from 'react-hook-form'
 import { Form } from 'ui'
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 
 import { AdvancedSettings } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/AdvancedSettings'
 import {
@@ -11,6 +12,10 @@ import {
   type DestinationPanelSchemaType,
 } from '@/components/interfaces/Database/Replication/DestinationPanel/DestinationForm/DestinationForm.schema'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock } from '@/tests/lib/msw'
+
+type ReplicationSourcesResponse = components['schemas']['SourcesResponse_Output']
+type PublicationDetailsResponse = components['schemas']['PublicationDetailsResponse_Output']
 
 const numericFields = [
   { label: 'Batch wait time', initialValue: 10_000 },
@@ -44,39 +49,72 @@ const TestForm = () => {
   )
 }
 
+// Waits for the table layout queries so none are left in flight when the test ends
+const renderExpanded = async () => {
+  customRender(<TestForm />)
+  fireEvent.click(screen.getByRole('button', { name: /Advanced settings/ }))
+  await screen.findByText('This publication has no tables.')
+}
+
 describe('AdvancedSettings', () => {
-  it.each(numericFields)(
-    'allows $label to be cleared and replaced',
-    async ({ label, initialValue }) => {
-      const user = userEvent.setup()
-      customRender(<TestForm />)
+  beforeEach(() => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/sources',
+      response: () =>
+        HttpResponse.json<ReplicationSourcesResponse>({
+          sources: [
+            {
+              id: 1,
+              name: 'default',
+              tenant_id: 'tenant',
+              config: { host: 'db.internal', name: 'main-db', port: 5432, username: 'etl_user' },
+            },
+          ],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/v2/:ref/sources/:source_id/publications/:publication_name',
+      response: () =>
+        HttpResponse.json<PublicationDetailsResponse>({
+          name: 'publication',
+          config: {
+            type: 'all_tables',
+            operations: ['insert', 'update', 'delete', 'truncate'],
+            publish_via_partition_root: false,
+          },
+          tables: [],
+        }),
+    })
+  })
 
-      await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
+  // One render for all fields: each field is independent, and re-rendering per field only adds setup cost
+  it('allows every numeric field to be cleared and replaced', async () => {
+    await renderExpanded()
 
-      const input = screen.getByRole('spinbutton', { name: label })
-      expect(input).toHaveValue(initialValue)
+    for (const { label, initialValue } of numericFields) {
+      const input = screen.getByLabelText(label)
+      expect(input, label).toHaveValue(initialValue)
 
-      await user.clear(input)
-      expect(input).toHaveValue(null)
+      fireEvent.change(input, { target: { value: '' } })
+      expect(input, label).toHaveValue(null)
 
-      await user.type(input, '5')
-      expect(input).toHaveValue(5)
+      fireEvent.change(input, { target: { value: '5' } })
+      expect(input, label).toHaveValue(5)
     }
-  )
+  })
 
   it('uses the existing error while an empty required number is being edited', async () => {
-    const user = userEvent.setup()
-    customRender(<TestForm />)
+    await renderExpanded()
+    const input = screen.getByLabelText('Table sync workers')
 
-    await user.click(screen.getByRole('button', { name: /Advanced settings/ }))
-    const input = screen.getByRole('spinbutton', { name: 'Table sync workers' })
-
-    await user.clear(input)
+    fireEvent.change(input, { target: { value: '' } })
     expect(
       await screen.findByText('Max table sync workers must be greater than 0.')
     ).toBeInTheDocument()
 
-    await user.type(input, '5')
+    fireEvent.change(input, { target: { value: '5' } })
     await waitFor(() => {
       expect(
         screen.queryByText('Max table sync workers must be greater than 0.')

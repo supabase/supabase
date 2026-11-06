@@ -4,8 +4,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
@@ -39,6 +41,7 @@ export async function updateDatabasePolicy({
     connectionString,
     sql,
     queryKey: ['policy', 'update', originalPolicy.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -51,12 +54,12 @@ export const useDatabasePolicyUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>,
+  UseCustomMutationOptions<DatabasePolicyUpdateData, StudioError, DatabasePolicyUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>({
+  return useMutation<DatabasePolicyUpdateData, StudioError, DatabasePolicyUpdateVariables>({
     mutationFn: (vars) => updateDatabasePolicy(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

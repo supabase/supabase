@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { ExternalLink, Search } from 'lucide-react'
+import { ExternalLinkIcon, SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -38,7 +38,7 @@ const UserAccessTokens: NextPageWithLayout = () => {
           <Input
             size="tiny"
             autoComplete="off"
-            icon={<Search size={12} />}
+            icon={<SearchIcon size={12} />}
             value={searchString}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchString(e.target.value)}
             name="search"
@@ -46,12 +46,12 @@ const UserAccessTokens: NextPageWithLayout = () => {
             placeholder="Filter tokens"
           />
           <div className="flex items-center gap-x-2">
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <a href={`${DOCS_URL}/reference/api/introduction`} target="_blank" rel="noreferrer">
                 API Docs
               </a>
             </Button>
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <a href={`${DOCS_URL}/reference/cli/start`} target="_blank" rel="noreferrer">
                 CLI docs
               </a>

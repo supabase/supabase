@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { profileKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProfileUpdateVariables = {
   firstName: string
@@ -38,12 +39,12 @@ export const useProfileUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProfileUpdateData, ResponseError, ProfileUpdateVariables>,
+  UseCustomMutationOptions<ProfileUpdateData, StudioError, ProfileUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProfileUpdateData, ResponseError, ProfileUpdateVariables>({
+  return useMutation<ProfileUpdateData, StudioError, ProfileUpdateVariables>({
     mutationFn: (vars) => updateProfile(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: profileKeys.profile() })

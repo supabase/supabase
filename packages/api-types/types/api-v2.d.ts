@@ -30,6 +30,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/v2/organizations/{slug}/maintenance/windows': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List maintenance windows of an organization
+     * @description Returns the weekly maintenance window for each region, with the open occurrence and the next five.
+     */
+    get: operations['v2-list-organization-maintenance-windows']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/v2/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -45,6 +65,26 @@ export interface paths {
     put?: never
     post?: never
     delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/organizations/{slug}/members/{user_id}': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    post?: never
+    /**
+     * Removes organization members
+     * @description Removes one or more organization members including their roles and project-scoped permissions.
+     */
+    delete: operations['v2-remove-organization-members']
     options?: never
     head?: never
     patch?: never
@@ -337,6 +377,23 @@ export interface paths {
     post?: never
     /** Delete a project log drain */
     delete: operations['v2-delete-log-drain']
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v2/projects/{ref}/backups/download': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Download project backup */
+    post: operations['v2-download-project-backup']
+    delete?: never
     options?: never
     head?: never
     patch?: never
@@ -790,6 +847,7 @@ export interface components {
         | 'unauthorized'
         | 'validation_failed'
         | 'agentic_credential_not_found'
+        | 'backup_unsupported'
         | 'branch_admin_required'
         | 'compute_build_context_too_large'
         | 'compute_build_in_progress'
@@ -952,6 +1010,29 @@ export interface components {
         type: 'log_drain'
       }
     }
+    DownloadBackupBody: {
+      data: {
+        id: number
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_backup_file_url'
+      }
+    }
+    DownloadBackupResponse_Output: {
+      data: {
+        attributes: {
+          file_url: string
+        }
+        id: number
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'project_backup_file_url'
+      }
+    }
     ErrorResponseBody: {
       error: components['schemas']['ErrorResponseBodyAPIErrorObject']
     }
@@ -969,6 +1050,7 @@ export interface components {
         | 'unauthorized'
         | 'validation_failed'
         | 'agentic_credential_not_found'
+        | 'backup_unsupported'
         | 'branch_admin_required'
         | 'compute_build_context_too_large'
         | 'compute_build_in_progress'
@@ -1427,13 +1509,17 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            /** @example public */
             exposure: string
-            /** @example 1 */
             instances: number
-            /** @example node */
             runtime?: string
-            /** @example 2gb-1vcpu */
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             size: string
           }
           state_reason?: string
@@ -1593,6 +1679,7 @@ export interface components {
           | 'unauthorized'
           | 'validation_failed'
           | 'agentic_credential_not_found'
+          | 'backup_unsupported'
           | 'branch_admin_required'
           | 'compute_build_context_too_large'
           | 'compute_build_in_progress'
@@ -1843,6 +1930,14 @@ export interface components {
             instances: number
             /** @example node */
             runtime?: string
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             /** @example 2gb-1vcpu */
             size: string
           }
@@ -1870,13 +1965,17 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            /** @example public */
             exposure: string
-            /** @example 1 */
             instances: number
-            /** @example node */
             runtime?: string
-            /** @example 2gb-1vcpu */
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             size: string
           }
           state_reason?: string
@@ -1965,6 +2064,62 @@ export interface components {
          */
         prev: string | null
       }
+    }
+    V2ListMaintenanceWindowsResponse_Output: {
+      data: {
+        attributes: {
+          /** @description The open occurrence, or null when the window is closed. */
+          current_window: {
+            /**
+             * Format: date-time
+             * @description End of the occurrence, exclusive.
+             */
+            end_at: string
+            /**
+             * Format: date-time
+             * @description Start of the occurrence, inclusive.
+             */
+            start_at: string
+          } | null
+          /** @description The next five occurrences that start after now, in order. */
+          next_windows: {
+            /**
+             * Format: date-time
+             * @description End of the occurrence, exclusive.
+             */
+            end_at: string
+            /**
+             * Format: date-time
+             * @description Start of the occurrence, inclusive.
+             */
+            start_at: string
+          }[]
+          window: {
+            /**
+             * @description UTC day the window starts.
+             * @enum {string}
+             */
+            day: 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun'
+            /** @example 120 */
+            duration_minutes: number
+            /**
+             * @description UTC start time.
+             * @example 06:00
+             */
+            start_utc: string
+          }
+        }
+        /**
+         * @description AWS region.
+         * @example us-east-1
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'maintenance_window'
+      }[]
     }
     V2ListMembersResponse_Output: {
       data: {
@@ -2212,6 +2367,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
         }
         /**
          * @description Project ref
@@ -2521,6 +2677,9 @@ export interface components {
               | 'log_auth_error_rate_high'
               | 'log_storage_error_rate_high'
               | 'log_edge_function_error_rate_high'
+              | 'realtime_authorization_timeouts'
+              | 'realtime_postgres_changes_spike'
+              | 'realtime_concurrent_users_near_limit'
               | 'project_not_active'
               | 'advisor_check_unavailable'
             /** Format: date-time */
@@ -2544,6 +2703,8 @@ export interface components {
             /** @description If `null`, no pool size is written to the project's PostgREST config and PostgREST's own default applies. The platform does not pick a value here. */
             db_pool: number | null
             db_pool_acquisition_timeout: number
+            db_pool_max_idletime: number
+            db_pool_max_lifetime: number
             /** @description Schemas exposed through the Data API */
             db_schema: string
             max_rows: number
@@ -2564,6 +2725,14 @@ export interface components {
               applied_at?: string
               /** @enum {string} */
               entitlement: 'disallowed' | 'allowed'
+              /** @description Present when a change that was never applied is waiting for review. `allowed_cidrs` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it. */
+              pending_allowed_cidrs?: {
+                address: string
+                /** @enum {string} */
+                type: 'v4' | 'v6'
+              }[]
+              /** @description When the change in `pending_allowed_cidrs` was requested. */
+              pending_requested_at?: string
               /**
                * @description Whether the allowlist below is applied to the project or only stored.
                * @enum {string}
@@ -2745,6 +2914,9 @@ export interface components {
               | 'log_auth_error_rate_high'
               | 'log_storage_error_rate_high'
               | 'log_edge_function_error_rate_high'
+              | 'realtime_authorization_timeouts'
+              | 'realtime_postgres_changes_spike'
+              | 'realtime_concurrent_users_near_limit'
           }[]
         }
         /**
@@ -2960,6 +3132,64 @@ export interface operations {
       }
     }
   }
+  'v2-list-organization-maintenance-windows': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['V2ListMaintenanceWindowsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Organization not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-list-organization-members': {
     parameters: {
       query?: {
@@ -3022,6 +3252,72 @@ export interface operations {
       }
     }
   }
+  'v2-remove-organization-members': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+        user_id: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      204: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Organization member not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to remove organization member */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
   'v2-assign-organization-member-role': {
     parameters: {
       query?: never
@@ -3056,7 +3352,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3127,7 +3423,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3189,7 +3485,7 @@ export interface operations {
           'application/json': components['schemas']['ErrorResponseBody']
         }
       }
-      /** @description This feature requires the Enterprise organization plan. */
+      /** @description This feature requires the Team, or Enterprise organization plan. */
       402: {
         headers: {
           [name: string]: unknown
@@ -3354,6 +3650,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -3385,6 +3683,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -3394,27 +3693,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
+                    | 'v1.organization.secrets.leaked'
                 }
                 /**
                  * Format: uuid
@@ -3439,7 +3718,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -4036,7 +4315,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4066,6 +4345,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -4075,6 +4355,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -4360,7 +4641,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -4393,6 +4674,7 @@ export interface operations {
                   | 'v1.project.branch.created'
                   | 'v1.project.branch.updated'
                   | 'v1.project.branch.removed'
+                  | 'v1.project.secrets.leaked'
                   | 'v1.organization.member.invitation.created'
                   | 'v1.organization.member.invitation.canceled'
                   | 'v1.organization.member.added'
@@ -4402,6 +4684,7 @@ export interface operations {
                   | 'v1.organization.member.role.updated'
                   | 'v1.organization.billing.plan.upgraded'
                   | 'v1.organization.billing.plan.downgraded'
+                  | 'v1.organization.secrets.leaked'
                   | '*'
               }[]
               /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
@@ -4450,7 +4733,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4480,6 +4763,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -4489,6 +4773,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -4768,7 +5053,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -4798,6 +5083,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -4807,6 +5093,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -5088,7 +5375,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5118,6 +5405,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -5127,6 +5415,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -5445,7 +5734,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5475,6 +5764,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -5484,6 +5774,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -5786,7 +6077,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5816,6 +6107,7 @@ export interface operations {
                   | 'v1.project.branch.created'
                   | 'v1.project.branch.updated'
                   | 'v1.project.branch.removed'
+                  | 'v1.project.secrets.leaked'
                   | 'v1.organization.member.invitation.created'
                   | 'v1.organization.member.invitation.canceled'
                   | 'v1.organization.member.added'
@@ -5825,6 +6117,7 @@ export interface operations {
                   | 'v1.organization.member.role.updated'
                   | 'v1.organization.billing.plan.upgraded'
                   | 'v1.organization.billing.plan.downgraded'
+                  | 'v1.organization.secrets.leaked'
                   | '*'
               }[]
               /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
@@ -5873,7 +6166,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -5903,6 +6196,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -5912,6 +6206,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -6224,6 +6519,51 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -6247,7 +6587,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -6572,6 +6912,7 @@ export interface operations {
                 | 'v1.project.branch.created'
                 | 'v1.project.branch.updated'
                 | 'v1.project.branch.removed'
+                | 'v1.project.secrets.leaked'
                 | 'v1.organization.member.invitation.created'
                 | 'v1.organization.member.invitation.canceled'
                 | 'v1.organization.member.added'
@@ -6581,27 +6922,7 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
+                | 'v1.organization.secrets.leaked'
             }
             /**
              * @description Resource type.
@@ -7236,6 +7557,77 @@ export interface operations {
         }
       }
       /** @description Failed to delete a log drain */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+    }
+  }
+  'v2-download-project-backup': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['DownloadBackupBody']
+      }
+    }
+    responses: {
+      201: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['DownloadBackupResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Project not found */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ErrorResponseBody']
+        }
+      }
+      /** @description Failed to download project backup */
       500: {
         headers: {
           [name: string]: unknown
@@ -8359,6 +8751,8 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
                 event: {
                   /** @description Final data sent to the consumer. */
                   payload: {
@@ -8390,6 +8784,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -8399,27 +8794,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
-                    | 'project.v1.paused'
-                    | 'project.v1.created'
-                    | 'project.v1.restored'
-                    | 'project.v1.transferred'
-                    | 'project.v1.removed'
-                    | 'project.v1.restarted'
-                    | 'project.v1.status.changed'
-                    | 'project.v1.backup.started'
-                    | 'project.v1.branch.created'
-                    | 'project.v1.branch.updated'
-                    | 'project.v1.branch.removed'
-                    | 'organization.v1.member.invitation.created'
-                    | 'organization.v1.member.invitation.canceled'
-                    | 'organization.v1.member.added'
-                    | 'organization.v1.member.removed'
-                    | 'organization.v1.member.role.assigned'
-                    | 'organization.v1.member.role.removed'
-                    | 'organization.v1.member.role.updated'
-                    | 'organization.v1.billing.plan.upgraded'
-                    | 'organization.v1.billing.plan.downgraded'
-                    | 'project.v1.branch.deleted'
+                    | 'v1.organization.secrets.leaked'
                 }
                 /**
                  * Format: uuid
@@ -8444,7 +8819,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -9041,7 +9416,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9071,6 +9446,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -9080,6 +9456,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -9365,7 +9742,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /**
@@ -9398,6 +9775,7 @@ export interface operations {
                   | 'v1.project.branch.created'
                   | 'v1.project.branch.updated'
                   | 'v1.project.branch.removed'
+                  | 'v1.project.secrets.leaked'
                   | 'v1.organization.member.invitation.created'
                   | 'v1.organization.member.invitation.canceled'
                   | 'v1.organization.member.added'
@@ -9407,6 +9785,7 @@ export interface operations {
                   | 'v1.organization.member.role.updated'
                   | 'v1.organization.billing.plan.upgraded'
                   | 'v1.organization.billing.plan.downgraded'
+                  | 'v1.organization.secrets.leaked'
                   | '*'
               }[]
               /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
@@ -9455,7 +9834,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9485,6 +9864,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -9494,6 +9874,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -9773,7 +10154,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -9803,6 +10184,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -9812,6 +10194,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -10093,7 +10476,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10123,6 +10506,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -10132,6 +10516,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -10450,7 +10835,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10480,6 +10865,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -10489,6 +10875,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -10791,7 +11178,7 @@ export interface operations {
                */
               custom_headers?: {
                 [key: string]: string
-              } | null
+              }
               /** @description Optional description for the endpoint. */
               description?: string | null
               /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10821,6 +11208,7 @@ export interface operations {
                   | 'v1.project.branch.created'
                   | 'v1.project.branch.updated'
                   | 'v1.project.branch.removed'
+                  | 'v1.project.secrets.leaked'
                   | 'v1.organization.member.invitation.created'
                   | 'v1.organization.member.invitation.canceled'
                   | 'v1.organization.member.added'
@@ -10830,6 +11218,7 @@ export interface operations {
                   | 'v1.organization.member.role.updated'
                   | 'v1.organization.billing.plan.upgraded'
                   | 'v1.organization.billing.plan.downgraded'
+                  | 'v1.organization.secrets.leaked'
                   | '*'
               }[]
               /** @description Secret key to use when signing. All events will be signed according to the [Standard Webhooks](https://www.standardwebhooks.com/) specification. */
@@ -10878,7 +11267,7 @@ export interface operations {
                  */
                 custom_headers?: {
                   [key: string]: string
-                } | null
+                }
                 /** @description Optional description for the endpoint. */
                 description: string | null
                 /** @description Whether the endpoint is enabled or not - disabled endpoints won't emit any events. */
@@ -10908,6 +11297,7 @@ export interface operations {
                     | 'v1.project.branch.created'
                     | 'v1.project.branch.updated'
                     | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
                     | 'v1.organization.member.invitation.created'
                     | 'v1.organization.member.invitation.canceled'
                     | 'v1.organization.member.added'
@@ -10917,6 +11307,7 @@ export interface operations {
                     | 'v1.organization.member.role.updated'
                     | 'v1.organization.billing.plan.upgraded'
                     | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
                     | '*'
                 }[]
                 /**
@@ -11229,6 +11620,51 @@ export interface operations {
                  * @description Timestamp of the attempt.
                  */
                 attempt_timestamp: string
+                error_code: string | null
+                error_message: string | null
+                event: {
+                  /** @description Final data sent to the consumer. */
+                  payload: {
+                    /**
+                     * @description Organization slug
+                     * @example tsrqponmlkjihgfedcba
+                     */
+                    organization_slug: string
+                    project_ref: string | null
+                  }
+                  /**
+                   * Format: date-time
+                   * @description Timestamp of event publication.
+                   */
+                  timestamp: string
+                  /**
+                   * @description Webhook event type.
+                   * @enum {string}
+                   */
+                  type:
+                    | 'v1.project.paused'
+                    | 'v1.project.created'
+                    | 'v1.project.restored'
+                    | 'v1.project.transferred'
+                    | 'v1.project.removed'
+                    | 'v1.project.restarted'
+                    | 'v1.project.status.changed'
+                    | 'v1.project.backup.started'
+                    | 'v1.project.branch.created'
+                    | 'v1.project.branch.updated'
+                    | 'v1.project.branch.removed'
+                    | 'v1.project.secrets.leaked'
+                    | 'v1.organization.member.invitation.created'
+                    | 'v1.organization.member.invitation.canceled'
+                    | 'v1.organization.member.added'
+                    | 'v1.organization.member.removed'
+                    | 'v1.organization.member.role.assigned'
+                    | 'v1.organization.member.role.removed'
+                    | 'v1.organization.member.role.updated'
+                    | 'v1.organization.billing.plan.upgraded'
+                    | 'v1.organization.billing.plan.downgraded'
+                    | 'v1.organization.secrets.leaked'
+                }
                 /**
                  * Format: uuid
                  * @description Identifier of the event, which triggered the delivery (UUID v7).
@@ -11252,7 +11688,7 @@ export interface operations {
                 /** @description HTTP headers of the response, `{}` if unavailable. */
                 response_headers: {
                   [key: string]: string
-                } | null
+                }
                 /**
                  * @description Status of the delivery attempt.
                  * @enum {string}
@@ -11577,6 +12013,7 @@ export interface operations {
                 | 'v1.project.branch.created'
                 | 'v1.project.branch.updated'
                 | 'v1.project.branch.removed'
+                | 'v1.project.secrets.leaked'
                 | 'v1.organization.member.invitation.created'
                 | 'v1.organization.member.invitation.canceled'
                 | 'v1.organization.member.added'
@@ -11586,27 +12023,7 @@ export interface operations {
                 | 'v1.organization.member.role.updated'
                 | 'v1.organization.billing.plan.upgraded'
                 | 'v1.organization.billing.plan.downgraded'
-                | 'project.v1.paused'
-                | 'project.v1.created'
-                | 'project.v1.restored'
-                | 'project.v1.transferred'
-                | 'project.v1.removed'
-                | 'project.v1.restarted'
-                | 'project.v1.status.changed'
-                | 'project.v1.backup.started'
-                | 'project.v1.branch.created'
-                | 'project.v1.branch.updated'
-                | 'project.v1.branch.removed'
-                | 'organization.v1.member.invitation.created'
-                | 'organization.v1.member.invitation.canceled'
-                | 'organization.v1.member.added'
-                | 'organization.v1.member.removed'
-                | 'organization.v1.member.role.assigned'
-                | 'organization.v1.member.role.removed'
-                | 'organization.v1.member.role.updated'
-                | 'organization.v1.billing.plan.upgraded'
-                | 'organization.v1.billing.plan.downgraded'
-                | 'project.v1.branch.deleted'
+                | 'v1.organization.secrets.leaked'
             }
             /**
              * @description Resource type.

@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { ExternalLink, Eye, EyeOff, FlaskConical } from 'lucide-react'
+import { ExternalLinkIcon, EyeIcon, EyeOffIcon, FlaskConicalIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { ReactNode } from 'react'
@@ -33,7 +33,6 @@ import { AdvisorRulesPreview } from './AdvisorRulesPreview'
 import { CLSPreview } from './CLSPreview'
 import { ExplorerPreview } from './ExplorerPreview'
 import { useFeaturePreviewContext, useFeaturePreviewModal } from './FeaturePreviewContext'
-import { IntegrationsLayoutPreview } from './IntegrationsLayoutPreview'
 import { JitDbAccessPreview } from './JitDbAccessPreview'
 import { PgDeltaDiffPreview } from './PgDeltaDiffPreview'
 import { PipelineCreationPreview } from './PipelineCreationPreview'
@@ -57,7 +56,6 @@ const FEATURE_PREVIEW_KEY_TO_CONTENT: {
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_PLATFORM_WEBHOOKS]: <PlatformWebhooksPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_JIT_DB_ACCESS]: <JitDbAccessPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE]: <SqlEditorManualSavePreview />,
-  [LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE]: <IntegrationsLayoutPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_EXPLORER]: <ExplorerPreview />,
   [LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING]: <StorageVersioningPreview />,
 }
@@ -88,6 +86,14 @@ export const FeaturePreviewModal = () => {
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
 
+  const currentPath = router.asPath.split(/[?#]/)[0].replace(/\/$/, '')
+  const isAlreadyOnFeatureRoute =
+    hasRoute &&
+    (currentPath === selectedFeatureRoute ||
+      (selectedFeature.matchesSubroutes === true &&
+        currentPath.startsWith(`${selectedFeatureRoute}/`)))
+  const shouldRedirect = hasRoute && !isAlreadyOnFeatureRoute
+
   const toggleFeature = () => {
     if (!selectedFeature) return
 
@@ -103,7 +109,7 @@ export const FeaturePreviewModal = () => {
       return
     }
 
-    if (hasRoute) {
+    if (shouldRedirect) {
       // Navigating away drops the `featurePreviewModal` query param, which is
       // what closes the modal. Don't also close it via
       // toggleFeaturePreviewModal — its queued nuqs URL update races the push
@@ -178,9 +184,9 @@ export const FeaturePreviewModal = () => {
                   <SelectTrigger id="feature-preview-select">
                     <div className="flex items-center gap-x-2">
                       {(flags[selectedFeature.key] ?? false) ? (
-                        <Eye size={14} strokeWidth={2} className="text-primary" />
+                        <EyeIcon size={14} strokeWidth={2} className="text-primary" />
                       ) : (
-                        <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+                        <EyeOffIcon size={14} strokeWidth={1.5} className="text-foreground-light" />
                       )}
                       <p>{selectedFeature.name}</p>
                       {selectedFeature.isNew && <Badge variant="success">New</Badge>}
@@ -209,7 +215,7 @@ export const FeaturePreviewModal = () => {
                   <p>{selectedFeature?.name}</p>
                   <div className="flex items-center gap-x-2">
                     {selectedFeature?.discussionsUrl !== undefined && (
-                      <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+                      <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                         <Link
                           href={selectedFeature.discussionsUrl}
                           target="_blank"
@@ -257,14 +263,14 @@ export const FeaturePreviewModal = () => {
             </div>
           ) : (
             <div className="h-[550px] flex flex-col items-center justify-center">
-              <FlaskConical size={30} strokeWidth={1.5} className="text-foreground-light" />
+              <FlaskConicalIcon size={30} strokeWidth={1.5} className="text-foreground-light" />
               <div className="mt-1 mb-3 flex flex-col items-center gap-y-0.5">
                 <p className="text-sm">No feature previews available</p>
                 <p className="text-sm text-foreground-light">
                   Have an idea for the dashboard? Let us know via GitHub Discussions!
                 </p>
               </div>
-              <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                 <Link
                   href="https://github.com/orgs/supabase/discussions/categories/feature-requests"
                   target="_blank"
@@ -312,9 +318,9 @@ const FeaturePreviewItem = ({
     >
       <div className="flex items-center gap-x-3">
         {isEnabled ? (
-          <Eye size={14} strokeWidth={2} className="text-primary" />
+          <EyeIcon size={14} strokeWidth={2} className="text-primary" />
         ) : (
-          <EyeOff size={14} strokeWidth={1.5} className="text-foreground-light" />
+          <EyeOffIcon size={14} strokeWidth={1.5} className="text-foreground-light" />
         )}
         <p className="text-sm truncate" title={feature.name}>
           {feature.name}

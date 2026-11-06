@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Button,
@@ -14,6 +14,9 @@ import {
   PopoverTrigger,
   RadioGroupStacked,
   RadioGroupStackedItem,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
   Select,
   SelectContent,
   SelectItem,
@@ -317,7 +320,7 @@ function ConnectCombobox({
           aria-expanded={isOpen}
           aria-controls={listboxElementId}
           className={cn('w-full justify-between', !selectedOption && 'text-foreground-muted')}
-          iconRight={<ChevronsUpDown className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
+          iconRight={<ChevronsUpDownIcon className="h-4 w-4 shrink-0 opacity-50" strokeWidth={1} />}
         >
           <span className="flex min-w-0 items-center gap-x-2">
             {showIcons && selectedOption?.icon && (
@@ -335,41 +338,46 @@ function ConnectCombobox({
           <p className="sr-only" role="status" aria-live="polite">
             {showEmptyStatus ? emptyMessage : ''}
           </p>
-          <CommandList
-            className="max-h-72 overscroll-contain"
-            ref={(node) => {
-              if (node?.id) setListboxElementId(node.id)
-            }}
-          >
-            <CommandEmpty>{emptyMessage}</CommandEmpty>
-            <CommandGroup>
-              {options.map((option) => (
-                <CommandItem
-                  key={option.value}
-                  value={option.label}
-                  keywords={[option.value]}
-                  onSelect={() => {
-                    onValueChange(option.value)
-                    handleOpenChange(false)
-                  }}
-                  className="gap-x-2"
-                >
-                  <Check
-                    className={cn(
-                      'h-4 w-4 shrink-0',
-                      option.value === value ? 'opacity-100' : 'opacity-0'
-                    )}
-                  />
-                  {showIcons && option.icon && (
-                    <span aria-hidden="true" className="flex shrink-0">
-                      <ConnectionIcon icon={option.icon} />
-                    </span>
-                  )}
-                  <span className="truncate">{option.label}</span>
-                </CommandItem>
-              ))}
-            </CommandGroup>
-          </CommandList>
+          <ScrollRoot className="flex flex-col">
+            <ScrollViewport className="max-h-72 overscroll-contain">
+              <CommandList
+                className="max-h-none overflow-visible"
+                ref={(node) => {
+                  if (node?.id) setListboxElementId(node.id)
+                }}
+              >
+                <CommandEmpty>{emptyMessage}</CommandEmpty>
+                <CommandGroup>
+                  {options.map((option) => (
+                    <CommandItem
+                      key={option.value}
+                      value={option.label}
+                      keywords={[option.value]}
+                      onSelect={() => {
+                        onValueChange(option.value)
+                        handleOpenChange(false)
+                      }}
+                      className="gap-x-2"
+                    >
+                      <CheckIcon
+                        className={cn(
+                          'h-4 w-4 shrink-0',
+                          option.value === value ? 'opacity-100' : 'opacity-0'
+                        )}
+                      />
+                      {showIcons && option.icon && (
+                        <span aria-hidden="true" className="flex shrink-0">
+                          <ConnectionIcon icon={option.icon} />
+                        </span>
+                      )}
+                      <span className="truncate">{option.label}</span>
+                    </CommandItem>
+                  ))}
+                </CommandGroup>
+              </CommandList>
+            </ScrollViewport>
+            <ScrollBar />
+          </ScrollRoot>
         </Command>
       </PopoverContent>
     </Popover>

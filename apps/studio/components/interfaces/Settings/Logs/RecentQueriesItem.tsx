@@ -1,4 +1,4 @@
-import { Play } from 'lucide-react'
+import { PlayIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
@@ -24,7 +24,7 @@ const RecentQueriesItem: React.FC<Props> = ({ item }) => {
       <Table.td className="text-right">
         <Button
           variant="primary"
-          iconRight={<Play size={10} />}
+          iconRight={<PlayIcon size={10} />}
           onClick={() =>
             router.push(`/project/${ref}/logs/explorer?q=${encodeURIComponent(item.unchecked_sql)}`)
           }

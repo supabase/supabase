@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { projectKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectCloneVariables = {
   projectRef: string
@@ -42,12 +43,12 @@ export const useProjectCloneMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectCloneData, ResponseError, ProjectCloneVariables>,
+  UseCustomMutationOptions<ProjectCloneData, StudioError, ProjectCloneVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectCloneData, ResponseError, ProjectCloneVariables>({
+  return useMutation<ProjectCloneData, StudioError, ProjectCloneVariables>({
     mutationFn: (vars) => triggerClone(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

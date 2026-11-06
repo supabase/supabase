@@ -13,7 +13,7 @@ date: '2022-10-21'
 toc_depth: 3
 ---
 
-A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://supabase.com/docs/guides/with-flutter), [documentation](https://supabase.com/docs/reference/dart) and a [migration guide from v0](https://github.com/supabase/supabase/blob/master/apps/docs/docs/ref/dart/v0/upgrade-guide.mdx).
+A few months ago, we announced a [developer preview version of supabase-flutter SDK](https://supabase.com/blog/supabase-flutter-sdk-1-developer-preview). Since then, we have heard a lot of amazing feedback from the community, and have been improving it. Today, we are happy to announce the stable v1 of [supabase-flutter](https://pub.dev/packages/supabase_flutter). You can also find the updated [quick start guide](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter), [documentation](https://supabase.com/docs/reference/dart/introduction) and a [migration guide from v0](https://github.com/supabase/supabase/blob/master/apps/docs/docs/ref/dart/v0/upgrade-guide.mdx).
 
 ## What is new in v1?
 
@@ -53,7 +53,7 @@ supabase.auth.onAuthStateChange.listen((data) {
 
 ### Realtime Multiplayer edition support
 
-During the last launch week, we announced the [general availability of Realtime Multiplayer](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability). supabase-flutter now has first class support for the two newly introduced realtime methods, broadcast and presence. Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
+During the last launch week, we announced the [general availability of Realtime Multiplayer](https://supabase.com/blog/supabase-realtime-multiplayer-general-availability). supabase-flutter now has first class support for the two newly introduced realtime methods, [broadcast](/docs/guides/realtime/broadcast) and [presence](/docs/guides/realtime/presence). Broadcast can be used to share realtime data to all connected clients with low latency. Presence is a way to let other connected clients know the status of the client. You can visit [multiplayer.dev](http://multiplayer.dev) to see a quick demo of the feature.
 
 ```dart
 final channel = Supabase.instance.client.channel('my_channel');
@@ -89,7 +89,7 @@ channel.subscribe((status) async {
 });
 ```
 
-These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://supabase.com/docs/reference/dart/) to see the full list.
+These are just tip of the iceberg of all the updates that we shipped in v1. Check out the [documentation](https://supabase.com/docs/reference/dart/introduction) to see the full list.
 
 ## Acknowledgements
 
@@ -98,9 +98,9 @@ It required massive support from the community to bring the supabase-flutter to 
 ## Resources
 
 - [Install supabase-flutter v1.0](https://pub.dev/packages/supabase_flutter)
-- [supabase-flutter documentation](https://supabase.com/docs/reference/dart/)
+- [supabase-flutter documentation](https://supabase.com/docs/reference/dart/introduction)
 - [v0 to v1 migration guide](https://github.com/supabase/supabase/blob/master/apps/docs/docs/ref/dart/v0/upgrade-guide.mdx)
 - [Flutter Tutorial: building a Flutter chat app](https://supabase.com/blog/flutter-tutorial-building-a-chat-app)
-- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
+- [Flutter Tutorial - Part 2: Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authorization-with-rls)
 - [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
 - [Build a Flutter app with Very Good CLI and Supabase](https://verygood.ventures/blog/flutter-app-very-good-cli-supabase)

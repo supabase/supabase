@@ -22,12 +22,18 @@ export type FeaturePreview = {
    */
   isForced?: boolean
   /** Optional category that the feature preview falls under, defaults to "Others" in the UI otherwise */
-  category?: 'observability' | 'database' | 'editors'
+  category?: 'observability' | 'database' | 'editors' | 'storage'
   /**
    * Where to send the user after enabling, to try the feature out. Omit if the
    * feature has no single destination (e.g. a global layout change).
    */
   getRoute?: (ref?: string) => string
+  /**
+   * Set when nested routes under `getRoute` also surface the feature, so being
+   * on one of them counts as already being at the destination. Otherwise only
+   * an exact match of `getRoute` does.
+   */
+  matchesSubroutes?: boolean
   bannerId?: BannerId
 }
 
@@ -35,7 +41,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
   const isPipelineCreationWizardAvailable = useFlag('pipelineCreationWizard')
   const isPlatformWebhooksEnabled = useFlag('platformWebhooks')
   const jitDbAccessEnabled = useFlag('jitDbAccess')
-  const isMarketplaceEnabled = useFlag('marketplaceIntegrations')
   const isExplorerEnabled = useFlag('explorer')
   const isStorageVersioningEnabled = useFlag('storageVersioningPrivateAlpha')
 
@@ -62,6 +67,7 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         isPlatformOnly: true,
         isDefaultOptIn: false,
         getRoute: (ref?: string) => `/project/${ref}/explorer`,
+        matchesSubroutes: true,
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS,
@@ -126,16 +132,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
         getRoute: (ref?: string) => `/project/${ref}/database/column-privileges`,
       },
       {
-        key: LOCAL_STORAGE_KEYS.UI_PREVIEW_MARKETPLACE,
-        name: 'One-click Integrations',
-        discussionsUrl: undefined,
-        enabled: isMarketplaceEnabled,
-        isNew: false,
-        isPlatformOnly: false,
-        isDefaultOptIn: true,
-        getRoute: (ref?: string) => `/project/${ref}/integrations`,
-      },
-      {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_SQL_EDITOR_MANUAL_SAVE,
         category: 'editors',
         name: 'Disable snippet auto-saving',
@@ -151,7 +147,8 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
       },
       {
         key: LOCAL_STORAGE_KEYS.UI_PREVIEW_STORAGE_VERSIONING,
-        name: 'Storage versioning',
+        name: 'Storage object versioning',
+        category: 'storage',
         discussionsUrl: undefined,
         isNew: true,
         isPlatformOnly: true,
@@ -167,7 +164,6 @@ export const useFeaturePreviews = (): FeaturePreview[] => {
     isSqlEditorManualSaveForced,
     isPlatformWebhooksEnabled,
     jitDbAccessEnabled,
-    isMarketplaceEnabled,
     isExplorerEnabled,
     isStorageVersioningEnabled,
   ])

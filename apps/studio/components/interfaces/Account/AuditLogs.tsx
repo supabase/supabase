@@ -6,23 +6,33 @@ import {
   type RowSelectionState,
   type SortingState,
 } from '@tanstack/react-table'
-import { useDebounce } from '@uidotdev/usehooks'
 import dayjs from 'dayjs'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { cn, ResizablePanel, ResizablePanelGroup } from 'ui'
+import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LogsDatePicker } from '../Settings/Logs/Logs.DatePickers'
+import { parseTimeRange, serializeTimeRange } from '../Settings/Logs/Logs.timeRange'
 import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
 import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
-import { filterByProjects } from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import {
+  DATE_FILTER_PROPERTY,
+  filterByFilterGroup,
+  findDateCondition,
+  getDefaultAuditLogRange,
+  PROJECT_FILTER_PROPERTY,
+} from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import {
+  DateRangeOption,
+  formatDateRangeValue,
+} from '@/components/interfaces/AuditLogs/AuditLogsDateRangeOption'
+import { createAuditLogsProjectOption } from '@/components/interfaces/AuditLogs/AuditLogsProjectOption'
 import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
 import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { FilterPopover } from '@/components/ui/FilterPopover'
 import { type AuditLog } from '@/data/organizations/organization-audit-logs-query'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfileAuditLogsQuery } from '@/data/profile/profile-audit-logs-query'
@@ -31,30 +41,39 @@ import { useProjectsInfiniteQuery } from '@/data/projects/projects-infinite-quer
 const CONTENT_PADDING = 'w-full px-6 xl:px-10'
 
 export const AuditLogs = () => {
-  const currentTime = dayjs().utc().set('millisecond', 0)
-
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 500)
-
-  const [dateRange, setDateRange] = useState({
-    from: currentTime.subtract(1, 'day').toISOString(),
-    to: currentTime.toISOString(),
-  })
+  const [dateRange, setDateRange] = useState(getDefaultAuditLogRange)
 
   const [selectedLog, setSelectedLog] = useState<AuditLog>()
-  const [filters, setFilters] = useState<{ projects: string[] }>({
-    projects: [],
-  })
+  const [filterGroup, setFilterGroup] = useState<FilterGroup>(() => ({
+    logicalOperator: 'AND',
+    conditions: [
+      {
+        propertyName: DATE_FILTER_PROPERTY,
+        operator: '=',
+        value: serializeTimeRange([new Date(dateRange.from), new Date(dateRange.to)]),
+      },
+    ],
+  }))
+  const [freeformText, setFreeformText] = useState('')
+  const [projectNames, setProjectNames] = useState<Record<string, string>>({})
 
-  const {
-    data: projectsData,
-    isPending: isLoadingProjects,
-    isFetching: isFetchingProjects,
-    isFetchingNextPage,
-    hasNextPage,
-    fetchNextPage,
-  } = useProjectsInfiniteQuery(
-    { search: search.length === 0 ? search : debouncedSearch },
+  const handleSelectProject = (project: { ref: string; name: string }) =>
+    setProjectNames((prev) => ({ ...prev, [project.ref]: project.name }))
+
+  const handleFilterChange = (next: FilterGroup) => {
+    setFilterGroup(next)
+    // The API call is driven by `dateRange`, so keep it in sync with the date chip
+    const dateCondition = findDateCondition(next)
+    if (!dateCondition) {
+      setDateRange(getDefaultAuditLogRange())
+      return
+    }
+    const range = parseTimeRange(dateCondition.value)
+    if (range) setDateRange({ from: range[0].toISOString(), to: range[1].toISOString() })
+  }
+
+  const { data: projectsData, isPending: isLoadingProjects } = useProjectsInfiniteQuery(
+    {},
     { placeholderData: keepPreviousData }
   )
   const projects = useMemo(
@@ -83,10 +102,32 @@ export const AuditLogs = () => {
   )
 
   const logs = useMemo(() => data?.result ?? [], [data?.result])
-  const filteredLogs = useMemo(
-    () => filterByProjects(logs, filters.projects),
-    [logs, filters.projects]
-  )
+  const filteredLogs = useMemo(() => filterByFilterGroup(logs, filterGroup), [logs, filterGroup])
+
+  const hasDateFilter = !!findDateCondition(filterGroup)
+  const filterProperties: FilterProperty[] = [
+    {
+      label: 'Project',
+      name: PROJECT_FILTER_PROPERTY,
+      type: 'string',
+      operators: ['='],
+      options: { component: createAuditLogsProjectOption(handleSelectProject) },
+      formatValue: (value) => {
+        const ref = String(value ?? '')
+        return projectNames[ref] ?? projects.find((p) => p.ref === ref)?.name ?? ref
+      },
+    },
+    {
+      label: 'Date range',
+      name: DATE_FILTER_PROPERTY,
+      type: 'date',
+      operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
+      options: { component: DateRangeOption },
+      formatValue: formatDateRangeValue,
+      isAvailable: !hasDateFilter,
+      topLevelOnly: true,
+    },
+  ]
 
   const lastSelectedRowId = useRef<string | null>(null)
   const columns = useMemo(
@@ -135,75 +176,7 @@ export const AuditLogs = () => {
   return (
     <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
       <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
-        <div className="space-y-4 flex flex-col h-full min-h-0">
-          {/* [Joshen] Can consider replacing this with filter bar */}
-          <div
-            className={cn(
-              CONTENT_PADDING,
-              'flex flex-col md:flex-row md:items-center justify-between'
-            )}
-          >
-            <div className="flex items-center space-x-2">
-              <p className="text-xs prose">Filter by</p>
-              <FilterPopover
-                name="Projects"
-                options={projects}
-                labelKey="name"
-                valueKey="ref"
-                activeOptions={filters.projects}
-                onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
-                search={search}
-                setSearch={setSearch}
-                hasNextPage={hasNextPage}
-                isLoading={isLoadingProjects}
-                isFetching={isFetchingProjects}
-                isFetchingNextPage={isFetchingNextPage}
-                fetchNextPage={fetchNextPage}
-              />
-              <LogsDatePicker
-                hideWarnings
-                value={dateRange}
-                onSubmit={(value) => setDateRange(value)}
-                helpers={[
-                  {
-                    text: 'Last 1 hour',
-                    calcFrom: () => dayjs().subtract(1, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 3 hours',
-                    calcFrom: () => dayjs().subtract(3, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-
-                  {
-                    text: 'Last 6 hours',
-                    calcFrom: () => dayjs().subtract(6, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 12 hours',
-                    calcFrom: () => dayjs().subtract(12, 'hour').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                  {
-                    text: 'Last 24 hours',
-                    calcFrom: () => dayjs().subtract(1, 'day').toISOString(),
-                    calcTo: () => dayjs().toISOString(),
-                  },
-                ]}
-              />
-            </div>
-            <ButtonTooltip
-              disabled={isLoading}
-              loading={isLoading || isRefetching}
-              className="w-7"
-              icon={<RefreshCw />}
-              onClick={() => refetch()}
-              tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
-            />
-          </div>
-
+        <div className="flex flex-col h-full min-h-0">
           {isLoading && (
             <div className={cn(CONTENT_PADDING, 'space-y-2')}>
               <ShimmeringLoader />
@@ -220,6 +193,28 @@ export const AuditLogs = () => {
 
           {isSuccess && (
             <>
+              <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row md:items-center justify-between">
+                <FilterBar
+                  supportsOperators
+                  variant="pill"
+                  defaultGroupOperator="OR"
+                  className="bg-transparent border-0 [&>div>div>div>input]:!text-xs [&_[data-testid=filter-bar-freeform-input]]:min-w-64"
+                  filterProperties={filterProperties}
+                  freeformText={freeformText}
+                  filters={filterGroup}
+                  onFilterChange={handleFilterChange}
+                  onFreeformTextChange={setFreeformText}
+                />
+                <ButtonTooltip
+                  disabled={isLoading}
+                  loading={isLoading || isRefetching}
+                  className="w-7"
+                  icon={<RefreshCwIcon />}
+                  onClick={() => refetch()}
+                  tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
+                />
+              </div>
+
               {logs.length === 0 ? (
                 <div className={CONTENT_PADDING}>
                   <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">

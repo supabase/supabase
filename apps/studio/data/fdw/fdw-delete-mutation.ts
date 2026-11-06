@@ -6,10 +6,12 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWDeleteVariables = {
   projectRef?: string
@@ -30,6 +32,7 @@ export async function deleteFDW({
     connectionString,
     sql,
     queryKey: ['delete-fdw'],
+    grant: unguarded.migrating,
   })
   return result
 }
@@ -41,12 +44,12 @@ export const useFDWDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<FDWDeleteData, ResponseError, FDWDeleteVariables>,
+  UseCustomMutationOptions<FDWDeleteData, StudioError, FDWDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>({
+  return useMutation<FDWDeleteData, StudioError, FDWDeleteVariables>({
     mutationFn: (vars) => deleteFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

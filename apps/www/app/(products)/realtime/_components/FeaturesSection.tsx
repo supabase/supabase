@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { motion } from 'framer-motion'
 import { Key } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
 

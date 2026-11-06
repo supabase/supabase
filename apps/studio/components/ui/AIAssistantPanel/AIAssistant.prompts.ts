@@ -1,10 +1,10 @@
 import {
-  BookOpen,
-  Bug,
-  Database,
-  Gauge,
-  NotebookText,
-  ShieldCheck,
+  BookOpenIcon,
+  BugIcon,
+  DatabaseIcon,
+  GaugeIcon,
+  NotebookTextIcon,
+  ShieldCheckIcon,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -17,17 +17,17 @@ export type ChatTemplate = {
 export const CHAT_TEMPLATES: ChatTemplate[] = [
   {
     title: 'Generate sample data',
-    icon: Database,
+    icon: DatabaseIcon,
     initialMessage: 'Generate sample data for a blog with users, posts, and comments tables.',
   },
   {
     title: 'Set up RLS policies',
-    icon: ShieldCheck,
+    icon: ShieldCheckIcon,
     initialMessage: 'Create RLS policies to ensure users can only access their own data.',
   },
   {
     title: 'Build a notebook',
-    icon: NotebookText,
+    icon: NotebookTextIcon,
     initialMessage: 'Build me a notebook that tracks weekly signups and active users.',
   },
 ]
@@ -35,17 +35,17 @@ export const CHAT_TEMPLATES: ChatTemplate[] = [
 export const codeSnippetPrompts = [
   {
     title: 'Explain code',
-    icon: BookOpen,
+    icon: BookOpenIcon,
     prompt: 'Explain what this code does and how it works',
   },
   {
     title: 'Improve code',
-    icon: Gauge,
+    icon: GaugeIcon,
     prompt: 'How can I improve this code for better performance and readability?',
   },
   {
     title: 'Debug issues',
-    icon: Bug,
+    icon: BugIcon,
     prompt: 'Help me debug any potential issues with this code',
   },
 ]

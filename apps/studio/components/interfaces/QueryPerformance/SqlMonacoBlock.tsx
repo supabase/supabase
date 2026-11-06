@@ -1,4 +1,4 @@
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, cn, copyToClipboard, FloatingPlate } from 'ui'
 
@@ -39,7 +39,7 @@ export const SqlMonacoBlock = ({ value, wrapperClassName }: SqlMonacoBlockProps)
       <FloatingPlate className="absolute right-2 top-2 opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 transition-opacity">
         <Button
           className="px-1.5"
-          icon={copied ? <Check /> : <Copy />}
+          icon={copied ? <CheckIcon /> : <CopyIcon />}
           onClick={() => handleCopy(content)}
         >
           {copied ? 'Copied' : ''}

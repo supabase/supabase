@@ -2,10 +2,12 @@ import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
 import { useQuery } from '@tanstack/react-query'
 
 import { storageKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PublicBucketsWithSelectPoliciesVariables = {
   projectRef?: string
@@ -63,6 +65,7 @@ async function getPublicBucketsWithSelectPolicies({
         )
       ORDER BY p.policyname
     `,
+    grant: unguarded.migrating,
   })
 
   return result
@@ -71,7 +74,7 @@ async function getPublicBucketsWithSelectPolicies({
 export type PublicBucketsWithSelectPoliciesData = Awaited<
   ReturnType<typeof getPublicBucketsWithSelectPolicies>
 >
-export type PublicBucketsWithSelectPoliciesError = ResponseError
+export type PublicBucketsWithSelectPoliciesError = StudioError
 
 export const usePublicBucketsWithSelectPoliciesQuery = <
   TData = PublicBucketsWithSelectPoliciesData,

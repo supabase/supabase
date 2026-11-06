@@ -9,6 +9,7 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { storageKeys } from '@/data/storage/keys'
 import { usePublicBucketsWithSelectPoliciesQuery } from '@/data/storage/public-buckets-with-select-policies-query'
@@ -66,6 +67,7 @@ export function PublicBucketWarning({ projectRef, bucketId }: PublicBucketWarnin
         projectRef,
         connectionString: project?.connectionString,
         sql: generatePolicyRemovalSql(policyName),
+        grant: unguarded.migrating,
       })
     },
     onSuccess: async () => {
@@ -198,16 +200,16 @@ function PublicBucketWarningView(props: PublicBucketWarningViewProps): ReactNode
       >
         <div className="flex flex-col gap-3">
           <p className="text-sm text-foreground-light">
-            This will drop {hasMultiplePolicies ? 'one' : 'the'}{' '}
-            <code className="text-code-inline">SELECT</code>
+            This will drop {hasMultiplePolicies ? <span>one</span> : <span>the</span>}{' '}
+            <code>SELECT</code>
             {
               ' policy that makes the bucket’s contents listable. Object URLs will continue to work.'
             }
-            {hasMultiplePolicies
-              ? ` ${policyCount - 1} matching ${
-                  policyCount - 1 === 1 ? 'policy' : 'policies'
-                } will remain after this.`
-              : null}
+            {hasMultiplePolicies ? (
+              <span>{` ${policyCount - 1} matching ${
+                policyCount - 1 === 1 ? 'policy' : 'policies'
+              } will remain after this.`}</span>
+            ) : null}
           </p>
           <div className="-mx-4 md:-mx-5 -mb-4 border-t">
             <CodeBlock

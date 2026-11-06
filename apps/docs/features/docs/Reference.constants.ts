@@ -21,4 +21,5 @@ export const SUPPORTS_NEW_REFERENCE_PROCESS = new Set([
   'dart-v2',
   'server-v1',
   'middleware-v1',
+  'tanstack_db-v1',
 ])

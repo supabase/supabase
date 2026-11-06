@@ -40,6 +40,7 @@ export const TINY_NON_SCALING_CATALOGS = new Set([
   'pg_foreign_data_wrapper',
   'pg_enum',
   'pg_proc',
+  'pg_extension',
 ])
 
 /**

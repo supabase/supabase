@@ -1,4 +1,4 @@
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import {
   AiIconAnimation,
   Button,
@@ -111,7 +111,7 @@ export const QueryInsightsDetailSheet = ({
           <TabsContent value="explain" className="mt-0 grow min-h-0 flex flex-col overflow-hidden">
             {explainLoadingQuery ? (
               <div className="px-6 py-4 flex items-center gap-2 text-sm text-foreground-light">
-                <Loader2 size={14} className="animate-spin" /> Running EXPLAIN ANALYZE...
+                <Loader2Icon size={14} className="animate-spin" /> Running EXPLAIN ANALYZE...
               </div>
             ) : activeSheetRow && explainResults[activeSheetRow.query]?.length > 0 ? (
               <>

@@ -53,7 +53,7 @@ describe('FunctionsEmptyState', () => {
     expect(screen.getByText('Start with a template')).toBeInTheDocument()
   })
 
-  it('hides the templates section on self-hosted (Docker mode)', () => {
+  it('hides the templates section and shows the manual card on self-hosted (Docker mode)', () => {
     mockIsPlatform.value = false
     mockUseDeploymentMode.mockReturnValue({
       isPlatform: false,
@@ -64,6 +64,7 @@ describe('FunctionsEmptyState', () => {
     render(<FunctionsEmptyState />)
 
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument()
+    expect(screen.getByText('Self-Hosted')).toBeInTheDocument()
   })
 
   it('hides the templates section on CLI mode', () => {
@@ -77,18 +78,5 @@ describe('FunctionsEmptyState', () => {
     render(<FunctionsEmptyState />)
 
     expect(screen.queryByText('Start with a template')).not.toBeInTheDocument()
-  })
-
-  it('renders the self-hosted manual card when isSelfHosted', () => {
-    mockIsPlatform.value = false
-    mockUseDeploymentMode.mockReturnValue({
-      isPlatform: false,
-      isCli: false,
-      isSelfHosted: true,
-    })
-
-    render(<FunctionsEmptyState />)
-
-    expect(screen.getByText('Self-Hosted')).toBeInTheDocument()
   })
 })

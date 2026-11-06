@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
@@ -31,7 +31,7 @@ export const PreviewSection = ({
               <span className="text-xs font-normal text-foreground-lighter">{count}</span>
             )}
           </span>
-          <ChevronRight
+          <ChevronRightIcon
             size={14}
             className={cn('text-foreground-lighter transition-transform', isOpen && 'rotate-90')}
           />

@@ -1,4 +1,4 @@
-import { MessageSquare, NotebookText, Trash } from 'lucide-react'
+import { MessageSquareIcon, NotebookTextIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { type CSSProperties } from 'react'
 import { cn, ContextMenu, ContextMenuContent, ContextMenuItem, ContextMenuTrigger } from 'ui'
@@ -36,9 +36,12 @@ export const ExplorerNavItem = ({
           onDoubleClick={onDoubleClick}
         >
           {type === 'notebook' ? (
-            <NotebookText size={14} className={cn('shrink-0', isActive && 'text-foreground')} />
+            <NotebookTextIcon size={14} className={cn('shrink-0', isActive && 'text-foreground')} />
           ) : (
-            <MessageSquare size={14} className={cn('shrink-0', isActive && 'text-foreground')} />
+            <MessageSquareIcon
+              size={14}
+              className={cn('shrink-0', isActive && 'text-foreground')}
+            />
           )}
           <span className="flex-1 truncate text-left">{name}</span>
           {!!description && (
@@ -48,7 +51,7 @@ export const ExplorerNavItem = ({
       </ContextMenuTrigger>
       <ContextMenuContent>
         <ContextMenuItem className="gap-x-2" onSelect={onSelectDelete}>
-          <Trash size={14} />
+          <TrashIcon size={14} />
           <span>Delete {type}</span>
         </ContextMenuItem>
       </ContextMenuContent>

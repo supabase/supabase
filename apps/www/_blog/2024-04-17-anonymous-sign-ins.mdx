@@ -14,7 +14,7 @@ toc_depth: 3
 launchweek: '11'
 ---
 
-Supabase Auth now supports [anonymous sign-ins](/docs/guides/auth/auth-anonymous), one of our [most-requested features](https://github.com/supabase/auth/issues/68) by the community.
+[Supabase Auth](/docs/guides/auth) now supports [anonymous sign-ins](/docs/guides/auth/auth-anonymous), one of our [most-requested features](https://github.com/supabase/auth/issues/68) by the community.
 
 Anonymous sign-ins can be used to create **temporary users** who haven’t signed up for your application yet. This lowers the friction for new users to try out your product since they don’t have to provide any signup credentials.
 
@@ -82,7 +82,7 @@ Like a permanent user, anonymous users are persisted in the `auth.users` table:
 | e053e470-afa1-4625-8963-37adb862fd11 | authenticated | NULL              | true         |
 | 5563108e-ac81-4063-9288-4f3db068efa1 | authenticated | luke@starwars.com | false        |
 
-An anonymous user can be identified by the `is_anonymous` claim returned in the user’s JWT, which is accessible from your Row Level Security policies (RLS). This is helpful if you want to limit access to certain features in your application.
+An anonymous user can be identified by the `is_anonymous` claim returned in the user’s JWT, which is accessible from your [Row Level Security](/docs/guides/database/postgres/row-level-security) policies (RLS). This is helpful if you want to limit access to certain features in your application.
 
 For example, let’s say that we have an online forum where users can create and read posts.
 

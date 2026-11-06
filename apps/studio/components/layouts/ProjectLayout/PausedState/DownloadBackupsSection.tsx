@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Database, Storage } from 'icons'
-import { ChevronDown, Download } from 'lucide-react'
+import { ChevronDownIcon, DownloadIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -83,17 +83,8 @@ export const DownloadBackupsSection = () => {
     const toastId = toast.loading('Fetching database backup')
 
     downloadBackup(
-      {
-        ref,
-        backup: {
-          id: latestBackup,
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success('Downloading database backup', { id: toastId })
-        },
-      }
+      { ref, backupId: latestBackup },
+      { onSuccess: () => toast.success('Downloading database backup', { id: toastId }) }
     )
   }
 
@@ -124,7 +115,7 @@ export const DownloadBackupsSection = () => {
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button icon={<Download />} iconRight={<ChevronDown />}>
+          <Button icon={<DownloadIcon />} iconRight={<ChevronDownIcon />}>
             Download backups
           </Button>
         </DropdownMenuTrigger>

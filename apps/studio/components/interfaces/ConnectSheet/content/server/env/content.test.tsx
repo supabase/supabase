@@ -13,9 +13,9 @@ type ProjectSettingsResponse = components['schemas']['ProjectSettingsResponse_Ou
 const { mockUseAsyncCheckPermissions } = vi.hoisted(() => ({
   mockUseAsyncCheckPermissions: vi.fn(),
 }))
-vi.mock('@/hooks/misc/useCheckPermissions', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissions')>()),
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/hooks/misc/useCheckPermissionsV2')>()),
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
 }))
 
 // CopyButton writes via copyToClipboard from 'ui'. Stub just that export

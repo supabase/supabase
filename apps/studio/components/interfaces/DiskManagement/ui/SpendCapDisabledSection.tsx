@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { AlertDescription, AlertTitle, buttonVariants, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'

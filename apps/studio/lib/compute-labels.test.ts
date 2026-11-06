@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { getComputeCpuLabel, isSharedComputeSize } from './compute-labels'
+import { getComputeCpuLabel, getComputeSizeLabel, isSharedComputeSize } from './compute-labels'
 
 describe('isSharedComputeSize', () => {
   it('treats sizes below Large as shared', () => {
@@ -38,5 +38,44 @@ describe('getComputeCpuLabel', () => {
 
   it('falls back to a generic dedicated label without a count', () => {
     expect(getComputeCpuLabel('large')).toBe('Dedicated compute')
+  })
+})
+
+describe('getComputeSizeLabel', () => {
+  it.each([
+    ['pico', 'Pico'],
+    ['nano', 'Nano'],
+    ['micro', 'Micro'],
+    ['small', 'Small'],
+    ['medium', 'Medium'],
+    ['large', 'Large'],
+    ['xlarge', 'XL'],
+    ['2xlarge', '2XL'],
+    ['4xlarge', '4XL'],
+    ['8xlarge', '8XL'],
+    ['12xlarge', '12XL'],
+    ['16xlarge', '16XL'],
+    ['24xlarge', '24XL'],
+    ['24xlarge_optimized_memory', '24XL - Optimized Memory'],
+    ['24xlarge_optimized_cpu', '24XL - Optimized CPU'],
+    ['24xlarge_high_memory', '24XL - High Memory'],
+    ['48xlarge', '48XL'],
+    ['48xlarge_optimized_memory', '48XL - Optimized Memory'],
+    ['48xlarge_optimized_cpu', '48XL - Optimized CPU'],
+    ['48xlarge_high_memory', '48XL - High Memory'],
+  ])('maps %s to %s', (size, label) => {
+    expect(getComputeSizeLabel(size)).toBe(label)
+  })
+
+  it('accepts addon variant identifiers and mixed case', () => {
+    expect(getComputeSizeLabel('ci_micro')).toBe('Micro')
+    expect(getComputeSizeLabel('Medium')).toBe('Medium')
+  })
+
+  it('returns undefined for unknown or missing values instead of leaking them', () => {
+    expect(getComputeSizeLabel('t4g.small')).toBeUndefined()
+    expect(getComputeSizeLabel('')).toBeUndefined()
+    expect(getComputeSizeLabel(undefined)).toBeUndefined()
+    expect(getComputeSizeLabel(null)).toBeUndefined()
   })
 })

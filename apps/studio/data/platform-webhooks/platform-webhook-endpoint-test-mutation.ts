@@ -7,15 +7,17 @@ import {
   sendTestWebhookEvent,
   type WebhookScopeParams,
 } from './platform-webhooks-fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointTestVariables = {
   scope: WebhookScopeParams
   id: string
+  eventType?: string
 }
 
-async function testEndpoint({ scope, id }: WebhookEndpointTestVariables) {
-  return sendTestWebhookEvent(scope, id)
+async function testEndpoint({ scope, id, eventType }: WebhookEndpointTestVariables) {
+  return sendTestWebhookEvent(scope, id, eventType)
 }
 
 type WebhookEndpointTestData = Awaited<ReturnType<typeof testEndpoint>>
@@ -25,17 +27,17 @@ export const useWebhookEndpointTestMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WebhookEndpointTestData, ResponseError, WebhookEndpointTestVariables>,
+  UseCustomMutationOptions<WebhookEndpointTestData, StudioError, WebhookEndpointTestVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointTestData, ResponseError, WebhookEndpointTestVariables>({
+  return useMutation<WebhookEndpointTestData, StudioError, WebhookEndpointTestVariables>({
     mutationFn: testEndpoint,
     async onSuccess(data, variables, context) {
       // The test delivery lands asynchronously — invalidate so it shows up once it does.
       await queryClient.invalidateQueries({
-        queryKey: platformWebhooksKeys.deliveries(variables.scope, variables.id),
+        queryKey: platformWebhooksKeys.deliveriesAll(variables.scope, variables.id),
       })
 
       await onSuccess?.(data, variables, context)
@@ -43,7 +45,7 @@ export const useWebhookEndpointTestMutation = ({
     async onError(data, variables, context) {
       if (onError === undefined) {
         if (isWebhookRateLimitError(data)) {
-          toast.error('Too many test events — wait a minute and try again (limit: 10 per minute).')
+          toast.error('Too many requests. Wait a minute and try again (limit: 10 per minute).')
         } else {
           toast.error(`Failed to send test event: ${data.message}`)
         }

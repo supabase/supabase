@@ -5,9 +5,19 @@ import { classifyApiError, classifyStripeError, classifyValidationError } from '
 
 describe('classifyApiError', () => {
   it('classifies connection timeout as network', () => {
-    expect(classifyApiError('signup', { errorType: 'connection-timeout' })).toEqual({
+    expect(classifyApiError('signup', { _tag: 'DbConnectionTimeout' })).toEqual({
       errorCategory: 'network',
       errorReason: 'connection_timeout',
+    })
+  })
+
+  it.each([
+    ['a RequestAborted tagged error', { _tag: 'RequestAborted', message: 'aborted' }],
+    ['a native AbortError', { name: 'AbortError', message: 'The operation was aborted' }],
+  ])('classifies %s as request_aborted', (_, error) => {
+    expect(classifyApiError('signup', error)).toEqual({
+      errorCategory: 'network',
+      errorReason: 'request_aborted',
     })
   })
 

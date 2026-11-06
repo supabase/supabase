@@ -76,15 +76,6 @@ Specific traps to watch for. One-liner per item.
   URLs are passed through. Use it consistently in markdown output to avoid
   broken links.
 
-## Troubleshooting subtree
-
-- `Troubleshooting.utils.common.mjs` is `.mjs` because the troubleshooting
-  sync script can't resolve `.ts` imports cleanly. Don't convert it.
-- Rebasing can resurrect a **stale** version of this file when you reset
-  unrelated changes — verify against current `master` after
-  `git checkout master -- <path>`.
-- The `topics` enum in `TroubleshootingSchema` is hand-maintained. Adding a
-  new product means updating that enum.
 
 ## Build / CI
 

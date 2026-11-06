@@ -1,6 +1,7 @@
 import { getUnsafeEntitiesInApiSql } from '@supabase/pg-meta'
 
 import type { EnableCheckAction, EnableCheckState } from './DataApiEnableSwitch.types'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 
 export type ExposedEntity = {
@@ -33,6 +34,7 @@ export async function queryUnsafeEntitiesInApi({
     connectionString,
     sql: getUnsafeEntitiesInApiSql({ schemas }),
     queryKey: ['unsafe-entities-in-api'],
+    grant: unguarded.migrating,
   })
 
   return result ?? []

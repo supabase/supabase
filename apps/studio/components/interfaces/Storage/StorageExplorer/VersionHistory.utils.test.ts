@@ -12,6 +12,7 @@ describe('computeVersionFate', () => {
         expiryDays: null,
         cap: null,
         mode: 'and',
+        willRetainVersionOnWrite: true,
       })
     ).toEqual({ type: 'retained' })
   })
@@ -26,6 +27,7 @@ describe('computeVersionFate', () => {
         expiryDays: 0,
         cap: 0,
         mode: 'or',
+        willRetainVersionOnWrite: true,
       })
     ).toEqual({ type: 'retained' })
   })
@@ -37,6 +39,7 @@ describe('computeVersionFate', () => {
       expiryDays: 30,
       cap: null,
       mode: 'and' as const,
+      willRetainVersionOnWrite: true,
     }
 
     it('gives every version a determined countdown', () => {
@@ -51,7 +54,7 @@ describe('computeVersionFate', () => {
 
   it('ignores a cap that has no expiration age alongside it', () => {
     // Not a reachable policy: S3 requires NoncurrentDays on any expiration rule.
-    const base = { expiryDays: null, cap: 3, mode: 'and' as const }
+    const base = { expiryDays: null, cap: 3, mode: 'and' as const, willRetainVersionOnWrite: true }
 
     expect(computeVersionFate({ ...base, daysOld: 3, chronoIndex: 2, noncurrentCount: 3 })).toEqual(
       {
@@ -65,7 +68,7 @@ describe('computeVersionFate', () => {
   })
 
   describe('both — AND', () => {
-    const base = { expiryDays: 30, cap: 3, mode: 'and' as const }
+    const base = { expiryDays: 30, cap: 3, mode: 'and' as const, willRetainVersionOnWrite: true }
 
     it('retains every version under the cap regardless of age', () => {
       expect(
@@ -94,7 +97,7 @@ describe('computeVersionFate', () => {
   })
 
   describe('either — OR', () => {
-    const base = { expiryDays: 30, cap: 3, mode: 'or' as const }
+    const base = { expiryDays: 30, cap: 3, mode: 'or' as const, willRetainVersionOnWrite: true }
 
     it('lets age alone trigger removal, even well under the cap', () => {
       expect(
@@ -129,6 +132,27 @@ describe('computeVersionFate', () => {
 
       expect(
         computeVersionFate({ ...base, daysOld: 1, chronoIndex: 0, noncurrentCount: 5 })
+      ).toEqual({ type: 'expiry-due' })
+    })
+  })
+
+  describe('when no further write will retain a version', () => {
+    // A suspended bucket overwrites in place, so nothing will ever push the version
+    // sitting at the cap boundary over it.
+    const base = { expiryDays: 30, cap: 3, mode: 'or' as const, willRetainVersionOnWrite: false }
+
+    it('falls back to the age countdown at the cap boundary', () => {
+      expect(
+        computeVersionFate({ ...base, daysOld: 6, chronoIndex: 1, noncurrentCount: 4 })
+      ).toEqual({ type: 'expires-in', days: 24 })
+    })
+
+    it('leaves every other fate untouched', () => {
+      expect(
+        computeVersionFate({ ...base, daysOld: 3, chronoIndex: 2, noncurrentCount: 4 })
+      ).toEqual({ type: 'expires-in', days: 27 })
+      expect(
+        computeVersionFate({ ...base, daysOld: 9, chronoIndex: 0, noncurrentCount: 4 })
       ).toEqual({ type: 'expiry-due' })
     })
   })

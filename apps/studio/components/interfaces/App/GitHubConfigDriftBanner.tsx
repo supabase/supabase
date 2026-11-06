@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AnimatePresence } from 'framer-motion'
+import { AnimatePresence } from 'motion/react'
 import Link from 'next/link'
 
 import { HeaderBanner } from '../Organization/HeaderBanner'
