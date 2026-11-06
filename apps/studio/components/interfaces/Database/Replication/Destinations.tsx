@@ -45,6 +45,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import {
@@ -58,6 +59,7 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -98,6 +100,7 @@ const compareStatusNames = (
 }
 
 export const Destinations = () => {
+  const clusterId = useReplicationClusterId()
   const queryClient = useQueryClient()
   const router = useTanStackRouter({ warn: false })
   const nextRouter = useNextRouter()
@@ -168,7 +171,7 @@ export const Destinations = () => {
   // the rows' query keys, so each status is still only fetched once.
   const statusByPipelineId = useQueries({
     queries: pipelines.map((pipeline) =>
-      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id })
+      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id, clusterId })
     ),
     combine: combinePipelineStatuses,
   })
@@ -241,7 +244,10 @@ export const Destinations = () => {
 
   const canLinkToWizard =
     isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
-  const wizardHref = `/project/${projectRef}/database/pipelines/new`
+  const wizardHref = withReplicationCluster(
+    `/project/${projectRef}/database/pipelines/new`,
+    clusterId
+  )
 
   const openCreation = (type: DestinationType) => {
     if (isWizardEnabled && hasWizardDestination && projectRef) {
@@ -249,8 +255,9 @@ export const Destinations = () => {
         void router.navigate({
           to: '/project/$ref/database/pipelines/new',
           params: { ref: projectRef },
+          search: { cluster_id: clusterId },
         })
-      else void nextRouter?.push(`/project/${projectRef}/database/pipelines/new`)
+      else void nextRouter?.push(wizardHref)
     } else {
       setDestinationType(type)
     }
@@ -276,7 +283,8 @@ export const Destinations = () => {
     pendingCreationTypeRef.current = null
     if (
       type &&
-      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
+      queryClient.getQueryState(replicationKeys.sources(projectRef, clusterId))?.status ===
+        'success'
     ) {
       openCreation(type)
     }
@@ -305,14 +313,14 @@ export const Destinations = () => {
       pipelinesData.pipelines.forEach((p) => {
         if (!p?.id) return
         queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id),
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, clusterId),
           queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id }, signal),
+            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id, clusterId }, signal),
           staleTime: Infinity,
         })
       })
     }
-  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient])
+  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient, clusterId])
 
   return (
     <div className="w-full space-y-4">

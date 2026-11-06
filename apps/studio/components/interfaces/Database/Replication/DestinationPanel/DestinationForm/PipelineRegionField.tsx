@@ -1,13 +1,14 @@
+import { useQuery } from '@tanstack/react-query'
 import { AWS_REGIONS } from 'shared-data'
 import { cn } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import type { DestinationType } from '../DestinationPanel.types'
 import { RegionFlag } from '@/components/ui/RegionFlag'
+import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
 import { IS_STAGING_OR_LOCAL } from '@/lib/constants'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
-// Pipelines always run from a single fixed region per environment, regardless of the source
-// project's region.
 export const PIPELINE_REGION = IS_STAGING_OR_LOCAL
   ? AWS_REGIONS.SOUTHEAST_ASIA
   : AWS_REGIONS.CENTRAL_EU
@@ -25,7 +26,7 @@ export const getPipelineRegionDescription = (destinationType?: DestinationType) 
     ? DESTINATION_REGION_HINT[destinationType]
     : 'Choose a nearby destination region where possible.'
 
-  return `All pipelines run from this region. ${destinationHint}`
+  return `This pipeline uses the selected cluster. ${destinationHint}`
 }
 
 export const PipelineRegionField = ({
@@ -47,17 +48,27 @@ export const PipelineRegionField = ({
   )
 }
 
-export const PipelineRegionReadonly = ({ className }: { className?: string }) => (
-  <div
-    className={cn(
-      'flex h-9 min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 px-3 text-sm',
-      className
-    )}
-  >
-    <RegionFlag className="w-5 shrink-0" region={PIPELINE_REGION.code} />
-    <span className="min-w-0 truncate text-foreground">{PIPELINE_REGION.displayName}</span>
-    <span className="shrink-0 font-mono text-xs text-foreground-lighter">
-      {PIPELINE_REGION.code}
-    </span>
-  </div>
-)
+export const PipelineRegionReadonly = ({ className }: { className?: string }) => {
+  const selectedClusterId = useReplicationClusterId()
+  const { data } = useQuery(replicationClustersQueryOptions())
+  const clusterId = selectedClusterId ?? data?.default_cluster_id
+  const cluster = data?.regions.find((item) => item.cluster_id === clusterId)
+  const region = cluster ? cluster.aws_region : PIPELINE_REGION.code
+
+  return (
+    <div
+      className={cn(
+        'flex h-9 min-w-0 items-center gap-x-2 rounded-md border bg-surface-200 px-3 text-sm',
+        className
+      )}
+    >
+      {region && <RegionFlag className="w-5 shrink-0" region={region} />}
+      <span className="min-w-0 truncate text-foreground">
+        {cluster?.name ?? PIPELINE_REGION.displayName}
+      </span>
+      {region && (
+        <span className="shrink-0 font-mono text-xs text-foreground-lighter">{region}</span>
+      )}
+    </div>
+  )
+}

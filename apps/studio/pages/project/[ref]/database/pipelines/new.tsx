@@ -7,21 +7,24 @@ import { usePipelineCreationPreview } from '@/components/interfaces/App/FeatureP
 import { PipelineCreationFlow } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationFlow'
 import { PipelineCreationHeader } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationHeader'
 import { PipelineCreationSkeleton } from '@/components/interfaces/Database/Replication/CreatePipeline/PipelineCreationSkeleton'
+import { PipelineClusterScope } from '@/components/interfaces/Database/Replication/PipelineClusterScope'
 import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { NextPageWithLayout } from '@/types'
 
 const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
+  const clusterId = useReplicationClusterId()
   const { ref } = useParams()
   const router = useRouter()
   const { hasLoaded } = useFeatureFlags()
@@ -41,7 +44,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
     { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
   )
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
-  const listHref = `/project/${ref}/database/pipelines`
+  const listHref = withReplicationCluster(`/project/${ref}/database/pipelines`, clusterId)
   const isAccessLoading =
     !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
   const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
@@ -53,7 +56,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   }, [isAccessLoading, canOpenFlow, isEnabled, listHref, router])
   const handleClose = () => {
     if (!ref) return
-    void router.push(`/project/${ref}/database/pipelines`)
+    void router.push(withReplicationCluster(`/project/${ref}/database/pipelines`, clusterId))
   }
 
   let statusMessage = 'Pipeline creation ready'
@@ -106,8 +109,6 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   )
 }
 
-PipelineCreationPage.getLayout = (page) => (
-  <PipelineRequestStatusProvider>{page}</PipelineRequestStatusProvider>
-)
+PipelineCreationPage.getLayout = (page) => <PipelineClusterScope>{page}</PipelineClusterScope>
 
 export default withAuth(PipelineCreationPage)

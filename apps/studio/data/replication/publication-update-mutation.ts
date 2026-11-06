@@ -1,8 +1,9 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, put } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -12,10 +13,11 @@ export type UpdatePublicationParams = {
   sourceId: number
   publicationName: string
   config: components['schemas']['PutPublicationBody']
+  clusterId?: string
 }
 
 async function updatePublication(
-  { projectRef, sourceId, publicationName, config }: UpdatePublicationParams,
+  { projectRef, sourceId, publicationName, config, clusterId }: UpdatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -23,7 +25,10 @@ async function updatePublication(
   const { data, error } = await put(
     '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
-      params: { path: { ref: projectRef, source_id: sourceId, publication_name: publicationName } },
+      params: {
+        path: { ref: projectRef, source_id: sourceId, publication_name: publicationName },
+        query: { cluster_id: clusterId },
+      },
       body: config,
       signal,
     }
@@ -47,12 +52,12 @@ export const useUpdatePublicationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdatePublicationData, StudioError, UpdatePublicationParams>({
+  return useReplicationMutation<UpdatePublicationData, StudioError, UpdatePublicationParams>({
     mutationFn: (vars) => updatePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
       await queryClient.invalidateQueries({
-        queryKey: replicationKeys.publications(projectRef, sourceId),
+        queryKey: replicationKeys.publications(projectRef, sourceId, variables.clusterId),
       })
       await onSuccess?.(data, variables, context)
     },

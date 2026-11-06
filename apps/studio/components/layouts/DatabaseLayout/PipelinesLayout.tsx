@@ -1,15 +1,10 @@
-import { useParams } from 'common'
-import { PropsWithChildren } from 'react'
+import type { PropsWithChildren } from 'react'
 
 import { DatabaseLayout } from './DatabaseLayout'
-import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
+import { PipelineClusterScope } from '@/components/interfaces/Database/Replication/PipelineClusterScope'
 
-export const PipelinesLayout = ({ children }: PropsWithChildren) => {
-  const { ref: projectRef } = useParams()
-
-  return (
-    <DatabaseLayout title="Pipelines">
-      <PipelineRequestStatusProvider key={projectRef}>{children}</PipelineRequestStatusProvider>
-    </DatabaseLayout>
-  )
-}
+export const PipelinesLayout = ({ children }: PropsWithChildren) => (
+  <DatabaseLayout title="Pipelines">
+    <PipelineClusterScope>{children}</PipelineClusterScope>
+  </DatabaseLayout>
+)

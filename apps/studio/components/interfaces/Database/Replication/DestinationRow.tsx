@@ -19,6 +19,8 @@ import { RowMenu } from './RowMenu'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useDestinationInformation } from './useDestinationInformation'
 import { AlertError } from '@/components/ui/AlertError'
+import CopyButton from '@/components/ui/CopyButton'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication/pipeline-replication-status-query'
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
@@ -26,6 +28,7 @@ import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { createNavigationHandler } from '@/lib/navigation'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -36,6 +39,7 @@ interface DestinationRowProps {
 }
 
 export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
+  const clusterId = useReplicationClusterId()
   const router = useRouter()
   const { ref: projectRef } = useParams()
   const [showDeleteDestinationForm, setShowDeleteDestinationForm] = useState(false)
@@ -102,7 +106,13 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
   const hasUpdate = Boolean(versionData?.new_version)
 
   const handleNavigation = pipeline
-    ? createNavigationHandler(`/project/${projectRef}/database/pipelines/${pipeline.id}`, router)
+    ? createNavigationHandler(
+        withReplicationCluster(
+          `/project/${projectRef}/database/pipelines/${pipeline.id}`,
+          pipeline.cluster_id ?? clusterId
+        ),
+        router
+      )
     : undefined
 
   const onDeleteClick = async () => {
@@ -169,7 +179,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
             {type ? <DestinationLogo type={type} hasErrors={hasTableErrors} /> : null}
           </TableCell>
 
-          <TableCell className="max-w-[180px]">
+          <TableCell className="max-w-[250px]">
             {isPipelineLoading && !destinationName ? (
               <ShimmeringLoader />
             ) : (
@@ -178,8 +188,22 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   {destinationName || type}
                 </p>
                 {pipeline && (
-                  <DetailSubtext className="flex items-center gap-x-1.5">
-                    <span>#{pipeline.id}</span>
+                  <DetailSubtext className="flex min-w-0 flex-wrap items-center gap-x-1.5 gap-y-0.5">
+                    <CopyButton
+                      text={pipeline.id}
+                      aria-label="Copy pipeline ID"
+                      title={pipeline.id}
+                      variant="text"
+                      className="h-auto min-w-0 max-w-full p-0 font-mono text-xs text-foreground-lighter hover:text-foreground"
+                      onClick={(event) => event.stopPropagation()}
+                      onKeyDown={(event) => event.stopPropagation()}
+                      onAuxClick={(event) => event.stopPropagation()}
+                    >
+                      #
+                      {pipeline.id.length > 16
+                        ? `${pipeline.id.slice(0, 6)}…${pipeline.id.slice(-6)}`
+                        : pipeline.id}
+                    </CopyButton>
                     <span aria-hidden>&middot;</span>
                     <span>{type}</span>
                     {hasTableErrors && (

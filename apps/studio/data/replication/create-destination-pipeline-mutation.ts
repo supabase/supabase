@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
@@ -12,6 +12,7 @@ import type {
   DucklakeDestinationConfig,
   PipelineConfig,
 } from './types'
+import { useReplicationMutation } from './use-cluster-mutation'
 import {
   buildBigQueryTableOptionApiConfig,
   buildPipelineApiConfig,
@@ -162,6 +163,7 @@ export type CreateDestinationPipelineParams = {
   destinationConfig: DestinationConfig
   sourceId: number
   pipelineConfig: PipelineConfig
+  clusterId?: string
 }
 
 async function createDestinationPipeline(
@@ -171,6 +173,7 @@ async function createDestinationPipeline(
     destinationConfig,
     pipelineConfig,
     sourceId,
+    clusterId,
   }: CreateDestinationPipelineParams,
   signal?: AbortSignal
 ) {
@@ -181,7 +184,7 @@ async function createDestinationPipeline(
   const pipeline_config = buildPipelineApiConfig(pipelineConfig)
 
   const { data, error } = await post('/platform/replication/{ref}/destinations-pipelines', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     body: {
       source_id: sourceId,
       destination_name: destinationName,
@@ -211,14 +214,20 @@ export const useCreateDestinationPipelineMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateDestinationPipelineData, StudioError, CreateDestinationPipelineParams>({
+  return useReplicationMutation<
+    CreateDestinationPipelineData,
+    StudioError,
+    CreateDestinationPipelineParams
+  >({
     mutationFn: (vars) => createDestinationPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-        invalidateReplicationPipelineQueries(queryClient, projectRef),
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.destinations(projectRef, variables.clusterId),
+        }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef, variables.clusterId),
       ])
 
       await onSuccess?.(data, variables, context)

@@ -1,8 +1,8 @@
-import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { buildCreateDestinationApiConfig } from './create-destination-pipeline-mutation'
 import type { DestinationConfig, TableSyncCopyConfig } from './types'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -18,6 +18,7 @@ type ValidateDestinationParams = {
   maxCopyConnectionsPerTable?: number
   invalidatedSlotBehavior?: 'error' | 'recreate'
   tableSyncCopy?: TableSyncCopyConfig
+  clusterId?: string
 }
 
 type ValidateDestinationResponse = components['schemas']['ValidateDestinationResponse_Output']
@@ -34,13 +35,14 @@ async function validateDestination(
     maxCopyConnectionsPerTable,
     invalidatedSlotBehavior,
     tableSyncCopy,
+    clusterId,
   }: ValidateDestinationParams,
   signal?: AbortSignal
 ): Promise<ValidateDestinationResponse> {
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await post('/platform/replication/{ref}/destinations/validate', {
-    params: { path: { ref: projectRef } },
+    params: { path: { ref: projectRef }, query: { cluster_id: clusterId } },
     body: {
       config: buildCreateDestinationApiConfig(destinationConfig),
       source_id: sourceId,
@@ -71,7 +73,7 @@ export const useValidateDestinationMutation = (
     'mutationFn'
   >
 ) => {
-  return useMutation<ValidateDestinationData, StudioError, ValidateDestinationParams>({
+  return useReplicationMutation<ValidateDestinationData, StudioError, ValidateDestinationParams>({
     mutationFn: (vars) => validateDestination(vars),
     ...options,
   })
