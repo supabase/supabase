@@ -21,7 +21,15 @@ export const InvalidRestrictionsNotice = ({
 }: InvalidRestrictionsNoticeProps) => {
   const [isConfirming, setIsConfirming] = useState(false)
   const { corrected, hasCorrectedEntries, applyCorrected, isApplyingCorrected } =
-    useApplyCorrectedRestrictions({ projectRef, ipv4, ipv6 })
+    useApplyCorrectedRestrictions({
+      projectRef,
+      ipv4,
+      ipv6,
+      onSuccess: () => {
+        setIsConfirming(false)
+        toast.success('Network restrictions fixed')
+      },
+    })
 
   // Saving an empty list would block all access, which isn't a correction
   const getFixDisabledReason = () => {
@@ -32,12 +40,6 @@ export const InvalidRestrictionsNotice = ({
     return undefined
   }
   const fixDisabledReason = getFixDisabledReason()
-
-  const handleFix = () =>
-    applyCorrected(() => {
-      setIsConfirming(false)
-      toast.success('Network restrictions fixed')
-    })
 
   return (
     <>
@@ -63,7 +65,7 @@ export const InvalidRestrictionsNotice = ({
         confirmLabel="Fix entries"
         corrections={corrected.corrections}
         loading={isApplyingCorrected}
-        onConfirm={handleFix}
+        onConfirm={applyCorrected}
         onCancel={() => setIsConfirming(false)}
       />
     </>

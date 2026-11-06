@@ -40,13 +40,32 @@ export const NetworkRestrictionsReview = ({
     projectRef,
   })
 
+  // Success is handled on the hooks rather than per call: the refetch that follows a successful change can unmount
+  // this review first, and a per-call callback doesn't run once its component has unmounted
   const {
     mutate: reviewNetworkRestrictions,
     isPending: isReviewing,
     variables: reviewVariables,
-  } = useNetworkRestrictionsReviewMutation()
+  } = useNetworkRestrictionsReviewMutation({
+    onSuccess: (_data, { action }) => {
+      if (action === 'apply') {
+        toast.success('Applying network restrictions change')
+      } else {
+        setIsDiscarding(false)
+        toast.success('Network restrictions change discarded')
+      }
+    },
+  })
   const { corrected, hasCorrectedEntries, applyCorrected, isApplyingCorrected } =
-    useApplyCorrectedRestrictions({ projectRef, ipv4: pending.ipv4, ipv6: pending.ipv6 })
+    useApplyCorrectedRestrictions({
+      projectRef,
+      ipv4: pending.ipv4,
+      ipv6: pending.ipv6,
+      onSuccess: () => {
+        setIsConfirmingCorrections(false)
+        toast.success('Network restrictions change applied')
+      },
+    })
 
   const rows = [
     ...getRestrictionsDiff(enforced.ipv4, pending.ipv4).map((row) => ({
@@ -93,33 +112,26 @@ export const NetworkRestrictionsReview = ({
   }
   const applyDisabledReason = getApplyDisabledReason()
 
-  const handleApplyCorrected = () =>
-    applyCorrected(() => {
-      setIsConfirmingCorrections(false)
-      toast.success('Network restrictions change applied')
-    })
-
   const handleApply = () => {
     if (hasCorrections) return setIsConfirmingCorrections(true)
-    if (hasIssues) return handleApplyCorrected()
+    if (hasIssues) return applyCorrected()
     if (reviewGrant.status !== 'granted') return
-    reviewNetworkRestrictions(
-      { projectRef, grant: reviewGrant.grant, action: 'apply', requestedAt },
-      { onSuccess: () => toast.success('Applying network restrictions change') }
-    )
+    reviewNetworkRestrictions({
+      projectRef,
+      grant: reviewGrant.grant,
+      action: 'apply',
+      requestedAt,
+    })
   }
 
   const handleDiscard = () => {
     if (reviewGrant.status !== 'granted') return
-    reviewNetworkRestrictions(
-      { projectRef, grant: reviewGrant.grant, action: 'reject', requestedAt },
-      {
-        onSuccess: () => {
-          setIsDiscarding(false)
-          toast.success('Network restrictions change discarded')
-        },
-      }
-    )
+    reviewNetworkRestrictions({
+      projectRef,
+      grant: reviewGrant.grant,
+      action: 'reject',
+      requestedAt,
+    })
   }
 
   return (
@@ -194,7 +206,7 @@ export const NetworkRestrictionsReview = ({
         confirmLabel="Apply corrected change"
         corrections={corrected.corrections}
         loading={isApplyingCorrected}
-        onConfirm={handleApplyCorrected}
+        onConfirm={applyCorrected}
         onCancel={() => setIsConfirmingCorrections(false)}
       />
     </div>
