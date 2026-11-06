@@ -340,6 +340,75 @@
       }
     },
     {
+      "name": "magic-auth-nextjs",
+      "type": "registry:block",
+      "title": "Magic Link Authentication for Next.js",
+      "description": "Passwordless authentication with magic links for Next.js",
+      "registryDependencies": [
+        "button",
+        "card",
+        "input",
+        "label",
+        "https://supabase.com/library/r/safe-next-path.json"
+      ],
+      "dependencies": [
+        "@supabase/ssr@latest",
+        "@supabase/supabase-js@latest"
+      ],
+      "files": [
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/app/auth/magic-link/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/magic-link/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/app/auth/verify/route.ts",
+          "type": "registry:page",
+          "target": "app/auth/verify/route.ts"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/app/auth/error/page.tsx",
+          "type": "registry:page",
+          "target": "app/auth/error/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/app/protected/page.tsx",
+          "type": "registry:page",
+          "target": "app/protected/page.tsx"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/components/magic-link-form.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/components/logout-button.tsx",
+          "type": "registry:component"
+        },
+        {
+          "path": "registry/default/blocks/magic-auth-nextjs/middleware.ts",
+          "type": "registry:file",
+          "target": "middleware.ts"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/client.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+          "type": "registry:lib"
+        },
+        {
+          "path": "registry/default/clients/nextjs/lib/supabase/server.ts",
+          "type": "registry:lib"
+        }
+      ],
+      "docs": "You'll need to set the following environment variables in your project: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`.",
+      "envVars": {
+        "NEXT_PUBLIC_SUPABASE_URL": "",
+        "NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY": ""
+      }
+    },
+    {
       "name": "social-auth-nextjs",
       "type": "registry:block",
       "title": "Social Auth flow for Nextjs and Supabase",
