@@ -12,6 +12,8 @@ import { type AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { type ProjectSecret } from '@/data/secrets/secrets-query'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
+import { allPermissionsFor } from '@/tests/lib/permissions-fixtures'
 
 // The OAuth-apps query overrides its return type to `AuthorizedApp`, but the wire response (and so
 // the MSW resolver) is the raw OpenAPI `OAuthAppResponse`. Build fixtures against the API shape.
@@ -103,6 +105,8 @@ const mockProjectResources = ({
   oauthApps = [] as OAuthAppResponse[],
   smtpHost = null as string | null,
 } = {}) => {
+  // The API keys query is gated on a grant
+  mockPermissions(allPermissionsFor(['acme']))
   addAPIMock({
     method: 'get',
     path: '/platform/profile/permissions',

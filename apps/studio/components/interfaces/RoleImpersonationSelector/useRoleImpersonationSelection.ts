@@ -2,9 +2,9 @@ import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
 import { getRoleSelectionUpdate, getSelectedRoleOption } from './RoleImpersonationSelector.utils'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { PostgrestRole } from '@/lib/role-impersonation'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
-import type { ResponseError } from '@/types'
 
 export const useRoleImpersonationSelection = (state: RoleImpersonationController) => {
   const [isAuthenticatedPending, setIsAuthenticatedPending] = useState(false)
@@ -34,7 +34,7 @@ export const useRoleImpersonationSelection = (state: RoleImpersonationController
       await state.setRole(update.role)
       setIsAuthenticatedPending(false)
     } catch (error) {
-      toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to impersonate user: ${(error as StudioError).message}`)
     }
   }
 

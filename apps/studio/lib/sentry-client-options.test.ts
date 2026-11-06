@@ -7,6 +7,7 @@ import {
   isCancellationRejection,
   isChallengeExpiredError,
   isUserAbortedOperation,
+  shouldDropForSampleRate,
 } from './sentry-client-options'
 
 describe('Sentry beforeSend filtering functions', () => {
@@ -340,6 +341,26 @@ describe('Sentry beforeSend filtering functions', () => {
       expect(isCancellationRejection(event)).toBe(false)
       expect(isChallengeExpiredError(error, event)).toBe(false)
     })
+  })
+})
+
+describe('shouldDropForSampleRate', () => {
+  it('keeps events without a sample_rate tag', () => {
+    expect(shouldDropForSampleRate({}, () => 0.99)).toBe(false)
+  })
+
+  it('keeps events with rate 1', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: 1 } }, () => 0.99)).toBe(false)
+  })
+
+  it('keeps or drops sampled events depending on the random draw', () => {
+    const event = { tags: { sample_rate: 0.1 } }
+    expect(shouldDropForSampleRate(event, () => 0.05)).toBe(false)
+    expect(shouldDropForSampleRate(event, () => 0.5)).toBe(true)
+  })
+
+  it('accepts numeric string rates', () => {
+    expect(shouldDropForSampleRate({ tags: { sample_rate: '0.1' } }, () => 0.5)).toBe(true)
   })
 })
 

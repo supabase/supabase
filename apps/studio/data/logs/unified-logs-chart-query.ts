@@ -11,7 +11,8 @@ import {
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
@@ -157,7 +158,7 @@ export async function getUnifiedLogsChart(
 }
 
 export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
-export type UnifiedLogsChartError = ResponseError
+export type UnifiedLogsChartError = StudioError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,

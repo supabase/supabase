@@ -23,7 +23,8 @@ import {
 import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { getUnifiedLogsScopeCondition } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [
@@ -313,7 +314,7 @@ LIMIT 100
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>
-export type UnifiedLogInspectionError = ResponseError
+export type UnifiedLogInspectionError = StudioError
 
 export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   { projectRef, logId, type, search, logTimestampMs }: UnifiedLogInspectionVariables,

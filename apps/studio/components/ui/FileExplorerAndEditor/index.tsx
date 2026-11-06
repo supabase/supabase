@@ -187,7 +187,7 @@ export const FileExplorerAndEditor = ({
       toast.success(
         <div className="flex flex-col gap-y-1">
           <p className="text-foreground">
-            Successfully added dropped file{totalFilesProcessed > 1 ? 's' : ''}
+            Successfully added dropped file{totalFilesProcessed > 1 ? <span>s</span> : ''}
           </p>
           <p className="text-foreground-light">{messages.join(', ')}.</p>
         </div>,

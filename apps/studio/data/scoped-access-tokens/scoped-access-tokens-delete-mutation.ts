@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { scopedAccessTokenKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ScopedAccessTokenDeleteVariables = {
   id: string
@@ -25,12 +25,12 @@ export const useScopedAccessTokenDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<ScopedAccessTokenDeleteData, ResponseError, ScopedAccessTokenDeleteVariables>,
+  UseMutationOptions<ScopedAccessTokenDeleteData, StudioError, ScopedAccessTokenDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ScopedAccessTokenDeleteData, ResponseError, ScopedAccessTokenDeleteVariables>({
+  return useMutation<ScopedAccessTokenDeleteData, StudioError, ScopedAccessTokenDeleteVariables>({
     mutationFn: (vars) => deleteScopedAccessToken(vars),
     async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({ queryKey: scopedAccessTokenKeys.list() })

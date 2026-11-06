@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type AnalyticsBucketCreateVariables = CreateAnalyticsBucketBody & {
   projectRef: string
@@ -32,16 +33,12 @@ export const useAnalyticsBucketCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    AnalyticsBucketCreateData,
-    ResponseError,
-    AnalyticsBucketCreateVariables
-  >,
+  UseCustomMutationOptions<AnalyticsBucketCreateData, StudioError, AnalyticsBucketCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AnalyticsBucketCreateData, ResponseError, AnalyticsBucketCreateVariables>({
+  return useMutation<AnalyticsBucketCreateData, StudioError, AnalyticsBucketCreateVariables>({
     mutationFn: (vars) => createAnalyticsBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

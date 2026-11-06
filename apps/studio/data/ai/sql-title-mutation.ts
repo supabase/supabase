@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 type SqlTitleGenerateResponse = {
   title: string
@@ -32,7 +34,7 @@ async function generateSqlTitle({ sql }: SqlTitleGenerateVariables) {
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw classifyResponseError({ message: body?.message, code: response.status })
   }
 
   return body as SqlTitleGenerateResponse
@@ -45,10 +47,10 @@ export const useSqlTitleGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>,
+  UseCustomMutationOptions<SqlTitleGenerateData, StudioError, SqlTitleGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlTitleGenerateData, ResponseError, SqlTitleGenerateVariables>({
+  return useMutation<SqlTitleGenerateData, StudioError, SqlTitleGenerateVariables>({
     mutationFn: (vars) => generateSqlTitle(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

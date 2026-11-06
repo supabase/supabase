@@ -1,9 +1,9 @@
 'use client'
 
+import { useDocsPathname } from '~/features/IaNav'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
 import { PREFERRED_SOURCE_URL } from 'common/markdown-affordance'
 import { type MarkdownAffordancePageType } from 'common/telemetry-constants'
-import { usePathname } from 'next/navigation'
 import { AiTools as SharedAiTools, type AiAgent } from 'ui-patterns/AiTools'
 
 function AiTools({
@@ -25,7 +25,7 @@ function AiTools({
   markdownUrl?: string
   className?: string
 }) {
-  const path = usePathname()
+  const path = useDocsPathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
   function handleAgentSetupClick() {

@@ -1,6 +1,5 @@
 'use client'
 
-import { usePathname } from 'next/navigation'
 import { Accordion } from 'radix-ui'
 import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
@@ -8,7 +7,7 @@ import { cn } from 'ui'
 import { type NavMenuSection } from '../Navigation.types'
 import { MenuId } from './NavigationMenu'
 import NavigationMenuGuideListItems from './NavigationMenuGuideListItems'
-import { useIaNavReady, useNavItems } from '@/features/IaNav'
+import { IA_NAV_PENDING_CLASS, useDocsPathname, useIaNavReady, useNavItems } from '@/features/IaNav'
 
 const NavigationMenuGuideList = ({
   id,
@@ -17,7 +16,7 @@ const NavigationMenuGuideList = ({
   id: string
   additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }) => {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const firstLevelRoute = pathname?.split('/')?.slice(0, 4)?.join('/')
   const NavItems = useNavItems()
   const isNavReady = useIaNavReady()
@@ -79,7 +78,7 @@ const NavigationMenuGuideList = ({
     <NavigationMenuGuideListWrapper
       id={id}
       firstLevelRoute={firstLevelRoute}
-      className={cn(!isNavReady && 'invisible noscript:visible')}
+      className={cn(!isNavReady && IA_NAV_PENDING_CLASS)}
     >
       <NavigationMenuGuideListItems menu={menu} id={id} />
     </NavigationMenuGuideListWrapper>

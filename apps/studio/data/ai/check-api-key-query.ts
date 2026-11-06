@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { aiKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 // check to see if the OPENAI_API_KEY env var is set in self-hosted
 // so we can disable the chat editor and add a warning about manually adding the key
@@ -25,7 +26,7 @@ export async function checkOpenAIKey(signal?: AbortSignal) {
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw classifyResponseError({ message: body?.message, code: response.status })
   }
 
   return body as { hasKey: boolean }

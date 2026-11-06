@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseCronJobsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobDeleteVariables = {
   projectRef: string
@@ -37,16 +38,12 @@ export const useDatabaseCronJobDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseCronJobDeleteData,
-    ResponseError,
-    DatabaseCronJobDeleteVariables
-  >,
+  UseCustomMutationOptions<DatabaseCronJobDeleteData, StudioError, DatabaseCronJobDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobDeleteData, ResponseError, DatabaseCronJobDeleteVariables>({
+  return useMutation<DatabaseCronJobDeleteData, StudioError, DatabaseCronJobDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables

@@ -66,12 +66,12 @@ const MergePage: NextPageWithLayout = () => {
     projectRef: parentProjectRef,
   })
 
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { refetchOnMount: 'always', refetchOnWindowFocus: true, staleTime: 0 }
+    )
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
@@ -84,6 +84,14 @@ const MergePage: NextPageWithLayout = () => {
     isDefault: currentBranch?.is_default,
   })
   const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
+  const mergeBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/merge', {
+    projectRef: parentProjectRef,
+    isDefault: currentBranch?.is_default,
+  })
+  const diffGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}/diff', {
     projectRef: parentProjectRef,
     isDefault: currentBranch?.is_default,
   })
@@ -106,6 +114,7 @@ const MergePage: NextPageWithLayout = () => {
     modifiedFunctionsCount,
   } = useBranchMergeDiff({
     currentBranchRef: ref,
+    isCurrentBranchDefault: currentBranch?.is_default,
     parentProjectRef,
     currentBranchConnectionString: project?.connectionString || undefined,
     parentBranchConnectionString: parentProject?.connectionString || undefined,
@@ -278,12 +287,21 @@ const MergePage: NextPageWithLayout = () => {
   }
 
   const handleMerge = () => {
-    if (!ref || !parentProjectRef) return
+    if (
+      !ref ||
+      !parentProjectRef ||
+      mergeBranchGrant.status !== 'granted' ||
+      diffGrant.status !== 'granted'
+    ) {
+      return
+    }
     setIsSubmitting(true)
 
     track('branch_merge_submitted', undefined, { project: parentProjectRef })
 
     mergeBranch({
+      grant: mergeBranchGrant.grant,
+      diffGrant: diffGrant.grant,
       branchProjectRef: ref,
       baseProjectRef: parentProjectRef,
       migration_version: undefined,
@@ -380,6 +398,7 @@ const MergePage: NextPageWithLayout = () => {
         <MergeActions
           isWorkflowRunning={isWorkflowRunning}
           isSubmitting={isMerging || isSubmitting}
+          canMerge={mergeBranchGrant.status === 'granted' && diffGrant.status === 'granted'}
           onSelectMerge={() => setShowConfirmDialog(true)}
         />
       }

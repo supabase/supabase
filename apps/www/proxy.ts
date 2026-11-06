@@ -46,6 +46,9 @@ export function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     // MUST exclude _next/data to prevent full page reloads in multi-zone apps.
-    '/((?!api|_next/static|_next/image|_next/data|favicon.ico|__nextjs).*)',
+    // Studio's assets, server functions and API routes are excluded because they
+    // don't need this proxy. Studio documents must still match: they are where
+    // direct /dashboard landings get the first-referrer cookie.
+    '/((?!api|_next/static|_next/image|_next/data|favicon.ico|__nextjs|dashboard/(?:_vercel|_serverFn|api)/).*)',
   ],
 }

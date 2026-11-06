@@ -110,10 +110,12 @@ export const GitHubIntegrationConnectionForm = ({
     data: existingBranches,
     error: branchesError,
     isSuccess: isSuccessBranches,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef: selectedProject?.ref, grant: branchesGrant.grant }),
-    enabled: !!selectedProject?.ref,
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      { projectRef: selectedProject?.ref, grant: branchesGrant.grant },
+      { enabled: !!selectedProject?.ref }
+    )
+  )
 
   const { mutateAsync: checkGithubBranchValidity, isPending: isCheckingBranch } =
     useCheckGithubBranchValidity({ onError: () => {} })
@@ -345,6 +347,11 @@ export const GitHubIntegrationConnectionForm = ({
     currentConnection: GitHubConnection
   ) => {
     if (!selectedProject?.ref || !selectedOrganization?.id) return
+    if (!canManageProductionBranch) {
+      setIsConfirmingBranchChange(false)
+      toast.error(productionBranchPermissionMessage)
+      return
+    }
 
     const connectionRequest = updateConnectionSettings({
       connectionId: currentConnection.id,

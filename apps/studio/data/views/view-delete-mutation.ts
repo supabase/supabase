@@ -7,7 +7,8 @@ import { entityTypeKeys } from '@/data/entity-types/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { tableEditorKeys } from '@/data/table-editor/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ViewDeleteVariables = {
   projectRef: string
@@ -46,12 +47,12 @@ export const useViewDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ViewDeleteData, ResponseError, ViewDeleteVariables>,
+  UseCustomMutationOptions<ViewDeleteData, StudioError, ViewDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ViewDeleteData, ResponseError, ViewDeleteVariables>({
+  return useMutation<ViewDeleteData, StudioError, ViewDeleteVariables>({
     mutationFn: (vars) => deleteView(vars),
     async onSuccess(data, variables, context) {
       const { id, projectRef, schema } = variables
