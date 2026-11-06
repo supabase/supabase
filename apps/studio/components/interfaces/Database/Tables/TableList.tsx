@@ -55,6 +55,7 @@ import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
+import { isTableInPublication } from '@/data/database-publications/database-publications.utils'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { useForeignTablesQuery } from '@/data/foreign-tables/foreign-tables-query'
 import { useMaterializedViewsQuery } from '@/data/materialized-views/materialized-views-query'
@@ -496,9 +497,8 @@ export const TableList = ({
                           )}
                         </TableCell>
                         <TableCell>
-                          {(realtimePublication?.tables ?? []).find(
-                            (table) => table.id === x.id
-                          ) ? (
+                          {x.type === ENTITY_TYPE.TABLE &&
+                          isTableInPublication(realtimePublication, x.id) ? (
                             <div className="flex items-center gap-x-2">
                               <CheckIcon size={16} strokeWidth={2} className="text-primary" />
                               <p className="text-foreground-light">Enabled</p>
