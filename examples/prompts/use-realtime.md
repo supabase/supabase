@@ -173,9 +173,6 @@ This would be an example of catch all trigger function that would broadcast to t
 ```sql
 CREATE OR REPLACE FUNCTION notify_table_changes()
 RETURNS TRIGGER AS $$
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
 BEGIN
   PERFORM realtime.broadcast_changes(
     TG_TABLE_NAME ||':' || COALESCE(NEW.id, OLD.id)::text,
@@ -188,7 +185,7 @@ BEGIN
   );
   RETURN COALESCE(NEW, OLD);
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 But you can also create more specific trigger functions for specific tables and events so adapt to your use case:
@@ -196,9 +193,6 @@ But you can also create more specific trigger functions for specific tables and 
 ```sql
 CREATE OR REPLACE FUNCTION room_messages_broadcast_trigger()
 RETURNS TRIGGER AS $$
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
 BEGIN
   PERFORM realtime.broadcast_changes(
     'room:' || COALESCE(NEW.room_id, OLD.room_id)::text,
@@ -211,7 +205,7 @@ BEGIN
   );
   RETURN COALESCE(NEW, OLD);
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 By default, `realtime.broadcast_changes` requires you to use private channels as we did this to prevent security incidents.
@@ -221,9 +215,6 @@ By default, `realtime.broadcast_changes` requires you to use private channels as
 ```sql
 CREATE OR REPLACE FUNCTION notify_custom_event()
 RETURNS TRIGGER AS $$
-SECURITY DEFINER
-LANGUAGE plpgsql
-AS $$
 BEGIN
   PERFORM realtime.send(
     'room:' || NEW.room_id::text,
@@ -233,7 +224,7 @@ BEGIN
   );
   RETURN NEW;
 END;
-$$;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
 ```
 
 This allows us to broadcast to a specific room with any content that is not bound to a table or if you need to send data to public channels. It's also a good way to integrate with other services and extensions.
