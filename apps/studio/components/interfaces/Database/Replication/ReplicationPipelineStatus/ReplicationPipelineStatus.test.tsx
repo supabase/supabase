@@ -27,6 +27,7 @@ const pipeline: PipelineResponse = {
   source_id: 2,
   source_name: 'main-db',
   tenant_id: 'default',
+  cluster_id: '1',
 }
 
 const mockPipelineQueries = ({

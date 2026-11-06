@@ -3,6 +3,7 @@ import { useParams } from 'common'
 import { createContext, useContext, useState, type ReactNode } from 'react'
 
 import { replicationPipelineStatusQueryOptions } from '@/data/replication/pipeline-status-query'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 
 export enum PipelineStatusRequestStatus {
   None = 'None',
@@ -30,6 +31,7 @@ const PipelineRequestStatusContext = createContext<PipelineRequestStatusContextT
 )
 
 export const PipelineRequestStatusProvider = ({ children }: { children: ReactNode }) => {
+  const clusterId = useReplicationClusterId()
   const { ref: projectRef } = useParams()
   const queryClient = useQueryClient()
   const [requests, setRequests] = useState<Record<string, PipelineRequest>>({})
@@ -45,7 +47,7 @@ export const PipelineRequestStatusProvider = ({ children }: { children: ReactNod
       return await action()
     } finally {
       const options = {
-        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId }),
+        ...replicationPipelineStatusQueryOptions({ projectRef, pipelineId, clusterId }),
         staleTime: 0,
       }
       // A status fetch that was already in flight started before this mutation resolved, so it

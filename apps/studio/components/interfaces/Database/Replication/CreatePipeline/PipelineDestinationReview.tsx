@@ -215,7 +215,7 @@ export const PipelineDestinationReview = ({
             isReactForm={false}
             layout="horizontal"
             label="Pipeline region"
-            description={`All pipelines run from this region. ${type} connections originate here.`}
+            description={`${type} connections originate in the selected cluster.`}
           >
             <PipelineRegionReadonly />
           </FormItemLayout>

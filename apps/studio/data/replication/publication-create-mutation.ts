@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { handleError, put } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -12,10 +13,18 @@ export type CreatePublicationParams = {
   name: string
   tableIds: number[]
   publishViaPartitionRoot?: boolean
+  clusterId?: string
 }
 
 async function createPublication(
-  { projectRef, sourceId, name, tableIds, publishViaPartitionRoot = true }: CreatePublicationParams,
+  {
+    projectRef,
+    sourceId,
+    name,
+    tableIds,
+    publishViaPartitionRoot = true,
+    clusterId,
+  }: CreatePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -23,7 +32,10 @@ async function createPublication(
   const { data, error } = await put(
     '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
-      params: { path: { ref: projectRef, source_id: sourceId, publication_name: name } },
+      params: {
+        path: { ref: projectRef, source_id: sourceId, publication_name: name },
+        query: { cluster_id: clusterId },
+      },
       body: {
         type: 'tables',
         tables: tableIds.map((id) => ({ id })),
@@ -52,12 +64,12 @@ export const useCreatePublicationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
+  return useReplicationMutation<CreatePublicationData, StudioError, CreatePublicationParams>({
     mutationFn: (vars) => createPublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
       await queryClient.invalidateQueries({
-        queryKey: replicationKeys.publications(projectRef, sourceId),
+        queryKey: replicationKeys.publications(projectRef, sourceId, variables.clusterId),
       })
       await onSuccess?.(data, variables, context)
     },

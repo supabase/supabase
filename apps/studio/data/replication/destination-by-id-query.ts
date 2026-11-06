@@ -4,18 +4,26 @@ import type { components } from 'api-types'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationDestinationByIdParams = { projectRef?: string; destinationId?: number | null }
+type ReplicationDestinationByIdParams = {
+  projectRef?: string
+  destinationId?: number | null
+  clusterId?: string
+}
 
 async function fetchReplicationDestinationById(
-  { projectRef, destinationId }: ReplicationDestinationByIdParams,
+  { projectRef, destinationId, clusterId }: ReplicationDestinationByIdParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
   if (!destinationId) throw new Error('destinationId is required')
   const { data, error } = await get('/platform/replication/{ref}/destinations/{destination_id}', {
-    params: { path: { ref: projectRef, destination_id: destinationId } },
+    params: {
+      path: { ref: projectRef, destination_id: destinationId },
+      query: { cluster_id: clusterId },
+    },
     signal,
   })
   if (error) {
@@ -28,15 +36,17 @@ async function fetchReplicationDestinationById(
 export type ReplicationDestinationByIdData = components['schemas']['DestinationResponse_Output']
 
 export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinationByIdData>(
-  { projectRef, destinationId }: ReplicationDestinationByIdParams,
+  { projectRef, destinationId, clusterId: requestedClusterId }: ReplicationDestinationByIdParams,
   {
     enabled = true,
     ...options
   }: UseCustomQueryOptions<ReplicationDestinationByIdData, StudioError, TData> = {}
-) =>
-  useQuery<ReplicationDestinationByIdData, StudioError, TData>({
-    queryKey: replicationKeys.destinationById(projectRef, destinationId),
-    queryFn: ({ signal }) => fetchReplicationDestinationById({ projectRef, destinationId }, signal),
+) => {
+  const clusterId = useReplicationClusterId(requestedClusterId)
+  return useQuery<ReplicationDestinationByIdData, StudioError, TData>({
+    queryKey: replicationKeys.destinationById(projectRef, destinationId, clusterId),
+    queryFn: ({ signal }) =>
+      fetchReplicationDestinationById({ projectRef, destinationId, clusterId }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&
@@ -44,3 +54,4 @@ export const useReplicationDestinationByIdQuery = <TData = ReplicationDestinatio
       destinationId !== null,
     ...options,
   })
+}

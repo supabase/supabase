@@ -7,9 +7,10 @@ const isPollingQuery = ({ queryKey }: { queryKey: QueryKey }) =>
 
 export const invalidateReplicationPipelineQueries = (
   queryClient: QueryClient,
-  projectRef: string | undefined
+  projectRef: string | undefined,
+  clusterId?: string
 ) => {
-  const queryKey = replicationKeys.pipelines(projectRef)
+  const queryKey = replicationKeys.pipelines(projectRef, clusterId)
   return Promise.all([
     queryClient.invalidateQueries({ queryKey, predicate: (query) => !isPollingQuery(query) }),
     // Polls will refresh again after the current read; metadata needs a post-mutation read now.

@@ -12,6 +12,7 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
+import { PipelineClusterSelector } from '@/components/interfaces/Database/Replication/PipelineClusterSelector'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { PipelinesLayout } from '@/components/layouts/DatabaseLayout/PipelinesLayout'
@@ -75,6 +76,7 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent className="flex flex-col gap-12">
+            <PipelineClusterSelector />
             {isPending ? (
               <>
                 <p className="sr-only" role="status">

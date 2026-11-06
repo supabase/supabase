@@ -55,6 +55,7 @@ import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { withReplicationCluster } from '@/data/replication/cluster-path'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -65,6 +66,7 @@ import { useStartPipelineMutation } from '@/data/replication/start-pipeline-muta
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import { DOCS_URL } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -81,6 +83,7 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
+  const clusterId = useReplicationClusterId()
   const { ref: projectRef, pipelineId } = useParams()
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
@@ -200,7 +203,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(`/project/${projectRef}/database/pipelines`)
+      router.push(withReplicationCluster(`/project/${projectRef}/database/pipelines`, clusterId))
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {
@@ -229,7 +232,14 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link href={`/project/${projectRef}/database/pipelines`}>Pipelines</Link>
+                <Link
+                  href={withReplicationCluster(
+                    `/project/${projectRef}/database/pipelines`,
+                    clusterId
+                  )}
+                >
+                  Pipelines
+                </Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />

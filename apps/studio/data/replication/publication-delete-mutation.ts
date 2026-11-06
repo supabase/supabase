@@ -1,7 +1,8 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { useReplicationMutation } from './use-cluster-mutation'
 import { del, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
@@ -10,10 +11,11 @@ export type DeletePublicationParams = {
   projectRef?: string
   sourceId: number
   publicationName: string
+  clusterId?: string
 }
 
 async function deletePublication(
-  { projectRef, sourceId, publicationName }: DeletePublicationParams,
+  { projectRef, sourceId, publicationName, clusterId }: DeletePublicationParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -27,6 +29,7 @@ async function deletePublication(
           source_id: sourceId,
           publication_name: publicationName,
         },
+        query: { cluster_id: clusterId },
       },
       signal,
     }
@@ -47,12 +50,12 @@ export const useDeletePublicationMutation = ({
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeletePublicationData, StudioError, DeletePublicationParams>({
+  return useReplicationMutation<DeletePublicationData, StudioError, DeletePublicationParams>({
     mutationFn: (vars) => deletePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables
       await queryClient.invalidateQueries({
-        queryKey: replicationKeys.publications(projectRef, sourceId),
+        queryKey: replicationKeys.publications(projectRef, sourceId, variables.clusterId),
       })
       await onSuccess?.(data, variables, context)
     },
