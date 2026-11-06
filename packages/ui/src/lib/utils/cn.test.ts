@@ -20,6 +20,14 @@ describe('cn', () => {
     expect(cn('gap-2', 'gap-card')).toBe('gap-card')
   })
 
+  it('treats the floating surface shadows as shadow utilities', () => {
+    expect(cn('floating-surface-shadow-md', 'shadow-none')).toBe('shadow-none')
+    expect(cn('shadow-md', 'floating-surface-shadow-md')).toBe('floating-surface-shadow-md')
+    expect(cn('floating-surface-shadow-sm', 'floating-surface-shadow-md')).toBe(
+      'floating-surface-shadow-md'
+    )
+  })
+
   it('keeps variants separate from base utilities', () => {
     expect(cn('p-2 hover:p-4', 'md:p-6')).toBe('p-2 hover:p-4 md:p-6')
   })

@@ -165,9 +165,14 @@ export const USAGE_CATEGORIES: (subscription?: OrgSubscription) => CategoryMeta[
                   <div>
                     When you reach your database size limit, your project can go into read-only
                     mode.{' '}
-                    {onFreePlan
-                      ? 'Please upgrade your Plan.'
-                      : "Disable your spend cap to scale seamlessly, and pay for over-usage beyond your Plan's quota."}
+                    {onFreePlan ? (
+                      <span>Please upgrade your Plan.</span>
+                    ) : (
+                      <span>
+                        Disable your spend cap to scale seamlessly, and pay for over-usage beyond
+                        your Plan's quota.
+                      </span>
+                    )}
                   </div>
                 </div>
               </Admonition>

@@ -29,7 +29,7 @@ const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps
   const currentPath = router.pathname
 
   const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
-  const showOAuthApps = useFlag('OauthAppScopedGrants') && USE_MOCKS
+  const showOAuthApps = useFlag('enableScopedOAuthManage') && USE_MOCKS
   const { appTitle } = useCustomContent(['app:title'])
   const brandTitle = appTitle || 'Supabase'
   const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
