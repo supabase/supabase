@@ -1,0 +1,14 @@
+[
+  {
+    "title": "From Supabase Pipelines to GTM",
+    "description": "An episode series on building a chain from a Supabase Postgres change, through Supabase Pipelines and a BigQuery warehouse, to GTM tools.",
+    "url": "https://www.skene.ai/resources/series",
+    "topics": ["Database"]
+  },
+  {
+    "title": "Moving Our AI Data Agent onto Supabase Compute",
+    "description": "How Dreambase moved its read-only AI data analyst onto Supabase Compute, next to its customers' data.",
+    "url": "https://dreambase.com/blog/running-our-data-pipeline-on-supabase-compute",
+    "topics": ["Platform"]
+  }
+]

@@ -42,6 +42,7 @@ export const HERO_SHAPES: Record<Topic, IsoBox[]> = {
   Tutorials: [0, 1, 2].map((i) => ({ ...cube(0, -i * 1.4, i * 0.85, 1.1), h: 0.6 })),
   Platform: [0, 1, 2].map((i) => ({ x: 0, y: 0, z: i * 0.9, w: 2.2, d: 2.2, h: 0.18 })),
   FAQs: FAQ_BLOCKS,
+  Community: FAQ_BLOCKS,
 }
 
 // a share of the shape's long side added on each edge, so a lone shape does not fill the flank.
