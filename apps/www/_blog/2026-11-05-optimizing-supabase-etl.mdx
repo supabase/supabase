@@ -1,6 +1,6 @@
 ---
 title: 'Optimizing Supabase ETL for faster initial copies'
-description: 'How observability and successive CPU optimizations reduced one staging copy from 1.91 hours to 18.8 minutes in Supabase ETL.'
+description: 'How we used observability and benchmarks to reduce CPU work and speed up initial copies in Supabase ETL.'
 author: riccardo_busetti
 imgSocial: supabase-etl-initial-copy/og-fast-lanes.png
 imgThumb: supabase-etl-initial-copy/thumb-fast-lanes.png
@@ -17,17 +17,22 @@ toc_depth: 2
 
 [Supabase Pipelines](/blog/introducing-supabase-pipelines) is our managed service for moving data from Postgres into analytical destinations such as BigQuery. Replicating the data lets teams run large analytical queries in a system built for them, keeping that query load away from the Postgres database serving their application.
 
-Its open-source Rust engine, [Supabase ETL](https://github.com/supabase/etl), performs an initial copy of existing rows and keeps each table current by streaming changes. **A faster initial copy means less time waiting for existing data to reach the analytical destination.**
+Its open-source Rust engine, [Supabase ETL](https://github.com/supabase/etl), moves the data in two phases:
 
-Our starting point was a staging copy of one large, text-heavy table that took **1.91 hours**. We wanted to shorten that wait within the same CPU budget, so we investigated where ETL spent its time. After tuning the BigQuery client and rewriting the Postgres row parser, the same copy took **18.8 minutes: about 6.1× faster**, with the same half-CPU container limit.
+1. **Initial sync:** copy the table’s existing rows to the destination.
+2. **Ongoing replication:** catch up with changes made during the copy, then keep applying new changes, such as inserts, updates, and deletes.
 
-**That speedup is specific to this workload and deployment.** End-to-end performance depends on network conditions, CPU allocation, table size, row size, and column types. This post follows how we used the measurements to identify bottlenecks, remove repeated work, and decide what to investigate next.
+For a large table, **initial sync**, also called the initial copy, can keep the engine busy reading and sending existing data. That sustained workload makes it a useful place to investigate throughput bottlenecks. A faster copy means less time waiting for existing data to reach the analytical destination.
+
+Our starting point was a staging copy of one large, text-heavy table that took **1.91 hours**. We investigated where ETL spent its time and how to process the data more efficiently within the same CPU budget. After tuning the BigQuery client and rewriting the Postgres row parser, the same copy took **18.8 minutes: about 6.1× faster**, with the same half-CPU container limit.
+
+**The 6.1× speedup describes this initial-copy workload and deployment.** Results depend on network conditions, CPU allocation, table size, row size, and column types. We followed the measurements through the code, removed repeated work, and measured again to find the next bottleneck.
 
 We used AI throughout the investigation to trace code paths, challenge assumptions, and explore alternatives. Observability told us where to look; tests and benchmarks told us which ideas to keep. Each improvement also changed what was worth optimizing next.
 
-## How the initial copy works
+## The initial-copy workload and runtime
 
-For the BigQuery destination, ETL reads Postgres `COPY` text rows, validates and parses them, batches the typed rows, and prepares append requests. Parsing, type conversion, and encoding all require local CPU time before a batch can reach BigQuery.
+ETL uses Postgres’s `COPY` command to read the existing rows in bulk. It validates and parses each row, converts the fields to typed values, and groups the rows into batches. For BigQuery, it then encodes each batch and prepares an append request to send the data. These steps all use CPU time.
 
 <div className="hidden lg:block">
   <Img
@@ -58,11 +63,11 @@ For the BigQuery destination, ETL reads Postgres `COPY` text rows, validates and
   />
 </div>
 
-The workload contained 1.82 million rows and 119.4 GB of source `COPY` data: **about 66 kB of `COPY` text per row**. This was a wide-row Postgres workload. For context, Postgres normally uses 8 KiB pages and [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) to compress large values or store them out of line. The 66 kB measures the serialized data ETL had to parse, rather than the size of a physical heap tuple.
+The workload contained 1.82 million rows and 119.4 GB of source `COPY` data: **about 66 kB of `COPY` text per row**. This was a wide-row Postgres workload. For context, Postgres normally uses 8 KiB pages and [TOAST](https://www.postgresql.org/docs/current/storage-toast.html) to compress large values or store them out of line. The 66 kB is the average size of a row in the `COPY` output, not its physical storage size in Postgres.
 
 The source database and ETL ran in AWS’s Singapore region, while BigQuery ran in GCP’s Singapore region.
 
-The ETL container requested 0.25 CPU and had a 0.5-CPU limit. The request affects placement and CPU shares under contention; the limit [caps aggregate CPU time through throttling](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/). It does not restrict the process to one OS thread. The memory request and limit were 500 MiB and 600 MiB. Those resources stayed the same across all three staging runs in this post.
+The ETL container requested 0.25 CPU and had a CPU limit of 0.5. The request affects placement and CPU shares under contention; the limit [caps aggregate CPU time through throttling](https://kubernetes.io/docs/concepts/configuration/manage-resources-containers/). It does not restrict the process to one OS thread. The memory request and limit were 500 MiB and 600 MiB. Those resources stayed the same across all three staging runs in this post.
 
 ETL already supported concurrent table copies, multiple destination writes in flight, and splitting large tables into physical ranges for multiple copy tasks. Its BigQuery client also spawns connection and request tasks. These are async tasks, not dedicated runtime worker threads.
 
@@ -72,7 +77,7 @@ Many tasks could therefore keep requests in flight, while their CPU work shared 
 
 The metrics gave us symptoms, rather than a function-level CPU profile. We followed those symptoms through the implementation, using AI to help inspect both our code and the client library. The first lead was a transport setting: the BigQuery client compressed outgoing append messages with GZIP.
 
-## Revisit the cost of compression
+## Reducing compression and encoding overhead
 
 Compression trades **CPU work for fewer network bytes**. We had enabled it expecting smaller requests to improve transfers. Sustained copies of large, text-heavy rows made the other side of that trade-off visible.
 
@@ -82,13 +87,15 @@ We made GZIP opt-in and disabled it for ETL. With the other BigQuery client tuni
 
 We also removed repeated work in BigQuery row encoding. Previously, checking a row’s encoded length and then encoding it could repeatedly format values such as dates, numerics, UUIDs, and JSON. Keeping the encoded row bytes lets size checks read the buffer length and lets subsequent encoding copy those bytes, instead of formatting the source values again.
 
-These changes are collected with the parser work in [the first optimization PR (PR #878)](https://github.com/supabase/etl/pull/878). The staging runs capture intermediate deployments, so the throughput jump is evidence for a change set, rather than an isolated measurement of GZIP. Compression can still be useful when bandwidth is the tighter constraint.
+The BigQuery client uses the same encoding and append path for initial-copy rows and ongoing replication events. Removing repeated encoding and disabling GZIP therefore also reduce work when sending ongoing changes. The measurements here show their effect during the initial copy; we did not benchmark ongoing replication separately.
+
+These changes are collected with the parser work in [the first optimization (PR #878)](https://github.com/supabase/etl/pull/878). The staging runs used different versions of ETL as we made these changes. They show the combined effect of the client changes; they do not isolate the effect of disabling GZIP. Compression can still be useful when bandwidth is the tighter constraint.
 
 There was another useful observability detail here: our “batch send duration” timer **starts after source rows have been parsed and batched**. It includes destination-side conversion and encoding, request handling, and waiting for completion. A high value does not, by itself, mean the network or BigQuery is slow. Understanding the timer’s boundary was part of understanding the bottleneck.
 
-## Scan spans instead of characters
+## Byte scanning and borrowing in the COPY parser
 
-With the BigQuery path optimized, we investigated the CPU work performed before a batch reached the destination. Every initial-copy row passes through the Postgres `COPY` parser, making it a useful place to look beyond BigQuery-specific changes.
+Next, we looked at the work done before a batch reached the BigQuery client. Every initial-copy row passes through ETL’s Postgres `COPY` parser, regardless of its destination. Optimizing that parser could therefore help initial copies beyond BigQuery. Ongoing replication uses a different decoder for row-change messages.
 
 The old parser first validated UTF-8, then walked the row one character at a time. For each ordinary character, it checked parser state and appended the character to a temporary string. A 50,000-character text field required 50,000 character iterations even when it contained no tabs, newlines, or backslashes.
 
@@ -147,9 +154,15 @@ AI helped us explore byte scanning, temporary buffers, and vectorized search. It
 
 Correctness checks covered invalid UTF-8, missing row terminators, dangling escapes, multibyte text, escaped delimiters, and column-count mismatches. The follow-up also tightened null handling: the raw `\N` marker means `NULL`, while an escaped backslash followed by `N` is literal text. The parser must distinguish them before unescaping. Performance work was also an opportunity to check those boundaries carefully.
 
-## What changed in the complete copy?
+## Initial-copy results from three staging runs
 
-We compared three staging deployments: the original implementation, BigQuery client tuning with GZIP disabled, and that tuned path with the byte-oriented parser added. These are deployment comparisons on the same table and resource limits, rather than controlled experiments attributing a separate speedup to every edit.
+We first measured complete table copies in staging. The runs were performed in this order:
+
+1. The original implementation.
+2. The tuned BigQuery client with GZIP disabled.
+3. The tuned client plus the byte-oriented COPY parser.
+
+Each run copied the same table with the same resource limits. The results compare these three versions within that staging setup. They measure the combined changes in each version, not the contribution of every individual edit.
 
 <div className="hidden lg:block">
   <Img
@@ -186,7 +199,9 @@ Throughput rose from about 17.5 MB/s to 110–115 MB/s, measured as source `COPY
 
 The worker also became much less busy: 25–28% in the final run, compared with 86–90% originally. [Tokio’s busy-duration metric](https://docs.rs/tokio/latest/tokio/runtime/struct.RuntimeMetrics.html#method.worker_total_busy_duration) measures elapsed time while a worker processes work. It is distinct from CPU utilization and can include time when the OS deschedules or throttles that thread. Container CPU consumption fell separately, from about 0.45 to 0.26 CPU.
 
-For this wide-row initial copy across two clouds in the same geographic region, the same constrained container moved much more data while consuming less CPU. **The 6.1× result applies to this staging comparison.** Network latency and available bandwidth affect how much time transfers take; CPU allocation determines how much compute time is available for parsing, encoding, and compression. Table size changes the balance between setup costs and sustained copying. Row size, column types, and escape density change the work done per row, including type conversion and destination encoding. A different workload or resource allocation can expose a different bottleneck and produce a different end-to-end improvement.
+The copy finished sooner and used less CPU, with the same resource limits. **The 6.1× result applies to this staging comparison.**
+
+Other workloads can benefit differently. Network latency and bandwidth affect transfer time. CPU allocation limits how much parsing, encoding, and compression the process can do per second. For smaller tables, setup can account for more of the total copy time. Row size, column types, and the number of escape sequences also affect the work needed to parse and encode each row. These factors can change both the bottleneck and the overall speedup.
 
 <BlogCollapsible
   title="View the original Grafana panels"
@@ -203,7 +218,7 @@ The active copy periods show the same three runs, from left to right: the origin
   height={762}
   src="/images/blog/supabase-etl-initial-copy/grafana-batch-send-duration.png"
   alt="Original Grafana panel showing p50 and p99 batch send duration falling across the three staging copies."
-  caption="Yellow: p50 estimate. Green: p99 estimate. The panel shows the highest reported estimate in each rolling five-minute window."
+  caption="Yellow: estimated median (p50). Green: estimated 99th percentile (p99)."
 />
 
 Parsing happens before this timer starts. The third run’s lower send duration is consistent with less contention on the runtime worker; it is not a direct measurement of parser speed.
@@ -243,15 +258,25 @@ Parsing happens before this timer starts. The third run’s lower send duration 
 
 </BlogCollapsible>
 
-## Follow the next bottleneck
+## Local parser benchmarks and SIMD UTF-8 validation
 
-The staging comparison stops at the first parser rewrite. The allocation follow-up and later UTF-8 change are additional work, outside that 6.1× result.
+After the staging comparison, we benchmarked the COPY parser separately while preparing this post. This second experiment ran **locally on a MacBook Pro with an Apple M4 chip** (`arm64`, macOS), using an optimized build with Rust 1.95. The MacBook Pro has different performance characteristics from the staging machines. **Compare the results within each experiment:** the local parser timings and speedup ratios do not predict the results on the staging hardware.
+
+These local benchmarks include the allocation follow-up and later UTF-8 optimization, which are outside the staging comparison’s 6.1× result.
 
 While preparing this post, we compared the parser paths independently using [Criterion](https://bheisler.github.io/criterion.rs/book/). Once scanning and temporary copying were cheaper, UTF-8 validation became a substantial part of the cost for large non-ASCII fields. We then [replaced the standard validator with `simdutf8` (PR #927)](https://github.com/supabase/etl/pull/927), which uses SIMD instructions on supported targets. Every row is still validated before parsing.
 
-The benchmark compares three paths using the same current type-conversion code: a reconstruction of the original character scanner’s successful-input path, the parser after the allocation follow-up with standard UTF-8 validation, and the same parsing core with SIMD validation. These are parser comparisons, rather than three historical ETL binaries.
+On that same MacBook Pro, we compared three parser paths, shown from left to right in the table:
 
-Each synthetic row contains one `TEXT` field with 50,000 raw field bytes, including any escape sequences, followed by a newline. We ran an optimized build on an Apple M4 (`arm64`) with Rust 1.95. Criterion warmed each case for two seconds and collected 100 samples over about five seconds. All paths start with raw bytes, include validation and construction of the output cell, and are checked for matching output on these inputs.
+1. A reconstruction of the original character scanner for valid inputs.
+2. Byte scanning and borrowing with standard UTF-8 validation.
+3. The same byte-oriented parser with SIMD validation.
+
+All three use the same current type-conversion code. We are comparing parser implementations, not running three historical ETL binaries.
+
+Each synthetic row contains one `TEXT` field with 50,000 raw field bytes, including any escape sequences, followed by a newline.
+
+Criterion warmed each case for two seconds and collected 100 samples over about five seconds. Each implementation receives the same raw bytes and produces a cell value, so the timings include validation, parsing, and construction of the output cell. We checked that all three returned matching values.
 
 <div className="overflow-x-auto">
 
@@ -264,7 +289,7 @@ Each synthetic row contains one `TEXT` field with 50,000 raw field bytes, includ
 
 </div>
 
-_Rounded medians from focused runs. The middle column includes both the byte-oriented rewrite and the allocation follow-up; it does not measure borrowing alone._
+_Rounded median parser timings from local runs on the M4 MacBook Pro. The middle column includes both the byte-oriented rewrite and the allocation follow-up; it does not measure borrowing alone._
 
 For the ASCII literal, byte scanning and borrowing made parsing about 17.5× faster than the reconstructed character scanner. SIMD validation made that path another 1.55× faster, for a combined speedup of about 27×. That total includes all three changes.
 
@@ -272,9 +297,9 @@ The non-ASCII case shows why we revisited validation: the complete parse fell fr
 
 This is why we benchmark different row shapes. A large literal field exposes scanning and validation costs; an escape-heavy field exposes a different limit. Neither predicts the speedup of a whole pipeline by itself.
 
-## A feedback loop for optimization
+## Lessons from optimizing the initial copy
 
-AI helped us inspect a larger portion of the system and explore alternatives step by step. Its suggestions were _hypotheses to test_, including suggestions that did not justify their added complexity. The useful loop was to bring a concrete symptom and the relevant code, identify repeated work, check the proposed change’s correctness boundaries, benchmark it, and then measure the complete pipeline again.
+AI helped us inspect a larger portion of the system and explore alternatives step by step. Its suggestions were _hypotheses to test_, including suggestions that did not justify their added complexity. We started with an observed symptom and traced it through the code. For each proposed change, we checked correctness, ran benchmarks, and measured the complete pipeline again.
 
 Several lessons carried through the investigation:
 
@@ -284,6 +309,8 @@ Several lessons carried through the investigation:
 - **Expect the next limit to become visible.** Faster scanning made UTF-8 validation worth revisiting. Different inputs still favored different paths.
 - **Keep suggestions testable.** AI helped propose alternatives; specifications, regression tests, and benchmarks determined what we kept.
 
-The parser improvements live in the shared ETL engine, so they are available to every destination using this copy path. Their end-to-end benefit depends on the workload’s bottleneck. The approach carries over: measure the whole path, investigate the cost the data points to, and measure again as each change reveals the next constraint.
+For the staging workload, reducing work in the BigQuery client and COPY parser shortened the initial copy with the same resource limits. The client changes also reduce work during ongoing replication, while the parser improvements apply to initial sync across destinations using the COPY path.
+
+The broader lesson is the process: measure the complete copy, trace the bottleneck through the code, test the change, and measure again. Each improvement changes where the next investigation should start.
 
 You can [set up Supabase Pipelines](/docs/guides/database/replication/pipelines) to replicate your Postgres data, or [explore Supabase ETL](https://github.com/supabase/etl) to see how the engine works.
