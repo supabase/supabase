@@ -9,11 +9,12 @@ import {
   LoaderCircleIcon,
   MoreVerticalIcon,
   MoveIcon,
+  RefreshCwIcon,
   RotateCcwIcon,
   Trash2Icon,
   UploadIcon,
 } from 'lucide-react'
-import type { CSSProperties, ReactNode } from 'react'
+import { Ref, useRef, useState, type CSSProperties, type ReactNode } from 'react'
 import { toast } from 'sonner'
 import {
   Checkbox,
@@ -46,6 +47,7 @@ import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { pickFile } from './pickFile'
+import { PurgeBucketObjectCDNCacheModal } from './PurgeBucketObjectCDNCacheModal'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
@@ -56,6 +58,7 @@ import { useCopyUrl } from './useCopyUrl'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { IS_PLATFORM } from '@/lib/constants'
 import { formatBytes } from '@/lib/helpers'
 import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
 
@@ -95,9 +98,17 @@ const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }
   </Tooltip>
 )
 
-const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] }) => (
+const RowActionsMenu = ({
+  name,
+  options,
+  triggerRef,
+}: {
+  name: string
+  options: RowOption[]
+  triggerRef?: Ref<HTMLButtonElement>
+}) => (
   <DropdownMenu>
-    <DropdownMenuTrigger className="focus-ring rounded-sm">
+    <DropdownMenuTrigger className="focus-ring rounded-sm" ref={triggerRef}>
       <div className="storage-row-menu opacity-0">
         <MoreVerticalIcon size={16} />
         <span className="sr-only">{name} actions</span>
@@ -254,6 +265,7 @@ export const FileExplorerRow = ({
     },
   ]
 
+  const [showPurgeCDNCacheModal, setShowPurgeCDNCacheModal] = useState(false)
   const rowOptions: RowOption[] =
     item.type === STORAGE_ROW_TYPES.FOLDER
       ? [
@@ -361,13 +373,22 @@ export const FileExplorerRow = ({
                         icon: <UploadIcon size={12} className="text-foreground-light" />,
                         onClick: onReplaceFile,
                       },
-                      { name: 'Separator', icon: undefined, onClick: undefined },
                     ]
                   : []),
               ]
             : []),
+          ...(IS_PLATFORM
+            ? [
+                {
+                  name: 'Purge CDN Cache',
+                  icon: <RefreshCwIcon size={12} className="text-foreground-light" />,
+                  onClick: () => setShowPurgeCDNCacheModal(true),
+                },
+              ]
+            : []),
           ...(canUpdateFiles
             ? [
+                { name: 'Separator', icon: undefined, onClick: undefined },
                 {
                   // On a versioned bucket this is a soft delete, so it reads as Archive.
                   name: isActivelyVersioning ? 'Archive' : 'Delete',
@@ -466,6 +487,8 @@ export const FileExplorerRow = ({
       : view === STORAGE_VIEWS.LIST && !item.isCorrupted
         ? `calc(100% - 50px)`
         : '100%'
+
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
 
   if (item.status === STORAGE_ROW_STATUS.EDITING) {
     return (
@@ -605,10 +628,22 @@ export const FileExplorerRow = ({
               <RowActionsMenu name={item.name} options={archivedRowOptions} />
             )
           ) : (
-            <RowActionsMenu name={item.name} options={rowOptions} />
+            <RowActionsMenu name={item.name} options={rowOptions} triggerRef={menuTriggerRef} />
           )}
         </div>
       </div>
+      <PurgeBucketObjectCDNCacheModal
+        visible={showPurgeCDNCacheModal}
+        onClose={() => {
+          setShowPurgeCDNCacheModal(false)
+          setTimeout(() => {
+            if (menuTriggerRef.current == null) return
+            menuTriggerRef.current.focus()
+          })
+        }}
+        bucket={selectedBucket}
+        path={item.path!}
+      />
     </div>
   )
 }
