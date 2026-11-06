@@ -122,16 +122,16 @@ Supports slot behavior with `asChild` prop.
 
 ### Split with dropdown
 
-Pair a button with a chevron `DropdownMenu` trigger when there are variations of the same action, or alternative ways to accomplish the same goal. The default or most likely option should be used on the exposed button.
+Pair a button with a chevron `DropdownMenu` trigger for variations of an action or related management actions on the same object. Use the most likely action on the exposed button. Keep destructive actions clearly labelled in the menu.
 
-When secondary actions are related but distinct (not alternatives to the primary action) display the primary action as a button and place the rest in an overflow menu instead. See [Table multiple actions](./table#multiple-actions).
+Use a separate overflow menu when the actions span different objects or jobs, or when a split button would imply a relationship that is not clear. See [Table multiple actions](./table#multiple-actions).
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
 Ensure the middle border is shared rather than doubled-up. Do not use `border-l-0` on the chevron button as that drops the divider on hover/focus. Instead:
 
 - Primary action: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
-- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
+- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-1 py-1.25`, and `-ml-px` to overlap the adjacent border by one pixel.
 - Both: `focus-visible:z-10` so the focus ring stacks above the neighbour, and `focus-visible:rounded-r-sm` / `focus-visible:rounded-l-sm` so the squared-off edge is slightly rounded while the ring is shown.
 - Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
 
