@@ -82,6 +82,8 @@ const PlatformPreferences = () => {
   useEffect(() => {
     const hash = asPath.split('#')[1]
     const isEmailConfirmation = !!parseRedirectMessage(asPath)
+    // Email-change links already sent still return to Preferences (account/me).
+    // Now that sign-in methods are in Security, we need to redirect them there instead.
     if (accountShowSecuritySettings && isEmailConfirmation) {
       void replace({ pathname: '/account/security', query, hash })
       return
