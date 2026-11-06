@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, type UseCustomMutationOptions } from '@/types'
+import { UnexpectedError, type StudioError } from '@/lib/errors/studio-errors'
+import { type UseCustomMutationOptions } from '@/types'
 
 type SessionTerminateVariables = {
   pid: number
@@ -30,9 +31,9 @@ export async function terminateSession({
     grant: unguarded.migrating,
   })
   if (backendStart !== undefined && result.length === 0) {
-    throw new ResponseError(
-      `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`
-    )
+    throw new UnexpectedError({
+      message: `Session (PID: ${pid}) has already changed since this list was loaded. Refresh and try again.`,
+    })
   }
   return result
 }
@@ -44,11 +45,11 @@ export const useSessionTerminateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<QueryAbortData, ResponseError, SessionTerminateVariables>,
+  UseCustomMutationOptions<QueryAbortData, StudioError, SessionTerminateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<QueryAbortData, ResponseError, SessionTerminateVariables>({
+  return useMutation<QueryAbortData, StudioError, SessionTerminateVariables>({
     mutationFn: (vars) => terminateSession(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

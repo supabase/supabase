@@ -15,7 +15,7 @@ import {
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -34,7 +34,7 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import { LOG_TYPES, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
@@ -81,6 +81,7 @@ import { useUnifiedLogsCountQuery } from '@/data/logs/unified-logs-count-query'
 import { useUnifiedLogsInfiniteQuery } from '@/data/logs/unified-logs-infinite-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useShowMultigresLogs } from '@/hooks/misc/useShowMultigresLogs'
+import { useShowPipelinesLogs } from '@/hooks/misc/useShowPipelinesLogs'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -99,6 +100,8 @@ export const CHART_CONFIG = {
     color: 'hsl(var(--destructive-default))',
   },
 } satisfies ChartConfig
+
+const PipelineLevelOption = (option: Option) => <span className="text-xs">{option.label}</span>
 
 interface UnifiedLogsProps {
   scope?: UnifiedLogsScope
@@ -119,6 +122,9 @@ export const UnifiedLogs = ({
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
   const showMultigresLogs = useShowMultigresLogs()
+  const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
+  // Keep linked Pipelines filters until replication sources load.
+  const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
   const computeAvailability = getComputeLogsAvailability({
@@ -131,6 +137,7 @@ export const UnifiedLogs = ({
     getLogTypeVisibility(
       {
         multigres: showMultigresLogs,
+        pipelines: canShowPipelinesLogs,
         compute: computeAvailability.preserveComputeFilter,
       },
       scope
@@ -178,11 +185,12 @@ export const UnifiedLogs = ({
       getLogTypeVisibility(
         {
           multigres: showMultigresLogs,
+          pipelines: canShowPipelinesLogs,
           compute: computeAvailability.canQueryCompute,
         },
         scope
       ),
-    [showMultigresLogs, computeAvailability.canQueryCompute, scope]
+    [showMultigresLogs, canShowPipelinesLogs, computeAvailability.canQueryCompute, scope]
   )
 
   const searchParameters = useMemo(() => {
@@ -193,8 +201,20 @@ export const UnifiedLogs = ({
     return parameters
   }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
+  const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
+  const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
+    (filter) => filter.column === 'log_type' && filter.operator === '='
+  )
+  const isPipelinesLogsView =
+    (selectedLogTypes.length === 1 && selectedLogTypes[0].value === 'pipelines') ||
+    (selectedLogTypes.length === 0 &&
+      parsedFilters.some((filter) => filter.column === 'pipeline_id'))
 
-  useEffect(() => setLocalFilterOrigin(null), [urlFilterScope])
+  const syncUrlFilters = useEffectEvent(() => {
+    setLocalFilterOrigin(null)
+    setColumnFilters(buildDefaultColumnFilters({ ...search, filter: visibleSearchFilters }))
+  })
+  useEffect(() => syncUrlFilters(), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -295,9 +315,15 @@ export const UnifiedLogs = ({
     const baseLevels: readonly string[] = included.length > 0 ? included : LEVELS
     const activeLevels = baseLevels.filter((l) => !excluded.has(l))
     return Object.fromEntries(
-      Object.entries(CHART_CONFIG).filter(([key]) => activeLevels.includes(key))
+      LEVELS.filter((level) => activeLevels.includes(level)).map((level) => [
+        level,
+        {
+          ...CHART_CONFIG[level],
+          label: <TooltipLabel level={level} isProcessLog={isPipelinesLogsView} />,
+        },
+      ])
     ) as ChartConfig
-  }, [search.filter])
+  }, [search.filter, isPipelinesLogsView])
 
   const getRowClassName = (row: Row<ColumnSchema>) =>
     getLogRowClassName(row.original, liveMode.timestamp)
@@ -356,12 +382,28 @@ export const UnifiedLogs = ({
   // Will need to refactor this bit
   // - Each facet just handles its own state, rather than getting passed down like this
   const filterFields = useMemo(() => {
+    const canFilterByPipeline = queryLogTypeVisibility.pipelines !== false
     const gatedFields = gateLogTypeOptions(
-      defaultFilterFields.filter((field) => isOfferedFilter(field.value, offeredFilters)),
+      defaultFilterFields.filter(
+        (field) =>
+          isOfferedFilter(field.value, offeredFilters) &&
+          (field.value !== 'pipeline_id' || canFilterByPipeline)
+      ),
       queryLogTypeVisibility
     )
 
     return gatedFields.map((field) => {
+      if (field.value === 'level' && isPipelinesLogsView) {
+        return {
+          ...field,
+          options: LEVELS.map((level) => ({
+            value: level,
+            label: PIPELINE_LOG_LEVEL_LABELS[level],
+            count: facets?.level?.rows.find((row) => row.value === level)?.total ?? 0,
+          })),
+          component: PipelineLevelOption,
+        }
+      }
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
@@ -387,10 +429,15 @@ export const UnifiedLogs = ({
 
       return { ...field, options }
     })
-  }, [facets, offeredFilters, queryLogTypeVisibility])
+  }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
 
   const applyFilterSearch = () => {
-    const update = buildFilterSearchUpdate(columnFilters, filterFields)
+    const offeredColumnFilters = columnFilters.filter(
+      ({ id }) =>
+        !defaultFilterFields.some((field) => field.value === id) ||
+        isOfferedFilter(id, offeredFilters)
+    )
+    const update = buildFilterSearchUpdate(offeredColumnFilters, filterFields)
     if (Array.isArray(update.filter)) {
       update.filter = gateLogTypeFilters(update.filter.map(String), queryLogTypeVisibility)
     }
@@ -400,7 +447,7 @@ export const UnifiedLogs = ({
   useFilterSearchSync({
     applyFilterSearch,
     columnFilters,
-    enabled: computeAvailability.readyToSyncFilters,
+    enabled: computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs,
   })
 
   useEffect(() => {
@@ -500,6 +547,13 @@ export const UnifiedLogs = ({
             className="flex max-w-full flex-1 flex-col overflow-hidden"
           >
             <div ref={topBarRef} className="top-0 z-10 flex flex-col bg-background">
+              {isError && flatData.length > 0 && (
+                <AlertError
+                  error={error}
+                  subject="Failed to refresh logs"
+                  projectRef={projectRef}
+                />
+              )}
               <div className="flex flex-wrap items-center gap-2 px-2 border-b">
                 {hasFilterSideBar && (
                   <>

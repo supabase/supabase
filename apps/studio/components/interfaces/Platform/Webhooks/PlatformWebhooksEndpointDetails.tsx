@@ -30,14 +30,15 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { DELIVERIES_PAGE_SIZE } from './PlatformWebhooks.constants'
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
+import { isTestDelivery } from './PlatformWebhooks.utils'
 import { statusBadgeVariant } from './PlatformWebhooksView.utils'
 import { getStatusLevel } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DataTableColumnStatusCode } from '@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import type { ResponseError } from '@/types'
 
 interface DetailItemProps {
   label: string
@@ -54,7 +55,7 @@ const DetailItem = ({ label, children, ddClassName = 'text-sm' }: DetailItemProp
 
 interface PlatformWebhooksEndpointDetailsProps {
   deliveries: WebhookDelivery[]
-  deliveriesError: ResponseError | null
+  deliveriesError: StudioError | null
   hasNextPage: boolean
   hasPreviousPage: boolean
   hasRefreshError: boolean
@@ -100,7 +101,12 @@ const DELIVERY_COLUMNS: ColumnDef<WebhookDelivery>[] = [
   {
     accessorKey: 'eventType',
     header: 'Event',
-    cell: ({ row }) => <code className="text-xs">{row.original.eventType}</code>,
+    cell: ({ row }) => (
+      <div className="flex items-center gap-x-2">
+        <code className="text-xs">{row.original.eventType}</code>
+        {isTestDelivery(row.original) && <Badge variant="success">Test</Badge>}
+      </div>
+    ),
   },
   {
     accessorKey: 'responseCode',
@@ -409,8 +415,7 @@ export const PlatformWebhooksEndpointDetails = ({
                 <ShimmeringLoader className="w-28" />
               ) : (
                 <p className="text-foreground-muted text-sm">
-                  Showing {deliveryRows.length}{' '}
-                  {deliveryRows.length === 1 ? 'delivery' : 'deliveries'}
+                  {`Showing ${deliveryRows.length} ${deliveryRows.length === 1 ? 'delivery' : 'deliveries'}`}
                 </p>
               )}
               <div className="flex items-center gap-x-2" aria-label="Pagination">

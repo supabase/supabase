@@ -122,6 +122,8 @@ function createProjectConfigResponse(auth: Record<string, unknown>): V2ProjectCo
           db_extra_search_path: 'public,extensions',
           db_pool: null,
           db_pool_acquisition_timeout: 10,
+          db_pool_max_idletime: 10,
+          db_pool_max_lifetime: 30,
           db_schema: 'public,graphql_public',
           max_rows: 1000,
         },

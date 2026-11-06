@@ -5,7 +5,8 @@ import { configKeys } from '../config/keys'
 import { databaseKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PgbouncerConfigurationUpdateVariables = {
   ref: string
@@ -44,7 +45,7 @@ export const usePgbouncerConfigurationUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     PgbouncerConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     PgbouncerConfigurationUpdateVariables
   >,
   'mutationFn'
@@ -53,7 +54,7 @@ export const usePgbouncerConfigurationUpdateMutation = ({
 
   return useMutation<
     PgbouncerConfigurationUpdateData,
-    ResponseError,
+    StudioError,
     PgbouncerConfigurationUpdateVariables
   >({
     mutationFn: (vars) => updatePgbouncerConfiguration(vars),

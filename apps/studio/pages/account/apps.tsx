@@ -18,16 +18,16 @@ import { USE_MOCKS } from '@/data/oauth-apps/mocks'
 import type { NextPageWithLayout } from '@/types'
 
 const UserOAuthApps: NextPageWithLayout = () => {
-  const isOAuthAppScopedGrantsEnabled = useFlag('OauthAppScopedGrants') && USE_MOCKS
+  const isScopedOAuthManageEnabled = useFlag('enableScopedOAuthManage') && USE_MOCKS
   const { hasLoaded } = useFeatureFlags()
   const router = useRouter()
   useEffect(() => {
-    if (hasLoaded && !isOAuthAppScopedGrantsEnabled) {
+    if (hasLoaded && !isScopedOAuthManageEnabled) {
       router.replace('/404')
     }
-  }, [hasLoaded, isOAuthAppScopedGrantsEnabled, router])
+  }, [hasLoaded, isScopedOAuthManageEnabled, router])
 
-  if (!hasLoaded || !isOAuthAppScopedGrantsEnabled) {
+  if (!hasLoaded || !isScopedOAuthManageEnabled) {
     return null
   }
 

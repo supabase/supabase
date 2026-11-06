@@ -6,7 +6,7 @@ import { describe, expect, it, vi } from 'vitest'
 
 import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
 import { PlatformWebhooksEndpointDetails } from './PlatformWebhooksEndpointDetails'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 vi.mock('@/components/ui/DataTable/DataTableColumn/DataTableColumnStatusCode', () => ({
   DataTableColumnStatusCode: ({ value }: { value: number }) => <span>{value}</span>,
@@ -251,7 +251,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
   it('shows an error instead of the empty state when deliveries fail to load', () => {
     renderComponent({
       deliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
     })
 
     expect(screen.getByText(/Failed to retrieve deliveries/)).toBeInTheDocument()
@@ -261,7 +261,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
   it('passes the project to the error so the support link is pre-filled', () => {
     renderComponent({
       deliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
       projectRef: 'abcdefghijklmnopqrst',
     })
 
@@ -277,7 +277,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
 
     renderComponent({
       deliveries: [],
-      deliveriesError: { message: 'Something went wrong' } as ResponseError,
+      deliveriesError: { message: 'Something went wrong' } as StudioError,
       onRefetchDeliveries,
     })
 
@@ -355,7 +355,7 @@ describe('PlatformWebhooksEndpointDetails', () => {
   })
 
   it('keeps showing deliveries when a refetch fails after they loaded', () => {
-    renderComponent({ deliveriesError: { message: 'Something went wrong' } as ResponseError })
+    renderComponent({ deliveriesError: { message: 'Something went wrong' } as StudioError })
 
     expect(screen.getByText('Showing 5 deliveries')).toBeInTheDocument()
     expect(screen.queryByText(/Failed to retrieve deliveries/)).not.toBeInTheDocument()
@@ -428,6 +428,35 @@ describe('PlatformWebhooksEndpointDetails', () => {
     await user.click(screen.getByLabelText('Retry pending-delivery'))
 
     expect(onRetryDelivery).toHaveBeenCalledWith('pending-delivery')
+  })
+
+  it('shows a Test badge on deliveries sent as test events', () => {
+    renderComponent({
+      deliveries: [
+        createDelivery({
+          id: 'test-delivery',
+          eventType: 'event.test',
+          eventPayload: { is_test: true },
+        }),
+      ],
+    })
+
+    expect(screen.getByText('Test')).toBeInTheDocument()
+  })
+
+  it('does not show a Test badge on real deliveries', () => {
+    renderComponent({
+      deliveries: [
+        createDelivery({ id: 'real-delivery', eventType: 'event.real', eventPayload: {} }),
+        createDelivery({
+          id: 'explicit-false',
+          eventType: 'event.false',
+          eventPayload: { is_test: false },
+        }),
+      ],
+    })
+
+    expect(screen.queryByText('Test')).not.toBeInTheDocument()
   })
 
   it('renders a zero response code instead of the placeholder', () => {

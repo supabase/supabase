@@ -28,7 +28,7 @@ export function SearchDialog({ open, onOpenChange, children, labels }: SearchDia
             'data-closed:animate-out! data-closed:fade-out-0 data-closed:fill-mode-forwards data-closed:duration-150 data-closed:ease-enter pt-20 sm:pt-20',
         }}
         size="large"
-        className="overflow-hidden rounded-lg border-0 p-0 inset-ring inset-ring-border shadow-(--shadow-codeblock)!"
+        className="overflow-hidden rounded-lg border-0 p-0 outline-hidden [view-transition-name:search-dialog] inset-ring inset-ring-border shadow-(--shadow-codeblock)!"
       >
         <VisuallyHidden.VisuallyHidden>
           <DialogTitle>{dialogTitle}</DialogTitle>

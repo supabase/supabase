@@ -79,7 +79,9 @@ export const SpreadsheetImportPreview = ({
               {!isCompatible && <Badge variant="destructive">Data incompatible</Badge>}
               {dedupedErrors.length > 0 && (
                 <Badge variant="warning">
-                  {dedupedErrors.length} {dedupedErrors.length === 1 ? 'issue' : 'issues'} found
+                  {dedupedErrors.length}{' '}
+                  {dedupedErrors.length === 1 ? <span>issue</span> : <span>issues</span>}{' '}
+                  <span>found</span>
                 </Badge>
               )}
             </div>
@@ -160,9 +162,10 @@ export const SpreadsheetImportPreview = ({
                           <div className="size-[6px] rounded-full bg-foreground-lighter" />
                         </div>
                         <p className="text-sm">
-                          The column{incompatibleHeaders.length > 1 ? 's' : ''}{' '}
+                          The column{incompatibleHeaders.length > 1 ? <span>s</span> : ''}{' '}
                           {incompatibleHeaders.map((x) => `"${x}"`).join(', ')}{' '}
-                          {incompatibleHeaders.length > 1 ? 'are' : 'is'} not present in your table
+                          {incompatibleHeaders.length > 1 ? <span>are</span> : <span>is</span>}{' '}
+                          <span>not present in your table</span>
                         </p>
                       </div>
                     </div>

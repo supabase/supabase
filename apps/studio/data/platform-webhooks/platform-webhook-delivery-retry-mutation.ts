@@ -7,7 +7,8 @@ import {
   retryWebhookDelivery,
   type WebhookScopeParams,
 } from './platform-webhooks-fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookDeliveryRetryVariables = {
   scope: WebhookScopeParams
@@ -26,12 +27,12 @@ export const useWebhookDeliveryRetryMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WebhookDeliveryRetryData, ResponseError, WebhookDeliveryRetryVariables>,
+  UseCustomMutationOptions<WebhookDeliveryRetryData, StudioError, WebhookDeliveryRetryVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookDeliveryRetryData, ResponseError, WebhookDeliveryRetryVariables>({
+  return useMutation<WebhookDeliveryRetryData, StudioError, WebhookDeliveryRetryVariables>({
     mutationFn: retryDelivery,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

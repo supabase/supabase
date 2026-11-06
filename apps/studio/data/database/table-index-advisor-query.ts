@@ -5,7 +5,8 @@ import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexStatements } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type TableIndexAdvisorVariables = {
   projectRef?: string
@@ -140,7 +141,7 @@ export async function getTableIndexAdvisorSuggestions({
 }
 
 export type TableIndexAdvisorData = Awaited<ReturnType<typeof getTableIndexAdvisorSuggestions>>
-export type TableIndexAdvisorError = ResponseError
+export type TableIndexAdvisorError = StudioError
 
 export function useTableIndexAdvisorQuery<TData = TableIndexAdvisorData>(
   { projectRef, connectionString, schema, table }: TableIndexAdvisorVariables,

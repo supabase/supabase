@@ -152,9 +152,11 @@ export const DiskUsage = ({
                 <p className="text-xs text-foreground-light">Overage in period</p>
                 <p className="text-xs">
                   {(gp3UsageInPeriod?.usage ?? 0).toLocaleString()} GP3 GB-Hrs
-                  {io2UsageInPeriod?.usage
-                    ? ` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`
-                    : ``}
+                  {io2UsageInPeriod?.usage ? (
+                    <span>{` / ${io2UsageInPeriod.usage.toLocaleString()} IO2 GB-Hrs`}</span>
+                  ) : (
+                    <span>{``}</span>
+                  )}
                 </p>
               </div>
             </div>
@@ -217,7 +219,11 @@ export const DiskUsage = ({
                                 <>
                                   <p>
                                     {replicaDiskUsage} GB for {replicaDbs.length} Read{' '}
-                                    {replicaDbs.length === 1 ? 'Replica' : 'Replicas'}
+                                    {replicaDbs.length === 1 ? (
+                                      <span>Replica</span>
+                                    ) : (
+                                      <span>Replicas</span>
+                                    )}
                                   </p>
                                   <p className="mt-1">
                                     Read replicas have their own disk and use 25% more disk to

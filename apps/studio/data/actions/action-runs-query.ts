@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { actionKeys } from './keys'
 import type { operations } from '@/data/api'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ActionsVariables = operations['v1-list-action-runs']['parameters']['path']
 
@@ -18,7 +19,7 @@ export async function listActionRuns(params: ActionsVariables, signal?: AbortSig
 }
 
 export type ActionsData = Awaited<ReturnType<typeof listActionRuns>>
-export type ActionsError = ResponseError
+export type ActionsError = StudioError
 
 export type ActionRunStep = ActionsData[number]['run_steps'][number]
 export type ActionName = ActionRunStep['name']

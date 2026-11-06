@@ -11,12 +11,28 @@
 
 /apps/docs/ @supabase/docs
 
+# intentionally blank so anyone with write access can approve here
+/apps/docs/public/humans.txt
+
 /apps/kb/ @supabase/knowledgebase
 
 /apps/www/ @supabase/marketing
 /apps/www/public/images/blog @supabase/marketing
 /apps/www/public/schemas/ @supabase/cli
 /apps/www/lib/redirects.js
+/apps/www/data/legal/ @supabase/frontend
+/apps/www/pages/legal/ @supabase/frontend
+/apps/www/public/legal/ @supabase/frontend
+/apps/www/_go/legal/ @supabase/frontend
+/apps/www/pages/aup.tsx @supabase/frontend
+/apps/www/pages/privacy.tsx @supabase/frontend
+/apps/www/pages/terms.tsx @supabase/frontend
+/apps/www/pages/sla.tsx @supabase/frontend
+/apps/www/pages/enterprise-terms.tsx @supabase/frontend
+/apps/www/pages/support-policy.tsx @supabase/frontend
+/apps/www/components/Legal/ @supabase/frontend
+/apps/www/lib/addenda.ts @supabase/frontend
+/apps/www/lib/addenda-utils.ts @supabase/frontend
 
 /docker/ @supabase/cli @supabase/self-hosted
 

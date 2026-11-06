@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { keys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateThirdPartyAuthVariables = {
   projectRef: string
@@ -45,28 +46,26 @@ export const useCreateThirdPartyAuthIntegrationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ThirdPartyIntegrationCreateData,
-    ResponseError,
+    StudioError,
     CreateThirdPartyAuthVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<ThirdPartyIntegrationCreateData, ResponseError, CreateThirdPartyAuthVariables>(
-    {
-      mutationFn: (vars) => createThirdPartyIntegration(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries({ queryKey: keys.integrations(projectRef) })
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create third party auth integration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<ThirdPartyIntegrationCreateData, StudioError, CreateThirdPartyAuthVariables>({
+    mutationFn: (vars) => createThirdPartyIntegration(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: keys.integrations(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create third party auth integration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

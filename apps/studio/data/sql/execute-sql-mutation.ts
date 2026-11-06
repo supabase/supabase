@@ -14,10 +14,11 @@ import {
 import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import { UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Intention is that we invalidate all database related keys whenever running a mutation related query
 // So we attempt to ignore all the non-related query keys. We could probably look into grouping our query keys better
@@ -52,7 +53,7 @@ type ExecuteSqlVariables = {
   connectionString?: string | null
   sql: SafeSqlFragment
   queryKey?: QueryKey
-  handleError?: (error: ResponseError) => { result: any }
+  handleError?: (error: StudioError) => { result: any }
   isRoleImpersonationEnabled?: boolean
   /**
    * Disables transaction mode - should be used only for manual queries ran via the SQL Editor
@@ -92,7 +93,7 @@ export async function executeSql<T = any>(
   fetcherOverride?: (options: {
     query: string
     headers?: HeadersInit
-  }) => Promise<{ data: T } | { error: ResponseError }>
+  }) => Promise<{ data: T } | { error: Error }>
 ): Promise<{ result: T }> {
   if (!projectRef) throw new Error('projectRef is required')
 

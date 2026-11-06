@@ -454,10 +454,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                                 No function with a single JSON/B argument
                                 <br />
                                 and JSON/B
-                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
-                                  ? ' or void'
-                                  : ''}{' '}
-                                return type found in this schema.
+                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED' ? (
+                                  <span>{' or void'}</span>
+                                ) : (
+                                  ''
+                                )}{' '}
+                                <span>return type found in this schema.</span>
                               </span>
                             }
                           />

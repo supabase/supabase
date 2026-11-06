@@ -53,7 +53,7 @@ export const OrganizationCard = ({
                 <>
                   <span className="text-foreground-lighter">·</span>
                   <span>
-                    {numProjects} project{numProjects > 1 ? 's' : ''}
+                    {numProjects} project{numProjects > 1 ? <span>s</span> : ''}
                   </span>
                 </>
               )}

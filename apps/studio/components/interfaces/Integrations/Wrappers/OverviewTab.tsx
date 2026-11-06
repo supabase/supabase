@@ -3,13 +3,11 @@ import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { IntegrationOverviewTab } from '../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../Integration/RequiredExtensionsSection'
 import { useAvailableIntegrations } from '../Landing/useAvailableIntegrations'
 import { AddWrapperButton } from './AddWrapperButton'
 import { WRAPPERS } from './Wrappers.constants'
 import { WrapperTable } from './WrapperTable'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
@@ -54,8 +52,9 @@ const AddNewWrapperCTA = () => {
             The {wrapperMeta.label} wrapper requires a minimum extension version of{' '}
             {wrapperMeta.minimumExtensionVersion}. You have version{' '}
             {wrappersExtension?.installed_version} installed. Please{' '}
-            {databaseNeedsUpgrading && 'upgrade your database then '}update the extension by
-            disabling and enabling the <code>wrappers</code> extension to create this wrapper.
+            {databaseNeedsUpgrading && <span>{'upgrade your database then '}</span>}
+            <span>update the extension by disabling and enabling the</span> <code>wrappers</code>{' '}
+            <span>extension to create this wrapper.</span>
           </p>
           <p className="text-warning">
             Warning: Before reinstalling the wrapper extension, you must first remove all existing
@@ -116,16 +115,4 @@ export const WrapperContent = () => {
   )
 }
 
-export const WrapperOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) return <RequiredExtensionsSection />
-
-  return (
-    <IntegrationOverviewTab actions={<AddNewWrapperCTA />}>
-      <div className="mx-10">
-        <WrapperOverviewContent />
-      </div>
-    </IntegrationOverviewTab>
-  )
-}
+export const WrapperOverviewTab = () => <RequiredExtensionsSection />

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { clientSecretKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ClientSecretCreateVariables = {
   slug: string
@@ -24,12 +25,12 @@ export const useClientSecretCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<any, ResponseError, ClientSecretCreateVariables>,
+  UseCustomMutationOptions<any, StudioError, ClientSecretCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<any, ResponseError, ClientSecretCreateVariables>({
+  return useMutation<any, StudioError, ClientSecretCreateVariables>({
     mutationFn: (vars) => createClientSecret(vars),
     async onSuccess(data, variables, context) {
       const { slug, appId } = variables

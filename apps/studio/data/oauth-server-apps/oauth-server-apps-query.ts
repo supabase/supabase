@@ -5,8 +5,9 @@ import { oauthServerAppKeys } from './keys'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthServerAppsVariables = {
   projectRef: string | undefined
@@ -37,7 +38,7 @@ export async function getOAuthServerApps({
 }
 
 export type OAuthServerAppsData = Awaited<ReturnType<typeof getOAuthServerApps>>
-export type OAuthServerAppsError = ResponseError
+export type OAuthServerAppsError = StudioError
 
 export const useOAuthServerAppsQuery = <TData = OAuthServerAppsData>(
   { projectRef }: OAuthServerAppsVariables,

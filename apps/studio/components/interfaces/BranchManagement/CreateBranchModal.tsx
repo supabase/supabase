@@ -146,7 +146,7 @@ export const CreateBranchModal = () => {
   const isError = isErrorAuthorization || isErrorConnections
   const error = authorizationError || connectionsError
 
-  const { data: branches } = useQuery(
+  const { data: branches, isSuccess: isSuccessBranches } = useQuery(
     branchesQueryOptions({ projectRef, grant: branchesGrant.grant })
   )
   const { data: addons, isSuccess: isSuccessAddons } = useProjectAddonsQuery(
@@ -572,7 +572,7 @@ export const CreateBranchModal = () => {
                 </div>
               )}
 
-              {githubConnection && (
+              {githubConnection && isSuccessBranches && (
                 <div className="flex flex-row gap-4">
                   <div>
                     <figure className="w-10 h-10 rounded-md bg-info-200 border border-info-400 flex items-center justify-center">
@@ -614,8 +614,12 @@ export const CreateBranchModal = () => {
                 <div className="flex flex-col gap-y-1">
                   <p className="text-sm text-foreground">
                     Branch compute is billed at $
-                    {withData ? branchComputeSize.priceHourly : instanceSizeSpecs.micro.priceHourly}{' '}
-                    per hour
+                    {withData ? (
+                      <span>{branchComputeSize.priceHourly}</span>
+                    ) : (
+                      <span>{instanceSizeSpecs.micro.priceHourly}</span>
+                    )}{' '}
+                    <span>per hour</span>
                   </p>
                   <p className="text-sm text-foreground-light">
                     {withData ? (

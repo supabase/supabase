@@ -93,7 +93,7 @@
         },
         "enable_signup": {
           "type": "boolean",
-          "description": "Allow/disallow new user signups to your project.",
+          "description": "Allow/disallow new user signups to your project. Existing users can still sign in.",
           "default": true
         },
         "enable_anonymous_sign_ins": {
@@ -364,7 +364,7 @@
           "properties": {
             "enable_signup": {
               "type": "boolean",
-              "description": "Allow/disallow new user signups via email to your project.",
+              "description": "Allow/disallow the email provider. When false, users can't sign up or sign in with email (password, magic link or OTP); set `auth.enable_signup = false` to block new signups only.",
               "default": true
             },
             "double_confirm_changes": {
@@ -483,7 +483,7 @@
           "properties": {
             "enable_signup": {
               "type": "boolean",
-              "description": "Allow/disallow new user signups via SMS to your project.",
+              "description": "Allow/disallow the phone provider. When false, users can't sign up or sign in with a phone number (password or SMS OTP); set `auth.enable_signup = false` to block new signups only.",
               "default": false
             },
             "enable_confirmations": {

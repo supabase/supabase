@@ -145,11 +145,14 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor('https://supabase.com/customers/acme')?.lastmod).toBe('2024-05-16')
   })
 
-  it('emits no lastmod for events, static pages, and the proxied evals app', () => {
+  it('emits no lastmod for events, static pages, and the proxied apps', () => {
     for (const loc of [
       'https://supabase.com/events/webinar',
       'https://supabase.com/company',
       'https://supabase.com/evals',
+      'https://supabase.com/migrate/instantdb',
+      'https://supabase.com/dashboard/sign-in',
+      'https://supabase.com/dashboard/sign-up',
     ]) {
       const entry = entryFor(loc)
       expect(entry, loc).toBeDefined()
@@ -186,6 +189,7 @@ describe('generate-sitemap lastmod', () => {
     const index = fs.readFileSync(path.join(fixtureDir, 'public', 'sitemap.xml'), 'utf-8')
     expect(index).toContain('<loc>https://supabase.com/sitemap_www.xml</loc>')
     expect(index).toContain('<loc>https://supabase.com/docs/sitemap.xml</loc>')
+    expect(index).toContain('<loc>https://supabase.com/library/sitemap.xml</loc>')
   })
 })
 
@@ -217,10 +221,13 @@ describe('generate-sitemap App Router pages', () => {
           '',
           '/blog/example',
           '/company',
+          '/dashboard/sign-in',
+          '/dashboard/sign-up',
           '/evals',
           '/events/example',
           '/example',
           '/guides/start',
+          '/migrate/instantdb',
           '/reference/index',
         ].map((route) => ({ loc: `https://supabase.com${route}`, lastmod: undefined }))
       )
@@ -257,6 +264,9 @@ describe('generate-sitemap prerendered feature pages', () => {
         'https://supabase.com/features/auth-hooks',
         'https://supabase.com/features/social-sign-in',
         'https://supabase.com/evals',
+        'https://supabase.com/migrate/instantdb',
+        'https://supabase.com/dashboard/sign-in',
+        'https://supabase.com/dashboard/sign-up',
       ])
     },
     SPAWN_TIMEOUT_MS

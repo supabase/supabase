@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskUtilizationVariables = {
   projectRef?: string
@@ -24,7 +25,7 @@ export async function getDiskUtilization(
 }
 
 export type DiskUtilizationData = Awaited<ReturnType<typeof getDiskUtilization>>
-export type DiskUtilizationError = ResponseError
+export type DiskUtilizationError = StudioError
 
 export const useDiskUtilizationQuery = <TData = DiskUtilizationData>(
   { projectRef }: DiskUtilizationVariables,

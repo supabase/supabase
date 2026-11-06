@@ -216,9 +216,15 @@ async function generate() {
     return [...lastmodByUrl].map(([url, lastmod]) => urlEntry(url, lastmod))
   })()
 
-  // /evals is a separate app proxied onto supabase.com via a rewrite in lib/rewrites.js,
-  // so it has no page file for the globs above to find. Hardcode it here.
-  const proxiedAppUrls = [urlEntry('https://supabase.com/evals')]
+  // /evals, /migrate/instantdb, and the public /dashboard auth pages are served by other apps
+  // proxied onto supabase.com via rewrites in lib/rewrites.js, so they have no page file for the
+  // globs above to find. Hardcode them here.
+  const proxiedAppUrls = [
+    urlEntry('https://supabase.com/evals'),
+    urlEntry('https://supabase.com/migrate/instantdb'),
+    urlEntry('https://supabase.com/dashboard/sign-in'),
+    urlEntry('https://supabase.com/dashboard/sign-up'),
+  ]
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -235,7 +241,7 @@ async function generate() {
   /**
    * generate sitemap router
    *
-   * this points to www and docs sitemaps
+   * this points to www, docs, kb, and library sitemaps
    */
   const sitemapRouter = `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
@@ -247,6 +253,9 @@ async function generate() {
   </sitemap>
   <sitemap>
     <loc>https://supabase.com/kb/sitemap-index.xml</loc>
+  </sitemap>
+  <sitemap>
+    <loc>https://supabase.com/library/sitemap.xml</loc>
   </sitemap>
 </sitemapindex>
 `

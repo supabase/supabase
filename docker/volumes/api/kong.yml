@@ -376,6 +376,9 @@ services:
   ## The request-transformer strips any client-supplied `sb-api-key` (anti-spoof)
   ## and re-adds the translated value; on no match the Lua expression yields nil
   ## (an empty header) which the post-function then removes.
+  ##
+  ## No `cors`: functions handle CORS themselves, as on the platform. Preflights
+  ## reach the function and its responses pass through unchanged.
   - name: functions-v1
     _comment: 'Edge Functions: /functions/v1/* -> http://functions:9000/*'
     url: http://functions:9000/
@@ -387,7 +390,6 @@ services:
         paths:
           - /functions/v1/
     plugins:
-      - name: cors
       - name: request-transformer
         config:
           remove:
