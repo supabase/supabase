@@ -5,6 +5,7 @@ import {
   Button,
   Dialog,
   DialogContent,
+  DialogDescription,
   DialogFooter,
   DialogHeader,
   DialogSection,
@@ -59,6 +60,9 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
       <DialogContent size="small">
         <DialogHeader>
           <DialogTitle>Save snippet</DialogTitle>
+          <DialogDescription>
+            Choose a name for this SQL snippet before saving it to your project.
+          </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection className="flex flex-col gap-y-4 py-5">
