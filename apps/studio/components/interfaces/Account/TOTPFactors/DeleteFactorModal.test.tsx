@@ -247,7 +247,7 @@ describe('DeleteFactorModal identity verification', () => {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    await screen.findByText('Remove authenticator')
+    await screen.findByText('Remove MFA method')
     expect(auth.mfa.challengeAndVerify).toHaveBeenCalledWith({
       factorId: 'other_id',
       code: '123456',

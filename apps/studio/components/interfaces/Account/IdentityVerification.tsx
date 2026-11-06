@@ -32,7 +32,7 @@ import { useMfaListFactorsQuery, type MFAFactor } from '@/data/profile/mfa-list-
 
 const VerificationSchema = z.object({
   code: z.string().trim().min(1, 'Enter an authentication code'),
-  factorId: z.string().min(1, 'Choose an authenticator'),
+  factorId: z.string().min(1, 'Choose an authenticator app'),
 })
 type VerificationValues = z.infer<typeof VerificationSchema>
 
@@ -224,7 +224,7 @@ const VerificationForm = ({
                 <Select value={field.value} onValueChange={field.onChange} disabled={loading}>
                   <FormControl>
                     <SelectTrigger>
-                      <SelectValue placeholder="Choose an authenticator" />
+                      <SelectValue placeholder="Choose an authenticator app" />
                     </SelectTrigger>
                   </FormControl>
                   <SelectContent>
