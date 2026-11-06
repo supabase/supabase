@@ -82,16 +82,39 @@ export const DecryptedReadOnlyInput = ({
             secureEntry ? (
               isLoading ? (
                 <div className="flex items-center justify-center">
-                  <Button disabled className="w-7" icon={<LoaderIcon className="animate-spin" />} />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        disabled
+                        focusableWhenDisabled
+                        className="w-7"
+                        icon={<LoaderIcon className="animate-spin" />}
+                        aria-label="Loading value"
+                        // Tooltip repeats the label; screen readers would read it twice
+                        aria-describedby={undefined}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">Loading value</TooltipContent>
+                  </Tooltip>
                 </div>
               ) : (
                 <div className="flex items-center justify-center">
-                  <Button
-                    className="w-7"
-                    loading={showHidden && isDecryptedValueLoading}
-                    icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
-                    onClick={() => setShowHidden(!showHidden)}
-                  />
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <Button
+                        className="w-7"
+                        loading={showHidden && isDecryptedValueLoading}
+                        icon={showHidden ? <EyeIcon /> : <EyeOffIcon />}
+                        onClick={() => setShowHidden(!showHidden)}
+                        aria-label={showHidden ? 'Hide value' : 'Show value'}
+                        // Tooltip repeats the label; screen readers would read it twice
+                        aria-describedby={undefined}
+                      />
+                    </TooltipTrigger>
+                    <TooltipContent side="bottom">
+                      {showHidden ? 'Hide value' : 'Show value'}
+                    </TooltipContent>
+                  </Tooltip>
                 </div>
               )
             ) : null
