@@ -49,6 +49,10 @@ const renderFactors = () => {
 describe('authenticator removal recovery-status guard', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -79,6 +83,20 @@ describe('authenticator removal recovery-status guard', () => {
     expect(screen.queryByText('Failed to load recovery codes')).not.toBeInTheDocument()
     fireEvent.click(remove)
     expect(await screen.findByRole('dialog', { name: 'Remove MFA method' })).toBeInTheDocument()
+  })
+
+  test('keeps the session check on Delete without showing an interstitial', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockImplementation(
+      () => new Promise(() => {})
+    )
+    renderFactors()
+    const remove = await screen.findByRole('button', { name: 'Delete' })
+    await waitFor(() => expect(remove).not.toBeAriaDisabled())
+    fireEvent.click(remove)
+    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled())
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
+    expect(screen.queryByText('Verify your identity')).not.toBeInTheDocument()
   })
 
   test('keeps removal unavailable while recovery-code status is loading', async () => {

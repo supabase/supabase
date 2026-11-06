@@ -1,16 +1,24 @@
-import { AuthApiError } from '@supabase/supabase-js'
+import { AuthApiError, AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DeleteFactorModal } from './DeleteFactorModal'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
+mockAnimationsApi()
+
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
 
-beforeEach(() => vi.restoreAllMocks())
-
 describe('DeleteFactorModal', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
+  })
   test("Requests users confirmation before deleting an MFA when it's not the last", async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
       data: {
@@ -140,7 +148,206 @@ describe('DeleteFactorModal', () => {
   })
 })
 
+const authenticator = {
+  id: 'other_id',
+  factor_type: 'totp' as const,
+  status: 'verified' as const,
+  friendly_name: 'Backup device',
+  created_at: '',
+  updated_at: '',
+}
+const verifyResponse = {
+  access_token: 'access',
+  token_type: 'bearer' as const,
+  expires_in: 3600,
+  refresh_token: 'refresh',
+  user: { id: 'user', aud: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '' },
+}
+function renderDeletion() {
+  customRender(
+    <DeleteFactorModal
+      visible
+      factorId="some_id"
+      lastFactorToBeDeleted
+      hasRecoveryCodes
+      onClose={vi.fn()}
+    />
+  )
+}
+
+describe('DeleteFactorModal identity verification', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: { currentLevel: 'aal1', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
+    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+      data: {
+        all: [authenticator],
+        totp: [authenticator],
+        phone: [],
+        recovery_code: [],
+        webauthn: [],
+      },
+      error: null,
+    })
+    vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({ data: { id: 'some_id' }, error: null })
+    vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
+      data: { id: 'codes' },
+      error: null,
+    })
+  })
+  test('AAL1 prompts verification without deleting anything', async () => {
+    renderDeletion()
+    await screen.findByText('Verify your identity')
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+    const input = await screen.findByRole('textbox', { name: 'Authentication code' })
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(input).toHaveAccessibleDescription('From your authenticator app “Backup device”.')
+  })
+  test('two authenticators use a dropdown without repeating the app in the code description', async () => {
+    const other = { ...authenticator, id: 'some_id', friendly_name: 'Main device' }
+    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+      data: {
+        all: [other, authenticator],
+        totp: [other, authenticator],
+        phone: [],
+        recovery_code: [],
+        webauthn: [],
+      },
+      error: null,
+    })
+    renderDeletion()
+    expect(await screen.findByRole('combobox', { name: 'Authenticator app' })).toHaveTextContent(
+      'Backup device'
+    )
+    expect(
+      screen.getByRole('textbox', { name: 'Authentication code' })
+    ).not.toHaveAccessibleDescription(/From your authenticator app/)
+  })
+  test('verification comes before explicit confirmation and removal deletes codes first', async () => {
+    const assurance = vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel')
+    assurance.mockResolvedValueOnce({
+      data: { currentLevel: 'aal1', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
+    assurance.mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
+    vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+      data: verifyResponse,
+      error: null,
+    })
+    renderDeletion()
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Authentication code' }), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
+    await screen.findByText('Remove MFA method')
+    expect(auth.mfa.challengeAndVerify).toHaveBeenCalledWith({
+      factorId: 'other_id',
+      code: '123456',
+    })
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await waitFor(() => expect(auth.mfa.unenroll).toHaveBeenCalledOnce())
+    expect(vi.mocked(auth.mfa.recoveryCodes.unenroll).mock.invocationCallOrder[0]).toBeLessThan(
+      vi.mocked(auth.mfa.unenroll).mock.invocationCallOrder[0]
+    )
+  })
+  test('failed verification shows an error and does not delete anything', async () => {
+    vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+      data: null,
+      error: new AuthApiError('Invalid verification code', 422, 'mfa_verification_failed'),
+    })
+    renderDeletion()
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Authentication code' }), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
+    await screen.findByText('Incorrect code. Enter a new code and try again.')
+    const input = screen.getByRole('textbox', { name: 'Authentication code' })
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveAccessibleDescription(/Incorrect code\./)
+    fireEvent.change(input, { target: { value: '654321' } })
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Incorrect code. Enter a new code and try again.')
+      ).not.toBeInTheDocument()
+    )
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+  })
+  test('an assurance lookup failure does not delete anything', async () => {
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: null,
+      error: new AuthError('Session check failed'),
+    })
+    renderDeletion()
+    await screen.findByText(/Session check failed/)
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+  })
+  test('a verification response that leaves AAL1 never enables removal', async () => {
+    vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
+      data: verifyResponse,
+      error: null,
+    })
+    renderDeletion()
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Authentication code' }), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
+    await screen.findByText(/Verification did not update your session/)
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+  })
+  test('cancelling verification never opens removal confirmation or deletes anything', async () => {
+    const onClose = vi.fn()
+    customRender(
+      <DeleteFactorModal
+        visible
+        factorId="some_id"
+        lastFactorToBeDeleted
+        hasRecoveryCodes
+        onClose={onClose}
+      />
+    )
+    await screen.findByRole('textbox', { name: 'Authentication code' })
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    expect(onClose).toHaveBeenCalledOnce()
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+  })
+  test('a failed authenticator lookup can be retried before verification', async () => {
+    const listFactors = vi.spyOn(auth.mfa, 'listFactors').mockResolvedValueOnce({
+      data: null,
+      error: new AuthError('Authenticators unavailable'),
+    })
+    renderDeletion()
+    await screen.findByText(/Authenticators unavailable/)
+    expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Retry' }))
+    await screen.findByRole('textbox', { name: 'Authentication code' })
+    expect(listFactors).toHaveBeenCalledTimes(2)
+    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
+  })
+})
+
 describe('authenticator removal failures', () => {
+  beforeEach(() => {
+    vi.restoreAllMocks()
+    vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockResolvedValue({
+      data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
+      error: null,
+    })
+  })
   test('keeps the dialog open if recovery code removal fails', async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll')
     vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({

@@ -4,6 +4,7 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { IdentityVerification } from '@/components/interfaces/Account/IdentityVerification'
 import { AlertError } from '@/components/ui/AlertError'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
@@ -15,6 +16,7 @@ interface DeleteFactorModalProps {
   factorId: string | null
   lastFactorToBeDeleted: boolean
   hasRecoveryCodes: boolean
+  onCheckingIdentity?: (isChecking: boolean) => void
   canRemove?: boolean
   recoveryCodesError?: { message: string } | null
   isCheckingRecoveryCodes?: boolean
@@ -24,6 +26,23 @@ interface DeleteFactorModalProps {
 
 export const DeleteFactorModal = ({
   visible,
+  onCheckingIdentity,
+  ...confirmationProps
+}: DeleteFactorModalProps) => {
+  if (!visible) return null
+
+  return (
+    <IdentityVerification
+      factorToAvoidId={confirmationProps.factorId ?? undefined}
+      onCancel={confirmationProps.onClose}
+      onCheckingChange={onCheckingIdentity}
+    >
+      <RemoveAuthenticatorConfirmation {...confirmationProps} />
+    </IdentityVerification>
+  )
+}
+
+const RemoveAuthenticatorConfirmation = ({
   factorId,
   lastFactorToBeDeleted,
   hasRecoveryCodes,
@@ -32,7 +51,7 @@ export const DeleteFactorModal = ({
   isCheckingRecoveryCodes = false,
   onRetryRecoveryCodes,
   onClose,
-}: DeleteFactorModalProps) => {
+}: Omit<DeleteFactorModalProps, 'visible' | 'onCheckingIdentity'>) => {
   const queryClient = useQueryClient()
   const [error, setError] = useState<{ message: string } | null>(null)
   const [hasRemovedRecoveryCodes, setHasRemovedRecoveryCodes] = useState(false)
@@ -76,9 +95,9 @@ export const DeleteFactorModal = ({
 
   return (
     <ConfirmationModal
+      visible
       size="medium"
-      visible={visible}
-      variant={'destructive'}
+      variant="destructive"
       title="Remove MFA method"
       confirmLabel="Remove"
       confirmLabelLoading="Removing"
