@@ -1,19 +1,9 @@
 import type { AuthMFARecoveryCodesStatusResponseData } from '@supabase/supabase-js'
-import { ChevronDownIcon, RectangleEllipsisIcon, RefreshCwIcon } from 'lucide-react'
-import { useState } from 'react'
-import {
-  Button,
-  Card,
-  CardContent,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { RectangleEllipsisIcon, RefreshCwIcon } from 'lucide-react'
+import { Button, Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
-import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 
 interface RecoveryCodesAvailableProps {
@@ -29,8 +19,6 @@ export const RecoveryCodesAvailable = ({
   finding,
   isPrimary,
 }: RecoveryCodesAvailableProps) => {
-  const [isRemovalOpen, setIsRemovalOpen] = useState(false)
-
   return (
     <>
       <RegenerateRecoveryCodesModal>
@@ -42,12 +30,10 @@ export const RecoveryCodesAvailable = ({
               isPrimary={isPrimary}
               onRegenerate={onClick}
               isRegenerating={isPending}
-              onRemove={() => setIsRemovalOpen(true)}
             />
           ) : null
         }
       </RegenerateRecoveryCodesModal>
-      <UnenrollRecoveryCodesModal visible={isRemovalOpen} onClose={() => setIsRemovalOpen(false)} />
     </>
   )
 }
@@ -58,7 +44,6 @@ interface RecoveryCodesCardProps {
   isPrimary: boolean
   onRegenerate: () => void
   isRegenerating: boolean
-  onRemove: () => void
 }
 
 const RecoveryCodesCard = ({
@@ -67,33 +52,16 @@ const RecoveryCodesCard = ({
   isPrimary,
   onRegenerate,
   isRegenerating,
-  onRemove,
 }: RecoveryCodesCardProps) => {
   const action = (
-    <div className="flex w-fit">
-      <Button
-        variant={isPrimary ? 'primary' : 'default'}
-        className="flex-1 @lg:flex-none rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-        icon={<RefreshCwIcon />}
-        onClick={onRegenerate}
-        loading={isRegenerating}
-      >
-        Regenerate
-      </Button>
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button
-            variant={isPrimary ? 'primary' : 'default'}
-            aria-label="Recovery code options"
-            className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
-            icon={<ChevronDownIcon />}
-          />
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-44">
-          <DropdownMenuItem onSelect={onRemove}>Remove codes</DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    </div>
+    <Button
+      variant={isPrimary ? 'primary' : 'default'}
+      icon={<RefreshCwIcon />}
+      onClick={onRegenerate}
+      loading={isRegenerating}
+    >
+      Regenerate
+    </Button>
   )
   return (
     <>
