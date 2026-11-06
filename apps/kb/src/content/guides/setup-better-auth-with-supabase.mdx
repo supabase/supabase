@@ -201,7 +201,7 @@ export const Route = createFileRoute('/api/auth/$')({
    })
    ```
 
-3. Replace `src/routes/index.tsx` with a page that loads the session on the server. The page shows a sign-up and sign-in form, or the signed-in user's email:
+3. Replace `src/routes/index.tsx` with a page that loads the session on the server. The page shows a sign-up and sign-in form, or the signed-in user's email. It uses Tailwind CSS classes, which the TanStack Start starter includes:
 
    ```tsx
    import { createFileRoute, useRouter } from '@tanstack/react-router'
@@ -215,6 +215,9 @@ export const Route = createFileRoute('/api/auth/$')({
      component: Home,
    })
 
+   const inputClass = 'w-full rounded-md border border-neutral-300 px-3 py-2 text-sm'
+   const buttonClass = 'flex-1 rounded-md px-4 py-2 text-sm font-medium'
+
    function Home() {
      const session = Route.useLoaderData()
      const router = useRouter()
@@ -225,9 +228,11 @@ export const Route = createFileRoute('/api/auth/$')({
 
      if (session) {
        return (
-         <main>
-           <p>Signed in as {session.user.email}</p>
+         <main className="mx-auto my-16 max-w-sm rounded-lg border border-neutral-200 bg-white p-6 text-neutral-900 shadow-sm">
+           <p className="text-sm text-neutral-600">Signed in as</p>
+           <p className="mt-1 font-medium">{session.user.email}</p>
            <button
+             className={`${buttonClass} mt-6 w-full border border-neutral-300 hover:bg-neutral-100`}
              onClick={async () => {
                await authClient.signOut()
                router.invalidate()
@@ -252,18 +257,42 @@ export const Route = createFileRoute('/api/auth/$')({
      }
 
      return (
-       <main>
-         <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-         <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+       <main className="mx-auto my-16 flex max-w-sm flex-col gap-3 rounded-lg border border-neutral-200 bg-white p-6 text-neutral-900 shadow-sm">
+         <h1 className="mb-2 text-lg font-semibold">Sign in or create an account</h1>
          <input
+           className={inputClass}
+           placeholder="Name"
+           value={name}
+           onChange={(e) => setName(e.target.value)}
+         />
+         <input
+           className={inputClass}
+           placeholder="Email"
+           value={email}
+           onChange={(e) => setEmail(e.target.value)}
+         />
+         <input
+           className={inputClass}
            placeholder="Password"
            type="password"
            value={password}
            onChange={(e) => setPassword(e.target.value)}
          />
-         <button onClick={handleSignUp}>Sign up</button>
-         <button onClick={handleSignIn}>Sign in</button>
-         {error && <p>{error}</p>}
+         {error && <p className="text-sm text-red-600">{error}</p>}
+         <div className="mt-2 flex gap-3">
+           <button
+             className={`${buttonClass} bg-neutral-900 text-white hover:bg-neutral-700`}
+             onClick={handleSignIn}
+           >
+             Sign in
+           </button>
+           <button
+             className={`${buttonClass} border border-neutral-300 hover:bg-neutral-100`}
+             onClick={handleSignUp}
+           >
+             Sign up
+           </button>
+         </div>
        </main>
      )
    }
