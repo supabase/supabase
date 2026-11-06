@@ -26,6 +26,12 @@ Where docs uses static flags:
 - Read them with `useFeatureFlags()` from `common`. Use the `posthog` object (flag key to value) and the `hasLoaded` boolean. Before `hasLoaded` is `true`, `posthog` is empty.
 - Local and staging only: the dev toolbar writes the `x-ph-flag-overrides` cookie, and the provider merges it into `posthog`. See `../../dev-toolbar-review/SKILL.md`.
 
+### Without Supabase access
+
+- A local build is not on the platform, so no PostHog flags load. Variant hooks return `control` (or the cached value from an earlier visit).
+- The URL override still works. `?docs-ia-mvp-v1=option-1` shows Option 1 locally with no PostHog access.
+- Only Supabase staff can create, change, or ramp PostHog flags. Contributors without access suggest an experiment in the PR or a GitHub issue. See `pm-the-docs` for both paths.
+
 ## Variant hook pattern
 
 The template is `apps/docs/features/IaNav/useIaNavVariant.ts`. It reads the `docs-ia-mvp-v1` flag (`IA_NAV_FLAG` in `features/IaNav/constants.ts`). Rules the hook follows:
@@ -56,4 +62,4 @@ The hook has tests in `useIaNavVariant.test.ts`. Write tests for each new varian
 
 - `../../telemetry-standards/SKILL.md`, section "Feature Flag Measurement". It describes Studio patterns (`usePHFlag`). Use it for measurement ideas, not as a docs hook template.
 - `../../dev-toolbar-review/SKILL.md` for the override cookies and environment guards.
-- PMs: see `pm-the-docs`. Docs engineering owns creating and ramping PostHog flags.
+- PMs: see `pm-the-docs`. Docs engineering owns creating and ramping PostHog flags. Contributors without Supabase access follow the OSS path in `pm-the-docs`.

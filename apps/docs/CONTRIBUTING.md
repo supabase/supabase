@@ -167,7 +167,9 @@ Docs can hide or show content at build time with `enabled-features` flags. Use t
 
 Docs also supports A/B tests behind PostHog feature flags. PostHog flags resolve in the browser, not at build time.
 
-Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering, or file a DOCS issue in Linear. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal) first.
+Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering, or file a DOCS issue in Linear. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) first.
+
+Other contributors: if your change may need an A/B test, say so in your PR description or issue. The Docs team decides and sets up the flag. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL.
 
 ## Search
 
