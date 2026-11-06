@@ -104,3 +104,6 @@ url = ""
 
 [functions.search-embeddings]
 verify_jwt = false
+
+[functions.og-images]
+verify_jwt = false
