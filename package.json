@@ -74,6 +74,7 @@
     "tsx": "catalog:",
     "turbo": "2.9.14",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "zod": "catalog:"
   },

@@ -11,7 +11,7 @@
     "test": "test/run-tests.sh vitest run --coverage",
     "test:update": "test/run-tests.sh vitest run --update",
     "lint": "tsc --noEmit",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "dependencies": {
     "zod": "catalog:"
@@ -23,6 +23,7 @@
     "pg": "^8.13.1",
     "postgres-array": "^3.0.2",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:"

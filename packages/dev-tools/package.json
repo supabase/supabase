@@ -14,7 +14,7 @@
     "clean": "rimraf .turbo dist tsconfig.tsbuildinfo",
     "test": "vitest run",
     "test:watch": "vitest",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsrs --noEmit --tsBuildInfoFile node_modules/.cache/tsrs.tsbuildinfo"
   },
   "dependencies": {
     "common": "workspace:*",
@@ -34,6 +34,7 @@
     "tailwindcss": "catalog:",
     "tsconfig": "workspace:*",
     "@typescript/native": "catalog:",
+    "tsrs": "catalog:",
     "typescript": "catalog:",
     "vite": "catalog:",
     "vitest": "catalog:",
