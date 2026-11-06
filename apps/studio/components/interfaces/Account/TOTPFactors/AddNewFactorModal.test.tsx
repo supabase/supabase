@@ -25,11 +25,11 @@ async function enrollFactor() {
     },
     error: null,
   })
-  fireEvent.change(screen.getByRole('textbox', { name: 'Authenticator app name' }), {
+  fireEvent.change(screen.getByRole('textbox', { name: 'Authenticator name' }), {
     target: { value: 'Backup' },
   })
-  fireEvent.click(screen.getByRole('button', { name: 'Generate QR' }))
-  await screen.findByText('Verify new factor Backup')
+  fireEvent.click(screen.getByRole('button', { name: 'Generate QR code' }))
+  await screen.findByText('Verify authenticator app: Backup')
 }
 
 describe('AddNewFactorModal completion', () => {
@@ -112,7 +112,7 @@ describe('AddNewFactorModal completion', () => {
       />
     )
     await waitFor(() =>
-      expect(screen.getByRole('button', { name: 'Generate QR' })).not.toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Generate QR code' })).not.toBeDisabled()
     )
     await enrollFactor()
     fireEvent.change(screen.getByRole('textbox', { name: 'Authentication code' }), {
@@ -245,10 +245,10 @@ describe('Security backup authenticator offer', () => {
     })
   })
   async function enroll() {
-    fireEvent.change(await screen.findByRole('textbox', { name: 'Authenticator app name' }), {
+    fireEvent.change(await screen.findByRole('textbox', { name: 'Authenticator name' }), {
       target: { value: 'Main' },
     })
-    fireEvent.click(await screen.findByRole('button', { name: 'Generate QR' }))
+    fireEvent.click(await screen.findByRole('button', { name: 'Generate QR code' }))
     await screen.findByRole('textbox', { name: 'Authentication code' })
   }
   async function verifyAndSave() {
@@ -258,7 +258,7 @@ describe('Security backup authenticator offer', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
     await screen.findByText('Save your recovery codes')
-    expect(screen.queryByText('Add a backup authenticator?')).toBeNull()
+    expect(screen.queryByText('Add another MFA method?')).toBeNull()
     fireEvent.click(
       screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
@@ -267,15 +267,15 @@ describe('Security backup authenticator offer', () => {
   test('offers optional backup after saving and restarts setup without generating twice', async () => {
     customRender(<Enrollment />)
     await verifyAndSave()
-    await screen.findByText('Add a backup authenticator?')
+    await screen.findByText('Add another MFA method?')
     expect(onSaved).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Add another' }))
-    expect(await screen.findByRole('textbox', { name: 'Authenticator app name' })).toHaveValue('')
+    fireEvent.click(screen.getByRole('button', { name: 'Add another method' }))
+    expect(await screen.findByRole('textbox', { name: 'Authenticator name' })).toHaveValue('')
     expect(auth.mfa.recoveryCodes.generate).toHaveBeenCalledOnce()
     expect(onComplete).toHaveBeenCalledOnce()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() =>
-      expect(screen.queryByRole('textbox', { name: 'Authenticator app name' })).toBeNull()
+      expect(screen.queryByRole('textbox', { name: 'Authenticator name' })).toBeNull()
     )
     expect(onSaved).toHaveBeenCalledOnce()
   })
@@ -283,7 +283,7 @@ describe('Security backup authenticator offer', () => {
     customRender(<Enrollment />)
     await verifyAndSave()
     fireEvent.click(await screen.findByRole('button', { name: 'Not now' }))
-    await waitFor(() => expect(screen.queryByText('Add a backup authenticator?')).toBeNull())
+    await waitFor(() => expect(screen.queryByText('Add another MFA method?')).toBeNull())
     expect(onComplete).toHaveBeenCalledOnce()
     expect(onSaved).toHaveBeenCalledOnce()
     expect(auth.mfa.enroll).toHaveBeenCalledOnce()
@@ -302,7 +302,7 @@ describe('Security backup authenticator offer', () => {
     customRender(<Enrollment />)
     await verifyAndSave()
     await waitFor(() => expect(onSaved).toHaveBeenCalledOnce())
-    expect(screen.queryByText('Add a backup authenticator?')).toBeNull()
+    expect(screen.queryByText('Add another MFA method?')).toBeNull()
   })
   test('cancellation does not generate codes or complete enrollment', async () => {
     customRender(<Enrollment />)

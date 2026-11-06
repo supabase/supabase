@@ -136,12 +136,12 @@ export const AddNewFactorModal = ({
       <Dialog open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
         <DialogContent size="small" aria-describedby={undefined}>
           <DialogHeader>
-            <DialogTitle>Add a backup authenticator?</DialogTitle>
+            <DialogTitle>Add another MFA method?</DialogTitle>
           </DialogHeader>
           <DialogSection>
             <p className="text-sm text-foreground-light">
-              Your recovery codes are saved. Add an authenticator on another device as a backup if
-              you lose access to your main device.
+              Your recovery codes are saved. Set up another authenticator app on a different device
+              as a backup if you lose access to your main device.
             </p>
           </DialogSection>
           <DialogFooter>
@@ -156,7 +156,7 @@ export const AddNewFactorModal = ({
                 setIsBackupSetupOpen(true)
               }}
             >
-              Add another
+              Add another method
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -201,9 +201,9 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title="Add a new authenticator app as a factor"
-      confirmLabel="Generate QR"
-      confirmLabelLoading="Generating QR"
+      title="Set up MFA"
+      confirmLabel="Generate QR code"
+      confirmLabelLoading="Generating QR code"
       loading={isEnrolling}
       onCancel={onClose}
       onConfirm={form.handleSubmit(onSubmit)}
@@ -221,8 +221,8 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
             render={({ field }) => (
               <FormItemLayout
                 name="name"
-                label="Authenticator app name"
-                description="Used to identify the app in your account settings and during sign-in."
+                label="Authenticator name"
+                description="Use this name to identify the MFA method in settings and during sign-in."
               >
                 <FormControl>
                   <Input placeholder="e.g.: Google Authenticator" autoFocus {...field} />
@@ -276,7 +276,7 @@ const SecondStep = ({
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
-      toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
+      toast.error(`Failed to add MFA method: ${error?.message}`)
     },
     onSuccess: async (_data, variables) => {
       setVerifiedFactorId(variables.factorId)
@@ -285,13 +285,13 @@ const SecondStep = ({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
-      toast.success(`Successfully added a second factor authentication`)
+      toast.success('MFA method added')
       onComplete()
     },
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    if (!factor) return toast.error('Factor required')
+    if (!factor) return toast.error('Unable to load this MFA method. Close setup and try again.')
     challengeAndVerify({ factorId: factor.id, code: values.code })
   }
 
@@ -310,7 +310,7 @@ const SecondStep = ({
       size="medium"
       visible={visible}
       className="py-5"
-      title={`Verify new factor ${factorName}`}
+      title={`Verify authenticator app: ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
       loading={isVerifying || isLoading || hasCompletedChallenge}
@@ -323,8 +323,8 @@ const SecondStep = ({
       onConfirm={form.handleSubmit(onSubmit)}
     >
       <p className="text-sm">
-        Use an authenticator app to scan the following QR code, and provide the code from the app to
-        complete the enrolment.
+        Scan this QR code with an authenticator app, then enter the code from the app to finish
+        setup.
       </p>
 
       {!factor && (
