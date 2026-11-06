@@ -1,31 +1,21 @@
 ---
-title: 'Set up Better Auth with Supabase'
-description: 'Store Better Auth users and sessions in Supabase Postgres. Create the tables with declarative schemas and the Supabase CLI, then deploy them to your project.'
+title: 'Set up Better Auth with Supabase Declarative Schema'
+description: 'Store Better Auth users and sessions in Supabase Postgres. Create the tables with the Supabase CLI and declarative schemas, then deploy them to your project.'
 topics: ['Auth', 'Database', 'Tutorials']
 lastEdited: 2026-11-06
 ---
 
-Store Better Auth users, sessions, and accounts in your Supabase Postgres database. Create and update the tables with the Supabase CLI and [declarative schemas](/docs/guides/local-development/declarative-database-schemas). [Better Auth](https://better-auth.com) is an open source authentication library for TypeScript that stores its data in your own database.
+This tutorial demonstrates how to set up [Better Auth](https://better-auth.com) with Supabase and manage its tables using [declarative schemas](/docs/guides/local-development/declarative-database-schemas).
 
 In this guide, you build a [TanStack Start](https://tanstack.com/start) app with email and password sign-in. The database setup works the same in any framework. Only the route handler and client code change. Better Auth documents those for each framework in its [installation guide](https://better-auth.com/docs/installation#mount-handler).
-
-The guide has five parts:
-
-- [Set up the project](#set-up-the-project) creates a TanStack Start app and a local Supabase stack.
-- [Create the Better Auth tables](#create-the-better-auth-tables) writes a declarative schema file and a migration that you commit.
-- [Add sign-up and sign-in](#add-sign-up-and-sign-in) connects the app to Better Auth and tests the flow locally.
-- [Deploy and update the schema](#deploy-and-update-the-schema) pushes the tables to your hosted project and covers later schema changes.
-- [Read and write app data](#read-and-write-app-data) compares ways to query your own tables.
-
-> [!NOTE]
-> Better Auth replaces [Supabase Auth](/docs/guides/auth) for the users it authenticates. Supabase Auth features such as `auth.uid()` in Row Level Security (RLS) policies and the auth methods in `supabase-js` don't apply to Better Auth sessions.
 
 ## Prerequisites
 
 - [Node.js](https://nodejs.org) 22 or later
+- [pnpm](https://pnpm.io) installed
 - A [Supabase project](/dashboard/project/_), to deploy to
 
-This guide uses Supabase CLI v3. It installs as a development dependency, so you run it with `npx supabase`.
+This guide uses Supabase CLI v3. It installs as a development dependency, so you run it with `pnpm supabase`.
 
 ## Set up the project
 
@@ -36,15 +26,15 @@ Create the app, start a local Supabase stack, and set the environment variables 
 1. Create a TanStack Start app and move into its directory:
 
    ```bash
-   npx @tanstack/cli@latest create my-app
+   pnpm dlx @tanstack/cli@latest create my-app --package-manager pnpm
    cd my-app
    ```
 
 2. Install Better Auth, the Postgres driver, Kysely, and the Supabase CLI. Better Auth uses Kysely to connect to Postgres:
 
    ```bash
-   npm install better-auth pg kysely
-   npm install -D @types/pg supabase
+   pnpm add better-auth pg kysely
+   pnpm add -D @types/pg supabase
    ```
 
 ### Start Supabase locally
@@ -52,8 +42,8 @@ Create the app, start a local Supabase stack, and set the environment variables 
 Initialize Supabase in your project and start the local stack:
 
 ```bash
-npx supabase init
-npx supabase start
+pnpm supabase init
+pnpm supabase start
 ```
 
 When the stack is running, the CLI prints its connection details. The local database URL is:
@@ -67,7 +57,7 @@ postgresql://postgres:postgres@127.0.0.1:54322/postgres
 1. Generate a secret that Better Auth uses to sign session cookies:
 
    ```bash
-   npx auth@latest secret
+   pnpm dlx auth@latest secret
    ```
 
 2. In your project root, create a `.env` file with the secret, the local database URL, and your app's URL:
@@ -119,7 +109,7 @@ Use the Better Auth CLI to write its tables to a schema file:
 
 ```bash
 mkdir -p supabase/schemas
-npx auth@latest generate --output supabase/schemas/better_auth.sql --yes
+pnpm dlx auth@latest generate --output supabase/schemas/better_auth.sql --yes
 ```
 
 > [!NOTE]
@@ -147,30 +137,19 @@ create table "better_auth"."verification" ( ... );
 1. Generate a migration from your schema files, then apply it to your local database:
 
    ```bash
-   npx supabase db schema declarative sync -f add_better_auth --no-apply
-   npx supabase migration up
+   pnpm supabase db schema declarative sync -f add_better_auth --no-apply
+   pnpm supabase migration up
    ```
 
-2. Review the migration that the CLI writes to `supabase/migrations/<timestamp>_add_better_auth.sql`. It starts like this:
-
-   ```sql
-   CREATE SCHEMA "better_auth";
-
-   CREATE TABLE "better_auth"."account" (
-     "id"                    text                     NOT NULL,
-     "accountId"             text                     NOT NULL,
-     ...
-   ```
-
-3. Confirm that the database matches what Better Auth expects:
+2. Confirm that the database matches what Better Auth expects:
 
    ```bash
-   npx auth@latest check schema
+   pnpm dlx auth@latest check schema
    ```
 
    The command prints `Schema check passed against the live database.`
 
-4. Commit `supabase/schemas/better_auth.sql` and the migration.
+3. Commit `supabase/schemas/better_auth.sql` and the migration.
 
 ## Add sign-up and sign-in
 
@@ -298,7 +277,7 @@ Test the sign-up flow against your local Supabase stack:
 1. Start the dev server:
 
    ```bash
-   npm run dev
+   pnpm dev
    ```
 
 2. Open your app at `http://localhost:3000`, and sign up with a name, email, and password. The page shows `Signed in as` with your email.
@@ -306,7 +285,7 @@ Test the sign-up flow against your local Supabase stack:
 3. Check that the user is stored in the `better_auth` schema:
 
    ```bash
-   npx supabase db query 'select id, email from better_auth."user"'
+   pnpm supabase db query 'select id, email from better_auth."user"'
    ```
 
    You can also view the tables in Studio at `http://127.0.0.1:54323`. In the Table Editor, select the `better_auth` schema.
@@ -320,19 +299,19 @@ Push the tables to your hosted project. When the Better Auth schema changes late
 1. Sign in to the Supabase CLI and link your project:
 
    ```bash
-   npx supabase login
-   npx supabase link
+   pnpm supabase login
+   pnpm supabase link
    ```
 
 2. Push your migrations to the hosted database. The CLI asks you to confirm before it changes your project:
 
    ```bash
-   npx supabase db push --remote
+   pnpm supabase db push --remote
    ```
 
 3. Where your app runs, set the following environment variables:
    - `DATABASE_URL`: the connection string from your project's [**Connect** panel](/dashboard/project/_?showConnect=true)
-   - `BETTER_AUTH_SECRET`: a new secret for production, generated with `npx auth@latest secret`
+   - `BETTER_AUTH_SECRET`: a new secret for production, generated with `pnpm dlx auth@latest secret`
    - `BETTER_AUTH_URL`: your app's public URL
 
 Choose the `DATABASE_URL` connection type based on where your app runs:
@@ -354,7 +333,7 @@ Better Auth plugins, and some Better Auth upgrades, add tables or columns. Becau
 2. Generate the changes against your local database, which has the current schema applied. Write them to a temporary file:
 
    ```bash
-   npx auth@latest generate --output better_auth_changes.sql --yes
+   pnpm dlx auth@latest generate --output better_auth_changes.sql --yes
    ```
 
    For example, adding the Better Auth [`username` plugin](https://better-auth.com/docs/plugins/username) generates:
@@ -377,21 +356,21 @@ Better Auth plugins, and some Better Auth upgrades, add tables or columns. Becau
 4. Generate and apply a new migration:
 
    ```bash
-   npx supabase db schema declarative sync -f add_better_auth_username --no-apply
-   npx supabase migration up
+   pnpm supabase db schema declarative sync -f add_better_auth_username --no-apply
+   pnpm supabase migration up
    ```
 
-5. Deploy the migration with `npx supabase db push --remote`.
+5. Deploy the migration with `pnpm supabase db push --remote`.
 
 > [!CAUTION]
-> Changes made with `npx auth@latest migrate` apply directly to the database, so the Supabase CLI doesn't include them in your migrations. Make schema changes in the declarative schema files instead, and don't run `migrate` in this setup.
+> Changes made with `pnpm dlx auth@latest migrate` apply directly to the database, so the Supabase CLI doesn't include them in your migrations. Make schema changes in the declarative schema files instead, and don't run `migrate` in this setup.
 
 ## Read and write app data
 
 Better Auth signs users in and tracks their sessions. Your app reads and writes its own data in one of these ways:
 
-- **A Postgres client or object-relational mapper (ORM) on the server**, such as Kysely, Drizzle, or Prisma. Read the user from `auth.api.getSession()`, then filter queries by `session.user.id`.
-- **The Supabase Data API**. The Data API and RLS policies identify users from Supabase-issued JSON Web Tokens (JWTs), and Better Auth sessions aren't Supabase JWTs. Using the Data API with per-user RLS needs extra setup that this guide doesn't cover.
+- **A Postgres client or an ORM on the server**, such as Kysely, Drizzle, or Prisma. Read the user from `auth.api.getSession()`, then filter queries by `session.user.id`.
+- **The Supabase Data API with Row Level Security (RLS)**. Supabase accepts JSON Web Tokens (JWTs) from any OpenID Connect (OIDC) provider through [third-party auth](/docs/guides/auth/third-party/custom-oidc). Better Auth's [JWT plugin](https://better-auth.com/docs/plugins/jwt) can issue those JWTs, so your RLS policies can identify Better Auth users. In policies, read the user ID with `auth.jwt()->>'sub'`, because `auth.uid()` expects a UUID. Custom OIDC providers aren't available in the Supabase CLI, so test this setup on a hosted project.
 
 ### Link your tables to Better Auth users
 
@@ -405,7 +384,7 @@ create table public.profiles (
 );
 ```
 
-Add tables like this to a file in `supabase/schemas/`. Then generate and apply a migration, as in [Generate and apply the migration](#generate-and-apply-the-migration). If a table is in `public` or another exposed schema, enable RLS on it.
+Add tables like this to a file in `supabase/schemas/`. Then generate and apply a migration, as in [Generate and apply the migration](#generate-and-apply-the-migration). If a table is in a schema that is exposed via the Data API, enable RLS on it.
 
 ## Resources
 
