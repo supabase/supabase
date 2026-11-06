@@ -26,6 +26,7 @@ import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const LOGS_PAGE_LIMIT = 50
+const LIVE_LOGS_OVERLAP_MS = 2 * 60 * 1000
 const REFRESH_REQUESTS_PER_RETAINED_PAGE = 2
 const REFRESH_EXTRA_REQUESTS = 10
 const createRefreshBudget = (retainedPageCount = 1) => ({
@@ -110,9 +111,11 @@ export async function getUnifiedLogs(
   const cursorValue = pageParam?.cursor
   const cursorDirection = pageParam?.direction
 
+  let timestampStart = isoTimestampStart
   let timestampEnd = isoTimestampEnd
 
-  if (cursorDirection === 'prev') {
+  if (cursorDirection === 'prev' && !search.date) {
+    timestampStart = new Date(Number(cursorValue) - LIVE_LOGS_OVERLAP_MS).toISOString()
     timestampEnd = new Date().toISOString()
   } else if (cursorDirection === 'next' && !pageParam?.row) {
     timestampEnd =
@@ -160,7 +163,7 @@ export async function getUnifiedLogs(
       projectRef,
       endpoint,
       sql,
-      iso_timestamp_start: isoTimestampStart,
+      iso_timestamp_start: timestampStart,
       iso_timestamp_end: timestampEnd,
       signal,
       headers: headersInit,
@@ -173,7 +176,7 @@ export async function getUnifiedLogs(
   let page = await fetchPage(pageParam?.row)
   const rows = [...page]
 
-  if (refreshThrough) {
+  if (cursorDirection === 'prev' || refreshThrough) {
     while (page.length === pageSize) {
       page = await fetchPage(page[page.length - 1])
       rows.push(...page)
@@ -181,13 +184,12 @@ export async function getUnifiedLogs(
   }
   const result = rows.map(mapUnifiedLogRow)
 
-  const firstRow = result.length > 0 ? result[0] : null
   const lastRow = result.length > 0 ? result[result.length - 1] : null
   const lastQueryRow = rows.length > 0 ? rows[rows.length - 1] : pageParam?.row
-  const hasMore = refreshThrough?.hasMore ?? result.length === pageSize
+  const hasMore = refreshThrough?.hasMore ?? result.length >= pageSize
 
   const nextCursor = lastRow ? lastRow.date.getTime() : (pageParam?.cursor ?? null)
-  const prevCursor = firstRow ? firstRow.date.getTime() : new Date().getTime()
+  const prevCursor = new Date(timestampEnd).getTime()
 
   return {
     data: result,
