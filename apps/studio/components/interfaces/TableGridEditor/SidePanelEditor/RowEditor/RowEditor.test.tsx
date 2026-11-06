@@ -219,6 +219,8 @@ describe('RowEditor', () => {
 
       expect(await screen.findByText('Loading full value...')).toBeInTheDocument()
       expect(await getInput('body')).toBeDisabled()
+      // The expanded editor could save an edit that the fetched value then replaces
+      expect(screen.getByTestId('body-field-actions')).toBeDisabled()
       expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
 
       // Submitting the form another way (e.g. pressing Enter) must not save a blank either
@@ -228,6 +230,7 @@ describe('RowEditor', () => {
       release()
       await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled())
       expect(await getInput('body')).toHaveValue('the full body')
+      expect(screen.getByTestId('body-field-actions')).toBeEnabled()
     })
 
     it('leaves the field empty and says so when the value is too large to copy', async () => {

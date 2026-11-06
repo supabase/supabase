@@ -62,6 +62,8 @@ export const InputField = ({
   onSelectForeignKey = noop,
 }: InputFieldProps) => {
   const notice = status !== undefined ? LARGE_VALUE_NOTICES[status] : undefined
+  // The expanded editors can save an edit that the fetched value would then replace
+  const isLoadingValue = status === 'loading'
 
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
@@ -233,6 +235,7 @@ export const InputField = ({
                   variant="default"
                   icon={<EditIcon />}
                   className="ml-auto px-1.5"
+                  disabled={isLoadingValue}
                 />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-28">
@@ -295,6 +298,7 @@ export const InputField = ({
               type="button"
               icon={isEditable ? <EditIcon /> : <ExpandIcon />}
               className="px-1.5"
+              disabled={isLoadingValue}
               onClick={() => onEditJson({ column: field.name, value: field.value })}
             />
           </InputGroupAddon>
