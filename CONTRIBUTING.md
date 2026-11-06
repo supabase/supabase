@@ -6,8 +6,6 @@ Thank you for contributing to Supabase! We’re a big, exciting open source proj
 
 To ensure a positive and inclusive environment, please read our [code of conduct](https://github.com/supabase/.github/blob/main/CODE_OF_CONDUCT.md) before contributing. For help setting up the code in this repo, please follow our [DEVELOPERS.md](https://github.com/supabase/supabase/blob/master/DEVELOPERS.md) file. For the [docs](https://supabase.com/docs) site, follow this [CONTRIBUTING.md](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md) guide.
 
-Supabase staff: to ship a docs change behind a feature flag or A/B test, see [Feature flags and experiments](https://github.com/supabase/supabase/blob/master/apps/docs/CONTRIBUTING.md#feature-flags-and-experiments).
-
 ## Issues
 
 If you find a bug, please create an Issue and we’ll triage it.
