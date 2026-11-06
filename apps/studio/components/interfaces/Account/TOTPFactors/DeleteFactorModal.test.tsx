@@ -243,14 +243,23 @@ describe('DeleteFactorModal identity verification', () => {
   test('failed verification shows an error and does not delete anything', async () => {
     vi.spyOn(auth.mfa, 'challengeAndVerify').mockResolvedValue({
       data: null,
-      error: new AuthError('Invalid verification code'),
+      error: new AuthApiError('Invalid verification code', 422, 'mfa_verification_failed'),
     })
     renderDeletion()
     fireEvent.change(await screen.findByRole('textbox', { name: 'Authentication code' }), {
       target: { value: '123456' },
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
-    expect(await screen.findByRole('alert')).toHaveTextContent('Invalid verification code')
+    await screen.findByText('Incorrect code. Enter a new code and try again.')
+    const input = screen.getByRole('textbox', { name: 'Authentication code' })
+    expect(input).toHaveAttribute('aria-invalid', 'true')
+    expect(input).toHaveAccessibleDescription(/Incorrect code\./)
+    fireEvent.change(input, { target: { value: '654321' } })
+    await waitFor(() =>
+      expect(
+        screen.queryByText('Incorrect code. Enter a new code and try again.')
+      ).not.toBeInTheDocument()
+    )
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
   })

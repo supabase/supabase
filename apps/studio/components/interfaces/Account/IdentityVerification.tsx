@@ -78,7 +78,9 @@ export const IdentityVerification = ({
     (factor) => factor.status === 'verified'
   )
   const verify = useMfaChallengeAndVerifyMutation({
-    onError: setError,
+    onError: (error) => {
+      if (error.code !== 'mfa_verification_failed') setError(error)
+    },
     onSuccess: async () => {
       setIsCheckingSession(true)
       try {
@@ -102,10 +104,10 @@ export const IdentityVerification = ({
     },
   })
   const loading = verify.isPending || isCheckingSession
-  const handleVerify = ({ code, factorId }: VerificationValues) => {
+  const handleVerify = async ({ code, factorId }: VerificationValues) => {
     if (loading) return
     setError(null)
-    verify.mutate({ factorId, code, refreshFactors: false })
+    await verify.mutateAsync({ factorId, code, refreshFactors: false })
   }
   const readError = assurance.error ?? (needsCode ? factors.error : null)
 
@@ -194,7 +196,7 @@ const VerificationForm = ({
   loading: boolean
   error: { message: string } | null
   onCancel: () => void
-  onVerify: (values: VerificationValues) => void
+  onVerify: (values: VerificationValues) => Promise<void>
 }) => {
   const preferredFactor =
     verifiedFactors.find((factor) => factor.id !== factorToAvoidId) ?? verifiedFactors[0]
@@ -206,7 +208,29 @@ const VerificationForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onVerify)} className="space-y-4">
+      <form
+        onSubmit={form.handleSubmit(async (values) => {
+          try {
+            await onVerify(values)
+          } catch (error) {
+            if (
+              error instanceof Error &&
+              'code' in error &&
+              error.code === 'mfa_verification_failed'
+            ) {
+              form.setError(
+                'code',
+                {
+                  type: 'server',
+                  message: 'Incorrect code. Enter a new code and try again.',
+                },
+                { shouldFocus: true }
+              )
+            }
+          }
+        })}
+        className="space-y-4"
+      >
         <FormField
           control={form.control}
           name="factorId"
@@ -237,6 +261,10 @@ const VerificationForm = ({
               <FormControl>
                 <Input
                   {...field}
+                  onChange={(event) => {
+                    form.clearErrors('code')
+                    field.onChange(event)
+                  }}
                   autoFocus
                   autoComplete="one-time-code"
                   inputMode="numeric"
