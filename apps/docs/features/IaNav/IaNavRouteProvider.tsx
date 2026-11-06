@@ -30,6 +30,7 @@ export function useIaNavRouteVariant(): IaNavVariant | null {
 /**
  * The page's public pathname. On the server, `usePathname` returns the rewritten
  * variant route, so this strips its prefix to match what the browser sees.
+ * The rewritten route encodes the slashes inside a nested slug, so it is decoded too.
  */
 export function useDocsPathname(): string {
   const pathname = usePathname()
@@ -37,5 +38,6 @@ export function useDocsPathname(): string {
   if (!routeVariant) return pathname
 
   const prefix = iaNavRoutePrefix(routeVariant)
-  return pathname.startsWith(prefix) ? pathname.slice(prefix.length) || '/' : pathname
+  if (!pathname.startsWith(prefix)) return pathname
+  return decodeURIComponent(pathname.slice(prefix.length)) || '/'
 }
