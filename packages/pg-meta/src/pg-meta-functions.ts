@@ -40,7 +40,7 @@ export const pgFunctionZod = z.object({
   argument_types: z.string(),
   identity_argument_types: z.string(),
   return_type_id: z.number(),
-  return_type: z.string(),
+  return_type: z.union([z.string(), z.null()]),
   return_type_relation_id: z.union([z.number(), z.null()]),
   is_set_returning_function: z.boolean(),
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
@@ -217,7 +217,7 @@ export type PGSavedFunction = Omit<
 > & {
   argument_types: SafeSqlFragment
   identity_argument_types: SafeSqlFragment
-  return_type: SafeSqlFragment
+  return_type: SafeSqlFragment | null
   config_params: Record<string, SafeSqlFragment> | null
 }
 
@@ -339,6 +339,7 @@ export function update(
             args,
             config_params: currentFunc.config_params ?? {},
             type: currentFunc.type,
+            return_type: currentFunc.return_type ?? undefined,
           },
           { replace: true }
         )
