@@ -1,4 +1,5 @@
 import { screen, waitFor, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import { platformComponents } from 'api-types'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { HttpResponse } from 'msw'
@@ -110,7 +111,7 @@ describe('ComputePlanUsage', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('Plan usage')).toBeInTheDocument()
+    expect(await screen.findByText('Usage')).toBeInTheDocument()
     expect(await screen.findByText('vCPU-hours')).toBeInTheDocument()
     expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Instances')).toBeInTheDocument()
@@ -184,14 +185,26 @@ describe('ComputePlanUsage', () => {
     })
   })
 
-  it('names the plan the meters are measured against', async () => {
+  it('measures against the current plan without naming it in the header', async () => {
     mockOrganizationOnPlan('team', 'Team')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText(/Team Plan · last 30 days/)).toBeInTheDocument()
     expect(await screen.findByText('1 of 75')).toBeInTheDocument()
+    expect(screen.queryByText(/Team Plan/)).not.toBeInTheDocument()
+  })
+
+  it('switches the usage timeframe from the dropdown', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: PROFILE_CONTEXT,
+    })
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Last 30 days' }))
+    await userEvent.click(await screen.findByRole('menuitemradio', { name: 'Last 7 days' }))
+
+    expect(await screen.findByRole('button', { name: 'Last 7 days' })).toBeInTheDocument()
   })
 })
 
@@ -204,7 +217,6 @@ describe('ComputePlanUsage in private alpha', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText(/Private alpha · last 30 days/)).toBeInTheDocument()
     expect(await screen.findByText('1 of 2')).toBeInTheDocument()
   })
 
@@ -242,6 +254,6 @@ describe('ComputePlanUsage in private alpha', () => {
     })
 
     expect(await screen.findByLabelText('Instances: 1 of 2')).toBeInTheDocument()
-    expect(screen.queryByText(/last 30 days/)).not.toBeInTheDocument()
+    expect(screen.queryByText('vCPU-hours', { selector: 'p' })).not.toBeInTheDocument()
   })
 })

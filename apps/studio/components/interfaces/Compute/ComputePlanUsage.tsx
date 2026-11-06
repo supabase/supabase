@@ -2,7 +2,19 @@ import { useQuery } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import { ChevronDownIcon, ChevronUpIcon } from 'lucide-react'
 import Link from 'next/link'
-import { Button, Card, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { useState } from 'react'
+import {
+  Button,
+  Card,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
@@ -14,7 +26,13 @@ import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-qu
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
-const USAGE_WINDOW_DAYS = 30
+const USAGE_TIMEFRAMES = [
+  { key: '24h', label: 'Last 24 hours', days: 1 },
+  { key: '7d', label: 'Last 7 days', days: 7 },
+  { key: '30d', label: 'Last 30 days', days: 30 },
+] as const
+
+type UsageTimeframe = (typeof USAGE_TIMEFRAMES)[number]
 
 interface ComputePlanUsageProps {
   projectRef: string
@@ -23,7 +41,8 @@ interface ComputePlanUsageProps {
 
 export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const { limits, limitsLabel, noLimitLabel } = useComputeLimits(organization?.plan)
+  const { limits, noLimitLabel } = useComputeLimits(organization?.plan)
+  const [timeframe, setTimeframe] = useState<UsageTimeframe>(USAGE_TIMEFRAMES[2])
   const [isCollapsed, setIsCollapsed] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.COMPUTE_PLAN_USAGE_COLLAPSED,
     false
@@ -37,7 +56,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
         size: instance.size,
         declaredInstances: instance.declaredInstances,
       })),
-      days: USAGE_WINDOW_DAYS,
+      days: timeframe.days,
     })
   )
 
@@ -87,17 +106,16 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       <div className="flex items-center justify-between gap-x-4 gap-y-2 px-5 py-3">
         <div className="flex flex-wrap items-center gap-x-6 gap-y-2">
           <h3 className="text-sm text-foreground">Usage</h3>
-          {isCollapsed ? (
+          {isCollapsed && (
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
               {meters.map((meter) => (
                 <CompactUsageMeter key={meter.label} {...meter} />
               ))}
             </div>
-          ) : (
-            <p className="text-xs text-foreground-lighter">{`${limitsLabel} · last 30 days`}</p>
           )}
         </div>
         <div className="flex items-center gap-x-2">
+          <UsageTimeframeDropdown value={timeframe} onChange={setTimeframe} />
           {organization?.slug && (
             <Button asChild>
               <Link href={`/org/${organization.slug}/usage#compute-services`}>View usage</Link>
@@ -124,6 +142,37 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     </Card>
   )
 }
+
+const UsageTimeframeDropdown = ({
+  value,
+  onChange,
+}: {
+  value: UsageTimeframe
+  onChange: (timeframe: UsageTimeframe) => void
+}) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger asChild>
+      <Button iconRight={<ChevronDownIcon size={14} />}>
+        {value.label}
+      </Button>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent side="bottom" align="end" className="w-40">
+      <DropdownMenuRadioGroup
+        value={value.key}
+        onValueChange={(key) => {
+          const next = USAGE_TIMEFRAMES.find((timeframe) => timeframe.key === key)
+          if (next) onChange(next)
+        }}
+      >
+        {USAGE_TIMEFRAMES.map((timeframe) => (
+          <DropdownMenuRadioItem key={timeframe.key} value={timeframe.key}>
+            {timeframe.label}
+          </DropdownMenuRadioItem>
+        ))}
+      </DropdownMenuRadioGroup>
+    </DropdownMenuContent>
+  </DropdownMenu>
+)
 
 interface MeterDefinition {
   label: string
