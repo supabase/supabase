@@ -350,10 +350,12 @@ const { data } = await supabase.storage.from('bucket_name').createSignedUploadUr
 <TabPanel id="python" label="Python">
 
 ```python
+from storage3.types import CreateSignedUploadUrlOptions
+
 # Create a signed upload URL with upsert option
 response = supabase.storage.from_('bucket_name').create_signed_upload_url(
     'file_path',
-    options={'upsert': 'true'}  # Optional: allow overwriting existing files
+    options=CreateSignedUploadUrlOptions(upsert='true')  # Optional: allow overwriting existing files
 )
 
 # Use the signed URL token in resumable upload headers
