@@ -2,7 +2,11 @@
 
 Runs a package script through [Turborepo](https://turborepo.dev) unless it's already running inside Turborepo.
 
-> **TL;DR:** Think of Turborepo as a monad. `maybe-turbo` lifts a script into it: outside Turborepo it wraps the command in `turbo run`, and inside Turborepo, where the script already is, it runs the command as is. Turborepo inside Turborepo flattens to a single run, so the script runs in Turborepo exactly once.
+**TL;DR:** In the script `"<script>": "maybe-turbo <command>"`, `maybe-turbo` is shorthand for:
+
+```sh
+if [ -n "$TURBO_HASH" ]; then <command>; else turbo run <script> --filter=<package>; fi
+```
 
 Prefix a script with `maybe-turbo`, and `pnpm run <script>` gets the task's `dependsOn` prerequisites and caching from `turbo.jsonc`, without pnpm `pre`/`post` hooks.
 
