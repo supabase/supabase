@@ -124,10 +124,9 @@ export const useProjectOAuthIntegrationData = (
   // The grant gates the request. A denied grant sends no request, and a failed permission check
   // surfaces as an error, so both settle instead of staying pending.
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const apiKeysQuery = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    ...sharedOptions,
-  })
+  const apiKeysQuery = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, sharedOptions)
+  )
   const apiKeysState = enabled ? getGatedQueryState(apiKeysGrant, apiKeysQuery) : apiKeysQuery
 
   const queries = {

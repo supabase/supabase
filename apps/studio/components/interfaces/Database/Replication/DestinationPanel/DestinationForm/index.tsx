@@ -181,11 +181,12 @@ export const DestinationForm = ({
     { projectRef },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-    enabled: shouldPrefillCatalogToken,
-  })
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys, enabled: shouldPrefillCatalogToken }
+    )
+  )
   const { serviceKey } = apiKeysData ?? {}
   const catalogToken = serviceKey?.api_key ?? ''
 
