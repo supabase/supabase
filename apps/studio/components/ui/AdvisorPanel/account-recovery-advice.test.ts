@@ -44,7 +44,7 @@ describe('mapAccountRecoveryFindings', () => {
       { label: 'Generate recovery codes', href: '/account/security#recovery-codes' },
       { label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' },
       { label: 'Regenerate recovery codes', href: '/account/security#recovery-codes' },
-      { label: 'Review multi-factor authentication', href: '/account/security' },
+      { label: 'Add another method', href: '/account/security' },
       { label: 'Add a password', href: '/reset-password?type=change' },
     ])
   })

@@ -22,7 +22,7 @@ export const mapAccountRecoveryFindings = (
           ...base,
           title: 'Generate account recovery codes',
           summary:
-            'Your account has no recovery codes. Generate codes and store them somewhere safe so you can sign in if you lose access to an authenticator app.',
+            'Your account has no recovery codes. Generate codes and store them somewhere safe so you can sign in if you lose access to your MFA methods.',
           actions: [{ label: 'Generate recovery codes', href: recoveryCodesHref }],
         }
       case 'recovery-codes-exhausted':
@@ -45,8 +45,8 @@ export const mapAccountRecoveryFindings = (
           ...base,
           title: 'Add a backup MFA method',
           summary:
-            'Your account has one verified MFA method. Add a backup method on another device in case you lose access to the first.',
-          actions: [{ label: 'Review multi-factor authentication', href: '/account/security' }],
+            'Your account has one verified MFA method. Set up another authenticator app on a different device in case you lose access to the first.',
+          actions: [{ label: 'Add another method', href: '/account/security' }],
         }
       case 'single-oauth-identity':
         return {
