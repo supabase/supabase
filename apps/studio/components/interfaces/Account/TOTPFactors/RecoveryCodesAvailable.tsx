@@ -1,68 +1,22 @@
 import type { AuthMFARecoveryCodesStatusResponseData } from '@supabase/supabase-js'
-import { RectangleEllipsisIcon, RefreshCwIcon } from 'lucide-react'
-import { Button, Card, CardContent } from 'ui'
+import { RectangleEllipsisIcon } from 'lucide-react'
+import { Card, CardContent } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 
 interface RecoveryCodesAvailableProps {
-  codes: AuthMFARecoveryCodesStatusResponseData | undefined
-  isVisible: boolean
+  codes: AuthMFARecoveryCodesStatusResponseData
   finding: AccountRecoveryFinding | undefined
   isPrimary: boolean
 }
 
 export const RecoveryCodesAvailable = ({
   codes,
-  isVisible,
   finding,
   isPrimary,
 }: RecoveryCodesAvailableProps) => {
-  return (
-    <>
-      <RegenerateRecoveryCodesModal>
-        {({ onClick, isPending }) =>
-          isVisible && codes ? (
-            <RecoveryCodesCard
-              codes={codes}
-              finding={finding}
-              isPrimary={isPrimary}
-              onRegenerate={onClick}
-              isRegenerating={isPending}
-            />
-          ) : null
-        }
-      </RegenerateRecoveryCodesModal>
-    </>
-  )
-}
-
-interface RecoveryCodesCardProps {
-  codes: AuthMFARecoveryCodesStatusResponseData
-  finding: AccountRecoveryFinding | undefined
-  isPrimary: boolean
-  onRegenerate: () => void
-  isRegenerating: boolean
-}
-
-const RecoveryCodesCard = ({
-  codes,
-  finding,
-  isPrimary,
-  onRegenerate,
-  isRegenerating,
-}: RecoveryCodesCardProps) => {
-  const action = (
-    <Button
-      variant={isPrimary ? 'primary' : 'default'}
-      icon={<RefreshCwIcon />}
-      onClick={onRegenerate}
-      loading={isRegenerating}
-    >
-      Regenerate
-    </Button>
-  )
   return (
     <>
       {finding && (
@@ -95,7 +49,7 @@ const RecoveryCodesCard = ({
               </p>
             </div>
           </div>
-          {action}
+          <RegenerateRecoveryCodesModal variant={isPrimary ? 'primary' : 'default'} />
         </CardContent>
       </Card>
     </>

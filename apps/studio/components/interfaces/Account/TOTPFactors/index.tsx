@@ -73,6 +73,8 @@ export const TOTPFactors = () => {
   const isCodeActionPrimary =
     primaryAction === 'generate-codes' || primaryAction === 'regenerate-codes'
 
+  const canShowRecoveryCodes = shouldVerifyRecoveryCodes && !recoveryCodesIsError
+
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   const disableDeleteFactor =
@@ -193,21 +195,16 @@ export const TOTPFactors = () => {
             {recoveryCodesIsError && (
               <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
             )}
-            <RecoveryCodesSetup
-              isVisible={
-                shouldVerifyRecoveryCodes && status === 'unenrolled' && !recoveryCodesIsError
-              }
-              finding={codeFinding}
-              isPrimary={isCodeActionPrimary}
-            />
-            <RecoveryCodesAvailable
-              isVisible={
-                shouldVerifyRecoveryCodes && status === 'available' && !recoveryCodesIsError
-              }
-              codes={codes ?? undefined}
-              finding={codeFinding}
-              isPrimary={isCodeActionPrimary}
-            />
+            {canShowRecoveryCodes && status === 'unenrolled' && (
+              <RecoveryCodesSetup finding={codeFinding} isPrimary={isCodeActionPrimary} />
+            )}
+            {canShowRecoveryCodes && status === 'available' && codes && (
+              <RecoveryCodesAvailable
+                codes={codes}
+                finding={codeFinding}
+                isPrimary={isCodeActionPrimary}
+              />
+            )}
           </PageSectionContent>
         </PageSection>
       )}
