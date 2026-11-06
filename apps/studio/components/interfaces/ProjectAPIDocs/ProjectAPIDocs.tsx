@@ -53,10 +53,8 @@ export const ProjectAPIDocs = () => {
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef: ref })
   const { data: apiKeysData } = useQuery({
-    ...apiKeysQueryOptions({
-      projectRef: ref,
-      grant: snap.showProjectApiDocs ? apiKeysGrant.grant : undefined,
-    }),
+    ...apiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }),
+    enabled: snap.showProjectApiDocs,
     select: getKeys,
   })
   const canShowKeys = apiKeysGrant.status === 'granted'

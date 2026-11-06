@@ -4,6 +4,7 @@ import type {
   EntitySearchFunction,
   EntitySearchPolicy,
   EntitySearchTable,
+  EntitySearchTrigger,
 } from '@/data/database/entity-search-query'
 
 // Each search runs SQL against the user's database, so keep it to queries that
@@ -43,12 +44,12 @@ export function matchesEntitySearch(
 }
 
 /**
- * Client-side mirror of how policies are matched in getSearchEntitiesSql: the
- * policy name contains the query, or the policy's table matches it. Used to
- * narrow results from a previous search while the current one is still in
- * flight.
+ * Client-side mirror of how policies and triggers are matched in
+ * getSearchEntitiesSql: the entity's own name contains the query, or its table
+ * matches it. Used to narrow results from a previous search while the current
+ * one is still in flight.
  */
-export function matchesPolicySearch(
+export function matchesTableRelatedSearch(
   { name, schema, table }: Pick<EntitySearchPolicy, 'name' | 'schema' | 'table'>,
   query: string
 ) {
@@ -78,6 +79,41 @@ export function getPolicyEditorRoute(
   policy: Pick<EntitySearchPolicy, 'id' | 'schema'>
 ): `/${string}` {
   return `/project/${projectRef}/database/policies?schema=${encodeURIComponent(policy.schema)}&edit=${policy.id}`
+}
+
+// Triggers found through their function don't match by name or table, so say which
+// function they run instead of their timing
+export function formatTriggerSearchDetails({
+  activation,
+  events,
+  schema,
+  table,
+  matched_function,
+}: Pick<EntitySearchTrigger, 'activation' | 'events' | 'schema' | 'table' | 'matched_function'>) {
+  if (matched_function) return `Runs ${matched_function}`
+  return `${activation} ${events.join(' OR ')} on ${schema}.${table}`
+}
+
+/**
+ * Client-side mirror of how triggers are matched in getSearchEntitiesSql: like
+ * policies, by name or table, plus triggers found through the function they run.
+ */
+export function matchesTriggerSearch(
+  trigger: Pick<EntitySearchTrigger, 'name' | 'schema' | 'table' | 'matched_function'>,
+  query: string
+) {
+  if (matchesTableRelatedSearch(trigger, query)) return true
+  return trigger.matched_function?.toLowerCase().includes(query.toLowerCase()) ?? false
+}
+
+// The triggers page lists triggers per schema (of their table), so the schema
+// must be set for the trigger to be found and opened for editing. The index
+// route only redirects, and drops the query string, so link to the list directly.
+export function getTriggerEditorRoute(
+  projectRef: string,
+  trigger: Pick<EntitySearchTrigger, 'id' | 'schema'>
+): `/${string}` {
+  return `/project/${projectRef}/database/triggers/data?schema=${encodeURIComponent(trigger.schema)}&edit=${trigger.id}`
 }
 
 export function formatFunctionSearchDetails({

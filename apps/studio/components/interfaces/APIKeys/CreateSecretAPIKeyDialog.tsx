@@ -18,6 +18,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  DialogTrigger,
   Form,
   FormControl,
   FormField,
@@ -96,32 +97,32 @@ export const CreateSecretAPIKeyDialog = () => {
 
   return (
     <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
-      <Shortcut
-        id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
-        onTrigger={openDialog}
-        side="bottom"
-        tooltipOpen={visible === 'secret' ? false : undefined}
-      >
-        <ButtonTooltip
-          className="mt-2"
-          icon={<PlusIcon />}
-          onClick={openDialog}
-          disabled={!canCreateAPIKeys}
-          tooltip={{
-            content: { side: 'bottom', text: getWriteGrantTooltip(createGrant.status, 'create') },
-          }}
+      <DialogTrigger asChild>
+        <Shortcut
+          id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
+          onTrigger={openDialog}
+          side="bottom"
+          tooltipOpen={visible === 'secret' ? false : undefined}
         >
-          New secret key
-        </ButtonTooltip>
-      </Shortcut>
+          <ButtonTooltip
+            className="mt-2"
+            icon={<PlusIcon />}
+            onClick={openDialog}
+            disabled={!canCreateAPIKeys}
+            tooltip={{
+              content: { side: 'bottom', text: getWriteGrantTooltip(createGrant.status, 'create') },
+            }}
+          >
+            New secret key
+          </ButtonTooltip>
+        </Shortcut>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
-          <DialogDescription className="grid gap-y-2">
-            <p>
-              Secret API keys allow elevated access to your project's data, bypassing Row-Level
-              security.
-            </p>
+          <DialogDescription>
+            Secret API keys allow elevated access to your project's data, bypassing Row-Level
+            security.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
