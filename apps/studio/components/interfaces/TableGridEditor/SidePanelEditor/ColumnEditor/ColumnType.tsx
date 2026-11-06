@@ -46,6 +46,7 @@ import {
   RECOMMENDED_ALTERNATIVE_DATA_TYPE,
 } from '../SidePanelEditor.constants'
 import type { PostgresDataTypeOption } from '../SidePanelEditor.types'
+import { displayColumnType } from './ColumnEditor.utils'
 import type { EnumeratedType } from '@/data/enumerated-types/enumerated-types-query'
 
 export type ColumnTypeSelection = { format: string; formatSchema?: string }
@@ -253,10 +254,12 @@ const ColumnType = ({
                     <CommandGroup heading="Other types">
                       {enumTypes.map((option) => {
                         const isSelected = matchesEnum(option, value)
+                        const formattedType = displayColumnType(option.name, option.schema)
+
                         return (
                           <CommandItem
                             key={option.id}
-                            value={option.format}
+                            value={formattedType}
                             className={cn('relative', isSelected ? 'bg-surface-200' : '')}
                             onSelect={() => {
                               onOptionSelect({
@@ -275,9 +278,7 @@ const ColumnType = ({
                                   strokeWidth={1.5}
                                 />
                               </div>
-                              <span className="text-foreground">
-                                {option.format.replaceAll('"', '')}
-                              </span>
+                              <span className="text-foreground">{formattedType}</span>
                               {option.comment !== undefined && (
                                 <span
                                   title={option.comment ?? ''}
