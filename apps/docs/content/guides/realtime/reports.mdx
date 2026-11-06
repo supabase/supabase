@@ -1,6 +1,6 @@
 ---
-title: 'Realtime Reports'
-description: 'Reports to help debug Realtime issues'
+title: "Realtime Reports"
+description: "Reports to help debug Realtime issues"
 ---
 
 Realtime reports give insights into how your application uses Supabase Realtime, including connections, broadcast and change events, execution times, and lag.
@@ -42,7 +42,7 @@ The Connected Clients report helps you monitor the total number of concurrent Re
 The report displays the total number of connected Realtime clients, showing how connection counts fluctuate throughout the selected time period. Each client connection represents an active WebSocket connection to your Realtime service, which can subscribe to multiple channels for receiving real-time updates.
 
 <Image
-  alt="Connected Clients chart"
+alt="Connected Clients chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/connected-clients-chart-dark.png',
@@ -55,15 +55,15 @@ height={625}
 
 ### Actions you can take
 
-| Action                      | Description                                                                                                                                                  | More information                                                                                                                              |
-| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- |
-| Configure connection limit  | Adjust the "Max concurrent connections" setting to increase or decrease the connection limit for your project                                                | [Realtime Settings Guide](/docs/guides/realtime/settings)                                                                                     |
-| Upgrade plan                | Increase available client connections. Connection limits vary by plan: Free (200), Pro (500), Pro no spend cap (10,000), Team (10,000), Enterprise (10,000+) | [Pricing and Plans](/pricing)                                                                                                                 |
-| Review quotas               | Understand connection limits and other Realtime quotas for your plan                                                                                         | [Realtime Quotas Reference](/docs/guides/realtime/limits)                                                                                     |
-| Understand connection quota | Learn how the concurrent connections quota works and how to configure it for your plan                                                                       | [Concurrent Peak Connections Quota Troubleshooting](/kb/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp)                    |
+| Action                      | Description                                                                                                                                                  | More information                                                                                                                                     |
+| --------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Configure connection limit  | Adjust the "Max concurrent connections" setting to increase or decrease the connection limit for your project                                                | [Realtime Settings Guide](/docs/guides/realtime/settings)                                                                                            |
+| Upgrade plan                | Increase available client connections. Connection limits vary by plan: Free (200), Pro (500), Pro no spend cap (10,000), Team (10,000), Enterprise (10,000+) | [Pricing and Plans](/pricing)                                                                                                                        |
+| Review quotas               | Understand connection limits and other Realtime quotas for your plan                                                                                         | [Realtime Quotas Reference](/docs/guides/realtime/limits)                                                                                            |
+| Understand connection quota | Learn how the concurrent connections quota works and how to configure it for your plan                                                                       | [Concurrent Peak Connections Quota Troubleshooting](/kb/troubleshooting/realtime-concurrent-peak-connections-quota-jdDqcp)                           |
 | Fix silent disconnections   | Fix connection issues in background applications using heartbeat callbacks and Web Workers                                                                   | [Handling Silent Disconnections in Background Apps](/kb/troubleshooting/realtime-handling-silent-disconnections-in-backgrounded-applications-592794) |
-| Check logs                  | Investigate connection errors and quota errors in your project dashboard                                                                                     | [Realtime Logs Dashboard](/dashboard/project/_/database/realtime-logs)                                                                        |
-| Contact support             | Request custom quota increases for Enterprise plans or discuss connection requirements                                                                       | [Support Portal](/dashboard/support/new)                                                                                                      |
+| Check logs                  | Investigate connection errors and quota errors in your project dashboard                                                                                     | [Realtime Logs Dashboard](/dashboard/project/_/database/realtime-logs)                                                                               |
+| Contact support             | Request custom quota increases for Enterprise plans or discuss connection requirements                                                                       | [Support Portal](/dashboard/support/new)                                                                                                             |
 
 ## Broadcast Events
 
@@ -72,7 +72,7 @@ The Broadcast Events report helps you monitor the volume of broadcast messages s
 The report displays the total number of broadcast events sent by clients, showing message volume throughout the selected time period. Broadcast events are low-latency messages sent between users using Realtime's pub/sub pattern, which can be sent from client libraries, REST APIs, or directly from your database. Each event represents a message broadcast to subscribers of a specific channel topic.
 
 <Image
-  alt="Broadcast Events chart"
+alt="Broadcast Events chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/broadcast-events-chart-dark.png',
@@ -101,7 +101,7 @@ The Presence Events report helps you monitor the volume of presence state update
 The report displays the total number of presence events sent by clients, showing state synchronization activity throughout the selected time period. Presence events occur when clients `track`, `update`, or `untrack` their presence state in a channel, triggering `sync`, `join`, or `leave` events. Unlike broadcast messages, presence state is persisted in the channel so new joiners immediately receive the current state without waiting for other users to send updates.
 
 <Image
-  alt="Presence Events chart"
+alt="Presence Events chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/presence-events-chart-dark.png',
@@ -130,7 +130,7 @@ The Postgres Changes Events report helps you monitor the volume of database chan
 The report displays the total number of Postgres change events received by clients, showing database change activity throughout the selected time period. Postgres Changes use logical replication to stream database changes from the Write-Ahead Log (WAL) to subscribed clients. Each event represents a database change that has been broadcast to clients subscribed to the relevant schema and table. Note that Postgres Changes process changes on a single thread to maintain order, which can create bottlenecks at scale compared to Broadcast.
 
 <Image
-  alt="Postgres Changes Events chart"
+alt="Postgres Changes Events chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/postgres-changes-events-chart-dark.png',
@@ -160,7 +160,7 @@ The Rate of Channel Joins report helps you monitor how fast clients are joining 
 The report displays the rate of channel joins per second, showing how frequently clients subscribe to channels throughout the selected time period. A channel join occurs whenever a client subscribes to a channel topic to receive real-time updates. Each client connection can join multiple channels (up to 100 per connection for most plans), and the join rate measures how many of these subscriptions happen per second across your entire project.
 
 <Image
-  alt="Rate of Channel Joins chart"
+alt="Rate of Channel Joins chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/rate-of-channel-joins-chart-dark.png',
@@ -188,7 +188,7 @@ The Message Payload Size report helps you monitor the median size of message pay
 The report displays the median payload size in bytes, showing how message sizes fluctuate throughout the selected time period. Payload size directly affects message throughput and latency—larger payloads require more bandwidth and processing time, which can increase latency and reduce the number of messages your system can handle per second. Monitoring this metric helps you optimize your message structure and identify opportunities to reduce payload sizes for better performance.
 
 <Image
-  alt="Message Payload Size chart"
+alt="Message Payload Size chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/message-payload-size-chart-dark.png',
@@ -218,7 +218,7 @@ The Broadcast from Database Replication Lag report helps you monitor the median 
 The report displays the median replication lag in milliseconds, showing the delay between database commit and broadcast throughout the selected time period. When you use broadcast from database (by inserting messages into `realtime.messages`), Realtime reads changes from the Write-Ahead Log (WAL) using logical replication. The lag represents the time it takes for these changes to be processed and broadcast to subscribed clients. Higher lag values indicate delays in the replication pipeline, which can impact the real-time responsiveness of your application.
 
 <Image
-  alt="Broadcast from Database Replication Lag chart"
+alt="Broadcast from Database Replication Lag chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/broadcast-from-database-replication-lag-chart-dark.png',
@@ -250,7 +250,7 @@ The (Read) Private Channel Subscription RLS Execution Time report helps you moni
 The report displays the median RLS execution time in milliseconds, showing how long it takes to validate user permissions when subscribing to private channels throughout the selected time period. When a user joins a private channel, Realtime checks RLS policies on the `realtime.messages` table to determine if the user has read access. This authorization check happens once per channel subscription and the result is cached for the duration of the connection. However, complex RLS policies with joins, function calls, or missing indexes can significantly increase this initial connection time.
 
 <Image
-  alt="(Read) Private Channel Subscription RLS Execution Time chart"
+alt="(Read) Private Channel Subscription RLS Execution Time chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/read-private-channel-subscription-rls-execution-time-chart-dark.png',
@@ -283,7 +283,7 @@ The (Write)Private Channel Subscription RLS Execution Time report helps you moni
 The report displays the median RLS execution time in milliseconds, showing how long it takes to validate user permissions when publishing to private channels throughout the selected time period. When a user sends a broadcast message to a private channel, Realtime checks RLS policies on the `realtime.messages` table to determine if the user has write (INSERT) access. This authorization check happens for the first message sent and then it's cached. Complex RLS policies with joins, function calls, or missing indexes can significantly increase first message publishing latency.
 
 <Image
-  alt="(Write) Private Channel Subscription RLS Execution Time chart"
+alt="(Write) Private Channel Subscription RLS Execution Time chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/write-private-channel-subscription-rls-execution-time-chart-dark.png',
@@ -316,7 +316,7 @@ The Total Requests report helps you monitor the overall volume of HTTP requests 
 The report displays the total number of HTTP requests made to the Realtime service which include the WebSocket upgrade requests and the REST API requests.
 
 <Image
-  alt="Total Requests chart"
+alt="Total Requests chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/total-requests-chart-dark.png',
@@ -345,7 +345,7 @@ The Response Errors report helps you monitor the number of failed HTTP requests 
 The report displays the total number of response errors from the Realtime API, showing error frequency throughout the selected time period. These errors include HTTP error status codes (4xx client errors and 5xx server errors) from REST API requests, failed WebSocket upgrade requests, authorization failures, and other error responses. Monitoring error rates alongside total requests helps you identify patterns, correlate errors with specific events, and troubleshoot issues affecting your Realtime service availability.
 
 <Image
-  alt="Response Errors chart"
+alt="Response Errors chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/response-errors-chart-dark.png',
@@ -378,7 +378,7 @@ The Response Speed report helps you monitor the average response time for HTTP r
 The report displays the average response time in milliseconds, showing how fast the Realtime service responds to HTTP requests throughout the selected time period. This includes response times for REST API requests such as broadcast messages, WebSocket upgrade requests, and other HTTP-based interactions. Higher response times can indicate performance bottlenecks, database load issues, or network problems that may impact the real-time responsiveness of your application.
 
 <Image
-  alt="Response Speed chart"
+alt="Response Speed chart"
 
 src={{
     dark: '/docs/img/guides/platform/realtime/reports/response-speed-chart-dark.png',
