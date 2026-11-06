@@ -48,9 +48,9 @@ export function UserFields({
           onAddFilter={label === 'User ID' ? onFilterByUser : undefined}
         >
           {value ? (
-            <span className="min-w-0 truncate text-right font-mono text-sm leading-5">{value}</span>
+            <span className="min-w-0 truncate text-right font-mono text-xs leading-5">{value}</span>
           ) : (
-            <span className="font-mono text-sm leading-5 text-foreground-muted">—</span>
+            <span className="font-mono text-xs leading-5 text-foreground-muted">—</span>
           )}
         </LogFieldRow>
       ))}

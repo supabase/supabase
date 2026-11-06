@@ -55,9 +55,10 @@ const HTTP_STATUS_EXPR: SafeLogSqlFragment = safeSql`CASE
     END`
 
 // storage-service rows expose method/path under `req.method` / `req.url`
-// rather than the gateway's `request.method` / `request.path`.
+// rather than the gateway's `request.method` / `request.path`, and
+// edge function rows expose their path as `request.pathname`.
 const HTTP_METHOD_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.method'], ${ATTR.method})`
-const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`if(source = 'storage_logs', log_attributes['req.url'], ${ATTR.path})`
+const HTTP_PATH_EXPR: SafeLogSqlFragment = safeSql`multiIf(source = 'storage_logs', log_attributes['req.url'], source = 'function_edge_logs', log_attributes['request.pathname'], ${ATTR.path})`
 
 /**
  * Condition that matches rows belonging to a given log_type. Mirrors the
@@ -211,8 +212,8 @@ const translateFilter = (
       return safeSql`(${STATUS_EXPR}) ${inOp} ${inList(values)}`
     case 'pathname': {
       // Match the displayed pathname: gateway rows read `request.path`,
-      // storage rows read `req.url`. Inline HTTP_PATH_EXPR so filtering
-      // picks up storage rows too.
+      // storage rows read `req.url`, and edge function rows read
+      // `request.pathname`. Inline HTTP_PATH_EXPR so filtering picks up all of them.
       if (operator === '~~*' || operator === '!~~*') {
         const op = operator === '~~*' ? ILIKE_OP : NOT_ILIKE_OP
         const join = operator === '!~~*' ? ' AND ' : ' OR '
