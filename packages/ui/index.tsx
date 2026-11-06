@@ -20,6 +20,7 @@ export {
   removeAnchor,
   highlightSelectedNavItem,
 } from './src/components/CustomHTMLElements'
+export { CrossfadeIcon } from './src/components/CrossfadeIcon/CrossfadeIcon'
 
 // UTILITIES
 
