@@ -1,13 +1,15 @@
 import type { PGTable } from '@supabase/pg-meta'
+import { MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
+import { toast } from 'sonner'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { RowEditor, type RowEditorProps } from './RowEditor'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
@@ -43,8 +45,24 @@ const table = {
       comment: null,
       enums: [],
     },
+    {
+      id: '1.3',
+      table: 'posts',
+      schema: 'public',
+      name: 'body',
+      format: 'text',
+      is_identity: false,
+      is_generated: false,
+      is_nullable: true,
+      default_value: null,
+      comment: null,
+      enums: [],
+    },
   ],
 } as unknown as PGTable
+
+// A value the grid truncated: it ends with "..." and is longer than MAX_CHARACTERS
+const TRUNCATED_BODY = 'a'.repeat(MAX_CHARACTERS + 1) + '...'
 
 const renderRowEditor = (props: Partial<RowEditorProps> = {}) =>
   customRender(
@@ -62,7 +80,13 @@ const getInput = async (name: string) =>
   (await screen.findByTestId(`${name}-input`)) as HTMLInputElement | HTMLTextAreaElement
 
 describe('RowEditor', () => {
+  let largeValueQueries: string[] = []
+  let largeValuesResponse: () => Response | Promise<Response>
+
   beforeEach(() => {
+    largeValueQueries = []
+    largeValuesResponse = () => HttpResponse.json<unknown[]>([{ body: 'the full body' }])
+
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -79,11 +103,18 @@ describe('RowEditor', () => {
       },
     })
 
-    // Foreign key constraints lookup
+    // Foreign key constraints lookup, and the fetch of a copied row's truncated values
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json<unknown[]>([]),
+      response: async ({ request }) => {
+        const { query } = (await request.json()) as { query: string }
+        if (query.includes('octet_length')) {
+          largeValueQueries.push(query)
+          return largeValuesResponse()
+        }
+        return HttpResponse.json<unknown[]>([])
+      },
     })
   })
 
@@ -157,6 +188,86 @@ describe('RowEditor', () => {
       await user.click(await screen.findByRole('button', { name: 'Row creation options' }))
       expect(await screen.findByText('Row creation options')).toBeInTheDocument()
       expect(screen.getByLabelText('Keep values for the next row')).not.toBeChecked()
+    })
+  })
+
+  describe('duplicating a row with truncated values', () => {
+    const source = { id: 7, title: 'Hello world', body: TRUNCATED_BODY }
+
+    it('fetches the full value and includes it in the insert', async () => {
+      const saveChanges = vi.fn()
+      renderRowEditor({ duplicateFrom: source, saveChanges })
+
+      await waitFor(async () => expect(await getInput('body')).toHaveValue('the full body'))
+      expect(largeValueQueries).toHaveLength(1)
+      expect(largeValueQueries[0]).toContain('where id = 7')
+
+      fireEvent.click(screen.getByRole('button', { name: 'Save' }))
+      await waitFor(() => expect(saveChanges).toHaveBeenCalled())
+      expect(saveChanges.mock.calls[0][0]).toEqual({ title: 'Hello world', body: 'the full body' })
+    })
+
+    it('disables the field and Save while the value loads', async () => {
+      let release: () => void = () => {}
+      const gate = new Promise<void>((resolve) => (release = resolve))
+      largeValuesResponse = async () => {
+        await gate
+        return HttpResponse.json<unknown[]>([{ body: 'the full body' }])
+      }
+      const saveChanges = vi.fn()
+      renderRowEditor({ duplicateFrom: source, saveChanges })
+
+      expect(await screen.findByText('Loading full value...')).toBeInTheDocument()
+      expect(await getInput('body')).toBeDisabled()
+      expect(screen.getByRole('button', { name: 'Save' })).toBeDisabled()
+
+      // Submitting the form another way (e.g. pressing Enter) must not save a blank either
+      fireEvent.submit(document.getElementById('row-editor-panel')!)
+      expect(saveChanges).not.toHaveBeenCalled()
+
+      release()
+      await waitFor(() => expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled())
+      expect(await getInput('body')).toHaveValue('the full body')
+    })
+
+    it('leaves the field empty and says so when the value is too large to copy', async () => {
+      largeValuesResponse = () => HttpResponse.json<unknown[]>([{ body: null }])
+      renderRowEditor({ duplicateFrom: source })
+
+      expect(await screen.findByText(/Value is too large to copy/)).toBeInTheDocument()
+      expect(await getInput('body')).toHaveValue('')
+      expect(await getInput('body')).toBeEnabled()
+      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+    })
+
+    it('leaves the field empty, says so, and shows a toast when the fetch fails', async () => {
+      const toastError = vi.spyOn(toast, 'error').mockImplementation(() => '')
+      largeValuesResponse = () =>
+        HttpResponse.json<APIErrorBody>({ message: 'permission denied' }, { status: 500 })
+      renderRowEditor({ duplicateFrom: source })
+
+      expect(await screen.findByText('Unable to load value.')).toBeInTheDocument()
+      expect(toastError).toHaveBeenCalledWith(expect.stringContaining('permission denied'))
+      expect(await getInput('body')).toHaveValue('')
+      expect(screen.getByRole('button', { name: 'Save' })).toBeEnabled()
+      toastError.mockRestore()
+    })
+
+    it('does not fetch when the table has no primary key', async () => {
+      const noPrimaryKeyTable = { ...table, primary_keys: [] } as unknown as PGTable
+      renderRowEditor({ duplicateFrom: source, selectedTable: noPrimaryKeyTable })
+
+      expect(await screen.findByText(/table has no primary key/)).toBeInTheDocument()
+      expect(await getInput('body')).toHaveValue('')
+      expect(largeValueQueries).toHaveLength(0)
+    })
+
+    it('does not fetch when nothing was truncated', async () => {
+      renderRowEditor({ duplicateFrom: { id: 7, title: 'Hello world', body: 'short' } })
+
+      expect(await getInput('body')).toHaveValue('short')
+      expect(screen.queryByText('Loading full value...')).not.toBeInTheDocument()
+      expect(largeValueQueries).toHaveLength(0)
     })
   })
 })

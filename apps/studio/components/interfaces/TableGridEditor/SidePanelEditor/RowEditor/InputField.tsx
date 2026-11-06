@@ -24,14 +24,23 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
 import { DATETIME_TYPES, JSON_TYPES, TEXT_TYPES } from '../SidePanelEditor.constants'
 import { DateTimeInput } from './DateTimeInput'
-import type { EditValue, RowField } from './RowEditor.types'
+import type { EditValue, LargeValueStatus, RowField } from './RowEditor.types'
 import { isValueTruncated } from './RowEditor.utils'
 
 const TRUNCATE_DESCRIPTION =
   'Note: Value is too large to be rendered in the dashboard. Please expand the editor to edit the value'
 
+const LARGE_VALUE_NOTICES: Record<LargeValueStatus, string> = {
+  loading: 'Loading full value...',
+  'too-large': 'Value is too large to copy.',
+  'no-primary-key': 'Unable to copy value: table has no primary key.',
+  failed: 'Unable to load value.',
+}
+
 export interface InputFieldProps {
   field: RowField
+  /** Set while a value copied from another row is loading, or when it couldn't be copied */
+  status?: LargeValueStatus
   errors: any
   isNewRow?: boolean
   isEditable?: boolean
@@ -43,6 +52,7 @@ export interface InputFieldProps {
 
 export const InputField = ({
   field,
+  status,
   errors,
   isNewRow = false,
   isEditable = true,
@@ -51,6 +61,8 @@ export const InputField = ({
   onEditText = noop,
   onSelectForeignKey = noop,
 }: InputFieldProps) => {
+  const notice = status !== undefined ? LARGE_VALUE_NOTICES[status] : undefined
+
   if (field.enums.length > 0) {
     const isArray = field.format[0] === '_'
     if (isArray) {
@@ -191,6 +203,7 @@ export const InputField = ({
           <>
             {field.comment && <p>{field.comment}</p>}
             {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+            {notice && <p>{notice}</p>}
           </>
         }
         error={errors[field.name]}
@@ -263,6 +276,7 @@ export const InputField = ({
           <>
             {field.comment && <p>{field.comment}</p>}
             {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+            {notice && <p>{notice}</p>}
           </>
         }
         error={errors[field.name]}
@@ -358,6 +372,7 @@ export const InputField = ({
           <>
             {field.comment && <p>{field.comment}</p>}
             <p>Bytea columns are edited and displayed as hex in the dashboard</p>
+            {notice && <p>{notice}</p>}
           </>
         }
         error={errors[field.name]}
@@ -385,6 +400,7 @@ export const InputField = ({
         <>
           {field.comment && <p>{field.comment}</p>}
           {isTruncated && <p>{TRUNCATE_DESCRIPTION}</p>}
+          {notice && <p>{notice}</p>}
         </>
       }
       error={errors[field.name]}

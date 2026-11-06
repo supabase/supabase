@@ -1,4 +1,5 @@
-import { MAX_ARRAY_SIZE } from '@supabase/pg-meta/src/query/table-row-query'
+import type { PGTable } from '@supabase/pg-meta'
+import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
@@ -7,7 +8,10 @@ import {
   generateReusedRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getPrimaryKeyMatch,
+  getTruncatedFieldNames,
   isValueTruncated,
+  mergeLargeValues,
   parseValue,
   validateFields,
 } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
@@ -897,5 +901,108 @@ describe('generateReusedRowFields', () => {
       blankFields: [makeField({ format: 'bool', value: 'null' })],
     })
     expect(field.value).toBe('null')
+  })
+})
+
+describe('large values when duplicating', () => {
+  const makeField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'col',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: 'copied',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+  const truncated = 'a'.repeat(MAX_CHARACTERS + 1) + '...'
+
+  describe('getTruncatedFieldNames', () => {
+    it('returns the fields whose values were truncated', () => {
+      const fields = [
+        makeField({ name: 'title', value: 'short' }),
+        makeField({ name: 'body', value: truncated }),
+        makeField({ name: 'meta', format: 'jsonb', value: truncated }),
+      ]
+      expect(getTruncatedFieldNames(fields)).toEqual(['body', 'meta'])
+    })
+
+    it.each([
+      ['primary key', { isPrimaryKey: true }],
+      ['identity', { isIdentity: true }],
+      ['function default', { defaultValue: 'gen_random_uuid()' }],
+      ['generated', { isGenerated: true }],
+    ])('skips %s fields, which are never copied', (_, overrides) => {
+      expect(getTruncatedFieldNames([makeField({ value: truncated, ...overrides })])).toEqual([])
+    })
+  })
+
+  describe('getPrimaryKeyMatch', () => {
+    const table = {
+      primary_keys: [{ name: 'org_id' }, { name: 'id' }],
+      columns: [
+        { name: 'org_id', format: 'int8' },
+        { name: 'id', format: 'bytea' },
+      ],
+    } as unknown as PGTable
+
+    it('matches on every primary key column', () => {
+      const match = getPrimaryKeyMatch({
+        row: { org_id: 7, id: { type: 'Buffer', data: [1, 2] }, other: 'x' },
+        table,
+      })
+      expect(match).toEqual({ org_id: 7, id: '\\x0102' })
+    })
+
+    it('returns undefined when the table has no primary key', () => {
+      const noPk = { primary_keys: [], columns: [] } as unknown as PGTable
+      expect(getPrimaryKeyMatch({ row: { id: 1 }, table: noPk })).toBeUndefined()
+    })
+
+    it('returns undefined when the row is missing a primary key value', () => {
+      expect(getPrimaryKeyMatch({ row: { org_id: 7 }, table })).toBeUndefined()
+    })
+  })
+
+  describe('mergeLargeValues', () => {
+    it('fills in fetched values and leaves other fields alone', () => {
+      const fields = [
+        makeField({ name: 'title', value: 'edited by the user' }),
+        makeField({ name: 'body', value: undefined }),
+      ]
+      const result = mergeLargeValues({ fields, values: { body: 'the full text' } })
+
+      expect(result.fields.map((f) => f.value)).toEqual(['edited by the user', 'the full text'])
+      expect(result.unavailable).toEqual([])
+    })
+
+    it('stringifies jsonb values the way row values are', () => {
+      const fields = [makeField({ name: 'meta', format: 'jsonb', value: undefined })]
+      const result = mergeLargeValues({ fields, values: { meta: { a: [1, 2] } } })
+
+      expect(result.fields[0].value).toBe('{"a":[1,2]}')
+    })
+
+    it('converts bytea values to hex', () => {
+      const fields = [makeField({ name: 'blob', format: 'bytea', value: undefined })]
+      const result = mergeLargeValues({
+        fields,
+        values: { blob: { type: 'Buffer', data: [255, 0] } },
+      })
+
+      expect(result.fields[0].value).toBe('\\xff00')
+    })
+
+    it('reports null values as unavailable and keeps the field unchanged', () => {
+      const fields = [makeField({ name: 'body', value: undefined })]
+      const result = mergeLargeValues({ fields, values: { body: null } })
+
+      expect(result.fields[0].value).toBeUndefined()
+      expect(result.unavailable).toEqual(['body'])
+    })
   })
 })

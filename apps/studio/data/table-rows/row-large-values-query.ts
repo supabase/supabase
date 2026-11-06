@@ -23,7 +23,7 @@ export type RowLargeValuesVariables = {
   /** The columns whose values the grid truncated */
   columns: string[]
   /** Primary key column names mapped to the selected row's values */
-  pkMatch: { [key: string]: any }
+  pkMatch: Record<string, unknown>
   roleImpersonationState?: RoleImpersonationState
 }
 
