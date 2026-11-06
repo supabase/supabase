@@ -59,7 +59,7 @@ supabase logs --remote --since 30m --limit 500
 supabase logs --remote --from 2026-11-01T09:00:00Z --to 2026-11-01T10:00:00Z
 ```
 
-`--since` accepts a duration or UTC timestamp. Explicit timestamps must end in `Z`. Use `--from` and `--to` for fixed bounds. With only `--to`, the range covers the hour ending at that timestamp. Do not combine `--since` with `--from` or `--to`.
+`--since` accepts a duration or UTC timestamp. Use `--from` and `--to` for fixed UTC bounds ending in `Z`. With only `--to`, the range covers the hour ending at that timestamp. Do not combine `--since` with `--from` or `--to`.
 
 Each hosted request can span at most 24 hours. Local ranges have no 24-hour ceiling. The displayed lower bound stays fixed during refreshes. If a later load requires a wider request window, restart with a narrower range.
 
@@ -112,21 +112,22 @@ Use `--output-format` for both `logs` and `logs sources`. These commands reject 
 Pass SQL with `--sql`, `--file <path>`, or `--file -` for piped input. SQL requires an explicit hosted target:
 
 ```sh
-supabase logs --remote --sql "select timestamp, id, event_message, log_attributes from logs limit 20"
+supabase logs --remote --sql "select timestamp, id, event_message, log_attributes from logs order by timestamp desc limit 20"
 ```
 
-Queries use ClickHouse SQL over the hosted `logs` table. They do not query your Postgres database. Select `log_attributes` to keep correlation IDs and user attributes. Save this query as `errors.sql`:
+Queries use ClickHouse SQL over the hosted `logs` table. They do not query your Postgres database. Select `log_attributes` to keep correlation IDs and user attributes. Save this query as `postgres.sql`:
 
 ```sql
 select timestamp, id, event_message, log_attributes
 from logs
 where source = 'postgres_logs'
+order by timestamp desc
 limit 20;
 ```
 
 ```sh
-supabase logs --remote --file errors.sql --since 30m --output-format json
-cat errors.sql | supabase logs --remote --file - --output-format stream-json
+supabase logs --remote --file postgres.sql --since 30m --output-format json
+cat postgres.sql | supabase logs --remote --file - --output-format stream-json
 ```
 
 The CLI reads stdin only with `--file -`. This flag requires piped, nonempty input. `--file` has no `-f` alias. Choose either `--sql` or `--file`. SQL cannot be combined with `--service`, `--resource`, `--kind`, `--level`, `--search`, `--stack`, or `--stack-id`. Time-range flags still apply. SQL controls its own `limit`; the CLI's `--limit` applies to filtered history.
@@ -203,7 +204,7 @@ The unified browser uses `L` for manual loads. Scripts perform a finite read. Re
 | No events                            | Check the target, time range, service, and filters. Discovery lists support, not event volume. Check [logging configuration](/docs/guides/observability/configure-logging) and [source capture limits](/docs/guides/observability/log-field-reference#capture-limits). |
 | Local stack unavailable              | Turn on the experimental stack runtime and select an existing stack. Log reads never create or start one.                                                                                                                                                              |
 | Unsupported level, resource, or kind | Inspect `logs sources --remote --service <service>`. Local reads do not support level, search, kind, or SQL filters.                                                                                                                                                   |
-| Invalid time range                   | Use UTC timestamps ending in `Z`, separate `--since` from explicit bounds, and keep hosted ranges within 24 hours.                                                                                                                                                     |
+| Invalid time range                   | End `--from` and `--to` timestamps in `Z`, separate `--since` from explicit bounds, and keep hosted ranges within 24 hours.                                                                                                                                            |
 | SQL error                            | Check ClickHouse syntax and columns on `logs`. Remove filter-selector flags and select `--remote`. Shorten oversized queries if the server rejects the URL.                                                                                                            |
 | Access denied                        | Check authentication, profile, project access, and scoped token permissions. Hosted log reads require `analytics_logs_read`; project or branch resolution can also require read permissions.                                                                           |
 | Clipboard failure                    | Check the footer error and install a supported clipboard tool on Linux. Export JSON if clipboard access is unavailable.                                                                                                                                                |
