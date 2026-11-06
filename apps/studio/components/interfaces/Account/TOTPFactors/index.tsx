@@ -86,8 +86,7 @@ export const TOTPFactors = () => {
           <PageSectionSummary>
             <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
             <PageSectionDescription>
-              Use a multi-factor authentication app (like Google Authenticator or 1Password) to
-              protect your account.
+              Require an extra verification step when you sign in.
             </PageSectionDescription>
           </PageSectionSummary>
           {canAddApp && hasVerifiedFactors && (
@@ -101,7 +100,7 @@ export const TOTPFactors = () => {
                 icon={<PlusIcon />}
                 onClick={handleAddNewApp}
               >
-                Add authenticator
+                Add another method
               </Button>
             </PageSectionAside>
           )}
@@ -136,8 +135,8 @@ export const TOTPFactors = () => {
             <Admonition
               type="warning"
               layout="responsive"
-              title="Add a backup authenticator"
-              description="Add an authenticator on another device so you can still sign in if you lose access to this one."
+              title="Add a backup MFA method"
+              description="Set up an authenticator app on another device so you can still sign in if you lose access to this one."
             />
           )}
           {isSuccess && totpFactors.length > 0 && (
@@ -164,8 +163,8 @@ export const TOTPFactors = () => {
                     <ButtonTooltip
                       size="tiny"
                       icon={<TrashIcon size={14} />}
-                      aria-label={`Remove ${factor.friendly_name ?? 'unnamed'} authenticator`}
-                      tooltip={{ content: { side: 'bottom', text: 'Remove authenticator' } }}
+                      aria-label={`Remove MFA method: ${factor.friendly_name ?? 'unnamed'}`}
+                      tooltip={{ content: { side: 'bottom', text: 'Remove MFA method' } }}
                       onClick={() => setFactorToBeDeleted(factor.id)}
                       disabled={disableDeleteFactor}
                     />

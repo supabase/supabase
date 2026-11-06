@@ -130,17 +130,17 @@ describe('account security MFA and recovery sections', () => {
     renderSection()
     expect(await screen.findByText('Set up multi-factor authentication')).toBeInTheDocument()
     await userEvent.click(screen.getByRole('button', { name: 'Set up MFA' }))
-    expect(await screen.findByText('Add a new authenticator app as a factor')).toBeInTheDocument()
-    expect(screen.getByLabelText('Authenticator app name')).toBeInTheDocument()
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    expect(screen.getByRole('textbox', { name: /authenticator.*name/i })).toBeInTheDocument()
     expect(screen.queryByText('Recovery codes')).not.toBeInTheDocument()
   })
 
   it('shows a backup warning with one authenticator action', async () => {
     renderSection()
-    expect(await screen.findByText('Add a backup authenticator')).toBeInTheDocument()
-    expect(await screen.findAllByRole('button', { name: 'Add authenticator' })).toHaveLength(1)
+    expect(await screen.findByText('Add a backup MFA method')).toBeInTheDocument()
+    expect(await screen.findAllByRole('button', { name: 'Add another method' })).toHaveLength(1)
     expect(
-      await screen.findByRole('button', { name: 'Remove Phone authenticator' })
+      await screen.findByRole('button', { name: 'Remove MFA method: Phone' })
     ).toBeInTheDocument()
   })
 
@@ -149,7 +149,7 @@ describe('account security MFA and recovery sections', () => {
     renderSection()
     expect(await screen.findByText('10/10 recovery codes available')).toBeInTheDocument()
     expect(screen.queryByText('Set up multi-factor authentication')).not.toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Add authenticator' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add another method' })).toBeInTheDocument()
   })
 
   it('does not treat an authenticator as the last MFA method when a verified phone factor remains', async () => {
@@ -159,7 +159,7 @@ describe('account security MFA and recovery sections', () => {
       { ...factor, id: 'unfinished-a', status: 'unverified' },
     ])
     renderSection()
-    await userEvent.click(await screen.findByRole('button', { name: 'Remove Phone authenticator' }))
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove MFA method: Phone' }))
     expect(await screen.findByText('This action cannot be undone')).toBeInTheDocument()
     expect(
       screen.queryByText('Multi-factor authentication will be disabled')
@@ -178,7 +178,7 @@ describe('account security MFA and recovery sections', () => {
     )
     renderSection()
     expect(await screen.findByText('Failed to load recovery codes')).toBeInTheDocument()
-    expect(screen.getByRole('button', { name: 'Remove Phone authenticator' })).toHaveAttribute(
+    expect(screen.getByRole('button', { name: 'Remove MFA method: Phone' })).toHaveAttribute(
       'aria-disabled',
       'true'
     )
