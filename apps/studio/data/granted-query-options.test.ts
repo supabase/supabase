@@ -62,4 +62,10 @@ describe('grantedQueryOptions', () => {
     expect(result.select).toBeTypeOf('function')
     expectTypeOf(result.select).not.toBeAny()
   })
+
+  test('carries the brand the type-aware lint rule looks for', () => {
+    // fga/no-spread-granted-query-options detects this exact property name (scripts/eslint-rules/fga.cjs).
+    const result = grantedQueryOptions({ queryKey, queryFn })
+    expectTypeOf(result).toHaveProperty('__grantedQueryOptions')
+  })
 })

@@ -97,7 +97,7 @@ export const xQueryOptions = <TData = XData>(
 useQuery(xQueryOptions({ projectRef, grant: xGrant.grant }, { select, enabled: open }))
 ```
 
-Why: TanStack keeps one options object per cache entry, overwritten by whichever observer rendered last, and invalidation refetches with it. A missing grant yields `queryFn: undefined` and `enabled: false` (not `skipToken`, which would make invalidation fail with `Missing queryFn` if a grant-less observer rendered last). The helper owns `queryKey`, `queryFn`, and the `enabled` gate, so a caller can't override the grant check. The `fga/no-spread-granted-query-options` lint rule enforces this.
+Why: TanStack keeps one options object per cache entry, overwritten by whichever observer rendered last, and invalidation refetches with it. A missing grant yields `queryFn: undefined` and `enabled: false` (not `skipToken`, which would make invalidation fail with `Missing queryFn` if a grant-less observer rendered last). The helper owns `queryKey`, `queryFn`, and the `enabled` gate, so a caller can't override the grant check. `grantedQueryOptions` brands its return type (a type-only `__grantedQueryOptions` property), and the type-aware `fga/no-spread-granted-query-options` lint rule reports any object spread or `Object.assign` of a branded value, however it was obtained (variable, wrapper, renamed import).
 
 ## Using Query Options in Components
 

@@ -1496,6 +1496,9 @@ importers:
       '@types/zxcvbn':
         specifier: ^4.4.1
         version: 4.4.2
+      '@typescript-eslint/parser':
+        specifier: 8.65.0
+        version: 8.65.0(eslint@9.37.0(jiti@2.7.0)(supports-color@8.1.1))(supports-color@8.1.1)(typescript@6.0.2)
       '@typescript/native':
         specifier: 'catalog:'
         version: typescript@7.0.2

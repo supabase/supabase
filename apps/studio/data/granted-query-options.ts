@@ -5,6 +5,13 @@ import {
   type UseQueryOptions,
 } from '@tanstack/react-query'
 
+/**
+ * Type-only marker (no runtime field) on everything `grantedQueryOptions` returns. The type-aware
+ * `fga/no-spread-granted-query-options` lint rule finds it by this property name, so don't rename
+ * it without updating `scripts/eslint-rules/fga.cjs`.
+ */
+export type GrantedQueryOptionsBrand = { readonly __grantedQueryOptions?: true }
+
 /** Caller options for grant-gated factories. The factory owns queryKey/queryFn and gates `enabled`. */
 export type GrantedQueryCallerOptions<
   TQueryFnData,
@@ -36,10 +43,12 @@ export function grantedQueryOptions<
     ...options
   }: GrantedQueryCallerOptions<TQueryFnData, TError, TData, TQueryKey> = {}
 ) {
-  return queryOptions<TQueryFnData, TError, TData, TQueryKey>({
+  const result = queryOptions<TQueryFnData, TError, TData, TQueryKey>({
     ...options,
     queryKey,
     queryFn,
     enabled: queryFn ? enabled : false,
   })
+  const branded: typeof result & GrantedQueryOptionsBrand = result
+  return branded
 }
