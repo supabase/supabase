@@ -1,4 +1,4 @@
-import { ConnectionTimeoutError } from '@/lib/errors/studio-errors'
+import { ConnectionTimeoutError, DbQueryError } from '@/lib/errors/studio-errors'
 import type { ClassifiedError, StudioErrorInput } from '@/lib/errors/studio-errors'
 
 type ErrorConstructor = new (input: StudioErrorInput) => ClassifiedError
@@ -15,6 +15,8 @@ export interface ErrorPattern {
  */
 const ERROR_PATTERN_MAP = new Map<ErrorConstructor, RegExp>([
   [ConnectionTimeoutError, /CONNECTION\s+TERMINATED\s+DUE\s+TO\s+CONNECTION\s+TIMEOUT/i],
+  // pg-meta wraps Postgres errors as `Failed to run sql query: ERROR: <SQLSTATE>: <message>`
+  [DbQueryError, /FAILED\s+TO\s+RUN\s+SQL\s+QUERY:\s*ERROR:\s*[0-9A-Z]{5}:/i],
 ])
 
 export const ERROR_PATTERNS: ErrorPattern[] = Array.from(ERROR_PATTERN_MAP.entries()).map(

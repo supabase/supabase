@@ -119,6 +119,15 @@ export class ConnectionTimeoutError extends studioError('DbConnectionTimeout', {
   retryable: () => true,
 }) {}
 
+// Postgres rejected a SQL query with a SQLSTATE code, e.g. a missing function or a syntax error.
+// The query or the schema it runs against belongs to the user, so retrying won't help.
+export class DbQueryError extends studioError('DbQueryError', {
+  fault: 'user',
+  classifiedBy: 'rule',
+  defaultReason: 'sql_error',
+  retryable: () => false,
+}) {}
+
 export class UnexpectedError extends studioError('UnexpectedError', {
   fault: 'studio',
   classifiedBy: 'default',
@@ -133,11 +142,12 @@ export type StudioError =
   | PlatformError
   | UnclassifiedApiError
   | ConnectionTimeoutError
+  | DbQueryError
   | UnexpectedError
 
 export type StudioErrorTag = StudioError['_tag']
 
-export type ClassifiedError = ConnectionTimeoutError
+export type ClassifiedError = ConnectionTimeoutError | DbQueryError
 
 // A Record (not a Set) so a new tag fails typecheck until it is listed here.
 const STUDIO_ERROR_TAGS: Record<StudioErrorTag, true> = {
@@ -147,6 +157,7 @@ const STUDIO_ERROR_TAGS: Record<StudioErrorTag, true> = {
   PlatformError: true,
   UnclassifiedApiError: true,
   DbConnectionTimeout: true,
+  DbQueryError: true,
   UnexpectedError: true,
 }
 

@@ -4,6 +4,7 @@ import { classifyResponseError } from './error-classification'
 import { ERROR_ROUTING } from '@/lib/errors/error-routing'
 import {
   ConnectionTimeoutError,
+  DbQueryError,
   isStudioError,
   MalformedResponseError,
   NetworkUnreachableError,
@@ -47,6 +48,21 @@ describe('handleError — error classification', () => {
     expect(err._tag).toBe('DbConnectionTimeout')
     expect(err.classifiedBy).toBe('rule')
     expect(err.fault).toBe('platform')
+  })
+
+  it('classifies a Postgres error with a SQLSTATE as a user-fault DbQueryError', () => {
+    const err = throwAndCatch({
+      message: 'Failed to run sql query: ERROR: 42883: function public.my_fn() does not exist',
+      code: 400,
+    })
+    expect(err).toBeInstanceOf(DbQueryError)
+    expect(err._tag).toBe('DbQueryError')
+    expect(err.classifiedBy).toBe('rule')
+    expect(err.fault).toBe('user')
+    expect(err.retryable).toBe(false)
+    expect(ERROR_ROUTING.DbQueryError.sentrySampleRate).toBe(
+      ERROR_ROUTING.DbConnectionTimeout.sentrySampleRate
+    )
   })
 
   it.each([

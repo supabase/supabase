@@ -20,6 +20,19 @@ const PATTERN_SAMPLES: Record<string, { matches: string[]; nonMatches: string[] 
       '',
     ],
   },
+  DbQueryError: {
+    matches: [
+      'Failed to run sql query: ERROR: 42883: function public.my_fn() does not exist',
+      'Failed to run sql query: ERROR: 22P02: invalid input syntax for type uuid: \"x\"',
+      'Failed to run sql query: ERROR:  42601: syntax error at or near \"selec\"',
+    ],
+    nonMatches: [
+      'Failed to run sql query: CONNECTION TERMINATED DUE TO CONNECTION TIMEOUT',
+      'Failed to run sql query: ERROR: could not determine which collation to use',
+      'ERROR: 42883: function public.my_fn() does not exist',
+      '',
+    ],
+  },
 }
 
 describe('ERROR_PATTERNS registry', () => {
