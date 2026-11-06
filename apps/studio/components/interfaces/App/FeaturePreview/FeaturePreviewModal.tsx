@@ -86,7 +86,12 @@ export const FeaturePreviewModal = () => {
   const selectedFeatureRoute = selectedFeature?.getRoute?.(ref)
   const hasRoute = selectedFeatureRoute !== undefined && ref !== undefined
 
-  const isAlreadyOnFeatureRoute = hasRoute && router.asPath.startsWith(selectedFeatureRoute)
+  const currentPath = router.asPath.split(/[?#]/)[0].replace(/\/$/, '')
+  const isAlreadyOnFeatureRoute =
+    hasRoute &&
+    (currentPath === selectedFeatureRoute ||
+      (selectedFeature.matchesSubroutes === true &&
+        currentPath.startsWith(`${selectedFeatureRoute}/`)))
   const shouldRedirect = hasRoute && !isAlreadyOnFeatureRoute
 
   const toggleFeature = () => {
