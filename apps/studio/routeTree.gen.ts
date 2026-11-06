@@ -167,6 +167,7 @@ import { Route as ProjectRefFunctionsNewRouteImport } from './routes/project/$re
 import { Route as ProjectRefFunctionsSecretsRouteImport } from './routes/project/$ref/functions/secrets'
 import { Route as ProjectRefIntegrationsIndexRouteImport } from './routes/project/$ref/integrations/index'
 import { Route as ProjectRefIssuesIndexRouteImport } from './routes/project/$ref/issues/index'
+import { Route as ProjectRefIssuesIdRouteImport } from './routes/project/$ref/issues/$id'
 import { Route as ProjectRefLogsIndexRouteImport } from './routes/project/$ref/logs/index'
 import { Route as ProjectRefLogsAuthLogsRouteImport } from './routes/project/$ref/logs/auth-logs'
 import { Route as ProjectRefLogsCronLogsRouteImport } from './routes/project/$ref/logs/cron-logs'
@@ -1163,6 +1164,11 @@ const ProjectRefIntegrationsIndexRoute =
 const ProjectRefIssuesIndexRoute = ProjectRefIssuesIndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => ProjectRefIssuesRoute,
+} as any)
+const ProjectRefIssuesIdRoute = ProjectRefIssuesIdRouteImport.update({
+  id: '/$id',
+  path: '/$id',
   getParentRoute: () => ProjectRefIssuesRoute,
 } as any)
 const ProjectRefLogsIndexRoute = ProjectRefLogsIndexRouteImport.update({
@@ -2316,6 +2322,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -2629,6 +2636,7 @@ export interface FileRoutesByTo {
   '/project/$ref/editor/new': typeof ProjectRefEditorNewRoute
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -2959,6 +2967,7 @@ export interface FileRoutesById {
   '/project/$ref/functions/$functionSlug': typeof ProjectRefFunctionsFunctionSlugRouteWithChildren
   '/project/$ref/functions/new': typeof ProjectRefFunctionsNewRoute
   '/project/$ref/functions/secrets': typeof ProjectRefFunctionsSecretsRoute
+  '/project/$ref/issues/$id': typeof ProjectRefIssuesIdRoute
   '/project/$ref/logs/auth-logs': typeof ProjectRefLogsAuthLogsRoute
   '/project/$ref/logs/cron-logs': typeof ProjectRefLogsCronLogsRoute
   '/project/$ref/logs/dedicated-pooler-logs': typeof ProjectRefLogsDedicatedPoolerLogsRoute
@@ -3289,6 +3298,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -3602,6 +3612,7 @@ export interface FileRouteTypes {
     | '/project/$ref/editor/new'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -3931,6 +3942,7 @@ export interface FileRouteTypes {
     | '/project/$ref/functions/$functionSlug'
     | '/project/$ref/functions/new'
     | '/project/$ref/functions/secrets'
+    | '/project/$ref/issues/$id'
     | '/project/$ref/logs/auth-logs'
     | '/project/$ref/logs/cron-logs'
     | '/project/$ref/logs/dedicated-pooler-logs'
@@ -5347,6 +5359,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/project/$ref/issues/'
       preLoaderRoute: typeof ProjectRefIssuesIndexRouteImport
+      parentRoute: typeof ProjectRefIssuesRoute
+    }
+    '/project/$ref/issues/$id': {
+      id: '/project/$ref/issues/$id'
+      path: '/$id'
+      fullPath: '/project/$ref/issues/$id'
+      preLoaderRoute: typeof ProjectRefIssuesIdRouteImport
       parentRoute: typeof ProjectRefIssuesRoute
     }
     '/project/$ref/logs/': {
@@ -6982,10 +7001,12 @@ const ProjectRefIntegrationsRouteWithChildren =
   )
 
 interface ProjectRefIssuesRouteChildren {
+  ProjectRefIssuesIdRoute: typeof ProjectRefIssuesIdRoute
   ProjectRefIssuesIndexRoute: typeof ProjectRefIssuesIndexRoute
 }
 
 const ProjectRefIssuesRouteChildren: ProjectRefIssuesRouteChildren = {
+  ProjectRefIssuesIdRoute: ProjectRefIssuesIdRoute,
   ProjectRefIssuesIndexRoute: ProjectRefIssuesIndexRoute,
 }
 
