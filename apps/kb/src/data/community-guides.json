@@ -9,6 +9,7 @@
     "title": "Moving Our AI Data Agent onto Supabase Compute",
     "description": "How Dreambase moved its read-only AI data analyst onto Supabase Compute, next to its customers' data.",
     "url": "https://dreambase.com/blog/running-our-data-pipeline-on-supabase-compute",
-    "topics": ["Platform"]
+    "topics": ["Platform"],
+    "lastEdited": "2026-10-08"
   }
 ]
