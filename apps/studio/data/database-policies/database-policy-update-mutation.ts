@@ -20,8 +20,8 @@ export type DatabasePolicyUpdateVariables = {
   }
   payload: {
     name?: string
-    definition?: SafeSqlFragment
-    check?: SafeSqlFragment
+    definition?: SafeSqlFragment | null
+    check?: SafeSqlFragment | null
     roles?: string[]
   }
 }

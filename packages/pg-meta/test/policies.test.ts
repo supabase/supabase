@@ -129,13 +129,28 @@ withTestDatabase('retrieve, create, update, delete policies', async ({ executeQu
     `
   )
 
+  // Update policy to clear definition and check using null
+  const { sql: clearSql } = pgMeta.policies.update(updatedPolicy!, {
+    definition: null,
+    check: null,
+  })
+  await executeQuery(clearSql)
+
+  // Retrieve cleared policy
+  const { sql: retrieveClearedSql, zod: retrieveClearedZod } = pgMeta.policies.retrieve({
+    id: createdPolicy!.id,
+  })
+  const clearedPolicy = retrieveClearedZod.parse((await executeQuery(retrieveClearedSql))[0])
+  expect(clearedPolicy?.definition).toBeNull()
+  expect(clearedPolicy?.check).toBeNull()
+
   // Remove policy
-  const { sql: removeSql } = pgMeta.policies.remove(updatedPolicy!)
+  const { sql: removeSql } = pgMeta.policies.remove(clearedPolicy!)
   await executeQuery(removeSql)
 
   // Verify policy is removed
   const { sql: verifyRemoveSql } = pgMeta.policies.retrieve({
-    id: updatedPolicy!.id,
+    id: clearedPolicy!.id,
   })
   const result = await executeQuery(verifyRemoveSql)
   expect(result).toHaveLength(0)
