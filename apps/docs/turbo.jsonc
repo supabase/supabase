@@ -3,8 +3,8 @@
   "extends": ["//"],
   "tasks": {
     // Generated artifacts are gitignored, so tasks downstream of an uncached task list the
-    // files it writes in `inputs` explicitly. Otherwise a cache hit could restore output built
-    // from stale remote content.
+    // files it writes in `inputs` explicitly, in "jit" mode so they're hashed after that task
+    // runs. Otherwise a cache hit could restore output built from stale remote content.
 
     "codegen:graphql": {
       "outputs": ["__generated__/**"],
@@ -23,7 +23,7 @@
     },
     "codegen:references:new": {
       "dependsOn": ["codegen:references:new:ensure", "codegen:references:dart"],
-      "inputs": ["$TURBO_DEFAULT$", "spec/reference/**"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["spec/reference/**"] }],
       "outputs": ["content/reference/**"],
     },
     // Shares features/docs/generated/ with build:federated-content, so only claim this
@@ -56,7 +56,10 @@
     },
     "build:guides-markdown": {
       "dependsOn": ["build:federated-content"],
-      "inputs": ["$TURBO_DEFAULT$", "content/guides/**", "features/docs/generated/**"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        { "mode": "jit", "globs": ["content/guides/**", "features/docs/generated/**"] },
+      ],
       "env": [
         "CI",
         "NODE_ENV",
@@ -96,7 +99,7 @@
     },
     "build:sitemap": {
       "dependsOn": ["build:federated-content", "codegen:references"],
-      "inputs": ["$TURBO_DEFAULT$", "content/guides/**"],
+      "inputs": ["$TURBO_DEFAULT$", { "mode": "jit", "globs": ["content/guides/**"] }],
       "outputs": ["public/sitemap.xml"],
     },
     "redirects:generate": {
@@ -212,13 +215,14 @@
         "SUPABASE_SECRET_KEY",
       ],
       "passThroughEnv": ["SENTRY_AUTH_TOKEN"],
-      // Gitignored files written by the uncached fetch tasks, hashed so new remote content
-      // invalidates the build.
+      // Gitignored files written by the uncached fetch tasks, hashed after they run so new
+      // remote content invalidates the build.
       "inputs": [
         "$TURBO_DEFAULT$",
-        "content/guides/**",
-        "features/docs/generated/**",
-        "spec/reference/**",
+        {
+          "mode": "jit",
+          "globs": ["content/guides/**", "features/docs/generated/**", "spec/reference/**"],
+        },
       ],
       "outputs": [".next/**", "!.next/cache/**"],
     },
