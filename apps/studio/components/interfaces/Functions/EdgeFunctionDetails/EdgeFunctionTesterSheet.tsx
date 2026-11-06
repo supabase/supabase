@@ -90,10 +90,9 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
     { projectRef },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { anonKey, publishableKey, secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
 

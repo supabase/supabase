@@ -40,10 +40,7 @@ export const APIKeys = () => {
     error: errorAPIKeys,
     isError: isErrorAPIKeys,
     isPending: isLoadingAPIKeys,
-  } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  } = useQuery(apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys }))
   const { anonKey, serviceKey, publishableKey, secretKey } = apiKeysData ?? {}
 
   const hasNewAPIKeys = !!publishableKey && !!secretKey

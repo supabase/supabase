@@ -140,11 +140,15 @@ function VectorBucketIndexExamples({
   const { ref: projectRef, bucketId } = useParams()
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { data: apiKeysData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    // A skipped query still returns cached data, so ignore it unless the grant is granted
-    select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
-  })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
+  )
   const { secretKey } = apiKeysData ?? {}
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })

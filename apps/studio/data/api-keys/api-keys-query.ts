@@ -1,7 +1,6 @@
-import { queryOptions, skipToken } from '@tanstack/react-query'
-
 import { apiKeysKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 
@@ -80,20 +79,42 @@ export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
 export type APIKeysError = StudioError
 
 /** Keys without their secret values (`reveal=false`). Needs a plain grant. */
-export const apiKeysQueryOptions = ({ projectRef, grant }: APIKeysVariables) =>
-  queryOptions<APIKeysData, APIKeysError>({
-    queryKey: apiKeysKeys.list(projectRef, false),
-    queryFn:
-      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
-  })
+export const apiKeysQueryOptions = <TData = APIKeysData>(
+  { projectRef, grant }: APIKeysVariables,
+  options?: GrantedQueryCallerOptions<
+    APIKeysData,
+    APIKeysError,
+    TData,
+    ReturnType<typeof apiKeysKeys.list>
+  >
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: apiKeysKeys.list(projectRef, false),
+      queryFn:
+        projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : undefined,
+    },
+    options
+  )
 
 /** Keys with their secret values (`reveal=true`). Needs the `reveal` grant. */
-export const revealedApiKeysQueryOptions = ({ projectRef, grant }: RevealedAPIKeysVariables) =>
-  queryOptions<APIKeysData, APIKeysError>({
-    queryKey: apiKeysKeys.list(projectRef, true),
-    queryFn:
-      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
-  })
+export const revealedApiKeysQueryOptions = <TData = APIKeysData>(
+  { projectRef, grant }: RevealedAPIKeysVariables,
+  options?: GrantedQueryCallerOptions<
+    APIKeysData,
+    APIKeysError,
+    TData,
+    ReturnType<typeof apiKeysKeys.list>
+  >
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: apiKeysKeys.list(projectRef, true),
+      queryFn:
+        projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : undefined,
+    },
+    options
+  )
 
 const EmptyKey = {
   anonKey: undefined,
