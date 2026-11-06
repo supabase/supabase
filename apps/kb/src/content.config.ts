@@ -1,5 +1,5 @@
 import { defineCollection } from 'astro:content'
-import { glob } from 'astro/loaders'
+import { file, glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 
 import { TOPIC_NAMES } from './lib/topics'
@@ -80,4 +80,29 @@ const faqs = defineCollection({
     .transform((data) => ({ ...data, topics: [...new Set(['FAQs', ...data.topics])] })),
 })
 
-export const collections = { guides, troubleshooting, faqs }
+// Community-written guides listed in src/data/community-guides.json — a plain
+// array of entries with no `id` field, so the parser uses each entry's `url`
+// as its id. Every entry is tagged with the Community topic in addition to any
+// topics it lists, the same way `faqs` adds FAQs.
+const communityGuides = defineCollection({
+  loader: file('src/data/community-guides.json', {
+    parser: (text) =>
+      (JSON.parse(text) as { url: string }[]).map((entry) => ({ ...entry, id: entry.url })),
+  }),
+  schema: z
+    .object({
+      title: z.string(),
+      description: z.string().optional(),
+      // Where the guide lives, usually off-site, since there is no body to render here
+      url: z.url(),
+      topics: z.array(z.string()).default([]),
+      // JSON has no date type, so `lastEdited` arrives as an ISO string
+      lastEdited: z.coerce
+        .date()
+        .nullish()
+        .transform((value) => value ?? undefined),
+    })
+    .transform((data) => ({ ...data, topics: [...new Set(['Community', ...data.topics])] })),
+})
+
+export const collections = { guides, troubleshooting, faqs, communityGuides }
