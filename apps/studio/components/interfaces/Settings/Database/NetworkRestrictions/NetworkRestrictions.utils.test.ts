@@ -72,6 +72,17 @@ describe('getRestrictionIssue', () => {
     })
   })
 
+  test('handles malformed prefixes without throwing', () => {
+    expect(getRestrictionIssue('1.2.3.4/24/5')).toEqual({
+      message: 'Prefix length must be between 0 and 32',
+      suggestion: '1.2.3.4/32',
+    })
+    expect(getRestrictionIssue('2001:db8::1/064')).toEqual({
+      message: "The address isn't the start of its range",
+      suggestion: '2001:db8::/64',
+    })
+  })
+
   test('has no suggestion for something that is not an IP address', () => {
     expect(getRestrictionIssue('not-an-address/32')).toEqual({ message: 'Not a valid IP address' })
   })

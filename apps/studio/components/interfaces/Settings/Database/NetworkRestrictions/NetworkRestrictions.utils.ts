@@ -125,7 +125,9 @@ export const isIPv4MappedIPv6 = (address: string) => getMappedIPv4(address) !== 
 
 // Why the API refuses to store an entry, with the range it most likely meant. Mirrors the API's validation.
 export const getRestrictionIssue = (entry: string): RestrictionIssue | undefined => {
-  const [address, prefix] = entry.split('/')
+  // Everything after the first slash is the prefix, so an extra slash (1.2.3.4/24/5) makes it invalid
+  const [address, ...prefixParts] = entry.split('/')
+  const prefix = prefixParts.length > 0 ? prefixParts.join('/') : undefined
   const hasNumericPrefix = prefix !== undefined && /^\d+$/.test(prefix)
   const prefixLength = Number(prefix)
 
@@ -151,7 +153,11 @@ export const getRestrictionIssue = (entry: string): RestrictionIssue | undefined
       suggestion: `${address}/${maxPrefixLength}`,
     }
   }
-  return { message: "The address isn't the start of its range", suggestion: normalize(entry) }
+  // Rebuilt from the parsed length, as ip-num refuses a zero-padded IPv6 prefix such as /064
+  return {
+    message: "The address isn't the start of its range",
+    suggestion: normalize(`${address}/${prefixLength}`),
+  }
 }
 
 // The issue with each entry of a list, aligned with it. An entry that repeats an earlier one's network is an issue too:
