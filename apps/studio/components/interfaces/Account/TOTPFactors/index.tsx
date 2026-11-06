@@ -13,7 +13,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -22,6 +22,7 @@ import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
@@ -32,7 +33,7 @@ export const TOTPFactors = () => {
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
   const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
-  const totpFactors = data?.totp ?? []
+  const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
   const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
@@ -42,6 +43,8 @@ export const TOTPFactors = () => {
     error: recoveryCodesError,
     isError: recoveryCodesIsError,
     isPending: recoveryCodesIsPending,
+    isFetching: recoveryCodesIsFetching,
+    refetch: refetchRecoveryCodesStatus,
   } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
   })
@@ -50,7 +53,13 @@ export const TOTPFactors = () => {
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
-  const disableDeleteFactor = shouldVerifyRecoveryCodes && recoveryCodesIsPending
+  const disableDeleteFactor =
+    shouldVerifyRecoveryCodes &&
+    (recoveryCodesIsPending || recoveryCodesIsFetching || recoveryCodesIsError || !status)
+
+  const deleteFactorTooltip = recoveryCodesIsError
+    ? 'Cannot delete authenticator: recovery code status unavailable'
+    : 'Checking recovery code status before deletion'
 
   return (
     <>
@@ -116,13 +125,19 @@ export const TOTPFactors = () => {
                           />
                         </p>
                       </div>
-                      <Button
+                      <ButtonTooltip
                         size="tiny"
                         onClick={() => setFactorToBeDeleted(factor.id)}
                         disabled={disableDeleteFactor}
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: disableDeleteFactor ? deleteFactorTooltip : undefined,
+                          },
+                        }}
                       >
                         Delete
-                      </Button>
+                      </ButtonTooltip>
                     </CardContent>
                   ))}
                 </div>
@@ -144,8 +159,38 @@ export const TOTPFactors = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent aria-live="polite">
+            {recoveryCodesIsPending && (
+              <Card>
+                <CardContent role="status" className="flex items-center gap-4">
+                  <span className="sr-only">Checking recovery codes</span>
+                  <ShimmeringLoader className="size-9 shrink-0 rounded-full py-0" />
+                  <div className="flex flex-1 flex-col gap-2 py-1">
+                    <ShimmeringLoader className="h-3 w-48 py-0" />
+                    <ShimmeringLoader className="h-3 w-40 py-0" />
+                  </div>
+                  <ShimmeringLoader className="h-7 w-24 py-0" />
+                </CardContent>
+              </Card>
+            )}
+            {!recoveryCodesIsPending && recoveryCodesIsFetching && (
+              <p role="status" className="text-sm text-foreground-light">
+                Checking recovery codes…
+              </p>
+            )}
             {recoveryCodesIsError && (
-              <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
+              <AlertError
+                subject="Failed to load recovery codes"
+                error={recoveryCodesError}
+                showInstructions={false}
+                additionalActions={
+                  <Button
+                    loading={recoveryCodesIsFetching}
+                    onClick={() => void refetchRecoveryCodesStatus()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
             )}
             {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
             {status === 'available' && codes && (
@@ -182,6 +227,10 @@ export const TOTPFactors = () => {
       <DeleteFactorModal
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
+        canRemove={!disableDeleteFactor}
+        recoveryCodesError={shouldVerifyRecoveryCodes ? recoveryCodesError : null}
+        isCheckingRecoveryCodes={recoveryCodesIsFetching}
+        onRetryRecoveryCodes={() => void refetchRecoveryCodesStatus()}
         lastFactorToBeDeleted={totpFactors.length === 1}
         onClose={() => setFactorToBeDeleted(null)}
         hasRecoveryCodes={status === 'available'}

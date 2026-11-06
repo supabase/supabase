@@ -1,7 +1,10 @@
 import { useQueryClient } from '@tanstack/react-query'
+import { useState } from 'react'
 import { toast } from 'sonner'
+import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { AlertError } from '@/components/ui/AlertError'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
 import { useRecoveryCodesUnenrollMutation } from '@/data/recovery-codes/recovery-codes-unenroll'
@@ -12,6 +15,10 @@ interface DeleteFactorModalProps {
   factorId: string | null
   lastFactorToBeDeleted: boolean
   hasRecoveryCodes: boolean
+  canRemove?: boolean
+  recoveryCodesError?: { message: string } | null
+  isCheckingRecoveryCodes?: boolean
+  onRetryRecoveryCodes?: () => void
   onClose: () => void
 }
 
@@ -20,26 +27,40 @@ export const DeleteFactorModal = ({
   factorId,
   lastFactorToBeDeleted,
   hasRecoveryCodes,
+  canRemove = true,
+  recoveryCodesError,
+  isCheckingRecoveryCodes = false,
+  onRetryRecoveryCodes,
   onClose,
 }: DeleteFactorModalProps) => {
   const queryClient = useQueryClient()
+  const [error, setError] = useState<{ message: string } | null>(null)
+  const [hasRemovedRecoveryCodes, setHasRemovedRecoveryCodes] = useState(false)
+  const handleClose = () => {
+    setError(null)
+    setHasRemovedRecoveryCodes(false)
+    onClose()
+  }
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const unenrollMFAMutation = useMfaUnenrollMutation({
+    onError: setError,
     onSuccess: async () => {
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
-      toast.success(`Successfully deleted factor`)
-      onClose()
+      toast.success('MFA method removed')
+      handleClose()
     },
   })
 
   const unenrollRecoveryCodesMutation = useRecoveryCodesUnenrollMutation({
+    onError: setError,
     onSuccess: () => {
+      setHasRemovedRecoveryCodes(true)
       if (!factorId) return // Should never happen
       unenrollMFAMutation.mutate({ factorId })
     },
@@ -47,20 +68,29 @@ export const DeleteFactorModal = ({
 
   const loading = unenrollMFAMutation.isPending || unenrollRecoveryCodesMutation.isPending
 
+  const shouldExplainRecoveryCodeRemoval =
+    hasRecoveryCodes || hasRemovedRecoveryCodes || unenrollRecoveryCodesMutation.isPending
+  const lastAuthenticatorDescription = shouldExplainRecoveryCodeRemoval
+    ? 'Removing your last MFA method disables MFA and removes your recovery codes.'
+    : 'Removing your last MFA method disables MFA.'
+
   return (
     <ConfirmationModal
       size="medium"
       visible={visible}
       variant={'destructive'}
-      title="Confirm to delete factor"
-      confirmLabel="Delete"
-      confirmLabelLoading="Deleting"
+      title="Remove MFA method"
+      confirmLabel="Remove"
+      confirmLabelLoading="Removing"
       loading={loading}
-      onCancel={onClose}
+      onCancel={handleClose}
+      disabled={!factorId || !canRemove}
       onConfirm={() => {
-        // If users have recovery codes and this is the last MFA for their account,
-        // we must first delete the recovery codes (they don't make sense without any MFA)
-        const shouldDeleteRecoveryCodes = lastFactorToBeDeleted && hasRecoveryCodes
+        if (!factorId || loading || !canRemove) return
+        setError(null)
+        // The API requires recovery codes to be removed before the last verified authenticator.
+        const shouldDeleteRecoveryCodes =
+          lastFactorToBeDeleted && hasRecoveryCodes && !hasRemovedRecoveryCodes
         if (factorId && !shouldDeleteRecoveryCodes) {
           return unenrollMFAMutation.mutate({ factorId })
         }
@@ -71,28 +101,57 @@ export const DeleteFactorModal = ({
           ? 'Multi-factor authentication will be disabled'
           : 'This action cannot be undone',
         description: lastFactorToBeDeleted
-          ? 'There are no other factors that are set up once you delete this factor, as such your account will no longer be guarded by multi-factor authentication'
-          : 'You will no longer be able to use this authenticator app for multi-factor authentication when signing in to the dashboard',
+          ? lastAuthenticatorDescription
+          : 'You can no longer use this MFA method to sign in.',
       }}
     >
-      <p className="text-sm">Before deleting this factor, consider:</p>
+      <p className="text-sm">Before removing this MFA method, consider:</p>
       <ul className="text-sm text-foreground-light py-1 list-disc mx-4 space-y-1">
         {lastFactorToBeDeleted ? (
           <>
-            <li>Adding another authenticator app as a factor prior to deleting</li>
-            <li>Ensure that your account does not need multi-factor authentication</li>
+            <li>Set up another authenticator app on a different device first</li>
+            <li>Check that you no longer need MFA</li>
             <li>
               You will lose access to any organization that enforces multi-factor authentication
             </li>
-            {hasRecoveryCodes && <li>Your recovery codes will be deleted too</li>}
+            {shouldExplainRecoveryCodeRemoval && <li>Your recovery codes will be removed too</li>}
           </>
         ) : (
           <>
-            <li>Your backup authenticator app is still available to use</li>
-            <li>Adding another authenticator app thereafter as a backup</li>
+            <li>Your other MFA method is still available to use</li>
+            <li>Set up another authenticator app on a different device as a backup</li>
           </>
         )}
       </ul>
+      {!canRemove && recoveryCodesError && (
+        <AlertError
+          className="mt-4"
+          subject="Failed to load recovery codes"
+          error={recoveryCodesError}
+          showInstructions={false}
+          additionalActions={
+            onRetryRecoveryCodes && (
+              <Button loading={isCheckingRecoveryCodes} onClick={onRetryRecoveryCodes}>
+                Retry
+              </Button>
+            )
+          }
+        />
+      )}
+      {error && (
+        <AlertError
+          className="mt-4"
+          subject="Unable to remove MFA method"
+          error={
+            hasRemovedRecoveryCodes
+              ? {
+                  message: `Your recovery codes were removed, but your MFA method is still active. Try again to complete removal. ${error.message}`,
+                }
+              : error
+          }
+          showInstructions={false}
+        />
+      )}
     </ConfirmationModal>
   )
 }
