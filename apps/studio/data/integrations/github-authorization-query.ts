@@ -5,7 +5,6 @@ import { get } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomQueryOptions } from '@/types'
 
-// FIXME(kamil): Do not retry, a single check is fine.
 export async function getGitHubAuthorization(signal?: AbortSignal) {
   const { data, error } = await get('/platform/integrations/github/authorization', {
     signal,
@@ -26,8 +25,10 @@ export const useGitHubAuthorizationQuery = <TData = GitHubAuthorizationData>({
   return useQuery<GitHubAuthorizationData, GitHubAuthorizationError, TData>({
     queryKey: integrationKeys.githubAuthorization(),
     queryFn: ({ signal }) => getGitHubAuthorization(signal),
-    enabled,
-    staleTime: 0,
     ...options,
+    enabled,
+    staleTime: 1000 * 60,
+    // explicitly disable retries so we don't spam the endpoint if the user just isn't connected
+    retry: false,
   })
 }
