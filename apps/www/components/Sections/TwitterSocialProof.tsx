@@ -1,22 +1,22 @@
+import { useBreakpoint } from 'common'
+import { range } from 'lib/helpers'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
+import React from 'react'
+import { topTweets } from 'shared-data/tweets'
 import { cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
-import { range } from 'lodash'
-
-import Tweets from '~/data/tweets/Tweets.json'
-import { useBreakpoint } from 'common'
-import React from 'react'
 
 interface Props {
   className?: string
 }
 
+const tweetsData = topTweets
+
 const TwitterSocialProof: React.FC<Props> = ({ className }) => {
   const { basePath } = useRouter()
   const isSm = useBreakpoint()
   const isMd = useBreakpoint(1024)
-  const tweets = Tweets.slice(0, 18)
 
   return (
     <>
@@ -39,7 +39,7 @@ const TwitterSocialProof: React.FC<Props> = ({ className }) => {
               'will-change-transform transition-transform'
             )}
           >
-            {tweets.slice(0, isSm ? 9 : isMd ? 12 : 18).map((tweet: any, i: number) => (
+            {tweetsData.slice(0, isSm ? 9 : isMd ? 12 : 18).map((tweet: any, i: number) => (
               <Link
                 key={tweet.text}
                 href={tweet.url}
@@ -65,7 +65,7 @@ const TwitterSocialProof: React.FC<Props> = ({ className }) => {
             absolute pointer-events-none
             w-full h-full max-h-[400px] lg:max-h-none
             inset-0 top-auto
-            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,hsl(var(--background-default))_100%)]
+            lg:bg-[radial-gradient(50%_100%_at_50%_0,transparent_0%,transparent_50%,var(--background-default)_100%)]
           "
       />
     </>

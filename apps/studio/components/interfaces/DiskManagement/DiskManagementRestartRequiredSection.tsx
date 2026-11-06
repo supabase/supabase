@@ -1,6 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { RotateCcw } from 'lucide-react'
-
+import { RotateCcwIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { DialogSection, WarningIcon } from 'ui'
 
 interface DiskMangementRestartRequiredSectionProps {
@@ -26,11 +25,11 @@ export const DiskMangementRestartRequiredSection = ({
           <DialogSection className="bg-surface-100 text-sm text-foreground-light flex items-center gap-4 relative w-full rounded-md border-spacing-0 border">
             <div className="w-12 h-12">
               <div className="relative w-10 h-10 m-1 bg-alternative text-foreground border rounded-full flex items-center justify-center">
-                <RotateCcw strokeWidth={1} />
+                <RotateCcwIcon strokeWidth={1} />
                 <WarningIcon className="absolute -right-1.5 -top-1.5" />
               </div>
             </div>
-            <div className="flex flex-col gap-0 flex-grow">
+            <div className="flex flex-col gap-0 grow">
               <p className="text-sm text-foreground">{title}</p>
               <p className="text-sm text-foreground-light">{description}</p>
             </div>

@@ -1,33 +1,43 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, patch } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
+import { handleError, patch } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type BranchUpdateGrant = GrantForVariants<'patch', '/v1/branches/{branch_id_or_ref}'>
 
 export type BranchUpdateVariables = {
-  id: string
+  grant: BranchUpdateGrant
+  branchRef: string
   projectRef: string
   branchName?: string
   gitBranch?: string
   persistent?: boolean
+  requestReview?: boolean
 }
 
 export async function updateBranch({
-  id,
+  branchRef,
   branchName,
   gitBranch,
   persistent,
+  requestReview,
+  grant,
 }: BranchUpdateVariables) {
-  const { data, error } = await patch('/v1/branches/{branch_id}', {
+  const { data, error } = await patch('/v1/branches/{branch_id_or_ref}', {
     params: {
-      path: { branch_id: id },
+      path: { branch_id_or_ref: branchRef },
     },
     body: {
       branch_name: branchName,
       git_branch: gitBranch,
       persistent,
+      request_review: requestReview,
     },
+    grant,
   })
 
   if (error) handleError(error)
@@ -41,26 +51,24 @@ export const useBranchUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchUpdateData, ResponseError, BranchUpdateVariables>,
+  UseCustomMutationOptions<BranchUpdateData, StudioError, BranchUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchUpdateData, ResponseError, BranchUpdateVariables>(
-    (vars) => updateBranch(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(branchKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update branch: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<BranchUpdateData, StudioError, BranchUpdateVariables>({
+    mutationFn: (vars) => updateBranch(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: branchKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update branch: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

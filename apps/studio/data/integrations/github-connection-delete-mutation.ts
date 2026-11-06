@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { integrationKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteVariables = {
   connectionId: string | number
@@ -27,29 +28,27 @@ export const useGitHubConnectionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DeleteContentData, ResponseError, DeleteVariables>,
+  UseCustomMutationOptions<DeleteContentData, StudioError, DeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DeleteContentData, ResponseError, DeleteVariables>(
-    (args) => deleteConnection(args),
-    {
-      async onSuccess(data, variables, context) {
-        await Promise.all([
-          queryClient.invalidateQueries(
-            integrationKeys.githubConnectionsList(variables.organizationId)
-          ),
-        ])
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete Github connection: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DeleteContentData, StudioError, DeleteVariables>({
+    mutationFn: (args) => deleteConnection(args),
+    async onSuccess(data, variables, context) {
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: integrationKeys.githubConnectionsList(variables.organizationId),
+        }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete GitHub connection: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

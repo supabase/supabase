@@ -4,8 +4,8 @@ description: 'Realtime database changes are now broadcast to authenticated users
 author: oli_rice
 author_url: https://github.com/olirice
 author_image_url: https://github.com/olirice.png
-image: launch-week-three/realtime-row-level-security-in-postgresql/realtime-row-level-security-in-postgresql-og.png
-thumb: launch-week-three/realtime-row-level-security-in-postgresql/realtime-row-level-security-in-postgresql-thumb.png
+imgSocial: launch-week-three/realtime-row-level-security-in-postgresql/realtime-row-level-security-in-postgresql-og.png
+imgThumb: launch-week-three/realtime-row-level-security-in-postgresql/realtime-row-level-security-in-postgresql-thumb.png
 categories:
   - product
 tags:
@@ -17,7 +17,7 @@ toc_depth: 3
 video: https://www.youtube.com/v/zHvatf2wySI
 ---
 
-Realtime is a server that listens to changes in your PostgreSQL database and broadcasts the changes to clients through a websocket connection.
+[Realtime](/realtime) is a server that listens to changes in your PostgreSQL database and broadcasts the changes to clients through a websocket connection.
 
 Today, we're announcing security improvements to Realtime, where database changes will be broadcast to authenticated users, respecting the same PostgreSQL policies that you use for Row Level Security.
 
@@ -77,7 +77,7 @@ where auth.uid() = todos.user_id; -- Policy is implicitly added.
 
 to queries.
 
-Check out the [Row Level Security guide](https://supabase.com/docs/guides/auth/row-level-security) for more info on how to use RLS with your project.
+Check out the [Row Level Security guide](https://supabase.com/docs/guides/database/postgres/row-level-security) for more info on how to use RLS with your project.
 
 ## Realtime Design
 
@@ -185,7 +185,7 @@ and launch your new PostgreSQL database today: [database.new](https://database.n
 - [Implementing "seen by" functionality with Postgres](https://supabase.com/blog/seen-by-in-postgresql)
 - [Partial data dumps using Postgres Row Level Security](https://supabase.com/blog/partial-postgresql-data-dumps-with-rls)
 - [Postgres Views](https://supabase.com/blog/postgresql-views)
-- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/audit)
+- [Postgres Auditing in 150 lines of SQL](https://supabase.com/blog/postgres-audit)
 - [Cracking PostgreSQL Interview Questions](https://supabase.com/blog/cracking-postgres-interview)
 - [What are PostgreSQL Templates?](https://supabase.com/blog/postgresql-templates)
 

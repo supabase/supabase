@@ -1,8 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type SupavisorConfigurationVariables = {
   projectRef?: string
@@ -23,20 +25,18 @@ export async function getSupavisorConfiguration(
 }
 
 export type SupavisorConfigurationData = Awaited<ReturnType<typeof getSupavisorConfiguration>>
-export type SupavisorConfigurationError = ResponseError
+export type SupavisorConfigurationError = StudioError
 
 export const useSupavisorConfigurationQuery = <TData = SupavisorConfigurationData>(
   { projectRef }: SupavisorConfigurationVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<SupavisorConfigurationData, SupavisorConfigurationError, TData> = {}
+  }: UseCustomQueryOptions<SupavisorConfigurationData, SupavisorConfigurationError, TData> = {}
 ) =>
-  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>(
-    databaseKeys.poolingConfiguration(projectRef),
-    ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<SupavisorConfigurationData, SupavisorConfigurationError, TData>({
+    queryKey: databaseKeys.poolingConfiguration(projectRef),
+    queryFn: ({ signal }) => getSupavisorConfiguration({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })

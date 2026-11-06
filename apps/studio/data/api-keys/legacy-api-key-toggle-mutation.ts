@@ -1,0 +1,61 @@
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { apiKeysKeys } from './keys'
+import { handleError, put, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type ToggleLegacyAPIKeysVariables = {
+  projectRef?: string
+  enabled: boolean
+}
+
+export async function toggleLegacyAPIKeys(payload: ToggleLegacyAPIKeysVariables) {
+  if (!payload.projectRef) throw new Error('projectRef is required')
+
+  const { data, error } = await put('/v1/projects/{ref}/api-keys/legacy', {
+    params: {
+      path: { ref: payload.projectRef },
+      query: { enabled: payload.enabled ? 'true' : 'false' },
+    },
+    grant: unguarded.migrating,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
+type ToggleLegacyAPIKeysData = Awaited<ReturnType<typeof toggleLegacyAPIKeys>>
+
+export const useToggleLegacyAPIKeysMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>,
+  'mutationFn'
+> = {}) => {
+  const queryClient = useQueryClient()
+
+  return useMutation<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>({
+    mutationFn: (vars) => toggleLegacyAPIKeys(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+
+      await queryClient.invalidateQueries({ queryKey: apiKeysKeys.status(projectRef) })
+
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(
+          `Failed to ${variables.enabled ? 're-enable' : 'disable'} JWT-based API keys: ${data.message}`
+        )
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

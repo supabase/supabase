@@ -2,8 +2,8 @@
 title: 'Edge Functions: Deploy from the Dashboard + Deno 2.1'
 description: 'You can create, test, and deploy Edge Functions directly from the Supabase Dashboard.'
 author: saxon_fletcher,nyannyacha,laktek
-image: launch-week-14/day-2-edge-functions-dashboard/og.png
-thumb: launch-week-14/day-2-edge-functions-dashboard/thumb.png
+imgSocial: launch-week-14/day-2-edge-functions-dashboard/og.png
+imgThumb: launch-week-14/day-2-edge-functions-dashboard/thumb.png
 categories:
   - launch-week
   - product
@@ -12,10 +12,10 @@ tags:
   - functions
 date: '2025-04-01T00:00:01'
 toc_depth: 3
-launchweek: 14
+launchweek: '14'
 ---
 
-Now you can create, test, edit, and deploy Edge Functions directly from the Supabase Dashboard. We're also releasing Deno 2.1 Preview today but more on that later.
+Now you can create, test, edit, and deploy [Edge Functions](/edge-functions) directly from the Supabase Dashboard. We're also releasing Deno 2.1 Preview today but more on that later.
 
 <div className="video-container mb-8">
   <iframe
@@ -29,7 +29,7 @@ Now you can create, test, edit, and deploy Edge Functions directly from the Supa
 
 ## Creating Edge Functions from the Supabase Dashboard
 
-To write an Edge Functions previously, you had to install the Supabase CLI, spin up Docker, and then set up your editor to use Deno. Those steps are no longer necessary. The Edge Functions editor in the Dashboard has built-in syntax highlighting and type-checking for Deno and Supabase-specific APIs.
+To write an Edge Functions previously, you had to install the [Supabase CLI](/features/cli), spin up Docker, and then set up your editor to use Deno. Those steps are no longer necessary. The Edge Functions editor in the Dashboard has built-in syntax highlighting and type-checking for Deno and Supabase-specific APIs.
 
 <Img
   alt="Create a Function from Dashboard"
@@ -49,7 +49,7 @@ The Edge Functions editor includes templates for common use cases, such as Strip
   }}
 />
 
-Once a Function has been deployed you can make edits directly within the Dashboard, and if you get stuck you can summon an inline AI Assistant to explain, debug or write code.
+Once a Function has been deployed you can make edits directly within the Dashboard, and if you get stuck you can summon an inline [AI Assistant](/features/ai-assistant) to explain, debug or write code.
 
 <Img
   alt="Edit Functions from Dashboard"
@@ -73,7 +73,7 @@ You can download Edge Functions source code via Supabase CLI using `supabase fun
 
 <Admonition type="caution">
 
-The Dashboard's Edge Function editor currently does not support versioning or rollbacks. We recommend using it only for quick testing and prototypes. When you’re ready to go to production, store Edge Functions code in a source code repository (e.g. git) and deploy it using one of the [CI integrations](https://supabase.com/docs/guides/functions/cicd-workflow).
+The Dashboard's Edge Function editor currently does not support versioning or rollbacks. We recommend using it only for quick testing and prototypes. When you’re ready to go to production, store Edge Functions code in a source code repository (e.g. git) and deploy it using one of the [CI integrations](https://supabase.com/docs/guides/functions/deploy).
 
 </Admonition>
 
@@ -105,17 +105,11 @@ The ability to deploy without Docker in both the Edge Functions editor and Supab
 
 You can check [the Changelog announcement](https://github.com/orgs/supabase/discussions/33720) for more details and official references to these API endpoints.
 
-## Deno 2.1 Preview
+## Deno 2.1 support
 
 Last, but not least, we have added Deno 2.1 support for Supabase Edge Runtime. With Deno 2.1, you can use built-in Deno commands to scaffold a new project, manage dependencies, run tests, and lints.
 
 Check [our guide on how to start using Deno 2.1](https://github.com/orgs/supabase/discussions/34054) tooling for your Edge Functions.
-
-<Admonition type="info">
-
-Note that the Supabase hosted platform is still using Deno 1.45. In the coming weeks, we will provide more details on deploying Deno 2.1 projects in the hosted platform.
-
-</Admonition>
 
 ## Conclusion
 

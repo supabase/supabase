@@ -1,4 +1,29 @@
-export const COLUMNS_SQL = /* SQL */ `
+import { safeSql, type SafeSqlFragment } from '../pg-format'
+
+// Columns of the underlying pg_class scan that callers are allowed to filter
+// on. The map owns the actual aliased reference (`c.oid` etc.), so callers
+// never need to know the internal aliases — they just pick a key.
+const COLUMNS_FILTER_COLUMNS = {
+  oid: safeSql`c.oid`,
+} as const
+
+export type ColumnsFilterColumn = keyof typeof COLUMNS_FILTER_COLUMNS
+
+export type ColumnsFilter = {
+  column: ColumnsFilterColumn
+  // Everything to the right of the column reference — e.g.
+  //   safeSql`IN (SELECT oid FROM page)`  or  safeSql`= ${literal(123)}`
+  predicate: SafeSqlFragment
+}
+
+// `filter`, if provided, is appended to the WHERE clause as
+// `AND <column-ref> <predicate>`.
+export const getColumnsSql = ({ filter }: { filter?: ColumnsFilter } = {}): SafeSqlFragment => {
+  const filterClause = filter
+    ? safeSql`AND ${COLUMNS_FILTER_COLUMNS[filter.column]} ${filter.predicate}`
+    : safeSql``
+
+  return /* SQL */ safeSql`
 -- Adapted from information_schema.columns
 
 SELECT
@@ -27,6 +52,7 @@ SELECT
     END
   END AS data_type,
   COALESCE(bt.typname, t.typname) AS format,
+  COALESCE(nbt.nspname, nt.nspname) AS format_schema,
   a.attidentity IN ('a', 'd') AS is_identity,
   CASE
     a.attidentity
@@ -110,4 +136,8 @@ WHERE
       'SELECT, INSERT, UPDATE, REFERENCES'
     )
   )
+  ${filterClause}
 `
+}
+
+export const COLUMNS_SQL = getColumnsSql()

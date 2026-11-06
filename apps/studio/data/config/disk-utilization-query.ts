@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { configKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskUtilizationVariables = {
   projectRef?: string
@@ -24,17 +25,18 @@ export async function getDiskUtilization(
 }
 
 export type DiskUtilizationData = Awaited<ReturnType<typeof getDiskUtilization>>
-export type DiskUtilizationError = ResponseError
+export type DiskUtilizationError = StudioError
 
 export const useDiskUtilizationQuery = <TData = DiskUtilizationData>(
   { projectRef }: DiskUtilizationVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<DiskUtilizationData, DiskUtilizationError, TData> = {}
+  }: UseCustomQueryOptions<DiskUtilizationData, DiskUtilizationError, TData> = {}
 ) =>
-  useQuery<DiskUtilizationData, DiskUtilizationError, TData>(
-    configKeys.diskUtilization(projectRef),
-    ({ signal }) => getDiskUtilization({ projectRef }, signal),
-    { enabled: enabled && typeof projectRef !== 'undefined', ...options }
-  )
+  useQuery<DiskUtilizationData, DiskUtilizationError, TData>({
+    queryKey: configKeys.diskUtilization(projectRef),
+    queryFn: ({ signal }) => getDiskUtilization({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,0 +1,108 @@
+---
+id: 'manual-replication-setup'
+title: 'Set up manual replication'
+description: 'Configure your own replication using external tools and Postgres logical replication.'
+subtitle: 'Set up replication with Airbyte, Estuary, Fivetran, and other tools.'
+sidebar_label: 'Setting up'
+---
+
+This guide covers setting up **manual logical replication** using your own tools. If you prefer a managed solution, read [Set up Pipelines](/docs/guides/database/replication/pipelines) instead.
+
+<Admonition type="note">
+
+For deploying read-only databases across multiple regions, see [read replicas](/docs/guides/platform/read-replicas).
+
+</Admonition>
+
+## Prerequisites
+
+To set up replication, the following is recommended:
+
+- Instance size of XL or greater
+- [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled
+
+<Admonition type="note">
+
+If you are running Postgres 17 or higher, you can create a new user and grant them replication permissions with the `postgres` user. For versions below 17, you will need to use the `postgres` user.
+
+</Admonition>
+
+## Choose your replication tool
+
+Follow your tool's setup guide, using the Supabase-specific notes below. If you are building your own consumer, follow the [logical replication example](/docs/guides/database/postgres/setup-replication-external) to create a publication and replication slot.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="estuary"
+  queryGroup="tool"
+>
+
+<TabPanel id="airbyte" label="Airbyte">
+
+Follow the [Airbyte Postgres source guide](https://docs.airbyte.com/integrations/sources/postgres/) for its cloud or self-hosted service.
+
+Apply these Supabase-specific settings:
+
+1. Use the `postgres` user
+2. Select `logical replication` as the replication method (`xmin` is possible, but not recommended)
+
+</TabPanel>
+
+<TabPanel id="estuary" label="Estuary">
+Follow the [Estuary Supabase source guide](https://docs.estuary.dev/reference/Connectors/capture-connectors/PostgreSQL/Supabase/).
+
+</TabPanel>
+
+<TabPanel id="fivetran" label="Fivetran">
+
+Follow the [Fivetran Postgres setup guide](https://fivetran.com/docs/connectors/databases/postgresql/setup-guide).
+
+Apply these Supabase-specific settings:
+
+1. In Step 2, choose `logical replication` as the sync mechanism
+2. In Step 3, do not create a user and use the existing `postgres` user for replication
+3. In Step 5, don't copy generic WAL settings without sizing them for your database. Supabase supports logical replication, but you still need to size `max_slot_wal_keep_size` for your write rate and expected replication lag, then [monitor the slot](/docs/guides/database/replication/manual-replication-monitoring#replication-slot-status).
+
+</TabPanel>
+
+<TabPanel id="materialize" label="Materialize">
+
+Follow the [Materialize Postgres source guide](https://materialize.com/docs/sql/create-source/postgres/).
+
+Use the [logical replication example](/docs/guides/database/postgres/setup-replication-external) for the Supabase publication and replication slot setup.
+
+</TabPanel>
+
+<TabPanel id="stitch" label="Stitch">
+
+Follow the [Stitch Postgres extraction guide](https://www.stitchdata.com/docs/integrations/databases/postgresql/v2#extracting-data).
+
+Apply these Supabase-specific settings:
+
+1. Use the `postgres` user for replication
+2. Skip step 3
+
+</TabPanel>
+
+<TabPanel id="dms" label="AWS DMS">
+
+Follow the [AWS DMS documentation](https://docs.aws.amazon.com/dms/latest/userguide/Welcome.html) to configure Postgres as a source.
+
+DMS is notably useful if you have infrastructure running in AWS and/or you have custom networking. An additional benefit is that DMS is able to replicate schema changes.
+
+Apply these Supabase-specific settings:
+
+1. Use the `postgres` user for replication (or create a new user with replication permissions: `ALTER USER <user> WITH REPLICATION;`)
+2. Set `pluginname` to `test-decoding`
+3. Depending on your databases the pre-assessment may fail. It is not required.
+4. Increase `wal_sender_timeout` and other settings (`max_wal_size`) using the [Supabase CLI](/docs/guides/database/custom-postgres-config)
+
+</TabPanel>
+
+</Tabs>
+
+## Monitor replication
+
+After starting your consumer, [monitor replication slots, WAL retention, and progress](/docs/guides/database/replication/manual-replication-monitoring).

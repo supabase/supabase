@@ -1,20 +1,27 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { queryOptions, skipToken } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { branchKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
+
+export type BranchGrant = GrantForVariants<'get', '/v1/branches/{branch_id_or_ref}'>
 
 export type BranchVariables = {
+  branchRef?: string
   projectRef?: string
-  id?: string
+  grant?: BranchGrant
 }
 
-export async function getBranch({ id }: BranchVariables, signal?: AbortSignal) {
-  if (!id) throw new Error('id is required')
-
-  const { data, error } = await get(`/v1/branches/{branch_id}`, {
-    params: { path: { branch_id: id } },
+async function getBranch(
+  { branchRef, grant }: { branchRef: string; grant: BranchGrant },
+  signal?: AbortSignal
+) {
+  const { data, error } = await get(`/v1/branches/{branch_id_or_ref}`, {
+    params: { path: { branch_id_or_ref: branchRef } },
     signal,
+    grant,
   })
 
   if (error) handleError(error)
@@ -22,17 +29,13 @@ export async function getBranch({ id }: BranchVariables, signal?: AbortSignal) {
 }
 
 export type BranchData = Awaited<ReturnType<typeof getBranch>>
-export type BranchError = ResponseError
+export type BranchError = StudioError
 
-export const useBranchQuery = <TData = BranchData>(
-  { projectRef, id }: BranchVariables,
-  { enabled = true, ...options }: UseQueryOptions<BranchData, BranchError, TData> = {}
-) =>
-  useQuery<BranchData, BranchError, TData>(
-    branchKeys.detail(projectRef, id),
-    ({ signal }) => getBranch({ id }, signal),
-    {
-      enabled: enabled && typeof id !== 'undefined',
-      ...options,
-    }
-  )
+export const branchQueryOptions = ({ projectRef, branchRef, grant }: BranchVariables) =>
+  queryOptions<BranchData, BranchError>({
+    queryKey: branchKeys.detail(projectRef, branchRef),
+    queryFn:
+      IS_PLATFORM && branchRef && grant
+        ? ({ signal }) => getBranch({ branchRef, grant }, signal)
+        : skipToken,
+  })

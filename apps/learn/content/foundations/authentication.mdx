@@ -1,0 +1,125 @@
+---
+title: Authentication
+description: Learn how to manage users, and how signed-in requests connect to the database.
+chapterNumber: 3
+---
+
+Most applications need to know who is using them. Authentication is how we identify
+a user and attach their actions to their own data. Supabase Authentication works closely with the database, so each request carries the user's identity.
+
+Authentication in Supabase is handled by the Supabase Auth service. It manages creating accounts, signing in, and identifying the user on each request.
+
+---
+
+## Users
+
+A user in Supabase has an id and some optional profile information (such as
+email, phone number, name, etc.). When someone signs up, Supabase creates a new user record and assigns
+them a unique identifier.
+
+You do not need to create or manage the users table yourself. Supabase stores it
+internally and keeps it updated.
+
+Example of the kind of data Supabase stores for a user:
+
+```text
+id: 74d23f1b-1c94-3e7b-4d6a-9fa71e2a3c4ba987
+email: maria@example.com
+created_at: 2025-01-12 09:44:21
+updated_at: 2025-01-12 09:44:21
+last_sign_in_at: 2025-01-12 09:44:21
+```
+
+You can reference this user id in your tables when you want to link data to a
+specific user.
+
+For example, you can associate notes with a user by storing the user's id in the note table.
+
+```text
+| id | user_id                              | content          | created_at           |
+|----|--------------------------------------|------------------|----------------------|
+| 1  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Buy groceries    | 2025-01-10 14:22:11  |
+| 2  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Call the dentist | 2025-01-10 15:08:54  |
+```
+
+---
+
+## Tokens and identity
+
+When a user signs in, Supabase returns a token. This token proves who the user
+is. This token is stored locally (usually in memory or local
+storage) and automatically included in each API request.
+
+Inside the database, this token becomes the value returned by `auth.uid()`.
+This lets security policies decide which data belongs to which user.
+
+For example:
+
+```text
+select auth.uid();
+```
+
+returns the id of the signed-in user who made the request.
+
+---
+
+## Sign up and sign in
+
+Supabase Auth supports several sign-in methods:
+
+- Email and password
+- Magic links (sign in by clicking a link in an email)
+- Social providers (Google, GitHub, etc.)
+- Phone number (SMS)
+
+For now, we will use email and password, since it is the simplest starting point.
+
+---
+
+## Where authentication connects to data
+
+Authentication tells us who the user is. But it does not decide what they are
+allowed to access. To handle that part, we use a Postgres feature called Row Level Security (RLS).
+
+RLS lets the database check each row before returning it. The database uses the
+user's id to decide whether that row should be visible or changeable. This means
+the rules for access live inside the database itself, not in the application
+code.
+
+From our previous notes example, RLS would allow a user to select only their own notes, but not the notes of other users.
+
+So the flow looks like this:
+
+```text
+| id | user_id                              | content          | created_at           |
+|----|--------------------------------------|------------------|----------------------|
+| 1  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Buy groceries    | 2025-01-10 14:22:11  |
+| 2  | 9f1b1c94-3e7b-4d6a-9fa7-1e2a3c4ba987 | Call the dentist | 2025-01-10 15:08:54  |
+```
+
+```text
+User signs in
+↓
+Supabase gives the client a user token
+↓
+Client sends token with API requests
+↓
+Postgres receives token and sets auth.uid()
+↓
+RLS policies use auth.uid() to enforce access rules
+```
+
+Authentication says who the user is.
+RLS decides what they are allowed to do.
+
+---
+
+## What we learned
+
+- Supabase Auth manages user accounts and sign-in.
+- Each user has a unique id that you can reference in your tables.
+- When a user signs in, Supabase provides a token.
+- The token tells the database who the user is through `auth.uid()`.
+- Authentication by itself does not control access. RLS does that part.
+
+Understanding this identity flow is important before we begin writing policies.

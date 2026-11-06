@@ -1,35 +1,43 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get } from 'lib/common/fetch'
-import type { ResponseError } from 'types'
 import { serviceStatusKeys } from './keys'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type EdgeFunctionServiceStatusVariables = {
   projectRef?: string
 }
 
 export async function getEdgeFunctionServiceStatus(signal?: AbortSignal) {
-  const res = await get(`https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check`, {
-    signal,
-  })
-  return res as { healthy: boolean }
+  try {
+    const res = await fetch('https://obuldanrptloktxcffvn.supabase.co/functions/v1/health-check', {
+      method: 'GET',
+      signal,
+    })
+    const response = await res.json()
+    return response as { healthy: boolean }
+  } catch (err) {
+    return { healthy: false }
+  }
 }
 
 export type EdgeFunctionServiceStatusData = Awaited<ReturnType<typeof getEdgeFunctionServiceStatus>>
-export type EdgeFunctionServiceStatusError = ResponseError
+export type EdgeFunctionServiceStatusError = StudioError
 
 export const useEdgeFunctionServiceStatusQuery = <TData = EdgeFunctionServiceStatusData>(
   { projectRef }: EdgeFunctionServiceStatusVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData> = {}
+  }: UseCustomQueryOptions<
+    EdgeFunctionServiceStatusData,
+    EdgeFunctionServiceStatusError,
+    TData
+  > = {}
 ) =>
-  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>(
-    serviceStatusKeys.edgeFunctions(projectRef),
-    ({ signal }) => getEdgeFunctionServiceStatus(signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<EdgeFunctionServiceStatusData, EdgeFunctionServiceStatusError, TData>({
+    queryKey: serviceStatusKeys.edgeFunctions(projectRef),
+    queryFn: ({ signal }) => getEdgeFunctionServiceStatus(signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

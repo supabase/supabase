@@ -1,14 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { ResponseError } from 'types'
+
 import { organizationKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationPaymentMethodsVariables = { slug?: string }
-export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse']['data'][0]
+export type OrganizationPaymentMethod = components['schemas']['PaymentsResponse_Output']['data'][0]
 
 export async function getOrganizationPaymentMethods(
   { slug }: OrganizationPaymentMethodsVariables,
@@ -35,22 +35,26 @@ export async function getOrganizationPaymentMethods(
 export type OrganizationPaymentMethodsData = Awaited<
   ReturnType<typeof getOrganizationPaymentMethods>
 >
-export type OrganizationPaymentMethodsError = ResponseError
+export type OrganizationPaymentMethodsError = StudioError
 
 export const useOrganizationPaymentMethodsQuery = <TData = OrganizationPaymentMethodsData>(
   { slug }: OrganizationPaymentMethodsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData> = {}
+  }: UseCustomQueryOptions<
+    OrganizationPaymentMethodsData,
+    OrganizationPaymentMethodsError,
+    TData
+  > = {}
 ) => {
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.payment_methods'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
-  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>(
-    organizationKeys.paymentMethods(slug),
-    ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
-    { enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions, ...options }
-  )
+  return useQuery<OrganizationPaymentMethodsData, OrganizationPaymentMethodsError, TData>({
+    queryKey: organizationKeys.paymentMethods(slug),
+    queryFn: ({ signal }) => getOrganizationPaymentMethods({ slug }, signal),
+    enabled: enabled && typeof slug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

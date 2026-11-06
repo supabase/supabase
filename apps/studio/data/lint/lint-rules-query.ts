@@ -1,16 +1,17 @@
-import { UseQueryOptions, useQuery } from '@tanstack/react-query'
-
+import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
-import { get, handleError } from 'data/fetchers'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { PROJECT_STATUS } from 'lib/constants'
-import { ResponseError } from 'types'
+
 import { lintKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectLintRulesVariables = {
   projectRef?: string
 }
-type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponseDto']
+type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse_Output']
 export type LintException = LintDismissalResponse['exceptions'][0]
 
 export async function getProjectLintRules(
@@ -30,24 +31,22 @@ export async function getProjectLintRules(
 }
 
 export type ProjectLintRulesData = Awaited<ReturnType<typeof getProjectLintRules>>
-export type ProjectLintRulesError = ResponseError
+export type ProjectLintRulesError = StudioError
 
 export const useProjectLintRulesQuery = <TData = ProjectLintRulesData>(
   { projectRef }: ProjectLintRulesVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectLintRulesData, ProjectLintRulesError, TData> = {}
+  }: UseCustomQueryOptions<ProjectLintRulesData, ProjectLintRulesError, TData> = {}
 ) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  return useQuery<ProjectLintRulesData, ProjectLintRulesError, TData>(
-    lintKeys.lintRules(projectRef),
-    ({ signal }) => getProjectLintRules({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined' && isActive,
-      ...options,
-    }
-  )
+  return useQuery<ProjectLintRulesData, ProjectLintRulesError, TData>({
+    queryKey: lintKeys.lintRules(projectRef),
+    queryFn: ({ signal }) => getProjectLintRules({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && isActive,
+    ...options,
+  })
 }

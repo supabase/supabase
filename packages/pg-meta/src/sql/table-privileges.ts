@@ -1,23 +1,13 @@
-export const TABLE_PRIVILEGES_SQL = /* SQL */ `
--- Despite the name \`table_privileges\`, this includes other kinds of relations:
--- views, matviews, etc. "Relation privileges" just doesn't roll off the tongue.
---
--- For each relation, get its relacl in a jsonb format,
--- e.g.
---
--- '{postgres=arwdDxt/postgres}'
---
--- becomes
---
--- [
---   {
---     "grantee": "postgres",
---     "grantor": "postgres",
---     "is_grantable": false,
---     "privilege_type": "INSERT"
---   },
---   ...
--- ]
+import { safeSql, type SafeSqlFragment } from '../pg-format'
+
+/**
+ * Relation ACLs (tables, views, matviews, foreign/partitioned). `scopeFilter`
+ * is a `safeSql` fragment starting with `and ` (or empty) on aliases `c`
+ * (pg_class) and `nc` (pg_namespace), applied before aclexplode / GROUP BY.
+ */
+export const getScopedTablePrivilegesSql = (
+  scopeFilter: SafeSqlFragment = safeSql``
+): SafeSqlFragment => safeSql`
 select
   c.oid as relation_id,
   nc.nspname as schema,
@@ -61,6 +51,7 @@ left join (
   on grantee.oid = _priv.grantee
 where c.relkind in ('r', 'v', 'm', 'f', 'p')
   and not pg_is_other_temp_schema(c.relnamespace)
+  ${scopeFilter}
   and (
     pg_has_role(c.relowner, 'USAGE')
     or has_table_privilege(

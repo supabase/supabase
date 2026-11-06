@@ -1,0 +1,50 @@
+import { useMutation } from '@tanstack/react-query'
+import { toast } from 'sonner'
+
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
+
+type OrganizationProjectClaimVariables = {
+  slug: string
+  token: string
+}
+
+async function claimOrganizationProject({ slug, token }: OrganizationProjectClaimVariables) {
+  const { data, error } = await post('/v1/organizations/{slug}/project-claim/{token}', {
+    params: { path: { slug, token } },
+    grant: unguarded.migrating,
+  })
+  if (error) handleError(error)
+  return data
+}
+
+type ClaimOrganizationProjectData = Awaited<ReturnType<typeof claimOrganizationProject>>
+
+export const useOrganizationProjectClaimMutation = ({
+  onSuccess,
+  onError,
+  ...options
+}: Omit<
+  UseCustomMutationOptions<
+    ClaimOrganizationProjectData,
+    StudioError,
+    OrganizationProjectClaimVariables
+  >,
+  'mutationFn'
+> = {}) => {
+  return useMutation<ClaimOrganizationProjectData, StudioError, OrganizationProjectClaimVariables>({
+    mutationFn: (vars) => claimOrganizationProject(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to claim project: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
+}

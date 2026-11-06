@@ -1,10 +1,10 @@
-import React, { FC } from 'react'
 import { buildDays as days } from '~/components/LaunchWeek/X/Releases/data'
-
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import AdventCard from './components/AdventCard'
-import { motion, useInView } from 'framer-motion'
+import { motion, useInView } from 'motion/react'
+import React, { FC } from 'react'
 import { cn } from 'ui'
+
+import AdventCard from './components/AdventCard'
 
 const BuildStage: FC = () => {
   const ref = React.useRef(null)
@@ -24,7 +24,7 @@ const BuildStage: FC = () => {
 
   return (
     <>
-      <SectionContainer className="!max-w-none lg:!container lwx-nav-anchor" id="build-stage">
+      <SectionContainer className="max-w-none! lg:container! lwx-nav-anchor" id="build-stage">
         <h3 className="text-foreground uppercase font-mono pb-4 md:pb-8 text-sm tracking-[0.1rem]">
           Build Stage
         </h3>

@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { organizationKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationMemberDeleteVariables = {
   slug: string
@@ -28,26 +29,23 @@ export const useOrganizationMemberDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberDeleteData,
-    ResponseError,
+    StudioError,
     OrganizationMemberDeleteVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    OrganizationMemberDeleteData,
-    ResponseError,
-    OrganizationMemberDeleteVariables
-  >((vars) => deleteOrganizationMember(vars), {
+  return useMutation<OrganizationMemberDeleteData, StudioError, OrganizationMemberDeleteVariables>({
+    mutationFn: (vars) => deleteOrganizationMember(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables
 
       await Promise.all([
-        queryClient.invalidateQueries(organizationKeys.members(slug)),
-        queryClient.invalidateQueries(organizationKeys.roles(slug)),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.members(slug) }),
+        queryClient.invalidateQueries({ queryKey: organizationKeys.roles(slug) }),
       ])
 
       await onSuccess?.(data, variables, context)

@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,7 +12,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { useState } from 'react'
 
 export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [email, setEmail] = useState('')
@@ -50,20 +51,22 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Thank you for signing up!</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">
+              Thank you for signing up!
+            </CardTitle>
             <CardDescription>Check your email to confirm</CardDescription>
           </CardHeader>
           <CardContent>
             <p className="text-sm text-muted-foreground">
-              You've successfully signed up. Please check your email to confirm your account before
-              signing in.
+              You&apos;ve successfully signed up. Please check your email to confirm your account
+              before signing in.
             </p>
           </CardContent>
         </Card>
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Sign up</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">Sign up</CardTitle>
             <CardDescription>Create a new account</CardDescription>
           </CardHeader>
           <CardContent>
@@ -112,7 +115,7 @@ export function SignUpForm({ className, ...props }: React.ComponentPropsWithoutR
               <div className="mt-4 text-center text-sm">
                 Already have an account?{' '}
                 <a href="/login" className="underline underline-offset-4">
-                  Login
+                  Sign in
                 </a>
               </div>
             </form>

@@ -2,8 +2,8 @@
 title: 'Slack Consolidate: a slackbot built with Python and Supabase'
 description: A slackbot to consolidate messages from different channels using Supabase, Slack SDK and Python
 author: rodrigo_mansueli
-image: slackbot-consolidate/slackbot-thumb.jpg
-thumb: slackbot-consolidate/slackbot-thumb.jpg
+imgSocial: slackbot-consolidate/slackbot-thumb.jpg
+imgThumb: slackbot-consolidate/slackbot-thumb.jpg
 categories:
   - engineering
 tags:
@@ -124,7 +124,7 @@ Now, we are done with Slack for now. Let's create some buffer tables in Supabase
 
 Create an account [here](https://supabase.com/dashboard/) (if you don't have one yet).
 
-We will be using Supabase's [database](https://supabase.com/docs/guides/database) and the Python [client Libraries](https://supabase.com/docs/guides/client-libraries#managing-data). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
+We will be using Supabase's [database](https://supabase.com/docs/guides/database/overview) and the Python [client Libraries](/docs/reference/python/introduction). First, we will create one table to store the channels that are being watched and where they are going to send the message which works analogously to a multiplexer circuit. Since you may want to watch several channels but split them into a smaller buffer e.g VIP / Enterprise, etc.
 
 Go to the SQL Editor and run this:
 
@@ -159,9 +159,10 @@ After right-clicking a message in Slack, you can see the option to select the li
 
 Slack links have the following format:
 
-<span className="break-words">
+<span className="wrap-break-word">
   https://<span className="text-foreground">ORGANIZATION</span>.slack.com/archives/
-  <span className="text-foreground">channel_id</span>/p<span className="text-foreground">message_id</span>
+  <span className="text-foreground">channel_id</span>/p
+  <span className="text-foreground">message_id</span>
 </span>
 <br />
 <span style={{ color: 'maroon' }}>Organization: subdomain used in Slack</span>
@@ -228,7 +229,7 @@ Notes:
 
 You need to get the supabase URL and API keys from here:
 
-[https://supabase.com/dashboard/project/\_/settings/api](https://supabase.com/dashboard/project/_/settings/api)
+[https://supabase.com/dashboard/project/\_/settings/api](https://supabase.com/dashboard/project/_/integrations/data_api/overview)
 
 ![The picture illustrates where to get the URL and the service key to setup the environment variables.](/images/blog/slackbot-consolidate/10_copy_supabase_apis.png)
 

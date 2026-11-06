@@ -1,0 +1,58 @@
+import { getIndexWorkerStatusSQL } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
+import { authKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
+
+type IndexWorkerStatusVariables = {
+  projectRef?: string
+  connectionString?: string | null
+}
+type IndexWorkerStatusData = {
+  is_in_progress: boolean
+}
+export type IndexWorkerStatusError = StudioError
+
+export async function getIndexWorkerStatus(
+  { projectRef, connectionString }: IndexWorkerStatusVariables,
+  signal?: AbortSignal
+): Promise<IndexWorkerStatusData> {
+  const sql = getIndexWorkerStatusSQL()
+
+  const { result } = await executeSql<IndexWorkerStatusData[]>(
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['index-worker-status'],
+      grant: unguarded.migrating,
+    },
+    signal
+  )
+
+  return result[0]
+}
+
+export const useIndexWorkerStatusQuery = <TData = IndexWorkerStatusData>(
+  { projectRef, connectionString }: IndexWorkerStatusVariables,
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<IndexWorkerStatusData, IndexWorkerStatusError, TData> = {}
+) =>
+  useQuery<IndexWorkerStatusData, IndexWorkerStatusError, TData>({
+    queryKey: authKeys.indexWorkerStatus(projectRef),
+    queryFn: ({ signal }) =>
+      getIndexWorkerStatus(
+        {
+          projectRef,
+          connectionString,
+        },
+        signal
+      ),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

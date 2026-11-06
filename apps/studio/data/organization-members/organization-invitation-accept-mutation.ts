@@ -1,9 +1,11 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
-import { toast } from 'sonner'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 
-import { handleError, post } from 'data/fetchers'
-import { invalidateOrganizationsQuery } from 'data/organizations/organizations-query'
-import type { ResponseError } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import { invalidateOrganizationsQuery } from '@/data/organizations/organizations-query'
+import { invalidatePermissionsQuery } from '@/data/permissions/permissions-query'
+import { useInvalidateProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationAcceptInvitationVariables = {
   slug: string
@@ -26,34 +28,31 @@ type OrganizationMemberUpdateData = Awaited<ReturnType<typeof acceptOrganization
 
 export const useOrganizationAcceptInvitationMutation = ({
   onSuccess,
-  onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationAcceptInvitationVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
+  const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
   return useMutation<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationAcceptInvitationVariables
-  >((vars) => acceptOrganizationInvitation(vars), {
+  >({
+    mutationFn: (vars) => acceptOrganizationInvitation(vars),
     async onSuccess(data, variables, context) {
-      await invalidateOrganizationsQuery(queryClient)
-
+      await Promise.all([
+        invalidateOrganizationsQuery(queryClient),
+        invalidateProjectsQuery(),
+        invalidatePermissionsQuery(queryClient),
+      ])
       await onSuccess?.(data, variables, context)
-    },
-    async onError(data, variables, context) {
-      if (onError === undefined) {
-        toast.error(`Failed to accept invitation: ${data.message}`)
-      } else {
-        onError(data, variables, context)
-      }
     },
     ...options,
   })

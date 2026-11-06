@@ -1,7 +1,6 @@
 'use client'
 
 import * as React from 'react'
-
 import { Calendar } from 'ui'
 
 export default function CalendarDemo() {

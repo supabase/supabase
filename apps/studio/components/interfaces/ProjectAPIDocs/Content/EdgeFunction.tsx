@@ -1,12 +1,12 @@
 import { useParams } from 'common'
 
-import { useEdgeFunctionsQuery } from 'data/edge-functions/edge-functions-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
+export const EdgeFunction = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
   const { ref } = useParams()
   const snap = useAppStateSnapshot()
   const { data } = useEdgeFunctionsQuery({ projectRef: ref })
@@ -21,7 +21,7 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
-          <h2 className="text-xl">{edgeFunction.name}</h2>
+          <h2>{edgeFunction.name}</h2>
         </div>
       </div>
 
@@ -37,5 +37,3 @@ const Bucket = ({ language, apikey = 'API_KEY', endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

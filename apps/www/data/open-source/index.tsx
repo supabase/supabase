@@ -66,6 +66,7 @@ export default {
         'gotrue',
         'gotrue-dart',
         'gotrue-js',
+        'auth-js',
         'mailme',
       ],
     },

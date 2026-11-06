@@ -1,21 +1,15 @@
-import { AvailableIntegrations } from 'components/interfaces/Integrations/Landing/AvailableIntegrations'
-import { InstalledIntegrations } from 'components/interfaces/Integrations/Landing/InstalledIntegrations'
-import DefaultLayout from 'components/layouts/DefaultLayout'
-import IntegrationsLayout from 'components/layouts/Integrations/layout'
-import type { NextPageWithLayout } from 'types'
+import { MarketplaceIndex } from '@/components/interfaces/Integrations/Marketplace/MarketplaceIndex'
+import { DefaultLayout } from '@/components/layouts/DefaultLayout'
+import { ProjectMarketplaceLayout } from '@/components/layouts/ProjectMarketplaceLayout'
+import type { NextPageWithLayout } from '@/types'
 
 const IntegrationsPage: NextPageWithLayout = () => {
-  return (
-    <div>
-      <InstalledIntegrations />
-      <AvailableIntegrations />
-    </div>
-  )
+  return <MarketplaceIndex />
 }
 
 IntegrationsPage.getLayout = (page) => (
   <DefaultLayout>
-    <IntegrationsLayout>{page}</IntegrationsLayout>
+    <ProjectMarketplaceLayout>{page}</ProjectMarketplaceLayout>
   </DefaultLayout>
 )
 

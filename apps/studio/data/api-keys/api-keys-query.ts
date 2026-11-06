@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
+import { queryOptions, skipToken } from '@tanstack/react-query'
 
 import { apiKeysKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
 
 type LegacyKeys = {
   api_key: string
@@ -43,38 +44,77 @@ type PublishableKeys = {
   updated_at?: string
 }
 
-export interface APIKeysVariables {
+export type APIKey = LegacyKeys | SecretKeys | PublishableKeys
+
+export type APIKeysGrant = GrantFor<'get', '/v1/projects/{ref}/api-keys'>
+export type RevealedAPIKeysGrant = GrantFor<'get', '/v1/projects/{ref}/api-keys', 'reveal'>
+
+export type APIKeysVariables = {
   projectRef?: string
-  reveal: boolean
+  grant?: APIKeysGrant
 }
 
-export async function getAPIKeys({ projectRef, reveal }: APIKeysVariables, signal?: AbortSignal) {
-  if (!projectRef) throw new Error('projectRef is required')
+export type RevealedAPIKeysVariables = {
+  projectRef?: string
+  grant?: RevealedAPIKeysGrant
+}
 
+/** The wrapper sets the `reveal` query param from the grant's variant. */
+async function getAPIKeys(
+  { projectRef, grant }: { projectRef: string; grant: APIKeysGrant | RevealedAPIKeysGrant },
+  signal?: AbortSignal
+) {
   const { data, error } = await get(`/v1/projects/{ref}/api-keys`, {
-    params: { path: { ref: projectRef }, query: { reveal } },
+    params: { path: { ref: projectRef } },
     signal,
+    grant,
   })
 
-  if (error) {
-    handleError(error)
-  }
+  if (error) handleError(error)
 
   // [Jonny]: Overriding the types here since some stuff is not actually nullable or optional
-  return data as unknown as (LegacyKeys | SecretKeys | PublishableKeys)[]
+  return data as unknown as APIKey[]
 }
 
 export type APIKeysData = Awaited<ReturnType<typeof getAPIKeys>>
+export type APIKeysError = StudioError
 
-export const useAPIKeysQuery = <TData = APIKeysData>(
-  { projectRef, reveal }: APIKeysVariables,
-  { enabled, ...options }: UseQueryOptions<APIKeysData, ResponseError, TData> = {}
-) =>
-  useQuery<APIKeysData, ResponseError, TData>(
-    apiKeysKeys.list(projectRef),
-    ({ signal }) => getAPIKeys({ projectRef, reveal }, signal),
-    {
-      enabled: enabled && !!projectRef,
-      ...options,
-    }
-  )
+/** Keys without their secret values (`reveal=false`). Needs a plain grant. */
+export const apiKeysQueryOptions = ({ projectRef, grant }: APIKeysVariables) =>
+  queryOptions<APIKeysData, APIKeysError>({
+    queryKey: apiKeysKeys.list(projectRef, false),
+    queryFn:
+      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
+  })
+
+/** Keys with their secret values (`reveal=true`). Needs the `reveal` grant. */
+export const revealedApiKeysQueryOptions = ({ projectRef, grant }: RevealedAPIKeysVariables) =>
+  queryOptions<APIKeysData, APIKeysError>({
+    queryKey: apiKeysKeys.list(projectRef, true),
+    queryFn:
+      projectRef && grant ? ({ signal }) => getAPIKeys({ projectRef, grant }, signal) : skipToken,
+  })
+
+const EmptyKey = {
+  anonKey: undefined,
+  serviceKey: undefined,
+  publishableKey: undefined,
+  secretKey: undefined,
+  allSecretKeys: [],
+}
+
+export const getKeys = (apiKeys: APIKey[] = []) => {
+  if (!Array.isArray(apiKeys)) {
+    return EmptyKey
+  }
+  const anonKey = apiKeys.find((x) => x.name === 'anon')
+  const serviceKey = apiKeys.find((x) => x.name === 'service_role')
+
+  // [Joshen] For now I just want 1 of each, I don't need all
+  const publishableKey = apiKeys.find((x) => x.type === 'publishable')
+  const secretKey = apiKeys.find((x) => x.type === 'secret')
+
+  const allSecretKeys = apiKeys.filter((x) => x.type === 'secret')
+
+  return { anonKey, serviceKey, publishableKey, secretKey, allSecretKeys }
+}

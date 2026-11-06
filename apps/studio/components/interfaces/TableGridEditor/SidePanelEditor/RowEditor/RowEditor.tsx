@@ -1,30 +1,36 @@
-import type { PostgresTable } from '@supabase/postgres-meta'
+import type { PGTable } from '@supabase/pg-meta'
 import { isEmpty, noop, partition } from 'lodash'
 import { useEffect, useMemo, useState } from 'react'
+import { Label, SidePanel, Switch } from 'ui'
 
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { useForeignKeyConstraintsQuery } from 'data/database/foreign-key-constraints-query'
-import type { Dictionary } from 'types'
-import { SidePanel } from 'ui'
-import ActionBar from '../ActionBar'
+import { ActionBar } from '../ActionBar'
 import { formatForeignKeys } from '../ForeignKeySelector/ForeignKeySelector.utils'
-import ForeignRowSelector from './ForeignRowSelector/ForeignRowSelector'
-import HeaderTitle from './HeaderTitle'
-import InputField from './InputField'
+import { ForeignRowSelector } from './ForeignRowSelector/ForeignRowSelector'
+import { HeaderTitle } from './HeaderTitle'
+import { InputField } from './InputField'
 import { JsonEditor } from './JsonEditor'
+import { RowCreationOptions } from './RowCreationOptions'
 import type { EditValue, RowField } from './RowEditor.types'
 import {
   convertByteaToHex,
+  generateReusedRowFields,
   generateRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
   validateFields,
 } from './RowEditor.utils'
 import { TextEditor } from './TextEditor'
+import { getStableRowIdentifiers } from '@/components/grid/utils/queueOperationUtils'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { Dictionary } from '@/types'
 
 export interface RowEditorProps {
   row?: Dictionary<any>
-  selectedTable: PostgresTable
+  /** Seeds a new record from an existing row; primary key, identity, and generated values are cleared */
+  duplicateFrom?: Dictionary<any>
+  selectedTable: PGTable
   visible: boolean
   editable?: boolean
   closePanel: () => void
@@ -32,8 +38,11 @@ export interface RowEditorProps {
   updateEditorDirty: () => void
 }
 
-const RowEditor = ({
+const formId = 'row-editor-panel'
+
+export const RowEditor = ({
   row,
+  duplicateFrom,
   selectedTable,
   visible = false,
   editable = true,
@@ -41,6 +50,10 @@ const RowEditor = ({
   saveChanges = noop,
   updateEditorDirty = noop,
 }: RowEditorProps) => {
+  const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save'
+
   const [errors, setErrors] = useState<Dictionary<any>>({})
   const [rowFields, setRowFields] = useState<RowField[]>([])
 
@@ -55,13 +68,16 @@ const RowEditor = ({
   const isEditingJson = selectedValueForJsonEdit !== undefined
 
   const [loading, setLoading] = useState(false)
+  const [createMore, setCreateMore] = useState(false)
+  const [keepValues, setKeepValues] = useState(false)
 
+  // Generated columns are always computed by the database, so they are excluded from the form.
+  // They remain in rowFields as primary key identifiers may rely on them.
   const [requiredFields, optionalFields] = partition(
-    rowFields,
+    rowFields.filter((rowField) => !rowField.isGenerated),
     (rowField: any) => !rowField.isNullable
   )
 
-  const { project } = useProjectContext()
   const { data } = useForeignKeyConstraintsQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
@@ -83,8 +99,16 @@ const RowEditor = ({
   useEffect(() => {
     if (visible) {
       setErrors({})
-      const rowFields = generateRowFields(row, selectedTable, foreignKeys)
-      setRowFields(rowFields)
+      if (duplicateFrom !== undefined) {
+        setRowFields(
+          generateReusedRowFields({
+            fields: generateRowFields(duplicateFrom, selectedTable, foreignKeys),
+            blankFields: generateRowFields(undefined, selectedTable, foreignKeys),
+          })
+        )
+      } else {
+        setRowFields(generateRowFields(row, selectedTable, foreignKeys))
+      }
     }
   }, [visible])
 
@@ -126,7 +150,7 @@ const RowEditor = ({
       updateEditorDirty()
 
       const payload = isNewRecord
-        ? generateRowObjectFromFields(rowFields)
+        ? generateRowObjectFromFields({ fields: rowFields, useDefaultForEmptyValues: true })
         : generateUpdateRowPayload(row, rowFields)
 
       const configuration = { identifiers: {}, rowIdx: -1 }
@@ -137,11 +161,20 @@ const RowEditor = ({
           identifiers[column.name] =
             column.format === 'bytea' ? convertByteaToHex(row![column.name]) : row![column.name]
         })
-        configuration.identifiers = identifiers
+        configuration.identifiers = getStableRowIdentifiers(row!, identifiers)
         configuration.rowIdx = row!.idx
       }
 
-      saveChanges(payload, isNewRecord, configuration, () => setLoading(false))
+      saveChanges(payload, isNewRecord, { ...configuration, createMore }, (err?: any) => {
+        setLoading(false)
+        if (!err && createMore && isNewRecord) {
+          const blankFields = generateRowFields(undefined, selectedTable, foreignKeys)
+          setRowFields(
+            keepValues ? generateReusedRowFields({ fields: rowFields, blankFields }) : blankFields
+          )
+          setErrors({})
+        }
+      })
     } else {
       setLoading(false)
     }
@@ -157,7 +190,8 @@ const RowEditor = ({
 
   return (
     <SidePanel
-      hideFooter
+      data-testid="side-panel-row-editor"
+      // hideFooter
       size="large"
       key="RowEditor"
       visible={visible}
@@ -166,31 +200,60 @@ const RowEditor = ({
         isEditingText || isEditingJson || isSelectingForeignKey ? ' mr-32' : ''
       }`}
       onCancel={closePanel}
+      customFooter={
+        <ActionBar
+          loading={loading}
+          formId={formId}
+          backButtonLabel="Cancel"
+          applyButtonLabel={applyChangesLabel}
+          closePanel={closePanel}
+          hideApply={!editable}
+          visible={visible}
+        >
+          {isNewRecord && editable && (
+            <div className="flex items-center space-x-2">
+              <Switch
+                id="create-more"
+                size="small"
+                checked={createMore}
+                onCheckedChange={(checked) => setCreateMore(checked)}
+              />
+              <Label htmlFor="create-more">Create more</Label>
+              {createMore && (
+                <RowCreationOptions keepValues={keepValues} onKeepValuesChange={setKeepValues} />
+              )}
+            </div>
+          )}
+        </ActionBar>
+      }
     >
-      <form onSubmit={(e) => onSaveChanges(e)} className="h-full">
+      <form id={formId} onSubmit={(e) => onSaveChanges(e)} className="h-full">
         <div className="flex h-full flex-col">
-          <div className="flex flex-grow flex-col">
-            <SidePanel.Content>
-              <div className="space-y-10 py-6">
-                {requiredFields.map((field: RowField) => {
-                  return (
-                    <InputField
-                      key={field.id}
-                      field={field}
-                      errors={errors}
-                      onUpdateField={onUpdateField}
-                      onEditJson={setSelectedValueForJsonEdit}
-                      onEditText={setSelectedValueForTextEdit}
-                      onSelectForeignKey={() => onOpenForeignRowSelector(field)}
-                      isEditable={editable}
-                    />
-                  )
-                })}
-              </div>
-            </SidePanel.Content>
+          <div className="flex grow flex-col">
+            {requiredFields.length > 0 && (
+              <SidePanel.Content>
+                <div className="space-y-10 py-6">
+                  {requiredFields.map((field: RowField) => {
+                    return (
+                      <InputField
+                        key={field.id}
+                        field={field}
+                        errors={errors}
+                        onUpdateField={onUpdateField}
+                        onEditJson={setSelectedValueForJsonEdit}
+                        onEditText={setSelectedValueForTextEdit}
+                        onSelectForeignKey={() => onOpenForeignRowSelector(field)}
+                        isEditable={editable}
+                        isNewRow={isNewRecord || '__tempId' in row}
+                      />
+                    )
+                  })}
+                </div>
+              </SidePanel.Content>
+            )}
             {optionalFields.length > 0 && (
               <>
-                <SidePanel.Separator />
+                {requiredFields.length > 0 && <SidePanel.Separator />}
                 <SidePanel.Content>
                   <div className="space-y-10 py-6">
                     <div>
@@ -210,6 +273,7 @@ const RowEditor = ({
                           onEditJson={setSelectedValueForJsonEdit}
                           onSelectForeignKey={() => onOpenForeignRowSelector(field)}
                           isEditable={editable}
+                          isNewRow={isNewRecord || '__tempId' in row}
                         />
                       )
                     })}
@@ -241,15 +305,6 @@ const RowEditor = ({
               readOnly={!editable}
             />
           </div>
-          <div className="flex-shrink">
-            <ActionBar
-              loading={loading}
-              backButtonLabel="Cancel"
-              applyButtonLabel="Save"
-              closePanel={closePanel}
-              hideApply={!editable}
-            />
-          </div>
         </div>
       </form>
 
@@ -266,5 +321,3 @@ const RowEditor = ({
     </SidePanel>
   )
 }
-
-export default RowEditor

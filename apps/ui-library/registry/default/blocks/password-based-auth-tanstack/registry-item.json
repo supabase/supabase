@@ -3,7 +3,13 @@
   "type": "registry:block",
   "title": "Password Based Auth flow for tanstack and Supabase",
   "description": "Password Based Auth flow for tanstack and Supabase",
-  "registryDependencies": ["button", "card", "input", "label"],
+  "registryDependencies": [
+    "button",
+    "card",
+    "input",
+    "label",
+    "https://supabase.com/library/r/safe-next-path.json"
+  ],
   "dependencies": ["@supabase/ssr@latest"],
   "files": [
     {
@@ -22,9 +28,9 @@
       "target": "routes/_protected.tsx"
     },
     {
-      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/info.tsx",
+      "path": "registry/default/blocks/password-based-auth-tanstack/routes/_protected/protected.tsx",
       "type": "registry:file",
-      "target": "routes/_protected/info.tsx"
+      "target": "routes/_protected/protected.tsx"
     },
     {
       "path": "registry/default/blocks/password-based-auth-tanstack/routes/auth/confirm.ts",

@@ -1,41 +1,51 @@
-import { BASE_PATH } from 'lib/constants'
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { PropsWithChildren } from 'react'
+import { cn } from 'ui'
+
+import { DisabledUntilHydrated } from '@/components/ui/DisabledUntilHydrated'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { BASE_PATH } from '@/lib/constants'
 
 type ForgotPasswordLayoutProps = {
-  heading: string
-  subheading: string
+  heading?: string
+  subheading?: string
   logoLinkToMarketingSite?: boolean
   showHeadings?: boolean
+  className?: string
 }
 
-const ForgotPasswordLayout = ({
+export const ForgotPasswordLayout = ({
   heading,
   subheading,
   logoLinkToMarketingSite = false,
   showHeadings = true,
+  className,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
-  const { resolvedTheme } = useTheme()
+  const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
+  const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
 
   return (
-    <div className="flex-1 bg-studio flex flex-col gap-8 lg:gap-16 xl:gap-32">
+    <div
+      className={cn(
+        'min-h-screen flex-1 bg-studio flex flex-col gap-8 lg:gap-16 xl:gap-32',
+        className
+      )}
+    >
       <div className="sticky top-0 mx-auto w-full max-w-7xl px-8 pt-6 sm:px-6 lg:px-8">
         <nav className="relative flex items-center justify-between sm:h-10">
-          <div className="flex flex-shrink-0 flex-grow items-center lg:flex-grow-0">
+          <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href={logoLinkToMarketingSite ? 'https://supabase.com' : '/projects'}>
-                <Image
-                  src={
-                    resolvedTheme?.includes('dark')
-                      ? `${BASE_PATH}/img/supabase-dark.svg`
-                      : `${BASE_PATH}/img/supabase-light.svg`
-                  }
+              <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
+                <img
+                  src={`${BASE_PATH}/img/supabase-light.svg`}
                   alt=""
-                  height={24}
-                  width={120}
+                  className="h-[24px] dark:hidden"
+                />
+                <img
+                  src={`${BASE_PATH}/img/supabase-dark.svg`}
+                  alt=""
+                  className="hidden h-[24px] dark:block"
                 />
               </Link>
             </div>
@@ -47,16 +57,14 @@ const ForgotPasswordLayout = ({
         <main className="max-w-[448px] w-full flex flex-col px-5">
           {showHeadings && (
             <div className="mb-6">
-              <h1 className="text-2xl lg:text-3xl mt-8 mb-2">{heading}</h1>
+              <h1 className="lg:text-3xl mt-8 mb-2">{heading}</h1>
               <h2 className="text-foreground-light text-sm">{subheading}</h2>
             </div>
           )}
 
-          {children}
+          <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
         </main>
       </div>
     </div>
   )
 }
-
-export default ForgotPasswordLayout

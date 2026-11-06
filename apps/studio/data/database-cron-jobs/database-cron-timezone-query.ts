@@ -1,11 +1,15 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { ResponseError } from 'types'
+import { safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseCronJobsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getDatabaseCronTimezone({
@@ -17,22 +21,21 @@ export async function getDatabaseCronTimezone({
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `select setting from pg_settings where name = 'cron.timezone';`,
+    sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
+    grant: unguarded.migrating,
   })
   return result[0].setting
 }
 
-export type DatabaseCronJobError = ResponseError
+export type DatabaseCronJobError = StudioError
 
 export const useCronTimezoneQuery = <TData = string>(
   { projectRef, connectionString }: DatabaseCronJobsVariables,
-  { enabled = true, ...options }: UseQueryOptions<string, DatabaseCronJobError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<string, DatabaseCronJobError, TData> = {}
 ) =>
-  useQuery<string, DatabaseCronJobError, TData>(
-    databaseCronJobsKeys.timezone(projectRef),
-    () => getDatabaseCronTimezone({ projectRef, connectionString }),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<string, DatabaseCronJobError, TData>({
+    queryKey: databaseCronJobsKeys.timezone(projectRef),
+    queryFn: () => getDatabaseCronTimezone({ projectRef, connectionString }),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

@@ -1,14 +1,16 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { getCreateVaultSecretSQL } from '@supabase/pg-meta'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import { quoteLiteral } from 'lib/pg-format'
-import type { ResponseError, VaultSecret } from 'types'
 import { vaultSecretsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions, VaultSecret } from '@/types'
 
 export type VaultSecretCreateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
 } & Partial<VaultSecret>
 
 export async function createVaultSecret({
@@ -16,17 +18,17 @@ export async function createVaultSecret({
   connectionString,
   ...newSecret
 }: VaultSecretCreateVariables) {
-  const { name, description, secret, key_id } = newSecret
-  const sql = /* SQL */ `
-select vault.create_secret(
-    new_secret := ${quoteLiteral(secret)}
-  ${name ? `, new_name := ${quoteLiteral(name)}` : ''}
-  ${description ? `, new_description := ${quoteLiteral(description)}` : ''}
-  ${key_id ? `, new_key_id := ${quoteLiteral(key_id)}` : ''}
-)
-`
+  const { name, description, secret } = newSecret
 
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  if (!secret) throw new Error('Secret value is required')
+  const sql = getCreateVaultSecretSQL({ secret, name, description })
+
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -37,27 +39,25 @@ export const useVaultSecretCreateMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseMutationOptions<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>,
+  UseCustomMutationOptions<VaultSecretCreateData, StudioError, VaultSecretCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<VaultSecretCreateData, ResponseError, VaultSecretCreateVariables>(
-    (vars) => createVaultSecret(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(vaultSecretsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create secret: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<VaultSecretCreateData, StudioError, VaultSecretCreateVariables>({
+    mutationFn: (vars) => createVaultSecret(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: vaultSecretsKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create secret: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

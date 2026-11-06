@@ -2,13 +2,13 @@ import { useParams } from 'common'
 import { useEffect } from 'react'
 import { Badge } from 'ui'
 
-import Table from 'components/to-be-cleaned/Table'
-import { useProjectJsonSchemaQuery } from 'data/docs/project-json-schema-query'
-import { useOpenAPISpecQuery } from 'data/open-api/api-spec-query'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import Table from '@/components/to-be-cleaned/Table'
+import { useProjectJsonSchemaQuery } from '@/data/docs/project-json-schema-query'
+import { useOpenAPISpecQuery } from '@/data/open-api/api-spec-query'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export const RPC = ({ language }: ContentProps) => {
   const { ref } = useParams()
@@ -57,7 +57,7 @@ export const RPC = ({ language }: ContentProps) => {
   return (
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
-        <h2 className="text-xl">{rpc.name}</h2>
+        <h2>{rpc.name}</h2>
         <p className="text-sm text-foreground-light">{summary ?? 'No description available'}</p>
       </div>
       <div className="space-y-2 px-4 py-4">

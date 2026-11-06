@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { keys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteThirdPartyAuthIntegrationVariables = {
   projectRef: string
@@ -21,6 +22,7 @@ export async function deleteThirdPartyIntegration({
         tpa_id: tpaId,
       },
     },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -33,9 +35,9 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DeleteThirdPartyAuthIntegrationData,
-    ResponseError,
+    StudioError,
     DeleteThirdPartyAuthIntegrationVariables
   >,
   'mutationFn'
@@ -43,12 +45,13 @@ export const useDeleteThirdPartyAuthIntegrationMutation = ({
   const queryClient = useQueryClient()
   return useMutation<
     DeleteThirdPartyAuthIntegrationData,
-    ResponseError,
+    StudioError,
     DeleteThirdPartyAuthIntegrationVariables
-  >((vars) => deleteThirdPartyIntegration(vars), {
+  >({
+    mutationFn: (vars) => deleteThirdPartyIntegration(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
-      await queryClient.invalidateQueries(keys.integrations(projectRef))
+      await queryClient.invalidateQueries({ queryKey: keys.integrations(projectRef) })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

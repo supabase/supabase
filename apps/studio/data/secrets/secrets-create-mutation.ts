@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { secretsKeys } from './keys'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SecretsCreateVariables = {
   projectRef?: string
@@ -16,6 +17,7 @@ export async function createSecrets({ projectRef, secrets }: SecretsCreateVariab
   const { data, error } = await post('/v1/projects/{ref}/secrets', {
     params: { path: { ref: projectRef } },
     body: secrets,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -29,26 +31,24 @@ export const useSecretsCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<SecretsCreateData, ResponseError, SecretsCreateVariables>,
+  UseCustomMutationOptions<SecretsCreateData, StudioError, SecretsCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsCreateData, ResponseError, SecretsCreateVariables>(
-    (vars) => createSecrets(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(secretsKeys.list(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create secrets: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<SecretsCreateData, StudioError, SecretsCreateVariables>({
+    mutationFn: (vars) => createSecrets(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({ queryKey: secretsKeys.list(projectRef) })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create secrets: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

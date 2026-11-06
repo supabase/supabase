@@ -1,14 +1,14 @@
-import React, { FC } from 'react'
 import type { LucideIcon } from 'lucide-react'
+import React, { type FC, type ReactNode } from 'react'
+import { TextLink } from 'ui-patterns/TextLink'
 
-import { TextLink } from 'ui'
-import SectionContainer from '~/components/Layouts/SectionContainer'
+import SectionContainer from '@/components/Layouts/SectionContainer'
 
-interface Props {
+export interface SecuritySectionProps {
   id: string
-  label: string | JSX.Element
-  heading: string | JSX.Element
-  subheading: string | JSX.Element
+  label: ReactNode
+  heading: ReactNode
+  subheading: ReactNode
   features: FeatureProps[]
   cta: {
     label: string
@@ -19,7 +19,7 @@ interface Props {
 export type Story = {
   url: string
   heading: string
-  subheading: string | JSX.Element
+  subheading: ReactNode
 }
 
 type FeatureProps = {
@@ -27,7 +27,7 @@ type FeatureProps = {
   heading: string
 }
 
-const EnterpriseSecurity: FC<Props> = (props) => {
+const EnterpriseSecurity: FC<SecuritySectionProps> = (props) => {
   return (
     <SectionContainer
       id={props.id}
@@ -35,8 +35,8 @@ const EnterpriseSecurity: FC<Props> = (props) => {
     >
       <div className="flex flex-col gap-2 max-w-xl">
         <span className="label">{props.label}</span>
-        <h2 className="h2 !m-0">{props.heading}</h2>
-        <p className="p !text-foreground-lighter">{props.subheading}</p>
+        <h2 className="h2 m-0!">{props.heading}</h2>
+        <p className="p text-foreground-lighter!">{props.subheading}</p>
         <TextLink hasChevron label={props.cta.label} url={props.cta.url} className="mt-2" />
       </div>
       <ul className="grid grid-cols-2 sm:grid-cols-2 gap-4 md:gap-x-20 h-fit xl:grid-cols-2 mt-4 xl:mt-8">
@@ -56,7 +56,7 @@ const FeatureItem: FC<FeatureItemProps> = ({ feature }) => {
   const Icon: LucideIcon = feature.icon
 
   return (
-    <li className="flex flex-nowrap items-center h-fit gap-2 sm:gap-4 text-foreground text-xs sm:text-sm">
+    <li className="flex flex-nowrap items-center h-fit gap-2 sm:gap-4 text-foreground-light text-xs sm:text-sm">
       <figure className="border not-prose bg-surface-100 flex h-8 w-8 items-center justify-center rounded-md">
         <Icon className="w-4 h-4 stroke-1" />
       </figure>

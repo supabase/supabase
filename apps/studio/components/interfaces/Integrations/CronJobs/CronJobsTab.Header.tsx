@@ -1,0 +1,81 @@
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
+import type { KeyboardEvent, Ref } from 'react'
+import { Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Input } from 'ui-patterns/DataInputs/Input'
+
+import { EnableCleanupButton } from './CronJobsTab.EnableCleanupButton'
+import { onSearchInputEscape } from '@/lib/keyboard'
+
+interface CronJobsTabHeaderProps {
+  search: string
+  isRefreshing: boolean
+  searchInputRef?: Ref<HTMLInputElement>
+  onSearchChange: (value: string) => void
+  onSearchSubmit: () => void
+  onClearSearch: () => void
+  onRefresh: () => void
+  onCreateJob: () => void
+}
+
+export const CronJobsTabHeader = ({
+  search,
+  isRefreshing,
+  searchInputRef,
+  onSearchChange,
+  onSearchSubmit,
+  onClearSearch,
+  onRefresh,
+  onCreateJob,
+}: CronJobsTabHeaderProps) => {
+  const handleKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
+    onSearchInputEscape(search, onClearSearch)(event)
+    if (event.key === 'Enter' || event.code === 'NumpadEnter') {
+      onSearchSubmit()
+    }
+  }
+
+  return (
+    <div className="bg-surface-200 py-3 px-10 flex items-center justify-between flex-wrap gap-y-2">
+      <Input
+        ref={searchInputRef}
+        size="tiny"
+        className="w-52"
+        placeholder="Search for a job"
+        icon={<SearchIcon />}
+        value={search}
+        onChange={(e) => onSearchChange(e.target.value)}
+        onKeyDown={handleKeyDown}
+        actions={[
+          search && (
+            <Tooltip>
+              <TooltipTrigger asChild>
+                <Button
+                  key="clear-search"
+                  size="tiny"
+                  variant="text"
+                  icon={<XIcon />}
+                  onClick={onClearSearch}
+                  className="p-0 h-5 w-5"
+                  aria-label="Clear search"
+                  // Tooltip repeats the label; screen readers would read it twice
+                  aria-describedby={undefined}
+                />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">Clear search</TooltipContent>
+            </Tooltip>
+          ),
+        ]}
+      />
+
+      <div className="flex items-center gap-x-2">
+        <EnableCleanupButton onScheduled={onRefresh} />
+        <Button icon={<RefreshCwIcon />} loading={isRefreshing} onClick={onRefresh}>
+          Refresh
+        </Button>
+        <Button variant="primary" onClick={onCreateJob}>
+          Create job
+        </Button>
+      </div>
+    </div>
+  )
+}

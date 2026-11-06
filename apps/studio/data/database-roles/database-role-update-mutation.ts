@@ -1,16 +1,19 @@
 import pgMeta from '@supabase/pg-meta'
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { invalidateRolesQuery } from './database-roles-query'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { getRolePasswordForSql } from '@/lib/scram-sha-256'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateRoleBody = Parameters<typeof pgMeta.roles.update>[1]
 
 export type DatabaseRoleUpdateVariables = {
   projectRef: string
-  connectionString?: string
+  connectionString?: string | null
   id: number
   payload: UpdateRoleBody
 }
@@ -21,12 +24,15 @@ export async function updateDatabaseRole({
   id,
   payload,
 }: DatabaseRoleUpdateVariables) {
-  const sql = pgMeta.roles.update({ id }, payload).sql
+  const password =
+    payload.password === undefined ? undefined : await getRolePasswordForSql(payload.password)
+  const sql = pgMeta.roles.update({ id }, { ...payload, password }).sql
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql,
     queryKey: ['roles', 'update'],
+    grant: unguarded.migrating,
   })
   return result
 }
@@ -38,27 +44,25 @@ export const useDatabaseRoleUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>,
+  UseCustomMutationOptions<DatabaseRoleUpdateData, StudioError, DatabaseRoleUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleUpdateData, ResponseError, DatabaseRoleUpdateVariables>(
-    (vars) => updateDatabaseRole(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await invalidateRolesQuery(queryClient, projectRef)
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update database role: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<DatabaseRoleUpdateData, StudioError, DatabaseRoleUpdateVariables>({
+    mutationFn: (vars) => updateDatabaseRole(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await invalidateRolesQuery(queryClient, projectRef)
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to update database role: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

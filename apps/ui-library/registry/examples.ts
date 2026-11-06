@@ -1,6 +1,6 @@
-import { type Registry } from 'shadcn/registry'
+import type { RegistryItem } from 'shadcn/schema'
 
-export const examples: Registry['items'] = [
+export const examples: RegistryItem[] = [
   {
     name: 'dropzone-demo',
     type: 'registry:example',
@@ -19,6 +19,28 @@ export const examples: Registry['items'] = [
     files: [
       {
         path: 'registry/default/examples/realtime-cursor-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'realtime-flow-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/realtime-flow-demo.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'realtime-monaco-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/realtime-monaco-demo.tsx',
         type: 'registry:example',
       },
     ],
@@ -74,6 +96,17 @@ export const examples: Registry['items'] = [
     files: [
       {
         path: 'registry/default/examples/realtime-avatar-stack-preview.tsx',
+        type: 'registry:example',
+      },
+    ],
+  },
+  {
+    name: 'infinite-query-hook-demo',
+    type: 'registry:example',
+    registryDependencies: [],
+    files: [
+      {
+        path: 'registry/default/examples/infinite-query-hook-demo.tsx',
         type: 'registry:example',
       },
     ],

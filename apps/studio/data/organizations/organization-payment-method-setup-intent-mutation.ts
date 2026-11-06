@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationPaymentMethodSetupIntentVariables = {
   slug: string
@@ -30,18 +31,19 @@ export const useOrganizationPaymentMethodSetupIntent = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     OrganizationPaymentMethodSetupIntentData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodSetupIntentVariables
   >,
   'mutationFn'
 > = {}) => {
   return useMutation<
     OrganizationPaymentMethodSetupIntentData,
-    ResponseError,
+    StudioError,
     OrganizationPaymentMethodSetupIntentVariables
-  >((vars) => setupPaymentMethodIntent(vars), {
+  >({
+    mutationFn: (vars) => setupPaymentMethodIntent(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
     },

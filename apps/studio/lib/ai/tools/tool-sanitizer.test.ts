@@ -1,0 +1,253 @@
+import type { ToolUIPart } from 'ai'
+import { describe, expect, test } from 'vitest'
+
+// End of third-party imports
+
+import { prepareMessagesForAPI } from '../message-utils'
+import {
+  createAssistantMessageWithExecuteSqlTool,
+  createAssistantMessageWithMultipleTools,
+  createAssistantMessageWithUpdateNotebookTool,
+  createLongConversation,
+} from '../test-fixtures'
+import { NO_DATA_PERMISSIONS } from './execute-sql-output'
+import { INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE, type NotebookRunOutput } from './notebook-run-output'
+import { sanitizeMessagePart } from './tool-sanitizer'
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
+
+const notebookRunPart = {
+  type: 'tool-run_notebook',
+  state: 'output-available',
+  toolCallId: 'run-1',
+  input: { id: 'notebook-1', expected_updated_at: '2026-01-01T00:00:00.000Z' },
+  output: {
+    id: 'notebook-1',
+    name: 'Notebook',
+    updated_at: '2026-01-01T00:00:00.000Z',
+    optInLevel: 'schema_and_log_and_data',
+    cells: [
+      {
+        cell_id: 'db',
+        title: 'Database',
+        source: 'database',
+        status: 'success',
+        rows: [{ secret: 'database value' }],
+      },
+      {
+        cell_id: 'logs',
+        title: 'Logs',
+        source: 'logs',
+        status: 'success',
+        rows: [{ secret: 'log value' }],
+      },
+    ],
+  },
+} as unknown as ToolUIPart
+
+describe('messages are sanitized based on opt-in level', () => {
+  test('notebook runs sanitize database and log rows independently', () => {
+    const schemaOutput = (sanitizeMessagePart(notebookRunPart, 'schema') as ToolUIPart)
+      .output as NotebookRunOutput
+    const logOutput = (sanitizeMessagePart(notebookRunPart, 'schema_and_log') as ToolUIPart)
+      .output as NotebookRunOutput
+    const dataOutput = (
+      sanitizeMessagePart(notebookRunPart, 'schema_and_log_and_data') as ToolUIPart
+    ).output as NotebookRunOutput
+
+    expect(schemaOutput.cells[0].rows).toBeUndefined()
+    expect(schemaOutput.cells[1].rows).toBeUndefined()
+    expect(logOutput.cells[0].rows).toBeUndefined()
+    expect(logOutput.cells[1].rows).toEqual([{ secret: 'log value' }])
+    expect(dataOutput.cells[0].rows).toEqual([{ secret: 'database value' }])
+    expect(dataOutput.cells[1].rows).toEqual([{ secret: 'log value' }])
+  })
+
+  test.each([
+    ['a non-object output', 'client-controlled output'],
+    ['an object without cells', { status: 'privacy message' }],
+    [
+      'a cell with an untrusted source label',
+      {
+        id: 'notebook-1',
+        name: 'Notebook',
+        updated_at: '2026-01-01T00:00:00.000Z',
+        cells: [
+          {
+            cell_id: 'db',
+            title: 'Database',
+            source: 'untrusted-source',
+            status: 'success',
+            rows: [{ secret: 'database value' }],
+          },
+        ],
+      },
+    ],
+  ])('notebook runs fail closed for %s', (_description, output) => {
+    const malformedPart = { ...notebookRunPart, output } as ToolUIPart
+
+    expect((sanitizeMessagePart(malformedPart, 'schema_and_log') as ToolUIPart).output).toBe(
+      INVALID_NOTEBOOK_RUN_OUTPUT_MESSAGE
+    )
+  })
+
+  // Prepares messages as the frontend would, then sanitizes them as the API endpoint would
+  const sanitizeExecuteSqlConversation = (level: AiOptInLevel) => {
+    const messages = [
+      createAssistantMessageWithExecuteSqlTool('SELECT email FROM users', [
+        { email: 'test@example.com' },
+      ]),
+    ]
+    const processedMessages = prepareMessagesForAPI(messages).map((msg) =>
+      msg.role === 'assistant' && msg.parts
+        ? { ...msg, parts: msg.parts.map((part) => sanitizeMessagePart(part, level)) }
+        : msg
+    )
+    return (processedMessages[0].parts[1] as ToolUIPart).output
+  }
+
+  test.each(['disabled', 'schema', 'schema_and_log'] as const)(
+    'execute_sql rows are hidden at %s level',
+    (level) => {
+      expect(sanitizeExecuteSqlConversation(level)).toMatch(NO_DATA_PERMISSIONS)
+    }
+  )
+
+  test('execute_sql rows are not sanitized at data level', () => {
+    expect(sanitizeExecuteSqlConversation('schema_and_log_and_data')).toEqual([
+      { email: 'test@example.com' },
+    ])
+  })
+
+  test('multiple tool parts in message are sanitized', () => {
+    const messages = [createAssistantMessageWithMultipleTools()]
+
+    // Prepare messages as frontend would
+    const preparedMessages = prepareMessagesForAPI(messages)
+
+    // Sanitize messages as API endpoint would
+    const processedMessages = preparedMessages.map((msg) => {
+      if (msg.role === 'assistant' && msg.parts) {
+        const processedParts = msg.parts.map((part) => {
+          return sanitizeMessagePart(part, 'schema')
+        })
+
+        return { ...msg, parts: processedParts }
+      }
+      return msg
+    })
+
+    const parts = processedMessages[0].parts
+    parts.forEach((part) => {
+      if (part.type.startsWith('tool')) {
+        const tool = part as ToolUIPart
+        expect(tool.output).toMatch(NO_DATA_PERMISSIONS)
+      }
+    })
+  })
+
+  test('long message chain is sanitized', () => {
+    const messages = createLongConversation()
+
+    // Prepare messages as frontend would
+    const preparedMessages = prepareMessagesForAPI(messages)
+
+    // Sanitize messages as API endpoint would
+    const processedMessages = preparedMessages.map((msg) => {
+      if (msg.role === 'assistant' && msg.parts) {
+        const processedParts = msg.parts.map((part) => {
+          return sanitizeMessagePart(part, 'schema')
+        })
+
+        return { ...msg, parts: processedParts }
+      }
+      return msg
+    })
+
+    processedMessages.forEach((msg) => {
+      if (msg.role === 'assistant' && msg.parts) {
+        const parts = msg.parts
+        parts.forEach((part) => {
+          if (part.type.startsWith('tool')) {
+            const tool = part as ToolUIPart
+            expect(tool.output).toMatch(NO_DATA_PERMISSIONS)
+          }
+        })
+      }
+    })
+  })
+
+  test('update_notebook previous_content is stripped from the tool output regardless of opt-in level', () => {
+    const message = createAssistantMessageWithUpdateNotebookTool()
+
+    const sanitized = sanitizeMessagePart(message.parts[0], 'schema') as ToolUIPart
+
+    expect(sanitized.output).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+  })
+
+  test('an update_notebook output that never had previous_content passes through unchanged', () => {
+    const message = createAssistantMessageWithUpdateNotebookTool({
+      id: 'notebook-1',
+      name: 'Signup funnel',
+    })
+
+    const sanitized = sanitizeMessagePart(message.parts[0], 'schema') as ToolUIPart
+
+    expect(sanitized.output).toEqual({ id: 'notebook-1', name: 'Signup funnel' })
+  })
+})
+
+describe('execute_sql rows are shared only up to the level they ran under', () => {
+  const executeSqlPart = (output: unknown) =>
+    ({
+      type: 'tool-execute_sql',
+      state: 'output-available',
+      toolCallId: 'sql-1',
+      input: { sql: 'select email from users' },
+      output,
+    }) as unknown as ToolUIPart
+  const rows = [{ email: 'test@example.com' }]
+
+  test.each([
+    ['schema', 'schema_and_log_and_data', NO_DATA_PERMISSIONS],
+    ['schema_and_log_and_data', 'schema', NO_DATA_PERMISSIONS],
+    ['schema_and_log_and_data', 'schema_and_log_and_data', rows],
+  ] as const)('stamp %s, current %s', (stamp, current, expected) => {
+    const part = executeSqlPart({ rows, optInLevel: stamp })
+    expect((sanitizeMessagePart(part, current) as ToolUIPart).output).toEqual(expected)
+  })
+
+  test('caps rows replayed to the model and notes the result is partial', () => {
+    const manyRows = Array.from({ length: 101 }, (_, i) => ({ id: i }))
+    const part = executeSqlPart({ rows: manyRows, optInLevel: 'schema_and_log_and_data' })
+    expect((sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output).toEqual({
+      rows: manyRows.slice(0, 100),
+      note: 'Only the first 100 of 101 rows are included.',
+    })
+  })
+
+  test('does not report a total when more rows existed than were fetched', () => {
+    const part = executeSqlPart({
+      rows: Array.from({ length: 100 }, (_, i) => ({ id: i })),
+      hasMoreRows: true,
+      optInLevel: 'schema_and_log_and_data',
+    })
+    const output = (sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output
+    expect(output).toMatchObject({ note: expect.stringContaining('more than 100 rows') })
+  })
+
+  test('output saved before the stamp existed stays hidden', () => {
+    const part = executeSqlPart(rows)
+    expect((sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart).output).toBe(
+      NO_DATA_PERMISSIONS
+    )
+  })
+
+  test('notebook run without a stamp hides rows even at data level', () => {
+    const { optInLevel: _, ...unstamped } = notebookRunPart.output as NotebookRunOutput
+    const part = { ...notebookRunPart, output: unstamped } as ToolUIPart
+    const output = (sanitizeMessagePart(part, 'schema_and_log_and_data') as ToolUIPart)
+      .output as NotebookRunOutput
+    expect(output.cells[0].rows).toBeUndefined()
+    expect(output.cells[1].rows).toBeUndefined()
+  })
+})

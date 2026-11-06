@@ -5,6 +5,7 @@ export const SUPABASE_ROLES = [
   'authenticator',
   'dashboard_user',
   'supabase_admin',
+  'supabase_privileged_role',
   'supabase_auth_admin',
   'supabase_functions_admin',
   'supabase_read_only_user',
@@ -16,6 +17,8 @@ export const SUPABASE_ROLES = [
   'pgsodium_keyiduser',
   'pgsodium_keymaker',
   'pgtle_admin',
+  'cli_login_postgres',
+  'supabase_etl_admin',
 ] as const
 
 // [Joshen] This was originally in the Roles mobx store

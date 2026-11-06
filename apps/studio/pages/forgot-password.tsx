@@ -1,19 +1,26 @@
-import ForgotPasswordForm from 'components/interfaces/SignIn/ForgotPasswordForm'
-import ForgotPasswordLayout from 'components/layouts/SignInLayout/ForgotPasswordLayout'
 import Link from 'next/link'
-import type { NextPageWithLayout } from 'types'
+
+import { ForgotPasswordWizard } from '@/components/interfaces/SignIn/ForgotPasswordWizard'
+import { ForgotPasswordLayout } from '@/components/layouts/SignInLayout/ForgotPasswordLayout'
+import { useHydratedQuery } from '@/hooks/misc/useHydratedQuery'
+import type { NextPageWithLayout } from '@/types'
 
 const ForgotPasswordPage: NextPageWithLayout = () => {
+  const query = useHydratedQuery()
+
   return (
     <>
       <div className="flex flex-col gap-4">
-        <ForgotPasswordForm />
+        <ForgotPasswordWizard />
       </div>
 
       <div className="my-8 self-center text-sm">
         <span className="text-foreground-light">Already have an account?</span>{' '}
-        <Link href="/sign-in" className="underline hover:text-foreground-light">
-          Sign In
+        <Link
+          href={{ pathname: '/sign-in', query }}
+          className="underline hover:text-foreground-light"
+        >
+          Sign in
         </Link>
       </div>
     </>
@@ -22,8 +29,8 @@ const ForgotPasswordPage: NextPageWithLayout = () => {
 
 ForgotPasswordPage.getLayout = (page) => (
   <ForgotPasswordLayout
-    heading="Reset Your Password"
-    subheading="Type in your email and we'll send you a link to reset your password"
+    heading="Forgot your password?"
+    subheading="Enter your email and we'll send you a code to reset the password"
   >
     {page}
   </ForgotPasswordLayout>

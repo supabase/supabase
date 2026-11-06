@@ -1,20 +1,21 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { usageKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrgUsageVariables = {
   orgSlug?: string
-  projectRef?: string
+  projectRef?: string | null
   start?: Date
   end?: Date
 }
 
-export type OrgUsageResponse = components['schemas']['OrgUsageResponse']
-export type OrgMetricsUsage = components['schemas']['OrgUsageResponse']['usages'][0]
+export type OrgUsageResponse = components['schemas']['OrgUsageResponse_Output']
+export type OrgMetricsUsage = components['schemas']['OrgUsageResponse_Output']['usages'][0]
 
 export async function getOrgUsage(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
@@ -24,7 +25,11 @@ export async function getOrgUsage(
   const { data, error } = await get(`/platform/organizations/{slug}/usage`, {
     params: {
       path: { slug: orgSlug },
-      query: { project_ref: projectRef, start: start?.toISOString(), end: end?.toISOString() },
+      query: {
+        project_ref: projectRef ?? undefined,
+        start: start?.toISOString(),
+        end: end?.toISOString(),
+      },
     },
     signal,
   })
@@ -33,18 +38,21 @@ export async function getOrgUsage(
 }
 
 export type OrgUsageData = Awaited<ReturnType<typeof getOrgUsage>>
-export type OrgUsageError = ResponseError
+export type OrgUsageError = StudioError
 
 export const useOrgUsageQuery = <TData = OrgUsageData>(
   { orgSlug, projectRef, start, end }: OrgUsageVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<OrgUsageData, OrgUsageError, TData> = {}
 ) =>
-  useQuery<OrgUsageData, OrgUsageError, TData>(
-    usageKeys.orgUsage(orgSlug, projectRef, start?.toISOString(), end?.toISOString()),
-    ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
-      staleTime: 1000 * 60 * 30, // 30 mins, underlying usage data only refreshes once an hour, so safe to cache for a while
-      ...options,
-    }
-  )
+  useQuery<OrgUsageData, OrgUsageError, TData>({
+    queryKey: usageKeys.orgUsage(
+      orgSlug,
+      projectRef ?? undefined,
+      start?.toISOString(),
+      end?.toISOString()
+    ),
+    queryFn: ({ signal }) => getOrgUsage({ orgSlug, projectRef, start, end }, signal),
+    enabled: enabled && IS_PLATFORM && typeof orgSlug !== 'undefined',
+    staleTime: 1000 * 60 * 60,
+    ...options,
+  })

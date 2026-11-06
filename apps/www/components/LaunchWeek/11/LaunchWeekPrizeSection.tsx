@@ -1,8 +1,9 @@
+import Image from 'next/image'
 import React from 'react'
 import { cn } from 'ui'
+
 import LabelBadge from './LabelBadge'
 import LaunchWeekPrizeCard from './LaunchWeekPrizeCard'
-import Image from 'next/image'
 import PrizeActions from './Releases/PrizeActions'
 
 export default function LaunchWeekPrizeSection({ className }: { className?: string }) {
@@ -22,7 +23,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
             contentClassName="flex flex-col justify-between"
             content={
               <div className="w-full h-auto lg:min-h-[400px] flex flex-col lg:flex-row items-stretch rounded-lg overflow-hidden">
-                <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-[3/1] top-0 md:-bottom-8 overflow-hidden">
+                <div className="relative w-full pl-4 xl:px-4 lg:w-2/3 border-b lg:border-none border-muted aspect-3/1 top-0 md:-bottom-8 overflow-hidden">
                   <Image
                     src="/images/launchweek/11/airpods-max-alpha.png"
                     alt="Supabase AirPod Max prize"
@@ -41,7 +42,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
                   />
                 </div>
                 <div className="flex flex-col lg:w-1/2 gap-1 p-4 md:p-8 lg:pl-0 lg:h-full">
-                  <div className="flex flex-col gap-2 flex-grow">
+                  <div className="flex flex-col gap-2 grow">
                     <LabelBadge text="5 sets" />
                     <p className="xl:mt-4 text-foreground">Win AirPods Max</p>
                     <p className="text-foreground-lighter text-sm">
@@ -57,7 +58,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
           />
           <div className="w-full flex flex-col gap-4 items-stretch">
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="30 t-shirts" />
@@ -66,7 +67,7 @@ export default function LaunchWeekPrizeSection({ className }: { className?: stri
               }
             />
             <LaunchWeekPrizeCard
-              className="flex-grow"
+              className="grow"
               content={
                 <div className="p-4 md:p-6 flex flex-col gap-2 text-sm items-start justify-between h-full">
                   <LabelBadge text="25 pins" />

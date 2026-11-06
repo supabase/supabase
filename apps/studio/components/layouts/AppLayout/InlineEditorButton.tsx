@@ -1,26 +1,53 @@
 import { SqlEditor } from 'icons'
-import { useAiAssistantStateSnapshot } from 'state/ai-assistant-state'
-import { useAppStateSnapshot } from 'state/app-state'
-import { Button } from 'ui'
+import { cn, KeyboardShortcut } from 'ui'
 
-const InlineEditorButton = () => {
-  const { closeAssistant } = useAiAssistantStateSnapshot()
-  const { setEditorPanel, editorPanel } = useAppStateSnapshot()
+import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { useTrack } from '@/lib/telemetry/track'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useIsShortcutEnabled } from '@/state/shortcuts/useIsShortcutEnabled'
+import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
-  return (
-    <Button
-      type="text"
-      size="tiny"
-      id="editor-trigger"
-      className="w-[24px] h-[24px] flex items-center justify-center p-0"
-      onClick={() => {
-        closeAssistant()
-        setEditorPanel({ open: !editorPanel.open })
-      }}
-    >
-      <SqlEditor size={20} strokeWidth={1.5} />
-    </Button>
-  )
+const InlineEditorKeyboardTooltip = () => {
+  const hotkeyEnabled = useIsShortcutEnabled(SHORTCUT_IDS.INLINE_EDITOR_TOGGLE)
+
+  return hotkeyEnabled ? <KeyboardShortcut keys={['Meta', 'E']} /> : null
 }
 
-export default InlineEditorButton
+export const InlineEditorButton = () => {
+  const { activeSidebar, toggleSidebar } = useSidebarManagerSnapshot()
+  const isOpen = activeSidebar?.id === SIDEBAR_KEYS.EDITOR_PANEL
+  const track = useTrack()
+
+  const handleClick = () => {
+    track('header_inline_editor_button_clicked')
+    toggleSidebar(SIDEBAR_KEYS.EDITOR_PANEL)
+  }
+
+  return (
+    <ButtonTooltip
+      variant="outline"
+      size="tiny"
+      id="editor-trigger"
+      className={cn(
+        'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 text-foreground-light hover:text-foreground',
+        isOpen && 'bg-foreground text-background hover:text-background'
+      )}
+      onClick={handleClick}
+      tooltip={{
+        content: {
+          className: 'p-1 pl-2.5',
+          text: (
+            <div className="flex items-center gap-2.5">
+              <span>SQL Editor</span>
+              <InlineEditorKeyboardTooltip />
+            </div>
+          ),
+        },
+      }}
+    >
+      <SqlEditor size={16} strokeWidth={1.5} />
+      <span className="sr-only">SQL Editor</span>
+    </ButtonTooltip>
+  )
+}

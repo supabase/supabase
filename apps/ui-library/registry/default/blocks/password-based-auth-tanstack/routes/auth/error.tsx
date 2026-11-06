@@ -1,5 +1,6 @@
-import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 import { createFileRoute } from '@tanstack/react-router'
+
+import { Card, CardContent, CardHeader, CardTitle } from '@/registry/default/components/ui/card'
 
 export const Route = createFileRoute('/auth/error')({
   component: AuthError,
@@ -20,7 +21,9 @@ function AuthError() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Sorry, something went wrong.</CardTitle>
+              <CardTitle className="font-medium text-lg tracking-normal">
+                Sorry, something went wrong.
+              </CardTitle>
             </CardHeader>
             <CardContent>
               {params?.error ? (

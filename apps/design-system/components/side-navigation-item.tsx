@@ -1,29 +1,38 @@
 'use client'
 
-import { SidebarNavItem } from '@/types/nav'
-import { cn } from 'ui/src/lib/utils/cn'
-import { usePathname } from 'next/navigation'
 import Link from 'next/link'
+import { usePathname } from 'next/navigation'
 import React from 'react'
+import { cn } from 'ui'
 
-const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
+import { useMobileSidebar } from '@/hooks/use-mobile-sidebar'
+import { SidebarNavItem } from '@/types/nav'
+
+export const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item }) => {
   const pathname = usePathname()
+  const { setOpen } = useMobileSidebar()
 
   const isActive = pathname === item.href
+
+  const handleClick = () => {
+    setOpen(false)
+  }
 
   return (
     <Link
       href={`${item.href}`}
+      onClick={handleClick}
       className={cn(
         'relative',
         'flex',
         'items-center',
         'h-6',
         'text-sm',
-        'text-foreground-lighter px-6',
-        !isActive && 'hover:bg-surface-100 hover:text-foreground',
-        isActive && 'bg-surface-200 text-foreground',
-        'transition-all'
+        'px-6',
+        'transition-all',
+        isActive
+          ? 'bg-selection text-foreground'
+          : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
       )}
     >
       <div
@@ -40,5 +49,3 @@ const NavigationItem: React.FC<{ item: SidebarNavItem }> = React.memo(({ item })
 })
 
 NavigationItem.displayName = 'NavigationItem'
-
-export default NavigationItem

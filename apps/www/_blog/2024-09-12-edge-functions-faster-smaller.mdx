@@ -2,8 +2,8 @@
 title: 'Edge Functions are now 2x smaller and boot 3x faster'
 description: 'Redeploy your Edge Functions with the CLI v1.192.5 for a peformance boost'
 author: nyannyacha
-image: edge-functions-faster-smaller/edge-fns-faster-thumb.png
-thumb: edge-functions-faster-smaller/edge-fns-faster-thumb.png
+imgSocial: edge-functions-faster-smaller/edge-fns-faster-thumb.png
+imgThumb: edge-functions-faster-smaller/edge-fns-faster-thumb.png
 categories:
   - product
 tags:
@@ -12,9 +12,9 @@ date: '2024-09-12'
 toc_depth: 3
 ---
 
-We’ve rolled out some exciting updates to Edge Functions which bring significant reductions to function size and boot time. If you’re using [npm modules](https://supabase.com/blog/edge-functions-node-npm) in your functions, you should see function sizes being halved and boot time reduced by 300% in most cases.
+We’ve rolled out some exciting updates to [Edge Functions](/edge-functions) which bring significant reductions to function size and boot time. If you’re using [npm modules](https://supabase.com/blog/edge-functions-node-npm) in your functions, you should see function sizes being halved and boot time reduced by 300% in most cases.
 
-To take advantage of these performance improvements, you can redeploy your functions using the Supabase CLI v1.192.5 or later.
+To take advantage of these performance improvements, you can redeploy your functions using the [Supabase CLI](/features/cli) v1.192.5 or later.
 
 Let’s compare the bundle size and boot time using some popular examples.
 
@@ -157,7 +157,7 @@ This allowed us to switch to xxHash-3 over SHA_256 for the source checksums. Giv
 
 To get the advantage of these optimizations, follow these steps:
 
-- [Update Supabase CLI](https://supabase.com/docs/guides/cli/getting-started#updating-the-supabase-cli) to version is v1.195.2 or later.
+- [Update Supabase CLI](https://supabase.com/docs/guides/local-development/cli/getting-started#updating-the-supabase-cli) to version is v1.195.2 or later.
 - Then, redeploy your functions by running `supabase functions deploy [FUNCTION_NAME]`
 
 ## Getting Help

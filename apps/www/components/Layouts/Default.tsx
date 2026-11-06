@@ -1,7 +1,9 @@
-import Nav from 'components/Nav/index'
-import Footer from 'components/Footer/index'
 import { cn } from 'ui'
-import { useForceDeepDark } from '~/lib/theme.utils'
+import { SkipToContent } from 'ui-patterns/SkipToContent'
+
+import Footer from '@/components/Footer/index'
+import Nav from '@/components/Nav/index'
+import { ThemeForcer } from '@/components/ThemeForcer'
 
 type Props = {
   hideHeader?: boolean
@@ -22,12 +24,18 @@ const DefaultLayout = (props: Props) => {
     children,
   } = props
 
-  useForceDeepDark()
-
   return (
     <>
+      <SkipToContent href="#main" />
+      <ThemeForcer />
       <Nav hideNavbar={hideHeader} stickyNavbar={stickyNavbar} />
-      <main className={cn('relative min-h-screen', className)}>{children}</main>
+      <main
+        id="main"
+        tabIndex={-1}
+        className={cn('relative min-h-screen scroll-mt-16 outline-hidden', className)}
+      >
+        {children}
+      </main>
       <Footer className={footerClassName} hideFooter={hideFooter} />
     </>
   )

@@ -1,12 +1,60 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import NoPermission from 'components/ui/NoPermission'
-import { useCheckPermissions, usePermissionsLoaded } from 'hooks/misc/useCheckPermissions'
-import { PropsWithChildren } from 'react'
-import { ProjectLayoutWithAuth } from '../ProjectLayout/ProjectLayout'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { PropsWithChildren, useEffect } from 'react'
 
-const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
-  const isPermissionsLoaded = usePermissionsLoaded()
-  const canReadTables = useCheckPermissions(PermissionAction.TENANT_SQL_ADMIN_READ, 'tables')
+import { ProjectLayoutWithAuth } from '../ProjectLayout'
+import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
+import { useBannerStack } from '@/components/ui/BannerStack/BannerStackProvider'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+
+export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
+  const { ref } = useParams()
+  const { addBanner, dismissBanner } = useBannerStack()
+  const isTableQueueOperationsEnabled = useIsQueueOperationsEnabled()
+
+  const [isTableEditorQueueOperationsBannerDismissed] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.TABLE_EDITOR_QUEUE_OPERATIONS_BANNER_DISMISSED(ref ?? ''),
+    false
+  )
+
+  const { can: canReadTables, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_READ
+  )
+
+  const { can: canWriteTables } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
+
+  useEffect(() => {
+    if (!isPermissionsLoaded) return
+
+    if (
+      canWriteTables &&
+      !isTableEditorQueueOperationsBannerDismissed &&
+      !isTableQueueOperationsEnabled
+    ) {
+      addBanner({
+        id: 'table-editor-queue-operations-banner',
+        priority: 2,
+        isDismissed: false,
+        content: <BannerTableEditorQueueOperations />,
+      })
+    } else {
+      dismissBanner('table-editor-queue-operations-banner')
+    }
+
+    return () => {
+      dismissBanner('table-editor-queue-operations-banner')
+    }
+  }, [
+    addBanner,
+    dismissBanner,
+    isPermissionsLoaded,
+    canWriteTables,
+    isTableEditorQueueOperationsBannerDismissed,
+    isTableQueueOperationsEnabled,
+  ])
 
   if (isPermissionsLoaded && !canReadTables) {
     return (
@@ -16,7 +64,10 @@ const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
     )
   }
 
-  return <>{children}</>
+  return (
+    <>
+      {children}
+      <SaveQueueActionBar />
+    </>
+  )
 }
-
-export default TableEditorLayout

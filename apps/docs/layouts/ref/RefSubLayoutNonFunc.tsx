@@ -1,9 +1,10 @@
-import { useInView } from 'react-intersection-observer'
-import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
+import { safeHistoryReplaceState } from '~/lib/historyUtils'
+import { useRouter } from 'next/compat/router'
+import { FC, PropsWithChildren } from 'react'
+import { useInView } from 'react-intersection-observer'
+import { highlightSelectedNavItem } from 'ui'
 
 interface ISectionContainer {
   id: string
@@ -60,7 +61,7 @@ const StickyHeader: FC<StickyHeader> = (props) => {
     onChange: (inView, entry) => {
       if (inView && window) highlightSelectedNavItem(entry.target.attributes['data-ref-id'].value)
       if (inView && props.scrollSpyHeader) {
-        window.history.replaceState(null, '', entry.target.id)
+        safeHistoryReplaceState(entry.target.id)
         // if (setActiveRefItem) setActiveRefItem(entry.target.attributes['data-ref-id'].value)
         menuState.setMenuActiveRefId(entry.target.attributes['data-ref-id'].value)
         // router.push(`/reference/javascript/${entry.target.attributes['data-ref-id'].value}`, null, {

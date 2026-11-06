@@ -1,28 +1,38 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { literal, safeSql } from '@supabase/pg-meta/src/pg-format'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { executeSql } from 'data/sql/execute-sql-query'
-import type { ResponseError } from 'types'
 import { databaseQueuesKeys } from './keys'
+import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageArchiveVariables = {
   projectRef: string
-  connectionString?: string
-  queryName: string
+  connectionString?: string | null
+  queueName: string
   messageId: number
 }
 
 export async function archiveDatabaseQueueMessage({
   projectRef,
   connectionString,
-  queryName,
+  queueName,
   messageId,
 }: DatabaseQueueMessageArchiveVariables) {
+  if (!isQueueNameValid(queueName)) {
+    throw new Error(
+      'Invalid queue name: must contain only alphanumeric characters, underscores, and hyphens'
+    )
+  }
   const { result } = await executeSql({
     projectRef,
     connectionString,
-    sql: `SELECT * FROM pgmq.archive('${queryName}', ${messageId})`,
+    sql: safeSql`SELECT * FROM pgmq.archive(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -35,9 +45,9 @@ export const useDatabaseQueueMessageArchiveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<
+  UseCustomMutationOptions<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
   >,
   'mutationFn'
@@ -46,14 +56,15 @@ export const useDatabaseQueueMessageArchiveMutation = ({
 
   return useMutation<
     DatabaseQueueMessageArchiveData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageArchiveVariables
-  >((vars) => archiveDatabaseQueueMessage(vars), {
+  >({
+    mutationFn: (vars) => archiveDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, queryName } = variables
-      await queryClient.invalidateQueries(
-        databaseQueuesKeys.getMessagesInfinite(projectRef, queryName)
-      )
+      const { projectRef, queueName } = variables
+      await queryClient.invalidateQueries({
+        queryKey: databaseQueuesKeys.getMessagesInfinite(projectRef, queueName),
+      })
       await onSuccess?.(data, variables, context)
     },
     async onError(data, variables, context) {

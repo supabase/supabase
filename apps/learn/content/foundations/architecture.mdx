@@ -1,0 +1,179 @@
+---
+title: Architecture
+description: Learn how Supabase's core products work together.
+chapterNumber: 1
+
+explore:
+  - title: Supabase Docs
+    link: https://supabase.com/docs/guides/database/overview
+    itemType: doc
+  - title: Postgres for Beginners
+    link: https://www.postgresqltutorial.com/
+    itemType: doc
+---
+
+This page explains how Supabase is structured and how its main services work
+together. Supabase is built on top of a powerful open source database called
+Postgres, but it includes much more than a database. Around Postgres,
+Supabase adds services for authentication, serverless functions, file storage, realtime updates, AI-powered search, and easy APIs to access it — all designed to work easily together.
+
+The goal is to give you a complete backend that feels consistent and connected,
+so you can focus on building your app instead of wiring together separate tools.
+
+---
+
+## The mental model
+
+At the center of Supabase is Postgres. Every other part connects to it.
+
+```text
+Clients (web, mobile, scripts)
+        |
+        v
+  API layer (REST via PostgREST, GraphQL)
+        |
+        v
+     Postgres  <---- Realtime (listens for changes)
+        |  ^
+        |  |
+        v  |
+   Storage |          Auth (manages users)
+        |  |          Edge Functions (runs code)
+        v  |          Vector Search (pgvector)
+  Files + URLs        Studio, CLI, Policies (RLS)
+```
+
+You interact with Supabase mainly through the API layer or the client libraries.
+The API talks to Postgres, and Postgres enforces security rules that you define.
+All the other services stay in sync because they share the same database.
+
+---
+
+## The main components
+
+### Database (Postgres)
+
+Your data lives in Postgres tables. You can design tables, columns, and
+relationships using SQL or the visual editor in Supabase Studio. Supabase
+manages backups, scaling, and migrations for you.
+
+**Why this matters:** Postgres is a full relational database with features like
+foreign keys, indexes, and extensions. Supabase gives you these tools without
+the usual setup.
+
+---
+
+### API layer (REST and GraphQL)
+
+Supabase automatically exposes your tables as APIs using PostgREST (for REST)
+and PostGraphile (for GraphQL). You can read, insert, update, and delete rows
+with simple HTTP requests. You can also expose your own SQL functions as custom
+endpoints.
+
+**Why this matters:** You can connect any frontend or script directly to your
+database without building a separate API server.
+
+---
+
+### Auth (users and tokens)
+
+Auth manages users and issues tokens that identify them. When someone signs in,
+their token is sent with every request, and Postgres uses that identity to apply
+the right access rules.
+
+**Why this matters:** Authentication is built into your database layer, so you
+don't need an external service to handle sign-ups or sessions.
+
+---
+
+### Row Level Security (RLS) and policies
+
+RLS lets you write SQL rules that decide who can read or modify each row in your
+tables. These policies apply everywhere — through REST, GraphQL, or Realtime.
+
+**Why this matters:** Security lives directly in the database. You define it
+once, and it's enforced across every API call.
+
+---
+
+### Storage (files and buckets)
+
+Storage provides an S3-style interface for storing files such as images, videos,
+and documents. File metadata lives in Postgres, so you can apply the same access
+policies you use for your data.
+
+**Why this matters:** File access and data access follow the same security rules,
+which keeps your system consistent and simple.
+
+---
+
+### Realtime
+
+Realtime listens to changes in Postgres and sends them to connected clients over
+WebSocket. You can subscribe to table events and see updates as they happen.
+
+**Why this matters:** You can build collaborative or live-updating interfaces
+without managing your own socket server.
+
+---
+
+### Edge Functions
+
+Edge Functions let you run server-side JavaScript or TypeScript using Deno.
+They're good for webhooks, background tasks, and any logic that shouldn't run
+on the client.
+
+**Why this matters:** You can write custom backend logic without maintaining a
+full server or worrying about scaling.
+
+---
+
+### Vector Search
+
+The pgvector extension adds support for storing and searching **embeddings** —
+numerical representations of text, images, or other data. This allows you to
+search by meaning, not just by keywords.
+
+**Why this matters:** You can add AI-style semantic search or recommendations
+directly to your database.
+
+---
+
+### Studio and CLI
+
+Supabase Studio is the web dashboard for managing your project: running SQL,
+browsing data, editing policies, and managing users. The CLI is for local
+development and migrations, so your schema can live alongside your code.
+
+**Why this matters:** You can move smoothly between GUI and code, keeping your
+database versioned and reproducible.
+
+---
+
+## How everything connects
+
+When your app makes a request, it goes through a simple path:
+
+1. The client calls a Supabase API endpoint, sending a project key and (usually)
+   a user token.
+2. The API turns that request into a SQL query.
+3. Postgres runs the query and applies any RLS policies.
+4. The API returns the results as JSON.
+5. If there are changes, Realtime broadcasts them to any connected clients that
+   are allowed to see them.
+
+Edge Functions can follow the same pattern — they can call the APIs or connect
+directly to Postgres when they need more control.
+
+---
+
+## Why this architecture helps
+
+- **Everything shares one source of truth:** Postgres is at the center.
+- **Security is consistent:** RLS policies apply across every service.
+- **No separate backend required:** APIs are generated automatically from you database.
+- **You can grow gradually:** Start with just a table, add realtime, storage, or functions later.
+- **It's just Postgres:** You can use standard SQL, extensions, and tools.
+
+Supabase gives you the power of Postgres with the convenience of a fully
+integrated backend platform.

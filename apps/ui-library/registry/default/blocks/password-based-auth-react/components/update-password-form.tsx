@@ -1,3 +1,5 @@
+import { useState } from 'react'
+
 import { cn } from '@/lib/utils'
 import { createClient } from '@/registry/default/clients/react/lib/supabase/client'
 import { Button } from '@/registry/default/components/ui/button'
@@ -10,7 +12,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { useState } from 'react'
 
 export function UpdatePasswordForm({ className, ...props }: React.ComponentPropsWithoutRef<'div'>) {
   const [password, setPassword] = useState('')
@@ -27,7 +28,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
       const { error } = await supabase.auth.updateUser({ password })
       if (error) throw error
       // Update this route to redirect to an authenticated route. The user already has an active session.
-      location.href = '/info'
+      location.href = '/protected'
     } catch (error: unknown) {
       setError(error instanceof Error ? error.message : 'An error occurred')
     } finally {
@@ -39,7 +40,7 @@ export function UpdatePasswordForm({ className, ...props }: React.ComponentProps
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+          <CardTitle className="font-medium text-lg tracking-normal">Reset Your Password</CardTitle>
           <CardDescription>Please enter your new password below.</CardDescription>
         </CardHeader>
         <CardContent>

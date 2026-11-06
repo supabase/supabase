@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { lintKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type LintRuleDeleteVariables = {
   projectRef: string
@@ -12,7 +13,7 @@ export type LintRuleDeleteVariables = {
 
 export async function deleteLintRule({ projectRef, ids }: LintRuleDeleteVariables) {
   const { data, error } = await del('/platform/projects/{ref}/notifications/advisor/exceptions', {
-    params: { path: { ref: projectRef }, query: { ids } },
+    params: { path: { ref: projectRef }, query: { ids: ids.join(',') } },
   })
 
   if (error) handleError(error)
@@ -26,26 +27,27 @@ export const useLintRuleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>,
+  UseCustomMutationOptions<LintRuleDeleteData, StudioError, LintRuleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<LintRuleDeleteData, ResponseError, LintRuleDeleteVariables>(
-    (vars) => deleteLintRule(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(lintKeys.lintRules(projectRef))
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete lint rule: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<LintRuleDeleteData, StudioError, LintRuleDeleteVariables>({
+    mutationFn: (vars) => deleteLintRule(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: lintKeys.lintRules(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+      ])
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete lint rule: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

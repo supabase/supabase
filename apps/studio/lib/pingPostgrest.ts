@@ -1,5 +1,5 @@
-import { headWithTimeout } from './common/fetch'
 import { API_URL } from './constants'
+import { fetchHeadWithTimeout } from '@/data/fetchers'
 
 const DEFAULT_TIMEOUT_MILLISECONDS = 2000
 
@@ -33,7 +33,7 @@ export default pingPostgrest
  * @return true if there's no error else false
  */
 async function pingOpenApi(ref: string, timeout?: number) {
-  const { error } = await headWithTimeout(`${API_URL}/projects/${ref}/api/rest`, [], {
+  const { error } = await fetchHeadWithTimeout(`${API_URL}/projects/${ref}/api/rest`, [], {
     timeout: timeout ?? DEFAULT_TIMEOUT_MILLISECONDS,
   })
   return error === undefined

@@ -1,50 +1,55 @@
-import type { PostgresExtension } from '@supabase/postgres-meta'
-import { Database, ExternalLinkIcon, Plus } from 'lucide-react'
-import { useEffect, useState } from 'react'
+import { ident, safeSql } from '@supabase/pg-meta'
 import { toast } from 'sonner'
-
-import { useProjectContext } from 'components/layouts/ProjectLayout/ProjectContext'
-import { DocsButton } from 'components/ui/DocsButton'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useDatabaseExtensionEnableMutation } from 'data/database-extensions/database-extension-enable-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { executeSql } from 'data/sql/execute-sql-query'
-import { useIsOrioleDb } from 'hooks/misc/useSelectedProject'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
   Button,
-  Form,
-  Input,
-  Listbox,
-  Modal,
-  WarningIcon,
+  Card,
+  CardContent,
+  cn,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
 } from 'ui'
-import { Admonition } from 'ui-patterns'
+import { Admonition } from 'ui-patterns/Admonition'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from 'ui-patterns/DialogDisclosure'
+
+import { DocsButton } from '@/components/ui/DocsButton'
+import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
+import { type DatabaseExtension } from '@/data/database-extensions/database-extensions-query'
+import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 const orioleExtCallOuts = ['vector', 'postgis']
 
 interface EnableExtensionModalProps {
   visible: boolean
-  extension: PostgresExtension
+  extension: DatabaseExtension
   onCancel: () => void
 }
 
-const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionModalProps) => {
-  const { project } = useProjectContext()
+export const EnableExtensionModal = ({
+  visible,
+  extension,
+  onCancel,
+}: EnableExtensionModalProps) => {
   const isOrioleDb = useIsOrioleDb()
-  const [defaultSchema, setDefaultSchema] = useState()
-  const [fetchingSchemaInfo, setFetchingSchemaInfo] = useState(false)
 
-  const { data: schemas, isLoading: isSchemasLoading } = useSchemasQuery(
-    {
-      projectRef: project?.ref,
-      connectionString: project?.connectionString,
-    },
-    { enabled: visible }
-  )
-  const { mutate: enableExtension, isLoading: isEnabling } = useDatabaseExtensionEnableMutation({
+  const { data: project } = useSelectedProjectQuery()
+
+  // [Joshen] Hard-coding pg_cron here as this is enforced on our end (Not via pg_available_extension_versions)
+  const defaultSchema =
+    extension.name === 'pg_cron' ? 'pg_catalog' : extension.default_version_schema
+  const hasFixedSchema = defaultSchema != null
+
+  const { mutate: enableExtension, isPending: isEnabling } = useDatabaseExtensionEnableMutation({
     onSuccess: () => {
       toast.success(`Extension "${extension.name}" is now enabled`)
       onCancel()
@@ -54,202 +59,110 @@ const EnableExtensionModal = ({ visible, extension, onCancel }: EnableExtensionM
     },
   })
 
-  // [Joshen] Worth checking in with users - whether having this schema selection
-  // might be confusing, and if we should have a tooltip to explain that schemas
-  // are just concepts of namespace, you can use that extension no matter where it's
-  // installed in
-
-  useEffect(() => {
-    let cancel = false
-
-    if (visible) {
-      const checkExtensionSchema = async () => {
-        if (!cancel) {
-          setFetchingSchemaInfo(true)
-          setDefaultSchema(undefined)
-        }
-        try {
-          const res = await executeSql({
-            projectRef: project?.ref,
-            connectionString: project?.connectionString,
-            sql: `select * from pg_available_extension_versions where name = '${extension.name}'`,
-          })
-          if (!cancel) setDefaultSchema(res.result[0].schema)
-        } catch (error) {}
-
-        setFetchingSchemaInfo(false)
-      }
-      checkExtensionSchema()
-    }
-
-    return () => {
-      cancel = true
-    }
-  }, [visible, extension.name])
-
-  const validate = (values: any) => {
-    const errors: any = {}
-    if (values.schema === 'custom' && !values.name) errors.name = 'Required field'
-    return errors
-  }
-
-  const onSubmit = async (values: any) => {
+  const onConfirmEnable = async () => {
     if (project === undefined) return console.error('Project is required')
-
-    const schema =
-      defaultSchema !== undefined && defaultSchema !== null
-        ? defaultSchema
-        : values.schema === 'custom'
-          ? values.name
-          : values.schema
 
     enableExtension({
       projectRef: project.ref,
       connectionString: project?.connectionString,
-      schema,
+      schema: defaultSchema ?? 'extensions',
       name: extension.name,
       version: extension.default_version,
       cascade: true,
-      createSchema: !schema.startsWith('pg_'),
     })
   }
 
   return (
-    <Modal
-      hideFooter
-      visible={visible}
-      onCancel={onCancel}
-      size="small"
-      header={
-        <div className="flex items-baseline gap-2">
-          <h5 className="text-sm text-foreground">Confirm to enable</h5>
-          <code className="text-xs">{extension.name}</code>
-        </div>
-      }
+    <Dialog
+      open={visible}
+      onOpenChange={(open: boolean) => {
+        if (!open) onCancel()
+      }}
     >
-      <Form
-        initialValues={{
-          name: extension.name, // Name of new schema, if creating new
-          schema: 'extensions',
-        }}
-        validate={validate}
-        onSubmit={onSubmit}
-      >
-        {({ values }: any) => {
-          return (
-            <>
-              <Modal.Content className="flex flex-col gap-y-2">
-                {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
-                  <Admonition type="default" title="Extension is limited by OrioleDB">
-                    <span className="block">
-                      {extension.name} cannot be accelerated by indexes on tables that are using the
-                      OrioleDB access method
-                    </span>
-                    <DocsButton abbrev={false} className="mt-2" href="https://supabase.com/docs" />
-                  </Admonition>
-                )}
+      <DialogContent size="small" className="min-w-0 overflow-hidden" aria-describedby={undefined}>
+        <DialogHeader>
+          <DialogTitle>Enable {extension.name}</DialogTitle>
+        </DialogHeader>
 
-                {fetchingSchemaInfo || isSchemasLoading ? (
-                  <div className="space-y-2">
-                    <ShimmeringLoader />
-                    <div className="w-3/4">
-                      <ShimmeringLoader />
-                    </div>
+        <DialogSectionSeparator />
+
+        {isOrioleDb && orioleExtCallOuts.includes(extension.name) && (
+          <Admonition
+            type="default"
+            title="Extension is limited by OrioleDB"
+            className="border-x-0 border-t-0 rounded-none"
+          >
+            <span className="block">
+              {extension.name} cannot be accelerated by indexes on tables that are using the
+              OrioleDB access method
+            </span>
+            <DocsButton abbrev={false} className="mt-2" href={`${DOCS_URL}`} />
+          </Admonition>
+        )}
+
+        <DialogSection className="flex flex-col gap-y-4">
+          <p className="text-sm text-foreground-light">
+            {hasFixedSchema
+              ? 'This extension must be installed in the schema below.'
+              : 'This extension will be installed in the schema below.'}
+          </p>
+
+          <Card>
+            <CardContent className="divide-y text-sm p-0">
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <p className="text-foreground-lighter">Extension</p>
+                <code>{extension.name}</code>
+              </div>
+              <div className="flex items-center justify-between px-3 py-2.5">
+                <p className="text-foreground-lighter">Schema</p>
+                <code data-testid="enable-extension-schema">{defaultSchema ?? 'extensions'}</code>
+              </div>
+            </CardContent>
+          </Card>
+        </DialogSection>
+
+        {!hasFixedSchema && (
+          <>
+            <DialogSectionSeparator />
+            <DialogDisclosure>
+              <DialogDisclosureTrigger className="py-4 px-4 md:px-5">
+                <span>Install in a different schema</span>
+              </DialogDisclosureTrigger>
+              <DialogDisclosureContent>
+                <DialogSection className="pt-1 min-w-0 flex flex-col gap-y-3">
+                  <div className="text-sm text-foreground-light flex flex-col gap-y-3">
+                    <p>
+                      We recommend using the <code>extensions</code> schema to keep extension
+                      objects separate from your own tables.
+                    </p>
+                    <p>
+                      To use another schema, run the following in the SQL Editor. Replace{' '}
+                      <code>target_schema</code> with an existing schema name.
+                    </p>
                   </div>
-                ) : defaultSchema ? (
-                  <Input
-                    disabled
-                    id="schema"
-                    name="schema"
-                    value={defaultSchema}
-                    label="Select a schema to enable the extension for"
-                    descriptionText={`Extension must be installed in ${defaultSchema}.`}
+                  <CodeBlock
+                    language="pgsql"
+                    hideLineNumbers
+                    wrapLongLines
+                    wrapperClassName={cn('min-w-0 max-w-full [&_pre]:px-3 [&_pre]:py-3')}
+                    className="[&_code]:text-xs"
+                    value={safeSql`create extension if not exists ${ident(extension.name)} schema target_schema;`}
                   />
-                ) : (
-                  <Listbox
-                    size="small"
-                    name="schema"
-                    label="Select a schema to enable the extension for"
-                  >
-                    <Listbox.Option
-                      key="custom"
-                      id="custom"
-                      label={`Create a new schema "${extension.name}"`}
-                      value="custom"
-                      addOnBefore={() => <Plus size={16} strokeWidth={1.5} />}
-                    >
-                      Create a new schema "{extension.name}"
-                    </Listbox.Option>
-                    <Modal.Separator />
-                    {schemas?.map((schema) => {
-                      return (
-                        <Listbox.Option
-                          key={schema.id}
-                          id={schema.name}
-                          label={schema.name}
-                          value={schema.name}
-                          addOnBefore={() => <Database size={16} strokeWidth={1.5} />}
-                        >
-                          {schema.name}
-                        </Listbox.Option>
-                      )
-                    })}
-                  </Listbox>
-                )}
-              </Modal.Content>
+                </DialogSection>
+              </DialogDisclosureContent>
+            </DialogDisclosure>
+          </>
+        )}
 
-              {values.schema === 'custom' && (
-                <Modal.Content>
-                  <Input id="name" name="name" label="Schema name" />
-                </Modal.Content>
-              )}
-
-              {extension.name === 'pg_cron' && project?.cloud_provider === 'FLY' && (
-                <Modal.Content>
-                  <Alert_Shadcn_ variant="warning">
-                    <WarningIcon />
-                    <AlertTitle_Shadcn_>
-                      The pg_cron extension is not fully supported for Fly projects
-                    </AlertTitle_Shadcn_>
-
-                    <AlertDescription_Shadcn_>
-                      You can still enable the extension, but pg_cron jobs may not run due to the
-                      behavior of Fly projects.
-                    </AlertDescription_Shadcn_>
-
-                    <AlertDescription_Shadcn_ className="mt-3">
-                      <Button
-                        asChild
-                        type="default"
-                        iconRight={<ExternalLinkIcon width={12} height={12} />}
-                      >
-                        <a
-                          href="/docs/guides/platform/fly-postgres#limitations"
-                          target="_blank"
-                          rel="noopener noreferrer"
-                        >
-                          <span>Learn more</span>
-                        </a>
-                      </Button>
-                    </AlertDescription_Shadcn_>
-                  </Alert_Shadcn_>
-                </Modal.Content>
-              )}
-              <Modal.Separator />
-              <Modal.Content className="flex items-center justify-end space-x-2">
-                <Button type="default" disabled={isEnabling} onClick={() => onCancel()}>
-                  Cancel
-                </Button>
-                <Button htmlType="submit" disabled={isEnabling} loading={isEnabling}>
-                  Enable extension
-                </Button>
-              </Modal.Content>
-            </>
-          )
-        }}
-      </Form>
-    </Modal>
+        <DialogFooter>
+          <Button disabled={isEnabling} onClick={() => onCancel()}>
+            Cancel
+          </Button>
+          <Button variant="primary" loading={isEnabling} onClick={() => onConfirmEnable()}>
+            Enable
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   )
 }
-
-export default EnableExtensionModal

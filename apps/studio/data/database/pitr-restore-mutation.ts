@@ -1,8 +1,9 @@
-import { useMutation, UseMutationOptions } from '@tanstack/react-query'
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from 'data/fetchers'
-import type { ResponseError } from 'types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PitrRestoreVariables = {
   ref: string
@@ -13,6 +14,7 @@ export async function restoreFromPitr({ ref, recovery_time_target_unix }: PitrRe
   const { data, error } = await post('/platform/database/{ref}/backups/pitr', {
     params: { path: { ref } },
     body: { recovery_time_target_unix },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -25,23 +27,21 @@ export const usePitrRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<PitrRestoreData, ResponseError, PitrRestoreVariables>,
+  UseCustomMutationOptions<PitrRestoreData, StudioError, PitrRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<PitrRestoreData, ResponseError, PitrRestoreVariables>(
-    (vars) => restoreFromPitr(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to start PITR restoration: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<PitrRestoreData, StudioError, PitrRestoreVariables>({
+    mutationFn: (vars) => restoreFromPitr(vars),
+    async onSuccess(data, variables, context) {
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to start PITR restoration: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

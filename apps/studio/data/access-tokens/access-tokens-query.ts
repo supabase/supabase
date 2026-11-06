@@ -1,7 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
 import { accessTokenKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getAccessTokens(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile/access-tokens', { signal })
@@ -12,16 +14,16 @@ export async function getAccessTokens(signal?: AbortSignal) {
 }
 
 export type AccessTokensData = Awaited<ReturnType<typeof getAccessTokens>>
-export type AccessTokensError = unknown
+export type AccessTokensError = StudioError
 
 export type AccessToken = AccessTokensData[number]
 
 export const useAccessTokensQuery = <TData = AccessTokensData>({
   enabled = true,
   ...options
-}: UseQueryOptions<AccessTokensData, AccessTokensError, TData> = {}) =>
-  useQuery<AccessTokensData, AccessTokensError, TData>(
-    accessTokenKeys.list(),
-    ({ signal }) => getAccessTokens(signal),
-    options
-  )
+}: UseCustomQueryOptions<AccessTokensData, AccessTokensError, TData> = {}) =>
+  useQuery<AccessTokensData, AccessTokensError, TData>({
+    queryKey: accessTokenKeys.list(),
+    queryFn: ({ signal }) => getAccessTokens(signal),
+    ...options,
+  })

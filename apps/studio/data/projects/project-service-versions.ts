@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { projectKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceVersionsVariables = {
   projectRef?: string
@@ -23,20 +24,18 @@ export async function getProjectServiceVersions(
 }
 
 export type ProjectServiceVersionsData = Awaited<ReturnType<typeof getProjectServiceVersions>>
-export type ProjectServiceVersionsError = ResponseError
+export type ProjectServiceVersionsError = StudioError
 
 export const useProjectServiceVersionsQuery = <TData = ProjectServiceVersionsData>(
   { projectRef }: ProjectServiceVersionsVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectServiceVersionsData, ProjectServiceVersionsError, TData> = {}
+  }: UseCustomQueryOptions<ProjectServiceVersionsData, ProjectServiceVersionsError, TData> = {}
 ) =>
-  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>(
-    projectKeys.serviceVersions(projectRef),
-    ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectServiceVersionsData, ProjectServiceVersionsError, TData>({
+    queryKey: projectKeys.serviceVersions(projectRef),
+    queryFn: ({ signal }) => getProjectServiceVersions({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

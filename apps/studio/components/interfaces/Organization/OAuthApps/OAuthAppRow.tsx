@@ -1,10 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit, MoreVertical, Trash } from 'lucide-react'
-
-import Table from 'components/to-be-cleaned/Table'
-import CopyButton from 'components/ui/CopyButton'
-import type { OAuthApp } from 'data/oauth/oauth-apps-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -12,11 +6,17 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  TableCell,
+  TableRow,
   Tooltip,
   TooltipContent,
   TooltipTrigger,
 } from 'ui'
-import { TimestampInfo } from 'ui-patterns'
+import { TimestampInfo } from 'ui-patterns/TimestampInfo'
+
+import CopyButton from '@/components/ui/CopyButton'
+import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -25,43 +25,47 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const canUpdateOAuthApps = useCheckPermissions(PermissionAction.UPDATE, 'approved_oauth_apps')
-  const canDeleteOAuthApps = useCheckPermissions(PermissionAction.DELETE, 'approved_oauth_apps')
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
 
   return (
-    <Table.tr>
-      <Table.td>
+    <TableRow>
+      <TableCell className="w-[54px] min-w-[54px] max-w-[54px] pr-2">
         <div
-          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center"
+          className="w-[30px] h-[30px] rounded-full bg-no-repeat bg-cover bg-center border border-control flex items-center justify-center text-xs"
           style={{ backgroundImage: app.icon ? `url('${app.icon}')` : 'none' }}
         >
           {!!app.icon ? '' : `${app.name[0]}`}
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell className="pl-0">
         <p title={app.name} className="truncate">
           {app.name}
         </p>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <div className="flex items-center gap-x-2">
-          <p className="font-mono truncate" title={app.client_id}>
+          <p className="text-xs font-mono truncate" title={app.client_id}>
             {app.client_id}
           </p>
-          <CopyButton type="default" iconOnly text={app.client_id ?? ''} className="px-1" />
+          <CopyButton variant="default" iconOnly text={app.client_id ?? ''} className="px-1" />
         </div>
-      </Table.td>
-      <Table.td>
+      </TableCell>
+      <TableCell>
         <TimestampInfo
           utcTimestamp={app.created_at ?? ''}
           labelFormat="DD/MM/YYYY, HH:mm:ss"
           className="text-sm"
         />
-      </Table.td>
-      <Table.td align="right">
+      </TableCell>
+      <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button type="default" icon={<MoreVertical />} className="px-1" />
+            <Button icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" className="w-32">
             <Tooltip>
@@ -69,12 +73,12 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                 <DropdownMenuItem
                   key="edit"
                   disabled={!canUpdateOAuthApps}
-                  className="space-x-2 !pointer-events-auto"
+                  className="space-x-2 pointer-events-auto!"
                   onClick={() => {
                     if (canUpdateOAuthApps) onSelectEdit()
                   }}
                 >
-                  <Edit size={16} />
+                  <EditIcon size={16} />
                   <p>Edit app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -89,13 +93,13 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
               <TooltipTrigger asChild>
                 <DropdownMenuItem
                   disabled={!canDeleteOAuthApps}
-                  className="space-x-2 !pointer-events-auto"
+                  className="space-x-2 pointer-events-auto!"
                   key="delete"
                   onClick={() => {
                     if (canDeleteOAuthApps) onSelectDelete()
                   }}
                 >
-                  <Trash size={16} />
+                  <TrashIcon size={16} />
                   <p>Delete app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -107,7 +111,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
             </Tooltip>
           </DropdownMenuContent>
         </DropdownMenu>
-      </Table.td>
-    </Table.tr>
+      </TableCell>
+    </TableRow>
   )
 }

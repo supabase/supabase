@@ -1,0 +1,233 @@
+import { useQuery } from '@tanstack/react-query'
+import { useParams } from 'common'
+import { parseAsBoolean, useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef } from 'react'
+import {
+  cn,
+  ScrollBar,
+  ScrollRoot,
+  ScrollViewport,
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+} from 'ui'
+
+import type { ConnectMode, ProjectKeys } from './Connect.types'
+import { ConnectConfigSection, ModeSelector } from './ConnectConfigSection'
+import {
+  CLEARED_CONNECT_SHEET_QUERY_PARAMS,
+  resolveConnectSheetHydration,
+} from './ConnectSheet.utils'
+import { ConnectStepsSection } from './ConnectStepsSection'
+import { useAvailableConnectModes } from './useAvailableConnectModes'
+import { useConnectSheetParams } from './useConnectSheetParams'
+import { useConnectSheetShortcut } from './useConnectSheetShortcut'
+import { useConnectState } from './useConnectState'
+import { WarehouseTab } from './WarehouseTab'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
+import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
+import { useGrant } from '@/lib/grants'
+import { useTrack } from '@/lib/telemetry/track'
+import { useAppStateSnapshot } from '@/state/app-state'
+
+export const ConnectSheet = () => {
+  const track = useTrack()
+  const prevShowConnect = useRef(false)
+  const { ref: projectRef } = useParams()
+
+  useConnectSheetShortcut()
+
+  const availableModeIds = useAvailableConnectModes()
+  const { connectSheetSource, setConnectSheetSource } = useAppStateSnapshot()
+  const { state, activeFields, resolvedSteps, schema, getFieldOptions, setMode, updateField } =
+    useConnectState()
+
+  const [showConnect, setShowConnect] = useQueryState(
+    'showConnect',
+    parseAsBoolean.withDefault(false)
+  )
+  // URL params have no defaults: a `null` value signals "not in URL" so we can
+  // fall back to the user's last-used selections from localStorage.
+  const { params, storedPrefs, setConnectParams, setQueryParams } = useConnectSheetParams()
+  const {
+    connectTab,
+    framework: queryFramework,
+    using: queryUsing,
+    method: queryMethod,
+    type: queryType,
+    mcpClient: queryMcpClient,
+    warehouseQueryEngine: queryWarehouseQueryEngine,
+  } = params
+
+  useEffect(() => {
+    const justOpened = showConnect && !prevShowConnect.current
+    prevShowConnect.current = showConnect
+
+    if (!justOpened) return
+
+    track('connect_sheet_opened', { source: connectSheetSource })
+    setConnectSheetSource('header_button')
+
+    const { mode, fieldUpdates, urlUpdates } = resolveConnectSheetHydration(
+      {
+        connectTab,
+        framework: queryFramework,
+        using: queryUsing,
+        method: queryMethod,
+        type: queryType,
+        mcpClient: queryMcpClient,
+        warehouseQueryEngine: queryWarehouseQueryEngine,
+      },
+      storedPrefs,
+      availableModeIds
+    )
+
+    if (mode) setMode(mode)
+    fieldUpdates.forEach(({ fieldId, value }) => updateField(fieldId, value))
+    if (Object.keys(urlUpdates).length > 0) setQueryParams(urlUpdates)
+  }, [
+    showConnect,
+    connectSheetSource,
+    connectTab,
+    queryFramework,
+    queryUsing,
+    queryMethod,
+    queryType,
+    queryMcpClient,
+    queryWarehouseQueryEngine,
+    storedPrefs,
+    availableModeIds,
+    track,
+    setConnectSheetSource,
+    setMode,
+    updateField,
+    setQueryParams,
+  ])
+
+  const clearAllQueryParams = () => {
+    setQueryParams(CLEARED_CONNECT_SHEET_QUERY_PARAMS)
+  }
+
+  const handleOpenChange = (sheetOpen: boolean) => {
+    if (!sheetOpen) clearAllQueryParams()
+    setShowConnect(sheetOpen)
+  }
+
+  const { data: endpoint = '' } = useProjectApiUrl({ projectRef }, { enabled: showConnect })
+
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData } = useQuery({
+    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
+    select: getKeys,
+  })
+
+  const projectKeys: ProjectKeys = useMemo(() => {
+    const { anonKey, publishableKey } = apiKeysData ?? {}
+    return {
+      apiUrl: endpoint,
+      anonKey: anonKey?.api_key ?? null,
+      publishableKey: publishableKey?.api_key ?? null,
+    }
+  }, [endpoint, apiKeysData])
+
+  const availableModes = useMemo(
+    () => schema.modes.filter((m) => availableModeIds.includes(m.id)),
+    [schema.modes, availableModeIds]
+  )
+
+  const handleModeChange = (mode: ConnectMode) => {
+    setMode(mode)
+    setConnectParams({
+      connectTab: mode,
+      framework: null,
+      using: null,
+      method: null,
+      type: null,
+      mcpClient: null,
+      warehouseQueryEngine: null,
+    })
+  }
+
+  const handleFieldChange = (fieldId: string, value: string | boolean | string[]) => {
+    updateField(fieldId, value)
+    const str = String(value)
+    if (fieldId === 'framework') {
+      setConnectParams({ framework: str, using: null })
+    } else if (fieldId === 'frameworkVariant') {
+      setConnectParams({ using: str })
+    } else if (fieldId === 'orm') {
+      setConnectParams({ framework: str })
+    } else if (fieldId === 'connectionMethod') {
+      setConnectParams({ method: str, type: null })
+    } else if (fieldId === 'connectionType') {
+      setConnectParams({ type: str })
+    } else if (fieldId === 'mcpClient') {
+      setConnectParams({ mcpClient: str })
+    }
+  }
+
+  return (
+    <Sheet open={showConnect} onOpenChange={handleOpenChange}>
+      <SheetContent
+        size="lg"
+        className="flex w-full min-w-0 flex-col gap-0 space-y-0 p-0 max-w-4xl"
+      >
+        <SheetHeader className={cn('text-left border-b shrink-0 py-6 px-8')}>
+          <SheetTitle>Connect to your project</SheetTitle>
+          <SheetDescription>Choose how you want to use Supabase</SheetDescription>
+        </SheetHeader>
+
+        <ScrollRoot className="flex min-h-0 min-w-0 flex-1 flex-col">
+          <ScrollViewport className="[&>div]:block!">
+            <div className="flex min-w-0 flex-col divide-y">
+              <div className="p-8">
+                <ModeSelector
+                  modes={availableModes}
+                  selected={state.mode}
+                  onChange={handleModeChange}
+                />
+              </div>
+
+              {/* Only framework snippets embed API keys. The server env tab renders its own note
+                  next to the keys it offers to copy. */}
+              {state.mode === 'framework' && (
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholders with your own keys."
+                  className="px-8 py-4"
+                />
+              )}
+
+              {state.mode === 'warehouse' ? (
+                <WarehouseTab />
+              ) : (
+                <>
+                  {activeFields.length > 0 && (
+                    <div className="p-8">
+                      <ConnectConfigSection
+                        state={state}
+                        activeFields={activeFields}
+                        onFieldChange={handleFieldChange}
+                        getFieldOptions={getFieldOptions}
+                      />
+                    </div>
+                  )}
+
+                  <ConnectStepsSection
+                    steps={resolvedSteps}
+                    state={state}
+                    projectKeys={projectKeys}
+                  />
+                </>
+              )}
+            </div>
+          </ScrollViewport>
+          <ScrollBar />
+        </ScrollRoot>
+      </SheetContent>
+    </Sheet>
+  )
+}

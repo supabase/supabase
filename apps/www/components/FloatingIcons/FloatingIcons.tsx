@@ -8,7 +8,7 @@ function FloatingIcons() {
 
   return (
     <div className="absolute hidden h-full w-full lg:block">
-      <div className="container relative mx-auto h-full max-w-screen-2xl">
+      <div className="container relative mx-auto h-full max-w-(--breakpoint-2xl)">
         <img
           className={`${Styles['icon-react-one']}`}
           src={`${basePath}/images/product/auth/react-icon.svg`}

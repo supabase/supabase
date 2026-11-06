@@ -10,9 +10,9 @@ const LWHeader = ({ className }: { className?: string }) => {
         <div className="absolute z-0 inset-0 w-full">
           <LW12Background className="absolute z-0 inset-0 w-full flex items-center justify-center opacity-100 transition-opacity h-full" />
         </div>
-        <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_top,#060809)_0%,transparent_100%)]" />
+        <div className="absolute inset-0 w-full h-full bg-[linear-gradient(to_top,#060809)_0%,]" />
       </div>
-      <SectionContainer className="h-full flex flex-col items-start gap-3 !max-w-none lg:!container !pb-4 md:!pb-10">
+      <SectionContainer className="h-full flex flex-col items-start gap-3 max-w-none! lg:container! pb-4! md:pb-10!">
         <h1 className="text-3xl font-medium uppercase">
           Launch Week <span className="font-mono">12</span>
         </h1>

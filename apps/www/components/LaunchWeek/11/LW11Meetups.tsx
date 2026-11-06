@@ -1,9 +1,10 @@
+import { SupabaseClient } from '@supabase/supabase-js'
+import { ArrowRight } from 'lucide-react'
 import Link from 'next/link'
 import React, { useEffect, useState } from 'react'
 import { cn } from 'ui'
+
 import useConfData from '../hooks/use-conf-data'
-import { SupabaseClient } from '@supabase/supabase-js'
-import { ArrowRight } from 'lucide-react'
 
 export interface Meetup {
   id?: any
@@ -104,19 +105,20 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
               return (
                 <>
                   <button
+                    tabIndex={0}
                     key={meetup.id}
                     onClick={() => handleSelectMeetup(meetup)}
                     onMouseDown={() => handleSelectMeetup(meetup)}
                     title={liveNow ? 'Live now' : undefined}
                     className={cn(
                       'h-10 group inline-flex md:hidden items-center flex-wrap text-3xl',
-                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup?.id && '!text-foreground',
+                      'text-foreground-muted hover:text-foreground! leading-none! transition-colors',
+                      meetup.id === activeMeetup?.id && 'text-foreground!',
                       liveNow && 'text-foreground-light'
                     )}
                   >
                     {liveNow && (
-                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-brand-default mr-2 mb-4 animate-pulse" />
                     )}
                     <span>{meetup.title}</span>
                     {i !== meets.length - 1 && ', '}
@@ -130,13 +132,13 @@ const LW11Meetups = ({ meetups }: { meetups?: Meetup[] }) => {
                     title={liveNow ? 'Live now' : undefined}
                     className={cn(
                       'hidden h-10 group md:inline-flex items-center flex-wrap text-4xl',
-                      'text-foreground-muted hover:!text-foreground !leading-none transition-colors',
-                      meetup.id === activeMeetup?.id && '!text-foreground',
+                      'text-foreground-muted hover:text-foreground! leading-none! transition-colors',
+                      meetup.id === activeMeetup?.id && 'text-foreground!',
                       liveNow && 'text-foreground-light'
                     )}
                   >
                     {liveNow && (
-                      <div className="w-2 h-2 rounded-full bg-brand mr-2 mb-4 animate-pulse" />
+                      <div className="w-2 h-2 rounded-full bg-brand-default mr-2 mb-4 animate-pulse" />
                     )}
                     <span>{meetup.title}</span>
                     {i !== meets.length - 1 && ', '}

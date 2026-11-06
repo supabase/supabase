@@ -1,6 +1,7 @@
-import { expect, test, beforeAll, afterAll } from 'vitest'
+import { afterAll, beforeAll, expect, test } from 'vitest'
+
 import pgMeta from '../src/index'
-import { createTestDatabase, cleanupRoot } from './db/utils'
+import { cleanupRoot, createTestDatabase } from './db/utils'
 
 beforeAll(async () => {
   // Any global setup if needed
@@ -164,4 +165,36 @@ withTestDatabase('list with filters', async ({ executeQuery }) => {
   const { sql: offsetSql, zod: offsetZod } = await pgMeta.indexes.list({ offset: 1 })
   const offset = offsetZod.parse(await executeQuery(offsetSql))
   expect(offset).toHaveLength(withoutSystem.length - 1)
+})
+
+withTestDatabase('handles same index name across schemas correctly', async ({ executeQuery }) => {
+  // Create two schemas
+  await executeQuery(`CREATE SCHEMA schema_a;`)
+  await executeQuery(`CREATE SCHEMA schema_b;`)
+
+  // Create tables
+  await executeQuery(`CREATE TABLE schema_a.test (id int);`)
+  await executeQuery(`CREATE TABLE schema_b.test (id int);`)
+
+  // Create SAME index name in both schemas
+  await executeQuery(`CREATE INDEX idx_test ON schema_a.test (id);`)
+  await executeQuery(`CREATE INDEX idx_test ON schema_b.test (id);`)
+
+  // Fetch indexes
+  const { sql, zod } = await pgMeta.indexes.list({ includeSystemSchemas: true })
+  const indexes = zod.parse(await executeQuery(sql))
+
+  const schemaAIndex = indexes.find(
+    (i) => i.schema === 'schema_a' && i.index_definition.includes('schema_a.test')
+  )
+
+  const schemaBIndex = indexes.find(
+    (i) => i.schema === 'schema_b' && i.index_definition.includes('schema_b.test')
+  )
+
+  expect(schemaAIndex).toBeDefined()
+  expect(schemaBIndex).toBeDefined()
+
+  expect(schemaAIndex!.index_definition).toContain('schema_a.test')
+  expect(schemaBIndex!.index_definition).toContain('schema_b.test')
 })

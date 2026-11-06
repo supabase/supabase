@@ -21,6 +21,7 @@ You can also use the Supabase SDK `getPublicUrl` to generate this URL for you
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -35,6 +36,72 @@ If you want the browser to start an automatic download of the asset instead of t
 
 By default it will use the asset name to save the file on disk. You can optionally pass a custom name to the `download` parameter as following: `?download=customname.jpg`
 
+#### Programmatic downloads with query parameters
+
+When using the SDK's `download()` method, you can pass additional query parameters to customize the download behavior:
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="js"
+  queryGroup="language"
+>
+<TabPanel id="js" label="JavaScript">
+
+```js
+import { createClient } from '@supabase/supabase-js'
+
+const supabase = createClient('your_project_url', 'your_supabase_api_key')
+
+// ---cut---
+// Download with custom filename
+const { data, error } = await supabase.storage.from('avatars').download('avatar1.png', {
+  download: 'my-custom-name.png',
+})
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Download with additional query parameters
+final response = await supabase.storage
+  .from('avatars')
+  .download(
+    'avatar1.png',
+    queryParams: {
+      'download': 'my-custom-name.png',
+    },
+  );
+```
+
+[Reference.](/docs/reference/dart/file-buckets-download)
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Download with additional query parameters
+let response = try await supabase.storage
+  .from("avatars")
+  .download(
+    path: "avatar1.png",
+    queryItems: [
+      URLQueryItem(name: "download", value: "my-custom-name.png")
+    ]
+  )
+```
+
+[Reference.](/docs/reference/swift/storage-from-download)
+
+</TabPanel>
+</$Show>
+</Tabs>
+
 ## Private buckets
 
 Assets stored in a non-public bucket are considered private and are not accessible via a public URL like the public buckets.
@@ -46,10 +113,11 @@ You can access them only by:
 
 ### Signing URLs
 
-You can sign a time-limited URL that you can share to your users by invoking the `createSignedUrl` method on the SDK.
+You can sign a time-limited URL that you can share with your users by invoking the `createSignedUrl` method on the SDK.
 
 ```js
 import { createClient } from '@supabase/supabase-js'
+
 const supabase = createClient('your_project_url', 'your_supabase_api_key')
 
 // ---cut---
@@ -61,3 +129,13 @@ if (data) {
   console.log(data.signedUrl)
 }
 ```
+
+### Revoke signed URLs
+
+<Admonition type="note">
+
+You can't revoke individual signed URLs. To invalidate a specific one, delete, move, or rename the underlying object.
+
+</Admonition>
+
+To revoke all signed URLs, rotate your project's URL signing key, and then revoke the previous key. For more information, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).

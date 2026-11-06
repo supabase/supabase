@@ -1,0 +1,515 @@
+import { IS_PLATFORM, useFlag, useParams } from 'common'
+import { AlertCircleIcon, RotateCwIcon, TimerIcon } from 'lucide-react'
+import { AnimatePresence } from 'motion/react'
+import { useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
+import {
+  AlertDialog,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  Button,
+  Card,
+  CardContent,
+  Dialog,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogSection,
+  DialogSectionSeparator,
+  DialogTitle,
+  Table,
+  TableBody,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from 'ui'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+
+import { StartUsingJwtSigningKeysBanner } from '../start-using-keys-banner'
+import { ActionPanel } from './action-panel'
+import { CreateKeyDialog } from './create-key-dialog'
+import { KeyDetailsDialog } from './key-details-dialog'
+import { RotateKeyDialog } from './rotate-key-dialog'
+import { SigningKeyRow } from './signing-key-row'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
+import {
+  getJWTSigningKeyLastUsedAt,
+  useApiKeysLastUsedQuery,
+} from '@/data/analytics/api-keys-last-used-query'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useJWTSigningKeyDeleteMutation } from '@/data/jwt-signing-keys/jwt-signing-key-delete-mutation'
+import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
+import {
+  JWTSigningKey,
+  useJWTSigningKeysQuery,
+} from '@/data/jwt-signing-keys/jwt-signing-keys-query'
+import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+
+type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
+
+const JWTSecretKeysTableHeader = ({
+  showLastRotatedAt = false,
+}: {
+  showLastRotatedAt?: boolean
+}) => {
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+
+  return (
+    <TableHeader>
+      <TableRow>
+        <TableHead className="w-[315px]">Key</TableHead>
+        <TableHead className="w-[200px]">Type</TableHead>
+        <TableHead className="text-right w-[160px] hidden xl:table-cell">Created at</TableHead>
+        {IS_PLATFORM && showApiKeysLastUsed && (
+          <TableHead className="text-right w-[160px]">Last used</TableHead>
+        )}
+        {showLastRotatedAt && (
+          <TableHead className="text-right hidden xl:table-cell">Last rotated at</TableHead>
+        )}
+        <TableHead />
+      </TableRow>
+    </TableHeader>
+  )
+}
+
+export const JWTSecretKeysTable = () => {
+  const { ref: projectRef } = useParams()
+  const { data: project, isPending: isProjectLoading } = useSelectedProjectQuery()
+
+  const [selectedKey, setSelectedKey] = useState<JWTSigningKey>()
+  const [selectedKeyToUpdate, setSelectedKeyToUpdate] = useState<string>()
+  const [shownDialog, setShownDialog] = useState<DialogType>()
+  const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
+
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
+  const now = useRef(new Date()).current
+  const {
+    data: lastUsedData,
+    isError: isLastUsedError,
+    isLoading: isLoadingLastUsed,
+  } = useApiKeysLastUsedQuery(
+    {
+      projectRef,
+      isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
+      isoTimestampEnd: now.toISOString(),
+    },
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
+  )
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
+
+  const { mutate: migrateJWTSecret, isPending: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
+    {
+      onSuccess: () => {
+        setShownDialog(undefined)
+        toast.success('Successfully migrated JWT secret!')
+      },
+    }
+  )
+
+  const { mutate: updateJWTSigningKey, isPending: isUpdatingJWTSigningKey } =
+    useJWTSigningKeyUpdateMutation({
+      onSuccess: () => {
+        resetDialog()
+        setSelectedKeyToUpdate(undefined)
+      },
+    })
+  const { mutate: deleteJWTSigningKey, isPending: isDeletingJWTSigningKey } =
+    useJWTSigningKeyDeleteMutation({ onSuccess: () => resetDialog(), onError: () => resetDialog() })
+
+  const isPendingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
+  const isLoading =
+    isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
+
+  const sortedKeys = useMemo(() => {
+    if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
+
+    return signingKeys.keys.sort((a: JWTSigningKey, b: JWTSigningKey) => {
+      const order: Record<JWTSigningKey['status'], number> = {
+        standby: 0,
+        in_use: 1,
+        previously_used: 2,
+        revoked: 3,
+      }
+      return (
+        order[a.status] - order[b.status] ||
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      )
+    })
+  }, [signingKeys])
+
+  const standbyKey = useMemo(() => sortedKeys.find((key) => key.status === 'standby'), [sortedKeys])
+  const inUseKey = useMemo(() => sortedKeys.find((key) => key.status === 'in_use'), [sortedKeys])
+  const previouslyUsedKeys = useMemo(
+    () => sortedKeys.filter((key) => key.status === 'previously_used'),
+    [sortedKeys]
+  )
+  const revokedKeys = useMemo(
+    () => sortedKeys.filter((key) => key.status === 'revoked'),
+    [sortedKeys]
+  )
+  const getLastUsedAt = (keyId: string) => getJWTSigningKeyLastUsedAt(lastUsedData ?? [], keyId)
+
+  const resetDialog = () => {
+    setSelectedKey(undefined)
+    setShownDialog(undefined)
+  }
+
+  const handlePreviouslyUsedKey = async (keyId: string) => {
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
+      { projectRef, keyId, status: 'previously_used' },
+      { onSuccess: () => toast.success('Successfully moved key to previously used') }
+    )
+  }
+
+  const handleStandbyKey = (keyId: string) => {
+    setSelectedKeyToUpdate(keyId)
+    updateJWTSigningKey(
+      { projectRef: projectRef!, keyId, status: 'standby' },
+      { onSuccess: () => toast.success('Successfully moved key to standby') }
+    )
+  }
+
+  const handleRevokeKey = (keyId: string) => {
+    updateJWTSigningKey(
+      { projectRef: projectRef!, keyId, status: 'revoked' },
+      { onSuccess: () => toast.success('Successfully revoked key') }
+    )
+  }
+
+  const handleDeleteKey = (keyId: string) => {
+    deleteJWTSigningKey(
+      { projectRef: projectRef!, keyId },
+      { onSuccess: () => toast.success('Successfully deleted key') }
+    )
+  }
+
+  if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
+    return (
+      <div className="bg-surface-100 rounded-md border shadow-xs">
+        <div className="flex items-center py-8 px-8 space-x-2">
+          <AlertCircleIcon size={16} strokeWidth={1.5} />
+          <p className="text-sm text-foreground-light">
+            You don't have permission to view JWT signing keys. These keys are restricted to users
+            with higher access levels.
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (isLoading) {
+    return <GenericSkeletonLoader />
+  }
+
+  return (
+    <>
+      <div className="-space-y-px">
+        {!canReadAPIKeys ? null : legacyKey ? (
+          <>
+            {standbyKey ? (
+              <ActionPanel
+                title="Rotate Signing Key"
+                description="Switch the standby key to in use. All new JSON Web Tokens issued by Supabase Auth will be signed with this key."
+                buttonLabel="Rotate keys"
+                onClick={() => setShownDialog('rotate')}
+                loading={isUpdatingJWTSigningKey}
+                icon={<RotateCwIcon className="size-4" />}
+                variant="primary"
+              />
+            ) : (
+              <ActionPanel
+                title="Create standby key"
+                description="Set up a new key which you can switch to once it has been picked up by all components of your application."
+                buttonLabel="Create Standby Key"
+                onClick={() => setShownDialog('create')}
+                loading={isPendingMutation}
+                variant="primary"
+                shortcutId={SHORTCUT_IDS.JWT_KEYS_CREATE_STANDBY}
+              />
+            )}
+          </>
+        ) : (
+          <StartUsingJwtSigningKeysBanner
+            onClick={() => setShownDialog('legacy')}
+            isLoading={isMigrating}
+          />
+        )}
+      </div>
+
+      {sortedKeys.length > 0 && (
+        <>
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <JWTSecretKeysTableHeader />
+                <TableBody>
+                  <AnimatePresence>
+                    {inUseKey && (
+                      <SigningKeyRow
+                        key={inUseKey.id}
+                        signingKey={inUseKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(inUseKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                    {standbyKey && (
+                      <SigningKeyRow
+                        key={standbyKey.id}
+                        signingKey={standbyKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        isLoading={selectedKeyToUpdate === standbyKey.id && isUpdatingJWTSigningKey}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        lastUsedAt={getLastUsedAt(standbyKey.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    )}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+
+          <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-2">
+              <h2>Previously used keys</h2>
+              <p className="text-sm text-foreground-lighter">
+                These JWT signing keys are still used to{' '}
+                <em className="text-foreground not-italic">verify tokens</em> that are yet to
+                expire. Revoke once all tokens have expired.
+              </p>
+            </div>
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                {previouslyUsedKeys.length > 0 ? (
+                  <Table>
+                    <JWTSecretKeysTableHeader showLastRotatedAt />
+                    <TableBody>
+                      <AnimatePresence>
+                        {previouslyUsedKeys.map((key) => (
+                          <SigningKeyRow
+                            key={key.id}
+                            signingKey={key}
+                            legacyKey={legacyKey}
+                            standbyKey={standbyKey}
+                            isLoading={selectedKeyToUpdate === key.id && isUpdatingJWTSigningKey}
+                            setSelectedKey={setSelectedKey}
+                            setShownDialog={setShownDialog}
+                            handleStandbyKey={handleStandbyKey}
+                            handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                            lastUsedAt={getLastUsedAt(key.id)}
+                            isLoadingLastUsed={isLoadingLastUsed}
+                            isLastUsedError={isLastUsedError}
+                            isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                          />
+                        ))}
+                      </AnimatePresence>
+                    </TableBody>
+                  </Table>
+                ) : (
+                  <div className="flex flex-col items-center justify-center text-center text-foreground-light p-8 gap-2">
+                    <TimerIcon className="size-6 text-foreground-lighter" />
+                    <div className="flex flex-col gap-1">
+                      <p className="text-sm font-medium">No previously used keys</p>
+                      <p className="text-xs text-foreground-lighter">
+                        Rotated keys will appear here for verification of existing tokens
+                      </p>
+                    </div>
+                  </div>
+                )}
+              </CardContent>
+            </Card>
+          </div>
+        </>
+      )}
+
+      {revokedKeys.length > 0 && (
+        <div className="flex flex-col gap-4">
+          <div className="flex flex-col gap-2">
+            <h2>Revoked keys</h2>
+            <p className="text-sm text-foreground-lighter">
+              These keys are no longer used to verify or sign JWTs.
+            </p>
+          </div>
+          <Card className="overflow-hidden">
+            <CardContent className="p-0">
+              <Table>
+                <JWTSecretKeysTableHeader showLastRotatedAt />
+                <TableBody>
+                  <AnimatePresence>
+                    {revokedKeys.map((key) => (
+                      <SigningKeyRow
+                        key={key.id}
+                        signingKey={key}
+                        setSelectedKey={setSelectedKey}
+                        setShownDialog={setShownDialog}
+                        handleStandbyKey={handleStandbyKey}
+                        handlePreviouslyUsedKey={handlePreviouslyUsedKey}
+                        legacyKey={legacyKey}
+                        standbyKey={standbyKey}
+                        lastUsedAt={getLastUsedAt(key.id)}
+                        isLoadingLastUsed={isLoadingLastUsed}
+                        isLastUsedError={isLastUsedError}
+                        isLastUsedVisible={IS_PLATFORM && showApiKeysLastUsed}
+                      />
+                    ))}
+                  </AnimatePresence>
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      <Dialog open={shownDialog === 'legacy'} onOpenChange={resetDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Start using new JWT signing keys</DialogTitle>
+          </DialogHeader>
+          <DialogSectionSeparator />
+          <DialogSection className="flex flex-col gap-2 text-sm text-foreground-light">
+            <p>
+              Your project today uses a legacy symmetric JWT secret to create JWTs. To be able to
+              use an asymmetric JWT signing key you first have to migrate it to the new approach.
+            </p>
+            <p>This change does not cause any downtime on your project.</p>
+          </DialogSection>
+          <DialogFooter>
+            <Button
+              variant="primary"
+              loading={isMigrating}
+              onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
+            >
+              Migrate JWT secret
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={shownDialog === 'create'} onOpenChange={resetDialog}>
+        <DialogContent className="sm:max-w-[425px]">
+          <CreateKeyDialog projectRef={projectRef!} onClose={resetDialog} />
+        </DialogContent>
+      </Dialog>
+
+      {standbyKey && inUseKey && projectRef && (
+        <Dialog open={shownDialog === 'rotate'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-[425px]">
+            <RotateKeyDialog
+              projectRef={projectRef}
+              standbyKey={standbyKey}
+              inUseKey={inUseKey}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {selectedKey && project && (
+        <Dialog open={shownDialog === 'key-details'} onOpenChange={resetDialog}>
+          <DialogContent className="sm:max-w-lg">
+            <KeyDetailsDialog
+              selectedKey={selectedKey}
+              restURL={project.restUrl}
+              onClose={resetDialog}
+            />
+          </DialogContent>
+        </Dialog>
+      )}
+
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        (legacyKey?.id !== selectedKey.id || !(legacyAPIKeysStatus?.enabled ?? false)) && (
+          <TextConfirmModal
+            visible={shownDialog === 'revoke'}
+            loading={isPendingMutation}
+            onConfirm={() => handleRevokeKey(selectedKey.id)}
+            onCancel={resetDialog}
+            title={`Revoke ${selectedKey.id}`}
+            confirmString={selectedKey.id}
+            confirmLabel="Yes, revoke this signing key"
+            confirmPlaceholder="Type the ID of the key to confirm"
+            variant="destructive"
+            alert={{
+              title: 'This key will no longer be trusted!',
+              description:
+                'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
+            }}
+          />
+        )}
+
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        legacyKey?.id === selectedKey.id &&
+        (legacyAPIKeysStatus?.enabled ?? true) && (
+          <AlertDialog open={shownDialog === 'revoke'} onOpenChange={() => resetDialog()}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogDescription>
+                It's not possible to revoke the legacy JWT secret unless you have already disabled
+                JWT-based legacy API keys. This is because revoking the JWT secret invalidates the
+                JWT-based legacy API keys.
+              </AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel>OK</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
+
+      {selectedKey && selectedKey.status === 'revoked' && (
+        <TextConfirmModal
+          visible={shownDialog === 'delete'}
+          loading={isPendingMutation}
+          onConfirm={() => handleDeleteKey(selectedKey.id)}
+          onCancel={resetDialog}
+          title={`Permanently delete ${selectedKey.id}`}
+          confirmString={selectedKey.id}
+          confirmLabel="Yes, permanently delete this key"
+          confirmPlaceholder="Type the ID of the key to confirm"
+          variant="destructive"
+          alert={{
+            title: 'This key will be permanently deleted.',
+            description:
+              'The private key and all information about this key will be permanently deleted from our records. This action cannot be undone.',
+          }}
+        />
+      )}
+    </>
+  )
+}

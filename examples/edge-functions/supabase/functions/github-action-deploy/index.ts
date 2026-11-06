@@ -2,16 +2,21 @@
 // https://deno.land/manual/getting_started/setup_your_environment
 // This enables autocomplete, go to definition, etc.
 
+import { withSupabase } from 'npm:@supabase/server@^1'
+
 console.log('Hello from Functions!')
 
-Deno.serve((_req) => {
-  const data = {
-    message: `I was deployed via GitHub Actions!`,
-  }
+// Authenticated endpoint, so deploy with verify_jwt = true.
+export default {
+  fetch: withSupabase({ auth: 'user' }, async (_req, _ctx) => {
+    const data = {
+      message: `I was deployed via GitHub Actions!`,
+    }
 
-  return new Response(JSON.stringify(data), {
-    headers: { 'Content-Type': 'application/json' },
-  })
-})
+    return Response.json(data)
+  }),
+}
 
-// To invoke: http://localhost:54321/functions/v1/github-action-deploy
+// To invoke:
+// curl -i --location --request GET 'http://localhost:54321/functions/v1/github-action-deploy' \
+//   --header 'Authorization: Bearer <USER_ACCESS_TOKEN>'

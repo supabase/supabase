@@ -1,21 +1,20 @@
 import { useParams } from 'common'
 import { Badge } from 'ui'
 
-import { useBucketsQuery } from 'data/storage/buckets-query'
-import { formatBytes } from 'lib/helpers'
-import { useAppStateSnapshot } from 'state/app-state'
 import { DOCS_RESOURCE_CONTENT } from '../ProjectAPIDocs.constants'
 import ResourceContent from '../ResourceContent'
 import type { ContentProps } from './Content.types'
+import { useBucketInfoQueryPreferCached } from '@/data/storage/buckets-query'
+import { formatBytes } from '@/lib/helpers'
+import { useAppStateSnapshot } from '@/state/app-state'
 
-const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
+export const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const snap = useAppStateSnapshot()
-  const { data } = useBucketsQuery({ projectRef: ref })
 
+  const snap = useAppStateSnapshot()
   const resource = snap.activeDocsSection[1]
-  const buckets = data ?? []
-  const bucket = buckets.find((b) => b.name === resource)
+
+  const bucket = useBucketInfoQueryPreferCached(resource, ref)
   const allowedMimeTypes = bucket?.allowed_mime_types
   const maxFileSizeLimit = bucket?.file_size_limit
 
@@ -25,24 +24,30 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     <div className="divide-y">
       <div className="space-y-1 px-4 py-4">
         <div className="flex items-center space-x-2">
-          <h2 className="text-xl">{bucket.name}</h2>
+          <h2>{bucket.name}</h2>
           <Badge variant={bucket.public ? 'warning' : 'default'}>
             {bucket.public ? 'Public' : 'Private'}
           </Badge>
         </div>
         <p className="text-sm text-foreground-light">
           Allowed MIME types:{' '}
-          {allowedMimeTypes === null
-            ? 'All types are allowed'
-            : (allowedMimeTypes ?? []).length === 0
-              ? 'No types are allowed'
-              : (allowedMimeTypes ?? []).length > 1
-                ? (allowedMimeTypes ?? []).join(', ')
-                : 'Unknown'}
+          {allowedMimeTypes === null ? (
+            <span>All types are allowed</span>
+          ) : (allowedMimeTypes ?? []).length === 0 ? (
+            <span>No types are allowed</span>
+          ) : (allowedMimeTypes ?? []).length > 1 ? (
+            (allowedMimeTypes ?? []).join(', ')
+          ) : (
+            <span>Unknown</span>
+          )}
         </p>
         <p className="text-sm text-foreground-light">
           Max file size limit:{' '}
-          {maxFileSizeLimit === null ? 'No limit' : `${formatBytes(maxFileSizeLimit)}`}
+          {maxFileSizeLimit === null ? (
+            <span>No limit</span>
+          ) : (
+            <span>{`${formatBytes(maxFileSizeLimit)}`}</span>
+          )}
         </p>
       </div>
 
@@ -106,5 +111,3 @@ const Bucket = ({ language, apikey, endpoint }: ContentProps) => {
     </div>
   )
 }
-
-export default Bucket

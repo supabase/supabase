@@ -1,36 +1,24 @@
-const ALLOWED_ORIGINS = ["http://localhost:8000"];
-const corsHeaders = {
-  "Access-Control-Allow-Origin": ALLOWED_ORIGINS.join(","),
-  "Access-Control-Allow-Headers":
-    "authorization, x-client-info, apikey, content-type, range, if-match",
-  "Access-Control-Expose-Headers": "range, accept-ranges, etag",
-  "Access-Control-Max-Age": "300",
-};
+import { withSupabase } from 'npm:@supabase/server@^1'
 
-Deno.serve((req) => {
-  // This is needed if you're planning to invoke your function from a browser.
-  if (req.method === "OPTIONS") {
-    return new Response("ok", { headers: corsHeaders });
-  }
+const ALLOWED_ORIGINS = ['http://localhost:8000']
 
-  // Check origin
-  const origin = req.headers.get("Origin");
+// Public tile proxy, so deploy with verify_jwt = false.
+export default {
+  fetch: withSupabase({ auth: 'none' }, (req) => {
+    // Restrict which origins may read the private tiles.
+    const origin = req.headers.get('Origin')
+    if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
+      return new Response('Not Allowed', { status: 405 })
+    }
 
-  if (!origin || !ALLOWED_ORIGINS.includes(origin)) {
-    return new Response("Not Allowed", { status: 405 });
-  }
+    const reqUrl = new URL(req.url)
+    const url = `${Deno.env.get('SUPABASE_URL')}/storage/v1/object/authenticated${reqUrl.pathname}`
 
-  const reqUrl = new URL(req.url);
-  const url = `${
-    Deno.env.get("SUPABASE_URL")
-  }/storage/v1/object/authenticated${reqUrl.pathname}`;
-
-  const { method, headers } = req;
-  // Add Auth header
-  const modHeaders = new Headers(headers);
-  modHeaders.append(
-    "authorization",
-    `Bearer ${Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!}`,
-  );
-  return fetch(url, { method, headers: modHeaders });
-});
+    const SUPABASE_SECRET_KEYS = JSON.parse(Deno.env.get('SUPABASE_SECRET_KEYS')!)
+    const { method, headers } = req
+    // Add Auth header so Storage serves the private object.
+    const modHeaders = new Headers(headers)
+    modHeaders.append('authorization', `Bearer ${SUPABASE_SECRET_KEYS['default']!}`)
+    return fetch(url, { method, headers: modHeaders })
+  }),
+}

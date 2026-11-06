@@ -1,0 +1,100 @@
+import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
+
+export const logsKeys = {
+  otelLogKeys: (projectRef: string | undefined, source: string | undefined) =>
+    ['projects', projectRef, 'otel-log-keys', source] as const,
+  unifiedLogsInfinite: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'logs-data',
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+  unifiedLog: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType,
+    id: string | undefined
+  ) => ['projects', projectRef, 'unified-logs', 'single-log', searchParams, id] as const,
+  unifiedLogsCount: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'count-data',
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+  unifiedLogsChart: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'chart-data',
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+  unifiedLogsFacetCount: (
+    projectRef: string | undefined,
+    facet: string,
+    facetSearch: string | undefined,
+    searchParams: QuerySearchParamsType | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'count-data',
+      facet,
+      facetSearch,
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+  logAttributes: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'log-attributes',
+      logId,
+      { source, logTimestampMs },
+    ] as const,
+  requestTimeline: (
+    projectRef: string | undefined,
+    logId: string | undefined,
+    source: string | undefined,
+    logTimestampMs: number | null | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'request-timeline',
+      logId,
+      { source, logTimestampMs },
+    ] as const,
+  serviceFlow: (
+    projectRef: string | undefined,
+    searchParams: QuerySearchParamsType | undefined,
+    logId: string | undefined
+  ) =>
+    [
+      'projects',
+      projectRef,
+      'unified-logs',
+      'service-flow',
+      logId,
+      ...(searchParams ? [searchParams].filter(Boolean) : []),
+    ] as const,
+}

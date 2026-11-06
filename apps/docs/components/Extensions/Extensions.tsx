@@ -2,7 +2,7 @@ import { X } from 'lucide-react'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { extensions } from 'shared-data'
-import { Input } from 'ui'
+import { Badge, Input } from 'ui'
 import { GlassPanel } from 'ui-patterns/GlassPanel'
 
 type Extension = {
@@ -24,7 +24,7 @@ function getLinkTarget(link: string): LinkTarget {
 }
 
 function getUniqueTags(json: Extension[]): string[] {
-  const tags = []
+  const tags: string[] = []
   for (const item of json) {
     if (item.tags) {
       tags.push(...item.tags)
@@ -89,6 +89,7 @@ export default function Extensions() {
             </ul>
             <p className="mt-2">
               <button
+                tabIndex={0}
                 type="reset"
                 className="text-xs hover:underline"
                 onClick={() => setFilters([])}
@@ -108,14 +109,20 @@ export default function Extensions() {
               )
               .map((extension) => (
                 <Link
+                  key={extension.name}
                   href={extension.link}
                   target={getLinkTarget(extension.link)}
                   className="no-underline"
                 >
-                  <GlassPanel title={extension.name} background={false} key={extension.name}>
+                  <GlassPanel title={extension.name}>
                     <p className="mt-4">
                       {extension.comment.charAt(0).toUpperCase() + extension.comment.slice(1)}
                     </p>
+                    {extension.deprecated && (
+                      <Badge variant="destructive">
+                        Deprecated in {extension.deprecated.join(', ')}
+                      </Badge>
+                    )}
                   </GlassPanel>
                 </Link>
               ))}

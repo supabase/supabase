@@ -1,8 +1,9 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { get, handleError } from 'data/fetchers'
+import { useQuery } from '@tanstack/react-query'
+
 import { subscriptionKeys } from './keys'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { get, handleError } from '@/data/fetchers'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { UseCustomQueryOptions } from '@/types'
 
 export type OrgPlansVariables = {
   orgSlug?: string
@@ -24,19 +25,16 @@ export type OrgPlansError = unknown
 
 export const useOrgPlansQuery = <TData = OrgPlansData>(
   { orgSlug }: OrgPlansVariables,
-  { enabled = true, ...options }: UseQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<OrgPlansData, OrgPlansError, TData> = {}
 ) => {
-  const canReadSubscriptions = useCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
-  return useQuery<OrgPlansData, OrgPlansError, TData>(
-    subscriptionKeys.orgPlans(orgSlug),
-    ({ signal }) => getOrgPlans({ orgSlug }, signal),
-    {
-      enabled: enabled && typeof orgSlug !== 'undefined' && canReadSubscriptions,
-      ...options,
-    }
-  )
+  return useQuery<OrgPlansData, OrgPlansError, TData>({
+    queryKey: subscriptionKeys.orgPlans(orgSlug),
+    queryFn: ({ signal }) => getOrgPlans({ orgSlug }, signal),
+    enabled: enabled && typeof orgSlug !== 'undefined' && canReadSubscriptions,
+    ...options,
+  })
 }

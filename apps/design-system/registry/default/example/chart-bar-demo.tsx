@@ -1,7 +1,6 @@
 'use client'
 
 import { Bar, BarChart } from 'recharts'
-
 import { ChartConfig, ChartContainer } from 'ui'
 
 const chartData = [

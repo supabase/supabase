@@ -1,126 +1,182 @@
+'use client'
+
 import { components } from 'api-types'
 import { useRouter } from 'next/compat/router'
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef } from 'react'
-import { LOCAL_STORAGE_KEYS } from './constants'
+import Script from 'next/script'
+import { useCallback, useEffect, useRef, useState } from 'react'
+import { useLatest } from 'react-use'
+
+import { useUser } from './auth'
+import { hasConsented, useConsentState } from './consent-state'
+import { createConsentedUrlCookieSync } from './consented-url-cookie'
+import { IS_PLATFORM } from './constants'
 import { useFeatureFlags } from './feature-flags'
 import { post } from './fetchWrappers'
+import { parseFirstReferrerCookie, parseMwDiagCookie } from './first-referrer-cookie'
 import { ensurePlatformSuffix, isBrowser } from './helpers'
-import { useTelemetryCookie } from './hooks'
+import { useFirstTouchStore, useParams } from './hooks'
+import { handlePageLeaveTelemetry, handlePageTelemetry } from './page-telemetry'
+import {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
+} from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
-import { useUser } from './auth'
-import { getSharedTelemetryData } from './telemetry-utils'
+import { buildTelemetryEventRequest } from './telemetry-event'
+import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
 
-//---
-// PAGE TELEMETRY
-//---
+export { handlePageLeaveTelemetry }
 
-export function handlePageTelemetry(
-  API_URL: string,
-  pathname?: string,
-  featureFlags?: {
-    [key: string]: unknown
-  },
-  telemetryDataOverride?: components['schemas']['TelemetryPageBodyV2Dto']
-) {
-  return post(
-    `${ensurePlatformSuffix(API_URL)}/telemetry/page`,
-    telemetryDataOverride !== undefined
-      ? { feature_flags: featureFlags, ...telemetryDataOverride }
-      : {
-          ...getSharedTelemetryData(pathname),
-          feature_flags: featureFlags,
-        },
-    { headers: { Version: '2' } }
-  )
+export {
+  buildSessionRecordingConfig,
+  posthogClient,
+  type CapturedNetworkRequest,
+  type ClientTelemetryEvent,
+  type SessionRecordingOptions,
 }
 
-export function handlePageLeaveTelemetry(
-  API_URL: string,
-  pathname: string,
-  featureFlags?: {
-    [key: string]: unknown
-  }
-) {
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/page-leave`, {
-    body: {
-      pathname,
-      page_url: isBrowser ? window.location.href : '',
-      page_title: isBrowser ? document?.title : '',
-      feature_flags: featureFlags,
-    },
-  })
+export const TelemetryTagManager = () => {
+  const { hasAccepted } = useConsentState()
+  const [syncCookie] = useState(createConsentedUrlCookieSync)
+
+  const isGTMEnabled = Boolean(
+    IS_PLATFORM && process.env.NEXT_PUBLIC_GOOGLE_TAG_MANAGER_ID && hasAccepted
+  )
+
+  // Ad attribution capture is independent of GTM, so this runs even when the
+  // container is not configured.
+  useEffect(() => {
+    syncCookie(hasAccepted)
+  }, [hasAccepted, syncCookie])
+
+  if (!isGTMEnabled) return null
+
+  return (
+    <Script
+      id="consent"
+      strategy="afterInteractive"
+      dangerouslySetInnerHTML={{
+        __html: `(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],j=d.createElement(s);j.async=true;j.src="https://ss.supabase.com/4icgbaujh.js?"+i;f.parentNode.insertBefore(j,f);})(window,document,'script','dataLayer','60a389s=aWQ9R1RNLVdDVlJMTU43&page=2');`,
+      }}
+    />
+  )
 }
 
 export const PageTelemetry = ({
   API_URL,
   hasAcceptedConsent,
   enabled = true,
+  organizationSlug,
+  projectRef,
+  sessionReplay,
 }: {
   API_URL: string
   hasAcceptedConsent: boolean
   enabled?: boolean
+  organizationSlug?: string
+  projectRef?: string
+  /** Masking policy for session replay. Omit to disable recording. */
+  sessionReplay?: SessionRecordingOptions
 }) => {
   const router = useRouter()
 
   const pagesPathname = router?.pathname
   const appPathname = usePathname()
 
+  const params = useParams()
+  const slug = organizationSlug || params.slug
+  const ref = projectRef || params.ref
+
   const featureFlags = useFeatureFlags()
 
-  const title = typeof document !== 'undefined' ? document?.title : ''
-  const referrer = typeof document !== 'undefined' ? document?.referrer : ''
-  useTelemetryCookie({ hasAcceptedConsent, title, referrer })
+  useFirstTouchStore({ enabled: enabled && IS_PLATFORM })
+
+  const pathname =
+    pagesPathname ?? appPathname ?? (isBrowser ? window.location.pathname : undefined)
+  const pathnameRef = useLatest(pathname)
+  const featureFlagsRef = useLatest(featureFlags.posthog)
 
   const sendPageTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
-      API_URL,
-      pagesPathname ?? appPathname ?? undefined,
-      featureFlags.posthog
-    ).catch((e) => {
+    return handlePageTelemetry({
+      apiUrl: API_URL,
+      pathname: pathnameRef.current,
+      featureFlags: featureFlagsRef.current,
+      slug,
+      ref,
+    }).catch((e) => {
       console.error('Problem sending telemetry page:', e)
     })
-  }, [API_URL, pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const sendPageLeaveTelemetry = useCallback(() => {
     if (!(enabled && hasAcceptedConsent)) return Promise.resolve()
 
-    return handlePageTelemetry(
+    if (!pathnameRef.current) return Promise.resolve()
+
+    return handlePageLeaveTelemetry(
       API_URL,
-      pagesPathname ?? appPathname ?? undefined,
-      featureFlags.posthog
+      pathnameRef.current,
+      featureFlagsRef.current,
+      slug,
+      ref
     ).catch((e) => {
       console.error('Problem sending telemetry page-leave:', e)
     })
-  }, [pagesPathname, appPathname, hasAcceptedConsent, featureFlags.posthog])
+  }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
+  const previousAppPathnameRef = useRef<string | null>(null)
 
   useEffect(() => {
-    // Send page telemetry on first page load
-    // Waiting for router ready before sending page_view
-    // if not the path will be dynamic route instead of the browser url
+    if (hasAcceptedConsent && IS_PLATFORM) {
+      posthogClient.init({ sessionReplay })
+    }
+  }, [hasAcceptedConsent, IS_PLATFORM, sessionReplay])
+
+  // Waiting for router.isReady before sending to avoid dynamic route placeholders
+  useEffect(() => {
     if (
       (router?.isReady ?? true) &&
-      featureFlags.hasLoaded &&
+      enabled &&
+      hasAcceptedConsent &&
       !hasSentInitialPageTelemetryRef.current
     ) {
-      sendPageTelemetry()
-      hasSentInitialPageTelemetryRef.current = true
+      const cookieHeader = document.cookie
+      const firstReferrerData = parseFirstReferrerCookie(cookieHeader)
+      const mwDiagData = parseMwDiagCookie(cookieHeader)
+      const firstTouchData = getFirstTouchData()
+
+      try {
+        handlePageTelemetry({
+          apiUrl: API_URL,
+          pathname: pathnameRef.current,
+          featureFlags: featureFlagsRef.current,
+          slug,
+          ref,
+          ...(firstTouchData && { telemetryDataOverride: firstTouchData }),
+          firstReferrerData,
+          mwDiagData,
+        })
+      } finally {
+        clearFirstTouchData()
+        hasSentInitialPageTelemetryRef.current = true
+      }
     }
-  }, [router?.isReady, featureFlags.hasLoaded])
+  }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
 
   useEffect(() => {
-    // For pages router
     if (router === null) return
 
     function handleRouteChange() {
+      if (!hasSentInitialPageTelemetryRef.current) return
       sendPageTelemetry()
     }
 
-    // Listen for page changes after a navigation or when the query changes
     router.events.on('routeChangeComplete', handleRouteChange)
 
     return () => {
@@ -129,12 +185,17 @@ export const PageTelemetry = ({
   }, [router])
 
   useEffect(() => {
-    // For app router
     if (router !== null) return
 
-    if (appPathname) {
+    if (
+      appPathname &&
+      previousAppPathnameRef.current !== null &&
+      previousAppPathnameRef.current !== appPathname
+    ) {
       sendPageTelemetry()
     }
+
+    previousAppPathnameRef.current = appPathname
   }, [appPathname, router, sendPageTelemetry])
 
   useEffect(() => {
@@ -146,35 +207,50 @@ export const PageTelemetry = ({
     return () => window.removeEventListener('beforeunload', handleBeforeUnload)
   }, [enabled, sendPageLeaveTelemetry])
 
-  // Identify the user
+  useEffect(() => {
+    if (!enabled) return
+
+    const handleExampleLinkClick = (event: MouseEvent) => {
+      const anchor = event.target instanceof Element ? event.target.closest('a') : null
+      if (!(anchor instanceof HTMLAnchorElement)) return
+
+      const examplePath = anchor.href.match(EXAMPLE_LINK_PATTERN)?.[1].replace(/\/$/, '')
+      if (!examplePath) return
+
+      sendTelemetryEvent(
+        API_URL,
+        { action: 'example_link_clicked', properties: { examplePath } },
+        pathnameRef.current
+      )
+    }
+
+    document.addEventListener('click', handleExampleLinkClick, { capture: true })
+    return () => document.removeEventListener('click', handleExampleLinkClick, { capture: true })
+  }, [API_URL, enabled])
+
   useTelemetryIdentify(API_URL)
 
   return null
 }
 
-// ---
-// EVENT TELEMETRY
-// ---
-
-type EventBody = components['schemas']['TelemetryEventBodyV2Dto']
+const EXAMPLE_LINK_PATTERN =
+  /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
+  const request = buildTelemetryEventRequest(API_URL, event, pathname)
+  if (!request) return
 
-  if (!consent) return
-
-  const body: EventBody = {
-    ...getSharedTelemetryData(pathname),
-    action: event.action,
-    custom_properties: 'properties' in event ? event.properties : {},
-    groups: 'groups' in event ? event.groups : {},
-  }
-
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
+  // keepalive lets the request survive a navigation that starts right after
+  // the event (the OAuth redirect after sign_in_submitted, a plain-link click
+  // into the dashboard), but keepalive requests share a ~64KB in-flight quota
+  // page-wide, so it stays scoped to those events. Callers like useTrack
+  // fire-and-forget, so rejections are handled here rather than surfacing
+  // as unhandled promise rejections.
+  return post(request.url, request.body, {
     headers: { Version: '2' },
+    keepalive: request.keepalive,
+  }).catch((error) => {
+    console.error('Problem sending telemetry event:', error)
   })
 }
 
@@ -185,10 +261,7 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
 type IdentifyBody = components['schemas']['TelemetryIdentifyBodyV2']
 
 export function sendTelemetryIdentify(API_URL: string, body: IdentifyBody) {
-  const consent =
-    (typeof window !== 'undefined'
-      ? localStorage.getItem(LOCAL_STORAGE_KEYS.TELEMETRY_CONSENT)
-      : null) === 'true'
+  const consent = hasConsented()
 
   if (!consent) return Promise.resolve()
 
@@ -202,8 +275,19 @@ export function useTelemetryIdentify(API_URL: string) {
 
   useEffect(() => {
     if (user?.id) {
+      const anonymousId = posthogClient.getDistinctId()
+
       sendTelemetryIdentify(API_URL, {
         user_id: user.id,
+        ...(anonymousId && { anonymous_id: anonymousId }),
+      })
+
+      // user.created_at is gotrue's immutable signup timestamp — safe to $set on
+      // every identify because the value never changes per user. Lets flag
+      // targeting distinguish brand-new signups from returning single-org users.
+      posthogClient.identify(user.id, {
+        gotrue_id: user.id,
+        ...(user.created_at && { signup_timestamp: user.created_at }),
       })
     }
   }, [API_URL, user?.id])

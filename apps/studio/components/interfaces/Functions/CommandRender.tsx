@@ -1,6 +1,6 @@
-import { Check, Clipboard } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { forwardRef, useState } from 'react'
-import { cn } from 'ui'
+import { cn, copyToClipboard } from 'ui'
 
 const CommandRender = forwardRef<HTMLDivElement, { commands: any[]; className?: string }>(
   ({ commands, className }, ref) => {
@@ -31,22 +31,21 @@ const Command = ({ item }: any) => {
             <span>{item.jsx ? item.jsx() : null} </span>
             <button
               type="button"
+              tabIndex={0}
               className="text-foreground-lighter hover:text-foreground"
               onClick={() => {
                 function onCopy(value: any) {
                   setIsCopied(true)
-                  navigator.clipboard.writeText(value).then()
-                  setTimeout(function () {
-                    setIsCopied(false)
-                  }, 3000)
+                  copyToClipboard(value)
+                  setTimeout(() => setIsCopied(false), 3000)
                 }
                 onCopy(item.command)
               }}
             >
               {isCopied ? (
-                <Check size={14} strokeWidth={3} className="text-brand" />
+                <CheckIcon size={14} strokeWidth={3} className="text-primary" />
               ) : (
-                <Clipboard size={14} />
+                <CopyIcon size={14} />
               )}
             </button>
           </span>

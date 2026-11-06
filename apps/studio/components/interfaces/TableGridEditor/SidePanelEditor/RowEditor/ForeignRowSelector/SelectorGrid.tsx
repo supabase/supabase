@@ -1,16 +1,16 @@
-import { Key } from 'lucide-react'
+import { KeyIcon } from 'lucide-react'
 import DataGrid, { Column } from 'react-data-grid'
+import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
-import { NullValue } from 'components/grid/components/common/NullValue'
-import { COLUMN_MIN_WIDTH } from 'components/grid/constants'
-import type { SupaRow } from 'components/grid/types'
+import { convertByteaToHex } from '../RowEditor.utils'
+import { NullValue } from '@/components/grid/components/common/NullValue'
+import { COLUMN_MIN_WIDTH } from '@/components/grid/constants'
+import type { SupaRow } from '@/components/grid/types'
 import {
   ESTIMATED_CHARACTER_PIXEL_WIDTH,
   getColumnDefaultWidth,
-} from 'components/grid/utils/gridColumns'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
-import { convertByteaToHex } from '../RowEditor.utils'
+} from '@/components/grid/utils/gridColumns'
+import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
 
 export interface SelectorGridProps {
   rows: SupaRow[]
@@ -23,8 +23,8 @@ const columnRender = (name: string, isPrimaryKey = false) => {
       {isPrimaryKey && (
         <Tooltip>
           <TooltipTrigger>
-            <div className="text-brand">
-              <Key size={14} strokeWidth={2} />
+            <div className="text-primary">
+              <KeyIcon size={14} strokeWidth={2} />
             </div>
           </TooltipTrigger>
           <TooltipContent side="bottom">Primary key</TooltipContent>

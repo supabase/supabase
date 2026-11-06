@@ -1,9 +1,12 @@
-import { useQuery, useQueryClient, UseQueryOptions } from '@tanstack/react-query'
-import type { components } from 'data/api'
-import { get, handleError } from 'data/fetchers'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useCallback } from 'react'
-import type { ResponseError } from 'types'
+
 import { authKeys } from './keys'
+import type { components } from '@/data/api'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AuthConfigVariables = {
   projectRef?: string
@@ -27,32 +30,31 @@ export async function getProjectAuthConfig(
 }
 
 export type ProjectAuthConfigData = Awaited<ReturnType<typeof getProjectAuthConfig>>
-export type ProjectAuthConfigError = ResponseError
+export type ProjectAuthConfigError = StudioError
 
 export const useAuthConfigQuery = <TData = ProjectAuthConfigData>(
   { projectRef }: AuthConfigVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<ProjectAuthConfigData, ProjectAuthConfigError, TData> = {}
+  }: UseCustomQueryOptions<ProjectAuthConfigData, ProjectAuthConfigError, TData> = {}
 ) =>
-  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>(
-    authKeys.authConfig(projectRef),
-    ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<ProjectAuthConfigData, ProjectAuthConfigError, TData>({
+    queryKey: authKeys.authConfig(projectRef),
+    queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && projectRef !== '_',
+    ...options,
+  })
 
 export const useAuthConfigPrefetch = ({ projectRef }: AuthConfigVariables) => {
   const client = useQueryClient()
 
   return useCallback(() => {
     if (projectRef) {
-      client.prefetchQuery(authKeys.authConfig(projectRef), ({ signal }) =>
-        getProjectAuthConfig({ projectRef }, signal)
-      )
+      client.prefetchQuery({
+        queryKey: authKeys.authConfig(projectRef),
+        queryFn: ({ signal }) => getProjectAuthConfig({ projectRef }, signal),
+      })
     }
   }, [client, projectRef])
 }

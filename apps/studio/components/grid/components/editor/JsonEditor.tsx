@@ -1,21 +1,30 @@
-import { Maximize } from 'lucide-react'
+import { useParams } from 'common'
+import { MaximizeIcon } from 'lucide-react'
 import { useCallback, useState } from 'react'
 import type { RenderEditCellProps } from 'react-data-grid'
 import { toast } from 'sonner'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
 
-import { useParams } from 'common'
-import { useTableEditorQuery } from 'data/table-editor/table-editor-query'
-import { isTableLike } from 'data/table-editor/table-editor-types'
-import { useGetCellValueMutation } from 'data/table-rows/get-cell-value-mutation'
-import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
-import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from 'lib/helpers'
-import { useTableEditorTableStateSnapshot } from 'state/table-editor-table'
-import { Popover, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { BlockKeys } from '../common/BlockKeys'
-import { MonacoEditor } from '../common/MonacoEditor'
 import { NullValue } from '../common/NullValue'
 import { TruncatedWarningOverlay } from './TruncatedWarningOverlay'
+import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
+import { isValueTruncated } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
+import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
+import { useTableEditorQuery } from '@/data/table-editor/table-editor-query'
+import { isTableLike } from '@/data/table-editor/table-editor-types'
+import { useGetCellValueMutation } from '@/data/table-rows/get-cell-value-mutation'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { prettifyJSON, removeJSONTrailingComma, tryParseJson } from '@/lib/helpers'
+import { RoleImpersonationState } from '@/lib/role-impersonation'
+import { useRoleImpersonationStateSnapshot } from '@/state/role-impersonation-state'
 
 const verifyJSON = (value: string) => {
   try {
@@ -26,8 +35,10 @@ const verifyJSON = (value: string) => {
   }
 }
 
-interface JsonEditorProps<TRow, TSummaryRow = unknown>
-  extends RenderEditCellProps<TRow, TSummaryRow> {
+interface JsonEditorProps<TRow, TSummaryRow = unknown> extends RenderEditCellProps<
+  TRow,
+  TSummaryRow
+> {
   isEditable: boolean
   onExpandEditor: (column: string, row: TRow) => void
 }
@@ -52,18 +63,16 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   onRowChange,
   onExpandEditor,
 }: JsonEditorProps<TRow, TSummaryRow>) => {
-  const snap = useTableEditorTableStateSnapshot()
   const { id: _id } = useParams()
   const id = _id ? Number(_id) : undefined
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
+  const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
 
   const { data: selectedTable } = useTableEditorQuery({
     projectRef: project?.ref,
     connectionString: project?.connectionString,
     id,
   })
-
-  const gridColumn = snap.gridColumns.find((x) => x.name == column.key)
 
   const rawInitialValue = row[column.key as keyof TRow] as unknown
   const initialValue =
@@ -73,23 +82,13 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
 
   const jsonString = prettifyJSON(initialValue ? tryFormatInitialValue(initialValue) : '')
 
-  const isTruncated =
-    (typeof initialValue === 'string' &&
-      initialValue.endsWith('...') &&
-      initialValue.length > MAX_CHARACTERS) ||
-    // if the value is an array which total representation is > MAX_CHARACTERS
-    // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
-    (typeof initialValue === 'string' &&
-      // If the string represent an array finishing with "..." element
-      initialValue.startsWith('["') &&
-      initialValue.endsWith(',"..."]') &&
-      // If the array have MAX_ARRAY_SIZE elements in it
-      // its a large truncated array
-      (initialValue.match(/","/g) || []).length === MAX_ARRAY_SIZE)
+  const isTruncated = isValueTruncated(initialValue)
   const [isPopoverOpen, setIsPopoverOpen] = useState(true)
   const [value, setValue] = useState<string | null>(jsonString)
+  const applyChangesLabel = isQueueOperationsEnabled ? 'Queue changes' : 'Save changes'
 
-  const { mutate: getCellValue, isLoading, isSuccess } = useGetCellValueMutation()
+  const { mutate: getCellValue, isPending, isSuccess } = useGetCellValueMutation()
+  const roleImpersonationState = useRoleImpersonationStateSnapshot()
 
   const loadFullValue = () => {
     if (selectedTable === undefined || project === undefined || !isTableLike(selectedTable)) return
@@ -108,6 +107,7 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
         pkMatch,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
+        roleImpersonationState: roleImpersonationState as RoleImpersonationState,
       },
       {
         onSuccess: (data) => {
@@ -164,47 +164,50 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
   }
 
   return (
-    <Popover
-      open={isPopoverOpen}
-      side="bottom"
-      align="start"
-      sideOffset={-35}
-      className="rounded-none"
-      overlay={
-        isTruncated && !isSuccess ? (
-          <div
-            style={{ width: `${gridColumn?.width || column.width}px` }}
-            className="flex items-center justify-center flex-col relative"
-          >
-            <MonacoEditor
-              readOnly
-              onChange={() => {}}
-              width={`${gridColumn?.width || column.width}px`}
+    <Popover open={isPopoverOpen}>
+      <PopoverTrigger asChild>
+        <div
+          className={`${
+            !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
+          } text-grid overflow-hidden text-ellipsis px-2`}
+          onClick={() => setIsPopoverOpen(!isPopoverOpen)}
+        >
+          {value === null || value === '' ? <NullValue /> : jsonString}
+        </div>
+      </PopoverTrigger>
+      <PopoverContent side="bottom" align="start" sideOffset={-35} className="rounded-none p-0">
+        {isTruncated && !isSuccess ? (
+          <div className="flex items-center justify-center flex-col relative">
+            <CodeEditor
+              isReadOnly
+              hideLineNumbers
+              language="plaintext"
               value={value ?? ''}
-              language="markdown"
+              className="h-[200px]"
             />
-            <TruncatedWarningOverlay isLoading={isLoading} loadFullValue={loadFullValue} />
+            <TruncatedWarningOverlay isLoading={isPending} loadFullValue={loadFullValue} />
           </div>
         ) : (
           <BlockKeys value={value} onEscape={cancelChanges} onEnter={saveChanges}>
-            <MonacoEditor
-              width={`${gridColumn?.width || column.width}px`}
-              value={value ?? ''}
+            <CodeEditor
+              hideLineNumbers
+              isReadOnly={!isEditable}
               language="json"
-              readOnly={!isEditable}
-              onChange={onChange}
+              value={value ?? ''}
+              onInputChange={onChange}
+              className="h-[200px] border-b"
             />
             <div className="flex items-start justify-between p-2 bg-surface-200 gap-x-2">
               {isEditable && (
                 <div className="space-y-1">
                   <div className="flex items-center space-x-2">
-                    <div className="px-1.5 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1.5 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">⏎</span>
                     </div>
-                    <p className="text-xs text-foreground-light">Save changes</p>
+                    <p className="text-xs text-foreground-light">{applyChangesLabel}</p>
                   </div>
                   <div className="flex items-center space-x-2">
-                    <div className="px-1 py-[2.5px] rounded bg-selection border border-strong flex items-center justify-center">
+                    <div className="px-1 py-[2.5px] rounded-sm bg-selection border border-strong flex items-center justify-center">
                       <span className="text-[10px]">Esc</span>
                     </div>
                     <p className="text-xs text-foreground-light">Cancel changes</p>
@@ -215,12 +218,12 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
                 <TooltipTrigger asChild>
                   <div
                     className={[
-                      'border border-strong rounded p-1 flex items-center justify-center',
+                      'border border-strong rounded-sm p-1 flex items-center justify-center',
                       'transition cursor-pointer bg-selection hover:bg-border-strong',
                     ].join(' ')}
                     onClick={() => onSelectExpand()}
                   >
-                    <Maximize size={12} strokeWidth={2} />
+                    <MaximizeIcon size={12} strokeWidth={2} />
                   </div>
                 </TooltipTrigger>
                 <TooltipContent side="bottom" align="center">
@@ -229,17 +232,8 @@ export const JsonEditor = <TRow, TSummaryRow = unknown>({
               </Tooltip>
             </div>
           </BlockKeys>
-        )
-      }
-    >
-      <div
-        className={`${
-          !!value && jsonString.trim().length == 0 ? 'sb-grid-fill-container' : ''
-        } sb-grid-json-editor__trigger`}
-        onClick={() => setIsPopoverOpen(!isPopoverOpen)}
-      >
-        {value === null || value === '' ? <NullValue /> : jsonString}
-      </div>
+        )}
+      </PopoverContent>
     </Popover>
   )
 }

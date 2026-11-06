@@ -1,119 +1,240 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { keepPreviousData } from '@tanstack/react-query'
+import {
+  getCoreRowModel,
+  getSortedRowModel,
+  useReactTable,
+  type RowSelectionState,
+  type SortingState,
+} from '@tanstack/react-table'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowDown, ArrowUp, RefreshCw, User } from 'lucide-react'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-import { useEffect, useState } from 'react'
+import { RefreshCwIcon } from 'lucide-react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  cn,
+  ResizablePanel,
+  ResizablePanelGroup,
+  WarningIcon,
+} from 'ui'
+import { FilterBar, type FilterGroup, type FilterProperty } from 'ui-patterns/FilterBar'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { LogDetailsPanel } from 'components/interfaces/AuditLogs'
-import { ScaffoldContainerLegacy } from 'components/layouts/Scaffold'
-import Table from 'components/to-be-cleaned/Table'
-import AlertError from 'components/ui/AlertError'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DatePicker } from 'components/ui/DatePicker'
-import { FilterPopover } from 'components/ui/FilterPopover'
-import NoPermission from 'components/ui/NoPermission'
-import ShimmeringLoader from 'components/ui/ShimmeringLoader'
-import { useOrganizationRolesV2Query } from 'data/organization-members/organization-roles-query'
+import { AuditLogDetailsPanel } from '@/components/interfaces/AuditLogs/AuditLogDetailsPanel'
+import { getAuditLogColumns } from '@/components/interfaces/AuditLogs/AuditLogs.columns'
+import {
+  DATE_FILTER_PROPERTY,
+  filterByFilterGroup,
+  findDateCondition,
+  getDefaultAuditLogRange,
+  PROJECT_FILTER_PROPERTY,
+  USER_FILTER_PROPERTY,
+} from '@/components/interfaces/AuditLogs/AuditLogs.utils'
+import {
+  DateRangeOption,
+  formatDateRangeValue,
+} from '@/components/interfaces/AuditLogs/AuditLogsDateRangeOption'
+import { createAuditLogsProjectOption } from '@/components/interfaces/AuditLogs/AuditLogsProjectOption'
+import { AuditLogsSelectionHeader } from '@/components/interfaces/AuditLogs/AuditLogsSelectionHeader'
+import { AuditLogsTable } from '@/components/interfaces/AuditLogs/AuditLogsTable'
+import { createAuditLogsUserOption } from '@/components/interfaces/AuditLogs/AuditLogsUserOption'
+import {
+  parseTimeRange,
+  serializeTimeRange,
+} from '@/components/interfaces/Settings/Logs/Logs.timeRange'
+import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
+import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { UpgradeToPro } from '@/components/ui/UpgradeToPro'
 import {
   AuditLog,
   useOrganizationAuditLogsQuery,
-} from 'data/organizations/organization-audit-logs-query'
-import { useOrganizationMembersQuery } from 'data/organizations/organization-members-query'
-import { useOrganizationsQuery } from 'data/organizations/organizations-query'
-import { useProjectsQuery } from 'data/projects/projects-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  Button,
-  WarningIcon,
-} from 'ui'
-import { Admonition } from 'ui-patterns'
-import { formatSelectedDateRange } from './AuditLogs.utils'
+} from '@/data/organizations/organization-audit-logs-query'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
+import { useOrgProjectsInfiniteQuery } from '@/data/projects/org-projects-infinite-query'
+import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
 
-// [Joshen considerations]
-// - Maybe fix the height of the table to the remaining height of the viewport, so that the search input is always visible
-// - We'll need pagination as well if the audit logs get too large, but that needs to be implemented on the API side first if possible
-// - I've hidden time input in the date picker for now cause the time support in the component is a bit iffy, need to investigate
-//   - Maybe a rule to follow from here is just everytime we call dayjs, use UTC(), one TZ to rule them all
+const CONTENT_PADDING = 'w-full px-6 xl:px-9'
+const logsUpgradeError = 'upgrade to Team or Enterprise Plan to access audit logs.'
 
-const AuditLogs = () => {
+export const AuditLogs = () => {
   const { slug } = useParams()
-  const currentTime = dayjs().utc().set('millisecond', 0)
-  const [dateSortDesc, setDateSortDesc] = useState(true)
-  const [dateRange, setDateRange] = useState({
-    from: currentTime.subtract(1, 'day').toISOString(),
-    to: currentTime.toISOString(),
-  })
+
+  const [dateRange, setDateRange] = useState(getDefaultAuditLogRange)
   const [selectedLog, setSelectedLog] = useState<AuditLog>()
-  const [filters, setFilters] = useState<{ users: string[]; projects: string[] }>({
-    users: [], // gotrue_id[]
-    projects: [], // project_ref[]
+  const [filterGroup, setFilterGroup] = useState<FilterGroup>(() => ({
+    logicalOperator: 'AND',
+    conditions: [
+      {
+        propertyName: DATE_FILTER_PROPERTY,
+        operator: '=',
+        value: serializeTimeRange([new Date(dateRange.from), new Date(dateRange.to)]),
+      },
+    ],
+  }))
+  const [freeformText, setFreeformText] = useState('')
+  const [projectNames, setProjectNames] = useState<Record<string, string>>({})
+
+  const handleSelectProject = (project: { ref: string; name: string }) =>
+    setProjectNames((prev) => ({ ...prev, [project.ref]: project.name }))
+
+  const handleFilterChange = (next: FilterGroup) => {
+    setFilterGroup(next)
+    // The API call is driven by `dateRange`, so keep it in sync with the date chip
+    const dateCondition = findDateCondition(next)
+    if (!dateCondition) {
+      setDateRange(getDefaultAuditLogRange())
+      return
+    }
+    const range = parseTimeRange(dateCondition.value)
+    if (range) setDateRange({ from: range[0].toISOString(), to: range[1].toISOString() })
+  }
+
+  const { can: canReadAuditLogs, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.AUDIT_LOGS_READ
+  )
+
+  const { hasAccess: hasAccessToAuditLogs, isLoading: isLoadingEntitlements } =
+    useCheckEntitlements('security.audit_logs_days')
+
+  const {
+    data,
+    error,
+    isPending: isLoading,
+    isSuccess,
+    isError,
+    isRefetching,
+    fetchStatus,
+    refetch,
+  } = useOrganizationAuditLogsQuery(
+    {
+      slug,
+      iso_timestamp_start: dateRange.from,
+      iso_timestamp_end: dateRange.to,
+    },
+    {
+      enabled: canReadAuditLogs,
+      retry: false,
+      placeholderData: (previousData, previousQuery) =>
+        previousQuery?.queryKey[1] === slug ? previousData : undefined,
+      refetchOnWindowFocus: (query) => {
+        return !query.state.error?.message.endsWith(logsUpgradeError)
+      },
+    }
+  )
+
+  const isLogsNotAvailableBasedOnPlan = isError && !hasAccessToAuditLogs
+  const isRangeExceededError = isError && error.message.includes('range exceeded')
+  const showFilters = !isLoading && !isLogsNotAvailableBasedOnPlan
+
+  const { data: projectsData, isPending: isLoadingProjects } = useOrgProjectsInfiniteQuery(
+    { slug },
+    { placeholderData: keepPreviousData, enabled: showFilters }
+  )
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects) ?? [],
+    [projectsData?.pages]
+  )
+
+  const { data: selectedOrganization, isLoading: isLoadingOrganizations } =
+    useSelectedOrganizationQuery({ enabled: showFilters })
+  const organizations = useMemo(
+    () => (selectedOrganization ? [selectedOrganization] : []),
+    [selectedOrganization]
+  )
+
+  const { data: members } = useOrganizationMembersQuery({ slug }, { enabled: showFilters })
+
+  const logs = useMemo(() => data?.result ?? [], [data?.result])
+  const filteredLogs = useMemo(() => filterByFilterGroup(logs, filterGroup), [logs, filterGroup])
+
+  const hasDateFilter = !!findDateCondition(filterGroup)
+  const filterProperties: FilterProperty[] = [
+    {
+      label: 'User',
+      name: USER_FILTER_PROPERTY,
+      type: 'string',
+      operators: ['='],
+      options: { component: createAuditLogsUserOption(slug) },
+      formatValue: (value) => {
+        const id = String(value ?? '')
+        return members?.find((member) => member.gotrue_id === id)?.username ?? id
+      },
+    },
+    {
+      label: 'Project',
+      name: PROJECT_FILTER_PROPERTY,
+      type: 'string',
+      operators: ['='],
+      options: { component: createAuditLogsProjectOption(handleSelectProject, slug) },
+      formatValue: (value) => {
+        const ref = String(value ?? '')
+        return projectNames[ref] ?? projects.find((p) => p.ref === ref)?.name ?? ref
+      },
+    },
+    {
+      label: 'Date range',
+      name: DATE_FILTER_PROPERTY,
+      type: 'date',
+      operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
+      options: { component: DateRangeOption },
+      formatValue: formatDateRangeValue,
+      isAvailable: !hasDateFilter,
+      topLevelOnly: true,
+    },
+  ]
+
+  const lastSelectedRowId = useRef<string | null>(null)
+  const columns = useMemo(
+    () =>
+      getAuditLogColumns({
+        projects,
+        organizations,
+        members,
+        lastSelectedRowId,
+        isLoadingProjects,
+        isLoadingOrganizations,
+      }),
+    [projects, organizations, members, isLoadingProjects, isLoadingOrganizations]
+  )
+  const [sorting, setSorting] = useState<SortingState>([{ id: 'date', desc: true }])
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+
+  const table = useReactTable({
+    data: filteredLogs,
+    columns,
+    state: { sorting, rowSelection },
+    enableMultiRowSelection: true,
+    getRowId: (row) => row.request_id,
+    onSortingChange: setSorting,
+    onRowSelectionChange: setRowSelection,
+    getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
   })
 
-  const canReadAuditLogs = useCheckPermissions(PermissionAction.READ, 'notifications')
+  const shouldShowLoadingState =
+    (isLoading && fetchStatus !== 'idle') || isLoadingPermissions || isLoadingEntitlements
 
-  const { data: projects } = useProjectsQuery()
-  const { data: organizations } = useOrganizationsQuery()
-  const { data: members } = useOrganizationMembersQuery({ slug })
-  const { data: rolesData } = useOrganizationRolesV2Query({ slug })
-  const { data, error, isLoading, isSuccess, isError, isRefetching, refetch } =
-    useOrganizationAuditLogsQuery(
-      {
-        slug,
-        iso_timestamp_start: dateRange.from,
-        iso_timestamp_end: dateRange.to,
-      },
-      {
-        enabled: canReadAuditLogs,
-        retry(_failureCount, error) {
-          if (error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.')) {
-            return false
-          }
-          return true
-        },
-        retryOnMount: false,
-        refetchOnWindowFocus: false,
-      }
-    )
+  useShortcut(SHORTCUT_IDS.ORG_AUDIT_LOGS_REFRESH, () => refetch(), {
+    enabled: !isLoading && !isRefetching && canReadAuditLogs,
+  })
 
-  const activeMembers = (members ?? []).filter((x) => !x.invited_at)
-  const roles = [...(rolesData?.org_scoped_roles ?? []), ...(rolesData?.project_scoped_roles ?? [])]
+  useEffect(() => {
+    setRowSelection({})
+    lastSelectedRowId.current = null
+  }, [filterGroup])
 
-  const retentionPeriod = data?.retention_period ?? 0
-  const logs = data?.result ?? []
-  const sortedLogs = logs
-    ?.sort((a, b) =>
-      dateSortDesc
-        ? Number(new Date(b.occurred_at)) - Number(new Date(a.occurred_at))
-        : Number(new Date(a.occurred_at)) - Number(new Date(b.occurred_at))
-    )
-    ?.filter((log) => {
-      if (filters.users.length > 0) {
-        return filters.users.includes(log.actor.id)
-      } else {
-        return log
-      }
-    })
-    ?.filter((log) => {
-      if (filters.projects.length > 0) {
-        return filters.projects.includes(log.target.metadata.project_ref || '')
-      } else {
-        return log
-      }
-    })
-
-  const currentOrganization = organizations?.find((o) => o.slug === slug)
-  const minDate = dayjs().subtract(retentionPeriod, 'days')
-  const maxDate = dayjs()
-
-  // This feature depends on the subscription tier of the user. Free user can view logs up to 1 day
-  // in the past. The API limits the logs to maximum of 1 day and 5 minutes so when the page is
+  // This feature depends on the subscription tier of the user.
+  // The API limits the logs to maximum of 62 days and 5 minutes so when the page is
   // viewed for more than 5 minutes, the call parameters needs to be updated. This also works with
-  // higher tiers (7 days of logs).The user will see a loading shimmer.
+  // higher tiers. The user will see a loading shimmer.
   useEffect(() => {
     const duration = dayjs(dateRange.from).diff(dayjs(dateRange.to))
     const interval = setInterval(() => {
@@ -127,293 +248,133 @@ const AuditLogs = () => {
     return () => clearInterval(interval)
   }, [dateRange.from, dateRange.to])
 
-  if (!canReadAuditLogs) {
+  if (isLogsNotAvailableBasedOnPlan) {
     return (
-      <ScaffoldContainerLegacy>
-        <NoPermission resourceText="view organization audit logs" />
-      </ScaffoldContainerLegacy>
+      <ScaffoldContainer className="px-6 xl:px-10">
+        <ScaffoldSection isFullWidth>
+          <UpgradeToPro
+            plan="Team"
+            source="organizationAuditLogs"
+            primaryText="Organization Audit Logs are not available on Free or Pro plans"
+            secondaryText="Upgrade to Team or Enterprise to view up to 62 days of Audit Logs for your organization."
+            featureProposition="enable audit logs"
+          />
+        </ScaffoldSection>
+      </ScaffoldContainer>
     )
   }
 
   return (
-    <>
-      <ScaffoldContainerLegacy>
-        <div className="space-y-4 flex flex-col">
-          {isLoading && (
-            <div className="space-y-2">
+    <ScaffoldContainer size="full" className="px-0 h-full flex flex-col">
+      <ScaffoldSection isFullWidth className="pt-6! pb-0! flex-1 min-h-0">
+        <div className="flex flex-col h-full min-h-0">
+          {shouldShowLoadingState && (
+            <div className={cn(CONTENT_PADDING, 'space-y-2')}>
               <ShimmeringLoader />
               <ShimmeringLoader className="w-3/4" />
               <ShimmeringLoader className="w-1/2" />
             </div>
           )}
 
-          {isError ? (
-            error.message.endsWith('upgrade to Team or Enterprise Plan to access audit logs.') ? (
-              <Alert_Shadcn_
-                variant="default"
-                title="Organization Audit Logs are not available on Free or Pro plans"
-              >
-                <WarningIcon />
-                <div className="flex flex-col md:flex-row pt-1 gap-4">
-                  <div className="grow">
-                    <AlertTitle_Shadcn_>
-                      Organization Audit Logs are not available on Free or Pro plans
-                    </AlertTitle_Shadcn_>
-                    <AlertDescription_Shadcn_ className="flex flex-row justify-between gap-3">
-                      <p>
-                        Upgrade to Team or Enterprise to view up to 28 days of Audit Logs for your
-                        organization.
-                      </p>
-                    </AlertDescription_Shadcn_>
-                  </div>
+          {!shouldShowLoadingState && !canReadAuditLogs && (
+            <div className={CONTENT_PADDING}>
+              <NoPermission resourceText="view organization audit logs" />
+            </div>
+          )}
 
-                  <div className="flex items-center">
-                    <Button type="primary" asChild>
-                      <Link href={`/org/${slug}/billing?panel=subscriptionPlan&source=auditLogs`}>
-                        Upgrade subscription
-                      </Link>
-                    </Button>
-                  </div>
-                </div>
-              </Alert_Shadcn_>
-            ) : (
-              <AlertError error={error} subject="Failed to retrieve audit logs" />
-            )
-          ) : null}
+          {isError && (
+            <div className={CONTENT_PADDING}>
+              {isRangeExceededError ? (
+                <Alert variant="destructive" title="Date range too large">
+                  <WarningIcon />
+                  <AlertTitle>Date range too large</AlertTitle>
+                  <AlertDescription>
+                    The selected date range exceeds the maximum allowed period. Please select a
+                    smaller time range.
+                  </AlertDescription>
+                </Alert>
+              ) : (
+                <AlertError error={error} subject="Failed to retrieve audit logs" />
+              )}
+            </div>
+          )}
 
           {isSuccess && (
             <>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <p className="text-xs prose">Filter by</p>
-                  <FilterPopover
-                    name="Users"
-                    options={activeMembers}
-                    labelKey="username"
-                    valueKey="gotrue_id"
-                    activeOptions={filters.users}
-                    onSaveFilters={(values) => setFilters({ ...filters, users: values })}
+              {showFilters && (
+                <div className="border-t py-2 pl-1 pr-4 flex flex-col md:flex-row justify-between">
+                  <FilterBar
+                    supportsOperators
+                    variant="pill"
+                    defaultGroupOperator="OR"
+                    className="bg-transparent border-0 [&>div>div>div>input]:!text-xs [&_[data-testid=filter-bar-freeform-input]]:min-w-64"
+                    filterProperties={filterProperties}
+                    freeformText={freeformText}
+                    filters={filterGroup}
+                    onFilterChange={handleFilterChange}
+                    onFreeformTextChange={setFreeformText}
                   />
-                  <FilterPopover
-                    name="Projects"
-                    options={
-                      projects?.filter((p) => p.organization_id === currentOrganization?.id) ?? []
-                    }
-                    labelKey="name"
-                    valueKey="ref"
-                    activeOptions={filters.projects}
-                    onSaveFilters={(values) => setFilters({ ...filters, projects: values })}
+                  <ButtonTooltip
+                    disabled={isLoading}
+                    loading={isLoading || isRefetching}
+                    className="w-7"
+                    icon={<RefreshCwIcon />}
+                    onClick={() => refetch()}
+                    tooltip={{ content: { side: 'bottom', text: 'Refresh logs' } }}
                   />
-                  <DatePicker
-                    hideTime
-                    hideClear
-                    triggerButtonType="dashed"
-                    triggerButtonTitle=""
-                    from={dateRange.from}
-                    to={dateRange.to}
-                    minDate={minDate.toDate()}
-                    maxDate={maxDate.toDate()}
-                    onChange={(value) => {
-                      if (value.from !== null && value.to !== null) {
-                        const { from, to } = formatSelectedDateRange(value)
-                        setDateRange({ from, to })
-                      }
-                    }}
-                    renderFooter={() => {
-                      return (
-                        <Admonition
-                          showIcon={false}
-                          type="default"
-                          className="w-auto mx-2 px-3 py-2"
-                        >
-                          <div className="text-xs text-foreground-light">
-                            Your organization has a log retention period of{' '}
-                            <span className="text-brand">
-                              {retentionPeriod} day
-                              {retentionPeriod > 1 ? 's' : ''}
-                            </span>
-                            . You may only view logs from{' '}
-                            {dayjs().subtract(retentionPeriod, 'days').format('DD MMM YYYY')} as the
-                            earliest date.
-                          </div>
-                        </Admonition>
-                      )
-                    }}
-                  />
-                  {isSuccess && (
-                    <>
-                      <div className="h-[20px] border-r border-strong !ml-4 !mr-2" />
-                      <p className="prose text-xs">Viewing {sortedLogs.length} logs in total</p>
-                    </>
-                  )}
                 </div>
-                <Button
-                  type="default"
-                  disabled={isLoading || isRefetching}
-                  icon={<RefreshCw className={isRefetching ? 'animate-spin' : ''} />}
-                  onClick={() => refetch()}
-                >
-                  {isRefetching ? 'Refreshing' : 'Refresh'}
-                </Button>
-              </div>
+              )}
+
               {logs.length === 0 ? (
-                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                  <p className="prose text-sm">
-                    Your organization does not have any audit logs available yet
-                  </p>
+                <div className={cn(CONTENT_PADDING, 'border-t pt-4')}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      Your organization does not have any audit logs available yet
+                    </p>
+                  </div>
                 </div>
-              ) : logs.length > 0 && sortedLogs.length === 0 ? (
-                <div className="bg-surface-100 border rounded p-4 flex items-center justify-between">
-                  <p className="prose text-sm">No audit logs found based on the filters applied</p>
+              ) : logs.length > 0 && filteredLogs.length === 0 ? (
+                <div className={cn(CONTENT_PADDING, 'border-t pt-4')}>
+                  <div className="bg-surface-100 border rounded-sm p-4 flex items-center justify-between">
+                    <p className="prose text-sm">
+                      No audit logs found based on the filters applied
+                    </p>
+                  </div>
                 </div>
               ) : (
-                <Table
-                  head={[
-                    <Table.th key="user" className="py-2">
-                      User
-                    </Table.th>,
-                    <Table.th key="action" className="py-2">
-                      Action
-                    </Table.th>,
-                    <Table.th key="target" className="py-2">
-                      Target
-                    </Table.th>,
-                    <Table.th key="date" className="py-2">
-                      <div className="flex items-center space-x-2">
-                        <p>Date</p>
-
-                        <ButtonTooltip
-                          type="text"
-                          className="px-1"
-                          icon={
-                            dateSortDesc ? (
-                              <ArrowDown strokeWidth={1.5} size={14} />
-                            ) : (
-                              <ArrowUp strokeWidth={1.5} size={14} />
+                <div className="border-y overflow-hidden flex-1 min-h-0">
+                  <ResizablePanelGroup orientation="horizontal" className="h-full">
+                    <ResizablePanel
+                      defaultSize={100}
+                      minSize={30}
+                      className="flex flex-col overflow-hidden"
+                    >
+                      <div className="grow relative overflow-hidden">
+                        <AuditLogsSelectionHeader table={table} />
+                        <AuditLogsTable
+                          table={table}
+                          selectedLog={selectedLog}
+                          onSelectLog={(log) =>
+                            setSelectedLog((prev) =>
+                              prev?.request_id === log.request_id ? undefined : log
                             )
                           }
-                          onClick={() => setDateSortDesc(!dateSortDesc)}
-                          tooltip={{
-                            content: {
-                              side: 'bottom',
-                              text: dateSortDesc ? 'Sort latest first' : 'Sort earliest first',
-                            },
-                          }}
                         />
                       </div>
-                    </Table.th>,
-                    <Table.th key="actions" className="py-2"></Table.th>,
-                  ]}
-                  body={
-                    sortedLogs?.map((log) => {
-                      const user = (members ?? []).find(
-                        (member) => member.gotrue_id === log.actor.id
-                      )
-                      const role = roles.find((role) => user?.role_ids?.[0] === role.id)
-                      const project = projects?.find(
-                        (project) => project.ref === log.target.metadata.project_ref
-                      )
-                      const organization = organizations?.find(
-                        (org) => org.slug === log.target.metadata.org_slug
-                      )
-
-                      const hasStatusCode = log.action.metadata[0]?.status !== undefined
-                      const userIcon =
-                        user === undefined ? (
-                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
-                            <p>?</p>
-                          </div>
-                        ) : user?.invited_id || user?.username === user?.primary_email ? (
-                          <div className="flex h-[30px] w-[30px] items-center justify-center border-2 rounded-full border-strong">
-                            <User size={18} strokeWidth={2} />
-                          </div>
-                        ) : (
-                          <Image
-                            alt={user?.username}
-                            src={`https://github.com/${user?.username ?? ''}.png?size=80`}
-                            width="30"
-                            height="30"
-                            className="border rounded-full"
-                          />
-                        )
-
-                      return (
-                        <Table.tr
-                          key={log.occurred_at}
-                          onClick={() => setSelectedLog(log)}
-                          className="cursor-pointer hover:!bg-alternative transition duration-100"
-                        >
-                          <Table.td>
-                            <div className="flex items-center space-x-4">
-                              <div>{userIcon}</div>
-                              <div>
-                                <p className="text-foreground-light">{user?.username ?? '-'}</p>
-                                {role && (
-                                  <p className="mt-0.5 text-xs text-foreground-light">
-                                    {role?.name}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                          </Table.td>
-                          <Table.td className="max-w-[250px]">
-                            <div className="flex items-center space-x-2">
-                              {hasStatusCode && (
-                                <p className="bg-surface-200 rounded px-1 flex items-center justify-center text-xs font-mono border">
-                                  {log.action.metadata[0].status}
-                                </p>
-                              )}
-                              <p className="truncate" title={log.action.name}>
-                                {log.action.name}
-                              </p>
-                            </div>
-                          </Table.td>
-                          <Table.td>
-                            <p
-                              className="text-foreground-light max-w-[230px] truncate"
-                              title={project?.name ?? organization?.name ?? '-'}
-                            >
-                              {project?.name
-                                ? 'Project: '
-                                : organization?.name
-                                  ? 'Organization: '
-                                  : null}
-                              {project?.name ?? organization?.name ?? 'Unknown'}
-                            </p>
-                            <p
-                              className="text-foreground-light text-xs mt-0.5 truncate"
-                              title={
-                                log.target.metadata.project_ref ?? log.target.metadata.org_slug
-                              }
-                            >
-                              {log.target.metadata.project_ref
-                                ? 'Ref: '
-                                : log.target.metadata.org_slug
-                                  ? 'Slug: '
-                                  : null}
-                              {log.target.metadata.project_ref ?? log.target.metadata.org_slug}
-                            </p>
-                          </Table.td>
-                          <Table.td>
-                            {dayjs(log.occurred_at).format('DD MMM YYYY, HH:mm:ss')}
-                          </Table.td>
-                          <Table.td align="right">
-                            <Button type="default">View details</Button>
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    }) ?? []
-                  }
-                />
+                    </ResizablePanel>
+                    {selectedLog && (
+                      <AuditLogDetailsPanel
+                        selectedLog={selectedLog}
+                        onClose={() => setSelectedLog(undefined)}
+                      />
+                    )}
+                  </ResizablePanelGroup>
+                </div>
               )}
             </>
           )}
         </div>
-      </ScaffoldContainerLegacy>
-
-      <LogDetailsPanel selectedLog={selectedLog} onClose={() => setSelectedLog(undefined)} />
-    </>
+      </ScaffoldSection>
+    </ScaffoldContainer>
   )
 }
-
-export default AuditLogs

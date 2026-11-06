@@ -1,3 +1,5 @@
+import { redirect, useFetcher, type ActionFunctionArgs } from 'react-router'
+
 import { createClient } from '@/registry/default/clients/react-router/lib/supabase/server'
 import { Button } from '@/registry/default/components/ui/button'
 import {
@@ -9,7 +11,6 @@ import {
 } from '@/registry/default/components/ui/card'
 import { Input } from '@/registry/default/components/ui/input'
 import { Label } from '@/registry/default/components/ui/label'
-import { type ActionFunctionArgs, redirect, useFetcher } from 'react-router'
 
 export const action = async ({ request }: ActionFunctionArgs) => {
   const { supabase, headers } = createClient(request)
@@ -44,7 +45,9 @@ export default function Page() {
         <div className="flex flex-col gap-6">
           <Card>
             <CardHeader>
-              <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+              <CardTitle className="font-medium text-lg tracking-normal">
+                Reset Your Password
+              </CardTitle>
               <CardDescription>Please enter your new password below.</CardDescription>
             </CardHeader>
             <CardContent>

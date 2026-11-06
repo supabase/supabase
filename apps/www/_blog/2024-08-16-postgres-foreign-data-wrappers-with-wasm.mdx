@@ -2,8 +2,8 @@
 title: 'Postgres Foreign Data Wrappers with Wasm'
 description: 'Build Wasm foreign data wrapper with Wrappers and use it on Supabase'
 author: bo_lu
-image: lw12/day-5/OG_FDW-with-WASM.png
-thumb: lw12/day-5/thumb_FDW-with-WASM.png
+imgSocial: lw12/day-5/OG_FDW-with-WASM.png
+imgThumb: lw12/day-5/thumb_FDW-with-WASM.png
 launchweek: '12'
 categories:
   - launch-week
@@ -17,7 +17,7 @@ date: '2024-08-16'
 toc_depth: 3
 ---
 
-Foreign Data Wrappers (FDWs) allow Postgres to interact with externally hosted data. To operate a FDW, the user creates a foreign table. When queried, the foreign table reaches out to the 3rd party service, collects the requested data, and returns it to the query in the shape defined by the foreign table. This allows seamless querying and data manipulation across different tools as if they were local tables from within Postgres.
+[Foreign Data Wrappers](https://supabase.com/docs/guides/database/extensions/wrappers/overview) (FDWs) allow Postgres to interact with externally hosted data. To operate a FDW, the user creates a foreign table. When queried, the foreign table reaches out to the 3rd party service, collects the requested data, and returns it to the query in the shape defined by the foreign table. This allows seamless querying and data manipulation across different tools as if they were local tables from within Postgres.
 
 [Wrappers](https://github.com/supabase/wrappers) is a Rust framework for creating Postgres Foreign Data Wrappers. Today we're releasing support for [Wasm (WebAssembly)](https://webassembly.org/) wrappers.
 
@@ -137,7 +137,7 @@ The Wasm FDW feature is available today on the Supabase platform. We have 2 new 
 To get started, follow below steps:
 
 1. Create a new Supabase project: [database.new](http://database.new)
-2. Navigate to the [Database -> Wrappers](https://supabase.com/dashboard/project/_/database/wrappers) section and enable Wrappers.
+2. Navigate to the [Database -> Wrappers](https://supabase.com/dashboard/project/_/integrations?category=wrapper) section and enable Wrappers.
 3. Add `Snowflake` or `Paddle` wrapper, follow the instructions and create foreign tables.
 
 <div>

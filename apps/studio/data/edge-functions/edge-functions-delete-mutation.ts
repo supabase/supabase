@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { edgeFunctionsKeys } from './keys'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionsDeleteVariables = {
   projectRef: string
@@ -17,6 +18,7 @@ export async function deleteEdgeFunction({ projectRef, slug }: EdgeFunctionsDele
     params: {
       path: { ref: projectRef, function_slug: slug },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -30,29 +32,28 @@ export const useEdgeFunctionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeleteData, StudioError, EdgeFunctionsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>(
-    (vars) => deleteEdgeFunction(vars),
-    {
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
-        await queryClient.invalidateQueries(edgeFunctionsKeys.list(projectRef), {
-          refetchType: 'all',
-        })
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete edge function: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+  return useMutation<EdgeFunctionsDeleteData, StudioError, EdgeFunctionsDeleteVariables>({
+    mutationFn: (vars) => deleteEdgeFunction(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await queryClient.invalidateQueries({
+        queryKey: edgeFunctionsKeys.list(projectRef),
+        refetchType: 'all',
+      })
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete edge function: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

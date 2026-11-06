@@ -1,89 +1,151 @@
-import { ArrowLeft } from 'lucide-react'
+import { useFlag } from 'common'
 import Head from 'next/head'
-import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { PropsWithChildren, useEffect } from 'react'
+import type { PropsWithChildren } from 'react'
+import { useEffect, useLayoutEffect, useMemo } from 'react'
+import { cn } from 'ui'
 
-import { useNewLayout } from 'components/interfaces/App/FeaturePreview/FeaturePreviewContext'
-import { withAuth } from 'hooks/misc/withAuth'
-import { IS_PLATFORM } from 'lib/constants'
-import { useAppStateSnapshot } from 'state/app-state'
-import { cn, NavMenu, NavMenuItem } from 'ui'
-import {
-  MAX_WIDTH_CLASSES,
-  PADDING_CLASSES,
-  ScaffoldContainerLegacy,
-  ScaffoldTitle,
-} from '../Scaffold'
+import { useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
+import { AccountMenuContent } from './AccountMenuContent'
+import { WithSidebar } from './WithSidebar'
+import { USE_MOCKS } from '@/data/oauth-apps/mocks'
+import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { withAuth } from '@/hooks/misc/withAuth'
+import { IS_PLATFORM } from '@/lib/constants'
+import { buildStudioPageTitle } from '@/lib/page-title'
+import { useAppStateSnapshot } from '@/state/app-state'
 
 export interface AccountLayoutProps {
   title: string
 }
 
 const AccountLayout = ({ children, title }: PropsWithChildren<AccountLayoutProps>) => {
-  const newLayoutPreview = useNewLayout()
-
   const router = useRouter()
   const appSnap = useAppStateSnapshot()
-
-  const accountLinks = [
-    {
-      label: 'Account Settings',
-      href: `/account/me`,
-      keys: [`/account/me`, `/account/tokens`, `/account/security`],
-    },
-    {
-      label: 'Audit Logs',
-      href: `/account/audit`,
-      key: `/account/audit`,
-    },
-  ]
-
+  const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
   const currentPath = router.pathname
 
+  const showSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
+  const showOAuthApps = useFlag('enableScopedOAuthManage') && USE_MOCKS
+  const { appTitle } = useCustomContent(['app:title'])
+  const brandTitle = appTitle || 'Supabase'
+  const surfaceLabel = IS_PLATFORM ? 'Account' : 'Preferences'
+
+  const backToDashboardURL =
+    appSnap.lastRouteBeforeVisitingAccountPage.length > 0
+      ? appSnap.lastRouteBeforeVisitingAccountPage
+      : IS_PLATFORM && !!lastVisitedOrganization
+        ? `/org/${lastVisitedOrganization}`
+        : IS_PLATFORM
+          ? '/organizations'
+          : '/project/default'
+
+  const pageTitle = buildStudioPageTitle({
+    section: title,
+    surface: surfaceLabel,
+    brand: brandTitle,
+  })
+
+  const sections = useMemo(
+    () =>
+      !IS_PLATFORM
+        ? [
+            {
+              key: 'preferences',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+              ],
+            },
+          ]
+        : [
+            {
+              key: 'account-settings',
+              heading: 'Account Settings',
+              links: [
+                {
+                  key: 'preferences',
+                  label: 'Preferences',
+                  href: '/account/me',
+                  isActive: currentPath === '/account/me',
+                },
+                {
+                  key: 'access-tokens',
+                  label: 'Access Tokens',
+                  href: '/account/tokens',
+                  isActive:
+                    currentPath === '/account/tokens' || currentPath === '/account/tokens/scoped',
+                },
+                ...(showSecuritySettings
+                  ? [
+                      {
+                        key: 'security',
+                        label: 'Security',
+                        href: '/account/security',
+                        isActive: currentPath === '/account/security',
+                      },
+                    ]
+                  : []),
+                ...(showOAuthApps
+                  ? [
+                      {
+                        key: 'oauth-apps',
+                        label: 'OAuth Apps',
+                        href: '/account/apps',
+                        isActive: currentPath === '/account/apps',
+                      },
+                    ]
+                  : []),
+              ],
+            },
+            {
+              key: 'logs',
+              heading: 'Logs',
+              links: [
+                {
+                  key: 'audit-logs',
+                  label: 'Audit Logs',
+                  href: '/account/audit',
+                  isActive: currentPath === '/account/audit',
+                },
+              ],
+            },
+          ],
+    [currentPath, showOAuthApps, showSecuritySettings]
+  )
+
+  useLayoutEffect(() => {
+    const unregister = registerOpenMenu(() => {
+      setMobileSheetContent(
+        <AccountMenuContent sections={sections} onCloseSheet={() => setMobileSheetContent(null)} />
+      )
+    })
+    return unregister
+  }, [registerOpenMenu, setMobileSheetContent, sections])
+
   useEffect(() => {
-    if (!IS_PLATFORM) {
+    if (!IS_PLATFORM && currentPath !== '/account/me') {
       router.push('/project/default')
     }
-  }, [router])
-
-  if (!newLayoutPreview) {
-    return children
-  }
+  }, [currentPath, router])
 
   return (
     <>
       <Head>
-        <title>{title ? `${title} | Supabase` : 'Supabase'}</title>
+        <title>{pageTitle}</title>
         <meta name="description" content="Supabase Studio" />
       </Head>
-      <div className="flex flex-col h-screen w-screen">
-        <ScaffoldContainerLegacy>
-          <Link
-            href={appSnap.lastRouteBeforeVisitingAccountPage ?? '/'}
-            className="flex text-xs flex-row gap-2 items-center text-foreground-lighter focus-visible:text-foreground hover:text-foreground"
-          >
-            <ArrowLeft strokeWidth={1.5} size={14} />
-            Back to dashboard
-          </Link>
-          <ScaffoldTitle>Account settings</ScaffoldTitle>
-        </ScaffoldContainerLegacy>
-        <div className="border-b">
-          <NavMenu
-            className={cn(PADDING_CLASSES, MAX_WIDTH_CLASSES, 'border-none')}
-            aria-label="Organization menu navigation"
-          >
-            {accountLinks.map((item, i) => (
-              <NavMenuItem
-                key={`${item.key}-${i}`}
-                active={(item.key === currentPath || item.keys?.includes(currentPath)) ?? false}
-              >
-                <Link href={item.href}>{item.label}</Link>
-              </NavMenuItem>
-            ))}
-          </NavMenu>
-        </div>
-        {children}
+      <div className={cn('flex flex-col w-screen h-[calc(100vh-48px)]')}>
+        <WithSidebar backToDashboardURL={backToDashboardURL} sections={sections}>
+          {children}
+        </WithSidebar>
       </div>
     </>
   )

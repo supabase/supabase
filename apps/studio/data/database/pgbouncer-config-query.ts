@@ -1,8 +1,10 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { ResponseError } from 'types'
 import { databaseKeys } from './keys'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PgbouncerConfigVariables = {
   projectRef?: string
@@ -23,20 +25,18 @@ export async function getPgbouncerConfig(
 }
 
 export type PgbouncerConfigData = Awaited<ReturnType<typeof getPgbouncerConfig>>
-export type PgbouncerConfigError = ResponseError
+export type PgbouncerConfigError = StudioError
 
 export const usePgbouncerConfigQuery = <TData = PgbouncerConfigData>(
   { projectRef }: PgbouncerConfigVariables,
   {
     enabled = true,
     ...options
-  }: UseQueryOptions<PgbouncerConfigData, PgbouncerConfigError, TData> = {}
+  }: UseCustomQueryOptions<PgbouncerConfigData, PgbouncerConfigError, TData> = {}
 ) =>
-  useQuery<PgbouncerConfigData, PgbouncerConfigError, TData>(
-    databaseKeys.pgbouncerConfig(projectRef),
-    ({ signal }) => getPgbouncerConfig({ projectRef }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<PgbouncerConfigData, PgbouncerConfigError, TData>({
+    queryKey: databaseKeys.pgbouncerConfig(projectRef),
+    queryFn: ({ signal }) => getPgbouncerConfig({ projectRef }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined' && IS_PLATFORM,
+    ...options,
+  })

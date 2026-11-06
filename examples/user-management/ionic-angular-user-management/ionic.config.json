@@ -1,0 +1,7 @@
+{
+  "name": "supabase-ionic-angular",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "angular"
+}

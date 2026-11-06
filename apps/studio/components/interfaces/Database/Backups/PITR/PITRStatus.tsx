@@ -1,15 +1,14 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 
-import { FormPanel } from 'components/ui/Forms/FormPanel'
-import { useBackupsQuery } from 'data/database/backups-query'
-import { useReadReplicasQuery } from 'data/read-replicas/replicas-query'
-import { useCheckPermissions } from 'hooks/misc/useCheckPermissions'
-import type { Timezone } from './PITR.types'
 import { TimezoneSelection } from './TimezoneSelection'
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { FormPanel } from '@/components/ui/Forms/FormPanel'
+import { useBackupsQuery } from '@/data/database/backups-query'
+import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { Timezone } from '@/lib/constants/timezones'
 
 interface PITRStatusProps {
   selectedTimezone: Timezone
@@ -41,9 +40,8 @@ const PITRStatus = ({
     .tz(selectedTimezone?.utc[0])
     .format('DD MMM YYYY, HH:mm:ss')
 
-  const canTriggerPhysicalBackup = useCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.walg.prepare_restore'
+  const { can: canTriggerPhysicalBackup } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
 
   return (
@@ -53,12 +51,13 @@ const PITRStatus = ({
         footer={
           <div className="flex items-center justify-between p-6">
             <div className="flex items-center space-x-4">
-              <AlertCircle className="text-foreground-light" size={18} strokeWidth={1.5} />
+              <AlertCircleIcon className="text-foreground-light" size={18} strokeWidth={1.5} />
               <span className="text-foreground-light text-sm">
                 You'll be able to pick the right date and time when you begin
               </span>
             </div>
             <ButtonTooltip
+              variant="primary"
               disabled={hasReadReplicas || !canTriggerPhysicalBackup}
               onClick={() => onSetConfiguration()}
               tooltip={{
@@ -81,6 +80,7 @@ const PITRStatus = ({
           <div className="w-[350px]">
             <TimezoneSelection
               selectedTimezone={selectedTimezone}
+              date={dayjs.unix(latestPhysicalBackupDateUnix ?? 0)}
               onSelectTimezone={onUpdateTimezone}
             />
           </div>

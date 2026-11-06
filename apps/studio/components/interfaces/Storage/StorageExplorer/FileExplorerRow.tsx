@@ -1,0 +1,614 @@
+import { find, isEmpty, isEqual } from 'lodash'
+import {
+  AlertCircleIcon,
+  ArchiveIcon,
+  CopyIcon,
+  DownloadIcon,
+  EditIcon,
+  Link2Icon,
+  LoaderCircleIcon,
+  MoreVerticalIcon,
+  MoveIcon,
+  RotateCcwIcon,
+  Trash2Icon,
+  UploadIcon,
+} from 'lucide-react'
+import type { CSSProperties, ReactNode } from 'react'
+import { toast } from 'sonner'
+import {
+  Checkbox,
+  cn,
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuPortal,
+  DropdownMenuSeparator,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+  DropdownMenuTrigger,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from 'ui'
+
+import {
+  STORAGE_ROW_STATUS,
+  STORAGE_ROW_TYPES,
+  STORAGE_VIEWS,
+  URL_EXPIRY_DURATION,
+} from '../Storage.constants'
+import { StorageItemWithColumn, type StorageItem } from '../Storage.types'
+import { ICON_STROKE_WIDTH, StorageRowIcon } from '../StorageRowIcon'
+import { isVersioningActive } from '../StorageVersioning.constants'
+import { useArchivedFilesContext } from './ArchivedFilesContext'
+import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
+import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
+import { FileExplorerRowEditing } from './FileExplorerRowEditing'
+import { pickFile } from './pickFile'
+import {
+  copyStorageExplorerUrl,
+  copyStoragePath,
+  getStoragePathForItem,
+} from './StorageExplorer.utils'
+import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
+import { useCopyUrl } from './useCopyUrl'
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { formatBytes } from '@/lib/helpers'
+import { useStorageExplorerStateSnapshot } from '@/state/storage-explorer'
+
+/** Built from `currentColor` so the stripes track the row's text color. */
+const ARCHIVED_STRIPES_STYLE: CSSProperties = {
+  backgroundImage:
+    'repeating-linear-gradient(-45deg, color-mix(in srgb, currentColor 8%, transparent) 0 1px, transparent 1px 7px)',
+}
+
+const ARCHIVED_ICON_CLASS = 'flex h-4 w-4 items-center justify-center text-foreground-lighter'
+
+/** Takes the file icon's slot, and is an archived row's only keyboard focus target. */
+const ArchivedRowIcon = ({ name, onOpen }: { name: string; onOpen?: () => void }) => (
+  <Tooltip>
+    <TooltipTrigger asChild>
+      {onOpen ? (
+        <button
+          type="button"
+          tabIndex={0}
+          aria-label={`View archived file ${name}`}
+          onClick={(event) => {
+            event.stopPropagation()
+            onOpen()
+          }}
+          className={cn(ARCHIVED_ICON_CLASS, 'focus-ring rounded-sm')}
+        >
+          <ArchiveIcon size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
+        </button>
+      ) : (
+        <span className={ARCHIVED_ICON_CLASS}>
+          <ArchiveIcon size={16} strokeWidth={ICON_STROKE_WIDTH} aria-hidden />
+          <span className="sr-only">Archived</span>
+        </span>
+      )}
+    </TooltipTrigger>
+    <TooltipContent side="bottom">Archived</TooltipContent>
+  </Tooltip>
+)
+
+const RowActionsMenu = ({ name, options }: { name: string; options: RowOption[] }) => (
+  <DropdownMenu>
+    <DropdownMenuTrigger className="focus-ring rounded-sm">
+      <div className="storage-row-menu opacity-0">
+        <MoreVerticalIcon size={16} />
+        <span className="sr-only">{name} actions</span>
+      </div>
+    </DropdownMenuTrigger>
+    <DropdownMenuContent side="bottom" align="end">
+      {options.map((option) => {
+        if ((option?.children ?? []).length > 0) {
+          return (
+            <DropdownMenuSub key={option.name}>
+              <DropdownMenuSubTrigger className="space-x-2">
+                {option.icon || <></>}
+                <p>{option.name}</p>
+              </DropdownMenuSubTrigger>
+              <DropdownMenuPortal>
+                <DropdownMenuSubContent>
+                  {(option?.children ?? [])?.map((child) => (
+                    <DropdownMenuItem key={child.name} onClick={child.onClick}>
+                      <p>{child.name}</p>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuSubContent>
+              </DropdownMenuPortal>
+            </DropdownMenuSub>
+          )
+        }
+        if (option.name === 'Separator') return <DropdownMenuSeparator key={option.name} />
+        return (
+          <DropdownMenuItem className="space-x-2" key={option.name} onClick={option.onClick}>
+            {option.icon || <></>}
+            <p>{option.name}</p>
+          </DropdownMenuItem>
+        )
+      })}
+    </DropdownMenuContent>
+  </DropdownMenu>
+)
+
+interface FileExplorerRowProps {
+  /** Part of the virtual list's row contract; the row addresses itself by `item.id`. */
+  index: number
+  item: StorageItem
+  view: STORAGE_VIEWS
+  columnIndex: number
+  selectedItems: StorageItemWithColumn[]
+  style?: CSSProperties
+}
+
+type RowOption = {
+  name: string
+  icon?: ReactNode
+  onClick?: () => void
+  children?: { name: string; onClick: () => void }[]
+}
+
+export const FileExplorerRow = ({
+  item,
+  view = STORAGE_VIEWS.COLUMNS,
+  columnIndex = 0,
+  selectedItems = [],
+  style,
+}: FileExplorerRowProps) => {
+  const {
+    projectRef,
+    selectedBucket,
+    selectedFilePreview,
+    openedFolders,
+    setSelectedFileCustomExpiry,
+    setSelectedItems,
+    setSelectedItemsToDelete,
+    setItemsToPurge,
+    refetchAllOpenedFolders,
+    replaceFile,
+    downloadFile,
+    setSelectedItemToRename,
+    setSelectedItemsToMove,
+    downloadFolder,
+    selectRangeItems,
+  } = useStorageExplorerStateSnapshot()
+  const { openFolderAtIndex, setPreviewedFile, clearPreviewedFile, truncateToColumn } =
+    useStorageExplorerNavigation()
+  const { onCopyUrl } = useCopyUrl()
+  const ctx = useFileExplorerContextMenu()
+
+  const { archivedObjects, selectedArchivedObject, selectArchivedObject, clearArchivedSelection } =
+    useArchivedFilesContext()
+  const isArchived = item.archived !== undefined
+  const archivedObjectId = item.archived?.archivedObjectId
+  const isArchivedFile = archivedObjectId !== undefined && item.type === STORAGE_ROW_TYPES.FILE
+  const isArchivedFolder = isArchived && item.type === STORAGE_ROW_TYPES.FOLDER
+
+  const isPublic = selectedBucket.public
+  const itemWithColumnIndex = { ...item, columnIndex }
+  const isSelected = !!selectedItems.find((i) => i.id === item.id)
+  const isOpened =
+    openedFolders.length > columnIndex ? openedFolders[columnIndex].name === item.name : false
+  const isPreviewed =
+    (!isEmpty(selectedFilePreview) && isEqual(selectedFilePreview?.id, item.id)) ||
+    (isArchivedFile && selectedArchivedObject?.id === archivedObjectId)
+  const { can: canUpdateFiles } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.STORAGE_WRITE)
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
+  // Names the action being taken, not the retention behind it: a suspended bucket reads
+  // "Replace file" and "Delete" even for a file that still has one retained version coming.
+  const isActivelyVersioning = isStorageVersioningEnabled && isVersioningActive(selectedBucket)
+
+  const onSelectFile = (columnIndex: number) => {
+    if (isArchivedFile) {
+      // No live object to preview, so let the archived pane take over.
+      truncateToColumn(columnIndex)
+      selectArchivedObject(archivedObjectId)
+      return
+    }
+    clearArchivedSelection()
+    setPreviewedFile(itemWithColumnIndex)
+  }
+
+  const onReplaceFile = async () => {
+    const file = await pickFile()
+    if (file !== undefined) await replaceFile({ file, item: itemWithColumnIndex })
+  }
+
+  const onCheckItem = (isShiftKeyHeld: boolean) => {
+    // Select a range if shift is held down
+    if (isShiftKeyHeld && selectedItems.length !== 0) {
+      selectRangeItems(columnIndex, item.id)
+      return
+    }
+    if (find(selectedItems, (item) => itemWithColumnIndex.id === item.id) !== undefined) {
+      setSelectedItems(
+        selectedItems.filter((selectedItem) => itemWithColumnIndex.id !== selectedItem.id)
+      )
+    } else {
+      setSelectedItems([...selectedItems, itemWithColumnIndex])
+    }
+    clearPreviewedFile()
+  }
+
+  const copyPathOptions: RowOption[] = [
+    {
+      name: 'Copy relative path',
+      icon: <CopyIcon size={12} className="text-foreground-light" />,
+      onClick: () => copyStoragePath(openedFolders, itemWithColumnIndex),
+    },
+    {
+      name: 'Copy link',
+      icon: <Link2Icon size={12} className="text-foreground-light" />,
+      onClick: () =>
+        copyStorageExplorerUrl({
+          openedFolders,
+          item: itemWithColumnIndex,
+          projectRef,
+          bucketId: selectedBucket.id,
+        }),
+    },
+  ]
+
+  const rowOptions: RowOption[] =
+    item.type === STORAGE_ROW_TYPES.FOLDER
+      ? [
+          ...(canUpdateFiles
+            ? [
+                {
+                  name: 'Rename',
+                  icon: <EditIcon size={12} className="text-foreground-light" />,
+                  onClick: () => setSelectedItemToRename(itemWithColumnIndex),
+                },
+              ]
+            : []),
+          {
+            name: 'Download',
+            icon: <DownloadIcon size={12} className="text-foreground-light" />,
+            onClick: () => downloadFolder(itemWithColumnIndex),
+          },
+          ...copyPathOptions,
+          ...(canUpdateFiles
+            ? [
+                { name: 'Separator', icon: undefined, onClick: undefined },
+                {
+                  // Deleting a folder deletes everything under it, so on a versioned
+                  // bucket the whole prefix is archived rather than removed.
+                  name: isActivelyVersioning ? 'Archive' : 'Delete',
+                  icon: isActivelyVersioning ? (
+                    <ArchiveIcon size={12} className="text-foreground-light" />
+                  ) : (
+                    <Trash2Icon size={12} className="text-foreground-light" />
+                  ),
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+                ...(isActivelyVersioning
+                  ? [
+                      {
+                        name: 'Delete permanently',
+                        icon: <Trash2Icon size={12} className="text-destructive" />,
+                        onClick: () => setItemsToPurge([itemWithColumnIndex]),
+                      },
+                    ]
+                  : []),
+              ]
+            : []),
+        ]
+      : [
+          ...(!item.isCorrupted
+            ? [
+                ...(isPublic
+                  ? [
+                      {
+                        name: 'Get URL',
+                        icon: <CopyIcon size={12} className="text-foreground-light" />,
+                        onClick: () => {
+                          onCopyUrl(itemWithColumnIndex.path!)
+                        },
+                      },
+                    ]
+                  : [
+                      {
+                        name: 'Get URL',
+                        icon: <CopyIcon size={12} className="text-foreground-light" />,
+                        children: [
+                          {
+                            name: 'Expire in 1 week',
+                            onClick: () =>
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.WEEK),
+                          },
+                          {
+                            name: 'Expire in 1 month',
+                            onClick: () =>
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.MONTH),
+                          },
+                          {
+                            name: 'Expire in 1 year',
+                            onClick: () =>
+                              onCopyUrl(itemWithColumnIndex.path!, URL_EXPIRY_DURATION.YEAR),
+                          },
+                          {
+                            name: 'Custom expiry',
+                            onClick: () => setSelectedFileCustomExpiry(itemWithColumnIndex),
+                          },
+                        ],
+                      },
+                    ]),
+                {
+                  name: 'Download',
+                  icon: <DownloadIcon size={12} className="text-foreground-light" />,
+                  onClick: () => downloadFile(itemWithColumnIndex),
+                },
+                ...copyPathOptions,
+                ...(canUpdateFiles
+                  ? [
+                      {
+                        name: 'Rename',
+                        icon: <EditIcon size={12} className="text-foreground-light" />,
+                        onClick: () => setSelectedItemToRename(itemWithColumnIndex),
+                      },
+                      {
+                        name: 'Move',
+                        icon: <MoveIcon size={12} className="text-foreground-light" />,
+                        onClick: () => setSelectedItemsToMove([itemWithColumnIndex]),
+                      },
+                      {
+                        name: isActivelyVersioning ? 'Upload new version' : 'Replace file',
+                        icon: <UploadIcon size={12} className="text-foreground-light" />,
+                        onClick: onReplaceFile,
+                      },
+                      { name: 'Separator', icon: undefined, onClick: undefined },
+                    ]
+                  : []),
+              ]
+            : []),
+          ...(canUpdateFiles
+            ? [
+                {
+                  // On a versioned bucket this is a soft delete, so it reads as Archive.
+                  name: isActivelyVersioning ? 'Archive' : 'Delete',
+                  icon: isActivelyVersioning ? (
+                    <ArchiveIcon size={12} className="text-foreground-light" />
+                  ) : (
+                    <Trash2Icon size={12} className="text-foreground-light" />
+                  ),
+                  onClick: () => setSelectedItemsToDelete([itemWithColumnIndex]),
+                },
+                ...(isActivelyVersioning
+                  ? [
+                      {
+                        name: 'Delete permanently',
+                        icon: <Trash2Icon size={12} className="text-destructive" />,
+                        onClick: () => setItemsToPurge([itemWithColumnIndex]),
+                      },
+                    ]
+                  : []),
+              ]
+            : []),
+        ]
+
+  const { mutateAsync: restoreArchivedObject } = useArchivedObjectRestoreMutation()
+
+  // A folder is only a prefix, so restoring one means restoring everything archived under it.
+  const archivedFolderObjects = isArchivedFolder
+    ? getArchivedObjectsUnderFolder({
+        folderSegments: getStoragePathForItem(openedFolders, itemWithColumnIndex).split('/'),
+        archivedObjects,
+      })
+    : []
+
+  const handleRestoreArchived = async () => {
+    if (!projectRef || !selectedBucket?.id) return
+
+    const targets = isArchivedFolder
+      ? archivedFolderObjects.map((object) => ({ archivedObjectId: object.id, path: object.path }))
+      : [{ archivedObjectId, path: item.path }]
+
+    const results = await Promise.allSettled(
+      targets.map(({ archivedObjectId, path }) =>
+        archivedObjectId && path
+          ? restoreArchivedObject({
+              projectRef,
+              bucketId: selectedBucket.id,
+              archivedObjectId,
+              path,
+            })
+          : Promise.resolve()
+      )
+    )
+
+    const failureCount = results.filter((result) => result.status === 'rejected').length
+    if (failureCount > 0) {
+      // The mutation reports each failure; this is what the batch as a whole did.
+      toast.error(`Could not restore ${failureCount} file${failureCount === 1 ? '' : 's'}`)
+    } else {
+      toast.success(`Restored ${item.name}`)
+    }
+
+    // Whatever did restore is already live again.
+    await refetchAllOpenedFolders()
+  }
+
+  // An archived file has no live object, so downloading, copying a URL, renaming and
+  // moving all have nothing to act on. Only these two do.
+  const archivedRowOptions: RowOption[] = !canUpdateFiles
+    ? []
+    : [
+        {
+          name: 'Restore',
+          icon: <RotateCcwIcon size={12} className="text-foreground-light" />,
+          onClick: handleRestoreArchived,
+        },
+        { name: 'Separator', icon: undefined, onClick: undefined },
+        {
+          name: 'Delete permanently',
+          icon: <Trash2Icon size={12} className="text-destructive" />,
+          onClick: () => setItemsToPurge([itemWithColumnIndex]),
+        },
+      ]
+
+  const size = item.metadata ? formatBytes(item.metadata.size) : '-'
+  const mimeType = item.metadata ? item.metadata.mimetype : '-'
+  const createdAt = item.created_at ? new Date(item.created_at).toLocaleString() : '-'
+  const updatedAt = item.updated_at ? new Date(item.updated_at).toLocaleString() : '-'
+  const isFile = item.type === STORAGE_ROW_TYPES.FILE
+  // Files: checkbox replaces icon on hover, keyboard focus, and when selected.
+  // Folders: icon only (no selection checkbox).
+  const showRowIcon = !isFile || !isSelected
+
+  const nameWidth =
+    view === STORAGE_VIEWS.LIST && item.isCorrupted
+      ? `calc(100% - 60px)`
+      : view === STORAGE_VIEWS.LIST && !item.isCorrupted
+        ? `calc(100% - 50px)`
+        : '100%'
+
+  if (item.status === STORAGE_ROW_STATUS.EDITING) {
+    return (
+      <FileExplorerRowEditing style={style} view={view} item={item} columnIndex={columnIndex} />
+    )
+  }
+
+  return (
+    <div
+      style={style}
+      className="h-full border-b border-default"
+      onContextMenu={(e) => {
+        if (isArchived) return ctx?.onRowContextMenu(e, archivedRowOptions)
+        return ctx?.onRowContextMenu(e, rowOptions)
+      }}
+    >
+      <div
+        style={isArchived ? ARCHIVED_STRIPES_STYLE : undefined}
+        className={cn(
+          'storage-row group flex h-full items-center px-2.5 rounded-sm',
+          'hover:bg-panel-footer-light in-data-[theme*=dark]:hover:bg-panel-footer-dark',
+          isOpened && 'bg-selection',
+          isSelected && 'bg-selection',
+          isPreviewed && 'bg-selection hover:bg-selection',
+          item.status !== STORAGE_ROW_STATUS.LOADING && 'cursor-pointer',
+          isArchived && 'text-foreground-lighter [&_p]:text-foreground-lighter',
+          // Keyboard focus on the checkbox: ring the whole row
+          'has-[:focus-visible]:outline-solid has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-offset-[-2px] has-[:focus-visible]:outline-[var(--ring)]'
+        )}
+        onClick={(event) => {
+          event.stopPropagation()
+          event.preventDefault()
+          if (item.status !== STORAGE_ROW_STATUS.LOADING && !isOpened && !isPreviewed) {
+            if (item.type === STORAGE_ROW_TYPES.FOLDER) {
+              clearArchivedSelection()
+              openFolderAtIndex(columnIndex, item)
+            } else {
+              onSelectFile(columnIndex)
+            }
+          }
+        }}
+      >
+        <div
+          className={cn(
+            'flex items-center',
+            view === STORAGE_VIEWS.LIST ? 'w-[40%] min-w-[250px]' : 'w-[90%]'
+          )}
+        >
+          <div className="relative flex h-4 w-[30px] shrink-0 items-center">
+            {isArchived ? (
+              <ArchivedRowIcon
+                name={item.name}
+                onOpen={isArchivedFile ? () => onSelectFile(columnIndex) : undefined}
+              />
+            ) : (
+              <>
+                {showRowIcon && (
+                  <div
+                    className={cn(
+                      'absolute',
+                      isFile && 'group-hover:hidden group-focus-within:hidden'
+                    )}
+                    style={{ top: '2px' }}
+                  >
+                    <StorageRowIcon
+                      view={view}
+                      status={item.status}
+                      fileType={item.type}
+                      isOpened={isOpened}
+                      mimeType={item.metadata?.mimetype}
+                    />
+                  </div>
+                )}
+                {/* An archived row has no live object, so none of the bulk actions apply to it. */}
+                {isFile && !isArchived ? (
+                  <Checkbox
+                    className={
+                      isSelected
+                        ? 'opacity-100'
+                        : 'opacity-0 group-hover:opacity-100 group-focus-within:opacity-100 focus-visible:opacity-100'
+                    }
+                    checked={isSelected}
+                    // use onClick instead of onCheckedChange to handle shift-key selection
+                    onClick={(event) => {
+                      event.stopPropagation()
+                      onCheckItem(event.nativeEvent.shiftKey)
+                    }}
+                    aria-label="Check to select this item"
+                  />
+                ) : (
+                  // Reserve the same slot as the file checkbox without a focusable control
+                  <span aria-hidden className="h-4 w-4 shrink-0" />
+                )}
+              </>
+            )}
+          </div>
+          <p title={item.name} className="truncate text-sm" style={{ width: nameWidth }}>
+            {item.name}
+          </p>
+          {item.isCorrupted && (
+            <Tooltip>
+              <TooltipTrigger>
+                <AlertCircleIcon size={18} className="text-foreground-light" />
+              </TooltipTrigger>
+              <TooltipContent side="bottom">
+                File is corrupted, please delete and reupload again.
+              </TooltipContent>
+            </Tooltip>
+          )}
+        </div>
+
+        {view === STORAGE_VIEWS.LIST && (
+          <>
+            <p className="w-[11%] min-w-[100px] truncate text-sm">{size}</p>
+            <p className="w-[14%] min-w-[100px] truncate text-sm">{mimeType}</p>
+            <p className="w-[15%] min-w-[160px] truncate text-sm">{createdAt}</p>
+            <p className="w-[15%] min-w-[160px] truncate text-sm">{updatedAt}</p>
+          </>
+        )}
+
+        <div
+          className={`flex items-center justify-end ${
+            view === STORAGE_VIEWS.LIST ? 'grow' : 'w-[10%]'
+          }`}
+          onClick={(event) =>
+            // Stops click event from this div, to resolve an issue with menu item's click event triggering unexpected row select
+            event.stopPropagation()
+          }
+        >
+          {item.status === STORAGE_ROW_STATUS.LOADING ? (
+            <LoaderCircleIcon
+              className={`animate-spin text-foreground-lighter ${view === STORAGE_VIEWS.LIST ? 'invisible' : ''}`}
+              size={14}
+            />
+          ) : isArchived ? (
+            archivedRowOptions.length > 0 && (
+              <RowActionsMenu name={item.name} options={archivedRowOptions} />
+            )
+          ) : (
+            <RowActionsMenu name={item.name} options={rowOptions} />
+          )}
+        </div>
+      </div>
+    </div>
+  )
+}

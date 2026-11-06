@@ -20,7 +20,7 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
   <RefSubLayout.Examples>
 
     ```bash Terminal
-    supabase gen types typescript --project-id abcdefghijklmnopqrst > database.types.ts
+    supabase gen types typescript --remote=abcdefghijklmnopqrst > database.types.ts
     ```
 
   </RefSubLayout.Examples>
@@ -88,7 +88,7 @@ With TypeScript, `supabase-js` detects things like `not null` constraints and [g
 
     const supabase = createClient<Database>(
       process.env.SUPABASE_URL,
-      process.env.SUPABASE_ANON_KEY
+      process.env.SUPABASE_PUBLISHABLE_KEY
     )
     ```
 

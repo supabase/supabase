@@ -1,0 +1,26 @@
+@reference "./globals.css";
+
+.instance-configuration {
+  .react-flow__pane {
+    @apply cursor-default;
+  }
+  .react-flow__node {
+    @apply cursor-default;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .react-flow__edge.animated path {
+    animation: none;
+  }
+}
+
+.map-path {
+  animation: dash 8s linear infinite;
+}
+
+@keyframes dash {
+  to {
+    stroke-dashoffset: 100;
+  }
+}

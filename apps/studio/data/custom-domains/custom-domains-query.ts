@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { useProjectAddonsQuery } from 'data/subscriptions/project-addons-query'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { customDomainKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CustomDomainsVariables = {
   projectRef?: string
@@ -70,10 +71,11 @@ export async function getCustomDomains(
   const { data, error: _error } = await get('/v1/projects/{ref}/custom-hostname', {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (_error) {
-    const error = _error as ResponseError
+    const error = _error as StudioError
     // not allowed error and no hostname configured error are
     // valid steps in the process of setting up a custom domain
     // so we convert them to data instead of errors
@@ -101,21 +103,22 @@ export async function getCustomDomains(
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
-export type CustomDomainsError = ResponseError
+export type CustomDomainsError = StudioError
 
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,
-  { enabled = true, ...options }: UseQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
+  {
+    enabled = true,
+    ...options
+  }: UseCustomQueryOptions<CustomDomainsData, CustomDomainsError, TData> = {}
 ) => {
-  const { data } = useProjectAddonsQuery({ projectRef })
+  const { data } = useProjectAddonsQuery({ projectRef }, { enabled: enabled !== false })
   const hasCustomDomainsAddon = !!data?.selected_addons.find((x) => x.type === 'custom_domain')
 
-  return useQuery<CustomDomainsData, CustomDomainsError, TData>(
-    customDomainKeys.list(projectRef),
-    ({ signal }) => getCustomDomains({ projectRef }, signal),
-    {
-      enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
-      ...options,
-    }
-  )
+  return useQuery<CustomDomainsData, CustomDomainsError, TData>({
+    queryKey: customDomainKeys.list(projectRef),
+    queryFn: ({ signal }) => getCustomDomains({ projectRef }, signal),
+    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && hasCustomDomainsAddon,
+    ...options,
+  })
 }

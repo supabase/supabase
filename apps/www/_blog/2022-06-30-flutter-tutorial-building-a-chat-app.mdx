@@ -2,8 +2,8 @@
 title: 'Flutter Tutorial: building a Flutter chat app'
 description: Learn how to build a Flutter chat app with open source and scalable backend (inc. auth, realtime, database, and more).
 author: tyler_shukert
-image: flutter-chat/flutter-chat-app.jpg
-thumb: flutter-chat/flutter-chat-app.jpg
+imgSocial: flutter-chat/flutter-chat-app.jpg
+imgThumb: flutter-chat/flutter-chat-app.jpg
 categories:
   - engineering
 tags:
@@ -18,13 +18,13 @@ This is the first of a series of Flutter Tutorials. During the series, you will 
 
 In the first part, I will show you how to build a chat application, where users can sign up and talk to other users in a single chat room. The exchange of messages will happen in real time, meaning that you do not have to refresh the page to load new messages.
 
-In the second part, I will show you how to implement [Authentication and Authorization (with RLS)](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls) to the chat app.
+In the second part, I will show you how to implement [Authentication and Authorization (with RLS)](https://supabase.com/blog/flutter-authorization-with-rls) to the chat app.
 
 In order to build this chat app, we will need a database to store all of the chat information. We will be using [Supabase](https://supabase.com/) to store the chat information. Supabase is a back end as a service that provides auth, database, storage and functions to easily create a scalable application. Supabase is a suitable backend for this app, because it provides a nice set of APIs on Postgres database that we can easily call by using the SDK. It is also perfect for chat apps like the one we are about to create, because we can subscribe to real time changes on the database.
 
 This article also assumes that you have installed Flutter already on your machine. If not, you can go to the [official Flutter page](https://docs.flutter.dev/get-started/install) to start the installation.
 
-You can find the complete version of this app in [this](https://github.com/supabase-community/flutter-chat) Github repository.
+You can find the complete version of this app in [this](https://github.com/supabase-community/flutter-chat) GitHub repository.
 
 ## Overview of the final chat app
 
@@ -74,7 +74,7 @@ Run `flutter pub get` to install the packages. Note that you will have to termin
 
 If you do not have a Supabase account yet, do not worry, you can [get started for free](https://supabase.com/dashboard/).
 
-You will be prompted to sign in using your Github account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
+You will be prompted to sign in using your GitHub account with a big green button, so let's go ahead and press it. Proceed with the sign up process and once you are done, you will be taken to a list of projects. You can go ahead and create a new project by pressing the “New Project” button at the top.
 
 ![Create new Supabase project](/images/blog/flutter-chat/create-new-supabase-project.png)
 
@@ -544,9 +544,7 @@ create trigger on_auth_user_created
 Also, Supabase has email confirmation turned on by default, meaning that every time someone signs up, they have to click the confirmation link they receive in their email.
 This is ideal for a production app, but for our sample app, we can turn it off since we want to get up and running with building a functioning chat app.
 We will cover secure authentications using Supabase in later articles.
-Go to authentication → settings and turn off the switch of `Enable email confirmations`.
-
-![turn off email confirmation](/images/blog/flutter-chat/turn-off-email-confirmation.png)
+Go to [Authentication → Sign In / Providers](https://supabase.com/dashboard/project/_/auth/providers) and turn off the **Confirm email** toggle under **User Signups**.
 
 ### Step 6: Create login page
 
@@ -883,14 +881,14 @@ With that, we are done creating our application. If you kept your `flutter run` 
 
 ## Conclusion / Future improvements
 
-We saw how easily it is to create a chat application when you combine amazing tools like Flutter and Supabase. One thing that was missing from this chat application is authorization. We did implement registration, but that was only to distinguish different users. In the coming up article, we will cover how you can add authorization using [row level security](https://supabase.com/docs/guides/auth/row-level-security) in Supabase to secure this chat application. With authorization, we can create private chat rooms so that messages can only be seen by those inside those rooms.
+We saw how easily it is to create a chat application when you combine amazing tools like Flutter and Supabase. One thing that was missing from this chat application is authorization. We did implement registration, but that was only to distinguish different users. In the coming up article, we will cover how you can add authorization using [row level security](https://supabase.com/docs/guides/database/postgres/row-level-security) in Supabase to secure this chat application. With authorization, we can create private chat rooms so that messages can only be seen by those inside those rooms.
 
 If you have any questions please reach out via [Twitter](https://twitter.com/dshukertjr) or join our [Discord](https://discord.supabase.com).
 
 ## More Flutter Resources
 
-- [Part 2: Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authentication-and-authorization-with-rls)
-- [Flutter Supabase Quick Starter Guide](https://supabase.com/docs/guides/with-flutter)
+- [Part 2: Flutter Authentication and Authorization with RLS](https://supabase.com/blog/flutter-authorization-with-rls)
+- [Flutter Supabase Quick Starter Guide](https://supabase.com/docs/guides/getting-started/tutorials/with-flutter)
 - [supabase-flutter v1.0 released](https://supabase.com/blog/supabase-flutter-sdk-v1-released)
 - [How to build a real-time multiplayer game with Flutter Flame](https://supabase.com/blog/flutter-real-time-multiplayer-game)
 - [Open source map based Flutter app with CI/CD and scalable statemanagement example](https://github.com/dshukertjr/spot)

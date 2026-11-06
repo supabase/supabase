@@ -1,9 +1,10 @@
-import { useMutation, UseMutationOptions, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { del, handleError } from 'data/fetchers'
-import type { ResponseError } from 'types'
 import { accessTokenKeys } from './keys'
+import { del, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AccessTokenDeleteVariables = {
   id: number
@@ -15,7 +16,6 @@ export async function deleteAccessToken({ id }: AccessTokenDeleteVariables) {
   })
 
   if (error) handleError(error)
-
   return data
 }
 
@@ -26,27 +26,25 @@ export const useAccessTokenDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>,
+  UseCustomMutationOptions<AccessTokenDeleteData, StudioError, AccessTokenDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AccessTokenDeleteData, ResponseError, AccessTokenDeleteVariables>(
-    (vars) => deleteAccessToken(vars),
-    {
-      async onSuccess(data, variables, context) {
-        await queryClient.invalidateQueries(accessTokenKeys.list())
+  return useMutation<AccessTokenDeleteData, StudioError, AccessTokenDeleteVariables>({
+    mutationFn: (vars) => deleteAccessToken(vars),
+    async onSuccess(data, variables, context) {
+      await queryClient.invalidateQueries({ queryKey: accessTokenKeys.list() })
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete access token: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete access token: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

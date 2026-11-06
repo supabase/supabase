@@ -1,7 +1,7 @@
 ---
 # Specify the following for Cursor rules
 description: Guidelines for writing Postgres Row Level Security policies
-globs: "**/*.sql"
+alwaysApply: false
 ---
 
 # Database: Create RLS policies
@@ -30,7 +30,9 @@ The output should use the following instructions:
 The output should look like this:
 
 ```sql
-CREATE POLICY "My descriptive policy." ON books FOR INSERT to authenticated USING ( (select auth.uid()) = author_id ) WITH ( true );
+CREATE POLICY "My descriptive policy." ON books
+  FOR INSERT TO authenticated
+  WITH CHECK ((select auth.uid()) = author_id);
 ```
 
 Since you are running in a Supabase environment, take note of these Supabase-specific additions below.

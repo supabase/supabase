@@ -1,22 +1,9 @@
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { toast } from 'sonner'
-
-import { ButtonTooltip } from 'components/ui/ButtonTooltip'
-import { DocsButton } from 'components/ui/DocsButton'
-import InformationBox from 'components/ui/InformationBox'
-import { useCreateAndExposeAPISchemaMutation } from 'data/api-settings/create-and-expose-api-schema-mutation'
-import { useProjectPostgrestConfigQuery } from 'data/config/project-postgrest-config-query'
-import { useProjectPostgrestConfigUpdateMutation } from 'data/config/project-postgrest-config-update-mutation'
-import { useSchemasQuery } from 'data/database/schemas-query'
-import { useSelectedProject } from 'hooks/misc/useSelectedProject'
 import {
-  AlertDescription_Shadcn_,
-  AlertTitle_Shadcn_,
-  Alert_Shadcn_,
-  CodeBlock,
-  CollapsibleContent_Shadcn_,
-  CollapsibleTrigger_Shadcn_,
-  Collapsible_Shadcn_,
+  Alert,
+  AlertDescription,
+  AlertTitle,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -26,6 +13,22 @@ import {
   DialogTitle,
   WarningIcon,
 } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
+import {
+  DialogDisclosure,
+  DialogDisclosureContent,
+  DialogDisclosureTrigger,
+} from 'ui-patterns/DialogDisclosure'
+
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
+import { DocsButton } from '@/components/ui/DocsButton'
+import InformationBox from '@/components/ui/InformationBox'
+import { useCreateAndExposeAPISchemaMutation } from '@/data/api-settings/create-and-expose-api-schema-mutation'
+import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
+import { useProjectPostgrestConfigUpdateMutation } from '@/data/config/project-postgrest-config-update-mutation'
+import { useSchemasQuery } from '@/data/database/schemas-query'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 interface HardenAPIModalProps {
   visible: boolean
@@ -33,7 +36,7 @@ interface HardenAPIModalProps {
 }
 
 export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
-  const project = useSelectedProject()
+  const { data: project } = useSelectedProjectQuery()
 
   const { data: schemas } = useSchemasQuery({
     projectRef: project?.ref,
@@ -46,14 +49,14 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
   const isAPISchemaExposed = exposedSchemas.includes('api')
   const isPublicSchemaExposed = exposedSchemas.includes('public')
 
-  const { mutate: createAndExposeAPISchema, isLoading: isCreatingAPISchema } =
+  const { mutate: createAndExposeAPISchema, isPending: isCreatingAPISchema } =
     useCreateAndExposeAPISchemaMutation({
       onSuccess: () => {
         toast.success(`Successfully created api schema and exposed via Data API`)
       },
     })
 
-  const { mutate: updatePostgrestConfig, isLoading: isUpdatingConfig } =
+  const { mutate: updatePostgrestConfig, isPending: isUpdatingConfig } =
     useProjectPostgrestConfigUpdateMutation({
       onSuccess: () => {
         toast.success('Success removed public schema from exposed schemas')
@@ -104,8 +107,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
         <DialogHeader>
           <DialogTitle>Switch the default API schema</DialogTitle>
           <DialogDescription>
-            Expose a custom schema instead of the{' '}
-            <code className="text-xs text-foreground">public</code> schema
+            Expose a custom schema instead of the <code>public</code> schema
           </DialogDescription>
         </DialogHeader>
 
@@ -113,43 +115,36 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
         <DialogSection className="text-sm text-foreground-light">
           <p>
-            By default, the <code className="text-xs text-foreground">public</code> schema is used
-            to generate API routes. In some cases, it's better to use a custom schema. This is
-            important if you use tools that generate tables in the{' '}
-            <code className="text-xs text-foreground">public</code> schema to{' '}
-            <span className="text-brand">prevent accidental exposure of data</span>.
+            By default, the <code>public</code> schema is used to generate API routes. In some
+            cases, it's better to use a custom schema. This is important if you use tools that
+            generate tables in the <code>public</code> schema to{' '}
+            <span className="text-primary">prevent accidental exposure of data</span>.
           </p>
           <DocsButton
             abbrev={false}
             className="w-min mt-4"
-            href="https://supabase.com/docs/guides/database/hardening-data-api"
+            href={`${DOCS_URL}/guides/api/using-custom-schemas`}
           />
         </DialogSection>
 
         <DialogSectionSeparator />
 
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
-            <p>
-              1. Create a custom <code className="text-xs text-foreground">api</code> schema and
-              expose it
-            </p>
-            {hasAPISchema && isAPISchemaExposed ? (
-              <Check size={16} className="text-brand" />
-            ) : (
-              <ChevronDown
-                size={16}
-                className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
-              />
-            )}
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light flex flex-col gap-y-4">
+        <DialogDisclosure>
+          <DialogDisclosureTrigger
+            className="py-4 px-5"
+            icon={
+              hasAPISchema && isAPISchemaExposed ? (
+                <CheckIcon size={16} className="text-primary" />
+              ) : undefined
+            }
+          >
+            1. Create a custom <code>api</code> schema and expose it
+          </DialogDisclosureTrigger>
+          <DialogDisclosureContent className="text-sm text-foreground-light flex flex-col gap-y-4">
             <p className="mx-5">
-              Click the button below to create a new schema named{' '}
-              <code className="text-xs text-foreground">api</code> and grant the{' '}
-              <code className="text-xs text-foreground">anon</code> and{' '}
-              <code className="text-xs text-foreground">authenticated</code> roles usage privileges
-              on this schema. This schema will thereafter also be exposed to the Data API.
+              Click the button below to create a new schema named <code>api</code> and grant the{' '}
+              <code>anon</code> and <code>authenticated</code> roles usage privileges on this
+              schema. This schema will thereafter also be exposed to the Data API.
             </p>
 
             <div className="px-5">
@@ -158,9 +153,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 description={
                   <div className="flex flex-col gap-y-2">
                     <p>
-                      The following query will be run to create the{' '}
-                      <code className="text-xs text-foreground">api</code> schema , as well as to
-                      grant the necessary privileges to the respective roles
+                      The following query will be run to create the <code>api</code> schema , as
+                      well as to grant the necessary privileges to the respective roles
                     </p>
                     <CodeBlock
                       language="sql"
@@ -174,7 +168,7 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
             </div>
 
             <ButtonTooltip
-              type="primary"
+              variant="primary"
               className="w-min mx-5"
               onClick={onSelectCreateAndExposeAPISchema}
               disabled={hasAPISchema && isAPISchemaExposed}
@@ -194,11 +188,10 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
 
             <div className="flex flex-col gap-y-4 px-5 pb-4">
               <p>
-                Under these new settings, the <code className="text-xs text-foreground">anon</code>{' '}
-                and <code className="text-xs text-foreground">authenticated</code> roles can execute
-                functions defined in the <code className="text-xs text-foreground">api</code>{' '}
-                schema, but they have no automatic permissions on any tables. On a table-by-table
-                basis, you can grant them permissions by running the following command:
+                Under these new settings, the <code>anon</code> and <code>authenticated</code> roles
+                can execute functions defined in the <code>api</code> schema, but they have no
+                automatic permissions on any tables. On a table-by-table basis, you can grant them
+                permissions by running the following command:
               </p>
               <CodeBlock
                 language="sql"
@@ -207,47 +200,38 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 {`grant select on table api.<your_table> to anon;\ngrant select, insert, update, delete on table api.<your_table> to authenticated;`}
               </CodeBlock>
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </DialogDisclosureContent>
+        </DialogDisclosure>
 
         <DialogSectionSeparator />
 
-        <Collapsible_Shadcn_>
-          <CollapsibleTrigger_Shadcn_ className="py-4 px-5 w-full flex items-center justify-between text-sm">
-            <p>
-              2. Remove the <code className="text-xs text-foreground">public</code> schema from the
-              exposed schemas
-            </p>
-            {!isPublicSchemaExposed ? (
-              <Check size={16} className="text-brand" />
-            ) : (
-              <ChevronDown
-                size={16}
-                className="transition data-open-parent:rotate-180 data-closed-parent:rotate-0"
-              />
-            )}
-          </CollapsibleTrigger_Shadcn_>
-          <CollapsibleContent_Shadcn_ className="text-sm text-foreground-light">
+        <DialogDisclosure>
+          <DialogDisclosureTrigger
+            className="py-4 px-5"
+            icon={
+              !isPublicSchemaExposed ? <CheckIcon size={16} className="text-primary" /> : undefined
+            }
+          >
+            2. Remove the <code>public</code> schema from the exposed schemas
+          </DialogDisclosureTrigger>
+          <DialogDisclosureContent className="text-sm text-foreground-light">
             <div className="px-5 pb-4 flex flex-col gap-y-4">
-              <Alert_Shadcn_ variant="warning">
+              <Alert variant="warning">
                 <WarningIcon />
-                <AlertTitle_Shadcn_ className="text-foreground">
-                  Ensure that your app is no longer using the{' '}
-                  <code className="text-xs text-foreground">public</code> schema
-                </AlertTitle_Shadcn_>
-                <AlertDescription_Shadcn_>
-                  The <code className="text-xs text-foreground">public</code> schema will not be
-                  accessible via the API once its not exposed. You should be using the{' '}
-                  <code className="text-xs text-foreground">api</code> schema instead.
-                </AlertDescription_Shadcn_>
-              </Alert_Shadcn_>
+                <AlertTitle className="text-foreground">
+                  Ensure that your app is no longer using the <code>public</code> schema
+                </AlertTitle>
+                <AlertDescription>
+                  The <code>public</code> schema will not be accessible via the API once its not
+                  exposed. You should be using the <code>api</code> schema instead.
+                </AlertDescription>
+              </Alert>
               <p>
-                Click the button below to remove the{' '}
-                <code className="text-xs text-foreground">public</code> schema from both Exposed
+                Click the button below to remove the <code>public</code> schema from both Exposed
                 schemas and Extra search path in your API configuration.
               </p>
               <ButtonTooltip
-                type="primary"
+                variant="primary"
                 className="w-min"
                 disabled={!isPublicSchemaExposed}
                 loading={isUpdatingConfig}
@@ -262,8 +246,8 @@ export const HardenAPIModal = ({ visible, onClose }: HardenAPIModalProps) => {
                 Remove public schema from exposed schemas
               </ButtonTooltip>
             </div>
-          </CollapsibleContent_Shadcn_>
-        </Collapsible_Shadcn_>
+          </DialogDisclosureContent>
+        </DialogDisclosure>
       </DialogContent>
     </Dialog>
   )

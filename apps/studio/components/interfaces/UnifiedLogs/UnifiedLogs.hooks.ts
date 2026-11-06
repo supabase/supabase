@@ -1,0 +1,83 @@
+import type { ColumnFiltersState, VisibilityState } from '@tanstack/react-table'
+import { useDebounce } from 'common'
+import { useQueryState } from 'nuqs'
+import { useEffect, useMemo, useRef } from 'react'
+
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
+import { useShortcut } from '@/state/shortcuts/useShortcut'
+
+export const useFilterSearchSync = ({
+  applyFilterSearch,
+  columnFilters,
+  enabled,
+}: {
+  applyFilterSearch: () => void
+  columnFilters: ColumnFiltersState
+  enabled: boolean
+}) => {
+  const debouncedApplyFilterSearch = useDebounce(applyFilterSearch, 250)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    debouncedApplyFilterSearch()
+    return () => debouncedApplyFilterSearch.cancel()
+  }, [columnFilters, debouncedApplyFilterSearch, enabled])
+}
+
+const DEFAULT_COLUMN_VISIBILITY: VisibilityState = { uuid: false }
+
+export const useLogsTableColumns = (viewKey?: string) => {
+  const keyPrefix = viewKey ? `${viewKey}-` : ''
+  const [columnVisibility, setColumnVisibility] = useLocalStorageQuery<VisibilityState>(
+    `${keyPrefix}data-table-visibility`,
+    DEFAULT_COLUMN_VISIBILITY
+  )
+  const [columnOrder, setColumnOrder] = useLocalStorageQuery<string[]>(
+    `${keyPrefix}data-table-column-order`,
+    []
+  )
+
+  return { columnVisibility, setColumnVisibility, columnOrder, setColumnOrder }
+}
+
+export const useResetFocus = () => {
+  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_RESET_FOCUS, () => {
+    // FIXME: some dedicated div[tabindex="0"] do not auto-unblur (e.g. the DataTableFilterResetButton)
+    // REMINDER: we cannot just document.activeElement?.blur(); as the next tab will focus the next element in line,
+    // which is not what we want. We want to reset entirely.
+    document.body.setAttribute('tabindex', '0')
+    document.body.focus()
+    document.body.removeAttribute('tabindex')
+  })
+}
+
+export const useLiveMode = <TData extends { date: Date }>(data: TData[]) => {
+  const [live] = useQueryState('live', SEARCH_PARAMS_PARSER.live)
+  // REMINDER: used to capture the live mode on timestamp
+  const liveTimestamp = useRef<number | undefined>(live ? new Date().getTime() : undefined)
+
+  useEffect(() => {
+    if (live) liveTimestamp.current = new Date().getTime()
+    else liveTimestamp.current = undefined
+  }, [live])
+
+  const anchorRow = useMemo(() => {
+    if (!live) return undefined
+
+    const item = data.find((item) => {
+      // return first item that is there if not liveTimestamp
+      if (!liveTimestamp.current) return true
+      // return first item that is after the liveTimestamp
+      if (item.date.getTime() > liveTimestamp.current) return false
+      return true
+      // return first item if no liveTimestamp
+    })
+
+    return item
+  }, [live, data])
+
+  return { row: anchorRow, timestamp: liveTimestamp.current }
+}

@@ -1,4 +1,5 @@
 import type { SQLTemplate } from './SQLEditor.types'
+import { DOCS_URL } from '@/lib/constants'
 
 export const SQL_TEMPLATES: SQLTemplate[] = [
   {
@@ -91,7 +92,7 @@ for each row execute
     id: 9,
     type: 'template',
     title: 'Increment field value',
-    description: 'Update a field with incrementing value using stored procedure.',
+    description: 'Update a field with incrementing value using a function.',
     sql: `
 create function increment(row_id int)
 returns void as
@@ -901,7 +902,7 @@ create table profiles (
   constraint username_length check (char_length(username) >= 3)
 );
 -- Set up Row Level Security (RLS)
--- See https://supabase.com/docs/guides/auth/row-level-security for more details.
+-- See ${DOCS_URL}/guides/auth/row-level-security for more details.
 alter table profiles
   enable row level security;
 
@@ -915,7 +916,7 @@ create policy "Users can update own profile." on profiles
   for update using ((select auth.uid()) = id);
 
 -- This trigger automatically creates a profile entry when a new user signs up via Supabase Auth.
--- See https://supabase.com/docs/guides/auth/managing-user-data#using-triggers for more details.
+-- See ${DOCS_URL}/guides/auth/managing-user-data#using-triggers for more details.
 create function public.handle_new_user()
 returns trigger
 set search_path = ''
@@ -934,10 +935,10 @@ create trigger on_auth_user_created
 insert into storage.buckets (id, name)
   values ('avatars', 'avatars');
 
--- Set up access controls for storage.
--- See https://supabase.com/docs/guides/storage#policy-examples for more details.
+-- Set up access controls for storage. Allows downloading object with public key
+-- See ${DOCS_URL}/guides/storage/security/access-control#policy-examples for more details.
 create policy "Avatar images are publicly accessible." on storage.objects
-  for select using (bucket_id = 'avatars');
+  for select using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
 
 create policy "Anyone can upload an avatar." on storage.objects
   for insert with check (bucket_id = 'avatars');
@@ -1598,5 +1599,38 @@ $$;
 grant execute on function public.custom_access_token_hook to supabase_auth_admin;
 revoke execute on function public.custom_access_token_hook from authenticated, anon, public;
     `,
+  },
+  {
+    id: 30,
+    type: 'quickstart',
+    title: 'Instruments',
+    description:
+      'Create an instruments table with sample data and Row Level Security, as used in the framework quickstarts.',
+    sql: `
+-- Create the table
+create table instruments (
+  id bigint primary key generated always as identity,
+  name text not null
+);
+
+-- Insert sample data into the table
+insert into instruments (name)
+values
+  ('violin'),
+  ('viola'),
+  ('cello');
+
+-- Grant the privileges the role needs, which is read access
+grant select on public.instruments to anon;
+
+-- Enable row level security for the table
+alter table instruments enable row level security;
+
+-- Create a policy to allow the anon role to read from the instruments table
+create policy "public can read instruments"
+on public.instruments
+for select to anon
+using (true);
+`.trim(),
   },
 ]

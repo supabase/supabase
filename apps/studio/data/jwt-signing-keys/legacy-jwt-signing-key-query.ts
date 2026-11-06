@@ -1,0 +1,44 @@
+import { useQuery } from '@tanstack/react-query'
+
+import { jwtSigningKeysKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
+
+interface LegacyJWTSigningKeyVariables {
+  projectRef?: string
+}
+
+async function getLegacyJWTSigningKey(
+  { projectRef }: LegacyJWTSigningKeyVariables,
+  signal?: AbortSignal
+) {
+  if (!projectRef) throw new Error('projectRef is required')
+
+  const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys/legacy`, {
+    params: { path: { ref: projectRef } },
+    signal,
+    grant: unguarded.migrating,
+  })
+
+  if (error) {
+    handleError(error)
+  }
+
+  return data
+}
+
+export type LegacyJWTSigningKeyData = Awaited<ReturnType<typeof getLegacyJWTSigningKey>>
+
+export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
+  { projectRef }: LegacyJWTSigningKeyVariables,
+  { enabled, ...options }: UseCustomQueryOptions<LegacyJWTSigningKeyData, StudioError, TData> = {}
+) =>
+  useQuery<LegacyJWTSigningKeyData, StudioError, TData>({
+    queryKey: jwtSigningKeysKeys.legacy(projectRef),
+    queryFn: ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
+    enabled: enabled && !!projectRef,
+    retry: false,
+    refetchOnWindowFocus: false,
+    ...options,
+  })

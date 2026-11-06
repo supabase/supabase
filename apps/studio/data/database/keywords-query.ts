@@ -1,18 +1,15 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { executeSql, ExecuteSqlError } from '../sql/execute-sql-query'
+import { getKeywordsSql } from '@supabase/pg-meta'
+import { useQuery } from '@tanstack/react-query'
+
 import { databaseKeys } from './keys'
-
-export const getKeywordsSql = () => {
-  const sql = /* SQL */ `
-SELECT word FROM pg_get_keywords();
-`.trim()
-
-  return sql
-}
+import { unguarded } from '@/data/fetchers'
+import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type KeywordsVariables = {
   projectRef?: string
-  connectionString?: string
+  connectionString?: string | null
 }
 
 export async function getKeywords(
@@ -22,7 +19,7 @@ export async function getKeywords(
   const sql = getKeywordsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['keywords'] },
+    { projectRef, connectionString, sql, queryKey: ['keywords'], grant: unguarded.migrating },
     signal
   )
 
@@ -30,17 +27,15 @@ export async function getKeywords(
 }
 
 export type KeywordsData = Awaited<ReturnType<typeof getKeywords>>
-export type KeywordsError = ExecuteSqlError
+export type KeywordsError = StudioError
 
 export const useKeywordsQuery = <TData = KeywordsData>(
   { projectRef, connectionString }: KeywordsVariables,
-  { enabled = true, ...options }: UseQueryOptions<KeywordsData, KeywordsError, TData> = {}
+  { enabled = true, ...options }: UseCustomQueryOptions<KeywordsData, KeywordsError, TData> = {}
 ) =>
-  useQuery<KeywordsData, KeywordsError, TData>(
-    databaseKeys.keywords(projectRef),
-    ({ signal }) => getKeywords({ projectRef, connectionString }, signal),
-    {
-      enabled: enabled && typeof projectRef !== 'undefined',
-      ...options,
-    }
-  )
+  useQuery<KeywordsData, KeywordsError, TData>({
+    queryKey: databaseKeys.keywords(projectRef),
+    queryFn: ({ signal }) => getKeywords({ projectRef, connectionString }, signal),
+    enabled: enabled && typeof projectRef !== 'undefined',
+    ...options,
+  })

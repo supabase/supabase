@@ -1,10 +1,11 @@
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
+import { useQuery } from '@tanstack/react-query'
 
-import { get, handleError } from 'data/fetchers'
-import { IS_PLATFORM } from 'lib/constants'
-import type { ResponseError } from 'types'
 import { profileKeys } from './keys'
 import type { Profile } from './types'
+import { get, handleError } from '@/data/fetchers'
+import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getProfile(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile', {
@@ -25,19 +26,17 @@ export async function getProfile(signal?: AbortSignal) {
 }
 
 export type ProfileData = Awaited<ReturnType<typeof getProfile>>
-export type ProfileError = ResponseError
+export type ProfileError = StudioError
 
 export const useProfileQuery = <TData = ProfileData>({
   enabled = true,
   ...options
-}: UseQueryOptions<ProfileData, ProfileError, TData> = {}) => {
-  return useQuery<ProfileData, ProfileError, TData>(
-    profileKeys.profile(),
-    ({ signal }) => getProfile(signal),
-    {
-      staleTime: 1000 * 60 * 30, // default good for 30 mins
-      ...options,
-      enabled,
-    }
-  )
+}: UseCustomQueryOptions<ProfileData, ProfileError, TData> = {}) => {
+  return useQuery<ProfileData, ProfileError, TData>({
+    queryKey: profileKeys.profile(),
+    queryFn: ({ signal }) => getProfile(signal),
+    staleTime: 1000 * 60 * 30,
+    ...options,
+    enabled,
+  })
 }

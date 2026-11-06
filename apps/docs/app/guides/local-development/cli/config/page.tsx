@@ -1,18 +1,18 @@
-import ReactMarkdown from 'react-markdown'
-import { CodeBlock } from 'ui'
-import { Heading } from 'ui/src/components/CustomHTMLElements'
-import { type TOCHeader } from '~/components/GuidesTableOfContents'
-import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
+import { type TOCHeader } from '~/components/GuidesSidebar'
 import { GuideTemplate, newEditLink } from '~/features/docs/GuidesMdx.template'
+import { genGuideMeta } from '~/features/docs/GuidesMdx.utils'
 import type { Parameter } from '~/lib/refGenerator/refTypes'
 import specFile from '~/spec/cli_v1_config.yaml' with { type: 'yml' }
+import ReactMarkdown from 'react-markdown'
+import { Heading, Table } from 'ui'
+import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 const meta = {
   title: 'Supabase CLI config',
 }
 
 const generateMetadata = genGuideMeta(() => ({
-  pathname: '/guides/cli/config',
+  pathname: '/guides/local-development/cli/config',
   meta,
 }))
 
@@ -36,7 +36,7 @@ const Config = () => {
   const editLink = newEditLink('supabase/supabase/blob/master/apps/docs/spec/cli_v1_config.yaml')
 
   return (
-    <GuideTemplate meta={meta} editLink={editLink}>
+    <GuideTemplate meta={meta} editLink={editLink} pathname="/guides/local-development/cli/config">
       <ReactMarkdown>{specFile.info.description}</ReactMarkdown>
       <div>{content}</div>
     </GuideTemplate>
@@ -54,7 +54,7 @@ function Info({ parameter }: { parameter: Parameter }) {
         <div className="border-b pb-8" key={parameter.id}>
           <div className=" mb-16">
             <div>
-              <table className="table-auto">
+              <Table prose className="table-auto">
                 <thead>
                   <tr>
                     <th className="text-left">Name</th>
@@ -69,7 +69,7 @@ function Info({ parameter }: { parameter: Parameter }) {
                     <td>{parameter.required !== undefined && parameter.required.toString()}</td>
                   </tr>
                 </tbody>
-              </table>
+              </Table>
             </div>
             <div className="mb-4 scroll-mt-16 mt-0 ">
               <p className="text-sm font-bold uppercase">Description</p>

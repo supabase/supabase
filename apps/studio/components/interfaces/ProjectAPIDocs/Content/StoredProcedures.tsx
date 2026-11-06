@@ -2,7 +2,7 @@ import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
 
-const StoredProcedures = ({ language }: ContentProps) => {
+export const StoredProcedures = ({ language }: ContentProps) => {
   return (
     <>
       <ContentSnippet
@@ -12,5 +12,3 @@ const StoredProcedures = ({ language }: ContentProps) => {
     </>
   )
 }
-
-export default StoredProcedures

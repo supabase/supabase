@@ -1,6 +1,7 @@
+import { redirect } from 'next/navigation'
+
 import { LogoutButton } from '@/registry/default/blocks/password-based-auth-nextjs/components/logout-button'
 import { createClient } from '@/registry/default/clients/nextjs/lib/supabase/server'
-import { redirect } from 'next/navigation'
 
 export default async function ProtectedPage() {
   const supabase = await createClient()

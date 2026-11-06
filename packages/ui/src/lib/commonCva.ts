@@ -1,4 +1,4 @@
-import { VariantProps, cva } from 'class-variance-authority'
+import { cva, VariantProps } from 'class-variance-authority'
 
 const defaults = {
   bg: {
@@ -19,17 +19,6 @@ const defaults = {
     alternative: 'border-alternative',
   },
   placeholder: 'placeholder-border-stronger',
-  focus: `
-    outline-none
-    focus:ring-current focus:ring-2
-  `,
-  'focus-visible': `
-    outline-none
-    transition-all
-    outline-0
-    focus-visible:outline-4
-    focus-visible:outline-offset-1
-  `,
   size: {
     // buttons, inputs, input labels use these sizes
     text: {

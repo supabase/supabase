@@ -1,14 +1,34 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
+
+import { validateBlogFrontmatterImages } from './blog-images'
 import { generateReadingTime } from './helpers'
-import { BlogPost } from '../.contentlayer/generated'
 
 type Directories = '_blog' | '_case-studies' | '_customers' | '_alternatives' | '_events'
 
 // substring amount for file names
 // based on YYYY-MM-DD format
 export const FILENAME_SUBSTRING = 11
+
+export type Post = {
+  slug: string
+  title?: string
+  description?: string
+  author?: string
+  imgSocial?: string
+  imgThumb?: string
+  categories?: string[]
+  tags?: string[]
+  date?: string
+  toc_depth?: number
+  formattedDate: string
+  readingTime: string
+  url: string
+  path: string
+
+  [key: string]: any // Allow additional properties from frontmatter
+}
 
 type GetSortedPostsParams = {
   directory: Directories
@@ -25,7 +45,7 @@ export const getSortedPosts = ({
   tags,
   categories,
   currentPostSlug,
-}: GetSortedPostsParams) => {
+}: GetSortedPostsParams): Post[] => {
   //Finding directory named "blog" from the current working directory of Node.
   const postDirectory = path.join(process.cwd(), directory)
 
@@ -46,6 +66,10 @@ export const getSortedPosts = ({
       const { data, content } = matter(fileContents) as unknown as {
         data: { [key: string]: any; tags?: string[] }
         content: string
+      }
+
+      if (directory === '_blog') {
+        validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
       }
 
       const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' }
@@ -127,18 +151,30 @@ export const getAllPostSlugs = (directory: Directories) => {
   return files
 }
 
-export const getPostdata = async (slug: string, directory: string) => {
-  /**
-   * All files are mdx files
-   */
-  const fileType = 'mdx'
-  slug = slug + '.' + fileType
+/**
+ * Finds the file in `directory` that a URL slug resolves to. Matching is by
+ * substring, so `blog-post` also finds `2022-01-01-blog-post.mdx`.
+ */
+export const findPostFilename = (slug: string, directory: string): string | undefined => {
+  const postDirectory = path.join(process.cwd(), directory)
+  const folderfiles = fs.readdirSync(postDirectory)
+  return folderfiles.filter((x) => x.includes(`${slug}.mdx`))[0]
+}
 
+/**
+ * Canonical slug for a blog URL: the slug of the post the URL actually resolves
+ * to, so aliases like `/blog/postgres-13` map to `supabase-postgres-13`.
+ */
+export const resolveBlogSlug = (slug: string): string | undefined => {
+  const found = findPostFilename(slug, '_blog')
+  return found ? found.replace('.mdx', '').substring(FILENAME_SUBSTRING) : undefined
+}
+
+export const getPostdata = async (slug: string, directory: string) => {
   /**
    * Return full directory
    */
   const postDirectory = path.join(process.cwd(), directory)
-  const folderfiles = fs.readdirSync(postDirectory)
 
   /**
    * Check if the file exists in the directory
@@ -147,10 +183,20 @@ export const getPostdata = async (slug: string, directory: string) => {
    * this is so slugs like 'blog-post.mdx' will work
    * even if the mdx file is date namednamed like '2022-01-01-blog-post.mdx'
    */
-  const found = folderfiles.filter((x) => x.includes(slug))[0]
+  const found = findPostFilename(slug, directory)
+
+  if (!found) {
+    throw Object.assign(new Error(`Post not found: ${slug}.mdx`), { code: 'POST_NOT_FOUND' })
+  }
 
   const fullPath = path.join(postDirectory, found)
   const postContent = fs.readFileSync(fullPath, 'utf8')
+
+  if (directory === '_blog') {
+    const { data } = matter(postContent) as unknown as { data: { [key: string]: any } }
+    validateBlogFrontmatterImages(data as { imgSocial?: string; imgThumb?: string }, fullPath)
+  }
+
   return postContent
 }
 

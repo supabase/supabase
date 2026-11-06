@@ -24,7 +24,7 @@ android {
         }
         Properties properties = new Properties()
         properties.load(project.rootProject.file("local.properties").newDataInputStream())
-        buildConfigField("String", "API_KEY", "\"${properties.getProperty("API_KEY")}\"")
+        buildConfigField("String", "API_PUBLISHABLE_KEY", "\"${properties.getProperty("API_PUBLISHABLE_KEY")}\"")
         buildConfigField("String", "SECRET", "\"${properties.getProperty("SECRET")}\"")
         buildConfigField("String", "SUPABASE_URL", "\"${properties.getProperty("SUPABASE_URL")}\"")
     }

@@ -1,8 +1,10 @@
-import { get, handleError } from 'data/fetchers'
+import { useQuery } from '@tanstack/react-query'
+
 import { projectKeys } from './keys'
-import { useQuery, UseQueryOptions } from '@tanstack/react-query'
-import { ResponseError } from 'types'
-import { InfraInstanceSize } from 'components/interfaces/DiskManagement/DiskManagement.types'
+import { InfraInstanceSize } from '@/components/interfaces/DiskManagement/DiskManagement.types'
+import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getCloneBackups(projectRef?: string) {
   if (!projectRef) throw new Error('Project ref is required')
@@ -16,7 +18,7 @@ export async function getCloneBackups(projectRef?: string) {
 }
 
 export type CloneBackupsData = Awaited<ReturnType<typeof getCloneBackups>>
-export type CloneBackupsError = ResponseError
+export type CloneBackupsError = StudioError
 
 export const useCloneBackupsQuery = <
   TData = CloneBackupsData & {
@@ -25,11 +27,12 @@ export const useCloneBackupsQuery = <
   },
 >(
   { projectRef }: { projectRef?: string },
-  options: UseQueryOptions<CloneBackupsData, CloneBackupsError, TData> = {}
+  options: UseCustomQueryOptions<CloneBackupsData, CloneBackupsError, TData> = {}
 ) => {
-  return useQuery<CloneBackupsData, CloneBackupsError, TData>(
-    projectKeys.listCloneBackups(projectRef),
-    () => getCloneBackups(projectRef),
-    { enabled: !!projectRef, ...options }
-  )
+  return useQuery<CloneBackupsData, CloneBackupsError, TData>({
+    queryKey: projectKeys.listCloneBackups(projectRef),
+    queryFn: () => getCloneBackups(projectRef),
+    enabled: !!projectRef,
+    ...options,
+  })
 }
