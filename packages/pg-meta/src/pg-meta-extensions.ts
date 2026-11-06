@@ -8,7 +8,7 @@ const pgExtensionZod = z.object({
   schema: z.string().nullable(),
   default_version: z.string(),
   installed_version: z.string().nullable(),
-  comment: z.string(),
+  comment: z.string().nullable(),
 })
 
 const pgExtensionArrayZod = z.array(pgExtensionZod)
