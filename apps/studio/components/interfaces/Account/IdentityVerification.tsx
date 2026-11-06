@@ -231,33 +231,42 @@ const VerificationForm = ({
         })}
         className="space-y-4"
       >
-        <FormField
-          control={form.control}
-          name="factorId"
-          render={({ field }) => (
-            <FormItemLayout label="Authenticator app">
-              <Select value={field.value} onValueChange={field.onChange} disabled={loading}>
-                <FormControl>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Choose an authenticator" />
-                  </SelectTrigger>
-                </FormControl>
-                <SelectContent>
-                  {verifiedFactors.map((factor) => (
-                    <SelectItem key={factor.id} value={factor.id}>
-                      {factor.friendly_name || 'Authenticator app'}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormItemLayout>
-          )}
-        />
+        {verifiedFactors.length > 1 && (
+          <FormField
+            control={form.control}
+            name="factorId"
+            render={({ field }) => (
+              <FormItemLayout label="Authenticator app">
+                <Select value={field.value} onValueChange={field.onChange} disabled={loading}>
+                  <FormControl>
+                    <SelectTrigger>
+                      <SelectValue placeholder="Choose an authenticator" />
+                    </SelectTrigger>
+                  </FormControl>
+                  <SelectContent>
+                    {verifiedFactors.map((factor) => (
+                      <SelectItem key={factor.id} value={factor.id}>
+                        {factor.friendly_name || 'Authenticator app'}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormItemLayout>
+            )}
+          />
+        )}
         <FormField
           control={form.control}
           name="code"
           render={({ field }) => (
-            <FormItemLayout label="Authentication code">
+            <FormItemLayout
+              label="Authentication code"
+              description={
+                verifiedFactors.length === 1
+                  ? `From your authenticator app “${preferredFactor?.friendly_name || 'Authenticator app'}”.`
+                  : undefined
+              }
+            >
               <FormControl>
                 <Input
                   {...field}

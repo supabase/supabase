@@ -204,9 +204,29 @@ describe('DeleteFactorModal identity verification', () => {
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
+    const input = await screen.findByRole('textbox', { name: 'Authentication code' })
+    expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
+    expect(input).toHaveAccessibleDescription('From your authenticator app “Backup device”.')
+  })
+  test('two authenticators use a dropdown without repeating the app in the code description', async () => {
+    const other = { ...authenticator, id: 'some_id', friendly_name: 'Main device' }
+    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+      data: {
+        all: [other, authenticator],
+        totp: [other, authenticator],
+        phone: [],
+        recovery_code: [],
+        webauthn: [],
+      },
+      error: null,
+    })
+    renderDeletion()
     expect(await screen.findByRole('combobox', { name: 'Authenticator app' })).toHaveTextContent(
       'Backup device'
     )
+    expect(
+      screen.getByRole('textbox', { name: 'Authentication code' })
+    ).not.toHaveAccessibleDescription(/From your authenticator app/)
   })
   test('verification comes before explicit confirmation and removal deletes codes first', async () => {
     const assurance = vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel')
