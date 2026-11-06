@@ -22,6 +22,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
 import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
+import { parseRedirectMessage } from '@/components/interfaces/Account/Preferences/AccountIdentities.utils'
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
@@ -63,7 +64,7 @@ const PreferencesPageHeader = ({ description }: { description: string }) => (
 )
 
 const PlatformPreferences = () => {
-  const router = useRouter()
+  const { asPath, query, replace } = useRouter()
 
   const {
     profileShowInformation,
@@ -79,11 +80,16 @@ const PlatformPreferences = () => {
   const { error, isLoading, isError } = useProfile()
 
   useEffect(() => {
-    const hash = router.asPath.split('#')[1]
+    const hash = asPath.split('#')[1]
+    const isEmailConfirmation = !!parseRedirectMessage(asPath)
+    if (accountShowSecuritySettings && isEmailConfirmation) {
+      void replace({ pathname: '/account/security', query, hash })
+      return
+    }
     if (isLoading || !hash) return
 
     document.getElementById(hash)?.scrollIntoView({ block: 'start' })
-  }, [isLoading, router.asPath])
+  }, [accountShowSecuritySettings, asPath, isLoading, query, replace])
 
   return (
     <>
