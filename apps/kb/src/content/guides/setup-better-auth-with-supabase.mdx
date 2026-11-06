@@ -1,23 +1,24 @@
 ---
 title: 'Set up Better Auth with Supabase'
-description: 'Store Better Auth users and sessions in Supabase Postgres, and manage the tables with the Supabase CLI and declarative schemas.'
+description: 'Store Better Auth users and sessions in Supabase Postgres. Create the tables with declarative schemas and the Supabase CLI, then deploy them to your project.'
 topics: ['Auth', 'Database', 'Tutorials']
-lastEdited: 2026-11-05
+lastEdited: 2026-11-06
 ---
 
-[Better Auth](https://better-auth.com) is an open source authentication library for TypeScript. It stores users, sessions, and accounts in your own database. This guide shows you how to keep those tables in your Supabase Postgres database, and how to manage them with the Supabase CLI and [declarative schemas](/docs/guides/local-development/declarative-database-schemas).
+Store Better Auth users, sessions, and accounts in your Supabase Postgres database. Create and update the tables with the Supabase CLI and [declarative schemas](/docs/guides/local-development/declarative-database-schemas). [Better Auth](https://better-auth.com) is an open source authentication library for TypeScript that stores its data in your own database.
 
-You'll build a [TanStack Start](https://tanstack.com/start) app with email and password sign-in. The database setup works the same in any framework. Only the route handler and client code change, and Better Auth documents those for each framework in its [installation guide](https://better-auth.com/docs/installation#mount-handler).
+In this guide, you build a [TanStack Start](https://tanstack.com/start) app with email and password sign-in. The database setup works the same in any framework. Only the route handler and client code change. Better Auth documents those for each framework in its [installation guide](https://better-auth.com/docs/installation#mount-handler).
 
-By the end, you have:
+The guide has five parts:
 
-- Better Auth tables in a dedicated `better_auth` schema
-- A declarative schema file and a generated migration that you commit to your repository
-- A working sign-up, sign-in, and session flow against your local Supabase stack
-- The same schema deployed to your hosted Supabase project
+- [Set up the project](#set-up-the-project) creates a TanStack Start app and a local Supabase stack.
+- [Create the Better Auth tables](#create-the-better-auth-tables) writes a declarative schema file and a migration that you commit.
+- [Add sign-up and sign-in](#add-sign-up-and-sign-in) connects the app to Better Auth and tests the flow locally.
+- [Deploy and update the schema](#deploy-and-update-the-schema) pushes the tables to your hosted project and covers later schema changes.
+- [Read and write app data](#read-and-write-app-data) compares ways to query your own tables.
 
 > [!NOTE]
-> Better Auth replaces [Supabase Auth](/docs/guides/auth) for the users it manages. Supabase Auth features such as `auth.uid()` in Row Level Security (RLS) policies and the auth methods in `supabase-js` don't apply to Better Auth sessions.
+> Better Auth replaces [Supabase Auth](/docs/guides/auth) for the users it authenticates. Supabase Auth features such as `auth.uid()` in Row Level Security (RLS) policies and the auth methods in `supabase-js` don't apply to Better Auth sessions.
 
 ## Prerequisites
 
@@ -26,23 +27,27 @@ By the end, you have:
 
 This guide uses Supabase CLI v3. It installs as a development dependency, so you run it with `npx supabase`.
 
-## Create the app
+## Set up the project
 
-Create a TanStack Start app and move into its directory:
+Create the app, start a local Supabase stack, and set the environment variables that Better Auth reads.
 
-```bash
-npx @tanstack/cli@latest create my-app
-cd my-app
-```
+### Create the app
 
-Install Better Auth, the Postgres driver, and Kysely, which Better Auth uses to talk to Postgres:
+1. Create a TanStack Start app and move into its directory:
 
-```bash
-npm install better-auth pg kysely
-npm install -D @types/pg supabase
-```
+   ```bash
+   npx @tanstack/cli@latest create my-app
+   cd my-app
+   ```
 
-## Start Supabase locally
+2. Install Better Auth, the Postgres driver, Kysely, and the Supabase CLI. Better Auth uses Kysely to connect to Postgres:
+
+   ```bash
+   npm install better-auth pg kysely
+   npm install -D @types/pg supabase
+   ```
+
+### Start Supabase locally
 
 Initialize Supabase in your project and start the local stack:
 
@@ -57,25 +62,29 @@ When the stack is running, the CLI prints its connection details. The local data
 postgresql://postgres:postgres@127.0.0.1:54322/postgres
 ```
 
-## Set environment variables
+### Set environment variables
 
-Generate a secret that Better Auth uses to sign session cookies:
+1. Generate a secret that Better Auth uses to sign session cookies:
 
-```bash
-npx auth@latest secret
-```
+   ```bash
+   npx auth@latest secret
+   ```
 
-Create a `.env` file in your project root with the secret, the local database URL, and your app's URL:
+2. In your project root, create a `.env` file with the secret, the local database URL, and your app's URL:
 
-```bash
-DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
-BETTER_AUTH_SECRET=<your-generated-secret>
-BETTER_AUTH_URL=http://localhost:3000
-```
+   ```bash
+   DATABASE_URL=postgresql://postgres:postgres@127.0.0.1:54322/postgres
+   BETTER_AUTH_SECRET=<your-generated-secret>
+   BETTER_AUTH_URL=http://localhost:3000
+   ```
 
-## Configure Better Auth
+## Create the Better Auth tables
 
-Create `src/lib/auth.ts`. This configures Better Auth with the Kysely `PostgresDialect` and keeps its tables in a `better_auth` schema:
+Declarative schema files in `supabase/schemas/` describe the state you want your database to be in. The Supabase CLI compares them with your migrations and writes the difference as a new migration.
+
+### Configure Better Auth
+
+Create `src/lib/auth.ts`. This file configures Better Auth with the Kysely `PostgresDialect` and keeps its tables in a `better_auth` schema:
 
 ```ts
 import { betterAuth } from 'better-auth'
@@ -100,13 +109,11 @@ export const auth = betterAuth({
 })
 ```
 
-The `schemaName` option keeps the tables in their own schema, outside of the default schema of the database. Better Auth qualifies every query with the schema name, such as `"better_auth"."user"`.
+The `schemaName` option keeps the tables in their own schema, outside the database's default schema. Better Auth qualifies every query with the schema name, such as `"better_auth"."user"`.
 
 The `tanstackStartCookies` plugin sets cookies through TanStack Start. Other frameworks don't need it.
 
-## Generate the Better Auth schema
-
-Declarative schema files in `supabase/schemas/` describe the state you want your database to be in. The Supabase CLI compares them with your migrations and writes the difference as a new migration.
+### Generate the Better Auth schema
 
 Use the Better Auth CLI to write its tables to a schema file:
 
@@ -116,14 +123,14 @@ npx auth@latest generate --output supabase/schemas/better_auth.sql --yes
 ```
 
 > [!NOTE]
-> The command logs a `Database schema mismatch` error that lists missing tables. This is expected. The tables don't exist yet, and the generated file creates them.
+> You can ignore the `Database schema mismatch` error that the command logs. It lists the Better Auth tables that don't exist yet, which the generated file creates.
 
 The generated file creates the schema and each table with a schema-qualified name:
 
 ```sql
 create schema if not exists "better_auth";
 
-create table "better_auth"."user" ("id" text not null primary key, "name" text not null, "email" text not null unique, "emailVerified" boolean not null, "image" text, "createdAt" timestamptz default CURRENT_TIMESTAMP not null, "updatedAt" timestamptz default CURRENT_TIMESTAMP not null);
+create table "better_auth"."user" ( ... );
 
 create table "better_auth"."session" ( ... );
 
@@ -132,40 +139,44 @@ create table "better_auth"."account" ( ... );
 create table "better_auth"."verification" ( ... );
 ```
 
-> [!IMPORTANT]
-> With the Kysely adapter, `generate` inspects your live database and only outputs what's missing. Run it against a local database that doesn't have the Better Auth tables yet. To add changes later, see [Update the schema](#update-the-schema).
+> [!CAUTION]
+> If your local database already has Better Auth tables, `generate` writes only what's missing, and the schema file is incomplete. With the Kysely adapter, the command compares against your live database. To add changes later, see [Update the schema](#update-the-schema).
 
-## Generate and apply the migration
+### Generate and apply the migration
 
-Generate a migration from your schema files, then apply it to your local database:
+1. Generate a migration from your schema files, then apply it to your local database:
 
-```bash
-npx supabase db schema declarative sync -f add_better_auth --no-apply
-npx supabase migration up
-```
+   ```bash
+   npx supabase db schema declarative sync -f add_better_auth --no-apply
+   npx supabase migration up
+   ```
 
-The CLI writes the migration to `supabase/migrations/<timestamp>_add_better_auth.sql`. Review it before you commit it. It starts like this:
+2. Review the migration that the CLI writes to `supabase/migrations/<timestamp>_add_better_auth.sql`. It starts like this:
 
-```sql
-CREATE SCHEMA "better_auth";
+   ```sql
+   CREATE SCHEMA "better_auth";
 
-CREATE TABLE "better_auth"."account" (
-  "id"                    text                     NOT NULL,
-  "accountId"             text                     NOT NULL,
-  ...
-```
+   CREATE TABLE "better_auth"."account" (
+     "id"                    text                     NOT NULL,
+     "accountId"             text                     NOT NULL,
+     ...
+   ```
 
-Confirm that the database matches what Better Auth expects:
+3. Confirm that the database matches what Better Auth expects:
 
-```bash
-npx auth@latest check schema
-```
+   ```bash
+   npx auth@latest check schema
+   ```
 
-The command prints `Schema check passed against the live database.`
+   The command prints `Schema check passed against the live database.`
 
-Commit both `supabase/schemas/better_auth.sql` and the new migration.
+4. Commit `supabase/schemas/better_auth.sql` and the migration.
 
-## Mount the auth handler
+## Add sign-up and sign-in
+
+Connect your app to Better Auth with a server route, a client, and a sign-in page.
+
+### Mount the auth handler
 
 Better Auth serves its endpoints, such as `/api/auth/sign-up/email`, through a single handler. In TanStack Start, mount it as a server route.
 
@@ -186,160 +197,167 @@ export const Route = createFileRoute('/api/auth/$')({
 })
 ```
 
-## Add sign-up and sign-in
+### Add the sign-in page
 
-Create the Better Auth client in `src/lib/auth-client.ts`:
+1. Create `src/lib/auth-client.ts` with the Better Auth client:
 
-```ts
-import { createAuthClient } from 'better-auth/react'
+   ```ts
+   import { createAuthClient } from 'better-auth/react'
 
-export const authClient = createAuthClient()
-```
+   export const authClient = createAuthClient()
+   ```
 
-Create a server function that reads the current session from the request cookies in `src/lib/auth.functions.ts`:
+2. In `src/lib/auth.functions.ts`, create a server function that reads the current session from the request cookies:
 
-```ts
-import { createServerFn } from '@tanstack/react-start'
-import { getRequestHeaders } from '@tanstack/react-start/server'
+   ```ts
+   import { createServerFn } from '@tanstack/react-start'
+   import { getRequestHeaders } from '@tanstack/react-start/server'
 
-import { auth } from '@/lib/auth'
+   import { auth } from '@/lib/auth'
 
-export const getSession = createServerFn({ method: 'GET' }).handler(async () => {
-  const headers = getRequestHeaders()
-  return auth.api.getSession({ headers })
-})
-```
+   export const getSession = createServerFn({ method: 'GET' }).handler(async () => {
+     const headers = getRequestHeaders()
+     return auth.api.getSession({ headers })
+   })
+   ```
 
-Replace `src/routes/index.tsx` with a page that loads the session on the server. It shows a sign-up and sign-in form, or the signed-in user's email:
+3. Replace `src/routes/index.tsx` with a page that loads the session on the server. The page shows a sign-up and sign-in form, or the signed-in user's email:
 
-```tsx
-import { createFileRoute, useRouter } from '@tanstack/react-router'
-import { useState } from 'react'
+   ```tsx
+   import { createFileRoute, useRouter } from '@tanstack/react-router'
+   import { useState } from 'react'
 
-import { authClient } from '@/lib/auth-client'
-import { getSession } from '@/lib/auth.functions'
+   import { authClient } from '@/lib/auth-client'
+   import { getSession } from '@/lib/auth.functions'
 
-export const Route = createFileRoute('/')({
-  loader: () => getSession(),
-  component: Home,
-})
+   export const Route = createFileRoute('/')({
+     loader: () => getSession(),
+     component: Home,
+   })
 
-function Home() {
-  const session = Route.useLoaderData()
-  const router = useRouter()
-  const [name, setName] = useState('')
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+   function Home() {
+     const session = Route.useLoaderData()
+     const router = useRouter()
+     const [name, setName] = useState('')
+     const [email, setEmail] = useState('')
+     const [password, setPassword] = useState('')
+     const [error, setError] = useState<string | null>(null)
 
-  if (session) {
-    return (
-      <main>
-        <p>Signed in as {session.user.email}</p>
-        <button
-          onClick={async () => {
-            await authClient.signOut()
-            router.invalidate()
-          }}
-        >
-          Sign out
-        </button>
-      </main>
-    )
-  }
+     if (session) {
+       return (
+         <main>
+           <p>Signed in as {session.user.email}</p>
+           <button
+             onClick={async () => {
+               await authClient.signOut()
+               router.invalidate()
+             }}
+           >
+             Sign out
+           </button>
+         </main>
+       )
+     }
 
-  async function handleSignUp() {
-    const { error } = await authClient.signUp.email({ name, email, password })
-    if (error) return setError(error.message ?? 'Sign-up failed')
-    router.invalidate()
-  }
+     async function handleSignUp() {
+       const { error } = await authClient.signUp.email({ name, email, password })
+       if (error) return setError(error.message ?? 'Sign-up failed')
+       router.invalidate()
+     }
 
-  async function handleSignIn() {
-    const { error } = await authClient.signIn.email({ email, password })
-    if (error) return setError(error.message ?? 'Sign-in failed')
-    router.invalidate()
-  }
+     async function handleSignIn() {
+       const { error } = await authClient.signIn.email({ email, password })
+       if (error) return setError(error.message ?? 'Sign-in failed')
+       router.invalidate()
+     }
 
-  return (
-    <main>
-      <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
-      <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input
-        placeholder="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <button onClick={handleSignUp}>Sign up</button>
-      <button onClick={handleSignIn}>Sign in</button>
-      {error && <p>{error}</p>}
-    </main>
-  )
-}
-```
+     return (
+       <main>
+         <input placeholder="Name" value={name} onChange={(e) => setName(e.target.value)} />
+         <input placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
+         <input
+           placeholder="Password"
+           type="password"
+           value={password}
+           onChange={(e) => setPassword(e.target.value)}
+         />
+         <button onClick={handleSignUp}>Sign up</button>
+         <button onClick={handleSignIn}>Sign in</button>
+         {error && <p>{error}</p>}
+       </main>
+     )
+   }
+   ```
 
-To protect routes and server functions, see [Protecting resources](https://better-auth.com/docs/integrations/tanstack#protecting-resources) in the Better Auth TanStack Start guide.
+For how to protect routes and server functions, see [Protecting resources](https://better-auth.com/docs/integrations/tanstack#protecting-resources) in the Better Auth TanStack Start guide.
 
-## Test it locally
+### Test sign-up locally
 
-Start the dev server:
+Test the sign-up flow against your local Supabase stack:
 
-```bash
-npm run dev
-```
+1. Start the dev server:
 
-Open [http://localhost:3000](http://localhost:3000), and sign up with a name, email, and password. The page shows `Signed in as` with your email.
+   ```bash
+   npm run dev
+   ```
 
-Check that the user is stored in the `better_auth` schema:
+2. Open your app at `http://localhost:3000`, and sign up with a name, email, and password. The page shows `Signed in as` with your email.
 
-```bash
-npx supabase db query 'select id, email from better_auth."user"'
-```
+3. Check that the user is stored in the `better_auth` schema:
 
-You can also browse the tables in Studio at [http://127.0.0.1:54323](http://127.0.0.1:54323). In the Table Editor, select the `better_auth` schema.
+   ```bash
+   npx supabase db query 'select id, email from better_auth."user"'
+   ```
 
-## Deploy to your Supabase project
+   You can also view the tables in Studio at `http://127.0.0.1:54323`. In the Table Editor, select the `better_auth` schema.
 
-Sign in to the Supabase CLI and link your project:
+## Deploy and update the schema
 
-```bash
-npx supabase login
-npx supabase link
-```
+Push the tables to your hosted project. When the Better Auth schema changes later, update the schema file and deploy again.
 
-Push your migrations to the hosted database. The CLI asks you to confirm before it changes your project:
+### Deploy to your Supabase project
 
-```bash
-npx supabase db push --remote
-```
+1. Sign in to the Supabase CLI and link your project:
 
-Then set these environment variables where your app runs:
+   ```bash
+   npx supabase login
+   npx supabase link
+   ```
 
-- `DATABASE_URL`: the connection string from your project's [**Connect** panel](/dashboard/project/_?showConnect=true). Choose the connection type based on where your app runs (see the table after this list).
-- `BETTER_AUTH_SECRET`: a new secret for production, generated with `npx auth@latest secret`
-- `BETTER_AUTH_URL`: your app's public URL
+2. Push your migrations to the hosted database. The CLI asks you to confirm before it changes your project:
+
+   ```bash
+   npx supabase db push --remote
+   ```
+
+3. Where your app runs, set the following environment variables:
+   - `DATABASE_URL`: the connection string from your project's [**Connect** panel](/dashboard/project/_?showConnect=true)
+   - `BETTER_AUTH_SECRET`: a new secret for production, generated with `npx auth@latest secret`
+   - `BETTER_AUTH_URL`: your app's public URL
+
+Choose the `DATABASE_URL` connection type based on where your app runs:
 
 | Where your app runs                                | Connection type                 |
 | -------------------------------------------------- | ------------------------------- |
-| Serverless functions, such as Vercel or Netlify    | Shared pooler, transaction mode |
+| Serverless platforms, such as Vercel or Netlify    | Shared pooler, transaction mode |
 | A long-running server on an IPv4-only network      | Shared pooler, session mode     |
 | A long-running server with IPv6 or the IPv4 add-on | Direct connection               |
 
-For serverless functions, create the pool once at module scope and set `max: 1` on the `Pool`. Kysely with node-postgres doesn't use prepared statements, so it works with transaction mode without extra settings. See [Connect to your database](/docs/guides/database/connecting-to-postgres) for details on each connection type.
+On serverless platforms, set `max: 1` in the `Pool` options in `src/lib/auth.ts`. Kysely with node-postgres doesn't use prepared statements, so it works with transaction mode without extra settings. For details on each connection type, see [Connect to your database](/docs/guides/database/connecting-to-postgres).
 
-## Update the schema
+### Update the schema
 
 Better Auth plugins, and some Better Auth upgrades, add tables or columns. Because `generate` inspects your live database, it outputs only the changes. Use it to update your schema file:
 
-1. Make the change in `src/lib/auth.ts`, such as adding a plugin.
+1. In `src/lib/auth.ts`, update the Better Auth configuration. For example, add a plugin.
 
-1. Generate the changes against your local database, which has the current schema applied. Write them to a temporary file:
+2. Generate the changes against your local database, which has the current schema applied. Write them to a temporary file:
 
    ```bash
    npx auth@latest generate --output better_auth_changes.sql --yes
    ```
 
-   For example, adding the [`username` plugin](https://better-auth.com/docs/plugins/username) generates:
+   For example, adding the Better Auth [`username` plugin](https://better-auth.com/docs/plugins/username) generates:
 
    ```sql
    alter table "better_auth"."user" add column "username" text;
@@ -349,31 +367,33 @@ Better Auth plugins, and some Better Auth upgrades, add tables or columns. Becau
    create unique index "user_username_uidx" on "better_auth"."user" ("username");
    ```
 
-1. Append the changes to your schema file, and delete the temporary file:
+3. Append the changes to your schema file, and delete the temporary file:
 
    ```bash
    cat better_auth_changes.sql >> supabase/schemas/better_auth.sql
    rm better_auth_changes.sql
    ```
 
-1. Generate and apply a new migration:
+4. Generate and apply a new migration:
 
    ```bash
    npx supabase db schema declarative sync -f add_better_auth_username --no-apply
    npx supabase migration up
    ```
 
-1. Deploy it with `npx supabase db push --remote`.
+5. Deploy the migration with `npx supabase db push --remote`.
 
-> [!WARNING]
-> Don't run `npx auth@latest migrate` in this setup. It changes the database directly. The declarative schema files are the source of truth, so the Supabase CLI doesn't see changes made outside them and won't include them in your migrations.
+> [!CAUTION]
+> Changes made with `npx auth@latest migrate` apply directly to the database, so the Supabase CLI doesn't include them in your migrations. Make schema changes in the declarative schema files instead, and don't run `migrate` in this setup.
 
-## Access your app data
+## Read and write app data
 
-Better Auth handles sign-in and sessions. How your app reads and writes its own data is up to you:
+Better Auth signs users in and tracks their sessions. Your app reads and writes its own data in one of these ways:
 
-- **A Postgres client or ORM on the server**, such as Kysely, Drizzle, or Prisma. Read the user from `auth.api.getSession()`, then filter queries by `session.user.id`.
+- **A Postgres client or object-relational mapper (ORM) on the server**, such as Kysely, Drizzle, or Prisma. Read the user from `auth.api.getSession()`, then filter queries by `session.user.id`.
 - **The Supabase Data API**. The Data API and RLS policies identify users from Supabase-issued JSON Web Tokens (JWTs), and Better Auth sessions aren't Supabase JWTs. Using the Data API with per-user RLS needs extra setup that this guide doesn't cover.
+
+### Link your tables to Better Auth users
 
 To link your own tables to Better Auth users, reference `better_auth."user"(id)`. The ID is `text`:
 
@@ -385,7 +405,7 @@ create table public.profiles (
 );
 ```
 
-Add tables like this to a file in `supabase/schemas/`, then generate a migration with `npx supabase db schema declarative sync`. If a table is in `public` or another exposed schema, enable RLS on it.
+Add tables like this to a file in `supabase/schemas/`. Then generate and apply a migration, as in [Generate and apply the migration](#generate-and-apply-the-migration). If a table is in `public` or another exposed schema, enable RLS on it.
 
 ## Resources
 
