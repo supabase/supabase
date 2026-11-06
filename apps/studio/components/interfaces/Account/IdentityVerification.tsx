@@ -57,7 +57,6 @@ export const IdentityVerification = ({
   )
   const [hasVerified, setHasVerified] = useState(false)
   const [error, setError] = useState<{ message: string } | null>(null)
-  const [isCheckingSession, setIsCheckingSession] = useState(false)
 
   const assurance = useAuthenticatorAssuranceLevelQuery({
     queryKey: profileKeys.identityVerification(verificationId),
@@ -77,37 +76,23 @@ export const IdentityVerification = ({
   const verifiedFactors = (factors.data?.totp ?? []).filter(
     (factor) => factor.status === 'verified'
   )
-  const verify = useMfaChallengeAndVerifyMutation({
-    onError: (error) => {
-      if (error.code !== 'mfa_verification_failed') setError(error)
-    },
-    onSuccess: async () => {
-      setIsCheckingSession(true)
-      try {
-        const session = await getMfaAuthenticatorAssuranceLevel()
-        if (session?.currentLevel !== 'aal2') {
-          setError({
-            message: 'Verification did not update your session. Enter a new code and try again.',
-          })
-          return
-        }
-        setError(null)
-        setHasVerified(true)
-      } catch (error) {
-        setError({
-          message:
-            error instanceof Error ? error.message : 'Unable to check your session. Try again.',
-        })
-      } finally {
-        setIsCheckingSession(false)
-      }
-    },
-  })
-  const loading = verify.isPending || isCheckingSession
-  const handleVerify = async ({ code, factorId }: VerificationValues) => {
-    if (loading) return
+  const handleVerified = async () => {
     setError(null)
-    await verify.mutateAsync({ factorId, code, refreshFactors: false })
+    try {
+      const session = await getMfaAuthenticatorAssuranceLevel()
+      if (session?.currentLevel !== 'aal2') {
+        setError({
+          message: 'Verification did not update your session. Enter a new code and try again.',
+        })
+        return
+      }
+      setHasVerified(true)
+    } catch (error) {
+      setError({
+        message:
+          error instanceof Error ? error.message : 'Unable to check your session. Try again.',
+      })
+    }
   }
   const readError = assurance.error ?? (needsCode ? factors.error : null)
 
@@ -164,9 +149,8 @@ export const IdentityVerification = ({
                 <VerificationForm
                   verifiedFactors={verifiedFactors}
                   factorToAvoidId={factorToAvoidId}
-                  loading={loading}
                   error={error}
-                  onVerify={handleVerify}
+                  onVerified={handleVerified}
                   onCancel={onCancel}
                 />
               )}
@@ -186,17 +170,15 @@ export const IdentityVerification = ({
 const VerificationForm = ({
   verifiedFactors,
   factorToAvoidId,
-  loading,
   error,
-  onVerify,
+  onVerified,
   onCancel,
 }: {
   verifiedFactors: MFAFactor[]
   factorToAvoidId?: string
-  loading: boolean
   error: { message: string } | null
   onCancel: () => void
-  onVerify: (values: VerificationValues) => Promise<void>
+  onVerified: () => Promise<void>
 }) => {
   const preferredFactor =
     verifiedFactors.find((factor) => factor.id !== factorToAvoidId) ?? verifiedFactors[0]
@@ -206,31 +188,33 @@ const VerificationForm = ({
     defaultValues: { code: '', factorId: preferredFactor?.id ?? '' },
   })
 
+  const { mutate: verify, isPending: loading } = useMfaChallengeAndVerifyMutation({
+    onSuccess: onVerified,
+    onError: (error) => {
+      if (error.code === 'mfa_verification_failed') {
+        form.setError(
+          'code',
+          {
+            type: 'server',
+            message: 'Incorrect code. Enter a new code and try again.',
+          },
+          { shouldFocus: true }
+        )
+      } else {
+        form.setError('root', { type: 'server', message: error.message })
+      }
+    },
+  })
+  const { errors } = form.formState
+  const handleVerify = ({ code, factorId }: VerificationValues) => {
+    if (loading) return
+    form.clearErrors()
+    verify({ code, factorId, refreshFactors: false })
+  }
+
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(async (values) => {
-          try {
-            await onVerify(values)
-          } catch (error) {
-            if (
-              error instanceof Error &&
-              'code' in error &&
-              error.code === 'mfa_verification_failed'
-            ) {
-              form.setError(
-                'code',
-                {
-                  type: 'server',
-                  message: 'Incorrect code. Enter a new code and try again.',
-                },
-                { shouldFocus: true }
-              )
-            }
-          }
-        })}
-        className="space-y-4"
-      >
+      <form onSubmit={form.handleSubmit(handleVerify)} className="space-y-4">
         {verifiedFactors.length > 1 && (
           <FormField
             control={form.control}
@@ -284,9 +268,9 @@ const VerificationForm = ({
           )}
         />
 
-        {error && (
+        {(error || errors.root) && (
           <p role="alert" className="text-sm text-destructive">
-            {error.message}
+            {error?.message ?? errors.root?.message}
           </p>
         )}
 
