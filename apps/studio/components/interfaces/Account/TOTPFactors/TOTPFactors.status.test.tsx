@@ -111,7 +111,7 @@ describe('authenticator removal recovery-status guard', () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
     const remove = vi.spyOn(auth.mfa, 'unenroll')
     renderFactors('?removeAuthenticator=authenticator-a')
-    expect(await screen.findByRole('dialog', { name: 'Remove authenticator' })).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: 'Remove MFA method' })).toBeInTheDocument()
     expect(remove).not.toHaveBeenCalled()
   })
 
@@ -122,7 +122,7 @@ describe('authenticator removal recovery-status guard', () => {
     await screen.findByRole('button', { name: 'Delete' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Resume removal' }))
-    const dialog = await screen.findByRole('dialog', { name: 'Remove authenticator' })
+    const dialog = await screen.findByRole('dialog', { name: 'Remove MFA method' })
     fireEvent.click(within(dialog).getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
     expect(remove).not.toHaveBeenCalled()
