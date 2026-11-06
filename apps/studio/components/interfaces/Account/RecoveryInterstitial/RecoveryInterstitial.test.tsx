@@ -49,7 +49,7 @@ async function verifyFactor() {
   })
   await userEvent.type(screen.getByRole('textbox', { name: 'Authentication code' }), '123456')
   fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-  await screen.findByText('Backup authenticator added')
+  await screen.findByText('Backup MFA method added')
 }
 
 const response = {
@@ -121,13 +121,13 @@ describe('RecoveryReminder', () => {
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
     expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add another method' }))
     await enrollFactor()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
-    expect(screen.getByRole('button', { name: 'Add authenticator' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add another method' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add another method' }))
     await enrollFactor()
     rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} hasAuthenticatorTask />)
     await verifyFactor()
@@ -189,7 +189,7 @@ describe('RecoveryReminder', () => {
     const { rerender } = customRender(
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add another method' }))
     await enrollFactor()
     rerender(<RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />)
     expect(screen.getByRole('dialog')).toBeInTheDocument()
@@ -201,7 +201,7 @@ describe('RecoveryReminder', () => {
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     expect(screen.getByText('No recovery codes')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add authenticator' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add another method' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
   })
 
