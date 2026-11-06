@@ -66,6 +66,7 @@ export const TOTPFactors = () => {
     error: recoveryCodesError,
     isError: recoveryCodesIsError,
     isPending: recoveryCodesIsPending,
+    isFetching: recoveryCodesIsFetching,
   } = useRecoveryCodesStatusQuery({
     enabled: shouldVerifyRecoveryCodes,
   })
@@ -81,7 +82,8 @@ export const TOTPFactors = () => {
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
   const disableDeleteFactor =
-    shouldVerifyRecoveryCodes && (recoveryCodesIsPending || recoveryCodesIsError)
+    shouldVerifyRecoveryCodes &&
+    (recoveryCodesIsPending || recoveryCodesIsFetching || recoveryCodesIsError)
 
   return (
     <>
