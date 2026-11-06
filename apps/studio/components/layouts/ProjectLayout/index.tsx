@@ -156,7 +156,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_space_exhaustion ||
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+    // The free Micro upgrade is only included on paid plans
+    const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
+    const showUpgradeBanner = isPaidPlan && isNanoCompute && isComputeNearExhaustion
 
     const isExplorerEnabled = useFlag('explorer')
 
