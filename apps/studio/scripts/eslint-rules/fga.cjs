@@ -4,6 +4,8 @@
  * - `no-unguarded-migrating` marks call sites not yet migrated.
  * - `unguarded-by-design-reason` requires a non-empty string-literal reason.
  * - `no-fetch-type-bypass` flags calls that skip the typed fetch wrappers' grant check.
+ * - `no-spread-granted-query-options` flags spreading a grant-gated `xQueryOptions({ grant })`,
+ *   which would let the caller override the grant gate.
  */
 
 const path = require('node:path')
@@ -183,11 +185,44 @@ const noFetchTypeBypass = {
   },
 }
 
+/** @type {import('eslint').Rule.RuleModule} */
+const noSpreadGrantedQueryOptions = {
+  meta: {
+    type: 'problem',
+    docs: { description: 'Disallow spreading grant-gated query options' },
+    messages: {
+      spread:
+        'Pass query options as the second argument. Spreading lets callers override the grant gate.',
+    },
+    schema: [],
+  },
+  create(context) {
+    return {
+      SpreadElement(node) {
+        const call = node.argument
+        if (call.type !== 'CallExpression') return
+        if (call.callee.type !== 'Identifier' || !/QueryOptions$/.test(call.callee.name)) return
+        const variables = call.arguments[0]
+        if (variables?.type !== 'ObjectExpression') return
+        const hasGrant = variables.properties.some(
+          (property) =>
+            property.type === 'Property' &&
+            !property.computed &&
+            ((property.key.type === 'Identifier' && property.key.name === 'grant') ||
+              (property.key.type === 'Literal' && property.key.value === 'grant'))
+        )
+        if (hasGrant) context.report({ node, messageId: 'spread' })
+      },
+    }
+  },
+}
+
 module.exports = {
   meta: { name: 'fga' },
   rules: {
     'no-unguarded-migrating': noUnguardedMigrating,
     'unguarded-by-design-reason': unguardedByDesignReason,
     'no-fetch-type-bypass': noFetchTypeBypass,
+    'no-spread-granted-query-options': noSpreadGrantedQueryOptions,
   },
 }

@@ -90,3 +90,22 @@ ruleTester.run('no-fetch-type-bypass', rules['no-fetch-type-bypass'], {
     },
   ],
 })
+
+ruleTester.run('no-spread-granted-query-options', rules['no-spread-granted-query-options'], {
+  valid: [
+    `useQuery(apiKeysQueryOptions({ grant }, { select }))`,
+    `useQuery({ ...fooQueryOptions({ projectRef }), enabled })`,
+    `useQuery({ ...apiKeysQueryOptions(variables), enabled })`,
+    `useQuery({ ...getOptions({ grant }), enabled })`,
+  ],
+  invalid: [
+    {
+      code: `useQuery({ ...apiKeysQueryOptions({ projectRef, grant: g.grant }), enabled })`,
+      errors: [{ messageId: 'spread' }],
+    },
+    {
+      code: `useQuery({ ...branchesQueryOptions({ projectRef, grant }), enabled })`,
+      errors: [{ messageId: 'spread' }],
+    },
+  ],
+})

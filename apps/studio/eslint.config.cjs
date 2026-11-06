@@ -171,6 +171,7 @@ module.exports = defineConfig([
       'fga/no-unguarded-migrating': 'warn',
       'fga/unguarded-by-design-reason': 'error',
       'fga/no-fetch-type-bypass': 'error',
+      'fga/no-spread-granted-query-options': 'error',
     },
   },
   {
