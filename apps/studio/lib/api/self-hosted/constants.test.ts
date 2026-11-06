@@ -1,8 +1,14 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 describe('api/self-hosted/constants', () => {
   beforeEach(() => {
     vi.resetModules()
+    vi.stubEnv('PG_META_CRYPTO_KEY', 'test-encryption-key')
+  })
+
+  afterEach(() => {
+    vi.restoreAllMocks()
+    vi.unstubAllEnvs()
   })
 
   describe('ENCRYPTION_KEY', () => {
@@ -12,10 +18,33 @@ describe('api/self-hosted/constants', () => {
       expect(ENCRYPTION_KEY).toBe('my-secret-key-123')
     })
 
-    it('should use SAMPLE_KEY as default', async () => {
+    it('should use SAMPLE_KEY as default and warn about the fallback', async () => {
       vi.stubEnv('PG_META_CRYPTO_KEY', '')
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
       const { ENCRYPTION_KEY } = await import('./constants')
+
       expect(ENCRYPTION_KEY).toBe('SAMPLE_KEY')
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining('PG_META_CRYPTO_KEY is not set'))
+      expect(warn).toHaveBeenCalledWith(expect.stringContaining("postgres-meta's CRYPTO_KEY"))
+    })
+
+    it('should not warn when PG_META_CRYPTO_KEY is set', async () => {
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+      await import('./constants')
+
+      expect(warn).not.toHaveBeenCalled()
+    })
+
+    it('should not warn on the hosted platform', async () => {
+      vi.stubEnv('PG_META_CRYPTO_KEY', '')
+      vi.stubEnv('NEXT_PUBLIC_IS_PLATFORM', 'true')
+      const warn = vi.spyOn(console, 'warn').mockImplementation(() => undefined)
+
+      await import('./constants')
+
+      expect(warn).not.toHaveBeenCalled()
     })
   })
 
