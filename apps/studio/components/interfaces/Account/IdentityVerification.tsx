@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFlag } from 'common'
 import { PropsWithChildren, useEffect, useId, useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -56,7 +55,6 @@ export const IdentityVerification = ({
   children,
 }: PropsWithChildren<IdentityVerificationProps>) => {
   const verificationId = useId()
-  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
   const [restoreFocusTo] = useState(() =>
     typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
       ? document.activeElement
@@ -158,7 +156,7 @@ export const IdentityVerification = ({
                   factorToAvoidId={factorToAvoidId}
                   error={error}
                   onVerified={handleVerified}
-                  canUseRecoveryCodes={enableAuthRecoveryCodes && canUseRecoveryCodes}
+                  canUseRecoveryCodes={canUseRecoveryCodes}
                   returnTo={returnTo}
                 />
               )}
