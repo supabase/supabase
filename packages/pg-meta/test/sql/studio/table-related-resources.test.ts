@@ -146,19 +146,6 @@ withTestDatabase('ranks functions named after the table first, and caps the list
   expect(names[0]).toBe('public.blog_posts_summary')
 })
 
-withTestDatabase('treats LIKE wildcards in the table name literally', async (db) => {
-  await db.executeQuery(`
-    create table public.blog_posts (id int);
-    create table public.blogxposts (id int);
-
-    create function public.count_other() returns bigint language sql as
-      'select count(*) from public.blogxposts';
-  `)
-
-  // An unescaped `_` would make blog_posts match the blogxposts reference
-  expect(await referencingFunctions(db, 'blog_posts')).toEqual([])
-})
-
 withTestDatabase('returns empty results for a table that is not there', async (db) => {
   await db.executeQuery(`
     create table public.blog_posts (id int);

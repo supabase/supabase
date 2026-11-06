@@ -136,9 +136,6 @@ export async function buildStressFunctions(
     create procedure stress.build_functions(n int) language plpgsql as $$
     begin
       for i in 0..n-1 loop
-        -- The trailing comment makes every body mention a table, so searches
-        -- over prosrc have something to match at scale (and a reminder that
-        -- such a match is not necessarily a real reference)
         execute format('create function stress.fn_%s(a int) returns int language sql as ''select a -- reads stress.t_0''', i);
         execute format('create function stress_ext.fn_%s() returns int language sql as ''select 1''', i);
         execute format('alter extension pgcrypto add function stress_ext.fn_%s()', i);

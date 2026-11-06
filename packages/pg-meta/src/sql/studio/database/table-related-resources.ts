@@ -7,19 +7,15 @@ import {
   triggerEvents,
 } from './catalog-helpers'
 
-// Policies and triggers come back in full. The cap only exists so that a
-// pathological table can't flood the command menu or the response payload.
+// Only a safety cap, so a pathological table can't flood the menu or payload
 const RELATED_LIMIT = 100
 
-// Functions are found by scanning their source for the table's name, which
-// can't tell a real reference from a comment, a string literal, or a similarly
-// named table. Only the best-named few are offered, so a wrong guess stays a
-// small part of the list.
+// A source scan can't tell a real reference from a comment or a similarly named
+// table, so only a few are offered to keep wrong guesses a small part of the list
 export const TABLE_RELATED_FUNCTION_LIMIT = 5
 
-// How many source matches are collected before ranking and the privilege check.
-// Well above the final limit, so the odd function the role can't execute doesn't
-// starve the result.
+// Collected before ranking and the privilege check. Well above the limit so
+// functions the role can't execute don't starve the result.
 export const TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT = 50
 
 export type TableRelatedPolicy = {
@@ -56,7 +52,7 @@ export type TableReferencingFunctionsResult = {
 
 type TableArgs = { schema: string; name: string }
 
-/** The one table everything else here hangs off, and proof the role can see it. */
+/** The given table, only if the role can see it. */
 const targetTable = ({ schema, name }: TableArgs) => safeSql`target_table as (
       select c.oid, c.relname, c.relowner, nc.nspname
       from pg_class c
@@ -68,17 +64,10 @@ const targetTable = ({ schema, name }: TableArgs) => safeSql`target_table as (
     )`
 
 /**
- * The policies and triggers of one table, for the command menu's "Related
- * resources" section in the table editor.
+ * Policies and triggers of one table, for the command menu's "Related resources".
  *
- * Unlike the entity search this runs once per table rather than per keystroke,
- * and the table is given rather than matched, so both are plain index probes on
- * `polrelid` / `tgrelid` — a couple of milliseconds on a large catalog.
- *
- * Functions are deliberately not here: finding them means reading function
- * bodies, which is two orders of magnitude more expensive (see
- * `getTableReferencingFunctionsSql`). Keeping them apart lets this half render
- * immediately.
+ * Kept apart from functions (see `getTableReferencingFunctionsSql`) because
+ * those are far slower to find, and this half should render immediately.
  */
 export const getTableRelatedResourcesSql = ({
   schema,
@@ -142,25 +131,16 @@ export const getTableRelatedResourcesSql = ({
   `
 
 /**
- * Functions whose source mentions one table, for the command menu's "Related
- * resources" section in the table editor.
+ * Functions whose source mentions the table. Postgres records no dependency
+ * between a plpgsql function and the tables it reads, so this is a substring
+ * match on `prosrc`: a filtered seq scan of pg_proc, and imprecise.
  *
- * This is the expensive and imprecise half. Postgres records no dependency
- * between a plpgsql function and the tables it reads — the body is opaque text
- * — so the only thing available is a substring match on `prosrc`, one filtered
- * seq scan of pg_proc whose cost follows the total size of the project's
- * function source. Three things keep that honest:
- *
- * - Candidates are capped before anything is ranked. Ranking first would make
- *   Postgres read every function body before the limit could apply, which on a
- *   large catalog is the difference between milliseconds and about a second.
- * - The match is `strpos` rather than `ilike`, several times faster over
- *   megabytes of source, at the cost of missing differently-cased references.
- * - The result is capped hard, with functions named after the table first, so a
- *   wrong guess stays a small part of the list.
- *
- * Functions whose body is stored parsed (`BEGIN ATOMIC`, which leaves `prosrc`
- * null) are not matched.
+ * - Candidates are capped before ranking. Ranking first would read every
+ *   function body before the limit applies.
+ * - `strpos` over `ilike` is several times faster on large source, but misses
+ *   differently-cased references.
+ * - Functions with parsed bodies (`BEGIN ATOMIC`) have a null `prosrc` and
+ *   never match.
  */
 export const getTableReferencingFunctionsSql = ({
   schema,
@@ -184,15 +164,14 @@ export const getTableReferencingFunctionsSql = ({
           ', '
         )})
         and not pg_is_other_temp_schema(n.oid)
-        -- Skips the source scan entirely when the table isn't visible
+        -- Skips the source scan when the table isn't visible
         and exists (select 1 from target_table)
-        -- Excluded before the cap, so extension members can never crowd the
-        -- user's own functions out of the candidate set
+        -- Before the cap, so extension members can't crowd out the user's functions
         and p.oid not in (select objid from extension_functions)
         -- Already listed under the triggers they back
         and p.oid not in (select tgfoid from trigger_functions)
         and strpos(p.prosrc, ${literal(name)}) > 0
-      -- Deliberately unordered, so the scan can stop at the cap
+      -- Unordered on purpose, so the scan can stop at the cap
       limit ${literal(TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT)}
     ),
     related_functions as (
@@ -201,8 +180,7 @@ export const getTableReferencingFunctionsSql = ({
         fc.proname,
         fc.prokind,
         fc.nspname,
-        -- A function named after the table is far likelier to be a genuine
-        -- reference than one that merely mentions it somewhere in its body
+        -- Named after the table is likelier a real reference than a mere mention
         case when strpos(fc.proname, ${literal(name)}) > 0 then 0 else 1 end as rank
       from function_candidates fc
       where pg_has_role(fc.proowner, 'USAGE') or has_function_privilege(fc.oid, 'EXECUTE')

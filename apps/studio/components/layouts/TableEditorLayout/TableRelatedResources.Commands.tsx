@@ -2,11 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { FunctionSquareIcon, ShieldIcon, ZapIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
-import {
-  useCommandMenuOpen,
-  useCurrentPage,
-  useRegisterCommands,
-} from 'ui-patterns/CommandMenu'
+import { useCommandMenuOpen, useCurrentPage, useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 import {
   formatRelatedFunctionDetails,
@@ -41,9 +37,6 @@ const Badge = ({ children }: { children: string }) => (
  * table?" without the user having to type its name.
  *
  * Registered from the table editor layout, so it is scoped to that route.
- * Typing narrows the section down client-side (cmdk filters the commands by
- * name), alongside the project-wide entity search. A resource can therefore
- * show up in both, which reads more naturally than the section vanishing.
  */
 export function useTableRelatedResourcesCommands() {
   const { id } = useParams()
