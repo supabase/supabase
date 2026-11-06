@@ -38,7 +38,10 @@ import * as z from 'zod'
 import { HTTP_METHODS } from './EdgeFunctionDetails.constants'
 import { ErrorWithStatus, ResponseData } from './EdgeFunctionDetails.types'
 import { getEdgeFunctionErrorDocs } from './EdgeFunctionDetails.utils'
-import { buildEdgeFunctionTestHeaders } from './EdgeFunctionTesterSheet.utils'
+import {
+  buildEdgeFunctionTestHeaders,
+  edgeFunctionTestFormSchema,
+} from './EdgeFunctionTesterSheet.utils'
 import { buildEdgeFunctionHeaderAddActions } from '@/components/interfaces/Functions/httpHeaderAddActions'
 import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
@@ -56,27 +59,7 @@ interface EdgeFunctionTesterSheetProps {
   onClose: () => void
 }
 
-const FormSchema = z.object({
-  method: z.enum(HTTP_METHODS),
-  body: z
-    .string()
-    .optional()
-    .transform((str) => str || '{}'),
-  headers: z.array(
-    z.object({
-      key: z.string(),
-      value: z.string(),
-    })
-  ),
-  queryParams: z.array(
-    z.object({
-      key: z.string(),
-      value: z.string(),
-    })
-  ),
-})
-
-type FormValues = z.infer<typeof FormSchema>
+type FormValues = z.infer<typeof edgeFunctionTestFormSchema>
 
 export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTesterSheetProps) => {
   const { ref: projectRef, functionSlug } = useParams()
@@ -130,7 +113,7 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const url = `${protocol}://${endpoint}/functions/v1/${functionSlug}`
 
   const form = useForm<FormValues>({
-    resolver: zodResolver(FormSchema),
+    resolver: zodResolver(edgeFunctionTestFormSchema),
     defaultValues: {
       method: 'POST',
       body: '{ "name": "Functions" }',
@@ -151,14 +134,6 @@ export const EdgeFunctionTesterSheet = ({ visible, onClose }: EdgeFunctionTester
   const onSubmit = async (values: FormValues) => {
     setError(null)
     setResponse(null)
-
-    // Validate that the body is valid JSON
-    try {
-      JSON.parse(JSON.stringify(values.body))
-    } catch (e) {
-      form.setError('body', { message: 'Must be a valid JSON string' })
-      return
-    }
 
     // Construct query parameters
     const queryString = values.queryParams
