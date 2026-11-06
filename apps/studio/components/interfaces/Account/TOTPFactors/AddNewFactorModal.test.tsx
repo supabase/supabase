@@ -289,7 +289,7 @@ describe('Security backup authenticator offer', () => {
     expect(auth.mfa.enroll).toHaveBeenCalledOnce()
   })
   test('does not offer another backup with two verified authenticators', async () => {
-    vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
+    const response = {
       data: {
         all: [factor, { ...factor, id: 'totp-2' }],
         totp: [factor],
@@ -298,10 +298,16 @@ describe('Security backup authenticator offer', () => {
         webauthn: [],
       },
       error: null,
+    }
+    let finishLookup = () => {}
+    const lookup = new Promise<typeof response>((resolve) => {
+      finishLookup = () => resolve(response)
     })
+    vi.spyOn(auth.mfa, 'listFactors').mockReturnValue(lookup)
     customRender(<Enrollment />)
     await verifyAndSave()
     await waitFor(() => expect(onSaved).toHaveBeenCalledOnce())
+    await act(async () => finishLookup())
     expect(screen.queryByText('Add another MFA method?')).toBeNull()
   })
   test('cancellation does not generate codes or complete enrollment', async () => {
