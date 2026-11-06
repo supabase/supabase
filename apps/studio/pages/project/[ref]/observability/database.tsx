@@ -1,18 +1,18 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
 import dayjs from 'dayjs'
-import { ArrowRightIcon, ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
+import { ArrowRightIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Alert, AlertDescription, Button } from 'ui'
+import { Button } from 'ui'
 
+import { DatabaseSize } from '@/components/interfaces/Observability/DatabaseSize/DatabaseSize'
 import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { ReportPadding } from '@/components/interfaces/Reports/ReportPadding'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
-import ReportWidget from '@/components/interfaces/Reports/ReportWidget'
 import { ReportChartUpsell } from '@/components/interfaces/Reports/v2/ReportChartUpsell'
 import { POOLING_OPTIMIZATIONS } from '@/components/interfaces/Settings/Database/ConnectionPooling/ConnectionPooling.constants'
 import DiskSizeConfigurationModal from '@/components/interfaces/Settings/Database/DiskSizeConfigurationModal'
@@ -21,7 +21,6 @@ import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DateP
 import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import ObservabilityLayout from '@/components/layouts/ObservabilityLayout/ObservabilityLayout'
-import Table from '@/components/to-be-cleaned/Table'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { MultiAttribute } from '@/components/ui/Charts/ComposedChart.utils'
 import { LazyComposedChartHandler } from '@/components/ui/Charts/ComposedChartHandler'
@@ -33,19 +32,16 @@ import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { analyticsKeys } from '@/data/analytics/keys'
 import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useProjectDiskResizeMutation } from '@/data/config/project-disk-resize-mutation'
-import { useDatabaseSizeQuery } from '@/data/database/database-size-query'
+import { databaseKeys } from '@/data/database/keys'
 import { useMaxConnectionsQuery } from '@/data/database/max-connections-query'
 import { usePgbouncerConfigQuery } from '@/data/database/pgbouncer-config-query'
 import { getReportAttributesV2 } from '@/data/reports/database-charts'
-import { useDatabaseReport } from '@/data/reports/database-report-query'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useRefreshHandler, useReportDateRange } from '@/hooks/misc/useReportDateRange'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { DOCS_URL } from '@/lib/constants'
-import { formatBytes } from '@/lib/helpers'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 import { useMemoryCommitmentPreview } from '@/state/metrics-preview'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -174,16 +170,6 @@ const DatabaseUsage = () => {
 
   const isReplicaSelected = state.selectedDatabaseId !== project?.ref
 
-  const report = useDatabaseReport()
-  const { data, params, largeObjectsSql, isPending: isLoading, refresh } = report
-
-  const { data: databaseSizeData } = useDatabaseSizeQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString || undefined,
-  })
-  const databaseSizeBytes = databaseSizeData ?? 0
-  const currentDiskSize = project?.volumeSizeGb ?? 0
-
   const { data: diskConfig } = useDiskAttributesQuery({ projectRef: project?.ref })
   const { data: maxConnections } = useMaxConnectionsQuery({
     projectRef: project?.ref,
@@ -249,7 +235,18 @@ const DatabaseUsage = () => {
       if (!selectedDateRange) return
 
       setIsRefreshing(true)
-      refresh()
+      queryClient.invalidateQueries({
+        queryKey: databaseKeys.sizeBreakdown(ref, state.selectedDatabaseId ?? project?.ref),
+      })
+      queryClient.invalidateQueries({
+        queryKey: analyticsKeys.infraMonitoringGroup(ref, {
+          attributes: ['pg_database_size'],
+          startDate: selectedDateRange.period_start.date,
+          endDate: selectedDateRange.period_end.date,
+          interval: selectedDateRange.interval,
+          databaseIdentifier: state.selectedDatabaseId,
+        }),
+      })
       const { period_start, period_end, interval } = selectedDateRange
 
       REPORT_ATTRIBUTES.flatMap((chart) => chart.attributes || [])
@@ -413,139 +410,45 @@ const DatabaseUsage = () => {
           />
         )}
       </ReportStickyNav>
-      <section id="database-size-report">
-        <ReportWidget
-          isLoading={isLoading}
-          params={params.largeObjects}
-          title="Database Size"
-          data={data.largeObjects || []}
-          queryType={'db'}
-          resolvedSql={largeObjectsSql}
-          renderer={(props) => {
-            return (
-              <div>
-                <div className="flex flex-wrap items-center gap-8 mt-5">
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-foreground-light">Space used</p>
-                    <span className="text-lg font-semibold text-foreground">
-                      {formatBytes(databaseSizeBytes, 2, 'GB')}
-                    </span>
-                  </div>
-                  <div className="flex flex-col gap-1">
-                    <p className="text-sm text-foreground-light">Provisioned disk size</p>
-                    <span className="text-lg font-semibold text-foreground">
-                      {currentDiskSize} GB
-                    </span>
-                  </div>
+      <DatabaseSize
+        startDate={selectedDateRange?.period_start.date}
+        endDate={selectedDateRange?.period_end.date}
+        interval={selectedDateRange?.interval}
+        updateDateRange={updateDateRange}
+        diskAction={
+          project?.cloud_provider === 'AWS' && !isHighAvailability ? (
+            <Button asChild>
+              <Link href={getInfrastructurePath(ref)}>Increase disk size</Link>
+            </Button>
+          ) : (
+            <ButtonTooltip
+              disabled={!canUpdateDiskSizeConfig || isHighAvailability}
+              onClick={() => setshowIncreaseDiskSizeModal(true)}
+              tooltip={{
+                content: {
+                  side: 'bottom',
+                  text: !canUpdateDiskSizeConfig
+                    ? 'You need additional permissions to increase the disk size'
+                    : isHighAvailability
+                      ? 'Disk size management is unavailable for High Availability projects'
+                      : undefined,
+                },
+              }}
+            >
+              Increase disk size
+            </ButtonTooltip>
+          )
+        }
+      />
+      <DiskSizeConfigurationModal
+        visible={showIncreaseDiskSizeModal}
+        loading={isUpdatingDiskSize}
+        hideModal={setshowIncreaseDiskSizeModal}
+      />
 
-                  <div className="ml-auto">
-                    {/*
-                      [Joshen] TODO: Check if this check is still relevant
-                      The DiskSizeConfigurationModal is old and might be obsolete
-                     */}
-                    {project?.cloud_provider === 'AWS' && !isHighAvailability ? (
-                      <Button asChild>
-                        <Link href={getInfrastructurePath(ref)}>Increase disk size</Link>
-                      </Button>
-                    ) : (
-                      <ButtonTooltip
-                        disabled={!canUpdateDiskSizeConfig || isHighAvailability}
-                        onClick={() => setshowIncreaseDiskSizeModal(true)}
-                        tooltip={{
-                          content: {
-                            side: 'bottom',
-                            text: !canUpdateDiskSizeConfig
-                              ? 'You need additional permissions to increase the disk size'
-                              : isHighAvailability
-                                ? 'Disk size management is unavailable for High Availability projects'
-                                : undefined,
-                          },
-                        }}
-                      >
-                        Increase disk size
-                      </ButtonTooltip>
-                    )}
-                  </div>
-                </div>
-
-                <p className="mt-8 text-sm font-medium text-foreground-light">Large Objects</p>
-                {!props.isLoading && props.data.length === 0 && (
-                  <span className="text-sm text-foreground-light mt-2 block">
-                    No large objects found
-                  </span>
-                )}
-                {!props.isLoading && props.data.length > 0 && (
-                  <Table
-                    className="space-y-3 mt-4"
-                    head={[
-                      <Table.th key="object" className="py-2">
-                        Object
-                      </Table.th>,
-                      <Table.th key="size" className="py-2">
-                        Size
-                      </Table.th>,
-                    ]}
-                    body={props.data?.map((object) => {
-                      const percentage = (
-                        ((object.table_size as number) / databaseSizeBytes) *
-                        100
-                      ).toFixed(2)
-
-                      return (
-                        <Table.tr key={`${object.schema_name}.${object.relname}`}>
-                          <Table.td>
-                            {object.schema_name}.{object.relname}
-                          </Table.td>
-                          <Table.td>
-                            {formatBytes(object.table_size)} ({percentage}%)
-                          </Table.td>
-                        </Table.tr>
-                      )
-                    })}
-                  />
-                )}
-              </div>
-            )
-          }}
-          append={renderDatabaseSizeAdditionalInfo}
-        />
-        <DiskSizeConfigurationModal
-          visible={showIncreaseDiskSizeModal}
-          loading={isUpdatingDiskSize}
-          hideModal={setshowIncreaseDiskSizeModal}
-        />
-      </section>
       <div className="py-8">
         <ObservabilityLink />
       </div>
     </>
-  )
-}
-
-const renderDatabaseSizeAdditionalInfo = () => {
-  return (
-    <div className="px-6 pb-6">
-      <Alert variant="default" className="mt-4">
-        <AlertDescription>
-          <div className="space-y-2">
-            <p>
-              New Supabase projects have a database size of ~40-60mb. This space includes
-              pre-installed extensions, schemas, and default Postgres data. Additional database size
-              is used when installing extensions, even if those extensions are inactive.
-            </p>
-
-            <Button asChild icon={<ExternalLinkIcon />}>
-              <Link
-                href={`${DOCS_URL}/guides/platform/database-size#disk-space-usage`}
-                target="_blank"
-                rel="noreferrer"
-              >
-                Read about database size
-              </Link>
-            </Button>
-          </div>
-        </AlertDescription>
-      </Alert>
-    </div>
   )
 }
