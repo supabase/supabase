@@ -34,6 +34,7 @@ export async function getVaultSecrets(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'vault-secrets',
       queryKey: ['vault-secrets'],
       grant: unguarded.migrating,
     },

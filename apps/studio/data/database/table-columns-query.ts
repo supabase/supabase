@@ -33,6 +33,7 @@ export async function getTableColumns(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'table-columns',
       sql,
       queryKey: ['table-columns', schema, table],
       grant: unguarded.migrating,

@@ -30,6 +30,7 @@ export async function dropForeignTable({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'fdw-drop-foreign-table',
     sql,
     grant: unguarded.migrating,
   })

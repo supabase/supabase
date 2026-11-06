@@ -27,6 +27,7 @@ export async function deleteDatabaseIndex({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'index-delete',
     sql,
     queryKey: ['indexes'],
     grant: unguarded.migrating,

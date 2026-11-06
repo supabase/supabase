@@ -29,6 +29,7 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-create',
     sql,
     queryKey: ['table', 'create'],
     grant: unguarded.migrating,

@@ -56,6 +56,7 @@ export async function updateDatabaseColumn({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'column-update',
     sql,
     queryKey: ['column', 'update', originalColumn.id],
     grant: unguarded.migrating,

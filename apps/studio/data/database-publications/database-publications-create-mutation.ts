@@ -42,6 +42,7 @@ export async function createDatabasePublication({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'publication-create',
     sql,
     queryKey: ['publication', 'create'],
     grant: unguarded.migrating,

@@ -46,6 +46,7 @@ export async function getDatabaseFunctions(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'database-functions',
       sql: pgMetaFunctionsList.sql,
       queryKey: ['database-functions'],
       grant: unguarded.migrating,

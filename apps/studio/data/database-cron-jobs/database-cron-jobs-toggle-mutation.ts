@@ -26,6 +26,7 @@ export async function toggleDatabaseCronJob({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'database-cron-jobs-toggle',
     sql: safeSql`select cron.alter_job(job_id := ${literal(jobId)}, active := ${literal(active)});`,
     queryKey: databaseCronJobsKeys.alter(),
     grant: unguarded.migrating,

@@ -118,6 +118,7 @@ export const useQueryPerformanceQuery = (props: QueryPerformanceSQLParams) => {
   return useDbQuery({
     sql,
     sqlOrigin: 'studio',
+    queryName: 'query-performance',
     params: undefined,
     where: whereSql,
     orderBy: orderBySql,
@@ -191,6 +192,7 @@ export const useQueryPerformanceInfiniteQuery = (
             projectRef: project?.ref,
             connectionString: effectiveConnectionString,
             sqlOrigin: 'studio',
+            queryName: 'query-performance-infinite',
             sql,
             grant: unguarded.migrating,
           },

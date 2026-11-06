@@ -74,6 +74,7 @@ export const useUsersInfiniteQuery = <TData = UsersData>(
           projectRef,
           connectionString,
           sqlOrigin: 'studio',
+          queryName: 'users-infinite',
           sql: getPaginatedUsersSQL({
             page: column ? undefined : (pageParam as number),
             verified: filter,

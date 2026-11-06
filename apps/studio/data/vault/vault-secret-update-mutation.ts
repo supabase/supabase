@@ -28,6 +28,7 @@ export async function updateVaultSecret({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'vault-secret-update',
     sql,
     grant: unguarded.migrating,
   })

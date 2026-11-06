@@ -58,6 +58,7 @@ export const ViewEntityAutofixSecurityModal = ({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       sqlOrigin: 'studio',
+      queryName: 'view-security-invoker-autofix',
       sql,
       grant: unguarded.migrating,
     })

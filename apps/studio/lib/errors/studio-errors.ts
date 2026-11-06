@@ -22,8 +22,8 @@ export type StudioErrorInput = {
   /** OpenAPI path pattern, never a concrete URL */
   endpoint?: string
   method?: string
-  /** Query key of the Studio query that ran the SQL, joined with `-`, without the project ref */
-  queryKey?: string
+  /** Static name of the Studio query that ran the SQL, passed to `executeSql` */
+  queryName?: string
   /** Postgres SQLSTATE code (e.g. `42702`), for SQL errors */
   sqlState?: string
   /** 1-based character offset of the Postgres error in the SQL, for SQL errors */
@@ -145,14 +145,14 @@ export class UserSqlError extends studioError('UserSqlError', {
 
 // Postgres rejected SQL that Studio wrote. The Postgres message can still echo user data (row
 // values in a constraint violation, a schema name), so Sentry gets only the SQLSTATE and the query
-// key.
+// name.
 export class StudioSqlError extends studioError('StudioSqlError', {
   fault: 'studio',
   classifiedBy: 'rule',
   defaultReason: 'studio_sql',
   retryable: () => false,
-  sentryMessage: ({ sqlState, queryKey }) =>
-    `Postgres error ${sqlState ?? 'without SQLSTATE'} in query ${queryKey ?? 'without key'}`,
+  sentryMessage: ({ sqlState, queryName }) =>
+    `Postgres error ${sqlState ?? 'without SQLSTATE'} in query ${queryName ?? 'without name'}`,
 }) {}
 
 export class UnexpectedError extends studioError('UnexpectedError', {

@@ -169,6 +169,7 @@ export async function saveOperationQueue({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'operation-queue-save',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['operation-queue-save'],

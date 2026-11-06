@@ -41,6 +41,7 @@ export async function updateDatabasePublication({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'publication-update',
     sql,
     queryKey: ['publication', 'update', id],
     grant: unguarded.migrating,

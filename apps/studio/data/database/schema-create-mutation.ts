@@ -20,6 +20,7 @@ export async function createSchema({ name, projectRef, connectionString }: Schem
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'schema-create',
     sql,
     queryKey: ['schema', 'create'],
     grant: unguarded.migrating,

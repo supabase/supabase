@@ -23,6 +23,7 @@ export async function getForeignTables(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'foreign-tables',
       sql: pgMeta.foreignTables.list({ includedSchemas: schemas }).sql,
       queryKey: ['foreign-tables', schemas].filter(Boolean),
       grant: unguarded.migrating,

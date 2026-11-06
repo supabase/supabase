@@ -35,6 +35,7 @@ async function getTablePrivileges(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'table-privileges',
       queryKey,
       grant: unguarded.migrating,
     },

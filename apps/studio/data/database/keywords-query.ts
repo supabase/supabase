@@ -24,6 +24,7 @@ export async function getKeywords(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'keywords',
       queryKey: ['keywords'],
       grant: unguarded.migrating,
     },

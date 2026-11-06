@@ -263,6 +263,7 @@ export const fetchAllTableRows = async ({
             connectionString,
             sql: query,
             sqlOrigin: 'studio',
+            queryName: 'table-rows-cursor',
             grant: unguarded.migrating,
           })
         )
@@ -301,6 +302,7 @@ export const fetchAllTableRows = async ({
             connectionString,
             sql: query,
             sqlOrigin: 'studio',
+            queryName: 'table-rows-page',
             grant: unguarded.migrating,
           })
         )
@@ -390,6 +392,7 @@ async function getTableRows(
         projectRef,
         connectionString,
         sqlOrigin: 'studio',
+        queryName: 'table-rows',
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

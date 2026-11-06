@@ -29,6 +29,7 @@ export async function createDatabaseCronJob({
     connectionString,
     sql: query,
     sqlOrigin,
+    queryName: 'database-cron-job-create',
     queryKey: databaseCronJobsKeys.create(),
     grant: unguarded.migrating,
   })

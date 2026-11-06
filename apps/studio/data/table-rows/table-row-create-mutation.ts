@@ -51,6 +51,7 @@ export async function createTableRow({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-row-create',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     grant: unguarded.migrating,

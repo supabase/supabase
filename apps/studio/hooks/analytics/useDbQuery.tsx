@@ -32,12 +32,14 @@ export interface DbQueryHook<T = any> {
 const useDbQuery = ({
   sql,
   sqlOrigin,
+  queryName,
   params = DEFAULT_QUERY_PARAMS,
   where,
   orderBy,
 }: {
   sql: ReportQueryDb['safeSql'] | SafeSqlFragment
   sqlOrigin: SqlOrigin
+  queryName: string
   params?: BaseReportParams
   where?: string
   orderBy?: string
@@ -75,6 +77,7 @@ const useDbQuery = ({
         ...params,
         sql: resolvedSql,
         sqlOrigin,
+        queryName,
         identifier,
         connectionString: effectiveConnectionString,
       },
@@ -88,6 +91,7 @@ const useDbQuery = ({
           connectionString: effectiveConnectionString,
           sql: resolvedSql,
           sqlOrigin,
+          queryName,
           grant: unguarded.migrating,
         },
         signal

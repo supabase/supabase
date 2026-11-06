@@ -31,6 +31,7 @@ export async function createDatabaseFunction({
     connectionString,
     sql,
     sqlOrigin,
+    queryName: 'database-function-create',
     queryKey: ['functions', 'create'],
     grant: unguarded.migrating,
   })

@@ -80,6 +80,7 @@ export async function getTableRowsCount(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'table-rows-count',
       sql,
       queryKey: ['table-rows-count', table.id],
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

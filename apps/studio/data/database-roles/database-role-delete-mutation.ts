@@ -28,6 +28,7 @@ export async function deleteDatabaseRole({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'roles-delete',
     sql,
     queryKey: ['roles', 'delete'],
     grant: unguarded.migrating,

@@ -47,6 +47,7 @@ export async function getFDWs(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'fdws',
       queryKey: ['fdws'],
       grant: unguarded.migrating,
     },

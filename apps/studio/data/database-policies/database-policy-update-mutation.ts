@@ -44,6 +44,7 @@ export async function updateDatabasePolicy({
     connectionString,
     sql,
     sqlOrigin,
+    queryName: 'database-policy-update',
     queryKey: ['policy', 'update', originalPolicy.id],
     grant: unguarded.migrating,
   })

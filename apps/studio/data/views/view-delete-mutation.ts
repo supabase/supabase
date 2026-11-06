@@ -33,6 +33,7 @@ export async function deleteView({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'view-delete',
     sql,
     queryKey: ['view', 'delete', id],
     grant: unguarded.migrating,

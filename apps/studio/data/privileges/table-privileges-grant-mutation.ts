@@ -31,6 +31,7 @@ export async function grantTablePrivileges({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-privileges-grant',
     sql,
     queryKey: ['table-privileges', 'grant'],
     grant: unguarded.migrating,

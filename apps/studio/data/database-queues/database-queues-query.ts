@@ -28,6 +28,7 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'list-queues',
     sql: queueSqlQuery,
     queryKey: ['list-queues'],
     grant: unguarded.migrating,

@@ -26,6 +26,7 @@ export async function deleteEnumeratedType({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'enumerated-type-delete',
     sql,
     grant: unguarded.migrating,
   })

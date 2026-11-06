@@ -100,6 +100,7 @@ export async function getDatabaseQueue({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-infinite',
     sql,
     grant: unguarded.migrating,
   })

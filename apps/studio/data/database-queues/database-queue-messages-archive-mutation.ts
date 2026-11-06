@@ -31,6 +31,7 @@ export async function archiveDatabaseQueueMessage({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-archive',
     sql: safeSql`SELECT * FROM pgmq.archive(${literal(queueName)}, ${literal(messageId)})`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,

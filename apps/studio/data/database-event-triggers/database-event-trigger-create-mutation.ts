@@ -23,6 +23,7 @@ export async function createDatabaseEventTrigger({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'event-trigger-create',
     sql,
     queryKey: ['event-trigger', 'create'],
     grant: unguarded.migrating,

@@ -33,6 +33,7 @@ export async function deleteMaterializedView({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'materialized-view-delete',
     sql,
     queryKey: ['materialized-view', 'delete', id],
     grant: unguarded.migrating,

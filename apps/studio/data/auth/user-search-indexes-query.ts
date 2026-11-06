@@ -29,6 +29,7 @@ export async function getUserIndexStatuses(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'index-statuses',
       sql,
       queryKey: ['index-statuses'],
       grant: unguarded.migrating,

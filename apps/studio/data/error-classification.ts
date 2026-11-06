@@ -58,7 +58,7 @@ export type SqlOrigin = 'user' | 'studio'
  */
 export function classifySqlResponseError(
   error: unknown,
-  { origin, queryKey }: { origin: SqlOrigin; queryKey?: string }
+  { origin, queryName }: { origin: SqlOrigin; queryName?: string }
 ): StudioError {
   const raw = parseResponseErrorBody(error)
   if (!raw) return classifyError(error)
@@ -67,7 +67,7 @@ export function classifySqlResponseError(
   if (classified._tag !== 'UnclassifiedApiError' || classified.code !== 400) return classified
 
   const sqlState = raw.message?.match(SQLSTATE_IN_MESSAGE)?.[1]
-  const input = { ...raw, ...(queryKey && { queryKey }), ...(sqlState && { sqlState }) }
+  const input = { ...raw, ...(queryName && { queryName }), ...(sqlState && { sqlState }) }
   return origin === 'user' ? new UserSqlError(input) : new StudioSqlError(input)
 }
 

@@ -36,7 +36,7 @@ export function reportStudioError(
       classified_by: err.classifiedBy,
       service: err.service,
       ...(err.endpoint && { endpoint: err.endpoint }),
-      ...(err.queryKey && { query_key: err.queryKey }),
+      ...(err.queryName && { query_name: err.queryName }),
       ...(err.sqlState && { sql_state: err.sqlState }),
     },
     extra: { ...context?.extra, requestId: err.requestId, status: err.code },

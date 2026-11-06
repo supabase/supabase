@@ -31,6 +31,7 @@ export async function truncateTableRow({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-row-truncate',
     sql,
     grant: unguarded.migrating,
   })

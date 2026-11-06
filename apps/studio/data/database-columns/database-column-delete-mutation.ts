@@ -29,6 +29,7 @@ export async function deleteDatabaseColumn({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'column-delete',
     sql,
     queryKey: ['column', 'delete', column.id],
     grant: unguarded.migrating,

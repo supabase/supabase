@@ -46,6 +46,7 @@ export async function getTableConstraints(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'table-constraints',
       sql,
       queryKey: ['table-constraints', id],
       grant: unguarded.migrating,

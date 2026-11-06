@@ -136,16 +136,16 @@ describe('classifySqlResponseError', () => {
     expect(isNeverReportedError(err)).toBe(true)
   })
 
-  it('classifies a Postgres error from Studio SQL as StudioSqlError with the query key', () => {
+  it('classifies a Postgres error from Studio SQL as StudioSqlError with the query name', () => {
     const err = classifySqlResponseError(sqlBody, {
       origin: 'studio',
-      queryKey: 'projects-abc-tables',
+      queryName: 'tables',
     })
     expect(err).toBeInstanceOf(StudioSqlError)
     expect(err).toMatchObject({
       fault: 'studio',
       reason: 'studio_sql',
-      queryKey: 'projects-abc-tables',
+      queryName: 'tables',
       formattedError: sqlBody.formattedError,
     })
     expect(isNeverReportedError(err)).toBe(false)
@@ -174,9 +174,9 @@ describe('classifySqlResponseError', () => {
     expect(err).toMatchObject({ sqlState: '42702', position: '8' })
   })
 
-  it('sends Sentry only the SQLSTATE and query key for Studio SQL', () => {
-    const err = classifySqlResponseError(sqlBody, { origin: 'studio', queryKey: 'tables-list' })
+  it('sends Sentry only the SQLSTATE and query name for Studio SQL', () => {
+    const err = classifySqlResponseError(sqlBody, { origin: 'studio', queryName: 'tables' })
     expect(err.message).toBe(sqlBody.message)
-    expect(err.sentryMessage).toBe('Postgres error 42702 in query tables-list')
+    expect(err.sentryMessage).toBe('Postgres error 42702 in query tables')
   })
 })

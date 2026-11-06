@@ -100,6 +100,7 @@ export async function getDatabaseActivity(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'activity',
       queryKey: ['activity'],
       grant: unguarded.migrating,
     },

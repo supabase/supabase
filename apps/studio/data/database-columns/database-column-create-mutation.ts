@@ -55,6 +55,7 @@ export async function createDatabaseColumn({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'column-create',
     sql,
     queryKey: ['column', 'create'],
     grant: unguarded.migrating,

@@ -34,6 +34,7 @@ export async function getExposedFunctionCounts(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'exposed-function-counts',
       sql,
       queryKey: ['exposed-function-counts', selectedSchemas],
       grant: unguarded.migrating,

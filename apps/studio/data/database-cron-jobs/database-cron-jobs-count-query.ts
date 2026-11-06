@@ -24,6 +24,7 @@ export async function getDatabaseCronJobsCount({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'cron-jobs-count',
     sql: cronJobCountSql,
     queryKey: ['cron-jobs-count'],
     grant: unguarded.migrating,

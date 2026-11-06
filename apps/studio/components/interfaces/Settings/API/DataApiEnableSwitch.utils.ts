@@ -33,6 +33,7 @@ export async function queryUnsafeEntitiesInApi({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'unsafe-entities-in-api',
     sql: getUnsafeEntitiesInApiSql({ schemas }),
     queryKey: ['unsafe-entities-in-api'],
     grant: unguarded.migrating,

@@ -30,6 +30,7 @@ export async function createEnumeratedType({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'enumerated-type-create',
     sql,
     grant: unguarded.migrating,
   })

@@ -30,6 +30,7 @@ export async function updateEnumeratedType({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'enumerated-type-update',
     sql,
     grant: unguarded.migrating,
   })

@@ -22,6 +22,7 @@ export async function getDatabaseCronTimezone({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'database-cron-timezone',
     sql: safeSql`select setting from pg_settings where name = 'cron.timezone';`,
     grant: unguarded.migrating,
   })

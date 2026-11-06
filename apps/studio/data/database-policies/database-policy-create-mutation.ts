@@ -43,6 +43,7 @@ export async function createDatabasePolicy({
     connectionString,
     sql,
     sqlOrigin,
+    queryName: 'database-policy-create',
     queryKey: ['policy', 'create'],
     grant: unguarded.migrating,
   })

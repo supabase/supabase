@@ -43,6 +43,7 @@ export async function createFDW({ projectRef, connectionString, ...rest }: FDWCr
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'create-fdw',
     sql,
     queryKey: ['create-fdw'],
     grant: unguarded.migrating,

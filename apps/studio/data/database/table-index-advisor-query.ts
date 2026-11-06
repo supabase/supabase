@@ -96,6 +96,7 @@ export async function getTableIndexAdvisorSuggestions({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-index-advisor',
     sql,
     grant: unguarded.migrating,
   })

@@ -30,6 +30,7 @@ export async function getUser(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'user',
       queryKey: [`user-${userId}`],
       grant: unguarded.migrating,
     },

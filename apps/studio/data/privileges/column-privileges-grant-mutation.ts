@@ -39,6 +39,7 @@ export async function grantColumnPrivileges({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'column-privileges-grant',
     sql,
     queryKey: ['column-privileges', 'grant'],
     grant: unguarded.migrating,

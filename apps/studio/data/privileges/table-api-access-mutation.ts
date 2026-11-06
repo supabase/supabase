@@ -67,6 +67,7 @@ export async function updateTableApiAccessPrivileges({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-api-access-update-privileges',
     sql: joinSqlFragments(sqlStatements, '\n'),
     queryKey: ['table-api-access', 'update-privileges'],
     grant: unguarded.migrating,

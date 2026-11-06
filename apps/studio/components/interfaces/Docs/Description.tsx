@@ -63,6 +63,7 @@ const Description = ({ content, metadata, onChange = noop }: DescrptionProps) =>
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sqlOrigin: 'studio',
+          queryName: 'docs-description-update',
           sql: query,
           grant: unguarded.migrating,
         })

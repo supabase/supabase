@@ -31,6 +31,7 @@ export async function importForeignSchema({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'fdw-import-foreign-schema',
     sql,
     grant: unguarded.migrating,
   })

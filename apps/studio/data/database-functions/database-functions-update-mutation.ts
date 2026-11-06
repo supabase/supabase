@@ -34,6 +34,7 @@ export async function updateDatabaseFunction({
     connectionString,
     sql,
     sqlOrigin,
+    queryName: 'database-function-update',
     queryKey: ['functions', 'update', func.id.toString()],
     grant: unguarded.migrating,
   })

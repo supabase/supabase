@@ -53,6 +53,7 @@ export async function deleteAllTableRow({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-row-delete-all',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     grant: unguarded.migrating,

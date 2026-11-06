@@ -57,6 +57,7 @@ export async function getIndexAdvisorResult({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'retrieve-index-advisor-result',
     sql: safeSql`set search_path to public, extensions; select * from index_advisor(${literal(query)});`,
     grant: unguarded.migrating,
   })

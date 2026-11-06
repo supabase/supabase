@@ -18,7 +18,7 @@ describe('applyStudioErrorPolicy', () => {
     const err = new StudioSqlError({
       message: 'Failed to run sql query: ERROR:  23505: Key (email)=(a@b.co) already exists',
       sqlState: '23505',
-      queryKey: 'table-rows',
+      queryName: 'table-rows',
     })
     const event = applyStudioErrorPolicy(eventWith('Key (email)=(a@b.co) …', 'cause'), err)
 

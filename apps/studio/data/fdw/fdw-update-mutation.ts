@@ -39,6 +39,7 @@ export async function updateFDW({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'update-fdw',
     sql,
     queryKey: ['update-fdw'],
     grant: unguarded.migrating,

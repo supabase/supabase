@@ -30,6 +30,7 @@ export async function disableDatabaseExtension({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'extension-delete',
     sql,
     queryKey: ['extension', 'delete', id],
     grant: unguarded.migrating,

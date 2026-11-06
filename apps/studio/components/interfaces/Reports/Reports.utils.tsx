@@ -55,7 +55,8 @@ export const queriesFactory = <T extends string>(
     if (query.queryType === 'db') {
       return {
         ...acc,
-        [k]: () => useDbQuery({ sql: query.safeSql, sqlOrigin: 'studio' }),
+        [k]: () =>
+          useDbQuery({ sql: query.safeSql, sqlOrigin: 'studio', queryName: 'report-db-query' }),
       }
     } else {
       return {

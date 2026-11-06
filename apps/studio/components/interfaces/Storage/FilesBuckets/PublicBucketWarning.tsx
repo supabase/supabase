@@ -67,6 +67,7 @@ export function PublicBucketWarning({ projectRef, bucketId }: PublicBucketWarnin
         projectRef,
         connectionString: project?.connectionString,
         sqlOrigin: 'studio',
+        queryName: 'public-bucket-policy-remove',
         sql: generatePolicyRemovalSql(policyName),
         grant: unguarded.migrating,
       })

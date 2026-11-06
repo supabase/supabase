@@ -48,6 +48,7 @@ export async function getColumnPrivileges(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'column-privileges',
       queryKey,
       grant: unguarded.migrating,
     },

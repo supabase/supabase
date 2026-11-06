@@ -31,6 +31,7 @@ export async function revokeTablePrivileges({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-privileges-revoke',
     sql,
     queryKey: ['table-privileges', 'revoke'],
     grant: unguarded.migrating,

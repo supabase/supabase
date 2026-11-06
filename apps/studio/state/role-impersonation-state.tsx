@@ -42,6 +42,7 @@ function useCustomizeAccessToken(
         projectRef,
         connectionString,
         sqlOrigin: 'studio',
+        queryName: 'customize-access-token-hook',
         sql: safeSql`select ${ident(schema)}.${ident(functionName)}(${literal(JSON.stringify(event))}::jsonb) as event;`,
         queryKey: ['customize-access-token', projectRef],
         grant: unguarded.migrating,

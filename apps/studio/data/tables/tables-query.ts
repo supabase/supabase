@@ -46,6 +46,7 @@ export async function getTables(
       connectionString,
       sql,
       sqlOrigin: 'studio',
+      queryName: 'tables',
       queryKey,
       grant: unguarded.migrating,
     },
@@ -148,6 +149,7 @@ export async function getTablesPage(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'tables-infinite',
       sql,
       queryKey: [
         `project:${projectRef}`,

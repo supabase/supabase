@@ -26,6 +26,7 @@ export async function createDatabaseTrigger({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'trigger-create',
     sql,
     queryKey: ['trigger', 'create'],
     grant: unguarded.migrating,

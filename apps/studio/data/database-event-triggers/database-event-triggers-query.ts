@@ -60,6 +60,7 @@ export async function getDatabaseEventTriggers(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'database-event-triggers',
       sql: EVENT_TRIGGERS_SQL,
       queryKey: databaseEventTriggerKeys.list(projectRef),
       grant: unguarded.migrating,

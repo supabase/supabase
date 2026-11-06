@@ -30,6 +30,7 @@ export async function getDatabaseTriggers(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'triggers',
       sql,
       queryKey: ['triggers'],
       grant: unguarded.migrating,

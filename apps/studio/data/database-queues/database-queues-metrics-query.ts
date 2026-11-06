@@ -60,6 +60,7 @@ export async function getDatabaseQueuesMetrics({
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'database-queues-metrics-precise',
       sql: preciseMetricsSqlQuery(queueName),
       grant: unguarded.migrating,
     })
@@ -75,6 +76,7 @@ export async function getDatabaseQueuesMetrics({
         projectRef,
         connectionString,
         sqlOrigin: 'studio',
+        queryName: 'database-queues-metrics-estimate',
         sql: estimateMetricsSqlQuery(queueName),
         grant: unguarded.migrating,
       })

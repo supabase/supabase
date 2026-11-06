@@ -33,6 +33,7 @@ export async function runPgMetaQuery<TRows>(
       projectRef: ctx.projectRef,
       connectionString: ctx.connectionString,
       sqlOrigin: 'studio',
+      queryName: 'ai-tool-pg-meta-query',
       sql: query.sql,
       grant: unguarded.migrating,
     },

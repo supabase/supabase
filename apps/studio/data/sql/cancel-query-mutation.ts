@@ -27,6 +27,7 @@ async function cancelQuery({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'cancel-query',
     sql,
     queryKey: ['cancel-query'],
     grant: unguarded.migrating,

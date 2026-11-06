@@ -31,6 +31,7 @@ export async function getTableEditor(
       projectRef,
       connectionString,
       sqlOrigin: 'studio',
+      queryName: 'table-editor',
       sql,
       queryKey: ['table-editor', id],
       grant: unguarded.migrating,

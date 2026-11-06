@@ -23,6 +23,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'queues-postgrest-expose',
     sql,
     queryKey: ['queues-postgrest-expose'],
     grant: unguarded.migrating,

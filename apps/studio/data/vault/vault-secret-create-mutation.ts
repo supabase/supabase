@@ -27,6 +27,7 @@ export async function createVaultSecret({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'vault-secret-create',
     sql,
     grant: unguarded.migrating,
   })

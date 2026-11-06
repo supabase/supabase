@@ -36,6 +36,7 @@ grant usage on schema api to anon, authenticated;`
     connectionString,
     sql,
     sqlOrigin: 'studio',
+    queryName: 'create-and-expose-api-schema',
     grant: unguarded.migrating,
   })
 

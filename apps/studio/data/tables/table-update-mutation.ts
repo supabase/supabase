@@ -40,6 +40,7 @@ export async function updateTable({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-update',
     sql,
     queryKey: ['table', 'update', id],
     grant: unguarded.migrating,

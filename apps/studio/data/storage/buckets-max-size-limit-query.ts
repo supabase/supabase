@@ -28,6 +28,7 @@ export const getBucketNumberEstimate = async ({
       connectionString,
       queryKey,
       sqlOrigin: 'studio',
+      queryName: 'buckets-max-size-limit-estimate',
       sql,
       grant: unguarded.migrating,
     })
@@ -58,6 +59,7 @@ const getBucketsWithLargestSizeLimit = async ({
     connectionString,
     queryKey: key,
     sqlOrigin: 'studio',
+    queryName: 'buckets-largest-size-limit',
     sql,
     grant: unguarded.migrating,
   })

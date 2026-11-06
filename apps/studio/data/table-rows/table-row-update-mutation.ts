@@ -57,6 +57,7 @@ export async function updateTableRow({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-row-update',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['table-row-update', table.id],

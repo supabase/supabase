@@ -33,6 +33,7 @@ export async function getMigrations(
         connectionString,
         sql,
         sqlOrigin: 'studio',
+        queryName: 'migrations',
         queryKey: ['migrations'],
         grant: unguarded.migrating,
       },

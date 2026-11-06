@@ -32,6 +32,7 @@ export async function deleteTable({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'table-delete',
     sql,
     queryKey: ['table', 'delete', id],
     grant: unguarded.migrating,

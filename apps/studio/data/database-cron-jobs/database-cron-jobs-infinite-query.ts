@@ -39,6 +39,7 @@ export async function getDatabaseCronJobs({
     projectRef,
     connectionString,
     sqlOrigin: 'studio',
+    queryName: 'cron-jobs',
     sql: getCronJobsSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs'],
     preflightCheck: true,
