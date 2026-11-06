@@ -4,7 +4,6 @@ import { FunctionSquareIcon, ShieldIcon, ZapIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import {
   useCommandMenuOpen,
-  useQuery as useCommandMenuQuery,
   useCurrentPage,
   useRegisterCommands,
 } from 'ui-patterns/CommandMenu'
@@ -42,14 +41,14 @@ const Badge = ({ children }: { children: string }) => (
  * table?" without the user having to type its name.
  *
  * Registered from the table editor layout, so it is scoped to that route.
- * Searching replaces this with the entity search, which covers the whole
- * project, so the section is dropped as soon as the user types.
+ * Typing narrows the section down client-side (cmdk filters the commands by
+ * name), alongside the project-wide entity search. A resource can therefore
+ * show up in both, which reads more naturally than the section vanishing.
  */
 export function useTableRelatedResourcesCommands() {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const isOpen = useCommandMenuOpen()
-  const commandMenuQuery = useCommandMenuQuery()
   const isRootLevel = useCurrentPage() === undefined
 
   const tableId = Number(id)
@@ -61,7 +60,7 @@ export function useTableRelatedResourcesCommands() {
 
   const grantResult = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
 
-  const canShowSection = isOpen && isRootLevel && commandMenuQuery.trim().length === 0
+  const canShowSection = isOpen && isRootLevel
 
   const variables = {
     projectRef: project?.ref,

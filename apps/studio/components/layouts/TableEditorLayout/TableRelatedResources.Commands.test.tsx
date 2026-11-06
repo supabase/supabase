@@ -211,19 +211,17 @@ describe('useTableRelatedResourcesCommands', () => {
     expect(section).toHaveTextContent('/project/default/database/functions?schema=public&edit=301')
   })
 
-  it('drops the section once the user searches, and does not query again', async () => {
+  it('keeps the section while the user searches, without querying again', async () => {
     customRender(<Harness />)
 
     await screen.findByRole('region', { name: SECTION })
     await waitFor(() => expect(functionRequests).toHaveLength(1))
     expect(relatedRequests).toHaveLength(1)
 
-    // The entity search takes over from here, and covers the whole project
+    // Narrowing happens client-side in the command menu, off the loaded data
     await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'colors')
 
-    await waitFor(() => {
-      expect(screen.queryByRole('region', { name: SECTION })).not.toBeInTheDocument()
-    })
+    expect(screen.getByRole('region', { name: SECTION })).toHaveTextContent('set_updated_at')
     expect(relatedRequests).toHaveLength(1)
     expect(functionRequests).toHaveLength(1)
   })
