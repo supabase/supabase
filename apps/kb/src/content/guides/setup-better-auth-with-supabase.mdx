@@ -26,9 +26,11 @@ Create the app, start a local Supabase stack, and set the environment variables 
 1. Create a TanStack Start app and move into its directory:
 
    ```bash
-   pnpm dlx @tanstack/cli@latest create my-app --package-manager pnpm
+   pnpm dlx @tanstack/cli@latest create my-app --package-manager pnpm --yes --no-intent
    cd my-app
    ```
+
+   The `--yes` flag accepts the default options instead of prompting for them. The `--no-intent` flag skips TanStack's optional setup for AI coding agents.
 
 2. Install Better Auth, the Postgres driver, Kysely, and the Supabase CLI. Better Auth uses Kysely to connect to Postgres:
 
@@ -108,14 +110,13 @@ The `tanstackStartCookies` plugin sets cookies through TanStack Start. Other fra
 Use the Better Auth CLI to write its tables to a schema file:
 
 ```bash
-mkdir -p supabase/schemas
 pnpm dlx auth@latest generate --output supabase/schemas/better_auth.sql --yes
 ```
 
 > [!NOTE]
 > You can ignore the `Database schema mismatch` error that the command logs. It lists the Better Auth tables that don't exist yet, which the generated file creates.
 
-The generated file creates the schema and each table with a schema-qualified name:
+The generated file in `supabase/schemas/better_auth.sql` creates the schema and each table with a schema-qualified name:
 
 ```sql
 create schema if not exists "better_auth";
@@ -137,7 +138,7 @@ create table "better_auth"."verification" ( ... );
 1. Generate a migration from your schema files, then apply it to your local database:
 
    ```bash
-   pnpm supabase db schema declarative sync -f add_better_auth --no-apply
+   pnpm supabase db schema declarative sync -f add_better_auth --name add_better_auth --no-apply
    pnpm supabase migration up
    ```
 
