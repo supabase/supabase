@@ -78,7 +78,7 @@ describe('authenticator removal recovery-status guard', () => {
     await waitFor(() => expect(remove).not.toBeAriaDisabled())
     expect(screen.queryByText('Failed to load recovery codes')).not.toBeInTheDocument()
     fireEvent.click(remove)
-    expect(await screen.findByRole('dialog', { name: 'Remove authenticator' })).toBeInTheDocument()
+    expect(await screen.findByRole('dialog', { name: 'Remove MFA method' })).toBeInTheDocument()
   })
 
   test('keeps removal unavailable while recovery-code status is loading', async () => {
@@ -113,7 +113,7 @@ describe('authenticator removal recovery-status guard', () => {
     const remove = await screen.findByRole('button', { name: 'Delete' })
     await waitFor(() => expect(remove).not.toBeAriaDisabled())
     fireEvent.click(remove)
-    const dialog = await screen.findByRole('dialog', { name: 'Remove authenticator' })
+    const dialog = await screen.findByRole('dialog', { name: 'Remove MFA method' })
     expect(
       within(dialog).getByText('Multi-factor authentication will be disabled')
     ).toBeInTheDocument()
