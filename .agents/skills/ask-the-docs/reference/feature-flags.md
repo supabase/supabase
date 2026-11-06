@@ -25,35 +25,34 @@ Where docs uses static flags:
 - The provider loads PostHog flags from the platform API path `/telemetry/feature-flags`.
 - Read them with `useFeatureFlags()` from `common`. Use the `posthog` object (flag key to value) and the `hasLoaded` boolean. Before `hasLoaded` is `true`, `posthog` is empty.
 - Local and staging only: the dev toolbar writes the `x-ph-flag-overrides` cookie, and the provider merges it into `posthog`. See `../../dev-toolbar-review/SKILL.md`.
+- Reload the page to apply a toolbar override. The provider ignores the cookie when no PostHog flags load, so the override does nothing in a local build.
 
 ### Without Supabase access
 
 - A local build is not on the platform, so no PostHog flags load. Variant hooks return `control` (or the cached value from an earlier visit).
-- The URL override still works. `?docs-ia-mvp-v1=option-1` shows Option 1 locally with no PostHog access.
+- The URL override still works. `?<flag>=<variant>` shows that variant locally with no PostHog access.
+- The URL override applies only to the page that has it in its URL. Navigation links drop the query parameter, and the hook does not cache the override. After you follow a link, the page returns to `control` or the cached variant. Add the parameter to each page that you want to preview.
 - Only Supabase staff can create, change, or ramp PostHog flags. Contributors without access suggest an experiment in the PR or a GitHub issue. See `pm-the-docs` for both paths.
 
 ## Variant hook pattern
 
-The template is `apps/docs/features/IaNav/useIaNavVariant.ts`. It reads the `docs-ia-mvp-v1` flag (`IA_NAV_FLAG` in `features/IaNav/constants.ts`). Rules the hook follows:
+Each experiment reads its flag through a variant hook. To find the current hooks, search `apps/docs` for `captureExperimentExposure`. A variant hook follows these rules:
 
-1. Default to `control` when the flag is loading or unset.
-2. Before the flags load, use the value from the last visit. The hook stores it in `localStorage` under `LOCAL_STORAGE_KEYS.IA_NAV_FLAG`. A failed PostHog request keeps this cached value.
-3. Let the `?docs-ia-mvp-v1=<variant>` query parameter override the variant. Only known variants count.
-4. Treat a `false` flag value as "outside the rollout", not as `control`. The hook uses `isIaNavVariant` to tell them apart.
-5. Call `posthogClient.captureExperimentExposure(flag, { variant }, hasAccepted)` only when the loaded flag assigns the visitor and no URL override exists. Pass the consent value from `useConsentState`. A cached value never records an exposure.
+1. Before the flags load, use the value from the last visit. The hook stores it in `localStorage`. The cached value can be any variant, not only `control`.
+2. Keep the cached value after `hasLoaded` is `true` if PostHog returns no flags (an empty response or a failed request). Only a non-empty response replaces the cache.
+3. Default to `control` only when there is no cached value and no loaded flag value.
+4. Let the `?<flag>=<variant>` query parameter override the variant. Only known variants count.
+5. Treat a `false` flag value as "outside the rollout", not as `control`.
+6. Call `posthogClient.captureExperimentExposure(flag, { variant }, hasAccepted)` only when the loaded flag assigns the visitor and no URL override exists. Pass the consent value from `useConsentState`. A cached value never records an exposure.
 
-The hook has tests in `useIaNavVariant.test.ts`. Write tests for each new variant hook.
+Write tests for each variant hook, next to the hook.
 
-## Nav variant mechanism
-
-- `features/IaNav/option1.constants.ts` re-exports everything from `NavigationMenu.constants.ts`. It then overrides the menus that change (for example `database`, `auth`, `GLOBAL_MENU_ITEMS`). The override files live in `features/IaNav/option1/`.
-- `features/IaNav/useNavItems.ts` returns `option1NavItems` for the `option-1` variant. Otherwise it returns the current constants.
-- Consumers of `useNavItems`: `layouts/MainSkeleton.tsx`, `NavigationMenuGuideList.tsx`, `GlobalNavigationMenu.tsx`, and `GlobalMenuDrawer.tsx`.
+To test a nav variant, override the nav constants for that variant and select them in a hook. Every nav consumer must read the nav items from that hook.
 
 ## Gotchas
 
 - `$Show` reads static flags only. It cannot read PostHog flags. For a PostHog-driven change, branch in a React component with a variant hook.
-- The server renders the control nav, so an `option-1` visitor can see a flicker. The code limits this in two ways. The inline script `IA_NAV_CACHE_SCRIPT` in `app/layout.tsx` runs before paint. It sets `data-ia-nav="option-1"` on `<html>` from the URL override or the cached value. Until hydration, `useIaNavReady` returns `false`, and the nav adds `IA_NAV_PENDING_CLASS` to hide itself when that attribute is set.
+- The server renders `control`, so a visitor in another variant can see a flicker. To limit it, add an inline script to `app/layout.tsx`. The script reads the URL override or the cached value before paint and marks `<html>`. The changed component hides itself until hydration when that mark is set.
 - A first-time visitor has no cached value, so the flicker can still happen on the first visit.
 - Exposure is not recorded for a forced variant (URL override) or for a cached value.
 - The cache is a `localStorage` value. A stale value can show the wrong variant until the flags load.
@@ -63,3 +62,4 @@ The hook has tests in `useIaNavVariant.test.ts`. Write tests for each new varian
 - `../../telemetry-standards/SKILL.md`, section "Feature Flag Measurement". It describes Studio patterns (`usePHFlag`). Use it for measurement ideas, not as a docs hook template.
 - `../../dev-toolbar-review/SKILL.md` for the override cookies and environment guards.
 - PMs: see `pm-the-docs`. Docs engineering owns creating and ramping PostHog flags. Contributors without Supabase access follow the OSS path in `pm-the-docs`.
+- Example (2026): the IA nav experiment, flag `docs-ia-mvp-v1`, in `features/IaNav/`. It can be removed after the experiment ends.

@@ -47,7 +47,9 @@ Self-serve when the checklist is clear, standards exist, and you already know th
 
 Escalate to your docs team's PM when scope or stage is unclear, you need a review path, the bar is ambiguous, or the launch touches cross-cutting surfaces (quickstarts, API keys, tutorials, onboarding, platform concepts) — see the full "Ask the Docs PM" section in the checklist mirror.
 
-Feature flag and A/B test requests depend on Supabase access. Run the [capability gate](reference/universe-lookup.md#capability-gate) first. Use the same `gh api repos/supabase/universe` probe.
+A static `enabled-features` flag (show or hide content at build time) needs no PostHog flag and no A/B test. Add it in your PR by following the [enabled-features README](../../../packages/common/enabled-features/README.md). The flag file is shared with Studio and www, so keep changes to docs keys.
+
+Experiment requests (a PostHog flag with A/B testing) depend on Supabase access. Run the [capability gate](reference/universe-lookup.md#capability-gate) first. Use the same `gh api repos/supabase/universe` probe.
 
 - **Supabase org access:** Send the request to Docs Engineering through a DOCS issue in Linear. Docs Engineering creates and wires the PostHog flag, and you work with them to start A/B user testing. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) for the process.
 - **No access (OSS):** Do not tell the user to file a Linear issue or open the Notion page. Suggest the experiment in the PR description or a GitHub issue, and say why the change may need an A/B test. A Supabase team member decides and files the request. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL. Record `feature flags: staff-only (OSS)` in the Frame/Shape summary. This is a valid outcome, not a blocker.
