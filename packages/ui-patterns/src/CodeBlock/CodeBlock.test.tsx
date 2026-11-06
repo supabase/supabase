@@ -23,4 +23,22 @@ describe('CodeBlock', () => {
     expect(nextCopy).toHaveBeenCalledWith('select 2')
     expect(copy).toHaveBeenCalledTimes(1)
   })
+
+  it('stops propagation of Shift+wheel events while allowing regular wheel events to bubble', () => {
+    const onParentWheel = vi.fn()
+    const { container } = render(
+      <div onWheel={onParentWheel}>
+        <CodeBlock value="const longLine = 1" language="ts" className="p-2" />
+      </div>
+    )
+
+    const codeElement = container.querySelector('code')
+    expect(codeElement).not.toBeNull()
+
+    fireEvent.wheel(codeElement!, { deltaY: 100, shiftKey: true })
+    expect(onParentWheel).not.toHaveBeenCalled()
+
+    fireEvent.wheel(codeElement!, { deltaY: 100, shiftKey: false })
+    expect(onParentWheel).toHaveBeenCalledTimes(1)
+  })
 })
