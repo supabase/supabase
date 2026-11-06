@@ -281,7 +281,7 @@ Fires when a project-scoped credential is detected as leaked. This covers secret
 
 <Admonition type="note">
 
-This event only fires for project-scoped credentials. If an organization-scoped personal access token is leaked, only [`v1.organization.secrets.leaked`](#v1organizationsecretsleaked) is emitted — even though all projects in that organization are affected. Subscribe to both events for full visibility.
+This event only fires for project-scoped credentials. If an organization-scoped personal access token is leaked, only [`v1.organization.secrets.leaked`](#v1organizationsecretsleaked) is emitted — depending on the token's permissions, some or all projects in the organization may be affected. Subscribe to both events for full visibility.
 
 </Admonition>
 
@@ -308,7 +308,7 @@ The payload always includes the token prefix but never the full token value. `se
 {
   "secret": {
     "kind": "scoped_personal_access_token",
-    "token_prefix": "sb_pat_abcd",
+    "token_prefix": "sb_pat_fc12345abcde",
     "token_name": "My Token",
     "leak_source": null
   },
@@ -492,11 +492,11 @@ Fires when the organization's billing plan is downgraded.
 
 ### v1.organization.secrets.leaked
 
-Fires when an organization-scoped personal access token is detected as leaked. Because an organization-scoped token can access all projects in the organization, all of those projects are affected by such a leak.
+Fires when an organization-scoped personal access token is detected as leaked. Depending on the token's permissions, some or all projects in the organization may be affected.
 
 <Admonition type="note">
 
-This event only fires for organization-scoped tokens. Project-scoped credential leaks emit [`v1.project.secrets.leaked`](#v1projectsecretsleaked) instead. Subscribe to both events for full visibility.
+This event only fires for organization-scoped tokens. Depending on the token's permissions, some or all projects in the organization may be affected. Project-scoped credential leaks emit [`v1.project.secrets.leaked`](#v1projectsecretsleaked) instead. Subscribe to both events for full visibility.
 
 </Admonition>
 
