@@ -12,10 +12,9 @@ import { http, HttpResponse } from 'msw'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { TOTPFactors } from './index'
-import type { AccountRecoveryFinding } from '@/lib/account-recovery/evaluate-account-recovery'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
-import { mswServer } from '@/tests/lib/msw'
+import { mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
 mockAnimationsApi()
 
@@ -51,22 +50,23 @@ const session: Session = {
   user,
 }
 
-const renderSection = (finding?: AccountRecoveryFinding, searchParams = '') =>
+const renderSection = (searchParams = '') =>
   customRender(
     <AuthContext.Provider
       value={{ session, error: null, isLoading: false, refreshSession: async () => session }}
     >
       <FeatureFlagContext.Provider
         value={{
-          configcat: { enableAuthRecoveryCodes: true, textConfirmationModalClickToCopy: false },
+          configcat: {
+            enableAuthRecoveryCodes: true,
+            enableAccountPassword: false,
+            textConfirmationModalClickToCopy: false,
+          },
           posthog: {},
           hasLoaded: true,
         }}
       >
-        <TOTPFactors
-          findings={finding ? [finding] : []}
-          primaryAction={finding?.action ?? 'enable-mfa'}
-        />
+        <TOTPFactors />
       </FeatureFlagContext.Provider>
     </AuthContext.Provider>,
     { nuqs: { searchParams } }
@@ -93,6 +93,12 @@ describe('account security MFA and recovery sections', () => {
   beforeEach(async () => {
     mockUser()
     mswServer.use(
+      http.get('*/platform/projects/default', () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not found' }, { status: 404 })
+      ),
+      http.get('*/api/enabled-features-overrides', () =>
+        HttpResponse.json({ disabled_features: [] })
+      ),
       http.get('*/auth/v1/factors/recovery-codes', () =>
         HttpResponse.json<AuthMFARecoveryCodesStatusResponseData>({
           id: 'codes-a',
@@ -130,12 +136,35 @@ describe('account security MFA and recovery sections', () => {
   })
 
   it('shows a backup warning with one authenticator action', async () => {
-    renderSection({ id: 'single-mfa-factor', severity: 'warning', action: 'add-factor' })
+    renderSection()
     expect(await screen.findByText('Add a backup authenticator')).toBeInTheDocument()
     expect(await screen.findAllByRole('button', { name: 'Add authenticator' })).toHaveLength(1)
     expect(
       await screen.findByRole('button', { name: 'Remove Phone authenticator' })
     ).toBeInTheDocument()
+  })
+
+  it('keeps recovery codes available when a verified phone factor is the only MFA method', async () => {
+    mockUser([{ ...factor, factor_type: 'phone', friendly_name: 'Backup phone' }])
+    renderSection()
+    expect(await screen.findByText('10/10 recovery codes available')).toBeInTheDocument()
+    expect(screen.queryByText('Set up multi-factor authentication')).not.toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add authenticator' })).toBeInTheDocument()
+  })
+
+  it('does not treat an authenticator as the last MFA method when a verified phone factor remains', async () => {
+    mockUser([
+      factor,
+      { ...factor, id: 'phone-a', factor_type: 'phone', friendly_name: 'Backup phone' },
+      { ...factor, id: 'unfinished-a', status: 'unverified' },
+    ])
+    renderSection()
+    await userEvent.click(await screen.findByRole('button', { name: 'Remove Phone authenticator' }))
+    expect(await screen.findByText('This action cannot be undone')).toBeInTheDocument()
+    expect(
+      screen.queryByText('Multi-factor authentication will be disabled')
+    ).not.toBeInTheDocument()
+    expect(screen.queryByText('Your recovery codes will be deleted too')).not.toBeInTheDocument()
   })
 
   it('keeps removal unavailable when recovery-code status cannot be checked', async () => {
