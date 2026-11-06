@@ -9,7 +9,7 @@ description: >-
   for the docs app?", or before writing non-trivial changes under
   apps/docs/ — especially anything touching the MDX pipeline, markdown
   generation, content components, federated docs, or contributor-facing
-  authoring patterns. Can answer architecture questions with Mermaid
+  authoring patterns, or feature flags and experiments. Can answer architecture questions with Mermaid
   diagrams when helpful.
 ---
 
@@ -90,6 +90,7 @@ at hand — they cite each other where context matters.
 | [`reference/management-api-reference.md`](./reference/management-api-reference.md) | Management API OpenAPI → reference generation, including scoped PAT permission tables; why not to swap in Scalar/Redoc.                                                  |
 | [`reference/graphql-endpoint.md`](./reference/graphql-endpoint.md)                 | The `/api/graphql` endpoint under `apps/docs/resources/` — per-query folder layout, `rootSchema.ts`, connection/field utils, and the steps to add a new top-level query. |
 | [`reference/search-embeddings.md`](./reference/search-embeddings.md)               | The `scripts/search/` embeddings pipeline behind `searchDocs` — content sources, processing flow, change detection, and the `page` / `page_section` tables.              |
+| [`reference/feature-flags.md`](./reference/feature-flags.md)                       | Static `enabled-features` flags and PostHog experiment flags in `apps/docs`: where each resolves, the variant hook pattern, and gotchas.                                 |
 | [`reference/gotchas.md`](./reference/gotchas.md)                                   | Specific traps to watch for. One-liner per item.                                                                                                                         |
 
 ## How to use during a chat

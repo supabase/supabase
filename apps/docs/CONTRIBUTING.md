@@ -161,6 +161,14 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.
 
+## Feature flags and experiments
+
+Docs can hide or show content at build time with `enabled-features` flags. Use the `$Show` directive in MDX, or the `feature` field on a content listing item. To add or change a flag, see the [enabled-features README](../../packages/common/enabled-features/README.md).
+
+Docs also supports A/B tests behind PostHog feature flags. PostHog flags resolve in the browser, not at build time.
+
+Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering, or file a DOCS issue in Linear. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal) first.
+
 ## Search
 
 Search is keyword-based, backed by the `docs_search_v2` table and RPC in Postgres (see [`supabase/migrations/*_docs_search_v2*.sql`](../../supabase/migrations/)).
