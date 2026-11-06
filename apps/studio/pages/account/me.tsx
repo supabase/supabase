@@ -25,6 +25,7 @@ import { AccountIdentities } from '@/components/interfaces/Account/Preferences/A
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
+import { LanguageSettings } from '@/components/interfaces/Account/Preferences/LanguageSettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
 import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
@@ -34,6 +35,7 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useTranslation } from '@/lib/i18n/LocaleProvider'
 import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
@@ -51,19 +53,24 @@ User.getLayout = (page) => (
 
 export default User
 
-const PreferencesPageHeader = ({ description }: { description: string }) => (
-  <PageHeader size="small">
-    <PageHeaderMeta>
-      <PageHeaderSummary>
-        <PageHeaderTitle>Preferences</PageHeaderTitle>
-        <PageHeaderDescription>{description}</PageHeaderDescription>
-      </PageHeaderSummary>
-    </PageHeaderMeta>
-  </PageHeader>
-)
+const PreferencesPageHeader = ({ description }: { description: string }) => {
+  const { t } = useTranslation()
+
+  return (
+    <PageHeader size="small">
+      <PageHeaderMeta>
+        <PageHeaderSummary>
+          <PageHeaderTitle>{t('account.preferences.title')}</PageHeaderTitle>
+          <PageHeaderDescription>{description}</PageHeaderDescription>
+        </PageHeaderSummary>
+      </PageHeaderMeta>
+    </PageHeader>
+  )
+}
 
 const PlatformPreferences = () => {
   const router = useRouter()
+  const { t } = useTranslation()
 
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
@@ -82,7 +89,7 @@ const PlatformPreferences = () => {
 
   return (
     <>
-      <PreferencesPageHeader description="Manage your account profile, connections, and dashboard experience." />
+      <PreferencesPageHeader description={t('account.preferences.description.platform')} />
       <PageContainer size="small">
         {isError && (
           <Card>
@@ -106,6 +113,8 @@ const PlatformPreferences = () => {
             <AccountConnections />
 
             <ThemeSettings />
+
+            <LanguageSettings />
 
             <TimezoneSettings />
 
@@ -199,11 +208,15 @@ const ProfileFieldLoadingRow = ({
 )
 
 const SelfHostedPreferences = () => {
+  const { t } = useTranslation()
+
   return (
     <>
-      <PreferencesPageHeader description="Manage how the dashboard looks and behaves on this browser and device." />
+      <PreferencesPageHeader description={t('account.preferences.description.selfHosted')} />
       <PageContainer size="small">
         <ThemeSettings />
+
+        <LanguageSettings />
 
         <TimezoneSettings />
 

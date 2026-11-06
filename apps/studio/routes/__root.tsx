@@ -1,5 +1,7 @@
 /// <reference types="vite/client" />
 
+import { LocaleProvider } from '@/lib/i18n/LocaleProvider'
+
 import 'react-data-grid/lib/styles.css'
 import '@/styles/code.css'
 // Vite-only: defines @font-face for the custom fonts. The Next pipeline
@@ -376,43 +378,45 @@ function RootComponent() {
         <AuthProvider>
           <FeatureFlagProviderWithOrgContext API_URL={API_URL} enabled={IS_PLATFORM}>
             <ProfileProvider>
-              <TimezoneProvider>
-                <TimestampInfoTimezoneBridge>
-                  <DynamicTitle />
-                  <TooltipProvider>
-                    <RouteValidationWrapper>
-                      <ThemeProvider>
-                        <DevToolbarProvider apiUrl={API_URL}>
-                          <AiAssistantStateContextProvider>
-                            <CommandProvider>
-                              <BannerStackProvider>
-                                <FeaturePreviewContextProvider>
-                                  <MainScrollContainerProvider>
-                                    <RecoveryReminderController href={location.href}>
-                                      {canRenderPage ? <Outlet /> : <ShellFallback />}
-                                    </RecoveryReminderController>
-                                  </MainScrollContainerProvider>
-                                  <GlobalShortcuts />
-                                  <StudioCommandMenu />
-                                  <FeaturePreviewModal />
-                                  <IndirectTaxDeclarationModal />
-                                </FeaturePreviewContextProvider>
-                              </BannerStackProvider>
-                              <Toaster />
-                              <ToastErrorTracker />
-                              <MonacoThemeProvider />
-                              <AppearanceSettingsProvider />
-                            </CommandProvider>
-                          </AiAssistantStateContextProvider>
-                          <DevToolbar extraTabs={devToolbarExtraTabs} />
-                          <DevToolbarTrigger />
-                        </DevToolbarProvider>
-                      </ThemeProvider>
-                    </RouteValidationWrapper>
-                  </TooltipProvider>
-                  <Telemetry />
-                </TimestampInfoTimezoneBridge>
-              </TimezoneProvider>
+              <LocaleProvider>
+                <TimezoneProvider>
+                  <TimestampInfoTimezoneBridge>
+                    <DynamicTitle />
+                    <TooltipProvider>
+                      <RouteValidationWrapper>
+                        <ThemeProvider>
+                          <DevToolbarProvider apiUrl={API_URL}>
+                            <AiAssistantStateContextProvider>
+                              <CommandProvider>
+                                <BannerStackProvider>
+                                  <FeaturePreviewContextProvider>
+                                    <MainScrollContainerProvider>
+                                      <RecoveryReminderController href={location.href}>
+                                        {canRenderPage ? <Outlet /> : <ShellFallback />}
+                                      </RecoveryReminderController>
+                                    </MainScrollContainerProvider>
+                                    <GlobalShortcuts />
+                                    <StudioCommandMenu />
+                                    <FeaturePreviewModal />
+                                    <IndirectTaxDeclarationModal />
+                                  </FeaturePreviewContextProvider>
+                                </BannerStackProvider>
+                                <Toaster />
+                                <ToastErrorTracker />
+                                <MonacoThemeProvider />
+                                <AppearanceSettingsProvider />
+                              </CommandProvider>
+                            </AiAssistantStateContextProvider>
+                            <DevToolbar extraTabs={devToolbarExtraTabs} />
+                            <DevToolbarTrigger />
+                          </DevToolbarProvider>
+                        </ThemeProvider>
+                      </RouteValidationWrapper>
+                    </TooltipProvider>
+                    <Telemetry />
+                  </TimestampInfoTimezoneBridge>
+                </TimezoneProvider>
+              </LocaleProvider>
             </ProfileProvider>
           </FeatureFlagProviderWithOrgContext>
         </AuthProvider>
