@@ -143,10 +143,12 @@ describe('useIaNavVariant on the option-1 route', () => {
   it('returns option-1 before the URL is read and records no exposure', () => {
     vi.mocked(useFeatureFlags).mockReturnValue({
       posthog: { [IA_NAV_FLAG]: 'control' },
+      hasLoaded: true,
     } as unknown as ReturnType<typeof useFeatureFlags>)
     vi.mocked(useSearchParamsShallow).mockReturnValue(
       new URLSearchParams() as unknown as ReturnType<typeof useSearchParamsShallow>
     )
+    window.history.replaceState(null, '', '/')
 
     const { result } = renderHook(() => useIaNavVariant(), { wrapper: IaNavRouteProvider })
 
