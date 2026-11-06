@@ -340,7 +340,7 @@ export const SidePanelEditor = ({
     const selectedForeignKeyToEdit = snap.sidePanel.foreignKey
 
     try {
-      const { row } = selectedForeignKeyToEdit
+      const { row, column: editedColumn } = selectedForeignKeyToEdit
       const identifiers = {} as Dictionary<any>
       selectedTable.primary_keys.forEach((column) => {
         const col = selectedTable.columns?.find((x) => x.name === column.name)
@@ -354,7 +354,13 @@ export const SidePanelEditor = ({
         rowIdx: row.idx,
       }
 
-      await saveRow(value, isNewRecord, configuration, (error) => {
+      // For composite foreign keys, only update the column the user actually
+      // double-clicked. Updating all FK columns silently moves rows across
+      // composite-key boundaries (e.g. tenant isolation bypass, see #41085).
+      const filteredValue =
+        value && editedColumn?.name ? { [editedColumn.name]: value[editedColumn.name] } : value
+
+      await saveRow(filteredValue, isNewRecord, configuration, (error) => {
         if (error) {
           toast.error(`Failed to save row: ${error?.message ?? 'Unknown error'}`)
         }
