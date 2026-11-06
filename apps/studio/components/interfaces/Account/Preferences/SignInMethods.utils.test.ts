@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { parseRedirectMessage, shouldShowAddPasswordRow } from './AccountIdentities.utils'
+import { parseRedirectMessage, shouldShowAddPasswordRow } from './SignInMethods.utils'
 
 describe('parseRedirectMessage', () => {
   it('drops the trailing sb marker and decodes + as spaces', () => {

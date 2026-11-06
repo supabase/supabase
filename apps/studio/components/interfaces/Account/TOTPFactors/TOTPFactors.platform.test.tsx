@@ -14,6 +14,7 @@ import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vites
 
 import { TOTPFactors } from './index'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 import { mswServer, type APIErrorBody } from '@/tests/lib/msw'
@@ -52,6 +53,11 @@ const session: Session = {
   user,
 }
 
+const SecurityFactors = () => {
+  const { findings } = useAccountRecovery()
+  return <TOTPFactors findings={findings} primaryAction={undefined} />
+}
+
 const renderSection = (searchParams = '', queryClient?: QueryClient) =>
   customRender(
     <AuthContext.Provider
@@ -68,7 +74,7 @@ const renderSection = (searchParams = '', queryClient?: QueryClient) =>
           hasLoaded: true,
         }}
       >
-        <TOTPFactors />
+        <SecurityFactors />
       </FeatureFlagContext.Provider>
     </AuthContext.Provider>,
     { nuqs: { searchParams }, queryClient }
