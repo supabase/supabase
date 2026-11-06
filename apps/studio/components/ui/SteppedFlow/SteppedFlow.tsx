@@ -102,7 +102,7 @@ export const SteppedFlow = ({
       <div className="mx-auto w-full max-w-[760px] flex-1 px-6 pt-8 pb-10">
         <p className="mb-4 text-xs text-foreground-lighter" role="status">
           Step {currentIndex + 1} of {stepCount}
-          {currentStepLabel ? ` · ${currentStepLabel}` : ''}
+          {currentStepLabel ? <span>{` · ${currentStepLabel}`}</span> : ''}
         </p>
         <Card
           key={currentStep}

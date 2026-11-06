@@ -124,9 +124,9 @@ export const DestinationTypeSelection = () => {
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Destination type cannot be changed after creation.'}
-        {!editMode && stageDescription ? ' ' : null}
-        {stageDescription}
+        {[!editMode && 'Destination type cannot be changed after creation.', stageDescription]
+          .filter(Boolean)
+          .join(' ')}
       </span>
     ) : undefined
 

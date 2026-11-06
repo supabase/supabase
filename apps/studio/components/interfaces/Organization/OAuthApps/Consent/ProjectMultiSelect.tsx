@@ -104,8 +104,7 @@ export const ProjectMultiSelect = ({
 
           {hasFlagged && (
             <p className="text-xs text-destructive">
-              {flaggedRefs.length} of {selectedRefs.length}{' '}
-              {selectedRefs.length === 1 ? 'project' : 'projects'} unavailable
+              {`${flaggedRefs.length} of ${selectedRefs.length} ${selectedRefs.length === 1 ? 'project' : 'projects'} unavailable`}
             </p>
           )}
           {atCap && (

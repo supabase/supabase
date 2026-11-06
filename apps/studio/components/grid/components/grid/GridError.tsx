@@ -155,8 +155,14 @@ const InvalidOrderingOperatorError = ({ error }: { error: StudioError }) => {
     >
       <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}
-        {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
-        type. ({formattedInvalidDataType})
+        {sorts.length > 1 ? (
+          <span>one of the selected columns</span>
+        ) : (
+          <span>the selected column</span>
+        )}{' '}
+        <span>due to its data type. (</span>
+        {formattedInvalidDataType}
+        <span>)</span>
       </p>
       <p className="mb-2!">
         Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts

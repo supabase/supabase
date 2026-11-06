@@ -230,9 +230,10 @@ export const BucketLifecycleRules = ({ projectRef, bucket }: BucketLifecycleRule
                 Delete <code className="text-xs">{ruleToDelete.id}</code> from{' '}
               </>
             ) : (
-              'Delete this rule from '
+              <span>{'Delete this rule from '}</span>
             )}
-            <span className="text-foreground">{bucket.name}</span>?
+            <span className="text-foreground">{bucket.name}</span>
+            <span>?</span>
           </p>
           {ruleToDelete !== undefined && (
             <p className="text-foreground-lighter">{describeRule(ruleToDelete)}</p>

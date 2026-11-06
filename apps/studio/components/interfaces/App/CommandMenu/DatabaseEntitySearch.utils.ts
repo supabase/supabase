@@ -1,6 +1,10 @@
 import { SEARCH_ENTITIES_MAX_QUERY_LENGTH } from '@supabase/pg-meta'
 
-import type { EntitySearchPolicy, EntitySearchTable } from '@/data/database/entity-search-query'
+import type {
+  EntitySearchFunction,
+  EntitySearchPolicy,
+  EntitySearchTable,
+} from '@/data/database/entity-search-query'
 
 // Each search runs SQL against the user's database, so keep it to queries that
 // are specific enough to be useful: short queries match too broadly to be worth
@@ -74,4 +78,22 @@ export function getPolicyEditorRoute(
   policy: Pick<EntitySearchPolicy, 'id' | 'schema'>
 ): `/${string}` {
   return `/project/${projectRef}/database/policies?schema=${encodeURIComponent(policy.schema)}&edit=${policy.id}`
+}
+
+export function formatFunctionSearchDetails({
+  type,
+  args,
+}: Pick<EntitySearchFunction, 'type' | 'args'>) {
+  const procedure = type === 'procedure' ? 'procedure' : ''
+  if (args.length === 0) return procedure
+  return `${procedure} (${args})`.trim()
+}
+
+// The functions page lists functions per schema, so the schema must be set for
+// the function to be found and opened for editing.
+export function getFunctionEditorRoute(
+  projectRef: string,
+  fn: Pick<EntitySearchFunction, 'id' | 'schema'>
+): `/${string}` {
+  return `/project/${projectRef}/database/functions?schema=${encodeURIComponent(fn.schema)}&edit=${fn.id}`
 }

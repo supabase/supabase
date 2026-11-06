@@ -234,12 +234,16 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
               <Admonition type="default" className="border-x-0 rounded-none border-b-0">
                 <p className="leading-normal!">
                   Supabase will install the{' '}
-                  {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
-                  Iceberg Wrapper integration on your behalf.{' '}
+                  {wrappersExtensionState !== 'installed' ? (
+                    <span>{'Wrappers extension and '}</span>
+                  ) : (
+                    ''
+                  )}
+                  <span>Iceberg Wrapper integration on your behalf.</span>{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                     Learn more
                   </InlineLink>
-                  .
+                  <span>.</span>
                 </p>
               </Admonition>
             )}

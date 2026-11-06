@@ -267,6 +267,7 @@ export const fgaRequirements = {
   'POST /v1/projects/{ref}/network-bans/retrieve': [['database_network_bans_read']],
   'POST /v1/projects/{ref}/network-bans/retrieve/enriched': [['database_network_bans_read']],
   'POST /v1/projects/{ref}/network-restrictions/apply': [['database_network_restrictions_write']],
+  'POST /v1/projects/{ref}/network-restrictions/review': [['database_network_restrictions_write']],
   'POST /v1/projects/{ref}/pause': [['project_admin_write']],
   'POST /v1/projects/{ref}/read-replicas/remove': [['infra_read_replicas_write']],
   'POST /v1/projects/{ref}/read-replicas/setup': [['infra_read_replicas_write']],

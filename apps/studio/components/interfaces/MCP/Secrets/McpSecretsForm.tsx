@@ -175,9 +175,9 @@ export const McpSecretsForm = ({
                 {providerHint.name} dashboard
               </a>
             ) : (
-              `${providerHint.name} dashboard`
+              <span>{`${providerHint.name} dashboard`}</span>
             )}
-            .
+            <span>.</span>
           </InterstitialFooter>
         </>
       )}

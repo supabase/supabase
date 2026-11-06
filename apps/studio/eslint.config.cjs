@@ -2,6 +2,7 @@ const { defineConfig } = require('eslint/config')
 const { fixupPluginRules } = require('@eslint/compat')
 const barrelFiles = require('eslint-plugin-barrel-files')
 const valtio = require('eslint-plugin-valtio')
+const reactGoogleTranslate = require('eslint-plugin-react-google-translate')
 // eslint-plugin-react-hook-form@0.3.1 (latest) still calls the ESLint 8
 // `context.getScope()`, which ESLint 9 removed. fixupPluginRules shims the
 // deprecated context methods so the rules run under flat config.
@@ -116,6 +117,7 @@ module.exports = defineConfig([
       'barrel-files': barrelFiles,
       valtio,
       'react-hook-form': fixupPluginRules(reactHookForm),
+      'react-google-translate': reactGoogleTranslate,
     },
     rules: {
       '@next/next/no-img-element': 'off',
@@ -158,6 +160,8 @@ module.exports = defineConfig([
       'react-hook-form/no-access-control': 'error',
       'react-hook-form/no-nested-object-setvalue': 'error',
       'react-hook-form/no-use-watch': 'error',
+      'react-google-translate/no-conditional-text-nodes-with-siblings': 'error',
+      'react-google-translate/no-return-text-nodes': 'error',
     },
   },
   {

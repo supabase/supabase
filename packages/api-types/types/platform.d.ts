@@ -1991,6 +1991,23 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/restrictions/recheck': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Re-evaluates a restricted organization and lifts the restriction if it is now within its plan limits */
+    post: operations['OrgRestrictionsController_recheck']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/roles': {
     parameters: {
       query?: never
@@ -5518,6 +5535,11 @@ export interface components {
     }
     /** @default {} */
     ApproveAuthorizationBody: {
+      /**
+       * @description Allows creation of partial grants, i.e. those where the user is missing permissions for some requested scopes. Ignored if not supported by the app.
+       * @default false
+       */
+      partial?: boolean
       /** @description The projects that the authorization will be scoped to; if omitted, all of the organization projects will be in scope. */
       project_refs?: string[]
     }
@@ -6334,8 +6356,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -6696,8 +6718,8 @@ export interface components {
     }
     CreatePipelineResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
     }
@@ -7000,6 +7022,7 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -8113,8 +8136,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -10195,14 +10218,18 @@ export interface components {
       unread_count: number
     }
     OAuthAppResponse_Output: {
+      allow_partial_grants?: boolean
       app_id?: string
       authorized_at?: string
       client_id?: string
       created_at?: string
       created_by?: string
+      /** @enum {string} */
+      grant_kind?: 'organization_bound' | 'member_bound'
       icon?: string
       id: string
       name: string
+      project_scoping_mode?: boolean
       redirect_uris?: string[]
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
@@ -10378,6 +10405,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponse_Output: {
@@ -10863,8 +10891,8 @@ export interface components {
         write_lag?: number | null
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Table statuses */
@@ -11107,8 +11135,8 @@ export interface components {
        */
       destination_name: string
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
       /**
@@ -11256,8 +11284,8 @@ export interface components {
          */
         destination_name: string
         /**
-         * @description Pipeline id
-         * @example 1012
+         * @description Pipeline ID
+         * @example 03dg2o5teb2eucxr9ggh3uie6
          */
         id: string
         /**
@@ -11284,8 +11312,8 @@ export interface components {
     }
     PipelineStatusResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Pipeline status */
@@ -11312,8 +11340,8 @@ export interface components {
         name: string
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Current pipeline version */
@@ -11723,6 +11751,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
       billed_via_partner: boolean
       breakdown: {
@@ -11769,6 +11798,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -12016,6 +12046,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       subscription_id: string
       updated_at: string
       volumeSizeGb?: number | null
@@ -12370,6 +12401,49 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean | null
     }
+    RecheckRestrictionsResponse_Output: {
+      billing_period_end: string | null
+      /** Format: date-time */
+      checked_at: string
+      message: string | null
+      /** @enum {string} */
+      result: 'lifted' | 'still_restricted' | 'not_restricted' | 'not_eligible' | 'not_recheckable'
+      /** @description Set with `not_recheckable`: recorded violations only support can review. Empty when the organization usage cannot be measured; `message` says so. */
+      unrecheckable_violations: (
+        | 'exceed_db_size_quota'
+        | 'exceed_egress_quota'
+        | 'exceed_cached_egress_quota'
+        | 'exceed_edge_functions_count_quota'
+        | 'exceed_edge_functions_invocations_quota'
+        | 'exceed_monthly_active_users_quota'
+        | 'exceed_realtime_connection_count_quota'
+        | 'exceed_realtime_message_count_quota'
+        | 'exceed_storage_size_quota'
+        | 'exceed_log_query_quota'
+        | 'overdue_payment'
+      )[]
+      violations: {
+        /** @enum {string} */
+        aggregation: 'sum' | 'period_average' | 'period_max'
+        current: number
+        limit: number
+        /** @enum {string} */
+        type:
+          | 'exceed_db_size_quota'
+          | 'exceed_egress_quota'
+          | 'exceed_cached_egress_quota'
+          | 'exceed_edge_functions_count_quota'
+          | 'exceed_edge_functions_invocations_quota'
+          | 'exceed_monthly_active_users_quota'
+          | 'exceed_realtime_connection_count_quota'
+          | 'exceed_realtime_message_count_quota'
+          | 'exceed_storage_size_quota'
+          | 'exceed_log_query_quota'
+          | 'overdue_payment'
+        /** @enum {string} */
+        unit: 'gigabyte' | 'count'
+      }[]
+    }
     RegionsInfoPlatform_Output: {
       all: {
         auto?: {
@@ -12556,8 +12630,8 @@ export interface components {
     }
     RollbackTablesResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Rolled back tables */
@@ -13096,6 +13170,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -13245,6 +13320,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13368,6 +13444,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13575,6 +13652,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13698,6 +13776,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -16778,8 +16857,8 @@ export interface components {
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse disable has been requested
-       * @example 101
+       * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string | null
       /** @description Tables with Warehouse copies */
@@ -16869,8 +16948,8 @@ export interface components {
         wrapper_installed: boolean
       } | null
       /**
-       * @description Warehouse replication pipeline id when it exists
-       * @example 101
+       * @description Warehouse replication pipeline ID when it exists
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id?: string
       /**
@@ -23847,6 +23926,63 @@ export interface operations {
       }
     }
   }
+  OrgRestrictionsController_recheck: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RecheckRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to recheck restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage could not be measured */
+      503: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OrganizationRolesController_getAllRoles: {
     parameters: {
       query?: never
@@ -30643,6 +30779,7 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
+          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -30866,8 +31003,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -30932,8 +31069,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31369,8 +31506,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31422,8 +31559,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31486,8 +31623,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31560,8 +31697,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31613,8 +31750,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31680,8 +31817,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31746,8 +31883,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31806,8 +31943,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31859,8 +31996,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31919,8 +32056,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31972,8 +32109,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
