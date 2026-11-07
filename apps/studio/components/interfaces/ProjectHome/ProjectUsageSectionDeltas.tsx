@@ -56,9 +56,10 @@ export const ProjectUsageSectionDeltas = () => {
   const { getEntitlementMax } = useCheckEntitlements('log.retention_days')
   const retentionDays = getEntitlementMax()
 
-  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | undefined>(
+  // react-query rejects `undefined` query data, so the "no stored value" default must be `null`
+  const [storedInterval, setStoredInterval] = useLocalStorageQuery<string | null>(
     LOCAL_STORAGE_KEYS.HOME_CHART_INTERVAL(projectRef ?? ''),
-    undefined
+    null
   )
   const interval = resolveChartInterval(storedInterval, retentionDays)
 
