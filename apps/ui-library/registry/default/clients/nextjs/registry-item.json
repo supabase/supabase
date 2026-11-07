@@ -17,7 +17,7 @@
       "type": "registry:lib"
     },
     {
-      "path": "registry/default/clients/nextjs/lib/supabase/middleware.ts",
+      "path": "registry/default/clients/nextjs/lib/supabase/proxy.ts",
       "type": "registry:lib"
     },
     {
