@@ -1394,6 +1394,60 @@ describe('project creation wizard', () => {
     expect(onRequest).not.toHaveBeenCalled()
   })
 
+  // The tests below submit in the same tick as the password change, before the async
+  // strength check has written its score to the form.
+  test.each([
+    {
+      source: 'generated',
+      enterPassword: () =>
+        fireEvent.click(screen.getByRole('button', { name: 'Generate a password' })),
+    },
+    {
+      source: 'typed',
+      enterPassword: () =>
+        fireEvent.change(screen.getByPlaceholderText('Type in a strong password'), {
+          target: { value: 'a-strong-database-password' },
+        }),
+    },
+  ])(
+    'creates a project with a $source strong password submitted right away',
+    async ({ enterPassword }) => {
+      mockWizardEndpoints()
+      const onRequest = vi.fn()
+      mockCreateProject(onRequest)
+
+      await renderWizard()
+
+      await fillProjectName('Quick Submit Project')
+      await waitFor(() => expect(getSelectTriggerByLabel('Region')).toHaveTextContent('Americas'))
+
+      enterPassword()
+      fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+      await waitFor(() => expect(onRequest).toHaveBeenCalled())
+      expect(screen.getByRole('progressbar')).toHaveAttribute('aria-valuenow', '100')
+    }
+  )
+
+  test('blocks a weak password submitted right after a strong one', async () => {
+    mockWizardEndpoints()
+    const onRequest = vi.fn()
+    mockCreateProject(onRequest)
+
+    await renderWizard()
+
+    await fillProjectName('Weak Password Project')
+    await generateAndWaitForStrongPassword()
+
+    fireEvent.change(screen.getByPlaceholderText('Type in a strong password'), {
+      target: { value: 'password' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Create new project' }))
+
+    await screen.findByText(/You need a stronger password\./)
+    expect(onRequest).not.toHaveBeenCalled()
+  })
+
   test('blocks submission for a too-short project name', async () => {
     mockWizardEndpoints()
     const onRequest = vi.fn()
