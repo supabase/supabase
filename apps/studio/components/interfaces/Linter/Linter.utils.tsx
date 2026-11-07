@@ -6,6 +6,7 @@ import {
   DatabaseIcon,
   EyeIcon,
   GaugeIcon,
+  KeyRoundIcon,
   LockIcon,
   RulerIcon,
   ScalingIcon,
@@ -186,6 +187,15 @@ export const lintInfoMap: LintInfo[] = [
     link: ({ projectRef }) => `/project/${projectRef}/auth/performance`,
     linkText: 'View settings',
     docsLink: `${DOCS_URL}/guides/platform/going-into-prod`,
+    category: 'performance',
+  },
+  {
+    name: 'auth_signing_key_performance_concern',
+    title: 'Auth Signing Key Performance Concern',
+    icon: <KeyRoundIcon className="text-foreground-muted" size={15} strokeWidth={1} />,
+    link: ({ projectRef }) => `/project/${projectRef}/settings/jwt`,
+    linkText: 'View signing keys',
+    docsLink: `${DOCS_URL}/guides/auth/signing-keys`,
     category: 'performance',
   },
   {
