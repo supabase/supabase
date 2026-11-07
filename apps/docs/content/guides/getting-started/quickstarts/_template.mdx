@@ -55,10 +55,11 @@ sequentially from where its partial leaves off rather than copying numbers from 
      `nextjs.mdx` drops the step entirely, because the `with-supabase` template
      installs them as part of step 3.
 5. **Declare Supabase environment variables** — env vars only, never literal
-   credentials in code. Mobile guides (Flutter, iOS SwiftUI, Kotlin) are the
+   credentials in code. Mobile guides (Flutter, iOS SwiftUI, Kotlin) and Unity are the
    documented exception — they use `YOUR_SUPABASE_URL` / `YOUR_SUPABASE_PUBLISHABLE_KEY`
    placeholder substitution instead of a `.env` file, with
-   `<$Partial path="quickstart_mobile_env_note.mdx" />` explaining why. Include the
+   `<$Partial path="quickstart_mobile_env_note.mdx" />` explaining why. Unity has its
+   own note instead, because the partial's examples are mobile toolchains. Include the
    `<Button>` "Open Connect panel" link and `<$Partial path="api_settings.mdx" />`
    (or, for direct-Postgres guides, `<$Partial path="quickstart_connection_string.mdx" />`).
 6. **Create the Supabase client** — its own step, not inlined into the query
@@ -93,9 +94,9 @@ sequentially from where its partial leaves off rather than copying numbers from 
    which supplies the `##` heading itself, so don't add one in the host file. Every
    guide gets this, immediately before Next steps. Its wording is deliberately neutral
    about which tables the guide uses, so it stays true for both the `instruments`
-   guides and the direct-Postgres ones. `flutter.mdx` is the one guide that appends a
-   framework-specific `###` subsection under it, for the Android `INTERNET`
-   permission.
+   guides and the direct-Postgres ones. `flutter.mdx` (the Android `INTERNET`
+   permission) and `unity.mdx` (IL2CPP code stripping) append a framework-specific
+   `###` subsection under it.
 10. **Next steps** — canonical order: framework-specific Auth pointer (or the
     generic `Set up [Auth](/docs/guides/auth) for your app` if there's no
     framework-specific one) → Insert more data → Storage → Supabase Library (`/ui`).
