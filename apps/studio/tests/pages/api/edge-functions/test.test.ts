@@ -1,9 +1,21 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '../../../../pages/api/edge-functions/test'
+import { toWebHandler } from '@/compat/next/api'
 
-vi.mock('common', () => ({ IS_PLATFORM: true }))
+const { deployment, getUserClaims } = vi.hoisted(() => ({
+  deployment: { isPlatform: true },
+  getUserClaims: vi.fn(),
+}))
+
+vi.mock('@/lib/constants', () => ({
+  get IS_PLATFORM() {
+    return deployment.isPlatform
+  },
+}))
+vi.mock('@/lib/gotrue', () => ({ getUserClaims }))
+vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
 
 const createRequest = (
   url = 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test',
@@ -11,6 +23,7 @@ const createRequest = (
 ) =>
   createMocks({
     method: 'POST',
+    headers: { authorization: 'Bearer studio-session' },
     body: {
       url,
       method: 'POST',
@@ -20,8 +33,143 @@ const createRequest = (
   })
 
 describe('/api/edge-functions/test', () => {
+  beforeEach(() => {
+    deployment.isPlatform = true
+    getUserClaims.mockReset()
+    getUserClaims.mockResolvedValue({ claims: { sub: 'user-id' }, error: null })
+  })
+
   afterEach(() => {
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
+  })
+
+  it('rejects unauthenticated requests before fetching', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest(undefined, { Authorization: 'Bearer function-token' })
+    delete req.headers.authorization
+
+    await handler(req, res)
+
+    expect(res._getStatusCode()).toBe(401)
+    expect(getUserClaims).not.toHaveBeenCalled()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('enforces authentication through the TanStack API adapter', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const response = await toWebHandler(handler)({
+      request: new Request('http://localhost/api/edge-functions/test', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(createRequest().req.body),
+      }),
+    })
+
+    expect(response.status).toBe(401)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it.each([undefined, null, 123, {}])('rejects a non-string URL: %s', async (url) => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest()
+    req.body.url = url
+
+    await handler(req, res)
+
+    expect(res._getStatusCode()).toBe(400)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('rejects invalid sessions before fetching', async () => {
+    getUserClaims.mockResolvedValue({ claims: null, error: new Error('Invalid token') })
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const { req, res } = createRequest()
+
+    await handler(req, res)
+
+    expect(res._getStatusCode()).toBe(401)
+    expect(getUserClaims).toHaveBeenCalledWith('studio-session')
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  describe('self-hosted destinations', () => {
+    beforeEach(() => {
+      deployment.isPlatform = false
+      vi.stubEnv('SUPABASE_URL', 'http://kong:8000')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://supabase.example.com')
+    })
+
+    it.each([
+      'https://supabase.example.com/functions/v1/test?name=value',
+      'http://kong:8000/functions/v1/test?name=value',
+    ])('forwards %s to the configured gateway', async (url) => {
+      const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest(url)
+      delete req.headers.authorization
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(getUserClaims).not.toHaveBeenCalled()
+      expect(fetchMock).toHaveBeenCalledWith(
+        'http://kong:8000/functions/v1/test?name=value',
+        expect.objectContaining({ redirect: 'manual' })
+      )
+    })
+
+    it.each([
+      'http://169.254.169.254/functions/v1/test',
+      'http://127.0.0.1/functions/v1/test',
+      'http://internal-service/functions/v1/test',
+      'http://kong:8001/functions/v1/test',
+      'https://supabase.example.com.evil.example/functions/v1/test',
+      'https://supabase.example.com@evil.example/functions/v1/test',
+      'https://evil.example/functions/v1/https://supabase.example.com',
+      'https://supabase.example.com/functions/v1/../../rest/v1/test',
+      'http://kong:8000/functions/v1/%2e%2e/%2e%2e/rest/v1/test',
+      'https://user:password@supabase.example.com/functions/v1/test',
+      'not a URL',
+      '',
+    ])('rejects %s without fetching', async (url) => {
+      const fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest(url)
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(400)
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('fails closed when the internal URL is missing', async () => {
+      vi.stubEnv('SUPABASE_URL', undefined)
+      const fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest('https://supabase.example.com/functions/v1/test')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(400)
+      expect(fetchMock).not.toHaveBeenCalled()
+    })
+
+    it('clears the public port when the internal URL uses a default port', async () => {
+      vi.stubEnv('SUPABASE_URL', 'http://gateway')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'https://supabase.example.com:8443/')
+      const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest('https://supabase.example.com:8443/functions/v1/test')
+
+      await handler(req, res)
+
+      expect(fetchMock).toHaveBeenCalledWith('http://gateway/functions/v1/test', expect.anything())
+    })
   })
 
   it('preserves unsuccessful edge function responses', async () => {

@@ -35,24 +35,28 @@ export const isEdgeFunctionUrl = (
   )
 }
 
-export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean) => {
+export const isValidEdgeFunctionURL = (url: string, isPlatform: boolean, supabaseUrl?: string) => {
+  if (!URL.canParse(url)) return false
+  const parsed = new URL(url)
+  if (parsed.protocol !== 'http:' && parsed.protocol !== 'https:') return false
+  if (parsed.username || parsed.password) return false
+  if (!/^\/functions\/v[0-9]\//.test(parsed.pathname)) return false
+
+  if (!isPlatform) {
+    return (
+      !!supabaseUrl && URL.canParse(supabaseUrl) && parsed.origin === new URL(supabaseUrl).origin
+    )
+  }
+
   if (NIMBUS_PROD_PROJECTS_URL !== undefined) {
     const apexDomain = NIMBUS_PROD_PROJECTS_URL.replace('https://*.', '').replace(/\./g, '\\.')
     const nimbusRegex = new RegExp('^https://[a-z]*\\.' + apexDomain + '/functions/v[0-9]{1}/.*$')
-    return nimbusRegex.test(url)
-  }
-
-  if (!isPlatform) {
-    const regexValidLocalEdgeFunctionURL = new RegExp(
-      /^https?:\/\/[^\s/?#]+\/functions\/v[0-9]{1}\/.*$/
-    )
-
-    return regexValidLocalEdgeFunctionURL.test(url)
+    return nimbusRegex.test(parsed.href)
   }
 
   const regexValidEdgeFunctionURL = new RegExp(
     /^https:\/\/[a-z]{20}\.supabase\.(red|co)\/functions\/v[0-9]{1}\/.*$/
   )
 
-  return regexValidEdgeFunctionURL.test(url)
+  return regexValidEdgeFunctionURL.test(parsed.href)
 }

@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 
 import {
   buildDatabaseEdgeFunctionUrl,
@@ -91,6 +91,11 @@ describe('isEdgeFunctionUrl', () => {
 })
 
 describe('isValidEdgeFunctionURL', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs()
+    vi.resetModules()
+  })
+
   const validEdgeFunctionUrls = [
     'https://uniquetwentychararef.supabase.co/functions/v1/hello-world',
     'https://uniquetwentychararef.supabase.red/functions/v1/hello-world',
@@ -137,7 +142,10 @@ describe('isValidEdgeFunctionURL', () => {
 
   it('should match valid local edge function URLs off platform', () => {
     for (const url of validLocalEdgeFunctionsUrls) {
-      expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be valid`).toBe(true)
+      expect(
+        isValidEdgeFunctionURL(url, false, new URL(url).origin),
+        `Expected ${url} to be valid`
+      ).toBe(true)
     }
   })
 
@@ -151,5 +159,63 @@ describe('isValidEdgeFunctionURL', () => {
     for (const url of invalidEdgeFunctionUrls) {
       expect(isValidEdgeFunctionURL(url, false), `Expected ${url} to be invalid`).toBe(false)
     }
+  })
+
+  it.each([
+    'http://169.254.169.254/functions/v1/test',
+    'http://127.0.0.1/functions/v1/test',
+    'http://internal-service/functions/v1/test',
+    'http://kong:8001/functions/v1/test',
+    'https://kong:8000/functions/v1/test',
+    'http://kong.example.com:8000/functions/v1/test',
+    'http://kong:8000@evil.example/functions/v1/test',
+    'http://user:password@kong:8000/functions/v1/test',
+    'http://kong:8000/functions/v1/../../rest/v1/test',
+    'http://kong:8000/functions/v1/%2e%2e/%2e%2e/rest/v1/test',
+    'http://kong:8000/?path=/functions/v1/test',
+    'file:///functions/v1/test',
+    'not a URL',
+    '',
+  ])('rejects an untrusted self-hosted URL: %s', (url) => {
+    expect(isValidEdgeFunctionURL(url, false, 'http://kong:8000')).toBe(false)
+  })
+
+  it.each([undefined, '', 'not a URL'])(
+    'rejects missing or invalid configuration: %s',
+    (supabaseUrl) => {
+      expect(isValidEdgeFunctionURL('http://kong:8000/functions/v1/test', false, supabaseUrl)).toBe(
+        false
+      )
+    }
+  )
+
+  it('allows the configured origin with a trailing slash and query parameters', () => {
+    expect(
+      isValidEdgeFunctionURL(
+        'http://kong:8000/functions/v1/test?name=value',
+        false,
+        'http://kong:8000/'
+      )
+    ).toBe(true)
+  })
+
+  it.each([
+    'https://abcdefghijklmnopqrst.supabase.co/functions/v1/../../rest/v1/test',
+    'https://abcdefghijklmnopqrst.supabase.co/functions/v1/%2e%2e/test',
+    'https://user@abcdefghijklmnopqrst.supabase.co/functions/v1/test',
+  ])('rejects unsafe platform URLs: %s', (url) => {
+    expect(isValidEdgeFunctionURL(url, true)).toBe(false)
+  })
+
+  it('preserves configured platform domains without bypassing the self-hosted origin check', async () => {
+    vi.stubEnv('NIMBUS_PROD_PROJECTS_URL', 'https://*.projects.example.com')
+    vi.resetModules()
+    const { isValidEdgeFunctionURL: validate } = await import('./edgeFunctions')
+    const url = 'https://abcdefghijklmnopqrst.projects.example.com/functions/v1/test'
+
+    expect(validate(url, true)).toBe(true)
+    expect(validate(url, false, 'http://kong:8000')).toBe(false)
+    expect(validate('http://kong:8000/functions/v1/test', false, 'http://kong:8000')).toBe(true)
+    expect(validate(`${url}/../../rest/v1/test`, true)).toBe(false)
   })
 })
