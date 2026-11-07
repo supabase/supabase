@@ -7,38 +7,75 @@ description: Composable primitives for distributed-trace views built on the shar
 import { Trace } from 'ui-patterns/Trace'
 ```
 
-`Trace.Root` indexes a list of OpenTelemetry-style spans and shares the result with the parts inside it. `Trace.Waterfall` is the layout container and measures its width so time can be mapped to pixels. `Trace.Ruler` draws the time axis and `Trace.Grid` draws the vertical gridlines below it, and `Trace.Cursor` draws the live cursor. The waterfall has two columns: the tree (`treeWidth`) and the timeline. The children of `Trace.Ruler` render at the right end of the ruler's tree cell, next to the "Span" label.
+`Trace.Root` indexes a list of OpenTelemetry-style spans and shares the result with every part inside it. The other parts are small primitives you compose into the view you need.
 
-## Waterfall and Ruler
+## Composition
 
-The ruler adapts its ticks to the visible range. While a trace is live (any span has no end), `Trace.Cursor` also draws a line at `nowMs` from the top of the ruler to the bottom of the waterfall, with a dot on the ruler's bottom edge. Pass `nowMs` on the trace to pin it, and `minRangeMs` to keep a minimum visible duration while live.
+<ComponentPreview name="trace-waterfall-demo" peekCode wide squared />
+
+```tsx
+<Trace.Root trace={trace}>
+  <Trace.Header>
+    <Trace.Title />
+    <Trace.Status />
+  </Trace.Header>
+  <Trace.Waterfall>
+    <Trace.Minimap />
+    <Trace.Ruler>
+      <Trace.CollapseAll />
+      <Trace.ResetZoom />
+    </Trace.Ruler>
+    <Trace.Grid />
+    <Trace.Cursor />
+    <Trace.Rows>
+      <Trace.Cell />
+      <Trace.Lane>
+        <Trace.Bar />
+        <Trace.Timing />
+        <Trace.CollapsedChildren />
+        <Trace.Markers />
+        <Trace.Slowest />
+      </Trace.Lane>
+    </Trace.Rows>
+  </Trace.Waterfall>
+  <Trace.Inspector />
+</Trace.Root>
+```
+
+## Header
+
+`Trace.Header` is a layout container for the controls above the waterfall. `Trace.Title` shows the name of the trace's first root span. `Trace.Status` shows Live while any span is still running, Failed when the root span has an error status, and Done otherwise. It also announces changes to screen readers.
+
+`Trace.CollapseAll` and `Trace.ResetZoom` are icon buttons with tooltips that go at the right end of the ruler's tree cell, as children of `Trace.Ruler`. `Trace.CollapseAll` collapses every span that has children, and expands them all again when they are already collapsed. `Trace.ResetZoom` restores the full window and is disabled until you zoom.
+
+## Waterfall and ruler
+
+`Trace.Waterfall` is the layout container. It measures its width so time can be mapped to pixels, and has two columns: the tree (`treeWidth`) and the timeline. `Trace.Ruler` draws the time axis, adapts its ticks to the visible range, and renders its children at the right end of its tree cell, next to the "Span" label. `Trace.Grid` draws a vertical gridline at every tick below it. While a trace is live, `Trace.Cursor` draws a line at `nowMs` from the top of the ruler to the bottom of the waterfall. Pass `nowMs` on the trace to pin it, and `minRangeMs` to keep a minimum visible duration while live. Place `Trace.Grid` and `Trace.Cursor` directly after the ruler.
+
+## Rows and bars
+
+`Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and a spinner while the span is running. `Trace.Lane` is the timeline column, a positioned container for the primitives below. Compose the primitives in this order so markers and the badge draw over the bar:
+
+- `Trace.Bar` draws the span from its start to its end, tinted by status. A running span extends to `nowMs`.
+- `Trace.Timing` shows the span's duration just after the bar, or inside the bar's end when there is no room after it.
+- `Trace.CollapsedChildren` draws a tick at each direct child's midpoint when a span is collapsed.
+- `Trace.Markers` places a marker at each of the span's event timestamps.
+- `Trace.Slowest` badges the longest finished span.
+
+Rows follow the tree pattern. Use the arrow keys to move between rows, Right and Left to expand and collapse (Left on a collapsed row moves to its parent), and Enter or Space to select. Read the selection and collapse state with `useView()`.
 
 ## Minimap and zoom
 
 `Trace.Minimap` compresses the whole trace into a full-width strip above the ruler, with one row per depth level, colored by span status. The brush shows the visible window. Drag the brush to pan, drag either edge to resize it, or click outside the brush to recenter it. With the brush focused, the left and right arrow keys pan, and Shift with an arrow key moves the end edge.
 
-Until the window is changed, it follows the trace as it grows. Once it is zoomed it stays fixed, and ruler labels still read as offsets from the trace start. Read and control the window with `useView()`: `window`, `setWindow(start, end)` and `resetWindow()`.
-
-## Rows and bars
-
-`Trace.Rows` is a virtualized, scrollable list with one row per visible span. Its children are the row template and render once per row. `Trace.Cell` is the tree column: indent by depth, an expand and collapse toggle, the span name, and a spinner while the span is running. `Trace.Lane` is the timeline column, a positioned container for the primitives below.
-
-Five primitives go inside a `Trace.Lane`. `Trace.Bar` draws the span from its start to its end, tinted by status. A running span extends to `nowMs`. `Trace.Timing` shows the span's duration just after the bar, or inside the bar's end when there is no room after it. `Trace.Markers` places a marker at each of the span's event timestamps. `Trace.CollapsedChildren` draws a tick at each direct child's midpoint when a span is collapsed. `Trace.Slowest` badges the longest finished span. Compose them in this order so markers and the badge draw over the bar:
-
-```tsx
-<Trace.Lane>
-  <Trace.Bar />
-  <Trace.Timing />
-  <Trace.CollapsedChildren />
-  <Trace.Markers />
-  <Trace.Slowest />
-</Trace.Lane>
-```
-
-Rows follow the tree pattern. Use the arrow keys to move between rows, Right and Left to expand and collapse (Left on a collapsed row moves to its parent), and Enter or Space to select. Read the selection and collapse state with `useView()`.
-
-<ComponentPreview name="trace-waterfall-demo" peekCode wide squared />
+Until the window is changed, it follows the trace as it grows. Once it is zoomed it stays fixed, and ruler labels still read as offsets from the trace start. Use `Trace.ResetZoom` to follow the trace again, or read and control the window yourself with `useView()`: `window`, `setWindow(start, end)` and `resetWindow()`.
 
 ## Inspector
 
 Place `<Trace.Inspector />` once inside `Trace.Root`. When a span is selected, it opens a popover next to the span's bar with its name, status, start offset, duration, attributes and events. Arrow keys keep moving between rows while it is open, and clicking another row moves it to that span. Press Escape or click outside the waterfall to close it and clear the selection. If the selected row scrolls out of view, the popover hides and comes back when the row does.
+
+## Live traces
+
+Spans without an end are running. Update the trace and `nowMs` as time passes and the running bars grow, the ruler follows, and `Trace.Status` changes from Live to Done when the last span finishes. Press Play to run this example.
+
+<ComponentPreview name="trace-waterfall-live-demo" peekCode wide squared />
