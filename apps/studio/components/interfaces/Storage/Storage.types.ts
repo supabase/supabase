@@ -26,6 +26,7 @@ export interface StorageColumn {
   items: StorageItem[]
   hasMoreItems?: boolean
   isLoadingMoreItems?: boolean
+  nextOffset: number
 }
 
 export interface StorageItem {

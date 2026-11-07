@@ -274,6 +274,7 @@ export function createStorageExplorerState({
 
       state.updateFolderAfterEdit({ folderName: formattedName, columnIndex })
 
+      const bucketIdAtStart = state.selectedBucket.id
       const emptyPlaceholderFile = `${formattedName}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`
       const pathToFolder = state.openedFolders
         .slice(0, columnIndex)
@@ -299,7 +300,13 @@ export function createStorageExplorerState({
       }
 
       const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
-      if (newFolder) state.openFolder(columnIndex, newFolder)
+      // Folder creation changes the server's ordering and may remove a hidden placeholder.
+      // Reset pagination from a fresh listing before opening the new folder.
+      await state.refetchAllOpenedFolders()
+      // The folder belongs to the bucket it was created in, not one switched to mid-flight.
+      if (newFolder && state.selectedBucket.id === bucketIdAtStart) {
+        await state.openFolder(columnIndex, newFolder)
+      }
     },
 
     fetchFolderContents: async ({
@@ -332,6 +339,7 @@ export function createStorageExplorerState({
           path: prefix,
           status: STORAGE_ROW_STATUS.LOADING,
           items: [],
+          nextOffset: 0,
         },
         index
       )
@@ -372,6 +380,7 @@ export function createStorageExplorerState({
             // pagination a page early.
             hasMoreItems: (data ?? []).length === LIMIT,
             isLoadingMoreItems: false,
+            nextOffset: options.offset + (data ?? []).length,
           },
           index
         )
@@ -401,7 +410,7 @@ export function createStorageExplorerState({
 
       const options = {
         limit: LIMIT,
-        offset: column.items.length,
+        offset: column.nextOffset,
         search: searchString,
         sortBy: getSortOptions(),
       }
@@ -424,6 +433,7 @@ export function createStorageExplorerState({
             return {
               ...col,
               items: col.items.concat(formattedItems),
+              nextOffset: options.offset + data.length,
               isLoadingMoreItems: false,
               hasMoreItems: data.length === LIMIT,
             }
@@ -440,11 +450,19 @@ export function createStorageExplorerState({
     refetchAllOpenedFolders: async () => {
       const paths = state.openedFolders.map((folder) => folder.name)
 
-      if (state.itemSearchString && paths.length === 0) {
-        await state.fetchFoldersByPath({ paths, searchString: state.itemSearchString })
-      } else if (state.itemSearchString) {
-        await state.fetchFoldersByPath({ paths })
-        // Reapply the filter to the current column only.
+      // A failed listing would otherwise replace a loaded column with an empty one.
+      const keepColumnsOnIncomplete = true
+
+      const isSearchingRoot = Boolean(state.itemSearchString) && paths.length === 0
+      const { isComplete } = await state.fetchFoldersByPath({
+        paths,
+        searchString: isSearchingRoot ? state.itemSearchString : undefined,
+        keepColumnsOnIncomplete,
+      })
+
+      // Reapply the filter to the current column only. Skipped after a failed listing, since
+      // a failed contents fetch would blank the column that was just kept.
+      if (isComplete && state.itemSearchString && !isSearchingRoot) {
         await state.fetchFolderContents({
           bucketId: state.selectedBucket.id,
           folderId: state.openedFolders[paths.length - 1].id,
@@ -452,8 +470,6 @@ export function createStorageExplorerState({
           index: paths.length - 1,
           searchString: state.itemSearchString,
         })
-      } else {
-        await state.fetchFoldersByPath({ paths })
       }
 
       // The archived overlay is part of what the explorer shows, and an archive or a
@@ -480,12 +496,15 @@ export function createStorageExplorerState({
       paths,
       searchString = '',
       showLoading = false,
+      keepColumnsOnIncomplete = false,
     }: {
       paths: string[]
       searchString?: string
       showLoading?: boolean
-    }): Promise<{ missingPaths: string[] }> => {
-      if (state.selectedBucket.id === undefined) return { missingPaths: [] }
+      /** Keep the current rows when any listing fails, settling pagination and loading rows. */
+      keepColumnsOnIncomplete?: boolean
+    }): Promise<{ missingPaths: string[]; isComplete: boolean }> => {
+      if (state.selectedBucket.id === undefined) return { missingPaths: [], isComplete: true }
 
       // The listings below are issued against this bucket. The provider is keyed per
       // project rather than per bucket, so a bucket switch mid-flight would otherwise
@@ -497,7 +516,14 @@ export function createStorageExplorerState({
 
       if (showLoading) {
         state.columns = [state.selectedBucket.name].concat(paths).map((path) => {
-          return { id: path, name: path, path, status: STORAGE_ROW_STATUS.LOADING, items: [] }
+          return {
+            id: path,
+            name: path,
+            path,
+            status: STORAGE_ROW_STATUS.LOADING,
+            items: [],
+            nextOffset: 0,
+          }
         })
       }
 
@@ -540,10 +566,27 @@ export function createStorageExplorerState({
           // makes isParentListingExhaustive below claim a folder is missing.
           hasMoreItems: items.length === LIMIT,
           isLoadingMoreItems: false,
+          nextOffset: OFFSET + items.length,
         }
       })
 
-      if (state.selectedBucket.id !== bucketIdAtStart) return { missingPaths: [] }
+      if (state.selectedBucket.id !== bucketIdAtStart) return { missingPaths: [], isComplete: true }
+      if (keepColumnsOnIncomplete && foldersItems.some(({ isComplete }) => !isComplete)) {
+        // The kept offsets may no longer match the server's ordering after a mutation, so
+        // pagination waits for a successful refresh to rebuild it. Mutations also rely on the
+        // refresh to settle the rows they marked as loading.
+        state.columns = state.columns.map((column) => ({
+          ...column,
+          items: column.items.map((item) =>
+            item.status === STORAGE_ROW_STATUS.LOADING
+              ? { ...item, status: STORAGE_ROW_STATUS.READY }
+              : item
+          ),
+          hasMoreItems: false,
+          nextOffset: 0,
+        }))
+        return { missingPaths: [], isComplete: false }
+      }
 
       // Package into columns and update this.columns
       state.columns = formattedFolders
@@ -576,7 +619,7 @@ export function createStorageExplorerState({
       })
       state.openedFolders = updatedOpenedFolders
 
-      return { missingPaths }
+      return { missingPaths, isComplete: true }
     },
 
     /**
