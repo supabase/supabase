@@ -2,13 +2,14 @@ import { defineCollection } from 'astro:content'
 import { glob } from 'astro/loaders'
 import { z } from 'astro/zod'
 
+import { toContentId } from './lib/content-id'
 import { TOPIC_NAMES } from './lib/topics'
 
 // Astro's default id is a lowercased slug of the file path, but the markdown
 // export (scripts/generate-markdown.ts) keeps the filename's case and Vercel
 // serves static files case-sensitively. Keeping the case here makes the page
 // URL and the `.md` export path line up.
-const generateId = ({ entry }: { entry: string }) => entry.replace(/\.mdx?$/, '')
+const generateId = ({ entry }: { entry: string }) => toContentId(entry)
 
 // Every entry here is rendered through GuideLayout by
 // Shared by every article-like collection (guides, troubleshooting) so their
