@@ -52,10 +52,21 @@ export const CreateDiskStorageSchema = ({
   defaultTotalSize,
   cloudProvider,
   isSpendCapEnabled,
+  downsizeOnlyFrom,
 }: {
   defaultTotalSize: number
   cloudProvider: CloudProvider
   isSpendCapEnabled: boolean
+  /**
+   * When set, a cost guardrail (compute below Large, or spend cap enabled) is active
+   * and the persisted disk config it describes is over-provisioned relative to that
+   * guardrail. Storage type/IOPS/throughput may only move down from these values, never up.
+   */
+  downsizeOnlyFrom?: {
+    storageType: DiskType
+    provisionedIOPS: number
+    throughput?: number
+  }
 }) => {
   const isAwsNimbusProject = cloudProvider === 'AWS_NIMBUS'
   const isAwsK8sProject = cloudProvider === 'AWS_K8S'
@@ -69,6 +80,43 @@ export const CreateDiskStorageSchema = ({
       if (!parsedCompute.success) return Number.POSITIVE_INFINITY
       return COMPUTE_MAX_IOPS[parsedCompute.data] ?? Number.POSITIVE_INFINITY
     })()
+
+    if (validateDiskConfiguration && downsizeOnlyFrom) {
+      if (storageType === DiskType.IO2 && downsizeOnlyFrom.storageType !== DiskType.IO2) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message:
+            'Switching to io2 is unsupported. Your project is over-provisioned for its size, and can only be downsized.',
+          path: ['storageType'],
+        })
+      }
+
+      const iopsCeiling = Math.max(
+        downsizeOnlyFrom.provisionedIOPS,
+        DISK_LIMITS[storageType as DiskType].minIops
+      )
+      if (provisionedIOPS > iopsCeiling) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `Maximum IOPS is ${formatNumber(iopsCeiling)} for your current configuration.`,
+          path: ['provisionedIOPS'],
+        })
+      }
+
+      if (storageType === DiskType.GP3 && throughput !== undefined) {
+        const throughputCeiling = Math.max(
+          downsizeOnlyFrom.throughput ?? DISK_LIMITS[DiskType.GP3].minThroughput,
+          DISK_LIMITS[DiskType.GP3].minThroughput
+        )
+        if (throughput > throughputCeiling) {
+          ctx.addIssue({
+            code: z.ZodIssueCode.custom,
+            message: `Maximum throughput is ${formatNumber(throughputCeiling)} MB/s for your current configuration.`,
+            path: ['throughput'],
+          })
+        }
+      }
+    }
 
     if (validateDiskConfiguration && totalSize < 8 && totalSize !== defaultTotalSize) {
       ctx.addIssue({
