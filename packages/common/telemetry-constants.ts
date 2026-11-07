@@ -32,6 +32,17 @@ export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_E
 export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
 
 /**
+ * Maps PostHog flag key → exposure event-name base. Emitted event becomes
+ * `${value}_experiment_exposed`. Snake_case the value for new experiments;
+ * legacy camelCase values are kept to avoid breaking saved insights.
+ */
+export const EXPERIMENTS = {
+  onboardingSurveyPlacement: 'onboarding_survey_placement',
+} as const
+
+export type ExperimentKey = keyof typeof EXPERIMENTS
+
+/**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
  * @group Events
@@ -500,6 +511,83 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
     instanceSize?: string
   }
   groups: Omit<TelemetryGroups, 'project'>
+}
+
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
+
+/**
+ * Onboarding survey prompt UI became visible.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyPromptOpenedEvent {
+  action: 'onboarding_survey_prompt_opened'
+  properties: { surface: OnboardingSurveySurface }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
+  properties: { surface: OnboardingSurveySurface }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Submit. Fires before the backend mutation; pair with
+ * OnboardingSurveySubmitFailedEvent for failure rate. The platform's own
+ * `onboarding_survey_submitted` event tracks actual completions.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitButtonClickedEvent {
+  action: 'onboarding_survey_submit_button_clicked'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasCodingExperience: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User dismissed the onboarding survey.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyDismissedEvent {
+  action: 'onboarding_survey_dismissed'
+  properties: {
+    surface: OnboardingSurveySurface
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Onboarding survey submit failed.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitFailedEvent {
+  action: 'onboarding_survey_submit_failed'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasCodingExperience: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
 }
 
 /**
@@ -4518,6 +4606,11 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | OnboardingSurveyPromptOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
+  | OnboardingSurveySubmitButtonClickedEvent
+  | OnboardingSurveyDismissedEvent
+  | OnboardingSurveySubmitFailedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
