@@ -55,13 +55,9 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
       <AlertDialogContent size="small">
         <AlertDialogHeader>
           <AlertDialogTitle>Disable Pipelines</AlertDialogTitle>
-          <AlertDialogDescription className="flex flex-col gap-y-2 text-sm">
-            <span>
-              This will remove the <code className="text-code-inline">etl</code> schema and all
-              Pipelines-managed resources from your database. Data already written to destination
-              systems is not deleted.
-            </span>
-            <span>Read replicas are not affected.</span>
+          <AlertDialogDescription>
+            This removes the etl schema and all Pipelines-managed resources from your database. Data
+            already at destinations is kept. Read replicas are not affected.
           </AlertDialogDescription>
         </AlertDialogHeader>
         {error && (
@@ -76,7 +72,7 @@ export const DisablePipelinesDialog = ({ open, setOpen }: DisablePipelinesDialog
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isSubmitting}>Cancel</AlertDialogCancel>
           <AlertDialogAction variant="danger" loading={isSubmitting} onClick={onConfirm}>
-            Disable
+            Disable Pipelines
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>

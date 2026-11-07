@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Database as DatabaseIcon } from 'icons'
-import { Loader2, Minus, MoreVertical, RotateCcw, Trash } from 'lucide-react'
+import { Loader2Icon, MinusIcon, MoreVerticalIcon, RotateCcwIcon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo, useState } from 'react'
 import { AWS_REGIONS } from 'shared-data'
@@ -92,13 +92,13 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
             >
               {statusLabel}
             </Badge>
-            {isInTransition && <Loader2 className="animate-spin w-3 h-3" />}
+            {isInTransition && <Loader2Icon className="animate-spin w-3 h-3" />}
           </div>
         </TableCell>
 
         <TableCell>
           {isErrorLag || status !== REPLICA_STATUS.ACTIVE_HEALTHY ? (
-            <Minus size={18} className="text-foreground-lighter" />
+            <MinusIcon size={18} className="text-foreground-lighter" />
           ) : isLoadingLag ? (
             <ShimmeringLoader />
           ) : (
@@ -108,17 +108,12 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
 
         <TableCell>
           <div className="flex items-center justify-end gap-x-2">
-            <Button
-              asChild
-              variant="default"
-              className="relative"
-              disabled={status === 'GOING_DOWN'}
-            >
+            <Button asChild className="relative" disabled={status === 'GOING_DOWN'}>
               <Link href={getReadReplicaPath(ref, replica.identifier)}>View replica</Link>
             </Button>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="default" icon={<MoreVertical />} className="w-7" />
+                <Button icon={<MoreVerticalIcon />} className="w-7" />
               </DropdownMenuTrigger>
               <DropdownMenuContent align="end" className="w-52">
                 <DropdownMenuItem
@@ -126,7 +121,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
                   disabled={status !== 'ACTIVE_HEALTHY'}
                   onClick={() => setShowConfirmRestart(true)}
                 >
-                  <RotateCcw size={14} />
+                  <RotateCcwIcon size={14} />
                   <span>Restart replica</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
@@ -135,7 +130,7 @@ export const ReadReplicaRow = ({ replica, onUpdateReplica }: ReadReplicaRow) => 
                   disabled={status === 'GOING_DOWN'}
                   onClick={() => setShowConfirmDrop(true)}
                 >
-                  <Trash size={14} />
+                  <TrashIcon size={14} />
                   <span>Drop replica</span>
                 </DropdownMenuItem>
               </DropdownMenuContent>

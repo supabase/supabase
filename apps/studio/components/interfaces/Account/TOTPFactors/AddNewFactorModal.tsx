@@ -1,5 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
+import { useFlag } from 'common'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -10,11 +11,14 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
+import { RecoveryCodesModal } from './RecoveryCodesModal'
 import InformationBox from '@/components/ui/InformationBox'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
+import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
+import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 
 type TOTP = { qr_code: string; secret: string; uri: string }
@@ -22,10 +26,31 @@ type TOTP = { qr_code: string; secret: string; uri: string }
 interface AddNewFactorModalProps {
   visible: boolean
   onClose: () => void
+  onComplete?: () => void
+  onRecoveryCodesSaved?: () => void
 }
 
-export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) => {
+export const AddNewFactorModal = ({
+  visible,
+  onClose,
+  onComplete,
+  onRecoveryCodesSaved,
+}: AddNewFactorModalProps) => {
   const { data, mutate: enroll, isPending: isEnrolling, reset } = useMfaEnrollMutation()
+  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
+  const { isPending: isRecoveryCodesStatusPending, refetch: refetchRecoveryCodesStatus } =
+    useRecoveryCodesStatusQuery({
+      enabled: enableAuthRecoveryCodes,
+    })
+
+  const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
+    onSettled: () => {
+      onClose()
+      setIsRecoveryCodesModalOpen(true)
+    },
+  })
+
+  const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     if (!visible) reset()
@@ -35,7 +60,7 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
     <>
       <FirstStep
         visible={visible && !Boolean(data)}
-        isEnrolling={isEnrolling}
+        isEnrolling={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
         enroll={enroll}
         reset={reset}
         onClose={onClose}
@@ -44,8 +69,34 @@ export const AddNewFactorModal = ({ visible, onClose }: AddNewFactorModalProps) 
         visible={visible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
-        isLoading={isEnrolling}
+        isLoading={
+          isEnrolling ||
+          (enableAuthRecoveryCodes &&
+            (isRecoveryCodesStatusPending || recoveryCodesGenerateMutation.isPending))
+        }
         onClose={onClose}
+        onComplete={async () => {
+          onComplete?.()
+          if (enableAuthRecoveryCodes) {
+            const { data: currentRecoveryCodesStatus } = await refetchRecoveryCodesStatus()
+            const shouldGenerateRecoveryCodes = currentRecoveryCodesStatus?.status === 'unenrolled'
+
+            if (shouldGenerateRecoveryCodes) {
+              recoveryCodesGenerateMutation.mutate({})
+              return
+            }
+          }
+          onClose()
+        }}
+      />
+      <RecoveryCodesModal
+        open={isRecoveryCodesModalOpen}
+        onOpenChange={(open) => {
+          setIsRecoveryCodesModalOpen(open)
+          // A successful close is allowed only after the save acknowledgement.
+          if (!open && recoveryCodesGenerateMutation.isSuccess) onRecoveryCodesSaved?.()
+        }}
+        mutation={recoveryCodesGenerateMutation}
       />
     </>
   )
@@ -132,6 +183,7 @@ interface SecondStepProps {
   }
   isLoading: boolean
   onClose: () => void
+  onComplete: () => void
 }
 
 const SecondStep = ({
@@ -140,6 +192,7 @@ const SecondStep = ({
   factor: outerFactor,
   isLoading,
   onClose,
+  onComplete,
 }: SecondStepProps) => {
   const queryClient = useQueryClient()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -154,20 +207,23 @@ const SecondStep = ({
   })
 
   const [factor, setFactor] = useState<{ id: string; type: 'totp'; totp: TOTP } | null>(null)
+  const [verifiedFactorId, setVerifiedFactorId] = useState<string | null>(null)
+  const hasCompletedChallenge = !!factor && verifiedFactorId === factor.id
 
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
       toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
-    onSuccess: async () => {
+    onSuccess: async (_data, variables) => {
+      setVerifiedFactorId(variables.factorId)
       if (lastVisitedOrganization) {
         await queryClient.invalidateQueries({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
       toast.success(`Successfully added a second factor authentication`)
-      onClose()
+      onComplete()
     },
   })
 
@@ -194,12 +250,12 @@ const SecondStep = ({
       title={`Verify new factor ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
-      loading={isVerifying}
+      loading={isVerifying || isLoading || hasCompletedChallenge}
       onCancel={() => {
         // If a factor has been created (but not verified), unenroll it. This will be run as a
         // side effect so that it's not confusing to the user why the modal stays open while
         // unenrolling.
-        if (factor) unenroll({ factorId: factor.id })
+        if (factor && !hasCompletedChallenge) unenroll({ factorId: factor.id })
       }}
       onConfirm={form.handleSubmit(onSubmit)}
     >
@@ -208,7 +264,7 @@ const SecondStep = ({
         complete the enrolment.
       </p>
 
-      {isLoading && (
+      {!factor && (
         <div className="pb-4 px-4">
           <GenericSkeletonLoader />
         </div>
@@ -245,15 +301,9 @@ const SecondStep = ({
                 name="code"
                 control={form.control}
                 render={({ field }) => (
-                  <FormItemLayout name="code" label="Authentication code">
+                  <FormItemLayout label="Authentication code">
                     <FormControl>
-                      <Input
-                        id="code"
-                        autoFocus
-                        {...field}
-                        placeholder="XXXXXX"
-                        className="font-mono"
-                      />
+                      <Input autoFocus {...field} placeholder="XXXXXX" className="font-mono" />
                     </FormControl>
                   </FormItemLayout>
                 )}

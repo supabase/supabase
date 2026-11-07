@@ -1,4 +1,4 @@
-import { Database } from 'lucide-react'
+import { DatabaseIcon } from 'lucide-react'
 
 export const vercelIcon = (
   <div className="flex items-center justify-center rounded-sm bg-black p-1">
@@ -15,6 +15,6 @@ export const vercelIcon = (
 
 export const databaseIcon = (
   <div className="flex items-center justify-center rounded-sm bg-green-500 p-1 in-data-[theme*=dark]:text-typography-body-dark ">
-    <Database size={12} strokeWidth={2} />
+    <DatabaseIcon size={12} strokeWidth={2} />
   </div>
 )

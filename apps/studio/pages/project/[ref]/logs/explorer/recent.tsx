@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -26,7 +26,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
             <>
               <Table.th>Snippets</Table.th>
               <Table.th className="w-24">
-                <Button size="tiny" variant="default" onClick={() => setRecentLogSnippets([])}>
+                <Button size="tiny" onClick={() => setRecentLogSnippets([])}>
                   Clear history
                 </Button>
               </Table.th>
@@ -40,7 +40,7 @@ export const LogsSavedPage: NextPageWithLayout = () => {
       {recent.length === 0 && (
         <>
           <div className="my-auto flex h-full grow flex-col items-center justify-center gap-1">
-            <Clock className="animate-bounce" />
+            <ClockIcon className="animate-bounce" />
             <h3 className="text-lg text-foreground">No Recent Queries Yet</h3>
             <p className="text-sm text-foreground-lighter">
               Your recent queries run from the{' '}

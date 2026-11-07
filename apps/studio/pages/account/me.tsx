@@ -1,3 +1,5 @@
+import { useRouter } from 'next/router'
+import { useEffect } from 'react'
 import { Card, CardContent, CardFooter } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
 import {
@@ -61,6 +63,8 @@ const PreferencesPageHeader = ({ description }: { description: string }) => (
 )
 
 const PlatformPreferences = () => {
+  const router = useRouter()
+
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
       'profile:show_information',
@@ -68,6 +72,13 @@ const PlatformPreferences = () => {
       'profile:show_account_deletion',
     ])
   const { error, isLoading, isError } = useProfile()
+
+  useEffect(() => {
+    const hash = router.asPath.split('#')[1]
+    if (isLoading || !hash) return
+
+    document.getElementById(hash)?.scrollIntoView({ block: 'start' })
+  }, [isLoading, router.asPath])
 
   return (
     <>

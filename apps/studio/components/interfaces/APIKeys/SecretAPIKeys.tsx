@@ -1,17 +1,10 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
 import { toast } from 'sonner'
-import { Card } from 'ui'
+import { Card, Table, TableBody, TableHead, TableHeader, TableRow } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
-import {
-  Table,
-  TableBody,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from 'ui/src/components/shadcn/ui/table'
 
 import { APIKeyRow } from './APIKeyRow'
 import { CreateSecretAPIKeyDialog } from './CreateSecretAPIKeyDialog'
@@ -19,16 +12,13 @@ import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
-import type { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useGrant } from '@/lib/grants'
 
 export const SecretAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.SECRETS_READ,
-    '*'
-  )
+  // Lists keys without their secret values (revealing happens per key), so a plain grant is enough
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
 
   const {
     data: apiKeysData,
@@ -36,7 +26,8 @@ export const SecretAPIKeys = () => {
     isSuccess: isSuccessApiKeys,
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
-  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
+  } = useQuery(apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }))
+  const isLoadingGrant = apiKeysGrant.status === 'loading'
 
   const secretApiKeys = useMemo(
     () =>
@@ -46,7 +37,7 @@ export const SecretAPIKeys = () => {
     [apiKeysData]
   )
 
-  const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
+  const empty = secretApiKeys?.length === 0 && !isLoadingApiKeys
 
   const [deleteId, setDeleteId] = useQueryState('deleteSecretKey', parseAsString)
   const apiKeyToDelete = secretApiKeys?.find((key) => key.id === deleteId)
@@ -83,9 +74,11 @@ export const SecretAPIKeys = () => {
         actions={IS_PLATFORM ? <CreateSecretAPIKeyDialog /> : null}
       />
 
-      {!canReadAPIKeys && !isLoadingPermissions ? (
+      {apiKeysGrant.status === 'denied' ? (
         <NoPermission resourceText="view API keys" />
-      ) : isLoadingApiKeys || isLoadingPermissions ? (
+      ) : apiKeysGrant.status === 'error' ? (
+        <AlertError error={apiKeysGrant.error} subject="Failed to check API key permissions" />
+      ) : isLoadingGrant || isLoadingApiKeys ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load secret API keys" />

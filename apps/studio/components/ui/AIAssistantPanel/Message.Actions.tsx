@@ -1,5 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Check, Copy, Pencil, Split, ThumbsDown, ThumbsUp, Trash2 } from 'lucide-react'
+import {
+  CheckIcon,
+  CopyIcon,
+  PencilIcon,
+  SplitIcon,
+  ThumbsDownIcon,
+  ThumbsUpIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { useEffect, useState, type PropsWithChildren } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -35,7 +43,7 @@ function MessageActionsEdit({ onClick, tooltip }: { onClick: () => void; tooltip
   return (
     <ButtonTooltip
       variant="text"
-      icon={<Pencil size={14} strokeWidth={1.5} />}
+      icon={<PencilIcon size={14} strokeWidth={1.5} />}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       aria-label={tooltip}
@@ -54,7 +62,7 @@ function MessageActionsDelete({ onClick }: { onClick: () => void }) {
   return (
     <ButtonTooltip
       variant="text"
-      icon={<Trash2 size={14} strokeWidth={1.5} />}
+      icon={<Trash2Icon size={14} strokeWidth={1.5} />}
       tooltip={{ content: { side: 'bottom', text: 'Delete message' } }}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
@@ -69,7 +77,7 @@ function MessageActionsBranch({ onClick }: { onClick: () => void }) {
   return (
     <ButtonTooltip
       variant="text"
-      icon={<Split size={14} strokeWidth={1.5} />}
+      icon={<SplitIcon size={14} strokeWidth={1.5} />}
       onClick={onClick}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       title="Branch in new chat"
@@ -90,7 +98,9 @@ function MessageActionsCopy({ onClick }: { onClick: (onSuccess: () => void) => v
   return (
     <ButtonTooltip
       variant="text"
-      icon={copied ? <Check size={14} strokeWidth={2} /> : <Copy size={14} strokeWidth={1.5} />}
+      icon={
+        copied ? <CheckIcon size={14} strokeWidth={2} /> : <CopyIcon size={14} strokeWidth={1.5} />
+      }
       onClick={() => onClick(() => setCopied(true))}
       className="text-foreground-light hover:text-foreground p-1 rounded-sm"
       title="Copy response"
@@ -115,12 +125,12 @@ function MessageActionsThumbsUp({
       variant="text"
       disabled={disabled}
       icon={
-        <ThumbsUp
+        <ThumbsUpIcon
           size={14}
           strokeWidth={1.5}
           className={cn(
             isActive
-              ? 'text-brand hover:text-brand-700'
+              ? 'text-primary hover:text-brand-700'
               : 'text-foreground-light hover:text-foreground'
           )}
         />
@@ -200,7 +210,7 @@ function MessageActionsThumbsDown({
           title="Bad response"
           aria-label="Bad response"
         >
-          <ThumbsDown
+          <ThumbsDownIcon
             size={14}
             strokeWidth={1.5}
             className={cn(

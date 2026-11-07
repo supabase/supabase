@@ -8,6 +8,7 @@ import {
   getCellDisplay,
   setCellRowLimit,
   setCellSql,
+  shouldInvalidateResultOnSourceChange,
   toQueryModel,
 } from './QueryCell.utils'
 import { type ChartConfig, type QueryCell } from '@/data/content/notebooks/notebook-schema'
@@ -107,6 +108,45 @@ describe('changeCellSource', () => {
 
     expect(next.chart).toEqual(CHART)
     expect(next.chart).not.toBe(DATABASE_CELL.chart)
+  })
+})
+
+describe('shouldInvalidateResultOnSourceChange', () => {
+  it.each<[string, QueryCell, Parameters<typeof shouldInvalidateResultOnSourceChange>[1], boolean]>(
+    [
+      [
+        'invalidates when the backend changes from database to logs',
+        DATABASE_CELL,
+        { _tag: 'logs', time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 } },
+        true,
+      ],
+      [
+        'invalidates when the backend changes from logs to database',
+        LOG_CELL,
+        { _tag: 'database', database_identifier: undefined },
+        true,
+      ],
+      [
+        'invalidates a log cell result when the time range changes',
+        LOG_CELL,
+        { _tag: 'logs', time_range: { _tag: 'relative_time_range', unit: 'day', amount: 7 } },
+        true,
+      ],
+      [
+        'keeps a log cell result when the time range is unchanged',
+        LOG_CELL,
+        { _tag: 'logs', time_range: { _tag: 'relative_time_range', unit: 'hour', amount: 1 } },
+        false,
+      ],
+      [
+        'keeps a database cell result when only the connected database changes',
+        DATABASE_CELL,
+        { _tag: 'database', database_identifier: 'replica-2' },
+        false,
+      ],
+    ]
+  )('%s', (_, cell, source, expected) => {
+    expect(shouldInvalidateResultOnSourceChange(cell, source)).toBe(expected)
   })
 })
 

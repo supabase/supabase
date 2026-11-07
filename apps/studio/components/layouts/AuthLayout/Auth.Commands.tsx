@@ -43,7 +43,7 @@ export function useAuthGotoCommands(options?: CommandOptions) {
             {
               id: 'nav-auth-providers',
               name: 'Providers',
-              value: 'Auth: Providers (Social Login, SSO)',
+              value: 'Auth: Providers (Social Sign-in, SSO, Social Login)',
               route: `/project/${ref}/auth/providers`,
               defaultHidden: true,
             } as IRouteCommand,

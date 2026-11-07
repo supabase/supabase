@@ -3,13 +3,15 @@ import { useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { databaseExtensionsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
-export type DatabaseExtension = components['schemas']['PostgresExtension'] & {
+export type DatabaseExtension = components['schemas']['PostgresExtension_Output'] & {
   default_version_schema: string | null
 }
 
@@ -24,14 +26,20 @@ export async function getDatabaseExtensions(
 ) {
   const sql = getDatabaseExtensionsSQL()
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['database-extensions'] },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      queryKey: ['database-extensions'],
+      grant: unguarded.migrating,
+    },
     signal
   )
   return (Array.isArray(result) ? result : EMPTY_ARR) as DatabaseExtension[]
 }
 
 export type DatabaseExtensionsData = Awaited<ReturnType<typeof getDatabaseExtensions>>
-export type DatabaseExtensionsError = ResponseError
+export type DatabaseExtensionsError = StudioError
 
 export const useDatabaseExtensionsQuery = <TData = DatabaseExtensionsData>(
   { projectRef, connectionString }: DatabaseExtensionsVariables,

@@ -8,6 +8,8 @@ import { topTweets } from 'shared-data/tweets'
 import { Button, cn } from 'ui'
 import { TweetCard } from 'ui-patterns/TweetCard'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 function MobileCarousel() {
   return (
     <div
@@ -93,7 +95,11 @@ export default function TweetsSection({ section }: { section: GoTweetsSection })
                   variant={cta.variant === 'secondary' ? 'default' : 'primary'}
                   size="small"
                 >
-                  <Link href={cta.href}>{cta.label}</Link>
+                  {isCrossZoneHref(cta.href) ? (
+                    <a href={cta.href}>{cta.label}</a>
+                  ) : (
+                    <Link href={cta.href}>{cta.label}</Link>
+                  )}
                 </Button>
               ))}
             </div>

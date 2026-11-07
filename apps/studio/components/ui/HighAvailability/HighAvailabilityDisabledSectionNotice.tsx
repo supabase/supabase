@@ -10,18 +10,20 @@ const DEFAULT_DESCRIPTION =
 interface HighAvailabilityDisabledSectionNoticeProps {
   title?: string
   description?: ReactNode
+  className?: string
 }
 
 export function HighAvailabilityDisabledSectionNotice({
   title = DEFAULT_TITLE,
   description = DEFAULT_DESCRIPTION,
+  className,
 }: HighAvailabilityDisabledSectionNoticeProps) {
   const isHighAvailability = useIsHighAvailability()
 
   if (!isHighAvailability) return null
 
   return (
-    <Admonition type="default" title={title}>
+    <Admonition type="default" title={title} className={className}>
       <p className="text-sm text-foreground-light">{description}</p>
     </Admonition>
   )

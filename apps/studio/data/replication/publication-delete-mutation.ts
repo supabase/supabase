@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeletePublicationParams = {
   projectRef?: string
@@ -18,7 +19,7 @@ async function deletePublication(
   if (!projectRef) throw new Error('projectRef is required')
 
   const { data, error } = await del(
-    '/platform/replication/{ref}/sources/{source_id}/publications/{publication_name}',
+    '/platform/replication/v2/{ref}/sources/{source_id}/publications/{publication_name}',
     {
       params: {
         path: {
@@ -41,12 +42,12 @@ export const useDeletePublicationMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DeletePublicationData, ResponseError, DeletePublicationParams>,
+  UseCustomMutationOptions<DeletePublicationData, StudioError, DeletePublicationParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeletePublicationData, ResponseError, DeletePublicationParams>({
+  return useMutation<DeletePublicationData, StudioError, DeletePublicationParams>({
     mutationFn: (vars) => deletePublication(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, sourceId } = variables

@@ -1,4 +1,4 @@
-import { Code, GripHorizontal } from 'lucide-react'
+import { CodeIcon, GripHorizontalIcon } from 'lucide-react'
 import { DragEvent, PropsWithChildren, ReactNode } from 'react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -51,11 +51,11 @@ export const ReportBlockContainer = ({
             )}
           >
             {showDragHandle ? (
-              <GripHorizontal size={16} strokeWidth={1.5} />
+              <GripHorizontalIcon size={16} strokeWidth={1.5} />
             ) : icon ? (
               icon
             ) : (
-              <Code size={16} strokeWidth={1.5} className="text-foreground-muted" />
+              <CodeIcon size={16} strokeWidth={1.5} className="text-foreground-muted" />
             )}
             <div className={cn('flex items-center gap-2 flex-1 min-w-0 transition-opacity')}>
               <h3 className="heading-meta truncate">{label}</h3>

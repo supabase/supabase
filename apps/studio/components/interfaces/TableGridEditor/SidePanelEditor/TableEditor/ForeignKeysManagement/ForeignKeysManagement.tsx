@@ -11,7 +11,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { useForeignKeyConstraintsQuery } from '@/data/database/foreign-key-constraints-query'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 interface ForeignKeysManagementProps {
   table: TableField
@@ -68,7 +68,7 @@ export const ForeignKeysManagement = ({
 
         {isError && (
           <AlertError
-            error={error as unknown as ResponseError}
+            error={error as unknown as StudioError}
             subject="Failed to retrieve foreign key relationships"
           />
         )}
@@ -114,9 +114,7 @@ export const ForeignKeysManagement = ({
               })}
             </div>
             <div className="flex items-center justify-center rounded-sm border border-strong border-dashed py-3">
-              <Button variant="default" onClick={() => setOpen(true)}>
-                Add foreign key relation
-              </Button>
+              <Button onClick={() => setOpen(true)}>Add foreign key relation</Button>
             </div>
           </>
         )}

@@ -15,12 +15,14 @@ import {
   violationIds,
 } from '../utils/axe-helpers.js'
 import {
-  articleSelectorForPagePath,
-  browserLikeUserAgent,
+  checkLinkFromBrowser,
   collectDocsOwnedLinks,
+  GUIDE_ARTICLE_SELECTOR,
+  type LinkCheckResult,
 } from '../utils/docs-links.js'
 
 const pagePaths = parsePagePaths(process.env.DOCS_E2E_PAGE_PATHS)
+const LINK_CHECK_CONCURRENCY = 4
 
 function annotate(testInfo: TestInfo, description: string) {
   testInfo.annotations.push({ type: 'warning', description })
@@ -44,7 +46,7 @@ test.describe('Docs owned pages', () => {
       const baseURL = testInfo.project.use.baseURL
       expect(baseURL, 'A Playwright base URL should be configured').toBeTruthy()
 
-      const articleSelector = articleSelectorForPagePath(pagePath)
+      const articleSelector = GUIDE_ARTICLE_SELECTOR
       const response = await page.goto(pagePath)
       expect(response, `Expected a response for ${pagePath}`).not.toBeNull()
       expect(
@@ -56,19 +58,38 @@ test.describe('Docs owned pages', () => {
       await expect(article, 'Page article should be present').toBeVisible()
 
       const links = await collectDocsOwnedLinks(page, baseURL!, articleSelector)
-      const userAgent = await browserLikeUserAgent(page)
+      const anchoredUrls = new Set(links.filter((link) => link.anchor).map((link) => link.url))
+      const urls = [...new Set(links.map((link) => link.url))]
 
-      for (const url of links) {
-        try {
-          const linkResponse = await page.request.get(url, { headers: { 'user-agent': userAgent } })
-          expect
-            .soft(linkResponse.ok(), `${url} should resolve (status ${linkResponse.status()})`)
-            .toBeTruthy()
-        } catch (error) {
+      const results = new Map<string, LinkCheckResult>()
+      const queue = [...urls]
+      await Promise.all(
+        Array.from({ length: LINK_CHECK_CONCURRENCY }, async () => {
+          for (let url = queue.shift(); url; url = queue.shift()) {
+            results.set(url, await checkLinkFromBrowser(page, url, anchoredUrls.has(url)))
+          }
+        })
+      )
+
+      for (const url of urls) {
+        const result = results.get(url)!
+        expect
+          .soft(
+            result.ok,
+            result.error
+              ? `${url} should be reachable (${result.error})`
+              : `${url} should resolve (status ${result.status})`
+          )
+          .toBeTruthy()
+      }
+
+      for (const { url, anchor } of links) {
+        const result = results.get(url)!
+        if (anchor && result.ok) {
           expect
             .soft(
-              null,
-              `${url} should be reachable (${error instanceof Error ? error.message : error})`
+              result.anchors.includes(anchor),
+              `${pagePath} links to ${url}#${anchor}, but ${url} has no element with id "${anchor}"`
             )
             .toBeTruthy()
         }
@@ -82,7 +103,7 @@ test.describe('Docs owned pages', () => {
     }, testInfo) => {
       test.setTimeout(120_000)
 
-      const include = articleSelectorForPagePath(pagePath)
+      const include = GUIDE_ARTICLE_SELECTOR
 
       let response
       try {
@@ -107,8 +128,8 @@ test.describe('Docs owned pages', () => {
 
       await expect(
         page.locator(include),
-        `No article matching "${include}" on ${pagePath}. This suite covers guides and ` +
-          'troubleshooting entries; other routes have no article element to scan.'
+        `No article matching "${include}" on ${pagePath}. This suite covers guides; ` +
+          'other routes have no article element to scan.'
       ).toBeVisible()
 
       const result = await scanArticle(page, pagePath, include)

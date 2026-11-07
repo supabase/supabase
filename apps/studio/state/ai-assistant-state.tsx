@@ -26,6 +26,8 @@ import {
   applyNotebookCacheEffects,
   collectNotebookCacheEffects,
 } from '@/lib/ai/notebook-cache-invalidation'
+import type { contract as renameChatContract } from '@/lib/ai/tools/rename-chat'
+import type { ToolContractInput } from '@/lib/ai/tools/types'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
 
 type SuggestionsType = {
@@ -353,7 +355,7 @@ function createChatInstance(
       }
 
       if (toolCall.toolName === 'rename_chat') {
-        const { newName } = toolCall.input as { newName: string }
+        const { newName } = toolCall.input as ToolContractInput<typeof renameChatContract>
 
         if (options.id && newName?.trim()) {
           state.renameChat(options.id, newName.trim())
@@ -424,6 +426,10 @@ export const createAiAssistantState = (): AiAssistantState => {
 
     setModel: (model: AssistantModel) => {
       state.model = model
+    },
+
+    setInitialInput: (text: string) => {
+      state.initialInput = text
     },
 
     // Chat management
@@ -716,6 +722,7 @@ export type AiAssistantState = AiAssistantData & {
   isInitialized: boolean
   setContext: (context: Partial<AiAssistantContext>) => void
   setModel: (model: AssistantModel) => void
+  setInitialInput: (text: string) => void
   createChat: (options?: CreateChatOptions) => string
   newChat: (options?: NewChatOptions) => string
   createBranch: (sourceChatId: string, messageId: string) => string | undefined

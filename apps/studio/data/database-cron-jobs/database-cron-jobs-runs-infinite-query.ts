@@ -3,8 +3,10 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { last } from 'lodash'
 
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type DatabaseCronJobRunsVariables = {
   projectRef?: string
@@ -52,12 +54,13 @@ export async function getDatabaseCronJobRuns({
     projectRef,
     connectionString,
     sql: query,
+    grant: unguarded.migrating,
   })
   return result
 }
 
 type DatabaseCronJobRunData = CronJobRun[]
-type DatabaseCronJobError = ResponseError
+type DatabaseCronJobError = StudioError
 
 export const useCronJobRunsInfiniteQuery = <TData = DatabaseCronJobRunData>(
   { projectRef, connectionString, jobId }: DatabaseCronJobRunsVariables,

@@ -7,11 +7,12 @@ import { projectKeys } from './keys'
 import { OrgProjectsResponse } from './org-projects-infinite-query'
 import { getProjectStatusOverride } from './project-status-override'
 import type { components } from '@/data/api'
-import { get, handleError, isValidConnString, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, isValidConnString, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectDetailVariables = { ref?: string; skipWake?: boolean }
-export type ProjectDetail = components['schemas']['ProjectDetailResponse']
+export type ProjectDetail = components['schemas']['ProjectDetailResponse_Output']
 export interface Project extends Omit<ProjectDetail, 'status'> {
   /**
    * postgrestStatus is available on client side only.
@@ -49,6 +50,7 @@ export async function getProjectDetail(
       params: { path: { ref } },
       signal,
       headers,
+      grant: unguarded.migrating,
     })
 
     // We will still let the user load the page in case of a wake error, but log it for debugging purposes
@@ -89,7 +91,7 @@ export async function getProjectDetail(
 }
 
 export type ProjectDetailData = Awaited<ReturnType<typeof getProjectDetail>>
-export type ProjectDetailError = ResponseError
+export type ProjectDetailError = StudioError
 
 export const useProjectDetailQuery = <TData = ProjectDetailData>(
   { ref }: ProjectDetailVariables,

@@ -4,18 +4,15 @@ import { components } from 'api-types'
 import { contentKeys } from './keys'
 import type { SnippetStatus } from './snippet-status'
 import { get, handleError } from '@/data/fetchers'
-import type {
-  LogSqlSnippets,
-  ResponseError,
-  SqlSnippets,
-  UseCustomInfiniteQueryOptions,
-} from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { LogSqlSnippets, SqlSnippets, UseCustomInfiniteQueryOptions } from '@/types'
 
-export type SnippetFolderResponse = components['schemas']['GetUserContentFolderResponse']['data']
+export type SnippetFolderResponse =
+  components['schemas']['GetUserContentFolderResponse_Output']['data']
 export type SnippetFolder =
-  components['schemas']['GetUserContentFolderResponse']['data']['folders'][number]
+  components['schemas']['GetUserContentFolderResponse_Output']['data']['folders'][number]
 export type Snippet =
-  components['schemas']['GetUserContentFolderResponse']['data']['contents'][number]
+  components['schemas']['GetUserContentFolderResponse_Output']['data']['contents'][number]
 
 // The SQL editor's loaded-snippet type. Discriminated on `type` so database SQL
 // (`SqlSnippets.Content`, Postgres brand) and logs SQL (`LogSqlSnippets.Content`,
@@ -82,7 +79,7 @@ export async function getSQLSnippetFolders(
 }
 
 export type SQLSnippetFoldersData = Awaited<ReturnType<typeof getSQLSnippetFolders>>
-export type SQLSnippetFoldersError = ResponseError
+export type SQLSnippetFoldersError = StudioError
 
 export const useSQLSnippetFoldersQuery = <TData = SQLSnippetFoldersData>(
   { projectRef, name, sort }: Omit<SQLSnippetFolderVariables, 'cursor'>,

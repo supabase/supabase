@@ -1,6 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { Copy } from 'lucide-react'
+import { CopyIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, copyToClipboard } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -9,15 +9,17 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import ContentSnippet from '../ContentSnippet'
 import { DOCS_CONTENT } from '../ProjectAPIDocs.constants'
 import type { ContentProps } from './Content.types'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 import { useTrack } from '@/lib/telemetry/track'
 
 export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentProps) => {
   const { ref } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeysData } = useAPIKeys({ projectRef: ref }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef: ref })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   useProjectSettingsV2Query({ projectRef: ref })
   const { anonKey, serviceKey } = apiKeysData ?? {}
 
@@ -61,8 +63,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    variant="default"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('anon')
                       copyToClipboard(anonApiKey ?? 'SUPABASE_CLIENT_ANON_KEY')
@@ -102,8 +103,7 @@ export const Introduction = ({ showKeys, language, apikey, endpoint }: ContentPr
                 actions={[
                   <Button
                     key="copy"
-                    variant="default"
-                    icon={<Copy />}
+                    icon={<CopyIcon />}
                     onClick={() => {
                       setCopied('service')
                       copyToClipboard(serviceApiKey)

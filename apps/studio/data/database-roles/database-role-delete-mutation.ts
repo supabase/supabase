@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { invalidateRolesQuery } from './database-roles-query'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DropRoleBody = Parameters<typeof pgMeta.roles.remove>[1]
 
@@ -27,6 +29,7 @@ export async function deleteDatabaseRole({
     connectionString,
     sql,
     queryKey: ['roles', 'delete'],
+    grant: unguarded.migrating,
   })
   return result
 }
@@ -38,12 +41,12 @@ export const useDatabaseRoleDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>,
+  UseCustomMutationOptions<DatabaseRoleDeleteData, StudioError, DatabaseRoleDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseRoleDeleteData, ResponseError, DatabaseRoleDeleteVariables>({
+  return useMutation<DatabaseRoleDeleteData, StudioError, DatabaseRoleDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseRole(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

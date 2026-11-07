@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
-import { ChevronsUpDown, User as IconUser, Loader2, X } from 'lucide-react'
+import { ChevronsUpDownIcon, Loader2Icon, UserIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -33,8 +33,8 @@ import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
-import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 type UserSource = 'user' | 'external'
@@ -133,7 +133,7 @@ export const UserImpersonationSelector = ({
         customAccessTokenHookDetails
       )
     } catch (error) {
-      toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to impersonate user: ${(error as StudioError).message}`)
     } finally {
       setIsImpersonateLoading(false)
     }
@@ -163,7 +163,7 @@ export const UserImpersonationSelector = ({
         customAccessTokenHookDetails
       )
     } catch (error) {
-      toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to impersonate user: ${(error as StudioError).message}`)
     } finally {
       setIsImpersonateLoading(false)
     }
@@ -180,7 +180,7 @@ export const UserImpersonationSelector = ({
       setSelectedSource(value)
       onUserImpersonationCleared?.()
     } catch (error) {
-      toast.error(`Failed to stop impersonating user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to stop impersonating user: ${(error as StudioError).message}`)
     }
   }
 
@@ -200,7 +200,7 @@ export const UserImpersonationSelector = ({
       await state.setRole({ ...state.role, aal: value }, customAccessTokenHookDetails)
     } catch (error) {
       setAal(previousAal)
-      toast.error(`Failed to update MFA assurance level: ${(error as ResponseError).message}`)
+      toast.error(`Failed to update MFA assurance level: ${(error as StudioError).message}`)
     }
   }
 
@@ -347,7 +347,7 @@ type ImpersonationControlProps = {
   isLoading: boolean
   isSearching: boolean
   isError: boolean
-  error: ResponseError | null
+  error: StudioError | null
   isSuccess: boolean
   users: User[]
   impersonateUser: (user: User) => Promise<void>
@@ -386,7 +386,7 @@ const ImpersonationControl = ({
           variant="text"
           className="px-1"
           aria-label="Stop impersonating user"
-          icon={<X size={14} />}
+          icon={<XIcon size={14} />}
           onClick={stopImpersonating}
           disabled={isImpersonateLoading}
           loading={isImpersonateLoading}
@@ -427,12 +427,11 @@ const ImpersonationControl = ({
           id="run-as-user"
           type="button"
           size="tiny"
-          variant="default"
           role="combobox"
           aria-label="Find user"
           aria-expanded={isUserComboboxOpen}
           className="w-full justify-between"
-          iconRight={<ChevronsUpDown className="shrink-0 text-foreground-muted" size={14} />}
+          iconRight={<ChevronsUpDownIcon className="shrink-0 text-foreground-muted" size={14} />}
         >
           Email, name, or ID
         </Button>
@@ -447,7 +446,7 @@ const ImpersonationControl = ({
           <CommandList className="max-h-52">
             {(isLoading || isSearching) && (
               <div className="flex items-center justify-center gap-2 px-3 py-2">
-                <Loader2 className="animate-spin" size={14} />
+                <Loader2Icon className="animate-spin" size={14} />
                 <span className="text-xs text-foreground-light">Loading users…</span>
               </div>
             )}
@@ -474,7 +473,7 @@ const ImpersonationControl = ({
                       }}
                       className="gap-2"
                     >
-                      <IconUser size={14} className="shrink-0 text-foreground-lighter" />
+                      <UserIcon size={14} className="shrink-0 text-foreground-lighter" />
                       <span className="min-w-0 flex-1 truncate">
                         {emailOrPhone || userDisplayName || user.id}
                       </span>

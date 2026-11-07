@@ -3,9 +3,9 @@ import { JwtSecretUpdateError, JwtSecretUpdateProgress } from '@supabase/shared-
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 
 export const statusLabels: Record<JWTSigningKey['status'], string> = {
-  in_use: 'Current key',
-  standby: 'Standby key',
-  previously_used: 'Previous key',
+  in_use: 'Current',
+  standby: 'Standby',
+  previously_used: 'Previous',
   revoked: 'Revoked',
 }
 

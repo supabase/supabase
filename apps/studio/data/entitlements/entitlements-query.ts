@@ -3,20 +3,21 @@ import type { components } from 'api-types'
 
 import { get, handleError } from '@/data/fetchers'
 import { organizationKeys } from '@/data/organizations/keys'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
 import { UseCustomQueryOptions } from '@/types'
-import { ResponseError } from '@/types/base'
 
 export type FeatureKey =
-  components['schemas']['ListEntitlementsResponse']['entitlements'][number]['feature']['key']
+  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][number]['feature']['key']
 
 export type EntitlementsVariables = {
   slug: string
 }
 
 export type EntitlementConfig =
-  components['schemas']['ListEntitlementsResponse']['entitlements'][0]['config']
-export type Entitlement = components['schemas']['ListEntitlementsResponse']['entitlements'][0]
+  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][0]['config']
+export type Entitlement =
+  components['schemas']['ListEntitlementsResponse_Output']['entitlements'][0]
 export type EntitlementType = Entitlement['type']
 
 export async function getEntitlements(
@@ -40,7 +41,7 @@ export async function getEntitlements(
 }
 
 export type EntitlementsData = Awaited<ReturnType<typeof getEntitlements>>
-export type EntitlementsError = ResponseError
+export type EntitlementsError = StudioError
 
 /**
  * Helper to check a specific entitlement for an organization

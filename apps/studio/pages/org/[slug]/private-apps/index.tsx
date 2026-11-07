@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { PageContainer } from 'ui-patterns/PageContainer'
@@ -68,7 +68,7 @@ function PrivateAppsContent() {
                 >
                   <Button
                     variant="primary"
-                    icon={<Plus size={14} />}
+                    icon={<PlusIcon size={14} />}
                     onClick={() => setShowCreate(true)}
                   >
                     Create app

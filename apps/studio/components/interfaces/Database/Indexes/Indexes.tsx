@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { AlertCircle, Search, Trash } from 'lucide-react'
-import { parseAsBoolean, parseAsJson, parseAsString, useQueryState } from 'nuqs'
+import { AlertCircleIcon, SearchIcon, TrashIcon } from 'lucide-react'
+import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -32,6 +32,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { Shortcut } from '@/components/ui/Shortcut'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { useDatabaseIndexDeleteMutation } from '@/data/database-indexes/index-delete-mutation'
 import { useIndexesQuery, type DatabaseIndex } from '@/data/database-indexes/indexes-query'
 import { useSchemasQuery } from '@/data/database/schemas-query'
@@ -171,7 +172,7 @@ export const Indexes = () => {
             {isLoadingSchemas && <ShimmeringLoader className="w-[260px]" />}
             {isErrorSchemas && (
               <div className="w-[260px] text-foreground-light text-sm border px-3 py-1.5 rounded-sm flex items-center space-x-2">
-                <AlertCircle strokeWidth={2} size={16} />
+                <AlertCircleIcon strokeWidth={2} size={16} />
                 <p>Failed to load schemas</p>
               </div>
             )}
@@ -201,7 +202,7 @@ export const Indexes = () => {
               onChange={(e) => setSearch(e.target.value)}
               onKeyDown={onSearchInputEscape(search, setSearch)}
               placeholder="Search for an index"
-              icon={<Search />}
+              icon={<SearchIcon />}
             />
 
             <ReportsSelectFilter
@@ -264,14 +265,7 @@ export const Indexes = () => {
                       </TableRow>
                     )}
                     {indexes.length === 0 && search.length > 0 && (
-                      <TableRow>
-                        <TableCell colSpan={4}>
-                          <p className="text-sm text-foreground">No results found</p>
-                          <p className="text-sm text-foreground-light">
-                            Your search for "{search}" did not return any results
-                          </p>
-                        </TableCell>
-                      </TableRow>
+                      <TableRowNoResults colSpan={4} search={search} />
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (
@@ -287,7 +281,7 @@ export const Indexes = () => {
                           </TableCell>
                           <TableCell>
                             <div className="flex justify-end items-center space-x-2">
-                              <Button variant="default" onClick={() => setEditIndexId(index.name)}>
+                              <Button onClick={() => setEditIndexId(index.name)}>
                                 View definition
                               </Button>
                               {!isSchemaLocked && (
@@ -297,7 +291,7 @@ export const Indexes = () => {
                                       aria-label="Delete index"
                                       variant="text"
                                       className="px-1"
-                                      icon={<Trash />}
+                                      icon={<TrashIcon />}
                                       onClick={() => setDeleteIndexId(index.name)}
                                     />
                                   </TooltipTrigger>
@@ -348,8 +342,7 @@ export const Indexes = () => {
         visible={!!selectedIndexToDelete}
         title={
           <>
-            Confirm to delete index{' '}
-            <code className="text-code-inline">{selectedIndexToDelete?.name}</code>
+            Confirm to delete index <code>{selectedIndexToDelete?.name}</code>
           </>
         }
         confirmLabel="Confirm delete"

@@ -13,7 +13,7 @@ imgSocial: automatic-cli-login/automatic-cli-login-og.jpg
 imgThumb: automatic-cli-login/automatic-cli-login-thumb.jpg
 ---
 
-Using the [Supabase CLI](https://supabase.com/docs/guides/cli) is the go-to method for many to interact with their Supabase projects. It enables easy local project development, working with the local database, managing migrations, and generating types, among other functionalities. However, some scenarios demand connecting to the real Supabase project, requiring a login. Until now, the login process involved typing `supabase login`, which prompted users to manually generate a token from [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) and paste it back into the terminal.
+Using the [Supabase CLI](https://supabase.com/docs/guides/local-development) is the go-to method for many to interact with their Supabase projects. It enables easy local project development, working with the local database, managing migrations, and generating types, among other functionalities. However, some scenarios demand connecting to the real Supabase project, requiring a login. Until now, the login process involved typing `supabase login`, which prompted users to manually generate a token from [supabase.com/dashboard/account/tokens](https://supabase.com/dashboard/account/tokens) and paste it back into the terminal.
 
 This method proved inconvenient and suboptimal for our users, especially for those recording courses or tutorial videos, as they repeatedly had to go through the whole process manually. We are committed to prioritizing Developer Experience (DX), so we decided to improve this.
 
@@ -38,7 +38,7 @@ After gathering all this data, a unique URL is generated containing the session 
 
 With your identity confirmed, the CLI sends the provided session data to our management API, requesting its magic.
 
-The Management API generates a new access token for your account, creates its pair of ECDH keys, and encrypts the token using your public key and the server's private key. This encrypted token, alongside the server's public key, your session ID, and expiration date, is then stored in our database.
+The [Management API](/docs/reference/api/introduction) generates a new access token for your account, creates its pair of ECDH keys, and encrypts the token using your public key and the server's private key. This encrypted token, alongside the server's public key, your session ID, and expiration date, is then stored in our database.
 
 To send it back to your CLI it needs to be stored in a database.
 

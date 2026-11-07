@@ -1,38 +1,35 @@
-import { useDebounce } from '@uidotdev/usehooks'
+import { type Hotkey } from '@tanstack/react-hotkeys'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { Check, Keyboard, Loader2, MoreVertical, Save, SquareCode } from 'lucide-react'
+import {
+  AlignLeftIcon,
+  CheckIcon,
+  KeyboardIcon,
+  Loader2Icon,
+  MoreVerticalIcon,
+  SquareCodeIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { toast } from 'sonner'
+import { useCallback, useContext, useEffect, useRef, useState } from 'react'
 import {
   Button,
-  Command,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  KeyboardShortcut,
 } from 'ui'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ExplorerToolbarAction } from './ExplorerToolbar'
-import { useCreateNotebook } from './hooks'
-import { QueryEditor, type ExplorerQueryModel } from './QueryEditor'
+import { QueryEditor, type ExplorerQueryModel, type QueryEditorHandle } from './QueryEditor'
+import { SaveQueryDropdown } from './SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from './types'
-import { createQueryCellSkeleton } from './utils'
-import { getNotebook } from '@/data/content/notebooks/notebook-query'
-import { useNotebooksInfiniteQuery } from '@/data/content/notebooks/notebooks-infinite-query'
 import { toQuerySourceBinding } from '@/data/query-sources/query-source-registry'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { explorerQueryState, useExplorerQueryStateSnapshot } from '@/state/explorer-query'
-import { useNotebooksStateSnapshot } from '@/state/notebooks/notebooks-state'
 import { useControlledRoleImpersonationState } from '@/state/role-impersonation-state'
+import { hotkeyToKeys } from '@/state/shortcuts/formatShortcut'
+import { SHORTCUT_DEFINITIONS, SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { createTabId, TabsStateContext } from '@/state/tabs'
 
 /** Query-tab lifecycle adapter around the shared QueryEditor. */
@@ -42,33 +39,25 @@ export const ExplorerQueryTab = () => {
   const tabs = useContext(TabsStateContext)
   const querySnap = useExplorerQueryStateSnapshot()
 
-  const { createNotebook } = useCreateNotebook()
-  const notebooksSnap = useNotebooksStateSnapshot()
-
   const [isIntellisenseEnabled, setIsIntellisenseEnabled] = useLocalStorageQuery(
     LOCAL_STORAGE_KEYS.SQL_EDITOR_INTELLISENSE,
     true
   )
 
+  const queryEditorRef = useRef<QueryEditorHandle>(null)
+
+  const hotkeySequnece: Hotkey | undefined =
+    SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
+  const formatKeys = hotkeySequnece ? hotkeyToKeys(hotkeySequnece) : undefined
+
   const [restoredQueryKey, setRestoredQueryKey] = useState<string>()
   const [showQuery, setShowQuery] = useState(true)
-  const [search, setSearch] = useState('')
-  const debouncedSearch = useDebounce(search, 500)
-
-  const { data: notebooksData, isPending } = useNotebooksInfiniteQuery({
-    projectRef: ref,
-    limit: 100,
-    name: search.length === 0 ? search : debouncedSearch,
-  })
-  const notebooks = useMemo(() => {
-    const items = notebooksData?.pages.flatMap((page) => page.content) ?? []
-    return items
-  }, [notebooksData?.pages])
 
   const stateDraft = id ? querySnap.drafts[id] : undefined
   const draft = stateDraft?.projectRef === ref ? stateDraft : undefined
   const result = draft && id ? querySnap.results[id] : undefined
   const queryKey = id && ref ? `${ref}:${id}` : undefined
+  const isDraftReady = !!queryKey && restoredQueryKey === queryKey
 
   const roleImpersonationState = useControlledRoleImpersonationState(
     draft?._tag === 'database' ? draft.role : undefined,
@@ -88,6 +77,13 @@ export const ExplorerQueryTab = () => {
     setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref])
 
+  useEffect(() => {
+    if (!id || !isDraftReady || !draft?.pendingAutoRun) return
+
+    queryEditorRef.current?.run()
+    explorerQueryState.clearPendingAutoRun({ id })
+  }, [id, isDraftReady, draft?.pendingAutoRun])
+
   if (!queryKey || restoredQueryKey !== queryKey) {
     return (
       <div
@@ -95,7 +91,7 @@ export const ExplorerQueryTab = () => {
         aria-label="Loading query"
         className="flex h-full items-center justify-center bg-surface-100"
       >
-        <Loader2 className="animate-spin text-foreground-muted" size={18} />
+        <Loader2Icon className="animate-spin text-foreground-muted" size={18} />
       </div>
     )
   }
@@ -103,14 +99,16 @@ export const ExplorerQueryTab = () => {
   if (!id || !draft) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 bg-surface-100">
-        <SquareCode className="text-foreground-muted" size={24} />
+        <SquareCodeIcon className="text-foreground-muted" size={24} />
         <div className="text-center">
           <p className="text-sm font-medium">Query draft not found</p>
           <p className="text-sm text-foreground-lighter">
             This local draft may have been closed or cleared from this browser.
           </p>
         </div>
-        <Button onClick={() => router.push(`/project/${ref}/explorer`)}>Back to Explorer</Button>
+        <Button variant="primary" onClick={() => router.push(`/project/${ref}/explorer`)}>
+          Back to Explorer
+        </Button>
       </div>
     )
   }
@@ -138,35 +136,11 @@ export const ExplorerQueryTab = () => {
     })
   }
 
-  const onAddToNewNotebook = () => {
-    createNotebook({
-      cells: [createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql })],
-    })
-  }
-
-  const onAddToExistingNotebook = async (notebookId: string) => {
-    if (!ref) return
-    try {
-      if (!notebooksSnap.notebooks[notebookId]?.notebook.content) {
-        const notebook = await getNotebook({ projectRef: ref, id: notebookId })
-        notebooksSnap.setNotebook({ projectRef: ref, notebook })
-      }
-
-      notebooksSnap.insertCellAfter({
-        id: notebookId,
-        cell: createQueryCellSkeleton({ title: draft.name, sql: draft.uncheckedSql }),
-      })
-      notebooksSnap.requestScrollToBottom(notebookId)
-
-      router.push(`/project/${ref}/explorer/notebook/${notebookId}`)
-    } catch (error) {
-      toast.error('Failed to add query to notebook')
-    }
-  }
-
   return (
     <QueryEditor
+      ref={queryEditorRef}
       id={id}
+      location={{ surface: 'query_tab', queryId: id }}
       variant="viewport"
       title={draft.name}
       query={query}
@@ -177,7 +151,7 @@ export const ExplorerQueryTab = () => {
       roleImpersonationState={roleImpersonationState}
       onTitleChange={(value) => {
         persistTab()
-        const name = value.trim() || 'Untitled query'
+        const name = value.trim() || 'Run SQL'
         explorerQueryState.updateDraft({ id, name })
         tabs.updateTab(createTabId('query', { id }), { label: name })
       }}
@@ -200,68 +174,35 @@ export const ExplorerQueryTab = () => {
       }}
       toolbarActions={
         <>
+          <SaveQueryDropdown
+            query={{ title: draft.name, sql: draft.uncheckedSql }}
+            source={toQuerySourceBinding(draft)}
+          />
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<Save />} tooltip="Save query" />
+              <ExplorerToolbarAction icon={<MoreVerticalIcon size={16} strokeWidth={2} />} />
             </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-52" align="end">
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Add to existing notebook</DropdownMenuSubTrigger>
-                <DropdownMenuSubContent className="p-0">
-                  <Command shouldFilter={false}>
-                    <CommandInput
-                      autoFocus
-                      placeholder="Search notebooks..."
-                      className="text-xs"
-                      value={search}
-                      onValueChange={setSearch}
-                    />
-                    <CommandList>
-                      <CommandGroup>
-                        {isPending ? (
-                          <div className="flex flex-col p-1 gap-y-1">
-                            <ShimmeringLoader />
-                            <ShimmeringLoader className="w-3/4" />
-                          </div>
-                        ) : !notebooks?.length ? (
-                          <p className="text-xs text-center text-foreground-lighter py-3">
-                            No notebooks found
-                          </p>
-                        ) : null}
-                        {notebooks?.map((notebook) => (
-                          <CommandItem
-                            key={notebook.id}
-                            value={notebook.id}
-                            className="cursor-pointer"
-                            onSelect={() => onAddToExistingNotebook(notebook.id)}
-                          >
-                            {notebook.name}
-                          </CommandItem>
-                        ))}
-                      </CommandGroup>
-                    </CommandList>
-                  </Command>
-                </DropdownMenuSubContent>
-              </DropdownMenuSub>
-              <DropdownMenuItem onClick={onAddToNewNotebook}>
-                Create a new notebook
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<MoreVertical />} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent>
+            <DropdownMenuContent className="w-48" align="end">
               <DropdownMenuItem
                 className="justify-between"
                 onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
               >
                 <div className="flex items-center gap-x-2">
-                  <Keyboard size={14} />
+                  <KeyboardIcon size={14} />
                   <span>Intellisense enabled</span>
                 </div>
-                {isIntellisenseEnabled && <Check className="text-brand" size={16} />}
+                {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem
+                className="justify-between"
+                onClick={() => queryEditorRef.current?.prettify()}
+              >
+                <span className="flex items-center gap-x-2">
+                  <AlignLeftIcon size={14} />
+                  Prettify SQL
+                </span>
+                {formatKeys && <KeyboardShortcut keys={formatKeys} />}
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>

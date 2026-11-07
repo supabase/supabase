@@ -53,8 +53,11 @@ const mockToolTrace = (calls: Array<{ name: string; input?: unknown }>) => {
   return { trace: { getSpans } as unknown as Trace }
 }
 
-const runToolUsageScorer = (expected: Expected, trace?: Trace) =>
-  toolUsageScorer({ input: { prompt: 'irrelevant' }, expected, output: null, trace })
+const runToolUsageScorer = (
+  expected: Expected,
+  trace?: Trace,
+  output: AssistantEvalOutput | null = null
+) => toolUsageScorer({ input: { prompt: 'irrelevant' }, expected, output, trace })
 
 describe('scorers with online (null) output', () => {
   // Online scorers run against live production logs, which have no eval task
@@ -70,7 +73,7 @@ describe('scorers with online (null) output', () => {
     const { trace, getThread } = mockTrace(THREAD_WITH_DOCS_URL)
     const result = await runUrlValidityScorer(null, trace)
 
-    expect(getThread).toHaveBeenCalled()
+    expect(getThread).toHaveBeenCalledWith({ preprocessor: 'thread' })
     expect(result).toMatchObject({ name: 'URL Validity', score: 1, metadata: { urls: [DOCS_URL] } })
 
     vi.unstubAllGlobals()
@@ -90,19 +93,13 @@ describe('scorers with online (null) output', () => {
 })
 
 describe('toolUsageScorer', () => {
-  it('returns null when expected specifies neither requiredTools nor forbiddenTools', async () => {
-    const { trace } = mockToolTrace([])
-    await expect(runToolUsageScorer({}, trace)).resolves.toBeNull()
-  })
-
-  it('returns null when requiredTools is an empty array and forbiddenTools is unset', async () => {
+  it.each<[string, Expected]>([
+    ['neither requiredTools nor forbiddenTools is specified', {}],
+    ['requiredTools is empty and forbiddenTools is unset', { requiredTools: [] }],
+    ['forbiddenTools is empty and requiredTools is unset', { forbiddenTools: [] }],
+  ])('returns null when %s', async (_, expected) => {
     const { trace } = mockToolTrace([{ name: 'execute_sql' }])
-    await expect(runToolUsageScorer({ requiredTools: [] }, trace)).resolves.toBeNull()
-  })
-
-  it('returns null when forbiddenTools is an empty array and requiredTools is unset', async () => {
-    const { trace } = mockToolTrace([{ name: 'execute_sql' }])
-    await expect(runToolUsageScorer({ forbiddenTools: [] }, trace)).resolves.toBeNull()
+    await expect(runToolUsageScorer(expected, trace)).resolves.toBeNull()
   })
 
   it('returns null when there is no trace', async () => {
@@ -189,5 +186,36 @@ describe('toolUsageScorer', () => {
       trace
     )
     expect(result).toMatchObject({ score: 0 })
+  })
+
+  describe('tool calls the user denied', () => {
+    const output: AssistantEvalOutput = {
+      finishReason: 'stop',
+      transcript: transcript('a'),
+      deniedToolCalls: [{ toolName: 'update_opt_in_level', input: { requiredLevel: 'schema' } }],
+    }
+
+    it('counts a denied call as called', async () => {
+      const { trace } = mockToolTrace([])
+      const result = await runToolUsageScorer(
+        {
+          requiredTools: [
+            { name: 'update_opt_in_level', input: { requiredLevel: { equals: 'schema' } } },
+          ],
+        },
+        trace,
+        output
+      )
+      expect(result).toMatchObject({ score: 1 })
+    })
+
+    it('still scores 0 when the model never asked', async () => {
+      const { trace } = mockToolTrace([])
+      const result = await runToolUsageScorer({ requiredTools: ['update_opt_in_level'] }, trace, {
+        ...output,
+        deniedToolCalls: undefined,
+      })
+      expect(result).toMatchObject({ score: 0 })
+    })
   })
 })

@@ -268,6 +268,53 @@ export const FRAMEWORKS: ConnectionType[] = [
       },
     ],
   },
+  {
+    key: 'dotnet',
+    label: '.NET',
+    icon: 'dotnet',
+    guideLink: `${DOCS_URL}/reference/csharp/introduction`,
+    children: [
+      {
+        key: 'aspnetcore',
+        label: 'ASP.NET Core & Blazor',
+        icon: '',
+        children: [
+          {
+            key: 'supabasedotnet',
+            label: 'supabase-dotnet',
+            icon: 'supabase',
+            children: [],
+          },
+        ],
+      },
+      {
+        key: 'console',
+        label: 'Console / desktop',
+        icon: '',
+        children: [
+          {
+            key: 'supabasedotnet',
+            label: 'supabase-dotnet',
+            icon: 'supabase',
+            children: [],
+          },
+        ],
+      },
+      {
+        key: 'unity',
+        label: 'Unity',
+        icon: '',
+        children: [
+          {
+            key: 'supabasedotnet',
+            label: 'supabase-dotnet',
+            icon: 'supabase',
+            children: [],
+          },
+        ],
+      },
+    ],
+  },
 ]
 
 export const MOBILES: ConnectionType[] = [
@@ -369,7 +416,7 @@ export const ORMS: ConnectionType[] = [
     key: 'drizzle',
     label: 'Drizzle',
     icon: 'drizzle',
-    guideLink: `${DOCS_URL}/guides/database/connecting-to-postgres#connecting-with-drizzle`,
+    guideLink: `${DOCS_URL}/guides/database/drizzle`,
     children: [],
   },
 ]

@@ -3,12 +3,14 @@ import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdatePipelineVersionParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   versionId: number
+  skipStatusInvalidation?: boolean
 }
 
 async function updatePipelineVersion(
@@ -39,19 +41,28 @@ export const useUpdatePipelineVersionMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>,
+  UseCustomMutationOptions<UpdatePipelineVersionData, StudioError, UpdatePipelineVersionParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdatePipelineVersionData, ResponseError, UpdatePipelineVersionParams>({
+  return useMutation<UpdatePipelineVersionData, StudioError, UpdatePipelineVersionParams>({
     mutationFn: (vars) => updatePipelineVersion(vars),
     async onSuccess(data, variables, context) {
-      const { projectRef, pipelineId } = variables
-      // Ensure the version dot updates promptly
-      await queryClient.invalidateQueries({
-        queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
-      })
+      const { projectRef, pipelineId, skipStatusInvalidation = true } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.pipelinesVersion(projectRef, pipelineId),
+        }),
+        ...(skipStatusInvalidation
+          ? []
+          : [
+              queryClient.invalidateQueries(
+                { queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId) },
+                { cancelRefetch: false }
+              ),
+            ]),
+      ])
       await onSuccess?.(data, variables, context)
     },
     async onError(error, variables, context) {

@@ -127,7 +127,7 @@ GOTRUE_MAILER_TEMPLATES_EMAIL_CHANGED_NOTIFICATION='<template_url>'
 GOTRUE_MAILER_SUBJECTS_EMAIL_CHANGED_NOTIFICATION='<custom_subject>'
 ```
 
-### Example
+### Example [#notification-email-templates-example]
 
 Below is an example configuration for setting up a custom password changed notification template.
 
@@ -144,7 +144,7 @@ volumes/
     password_changed_notification.html
 ```
 
-### Step 2: Update `docker-compose.yml`
+### Step 2: Update `docker-compose.yml` [#notification-email-templates-step-2-update-docker-composeyml]
 
 Update the `auth` service in `docker-compose.yml` to enable password changed notification
 
@@ -168,7 +168,7 @@ services:
       - ./volumes/templates:/templates
 ```
 
-### Step 3: Restart containers
+### Step 3: Restart containers [#notification-email-templates-step-3-restart-containers]
 
 ```sh
 sh run.sh recreate auth templates-server

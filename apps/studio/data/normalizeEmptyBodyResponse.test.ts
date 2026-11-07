@@ -12,12 +12,18 @@ describe('normalizeEmptyBodyResponse', () => {
   it('adds Content-Length: 0 to an empty 201 that omits it (HTTP/3 case)', async () => {
     // HTTP/3 responses can drop `Content-Length: 0` on empty bodies, which makes
     // openapi-fetch attempt to JSON-parse the empty body and throw.
-    const response = new Response(null, { status: 201 })
+    const response = new Response(null, {
+      status: 201,
+      statusText: 'Created',
+      headers: { 'X-Request-Id': 'req-123' },
+    })
     expect(response.headers.has('Content-Length')).toBe(false)
 
     const normalized = await normalizeEmptyBodyResponse(response)
 
     expect(normalized.status).toBe(201)
+    expect(normalized.statusText).toBe('Created')
+    expect(normalized.headers.get('X-Request-Id')).toBe('req-123')
     expect(normalized.headers.get('Content-Length')).toBe('0')
     // The normalized empty body must not throw when parsed the way openapi-fetch parses it.
     expect(await normalized.text()).toBe('')
@@ -54,27 +60,6 @@ describe('normalizeEmptyBodyResponse', () => {
     const normalized = await normalizeEmptyBodyResponse(response)
 
     expect(normalized).toBe(response)
-  })
-
-  it('preserves status and statusText when normalizing', async () => {
-    const response = new Response(null, { status: 201, statusText: 'Created' })
-
-    const normalized = await normalizeEmptyBodyResponse(response)
-
-    expect(normalized.status).toBe(201)
-    expect(normalized.statusText).toBe('Created')
-  })
-
-  it('preserves other headers when adding Content-Length', async () => {
-    const response = new Response(null, {
-      status: 201,
-      headers: { 'X-Request-Id': 'req-123' },
-    })
-
-    const normalized = await normalizeEmptyBodyResponse(response)
-
-    expect(normalized.headers.get('X-Request-Id')).toBe('req-123')
-    expect(normalized.headers.get('Content-Length')).toBe('0')
   })
 })
 

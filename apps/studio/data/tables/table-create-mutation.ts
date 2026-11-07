@@ -2,10 +2,12 @@ import pgMeta from '@supabase/pg-meta'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { privilegeKeys } from '@/data/privileges/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CreateTableBody = {
   name: string
@@ -28,6 +30,7 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
     connectionString,
     sql,
     queryKey: ['table', 'create'],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -40,12 +43,12 @@ export const useTableCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableCreateData, ResponseError, TableCreateVariables>,
+  UseCustomMutationOptions<TableCreateData, StudioError, TableCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableCreateData, ResponseError, TableCreateVariables>({
+  return useMutation<TableCreateData, StudioError, TableCreateVariables>({
     mutationFn: (vars) => createTable(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, payload } = variables

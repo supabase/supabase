@@ -3,8 +3,9 @@ import { Table, TableBody } from 'ui'
 
 import { LoadMoreRow } from './BucketsTable.LoadMoreRow'
 import { BucketTableHeader } from './BucketTableHeader'
-import { BucketTableEmptyState, BucketTableRow } from './BucketTableRow'
+import { BucketTableRow } from './BucketTableRow'
 import type { AllowedBucketType, BucketsTablePaginationProps } from './types'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import { VirtualizedTable, VirtualizedTableBody } from '@/components/ui/VirtualizedTable'
 import { type Bucket } from '@/data/storage/buckets-query'
 
@@ -47,7 +48,11 @@ const BucketsTableUnvirtualized = ({
       <BucketTableHeader mode="standard" hasBuckets={buckets.length > 0} />
       <TableBody>
         {showSearchEmptyState ? (
-          <BucketTableEmptyState mode="standard" filterString={filterString} />
+          <TableRowNoResults
+            className="[&>td]:hover:bg-inherit"
+            colSpan={5}
+            search={filterString}
+          />
         ) : (
           buckets.map((bucket) => (
             <BucketTableRow
@@ -95,7 +100,11 @@ const BucketsTableVirtualized = ({
         paddingColSpan={5}
         emptyContent={
           showSearchEmptyState ? (
-            <BucketTableEmptyState mode="virtualized" filterString={filterString} />
+            <TableRowNoResults
+              className="[&>td]:hover:bg-inherit"
+              colSpan={5}
+              search={filterString}
+            />
           ) : undefined
         }
         trailingContent={

@@ -1,4 +1,5 @@
 import { untrustedSql } from '@supabase/pg-meta'
+import isEqual from 'lodash/isEqual'
 import { type Snapshot } from 'valtio'
 
 import { type ExplorerQueryModel } from '../QueryEditor'
@@ -89,6 +90,26 @@ export function changeCellSource(cell: Snapshot<QueryCell>, source: QuerySourceB
     row_limit: cell._tag === 'database_cell' ? cell.row_limit : DEFAULT_CELL_ROW_LIMIT,
     database_identifier: source.database_identifier,
   }
+}
+
+/**
+ * Whether a source change makes a cell's last in-session result stale enough to clear.
+ * A backend change (database ↔ logs) invalidates outright, since another engine returns
+ * unrelated columns. A log cell's time range is a request parameter rather than part of the
+ * SQL text (see notebookToMarkdown), so a plain SQL-text comparison wouldn't catch a result
+ * that's stale only because the range moved — that has to be checked here instead.
+ */
+export function shouldInvalidateResultOnSourceChange(
+  cell: Snapshot<QueryCell>,
+  source: QuerySourceBinding
+): boolean {
+  const isBackendChange = (source._tag === 'logs') !== (cell._tag === 'log_cell')
+  const isTimeRangeChange =
+    source._tag === 'logs' &&
+    cell._tag === 'log_cell' &&
+    !isEqual(source.time_range, cell.time_range)
+
+  return isBackendChange || isTimeRangeChange
 }
 
 /**

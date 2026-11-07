@@ -19,8 +19,8 @@ export function CTASection() {
           <span className="text-foreground block sm:inline"> scale to millions</span>
         </h2>
         <div className="flex items-center gap-2">
-          <Button asChild size="medium">
-            <Link
+          <Button variant="primary" asChild size="medium">
+            <a
               href={getDashboardCtaHref(isLoggedIn)}
               onClick={() =>
                 sendTelemetryEvent({
@@ -30,9 +30,9 @@ export function CTASection() {
               }
             >
               Start your project
-            </Link>
+            </a>
           </Button>
-          <Button asChild size="medium" variant="default">
+          <Button asChild size="medium">
             <Link
               href="/contact/sales"
               onClick={() =>

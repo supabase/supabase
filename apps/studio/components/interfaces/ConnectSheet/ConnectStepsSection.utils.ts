@@ -23,6 +23,8 @@ export function resolveContentPath(template: string, state: ConnectState): strin
 }
 
 export function shouldShowIpv4AddonNotice({
+  isAws,
+  isIpv4Enabled,
   isPlatform,
   mode,
   connectionMethod,
@@ -30,6 +32,8 @@ export function shouldShowIpv4AddonNotice({
   hasIpv4Addon,
   isHighAvailability,
 }: {
+  isAws: boolean
+  isIpv4Enabled: boolean
   isPlatform: boolean
   mode: ConnectMode
   connectionMethod: FieldValue
@@ -38,7 +42,15 @@ export function shouldShowIpv4AddonNotice({
   isHighAvailability: boolean
 }): boolean {
   // The IPv4 add-on does not apply to Multigres connections
-  if (!isPlatform || mode !== 'direct' || hasIpv4Addon || isHighAvailability) return false
+  if (
+    !isPlatform ||
+    !isAws ||
+    !isIpv4Enabled ||
+    mode !== 'direct' ||
+    hasIpv4Addon ||
+    isHighAvailability
+  )
+    return false
   return connectionMethod === 'direct' || (connectionMethod === 'transaction' && !useSharedPooler)
 }
 

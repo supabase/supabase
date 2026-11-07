@@ -1,4 +1,4 @@
-import { ArrowRight, Loader2, Square, X, type LucideIcon } from 'lucide-react'
+import { ArrowRightIcon, Loader2Icon, SquareIcon, XIcon, type LucideIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 export interface ReplicationState {
@@ -29,7 +29,7 @@ export const getEdgeVisual = ({
 }: ReplicationState): EdgeVisual => {
   if (isFailed) {
     return {
-      Icon: X,
+      Icon: XIcon,
       color: 'hsl(var(--destructive-default))',
       opacity: 1,
       dashArray: '5 5',
@@ -39,7 +39,7 @@ export const getEdgeVisual = ({
   }
   if (isComingUp) {
     return {
-      Icon: Loader2,
+      Icon: Loader2Icon,
       color: 'var(--foreground-light)',
       opacity: 1,
       dashArray: '5',
@@ -50,8 +50,8 @@ export const getEdgeVisual = ({
   }
   if (isReplicating) {
     return {
-      Icon: ArrowRight,
-      color: 'hsl(var(--brand-default))',
+      Icon: ArrowRightIcon,
+      color: 'var(--primary-bright)',
       opacity: 1,
       dashArray: '5',
       strokeWidth: 2,
@@ -59,7 +59,7 @@ export const getEdgeVisual = ({
     }
   }
   return {
-    Icon: Square,
+    Icon: SquareIcon,
     color: 'var(--foreground-lighter)',
     opacity: 0.5,
     dashArray: '5 5',

@@ -20,6 +20,8 @@ export interface DiscardChangesConfirmationDialogProps extends ConfirmOnCloseMod
   confirmLabel?: ReactNode
   cancelLabel?: ReactNode
   size?: React.ComponentProps<typeof AlertDialogContent>['size']
+  /** Extra content rendered between the description and the footer, e.g. an opt-out checkbox. */
+  children?: ReactNode
 }
 
 export const DiscardChangesConfirmationDialog = ({
@@ -31,6 +33,7 @@ export const DiscardChangesConfirmationDialog = ({
   confirmLabel = 'Discard changes',
   cancelLabel = 'Keep editing',
   size = 'tiny',
+  children,
 }: DiscardChangesConfirmationDialogProps) => {
   const isConfirmingRef = useRef(false)
 
@@ -65,7 +68,12 @@ export const DiscardChangesConfirmationDialog = ({
         <AlertDialogHeader>
           <AlertDialogTitle>{title}</AlertDialogTitle>
           {description !== undefined && description !== null && (
-            <AlertDialogDescription>{description}</AlertDialogDescription>
+            <AlertDialogDescription asChild>
+              <div>
+                {description}
+                {children && <div className="mt-4">{children}</div>}
+              </div>
+            </AlertDialogDescription>
           )}
         </AlertDialogHeader>
         <AlertDialogFooter>

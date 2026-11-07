@@ -2,6 +2,8 @@ export interface McpFeatureGroup {
   id: string
   name: string
   description: string
+  /** Opt-in groups that the server also leaves off when `features` is omitted. */
+  defaultDisabled?: boolean
 }
 
 export type McpOnCopyCallback = 'url' | 'config' | 'command'
@@ -60,15 +62,6 @@ export interface VSCodeMcpConfig {
     supabase: {
       type: 'http'
       url: string
-    }
-  }
-}
-
-export interface WindsurfMcpConfig {
-  mcpServers: {
-    supabase: {
-      command: 'npx'
-      args: ['-y', 'mcp-remote', string]
     }
   }
 }
@@ -214,6 +207,19 @@ export interface KimiMcpConfig extends McpClientBaseConfig {
     }
   }
 }
+/**
+ * Configuration format for the omp CLI MCP client.
+ * omp keys servers under `mcpServers` and requires an explicit `type: "http"`:
+ * an entry with a `url` but no `type` is validated as stdio and rejected.
+ */
+export interface OmpMcpConfig extends McpClientBaseConfig {
+  mcpServers: {
+    supabase: {
+      type: 'http'
+      url: string
+    }
+  }
+}
 
 // Union of all possible config types
 export type McpClientConfig =
@@ -230,10 +236,10 @@ export type McpClientConfig =
   | GrokMcpConfig
   | KimiMcpConfig
   | McpClientBaseConfig
+  | OmpMcpConfig
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
-  | WindsurfMcpConfig
 
 // Type guards
 export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { RefreshCw } from 'lucide-react'
+import { RefreshCwIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { LINT_TABS, LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
@@ -65,11 +65,12 @@ const LinterFilters = ({
         <ShortcutTooltip shortcutId={SHORTCUT_IDS.ADVISORS_REFRESH} side="bottom">
           <Button
             size="tiny"
-            variant="default"
             disabled={isLoading}
             onClick={onClickRefresh}
             icon={
-              <RefreshCw className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`} />
+              <RefreshCwIcon
+                className={`text-foreground-light ${isLoading ? 'animate-spin' : ''}`}
+              />
             }
           >
             Refresh

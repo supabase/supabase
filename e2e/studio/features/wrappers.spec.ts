@@ -28,7 +28,7 @@ testRunner('Stripe', () => {
           failOnStatusCode: true,
           data: {
             query: `
-              drop foreign data wrapper if exists ${wrapperName} cascade;
+              drop server if exists ${wrapperName} cascade;
               delete from vault.secrets where name = '${wrapperName}_api_key_id';
               drop schema ${schemaName} cascade;`,
           },
@@ -36,9 +36,9 @@ testRunner('Stripe', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/stripe_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
-    await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
+    await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
     await page.getByRole('radio', { name: 'Schema' }).click()
     await page
@@ -69,7 +69,7 @@ testRunner('Stripe', () => {
           failOnStatusCode: true,
           data: {
             query: `
-              drop foreign data wrapper if exists ${wrapperName} cascade;
+              drop server if exists ${wrapperName} cascade;
               delete from vault.secrets where name = '${wrapperName}_api_key_id';
               drop table if exists public.${tableName};`,
           },
@@ -77,9 +77,9 @@ testRunner('Stripe', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/stripe_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
-    await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
+    await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Stripe Secret Key' }).fill('my secret')
     await page.getByRole('button', { name: 'Add foreign table' }).click()
     await page.getByRole('combobox').click()
@@ -112,7 +112,7 @@ testRunner('S3 Wrapper', () => {
           failOnStatusCode: true,
           data: {
             query: `
-              drop foreign data wrapper if exists ${wrapperName} cascade;
+              drop server if exists ${wrapperName} cascade;
               delete from vault.secrets where name = '${wrapperName}_vault_access_key_id';
               delete from vault.secrets where name = '${wrapperName}_vault_secret_access_key';
               drop table if exists public.${tableName};`,
@@ -121,9 +121,9 @@ testRunner('S3 Wrapper', () => {
       }
     )
     await page.goto(toUrl(`/project/${ref}/integrations/s3_wrapper/overview`))
-    await page.getByRole('button', { name: 'Add new wrapper' }).click()
+    await page.getByRole('link', { name: 'Add new wrapper' }).click()
 
-    await page.getByRole('textbox', { name: 'Wrapper Name' }).fill(wrapperName)
+    await page.getByRole('textbox', { name: 'Server Name' }).fill(wrapperName)
     await page.getByRole('textbox', { name: 'Access Key ID' }).fill('s3 access id')
     await page.getByRole('textbox', { name: 'Access Key Secret' }).fill('s3 access secret')
     await page.getByRole('button', { name: 'Add foreign table' }).click()

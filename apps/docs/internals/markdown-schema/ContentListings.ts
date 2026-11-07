@@ -8,6 +8,12 @@ import {
 
 import { getInternalLinkBaseUrl } from '../internal-links'
 
+function listingMarkdownHref(href: string, linkBaseUrl: string) {
+  if (href.startsWith('#')) return href
+  if (isExternalContentListingHref(href)) return href
+  return `${linkBaseUrl}${withDocsBasePath(href)}`
+}
+
 const HEADING_MARKDOWN: Record<'h2' | 'h3' | 'h4', string> = {
   h2: '##',
   h3: '###',
@@ -33,12 +39,23 @@ export function serializeContentListingGroupToMarkdown(
     lines.push('')
   }
 
-  for (const item of items) {
-    const href = isExternalContentListingHref(item.href)
-      ? item.href
-      : `${linkBaseUrl}${withDocsBasePath(item.href)}`
-    lines.push(`- **[${item.title}](${href}):** ${item.description}`)
-  }
+  items.forEach((item, index) => {
+    const marker = group.type === 'progression' ? `${index + 1}.` : '-'
+    const detail = [item.subtitle, item.description].filter(Boolean).join('. ')
+    const label = detail ? `**${item.title}:** ${detail}` : `**${item.title}**`
+
+    if (!item.href) {
+      lines.push(`${marker} ${label}`)
+      return
+    }
+
+    const href = listingMarkdownHref(item.href, linkBaseUrl)
+    lines.push(
+      detail
+        ? `${marker} **[${item.title}](${href}):** ${detail}`
+        : `${marker} **[${item.title}](${href})**`
+    )
+  })
 
   return lines.join('\n')
 }

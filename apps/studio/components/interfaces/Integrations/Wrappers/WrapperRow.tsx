@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { partition } from 'lodash'
-import { ChevronRight, Edit, ExternalLink, Table2, Trash } from 'lucide-react'
+import { ChevronRightIcon, EditIcon, ExternalLinkIcon, Table2Icon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Badge, TableCell, TableRow, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -10,7 +9,7 @@ import { INTEGRATIONS } from '../Landing/Integrations.constants'
 import { convertKVStringArrayToJson, formatWrapperTables } from './Wrappers.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { FDW } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface WrapperRowProps {
   wrapper: FDW
@@ -18,9 +17,8 @@ interface WrapperRowProps {
 
 export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
   const { ref, id } = useParams()
-  const { can: canManageWrappers } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+  const { can: canManageWrappers } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const [, setSelectedWrapperToEdit] = useQueryState('edit', parseAsString)
@@ -40,11 +38,14 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
   const _tables = formatWrapperTables(wrapper, integration?.meta)
 
+  const editTooltip = canManageWrappers
+    ? 'Edit wrapper'
+    : 'You need additional permissions to edit wrappers'
+
   return (
     <TableRow>
       <TableCell className="gap-2 align-top py-3! min-w-80">
-        {wrapper.name}
-
+        <p className="text-sm">{wrapper.server_name}</p>
         {visibleMetadata.map((metadata) => (
           <div
             key={metadata.name}
@@ -52,7 +53,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           >
             <span className="text-foreground-lighter text-nowrap">{metadata.label}:</span>
             <span className="truncate max-w-72" title={serverOptions[metadata.name]}>
-              {serverOptions[metadata.name]}
+              {serverOptions[metadata.name] ?? metadata.defaultValue}
             </span>
           </div>
         ))}
@@ -60,11 +61,16 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
 
       <TableCell className="space-y-2 p-4!">
         {_tables?.map((table) => {
-          const target = table.table ?? table.object ?? table.src_key
+          const target =
+            (table.table as string | undefined) ??
+            (table.object as string | undefined) ??
+            (table.src_key as string | undefined) ??
+            table.table_name
+          const tableId = table.id as string
 
           return (
-            <div key={table.id} className="flex items-center">
-              <Badge className="bg-surface-300 gap-2 font-mono text-[0.75rem] h-6 text-foreground rounded-r-none">
+            <div key={tableId} className="flex items-center">
+              <Badge className="bg-surface-300 gap-2 font-mono text-xs tracking-tight h-6 text-foreground rounded-r-none">
                 <div className="relative w-3 h-3 flex items-center justify-center">
                   {integration.icon({ className: 'p-0' })}
                 </div>
@@ -77,12 +83,16 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                     {target}
                   </TooltipContent>
                 </Tooltip>
-                <ChevronRight size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
+                <ChevronRightIcon
+                  size={12}
+                  strokeWidth={1.5}
+                  className="text-foreground-lighter/50"
+                />
               </Badge>
 
-              <Link href={`/project/${ref}/editor/${table.id}`}>
-                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-[0.75rem] border-l-0">
-                  <Table2 size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
+              <Link href={`/project/${ref}/editor/${tableId}`}>
+                <Badge className="transition hover:bg-surface-300 px-2 rounded-l-none gap-1.5 h-6 font-mono text-xs tracking-tight border-l-0">
+                  <Table2Icon size={12} strokeWidth={1.5} className="text-foreground-lighter/50" />
                   <Tooltip>
                     <TooltipTrigger className="truncate max-w-28">
                       {table.schema}.{table.table_name}
@@ -105,16 +115,12 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
           <div key={metadata.name} className="flex items-center space-x-2 text-sm">
             <Link
               href={`/project/${ref}/settings/vault/secrets?search=${encodeURIComponent(
-                `${wrapper.name}_${metadata.name}`
+                serverOptions[metadata.name] ?? ''
               )}`}
-              className="transition text-foreground-light hover:text-foreground flex items-center space-x-2 max-w-28"
+              className="transition text-foreground-light hover:text-foreground flex items-center gap-x-2"
             >
-              <span className="truncate" title={metadata.label}>
-                {metadata.label}
-              </span>
-              <div>
-                <ExternalLink size={12} strokeWidth={1.5} className="text-foreground-lighter" />
-              </div>
+              <span title={`View ${metadata.label} in Vault`}>{metadata.label}</span>
+              <ExternalLinkIcon size={14} strokeWidth={1.5} />
             </Link>
           </div>
         ))}
@@ -123,23 +129,19 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
         <div className="flex items-center gap-x-2">
           <ButtonTooltip
             disabled={!canManageWrappers}
-            variant="default"
-            icon={<Edit strokeWidth={1.5} />}
+            icon={<EditIcon strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToEdit(wrapper.id.toString())}
             tooltip={{
               content: {
                 side: 'bottom',
-                text: !canManageWrappers
-                  ? 'You need additional permissions to edit wrappers'
-                  : 'Edit wrapper',
+                text: editTooltip,
               },
             }}
           />
           <ButtonTooltip
-            variant="default"
             disabled={!canManageWrappers}
-            icon={<Trash strokeWidth={1.5} />}
+            icon={<TrashIcon strokeWidth={1.5} />}
             className="px-1.5"
             onClick={() => setSelectedWrapperToDelete(wrapper.id.toString())}
             tooltip={{
@@ -147,7 +149,7 @@ export const WrapperRow = ({ wrapper }: WrapperRowProps) => {
                 side: 'bottom',
                 text: !canManageWrappers
                   ? 'You need additional permissions to delete wrappers'
-                  : 'Delete wrapper',
+                  : 'Delete connection',
               },
             }}
           />

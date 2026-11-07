@@ -1,11 +1,13 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { configKeys } from '../config/keys'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuthConfigUpdateVariables = {
   projectRef: string
@@ -34,12 +36,12 @@ export const useAuthConfigUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>,
+  UseCustomMutationOptions<AuthConfigUpdateData, StudioError, AuthConfigUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthConfigUpdateData, ResponseError, AuthConfigUpdateVariables>({
+  return useMutation<AuthConfigUpdateData, StudioError, AuthConfigUpdateVariables>({
     mutationFn: (vars) => updateAuthConfig(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, skipInvalidation = false } = variables
@@ -52,8 +54,10 @@ export const useAuthConfigUpdateMutation = ({
 
       await onSuccess?.(data, variables, context)
 
-      queryClient
-        .invalidateQueries({ queryKey: lintKeys.lint(projectRef) })
+      Promise.all([
+        queryClient.invalidateQueries({ queryKey: lintKeys.lint(projectRef) }),
+        queryClient.invalidateQueries({ queryKey: configKeys.projectConfig(projectRef) }),
+      ])
         .then(() =>
           queryClient.refetchQueries({
             queryKey: lintKeys.lint(projectRef),

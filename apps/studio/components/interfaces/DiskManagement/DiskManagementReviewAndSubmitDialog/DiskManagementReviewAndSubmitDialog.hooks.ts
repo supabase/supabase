@@ -2,7 +2,6 @@ import { useMemo } from 'react'
 import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 
 import { DiskStorageSchemaType } from '../DiskManagement.schema'
-import { ComputeInstanceAddonVariantId } from '../DiskManagement.types'
 import {
   calculateComputeSizePrice,
   calculateDiskSizePrice,
@@ -18,13 +17,6 @@ import {
   useIsAwsNimbusCloudProvider,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
-
-const COMPUTE_SIZES_BELOW_LARGE: Array<ComputeInstanceAddonVariantId> = [
-  'ci_nano',
-  'ci_micro',
-  'ci_small',
-  'ci_medium',
-]
 
 export function shouldShowComputeBillingBadge({
   isDirty,
@@ -180,16 +172,8 @@ export function useDiskManagementReviewChanges(
     Number(iopsPrice.newPrice) !== Number(iopsPrice.oldPrice) ||
     Number(throughputPrice.newPrice) !== Number(throughputPrice.oldPrice)
 
-  // Show cooldown warning whenever any disk attribute that counts toward the 24-hour modification limit changes
+  // Show cooldown warning whenever any disk attribute that enforces the 4-hour lock changes
   const anyDiskAttributeChange = hasIOPSChanges || hasStorageTypeChanges || hasTotalSizeChanges
-
-  // Show extended downtime warning when resizing to/from a size below large
-  const hasExtendedDowntimeRisk =
-    hasComputeChanges &&
-    (COMPUTE_SIZES_BELOW_LARGE.includes(
-      (defaultValues?.computeSize ?? 'ci_nano') as ComputeInstanceAddonVariantId
-    ) ||
-      COMPUTE_SIZES_BELOW_LARGE.includes(computeSize as ComputeInstanceAddonVariantId))
 
   // Throughput is only a user-configurable, separately-billed attribute for GP3. For IO2 it is
   // derived from provisioned IOPS (0.256 MiB/s per IOPS) and isn't surfaced as its own value, so
@@ -243,7 +227,6 @@ export function useDiskManagementReviewChanges(
     anyDiskAttributeChange,
     showThroughputRow,
     hasAnyBreakdownRows,
-    hasExtendedDowntimeRisk,
     // labels
     oldComputeLabel,
     newComputeLabel,
