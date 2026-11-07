@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { SubmitHandler, useForm } from 'react-hook-form'
+import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -16,11 +16,14 @@ import {
   Input,
   Separator,
 } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { isValidOidcIssuerUrl } from './ThirdPartyAuthForm.utils'
+import { findCiOidcProviders, isValidOidcIssuerUrl } from './ThirdPartyAuthForm.utils'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { DOCS_URL } from '@/lib/constants'
 
 interface CreateCustomOidcIntegrationDialogProps {
   visible: boolean
@@ -49,6 +52,10 @@ export const CreateCustomOidcIntegrationDialog = ({
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
     defaultValues,
+  })
+
+  const ciProviders = findCiOidcProviders({
+    issuerUrl: useWatch({ control: form.control, name: 'issuerUrl' }),
   })
 
   const handleClose = () => {
@@ -99,6 +106,27 @@ export const CreateCustomOidcIntegrationDialog = ({
                   </FormItemLayout>
                 )}
               />
+              {ciProviders.length > 0 && (
+                <Admonition
+                  type="warning"
+                  title={`${ciProviders.join(' and ')} tokens identify workflows, not end users`}
+                  description={
+                    <>
+                      Third-Party Auth is for signing in your end users. Tokens from a CI/CD service
+                      identify workflows and machines. Some of these issuers also sign tokens for
+                      every account on the service, so a token from another account can pass
+                      authentication unless your RLS policies check a claim such as <code>sub</code>{' '}
+                      that identifies your organization or repository. Read{' '}
+                      <InlineLink
+                        href={`${DOCS_URL}/guides/auth/third-party/custom-oidc#cicd-workflow-identity-issuers`}
+                      >
+                        how to restrict access
+                      </InlineLink>
+                      .
+                    </>
+                  }
+                />
+              )}
             </form>
           </Form>
         </DialogSection>
