@@ -54,6 +54,7 @@ import {
   notebookToMarkdown,
   type QueryCellSummary,
 } from './ExplorerNotebookTab.utils'
+import { ExplorerPreviewSuggestion } from './ExplorerPreviewSuggestion'
 import {
   ExplorerToolbar,
   ExplorerToolbarAction,
@@ -511,6 +512,8 @@ export const ExplorerNotebookTab = () => {
           </ButtonTooltip>
         </ExplorerToolbarActions>
       </ExplorerToolbar>
+
+      <ExplorerPreviewSuggestion className="mx-4 mt-4 w-auto shrink-0" />
 
       <div ref={scrollContainerRef} className="w-full mx-auto flex-grow min-h-0 overflow-y-auto">
         <div className="p-4 pb-10">

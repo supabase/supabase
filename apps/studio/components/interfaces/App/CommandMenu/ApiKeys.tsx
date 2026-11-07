@@ -38,10 +38,12 @@ export function useApiKeysCommands() {
     { projectRef: project?.ref },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: project?.ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
+  )
   const commands = useMemo(() => {
     const {
       anonKey: legacyAnonKey,

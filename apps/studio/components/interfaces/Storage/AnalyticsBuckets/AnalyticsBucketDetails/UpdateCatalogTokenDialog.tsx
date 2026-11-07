@@ -45,10 +45,9 @@ export const UpdateCatalogTokenDialog = ({ vaultTokenId }: { vaultTokenId?: stri
   const [open, setOpen] = useState(false)
   const [selectedKey, setSelectedKey] = useState<string>()
 
-  const { data: apiKeysData, isPending } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData, isPending } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { allSecretKeys } = apiKeysData ?? {}
 
   const { mutate: updateVaultSecret, isPending: isUpdating } = useVaultSecretUpdateMutation({

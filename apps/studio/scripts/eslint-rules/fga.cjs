@@ -4,6 +4,9 @@
  * - `no-unguarded-migrating` marks call sites not yet migrated.
  * - `unguarded-by-design-reason` requires a non-empty string-literal reason.
  * - `no-fetch-type-bypass` flags calls that skip the typed fetch wrappers' grant check.
+ * - `no-spread-granted-query-options` flags spreading (or `Object.assign`-ing) the result of
+ *   `grantedQueryOptions`, which would let the caller override the grant gate. It is type-aware:
+ *   it detects the type-only brand on the value, so it needs `parserOptions.projectService`.
  */
 
 const path = require('node:path')
@@ -183,11 +186,70 @@ const noFetchTypeBypass = {
   },
 }
 
+/**
+ * Name of the type-only optional property `grantedQueryOptions` adds to its return type
+ * (`GrantedQueryOptionsBrand` in data/granted-query-options.ts). Keep the two in sync.
+ */
+const GRANTED_QUERY_OPTIONS_BRAND = '__grantedQueryOptions'
+
+/** @type {import('eslint').Rule.RuleModule} */
+const noSpreadGrantedQueryOptions = {
+  meta: {
+    type: 'problem',
+    docs: {
+      description: 'Disallow spreading grant-gated query options (requires type information)',
+    },
+    messages: {
+      spread:
+        'Pass query options as the second argument. Spreading lets callers override the grant gate.',
+    },
+    schema: [],
+  },
+  create(context) {
+    const services = context.sourceCode.parserServices
+    if (!services?.program || !services.esTreeNodeToTSNodeMap) {
+      throw new Error(
+        'fga/no-spread-granted-query-options requires type information: enable `parserOptions.projectService` for the linted files.'
+      )
+    }
+    const checker = services.program.getTypeChecker()
+
+    function isBranded(node) {
+      const type = checker.getTypeAtLocation(services.esTreeNodeToTSNodeMap.get(node))
+      const constituents = type.isUnion() ? type.types : [type]
+      return constituents.some((t) => checker.getPropertyOfType(t, GRANTED_QUERY_OPTIONS_BRAND))
+    }
+
+    return {
+      SpreadElement(node) {
+        if (node.parent.type !== 'ObjectExpression') return
+        if (isBranded(node.argument)) context.report({ node, messageId: 'spread' })
+      },
+      CallExpression(node) {
+        const { callee } = node
+        const isObjectAssign =
+          callee.type === 'MemberExpression' &&
+          !callee.computed &&
+          callee.object.type === 'Identifier' &&
+          callee.object.name === 'Object' &&
+          callee.property.type === 'Identifier' &&
+          callee.property.name === 'assign'
+        if (!isObjectAssign) return
+        const args = node.arguments.map((arg) =>
+          arg.type === 'SpreadElement' ? arg.argument : arg
+        )
+        if (args.some(isBranded)) context.report({ node, messageId: 'spread' })
+      },
+    }
+  },
+}
+
 module.exports = {
   meta: { name: 'fga' },
   rules: {
     'no-unguarded-migrating': noUnguardedMigrating,
     'unguarded-by-design-reason': unguardedByDesignReason,
     'no-fetch-type-bypass': noFetchTypeBypass,
+    'no-spread-granted-query-options': noSpreadGrantedQueryOptions,
   },
 }

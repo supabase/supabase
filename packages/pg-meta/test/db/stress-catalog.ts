@@ -146,3 +146,37 @@ export async function buildStressFunctions(
   await db.executeQuery(`call stress.build_functions(${count});`)
   await db.executeQuery(`analyze;`)
 }
+
+/**
+ * Build a user trigger on every 4th stress table, plus triggers that run one
+ * shared function on every 24th, so trigger search runs against
+ * a large pg_trigger. Foreign keys in the stress catalog already contribute the
+ * internal RI triggers a real catalog has, which the search must skip. Needs the
+ * stress tables, so call it after `buildStressCatalog`, and keep it in the same
+ * separate database as `buildStressFunctions` for the same plan-shift reason.
+ */
+export async function buildStressTriggers(
+  db: TestDatabase,
+  tableCount: number = STRESS_TABLE_COUNT
+): Promise<void> {
+  await db.executeQuery(`
+    create function stress.trg() returns trigger language plpgsql as 'begin return new; end';
+    create function stress.audit_row_fn() returns trigger language plpgsql as 'begin return new; end';
+
+    create procedure stress.build_triggers(n int) language plpgsql as $$
+    begin
+      for i in 0..n-1 loop
+        if i % 4 = 0 then
+          execute format('create trigger trg_%s before insert on stress.t_%s for each row execute function stress.trg()', i, i);
+        end if;
+        -- Many triggers that run one function, with names that never match its name
+        if i % 24 = 0 then
+          execute format('create trigger aud_%s before update on stress.t_%s for each row execute function stress.audit_row_fn()', i, i);
+        end if;
+        if i % 100 = 99 then commit; end if;
+      end loop;
+    end $$;
+  `)
+  await db.executeQuery(`call stress.build_triggers(${tableCount});`)
+  await db.executeQuery(`analyze;`)
+}

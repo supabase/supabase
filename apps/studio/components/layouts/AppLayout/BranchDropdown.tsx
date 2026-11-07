@@ -50,10 +50,12 @@ export const BranchDropdown = ({
     isPending: isPendingBranches,
     isError: isBranchesError,
     isSuccess: isBranchesSuccess,
-  } = useQuery({
-    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
-    enabled: Boolean(projectDetails),
-  })
+  } = useQuery(
+    branchesQueryOptions(
+      { projectRef, grant: branchesGrant.grant },
+      { enabled: Boolean(projectDetails) }
+    )
+  )
 
   const isDenied = branchesGrant.status === 'denied' && Boolean(projectDetails)
   const isLoading =

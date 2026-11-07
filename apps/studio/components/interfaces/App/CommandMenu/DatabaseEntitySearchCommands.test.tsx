@@ -54,6 +54,38 @@ const SEARCH_RESULT: EntitySearchData = {
       table_id: 102,
     },
   ],
+  triggers: [
+    {
+      id: 401,
+      name: 'audit_blog_changes',
+      activation: 'AFTER',
+      events: ['INSERT', 'UPDATE'],
+      schema: 'public',
+      table: 'blog_posts',
+      table_id: 101,
+      matched_function: null,
+    },
+    {
+      id: 402,
+      name: 'set_updated_at',
+      activation: 'BEFORE',
+      events: ['UPDATE'],
+      schema: 'blog',
+      table: 'blog_posts_archive',
+      table_id: 102,
+      matched_function: null,
+    },
+    {
+      id: 403,
+      name: 'fill_audit_fields',
+      activation: 'BEFORE',
+      events: ['INSERT'],
+      schema: 'public',
+      table: 'comments',
+      table_id: 103,
+      matched_function: 'set_audit_fields',
+    },
+  ],
   functions: [
     { id: 301, schema: 'public', name: 'get_blog_post', type: 'function', args: 'id bigint' },
     { id: 302, schema: 'blog', name: 'archive_blog_posts', type: 'procedure', args: '' },
@@ -141,6 +173,29 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(section).toHaveTextContent('/project/default/database/policies?schema=blog&edit=202')
   })
 
+  it('lists matching triggers with their timing and table, linking to the trigger editor', async () => {
+    customRender(<CommandMenuHarness />)
+
+    await userEvent.type(screen.getByRole('textbox', { name: 'Search' }), 'blog_posts')
+
+    const section = await screen.findByRole('region', { name: 'Triggers' })
+    expect(section).toHaveTextContent('audit_blog_changes')
+    expect(section).toHaveTextContent('AFTER INSERT OR UPDATE on public.blog_posts')
+    expect(section).toHaveTextContent('BEFORE UPDATE on blog.blog_posts_archive')
+    // A trigger found through its function says which function it runs, instead of its timing
+    expect(section).toHaveTextContent('fill_audit_fields')
+    expect(section).toHaveTextContent('Runs set_audit_fields')
+    expect(section).not.toHaveTextContent('BEFORE INSERT on public.comments')
+    expect(section.textContent?.match(/Runs /g)).toHaveLength(1)
+    // The triggers page lists triggers per schema, so the link has to carry it
+    expect(section).toHaveTextContent(
+      '/project/default/database/triggers/data?schema=public&edit=401'
+    )
+    expect(section).toHaveTextContent(
+      '/project/default/database/triggers/data?schema=blog&edit=402'
+    )
+  })
+
   it('lists matching functions with their arguments, linking to the function editor', async () => {
     customRender(<CommandMenuHarness />)
 
@@ -178,6 +233,7 @@ describe('useDatabaseEntitySearchCommands', () => {
     expect(searchRequests).toHaveLength(0)
     expect(screen.queryByRole('region', { name: 'Tables' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Policies' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('region', { name: 'Triggers' })).not.toBeInTheDocument()
     expect(screen.queryByRole('region', { name: 'Functions' })).not.toBeInTheDocument()
   })
 
@@ -212,6 +268,43 @@ describe('useDatabaseEntitySearchCommands', () => {
     resolveSecondSearch?.()
     const section = await screen.findByRole('region', { name: 'Tables' })
     expect(section).toHaveTextContent('/project/other/editor/101?schema=public')
+  })
+
+  it('keeps a trigger found through its function visible while a refined search loads', async () => {
+    let requests = 0
+    let resolveRefinedSearch: (() => void) | undefined
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: async () => {
+        requests += 1
+        // Hold the refined search in flight until the test releases it
+        if (requests === 2) {
+          await new Promise<void>((resolve) => (resolveRefinedSearch = resolve))
+        }
+        return HttpResponse.json([
+          {
+            ...SEARCH_RESULT,
+            tables: [],
+            policies: [],
+            functions: [],
+            triggers: [SEARCH_RESULT.triggers[2]],
+          },
+        ])
+      },
+    })
+    customRender(<CommandMenuHarness />)
+    const input = screen.getByRole('textbox', { name: 'Search' })
+
+    await userEvent.type(input, 'set_audit')
+    expect(await screen.findByText(/Runs set_audit_fields/)).toBeInTheDocument()
+
+    // Neither the trigger's name nor its table match the refined search, only its function
+    await userEvent.type(input, '_fields')
+    await waitFor(() => expect(resolveRefinedSearch).toBeDefined())
+    expect(screen.getByText(/Runs set_audit_fields/)).toBeInTheDocument()
+
+    resolveRefinedSearch?.()
   })
 })
 
@@ -253,24 +346,55 @@ describe('useDatabaseEntitySearchCommands in the command menu list', () => {
     await waitFor(() => expect(screen.queryByText('No results found.')).not.toBeInTheDocument())
   })
 
-  it('lists tables, then policies, then functions, even when a function matches best', async () => {
+  it.each([
+    ['archive_blog_posts', 'a function'],
+    ['audit_blog', 'a trigger'],
+  ])(
+    'lists tables, policies, triggers, then functions, even when %s matches best',
+    async (search) => {
+      addAPIMock({
+        method: 'post',
+        path: '/platform/pg-meta/:ref/query',
+        response: () => HttpResponse.json([SEARCH_RESULT]),
+      })
+      customRender(<CommandMenuListHarness />)
+
+      await userEvent.type(screen.getByRole('combobox'), search)
+
+      await screen.findByText('Functions')
+      const headings = screen.getAllByText(/^(Tables|Policies|Triggers|Functions)$/)
+      expect(headings.map((heading) => heading.textContent)).toEqual([
+        'Tables',
+        'Policies',
+        'Triggers',
+        'Functions',
+      ])
+    }
+  )
+
+  it('lists functions before triggers that only match through the function they run', async () => {
     addAPIMock({
       method: 'post',
       path: '/platform/pg-meta/:ref/query',
-      response: () => HttpResponse.json([SEARCH_RESULT]),
+      response: () =>
+        HttpResponse.json([
+          {
+            tables: [],
+            policies: [],
+            triggers: [SEARCH_RESULT.triggers[2]],
+            functions: [
+              { id: 304, schema: 'public', name: 'set_audit_fields', type: 'function', args: '' },
+            ],
+          },
+        ]),
     })
     customRender(<CommandMenuListHarness />)
 
-    // Matches the `blog.archive_blog_posts` function far better than anything else
-    await userEvent.type(screen.getByRole('combobox'), 'archive_blog_posts')
+    await userEvent.type(screen.getByRole('combobox'), 'set_audit')
 
-    await screen.findByText('procedure')
-    const headings = screen.getAllByText(/^(Tables|Policies|Functions)$/)
-    expect(headings.map((heading) => heading.textContent)).toEqual([
-      'Tables',
-      'Policies',
-      'Functions',
-    ])
+    await screen.findByText('Runs set_audit_fields')
+    const headings = screen.getAllByText(/^(Tables|Policies|Triggers|Functions)$/)
+    expect(headings.map((heading) => heading.textContent)).toEqual(['Functions', 'Triggers'])
   })
 })
 
