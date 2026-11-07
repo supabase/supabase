@@ -61,7 +61,7 @@ export function OnboardingSurveyFollowUpPrompt() {
             <div className="flex flex-col gap-y-1 mb-2">
               <p className="text-sm font-medium">Help improve Supabase</p>
               <p className="text-xs text-foreground-lighter text-balance">
-                Answer two optional questions about your new organization.
+                Answer a few optional questions about your new organization.
               </p>
             </div>
             <div className="flex gap-2">
@@ -98,11 +98,21 @@ export function OnboardingSurveyFollowUpPrompt() {
     skipFollowUp('follow_up_closed')
   }
 
-  const handleSubmit = ({ building, coding_experience }: OnboardingSurveyFollowUpValues) => {
+  const handleSubmit = ({
+    kind,
+    size,
+    building,
+    coding_experience,
+  }: OnboardingSurveyFollowUpValues) => {
     if (!orgSlug) return
+
+    // Unanswered here, the org keeps the type picked on the new-org form
+    const answeredKind = kind || orgKind
+    const answeredSize = kind ? (kind === 'COMPANY' ? size : undefined) : orgSize
 
     const surveyProperties = {
       surface: 'follow_up' as const,
+      hasKind: kind !== '',
       hasBuilding: building !== '',
       hasCodingExperience: coding_experience !== '',
     }
@@ -111,8 +121,8 @@ export function OnboardingSurveyFollowUpPrompt() {
     submitOnboardingSurvey(
       {
         slug: orgSlug,
-        kind: orgKind,
-        size: orgSize,
+        kind: answeredKind,
+        size: answeredSize,
         building: building || undefined,
         coding_experience: coding_experience || undefined,
       },

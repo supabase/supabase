@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { AnimatePresence } from 'motion/react'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
@@ -21,11 +22,21 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { BUILDING_OPTIONS, CODING_EXPERIENCE_OPTIONS } from './OnboardingSurvey.constants'
+import {
+  BUILDING_OPTIONS,
+  CODING_EXPERIENCE_OPTIONS,
+  ORG_SIZE_DEFAULT,
+  ORG_SIZE_TYPES,
+  SURVEY_ORG_KIND_OPTIONS,
+} from './OnboardingSurvey.constants'
+import { OnboardingSurveySelect } from './OnboardingSurveySelect'
+import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 
 const FORM_ID = 'onboarding-survey-follow-up-form'
 
 const FormSchema = z.object({
+  kind: z.string(),
+  size: z.string(),
   building: z.string(),
   coding_experience: z.string(),
 })
@@ -33,6 +44,8 @@ const FormSchema = z.object({
 export type OnboardingSurveyFollowUpValues = z.infer<typeof FormSchema>
 
 const defaultValues: OnboardingSurveyFollowUpValues = {
+  kind: '',
+  size: ORG_SIZE_DEFAULT,
   building: '',
   coding_experience: '',
 }
@@ -57,11 +70,11 @@ export function OnboardingSurveyFollowUpDialog({
     defaultValues,
   })
 
-  const [building, codingExperience] = useWatch({
+  const [kind, building, codingExperience] = useWatch({
     control: form.control,
-    name: ['building', 'coding_experience'],
+    name: ['kind', 'building', 'coding_experience'],
   })
-  const hasAnswer = building !== '' || codingExperience !== ''
+  const hasAnswer = kind !== '' || building !== '' || codingExperience !== ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -74,57 +87,109 @@ export function OnboardingSurveyFollowUpDialog({
           <form id={FORM_ID} onSubmit={form.handleSubmit(onSubmit)}>
             <DialogSection className="flex flex-col gap-y-5 pt-4.5 pb-5">
               <p className="text-sm text-foreground-light">
-                Both questions are optional. Your answers help us improve Supabase.
+                All questions are optional. Your answers help us improve Supabase.
               </p>
 
-              <FormField
-                control={form.control}
-                name="building"
-                render={({ field }) => (
-                  <FormItemLayout label="What are you building?" layout="vertical">
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {BUILDING_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+              {/* Each question appears once the one before it is answered */}
+              <div>
+                <FormField
+                  control={form.control}
+                  name="kind"
+                  render={({ field }) => (
+                    <FormItemLayout label="Who is this org for?" layout="vertical">
+                      <FormControl>
+                        <OnboardingSurveySelect
+                          value={field.value}
+                          onValueChange={field.onChange}
+                          options={SURVEY_ORG_KIND_OPTIONS}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
 
-              <FormField
-                control={form.control}
-                name="coding_experience"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="How comfortable are you working with code?"
-                    layout="vertical"
-                  >
-                    <FormControl>
-                      <Select value={field.value} onValueChange={field.onChange}>
-                        <SelectTrigger className="w-full">
-                          <SelectValue placeholder="Select an option" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {CODING_EXPERIENCE_OPTIONS.map((option) => (
-                            <SelectItem key={option.value} value={option.value}>
-                              {option.label} - {option.description}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </FormControl>
-                  </FormItemLayout>
-                )}
-              />
+                <AnimatePresence initial={false}>
+                  {kind === 'COMPANY' && (
+                    <FormSectionCollapse>
+                      <div className="pt-5">
+                        <FormField
+                          control={form.control}
+                          name="size"
+                          render={({ field }) => (
+                            <FormItemLayout label="How many people?" layout="vertical">
+                              <FormControl>
+                                <Select value={field.value} onValueChange={field.onChange}>
+                                  <SelectTrigger className="w-full">
+                                    <SelectValue />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    {Object.entries(ORG_SIZE_TYPES).map(([value, label]) => (
+                                      <SelectItem key={value} value={value}>
+                                        {label}
+                                      </SelectItem>
+                                    ))}
+                                  </SelectContent>
+                                </Select>
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </FormSectionCollapse>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence initial={false}>
+                  {kind !== '' && (
+                    <FormSectionCollapse>
+                      <div className="pt-5">
+                        <FormField
+                          control={form.control}
+                          name="building"
+                          render={({ field }) => (
+                            <FormItemLayout label="What are you building?" layout="vertical">
+                              <FormControl>
+                                <OnboardingSurveySelect
+                                  value={field.value}
+                                  onValueChange={field.onChange}
+                                  options={BUILDING_OPTIONS}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </FormSectionCollapse>
+                  )}
+                </AnimatePresence>
+
+                <AnimatePresence initial={false}>
+                  {kind !== '' && building !== '' && (
+                    <FormSectionCollapse>
+                      <div className="pt-5">
+                        <FormField
+                          control={form.control}
+                          name="coding_experience"
+                          render={({ field }) => (
+                            <FormItemLayout
+                              label="How comfortable are you working with code?"
+                              layout="vertical"
+                            >
+                              <FormControl>
+                                <OnboardingSurveySelect
+                                  value={field.value}
+                                  onValueChange={field.onChange}
+                                  options={CODING_EXPERIENCE_OPTIONS}
+                                />
+                              </FormControl>
+                            </FormItemLayout>
+                          )}
+                        />
+                      </div>
+                    </FormSectionCollapse>
+                  )}
+                </AnimatePresence>
+              </div>
             </DialogSection>
           </form>
         </Form>

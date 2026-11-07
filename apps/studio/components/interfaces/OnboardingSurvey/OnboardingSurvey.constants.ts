@@ -1,7 +1,23 @@
+import { ORG_KIND_TYPES, type OrgKind } from '../Organization/NewOrg/OrganizationDetailsFields'
+
 // How long after creating an org its creator can be asked the survey again
 export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000
 
-export const BUILDING_OPTIONS = [
+export type OnboardingSurveyOption = {
+  value: string
+  label: string
+  description?: string
+  /** Shown below a divider, e.g. Prefer not to say */
+  isOptOut?: boolean
+}
+
+export const PREFER_NOT_TO_SAY_OPTION: OnboardingSurveyOption = {
+  value: 'prefer_not_to_say',
+  label: 'Prefer not to say',
+  isOptOut: true,
+}
+
+export const BUILDING_OPTIONS: readonly OnboardingSurveyOption[] = [
   { value: 'ai_assistant_or_agent', label: 'AI assistant or agent' },
   { value: 'ai_search_or_knowledge_base', label: 'AI search or knowledge base' },
   { value: 'b2b_saas', label: 'B2B SaaS application' },
@@ -13,9 +29,10 @@ export const BUILDING_OPTIONS = [
   { value: 'developer_tool_or_app_builder', label: 'Developer tool or app-building platform' },
   { value: 'analytics_or_reporting', label: 'Analytics or reporting application' },
   { value: 'other', label: 'Other' },
-] as const
+  PREFER_NOT_TO_SAY_OPTION,
+]
 
-export const CODING_EXPERIENCE_OPTIONS = [
+export const CODING_EXPERIENCE_OPTIONS: readonly OnboardingSurveyOption[] = [
   {
     value: 'beginner',
     label: 'Beginner',
@@ -41,7 +58,8 @@ export const CODING_EXPERIENCE_OPTIONS = [
     label: 'Expert',
     description: "I'm comfortable designing complex systems and infrastructure",
   },
-] as const
+  PREFER_NOT_TO_SAY_OPTION,
+]
 
 export {
   ORG_KIND_DEFAULT,
@@ -49,6 +67,16 @@ export {
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
 } from '../Organization/NewOrg/OrganizationDetailsFields'
+
+// Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?".
+// UNDISCLOSED is the org kind's own Prefer not to say.
+export const SURVEY_ORG_KIND_OPTIONS: readonly OnboardingSurveyOption[] = (
+  Object.keys(ORG_KIND_TYPES) as OrgKind[]
+).map((kind) =>
+  kind === 'UNDISCLOSED'
+    ? { value: kind, label: 'Prefer not to say', isOptOut: true }
+    : { value: kind, label: ORG_KIND_TYPES[kind] }
+)
 
 export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
 
