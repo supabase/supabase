@@ -242,8 +242,10 @@ function ContentListingsGroup({ group }: { group: ContentListingGroup }) {
   )
 }
 
-export function ContentListings({ id }: { id: string }) {
-  const group = getContentListingById(id)
+type ContentListingsProps = { id: string } | { group: ContentListingGroup }
+
+export function ContentListings(props: ContentListingsProps) {
+  const group = 'group' in props ? props.group : getContentListingById(props.id)
   if (!group || !filterContentListingItems(group.items).length) return null
   if (group.type === 'progression') {
     return (

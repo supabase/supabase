@@ -147,7 +147,7 @@ pages linking into reference docs or server-side auth guides.
 ### Out of scope
 
 - Federated guide sections: `graphql`, `database/extensions/wrappers`,
-  `ai/python`, `deployment/terraform`, `deployment/ci`
+  `deployment/terraform`, `deployment/ci`
 - Reference docs under `/docs/reference`
 - Non-docs routes such as `/dashboard` and `/ui`, which the link checker skips
 

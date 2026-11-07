@@ -49,7 +49,6 @@ public/docs/
 /content/guides/deployment/terraform.mdx
 /content/guides/deployment/terraform/tutorial.mdx
 /content/guides/deployment/ci/
-/content/guides/ai/python/
 /content/guides/database/extensions/wrappers/*
 !/content/guides/database/extensions/wrappers/overview.mdx
 

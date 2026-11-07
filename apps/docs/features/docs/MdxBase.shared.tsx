@@ -6,6 +6,7 @@ import { AuthSmsProviderConfig } from '~/components/AuthSmsProviderConfig'
 import ButtonCard from '~/components/ButtonCard'
 import { ComputeDiskLimitsTable } from '~/components/ComputeDiskLimitsTable'
 import { ContentListings } from '~/components/ContentListings'
+import { FederatedContentListing } from '~/components/ContentListings/FederatedContentListing'
 import { CustomContent } from '~/components/CustomContent'
 import { DatabaseAdvisorsIndex } from '~/components/DatabaseAdvisorsIndex'
 import { Extensions } from '~/components/Extensions'
@@ -93,6 +94,7 @@ const components = {
   DatabaseAdvisorsIndex,
   ErrorCodes,
   Extensions,
+  FederatedContentListing,
   GlassPanel,
   IconArrowDown: ArrowDown,
   IconCheck: Check,
