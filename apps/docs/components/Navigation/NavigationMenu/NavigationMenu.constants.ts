@@ -2489,6 +2489,12 @@ export const ai_tools: NavMenuConstant = {
       url: '/guides/ai-tools/ai-skills' as `/${string}`,
       enabled: agentSkillsEnabled,
     },
+    // agent-only instructions: the html page returns 404, and the .md stays available
+    {
+      name: 'Report documentation problems: instructions for agents',
+      url: '/guides/ai-tools/agent-feedback',
+      enabled: false,
+    },
     {
       name: 'Prompts',
       url: '/guides/ai-tools/ai-prompts' as `/${string}`,

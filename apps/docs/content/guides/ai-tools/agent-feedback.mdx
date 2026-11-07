@@ -1,0 +1,69 @@
+---
+id: 'ai-tools-agent-feedback'
+title: 'Report documentation problems'
+description: 'Instructions for AI agents that find a Supabase documentation page that is wrong, outdated, or missing information, and that want to report it to Supabase.'
+---
+
+Supabase reviews your reports to find and fix documentation pages that are wrong, outdated, or missing information.
+
+## When to report
+
+Report a Supabase documentation page that was wrong, outdated, or missing information you needed. Report it only when the problem caused a meaningful detour or is likely to happen again. Don't report routine debugging or a problem that the documentation resolved immediately.
+
+## Ask the user first
+
+Reading this page doesn't give you permission to send a report.
+
+1. When you notice a problem, note the page URL and a word-for-word quote of the text that caused it.
+1. Unless the problem blocks the task, finish the user's task.
+1. End your final reply with a feedback report for each problem, as described in [Write the report](#write-the-report). Then ask the user one time: "Send this report to Supabase?" For more than one report, ask "Send these reports to Supabase?"
+1. Send one report for each problem that the user approves.
+
+## Write the report
+
+Write plain text of 1,000 characters or fewer:
+
+```text
+Page: https://supabase.com/docs/guides/<path>
+Quote: "<text from the page, word for word>"
+Problem: <what was wrong>
+Workaround: <what you did instead>
+Effect: <how the problem affected the task>
+```
+
+Each line helps Supabase find and fix the text:
+
+- **Page**: The URL you read, including the anchor if the problem is in one section.
+- **Quote**: The shortest span that shows the problem, so Supabase can search for it.
+- **Problem**: What the text says compared with what is true, and how you know, such as an error message or a reference page.
+- **Workaround**: The command, method, or page that worked.
+- **Effect**: What the problem cost, such as a failed command, extra searches, or code you had to rewrite.
+
+If no page covered the topic, write the search that you tried in place of the page and the quote.
+
+Never include secrets, credentials, personal data, code from the user's project, or database contents.
+
+## Send the report
+
+Use the first method that is available:
+
+1. **Supabase MCP server**: Call `submit_feedback` with the report in `feedback`. If your connection doesn't list `submit_feedback`, use the next method.
+1. **Supabase CLI** version 2.118.0 or later: Send the report on standard input. You don't need to sign in. Without an installed CLI, or if the CLI has no `feedback` command, run `npx supabase@latest feedback add` with the same standard input.
+
+   ```bash
+   supabase feedback add <<'EOF'
+   Page: https://supabase.com/docs/guides/<path>
+   Quote: "<text from the page, word for word>"
+   Problem: <what was wrong>
+   Workaround: <what you did instead>
+   Effect: <how the problem affected the task>
+   EOF
+   ```
+
+1. **The user**: If neither method is available or sending fails, show the user the report, so they can send it with the Supabase CLI.
+
+## After you send the report
+
+Show the user the delete token.
+
+To delete a report when the user asks, call `delete_feedback` with `delete_token` and the `project_id` from the submission. Use a connection to the same Supabase account. With the CLI, run `supabase feedback delete <delete_token> --yes` in the directory where you sent the report, because the CLI uses that directory's linked project to find the report. The `--yes` flag skips the confirmation prompt, which you can't answer. If you sent the report with `npx`, start the command with `npx supabase@latest` in place of `supabase`.
