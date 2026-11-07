@@ -40,9 +40,9 @@ Each experiment reads its flag through a variant hook. To find the current hooks
 
 1. Before the flags load, use the value from the last visit. The hook stores it in `localStorage`. The cached value can be any variant, not only `control`.
 2. Keep the cached value after `hasLoaded` is `true` if PostHog returns no flags (an empty response or a failed request). Only a non-empty response replaces the cache.
-3. Default to `control` only when there is no cached value and no loaded flag value.
+3. If the cached or loaded flag value is not a known variant, use `control` unless a valid URL override applies.
 4. Let the `?<flag>=<variant>` query parameter override the variant. Only known variants count.
-5. Treat a `false` flag value as "outside the rollout", not as `control`.
+5. Treat a `false` flag value as "outside the rollout", not as an assignment to `control`.
 6. Call `posthogClient.captureExperimentExposure(flag, { variant }, hasAccepted)` only when the loaded flag assigns the visitor and no URL override exists. Pass the consent value from `useConsentState`. A cached value never records an exposure.
 
 Write tests for each variant hook, next to the hook.
@@ -52,7 +52,7 @@ To test a nav variant, override the nav constants for that variant and select th
 ## Gotchas
 
 - `$Show` reads static flags only. It cannot read PostHog flags. For a PostHog-driven change, branch in a React component with a variant hook.
-- The server renders `control`, so a visitor in another variant can see a flicker. To limit it, add an inline script to `app/layout.tsx`. The script reads the URL override or the cached value before paint and marks `<html>`. The changed component hides itself until hydration when that mark is set.
+- The server renders `control`, so a visitor in another variant can see a flicker. To limit it, add an inline script to `app/layout.tsx`. The script reads the URL override or the cached value before paint and marks `<html>`. The changed component hides itself until hydration when that mark is set. Add a fallback that restores visibility if hydration does not complete.
 - A first-time visitor has no cached value, so the flicker can still happen on the first visit.
 - Exposure is not recorded for a forced variant (URL override) or for a cached value.
 - The cache is a `localStorage` value. A stale value can show the wrong variant until the flags load.
