@@ -35,9 +35,9 @@ export function createEmptyGrant(roleId: string): JitRoleGrantDraft {
     roleId,
     enabled: false,
     branchesOnly: false,
-    expiryMode: '1h',
-    hasExpiry: true,
-    expiry: getRelativeDatetimeByMode('1h'),
+    expiryMode: 'never',
+    hasExpiry: false,
+    expiry: '',
     ipRanges: [createEmptyIpRange()],
   }
 }
