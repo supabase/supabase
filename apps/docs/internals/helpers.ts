@@ -12,7 +12,7 @@ export function stripHeadingCustomIds(tree: Root): void {
     if (last?.type !== 'text') return
     const text = last.value.trimEnd()
     const anchorStart = text.lastIndexOf('[#')
-    if (anchorStart === -1 || !text.endsWith(']')) return
+    if (anchorStart === -1 || text.indexOf(']', anchorStart) !== text.length - 1) return
     last.value = text.slice(0, anchorStart).trimEnd()
   })
 }
