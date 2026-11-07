@@ -19,6 +19,7 @@ import { get } from '@/data/fetchers'
 import { logsAllEndpointUrl } from '@/data/logs/logs-endpoint'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
+import { getErrorMessage } from '@/lib/get-error-message'
 
 export interface LogsQueryHook {
   params: LogsEndpointParams
@@ -98,8 +99,14 @@ export const useLogsQuery = ({
     refetchOnWindowFocus: false,
   })
 
+  // Self-hosted routes return `{ error: { message } }`; the platform API returns `{ message }`.
+  const nestedError =
+    typeof rqError === 'object' && rqError !== null && 'error' in rqError
+      ? rqError.error
+      : undefined
+
   let error: null | string | object = rqError
-    ? ((rqError as any).message ?? (rqError as any).error?.message ?? rqError)
+    ? (getErrorMessage(rqError) ?? getErrorMessage(nestedError) ?? rqError)
     : null
 
   if (!error && data?.error) {
