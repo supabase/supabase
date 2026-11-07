@@ -85,7 +85,7 @@ const buildSnippetMetadata = (
   inserted_at: createdAt.toISOString(),
   updated_at: createdAt.toISOString(),
   type: 'sql',
-  name: filename.replace('.sql', ''),
+  name: filename,
   description: '',
   favorite: false,
   visibility: 'user',
@@ -189,7 +189,7 @@ export async function getFilesystemEntries({
           includeContent ? fs.readFile(itemPath, 'utf-8') : Promise.resolve(undefined),
           fs.stat(itemPath),
         ])
-        const snippetName = item.name.replace('.sql', '')
+        const snippetName = item.name.slice(0, -'.sql'.length)
 
         entries.push({
           id: generateDeterministicUuid([folderId, `${snippetName}.sql`]),
