@@ -182,7 +182,7 @@ export const formatWrapperTables = (
 
   return tables.map((table) => {
     let index: number = 0
-    const options = Object.fromEntries(table.options.map((option: string) => option.split('=')))
+    const options = convertKVStringArrayToJson(table.options)
 
     switch (wrapper.handler) {
       case WRAPPER_HANDLERS.STRIPE:
@@ -222,8 +222,15 @@ export const formatWrapperTables = (
   })
 }
 
+// Options are stored by Postgres as `key=value` strings. Only split on the first `=` since
+// values can contain `=` themselves (e.g. a subquery in a table option or a URL query string)
 export const convertKVStringArrayToJson = (values: string[]): Record<string, string> => {
-  return Object.fromEntries(values.map((value) => value.split('=')))
+  return Object.fromEntries(
+    values.map((value) => {
+      const index = value.indexOf('=')
+      return index === -1 ? [value, ''] : [value.slice(0, index), value.slice(index + 1)]
+    })
+  )
 }
 
 export function wrapperMetaComparator(
