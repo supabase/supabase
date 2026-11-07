@@ -98,7 +98,9 @@ export const useLogsQuery = ({
     refetchOnWindowFocus: false,
   })
 
-  let error: null | string | object = rqError ? (rqError as any).message : null
+  let error: null | string | object = rqError
+    ? ((rqError as any).message ?? (rqError as any).error?.message ?? rqError)
+    : null
 
   if (!error && data?.error) {
     error = data?.error
