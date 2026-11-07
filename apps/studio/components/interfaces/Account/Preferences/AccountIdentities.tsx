@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { EditIcon, UnlinkIcon } from 'lucide-react'
+import { EditIcon, MailIcon, UnlinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -11,6 +11,7 @@ import {
   Button,
   Card,
   CardContent,
+  cn,
   Dialog,
   DialogContent,
   DialogHeader,
@@ -37,11 +38,16 @@ import {
   GitHubChangeEmailAddress,
   SSOChangeEmailAddress,
 } from './ChangeEmailAddress'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { IdentityProviderIcon } from '@/components/ui/ProviderIcon'
 import { useProfileIdentitiesQuery } from '@/data/profile/profile-identities-query'
 import { useUnlinkIdentityMutation } from '@/data/profile/profile-unlink-identity-mutation'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import {
+  evaluateAccountRecovery,
+  type AccountRecoveryFinding,
+} from '@/lib/account-recovery/evaluate-account-recovery'
 import { captureCriticalError } from '@/lib/error-reporting'
 import {
   buildProviderAuthRedirect,
@@ -51,10 +57,14 @@ import {
 import { getErrorMessage } from '@/lib/get-error-message'
 import { auth, buildPathWithParams } from '@/lib/gotrue'
 
-export const AccountIdentities = () => {
+export const AccountIdentities = ({
+  primaryAction,
+}: {
+  primaryAction?: AccountRecoveryFinding['action'] | 'enable-mfa'
+} = {}) => {
   const router = useRouter()
 
-  const { data, isPending: isLoading, isSuccess } = useProfileIdentitiesQuery()
+  const { data, isPending: isLoading, isSuccess, isError, error } = useProfileIdentitiesQuery()
 
   const enabledProviders = useEnabledIdentityProviders()
   const connectableExternalProviders = useMemo(
@@ -65,6 +75,18 @@ export const AccountIdentities = () => {
   const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
 
   const identities = data?.identities ?? []
+  const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
+  const passwordFinding = evaluateAccountRecovery({
+    identities,
+    email: data?.email,
+    verifiedFactorCount: 0,
+    recoveryCodes: { status: 'unknown' },
+    features: {
+      hasSecuritySettings: false,
+      recoveryCodesEnabled: false,
+      passwordEnabled: isAddAccountPasswordEnabled,
+    },
+  }).find((finding) => finding.id === 'single-oauth-identity')
   const showAddPasswordRow =
     isAddAccountPasswordEnabled && shouldShowAddPasswordRow({ identities, email: data?.email })
   const isChangeExpired = data?.email_change_sent_at
@@ -130,16 +152,24 @@ export const AccountIdentities = () => {
   }, [message])
 
   return (
-    <PageSection>
+    <PageSection id="sign-in-methods" className="scroll-mt-6">
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Sign-in methods</PageSectionTitle>
           <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
+            Choose how you sign in to your Supabase account.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
-      <PageSectionContent>
+      <PageSectionContent className="flex flex-col gap-4">
+        {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
+        {isSuccess && showAddPasswordRow && !!data.email && (
+          <AddPasswordRow
+            email={data.email}
+            providerName={passwordFinding ? getProviderName(identities[0]?.provider) : undefined}
+            isPrimary={primaryAction === 'set-password'}
+          />
+        )}
         <Card>
           {isLoading && (
             <CardContent>
@@ -148,8 +178,6 @@ export const AccountIdentities = () => {
           )}
           {isSuccess && (
             <div className="divide-y">
-              {showAddPasswordRow && !!data.email && <AddPasswordRow email={data.email} />}
-
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
                 const username = identity.identity_data?.user_name
@@ -159,9 +187,12 @@ export const AccountIdentities = () => {
                 const canUpdateEmail = !configuredProvider
 
                 return (
-                  <CardContent key={identity_id} className="flex justify-between items-center py-4">
+                  <CardContent
+                    key={identity_id}
+                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
                     <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                      <SignInMethodIcon provider={provider} />
                       <div>
                         <div className="flex items-center gap-x-2">
                           <p className="text-sm capitalize">{providerName}</p>
@@ -182,23 +213,25 @@ export const AccountIdentities = () => {
                     </div>
                     <div className="flex items-center gap-x-1">
                       {provider === 'email' && (
-                        <Button asChild>
+                        <Button variant="default" asChild>
                           <Link href="/reset-password?type=change">Change password</Link>
                         </Button>
                       )}
                       {canUpdateEmail && (
                         <ButtonTooltip
-                          variant="text"
-                          icon={<EditIcon />}
-                          className="w-7"
+                          variant="default"
+                          size="tiny"
+                          icon={<EditIcon size={14} />}
+                          aria-label="Update email address"
                           onClick={() => setSelectedProviderUpdateEmail(provider)}
-                          tooltip={{ content: { side: 'bottom', text: 'Update email address' } }}
+                          tooltip={{ content: { side: 'top', text: 'Update email address' } }}
                         />
                       )}
                       {identities.length > 1 && (
                         <ButtonTooltip
                           variant="text"
                           icon={<UnlinkIcon />}
+                          aria-label={`Unlink ${providerName} identity`}
                           className="w-7"
                           onClick={() => setSelectedProviderUnlink(provider)}
                           tooltip={{ content: { side: 'bottom', text: 'Unlink identity' } }}
@@ -210,12 +243,13 @@ export const AccountIdentities = () => {
               })}
 
               {unlinkedExternalProviders.map((provider) => {
-                const providerDisplay = getProviderDisplay(provider.authProvider)
-
                 return (
-                  <CardContent key={provider.id} className="flex justify-between items-center py-4">
+                  <CardContent
+                    key={provider.id}
+                    className="flex flex-col items-start gap-4 py-4 sm:flex-row sm:items-center sm:justify-between"
+                  >
                     <div className="flex gap-x-4">
-                      <IdentityProviderIcon display={providerDisplay} size={30} />
+                      <SignInMethodIcon provider={provider.authProvider} />
                       <div>
                         <p className="text-sm">{provider.displayName}</p>
                         <p className="text-sm text-foreground-lighter">
@@ -225,6 +259,7 @@ export const AccountIdentities = () => {
                       </div>
                     </div>
                     <Button
+                      variant="default"
                       loading={linkingProviderId === provider.id}
                       disabled={!!linkingProviderId}
                       onClick={() => onLinkExternalProvider(provider)}
@@ -237,6 +272,11 @@ export const AccountIdentities = () => {
             </div>
           )}
         </Card>
+        {isSuccess && isManagedAccount && (
+          <p className="text-sm text-foreground-light">
+            Your organization manages how you sign in.
+          </p>
+        )}
 
         <Dialog
           open={!!selectedProviderUpdateEmail}
@@ -281,5 +321,23 @@ export const AccountIdentities = () => {
         />
       </PageSectionContent>
     </PageSection>
+  )
+}
+
+const SignInMethodIcon = ({ provider }: { provider: string }) => {
+  const display = getProviderDisplay(provider)
+  return (
+    <div
+      className={cn(
+        'flex h-9 w-9 shrink-0 items-center justify-center rounded-full',
+        display.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'
+      )}
+    >
+      {provider === 'email' ? (
+        <MailIcon size={18} strokeWidth={2.5} />
+      ) : (
+        <IdentityProviderIcon display={display} size={30} />
+      )}
+    </div>
   )
 }
