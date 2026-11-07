@@ -28,3 +28,36 @@ See how these tools perform on real Supabase tasks in [Supabase Evals](/evals), 
 Agents that work in separate git worktrees or branches each need their own database. Otherwise migrations and seed data from one task affect another. With the experimental `supabase stack` commands turned on, `supabase start` gives each worktree or branch its own local Supabase project with its own ports and data. Agents that share one checkout and branch share a local project, so give each agent its own worktree. The commands also run without Docker on Linux and on macOS on Apple silicon, which covers agent sandboxes that have no container engine. See [Running multiple local projects](/docs/guides/local-development/running-multiple-local-projects) and [Docker and native runtimes](/docs/guides/local-development/docker-and-native-runtimes).
 
 <ContentListings id="ai-tools-building-into-app" />
+
+## Report documentation problems
+
+When an AI agent finds that a Supabase documentation page is wrong, outdated, or missing information, it can report the problem to Supabase. Supabase reviews reports to find and fix pages.
+
+### Approve or request a report
+
+Supabase tells agents to ask for your approval before they send a report. The instruction is in a note at the top of each guide's Markdown version and in the Supabase MCP server. The MCP server and the Supabase CLI don't ask for approval themselves.
+
+After the agent finishes your task, or when a problem blocks the task, it ends its reply with a feedback report and asks you one time whether to send it to Supabase.
+
+If you say yes, the agent sends the report with the Supabase MCP server or the Supabase CLI. It then shows you a delete token, which you can use to delete the report. If neither tool is available, the agent shows you the report so you can send it with `supabase feedback add`.
+
+To ask for a report yourself, tell your agent, for example: "Report the problem you found in the Auth guide to Supabase."
+
+### What a report contains
+
+A report is plain text of 1,000 characters or fewer. It names the page, quotes the text that caused the problem, and says how the problem affected the task. Supabase tells agents to leave out secrets, credentials, personal data, code from your project, and database contents.
+
+Each report also records the following:
+
+- The tool and its version
+- From the MCP server, the MCP client name and version
+- From the CLI, whether an agent ran it, the agent name, your operating system, and your CPU architecture
+- When available, your Supabase user ID and project ref
+
+### Turn off or delete reports
+
+To stop reports through the MCP server, set the server's `features` parameter to the groups you use and leave out `feedback`, or turn on read-only mode. Read-only mode also hides the tool that deletes reports. For more information, see [MCP server configuration options](/docs/guides/ai-tools/mcp#configuration-options).
+
+These settings don't stop the CLI. An agent with a shell can still send a report with it. If you don't want reports, tell your agent.
+
+To delete a report, ask your agent to delete it with its delete token, or run `supabase feedback delete` with that token.
