@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, use, useCallback, useMemo, useState } from 'react'
+import { createContext, use, useCallback, useMemo, useRef, useState } from 'react'
 
 import type { RootProps, TimeWindow, TraceIndex, ViewContextValue } from './types'
 import { buildTraceIndex, clampWindow } from './utils'
@@ -36,6 +36,7 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
     [bounds]
   )
   const resetWindow = useCallback(() => setZoom(null), [])
+  const treeRef = useRef<HTMLDivElement>(null)
 
   const view = useMemo<ViewContextValue>(
     () => ({
@@ -47,6 +48,7 @@ export function Root({ trace, minRangeMs, defaultCollapsed, children }: RootProp
       setCollapsed,
       setWindow,
       resetWindow,
+      treeRef,
     }),
     [selectedId, collapsed, window, zoom, setCollapsed, setWindow, resetWindow]
   )
