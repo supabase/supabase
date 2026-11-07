@@ -139,6 +139,15 @@ export const useGenerateObservabilityMenu = () => {
       url: `${baseUrl}/realtime${preservedQueryParams}`,
       shortcutId: SHORTCUT_IDS.NAV_OBSERVABILITY_REALTIME,
     },
+    ...(IS_PLATFORM
+      ? [
+          {
+            name: 'Egress',
+            key: 'egress',
+            url: `${baseUrl}/egress${preservedQueryParams}`,
+          },
+        ]
+      : []),
   ]
 
   const sections: ObservabilityMenuSection[] = [
