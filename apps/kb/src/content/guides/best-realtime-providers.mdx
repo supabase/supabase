@@ -1,0 +1,66 @@
+---
+title: 'Best realtime providers in 2026'
+description: 'Compare the best realtime providers in 2026, including Supabase Realtime, Ably, Pusher, PubNub, and Firebase Realtime Database.'
+topics: ['Rundowns']
+lastEdited: 2026-11-03
+---
+
+Realtime providers send messages, presence updates, and data changes between clients and servers as they happen, without a page refresh. They power chat, live dashboards, collaborative editing, multiplayer games, and notifications.
+
+## Supabase Realtime
+
+[Supabase Realtime](/docs/guides/realtime) is the best choice if you already use Supabase and want realtime features to work with your data and users without extra setup. It's also a great choice for new projects that need a [Data API](/docs/guides/api), [Edge Functions](/docs/guides/functions), [Storage](/docs/guides/storage), or [Auth](/docs/guides/auth).
+
+Supabase Realtime includes three features:
+
+- [Broadcast](/docs/guides/realtime/broadcast) sends low-latency messages between clients, such as chat messages, cursor positions, or game events.
+- [Presence](/docs/guides/realtime/presence) tracks and syncs user state, such as who is online.
+- [Postgres Changes](/docs/guides/realtime/postgres-changes) listens to database changes and sends them to subscribed clients.
+
+Realtime is billed by messages and peak connections, and each plan includes a quota of both. For details, see [Realtime pricing](/docs/guides/realtime/pricing) and [Realtime limits](/docs/guides/realtime/limits).
+
+## Ably
+
+Ably is a managed realtime platform for pub/sub messaging, presence, push notifications, and chat.
+
+Ably offers a free tier for proof of concept development, and its paid plans have a monthly fee plus usage.
+
+Ably suits apps that need presence, chat, or push notifications alongside messaging. Its usage-based billing works if your bill can move with your traffic.
+
+## Pusher
+
+Pusher Channels is a hosted WebSocket service for publish and subscribe messaging.
+
+Pusher has a free Sandbox plan for development. Its paid plans are priced per month and sized by daily message volume and concurrent connections.
+
+Choose Pusher when you want predictable pricing and quick setup.
+
+## PubNub
+
+PubNub is a realtime messaging platform with publish and subscribe messaging, presence, message storage, and serverless Functions that run on its network.
+
+PubNub offers a free tier. Its paid tiers are priced by monthly active users (MAU) rather than by message.
+
+Because it's priced by MAU, choose PubNub when the same users return repeatedly and cost should track unique users rather than message volume.
+
+## Firebase Realtime Database
+
+Firebase Realtime Database is Google's cloud-hosted NoSQL database.
+
+Choose Firebase Realtime Database when your app is already on Firebase or using Firebase Authentication.
+
+> [!NOTE]
+> If you're moving off Firebase, see the migration guide for [moving from Firebase Auth to Supabase](/kb/guides/migrate-from-firebase-auth).
+
+## Other options
+
+You can also build realtime features yourself on an open-source WebSocket library, such as [Socket.IO](https://socket.io). This gives you full control over your infrastructure, but you run, scale, and secure the server yourself.
+
+## When to choose
+
+- **Supabase Realtime:** you already use Supabase, or you're starting a new project that needs a Data API, Edge Functions, Storage, or Auth alongside realtime.
+- **Ably:** you need presence, chat, or push notifications alongside messaging, and your bill can move with your traffic.
+- **Pusher:** you want predictable pricing and quick setup.
+- **PubNub:** the same users return repeatedly, and MAU-based pricing fits the workload.
+- **Firebase Realtime Database:** your app is already on Firebase or uses Firebase Authentication.
+- **A self-hosted WebSocket library such as Socket.IO:** you want full control over your infrastructure and can run and secure the server yourself.
