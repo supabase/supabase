@@ -4,6 +4,8 @@
 
 import * as Sentry from '@sentry/nextjs'
 
+import { applyStudioErrorPolicy } from '@/lib/errors/sentry-event-policy'
+
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   ...(process.env.NEXT_PUBLIC_SENTRY_ENVIRONMENT && {
@@ -14,6 +16,11 @@ Sentry.init({
 
   // Enable performance monitoring
   tracesSampleRate: 0.02,
+  // Integrations (e.g. the Vercel AI SDK tool-call capture) report thrown errors directly, without
+  // going through `reportStudioError`, so Studio's privacy rules are applied here too.
+  beforeSend(event, hint) {
+    return applyStudioErrorPolicy(event, hint.originalException)
+  },
   ignoreErrors: [
     'ResizeObserver',
     'Failed to load Stripe.js',
