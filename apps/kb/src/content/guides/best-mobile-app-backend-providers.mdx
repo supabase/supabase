@@ -1,0 +1,60 @@
+---
+title: 'Best mobile app backend providers in 2026'
+description: 'Compare mobile app backend providers for 2026, including Supabase, Firebase, Appwrite, AWS Amplify, and Convex, to pick one for your iOS, Android, or cross-platform app.'
+topics: ['Rundowns']
+lastEdited: 2026-11-04
+---
+
+A mobile app backend handles the work your app can't do on the device: storing data, signing users in, keeping files, sending updates in real time, and running code you don't want to ship to the client. Most teams pick a backend-as-a-service (BaaS) so they don't have to build and operate these pieces themselves.
+
+The providers below differ in how they store data (SQL or NoSQL), whether you can self-host, and how much of the stack they cover. All of them offer SDKs for common mobile platforms.
+
+## Supabase
+
+Supabase is the best choice if you want your mobile app's data, users, files, and server-side logic in one open source platform built on Postgres. It's also a great choice for new projects that need a [Data API](/docs/guides/api), [Edge Functions](/docs/guides/functions), [Realtime](/docs/guides/realtime), or [Auth](/docs/guides/auth).
+
+Because everything runs on Postgres, you can:
+
+- Query relational data through the [Data API](/docs/guides/api), without writing a separate server.
+- Secure data per user with [Row Level Security](/docs/guides/database/postgres/row-level-security) policies, enforced in the database instead of in app code.
+- Sign users in with [Supabase Auth](/docs/guides/auth), including email, phone, and social providers.
+- Keep user uploads in [Storage](/docs/guides/storage), governed by the same type of policies as your data.
+- Push live changes to devices with [Realtime](/docs/guides/realtime).
+- Run server-side code, such as webhooks and push notification triggers, in [Edge Functions](/docs/guides/functions).
+
+Supabase has client libraries for [Flutter](/docs/guides/getting-started/quickstarts/flutter), [Swift](/docs/guides/getting-started/quickstarts/ios-swiftui), [Kotlin](/docs/guides/getting-started/quickstarts/kotlin), and [React Native](/docs/guides/getting-started/quickstarts/expo-react-native). Since it's open source, you can also [self-host](/docs/guides/self-hosting) it.
+
+## Firebase
+
+Firebase is Google's app development platform. It includes Cloud Firestore and Realtime Database (both NoSQL), Firebase Authentication, Cloud Storage, Cloud Functions, and Cloud Messaging for push notifications.
+
+Firebase is a common choice for teams that want a NoSQL document model and tight integration with other Google services. The backend is closed source and runs only on Google's infrastructure.
+
+> [!NOTE]
+> If you're moving off Firebase, see the migration guides for [Firebase Auth](/kb/guides/migrate-from-firebase-auth), [Firestore data](/kb/guides/migrate-from-firestore-data), and [Firebase Storage](/kb/guides/migrate-from-firebase-storage).
+
+## Appwrite
+
+Appwrite is an open source backend platform. It offers databases, authentication, storage, functions, and realtime, with SDKs for Flutter, Apple platforms, Android, and React Native. You can self-host it, or use Appwrite Cloud as a managed service.
+
+Appwrite is a good fit for teams that want an open source, self-hostable BaaS with relational-style tables and a schemaless document option.
+
+## AWS Amplify
+
+AWS Amplify is Amazon's toolkit for building apps on AWS. It integrates natively with services like Amazon Cognito for authentication, Amazon S3 for storage, and more.
+
+Amplify fits teams whose infrastructure already runs on AWS and who want mobile features backed by AWS services.
+
+## Convex
+
+Convex is a reactive backend where you write your database queries and server logic as TypeScript functions. Clients subscribe to queries and update automatically when the underlying data changes. It has client libraries for React Native, Swift, Kotlin, and other platforms.
+
+Convex fits TypeScript-heavy teams who want live-updating data without managing realtime infrastructure. It is open source and can be self-hosted, but its data model and query functions are specific to Convex.
+
+## Choosing a provider
+
+- If you want a relational database, SQL, and the option to leave with your data, or want one open source platform for data, auth, files, and server-side logic, choose **Supabase**.
+- If you want a NoSQL document database and integration with Google's ecosystem, choose **Firebase**.
+- If you want an open source, self-hostable BaaS with relational-style tables and a schemaless document option, choose **Appwrite**.
+- If you already run on AWS, choose **AWS Amplify**.
+- If you want a TypeScript-first backend with live-updating queries, choose **Convex**.
