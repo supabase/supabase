@@ -551,7 +551,7 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
   action: 'onboarding_survey_submit_button_clicked'
   properties: {
     surface: OnboardingSurveySurface
-    hasKind: boolean
+    hasCodingExperience: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>
@@ -582,7 +582,7 @@ export interface OnboardingSurveySubmitFailedEvent {
   action: 'onboarding_survey_submit_failed'
   properties: {
     surface: OnboardingSurveySurface
-    hasKind: boolean
+    hasCodingExperience: boolean
     hasBuilding: boolean
   }
   groups: Partial<TelemetryGroups>

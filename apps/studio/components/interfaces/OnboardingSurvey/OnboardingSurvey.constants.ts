@@ -1,12 +1,47 @@
-import { ORG_KIND_TYPES, type OrgKind } from '../Organization/NewOrg/OrganizationDetailsFields'
-
-export const BUILDING_MAX_LENGTH = 500
-
 // How long after creating an org its creator can be asked the survey again
 export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000
 
-export const BUILDING_PLACEHOLDER =
-  'e.g. realtime collaboration, an AI support workflow, or an operations dashboard'
+export const BUILDING_OPTIONS = [
+  { value: 'ai_assistant_or_agent', label: 'AI assistant or agent' },
+  { value: 'ai_search_or_knowledge_base', label: 'AI search or knowledge base' },
+  { value: 'b2b_saas', label: 'B2B SaaS application' },
+  { value: 'internal_tool_or_automation', label: 'Internal tool or workflow automation' },
+  { value: 'consumer_app', label: 'Consumer web or mobile app' },
+  { value: 'social_or_community', label: 'Social or community app' },
+  { value: 'marketplace_or_booking', label: 'Marketplace or booking platform' },
+  { value: 'ecommerce', label: 'E-commerce or commerce platform' },
+  { value: 'developer_tool_or_app_builder', label: 'Developer tool or app-building platform' },
+  { value: 'analytics_or_reporting', label: 'Analytics or reporting application' },
+  { value: 'other', label: 'Other' },
+] as const
+
+export const CODING_EXPERIENCE_OPTIONS = [
+  {
+    value: 'beginner',
+    label: 'Beginner',
+    description: 'I have little or no experience reading or writing code',
+  },
+  {
+    value: 'learning',
+    label: 'Learning',
+    description: 'I can understand and modify code with guidance',
+  },
+  {
+    value: 'intermediate',
+    label: 'Intermediate',
+    description: 'I can build applications and troubleshoot common issues',
+  },
+  {
+    value: 'advanced',
+    label: 'Advanced',
+    description: 'I can independently build, debug, and maintain production applications',
+  },
+  {
+    value: 'expert',
+    label: 'Expert',
+    description: "I'm comfortable designing complex systems and infrastructure",
+  },
+] as const
 
 export {
   ORG_KIND_DEFAULT,
@@ -14,12 +49,6 @@ export {
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
 } from '../Organization/NewOrg/OrganizationDetailsFields'
-
-// Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?"
-export const SURVEY_ORG_KIND_TYPES: Record<OrgKind, string> = {
-  ...ORG_KIND_TYPES,
-  UNDISCLOSED: 'Prefer not to say',
-}
 
 export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
 

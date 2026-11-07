@@ -57,5 +57,11 @@ export function useOnboardingSurveyFollowUp() {
     [setStoredState]
   )
 
-  return { isEligible, orgSlug, resolveFollowUp }
+  return {
+    isEligible,
+    orgSlug,
+    orgKind: followUpState?.kind,
+    orgSize: followUpState?.size,
+    resolveFollowUp,
+  }
 }

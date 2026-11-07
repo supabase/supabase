@@ -6,6 +6,10 @@ import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.consta
 const followUpStateSchema = z.object({
   status: z.enum(['pending', 'submitted', 'dismissed']),
   orgCreatedAt: z.string(),
+  // The org's type and size from the new-org form, saved with the follow-up's
+  // answers since the form sent nothing at creation
+  kind: z.string().optional(),
+  size: z.string().optional(),
 })
 
 export type OnboardingSurveyFollowUpState = z.infer<typeof followUpStateSchema>
@@ -28,15 +32,21 @@ export function parseFollowUpState(value: unknown): OnboardingSurveyFollowUpStat
 export function markFollowUpPending({
   profileId,
   orgSlug,
+  kind,
+  size,
   now = new Date(),
 }: {
   profileId: string
   orgSlug: string
+  kind?: string
+  size?: string
   now?: Date
 }) {
   const state: OnboardingSurveyFollowUpState = {
     status: 'pending',
     orgCreatedAt: now.toISOString(),
+    kind,
+    size,
   }
   safeLocalStorage.setItem(getFollowUpStorageKey(profileId, orgSlug), JSON.stringify(state))
 }

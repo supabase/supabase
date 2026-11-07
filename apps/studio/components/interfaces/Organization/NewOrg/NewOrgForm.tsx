@@ -23,7 +23,6 @@ import {
   SelectTrigger,
   SelectValue,
   Switch,
-  Textarea,
 } from 'ui'
 import { CollapsibleCardSection } from 'ui-patterns/CollapsibleCardSection'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -41,13 +40,12 @@ import {
 } from '@/components/interfaces/Billing/Payment/PaymentMethods/NewPaymentMethodElement'
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
-  BUILDING_MAX_LENGTH,
-  BUILDING_PLACEHOLDER,
+  BUILDING_OPTIONS,
+  CODING_EXPERIENCE_OPTIONS,
   ORG_KIND_DEFAULT,
   ORG_KIND_TYPES,
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
-  SURVEY_ORG_KIND_TYPES,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
 import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
@@ -88,7 +86,8 @@ const formSchema = organizationDetailsSchema.extend({
     .transform((val) => val.toUpperCase())
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
-  building: z.string().max(BUILDING_MAX_LENGTH).optional(),
+  building: z.string(),
+  coding_experience: z.string(),
 })
 
 type FormState = z.infer<typeof formSchema>
@@ -162,6 +161,7 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: '',
+      coding_experience: '',
     },
   })
 
@@ -190,6 +190,7 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: form.getValues('building'),
+      coding_experience: form.getValues('coding_experience'),
     })
   }, [defaultValues, form])
 
@@ -294,31 +295,32 @@ export const NewOrgForm = ({
     async (slug: string) => {
       if (!showOnboardingSurveyInOrgForm) return
 
-      const building = form.getValues('building')?.trim()
+      const building = form.getValues('building')
+      const codingExperience = form.getValues('coding_experience')
       const kind = form.getValues('kind')
       const size = kind === 'COMPANY' ? form.getValues('size') : undefined
-      // Kind always holds a value, so only count it as answered when changed
-      const hasKind = kind.toUpperCase() !== defaultValues.kind.toUpperCase()
-      const hasBuilding = !!building
+      const hasBuilding = building !== ''
+      const hasCodingExperience = codingExperience !== ''
       const profileId = user.profile?.gotrue_id
 
       const groupOverrides = { organization: slug }
 
       // Nothing answered: send nothing yet so the creator's follow-up answers
-      // aren't dropped (the survey endpoint keeps one response per user and org)
-      if (!hasKind && !hasBuilding) {
+      // aren't dropped (the survey endpoint keeps one response per user and org).
+      // Kind/size ride along with the follow-up, since this is their only save path.
+      if (!hasBuilding && !hasCodingExperience) {
         track(
           'onboarding_survey_dismissed',
           { surface: 'org_form', reason: 'org_form_blank' },
           groupOverrides
         )
-        if (profileId) markFollowUpPending({ profileId, orgSlug: slug })
+        if (profileId) markFollowUpPending({ profileId, orgSlug: slug, kind, size })
         return
       }
 
       track(
         'onboarding_survey_submit_button_clicked',
-        { surface: 'org_form', hasKind, hasBuilding },
+        { surface: 'org_form', hasBuilding, hasCodingExperience },
         groupOverrides
       )
 
@@ -330,23 +332,17 @@ export const NewOrgForm = ({
           kind,
           size,
           building: building || undefined,
+          coding_experience: codingExperience || undefined,
         })
       } catch {
         track(
           'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasKind, hasBuilding },
+          { surface: 'org_form', hasBuilding, hasCodingExperience },
           groupOverrides
         )
       }
     },
-    [
-      defaultValues.kind,
-      form,
-      showOnboardingSurveyInOrgForm,
-      submitOnboardingSurvey,
-      track,
-      user.profile?.gotrue_id,
-    ]
+    [form, showOnboardingSurveyInOrgForm, submitOnboardingSurvey, track, user.profile?.gotrue_id]
   )
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
@@ -494,21 +490,15 @@ export const NewOrgForm = ({
     return onPaymentMethodReset()
   }
 
-  const buildingPlaceholder = BUILDING_PLACEHOLDER
-
-  const orgKindLabels = showOnboardingSurveyInOrgForm ? SURVEY_ORG_KIND_TYPES : ORG_KIND_TYPES
-
   const orgKindField = (
     <FormField
       control={form.control}
       name="kind"
       render={({ field }) => (
         <FormItemLayout
-          label={showOnboardingSurveyInOrgForm ? 'Who is this org for?' : 'Type'}
+          label="Type"
           layout="horizontal"
-          description={
-            showOnboardingSurveyInOrgForm ? undefined : 'What best describes your organization?'
-          }
+          description="What best describes your organization?"
         >
           <FormControl>
             <Select value={field.value} onValueChange={field.onChange}>
@@ -517,7 +507,7 @@ export const NewOrgForm = ({
               </SelectTrigger>
 
               <SelectContent>
-                {Object.entries(orgKindLabels).map(([k, v]) => (
+                {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
                   <SelectItem key={k} value={k}>
                     {v}
                   </SelectItem>
@@ -535,7 +525,11 @@ export const NewOrgForm = ({
       control={form.control}
       name="size"
       render={({ field }) => (
-        <FormItemLayout label="How many people?" layout="horizontal">
+        <FormItemLayout
+          label="Company size"
+          layout="horizontal"
+          description="How many people are in your company?"
+        >
           <FormControl>
             <Select value={field.value} onValueChange={field.onChange}>
               <SelectTrigger className="w-full">
@@ -556,37 +550,52 @@ export const NewOrgForm = ({
     />
   )
 
-  const buildingField = (
-    <FormField
-      control={form.control}
-      name="building"
-      render={({ field }) => (
-        <FormItemLayout label="What are you building?" layout="horizontal">
-          <FormControl>
-            <div className="relative">
-              <Textarea
-                {...field}
-                value={field.value ?? ''}
-                rows={3}
-                maxLength={BUILDING_MAX_LENGTH}
-                placeholder={buildingPlaceholder}
-                className="resize-none pb-6"
-              />
-              <span className="pointer-events-none absolute bottom-1.5 right-2 text-xs text-foreground-lighter">
-                {(field.value ?? '').length}/{BUILDING_MAX_LENGTH}
-              </span>
-            </div>
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
-  )
-
   const onboardingSurveyFields = (
     <div className="flex flex-col gap-y-5">
-      {orgKindField}
-      {orgSizeField}
-      {buildingField}
+      <FormField
+        control={form.control}
+        name="building"
+        render={({ field }) => (
+          <FormItemLayout label="What are you building?" layout="horizontal">
+            <FormControl>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  {BUILDING_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+      <FormField
+        control={form.control}
+        name="coding_experience"
+        render={({ field }) => (
+          <FormItemLayout label="How comfortable are you working with code?" layout="horizontal">
+            <FormControl>
+              <Select value={field.value} onValueChange={field.onChange}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Select an option" />
+                </SelectTrigger>
+                <SelectContent>
+                  {CODING_EXPERIENCE_OPTIONS.map((option) => (
+                    <SelectItem key={option.value} value={option.value}>
+                      {option.label} - {option.description}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
     </div>
   )
 
@@ -796,7 +805,10 @@ export const NewOrgForm = ({
               <UpgradeExistingOrganizationCallout />
             )}
 
-            {showOnboardingSurveyInOrgForm ? (
+            <Panel.Content>{orgKindField}</Panel.Content>
+            {orgSizeField && <Panel.Content>{orgSizeField}</Panel.Content>}
+
+            {showOnboardingSurveyInOrgForm && (
               <Panel.Content>
                 <CollapsibleCardSection
                   title="Help improve Supabase"
@@ -806,11 +818,6 @@ export const NewOrgForm = ({
                   {onboardingSurveyFields}
                 </CollapsibleCardSection>
               </Panel.Content>
-            ) : (
-              <>
-                <Panel.Content>{orgKindField}</Panel.Content>
-                {orgSizeField && <Panel.Content>{orgSizeField}</Panel.Content>}
-              </>
             )}
           </div>
         </Panel>

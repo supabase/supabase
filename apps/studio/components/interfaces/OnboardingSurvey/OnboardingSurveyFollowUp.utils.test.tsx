@@ -63,6 +63,25 @@ describe('markFollowUpPending', () => {
     const stored = safeLocalStorage.getItem(getFollowUpStorageKey('user-1', 'new-org'))
     expect(JSON.parse(stored!)).toEqual({ status: 'pending', orgCreatedAt: now.toISOString() })
   })
+
+  it('stores the org type and size for the follow-up to save', () => {
+    const now = new Date('2026-10-30T10:00:00.000Z')
+    markFollowUpPending({
+      profileId: 'user-1',
+      orgSlug: 'new-org',
+      kind: 'COMPANY',
+      size: '10',
+      now,
+    })
+
+    const stored = safeLocalStorage.getItem(getFollowUpStorageKey('user-1', 'new-org'))
+    expect(parseFollowUpState(JSON.parse(stored!))).toEqual({
+      status: 'pending',
+      orgCreatedAt: now.toISOString(),
+      kind: 'COMPANY',
+      size: '10',
+    })
+  })
 })
 
 describe('isProjectCreationPath', () => {

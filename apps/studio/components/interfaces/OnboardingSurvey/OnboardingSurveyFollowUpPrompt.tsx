@@ -1,5 +1,5 @@
 import { usePathname } from 'next/navigation'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
@@ -21,10 +21,22 @@ import { useTrack } from '@/lib/telemetry/track'
  */
 export function OnboardingSurveyFollowUpPrompt() {
   const track = useTrack()
-  const { isEligible, orgSlug, resolveFollowUp } = useOnboardingSurveyFollowUp()
+  const { isEligible, orgSlug, orgKind, orgSize, resolveFollowUp } = useOnboardingSurveyFollowUp()
   const { addBanner, dismissBanner } = useBannerStack()
   const [isDialogOpen, setIsDialogOpen] = useState(false)
   const { mutate: submitOnboardingSurvey, isPending: isSubmitting } = useOnboardingSurveyMutation()
+
+  // The new-org form sent nothing for a blank survey, so the org's type and size
+  // are saved here whether the creator answers or skips.
+  const skipFollowUp = useCallback(
+    (reason: 'follow_up_skip' | 'follow_up_closed') => {
+      track('onboarding_survey_dismissed', { surface: 'follow_up', reason })
+      resolveFollowUp('dismissed')
+      if (orgSlug && orgKind)
+        submitOnboardingSurvey({ slug: orgSlug, kind: orgKind, size: orgSize })
+    },
+    [orgKind, orgSize, orgSlug, resolveFollowUp, submitOnboardingSurvey, track]
+  )
 
   const pathname = usePathname()
   const shouldShowCard = isEligible && !isDialogOpen && !isProjectCreationPath(pathname)
@@ -42,11 +54,7 @@ export function OnboardingSurveyFollowUpPrompt() {
       content: (
         <BannerCard
           onDismiss={() => {
-            track('onboarding_survey_dismissed', {
-              surface: 'follow_up',
-              reason: 'follow_up_skip',
-            })
-            resolveFollowUp('dismissed')
+            skipFollowUp('follow_up_skip')
           }}
         >
           <div className="flex flex-col gap-y-4">
@@ -71,11 +79,7 @@ export function OnboardingSurveyFollowUpPrompt() {
                 variant="default"
                 size="tiny"
                 onClick={() => {
-                  track('onboarding_survey_dismissed', {
-                    surface: 'follow_up',
-                    reason: 'follow_up_skip',
-                  })
-                  resolveFollowUp('dismissed')
+                  skipFollowUp('follow_up_skip')
                 }}
               >
                 Skip
@@ -87,30 +91,30 @@ export function OnboardingSurveyFollowUpPrompt() {
     })
 
     return () => dismissBanner(BANNER_ID.ONBOARDING_SURVEY_FOLLOW_UP)
-  }, [addBanner, dismissBanner, resolveFollowUp, shouldShowCard, track])
+  }, [addBanner, dismissBanner, shouldShowCard, skipFollowUp, track])
 
   const handleDialogDismiss = () => {
     setIsDialogOpen(false)
-    track('onboarding_survey_dismissed', { surface: 'follow_up', reason: 'follow_up_closed' })
-    resolveFollowUp('dismissed')
+    skipFollowUp('follow_up_closed')
   }
 
-  const handleSubmit = ({ kind, size, building }: OnboardingSurveyFollowUpValues) => {
+  const handleSubmit = ({ building, coding_experience }: OnboardingSurveyFollowUpValues) => {
     if (!orgSlug) return
 
     const surveyProperties = {
       surface: 'follow_up' as const,
-      hasKind: kind !== '',
-      hasBuilding: building.trim() !== '',
+      hasBuilding: building !== '',
+      hasCodingExperience: coding_experience !== '',
     }
     track('onboarding_survey_submit_button_clicked', surveyProperties)
 
     submitOnboardingSurvey(
       {
         slug: orgSlug,
-        kind: kind || undefined,
-        size: kind === 'COMPANY' ? size : undefined,
-        building,
+        kind: orgKind,
+        size: orgSize,
+        building: building || undefined,
+        coding_experience: coding_experience || undefined,
       },
       {
         onSuccess: () => {

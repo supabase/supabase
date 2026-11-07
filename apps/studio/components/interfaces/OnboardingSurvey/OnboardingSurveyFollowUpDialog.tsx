@@ -17,33 +17,24 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import {
-  BUILDING_MAX_LENGTH,
-  BUILDING_PLACEHOLDER,
-  ORG_SIZE_DEFAULT,
-  ORG_SIZE_TYPES,
-  SURVEY_ORG_KIND_TYPES,
-} from './OnboardingSurvey.constants'
+import { BUILDING_OPTIONS, CODING_EXPERIENCE_OPTIONS } from './OnboardingSurvey.constants'
 
 const FORM_ID = 'onboarding-survey-follow-up-form'
 
 const FormSchema = z.object({
-  kind: z.string(),
-  size: z.string(),
-  building: z.string().max(BUILDING_MAX_LENGTH),
+  building: z.string(),
+  coding_experience: z.string(),
 })
 
 export type OnboardingSurveyFollowUpValues = z.infer<typeof FormSchema>
 
 const defaultValues: OnboardingSurveyFollowUpValues = {
-  kind: '',
-  size: ORG_SIZE_DEFAULT,
   building: '',
+  coding_experience: '',
 }
 
 type OnboardingSurveyFollowUpDialogProps = {
@@ -66,8 +57,11 @@ export function OnboardingSurveyFollowUpDialog({
     defaultValues,
   })
 
-  const [kind, building] = useWatch({ control: form.control, name: ['kind', 'building'] })
-  const hasAnswer = kind !== '' || building.trim() !== ''
+  const [building, codingExperience] = useWatch({
+    control: form.control,
+    name: ['building', 'coding_experience'],
+  })
+  const hasAnswer = building !== '' || codingExperience !== ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -85,18 +79,18 @@ export function OnboardingSurveyFollowUpDialog({
 
               <FormField
                 control={form.control}
-                name="kind"
+                name="building"
                 render={({ field }) => (
-                  <FormItemLayout label="Who is this org for?" layout="vertical">
+                  <FormItemLayout label="What are you building?" layout="vertical">
                     <FormControl>
                       <Select value={field.value} onValueChange={field.onChange}>
                         <SelectTrigger className="w-full">
                           <SelectValue placeholder="Select an option" />
                         </SelectTrigger>
                         <SelectContent>
-                          {Object.entries(SURVEY_ORG_KIND_TYPES).map(([value, label]) => (
-                            <SelectItem key={value} value={value}>
-                              {label}
+                          {BUILDING_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label}
                             </SelectItem>
                           ))}
                         </SelectContent>
@@ -106,49 +100,27 @@ export function OnboardingSurveyFollowUpDialog({
                 )}
               />
 
-              {kind === 'COMPANY' && (
-                <FormField
-                  control={form.control}
-                  name="size"
-                  render={({ field }) => (
-                    <FormItemLayout label="How many people?" layout="vertical">
-                      <FormControl>
-                        <Select value={field.value} onValueChange={field.onChange}>
-                          <SelectTrigger className="w-full">
-                            <SelectValue />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {Object.entries(ORG_SIZE_TYPES).map(([value, label]) => (
-                              <SelectItem key={value} value={value}>
-                                {label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              )}
-
               <FormField
                 control={form.control}
-                name="building"
+                name="coding_experience"
                 render={({ field }) => (
-                  <FormItemLayout label="What are you building?" layout="vertical">
+                  <FormItemLayout
+                    label="How comfortable are you working with code?"
+                    layout="vertical"
+                  >
                     <FormControl>
-                      <div className="relative">
-                        <Textarea
-                          {...field}
-                          rows={3}
-                          maxLength={BUILDING_MAX_LENGTH}
-                          placeholder={BUILDING_PLACEHOLDER}
-                          className="resize-none pb-6"
-                        />
-                        <span className="pointer-events-none absolute bottom-1.5 right-2 text-xs text-foreground-lighter">
-                          {field.value.length}/{BUILDING_MAX_LENGTH}
-                        </span>
-                      </div>
+                      <Select value={field.value} onValueChange={field.onChange}>
+                        <SelectTrigger className="w-full">
+                          <SelectValue placeholder="Select an option" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {CODING_EXPERIENCE_OPTIONS.map((option) => (
+                            <SelectItem key={option.value} value={option.value}>
+                              {option.label} - {option.description}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                   </FormItemLayout>
                 )}
