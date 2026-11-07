@@ -1,4 +1,12 @@
-import type { Span, TimeScale, TimeTick, TimeWindow, TraceIndex, VisibleRow } from './types'
+import type {
+  Span,
+  SpanStatus,
+  TimeScale,
+  TimeTick,
+  TimeWindow,
+  TraceIndex,
+  VisibleRow,
+} from './types'
 
 export function buildTraceIndex(
   spans: readonly Span[],
@@ -134,23 +142,22 @@ export function formatMs(ms: number, stepMs: number): string {
   return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`
 }
 
-function computeTicks([start, end]: TimeWindow, width: number): TimeTick[] {
+function computeTicks([start, end]: TimeWindow, width: number, origin: number): TimeTick[] {
   const durationMs = end - start
   if (!(durationMs > 0) || !(width > 0)) return []
 
   const stepMs = niceTickStep(durationMs, Math.max(1, Math.floor(width / TARGET_TICK_SPACING)))
   const ticks: TimeTick[] = []
-  for (let offset = 0; offset <= durationMs + 1e-9; offset += stepMs) {
-    ticks.push({
-      ms: start + offset,
-      fraction: offset / durationMs,
-      label: formatMs(offset, stepMs),
-    })
+  for (let i = Math.ceil((start - origin) / stepMs - 1e-9); ; i++) {
+    const offset = i * stepMs
+    const ms = origin + offset
+    if (ms > end + 1e-9) break
+    ticks.push({ ms, fraction: (ms - start) / durationMs, label: formatMs(offset, stepMs) })
   }
   return ticks
 }
 
-export function createTimeScale(window: TimeWindow, width: number): TimeScale {
+export function createTimeScale(window: TimeWindow, width: number, origin: number): TimeScale {
   const [start, end] = window
   const durationMs = Math.max(0, end - start)
   const toFraction = (ms: number) => (durationMs > 0 ? (ms - start) / durationMs : 0)
@@ -158,7 +165,7 @@ export function createTimeScale(window: TimeWindow, width: number): TimeScale {
     window,
     width,
     durationMs,
-    ticks: computeTicks(window, width),
+    ticks: computeTicks(window, width, origin),
     toFraction,
     toX: (ms) => toFraction(ms) * width,
     toMs: (x) => (width > 0 ? start + (x / width) * durationMs : start),
@@ -219,4 +226,91 @@ export function getTimingPlacement({
   if (endPx + gapPx + labelPx <= laneWidth) return 'after'
   if (startPx - gapPx - labelPx >= 0) return 'before'
   return 'inside'
+}
+
+const MIN_WINDOW_FRACTION = 0.01
+export const MINIMAP_COLUMNS = 120
+
+const STATUS_RANK: Record<SpanStatus, number> = { unset: 1, ok: 2, error: 3 }
+const RANKED_STATUS: SpanStatus[] = ['unset', 'ok', 'error']
+
+const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
+
+export function clampWindow(
+  [start, end]: TimeWindow,
+  [boundsStart, boundsEnd]: TimeWindow
+): TimeWindow {
+  const total = boundsEnd - boundsStart
+  const size = Math.min(total, Math.max(end - start, total * MIN_WINDOW_FRACTION))
+  const clampedStart = clamp(start, boundsStart, boundsEnd - size)
+  return [clampedStart, clampedStart + size]
+}
+
+export function resizeWindow(
+  [start, end]: TimeWindow,
+  edge: 'start' | 'end',
+  ms: number,
+  [boundsStart, boundsEnd]: TimeWindow
+): TimeWindow {
+  const minSize = (boundsEnd - boundsStart) * MIN_WINDOW_FRACTION
+  if (edge === 'start') return [Math.min(clamp(ms, boundsStart, boundsEnd), end - minSize), end]
+  return [start, Math.max(clamp(ms, boundsStart, boundsEnd), start + minSize)]
+}
+
+export interface MinimapRect {
+  lane: number
+  x: number
+  width: number
+  status: SpanStatus
+}
+
+export function computeMinimapRects(
+  index: TraceIndex,
+  columns: number,
+  maxLanes: number
+): { rects: MinimapRect[]; laneCount: number } {
+  const [start, end] = index.bounds
+  const duration = end - start
+  if (!(duration > 0)) return { rects: [], laneCount: 0 }
+
+  const visits: { span: Span; depth: number }[] = []
+  const stack = index.roots.map((id) => ({ id, depth: 0 })).reverse()
+  while (stack.length > 0) {
+    const { id, depth } = stack.pop()!
+    visits.push({ span: index.byId.get(id)!, depth })
+    for (const childId of index.childrenOf.get(id) ?? [])
+      stack.push({ id: childId, depth: depth + 1 })
+  }
+
+  const laneCount = Math.min(Math.max(...visits.map((visit) => visit.depth)) + 1, maxLanes)
+  const cells = Array.from({ length: laneCount }, () => new Array<number>(columns).fill(0))
+  for (const { span, depth } of visits) {
+    const lane = cells[Math.min(depth, laneCount - 1)]
+    const from = clamp(Math.floor(((span.startMs - start) / duration) * columns), 0, columns - 1)
+    const spanEnd = effectiveEndMs(span, index.nowMs)
+    const to = clamp(Math.ceil(((spanEnd - start) / duration) * columns) - 1, from, columns - 1)
+    for (let column = from; column <= to; column++) {
+      lane[column] = Math.max(lane[column], STATUS_RANK[span.status])
+    }
+  }
+
+  const rects: MinimapRect[] = []
+  cells.forEach((lane, laneIndex) => {
+    for (let column = 0; column < columns; ) {
+      if (lane[column] === 0) {
+        column++
+        continue
+      }
+      let next = column + 1
+      while (next < columns && lane[next] === lane[column]) next++
+      rects.push({
+        lane: laneIndex,
+        x: column,
+        width: next - column,
+        status: RANKED_STATUS[lane[column] - 1],
+      })
+      column = next
+    }
+  })
+  return { rects, laneCount }
 }
