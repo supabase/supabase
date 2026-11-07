@@ -13,27 +13,14 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { AlertCircleIcon, ExternalLinkIcon, PlusIcon } from 'lucide-react'
+import { ExternalLinkIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useRef } from 'react'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Alert,
-  AlertDescription,
-  AlertTitle,
-  Button,
-  cn,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-  Input,
-  SidePanel,
-} from 'ui'
+import { Button, cn, Form, FormControl, FormField, Input, SidePanel } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { NATIVE_POSTGRES_TYPES } from './EnumeratedTypes.constants'
@@ -150,30 +137,26 @@ const CreateEnumeratedTypeSidePanel = ({
               control={form.control}
               name="name"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Name</FormLabel>
+                <FormItemLayout layout="vertical" label="Name">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormMessage />
-                </FormItem>
+                </FormItemLayout>
               )}
             />
             <FormField
               control={form.control}
               name="description"
               render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Description</FormLabel>
+                <FormItemLayout layout="vertical" label="Description" description="Optional">
                   <FormControl>
                     <Input {...field} />
                   </FormControl>
-                  <FormDescription>Optional</FormDescription>
-                </FormItem>
+                </FormItemLayout>
               )}
             />
 
-            <div>
+            <div className="space-y-4">
               <span
                 className={cn(
                   'text-foreground-light text-sm',
@@ -183,44 +166,42 @@ const CreateEnumeratedTypeSidePanel = ({
               >
                 Values
               </span>
-              <Alert>
-                <AlertCircleIcon strokeWidth={1.5} />
-                <AlertTitle>After creation, values cannot be deleted or sorted</AlertTitle>
-                <AlertDescription>
-                  <p className="leading-normal! track">
-                    You will need to delete and recreate the enumerated type with the updated values
-                    instead.
-                  </p>
-                  <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
-                    <Link
-                      href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      Learn more
-                    </Link>
-                  </Button>
-                </AlertDescription>
-              </Alert>
-              <DndContext
-                sensors={sensors}
-                collisionDetection={closestCenter}
-                onDragEnd={handleDragEnd}
-              >
-                <SortableContext items={fields} strategy={verticalListSortingStrategy}>
-                  {fields.map((field, index) => (
-                    <EnumeratedTypeValueRow
-                      key={field.id}
-                      id={field.id}
-                      name={`values.${index}.value`}
-                      index={index}
-                      control={form.control}
-                      isDisabled={fields.length < 2}
-                      onRemoveValue={() => remove(index)}
-                    />
-                  ))}
-                </SortableContext>
-              </DndContext>
+              <Admonition type="default" title="After creation, values cannot be deleted or sorted">
+                <p className="leading-normal! track">
+                  You will need to delete and recreate the enumerated type with the updated values
+                  instead.
+                </p>
+                <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />} className="mt-2">
+                  <Link
+                    href="https://www.postgresql.org/message-id/21012.1459434338%40sss.pgh.pa.us"
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    Learn more
+                  </Link>
+                </Button>
+              </Admonition>
+              <div>
+                <DndContext
+                  sensors={sensors}
+                  collisionDetection={closestCenter}
+                  onDragEnd={handleDragEnd}
+                >
+                  <SortableContext items={fields} strategy={verticalListSortingStrategy}>
+                    {fields.map((field, index) => (
+                      <EnumeratedTypeValueRow
+                        key={field.id}
+                        id={field.id}
+                        name={`values.${index}.value`}
+                        index={index}
+                        control={form.control}
+                        isDisabled={fields.length < 2}
+                        onRemoveValue={() => remove(index)}
+                      />
+                    ))}
+                  </SortableContext>
+                </DndContext>
+              </div>
             </div>
 
             <Button icon={<PlusIcon strokeWidth={1.5} />} onClick={() => append({ value: '' })}>
