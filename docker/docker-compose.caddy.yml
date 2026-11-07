@@ -30,7 +30,8 @@ services:
       - /bin/sh
       - -c
       - |
-        PROXY_AUTH_PASSWORD=$$(caddy hash-password --plaintext "$$PROXY_AUTH_PASSWORD") && \
+        PROXY_AUTH_HASH=$$(caddy hash-password --plaintext "$$PROXY_AUTH_PASSWORD") && \
+        printf '%s %s\n' "$$PROXY_AUTH_USERNAME" "$$PROXY_AUTH_HASH" > /config/dashboard-auth && \
         caddy run --config /etc/caddy/Caddyfile --adapter caddyfile
     volumes:
       - ./volumes/proxy/caddy:/etc/caddy
