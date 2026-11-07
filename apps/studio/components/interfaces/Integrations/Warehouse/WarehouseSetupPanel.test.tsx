@@ -209,6 +209,16 @@ describe('OrioleDB catalog restrictions', () => {
     ).not.toBeInTheDocument()
   })
 
+  test('links to Warehouse metrics when Warehouse is set up', async () => {
+    mockProject(false)
+    mockWarehouse('complete')
+    customRender(<WarehouseSetupPanel />)
+    expect(await screen.findByRole('link', { name: 'View metrics' })).toHaveAttribute(
+      'href',
+      '/project/default/observability/warehouse'
+    )
+  })
+
   test.each(['not_started', 'disabled', 'error'] as const)(
     'lets the API validate a retained Warehouse destination when %s',
     async (status) => {

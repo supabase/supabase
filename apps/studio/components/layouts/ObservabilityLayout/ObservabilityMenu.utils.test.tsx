@@ -8,6 +8,7 @@ import {
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useIsWarehouseEnabled } from '@/hooks/misc/useIsWarehouseEnabled'
 import { customRenderHook as renderHook } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
 
@@ -43,6 +44,10 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: vi.fn(),
 }))
 
+vi.mock('@/hooks/misc/useIsWarehouseEnabled', () => ({
+  useIsWarehouseEnabled: vi.fn(),
+}))
+
 vi.mock('@/data/content/content-query', () => ({
   useContentQuery: vi.fn(),
 }))
@@ -58,6 +63,7 @@ describe('useGenerateObservabilityMenu', () => {
       isLoading: false,
     })
     vi.mocked(useIsFeatureEnabled).mockReturnValue(true)
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(false)
   })
 
   const getGeneralKeys = () => {
@@ -134,6 +140,24 @@ describe('useGenerateObservabilityMenu', () => {
 
     expect(product?.items.map((item) => item.key)).toEqual(
       expect.arrayContaining(['database', 'postgrest', 'auth', 'edge-functions', 'realtime'])
+    )
+  })
+
+  it('includes Warehouse in the PRODUCT section only when Warehouse is enabled, preserving date range params', () => {
+    routerMock.setCurrentUrl(`/project/${REF}/observability?its=2024-01-01&ite=2024-01-31`)
+    const getWarehouse = () => {
+      const { result } = renderHook(() => useGenerateObservabilityMenu())
+      return result.current
+        .find((section) => section.title === 'PRODUCT')
+        ?.items.find((item) => item.key === 'warehouse')
+    }
+
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(false)
+    expect(getWarehouse()).toBeUndefined()
+
+    vi.mocked(useIsWarehouseEnabled).mockReturnValue(true)
+    expect(getWarehouse()?.url).toBe(
+      `/project/${REF}/observability/warehouse?its=2024-01-01&ite=2024-01-31`
     )
   })
 

@@ -193,6 +193,7 @@ import { Route as ProjectRefObservabilityQueryInsightsRouteImport } from './rout
 import { Route as ProjectRefObservabilityQueryPerformanceRouteImport } from './routes/project/$ref/observability/query-performance'
 import { Route as ProjectRefObservabilityRealtimeRouteImport } from './routes/project/$ref/observability/realtime'
 import { Route as ProjectRefObservabilityStorageRouteImport } from './routes/project/$ref/observability/storage'
+import { Route as ProjectRefObservabilityWarehouseRouteImport } from './routes/project/$ref/observability/warehouse'
 import { Route as ProjectRefRealtimeInspectorRouteImport } from './routes/project/$ref/realtime/inspector'
 import { Route as ProjectRefRealtimePoliciesRouteImport } from './routes/project/$ref/realtime/policies'
 import { Route as ProjectRefRealtimeSettingsRouteImport } from './routes/project/$ref/realtime/settings'
@@ -1317,6 +1318,12 @@ const ProjectRefObservabilityStorageRoute =
     path: '/storage',
     getParentRoute: () => ProjectRefObservabilityRoute,
   } as any)
+const ProjectRefObservabilityWarehouseRoute =
+  ProjectRefObservabilityWarehouseRouteImport.update({
+    id: '/warehouse',
+    path: '/warehouse',
+    getParentRoute: () => ProjectRefObservabilityRoute,
+  } as any)
 const ProjectRefRealtimeInspectorRoute =
   ProjectRefRealtimeInspectorRouteImport.update({
     id: '/inspector',
@@ -2329,6 +2336,7 @@ export interface FileRoutesByFullPath {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2641,6 +2649,7 @@ export interface FileRoutesByTo {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -2969,6 +2978,7 @@ export interface FileRoutesById {
   '/project/$ref/observability/query-performance': typeof ProjectRefObservabilityQueryPerformanceRoute
   '/project/$ref/observability/realtime': typeof ProjectRefObservabilityRealtimeRoute
   '/project/$ref/observability/storage': typeof ProjectRefObservabilityStorageRoute
+  '/project/$ref/observability/warehouse': typeof ProjectRefObservabilityWarehouseRoute
   '/project/$ref/realtime/inspector': typeof ProjectRefRealtimeInspectorRoute
   '/project/$ref/realtime/policies': typeof ProjectRefRealtimePoliciesRoute
   '/project/$ref/realtime/settings': typeof ProjectRefRealtimeSettingsRoute
@@ -3297,6 +3307,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3609,6 +3620,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -3936,6 +3948,7 @@ export interface FileRouteTypes {
     | '/project/$ref/observability/query-performance'
     | '/project/$ref/observability/realtime'
     | '/project/$ref/observability/storage'
+    | '/project/$ref/observability/warehouse'
     | '/project/$ref/realtime/inspector'
     | '/project/$ref/realtime/policies'
     | '/project/$ref/realtime/settings'
@@ -5509,6 +5522,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ProjectRefObservabilityStorageRouteImport
       parentRoute: typeof ProjectRefObservabilityRoute
     }
+    '/project/$ref/observability/warehouse': {
+      id: '/project/$ref/observability/warehouse'
+      path: '/warehouse'
+      fullPath: '/project/$ref/observability/warehouse'
+      preLoaderRoute: typeof ProjectRefObservabilityWarehouseRouteImport
+      parentRoute: typeof ProjectRefObservabilityRoute
+    }
     '/project/$ref/realtime/inspector': {
       id: '/project/$ref/realtime/inspector'
       path: '/inspector'
@@ -7008,6 +7028,7 @@ interface ProjectRefObservabilityRouteChildren {
   ProjectRefObservabilityQueryPerformanceRoute: typeof ProjectRefObservabilityQueryPerformanceRoute
   ProjectRefObservabilityRealtimeRoute: typeof ProjectRefObservabilityRealtimeRoute
   ProjectRefObservabilityStorageRoute: typeof ProjectRefObservabilityStorageRoute
+  ProjectRefObservabilityWarehouseRoute: typeof ProjectRefObservabilityWarehouseRoute
   ProjectRefObservabilityIndexRoute: typeof ProjectRefObservabilityIndexRoute
 }
 
@@ -7030,6 +7051,8 @@ const ProjectRefObservabilityRouteChildren: ProjectRefObservabilityRouteChildren
       ProjectRefObservabilityQueryPerformanceRoute,
     ProjectRefObservabilityRealtimeRoute: ProjectRefObservabilityRealtimeRoute,
     ProjectRefObservabilityStorageRoute: ProjectRefObservabilityStorageRoute,
+    ProjectRefObservabilityWarehouseRoute:
+      ProjectRefObservabilityWarehouseRoute,
     ProjectRefObservabilityIndexRoute: ProjectRefObservabilityIndexRoute,
   }
 
