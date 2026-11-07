@@ -526,6 +526,10 @@ describe('getSemanticVersion', () => {
 
     expect(result).toEqual(141088)
   })
+
+  it.each(['arm64', 'x86_64'])('parses versions with an %s architecture prefix', (architecture) => {
+    expect(getSemanticVersion(`supabase-postgres-${architecture}-17.9.0.019`)).toBe(1790019)
+  })
 })
 
 describe('getDatabaseMajorVersion', () => {
@@ -533,6 +537,10 @@ describe('getDatabaseMajorVersion', () => {
     const result = getDatabaseMajorVersion('supabase-postgres-14.1.0.88')
 
     expect(result).toEqual(14)
+  })
+
+  it.each(['arm64', 'x86_64'])('parses versions with an %s architecture prefix', (architecture) => {
+    expect(getDatabaseMajorVersion(`supabase-postgres-${architecture}-17.9.0.019`)).toBe(17)
   })
 })
 
