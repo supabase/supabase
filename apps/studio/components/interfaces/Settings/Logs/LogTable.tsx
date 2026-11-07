@@ -545,13 +545,13 @@ export const LogTable = ({
     }
     if (
       typeof error === 'object' &&
-      error.error?.errors.find((err) => err.reason === 'missingLimit')
+      error.error?.errors?.find((err) => err.reason === 'missingLimit')
     ) {
       return <MissingLimitErrorRenderer />
     }
     if (
       typeof error === 'object' &&
-      error.error?.errors.find((err) => err.reason === 'resourcesExceeded')
+      error.error?.errors?.find((err) => err.reason === 'resourcesExceeded')
     ) {
       return <ResourcesExceededErrorRenderer {...childProps} />
     }
