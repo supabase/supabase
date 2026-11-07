@@ -117,6 +117,8 @@
   "project_settings:database_upgrades": true,
   "project_settings:restart_project": true,
 
+  "project_storage:all": true,
+
   "quickstarts:hide_nimbus": true,
 
   "reports:all": true,
