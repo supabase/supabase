@@ -1,4 +1,4 @@
-import type { Span, TimeScale, TimeTick, TimeWindow, TraceIndex } from './types'
+import type { Span, TimeScale, TimeTick, TimeWindow, TraceIndex, VisibleRow } from './types'
 
 export function buildTraceIndex(
   spans: readonly Span[],
@@ -163,4 +163,25 @@ export function createTimeScale(window: TimeWindow, width: number): TimeScale {
     toX: (ms) => toFraction(ms) * width,
     toMs: (x) => (width > 0 ? start + (x / width) * durationMs : start),
   }
+}
+
+export function formatDuration(ms: number): string {
+  return ms > 0 ? formatMs(ms, 10 ** (Math.floor(Math.log10(ms)) - 2)) : '0ms'
+}
+
+export function flattenTree(index: TraceIndex, collapsed: ReadonlySet<string>): VisibleRow[] {
+  const rows: VisibleRow[] = []
+  const stack = index.roots.map((id) => ({ id, depth: 0 })).reverse()
+
+  while (stack.length > 0) {
+    const { id, depth } = stack.pop()!
+    const children = index.childrenOf.get(id) ?? []
+    const hasChildren = children.length > 0
+    const isExpanded = hasChildren && !collapsed.has(id)
+    rows.push({ span: index.byId.get(id)!, depth, hasChildren, isExpanded })
+    if (!isExpanded) continue
+    for (let i = children.length - 1; i >= 0; i--) stack.push({ id: children[i], depth: depth + 1 })
+  }
+
+  return rows
 }
