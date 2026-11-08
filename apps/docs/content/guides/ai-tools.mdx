@@ -39,7 +39,7 @@ Supabase tells agents to ask for your approval before they send a report. The in
 
 After the agent finishes your task, or when a problem blocks the task, it ends its reply with a feedback report and asks you one time whether to send it to Supabase.
 
-If you say yes, the agent sends the report with the Supabase MCP server or the Supabase CLI. It then shows you a delete token, which you can use to delete the report. If neither tool is available, the agent shows you the report so you can send it with `supabase feedback add`.
+If you say yes, the agent sends the report with the Supabase MCP server or the Supabase CLI. It then shows you a delete token, which you can use to delete the report. If neither tool is available or sending fails, the agent shows you the report so you can send it with `supabase feedback add` or `npx supabase@latest feedback add`.
 
 To ask for a report yourself, tell your agent, for example: "Report the problem you found in the Auth guide to Supabase."
 
@@ -60,4 +60,4 @@ To stop reports through the MCP server, set the server's `features` parameter to
 
 These settings don't stop the CLI. An agent with a shell can still send a report with it. If you don't want reports, tell your agent.
 
-To delete a report, ask your agent to delete it with its delete token, or run `supabase feedback delete` with that token.
+To delete a report, ask your agent to delete it with its delete token. You can also run `supabase feedback delete <delete_token>` in the project directory where the agent sent the report, or add `--project-ref <ref>`. If the CLI was signed in when the agent sent the report, use the same account.
