@@ -104,6 +104,32 @@ const page: GoPageInput = {
             { label: 'More than 1 TB', value: 'More than 1 TB' },
           ],
         },
+        {
+          type: 'select',
+          name: 'uses_extensions',
+          label: 'Do the tables you want to replicate use Postgres extensions or custom types?',
+          placeholder: 'Select an option',
+          description:
+            'For example, PostGIS geometry columns, pgvector embeddings, enums, or composite types.',
+          required: true,
+          options: [
+            { label: 'Yes', value: 'Yes' },
+            { label: 'No', value: 'No' },
+            { label: 'Not sure', value: 'Not sure' },
+          ],
+        },
+        {
+          type: 'textarea',
+          name: 'extensions_and_types',
+          label: 'Which extensions and types do they use?',
+          placeholder:
+            'For example: postgis (geometry), pgvector (vector), a custom order_status enum',
+          description:
+            'Include each extension and the column types it adds, plus any custom types.',
+          rows: 3,
+          required: true,
+          showWhen: { field: 'uses_extensions', equals: 'Yes' },
+        },
       ],
       submitLabel: 'Request access',
       successRedirect: '/go/warehouse-early-access/thank-you',
@@ -117,6 +143,8 @@ const page: GoPageInput = {
             org_slug: 'Organization Slug',
             use_case: 'Use Case',
             data_volume: 'Data Volume',
+            uses_extensions: 'Uses Extensions or Custom Types',
+            extensions_and_types: 'Extensions and Types',
           },
         },
       },
