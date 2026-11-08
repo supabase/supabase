@@ -24,10 +24,12 @@ import {
 import type { AbbrevApiReferenceSection } from '~/features/docs/Reference.utils'
 import { normalizeMarkdown } from '~/features/docs/Reference.utils'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
+import type { CliCommand } from '~/generator/types/CliSpec'
 import { isFeatureEnabled } from 'common'
 import { Fragment } from 'react'
 import ReactMarkdown from 'react-markdown'
 import { Badge, cn, Tabs, TabsContent, TabsList, TabsTrigger } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 
 import { type IApiEndPoint } from './Reference.api.utils'
 import { RefInternalLink } from './Reference.navigation.client'
@@ -114,7 +116,7 @@ export function SectionSwitch({ libraryId, version, section, tag }: SectionSwitc
         />
       )
     case 'cli-command':
-      return <CliCommandSection link={sectionLink} section={section} />
+      return <CliCommandSection version={version} link={sectionLink} section={section} />
     case 'operation':
       return <ApiEndpointSection link={sectionLink} section={section} tag={tag} />
     case 'self-hosted-operation':
@@ -167,20 +169,40 @@ async function MarkdownSection({
 }
 
 interface CliCommandSectionProps {
+  version: string
   link: string
   section: AbbrevApiReferenceSection
 }
 
-async function CliCommandSection({ link, section }: CliCommandSectionProps) {
-  const cliSpec = await getCliSpec()
-  const command = ((cliSpec as any).commands ?? []).find((cmd) => cmd.id === section.id)
+async function CliCommandSection({ version, link, section }: CliCommandSectionProps) {
+  const cliSpec = await getCliSpec(version)
+  const isLatestVersion = version === REFERENCES.cli.versions[0]
+  const command = cliSpec.commands.find((cmd) => cmd.id === section.id)
 
   if (!command) return null
+
+  const breakingChanges = (command as CliCommand).breaking_changes ?? []
 
   return (
     <RefSubLayout.Section columns="double" link={link} {...section}>
       <StickyHeader title={command.title} className="col-span-full" monoFont={true} />
       <div className="w-full min-w-0 prose wrap-break-word mb-8">
+        {breakingChanges.map((change) => (
+          <Admonition
+            key={change.id}
+            type="warning"
+            title={
+              change.direction === 'upcoming' ? `Changes in v${change.major}` : 'Changed since v2'
+            }
+          >
+            <ReactMarkdown>{change.summary}</ReactMarkdown>
+            {change.migration_url && (
+              <p>
+                <a href={change.migration_url}>Migration guide</a>
+              </p>
+            )}
+          </Admonition>
+        ))}
         {command.description && <ReactMarkdown>{command.description}</ReactMarkdown>}
         {command.usage && (
           <div className="mb-8">
@@ -193,14 +215,12 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
             <h3 className="mb-3 text-base text-foreground">Subcommands</h3>
             <ul className="prose">
               {command.subcommands.map((subcommand, index) => {
-                const subcommandDetails = (cliSpec as any).commands.find(
-                  (cmd) => cmd.id === subcommand
-                )
+                const subcommandDetails = cliSpec.commands.find((cmd) => cmd.id === subcommand)
                 if (!subcommandDetails) return null
                 return (
                   <li key={index} className="ml-4">
                     <RefInternalLink
-                      href={`/reference/cli/${subcommandDetails.id}`}
+                      href={`/reference/cli/${isLatestVersion ? '' : `${version}/`}${subcommandDetails.id}`}
                       sectionSlug={subcommandDetails.id}
                     >
                       {subcommandDetails.title}
@@ -227,6 +247,19 @@ async function CliCommandSection({ link, section }: CliCommandSectionProps) {
                       <Badge variant="default">Optional</Badge>
                     )}
                   </div>
+                  {breakingChanges
+                    .filter((change) => change.flags?.includes(`--${flag.id}`))
+                    .map((change) => (
+                      <p key={change.id} className="m-0 text-xs text-foreground-lighter">
+                        {change.direction === 'upcoming' ? 'Changes in' : 'Changed in'} v
+                        {change.major}.{' '}
+                        {change.migration_url && (
+                          <a href={change.migration_url} className="underline">
+                            Migration guide
+                          </a>
+                        )}
+                      </p>
+                    ))}
                   {flag.description && (
                     <div className="prose wrap-break-word text-sm">
                       <ReactMarkdown>{flag.description}</ReactMarkdown>

@@ -5,6 +5,7 @@
 @import 'ui-patterns/Notch/notch.css';
 @import './code-block.css';
 @import './reference.css';
+@import './cli-reference.css';
 @import './ask-ai.css';
 @import './curved-scroll-area.css';
 @import 'docs-search/styles.css';

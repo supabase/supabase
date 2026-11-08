@@ -1,20 +1,18 @@
 import * as fs from 'fs'
 import * as ejs from 'ejs'
 import * as yaml from 'js-yaml'
+
 import { writeToDisk } from './helpers'
 import template from './templates/CliTemplate'
-import type { CliSpec } from './types/CliSpec'
+import { parseCliSpec, type CliSpec } from './types/CliSpec'
 
 export default async function gen(inputFileName: string, outputDir: string) {
-  const spec = yaml.load(fs.readFileSync(inputFileName, 'utf8')) as any
+  const spec = parseCliSpec(yaml.load(fs.readFileSync(inputFileName, 'utf8')), inputFileName)
 
   switch (spec.clispec) {
     case '001':
+    case '002':
       await gen_v001(spec, outputDir)
-      break
-
-    default:
-      console.log('Unrecognized specification version:', spec.clispec)
       break
   }
 }
@@ -23,7 +21,7 @@ export default async function gen(inputFileName: string, outputDir: string) {
  * Versioned Generator
  */
 async function gen_v001(spec: CliSpec, dest: string) {
-  let commandMap = new Map(spec.commands.map((item) => [item.id, item]))
+  let commandMap = new Map(spec.commands.map((item) => [item.id, item] as const))
 
   const commands = spec.commands.map((x) => {
     const isChild = x.subcommands.length < 1
