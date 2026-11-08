@@ -31,7 +31,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { CreateOrUpdateOAuthAppSheet } from './CreateOrUpdateOAuthAppSheet'
 import { DeleteOAuthAppModal } from './DeleteOAuthAppModal'
-import { NewOAuthAppBanner } from './NewOAuthAppBanner'
+import { NewOAuthAppModal } from './NewOAuthAppModal'
 import {
   filterOAuthApps,
   OAUTH_APP_CLIENT_TYPE_OPTIONS,
@@ -230,9 +230,6 @@ export const OAuthAppsList = () => {
   return (
     <>
       <div className="flex flex-col gap-y-4">
-        {newOAuthApp?.client_secret && (
-          <NewOAuthAppBanner oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
-        )}
         {!isOAuthServerEnabled && (
           <Admonition
             type="default"
@@ -455,12 +452,10 @@ export const OAuthAppsList = () => {
         visible={isCreateOrUpdateSheetVisible}
         appToEdit={appToEdit}
         onSuccess={(app) => {
-          const isCreating = !appToEdit
           setShowCreateSheet(false)
           setSelectedAppToEdit(null)
           setSelectedApp(undefined)
-          // Only show banner for new apps or regenerated secrets, not for simple edits
-          if (isCreating || app.client_secret) {
+          if (app.client_secret) {
             setNewOAuthApp(app)
           }
         }}
@@ -470,6 +465,8 @@ export const OAuthAppsList = () => {
           setSelectedApp(undefined)
         }}
       />
+
+      <NewOAuthAppModal oauthApp={newOAuthApp} onClose={() => setNewOAuthApp(undefined)} />
 
       <DeleteOAuthAppModal
         visible={!!appToDelete}
