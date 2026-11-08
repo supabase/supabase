@@ -27,6 +27,7 @@
     "@octokit/auth-app": "^7.0.0",
     "@octokit/core": "^7.0.6",
     "@octokit/plugin-retry": "^8.1.0",
+    "@sentry/node": "catalog:",
     "@supabase/supabase-js": "catalog:",
     "astro": "^7.2.6",
     "common": "workspace:*",
