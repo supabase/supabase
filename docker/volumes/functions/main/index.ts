@@ -1,14 +1,15 @@
 import * as jose from 'jsr:@panva/jose@6'
+import { logInternal } from './logging.ts'
 import { startMemoryPressureLoop } from './memory-pressure.ts'
 
-console.log('main function started')
+logInternal('main', 'info', 'main function started')
 startMemoryPressureLoop()
 
 addEventListener('unhandledrejection', (ev) => {
   // Without preventDefault(), a floating rejection destroys the main worker and the process exits.
   // Sync throws inside timer callbacks are still fatal; wrap them in try/catch.
   ev.preventDefault()
-  console.error('unhandled promise rejection in main worker', ev.reason)
+  logInternal('main', 'error', 'unhandled promise rejection in main worker', ev.reason)
 })
 
 const MAX_WORKER_RETRIES = 3
@@ -67,7 +68,7 @@ function getFunctionErrorResponse({ code, message, status }: FunctionFailure): R
 
 function onError(e: unknown): Response {
   const ref = crypto.randomUUID()
-  console.error(`unhandled error in request handler (ref: ${ref})`, e)
+  logInternal('main', 'error', `unhandled error in request handler (ref: ${ref})`, e)
   return getFunctionErrorResponse({
     code: RequestErrors.BootError,
     message: `Internal Server Error (ref: ${ref})`,
@@ -227,7 +228,7 @@ function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
 
 async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   if (!JWT_SECRET) {
-    console.error('JWT_SECRET not available for HS256 token verification')
+    logInternal('main', 'error', 'JWT_SECRET not available for HS256 token verification')
     return { code: RequestErrors.InvalidLegacyJWT }
   }
 
@@ -237,7 +238,7 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
   try {
     await jose.jwtVerify(jwt, secretKey);
   } catch (e) {
-    console.error('Symmetric Legacy JWT verification error', e);
+    logInternal('main', 'error', 'Symmetric Legacy JWT verification error', e);
     return { code: RequestErrors.InvalidLegacyJWT }
   }
   return null
@@ -245,14 +246,14 @@ async function isValidLegacyJWT(jwt: string): Promise<AuthFailure | null> {
 
 async function isValidJWT(jwt: string): Promise<AuthFailure | null> {
   if (!LOCAL_JWKS) {
-    console.error('JWKS not available for ES256/RS256 token verification')
+    logInternal('main', 'error', 'JWKS not available for ES256/RS256 token verification')
     return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
   try {
     await jose.jwtVerify(jwt, LOCAL_JWKS);
   } catch (e) {
-    console.error('Asymmetric JWT verification error', e);
+    logInternal('main', 'error', 'Asymmetric JWT verification error', e);
     return { code: RequestErrors.InvalidAsymmetricJWT }
   }
 
@@ -278,7 +279,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   try {
     jwtAlgorithm = jose.decodeProtectedHeader(jwt).alg
   } catch (e) {
-    console.error('JWT format error', e)
+    logInternal('main', 'error', 'JWT format error', e)
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
@@ -293,7 +294,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   }
 
   if (jwtAlgorithm === 'HS256') {
-    console.log(`Legacy token type detected, attempting ${jwtAlgorithm} verification.`)
+    logInternal('main', 'info', `Legacy token type detected, attempting ${jwtAlgorithm} verification.`)
 
     return await isValidLegacyJWT(jwt)
   }
@@ -353,7 +354,7 @@ Deno.serve({ onError }, async (req: Request) => {
         status: 404,
       })
     }
-    console.error(e)
+    logInternal('main', 'error', 'function dispatch failed', e)
     return getFunctionErrorResponse({
       code: RequestErrors.BootError,
       message: 'Function failed to start (please check logs)',
@@ -400,13 +401,13 @@ Deno.serve({ onError }, async (req: Request) => {
     } catch (e) {
       // Retirement rejects before dispatch, so user code has not run yet.
       if (e instanceof Deno.errors.WorkerAlreadyRetired && retryReq) {
-        console.warn(`${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
+        logInternal('main', 'warning', `${service_name}: worker retired before dispatch; retrying (${retriesLeft} left)`)
         // Request.clone() does not copy the tag that connects streaming to the client.
         EdgeRuntime.applySupabaseTag(req, retryReq)
         return await callWorker(retryReq, retriesLeft - 1)
       }
 
-      console.error(e)
+      logInternal('main', 'error', 'function dispatch failed', e)
       return getFunctionErrorResponse(resolveRuntimeError(e))
     }
   }
