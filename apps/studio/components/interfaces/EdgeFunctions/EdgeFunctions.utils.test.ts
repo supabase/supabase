@@ -1,6 +1,21 @@
 import { describe, expect, it } from 'vitest'
 
-import { formatFunctionBodyToFiles, getDefaultSelectedFileId } from './EdgeFunctions.utils'
+import {
+  formatFunctionBodyToFiles,
+  getDefaultSelectedFileId,
+  getFallbackEntrypointPath,
+} from './EdgeFunctions.utils'
+
+describe('getFallbackEntrypointPath', () => {
+  it.each(['domain.ts', 'reindex.ts', 'helpers/main-utils.ts'])(
+    'selects index.ts instead of the misleading filename %s',
+    (helperName) => {
+      const files = [{ name: helperName }, { name: 'index.ts' }]
+
+      expect(getFallbackEntrypointPath(files)).toBe('index.ts')
+    }
+  )
+})
 
 describe('formatFunctionBodyToFiles', () => {
   it('returns no files when there is no entrypoint path', () => {

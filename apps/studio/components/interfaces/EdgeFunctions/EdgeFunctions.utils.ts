@@ -213,7 +213,7 @@ export const getFallbackEntrypointPath = (files: Omit<FileData, 'id' | 'content'
     return jsFiles[0].name
   } else if (jsFiles.length) {
     // 2. If function has a `index` or `main` file use it as the entrypoint
-    const regex = /^.*?(index|main).*$/i
+    const regex = /(^|\/)(index|main)\.(js|ts|jsx|tsx)$/i
     const matchingFile = jsFiles.find(({ name }) => regex.test(name))
     // 3. if no valid index / main file found, we set the entrypoint expliclty to first JS file
     return matchingFile ? matchingFile.name : jsFiles[0].name
