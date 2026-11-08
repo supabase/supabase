@@ -470,6 +470,8 @@ services:
         "start",
         "--user-worker-request-idle-timeout",
         "150000",
+        "--event-worker",
+        "/home/deno/functions/main/events",
         "--main-service",
         "/home/deno/functions/main"
       ]

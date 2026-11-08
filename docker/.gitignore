@@ -16,3 +16,6 @@ docker-compose.override.yml
 .supabase-version
 backups
 !volumes/functions/main/logging.ts
+!volumes/functions/main/events/
+volumes/functions/main/events/**
+!volumes/functions/main/events/index.ts

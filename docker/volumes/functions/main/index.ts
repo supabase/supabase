@@ -326,7 +326,7 @@ Deno.serve({ onError }, async (req: Request) => {
   const path_parts = pathname.split('/')
   const service_name = path_parts[1]
 
-  if (!service_name || service_name === '') {
+  if (!service_name || service_name === 'main') {
     return getFunctionErrorResponse({
       code: RequestErrors.NotFound,
       message: 'Requested function was not found',
