@@ -1,5 +1,5 @@
 import * as jose from 'jsr:@panva/jose@6'
-import { logInternal } from './logging.ts'
+import { emitLog, logInternal } from './logging.ts'
 import { startMemoryPressureLoop } from './memory-pressure.ts'
 
 logInternal('main', 'info', 'main function started')
@@ -335,7 +335,6 @@ Deno.serve({ onError }, async (req: Request) => {
   }
 
   const servicePath = `/home/deno/functions/${service_name}`
-  console.error(`serving the request with ${servicePath}`)
 
   try {
     const serviceInfo = await Deno.stat(servicePath)
@@ -376,7 +375,12 @@ Deno.serve({ onError }, async (req: Request) => {
   const envVarsObj = { ...Deno.env.toObject(), SUPABASE_FUNCTION_SLUG: service_name }
   const envVars = Object.keys(envVarsObj).map((k) => [k, envVarsObj[k]])
 
+  const start = performance.now()
+  const requestId = crypto.randomUUID()
+  let executionId: string | undefined
+
   const callWorker = async (req: Request, retriesLeft = MAX_WORKER_RETRIES): Promise<Response> => {
+    executionId = undefined
     // Preserve the body before fetch() can consume it, even on a failed attempt.
     // Must run before `new Request(req)` below, which takes over the body.
     // The unread retry branch can buffer the entire body in main-worker memory,
@@ -393,6 +397,7 @@ Deno.serve({ onError }, async (req: Request) => {
         importMapPath,
         envVars,
       })
+      executionId = worker.key
       // Gateway-minted internal JWT is for this router only; never expose it to user functions.
       const userReq = new Request(req)
       userReq.headers.delete('sb-api-key')
@@ -412,5 +417,43 @@ Deno.serve({ onError }, async (req: Request) => {
     }
   }
 
-  return await callWorker(req)
+  let response: Response
+  try {
+    response = await callWorker(req)
+  } catch (error) {
+    // Also account for preparation failures outside callWorker's inner try.
+    logInternal('main', 'error', 'request preparation failed', error)
+    response = getFunctionErrorResponse(resolveRuntimeError(error))
+  }
+
+  // user_workers.js constructs a new Response before returning it.
+  // Its headers are mutable; a response/body rebuild is unnecessary.
+  if (executionId) {
+    response.headers.set('x-deno-execution-id', executionId)
+    const exposed = (response.headers.get('Access-Control-Expose-Headers') ?? '')
+      .split(',').map((name) => name.trim()).filter(Boolean)
+    if (!exposed.some((name) => name.toLowerCase() === 'x-deno-execution-id')) {
+      exposed.push('x-deno-execution-id')
+    }
+    response.headers.set('Access-Control-Expose-Headers', exposed.join(', '))
+  }
+
+  try {
+    emitLog({
+      stream: 'request',
+      timestamp: new Date().toISOString(),
+      msg: `${req.method} ${pathname} ${response.status}`,
+      metadata: {
+        function_id: service_name,
+        request_id: requestId,
+        execution_id: executionId,
+        request: { method: req.method, pathname },
+        response: { status_code: response.status },
+        execution_time_ms: Math.round(performance.now() - start),
+      },
+    })
+  } catch (error) {
+    logInternal('main', 'error', 'main worker failed to emit request log', error)
+  }
+  return response
 })
