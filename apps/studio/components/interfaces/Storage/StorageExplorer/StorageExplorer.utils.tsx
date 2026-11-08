@@ -135,10 +135,16 @@ export function sanitizeNameForDuplicateInColumn(
       const fileName = fileNameSegments.slice(0, fileNameSegments.length - 1).join('.')
       const fileExt = fileNameSegments[fileNameSegments.length - 1]
 
-      const dupeNameRegex = new RegExp(`${fileName} \\([-0-9]+\\)${fileExt ? '.' + fileExt : ''}$`)
-      const namesWithSuffix = takenNames.filter((takenName) => takenName.match(dupeNameRegex))
+      const dupeNameRegex = new RegExp(
+        `${fileName} \\((?<number>\\d+)\\)${fileExt ? '.' + fileExt : ''}$`
+      )
+      const namesWithSuffix = takenNames
+        .map((takenName) => takenName.match(dupeNameRegex))
+        .filter((match) => match)
+        .map((match) => Number(match?.groups?.number ?? 0))
+      const maxSuffix = namesWithSuffix.length > 0 ? Math.max(...namesWithSuffix) : 0
 
-      const updatedFileName = fileName + ` (${namesWithSuffix.length + 1})`
+      const updatedFileName = fileName + ` (${maxSuffix + 1})`
       return fileExt ? `${updatedFileName}.${fileExt}` : updatedFileName
     } else {
       toast.error(

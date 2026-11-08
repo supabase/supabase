@@ -251,6 +251,16 @@ describe('sanitizeNameForDuplicateInColumn', () => {
       )
     })
 
+    it('chooses an unused name when a numbered duplicate has been deleted', () => {
+      const existingNames = ['file.txt', 'file (2).txt']
+      const state = makeState([existingNames.map((name) => ({ name }))])
+
+      const result = sanitizeNameForDuplicateInColumn(state, { name: 'file.txt', autofix: true })
+
+      expect(result).toMatch(/^file \(\d+\)\.txt$/)
+      expect(existingNames).not.toContain(result)
+    })
+
     it('counts a reserved duplicate, so the suffix skips a name an archived file holds', () => {
       // Without this the upload lands on `file (1).txt` and restores the archived file,
       // which is exactly what picking "keep both" declined.
