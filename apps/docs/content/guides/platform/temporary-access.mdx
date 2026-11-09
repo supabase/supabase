@@ -23,6 +23,12 @@ Projects need to be at least on Postgres 17.6.1.081 (or higher) to enable tempor
 
 The easiest way to manage temporary access is via the "Enable temporary access" settings section in [Database Settings page](/dashboard/project/_/database/settings) of the dashboard.
 
+<Admonition type="note">
+
+The "Enable temporary access" section only appears after you turn on the **Temporary database access** feature preview. Open the user menu in the top right, select **Feature previews**, then enable **Temporary database access**. If you don't see this preview, it isn't available for your account yet. The [Management API](#manage-temporary-access-via-the-management-api) commands below work either way.
+
+</Admonition>
+
 ## Manage temporary access via the Management API
 
 You can also manage temporary access using the Management API:
