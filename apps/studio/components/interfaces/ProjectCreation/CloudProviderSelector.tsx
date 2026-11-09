@@ -25,6 +25,7 @@ interface CloudProviderSelectorProps {
 export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
   const { infraCloudProviders: validCloudProviders } = useCustomContent(['infra:cloud_providers'])
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
+  const isProduction = process.env.NEXT_PUBLIC_ENVIRONMENT === 'prod'
 
   return (
     <FormField
@@ -56,6 +57,7 @@ export const CloudProviderSelector = ({ form }: CloudProviderSelectorProps) => {
               <SelectGroup>
                 {Object.values(PROVIDERS)
                   .filter((provider) => validCloudProviders?.includes(provider.id) ?? true)
+                  .filter((provider) => !isProduction || provider.id !== 'AWS_NIMBUS')
                   .map((providerObj) => {
                     const label = providerObj['name']
                     const value = providerObj['id']
