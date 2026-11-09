@@ -4,9 +4,11 @@ import { toast } from 'sonner'
 import { Button } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { useRecoveryCodesGate } from './useRecoveryCodesGate'
 import { IdentityVerification } from '@/components/interfaces/Account/IdentityVerification'
 import { AlertError } from '@/components/ui/AlertError'
 import { organizationKeys } from '@/data/organizations/keys'
+import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
 import { useRecoveryCodesUnenrollMutation } from '@/data/recovery-codes/recovery-codes-unenroll'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
@@ -14,45 +16,45 @@ import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganizat
 interface DeleteFactorModalProps {
   visible: boolean
   factorId: string | null
-  lastFactorToBeDeleted: boolean
-  hasRecoveryCodes: boolean
   onCheckingIdentity?: (isChecking: boolean) => void
-  canRemove?: boolean
-  recoveryCodesError?: { message: string } | null
-  isCheckingRecoveryCodes?: boolean
-  onRetryRecoveryCodes?: () => void
   onClose: () => void
 }
 
 export const DeleteFactorModal = ({
   visible,
+  factorId,
   onCheckingIdentity,
-  ...confirmationProps
+  onClose,
 }: DeleteFactorModalProps) => {
+  const { canUseRecoveryCodes } = useRecoveryCodesGate({ enabled: visible })
+
   if (!visible) return null
 
   return (
     <IdentityVerification
-      factorToAvoidId={confirmationProps.factorId ?? undefined}
-      onCancel={confirmationProps.onClose}
+      factorToAvoidId={factorId ?? undefined}
+      onCancel={onClose}
       onCheckingChange={onCheckingIdentity}
+      canUseRecoveryCodes={canUseRecoveryCodes}
+      returnTo={`/account/security?removeAuthenticator=${encodeURIComponent(factorId ?? '')}`}
     >
-      <RemoveAuthenticatorConfirmation {...confirmationProps} />
+      <RemoveAuthenticatorConfirmation factorId={factorId} onClose={onClose} />
     </IdentityVerification>
   )
 }
 
 const RemoveAuthenticatorConfirmation = ({
   factorId,
-  lastFactorToBeDeleted,
-  hasRecoveryCodes,
-  canRemove = true,
-  recoveryCodesError,
-  isCheckingRecoveryCodes = false,
-  onRetryRecoveryCodes,
   onClose,
-}: Omit<DeleteFactorModalProps, 'visible' | 'onCheckingIdentity'>) => {
+}: Pick<DeleteFactorModalProps, 'factorId' | 'onClose'>) => {
   const queryClient = useQueryClient()
+  const { data: factors } = useMfaListFactorsQuery()
+  const recoveryCodes = useRecoveryCodesGate()
+  const { canRemoveFactor, hasRecoveryCodes } = recoveryCodes
+  const verifiedFactorCount = (factors?.totp ?? []).filter(
+    (factor) => factor.status === 'verified'
+  ).length
+  const lastFactorToBeDeleted = verifiedFactorCount === 1
   const [error, setError] = useState<{ message: string } | null>(null)
   const [hasRemovedRecoveryCodes, setHasRemovedRecoveryCodes] = useState(false)
   const handleClose = () => {
@@ -103,9 +105,9 @@ const RemoveAuthenticatorConfirmation = ({
       confirmLabelLoading="Removing"
       loading={loading}
       onCancel={handleClose}
-      disabled={!factorId || !canRemove}
+      disabled={!factorId || !canRemoveFactor}
       onConfirm={() => {
-        if (!factorId || loading || !canRemove) return
+        if (!factorId || loading || !canRemoveFactor) return
         setError(null)
         // The API requires recovery codes to be removed before the last verified authenticator.
         const shouldDeleteRecoveryCodes =
@@ -142,18 +144,16 @@ const RemoveAuthenticatorConfirmation = ({
           </>
         )}
       </ul>
-      {!canRemove && recoveryCodesError && (
+      {!canRemoveFactor && recoveryCodes.error && (
         <AlertError
           className="mt-4"
           subject="Failed to load recovery codes"
-          error={recoveryCodesError}
+          error={recoveryCodes.error}
           showInstructions={false}
           additionalActions={
-            onRetryRecoveryCodes && (
-              <Button loading={isCheckingRecoveryCodes} onClick={onRetryRecoveryCodes}>
-                Retry
-              </Button>
-            )
+            <Button loading={recoveryCodes.isFetching} onClick={() => void recoveryCodes.refetch()}>
+              Retry
+            </Button>
           }
         />
       )}

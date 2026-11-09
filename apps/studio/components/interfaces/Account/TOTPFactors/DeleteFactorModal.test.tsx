@@ -1,15 +1,88 @@
 import { AuthApiError, AuthError } from '@supabase/auth-js'
+import type { AuthMFARecoveryCodesStatusResponse, Factor } from '@supabase/supabase-js'
+import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { DeleteFactorModal } from './DeleteFactorModal'
+import { profileKeys } from '@/data/profile/keys'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
 mockAnimationsApi()
 
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+
+const authenticator: Factor<'totp', 'verified'> = {
+  id: 'other_id',
+  factor_type: 'totp',
+  status: 'verified',
+  friendly_name: 'Backup device',
+  created_at: '',
+  updated_at: '',
+}
+const mainAuthenticator = { ...authenticator, id: 'some_id', friendly_name: 'Main device' }
+const factorsData = (totp: Factor<'totp', 'verified'>[]) => ({
+  all: totp,
+  totp,
+  phone: [],
+  recovery_code: [],
+  webauthn: [],
+})
+const availableCodes: AuthMFARecoveryCodesStatusResponse = {
+  data: { id: 'codes', type: 'recovery_code', remaining: 10, total: 10 },
+  error: null,
+}
+const unenrolledCodes: AuthMFARecoveryCodesStatusResponse = {
+  data: null,
+  error: new AuthApiError('No recovery codes', 404, 'mfa_factor_not_found'),
+}
+const verifyResponse = {
+  access_token: 'access',
+  token_type: 'bearer' as const,
+  expires_in: 3600,
+  refresh_token: 'refresh',
+  user: { id: 'user', aud: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '' },
+}
+
+/**
+ * The modal reads the factor list and recovery code status from the query cache. Pass
+ * `seededFactors` to have the list available up front, as it is on the security page.
+ */
+function renderDeletion({
+  factorId = 'some_id',
+  seededFactors,
+  onClose = vi.fn(),
+}: {
+  factorId?: string
+  seededFactors?: Factor<'totp', 'verified'>[]
+  onClose?: () => void
+} = {}) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false }, mutations: { retry: false } },
+  })
+  if (seededFactors) {
+    queryClient.setQueryData(profileKeys.mfaFactors(), factorsData(seededFactors))
+  }
+  customRender(
+    <FeatureFlagContext.Provider
+      value={{ configcat: { enableAuthRecoveryCodes: true }, posthog: {}, hasLoaded: true }}
+    >
+      <DeleteFactorModal visible factorId={factorId} onClose={onClose} />
+    </FeatureFlagContext.Provider>,
+    { queryClient }
+  )
+  return { onClose }
+}
+
+// Removal stays disabled until the recovery code status has loaded
+async function clickRemove() {
+  const button = await screen.findByRole('button', { name: 'Remove' })
+  await waitFor(() => expect(button).toBeEnabled())
+  fireEvent.click(button)
+}
 
 describe('DeleteFactorModal', () => {
   beforeEach(() => {
@@ -18,6 +91,7 @@ describe('DeleteFactorModal', () => {
       data: { currentLevel: 'aal2', nextLevel: 'aal2', currentAuthenticationMethods: [] },
       error: null,
     })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
   })
   test("Requests users confirmation before deleting an MFA when it's not the last", async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
@@ -32,26 +106,17 @@ describe('DeleteFactorModal', () => {
       },
       error: null,
     })
-    const onClose = vi.fn()
-
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        lastFactorToBeDeleted={false}
-        onClose={onClose}
-        hasRecoveryCodes
-      />
-    )
+    const { onClose } = renderDeletion({ seededFactors: [mainAuthenticator, authenticator] })
     await screen.findByText('Remove MFA method')
     expect(screen.queryByText('Multi-factor authentication will be disabled')).toBeNull()
     expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await clickRemove()
     await waitFor(() => expect(unenroll).toHaveBeenCalled())
     await waitFor(() => expect(onClose).toHaveBeenCalled())
     expect(unenrollRecoveryCodes).not.toHaveBeenCalled()
   })
   test("Requests users confirmation before deleting an MFA when it's the last one but no recovery codes are available", async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(unenrolledCodes)
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -64,56 +129,14 @@ describe('DeleteFactorModal', () => {
       },
       error: null,
     })
-    const onClose = vi.fn()
-
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        lastFactorToBeDeleted
-        onClose={onClose}
-        hasRecoveryCodes={false}
-      />
-    )
+    const { onClose } = renderDeletion({ seededFactors: [mainAuthenticator] })
     await screen.findByText('Remove MFA method')
     await screen.findByText('Multi-factor authentication will be disabled')
     expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await clickRemove()
     await waitFor(() => expect(unenroll).toHaveBeenCalled())
     await waitFor(() => expect(onClose).toHaveBeenCalled())
     expect(unenrollRecoveryCodes).not.toHaveBeenCalled()
-  })
-  test('Deletes the recovery codes when available and this is the last factor', async () => {
-    const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
-      data: {
-        id: 'some_id',
-      },
-      error: null,
-    })
-    const unenrollRecoveryCodes = vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
-      data: {
-        id: 'some_id',
-      },
-      error: null,
-    })
-    const onClose = vi.fn()
-
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        lastFactorToBeDeleted
-        onClose={onClose}
-        hasRecoveryCodes
-      />
-    )
-    await screen.findByText('Remove MFA method')
-    await screen.findByText('Multi-factor authentication will be disabled')
-    await screen.findByText('Your recovery codes will be removed too')
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
-    await waitFor(() => expect(unenrollRecoveryCodes).toHaveBeenCalled())
-    await waitFor(() => expect(unenroll).toHaveBeenCalled())
-    await waitFor(() => expect(onClose).toHaveBeenCalled())
   })
   test('Allows users to cancel the deletion', async () => {
     const unenroll = vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({
@@ -128,52 +151,14 @@ describe('DeleteFactorModal', () => {
       },
       error: null,
     })
-    const onClose = vi.fn()
-
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        lastFactorToBeDeleted={false}
-        onClose={onClose}
-        hasRecoveryCodes
-      />
-    )
+    const { onClose } = renderDeletion({ seededFactors: [mainAuthenticator, authenticator] })
     await screen.findByText('Remove MFA method')
-    expect(screen.queryByText('Your recovery codes will be removed too')).toBeNull()
     fireEvent.click(await screen.findByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(onClose).toHaveBeenCalled())
     expect(unenroll).not.toHaveBeenCalled()
     expect(unenrollRecoveryCodes).not.toHaveBeenCalled()
   })
 })
-
-const authenticator = {
-  id: 'other_id',
-  factor_type: 'totp' as const,
-  status: 'verified' as const,
-  friendly_name: 'Backup device',
-  created_at: '',
-  updated_at: '',
-}
-const verifyResponse = {
-  access_token: 'access',
-  token_type: 'bearer' as const,
-  expires_in: 3600,
-  refresh_token: 'refresh',
-  user: { id: 'user', aud: 'authenticated', app_metadata: {}, user_metadata: {}, created_at: '' },
-}
-function renderDeletion() {
-  customRender(
-    <DeleteFactorModal
-      visible
-      factorId="some_id"
-      lastFactorToBeDeleted
-      hasRecoveryCodes
-      onClose={vi.fn()}
-    />
-  )
-}
 
 describe('DeleteFactorModal identity verification', () => {
   beforeEach(() => {
@@ -183,41 +168,35 @@ describe('DeleteFactorModal identity verification', () => {
       error: null,
     })
     vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
-      data: {
-        all: [authenticator],
-        totp: [authenticator],
-        phone: [],
-        recovery_code: [],
-        webauthn: [],
-      },
+      data: factorsData([authenticator]),
       error: null,
     })
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
     vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({ data: { id: 'some_id' }, error: null })
     vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: { id: 'codes' },
       error: null,
     })
   })
-  test('AAL1 prompts verification without deleting anything', async () => {
+  test('recovery-code fallback is a usable link without a router provider', async () => {
+    renderDeletion()
+    expect(await screen.findByRole('link', { name: 'Use recovery code instead' })).toHaveAttribute(
+      'href',
+      '/sign-in-recovery-code?returnTo=%2Faccount%2Fsecurity%3FremoveAuthenticator%3Dsome_id'
+    )
+  })
+
+  test('AAL1 prompts for a code from the single authenticator before removal', async () => {
     renderDeletion()
     await screen.findByText('Verify your identity')
     expect(screen.queryByRole('button', { name: 'Remove' })).not.toBeInTheDocument()
-    expect(auth.mfa.unenroll).not.toHaveBeenCalled()
-    expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
     const input = await screen.findByRole('textbox', { name: 'Authentication code' })
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
     expect(input).toHaveAccessibleDescription('From your authenticator app “Backup device”.')
   })
   test('two authenticators use a dropdown without repeating the app in the code description', async () => {
-    const other = { ...authenticator, id: 'some_id', friendly_name: 'Main device' }
     vi.spyOn(auth.mfa, 'listFactors').mockResolvedValue({
-      data: {
-        all: [other, authenticator],
-        totp: [other, authenticator],
-        phone: [],
-        recovery_code: [],
-        webauthn: [],
-      },
+      data: factorsData([mainAuthenticator, authenticator]),
       error: null,
     })
     renderDeletion()
@@ -248,13 +227,14 @@ describe('DeleteFactorModal identity verification', () => {
     })
     fireEvent.click(screen.getByRole('button', { name: 'Verify' }))
     await screen.findByText('Remove MFA method')
+    expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(auth.mfa.challengeAndVerify).toHaveBeenCalledWith({
       factorId: 'other_id',
       code: '123456',
     })
     expect(auth.mfa.unenroll).not.toHaveBeenCalled()
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await clickRemove()
     await waitFor(() => expect(auth.mfa.unenroll).toHaveBeenCalledOnce())
     expect(vi.mocked(auth.mfa.recoveryCodes.unenroll).mock.invocationCallOrder[0]).toBeLessThan(
       vi.mocked(auth.mfa.unenroll).mock.invocationCallOrder[0]
@@ -308,16 +288,7 @@ describe('DeleteFactorModal identity verification', () => {
     expect(auth.mfa.recoveryCodes.unenroll).not.toHaveBeenCalled()
   })
   test('cancelling verification never opens removal confirmation or deletes anything', async () => {
-    const onClose = vi.fn()
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="some_id"
-        lastFactorToBeDeleted
-        hasRecoveryCodes
-        onClose={onClose}
-      />
-    )
+    const { onClose } = renderDeletion()
     await screen.findByRole('textbox', { name: 'Authentication code' })
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     expect(onClose).toHaveBeenCalledOnce()
@@ -349,28 +320,27 @@ describe('authenticator removal failures', () => {
     })
   })
   test('keeps the dialog open if recovery code removal fails', async () => {
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
     const unenroll = vi.spyOn(auth.mfa, 'unenroll')
     vi.spyOn(auth.mfa.recoveryCodes, 'unenroll').mockResolvedValue({
       data: null,
       error: new AuthApiError('Codes could not be removed', 500, 'unexpected_failure'),
     })
-    const onClose = vi.fn()
-    customRender(
-      <DeleteFactorModal
-        visible
-        factorId="factor-a"
-        lastFactorToBeDeleted
-        hasRecoveryCodes
-        onClose={onClose}
-      />
-    )
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    const { onClose } = renderDeletion({
+      factorId: 'factor-a',
+      seededFactors: [{ ...authenticator, id: 'factor-a' }],
+    })
+    await clickRemove()
     expect(await screen.findByText(/Codes could not be removed/)).toBeInTheDocument()
     expect(unenroll).not.toHaveBeenCalled()
     expect(onClose).not.toHaveBeenCalled()
   })
 
   test('retries factor removal without removing recovery codes a second time', async () => {
+    // Removing the codes invalidates their status, which then reports them as gone
+    vi.spyOn(auth.mfa.recoveryCodes, 'getStatus')
+      .mockResolvedValueOnce(availableCodes)
+      .mockResolvedValue(unenrolledCodes)
     const unenroll = vi
       .spyOn(auth.mfa, 'unenroll')
       .mockResolvedValueOnce({
@@ -381,33 +351,18 @@ describe('authenticator removal failures', () => {
     const unenrollCodes = vi
       .spyOn(auth.mfa.recoveryCodes, 'unenroll')
       .mockResolvedValue({ data: { id: 'codes-a' }, error: null })
-    const onClose = vi.fn()
-    const { rerender } = customRender(
-      <DeleteFactorModal
-        visible
-        factorId="factor-a"
-        lastFactorToBeDeleted
-        hasRecoveryCodes
-        onClose={onClose}
-      />
-    )
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    const { onClose } = renderDeletion({
+      factorId: 'factor-a',
+      seededFactors: [{ ...authenticator, id: 'factor-a' }],
+    })
+    await clickRemove()
     expect(await screen.findByText(/Authenticator could not be removed/)).toBeInTheDocument()
-    rerender(
-      <DeleteFactorModal
-        visible
-        factorId="factor-a"
-        lastFactorToBeDeleted
-        hasRecoveryCodes={false}
-        onClose={onClose}
-      />
-    )
     expect(
       screen.getByText(/Your recovery codes were removed, but your MFA method is still active/)
     ).toBeInTheDocument()
     expect(screen.getByText('Your recovery codes will be removed too')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'contact support' })).toBeInTheDocument()
-    fireEvent.click(await screen.findByRole('button', { name: 'Remove' }))
+    await clickRemove()
     await waitFor(() => expect(onClose).toHaveBeenCalledOnce())
     expect(unenrollCodes).toHaveBeenCalledOnce()
     expect(unenroll).toHaveBeenCalledTimes(2)

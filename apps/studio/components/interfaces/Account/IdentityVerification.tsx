@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 import {
   Button,
   CardContent,
+  CardFooter,
   Dialog,
   DialogContent,
   DialogTitle,
@@ -29,6 +30,7 @@ import {
 } from '@/data/profile/mfa-authenticator-assurance-level-query'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaListFactorsQuery, type MFAFactor } from '@/data/profile/mfa-list-factors-query'
+import { BASE_PATH } from '@/lib/constants'
 
 const VerificationSchema = z.object({
   code: z.string().trim().min(1, 'Enter an authentication code'),
@@ -37,19 +39,22 @@ const VerificationSchema = z.object({
 type VerificationValues = z.infer<typeof VerificationSchema>
 
 interface IdentityVerificationProps {
+  canUseRecoveryCodes?: boolean
+  returnTo?: string
   factorToAvoidId?: string
   onCancel: () => void
   onCheckingChange?: (isChecking: boolean) => void
 }
 
 export const IdentityVerification = ({
+  canUseRecoveryCodes = false,
+  returnTo = '/account/security',
   factorToAvoidId,
   onCancel,
   onCheckingChange,
   children,
 }: PropsWithChildren<IdentityVerificationProps>) => {
   const verificationId = useId()
-
   const [restoreFocusTo] = useState(() =>
     typeof document !== 'undefined' && document.activeElement instanceof HTMLElement
       ? document.activeElement
@@ -151,15 +156,16 @@ export const IdentityVerification = ({
                   factorToAvoidId={factorToAvoidId}
                   error={error}
                   onVerified={handleVerified}
-                  onCancel={onCancel}
+                  canUseRecoveryCodes={canUseRecoveryCodes}
+                  returnTo={returnTo}
                 />
               )}
-              {(readError || factors.isPending) && (
-                <Button block onClick={onCancel} variant="text">
-                  Cancel
-                </Button>
-              )}
             </CardContent>
+            <CardFooter className="justify-center border-t px-6 py-5">
+              <Button variant="text" size="tiny" onClick={onCancel}>
+                Cancel
+              </Button>
+            </CardFooter>
           </InterstitialLayout>
         </DialogContent>
       </Dialog>
@@ -170,14 +176,16 @@ export const IdentityVerification = ({
 const VerificationForm = ({
   verifiedFactors,
   factorToAvoidId,
+  canUseRecoveryCodes,
+  returnTo,
   error,
   onVerified,
-  onCancel,
 }: {
   verifiedFactors: MFAFactor[]
   factorToAvoidId?: string
+  canUseRecoveryCodes: boolean
+  returnTo: string
   error: { message: string } | null
-  onCancel: () => void
   onVerified: () => Promise<void>
 }) => {
   const preferredFactor =
@@ -284,9 +292,13 @@ const VerificationForm = ({
           >
             Verify
           </Button>
-          <Button block type="button" variant="text" onClick={onCancel}>
-            Cancel
-          </Button>
+          {canUseRecoveryCodes && (
+            <Button asChild block variant="text">
+              <a href={`${BASE_PATH}/sign-in-recovery-code?${new URLSearchParams({ returnTo })}`}>
+                Use recovery code instead
+              </a>
+            </Button>
+          )}
         </div>
       </form>
     </Form>
