@@ -2202,6 +2202,11 @@ export interface components {
             id: number
             username: string
           } | null
+          /**
+           * Format: uri
+           * @description Dashboard link for this notebook.
+           */
+          url: string
         }
         id: string
         /**
@@ -2518,6 +2523,11 @@ export interface components {
             id: number
             username: string
           } | null
+          /**
+           * Format: uri
+           * @description Dashboard link for this notebook.
+           */
+          url: string
         }
         id: string
         /**
