@@ -35,7 +35,17 @@ export function OnboardingSurveyFollowUpCard() {
       track('onboarding_survey_dismissed', { surface: 'follow_up', reason })
       resolveFollowUp('dismissed')
       if (orgSlug && orgKind)
-        submitOnboardingSurvey({ slug: orgSlug, kind: orgKind, size: orgSize })
+        submitOnboardingSurvey(
+          { slug: orgSlug, kind: orgKind, size: orgSize },
+          {
+            onError: () =>
+              track('onboarding_survey_submit_failed', {
+                surface: 'follow_up',
+                hasKind: false,
+                hasBuilding: false,
+              }),
+          }
+        )
     },
     [orgKind, orgSize, orgSlug, resolveFollowUp, submitOnboardingSurvey, track]
   )
@@ -142,6 +152,7 @@ export function OnboardingSurveyFollowUpCard() {
 
   return (
     <OnboardingSurveyFollowUpDialog
+      key={orgSlug}
       open={isDialogOpen}
       isSubmitting={isSubmitting}
       onOpenChange={(open) => {
