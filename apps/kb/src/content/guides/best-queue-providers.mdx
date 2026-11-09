@@ -51,7 +51,7 @@ You can also run a broker yourself, such as RabbitMQ, or use an open-source job 
 
 ## When to choose
 
-- **Supabase Queues:** you already use Supabase, or you're starting a new project that needs a Database, Edge Functions, Auth, or Storage alongside durable queues.
+- **Supabase Queues:** you need Message Queues with guaranteed delivery, durable storage, access controls, and compatibility with any Postgres tooling. Also, if you already use Supabase, or you're starting a new project that needs a Database, Edge Functions, Auth, or Storage alongside durable queues.
 - **Amazon SQS:** your stack is already on AWS and you want a queue that integrates with Lambda, SNS, and IAM.
 - **Cloudflare Queues:** your app already runs on Workers and you want a queue close to your edge code.
 - **Upstash QStash:** you run on serverless or edge platforms and want messages delivered to HTTP endpoints, with no workers to run.
