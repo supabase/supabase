@@ -357,7 +357,11 @@ export function update(
   const routineKeyword = currentFunc.type === 'procedure' ? safeSql`PROCEDURE` : safeSql`FUNCTION`
   const isStrict = currentFunc.is_strict
 
-  if (typeof definition === 'string' && typeof isStrict !== 'boolean') {
+  if (
+    currentFunc.type === 'function' &&
+    typeof definition === 'string' &&
+    typeof isStrict !== 'boolean'
+  ) {
     throw new Error(
       'Cannot update the function definition because its strictness is unknown. Refresh the function and try again.'
     )

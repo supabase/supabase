@@ -36,6 +36,13 @@ test('update refuses a definition change when strictness is unknown', () => {
     /strictness is unknown/
   )
   expect(() => pgMeta.functions.update(savedFunction, { name: 'stale_fn_renamed' })).not.toThrow()
+
+  // Procedures do not have a strictness clause, so a stale procedure row can
+  // still have its definition regenerated.
+  const staleProcedure = { ...savedFunction, type: 'procedure' } as unknown as PGSavedFunction
+  expect(() =>
+    pgMeta.functions.update(staleProcedure, { definition: 'begin null; end' })
+  ).not.toThrow()
 })
 
 afterAll(async () => {
