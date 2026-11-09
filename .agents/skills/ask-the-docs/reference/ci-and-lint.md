@@ -20,7 +20,7 @@ PR opened / updated
     └── Authorize Vercel Deploys → Vercel builds preview deploy → Preview on CDN
 
 Merge to master
-    └── Vercel → next build (with prebuild markdown generation) → deploy
+    └── Vercel → next build (after turbo runs markdown generation) → deploy
 ```
 
 ## On every pull request
@@ -69,9 +69,9 @@ Production deployment is handled by **Vercel**. Supabase employees branch the
 repo directly rather than fork it, so CI checks auto-run and Vercel deploys
 can be authorized without the external PR security gate.
 
-Markdown for every guide is generated as a **prebuild task** so Vercel can
+Markdown for every guide is generated as a **turbo dependency of `build`** so Vercel can
 bundle it with middleware and functions — see
-[`build-pipeline.md`](./build-pipeline.md) for the lifecycle.
+[`build-pipeline.md`](./build-pipeline.md) for the task graph.
 
 The **Authorize Vercel Deploys** workflow is the glue between GitHub Actions
 and Vercel: it runs first to approve the deploy, then Vercel picks it up and
@@ -115,7 +115,7 @@ to keep merge cadence high.
 ## Related
 
 - [`app-map.md`](./app-map.md) — what `pnpm test:docs` actually runs.
-- [`build-pipeline.md`](./build-pipeline.md) — `prebuild` step that ships
+- [`build-pipeline.md`](./build-pipeline.md) — turbo tasks that ship
   markdown to Vercel.
 - [`adding-features.md`](./adding-features.md) — reuse existing pipelines
   before adding new ones.
