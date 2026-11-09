@@ -165,12 +165,39 @@ describe('signalsToIssues', () => {
 })
 
 describe('sortIssues', () => {
+  it('ranks distinct resources above repeated findings on the same table', () => {
+    const issues = lintsToIssues([
+      ...['anon_select', 'authenticated_select', 'authenticated_insert'].map((role) =>
+        makeLint({ name: 'multiple_permissive_policies', level: 'WARN', cache_key: role })
+      ),
+      makeLint({ name: 'no_primary_key', level: 'WARN' }),
+      makeLint({
+        name: 'no_primary_key',
+        level: 'WARN',
+        metadata: { type: 'table', schema: 'public', name: 'users' },
+        cache_key: 'users',
+      }),
+    ])
+
+    expect(issues[0].affected).toHaveLength(3)
+    expect(sortIssues(issues).map((issue) => issue.id)).toEqual([
+      'no_primary_key',
+      'multiple_permissive_policies',
+    ])
+  })
+
   it('leads with the most severe, then the one affecting the most', () => {
     const issues = lintsToIssues([
       makeLint({ name: 'unused_index', title: 'Unused', level: 'INFO', cache_key: 'a' }),
       makeLint({ name: 'no_primary_key', title: 'PK one', level: 'WARN', cache_key: 'b' }),
       makeLint({ name: 'duplicate_index', title: 'Dup', level: 'WARN', cache_key: 'c' }),
-      makeLint({ name: 'duplicate_index', title: 'Dup', level: 'WARN', cache_key: 'd' }),
+      makeLint({
+        name: 'duplicate_index',
+        title: 'Dup',
+        level: 'WARN',
+        cache_key: 'd',
+        metadata: { type: 'table', schema: 'public', name: 'users' },
+      }),
       makeLint({ name: 'rls_disabled_in_public', level: 'ERROR', cache_key: 'e' }),
     ])
 

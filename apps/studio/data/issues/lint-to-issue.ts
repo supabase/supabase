@@ -1,3 +1,4 @@
+import { getUniqueIssueResources } from './issue-resource'
 import type {
   Issue,
   IssueAffectedResource,
@@ -127,10 +128,13 @@ export function signalsToIssues(signals: AdvisorSignalItem[]): Issue[] {
 
 /** Most severe first, then whatever affects the most, so what needs fixing most leads. */
 export function sortIssues(issues: Issue[]) {
-  return [...issues].sort(
-    (a, b) =>
-      SEVERITY_ORDER.indexOf(a.severity) - SEVERITY_ORDER.indexOf(b.severity) ||
-      b.affected.length - a.affected.length ||
-      a.title.localeCompare(b.title)
-  )
+  return issues
+    .map((issue) => ({ issue, resourceCount: getUniqueIssueResources(issue.affected).length }))
+    .sort(
+      (a, b) =>
+        SEVERITY_ORDER.indexOf(a.issue.severity) - SEVERITY_ORDER.indexOf(b.issue.severity) ||
+        b.resourceCount - a.resourceCount ||
+        a.issue.title.localeCompare(b.issue.title)
+    )
+    .map(({ issue }) => issue)
 }

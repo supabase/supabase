@@ -1,4 +1,5 @@
 import { ISSUE_SEVERITIES, RESOURCE_TYPE_NOUNS } from './Issues.constants'
+import { getUniqueIssueResources } from '@/data/issues/issue-resource'
 import type {
   Issue,
   IssueAffectedResource,
@@ -22,12 +23,13 @@ function formatLabelList(labels: string[]) {
  * count by type, e.g. `3 tables` or `2 tables and 1 view`. Null when there's nothing.
  */
 export function summarizeAffected(affected: Pick<IssueAffectedResource, 'resource'>[]) {
-  if (affected.length === 0) return null
-  if (affected.length === 1) return formatIssueResource(affected[0].resource)
+  const resources = getUniqueIssueResources(affected)
+  if (resources.length === 0) return null
+  if (resources.length === 1) return formatIssueResource(resources[0])
 
   // Keyed by the plural so types that share a noun count together
   const counts = new Map<string, { noun: { one: string; other: string }; count: number }>()
-  for (const { resource } of affected) {
+  for (const resource of resources) {
     const noun = RESOURCE_TYPE_NOUNS[resource.type]
     counts.set(noun.other, { noun, count: (counts.get(noun.other)?.count ?? 0) + 1 })
   }

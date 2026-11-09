@@ -50,6 +50,19 @@ describe('summarizeAffected', () => {
     ).toBe('2 tables and 1 view')
   })
 
+  it('names one table once when several policies or indexes affect it', () => {
+    expect(summarizeAffected([makeAffected('posts'), makeAffected('posts')])).toBe('public.posts')
+  })
+
+  it('keeps different schemas and resource types distinct', () => {
+    const archived = makeAffected('posts')
+    archived.resource.schema = 'archive'
+
+    expect(
+      summarizeAffected([makeAffected('posts'), archived, makeAffected('posts', 'view')])
+    ).toBe('2 tables and 1 view')
+  })
+
   it('has no summary when nothing is affected', () => {
     expect(summarizeAffected([])).toBeNull()
   })
