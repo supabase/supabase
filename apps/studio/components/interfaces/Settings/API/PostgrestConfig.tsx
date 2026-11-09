@@ -702,6 +702,8 @@ export const PostgrestConfig = () => {
           resetAuthenticatorOverride({
             projectRef,
             connectionString: project?.connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'authenticator-role-override-reset',
             sql: resetAuthenticatorDbSchemasSql,
             grant: unguarded.migrating,
           })
