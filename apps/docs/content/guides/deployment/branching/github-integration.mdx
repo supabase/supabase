@@ -149,6 +149,60 @@ The following changes are deployed:
 
 All other configurations, including API, Auth, and seed files, are ignored by default.
 
+<Admonition type="caution">
+
+If you push to your production branch before the previous deployment finishes, production can end up serving an older commit's Edge Functions. Each push starts its own deployment run, and runs for earlier commits aren't queued or canceled. Each function keeps the code from the run that deployed it last, and the checks for both commits still pass. To prevent this, see [Deploy one commit at a time](#deploy-one-commit-at-a-time).
+
+</Admonition>
+
+### Deploy one commit at a time
+
+To make sure production always ends on your newest commit, deploy your production branch from a GitHub Actions workflow with a `concurrency` group. GitHub Actions runs one deployment at a time. A push that arrives during a deployment waits for it to finish, and replaces any older push that's still waiting.
+
+1. In **Project Settings** > [**Integrations**](/dashboard/project/_/settings/integrations), turn off **Deploy to production**. Preview branches keep working.
+2. In your GitHub repository, add your [personal access token](/docs/guides/platform/personal-access-tokens) and database password as the secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
+3. Add your project ref as the repository variable `PROJECT_REF`.
+4. Add the following workflow to your repository:
+
+```yaml name=.github/workflows/deploy-production.yaml
+name: Deploy to production
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: supabase-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    env:
+      SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+      SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
+      SUPABASE_ENV: production
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      - uses: supabase/setup-cli@v3
+
+      - run: supabase db push --remote=${{ vars.PROJECT_REF }} --yes
+      - run: supabase functions deploy --remote=${{ vars.PROJECT_REF }} --yes
+```
+
+- Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which can leave migrations partially applied.
+- The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so this keeps the last run on your newest commit.
+- `supabase functions deploy` deploys every function directory in `supabase/functions`, including functions that `config.toml` doesn't declare. It doesn't save the secrets under `[edge_runtime.secrets]`, so set those with `supabase secrets set`.
+- If `config.toml` declares Storage buckets, add a `supabase seed buckets --remote=${{ vars.PROJECT_REF }} --yes` step. With `--yes`, the command also uploads the files in each bucket's `objects_path` and overwrites existing objects.
+
+For more information about the CLI flags in this workflow, see [Running in CI](/docs/guides/local-development/local-and-hosted-projects#ci).
+
 ## Preventing migration failures
 
 We highly recommend turning on a 'required check' for the Supabase integration. You can do this from your GitHub repository settings. This prevents PRs from being merged when migration checks fail, and stops invalid migrations from being merged into your production branch.
