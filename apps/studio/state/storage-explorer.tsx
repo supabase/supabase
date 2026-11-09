@@ -442,7 +442,7 @@ export function createStorageExplorerState({
           return col
         })
       } catch (error: any) {
-        if (!error.message.includes('aborted')) {
+        if (!isRequestAborted(error)) {
           toast.error(`Failed to retrieve more folder contents: ${error.message}`)
         }
       }
