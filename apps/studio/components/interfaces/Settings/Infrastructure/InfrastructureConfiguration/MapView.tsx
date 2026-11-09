@@ -250,7 +250,8 @@ const MapView = () => {
             <div>
               <p className="text-xs text-foreground-light">
                 {databasesInSelectedRegion.length} database
-                {databasesInSelectedRegion.length > 1 ? 's' : ''} deployed in
+                {databasesInSelectedRegion.length > 1 ? <span>s</span> : ''}{' '}
+                <span>deployed in</span>
               </p>
               <p className="text-sm">{selectedRegion.name}</p>
             </div>
@@ -270,12 +271,14 @@ const MapView = () => {
                     >
                       <div className="flex flex-col gap-y-1">
                         <p className="flex items-center gap-x-2">
-                          {database.identifier === ref
-                            ? 'Primary Database'
-                            : `Read Replica ${
-                                database.identifier.length > 0 &&
-                                `(ID: ${formatDatabaseID(database.identifier)})`
-                              }`}
+                          {database.identifier === ref ? (
+                            <span>Primary Database</span>
+                          ) : (
+                            <span>{`Read Replica ${
+                              database.identifier.length > 0 &&
+                              `(ID: ${formatDatabaseID(database.identifier)})`
+                            }`}</span>
+                          )}
                           {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                             <Badge variant="success">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
@@ -291,9 +294,11 @@ const MapView = () => {
                         <div>
                           <p className="text-xs text-foreground-light">
                             AWS
-                            {projectHomepageShowInstanceSize && !!computeSize
-                              ? ` • ${computeSize}`
-                              : ''}
+                            {projectHomepageShowInstanceSize && !!computeSize ? (
+                              <span>{` • ${computeSize}`}</span>
+                            ) : (
+                              ''
+                            )}
                           </p>
                           {database.identifier !== ref && (
                             <p className="text-xs text-foreground-light">

@@ -7,6 +7,6 @@ export const Route = createFileRoute('/_auth/sign-in-recovery-code')({
 })
 
 function SignInRecoveryCode() {
-  // The Next page inlines its own SignInLayout; just render it.
+  // The page owns its interstitial layout.
   return <SignInRecoveryCodePage dehydratedState={undefined} />
 }

@@ -261,7 +261,8 @@ export function generateDynamicColumns({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {logCount} {logCount === 1 ? 'log' : 'logs'} for this execution
+                  {logCount} {logCount === 1 ? <span>log</span> : <span>logs</span>}{' '}
+                  <span>for this execution</span>
                 </TooltipContent>
               </Tooltip>
             )}

@@ -24,9 +24,6 @@ import {
 } from '@/lib/account-recovery/recovery-reminder'
 import { useTrack } from '@/lib/telemetry/track'
 
-// Anchor the header while the card grows from checking to actionable tasks.
-const recoveryContainerClassName = 'items-start pt-16 sm:pt-32'
-
 export const RecoveryInterstitial = ({ onDismiss }: { onDismiss: () => void }) => {
   return <LiveRecoveryReminder onDismiss={onDismiss} />
 }
@@ -137,7 +134,6 @@ export const RecoveryReminder = ({
         logo={<SupabaseLogo />}
         title="Account recovery check unavailable"
         widthClassName="max-w-md"
-        containerClassName={recoveryContainerClassName}
       >
         <div className="px-6">
           <AlertError subject="Failed to check account recovery" />
@@ -160,7 +156,6 @@ export const RecoveryReminder = ({
           </div>
         }
         widthClassName="max-w-md"
-        containerClassName={recoveryContainerClassName}
         description={<ShimmeringLoader className="h-5 w-64 max-w-full py-0" />}
       >
         <CardFooter className="justify-center px-6 py-5 min-h-16" />
@@ -202,7 +197,7 @@ export const RecoveryReminder = ({
       title="Secure your account"
       description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
       widthClassName="max-w-md"
-      containerClassName={`${recoveryContainerClassName} relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent`}
+      containerClassName="relative before:pointer-events-none before:absolute before:inset-x-0 before:top-0 before:h-64 before:bg-gradient-to-b before:from-warning-600/10 before:to-transparent"
       cardClassName="relative"
     >
       <div className="border-t divide-y">

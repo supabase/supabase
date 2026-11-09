@@ -40,8 +40,8 @@ export const ComputeMetricsFooter = ({
         >
           {/* Stable live region: announces loading/unavailability, never the polled values */}
           <span role="status" className="sr-only">
-            {isMetricsLoading && 'Loading metrics'}
-            {!isMetricsLoading && isMetricsError && 'Metrics unavailable'}
+            {isMetricsLoading && <span>Loading metrics</span>}
+            {!isMetricsLoading && isMetricsError && <span>Metrics unavailable</span>}
             {!isMetricsLoading && !isMetricsError && (
               <>
                 {cpu === null && 'CPU unavailable. '}

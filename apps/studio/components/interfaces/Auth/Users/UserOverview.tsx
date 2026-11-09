@@ -240,7 +240,7 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                   <p className="capitalize">{providerName}</p>
                   <p className="text-xs text-foreground-light">
                     Signed in with a {providerName} account via{' '}
-                    {providerName === 'SAML' ? 'SSO' : 'OAuth'}
+                    {providerName === 'SAML' ? <span>SSO</span> : <span>OAuth</span>}
                   </p>
                   {authenticationSignInProviders && (
                     <Button asChild className="mt-2">

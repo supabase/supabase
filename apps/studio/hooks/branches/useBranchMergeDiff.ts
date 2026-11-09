@@ -71,18 +71,22 @@ export const useBranchMergeDiff = ({
     isRefetching: isDatabaseDiffRefetching,
     error: diffQueryError,
     refetch: refetchDatabaseDiff,
-  } = useQuery({
-    ...branchDiffQueryOptions({
-      branchRef: currentBranchRef,
-      projectRef: parentProjectRef,
-      pgdelta: pgDeltaDiffEnabled,
-      grant: diffGrant.grant,
-    }),
-    enabled: !!currentBranchRef && !!parentProjectRef,
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: false,
-    staleTime: 0,
-  })
+  } = useQuery(
+    branchDiffQueryOptions(
+      {
+        branchRef: currentBranchRef,
+        projectRef: parentProjectRef,
+        pgdelta: pgDeltaDiffEnabled,
+        grant: diffGrant.grant,
+      },
+      {
+        enabled: !!currentBranchRef && !!parentProjectRef,
+        refetchOnMount: 'always',
+        refetchOnWindowFocus: false,
+        staleTime: 0,
+      }
+    )
+  )
 
   const isDatabaseDiffLoading =
     diffGrant.status === 'loading' || (diffGrant.status === 'granted' && isDiffQueryPending)

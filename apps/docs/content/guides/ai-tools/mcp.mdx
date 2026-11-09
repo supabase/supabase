@@ -113,9 +113,22 @@ Disabled in read-only mode (`read_only` parameter).
 - `list_storage_buckets` - List storage buckets
 - `get_storage_config` / `update_storage_config` - Storage configuration
 
+### Notebooks
+
+<Admonition type="note">
+
+Available only on hosted connections. Not available in the MCP server for local or self-hosted Studio, including the Supabase CLI.
+
+</Admonition>
+
+- `list_notebooks` / `get_notebook` - List or get project notebooks
+- `create_notebook` - Create a notebook with Markdown, database, and log cells
+- `run_notebook` - Run up to 50 query cells in a notebook, or only selected cells
+- `delete_notebook` - Delete a notebook. See [Notebook confirmations](#notebook-confirmations).
+
 ## Elicitations
 
-[Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) lets an MCP server pause a tool call to ask you for input or confirmation. These flows require both server availability and an MCP client that supports the appropriate elicitation mode: forms for [cost confirmation](#cost-confirmation) and [SQL confirmations](#destructive-sql-confirmations), or URLs for [secret entry](#edge-function-secrets).
+[Elicitation](https://modelcontextprotocol.io/specification/2026-07-28/client/elicitation) lets an MCP server pause a tool call to ask you for input or confirmation. These flows require both server availability and an MCP client that supports the appropriate elicitation mode: forms for [cost confirmation](#cost-confirmation), [SQL confirmations](#destructive-sql-confirmations), and [notebook confirmations](#notebook-confirmations), or URLs for [secret entry](#edge-function-secrets).
 
 Server elicitation is separate from your MCP client's own approval of tool calls. It does not replace manual approval or the [security recommendations](#recommendations).
 
@@ -125,10 +138,10 @@ Treat elicitations as a guardrail, not a guarantee of human review or approval. 
 
 Elicitations require your MCP client to support the corresponding mode for the request.
 
-| Mode | Supabase use                                                                                                |
-| ---- | ----------------------------------------------------------------------------------------------------------- |
-| Form | [Cost confirmation](#cost-confirmation) and [destructive SQL confirmations](#destructive-sql-confirmations) |
-| URL  | [Edge Function secret entry](#edge-function-secrets) in the Supabase Dashboard                              |
+| Mode | Supabase use                                                                                                                                                    |
+| ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Form | [Cost confirmation](#cost-confirmation), [destructive SQL confirmations](#destructive-sql-confirmations), and [notebook confirmations](#notebook-confirmations) |
+| URL  | [Edge Function secret entry](#edge-function-secrets) in the Supabase Dashboard                                                                                  |
 
 Support for one mode does not imply support for the other. Check your client's documentation for the modes it supports. The MCP specification revision alone does not determine which flows your connection uses.
 
@@ -160,6 +173,20 @@ When SQL elicitation is available and your client supports forms, `execute_sql` 
 If SQL elicitation is unavailable, unsupported by your client, or skipped with [`skip_elicitations`](#skip-form-confirmations), SQL follows the existing execution path without an additional MCP confirmation. Read-only restrictions and permissions still apply. Keep the [security recommendations](#recommendations) in place.
 
 Troubleshooting: If you expect a dialog and don't see one, see [SQL confirmations do not appear in your MCP client](/kb/troubleshooting/sql-confirmations-do-not-appear-in-your-mcp-client-sQf7Kp).
+
+### Notebook confirmations
+
+When notebook elicitation is available, `run_notebook` and `delete_notebook` ask for confirmation through a form:
+
+- `run_notebook` asks before running any cell when the selected database cells contain statements other than plain reads. The form shows how many cells modify data or schema and how many are destructive. Plain reads run without a prompt as a read-only Postgres user. A `SELECT` that calls a function that writes data also runs without a prompt.
+- `delete_notebook` shows the notebook name and asks before deleting it for everyone with access to the project. Deletion cannot be undone.
+- If the notebook or the selected cells change after you approve, you are asked again.
+
+In [read-only mode](#configuration-options), `run_notebook` runs every database cell as a read-only Postgres user without a prompt, and `create_notebook` and `delete_notebook` are refused.
+
+Unlike SQL confirmations, notebook confirmations do not fall back to running without a prompt. If your client does not support forms, `run_notebook` refuses cells that need confirmation and `delete_notebook` refuses to delete. Use read-only mode to run the notebook, or delete it from the Supabase Dashboard.
+
+If you skip these confirmations with [`skip_elicitations`](#skip-form-confirmations), notebooks run and are deleted without an additional MCP confirmation. Read-only restrictions and permissions still apply.
 
 ### Edge Function secrets
 
@@ -197,17 +224,19 @@ When using [Supabase CLI](/docs/guides/local-development) for local development,
 
 ### Skip form confirmations
 
-Use one `skip_elicitations` parameter with a comma-separated list of tool names: `create_project`, `create_branch`, `execute_sql`, or `apply_migration`.
+Use one `skip_elicitations` parameter with a comma-separated list of tool names: `create_project`, `create_branch`, `execute_sql`, `apply_migration`, `run_notebook`, or `delete_notebook`.
 
 Names are case-sensitive. Omit the parameter or leave it empty to skip none; this does not enable confirmations that the server does not offer. Invalid names are rejected. There is no boolean or `all` switch, and `create_edge_function_secret` is not supported by this parameter.
 
-In the panel, skip choices are hidden for read-only and local connections. Cost confirmation choices require a connection not scoped to a project with account helpers enabled; `create_branch` also requires branching. SQL-confirmation choices require the database feature group. These limits apply to the panel, not to manually supplied URL parameters.
+In the panel, skip choices are hidden for read-only and local connections. Cost confirmation choices require a connection not scoped to a project with account helpers enabled; `create_branch` also requires branching. SQL-confirmation choices require the database feature group, and notebook-confirmation choices require the notebooks feature group. These limits apply to the panel, not to manually supplied URL parameters.
 
 Skip cost confirmation: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=create_project,create_branch</code>
 
 Skip SQL confirmations: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=execute_sql,apply_migration</code>
 
-Skipping cost confirmations retains the [legacy cost confirmation workflow](#cost-confirmation). Skipping SQL confirmations uses the existing SQL execution path without an additional MCP confirmation. Neither option bypasses authentication, permissions, read-only restrictions, or charges.
+Skip notebook confirmations: <code><CustomContent data="mcp:servers">remote</CustomContent>?skip_elicitations=run_notebook,delete_notebook</code>
+
+Skipping cost confirmations retains the [legacy cost confirmation workflow](#cost-confirmation). Skipping SQL or notebook confirmations runs those tools without an additional MCP confirmation. None of these options bypasses authentication, permissions, read-only restrictions, or charges.
 
 ## Manual authentication
 
@@ -282,6 +311,7 @@ We recommend the following best practices to mitigate security risks when using 
 - **Branching**: Use Supabase's [branching feature](/docs/guides/deployment/branching) to create a development branch for your database. This allows you to test changes in a safe environment before merging them to production.
 - **Cost confirmation**: When your connection uses cost confirmation dialogs, the server asks for [confirmation through your client](#cost-confirmation) before it creates resources that incur charges. This is a guardrail on top of authentication and authorization, not a replacement for them.
 - **Feature groups**: Restrict which [tool groups](#available-tools) are available using the `features` [configuration option](#configuration-options). This helps reduce the attack surface and limits the actions that LLMs can perform to only those that you need.
+- **Notebooks**: Notebook cells are SQL written by anyone with project access, and enabling the Notebooks group lets the agent run them even when the Database and Debugging groups are disabled. Each `run_notebook` call runs at most 50 query cells and returns about 1 MB of rows, but review a notebook's cells before your agent runs it and keep [notebook confirmations](#notebook-confirmations) in place.
 
 ## On GitHub
 

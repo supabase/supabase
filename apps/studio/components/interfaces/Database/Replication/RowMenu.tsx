@@ -150,7 +150,8 @@ export const RowMenu = ({
             </span>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs">
-            Couldn't load status{error?.message ? `: ${error.message}` : '.'}
+            Couldn't load status
+            {error?.message ? <span>{`: ${error.message}`}</span> : <span>.</span>}
           </TooltipContent>
         </Tooltip>
       )}

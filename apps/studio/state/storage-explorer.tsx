@@ -782,7 +782,8 @@ export function createStorageExplorerState({
           toast.error(
             <div>
               <p>
-                Renamed folder to {newName} with {failedFiles} error{failedFiles > 1 ? 's' : ''}
+                Renamed folder to {newName} with {failedFiles} error
+                {failedFiles > 1 ? <span>s</span> : ''}
               </p>
               <p className="text-foreground-light">
                 You may try again to rename the folder {originalName} to {newName}
@@ -1147,10 +1148,12 @@ export function createStorageExplorerState({
         toast.error(
           <div className="flex flex-col gap-y-1">
             <p className="text-foreground">
-              Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
-              {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-              {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of{' '}
-              {value} {unit}.
+              Failed to upload {numberOfFilesRejected} file
+              {numberOfFilesRejected > 1 ? <span>s</span> : ''} <span>as</span>{' '}
+              {numberOfFilesRejected > 1 ? <span>their</span> : <span>its</span>} <span>size</span>
+              {numberOfFilesRejected > 1 ? <span>s are</span> : <span>{' is'}</span>}{' '}
+              <span>beyond the global upload limit of</span> {value} {unit}
+              <span>.</span>
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
@@ -1172,9 +1175,11 @@ export function createStorageExplorerState({
         toast.error(
           <div className="flex flex-col gap-y-1">
             <p className="text-foreground">
-              Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
-              {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-              {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
+              Failed to upload {numberOfFilesRejected} file
+              {numberOfFilesRejected > 1 ? <span>s</span> : ''} <span>as</span>{' '}
+              {numberOfFilesRejected > 1 ? <span>their</span> : <span>its</span>} <span>size</span>
+              {numberOfFilesRejected > 1 ? <span>s are</span> : <span>{' is'}</span>}{' '}
+              <span>0.</span>
             </p>
           </div>
         )

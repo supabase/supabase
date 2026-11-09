@@ -366,3 +366,181 @@ withTestDatabase('caps the number of functions', async (db) => {
     'public.cap_b()',
   ])
 })
+
+const searchTriggers = async (
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  query: string,
+  options?: { limit?: number }
+) => {
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query, ...options })
+  )
+  return row.triggers.map(
+    (t) => `${t.schema}.${t.table}: ${t.name} (${t.activation} ${t.events.join(' OR ')})`
+  )
+}
+
+const TRIGGER_FN = `create function public.noop() returns trigger language plpgsql as 'begin return new; end';`
+
+withTestDatabase('finds triggers by name with their timing and events', async (db) => {
+  await db.executeQuery(`
+    ${TRIGGER_FN}
+    create table public.posts (id int);
+    create view public.posts_view as select * from public.posts;
+    create trigger audit_insert before insert on public.posts for each row execute function public.noop();
+    create trigger audit_change after update or delete on public.posts for each row execute function public.noop();
+    create trigger audit_wipe after truncate on public.posts for each statement execute function public.noop();
+    create trigger audit_view instead of insert on public.posts_view for each row execute function public.noop();
+  `)
+
+  expect((await searchTriggers(db, 'audit_', { limit: 10 })).sort()).toEqual([
+    'public.posts: audit_change (AFTER UPDATE OR DELETE)',
+    'public.posts: audit_insert (BEFORE INSERT)',
+    'public.posts: audit_wipe (AFTER TRUNCATE)',
+    'public.posts_view: audit_view (INSTEAD OF INSERT)',
+  ])
+})
+
+withTestDatabase('ranks name-matched triggers by trigger name, not by table', async (db) => {
+  await db.executeQuery(`
+    ${TRIGGER_FN}
+    create table public.a (id int);
+    create table public.bb (id int);
+    create trigger sync_everything after insert on public.a for each row execute function public.noop();
+    create trigger sync_x after insert on public.bb for each row execute function public.noop();
+  `)
+
+  expect(await searchTriggers(db, 'sync')).toEqual([
+    'public.bb: sync_x (AFTER INSERT)',
+    'public.a: sync_everything (AFTER INSERT)',
+  ])
+})
+
+withTestDatabase('includes triggers on a matched table, name matches first', async (db) => {
+  await db.executeQuery(`
+    ${TRIGGER_FN}
+    create table public.posts (id int);
+    create table public.comments (id int);
+    create trigger touch_updated_at before update on public.posts for each row execute function public.noop();
+    create trigger posts_audit after insert on public.posts for each row execute function public.noop();
+    create trigger posts_moderation after insert on public.comments for each row execute function public.noop();
+  `)
+
+  expect(await searchTriggers(db, 'posts', { limit: 10 })).toEqual([
+    // Name matches
+    'public.posts: posts_audit (AFTER INSERT)',
+    'public.comments: posts_moderation (AFTER INSERT)',
+    // Triggers on the matched `posts` table that didn't match by name
+    'public.posts: touch_updated_at (BEFORE UPDATE)',
+  ])
+})
+
+withTestDatabase('leaves out internal triggers such as foreign key checks', async (db) => {
+  await db.executeQuery(`
+    create table public.authors (id int primary key);
+    create table public.posts (id int, author_id int references public.authors (id));
+  `)
+
+  // Foreign keys create RI_ConstraintTrigger_* triggers on both tables
+  const [{ n }] = await db.executeQuery<{ n: number }[]>(
+    `select count(*)::int as n from pg_trigger where tgisinternal`
+  )
+  expect(n).toBeGreaterThan(0)
+  expect(await searchTriggers(db, 'ri_constraint')).toEqual([])
+  expect(await searchTriggers(db, 'authors')).toEqual([])
+})
+
+withTestDatabase('treats LIKE wildcards in trigger searches literally', async (db) => {
+  await db.executeQuery(`
+    ${TRIGGER_FN}
+    create table public.posts (id int);
+    create trigger set_slug before insert on public.posts for each row execute function public.noop();
+    create trigger setxslug before insert on public.posts for each row execute function public.noop();
+  `)
+
+  expect(await searchTriggers(db, 'set_slug')).toEqual(['public.posts: set_slug (BEFORE INSERT)'])
+  expect(await searchTriggers(db, '%')).toEqual([])
+})
+
+withTestDatabase('caps the number of triggers', async (db) => {
+  await db.executeQuery(`
+    ${TRIGGER_FN}
+    create table public.posts (id int);
+    create trigger cap_a before insert on public.posts for each row execute function public.noop();
+    create trigger cap_b before insert on public.posts for each row execute function public.noop();
+    create trigger cap_c before insert on public.posts for each row execute function public.noop();
+  `)
+
+  expect(await searchTriggers(db, 'cap_', { limit: 2 })).toEqual([
+    'public.posts: cap_a (BEFORE INSERT)',
+    'public.posts: cap_b (BEFORE INSERT)',
+  ])
+})
+
+const searchTriggerRows = async (
+  db: Awaited<ReturnType<typeof createTestDatabase>>,
+  query: string,
+  options?: { limit?: number }
+) => {
+  const [row] = await db.executeQuery<SearchEntitiesResult[]>(
+    getSearchEntitiesSql({ query, ...options })
+  )
+  return row.triggers.map((t) => ({ name: t.name, matchedFunction: t.matched_function }))
+}
+
+withTestDatabase('finds triggers that run a function matching the search', async (db) => {
+  await db.executeQuery(`
+    create function public.handle_new_user() returns trigger language plpgsql as 'begin return new; end';
+    create function public.set_slug() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger on_author_created after insert on public.authors for each row execute function public.handle_new_user();
+    create trigger fill_slug before insert on public.authors for each row execute function public.set_slug();
+  `)
+
+  // Neither the trigger name nor its table matches, only the function it runs
+  expect(await searchTriggerRows(db, 'handle_new_user')).toEqual([
+    { name: 'on_author_created', matchedFunction: 'handle_new_user' },
+  ])
+})
+
+withTestDatabase('lists name matches before triggers found through their function', async (db) => {
+  await db.executeQuery(`
+    create function public.sync_rows() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger zz_one after insert on public.authors for each row execute function public.sync_rows();
+    create trigger zz_two after update on public.authors for each row execute function public.sync_rows();
+    create trigger sync_rows_audit after delete on public.authors for each row execute function public.sync_rows();
+  `)
+
+  expect(await searchTriggerRows(db, 'sync_rows')).toEqual([
+    // Matched by its own name, so it doesn't claim to have matched through the function
+    { name: 'sync_rows_audit', matchedFunction: null },
+    { name: 'zz_one', matchedFunction: 'sync_rows' },
+    { name: 'zz_two', matchedFunction: 'sync_rows' },
+  ])
+})
+
+withTestDatabase('does not find triggers through extension or system functions', async (db) => {
+  await db.executeQuery(`
+    create schema ext;
+    create extension pgcrypto schema ext;
+    create table public.authors (id int primary key);
+    create table public.posts (id int, author_id int references public.authors (id));
+  `)
+
+  // Foreign keys run RI_FKey_* functions from pg_catalog, and pgcrypto has its own
+  expect(await searchTriggerRows(db, 'ri_fkey')).toEqual([])
+  expect(await searchTriggerRows(db, 'crypt')).toEqual([])
+})
+
+withTestDatabase('caps triggers found through a function', async (db) => {
+  await db.executeQuery(`
+    create function public.touch_row() returns trigger language plpgsql as 'begin return new; end';
+    create table public.authors (id int);
+    create trigger t_a before insert on public.authors for each row execute function public.touch_row();
+    create trigger t_b before update on public.authors for each row execute function public.touch_row();
+    create trigger t_c before delete on public.authors for each row execute function public.touch_row();
+  `)
+
+  expect(await searchTriggerRows(db, 'touch_row', { limit: 2 })).toHaveLength(2)
+})
