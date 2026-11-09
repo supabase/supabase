@@ -46,6 +46,7 @@ export function UserFields({
           filterFields={[]}
           disabled={!value}
           onAddFilter={label === 'User ID' ? onFilterByUser : undefined}
+          filterOperators={['=']}
         >
           {value ? (
             <span className="min-w-0 truncate text-right font-mono text-sm leading-5">{value}</span>

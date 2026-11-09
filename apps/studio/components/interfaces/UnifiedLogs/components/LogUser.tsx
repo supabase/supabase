@@ -150,6 +150,7 @@ function UserIdRow({ label, userId }: { label: string; userId: string }) {
       value={userId}
       filterFields={[]}
       onAddFilter={() => setUserFilter(userId)}
+      filterOperators={['=']}
     />
   )
 }
