@@ -181,7 +181,7 @@ const nextConfig = {
         ],
       },
       {
-        source: '/(docs|blog|kb)/:path*',
+        source: '/(docs|blog|kb|library)/:path*',
         headers: [
           {
             key: 'X-Robots-Tag',
