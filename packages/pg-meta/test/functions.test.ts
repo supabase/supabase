@@ -9,6 +9,35 @@ import { cleanupRoot, createTestDatabase } from './db/utils'
 // `update`/`remove` parameter types.
 const asSavedFunction = (fn: PGFunction): PGSavedFunction => fn as unknown as PGSavedFunction
 
+test('update refuses a definition change when strictness is unknown', () => {
+  const savedFunction = {
+    id: 1,
+    schema: 'public',
+    name: 'stale_fn',
+    language: 'sql',
+    definition: 'select 1',
+    complete_statement: 'create function public.stale_fn() returns integer ...',
+    args: [],
+    type: 'function',
+    argument_types: '',
+    identity_argument_types: '',
+    return_type_id: 23,
+    return_type: 'integer',
+    return_type_relation_id: null,
+    is_set_returning_function: false,
+    behavior: 'VOLATILE',
+    security_definer: false,
+    config_params: null,
+    // is_strict is deliberately omitted: an older cached row should not be
+    // regenerated because that would silently drop STRICT.
+  } as unknown as PGSavedFunction
+
+  expect(() => pgMeta.functions.update(savedFunction, { definition: 'select 2' })).toThrow(
+    /strictness is unknown/
+  )
+  expect(() => pgMeta.functions.update(savedFunction, { name: 'stale_fn_renamed' })).not.toThrow()
+})
+
 afterAll(async () => {
   await cleanupRoot()
 })
