@@ -153,13 +153,15 @@ Use `--output-format` for both `logs` and `logs sources`. These commands reject 
 
 ## Query with SQL
 
+For ClickHouse SQL syntax, available columns, and query examples, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering).
+
 Pass SQL with `--sql`, `--file <path>`, or `--file -` for piped input. SQL requires an explicit hosted target:
 
 ```sh
 supabase logs --remote --sql "select timestamp, id, event_message, log_attributes from logs order by timestamp desc limit 20"
 ```
 
-Queries use ClickHouse SQL over the hosted `logs` table. They do not query your Postgres database. Select `log_attributes` to keep correlation IDs and user attributes. Save this query as `postgres.sql`:
+Save this query as `postgres.sql`:
 
 ```sql
 select timestamp, id, event_message, log_attributes
