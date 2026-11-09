@@ -1,6 +1,6 @@
 import { usePrevious } from '@uidotdev/usehooks'
 import { noop } from 'lodash'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -42,7 +42,7 @@ const PolicyDefinition = ({
               </label>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+                  <HelpCircleIcon className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </TooltipTrigger>
 
                 <TooltipContent side="bottom">
@@ -85,7 +85,7 @@ const PolicyDefinition = ({
               </label>
               <Tooltip>
                 <TooltipTrigger>
-                  <HelpCircle className="text-foreground-light" size={16} strokeWidth={1.5} />
+                  <HelpCircleIcon className="text-foreground-light" size={16} strokeWidth={1.5} />
                 </TooltipTrigger>
 
                 <TooltipContent side="bottom">

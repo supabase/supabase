@@ -1,5 +1,4 @@
 import type { GoPageInput } from 'marketing'
-import Link from 'next/link'
 import { Button } from 'ui'
 
 const page: GoPageInput = {
@@ -20,11 +19,11 @@ const page: GoPageInput = {
       description: 'Explore Supabase and get ready to build with AI-assisted development.',
       children: (
         <div className="flex items-center justify-center gap-4">
-          <Button asChild variant="default" size="small">
-            <Link href="https://supabase.com/docs">Read the docs</Link>
+          <Button asChild size="small">
+            <a href="https://supabase.com/docs">Read the docs</a>
           </Button>
           <Button asChild variant="text" size="small">
-            <Link href="https://supabase.com/dashboard">Start a project</Link>
+            <a href="https://supabase.com/dashboard">Start a project</a>
           </Button>
         </div>
       ),

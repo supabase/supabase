@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { Clock } from 'lucide-react'
+import { ClockIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -17,7 +17,7 @@ import { useBackupRestoreMutation } from '@/data/database/backup-restore-mutatio
 import { DatabaseBackup, useBackupsQuery } from '@/data/database/backups-query'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
 
 export const BackupsList = () => {
@@ -29,6 +29,7 @@ export const BackupsList = () => {
   const { setProjectStatus } = useSetProjectStatus()
   const { data: selectedProject } = useSelectedProjectQuery()
   const isHealthy = selectedProject?.status === PROJECT_STATUS.ACTIVE_HEALTHY
+  const isHighAvailability = useIsHighAvailability()
 
   const { data: backups } = useBackupsQuery({ projectRef })
   const {
@@ -62,7 +63,7 @@ export const BackupsList = () => {
         addon="pitr"
         source="backups"
         featureProposition="have up to 7 days of scheduled backups"
-        icon={<Clock size={20} />}
+        icon={<ClockIcon size={20} />}
         primaryText="Free Plan does not include project backups."
         secondaryText="Upgrade to the Pro Plan for up to 7 days of scheduled backups."
         buttonText="Upgrade"
@@ -88,6 +89,7 @@ export const BackupsList = () => {
                     backup={x}
                     index={i}
                     isHealthy={isHealthy}
+                    isHighAvailability={isHighAvailability}
                     onSelectBackup={() => setSelectedBackup(x)}
                   />
                 )

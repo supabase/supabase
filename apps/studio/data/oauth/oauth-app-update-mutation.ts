@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { oauthAppKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppUpdateVariables = {
   id: string
@@ -12,7 +13,7 @@ export type OAuthAppUpdateVariables = {
   name: string
   website: string
   icon?: string
-  scopes?: OAuthScope[]
+  scopes: OAuthScope[]
   redirect_uris: string[]
 }
 
@@ -52,12 +53,12 @@ export const useOAuthAppUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>,
+  UseCustomMutationOptions<OAuthAppUpdateData, StudioError, OAuthAppUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppUpdateData, ResponseError, OAuthAppUpdateVariables>({
+  return useMutation<OAuthAppUpdateData, StudioError, OAuthAppUpdateVariables>({
     mutationFn: (vars) => updateOAuthApp(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

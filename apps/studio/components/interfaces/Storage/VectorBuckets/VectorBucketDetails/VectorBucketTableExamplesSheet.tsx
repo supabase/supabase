@@ -1,7 +1,7 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { SqlEditor } from 'icons'
-import { ChevronDown, ListPlus } from 'lucide-react'
+import { ChevronDownIcon, ListPlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useState } from 'react'
@@ -27,11 +27,12 @@ import { CodeBlock } from 'ui-patterns/CodeBlock'
 
 import { useS3VectorsWrapperExtension } from '../useS3VectorsWrapper'
 import { useS3VectorsWrapperInstance } from '../useS3VectorsWrapperInstance'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { VectorBucketIndex } from '@/data/storage/vector-buckets-indexes-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { isGreaterThanOrEqual } from '@/lib/semver'
 
 interface VectorBucketTableExamplesSheetProps {
@@ -58,7 +59,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
     <Sheet open={open} onOpenChange={setOpen}>
       {/* Move into overflow menu after vectors added */}
       <SheetTrigger asChild>
-        <Button variant="default" icon={<ListPlus size={12} className="text-foreground-lighter" />}>
+        <Button icon={<ListPlusIcon size={12} className="text-foreground-lighter" />}>
           Insert vectors
         </Button>
       </SheetTrigger>
@@ -66,8 +67,7 @@ export const VectorBucketTableExamplesSheet = ({ index }: VectorBucketTableExamp
         <div className="flex flex-col h-full" tabIndex={-1}>
           <SheetHeader>
             <SheetTitle>
-              Insert vectors into{' '}
-              <code className="text-code-inline text-sm!">{index.indexName}</code>
+              Insert vectors into <code className="text-sm!">{index.indexName}</code>
             </SheetTitle>
           </SheetHeader>
 
@@ -139,11 +139,16 @@ function VectorBucketIndexExamples({
 }: VectorBucketIndexExamplesProps) {
   const { ref: projectRef, bucketId } = useParams()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeysData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
   )
-  const { data: apiKeysData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { secretKey } = apiKeysData ?? {}
 
   const { data: wrapperInstance } = useS3VectorsWrapperInstance({ bucketId })
@@ -206,9 +211,8 @@ const result = await index.putVectors({
   return (
     <SheetSection className="flex flex-col gap-6">
       <p className="text-sm text-foreground-light">
-        Use the following code snippet to insert vectors into your table. The{' '}
-        <code className="text-code-inline">data</code> property should contain all of your vector
-        data.
+        Use the following code snippet to insert vectors into your table. The <code>data</code>{' '}
+        property should contain all of your vector data.
       </p>
       <div className="flex flex-col gap-2">
         <div className="flex justify-between">
@@ -219,8 +223,7 @@ const result = await index.putVectors({
                   Language
                 </span>
                 <Button
-                  variant="default"
-                  iconRight={<ChevronDown size={14} strokeWidth={2} />}
+                  iconRight={<ChevronDownIcon size={14} strokeWidth={2} />}
                   className="rounded-l-none"
                 >
                   {language === 'javascript' ? 'JavaScript' : 'SQL'}
@@ -255,6 +258,12 @@ const result = await index.putVectors({
             href={`${DOCS_URL}/guides/storage/vector/storing-vectors?queryGroups=language&language=${language}#basic-vector-insertion`}
           />
         </div>
+        {language === 'javascript' && (
+          <ApiKeysAccessNote
+            grant={apiKeysGrant}
+            fallback="The example uses SUPABASE_SERVICE_ROLE_KEY. Use your own secret key instead."
+          />
+        )}
         {language === 'javascript' ? (
           <CodeBlock
             hideLineNumbers
@@ -268,11 +277,7 @@ const result = await index.putVectors({
             type="default"
             title="Insert data via SQL with a Foreign Data Wrapper"
             description="Data from vector tables can be queried and inserted from Postgres with the S3 Vectors Wrapper as foreign tables."
-            actions={
-              <Button variant="default" onClick={onSelectQueryFromPostgres}>
-                Query from Postgres
-              </Button>
-            }
+            actions={<Button onClick={onSelectQueryFromPostgres}>Query from Postgres</Button>}
           />
         ) : (
           <>
@@ -284,11 +289,7 @@ const result = await index.putVectors({
               value={sqlCode}
             />
             <div className="flex justify-end">
-              <Button
-                variant="default"
-                asChild
-                icon={<SqlEditor size={12} className="text-foreground-lighter" />}
-              >
+              <Button asChild icon={<SqlEditor size={12} className="text-foreground-lighter" />}>
                 <Link
                   target="_blank"
                   rel="noreferrer"

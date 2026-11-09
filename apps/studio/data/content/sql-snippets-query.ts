@@ -40,7 +40,7 @@ export async function getSqlSnippets(
         type,
         cursor,
         visibility,
-        favorite,
+        favorite: favorite?.toString(),
         name,
         limit: SNIPPET_PAGE_LIMIT.toString(),
         sort_by: sort,

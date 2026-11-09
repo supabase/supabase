@@ -1,12 +1,11 @@
-import { useInView } from 'react-intersection-observer'
-import { FC, PropsWithChildren } from 'react'
-import { highlightSelectedNavItem } from 'ui/src/components/CustomHTMLElements/CustomHTMLElements.utils'
-import { useRouter } from 'next/compat/router'
 import { useNavigationMenuContext } from '~/components/Navigation/NavigationMenu/NavigationMenu.Context'
 import { menuState } from '~/hooks/useMenuState'
-import Image from 'next/legacy/image'
-import { cn } from 'ui'
 import { safeHistoryReplaceState } from '~/lib/historyUtils'
+import { useRouter } from 'next/compat/router'
+import Image from 'next/legacy/image'
+import { FC, PropsWithChildren } from 'react'
+import { useInView } from 'react-intersection-observer'
+import { cn, highlightSelectedNavItem } from 'ui'
 
 interface ISectionContainer {
   id: string
@@ -123,7 +122,7 @@ const StickyHeader: FC<StickyHeader> = ({ icon, ...props }) => {
           id={props.slug}
           data-ref-id={props.id}
           className={cn(
-            'text-2xl font-medium text-foreground scroll-mt-[calc(32px+2rem)] lg:scroll-mt-[calc(var(--header-height)+1px+4rem)]',
+            'text-2xl font-medium text-foreground scroll-mt-[calc(32px+2rem)] lg:scroll-mt-[calc(var(--header-height)+4rem)]',
             !icon && 'mb-8',
             props.monoFont && 'font-mono'
           )}

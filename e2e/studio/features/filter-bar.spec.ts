@@ -1159,7 +1159,9 @@ test.describe('Filter Bar', () => {
         await addFilter(page, ref, columnName, '=', 'Alice')
 
         const conditionEl = page.getByTestId(`filter-condition-${columnName}`)
-        await conditionEl.locator('span', { hasText: columnName }).first().click()
+        await conditionEl
+          .getByRole('button', { name: `Change property from ${columnName}` })
+          .click()
 
         const searchInput = page.getByTestId(`filter-property-search-${columnName}`)
         await expect(searchInput).toBeVisible()

@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import React from 'react'
 import { Button, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 import { CodeBlock } from 'ui-patterns/CodeBlock'
@@ -39,7 +39,7 @@ export const SnippetRow: React.FC<SnippetRowProps> = ({
                     onRemoveSnippet(idx)
                   }}
                   aria-label={`Remove snippet ${idx + 1}`}
-                  icon={<X strokeWidth={1.5} className="h-3! w-3!" />}
+                  icon={<XIcon strokeWidth={1.5} className="h-3! w-3!" />}
                 />
               )}
             </div>

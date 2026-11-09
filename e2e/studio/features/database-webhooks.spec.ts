@@ -27,7 +27,7 @@ const navigateToWebhooksList = async (page: Page, ref: string) => {
 }
 
 const createWebhookViaUI = async (page: Page, hookName: string, tableName: string) => {
-  await page.getByRole('button', { name: 'Create a new hook' }).click()
+  await page.getByRole('button', { name: 'Create webhook', exact: true }).click()
   await expect(page.getByText('Create a new database webhook')).toBeVisible({ timeout: 10000 })
 
   await page.locator('input[name="name"]').fill(hookName)
@@ -41,7 +41,7 @@ const createWebhookViaUI = async (page: Page, hookName: string, tableName: strin
     .getByPlaceholder('http://api.com/path/resource')
     .fill('http://localhost:3000/test-webhook')
 
-  await page.getByRole('button', { name: 'Create webhook' }).click()
+  await page.locator('button[form="edit-hook-panel-form"]').click()
   await expect(page.getByText(`Successfully created new webhook "${hookName}"`)).toBeVisible({
     timeout: 10000,
   })
@@ -56,7 +56,7 @@ const openWebhookEditor = async (page: Page, hookName: string) => {
 }
 
 const addCustomHeader = async (page: Page, name: string, value: string) => {
-  await page.getByRole('button', { name: 'Add a new header' }).click()
+  await page.getByRole('button', { name: 'Add header' }).click()
   await page.getByPlaceholder('Header name').last().fill(name)
   await page.getByPlaceholder('Header value').last().fill(value)
 }
@@ -92,7 +92,7 @@ test.describe('Database Webhooks', () => {
     await navigateToWebhooksList(page, ref)
 
     await expect(page.getByPlaceholder('Search for a webhook')).toBeVisible()
-    await expect(page.getByRole('button', { name: 'Create a new hook' })).toBeVisible()
+    await expect(page.getByRole('button', { name: 'Create webhook', exact: true })).toBeVisible()
   })
 
   test('can create a new webhook with correct toast message', async ({ page, ref }) => {
@@ -103,7 +103,7 @@ test.describe('Database Webhooks', () => {
       await ensureWebhooksEnabled(page, ref)
       await navigateToWebhooksList(page, ref)
 
-      await page.getByRole('button', { name: 'Create a new hook' }).click()
+      await page.getByRole('button', { name: 'Create webhook', exact: true }).click()
       await expect(page.getByText('Create a new database webhook')).toBeVisible({ timeout: 10000 })
 
       await page.locator('input[name="name"]').fill(hook)
@@ -114,7 +114,7 @@ test.describe('Database Webhooks', () => {
         .getByPlaceholder('http://api.com/path/resource')
         .fill('http://localhost:3000/test-webhook')
 
-      await page.getByRole('button', { name: 'Create webhook' }).click()
+      await page.locator('button[form="edit-hook-panel-form"]').click()
 
       await expect(page.getByText(`Successfully created new webhook "${hook}"`)).toBeVisible({
         timeout: 10000,

@@ -1,5 +1,6 @@
+// @vitest-environment jsdom
 import { getSequenceManager } from '@tanstack/react-hotkeys'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { eventMatchesAnyShortcut } from './matchEvent'
 import type { RegistryDefinations } from './types'
@@ -67,10 +68,6 @@ const registry: RegistryDefinations<string> = {
 }
 
 describe('eventMatchesAnyShortcut', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('returns false when there are no active registrations', () => {
     withRegistrations([])
     expect(eventMatchesAnyShortcut(shiftX, registry)).toBe(false)

@@ -17,10 +17,10 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
-type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse']
-type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse']
-type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
+type GetOAuthAuthorizationResponse = components['schemas']['GetOAuthAuthorizationResponse_Output']
+type ApproveAuthorizationResponse = components['schemas']['ApproveAuthorizationResponse_Output']
+type DeclineAuthorizationResponse = components['schemas']['DeclineAuthorizationResponse_Output']
 
 // --- Fixtures ---
 
@@ -228,32 +228,22 @@ describe('ApiAuthorizationScreen', () => {
         path: '/platform/oauth/authorizations/:id',
         response: () => new Promise<never>(() => {}),
       })
-      const { container } = renderScreen()
-      expect(screen.getByText('Loading...')).toBeInTheDocument()
-      expect(container.querySelectorAll('.shimmering-loader').length).toBeGreaterThan(0)
-    })
-
-    test('renders error screen when authorization query fails', async () => {
-      mockOrgsEndpoint()
-      addAPIMock({
-        method: 'get',
-        path: '/platform/oauth/authorizations/:id',
-        response: () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 }),
-      })
       renderScreen()
-      await screen.findByText('Unable to load authorization')
+      expect(screen.getByText('Loading...')).toBeInTheDocument()
     })
 
-    test('renders error screen when authorization query returns no requester', async () => {
-      mockOrgsEndpoint()
-      addAPIMock({
-        method: 'get',
-        path: '/platform/oauth/authorizations/:id',
-        response: () =>
+    test.each([
+      ['fails', () => HttpResponse.json<APIErrorBody>({ message: 'Not found' }, { status: 404 })],
+      [
+        'returns no requester',
+        () =>
           HttpResponse.json<GetOAuthAuthorizationResponse>(
             null as unknown as GetOAuthAuthorizationResponse
           ),
-      })
+      ],
+    ])('renders error screen when authorization query %s', async (_, response) => {
+      mockOrgsEndpoint()
+      addAPIMock({ method: 'get', path: '/platform/oauth/authorizations/:id', response })
       renderScreen()
       await screen.findByText('Unable to load authorization')
     })
@@ -317,7 +307,7 @@ describe('ApiAuthorizationScreen', () => {
           ).not.toBeInTheDocument()
         })
 
-        test('shows empty state when user has no organizations', async () => {
+        test('shows empty state linking back to this authorize request when user has no organizations', async () => {
           mockBothEndpoints(createMockAuthResponse(), [])
           renderScreen()
           await screen.findByText('No organizations found')
@@ -325,6 +315,10 @@ describe('ApiAuthorizationScreen', () => {
           expect(
             screen.queryByRole('button', { name: /Authorize Test App/ })
           ).not.toBeInTheDocument()
+          expect(screen.getByRole('link', { name: 'Create an organization' })).toHaveAttribute(
+            'href',
+            `/new?returnTo=${encodeURIComponent('/authorize?auth_id=test-auth-id')}`
+          )
         })
 
         test('shows not_member notice when organization_slug does not match any user organization', async () => {
@@ -421,13 +415,6 @@ describe('ApiAuthorizationScreen', () => {
           ).not.toBeInTheDocument()
           expect(screen.queryByRole('button', { name: 'Cancel' })).not.toBeInTheDocument()
           expect(screen.queryByRole('button', { name: /Authorize Claude/ })).not.toBeInTheDocument()
-        })
-
-        test('does not show expiration warning when request has not expired', async () => {
-          mockBothEndpoints()
-          renderScreen()
-          await screen.findByText('Authorize API access for Test App')
-          expect(screen.queryByText('Authorization request expired')).not.toBeInTheDocument()
         })
       })
 

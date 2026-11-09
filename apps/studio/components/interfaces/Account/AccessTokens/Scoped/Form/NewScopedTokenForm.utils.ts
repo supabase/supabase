@@ -2,8 +2,9 @@ import dayjs from 'dayjs'
 import { z } from 'zod'
 
 import type { PermissionMode } from '../../AccessToken.permissions'
+import { getMaxCustomExpiryDate } from '../../AccessToken.utils'
 
-export const EXPIRY_PRESETS = ['24h', '7d', '30d', '90d', 'custom'] as const
+export const EXPIRY_PRESETS = ['24h', '7d', '30d', '90d', 'custom', 'never'] as const
 export type ExpiryPreset = (typeof EXPIRY_PRESETS)[number]
 
 export const DEFAULT_EXPIRY: ExpiryPreset = '7d'
@@ -20,9 +21,13 @@ export const EXPIRY_OPTIONS: ExpiryOption[] = [
   { value: '30d', label: '30 days' },
   { value: '90d', label: '90 days' },
   { value: 'custom', label: 'Custom' },
+  { value: 'never', label: 'Never' },
 ]
 
-/** Resolves the final ISO expiry date for a preset, or `undefined` when the caller supplies a custom date. */
+/**
+ * Resolves the final ISO expiry date for a preset. Returns `undefined` for `custom`, where the
+ * caller supplies the date, and for `never`, where the token is created without an expiry.
+ */
 export const getExpiryDate = (preset: ExpiryPreset): string | undefined => {
   switch (preset) {
     case '24h':
@@ -33,6 +38,8 @@ export const getExpiryDate = (preset: ExpiryPreset): string | undefined => {
       return dayjs().add(30, 'days').toISOString()
     case '90d':
       return dayjs().add(90, 'days').toISOString()
+    case 'never':
+      return undefined
     default:
       return undefined
   }
@@ -57,7 +64,6 @@ export const TokenFormSchema = z
     resourceAccess: z.enum(RESOURCE_ACCESS_MODES),
     organizationSlugs: z.string().array().optional().default([]),
     projectRefs: z.string().array().optional().default([]),
-    accountConfirmed: z.boolean().optional(),
     permissions: z.record(z.string(), z.enum(['none', 'read', 'readwrite'])),
   })
   .superRefine((data, ctx) => {
@@ -65,6 +71,18 @@ export const TokenFormSchema = z
       ctx.addIssue({
         code: z.ZodIssueCode.custom,
         message: 'Required',
+        path: ['customExpiryDate'],
+      })
+    }
+
+    if (
+      data.expiresAt === 'custom' &&
+      data.customExpiryDate &&
+      dayjs(data.customExpiryDate).isAfter(getMaxCustomExpiryDate())
+    ) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'Expiry date must be within one year from today',
         path: ['customExpiryDate'],
       })
     }

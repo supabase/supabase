@@ -1,5 +1,10 @@
 import { LogoLoader } from 'ui'
 
+import {
+  BOOT_FALLBACK_MESSAGE,
+  BOOT_FALLBACK_REVEAL_DELAY_SECONDS,
+  BOOT_FALLBACK_SUPPORT_EMAIL,
+} from '@/lib/boot-fallback-copy'
 import { IS_PLATFORM } from '@/lib/constants'
 
 // Baked into the prerendered SPA shell (_shell.html) — this is the static HTML
@@ -15,7 +20,7 @@ export function ShellFallback() {
         #studio-shell-help {
           visibility: hidden;
           opacity: 0;
-          animation: studio-shell-help-reveal 0.3s ease-out 7s forwards;
+          animation: studio-shell-help-reveal 0.3s ease-out ${BOOT_FALLBACK_REVEAL_DELAY_SECONDS}s forwards;
         }
         @keyframes studio-shell-help-reveal {
           to {
@@ -40,13 +45,13 @@ export function ShellFallback() {
           data-nosnippet=""
           className="max-w-md text-center text-sm text-foreground-light"
         >
-          Taking longer than expected? Try clearing your browser cookies and reloading the page.
+          {BOOT_FALLBACK_MESSAGE}
           {IS_PLATFORM && (
             <>
               {' '}
               If the problem persists, contact{' '}
-              <a href="mailto:support@supabase.com" className="underline">
-                support@supabase.com
+              <a href={`mailto:${BOOT_FALLBACK_SUPPORT_EMAIL}`} className="underline">
+                {BOOT_FALLBACK_SUPPORT_EMAIL}
               </a>
               .
             </>

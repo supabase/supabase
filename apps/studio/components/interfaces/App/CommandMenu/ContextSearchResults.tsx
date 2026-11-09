@@ -1,7 +1,7 @@
 'use client'
 
 import { Auth, EdgeFunctions, Storage } from 'icons'
-import { Database } from 'lucide-react'
+import { DatabaseIcon } from 'lucide-react'
 import dynamic from 'next/dynamic'
 
 import { EmptyState, SkeletonResults } from './ContextSearchResults.shared'
@@ -57,7 +57,7 @@ const CONTEXT_CONFIG: Record<
   }
 > = {
   'database-tables': {
-    icon: Database,
+    icon: DatabaseIcon,
     label: 'Database Tables',
     requiresInput: false,
   },

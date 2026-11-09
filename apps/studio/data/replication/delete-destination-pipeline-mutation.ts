@@ -1,14 +1,17 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DeleteDestinationPipelineParams = {
   projectRef?: string
   destinationId: number
-  pipelineId: number
+  pipelineId: string
 }
 
 async function deleteDestinationPipeline(
@@ -28,7 +31,7 @@ async function deleteDestinationPipeline(
     handleError(error)
   }
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type DeleteDestinationPipelineData = Awaited<ReturnType<typeof deleteDestinationPipeline>>
@@ -40,46 +43,31 @@ export const useDeleteDestinationPipelineMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DeleteDestinationPipelineData,
-    ResponseError,
+    StudioError,
     DeleteDestinationPipelineParams
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteDestinationPipelineData, ResponseError, DeleteDestinationPipelineParams>(
-    {
-      mutationFn: (vars) => deleteDestinationPipeline(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef, destinationId, pipelineId } = variables
+  return useMutation<DeleteDestinationPipelineData, StudioError, DeleteDestinationPipelineParams>({
+    mutationFn: (vars) => deleteDestinationPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef),
+      ])
 
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelinesReplicationStatus(projectRef, pipelineId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.destinationById(projectRef, destinationId),
-          }),
-        ])
-
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to delete destination and pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to delete destination and pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

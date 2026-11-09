@@ -1,9 +1,9 @@
 import dayjs from 'dayjs'
-import { ArrowRight, ExternalLink, Github } from 'lucide-react'
+import { ArrowRightIcon, ExternalLinkIcon } from 'lucide-react'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
 import { forwardRef, HTMLAttributes, ReactNode, RefAttributes } from 'react'
-import { Badge, Button, cn } from 'ui'
+import { Badge, Button, cn, GithubIcon } from 'ui'
 
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -13,7 +13,7 @@ import type {
 } from '@/data/integrations/integrations.types'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { BASE_PATH } from '@/lib/constants'
-import { getIntegrationConfigurationUrl } from '@/lib/integration-utils'
+import { getFrameworkIconUrl, getIntegrationConfigurationUrl } from '@/lib/integration-utils'
 
 const ICON_STROKE_WIDTH = 2
 const ICON_SIZE = 14
@@ -29,7 +29,7 @@ type HandleIconType = Integration['integration']['name'] | 'Supabase'
 const HandleIcon = ({ type, className }: { type: HandleIconType; className?: string }) => {
   switch (type) {
     case 'GitHub':
-      return <Github strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
+      return <GithubIcon strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
       break
     // case 'Netlify':
     //   return <Square strokeWidth={ICON_STROKE_WIDTH} size={ICON_SIZE} />
@@ -118,7 +118,7 @@ export const IntegrationInstallation = forwardRef<HTMLLIElement, IntegrationInst
           </div>
         </div>
 
-        <Button asChild disabled={disabled} variant="default" iconRight={<ExternalLink />}>
+        <Button asChild disabled={disabled} iconRight={<ExternalLinkIcon />}>
           {disabled ? (
             <p>Manage</p>
           ) : (
@@ -140,16 +140,27 @@ export interface IntegrationConnectionProps extends HTMLAttributes<HTMLLIElement
   connection: IntegrationProjectConnection
   type: Integration['integration']['name']
   actions?: ReactNode
+  leadingAction?: ReactNode
   showNode?: boolean
   orientation?: 'horizontal' | 'vertical'
 }
 
 export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnectionProps>(
   (
-    { connection, type, actions, showNode = true, orientation = 'horizontal', className, ...props },
+    {
+      connection,
+      type,
+      actions,
+      leadingAction,
+      showNode = true,
+      orientation = 'horizontal',
+      className,
+      ...props
+    },
     ref
   ) => {
     const { data: project } = useProjectDetailQuery({ ref: connection.supabase_project_ref })
+    const frameworkIconUrl = getFrameworkIconUrl(connection?.metadata?.framework)
 
     return (
       <li
@@ -179,24 +190,19 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
                 </span>
               </div>
 
-              <ArrowRight
+              <ArrowRightIcon
                 size={14}
                 className="shrink-0 text-foreground-lighter"
                 strokeWidth={1.5}
               />
 
               <div className="flex-1 min-w-0 flex gap-2 items-center">
-                {!connection?.metadata?.framework ? (
+                {!frameworkIconUrl ? (
                   <div className="bg-black text-white w-4 h-4 rounded-sm flex items-center justify-center">
                     <HandleIcon type={type} className={'w-2.5!'} />
                   </div>
                 ) : (
-                  <img
-                    src={`${BASE_PATH}/img/icons/frameworks/${connection.metadata.framework}.svg`}
-                    width={21}
-                    height={21}
-                    alt={`icon`}
-                  />
+                  <img src={frameworkIconUrl} width={21} height={21} alt={`icon`} />
                 )}
                 {type === 'GitHub' ? (
                   <a
@@ -226,7 +232,10 @@ export const IntegrationConnection = forwardRef<HTMLLIElement, IntegrationConnec
             </div>
           </div>
 
-          <div className="shrink-0">{actions}</div>
+          <div className="shrink-0 flex items-center gap-x-2">
+            {leadingAction}
+            {actions}
+          </div>
         </div>
       </li>
     )
@@ -250,7 +259,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           <div className="flex gap-2 items-center">
             <HandleIcon type={'Supabase'} />
             <span className="text-sm">{project?.name}</span>
-            <ArrowRight size={14} className="text-foreground-lighter" strokeWidth={1.5} />
+            <ArrowRightIcon size={14} className="text-foreground-lighter" strokeWidth={1.5} />
             <HandleIcon type={type} />
             <span className="text-sm">{connection.metadata.name}</span>
           </div>
@@ -260,7 +269,7 @@ export const IntegrationConnectionOption = forwardRef<HTMLLIElement, Integration
           </span>
         </div>
 
-        <Button variant="default">Connect</Button>
+        <Button>Connect</Button>
       </li>
     )
   }
@@ -291,7 +300,7 @@ export const EmptyIntegrationConnection = forwardRef<
     },
     ref
   ) => {
-    const label = children ?? 'Add new project connection'
+    const label = children ?? 'Add connection'
 
     return (
       <div
@@ -315,7 +324,7 @@ export const EmptyIntegrationConnection = forwardRef<
           )}
         >
           {href && !disabled ? (
-            <Button icon={icon} asChild variant="default">
+            <Button icon={icon} asChild>
               <Link href={href} target="_blank" rel="noreferrer">
                 {label}
               </Link>
@@ -323,7 +332,6 @@ export const EmptyIntegrationConnection = forwardRef<
           ) : (
             <ButtonTooltip
               icon={icon}
-              variant="default"
               disabled={disabled}
               onClick={onClick ? () => onClick() : undefined}
               tooltip={{

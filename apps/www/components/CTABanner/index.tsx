@@ -1,8 +1,11 @@
 'use client'
 
+import { useSendTelemetryEvent } from '~/lib/telemetry'
+import { useIsLoggedIn } from 'common'
 import Link from 'next/link'
 import { Button, cn } from 'ui'
-import { useSendTelemetryEvent } from '~/lib/telemetry'
+
+import { getDashboardCtaHref } from '@/lib/dashboard-links'
 
 interface Props {
   className?: string
@@ -10,6 +13,7 @@ interface Props {
 }
 
 const CTABanner = ({ darkerBg, className }: Props) => {
+  const isLoggedIn = useIsLoggedIn()
   const sendTelemetryEvent = useSendTelemetryEvent()
   return (
     <div
@@ -26,9 +30,9 @@ const CTABanner = ({ darkerBg, className }: Props) => {
         </h2>
       </div>
       <div className="flex items-center justify-center gap-2 col-span-12 mt-4">
-        <Button asChild size="medium">
-          <Link
-            href="https://supabase.com/dashboard"
+        <Button variant="primary" asChild size="medium">
+          <a
+            href={getDashboardCtaHref(isLoggedIn)}
             onClick={() =>
               sendTelemetryEvent({
                 action: 'start_project_button_clicked',
@@ -37,9 +41,9 @@ const CTABanner = ({ darkerBg, className }: Props) => {
             }
           >
             Start your project
-          </Link>
+          </a>
         </Button>
-        <Button asChild size="medium" variant="default">
+        <Button asChild size="medium">
           <Link
             href="/contact/sales"
             onClick={() =>

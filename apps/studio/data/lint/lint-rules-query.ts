@@ -5,12 +5,13 @@ import { lintKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ProjectLintRulesVariables = {
   projectRef?: string
 }
-type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse']
+type LintDismissalResponse = components['schemas']['ListNotificationExceptionsResponse_Output']
 export type LintException = LintDismissalResponse['exceptions'][0]
 
 export async function getProjectLintRules(
@@ -30,7 +31,7 @@ export async function getProjectLintRules(
 }
 
 export type ProjectLintRulesData = Awaited<ReturnType<typeof getProjectLintRules>>
-export type ProjectLintRulesError = ResponseError
+export type ProjectLintRulesError = StudioError
 
 export const useProjectLintRulesQuery = <TData = ProjectLintRulesData>(
   { projectRef }: ProjectLintRulesVariables,

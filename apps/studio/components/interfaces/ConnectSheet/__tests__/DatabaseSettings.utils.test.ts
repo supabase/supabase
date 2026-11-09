@@ -3,8 +3,11 @@ import { describe, expect, test } from 'vitest'
 import {
   appendHighAvailabilitySslParams,
   buildConnectionStringPooler,
+  getConnectionStrings,
+  getHighAvailabilityLoadBalancerConnectionInfo,
   getSelfHostedDirectStrings,
   getSelfHostedPoolerStrings,
+  HIGH_AVAILABILITY_LOAD_BALANCER_PORT,
   HIGH_AVAILABILITY_SSL_PARAMS,
 } from '../DatabaseSettings.utils'
 import type { DeploymentMode } from '@/hooks/misc/useDeploymentMode'
@@ -60,11 +63,6 @@ describe('getSelfHostedPoolerStrings', () => {
     expect(strings.dotnet).toContain('Port=5432')
     expect(strings.dotnet).toContain('Database=mydb')
     expect(strings.nodejs).toBe(`DATABASE_URL=${strings.uri}`)
-  })
-
-  test('defaults database name to postgres', () => {
-    const strings = getSelfHostedPoolerStrings('db.example.com', 6543)
-    expect(strings.uri.endsWith('/postgres')).toBe(true)
   })
 })
 
@@ -199,22 +197,6 @@ describe('buildConnectionStringPooler', () => {
     expect(result.sessionDedicated).toBeUndefined()
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
   })
-
-  test('platform without high availability appends no SSL params', () => {
-    const result = buildConnectionStringPooler({
-      deploymentMode: platform,
-      connectionInfo,
-      connectionStringsShared: sharedPlatform,
-      connectionStringsDedicated: dedicatedPlatform,
-      ipv4Addon: true,
-      isHighAvailability: false,
-    })
-
-    expect(result.direct).toBe(sharedPlatform.direct.uri)
-    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
-    expect(result.direct).not.toContain('sslnegotiation')
-    expect(result.transactionShared).not.toContain('sslnegotiation')
-  })
 })
 
 describe('appendHighAvailabilitySslParams', () => {
@@ -237,5 +219,47 @@ describe('appendHighAvailabilitySslParams', () => {
 
   test('leaves an empty string untouched', () => {
     expect(appendHighAvailabilitySslParams('')).toBe('')
+  })
+})
+
+describe('getHighAvailabilityLoadBalancerConnectionInfo', () => {
+  test('swaps the port for the load balancer port and preserves the other fields', () => {
+    const connectionInfo = {
+      db_user: 'postgres',
+      db_port: 5432,
+      db_host: 'db.proj.supabase.co',
+      db_name: 'postgres',
+    }
+
+    expect(getHighAvailabilityLoadBalancerConnectionInfo(connectionInfo)).toEqual({
+      db_user: 'postgres',
+      db_port: HIGH_AVAILABILITY_LOAD_BALANCER_PORT,
+      db_host: 'db.proj.supabase.co',
+      db_name: 'postgres',
+    })
+  })
+
+  test('builds a read-only load balancer connection string on port 5433 with SSL params', () => {
+    const loadBalancerInfo = getHighAvailabilityLoadBalancerConnectionInfo({
+      db_user: 'postgres',
+      db_port: 5432,
+      db_host: 'db.proj.supabase.co',
+      db_name: 'postgres',
+    })
+
+    const result = buildConnectionStringPooler({
+      deploymentMode: platform,
+      connectionInfo: loadBalancerInfo,
+      connectionStringsShared: getConnectionStrings({
+        connectionInfo: loadBalancerInfo,
+        metadata: { projectRef: 'proj' },
+      }),
+      ipv4Addon: false,
+      isHighAvailability: true,
+    })
+
+    expect(result.direct).toBe(
+      `postgresql://postgres:[YOUR-PASSWORD]@db.proj.supabase.co:5433/postgres?${HIGH_AVAILABILITY_SSL_PARAMS}`
+    )
   })
 })

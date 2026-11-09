@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Alert, AlertTitle, Button } from 'ui'
 
@@ -86,7 +86,7 @@ function PartnerManagedResource({
       {details && <div className="text-sm text-foreground-light text-center">{details}</div>}
 
       {showCta && (
-        <Button asChild variant="default" iconRight={<ExternalLink />}>
+        <Button asChild iconRight={<ExternalLinkIcon />}>
           <a href={ctaUrl} target="_blank" rel="noopener noreferrer">
             {cta?.message || `View ${resource} on ${PARTNER_TO_NAME[managedBy]}`}
           </a>

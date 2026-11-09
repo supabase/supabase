@@ -8,7 +8,7 @@ export const TableMenuFilterEmptyState = ({ onResetFilters }: { onResetFilters: 
       description="All entity types are hidden."
       className="mx-4"
     >
-      <Button variant="default" onClick={onResetFilters} className="mt-2">
+      <Button onClick={onResetFilters} className="mt-2">
         Reset filters
       </Button>
     </InnerSideBarEmptyPanel>

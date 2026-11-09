@@ -47,7 +47,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       {success ? (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Check Your Email</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">Check Your Email</CardTitle>
             <CardDescription>Password reset instructions sent</CardDescription>
           </CardHeader>
           <CardContent>
@@ -60,7 +60,9 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
       ) : (
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Reset Your Password</CardTitle>
+            <CardTitle className="font-medium text-lg tracking-normal">
+              Reset Your Password
+            </CardTitle>
             <CardDescription>
               Type in your email and we&apos;ll send you a link to reset your password
             </CardDescription>
@@ -87,7 +89,7 @@ export function ForgotPasswordForm({ className, ...props }: React.ComponentProps
               <div className="mt-4 text-center text-sm">
                 Already have an account?{' '}
                 <Link href="/auth/login" className="underline underline-offset-4">
-                  Login
+                  Sign in
                 </Link>
               </div>
             </form>

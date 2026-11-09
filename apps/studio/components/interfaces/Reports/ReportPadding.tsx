@@ -19,4 +19,3 @@ export const ReportPadding = ({
     </div>
   )
 }
-export default ReportPadding

@@ -49,9 +49,9 @@ export const ValidationFailuresSection = ({
             Database settings
           </InlineLink>
         ) : (
-          'Database settings'
+          <span>Database settings</span>
         )}
-        .
+        <span>.</span>
       </p>
       <Card>
         <Accordion type="multiple">

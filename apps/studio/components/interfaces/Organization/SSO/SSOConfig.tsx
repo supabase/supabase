@@ -1,6 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { useFlag } from 'common'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect, useEffectEvent, useState } from 'react'
 import { SubmitHandler, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -103,13 +102,6 @@ export const SSOConfig = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { hasAccess: hasAccessToSso, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('auth.platform.sso')
-  const enterpriseMcpAuthOrgs = useFlag<string>('enableEnterpriseMcpAuth')
-  const showIdjagSettings =
-    typeof enterpriseMcpAuthOrgs === 'string' &&
-    enterpriseMcpAuthOrgs
-      .split(',')
-      .map((s) => s.trim())
-      .includes(organization?.slug ?? '')
 
   const {
     data: ssoConfig,
@@ -182,7 +174,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
-        idjag_issuer_url: values.idjagIssuerUrl || undefined,
+        idjag_issuer_url: values.idjagIssuerUrl || null,
       },
     }
 
@@ -368,11 +360,9 @@ export const SSOConfig = () => {
                         <JoinOrganizationOnSignup form={form} />
                       </CardContent>
 
-                      {showIdjagSettings && (
-                        <CardContent>
-                          <SSOAdvancedSettings form={form} />
-                        </CardContent>
-                      )}
+                      <CardContent>
+                        <SSOAdvancedSettings form={form} />
+                      </CardContent>
                     </>
                   )}
 
@@ -381,7 +371,7 @@ export const SSOConfig = () => {
                       {!!ssoConfig && (
                         <Button
                           variant="danger"
-                          icon={<Trash />}
+                          icon={<TrashIcon />}
                           onClick={() => setIsDeleteModalVisible(true)}
                           disabled={isCreating || isUpdating || isDeleting}
                         >
@@ -391,11 +381,7 @@ export const SSOConfig = () => {
                     </div>
                     <div className="flex space-x-2">
                       {form.formState.isDirty && (
-                        <Button
-                          variant="default"
-                          disabled={isCreating || isUpdating}
-                          onClick={() => form.reset()}
-                        >
+                        <Button disabled={isCreating || isUpdating} onClick={() => form.reset()}>
                           Cancel
                         </Button>
                       )}
@@ -435,14 +421,15 @@ export const SSOConfig = () => {
                       <span className="text-foreground font-semibold">{ssoConfig.domains[0]}</span>
                     </>
                   )}
-                  .
+                  <span>.</span>
                 </p>
 
                 {ssoMemberCount > 0 && (
                   <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3">
                     <p className="text-sm text-foreground">
                       <span className="font-semibold">
-                        {ssoMemberCount} organization member{ssoMemberCount !== 1 ? 's' : ''}
+                        {ssoMemberCount} organization member
+                        {ssoMemberCount !== 1 ? <span>s</span> : ''}
                       </span>{' '}
                       who authenticate via SSO will be{' '}
                       <span className="font-semibold">permanently removed</span> from this

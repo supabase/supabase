@@ -20,7 +20,7 @@ There’s something for everybody this month: AI, Auth, Database, Edge Functions
 
 The most popular GraphQL IDE/API explorer is now built into the dashboard! You can now explore and query your GraphQL API produced by `pg_graphql`.
 
-[Try it now](https://supabase.com/dashboard/project/_/api/graphiql).
+[Try it now](https://supabase.com/dashboard/project/_/integrations/graphiql).
 
 ## Supabase + OpenAI search
 
@@ -34,7 +34,7 @@ We've updated our Docs search functionality to use `pgvector` + OpenAI. Still no
 
 ![Serve all the functions!](/images/blog/2023-03-09-beta-update-february/supabase-cli-edge-functions.png)
 
-Do you use multiple Edge Functions in your project? Then celebrate! Supabase CLI 1.36+ now supports serving multiple Edge Functions at the same time.
+Do you use multiple Edge Functions in your project? Then celebrate! [Supabase CLI](https://supabase.com/docs/reference/cli/introduction) 1.36+ now supports serving multiple Edge Functions at the same time.
 
 To enable the feature, just run `supabase functions serve` in your project.
 
@@ -70,7 +70,7 @@ API docs got a light touchup and were moved to the table editor. You can now loo
 
 - **Auth**: Added full OpenAPI 3.0 spec which provides a comprehensive overview of the API with documentation on each request. [PR](https://github.com/supabase/gotrue/pull/918)
 
-- **Database**: supabase-js now infers the response type from your query. If the inferred type is incorrect, you can use `.returns<MyType>()` to override it. [Doc](https://supabase.com/docs/reference/javascript/db-returns)
+- **Database**: supabase-js now infers the response type from your query. If the inferred type is incorrect, you can use `.returns<MyType>()` to override it. [Doc](https://supabase.com/docs/reference/javascript/using-modifiers-returns)
 
 - **Dashboard**: Improved database roles management, you can now create, update and delete database roles through the dashboard. [Dashboard](https://supabase.com/dashboard/project/_/database/roles)
 

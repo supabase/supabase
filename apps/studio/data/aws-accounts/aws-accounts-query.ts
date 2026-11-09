@@ -5,17 +5,20 @@ import { components } from 'api-types'
 import { awsAccountKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type AWSAccountsVariables = {
   projectRef?: string
 }
 
-// [Joshen] API types should be updated with these 2 parameters, so remove once verified
+// [Joshen] API types should be updated with these parameters, so remove once verified
 export type AWSAccount =
-  components['schemas']['GetPrivateLinkResponse']['private_link_associations'][number] & {
+  components['schemas']['GetPrivateLinkResponse_Output']['private_link_associations'][number] & {
     database_type?: 'PRIMARY' | 'READ_REPLICA'
     database_identifier?: string
+    resource_access_manager_resource_config_id?: string
+    resource_access_manager_resource_config_arn?: string
+    resource_access_manager_share_arn?: string
   }
 
 async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: AbortSignal) {
@@ -33,7 +36,7 @@ async function getAWSAccounts({ projectRef }: AWSAccountsVariables, signal?: Abo
 }
 
 type AWSAccountsData = Awaited<ReturnType<typeof getAWSAccounts>>
-type AWSAccountsError = ResponseError
+type AWSAccountsError = StudioError
 
 export const useAWSAccountsQuery = <TData = AWSAccountsData>(
   { projectRef }: AWSAccountsVariables,

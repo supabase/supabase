@@ -1,8 +1,20 @@
-import { useParams } from 'common'
-import { Auth, Database, EdgeFunctions, Realtime, SqlEditor, Storage, TableEditor } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import { useFlag, useParams } from 'common'
+import {
+  Auth,
+  Compute,
+  Database,
+  EdgeFunctions,
+  Realtime,
+  SqlEditor,
+  Storage,
+  TableEditor,
+} from 'icons'
+import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
 
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import {
+  useIsExplorerEnabled,
+  useUnifiedLogsPreview,
+} from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { ICON_SIZE, ICON_STROKE_WIDTH } from '@/components/interfaces/Sidebar'
 import type { Route } from '@/components/ui/ui.types'
 import { EditorIndexPageLink } from '@/data/prefetchers/project.$ref.editor'
@@ -10,6 +22,7 @@ import type { Project } from '@/data/projects/project-detail-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PRODUCT_NAME } from '@/lib/constants/compute'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 interface RouteContext {
@@ -25,6 +38,7 @@ interface ProductFeatures {
   storage?: boolean
   realtime?: boolean
   authOverviewPage?: boolean
+  compute?: boolean
 }
 
 interface OtherFeatures {
@@ -32,6 +46,7 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
+  isHealthAdvisorEnabled?: boolean
 }
 
 function getRouteContext(ref?: string, project?: Project): RouteContext {
@@ -43,8 +58,12 @@ function getRouteContext(ref?: string, project?: Project): RouteContext {
   }
 }
 
-export const generateToolRoutes = (ref?: string, project?: Project): Route[] => {
+export const useGenerateToolRoutes = (): Route[] => {
+  const { ref } = useParams()
+  const { data: project } = useSelectedProjectQuery()
+
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
+  const isExplorerEnabled = useIsExplorerEnabled()
 
   return [
     {
@@ -56,14 +75,27 @@ export const generateToolRoutes = (ref?: string, project?: Project): Route[] => 
       linkElement: <EditorIndexPageLink projectRef={ref} />,
       shortcutId: SHORTCUT_IDS.NAV_TABLE_EDITOR,
     },
-    {
-      key: 'sql',
-      label: 'SQL Editor',
-      disabled: !isProjectActive,
-      icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
-      shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
-    },
+    ...(isExplorerEnabled
+      ? [
+          {
+            key: 'explorer',
+            label: 'Explorer',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/explorer`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]
+      : [
+          {
+            key: 'sql',
+            label: 'SQL Editor',
+            disabled: !isProjectActive,
+            icon: <SqlEditor size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/sql`),
+            shortcutId: SHORTCUT_IDS.NAV_SQL_EDITOR,
+          },
+        ]),
   ]
 }
 
@@ -79,6 +111,7 @@ export const generateProductRoutes = (
   const storageEnabled = features?.storage ?? true
   const realtimeEnabled = features?.realtime ?? true
   const authOverviewPageEnabled = features?.authOverviewPage ?? false
+  const computeEnabled = features?.compute ?? false
 
   return [
     {
@@ -137,6 +170,19 @@ export const generateProductRoutes = (
           },
         ]
       : []),
+    ...(computeEnabled
+      ? [
+          {
+            key: 'compute',
+            label: PRODUCT_NAME,
+            disabled: !isProjectActive,
+            icon: <Compute size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/compute`),
+            isNew: true,
+            shortcutId: SHORTCUT_IDS.NAV_COMPUTE,
+          },
+        ]
+      : []),
     ...(realtimeEnabled
       ? [
           {
@@ -162,14 +208,19 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+  const isHealthAdvisorEnabled = features?.isHealthAdvisorEnabled ?? false
 
   return [
     {
       key: 'advisors',
       label: 'Advisors',
       disabled: !isProjectActive,
-      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      icon: <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      link:
+        ref &&
+        (isProjectBuilding
+          ? buildingUrl
+          : `/project/${ref}/advisors/${isHealthAdvisorEnabled ? 'health' : 'security'}`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled
@@ -178,7 +229,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <TelescopeIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link:
               ref &&
               (isProjectBuilding
@@ -196,7 +247,7 @@ export const generateOtherRoutes = (
             key: 'logs',
             label: 'Logs',
             disabled: false,
-            icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <ListIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link:
               ref &&
               (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
@@ -208,7 +259,7 @@ export const generateOtherRoutes = (
       key: 'integrations',
       label: 'Integrations',
       disabled: !isProjectActive,
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
       shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
     },
@@ -222,11 +273,13 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   return generateOtherRoutes(ref, project, {
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
+    isHealthAdvisorEnabled,
   })
 }
 
@@ -235,7 +288,7 @@ export const generateSettingsRoutes = (ref?: string): Route[] => {
     {
       key: 'settings',
       label: 'Project Settings',
-      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && `/project/${ref}/settings/general`,
       disabled: false,
       shortcutId: SHORTCUT_IDS.NAV_SETTINGS,

@@ -117,12 +117,10 @@ check_logs db \
 check_logs auth \
     'db worker started'
 
-check_logs_if_running kong \
-    'init.lua.*declarative config loaded'
-
-check_logs_if_running api-gw \
-     'Envoy configuration generated successfully' \
-     'Starting Envoy...'
+# API gateway: Envoy by default, or Kong when the kong override is enabled.
+# The service is named api-gw in both cases, so accept either startup marker.
+check_logs api-gw \
+    'init\.lua.*declarative config loaded|Envoy configuration generated successfully'
 
 check_logs rest \
     'Schema cache loaded in.*milliseconds'
@@ -143,16 +141,27 @@ check_logs meta \
     'Server listening at http'
 
 check_logs functions \
-    'main function started'
+    'main function started' \
+    'Memory pressure monitor active'
 
 check_logs_if_running analytics \
     'Access LogflareWeb.Endpoint at http://localhost:4000' \
     'Executing startup tasks' \
     'Ensuring single tenant user is seeded'
 
-check_logs supavisor \
-    'Connected to Postgres database' \
-    'HEAD /api/health$'
+# Database pooler: Supavisor by default, or PgBouncer when the pgbouncer
+# override is enabled (which disables Supavisor). Check whichever is running.
+if is_service_running supavisor; then
+    check_logs supavisor \
+        'Connected to Postgres database' \
+        'HEAD /api/health$'
+elif is_service_running pgbouncer; then
+    check_logs pgbouncer \
+        'process up: PgBouncer' \
+        'listening on .*6432'
+else
+    fail_msg "pooler (neither supavisor nor pgbouncer is running)"
+fi
 
 check_logs_if_running vector \
     'Vector has started'

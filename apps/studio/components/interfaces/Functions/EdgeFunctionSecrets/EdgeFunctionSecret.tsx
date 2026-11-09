@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit2, MoreVertical, Trash } from 'lucide-react'
+import { Edit2Icon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import { toast } from 'sonner'
 import {
   Button,
@@ -19,7 +18,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import type { ProjectSecret } from '@/data/secrets/secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface EdgeFunctionSecretProps {
   secret: ProjectSecret
@@ -28,7 +27,9 @@ interface EdgeFunctionSecretProps {
 }
 
 const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFunctionSecretProps) => {
-  const { can: canUpdateSecrets } = useAsyncCheckPermissions(PermissionAction.SECRETS_WRITE, '*')
+  const { can: canUpdateSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
+  )
 
   return (
     <TableRow>
@@ -41,7 +42,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
             }}
           >
             <p className="truncate py-1">
-              <code className="text-code-inline">{secret.name}</code>
+              <code>{secret.name}</code>
             </p>
           </TooltipTrigger>
           <TooltipContent side="bottom">Click to copy</TooltipContent>
@@ -49,7 +50,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
       </TableCell>
       <TableCell>
         <p className="max-w-96 truncate" title={secret.value}>
-          <code className="text-code-inline text-foreground-light!">{secret.value}</code>
+          <code className="text-foreground-light!">{secret.value}</code>
         </p>
       </TableCell>
       <TableCell>
@@ -68,18 +69,13 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
         <div className="flex items-center justify-end">
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button
-                aria-label="More options"
-                variant="default"
-                className="px-1"
-                icon={<MoreVertical />}
-              />
+              <Button aria-label="More options" className="px-1" icon={<MoreVerticalIcon />} />
             </DropdownMenuTrigger>
             <DropdownMenuContent side="bottom" align="end" className="w-52">
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   variant="text"
-                  icon={<Edit2 size={14} />}
+                  icon={<Edit2Icon size={14} />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
                   onClick={() => onSelectEdit()}
@@ -101,7 +97,7 @@ const EdgeFunctionSecret = ({ secret, onSelectEdit, onSelectDelete }: EdgeFuncti
               <DropdownMenuItem asChild>
                 <ButtonTooltip
                   variant="text"
-                  icon={<Trash size={14} className="group-not-disabled:text-destructive" />}
+                  icon={<TrashIcon size={14} className="group-not-disabled:text-destructive" />}
                   className="w-full justify-start group text-inherit"
                   disabled={!canUpdateSecrets}
                   onClick={() => onSelectDelete()}

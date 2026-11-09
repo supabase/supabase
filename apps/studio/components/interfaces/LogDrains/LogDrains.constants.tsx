@@ -1,6 +1,6 @@
 import { components } from 'api-types'
 import { Axiom, Datadog, Grafana, Last9, Otlp, Sentry } from 'icons'
-import { BracesIcon, Cloud, Server } from 'lucide-react'
+import { BracesIcon, CloudIcon, ServerIcon } from 'lucide-react'
 
 const iconProps = {
   height: 24,
@@ -40,7 +40,7 @@ export const LOG_DRAIN_TYPES = [
     value: 's3',
     name: 'Amazon S3',
     description: 'Forward logs to an S3 bucket',
-    icon: <Cloud {...iconProps} />,
+    icon: <CloudIcon {...iconProps} />,
   },
   {
     value: 'sentry',
@@ -66,7 +66,7 @@ export const LOG_DRAIN_TYPES = [
     value: 'syslog',
     name: 'Syslog',
     description: 'Forward logs to a remote Syslog receiver using TCP or TLS, adhering to RFC 5424',
-    icon: <Server {...iconProps} />,
+    icon: <ServerIcon {...iconProps} />,
   },
 ] as const
 
@@ -86,12 +86,20 @@ export const DATADOG_REGIONS = [
     value: 'EU',
   },
   {
+    label: 'UK1',
+    value: 'UK1',
+  },
+  {
     label: 'US1',
     value: 'US1',
   },
   {
     label: 'US1-FED',
     value: 'US1-FED',
+  },
+  {
+    label: 'US2-FED',
+    value: 'US2-FED',
   },
   {
     label: 'US3',

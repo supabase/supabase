@@ -1,0 +1,54 @@
+---
+title: 'Best storage providers in 2026'
+description: 'Learn which storage providers to use in 2026'
+topics: ['Rundowns']
+lastEdited: 2026-11-05
+---
+
+Storage providers hold the files your app creates and serves, such as user uploads, images, videos, exports, and backups. They handle durability, access control, and delivery, so you do not need to run your own file servers.
+
+## Supabase Storage
+
+[Supabase Storage](/docs/guides/storage) is an object storage service built into the Supabase platform. Files are stored in buckets and organized into folders, and you can serve them through a CDN.
+
+Because Storage is part of the same project as your [database](/docs/guides/database/overview) and [Auth](/docs/guides/auth), you can control access with similar [Row Level Security policies](/docs/guides/database/postgres/row-level-security) to protect your data. Storage also supports standard, resumable, and [S3-compatible uploads](/docs/guides/storage/s3/compatibility), so many S3 tools can work with it.
+
+Supabase Storage is the best choice if you already use Supabase and want file storage to work with your data and users without extra setup. It's also a great choice for new projects that need a [Data API](/docs/guides/api), [Edge Functions](/docs/guides/functions), [Realtime](/docs/guides/realtime), or [Auth](/docs/guides/auth).
+
+## Amazon S3
+
+[Amazon S3](https://aws.amazon.com/s3/) is the object storage service from AWS and the reference for most object storage APIs. It offers many storage classes, lifecycle policies, and integrations with other AWS services.
+
+S3 fits teams whose infrastructure already runs on AWS and that need fine-grained control over storage classes, replication, and permissions. Many other providers, including the ones in this guide, implement the S3 API, so tools built for S3 often work with them too.
+
+## Cloudflare R2
+
+[Cloudflare R2](https://developers.cloudflare.com/r2/) is an object storage service that implements the S3 API. Its main draw is that it does not charge for egress, which is the cost of data leaving the service.
+
+R2 suits public file delivery and workloads that download large amounts of data, especially if your site or app already runs on Cloudflare.
+
+## Backblaze B2
+
+[Backblaze B2](https://www.backblaze.com/cloud-storage) is a low-cost object storage service with an S3-compatible API. It is commonly used for backups, archives, and media libraries that you store for a long time.
+
+B2 fits teams that want to keep storage costs low and do not need the wider set of AWS services.
+
+## Google Cloud Storage
+
+[Google Cloud Storage](https://cloud.google.com/storage) is the object storage service from Google Cloud. It offers storage classes for data accessed at different frequencies, integration with BigQuery and other Google Cloud services, and regional, dual-region, and multi-region buckets.
+
+Google Cloud Storage fits teams that already run on Google Cloud, or that need its data analytics and machine learning integrations.
+
+## Other providers
+
+Your app can store files with any provider that offers an S3 API or standard HTTP uploads, and save the file URL in your Supabase database. If you need a provider that is not listed here, check its API documentation for S3 compatibility first.
+
+## Which storage provider to choose
+
+If you already use Supabase or are starting a new project, Supabase Storage is the default choice. Otherwise, use this list to narrow down your options:
+
+- **Your project already uses Supabase, or you are starting a new project using Supabase:** [Supabase Storage](/docs/guides/storage)
+- **Your infrastructure already runs on AWS and you need fine-grained control over storage classes and replication:** [Amazon S3](https://aws.amazon.com/s3/)
+- **You serve public files or move large amounts of data out of storage, and you want to avoid egress fees:** [Cloudflare R2](https://developers.cloudflare.com/r2/)
+- **You want low-cost storage for backups, archives, or media libraries:** [Backblaze B2](https://www.backblaze.com/cloud-storage)
+- **Your infrastructure already runs on Google Cloud or you need its analytics and machine learning integrations:** [Google Cloud Storage](https://cloud.google.com/storage)

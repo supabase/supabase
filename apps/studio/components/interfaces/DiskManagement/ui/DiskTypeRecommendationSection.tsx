@@ -1,4 +1,4 @@
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { ReactNode } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -31,7 +31,7 @@ export function DiskTypeRecommendationSection({
         >
           <Admonition
             type="default"
-            title={`You will need to use ${io2Option?.name} to use a larger Disk size`}
+            title={`You will need to use ${io2Option?.name} to use a larger disk size`}
           >
             <div className="flex flex-col gap-2">{actions && <div>{actions}</div>}</div>
           </Admonition>

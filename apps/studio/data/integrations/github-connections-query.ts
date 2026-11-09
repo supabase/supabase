@@ -1,10 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
-import { useMemo } from 'react'
 
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GitHubConnectionsVariables = {
   organizationId?: number
@@ -30,7 +30,7 @@ export async function getGitHubConnections(
 }
 
 export type GitHubConnectionsData = Awaited<ReturnType<typeof getGitHubConnections>>
-export type GitHubConnectionsError = ResponseError
+export type GitHubConnectionsError = StudioError
 
 export type GitHubConnection = GitHubConnectionsData[0]
 
@@ -52,14 +52,11 @@ export const useGitHubConnectionsQuery = <TData = GitHubConnectionsData>(
 
 export const useProjectGitHubConnectionQuery = ({ ref }: { ref?: string }) => {
   const { data: organization } = useSelectedOrganizationQuery()
-  const { data: connections, ...props } = useGitHubConnectionsQuery(
+  return useGitHubConnectionsQuery(
     { organizationId: organization?.id },
-    { enabled: !!ref && !!organization?.id }
+    {
+      enabled: !!ref && !!organization?.id,
+      select: (data) => data?.find((c) => c.project.ref === ref),
+    }
   )
-
-  const existingConnection = useMemo(
-    () => connections?.find((c) => c.project.ref === ref),
-    [connections, ref]
-  )
-  return { data: existingConnection, ...props }
 }

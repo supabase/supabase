@@ -204,7 +204,7 @@ const FunctionsHero = () => {
             />
             <div className="text-foreground rounded-sm p-1.5 opacity-0 group-hover:opacity-100 transition-opacity">
               {copied ? (
-                <span className="text-brand">
+                <span className="text-primary">
                   <Check className="w-3.5 h-3.5" />
                 </span>
               ) : (

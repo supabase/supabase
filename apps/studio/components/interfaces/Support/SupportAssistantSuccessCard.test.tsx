@@ -68,6 +68,14 @@ vi.mock('@/lib/telemetry/track', () => ({
   useTrack: () => mockTrack,
 }))
 
+let mockCurrentProjectRef: string | undefined = 'project-1'
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useSelectedProjectQuery: () => ({
+    data: mockCurrentProjectRef ? { ref: mockCurrentProjectRef } : undefined,
+  }),
+}))
+
 const supportRequest: SubmittedSupportRequest = {
   organizationSlug: 'org-1',
   projectRef: 'project-1',
@@ -107,6 +115,8 @@ describe('SupportAssistantSuccessCard', () => {
     mockTrack.mockReset()
     nextChatMessages = []
     emitChatMessagesChange = undefined
+    mockCurrentProjectRef = 'project-1'
+    sessionStorage.clear()
 
     mockNewChat.mockImplementation(() => {
       chatInstances['chat-1'] = createMockChat(nextChatMessages)
@@ -134,11 +144,11 @@ describe('SupportAssistantSuccessCard', () => {
   })
 
   it('shows a loading preview before the assistant responds', async () => {
-    const { container } = render(<SupportAssistantSuccessCard request={supportRequest} />)
+    render(<SupportAssistantSuccessCard request={supportRequest} />)
 
     expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /open assistant response/i })).toBeInTheDocument()
-    expect(container.querySelectorAll('.animate-pulse').length).toBeGreaterThan(0)
+    expect(screen.queryByTestId('assistant-preview-message')).not.toBeInTheDocument()
   })
 
   it('renders the full assistant response preview inside the clipped content area', async () => {
@@ -242,18 +252,6 @@ describe('SupportAssistantSuccessCard', () => {
     expect(mockSyncSupportChatToFront).toHaveBeenCalledTimes(1)
   })
 
-  it('opens the generated assistant chat with keyboard activation', async () => {
-    const user = userEvent.setup()
-    render(<SupportAssistantSuccessCard request={supportRequest} />)
-
-    const button = await screen.findByRole('button', { name: /open assistant response/i })
-    button.focus()
-    await user.keyboard('{Enter}')
-
-    expect(mockSelectChat).toHaveBeenCalledWith('chat-1')
-    expect(mockOpenSidebar).toHaveBeenCalledWith('ai-assistant')
-  })
-
   it('does not render or create a chat when no project is selected', () => {
     render(
       <SupportAssistantSuccessCard
@@ -263,5 +261,46 @@ describe('SupportAssistantSuccessCard', () => {
 
     expect(screen.queryByText(/assistant response/i)).not.toBeInTheDocument()
     expect(mockNewChat).not.toHaveBeenCalled()
+  })
+
+  describe('when not already on the ticket project page', () => {
+    beforeEach(() => {
+      mockCurrentProjectRef = undefined
+    })
+
+    it('renders a handoff link with an opaque token, keeping the ticket content out of the URL', async () => {
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      expect(await screen.findByRole('heading', { name: 'While you wait' })).toBeInTheDocument()
+      const link = screen.getByRole('link', { name: /open assistant in project/i })
+      expect(link).toHaveAttribute('href', expect.stringContaining('/project/project-1?'))
+
+      const href = link.getAttribute('href') ?? ''
+      const token = new URL(href, 'https://example.com').searchParams.get('assistantHandoff')
+      expect(token).toBeTruthy()
+      // The message (and the rest of the ticket) must never appear in the URL itself.
+      expect(href).not.toContain(encodeURIComponent(supportRequest.message))
+
+      // The actual ticket content is stashed in sessionStorage instead, keyed by that token.
+      expect(sessionStorage.getItem(`assistant-handoff:${token}`)).toBe(
+        JSON.stringify(supportRequest)
+      )
+      expect(mockNewChat).not.toHaveBeenCalled()
+    })
+
+    it('tracks the click and does not touch the sidebar manager directly', async () => {
+      const user = userEvent.setup()
+      render(<SupportAssistantSuccessCard request={supportRequest} />)
+
+      const link = await screen.findByRole('link', { name: /open assistant in project/i })
+      await user.click(link)
+
+      expect(mockTrack).toHaveBeenCalledWith(
+        'support_assistant_follow_up_card_clicked',
+        { ticketCategory: SupportCategories.PROBLEM },
+        { project: 'project-1', organization: 'org-1' }
+      )
+      expect(mockOpenSidebar).not.toHaveBeenCalled()
+    })
   })
 })

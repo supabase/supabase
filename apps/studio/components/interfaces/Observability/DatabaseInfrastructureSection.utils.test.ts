@@ -69,7 +69,7 @@ describe('parseInfrastructureMetrics', () => {
           totalAverage: 200,
           yAxisLimit: 100,
         },
-        disk_io_consumption: {
+        disk_io_budget: {
           format: 'percent',
           total: 210,
           totalAverage: 70,
@@ -88,56 +88,22 @@ describe('parseInfrastructureMetrics', () => {
     })
   })
 
-  it('handles string values in metrics', () => {
-    const mockResponse: InfraMonitoringMultiResponse = {
-      data: [],
+  it('uses average remaining balance in the selected window rather than consumed IO or its lowest sample', () => {
+    const response: InfraMonitoringMultiResponse = {
+      data: [
+        { period_start: 't1', values: { disk_io_budget: '98', disk_io_consumption: '2' } },
+        { period_start: 't2', values: { disk_io_budget: '100', disk_io_consumption: '0' } },
+      ],
       series: {
-        avg_cpu_usage: { format: 'percent', total: 150, totalAverage: '50.5', yAxisLimit: 100 },
-        ram_usage: { format: 'bytes', total: 180, totalAverage: '60.8', yAxisLimit: 100 },
-        disk_fs_used_system: {
-          format: 'bytes',
-          total: 20,
-          totalAverage: '20.4',
-          yAxisLimit: 100,
-        },
-        disk_fs_used_wal: {
-          format: 'bytes',
-          total: 10,
-          totalAverage: '10.2',
-          yAxisLimit: 100,
-        },
-        pg_database_size: {
-          format: 'bytes',
-          total: 30,
-          totalAverage: '30.5',
-          yAxisLimit: 100,
-        },
-        disk_fs_size: {
-          format: 'bytes',
-          total: 200,
-          totalAverage: '200.0',
-          yAxisLimit: 100,
-        },
-        disk_io_consumption: {
-          format: 'percent',
-          total: 210,
-          totalAverage: '70.2',
-          yAxisLimit: 100,
-        },
+        disk_io_budget: { format: '%', total: 198, totalAverage: 99, yAxisLimit: 100 },
+        disk_io_consumption: { format: '%', total: 2, totalAverage: 1, yAxisLimit: 100 },
       },
     }
 
-    const result = parseInfrastructureMetrics(mockResponse)
-
-    expect(result).toEqual({
-      cpu: { current: 50.5, max: 100 },
-      ram: { current: 60.8, max: 100 },
-      disk: { current: 30.55, max: 100 },
-      diskIo: { current: 70.2, max: 100 },
-    })
+    expect(parseInfrastructureMetrics(response)?.diskIo.current).toBe(99)
   })
 
-  it('returns 0 for missing metrics', () => {
+  it('keeps missing disk IO balance unavailable', () => {
     const mockResponse: InfraMonitoringMultiResponse = {
       data: [],
       series: {},
@@ -149,7 +115,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 
@@ -167,7 +133,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 50, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 
@@ -186,7 +152,7 @@ describe('parseInfrastructureMetrics', () => {
       cpu: { current: 0, max: 100 },
       ram: { current: 0, max: 100 },
       disk: { current: 0, max: 100 },
-      diskIo: { current: 0, max: 100 },
+      diskIo: { current: undefined, max: 100 },
     })
   })
 })
@@ -243,20 +209,14 @@ describe('parseConnectionsData', () => {
     expect(result).toEqual({ peak: 7, max: 100 })
   })
 
-  it('skips missing values when computing peak', () => {
-    const mockInfraData = buildResponse([5, undefined, 7, undefined])
-
-    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
-
-    expect(result).toEqual({ peak: 7, max: 100 })
-  })
-
-  it('skips empty-string values when computing peak', () => {
-    const mockInfraData = buildResponse(['5', '', '7', ''])
-
-    const result = parseConnectionsData(mockInfraData, { maxConnections: 100 })
-
-    expect(result).toEqual({ peak: 7, max: 100 })
+  it.each([
+    ['missing', [5, undefined, 7, undefined]],
+    ['empty-string', ['5', '', '7', '']],
+  ])('skips %s values when computing peak', (_, values) => {
+    expect(parseConnectionsData(buildResponse(values), { maxConnections: 100 })).toEqual({
+      peak: 7,
+      max: 100,
+    })
   })
 
   it('returns peak connections even when maxConnectionsData is undefined', () => {

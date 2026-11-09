@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import { useForm } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
@@ -147,11 +147,7 @@ export const DashboardPreferences = () => {
                 </CardContent>
                 <CardFooter className="justify-end space-x-2">
                   {form.formState.isDirty && (
-                    <Button
-                      variant="default"
-                      type="button"
-                      onClick={() => form.reset(dashboardPreferences)}
-                    >
+                    <Button type="button" onClick={() => form.reset(dashboardPreferences)}>
                       Cancel
                     </Button>
                   )}
@@ -173,7 +169,7 @@ const DashboardQueriesDialog = () => {
   return (
     <Dialog>
       <DialogTrigger className="ml-1 translate-y-0.5">
-        <HelpCircle size={14} className="hover:text-foreground transition" />
+        <HelpCircleIcon size={14} className="hover:text-foreground transition" />
       </DialogTrigger>
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
@@ -197,7 +193,7 @@ const DashboardQueriesDialog = () => {
 
         <DialogFooter>
           <DialogClose asChild className="opacity-100">
-            <Button variant="default">Understood</Button>
+            <Button>Understood</Button>
           </DialogClose>
         </DialogFooter>
       </DialogContent>

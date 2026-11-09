@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { IS_PLATFORM, useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { cloneElement, useState, type ReactElement } from 'react'
 import { toast } from 'sonner'
 import {
@@ -31,16 +30,15 @@ import {
 import { LogDrainData, useLogDrainsQuery } from '@/data/log-drains/log-drains-query'
 import { useUpdateLogDrainMutation } from '@/data/log-drains/update-log-drain-mutation'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import type { NextPageWithLayout } from '@/types'
 
 const LogDrainsSettings: NextPageWithLayout = () => {
-  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.ANALYTICS_ADMIN_WRITE,
-    'logflare'
+  const { can: canManageLogDrains, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ANALYTICS_CONFIG_WRITE
   )
 
   const track = useTrack()
@@ -215,7 +213,7 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                     disabled={!hasAccessToLogDrains || !canManageLogDrains}
                     onClick={handleAddDestinationClick}
                     variant="primary"
-                    className="rounded-r-none px-3"
+                    className="rounded-r-none px-3 hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                   >
                     Add destination
                   </Button>
@@ -224,9 +222,9 @@ const LogDrainsSettings: NextPageWithLayout = () => {
                   <DropdownMenuTrigger asChild>
                     <Button
                       variant="primary"
-                      title="Choose token scope"
-                      className="rounded-l-none px-[4px] py-[5px]"
-                      icon={<ChevronDown />}
+                      aria-label="Choose destination type"
+                      className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                      icon={<ChevronDownIcon />}
                     />
                   </DropdownMenuTrigger>
                   <DropdownMenuContent align="end" side="bottom">

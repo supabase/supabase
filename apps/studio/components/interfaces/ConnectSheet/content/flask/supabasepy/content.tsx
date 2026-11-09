@@ -9,7 +9,7 @@ const ContentFile = ({ projectKeys }: StepContentProps) => {
       language: 'bash',
       code: `
 SUPABASE_URL=${projectKeys.apiUrl ?? 'your-project-url'}
-SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-anon-key'}
+SUPABASE_PUBLISHABLE_KEY=${projectKeys.publishableKey ?? projectKeys.anonKey ?? 'your-publishable-key'}
         `,
     },
     {

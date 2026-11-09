@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { OrganizationInvite } from './OrganizationInvite'
 import type { OrganizationInviteByToken } from '@/data/organization-members/organization-invitation-token-query'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { ProfileContextType } from '@/lib/profile'
 import { render } from '@/tests/helpers'
-import type { ResponseError } from '@/types'
 
 const mocks = vi.hoisted(() => ({
   isLoggedIn: vi.fn(),
@@ -85,7 +85,7 @@ const PROFILE: ProfileContextType['profile'] = {
   free_project_limit: null,
 }
 
-const responseError = (message: string, code = 500) => ({ message, code }) as ResponseError
+const responseError = (message: string, code = 500) => ({ message, code }) as StudioError
 
 function setSignedInDefaults() {
   mocks.isLoggedIn.mockReturnValue(true)
@@ -116,7 +116,6 @@ function setSignedInDefaults() {
 
 describe('OrganizationInvite', () => {
   beforeEach(() => {
-    vi.clearAllMocks()
     setSignedInDefaults()
   })
 
@@ -140,7 +139,7 @@ describe('OrganizationInvite', () => {
       'href',
       '/sign-in?returnTo=%2Fjoin%3Ftoken%3Dinvite-token%26slug%3Dacme-corp'
     )
-    expect(screen.getByRole('link', { name: 'Create an account' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Sign up' })).toHaveAttribute(
       'href',
       '/sign-up?returnTo=%2Fjoin%3Ftoken%3Dinvite-token%26slug%3Dacme-corp'
     )
