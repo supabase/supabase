@@ -2,12 +2,12 @@ import { ChevronLeft, ChevronRight, LucideIcon } from 'lucide-react'
 import { GetStaticPaths, GetStaticProps } from 'next'
 import { NextSeo } from 'next-seo'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
 import { Badge, Button, cn } from 'ui'
 import { Image } from 'ui-patterns/Image'
 
 import ShareArticleActions from '@/components/Blog/ShareArticleActions'
 import CTABanner from '@/components/CTABanner'
+import { FeatureDescription } from '@/components/FeatureDescription'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import PrevNextFeatureNav from '@/components/PrevNextFeatureNav'
@@ -223,9 +223,7 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
             </div>
             <main className="max-w-xl mx-auto flex flex-col items-start gap-8">
-              <div className="prose prose-docs">
-                <ReactMarkdown>{feature.description}</ReactMarkdown>
-              </div>
+              <FeatureDescription description={feature.description} ctaLabel={feature.ctaLabel} />
               {(feature.docsUrl || feature.blogUrl) && (
                 <div className="flex flex-wrap gap-2">
                   {feature.docsUrl && (

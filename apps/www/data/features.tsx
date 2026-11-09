@@ -49,6 +49,12 @@ enum ADDITIONAL_PRODUCTS {
   STUDIO = 'studio',
 }
 
+/**
+ * Placeholder in a feature description where the CTA button is rendered.
+ * Renders as nothing in markdown; FeatureDescription splits on it.
+ */
+export const FEATURE_CTA_MARKER = '<!-- feature-cta -->'
+
 export type FeatureProductType = PRODUCT | PRODUCT_MODULE | ADDITIONAL_PRODUCTS
 
 export enum PRODUCT_STAGES {
@@ -108,6 +114,11 @@ export type FeatureType = {
    */
   blogUrl?: string
   /**
+   * label for the CTA button rendered at the `FEATURE_CTA_MARKER` position in the description.
+   * Defaults to "Start your project".
+   */
+  ctaLabel?: string
+  /**
    * feature metadata on its status
    */
   status?: {
@@ -126,9 +137,9 @@ export const features: FeatureType[] = [
     title: 'Postgres database',
     subtitle: 'Every project is a full Postgres database.',
     description: `
-Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/) - _"a powerful, open source object-relational database system with over 35 years of active development that has earned it a strong reputation for reliability, feature robustness, and performance"_.
+Every Supabase project is a dedicated [Postgres database](https://www.postgresql.org/), which is a powerful, open source object-relational database. Start building for free.
 
-It's 100% portable, which means you can easily migrate your data to and from other Postgres databases, ensuring that your data is never locked into a proprietary system.
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Advanced data types: Utilize JSON, arrays, and custom types to store complex data structures efficiently.
@@ -154,7 +165,9 @@ It's 100% portable, which means you can easily migrate your data to and from oth
     title: 'Vector database',
     subtitle: 'Store vector embeddings right next to the rest of your data.',
     description: `
-Supabase provides an open source toolkit for developing AI applications using Postgres and pgvector. Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+Use the Supabase client libraries to store, index, and query your vector embeddings at scale.
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. Unified data storage: Keep vector embeddings and relational data in one place, simplifying your data architecture.
@@ -2729,8 +2742,11 @@ This feature is essential for organizations looking to maintain robust security 
   {
     title: 'SQL Editor',
     subtitle: 'A powerful interface for writing and executing SQL queries.',
+    ctaLabel: 'Use the SQL Editor',
     description: `
-The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. This feature is designed to enhance productivity by offering syntax highlighting, auto-completion, and error detection, making it easier for developers to interact with their databases efficiently.
+The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. 
+
+${FEATURE_CTA_MARKER}
 
 ## Key benefits
 1. User-friendly interface: Intuitive design that simplifies the process of writing SQL queries.
