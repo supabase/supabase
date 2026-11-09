@@ -185,3 +185,58 @@ export const formatComputeRequests = (requests: number): string => {
   if (requests >= 1_000) return `${(requests / 1_000).toFixed(1)}K`
   return requests.toLocaleString()
 }
+
+/* ------------------------------------------------------------------ *
+ * Capacity headroom                                                   *
+ * ------------------------------------------------------------------ */
+
+/**
+ * A capacity limit is never "80% used" in any way a developer can act on — what they want to
+ * know is whether the next deploy fits. At 50 workers a ratio warning fires with ten slots
+ * still free; at 2 it fires with none. So capacity warns on absolute headroom instead, and
+ * the number of slots left is the whole message.
+ */
+export const COMPUTE_CAPACITY_WARNING_SLOTS = 2
+
+export type ComputeCapacityStatus = 'available' | 'low' | 'full' | 'exceeded' | 'unlimited'
+
+export interface ComputeCapacity {
+  status: ComputeCapacityStatus
+  used: number
+  /** `null` when the plan sets no fixed cap. */
+  limit: number | null
+  /** Slots still free. Negative when more are running than the plan allows. */
+  remaining: number | null
+  /** Headroom phrased for a meter or a CLI footer. `null` when there is no cap. */
+  label: string | null
+}
+
+export const getComputeCapacity = (used: number, limit: number | null): ComputeCapacity => {
+  if (limit === null) {
+    return { status: 'unlimited', used, limit: null, remaining: null, label: null }
+  }
+
+  const remaining = limit - used
+
+  if (remaining < 0) {
+    return {
+      status: 'exceeded',
+      used,
+      limit,
+      remaining,
+      label: `${-remaining} over the limit`,
+    }
+  }
+
+  if (remaining === 0) {
+    return { status: 'full', used, limit, remaining, label: 'No room for more' }
+  }
+
+  return {
+    status: remaining <= COMPUTE_CAPACITY_WARNING_SLOTS ? 'low' : 'available',
+    used,
+    limit,
+    remaining,
+    label: `Room for ${remaining} more`,
+  }
+}

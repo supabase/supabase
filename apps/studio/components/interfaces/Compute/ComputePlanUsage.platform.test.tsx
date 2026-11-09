@@ -146,6 +146,8 @@ describe('ComputePlanUsage', () => {
     // Pro allows 10 concurrent workers per project.
     expect(await screen.findByText('7 of 10')).toBeInTheDocument()
     expect(await screen.findByText('Across 2 computes')).toBeInTheDocument()
+    // Three slots left is the actionable form of "70% used".
+    expect(await screen.findByText('Room for 3 more')).toBeInTheDocument()
   })
 
   it('marks a worker count that fills the plan limit as at limit, not over', async () => {
@@ -156,8 +158,8 @@ describe('ComputePlanUsage', () => {
 
     const instanceMeter = await meter('Concurrent workers')
     expect(await instanceMeter.findByText('1 of 1')).toBeInTheDocument()
-    expect(instanceMeter.getByText('At limit')).toBeInTheDocument()
-    expect(instanceMeter.queryByText('Over limit')).not.toBeInTheDocument()
+    expect(instanceMeter.getByText('No room for more')).toBeInTheDocument()
+    expect(instanceMeter.queryByText(/over the limit/)).not.toBeInTheDocument()
   })
 
   it('flags a worker count that exceeds the plan limit', async () => {
@@ -172,7 +174,7 @@ describe('ComputePlanUsage', () => {
 
     const instanceMeter = await meter('Concurrent workers')
     expect(await instanceMeter.findByText('2 of 1')).toBeInTheDocument()
-    expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
+    expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
 
   it('reports no fixed limit on enterprise rather than inventing one', async () => {
@@ -235,7 +237,7 @@ describe('ComputePlanUsage in private alpha', () => {
 
     const instanceMeter = await meter('Concurrent workers')
     expect(instanceMeter.getByText('3 of 2')).toBeInTheDocument()
-    expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
+    expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
 
   it('does not meter the quota during the private alpha', async () => {

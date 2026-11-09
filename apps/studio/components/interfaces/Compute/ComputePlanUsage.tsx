@@ -23,6 +23,7 @@ import {
   formatComputeHours,
   formatPercentage,
   formatVcpuMinutes,
+  getComputeCapacity,
   getCpuUtilization,
 } from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
@@ -190,21 +191,45 @@ interface MeterDefinition {
   detail?: string
 }
 
+const getBarClass = ({ isExceeded, isWarning }: { isExceeded: boolean; isWarning: boolean }) => {
+  if (isExceeded) return 'bg-destructive'
+  if (isWarning) return 'bg-warning'
+  return 'bg-foreground-light'
+}
+
 const getMeterStatus = ({ used, included, limitKind }: MeterDefinition) => {
   const hasLimit = included !== null && included > 0
-  const usageRatio = hasLimit ? used / included : 0
-  const isExceeded = hasLimit && (limitKind === 'allowance' ? usageRatio >= 1 : used > included)
-  const isAtCapacity = hasLimit && limitKind === 'capacity' && used === included
-  const isApproaching =
-    hasLimit && !isExceeded && !isAtCapacity && usageRatio >= COMPUTE_ALLOWANCE_WARNING_THRESHOLD
 
-  const barClass = isExceeded
-    ? 'bg-destructive'
-    : isApproaching || isAtCapacity
-      ? 'bg-warning'
-      : 'bg-foreground-light'
+  // Capacity is judged on slots left rather than percentage used: "8 of 10" and "40 of 50"
+  // are the same ratio but only one of them is about to block the next deploy.
+  if (hasLimit && limitKind === 'capacity') {
+    const { status, label } = getComputeCapacity(used, included)
+    const isExceeded = status === 'exceeded'
+    const isAtCapacity = status === 'full'
+    const isApproaching = status === 'low'
 
-  return { hasLimit, isExceeded, isAtCapacity, isApproaching, barClass }
+    return {
+      hasLimit,
+      isExceeded,
+      isAtCapacity,
+      isApproaching,
+      headroom: label,
+      barClass: getBarClass({ isExceeded, isWarning: isApproaching || isAtCapacity }),
+    }
+  }
+
+  const usageRatio = hasLimit && included !== null ? used / included : 0
+  const isExceeded = hasLimit && usageRatio >= 1
+  const isApproaching = hasLimit && !isExceeded && usageRatio >= COMPUTE_ALLOWANCE_WARNING_THRESHOLD
+
+  return {
+    hasLimit,
+    isExceeded,
+    isAtCapacity: false,
+    isApproaching,
+    headroom: null,
+    barClass: getBarClass({ isExceeded, isWarning: isApproaching }),
+  }
 }
 
 const formatMeterValue = ({ used, included, format }: MeterDefinition, hasLimit: boolean) =>
@@ -233,8 +258,9 @@ const MeterBar = ({
 }
 
 const CompactUsageMeter = (meter: MeterDefinition) => {
-  const { hasLimit, barClass } = getMeterStatus(meter)
+  const { hasLimit, headroom, barClass } = getMeterStatus(meter)
   const value = meter.isLoading ? undefined : formatMeterValue(meter, hasLimit)
+  const caption = [value, headroom ?? meter.detail].filter(Boolean).join(' · ')
 
   return (
     <Tooltip>
@@ -251,11 +277,7 @@ const CompactUsageMeter = (meter: MeterDefinition) => {
       </TooltipTrigger>
       <TooltipContent side="bottom" className="max-w-64">
         <p>{meter.description}</p>
-        {value && (
-          <p className="mt-1 tabular-nums text-foreground-light">
-            {meter.detail ? `${value} · ${meter.detail}` : value}
-          </p>
-        )}
+        {value && <p className="mt-1 tabular-nums text-foreground-light">{caption}</p>}
       </TooltipContent>
     </Tooltip>
   )
@@ -263,7 +285,8 @@ const CompactUsageMeter = (meter: MeterDefinition) => {
 
 const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel: string }) => {
   const { label, description, isLoading } = meter
-  const { hasLimit, isExceeded, isAtCapacity, isApproaching, barClass } = getMeterStatus(meter)
+  const { hasLimit, isExceeded, isAtCapacity, isApproaching, headroom, barClass } =
+    getMeterStatus(meter)
 
   return (
     <div className="flex flex-col gap-2 px-5 py-4">
@@ -283,9 +306,12 @@ const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel
       {meter.detail && !isLoading && (
         <p className="text-xs tabular-nums text-foreground-lighter">{meter.detail}</p>
       )}
-      {isExceeded && <p className="text-xs text-destructive">Over limit</p>}
-      {isAtCapacity && <p className="text-xs text-warning">At limit</p>}
-      {isApproaching && <p className="text-xs text-warning">Approaching limit</p>}
+      {isExceeded && <p className="text-xs text-destructive">{headroom ?? 'Over limit'}</p>}
+      {isAtCapacity && <p className="text-xs text-warning">{headroom ?? 'At limit'}</p>}
+      {isApproaching && <p className="text-xs text-warning">{headroom ?? 'Approaching limit'}</p>}
+      {!isExceeded && !isAtCapacity && !isApproaching && headroom !== null && (
+        <p className="text-xs text-foreground-lighter">{headroom}</p>
+      )}
 
       {!hasLimit && !isLoading && <p className="text-xs text-foreground-lighter">{noLimitLabel}</p>}
     </div>

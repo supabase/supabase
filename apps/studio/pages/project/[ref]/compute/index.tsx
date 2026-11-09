@@ -138,6 +138,10 @@ const ComputePage: NextPageWithLayout = () => {
       <DeployComputeInstanceDialog
         open={isDeployInstructionsOpen}
         onOpenChange={setIsDeployInstructionsOpen}
+        runningInstances={(instances ?? []).reduce(
+          (total, instance) => total + instance.declaredInstances,
+          0
+        )}
       />
     </div>
   )

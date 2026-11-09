@@ -10,6 +10,7 @@ import {
   formatGbHours,
   formatPercentage,
   formatVcpuHours,
+  getComputeCapacity,
   getCpuUtilization,
   getUsageConcentration,
   toGbHours,
@@ -208,5 +209,48 @@ describe('formatting', () => {
 
   it('rounds percentages to whole numbers', () => {
     expect(formatPercentage(0.256)).toBe('26%')
+  })
+})
+
+describe('getComputeCapacity', () => {
+  it('reports no cap when the plan sets none', () => {
+    const capacity = getComputeCapacity(12, null)
+    expect(capacity.status).toBe('unlimited')
+    expect(capacity.remaining).toBeNull()
+    expect(capacity.label).toBeNull()
+  })
+
+  it('counts down the slots that are left', () => {
+    expect(getComputeCapacity(3, 10)).toMatchObject({
+      status: 'available',
+      remaining: 7,
+      label: 'Room for 7 more',
+    })
+  })
+
+  it('warns on absolute headroom rather than percentage used', () => {
+    // 8 of 10 and 40 of 50 are the same ratio, but only one is about to block a deploy.
+    expect(getComputeCapacity(8, 10).status).toBe('low')
+    expect(getComputeCapacity(40, 50).status).toBe('available')
+  })
+
+  it('treats a full capacity limit as full, not exceeded', () => {
+    expect(getComputeCapacity(1, 1)).toMatchObject({
+      status: 'full',
+      remaining: 0,
+      label: 'No room for more',
+    })
+  })
+
+  it('reports how far over the limit a project has gone', () => {
+    expect(getComputeCapacity(12, 10)).toMatchObject({
+      status: 'exceeded',
+      remaining: -2,
+      label: '2 over the limit',
+    })
+  })
+
+  it('leaves a single free slot phrased as one', () => {
+    expect(getComputeCapacity(9, 10).label).toBe('Room for 1 more')
   })
 })

@@ -32,6 +32,7 @@ import { canPlanDeployAccess, canPlanDeploySize } from './Compute.limits'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize, generateComputeInstanceName } from './Compute.utils'
 import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
+import { getComputeCapacity } from './ComputeUsage.utils'
 import { RuntimeBadge } from './RuntimeBadge'
 import { useComputeLimits } from './useComputeLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -70,14 +71,19 @@ const ACCESS_OPTIONS: { value: ComputeInstanceAccess; label: string }[] = [
 interface DeployComputeInstanceDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
+  /** Instances already declared across this project, counted against the concurrency cap. */
+  runningInstances: number
 }
 
 export const DeployComputeInstanceDialog = ({
   open,
   onOpenChange,
+  runningInstances,
 }: DeployComputeInstanceDialogProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { limits, limitsLabel } = useComputeLimits(organization?.plan)
+  const capacity = getComputeCapacity(runningInstances, limits.concurrentWorkers)
+  const isOutOfCapacity = capacity.status === 'full' || capacity.status === 'exceeded'
 
   const form = useForm<DeployComputeInstanceFormValues>({
     mode: 'onBlur',
@@ -89,6 +95,14 @@ export const DeployComputeInstanceDialog = ({
     control: form.control,
     name: ['name', 'runtime', 'size', 'access', 'instances'],
   })
+
+  // The cap is enforced by the API, not here — this dialog only writes a CLI snippet. Stating
+  // the headroom up front is the difference between planning around the cap and discovering it
+  // from a 403.
+  const instancesDescription =
+    capacity.limit === null
+      ? '1 to 10'
+      : `1 to 10 · ${runningInstances} of ${capacity.limit} concurrent workers in use`
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -105,6 +119,24 @@ export const DeployComputeInstanceDialog = ({
           description={`Configure an instance below, then deploy it locally. Compute instances only deploy to ${COMPUTE_REGION} during alpha.`}
           className="border-x-0 border-y-0 rounded-none"
         />
+
+        {isOutOfCapacity && (
+          <Admonition
+            type="warning"
+            title={`This project runs ${runningInstances} of ${capacity.limit} concurrent workers`}
+            description={`Deploying more will fail until a worker stops. Upgrade from the ${limitsLabel} to raise the limit.`}
+            className="border-x-0 border-y-0 rounded-none"
+          />
+        )}
+
+        {capacity.status === 'low' && (
+          <Admonition
+            type="note"
+            title={`${capacity.label} on this project`}
+            description={`${runningInstances} of ${capacity.limit} concurrent workers are already running.`}
+            className="border-x-0 border-y-0 rounded-none"
+          />
+        )}
 
         <DialogSectionSeparator />
 
@@ -220,7 +252,7 @@ export const DeployComputeInstanceDialog = ({
                 control={form.control}
                 name="instances"
                 render={({ field }) => (
-                  <FormItemLayout label="Instances" description="1 to 10">
+                  <FormItemLayout label="Instances" description={instancesDescription}>
                     <FormControl>
                       <Input
                         {...field}
