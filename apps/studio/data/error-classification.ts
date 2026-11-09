@@ -180,6 +180,42 @@ export function parseJsonObject(text: string): Record<string, unknown> | undefin
   return undefined
 }
 
+const HTTP_DATE_MONTH = /\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/
+
+/**
+ * Parses a `Retry-After` header value into a number of seconds from now.
+ * Per RFC 9110 it is either delta-seconds (`"120"`) or an HTTP-date
+ * (`"Wed, 21 Oct 2015 07:28:00 GMT"`). Returns undefined for anything else.
+ */
+export function parseRetryAfterSeconds(
+  header: string | null | undefined,
+  now = Date.now()
+): number | undefined {
+  const value = header?.trim()
+  if (!value) return undefined
+  if (/^\d+$/.test(value)) return Number(value)
+  if (!HTTP_DATE_MONTH.test(value)) return undefined
+  const dateMs = Date.parse(value)
+  if (Number.isNaN(dateMs)) return undefined
+  return Math.max(0, Math.ceil((dateMs - now) / 1000))
+}
+
+/**
+ * Parses an `X-RateLimit-Reset` header value into a number of seconds from now.
+ * Supabase sends seconds remaining, but many APIs send a Unix epoch timestamp
+ * instead. Values >= 1_000_000_000 (an epoch in seconds, after 2001) are treated
+ * as epochs; smaller values are treated as delta-seconds.
+ */
+export function parseRateLimitResetSeconds(
+  header: string | null | undefined,
+  now = Date.now()
+): number | undefined {
+  const value = header?.trim()
+  if (!value || !/^\d+$/.test(value)) return undefined
+  const n = Number(value)
+  return n >= 1_000_000_000 ? Math.max(0, Math.ceil(n - now / 1000)) : n
+}
+
 /**
  * The single place that turns an HTTP error response into a `RawResponseError`. A JSON object body
  * supplies the message and extra fields. A short `text/plain` body becomes the message. Other
@@ -224,13 +260,14 @@ export function readResponseError({
     }
   }
 
-  const retryAfterHeader = headers.get('Retry-After') ?? headers.get('X-RateLimit-Reset')
-  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
+  const retryAfter =
+    parseRetryAfterSeconds(headers.get('Retry-After')) ??
+    parseRateLimitResetSeconds(headers.get('X-RateLimit-Reset'))
 
   const raw: RawResponseError = {
     message,
     code: status,
-    retryAfter: Number.isNaN(retryAfter) ? undefined : retryAfter,
+    retryAfter,
     requestId,
     endpoint,
     method,

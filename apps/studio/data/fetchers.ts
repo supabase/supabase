@@ -9,6 +9,7 @@ import {
   classifyResponseError,
   parseJsonObject,
   parseResponseErrorBody,
+  parseRetryAfterSeconds,
   readResponseError,
 } from './error-classification'
 import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
@@ -167,7 +168,7 @@ function pgMetaGuard(request: Request, schemaPath: string) {
         message: 'API Error: happened while trying to acquire connection to the database',
         code: 400,
         requestId: request.headers.get('X-Request-Id') ?? undefined,
-        retryAfter: retryAfterHeader ? parseInt(retryAfterHeader) : undefined,
+        retryAfter: parseRetryAfterSeconds(retryAfterHeader),
         endpoint: schemaPath,
         method: request.method,
       })

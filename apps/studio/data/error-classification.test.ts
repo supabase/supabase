@@ -6,7 +6,9 @@ import {
   classifySqlResponseError,
   isRequestAborted,
   NETWORK_UNREACHABLE_MESSAGE,
+  parseRateLimitResetSeconds,
   parseResponseErrorBody,
+  parseRetryAfterSeconds,
   readResponseError,
 } from './error-classification'
 import {
@@ -141,6 +143,20 @@ describe('readResponseError', () => {
     expect(read('').retryAfter).toBeUndefined()
   })
 
+  it('falls back to X-RateLimit-Reset when Retry-After is malformed', () => {
+    expect(read('', { 'Retry-After': '2015-10-21', 'X-RateLimit-Reset': '9' }).retryAfter).toBe(9)
+  })
+
+  it('reads retryAfter from an HTTP-date Retry-After', () => {
+    vi.useFakeTimers()
+    try {
+      vi.setSystemTime(new Date('2015-10-21T07:26:30Z'))
+      expect(read('', { 'Retry-After': 'Wed, 21 Oct 2015 07:28:00 GMT' }).retryAfter).toBe(90)
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
   it('passes through requestId, endpoint, and method', () => {
     expect(
       readResponseError({
@@ -152,6 +168,48 @@ describe('readResponseError', () => {
         method: 'GET',
       })
     ).toEqual({ code: 500, requestId: 'r1', endpoint: '/x', method: 'GET' })
+  })
+})
+
+describe('parseRetryAfterSeconds', () => {
+  const now = Date.parse('2015-10-21T07:26:30Z')
+
+  it('parses delta-seconds', () => {
+    expect(parseRetryAfterSeconds('120')).toBe(120)
+    expect(parseRetryAfterSeconds(' 7 ')).toBe(7)
+    expect(parseRetryAfterSeconds('0')).toBe(0)
+  })
+
+  it('parses an HTTP-date relative to now', () => {
+    expect(parseRetryAfterSeconds('Wed, 21 Oct 2015 07:28:00 GMT', now)).toBe(90)
+  })
+
+  it('clamps past HTTP-dates to 0', () => {
+    expect(parseRetryAfterSeconds('Wed, 21 Oct 2015 07:00:00 GMT', now)).toBe(0)
+  })
+
+  it.each([null, undefined, '', '-5', '1.5', '7abc', '2015-10-21', 'not a date'])(
+    'returns undefined for %j',
+    (value) => {
+      expect(parseRetryAfterSeconds(value, now)).toBeUndefined()
+    }
+  )
+})
+
+describe('parseRateLimitResetSeconds', () => {
+  const now = 1_700_000_000_000
+
+  it('treats small values as delta-seconds', () => {
+    expect(parseRateLimitResetSeconds('9', now)).toBe(9)
+  })
+
+  it('treats large values as epoch seconds', () => {
+    expect(parseRateLimitResetSeconds('1700000060', now)).toBe(60)
+    expect(parseRateLimitResetSeconds('1699999000', now)).toBe(0)
+  })
+
+  it.each([null, undefined, '', 'abc', '-1', '1.5'])('returns undefined for %j', (value) => {
+    expect(parseRateLimitResetSeconds(value, now)).toBeUndefined()
   })
 })
 
