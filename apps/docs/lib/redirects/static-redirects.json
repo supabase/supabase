@@ -1560,6 +1560,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/local-development/cli/managing-config",
+    "destination": "/docs/guides/local-development/managing-config",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/local-development/cli/managing-environments",
     "destination": "/docs/guides/deployment/managing-environments",
     "permanent": false
