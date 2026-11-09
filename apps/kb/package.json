@@ -55,6 +55,7 @@
     "config": "workspace:*",
     "dotenv": "^16.5.0",
     "lodash-es": "catalog:",
+    "maybe-turbo": "workspace:*",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
     "vitest": "catalog:"
