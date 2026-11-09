@@ -136,7 +136,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Link',
-            value: '</.well-known/api-catalog>; rel="api-catalog"',
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </.well-known/ai-catalog.json>; rel="ai-catalog"',
           },
         ],
       },
