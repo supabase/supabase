@@ -44,7 +44,7 @@ export const ProjectHome = () => {
   const track = useTrack()
 
   const showHomepageUsageDeltas = useFlag('newHomepageUsageDeltas')
-  const showIssuesInbox = useFlag('issuesInbox')
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const isExplorerEnabled = useIsExplorerEnabled()
 
   const isMatureProject = dayjs(project?.inserted_at).isBefore(dayjs().subtract(10, 'day'))
@@ -101,7 +101,7 @@ export const ProjectHome = () => {
   const showConnectSection = !!project && (!IS_PLATFORM || !isMatureProject)
 
   const renderOrder = mergeSectionOrder(sectionOrder).filter((id) => {
-    if (id === 'issues') return showIssuesInbox
+    if (id === 'issues') return isIssuesInboxEnabled
     if (id === 'connect') return showConnectSection
     if (id === 'usage' || id === 'custom-report') return IS_PLATFORM
     return true
