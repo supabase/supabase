@@ -64,35 +64,43 @@ Roles can be organized in a hierarchy, where one role can inherit permissions fr
 
 ### Role inheritance
 
-To create a role hierarchy, you first need to create the parent and child roles. The child role inherits permissions from its parent once it is made a member of the parent. You can do this when you create the child role, using `IN ROLE`:
+To create a role hierarchy, first create the parent role. The child role inherits permissions from its parent once it is made a member of the parent. You can do this when you create the child role, using `IN ROLE`:
 
 ```sql
 create role "child_role_name" inherit in role "parent_role_name";
 ```
 
-Or you can add an existing role to the parent with `GRANT`:
+Or, if the child role already exists, add it to the parent with `GRANT`:
 
 ```sql
 grant "parent_role_name" to "child_role_name";
 ```
 
-`INHERIT` is the default, so you can leave it out. It controls whether the child automatically uses its parent's permissions. It doesn't name the parent.
+`INHERIT` is the default, so you can leave it out. It controls whether the child automatically uses its parent's permissions. It doesn't name the parent. From Postgres 16, this is a setting on each membership: the role's `INHERIT` attribute only sets the default for new memberships.
 
 <Admonition type="note">
 
-From Postgres 16, the `CREATEROLE` attribute alone isn't enough to grant membership in a role. You also need `ADMIN OPTION` on the parent role. You get this automatically for roles you created yourself, but not for roles created by someone else.
+From Postgres 16, granting membership in a role requires `ADMIN OPTION` on that role (or superuser). The `CREATEROLE` attribute alone isn't enough. You get `ADMIN OPTION` automatically for roles you created yourself, but not for roles created by someone else.
 
 </Admonition>
 
 ### Preventing inheritance
 
-In some cases, you might want a role to not automatically use the permissions of the roles it's a member of (typically superuser roles). You can turn this off with `NOINHERIT`:
+In some cases, you might want a role to not automatically use the permissions of the roles it's a member of (typically superuser roles).
+
+From Postgres 16, turn inheritance off on the membership itself:
+
+```sql
+grant "parent_role_name" to "child_role_name" with inherit false;
+```
+
+Running `alter role "child_role_name" noinherit;` on Postgres 16 and later only changes the default for memberships added afterwards. It doesn't change existing ones. On earlier versions, `NOINHERIT` is a role attribute that applies to all of the role's memberships:
 
 ```sql
 alter role "child_role_name" noinherit;
 ```
 
-The role keeps its memberships, but it has to switch to the parent role with `SET ROLE` before it can use the parent's permissions.
+The role keeps its memberships, but it has to switch to the parent role with `SET ROLE` before it can use the parent's permissions. From Postgres 16, this also requires the membership's `SET` option, which is on by default.
 
 If a custom role still inherits privileges you didn't grant explicitly, see [Custom role inherits privileges that were not explicitly granted](/kb/troubleshooting/custom-role-inherits-privileges-that-were-not-explicitly-granted).
 
