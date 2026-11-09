@@ -1,3 +1,5 @@
+import type { Table } from '@tanstack/react-table'
+
 // Operators mirror PostgREST / Table Editor conventions:
 //   `=` / `<>` — exact equality, available on most columns
 //   `~~*` / `!~~*` — ILIKE / NOT ILIKE (case-insensitive substring
@@ -44,6 +46,49 @@ export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilt
     Array.isArray((value as LogsColumnFilterValue).values)
   )
 }
+
+export interface LogsFilterInput {
+  field: string
+  operator: LogsFilterOperator
+  value: string | number
+}
+
+export const EQUALITY_FILTER_OPERATORS = ['=', '<>'] as const satisfies LogsFilterOperator[]
+
+export const LOGS_FILTER_OPERATOR_LABELS: Record<LogsFilterOperator, string> = {
+  '=': 'Filter: equals',
+  '<>': 'Filter: not equals',
+  '~~*': 'Filter: contains',
+  '!~~*': 'Filter: does not contain',
+}
+
+export const LOGS_FILTER_OPERATOR_VERBS: Record<LogsFilterOperator, string> = {
+  '=': 'equals',
+  '<>': 'does not equal',
+  '~~*': 'contains',
+  '!~~*': 'does not contain',
+}
+
+export const addLogsColumnFilter = (
+  columnFilters: { id: string; value: unknown }[],
+  { field, operator, value }: LogsFilterInput
+): { id: string; value: unknown }[] => {
+  const stringValue = String(value)
+  const index = columnFilters.findIndex((filter) => filter.id === field)
+  const current = index === -1 ? undefined : columnFilters[index].value
+  const existing = isLogsFilterColumnValue(current) ? current : undefined
+  const matchesOperator = existing?.operator === operator
+  if (matchesOperator && existing.values.includes(stringValue)) return columnFilters
+  const next: LogsColumnFilterValue = {
+    operator,
+    values: matchesOperator ? [...existing.values, stringValue] : [stringValue],
+  }
+  if (index === -1) return [...columnFilters, { id: field, value: next }]
+  return columnFilters.map((filter, i) => (i === index ? { id: field, value: next } : filter))
+}
+
+export const addLogsFilter = <TData>(table: Table<TData>, filter: LogsFilterInput) =>
+  table.setColumnFilters((current) => addLogsColumnFilter(current, filter))
 
 export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[] => {
   if (!Array.isArray(filter)) return []
