@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { edgeFunctionsKeys } from './keys'
 import { handleError, patch, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionsUpdateVariables = {
   projectRef: string
@@ -41,12 +42,12 @@ export const useEdgeFunctionUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>,
+  UseCustomMutationOptions<EdgeFunctionsUpdateData, StudioError, EdgeFunctionsUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsUpdateData, ResponseError, EdgeFunctionsUpdateVariables>({
+  return useMutation<EdgeFunctionsUpdateData, StudioError, EdgeFunctionsUpdateVariables>({
     mutationFn: (vars) => updateEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, slug } = variables

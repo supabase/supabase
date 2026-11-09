@@ -7,7 +7,6 @@ import { Button, cn, InputVariants, Tooltip, TooltipContent, TooltipTrigger } fr
 import { useRevealedSecret } from './useRevealedSecret'
 import CopyButton from '@/components/ui/CopyButton'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export function ApiKeyPill({
   apiKey,
@@ -19,19 +18,20 @@ export function ApiKeyPill({
 
   const isSecret = apiKey.type === 'secret'
 
-  const { can: canManageSecretKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
-
   const {
     data: revealedKey,
     isLoading,
     reveal,
     clear,
+    revealGrant,
   } = useRevealedSecret({
     projectRef,
     id: apiKey.id as string,
   })
+
+  // Publishable keys are shown as-is, so only secret keys depend on the reveal grant
+  const isLoadingPermission = isSecret && revealGrant.status === 'loading'
+  const canManageSecretKeys = revealGrant.status === 'granted'
 
   // Auto-hide timer for the API key (security feature)
   useEffect(() => {
@@ -77,7 +77,11 @@ export function ApiKeyPill({
     }
   }
 
-  const isRestricted = isSecret && !canManageSecretKeys
+  const isRestricted = isSecret && !isLoadingPermission && !canManageSecretKeys
+  const restrictedReason = (action: 'reveal' | 'copy') =>
+    revealGrant.status === 'error'
+      ? `Failed to check permissions to ${action} secret API keys`
+      : `You need additional permissions to ${action} secret API keys`
 
   return (
     <>
@@ -114,12 +118,12 @@ export function ApiKeyPill({
               loading={show && isLoading}
               icon={show ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
               onClick={onToggleShow}
-              disabled={isRestricted}
+              disabled={isRestricted || isLoadingPermission}
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {isRestricted
-              ? 'You need additional permissions to reveal secret API keys'
+              ? restrictedReason('reveal')
               : isLoadingPermission
                 ? 'Loading permissions...'
                 : show
@@ -142,7 +146,7 @@ export function ApiKeyPill({
         </TooltipTrigger>
         <TooltipContent side="bottom">
           {isRestricted
-            ? 'You need additional permissions to copy secret API keys'
+            ? restrictedReason('copy')
             : isLoadingPermission
               ? 'Loading permissions...'
               : 'Copy API key'}

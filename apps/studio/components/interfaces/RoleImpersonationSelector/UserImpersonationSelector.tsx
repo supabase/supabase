@@ -33,8 +33,8 @@ import { User, useUsersInfiniteQuery } from '@/data/auth/users-infinite-query'
 import { useCustomAccessTokenHookDetails } from '@/hooks/misc/useCustomAccessTokenHookDetails'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { RoleImpersonationController } from '@/state/role-impersonation-state'
-import type { ResponseError } from '@/types'
 
 type AuthenticatorAssuranceLevels = 'aal1' | 'aal2'
 type UserSource = 'user' | 'external'
@@ -133,7 +133,7 @@ export const UserImpersonationSelector = ({
         customAccessTokenHookDetails
       )
     } catch (error) {
-      toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to impersonate user: ${(error as StudioError).message}`)
     } finally {
       setIsImpersonateLoading(false)
     }
@@ -163,7 +163,7 @@ export const UserImpersonationSelector = ({
         customAccessTokenHookDetails
       )
     } catch (error) {
-      toast.error(`Failed to impersonate user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to impersonate user: ${(error as StudioError).message}`)
     } finally {
       setIsImpersonateLoading(false)
     }
@@ -180,7 +180,7 @@ export const UserImpersonationSelector = ({
       setSelectedSource(value)
       onUserImpersonationCleared?.()
     } catch (error) {
-      toast.error(`Failed to stop impersonating user: ${(error as ResponseError).message}`)
+      toast.error(`Failed to stop impersonating user: ${(error as StudioError).message}`)
     }
   }
 
@@ -200,7 +200,7 @@ export const UserImpersonationSelector = ({
       await state.setRole({ ...state.role, aal: value }, customAccessTokenHookDetails)
     } catch (error) {
       setAal(previousAal)
-      toast.error(`Failed to update MFA assurance level: ${(error as ResponseError).message}`)
+      toast.error(`Failed to update MFA assurance level: ${(error as StudioError).message}`)
     }
   }
 
@@ -347,7 +347,7 @@ type ImpersonationControlProps = {
   isLoading: boolean
   isSearching: boolean
   isError: boolean
-  error: ResponseError | null
+  error: StudioError | null
   isSuccess: boolean
   users: User[]
   impersonateUser: (user: User) => Promise<void>

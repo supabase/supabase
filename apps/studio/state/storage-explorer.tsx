@@ -70,9 +70,9 @@ import { moveStorageObject } from '@/data/storage/object-move-mutation'
 import { archivedObjectNamesQueryOptions } from '@/data/storage/versioning/archived-object-names-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { lookupMime } from '@/lib/mime'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import { ResponseError } from '@/types'
 
 type UploadProgress = {
   percentage: number
@@ -296,6 +296,10 @@ export function createStorageExplorerState({
           bucketId: state.selectedBucket.id,
           paths: [`${pathToFolder}/${EMPTY_FOLDER_PLACEHOLDER_FILE_NAME}`],
         })
+        // The parent's placeholder was the only object hidden from its listing
+        state.columns = state.columns.map((col, idx) =>
+          idx === columnIndex ? { ...col, hiddenItemsCount: 0 } : col
+        )
       }
 
       const newFolder = state.columns[columnIndex]?.items?.find((x) => x?.name === formattedName)
@@ -367,6 +371,7 @@ export function createStorageExplorerState({
             path: prefix,
             status: STORAGE_ROW_STATUS.READY,
             items: formattedItems,
+            hiddenItemsCount: (data ?? []).length - formattedItems.length,
             // Compare the raw page, not the formatted one: formatFolderItems drops the
             // .emptyFolderPlaceholder, so a full page can format to LIMIT - 1 and stop
             // pagination a page early.
@@ -399,9 +404,13 @@ export function createStorageExplorerState({
     }) => {
       state.setColumnIsLoadingMore(index)
 
+      // `column` may be an overlaid copy (archived rows merged in for display), whose item
+      // count the live listing never had, so count from the column held in state.
+      const liveColumn = state.columns[index] ?? column
       const options = {
         limit: LIMIT,
-        offset: column.items.length,
+        // items.length alone undercounts: formatFolderItems hides the .emptyFolderPlaceholder
+        offset: liveColumn.items.length + (liveColumn.hiddenItemsCount ?? 0),
         search: searchString,
         sortBy: getSortOptions(),
       }
@@ -424,6 +433,7 @@ export function createStorageExplorerState({
             return {
               ...col,
               items: col.items.concat(formattedItems),
+              hiddenItemsCount: (col.hiddenItemsCount ?? 0) + data.length - formattedItems.length,
               isLoadingMoreItems: false,
               hasMoreItems: data.length === LIMIT,
             }
@@ -536,6 +546,7 @@ export function createStorageExplorerState({
           name: idx === 0 ? state.selectedBucket.name : pathsWithEmptyPrefix[idx],
           path: prefix,
           items: formattedItems,
+          hiddenItemsCount: items.length - formattedItems.length,
           // Raw page length — see fetchFolderContents. Getting this wrong here also
           // makes isParentListingExhaustive below claim a folder is missing.
           hasMoreItems: items.length === LIMIT,
@@ -739,7 +750,7 @@ export function createStorageExplorerState({
               })
               success = true
             } catch (error) {
-              if ((error as ResponseError).code === 429) {
+              if ((error as StudioError).code === 429) {
                 isRateLimited = true
                 retrySeconds = RATE_LIMIT_RETRY_SECONDS
               } else {
@@ -771,7 +782,8 @@ export function createStorageExplorerState({
           toast.error(
             <div>
               <p>
-                Renamed folder to {newName} with {failedFiles} error{failedFiles > 1 ? 's' : ''}
+                Renamed folder to {newName} with {failedFiles} error
+                {failedFiles > 1 ? <span>s</span> : ''}
               </p>
               <p className="text-foreground-light">
                 You may try again to rename the folder {originalName} to {newName}
@@ -1136,10 +1148,12 @@ export function createStorageExplorerState({
         toast.error(
           <div className="flex flex-col gap-y-1">
             <p className="text-foreground">
-              Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
-              {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-              {numberOfFilesRejected > 1 ? 's are' : ' is'} beyond the global upload limit of{' '}
-              {value} {unit}.
+              Failed to upload {numberOfFilesRejected} file
+              {numberOfFilesRejected > 1 ? <span>s</span> : ''} <span>as</span>{' '}
+              {numberOfFilesRejected > 1 ? <span>their</span> : <span>its</span>} <span>size</span>
+              {numberOfFilesRejected > 1 ? <span>s are</span> : <span>{' is'}</span>}{' '}
+              <span>beyond the global upload limit of</span> {value} {unit}
+              <span>.</span>
             </p>
             <p className="text-foreground-light">
               You can change the global file size upload limit in{' '}
@@ -1161,9 +1175,11 @@ export function createStorageExplorerState({
         toast.error(
           <div className="flex flex-col gap-y-1">
             <p className="text-foreground">
-              Failed to upload {numberOfFilesRejected} file{numberOfFilesRejected > 1 ? 's' : ''} as{' '}
-              {numberOfFilesRejected > 1 ? 'their' : 'its'} size
-              {numberOfFilesRejected > 1 ? 's are' : ' is'} 0.
+              Failed to upload {numberOfFilesRejected} file
+              {numberOfFilesRejected > 1 ? <span>s</span> : ''} <span>as</span>{' '}
+              {numberOfFilesRejected > 1 ? <span>their</span> : <span>its</span>} <span>size</span>
+              {numberOfFilesRejected > 1 ? <span>s are</span> : <span>{' is'}</span>}{' '}
+              <span>0.</span>
             </p>
           </div>
         )
@@ -1838,7 +1854,7 @@ export function createStorageExplorerState({
             id: toastId,
             closeButton: true,
             duration: SONNER_DEFAULT_DURATION,
-            description: (err as ResponseError).message,
+            description: (err as StudioError).message,
           })
 
           if (!files.some((f) => f.prefix)) {

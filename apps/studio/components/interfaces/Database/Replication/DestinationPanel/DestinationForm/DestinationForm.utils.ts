@@ -46,7 +46,7 @@ import {
   type CreateS3AccessKeyCredentialVariables,
   type S3AccessKeyCreateData,
 } from '@/data/storage/s3-access-key-create-mutation'
-import { type ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const normalizeOptionalString = (value?: string) => {
   const trimmed = value?.trim()
@@ -415,7 +415,7 @@ export const buildDestinationConfig = async ({
   data: z.infer<typeof DestinationPanelFormSchema>
   createS3AccessKey: UseMutateAsyncFunction<
     S3AccessKeyCreateData,
-    ResponseError,
+    StudioError,
     CreateS3AccessKeyCredentialVariables,
     unknown
   >

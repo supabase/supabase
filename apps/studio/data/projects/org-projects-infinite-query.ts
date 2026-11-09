@@ -4,8 +4,9 @@ import { useCallback } from 'react'
 
 import { INFINITE_PROJECTS_KEY_PREFIX, projectKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useProfile } from '@/lib/profile'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 /**
  * [Joshen] Try to keep this value a multiple of 6 (common denominator of 2 and 3) to fit the cards
@@ -59,7 +60,7 @@ export async function getOrganizationProjects(
 }
 
 export type OrgProjectsInfiniteData = Awaited<ReturnType<typeof getOrganizationProjects>>
-export type OrgProjectsInfiniteError = ResponseError
+export type OrgProjectsInfiniteError = StudioError
 
 export const useOrgProjectsInfiniteQuery = <TData = OrgProjectsInfiniteData>(
   { slug, sort = 'name_asc', search, statuses = [] }: GetOrgProjectsInfiniteVariables,

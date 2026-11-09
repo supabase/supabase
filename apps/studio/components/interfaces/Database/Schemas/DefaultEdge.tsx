@@ -200,8 +200,7 @@ const EdgeNodeData = ({
 
   return (
     <Badge className="normal-case text-[8px]">
-      {selectedSchema === schema ? '' : `${schema}.`}
-      {table}.{column}
+      <span>{`${selectedSchema === schema ? '' : `${schema}.`}${table}.${column}`}</span>
     </Badge>
   )
 }

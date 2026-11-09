@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type RestartPipelineParams = {
   projectRef: string
@@ -36,12 +37,12 @@ export const useRestartPipelineMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<RestartPipelineData, ResponseError, RestartPipelineParams>,
+  UseCustomMutationOptions<RestartPipelineData, StudioError, RestartPipelineParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RestartPipelineData, ResponseError, RestartPipelineParams>({
+  return useMutation<RestartPipelineData, StudioError, RestartPipelineParams>({
     mutationFn: (vars) => restartPipeline(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

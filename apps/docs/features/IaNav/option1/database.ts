@@ -3,10 +3,7 @@ import { isFeatureEnabled } from 'common/enabled-features'
 import type { NavMenuConstant } from '@/components/Navigation/Navigation.types'
 import { navDataForMdx } from '@/components/Navigation/NavigationMenu/NavigationMenu.constants'
 
-const { docsFdw: fdwEnabled, docsPgtap: pgTapEnabled } = isFeatureEnabled([
-  'docs:fdw',
-  'docs:pgtap',
-])
+const { docsFdw: fdwEnabled } = isFeatureEnabled(['docs:fdw'])
 
 export const database: NavMenuConstant = {
   icon: 'database',
@@ -136,10 +133,6 @@ export const database: NavMenuConstant = {
           ],
         },
         { name: 'Managing secrets with Vault', url: '/guides/database/vault' },
-        {
-          name: 'Test RLS policies with pgTAP',
-          url: '/guides/database/postgres/testing-row-level-security',
-        },
       ],
     },
     {
@@ -164,10 +157,6 @@ export const database: NavMenuConstant = {
           name: 'Query performance',
           items: [
             { name: 'Query optimization', url: '/guides/database/query-optimization' },
-            {
-              name: 'Debugging performance issues',
-              url: '/guides/database/debugging-performance',
-            },
             { name: 'Partitioning your tables', url: '/guides/database/partitions' },
             { name: 'Migrating to pg_partman', url: '/guides/database/migrating-to-pg-partman' },
           ],
@@ -179,17 +168,6 @@ export const database: NavMenuConstant = {
             {
               name: 'Print Postgres Version',
               url: '/guides/database/postgres/which-version-of-postgres',
-            },
-          ],
-        },
-        {
-          name: 'Testing',
-          items: [
-            { name: 'Testing your database', url: '/guides/database/testing' },
-            {
-              name: 'pgTAP advanced guide',
-              url: '/guides/local-development/testing/pgtap-extended',
-              enabled: pgTapEnabled,
             },
           ],
         },

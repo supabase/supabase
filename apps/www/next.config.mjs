@@ -136,7 +136,8 @@ const nextConfig = {
         headers: [
           {
             key: 'Link',
-            value: '</.well-known/api-catalog>; rel="api-catalog"',
+            value:
+              '</.well-known/api-catalog>; rel="api-catalog", </.well-known/ai-catalog.json>; rel="ai-catalog"',
           },
         ],
       },
@@ -189,7 +190,8 @@ const nextConfig = {
         ],
       },
       {
-        source: '/dashboard/:path*',
+        // Public auth pages are indexable; every other dashboard path stays noindex
+        source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
         headers: [
           {
             key: 'X-Robots-Tag',

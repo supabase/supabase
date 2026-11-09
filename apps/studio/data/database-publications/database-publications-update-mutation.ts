@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databasePublicationsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePublicationUpdateVariables = {
   projectRef: string
@@ -56,7 +57,7 @@ export const useDatabasePublicationUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabasePublicationUpdateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationUpdateVariables
   >,
   'mutationFn'
@@ -65,7 +66,7 @@ export const useDatabasePublicationUpdateMutation = ({
 
   return useMutation<
     DatabasePublicationUpdateData,
-    ResponseError,
+    StudioError,
     DatabasePublicationUpdateVariables
   >({
     mutationFn: (vars) => updateDatabasePublication(vars),

@@ -4,7 +4,8 @@ import { customDomainKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CustomDomainsVariables = {
   projectRef?: string
@@ -74,7 +75,7 @@ export async function getCustomDomains(
   })
 
   if (_error) {
-    const error = _error as ResponseError
+    const error = _error as StudioError
     // not allowed error and no hostname configured error are
     // valid steps in the process of setting up a custom domain
     // so we convert them to data instead of errors
@@ -102,7 +103,7 @@ export async function getCustomDomains(
 }
 
 export type CustomDomainsData = Awaited<ReturnType<typeof getCustomDomains>>
-export type CustomDomainsError = ResponseError
+export type CustomDomainsError = StudioError
 
 export const useCustomDomainsQuery = <TData = CustomDomainsData>(
   { projectRef }: CustomDomainsVariables,

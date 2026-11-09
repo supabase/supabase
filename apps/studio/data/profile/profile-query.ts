@@ -4,7 +4,8 @@ import { profileKeys } from './keys'
 import type { Profile } from './types'
 import { get, handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getProfile(signal?: AbortSignal) {
   const { data, error } = await get('/platform/profile', {
@@ -25,7 +26,7 @@ export async function getProfile(signal?: AbortSignal) {
 }
 
 export type ProfileData = Awaited<ReturnType<typeof getProfile>>
-export type ProfileError = ResponseError
+export type ProfileError = StudioError
 
 export const useProfileQuery = <TData = ProfileData>({
   enabled = true,

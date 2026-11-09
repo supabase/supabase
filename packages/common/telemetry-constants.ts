@@ -1138,6 +1138,22 @@ export interface DocsContentListingClickedEvent {
 }
 
 /**
+ * User clicked a link to an example in the supabase/supabase GitHub repo's examples/ folder.
+ *
+ * @group Events
+ * @source PageTelemetry, in every app that mounts it (docs, www, studio, learn, ui-library, kb)
+ */
+export interface ExampleLinkClickedEvent {
+  action: 'example_link_clicked'
+  properties: {
+    /**
+     * Path after examples/ in the GitHub URL, e.g. auth/nextjs.
+     */
+    examplePath: string
+  }
+}
+
+/**
  * User opened the Search V2 dialog.
  *
  * @group Events
@@ -1194,6 +1210,43 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
+ * A knowledge base search returned, with or without results. The query text is left out
+ * because it can contain personal data; only its length is sent.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchSubmittedEvent {
+  action: 'kb_search_submitted'
+  properties: {
+    /** Length of the trimmed search term. */
+    queryLength: number
+    /** Number of results the search returned. */
+    resultCount: number
+    /** Whether the search returned at least one result. */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a knowledge base search result, by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchResultClickedEvent {
+  action: 'kb_search_result_clicked'
+  properties: {
+    /** The path of the result that was activated. */
+    resultPath: string
+    /** 1-based position of the result in the list. */
+    resultPosition: number
+    /** Number of results showing when the result was activated. */
+    resultCount: number
+  }
+}
+
+/**
  * User closed the Search V2 dialog.
  *
  * @group Events
@@ -1227,7 +1280,8 @@ export interface DocsSearchV2AskAiOpenedEvent {
 }
 
 /**
- * User's question was sent to Ask AI in the Search V2 dialog.
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
  *
  * @group Events
  * @source docs
@@ -1236,11 +1290,7 @@ export interface DocsSearchV2AskAiQuestionSubmittedEvent {
   action: 'docs_search_v2_ask_ai_question_submitted'
   properties: {
     /**
-     * The question sent to Ask AI, cut to its first 300 characters.
-     */
-    question: string
-    /**
-     * The length of the full question, in characters.
+     * The length of the question, in characters.
      */
     questionLength: number
     /**
@@ -4502,9 +4552,12 @@ export type TelemetryEvent =
   | AskAiClickedEvent
   | DocsAiPromptCopiedEvent
   | DocsContentListingClickedEvent
+  | ExampleLinkClickedEvent
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
+  | KbSearchSubmittedEvent
+  | KbSearchResultClickedEvent
   | DocsSearchV2ClosedEvent
   | DocsSearchV2AskAiOpenedEvent
   | DocsSearchV2AskAiQuestionSubmittedEvent

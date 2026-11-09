@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
 import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 
 vi.mock('@sentry/nextjs', () => ({
   withSentryConfig: (configFn: any) => (typeof configFn === 'function' ? configFn() : configFn),
@@ -18,11 +18,23 @@ describe('next.config.mjs', () => {
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
-          source: '/dashboard/:path*',
+          source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
           headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
         }),
       ])
     )
+  })
+
+  it('keeps sign-in and sign-up indexable while other dashboard paths stay noindex', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+    const noindexRule = headers.find((header) => header.source.startsWith('/dashboard/'))
+    const matches = getPathMatch(noindexRule!.source)
+
+    expect(matches('/dashboard/sign-in')).toBe(false)
+    expect(matches('/dashboard/sign-up')).toBe(false)
+    expect(matches('/dashboard/org')).toBeTruthy()
+    expect(matches('/dashboard/project/abc')).toBeTruthy()
   })
 
   it('serves the published CLI schemas with CORS and a short cache', async () => {
@@ -94,6 +106,61 @@ describe('next.config.mjs', () => {
         }),
       ])
     )
+  })
+
+  it('forwards zone prefetches as the page path, so each zone adds the rsc suffix once', async () => {
+    // later tests must not get the production rewrites from the module cache
+    onTestFinished(() => {
+      vi.unstubAllEnvs()
+      vi.resetModules()
+    })
+    vi.resetModules()
+    const zones = [
+      { zone: '/docs', env: 'NEXT_PUBLIC_DOCS_URL', url: 'https://docs.example.com/docs' },
+      {
+        zone: '/library',
+        env: 'NEXT_PUBLIC_LIBRARY_URL',
+        url: 'https://library.example.com/library',
+      },
+      {
+        zone: '/design-system',
+        env: 'NEXT_PUBLIC_DESIGN_SYSTEM_URL',
+        url: 'https://design-system.example.com/design-system',
+      },
+    ]
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production')
+    for (const { env, url } of zones) vi.stubEnv(env, url)
+    const { default: rewrites } = (await import('./lib/rewrites.js')) as {
+      default: Array<{ source: string; destination: string }>
+    }
+
+    // the first rule rewrites every path to itself, so routing goes on to the next match
+    const forward = (path: string) =>
+      rewrites
+        .filter((rule) => rule.source !== '/:path*')
+        .map((rule) => ({
+          destination: rule.destination,
+          // next matches custom routes with these options
+          params: getPathMatch(rule.source, { strict: true, removeUnnamedParams: true })(path),
+        }))
+        .find((match) => match.params)
+
+    for (const { zone, url } of zones) {
+      expect(
+        forward(`${zone}/guides/auth/architecture.segments/_tree.segment.rsc`),
+        zone
+      ).toMatchObject({
+        destination: `${url}/:path`,
+        params: { path: 'guides/auth/architecture' },
+      })
+      expect(forward(`${zone}.segments/_tree.segment.rsc`), zone).toMatchObject({
+        destination: url,
+      })
+      expect(forward(`${zone}.rsc`), zone).toMatchObject({ destination: url })
+      expect(forward(`${zone}/guides/auth/architecture`), zone).toMatchObject({
+        destination: `${url}/:path*`,
+      })
+    }
   })
 
   it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {

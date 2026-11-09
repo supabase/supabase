@@ -3,8 +3,8 @@ import { toast } from 'sonner'
 
 import { branchKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantForVariants } from '@/lib/grants'
-import type { ResponseError } from '@/types'
 
 export type BranchRestoreGrant = GrantForVariants<'post', '/v1/branches/{branch_id_or_ref}/restore'>
 
@@ -33,11 +33,11 @@ export const useBranchRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<BranchRestoreData, ResponseError, BranchRestoreVariables>,
+  UseMutationOptions<BranchRestoreData, StudioError, BranchRestoreVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<BranchRestoreData, ResponseError, BranchRestoreVariables>({
+  return useMutation<BranchRestoreData, StudioError, BranchRestoreVariables>({
     mutationFn: (vars) => restoreBranch(vars),
     async onSuccess(data, variables, context, mutationContext) {
       const { projectRef } = variables

@@ -400,8 +400,9 @@ function TableSelector() {
                       </span>
                     ) : (
                       <span>
-                        Total: {tables.length} {tables.length === 1 ? 'table' : 'tables'}
-                        {hasNextTablesPage ? ' loaded' : ''}
+                        Total: {tables.length}{' '}
+                        {tables.length === 1 ? <span>table</span> : <span>tables</span>}
+                        {hasNextTablesPage ? <span>{' loaded'}</span> : ''}
                       </span>
                     )}
                   </div>

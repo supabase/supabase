@@ -1,10 +1,9 @@
-import { queryOptions, skipToken } from '@tanstack/react-query'
-
 import { branchKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantForVariants } from '@/lib/grants'
-import type { ResponseError } from '@/types'
 
 export type BranchGrant = GrantForVariants<'get', '/v1/branches/{branch_id_or_ref}'>
 
@@ -29,13 +28,24 @@ async function getBranch(
 }
 
 export type BranchData = Awaited<ReturnType<typeof getBranch>>
-export type BranchError = ResponseError
+export type BranchError = StudioError
 
-export const branchQueryOptions = ({ projectRef, branchRef, grant }: BranchVariables) =>
-  queryOptions<BranchData, BranchError>({
-    queryKey: branchKeys.detail(projectRef, branchRef),
-    queryFn:
-      IS_PLATFORM && branchRef && grant
-        ? ({ signal }) => getBranch({ branchRef, grant }, signal)
-        : skipToken,
-  })
+export const branchQueryOptions = <TData = BranchData>(
+  { projectRef, branchRef, grant }: BranchVariables,
+  options?: GrantedQueryCallerOptions<
+    BranchData,
+    BranchError,
+    TData,
+    ReturnType<typeof branchKeys.detail>
+  >
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: branchKeys.detail(projectRef, branchRef),
+      queryFn:
+        IS_PLATFORM && branchRef && grant
+          ? ({ signal }) => getBranch({ branchRef, grant }, signal)
+          : undefined,
+    },
+    options
+  )

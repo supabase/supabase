@@ -420,19 +420,45 @@ describe('Ask AI telemetry', () => {
     })
   })
 
-  // questions can hold pasted logs or connection strings
-  it('sends only the start of a long question, with its full length', () => {
+  // questions can hold personal data, pasted logs or connection strings
+  it('sends the length of a typed question and no question text', () => {
     render(<TriggerWithProvider />)
     fireEvent.keyDown(window, { key: 'i', metaKey: true })
     const input = screen.getByRole('textbox', { name: 'Ask Supabase AI a question' })
 
-    fireEvent.change(input, { target: { value: 'a'.repeat(400) } })
+    fireEvent.change(input, { target: { value: '  my secret question  ' } })
     fireEvent.submit(input.closest('form')!)
 
-    expect(sendTelemetryEvent).toHaveBeenCalledWith({
-      action: 'docs_search_v2_ask_ai_question_submitted',
-      properties: { question: 'a'.repeat(300), questionLength: 400, questionSource: 'typed' },
-    })
+    const submitted = sendTelemetryEvent.mock.calls
+      .map(([event]) => event)
+      .filter((event) => event.action === 'docs_search_v2_ask_ai_question_submitted')
+    expect(submitted).toEqual([
+      {
+        action: 'docs_search_v2_ask_ai_question_submitted',
+        properties: { questionLength: 18, questionSource: 'typed' },
+      },
+    ])
+    expect(submitted[0].properties).not.toHaveProperty('question')
+    expect(JSON.stringify(submitted[0])).not.toContain('secret')
+  })
+
+  it('shows the whole answer once the reveal catches up', async () => {
+    aiMessages.push(
+      { role: MessageRole.User, content: 'How do I turn on RLS?', status: MessageStatus.Complete },
+      {
+        role: MessageRole.Assistant,
+        content: 'Enable RLS on the table.',
+        status: MessageStatus.InProgress,
+      }
+    )
+    render(
+      <TooltipProvider>
+        <TriggerWithProvider />
+      </TooltipProvider>
+    )
+    fireEvent.keyDown(window, { key: 'i', metaKey: true })
+
+    await screen.findByText('Enable RLS on the table.')
   })
 
   it('copies an answer as Markdown with full source links', async () => {

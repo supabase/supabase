@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseCronJobsKeys, getScheduleDeleteCronJobRunDetailsKey } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ScheduleCronJobRunDetailsCleanupVariables = {
   projectRef: string
@@ -40,7 +41,7 @@ export const useScheduleCronJobRunDetailsCleanupMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >,
   'mutationFn'
@@ -49,7 +50,7 @@ export const useScheduleCronJobRunDetailsCleanupMutation = ({
 
   return useMutation<
     ScheduleCronJobRunDetailsCleanupData,
-    ResponseError,
+    StudioError,
     ScheduleCronJobRunDetailsCleanupVariables
   >({
     mutationFn: (vars) => scheduleCronJobRunDetailsCleanup(vars),
