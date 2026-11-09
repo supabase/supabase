@@ -1211,6 +1211,34 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
+ * User opened the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchOpenedEvent {
+  action: 'kb_search_opened'
+  properties: {
+    /** The trigger that opened the dialog: Cmd+K or Ctrl+K, or a search button on the page. */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User closed the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchClosedEvent {
+  action: 'kb_search_closed'
+  properties: {
+    /** Why the dialog closed: the user dismissed it or opened a result. */
+    closeReason: 'dismissed' | 'result_navigated'
+  }
+}
+
+/**
  * A knowledge base search returned, with or without results. The query text is left out
  * because it can contain personal data; only its length is sent.
  *
@@ -4557,6 +4585,8 @@ export type TelemetryEvent =
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
+  | KbSearchOpenedEvent
+  | KbSearchClosedEvent
   | KbSearchSubmittedEvent
   | KbSearchResultClickedEvent
   | DocsSearchV2ClosedEvent
