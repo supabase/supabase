@@ -1,6 +1,5 @@
 'use client'
 
-import { useSendTelemetryEvent } from '~/lib/telemetry'
 import ReactMarkdown from 'react-markdown'
 
 import { StartYourProjectButton } from '@/components/StartYourProjectButton'
@@ -9,6 +8,7 @@ import { FEATURE_CTA_MARKER } from '@/data/features'
 const DEFAULT_CTA_LABEL = 'Start your project'
 
 interface Props {
+  title: string
   description: string
   ctaLabel?: string
 }
@@ -17,9 +17,7 @@ interface Props {
  * Renders a feature description as markdown. If the description contains
  * FEATURE_CTA_MARKER, the shared StartYourProjectButton is rendered at the marker.
  */
-export const FeatureDescription = ({ description, ctaLabel = DEFAULT_CTA_LABEL }: Props) => {
-  const sendTelemetryEvent = useSendTelemetryEvent()
-
+export const FeatureDescription = ({ title, description, ctaLabel = DEFAULT_CTA_LABEL }: Props) => {
   if (!description.includes(FEATURE_CTA_MARKER)) {
     return (
       <div className="prose prose-docs">
@@ -39,12 +37,7 @@ export const FeatureDescription = ({ description, ctaLabel = DEFAULT_CTA_LABEL }
         <StartYourProjectButton
           variant="primary"
           size="medium"
-          onClick={() =>
-            sendTelemetryEvent({
-              action: 'start_project_button_clicked',
-              properties: { buttonLocation: 'Feature page' },
-            })
-          }
+          buttonLocation={`Feature page - ${title}`}
         >
           {ctaLabel}
         </StartYourProjectButton>

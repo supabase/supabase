@@ -223,7 +223,11 @@ const FeaturePage: React.FC<FeaturePageProps> = ({ feature, prevFeature, nextFea
               </div>
             </div>
             <main className="max-w-xl mx-auto flex flex-col items-start gap-8">
-              <FeatureDescription description={feature.description} ctaLabel={feature.ctaLabel} />
+              <FeatureDescription
+                title={feature.title}
+                description={feature.description}
+                ctaLabel={feature.ctaLabel}
+              />
               {(feature.docsUrl || feature.blogUrl) && (
                 <div className="flex flex-wrap gap-2">
                   {feature.docsUrl && (
