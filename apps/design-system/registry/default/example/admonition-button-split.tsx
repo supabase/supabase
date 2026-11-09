@@ -13,42 +13,28 @@ export default function AdmonitionButtonSplitDemo() {
     <Admonition
       type="default"
       layout="responsive"
-      title="Set up custom SMTP to edit templates"
-      description="Emails will be sent using the default templates. Set up custom SMTP to edit their subject and body."
+      title="Your report is ready"
+      description="Export the report in the format you need."
       actions={
         <div className="flex w-full @lg:w-auto">
           <Button
             type="button"
             className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
           >
-            Set up SMTP
+            Export CSV
           </Button>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                aria-label="More email template editing options"
-                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                aria-label="More export formats"
+                className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-52">
-              <DropdownMenuItem>
-                <div className="flex flex-col gap-y-0.5">
-                  <p className="block text-foreground">Upgrade to Pro</p>
-                  <p className="block text-foreground-lighter text-balance">
-                    Customize templates while using Supabase’s email service
-                  </p>
-                </div>
-              </DropdownMenuItem>
-              <DropdownMenuItem>
-                <div className="flex flex-col gap-y-0.5">
-                  <p className="block text-foreground">Configure Send Email hook</p>
-                  <p className="block text-foreground-lighter text-balance">
-                    Send auth emails through your own workflow
-                  </p>
-                </div>
-              </DropdownMenuItem>
+              <DropdownMenuItem>Export JSON</DropdownMenuItem>
+              <DropdownMenuItem>Export TSV</DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

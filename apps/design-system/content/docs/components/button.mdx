@@ -122,9 +122,7 @@ Supports slot behavior with `asChild` prop.
 
 ### Split with dropdown
 
-Pair a button with a chevron `DropdownMenu` trigger for variations of an action or related management actions on the same object. Use the most likely action on the exposed button. Keep destructive actions clearly labelled in the menu.
-
-Use a separate overflow menu when the actions span different objects or jobs, or when a split button would imply a relationship that is not clear. See [Table multiple actions](./table#multiple-actions).
+Use a split button when the menu offers variations of the same action. The main button runs the most common variation directly, and the attached chevron opens the alternatives. For example, “Export CSV” runs immediately while the menu offers “Export JSON”.
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
@@ -136,6 +134,20 @@ Ensure the middle border is shared rather than doubled-up. Do not use `border-l-
 - Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
 
 Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions when `layout="responsive"`: also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary action.
+
+### Dropdown button
+
+Use a single labeled button with a chevron when clicking anywhere on the button should open a menu. For example, a time-range button shows the current selection and opens the list of available ranges.
+
+<ComponentPreview name="button-dropdown" peekCode />
+
+### Button with more actions
+
+Keep the main action visible and put other actions for the same item or section in a separate ellipsis menu. For example, “Add pipeline” creates a pipeline, while the menu offers settings for the pipeline list. At row level, “Stop” stays visible while “View logs” and “Edit pipeline” go in the menu.
+
+Use a primary or default button for the visible action based on its importance on the page. Keep a gap between the controls so they read as separate buttons. Give the icon-only trigger an accessible name that identifies its context, such as “More actions for this pipeline”. For table rows, see [Multiple actions](./table#multiple-actions).
+
+<ComponentPreview name="button-more-actions" peekCode />
 
 ## Default fill and floating buttons
 
