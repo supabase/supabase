@@ -264,19 +264,37 @@ describe('Security backup authenticator offer', () => {
     )
     fireEvent.click(screen.getByRole('button', { name: 'Done' }))
   }
-  test('offers optional backup after saving and restarts setup without generating twice', async () => {
+  test('completes backup setup without generating a second set of recovery codes', async () => {
+    vi.mocked(auth.mfa.recoveryCodes.generate).mockImplementationOnce(async () => {
+      vi.mocked(auth.mfa.recoveryCodes.getStatus).mockResolvedValue({
+        data: { id: 'codes', type: 'recovery_code', total: 1, remaining: 1 },
+        error: null,
+      })
+      return {
+        data: { id: 'codes', type: 'recovery_code', total: 1, codes: ['abcdefghijklmnop'] },
+        error: null,
+      }
+    })
     customRender(<Enrollment />)
     await verifyAndSave()
     await screen.findByText('Add another MFA method?')
     expect(onSaved).toHaveBeenCalledOnce()
     fireEvent.click(screen.getByRole('button', { name: 'Add another method' }))
     expect(await screen.findByRole('textbox', { name: 'Authenticator name' })).toHaveValue('')
+
+    await enrollFactor()
+    fireEvent.change(screen.getByRole('textbox', { name: 'Authentication code' }), {
+      target: { value: '123456' },
+    })
+    fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
+
+    await waitFor(() => expect(onComplete).toHaveBeenCalledTimes(2))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
+    expect(auth.mfa.challengeAndVerify).toHaveBeenLastCalledWith({
+      factorId: 'backup-factor',
+      code: '123456',
+    })
     expect(auth.mfa.recoveryCodes.generate).toHaveBeenCalledOnce()
-    expect(onComplete).toHaveBeenCalledOnce()
-    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
-    await waitFor(() =>
-      expect(screen.queryByRole('textbox', { name: 'Authenticator name' })).toBeNull()
-    )
     expect(onSaved).toHaveBeenCalledOnce()
   })
   test('Not now finishes without starting another enrollment', async () => {
