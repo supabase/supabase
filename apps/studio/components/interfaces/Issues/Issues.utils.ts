@@ -12,22 +12,16 @@ export function formatIssueResource(resource: IssueResource) {
   return resource.schema ? `${resource.schema}.${resource.name}` : resource.name
 }
 
-/** `a`, `a and b`, `a, b and c`. */
 function formatLabelList(labels: string[]) {
   if (labels.length <= 1) return labels[0] ?? ''
   return `${labels.slice(0, -1).join(', ')} and ${labels.at(-1)}`
 }
 
-/**
- * What an issue affects, in a few words: the resource itself when there's one, otherwise a
- * count by type, e.g. `3 tables` or `2 tables and 1 view`. Null when there's nothing.
- */
 export function summarizeAffected(affected: Pick<IssueAffectedResource, 'resource'>[]) {
   const resources = getUniqueIssueResources(affected)
   if (resources.length === 0) return null
   if (resources.length === 1) return formatIssueResource(resources[0])
 
-  // Keyed by the plural so types that share a noun count together
   const counts = new Map<string, { noun: { one: string; other: string }; count: number }>()
   for (const resource of resources) {
     const noun = RESOURCE_TYPE_NOUNS[resource.type]
@@ -40,7 +34,6 @@ export function summarizeAffected(affected: Pick<IssueAffectedResource, 'resourc
   )
 }
 
-/** By severity and then name, so what needs fixing most leads a long list. */
 export function sortAffected(affected: IssueAffectedResource[]) {
   return [...affected].sort(
     (a, b) =>
@@ -55,7 +48,6 @@ export type IssueListFilters = {
   search: string
 }
 
-/** Matches what a person can see on a row: the title, the description and what's affected. */
 export function filterIssues(issues: Issue[], { severity, category, search }: IssueListFilters) {
   const query = search.trim().toLowerCase()
 
@@ -71,7 +63,6 @@ export function filterIssues(issues: Issue[], { severity, category, search }: Is
   })
 }
 
-/** Context handed to the Assistant, or copied for another agent, about an issue. */
 export function buildIssuePrompt(issue: Issue) {
   const affectedLines = issue.affected.map((item) => {
     const label = formatIssueResource(item.resource)
@@ -97,7 +88,6 @@ const TELEMETRY_CATEGORY = {
   health: 'HEALTH',
 } as const
 
-/** The properties advisor events already report, so existing dashboards keep counting. */
 export function getIssueTelemetryProperties(issue: Issue) {
   return {
     advisorCategory: TELEMETRY_CATEGORY[issue.category],

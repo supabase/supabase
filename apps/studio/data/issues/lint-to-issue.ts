@@ -42,7 +42,6 @@ const RESOURCE_TYPE_BY_ENTITY = new Map<string, IssueResource['type']>(
   } satisfies Record<LintEntityType | 'bucket', IssueResource['type']>)
 )
 
-// Lint text escapes backticks for the JSON it travels in
 const unescapeBackticks = (text: string) => text.replace(/\\`/g, '`')
 
 function getLintResource({ metadata }: Lint): IssueResource {
@@ -75,7 +74,6 @@ function lintToAffected(lint: Lint): IssueAffectedResource {
 const highestSeverity = (affected: IssueAffectedResource[]) =>
   SEVERITY_ORDER.find((severity) => affected.some((item) => item.severity === severity)) ?? 'info'
 
-/** A check is one issue. Each lint it returns is an affected resource of that issue. */
 export function lintsToIssues(lints: Lint[]): Issue[] {
   const lintsByCheck = new Map<string, Lint[]>()
   for (const lint of lints) {
@@ -100,7 +98,6 @@ export function lintsToIssues(lints: Lint[]): Issue[] {
   })
 }
 
-/** Every banned IP is one affected resource of a single issue, like a lint on many tables. */
 export function signalsToIssues(signals: AdvisorSignalItem[]): Issue[] {
   const [signal] = signals
   if (!signal) return []
@@ -126,7 +123,6 @@ export function signalsToIssues(signals: AdvisorSignalItem[]): Issue[] {
   ]
 }
 
-/** Most severe first, then whatever affects the most, so what needs fixing most leads. */
 export function sortIssues(issues: Issue[]) {
   return issues
     .map((issue) => ({ issue, resourceCount: getUniqueIssueResources(issue.affected).length }))

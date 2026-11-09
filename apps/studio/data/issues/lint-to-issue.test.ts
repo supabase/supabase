@@ -141,7 +141,6 @@ describe('lintsToIssues', () => {
 
   it('falls back to what the API sent for a check Studio does not know yet', () => {
     const [issue] = lintsToIssues([
-      // A lint added on the API before Studio's catalog catches up
       makeLint({ name: 'brand_new_lint' as Lint['name'], title: 'Brand new lint' }),
     ])
 

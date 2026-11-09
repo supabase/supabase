@@ -29,7 +29,6 @@ export const CATEGORY_ICONS: Record<IssueCategory, LucideIcon> = {
   health: ActivityIcon,
 }
 
-// What a count of affected resources calls each type, e.g. `3 tables`
 export const RESOURCE_TYPE_NOUNS: Record<IssueResourceType, { one: string; other: string }> = {
   bucket: { one: 'bucket', other: 'buckets' },
   table: { one: 'table', other: 'tables' },
