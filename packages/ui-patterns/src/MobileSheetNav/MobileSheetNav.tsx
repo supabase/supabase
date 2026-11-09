@@ -12,6 +12,7 @@ const MobileSheetNav: React.FC<{
   onOpenChange(open: boolean): void
   className?: string
   shouldCloseOnRouteChange?: boolean
+  shouldCloseOnQueryChange?: boolean
   shouldCloseOnViewportResize?: boolean
   onPointerDownOutside?: ComponentProps<typeof SheetContent>['onPointerDownOutside']
 }> = ({
@@ -20,20 +21,20 @@ const MobileSheetNav: React.FC<{
   onOpenChange,
   className,
   shouldCloseOnRouteChange = true,
+  shouldCloseOnQueryChange = true,
   shouldCloseOnViewportResize = true,
   onPointerDownOutside,
 }) => {
   const router = useRouter()
   const { width } = useWindowSize()
 
-  // Use full asPath (including query) so the sheet closes when navigating to the same path with
-  // different query params (e.g. Integrations submenu: All vs Wrappers vs Postgres Modules).
   const fullPath = router?.asPath ?? ''
+  const navigationPath = shouldCloseOnQueryChange ? fullPath : fullPath.split(/[?#]/)[0]
   useEffect(() => {
     if (shouldCloseOnRouteChange) {
       onOpenChange(false)
     }
-  }, [fullPath])
+  }, [navigationPath])
 
   useEffect(() => {
     if (shouldCloseOnViewportResize) {

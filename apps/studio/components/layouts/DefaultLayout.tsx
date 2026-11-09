@@ -21,6 +21,7 @@ import { Sidebar } from '@/components/interfaces/Sidebar'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
+import { getPathSegment } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -142,7 +143,9 @@ export const DefaultLayout = ({
             </div>
 
             <BannerStack />
-            <StudioMobileSheetNav />
+            <StudioMobileSheetNav
+              shouldCloseOnQueryChange={getPathSegment(router.pathname, 3) !== 'issues'}
+            />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>
