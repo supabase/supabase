@@ -250,7 +250,8 @@ async function parseSingleSource(
 }
 
 async function renderManifest(sources: MarkdownSource[]): Promise<void> {
-  const slugs = Array.from(new Set(sources.map((s) => s.slug)))
+  // Sorted so the output is deterministic: turbo hashes this tracked file as a task input.
+  const slugs = Array.from(new Set(sources.map((s) => s.slug))).sort()
   const content = `${JSON.stringify(slugs, null, 2)}\n`
 
   await fs.mkdir(path.dirname(MANIFEST_PATH), { recursive: true })
