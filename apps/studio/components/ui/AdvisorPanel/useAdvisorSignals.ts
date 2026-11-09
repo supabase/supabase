@@ -1,8 +1,12 @@
+import { useQueryClient } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { useCallback, useEffect, useMemo } from 'react'
 
 import type { AdvisorSignalItem } from './AdvisorPanel.types'
 import { useBannedIPsQuery } from '@/data/banned-ips/banned-ips-query'
 import type { IPData } from '@/data/banned-ips/banned-ips-query'
+import { BannedIPKeys } from '@/data/banned-ips/keys'
+import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 
 const createDismissalStorageKey = (projectRef: string) => `advisor-signal-dismissals:${projectRef}`
@@ -48,7 +52,25 @@ interface UseAdvisorSignalsOptions {
 }
 
 export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSignalsOptions) => {
-  const { data, isPending, isError } = useBannedIPsQuery({ projectRef }, { enabled })
+  const queryClient = useQueryClient()
+  const query = useBannedIPsQuery({ projectRef }, { enabled })
+  const { data } = query
+  const isEnabled = enabled && !!projectRef
+  const projectQuery = useProjectDetailQuery(
+    { ref: projectRef },
+    { enabled: isEnabled && IS_PLATFORM }
+  )
+  const isLoading =
+    isEnabled && IS_PLATFORM && (projectQuery.isPending || (query.isEnabled && query.isPending))
+  const error =
+    isEnabled && IS_PLATFORM ? (projectQuery.error ?? (query.isEnabled ? query.error : null)) : null
+  const isError = error !== null
+  const isSuccess =
+    isEnabled &&
+    (!IS_PLATFORM || (projectQuery.isSuccess && (!query.isEnabled || query.isSuccess))) &&
+    !isError
+  const refetch = () =>
+    queryClient.invalidateQueries({ queryKey: BannedIPKeys.list(projectRef), exact: true })
 
   const storageKey = projectRef
     ? createDismissalStorageKey(projectRef)
@@ -72,10 +94,6 @@ export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSign
     [projectRef, data]
   )
 
-  // Prune stale dismissals when the active signal list changes (e.g. an IP was unbanned).
-  // Only call the setter when pruning would actually change something — otherwise we
-  // churn subscribers unnecessarily, which can cause feedback loops when this hook is
-  // mounted in more than one place (AdvisorSection + AdvisorPanel).
   useEffect(() => {
     if (!data) return
 
@@ -98,9 +116,14 @@ export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSign
   )
 
   return {
-    data: formattedData,
+    data: isEnabled ? formattedData : [],
     dismissSignal,
-    isPending,
+    isPending: isLoading,
+    isLoading,
     isError,
+    isSuccess,
+    error,
+    isFetching: isEnabled && IS_PLATFORM && (projectQuery.isFetching || query.isFetching),
+    refetch,
   }
 }
