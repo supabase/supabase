@@ -43,6 +43,9 @@ export const pgFunctionZod = z.object({
   return_type: z.string(),
   return_type_relation_id: z.union([z.number(), z.null()]),
   is_set_returning_function: z.boolean(),
+  // Optional for compatibility with function rows sourced from older cached queries.
+  // The SQL read path always returns it.
+  is_strict: z.boolean().optional(),
   behavior: z.union([z.literal('IMMUTABLE'), z.literal('STABLE'), z.literal('VOLATILE')]),
   security_definer: z.boolean(),
   config_params: z.union([z.record(z.string(), z.string()), z.null()]),
@@ -187,6 +190,7 @@ export const pgFunctionCreateZod = z.object({
   language: z.string().optional(),
   return_type: z.string().optional(),
   security_definer: z.boolean().optional(),
+  is_strict: z.boolean().optional(),
 })
 
 // Zod validates `args`, `return_type`, and `config_params` values as runtime
@@ -248,6 +252,7 @@ function _generateCreateFunctionSql(
     behavior,
     security_definer,
     config_params,
+    is_strict = false,
     type = 'function',
   }: PGFunctionCreate,
   { replace = false } = {}
@@ -273,7 +278,7 @@ function _generateCreateFunctionSql(
     ${isProcedure ? safeSql`` : safeSql`RETURNS ${return_type!}`}
     AS ${literal(definition)}
     LANGUAGE ${keyword(language!)}
-    ${isProcedure ? safeSql`` : safeSql`${keyword(behavior!)} CALLED ON NULL INPUT`}
+    ${isProcedure ? safeSql`` : safeSql`${keyword(behavior!)} ${is_strict ? safeSql`STRICT` : safeSql`CALLED ON NULL INPUT`}`}
     ${security_definer ? safeSql`SECURITY DEFINER` : safeSql`SECURITY INVOKER`}
     ${configParamsFragment};
   `
@@ -289,6 +294,7 @@ export function create({
   behavior = 'VOLATILE',
   security_definer = false,
   config_params = {},
+  is_strict = false,
   type = 'function',
 }: PGFunctionCreate) {
   const sql = _generateCreateFunctionSql({
@@ -301,6 +307,7 @@ export function create({
     behavior,
     security_definer,
     config_params,
+    is_strict,
     type,
   })
 

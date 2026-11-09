@@ -64,6 +64,7 @@ withTestDatabase('list functions', async ({ executeQuery }) => {
       "id": Any<Number>,
       "identity_argument_types": "integer, integer",
       "is_set_returning_function": false,
+      "is_strict": true,
       "language": "sql",
       "name": "add",
       "return_type": "integer",
@@ -177,6 +178,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "id": Any<Number>,
         "identity_argument_types": "a smallint, b smallint",
         "is_set_returning_function": false,
+        "is_strict": false,
         "language": "sql",
         "name": "test_func",
         "return_type": "integer",
@@ -240,6 +242,7 @@ withTestDatabase('retrieve, create, update, delete', async ({ executeQuery }) =>
         "id": Any<Number>,
         "identity_argument_types": "a smallint, b smallint",
         "is_set_returning_function": false,
+        "is_strict": false,
         "language": "sql",
         "name": "test_func_renamed",
         "return_type": "integer",
@@ -298,6 +301,7 @@ withTestDatabase('retrieve set-returning function', async ({ executeQuery }) => 
       "id": Any<Number>,
       "identity_argument_types": "",
       "is_set_returning_function": true,
+      "is_strict": false,
       "language": "sql",
       "name": "function_returning_set_of_rows",
       "return_type": "SETOF users",
@@ -409,6 +413,43 @@ withTestDatabase(
     })
 
     const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(result!))
+    await executeQuery(removeSql)
+  }
+)
+
+withTestDatabase(
+  'create strict function and preserve strictness on update',
+  async ({ executeQuery }) => {
+    const { sql: createSql } = pgMeta.functions.create({
+      name: 'test_func_strict',
+      schema: 'public',
+      args: [safeSql`a integer`],
+      definition: 'select a + 1',
+      return_type: safeSql`integer`,
+      language: 'sql',
+      behavior: 'IMMUTABLE',
+      is_strict: true,
+    })
+    await executeQuery(createSql)
+
+    const { sql: retrieveSql, zod: retrieveZod } = pgMeta.functions.retrieve({
+      name: 'test_func_strict',
+      schema: 'public',
+      args: ['integer'],
+    })
+    const result = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(result!.is_strict).toBe(true)
+
+    const { sql: updateSql } = pgMeta.functions.update(asSavedFunction(result!), {
+      definition: 'select a + 2',
+    })
+    await executeQuery(updateSql)
+
+    const updated = retrieveZod.parse((await executeQuery(retrieveSql))[0])
+    expect(updated!.is_strict).toBe(true)
+    expect(updated!.definition).toBe('select a + 2')
+
+    const { sql: removeSql } = pgMeta.functions.remove(asSavedFunction(updated!))
     await executeQuery(removeSql)
   }
 )
