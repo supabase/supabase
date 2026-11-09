@@ -10,7 +10,7 @@ This guide shows how to connect your Prisma application to Supabase Postgres. If
 
 <Admonition type="note">
 
-This guide uses Prisma ORM 7. The `latest` tag of the `prisma` and `@prisma/client` packages on npm now points to the Prisma ORM 8 release candidate, which has a different CLI and client API, so the install commands below pin version 7. For Prisma ORM 8, see the [Prisma ORM 8 docs](https://www.prisma.io/docs/orm).
+This guide uses Prisma ORM 7. The `latest` tag of the `prisma` package on npm points to the Prisma ORM 8 release candidate, which has a different CLI and client API. The install commands in this guide pin version 7 for that reason. For Prisma ORM 8, see the [Prisma ORM 8 docs](https://www.prisma.io/docs/orm).
 
 </Admonition>
 
@@ -95,12 +95,12 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
               pnpm init
-              pnpm install prisma@7 tsx @types/pg --save-dev
+              pnpm install prisma@7 tsx @types/pg --save-dev --allow-build=prisma --allow-build=@prisma/engines --allow-build=esbuild
               pnpm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               pnpx tsc --init
 
-              pnpx prisma init
+              pnpm exec prisma init
               ```
             </TabPanel>
             <TabPanel id="yarn_initiate" label="yarn">
@@ -285,8 +285,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </TabPanel>
             <TabPanel id="pnpm_migrate" label="pnpm">
             ```bash
-            pnpx prisma migrate dev --name first_prisma_migration
-            pnpx prisma generate
+            pnpm exec prisma migrate dev --name first_prisma_migration
+            pnpm exec prisma generate
             ```
             </TabPanel>
             <TabPanel id="yarn_migrate" label="yarn">
@@ -345,7 +345,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
           <TabPanel id="pnpm_sync" label="pnpm">
             ```bash
-            pnpx prisma db pull
+            pnpm exec prisma db pull
             ```
 
             Create a migration file
@@ -355,7 +355,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
 
             Synchronize the migrations
             ```bash
-              pnpx prisma migrate diff \
+              pnpm exec prisma migrate diff \
               --from-empty \
               --to-schema prisma/schema.prisma \
               --script > prisma/migrations/0_init_supabase/migration.sql
@@ -367,8 +367,8 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             </Admonition>
 
             ```bash
-            pnpx prisma migrate resolve --applied 0_init_supabase
-            pnpx prisma generate
+            pnpm exec prisma migrate resolve --applied 0_init_supabase
+            pnpm exec prisma generate
             ```
           </TabPanel>
 
