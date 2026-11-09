@@ -53,14 +53,17 @@ export const IssuesSection = ({ showEmptyState = false }: { showEmptyState?: boo
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <h2 id="home-issues-heading">Issues</h2>
-          {isSuccess && <Badge>{issues.length.toLocaleString()} open</Badge>}
+          {!showEmptyState && isSuccess && <Badge>{issues.length.toLocaleString()} open</Badge>}
         </div>
-        <Button asChild variant="default">
-          <Link href={`/project/${projectRef}/issues`}>View all issues</Link>
-        </Button>
+        {!showEmptyState && (
+          <Button asChild variant="default">
+            <Link href={`/project/${projectRef}/issues`}>View all issues</Link>
+          </Button>
+        )}
       </div>
-      {isLoading && <GenericSkeletonLoader />}
-      {isError && (
+      {showEmptyState && <EmptyState />}
+      {!showEmptyState && isLoading && <GenericSkeletonLoader />}
+      {!showEmptyState && isError && (
         <AlertError
           error={error}
           subject="Failed to retrieve issues"
@@ -72,8 +75,8 @@ export const IssuesSection = ({ showEmptyState = false }: { showEmptyState?: boo
           }
         />
       )}
-      {!isLoading && !isError && issues.length === 0 && <EmptyState />}
-      {issues.length > 0 && (
+      {!showEmptyState && !isLoading && !isError && issues.length === 0 && <EmptyState />}
+      {!showEmptyState && issues.length > 0 && (
         <Row maxColumns={4} minWidth={280}>
           {issues.slice(0, MAX_HOMEPAGE_ISSUES).map((issue) => (
             <IssueCard
