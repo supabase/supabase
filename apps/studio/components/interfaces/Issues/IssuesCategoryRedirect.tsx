@@ -1,18 +1,30 @@
 import { useParams } from 'common'
-import { useRouter } from 'next/router'
 import { useEffect } from 'react'
 
+import { replaceIssuesLocation } from './IssuesLegacyRedirect'
+import { getIssuesCategoryDestination } from './IssuesLegacyRedirect.utils'
 import type { IssueCategory } from '@/data/issues/issue.types'
+import { BASE_PATH } from '@/lib/constants'
 
-/** The per-category advisor pages became filtered views of the issues list. */
-export const IssuesCategoryRedirect = ({ category }: { category: IssueCategory }) => {
-  const router = useRouter()
+export const IssuesCategoryRedirect = ({
+  category,
+  onRedirect = replaceIssuesLocation,
+}: {
+  category: IssueCategory
+  onRedirect?: (destination: string) => void
+}) => {
   const { ref } = useParams()
 
   useEffect(() => {
     if (!ref) return
-    router.replace(`/project/${ref}/issues?category=${category}`)
-  }, [ref, router, category])
+    onRedirect(
+      getIssuesCategoryDestination(
+        new URL(window.location.href),
+        category,
+        `${BASE_PATH}/project/${encodeURIComponent(ref)}/issues`
+      )
+    )
+  }, [ref, category, onRedirect])
 
   return null
 }

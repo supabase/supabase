@@ -106,6 +106,29 @@ describe('matchRedirect moved Studio routes', () => {
     }
   )
 
+  it.each([
+    ['advisors/security', 'security'],
+    ['advisors/performance', 'performance'],
+    ['advisors/health', 'health'],
+    ['database/security-advisor', 'security'],
+    ['database/performance-advisor', 'performance'],
+    ['database/linter', 'security'],
+  ])('preserves legacy finding links from %s', (path, category) => {
+    for (const isPlatform of [true, false]) {
+      expect(
+        matchRedirect({
+          pathname: `/project/${ref}/${path}`,
+          search: { id: 'opaque-key', preset: 'WARN' },
+          hash: 'finding',
+          isPlatform,
+        })
+      ).toEqual({
+        destination: `/project/${ref}/issues?category=${category}&id=opaque-key&preset=WARN#finding`,
+        permanent: true,
+      })
+    }
+  })
+
   it('redirects the advisor root while leaving check settings and Issues alone', () => {
     expect(
       matchRedirect({ pathname: `/project/${ref}/advisors`, search: {}, isPlatform: true })
