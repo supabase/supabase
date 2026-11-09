@@ -355,7 +355,6 @@ const ProjectLinks = () => {
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  // Check settings still live under /advisors
                   active={activeRoute === route.key || activeRoute === 'advisors'}
                   isLoading={isProjectPending}
                 >
