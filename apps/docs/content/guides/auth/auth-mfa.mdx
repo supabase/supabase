@@ -205,7 +205,24 @@ create policy "Policy name."
 
 If your app falls under this case, the rules get more complex. User accounts created past a certain timestamp must have a `aal2` level to access the database.
 
+The policy needs the caller's `created_at` from `auth.users`, but the `authenticated` role cannot read that table directly. A policy that selects from `auth.users` runs as the calling user and fails with `42501: permission denied for table users`. Wrap the lookup in a `SECURITY DEFINER` function so it runs with the owner's privileges, and expose only the caller's own timestamp:
+
 ```sql
+create or replace function public.current_user_created_at()
+returns timestamptz
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select created_at
+  from auth.users
+  where id = (select auth.uid());
+$$;
+
+revoke all on function public.current_user_created_at() from public;
+grant execute on function public.current_user_created_at() to authenticated;
+
 create policy "Policy name."
   on table_name
   as restrictive -- very important!
@@ -214,16 +231,18 @@ create policy "Policy name."
     (array[(select auth.jwt()->>'aal')] <@ (
        select
          case
-           when created_at >= '2022-12-12T00:00:00Z' then array['aal2']
+           when (select public.current_user_created_at()) >= '2022-12-12T00:00:00Z'
+             then array['aal2']
            else array['aal1', 'aal2']
          end as aal
-       from auth.users
-       where (select auth.uid()) = id));
+    ));
 ```
 
 - The policy will accept both `aal1` and `aal2` for users with a `created_at`
   timestamp prior to 12th December 2022 at 00:00 UTC, but will only accept
   `aal2` for all other timestamps.
+- The helper function must be owned by a role that can read `auth.users`, such as
+  `postgres`. It only returns the calling user's `created_at`.
 - The `<@` operator is Postgres's ["contained in"
   operator.](https://www.postgresql.org/docs/current/functions-array.html)
 - **Using `as restrictive` ensures this policy will restrict all commands on the
