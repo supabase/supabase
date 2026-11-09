@@ -258,9 +258,13 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
       endpoint,
       snippet: '',
     })
-    if (command) {
-      form.setValue('values.snippet', command)
-    }
+    if (!command) return
+
+    // Opening an existing job resets the form to the values parsed from its stored command, which
+    // re-runs this effect. Keep the stored command as-is while the fields still describe it, so
+    // the SQL only gets regenerated once the user actually changes a field.
+    const isStoredCommand = isEditing && command === buildCommand(cronJobValues)
+    form.setValue('values.snippet', isStoredCommand ? cronJobValues.snippet : command)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     cronType,
