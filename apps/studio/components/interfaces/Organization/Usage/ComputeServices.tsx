@@ -20,7 +20,6 @@ import {
   formatComputeRequests,
   formatGbHours,
   formatPercentage,
-  formatVcpuHours,
   formatVcpuMinutes,
   getCpuUtilization,
   getUsageConcentration,
@@ -43,7 +42,7 @@ const USAGE_WINDOW_DAYS = 30
 
 /**
  * Wall-clock runtime and GB-hours carry no quota of their own. Runtime is context — how long
- * workers were up — and memory tracks vCPU at a fixed 2 GB per vCPU, so neither can diverge
+ * instances were up — and memory tracks vCPU at a fixed 2 GB per vCPU, so neither can diverge
  * from the metered figure. Both are reported rather than metered.
  */
 const ComputeBillingDimensions = ({
@@ -69,8 +68,8 @@ const ComputeBillingDimensions = ({
 )
 
 const VCPU_CHART_ATTRIBUTES: Attribute[] = [
-  { key: 'usedVcpuHours', name: 'CPU used', color: 'white' },
-  { key: 'idleVcpuHours', name: 'Reserved, idle', color: 'muted' },
+  { key: 'usedVcpuMinutes', name: 'CPU used', color: 'white' },
+  { key: 'idleVcpuMinutes', name: 'Reserved, idle', color: 'muted' },
 ]
 
 export interface ComputeServicesProps {
@@ -113,11 +112,13 @@ export const ComputeServices = ({
   const concentration = getUsageConcentration(byProject.map((row) => row.reservedVcpuHours))
   const hasVcpuUsage = totalReservedVcpuHours > 0
 
+  // Minutes, not hours: these bars sum to the metered total, and a quota counted in minutes
+  // has to be readable against a chart counted in the same thing. In hours a day reads "0.98".
   const vcpuChartData: DataPoint[] = points.map((point) => ({
     period_start: point.timestamp,
     periodStartFormatted: dayjs(point.timestamp).format('DD MMM'),
-    usedVcpuHours: point.usedVcpuHours,
-    idleVcpuHours: Number(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours).toFixed(2)),
+    usedVcpuMinutes: Math.round(point.usedVcpuHours * 60),
+    idleVcpuMinutes: Math.round(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours) * 60),
   }))
 
   return (
@@ -152,7 +153,7 @@ export const ComputeServices = ({
             )}
 
             <div className="space-y-1">
-              <p className="text-sm">vCPU-hours per day</p>
+              <p className="text-sm">vCPU-minutes per day</p>
               <p className="text-sm text-foreground-light">
                 Reserved vCPU split into CPU used and idle.
                 {cpuUtilization !== null &&
@@ -161,12 +162,14 @@ export const ComputeServices = ({
             </div>
             {hasVcpuUsage ? (
               <UsageBarChart
-                name="vCPU-hours"
-                unit="hours"
+                name="vCPU-minutes"
+                // The chart's unit union has no minutes member; 'absolute' is the plain
+                // number path, and the heading and series names carry the unit.
+                unit="absolute"
                 attributes={VCPU_CHART_ATTRIBUTES}
                 data={vcpuChartData}
-                yFormatter={(value) => ChartYFormatterCompactNumber(value, 'hours')}
-                tooltipFormatter={(value) => ChartTooltipValueFormatter(value, 'hours')}
+                yFormatter={(value) => ChartYFormatterCompactNumber(value, 'absolute')}
+                tooltipFormatter={(value) => ChartTooltipValueFormatter(value, 'absolute')}
               />
             ) : (
               <NoComputeUsage />
@@ -331,7 +334,7 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
     <div className="divide-y border-b">
       <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
         <span className="col-span-6">Project</span>
-        <span className="col-span-4 text-right">vCPU-hrs</span>
+        <span className="col-span-4 text-right">vCPU-min</span>
         <span className="col-span-2 text-right">CPU used</span>
       </div>
       {rows.map((row) => {
@@ -349,11 +352,11 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
             </div>
             <div className="col-span-4 flex flex-col items-end gap-1">
               <p className="text-sm tabular-nums text-foreground-light">
-                {formatVcpuHours(row.reservedVcpuHours)}
+                {formatVcpuMinutes(row.reservedVcpuHours)}
               </p>
               <div
                 className="flex items-center gap-2"
-                aria-label={`${formatPercentage(share)} of org vCPU-hours`}
+                aria-label={`${formatPercentage(share)} of organization vCPU-minutes`}
               >
                 <span aria-hidden className="h-1 w-12 overflow-hidden rounded-full bg-surface-400">
                   <span

@@ -44,7 +44,7 @@ const ComputeQuotaOverage = ({
       <Heading>Compute is now billing overage</Heading>
       <Text muted>
         {organizationName} has used the {formatMinutes(includedVcpuMinutes)} included in the{' '}
-        {planName}. Workers keep running — Compute past the quota is billed at the overage rate.
+        {planName}. Instances keep running — Compute past the quota is billed at the overage rate.
       </Text>
 
       <UsageMeter
@@ -74,7 +74,7 @@ const ComputeQuotaOverage = ({
         <a href={billingUrl(organizationSlug)} style={{ color: theme.foregroundLight }}>
           billing
         </a>
-        . Workers stop when the quota runs out.
+        . Instances stop when the quota runs out.
       </Text>
     </Section>
   </EmailLayout>

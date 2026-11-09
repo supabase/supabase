@@ -20,16 +20,16 @@ describe('computeFeaturesFor', () => {
   })
 
   it('names the concurrency limit on each plan that has one', () => {
-    expect(flatten(computeFeaturesFor('free'))).toContain('1 concurrent worker')
-    expect(flatten(computeFeaturesFor('pro'))).toContain('10 concurrent workers')
-    expect(flatten(computeFeaturesFor('team'))).toContain('50 concurrent workers')
+    expect(flatten(computeFeaturesFor('free'))).toContain('1 concurrent instance')
+    expect(flatten(computeFeaturesFor('pro'))).toContain('10 concurrent instances')
+    expect(flatten(computeFeaturesFor('team'))).toContain('50 concurrent instances')
     // Enterprise is negotiated, so there is nothing to state.
-    expect(flatten(computeFeaturesFor('enterprise'))).not.toMatch(/concurrent worker/i)
+    expect(flatten(computeFeaturesFor('enterprise'))).not.toMatch(/concurrent instance/i)
   })
 
-  it('says Free workers suspend and paid plans may run private ones', () => {
+  it('says Free instances suspend and paid plans may run private ones', () => {
     expect(flatten(computeFeaturesFor('free'))).toContain('suspend when idle')
-    expect(flatten(computeFeaturesFor('pro'))).toContain('Public and private workers')
+    expect(flatten(computeFeaturesFor('pro'))).toContain('Public and private instances')
   })
 
   it('restricts Free to the base size and bursts paid plans', () => {

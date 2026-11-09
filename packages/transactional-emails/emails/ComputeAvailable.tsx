@@ -7,11 +7,11 @@ interface ComputeAvailableProps {
   organizationSlug: string
   planName: string
   includedVcpuMinutes: number
-  concurrentWorkers: number
+  concurrentInstances: number
 }
 
 /**
- * The one onboarding email worth sending. "You deployed your first worker" is a notification
+ * The one onboarding email worth sending. "You deployed your first instance" is a notification
  * about something the developer just watched happen in their own terminal; this is the only
  * moment where the inbox knows something the dashboard has not already said.
  *
@@ -23,18 +23,18 @@ const ComputeAvailable = ({
   organizationSlug,
   planName,
   includedVcpuMinutes,
-  concurrentWorkers,
+  concurrentInstances,
 }: ComputeAvailableProps) => (
   <EmailLayout
-    preview={`${includedVcpuMinutes} vCPU-minutes a month and ${concurrentWorkers} concurrent workers per project`}
+    preview={`${includedVcpuMinutes} vCPU-minutes a month and ${concurrentInstances} concurrent instances per project`}
     organizationName={organizationName}
   >
     <Section>
       <Heading>Compute is available on {organizationName}</Heading>
       <Text muted>
-        Deploy a worker from the CLI with <Mono>supabase compute new</Mono>, then{' '}
-        <Mono>supabase compute deploy</Mono>. Workers suspend when idle, so nothing accrues between
-        requests.
+        Deploy an instance from the CLI with <Mono>supabase compute new</Mono>, then{' '}
+        <Mono>supabase compute deploy</Mono>. Instances suspend when idle, so nothing accrues
+        between requests.
       </Text>
 
       <Hr />
@@ -51,9 +51,9 @@ const ComputeAvailable = ({
             </td>
           </tr>
           <tr>
-            <td style={{ padding: '6px 0', fontSize: '14px' }}>Concurrent workers</td>
+            <td style={{ padding: '6px 0', fontSize: '14px' }}>Concurrent instances</td>
             <td align="right" style={{ padding: '6px 0', fontSize: '14px' }}>
-              {concurrentWorkers} per project
+              {concurrentInstances} per project
             </td>
           </tr>
         </tbody>
@@ -62,8 +62,8 @@ const ComputeAvailable = ({
       <Hr />
 
       <Text small muted>
-        A vCPU-minute is one minute of one vCPU. A worker at the base size uses one a minute; a
-        larger one uses more. Suspended workers use none.
+        A vCPU-minute is one minute of one vCPU. A instance at the base size uses one a minute; a
+        larger one uses more. Suspended instances use none.
       </Text>
 
       <Button href={dashboardUrl(`/org/${organizationSlug}/usage#compute-services`)}>
@@ -83,6 +83,6 @@ export const computeAvailable: EmailTemplate<ComputeAvailableProps> = {
     organizationSlug: 'northwind',
     planName: 'Pro Plan',
     includedVcpuMinutes: 500,
-    concurrentWorkers: 10,
+    concurrentInstances: 10,
   },
 }

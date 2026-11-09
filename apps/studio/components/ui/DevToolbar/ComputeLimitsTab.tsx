@@ -72,7 +72,7 @@ export const ComputeLimitsTab = () => {
           <TableRow>
             <TableHead>Limits</TableHead>
             <TableHead className="text-right">vCPU-min / cycle</TableHead>
-            <TableHead className="text-right">Concurrent workers</TableHead>
+            <TableHead className="text-right">Concurrent instances</TableHead>
             <TableHead className="text-right">Sizes</TableHead>
             <TableHead className="text-right">Burst to</TableHead>
             <TableHead className="text-right">Max invocation</TableHead>
@@ -89,7 +89,7 @@ export const ComputeLimitsTab = () => {
                 {formatLimit(limits.vcpuMinutes)}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.concurrentWorkers)}
+                {formatLimit(limits.concurrentInstances)}
               </TableCell>
               <TableCell className="text-xs text-right">{limits.sizes.join(', ')}</TableCell>
               <TableCell className="text-xs text-right tabular-nums">

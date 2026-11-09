@@ -213,7 +213,7 @@ export const formatComputeRequests = (requests: number): string => {
 
 /**
  * A capacity limit is never "80% used" in any way a developer can act on — what they want to
- * know is whether the next deploy fits. At 50 workers a ratio warning fires with ten slots
+ * know is whether the next deploy fits. At 50 instances a ratio warning fires with ten slots
  * still free; at 2 it fires with none. So capacity warns on absolute headroom instead, and
  * the number of slots left is the whole message.
  */
@@ -253,11 +253,15 @@ export const getComputeCapacity = (used: number, limit: number | null): ComputeC
     return { status: 'full', used, limit, remaining, label: 'No room for more' }
   }
 
+  // Headroom is only worth saying when it is nearly gone. "Room for 48 more" is noise next to
+  // a counter that already reads 2/50.
+  const isLow = remaining <= COMPUTE_CAPACITY_WARNING_SLOTS
+
   return {
-    status: remaining <= COMPUTE_CAPACITY_WARNING_SLOTS ? 'low' : 'available',
+    status: isLow ? 'low' : 'available',
     used,
     limit,
     remaining,
-    label: `Room for ${remaining} more`,
+    label: isLow ? `Room for ${remaining} more` : null,
   }
 }

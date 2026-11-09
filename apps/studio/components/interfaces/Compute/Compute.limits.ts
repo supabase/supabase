@@ -28,22 +28,22 @@ export type ComputeInstanceSize = (typeof COMPUTE_INSTANCE_SIZES)[number]
  * `null` means no fixed limit.
  */
 export interface ComputeLimits {
-  /** Included vCPU-minutes per billing cycle, across all workers. */
+  /** Included vCPU-minutes per billing cycle, across all instances. */
   vcpuMinutes: number | null
   /**
-   * Workers that may run at once, per project. Scoped to the project because that is where
+   * Instances that may run at once, per project. Scoped to the project because that is where
    * the API enforces it — compute_instance_limit_exceeded is a per-project 403 — and because
    * the vCPU-minute quota is already the org-wide bound on consumption. This is a capacity
    * grant, not a consumption one: a plan can hold far more concurrency than its quota could
    * feed, which is the point of having both.
    */
-  concurrentWorkers: number | null
+  concurrentInstances: number | null
   /**
-   * Whether the plan may run private workers. Private workers never suspend, so one of them
+   * Whether the plan may run private instances. Private instances never suspend, so one of them
    * drains the included quota in a matter of hours and keeps costing us after that. Public
-   * workers suspend on idle, which is what makes a small quota viable.
+   * instances suspend on idle, which is what makes a small quota viable.
    */
-  canRunPrivateWorkers: boolean
+  canRunPrivateInstances: boolean
   /** Sizes the plan may deploy. */
   sizes: readonly ComputeInstanceSize[]
   /** Ceiling a running instance may burst to. `null` means it stays at its base size. */
@@ -70,18 +70,18 @@ const PAID_BURST_CEILING = { vcpu: 4, memoryGb: 8 }
  */
 const FREE_MAX_INVOCATION_MINUTES = 10
 
-// TODO: confirm the live instance cap with the workers-infra team. API fixtures use 100.
+// TODO: confirm the live instance cap with the instances-infra team. API fixtures use 100.
 export const COMPUTE_ALPHA_LIMITS: ComputeLimits = {
   vcpuMinutes: null,
-  concurrentWorkers: 2,
-  canRunPrivateWorkers: true,
+  concurrentInstances: 2,
+  canRunPrivateInstances: true,
   sizes: COMPUTE_INSTANCE_SIZES,
   burstTo: PAID_BURST_CEILING,
   maxInvocationMinutes: null,
 }
 
 /**
- * Concurrency is a placeholder. The RFC leaves it open — "# Concurrent Workers to be decided
+ * Concurrency is a placeholder. The RFC leaves it open — "# Concurrent Instances to be decided
  * each tier" — so these are working numbers chosen to be plausible, not agreed ones. They
  * climb roughly an order of magnitude per tier and stay under the unverified per-project
  * platform ceiling of 100.
@@ -89,41 +89,41 @@ export const COMPUTE_ALPHA_LIMITS: ComputeLimits = {
 export const COMPUTE_PLAN_LIMITS: Record<OrgPlan['id'], ComputeLimits> = {
   free: {
     vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
-    concurrentWorkers: 1,
-    // A private worker never suspends, so one would drain the included quota in hours.
-    canRunPrivateWorkers: false,
+    concurrentInstances: 1,
+    // A private instance never suspends, so one would drain the included quota in hours.
+    canRunPrivateInstances: false,
     sizes: [BASE_SIZE],
     burstTo: null,
     maxInvocationMinutes: FREE_MAX_INVOCATION_MINUTES,
   },
   pro: {
     vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
-    concurrentWorkers: 10,
-    canRunPrivateWorkers: true,
+    concurrentInstances: 10,
+    canRunPrivateInstances: true,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   team: {
     vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
-    concurrentWorkers: 50,
-    canRunPrivateWorkers: true,
+    concurrentInstances: 50,
+    canRunPrivateInstances: true,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   platform: {
     vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
-    concurrentWorkers: 50,
-    canRunPrivateWorkers: true,
+    concurrentInstances: 50,
+    canRunPrivateInstances: true,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   enterprise: {
     vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
-    concurrentWorkers: null,
-    canRunPrivateWorkers: true,
+    concurrentInstances: null,
+    canRunPrivateInstances: true,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
@@ -163,4 +163,4 @@ export const canPlanDeploySize = (limits: ComputeLimits, size: string): boolean 
   limits.sizes.some((allowed) => allowed === size)
 
 export const canPlanDeployAccess = (limits: ComputeLimits, access: string): boolean =>
-  access === 'private' ? limits.canRunPrivateWorkers : true
+  access === 'private' ? limits.canRunPrivateInstances : true

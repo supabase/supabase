@@ -52,9 +52,13 @@ describe('ComputeServices', () => {
     renderOnPlan('pro')
 
     expect(await screen.findByText('Compute usage')).toBeInTheDocument()
-    expect(await screen.findByText('vCPU-hours per day')).toBeInTheDocument()
-    expect(await screen.findByText('Running hours by size')).toBeInTheDocument()
+    // Everything that sums to the metered total reads in the unit the quota is set in.
+    expect(await screen.findByText('vCPU-minutes per day')).toBeInTheDocument()
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
+    expect(await screen.findByText('vCPU-min')).toBeInTheDocument()
+
+    // Wall-clock runtime is a different dimension, so it keeps its own unit.
+    expect(await screen.findByText('Running hours by size')).toBeInTheDocument()
   })
 
   it('breaks the allowance down the way the other usage sections do', async () => {

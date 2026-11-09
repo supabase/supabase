@@ -105,7 +105,7 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters the vCPU-minute quota and concurrent workers against the plan', async () => {
+  it('meters the vCPU-minute quota and concurrent instances against the plan', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
@@ -113,12 +113,16 @@ describe('ComputePlanUsage', () => {
 
     expect(await screen.findByText('Usage')).toBeInTheDocument()
     expect(await screen.findByText('Compute')).toBeInTheDocument()
-    expect(await screen.findByText('Concurrent workers')).toBeInTheDocument()
+    expect(await screen.findByText('Concurrent instances')).toBeInTheDocument()
     // GB-hours tracks vCPU at a fixed ratio, so it is not a separate meter.
     expect(screen.queryByText('GB-hours')).not.toBeInTheDocument()
     expect(screen.queryByText('Deployments')).not.toBeInTheDocument()
-    // The RFC includes 500 per cycle on every plan, read as vCPU-minutes.
-    expect(await screen.findByText(/^[\d,]+\/500 vCPU-min$/)).toBeInTheDocument()
+    // The quota belongs to the organization, so this project reports what it consumed and
+    // points at the org usage page for the burn-down rather than claiming a share of it.
+    const computeMeter = await meter('Compute')
+    expect(await computeMeter.findByText(/^[\d,]+ vCPU-min$/)).toBeInTheDocument()
+    expect(computeMeter.getByText('Counted against the organization quota')).toBeInTheDocument()
+    expect(computeMeter.queryByText(/\/500/)).not.toBeInTheDocument()
   })
 
   it('keeps runtime and CPU utilisation in the tooltip rather than under the bar', async () => {
@@ -148,25 +152,25 @@ describe('ComputePlanUsage', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    // Pro allows 10 concurrent workers per project.
+    // Pro allows 10 concurrent instances per project.
     expect(await screen.findByText('7/10')).toBeInTheDocument()
-    // Three slots left is the actionable form of "70% used".
-    expect(await screen.findByText('Room for 3 more')).toBeInTheDocument()
+    // Three slots is still comfortable, so the counter says it all.
+    expect(screen.queryByText(/^Room for/)).not.toBeInTheDocument()
   })
 
-  it('marks a worker count that fills the plan limit as at limit, not over', async () => {
+  it('marks an instance count that fills the plan limit as at limit, not over', async () => {
     mockOrganizationOnPlan('free', 'Free')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
-    const instanceMeter = await meter('Concurrent workers')
+    const instanceMeter = await meter('Concurrent instances')
     expect(await instanceMeter.findByText('1/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('No room for more')).toBeInTheDocument()
     expect(instanceMeter.queryByText(/over the limit/)).not.toBeInTheDocument()
   })
 
-  it('flags a worker count that exceeds the plan limit', async () => {
+  it('flags an instance count that exceeds the plan limit', async () => {
     mockOrganizationOnPlan('free', 'Free')
     customRender(
       <ComputePlanUsage
@@ -176,7 +180,7 @@ describe('ComputePlanUsage', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await meter('Concurrent workers')
+    const instanceMeter = await meter('Concurrent instances')
     expect(await instanceMeter.findByText('2/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
@@ -198,9 +202,7 @@ describe('ComputePlanUsage', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    // Team includes the same 500 vCPU-minute quota as every other plan; what differs is the
-    // concurrency it allows.
-    expect(await screen.findByText(/^[\d,]+\/500 vCPU-min$/)).toBeInTheDocument()
+    // Plans differ by the concurrency they allow, which is the only limit scoped to a project.
     expect(await screen.findByText('1/50')).toBeInTheDocument()
   })
 
@@ -220,7 +222,7 @@ describe('ComputePlanUsage', () => {
 describe('ComputePlanUsage in private alpha', () => {
   beforeEach(() => setComputeLimitsMode('alpha'))
 
-  it('measures concurrent workers against the alpha cap', async () => {
+  it('measures concurrent instances against the alpha cap', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
@@ -229,7 +231,7 @@ describe('ComputePlanUsage in private alpha', () => {
     expect(await screen.findByText('1/2')).toBeInTheDocument()
   })
 
-  it('flags concurrent workers over the alpha cap', async () => {
+  it('flags concurrent instances over the alpha cap', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(
       <ComputePlanUsage
@@ -239,7 +241,7 @@ describe('ComputePlanUsage in private alpha', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await meter('Concurrent workers')
+    const instanceMeter = await meter('Concurrent instances')
     expect(instanceMeter.getByText('3/2')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
@@ -262,7 +264,7 @@ describe('ComputePlanUsage in private alpha', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByLabelText('Concurrent workers: 1/2')).toBeInTheDocument()
+    expect(await screen.findByLabelText('Concurrent instances: 1/2')).toBeInTheDocument()
     expect(screen.queryByText('Compute', { selector: 'p' })).not.toBeInTheDocument()
   })
 })

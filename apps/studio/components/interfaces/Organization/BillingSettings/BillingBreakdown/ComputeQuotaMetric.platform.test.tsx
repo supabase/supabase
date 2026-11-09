@@ -44,18 +44,18 @@ describe('ComputeQuotaMetric', () => {
     expect(await screen.findByText(/\/ 500 vCPU-min/)).toBeInTheDocument()
   })
 
-  it('shows how many workers the usage came from, without a denominator', async () => {
+  it('shows how many instances the usage came from, without a denominator', async () => {
     render('pro')
 
     // Concurrency is capped per project, so an org-wide total has nothing to compare against.
-    expect(await screen.findByText('6 workers across the organization')).toBeInTheDocument()
+    expect(await screen.findByText('6 instances across the organization')).toBeInTheDocument()
   })
 
   it('does not compare the org-wide count against the per-project cap', async () => {
     render('free')
 
-    // Free allows 1 worker per project; 6 across the org is not an overage.
-    expect(await screen.findByText('6 workers across the organization')).toBeInTheDocument()
+    // Free allows 1 instance per project; 6 across the org is not an overage.
+    expect(await screen.findByText('6 instances across the organization')).toBeInTheDocument()
     expect(screen.queryByText(/of 1 concurrent/)).not.toBeInTheDocument()
   })
 

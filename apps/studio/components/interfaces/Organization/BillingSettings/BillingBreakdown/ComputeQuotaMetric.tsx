@@ -66,7 +66,7 @@ export const ComputeQuotaMetric = ({
         : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
   // Concurrency is capped per project, so an org-wide total has no denominator to show here.
-  const computesLabel = `${instances.toLocaleString()} ${instances === 1 ? 'worker' : 'workers'} across the organization`
+  const computesLabel = `${instances.toLocaleString()} ${instances === 1 ? 'instance' : 'instances'} across the organization`
 
   return (
     <div className={cn('flex items-center justify-between', className)}>

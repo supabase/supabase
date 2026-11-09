@@ -84,7 +84,7 @@ export const DeployComputeInstanceDialog = ({
 }: DeployComputeInstanceDialogProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { limits, limitsLabel } = useComputeLimits(organization?.plan)
-  const capacity = getComputeCapacity(runningInstances, limits.concurrentWorkers)
+  const capacity = getComputeCapacity(runningInstances, limits.concurrentInstances)
   const isOutOfCapacity = capacity.status === 'full' || capacity.status === 'exceeded'
 
   const form = useForm<DeployComputeInstanceFormValues>({
@@ -106,7 +106,7 @@ export const DeployComputeInstanceDialog = ({
   const cliNotice = organization
     ? buildCapacityNotice({
         runningInstances,
-        concurrentWorkers: limits.concurrentWorkers,
+        concurrentInstances: limits.concurrentInstances,
         requestedInstances: typeof instances === 'number' ? instances : DEFAULT_VALUES.instances,
         planName: limitsLabel,
         organizationSlug: organization.slug,
@@ -116,7 +116,7 @@ export const DeployComputeInstanceDialog = ({
   const instancesDescription =
     capacity.limit === null
       ? '1 to 10'
-      : `1 to 10 · ${runningInstances} of ${capacity.limit} concurrent workers in use`
+      : `1 to 10 · ${runningInstances} of ${capacity.limit} concurrent instances in use`
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -137,8 +137,8 @@ export const DeployComputeInstanceDialog = ({
         {isOutOfCapacity && (
           <Admonition
             type="warning"
-            title={`This project runs ${runningInstances} of ${capacity.limit} concurrent workers`}
-            description={`Deploying more will fail until a worker stops. Upgrade from the ${limitsLabel} to raise the limit.`}
+            title={`This project runs ${runningInstances} of ${capacity.limit} concurrent instances`}
+            description={`Deploying more will fail until an instance stops. Upgrade from the ${limitsLabel} to raise the limit.`}
             className="border-x-0 border-y-0 rounded-none"
           />
         )}
@@ -147,7 +147,7 @@ export const DeployComputeInstanceDialog = ({
           <Admonition
             type="note"
             title={`${capacity.label} on this project`}
-            description={`${runningInstances} of ${capacity.limit} concurrent workers are already running.`}
+            description={`${runningInstances} of ${capacity.limit} concurrent instances are already running.`}
             className="border-x-0 border-y-0 rounded-none"
           />
         )}

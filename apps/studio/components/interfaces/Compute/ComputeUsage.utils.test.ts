@@ -222,11 +222,12 @@ describe('getComputeCapacity', () => {
     expect(capacity.label).toBeNull()
   })
 
-  it('counts down the slots that are left', () => {
+  it('counts down the slots that are left without saying so out loud', () => {
+    // "Room for 7 more" adds nothing next to a counter that already reads 3/10.
     expect(getComputeCapacity(3, 10)).toMatchObject({
       status: 'available',
       remaining: 7,
-      label: 'Room for 7 more',
+      label: null,
     })
   })
 
@@ -284,5 +285,12 @@ describe('formatCapacityQuota', () => {
 
   it('shows the count alone when the plan sets no cap', () => {
     expect(formatCapacityQuota(7, null)).toBe('7')
+  })
+})
+
+describe('getComputeCapacity headroom copy', () => {
+  it('speaks up only once the headroom is nearly gone', () => {
+    expect(getComputeCapacity(2, 50).label).toBeNull()
+    expect(getComputeCapacity(48, 50).label).toBe('Room for 2 more')
   })
 })

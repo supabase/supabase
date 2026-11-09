@@ -25,16 +25,16 @@ const formatQuota = (limits: ComputeLimits) =>
     : `${limits.vcpuMinutes.toLocaleString()} vCPU-minutes of Compute`
 
 const formatConcurrency = (limits: ComputeLimits) =>
-  limits.concurrentWorkers === 1
-    ? '1 concurrent worker'
-    : `${limits.concurrentWorkers?.toLocaleString()} concurrent workers`
+  limits.concurrentInstances === 1
+    ? '1 concurrent instance'
+    : `${limits.concurrentInstances?.toLocaleString()} concurrent instances`
 
 const formatSizes = (limits: ComputeLimits) => limits.sizes.map(formatSize).join(', ')
 
 const formatExposure = (limits: ComputeLimits) =>
-  limits.canRunPrivateWorkers
-    ? 'Public and private workers'
-    : 'Public workers, which suspend when idle'
+  limits.canRunPrivateInstances
+    ? 'Public and private instances'
+    : 'Public instances, which suspend when idle'
 
 const formatBurst = (limits: ComputeLimits) =>
   limits.burstTo === null
@@ -63,7 +63,7 @@ const computeFeaturesForPlan = (planId: OrgPlan['id']): (string | string[])[] =>
     [quota, ALPHA_NOTE],
     // A plan with no concurrency limit has nothing to say here, so it says nothing rather
     // than advertising that the number is undecided.
-    ...(limits.concurrentWorkers === null
+    ...(limits.concurrentInstances === null
       ? []
       : [[formatConcurrency(limits), 'Running at once per project']]),
     [formatSizes(limits), formatBurst(limits)],

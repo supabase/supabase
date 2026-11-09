@@ -20,7 +20,7 @@ interface ComputeQuotaProjectedProps extends ComputeQuotaProps {
 }
 
 /**
- * The quota is 500 vCPU-minutes — eight hours and twenty minutes of one worker. A threshold
+ * The quota is 500 vCPU-minutes — eight hours and twenty minutes of one instance. A threshold
  * alert at 80% can arrive with less than two hours of headroom left, which is not a warning,
  * it is a receipt. This fires on the burn rate instead, so it can land before 80% does.
  */
@@ -59,7 +59,7 @@ const ComputeQuotaProjected = ({
       <Hr />
 
       <Callout tone="warning">
-        Most of the increase comes from <Mono>{leadingProject}</Mono>. A worker that stopped
+        Most of the increase comes from <Mono>{leadingProject}</Mono>. A instance that stopped
         suspending on idle will burn the quota continuously.
       </Callout>
 

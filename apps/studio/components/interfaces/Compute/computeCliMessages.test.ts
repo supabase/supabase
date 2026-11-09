@@ -35,7 +35,7 @@ describe('buildQuotaNotice', () => {
 
     expect(result?.severity).toBe('warning')
     expect(result?.exitCode).toBe(0)
-    expect(formatCliNotice(result!)).toContain('Workers keep running')
+    expect(formatCliNotice(result!)).toContain('Instances keep running')
   })
 
   it('fails the command when the spend cap makes the quota a hard stop', () => {
@@ -51,7 +51,7 @@ describe('buildQuotaNotice', () => {
 })
 
 const CAPACITY = {
-  concurrentWorkers: 10,
+  concurrentInstances: 10,
   planName: 'Pro Plan',
   organizationSlug: 'northwind',
 }
@@ -72,7 +72,7 @@ describe('buildCapacityNotice', () => {
 
     expect(result?.severity).toBe('info')
     expect(result?.exitCode).toBe(0)
-    expect(formatCliNotice(result!)).toContain('1 of 10 concurrent workers will be free')
+    expect(formatCliNotice(result!)).toContain('1 of 10 concurrent instances will be free')
   })
 
   it('fails the deploy that does not fit, and says by how much', () => {
@@ -91,7 +91,7 @@ describe('buildCapacityNotice', () => {
     expect(
       buildCapacityNotice({
         ...CAPACITY,
-        concurrentWorkers: null,
+        concurrentInstances: null,
         runningInstances: 90,
         requestedInstances: 20,
       })
@@ -114,7 +114,7 @@ describe('buildPlanGateNotice', () => {
     expect(text).toContain('Compare plans')
   })
 
-  it('offers the public-worker workaround before the upgrade', () => {
+  it('offers the public-instance workaround before the upgrade', () => {
     const text = formatCliNotice(
       buildPlanGateNotice({
         gate: 'private',
@@ -136,7 +136,7 @@ describe('buildUsageReport', () => {
     includedVcpuMinutes: 500,
     cycleEndsOn: '1 December',
     projectedExhaustionOn: '22 November',
-    concurrentWorkers: 10,
+    concurrentInstances: 10,
     projects: [
       { name: 'checkout-api', vcpuMinutes: 268, runningInstances: 4 },
       { name: 'staging', vcpuMinutes: 20, runningInstances: 1 },
@@ -156,7 +156,7 @@ describe('buildUsageReport', () => {
       includedVcpuMinutes: 500,
       cycleEndsOn: '1 December',
       projectedExhaustionOn: null,
-      concurrentWorkers: 10,
+      concurrentInstances: 10,
       projects: [{ name: 'checkout-api', vcpuMinutes: 120, runningInstances: 2 }],
     })
 

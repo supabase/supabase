@@ -31,7 +31,7 @@ inventory; the **Email** column marks the six moments that earn one.
 | Moment                           | Scope         | Shape      | Channel                                      | Email                     |
 | -------------------------------- | ------------- | ---------- | -------------------------------------------- | ------------------------- |
 | Compute enabled for an org       | Org           | —          | Email, dashboard                             | `compute-available`       |
-| No workers yet                   | Project       | —          | Empty state                                  | —                         |
+| No instances yet                 | Project       | —          | Empty state                                  | —                         |
 | First deploy                     | Project       | —          | CLI output                                   | —                         |
 | Steady-state usage               | Org + project | Consumable | Meters in Studio, `compute usage` in the CLI | —                         |
 | Burn rate projects an overrun    | Org           | Consumable | Banner, email                                | `compute-quota-projected` |
@@ -40,11 +40,11 @@ inventory; the **Email** column marks the six moments that earn one.
 | 100%, spend cap on               | Org           | Consumable | Banner, CLI block, email                     | `compute-quota-stopped`   |
 | Concurrency cap reached          | **Project**   | Capacity   | Deploy dialog, CLI error                     | —                         |
 | Size not on plan                 | Project       | Gate       | Disabled option, CLI error                   | —                         |
-| Private worker not on plan       | Project       | Gate       | Disabled option, CLI error                   | —                         |
+| Private instance not on plan     | Project       | Gate       | Disabled option, CLI error                   | —                         |
 | Invocation exceeded max duration | Project       | Gate       | Runtime error, logs, advisor                 | —                         |
 | Payment overdue                  | Org           | Billing    | Existing restriction ladder                  | existing                  |
 | New cycle restores a stopped org | Org           | Recovery   | Email                                        | `compute-quota-reset`     |
-| Worker crash or boot failure     | Project       | Error      | Advisor, logs                                | —                         |
+| Instance crash or boot failure   | Project       | Error      | Advisor, logs                                | —                         |
 
 Two rules decide that **Email** column.
 
@@ -71,7 +71,7 @@ The projection has a 48-hour floor on its trailing window; without one it cries 
 Tuesday-afternoon spike.
 
 `compute-quota-projected` is deliberately allowed to land _before_ `compute-quota-warning`.
-The quota is 500 vCPU-minutes — eight hours and twenty minutes of a single worker — so a
+The quota is 500 vCPU-minutes — eight hours and twenty minutes of a single instance — so a
 threshold crossed at 80% can leave under two hours of headroom. Rate is the signal; level is
 the receipt.
 

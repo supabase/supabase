@@ -5,7 +5,7 @@ import { CLI_NAME } from '@/lib/constants/compute'
  * What the CLI says about Compute limits.
  *
  * The CLI is where the capacity and plan-gate limits are actually met: a developer deploying a
- * worker is at a terminal, mid-action, and an error there lands better than any dashboard
+ * instance is at a terminal, mid-action, and an error there lands better than any dashboard
  * banner or email could. These builders exist so the message is written once and the dashboard
  * can show the same text next to the command it hands out — discovering a limit from a 403 you
  * were never warned about is the failure mode worth designing away.
@@ -81,7 +81,7 @@ export const buildQuotaNotice = ({
 
   if (remaining <= 0 && isSpendCapEnabled) {
     return notice('error', `Compute quota used in full for this organization.`, [
-      `  The spend cap is on, so workers stop at ${includedVcpuMinutes} vCPU-min rather than`,
+      `  The spend cap is on, so instances stop at ${includedVcpuMinutes} vCPU-min rather than`,
       `  billing the overage. Nothing will deploy until the quota resets.`,
       '',
       `  Turn off the spend cap or change plan:`,
@@ -92,7 +92,7 @@ export const buildQuotaNotice = ({
   if (remaining <= 0) {
     return notice('warning', 'Compute past the included quota is billing overage.', [
       `  ${usedVcpuMinutes} of ${includedVcpuMinutes} vCPU-min used on the ${planName}.`,
-      `  Workers keep running. Usage beyond the quota is billed at the Compute rate.`,
+      `  Instances keep running. Usage beyond the quota is billed at the Compute rate.`,
       '',
       `    ${usageUrl(organizationSlug)}`,
     ])
@@ -113,7 +113,7 @@ export const buildQuotaNotice = ({
 export interface ComputeCapacityCliInput {
   runningInstances: number
   /** `null` when the plan sets no cap. */
-  concurrentWorkers: number | null
+  concurrentInstances: number | null
   requestedInstances: number
   planName: string
   organizationSlug: string
@@ -122,26 +122,26 @@ export interface ComputeCapacityCliInput {
 /**
  * Capacity is binary, so this is an error when the deploy does not fit and a one-line
  * heads-up when it only just does. There is no middle state to warn about: a ratio means
- * nothing when the question is whether the next worker has somewhere to run.
+ * nothing when the question is whether the next instance has somewhere to run.
  */
 export const buildCapacityNotice = ({
   runningInstances,
-  concurrentWorkers,
+  concurrentInstances,
   requestedInstances,
   planName,
   organizationSlug,
 }: ComputeCapacityCliInput): ComputeCliNotice | null => {
-  const capacity = getComputeCapacity(runningInstances, concurrentWorkers)
+  const capacity = getComputeCapacity(runningInstances, concurrentInstances)
   if (capacity.limit === null || capacity.remaining === null) return null
 
   if (requestedInstances > capacity.remaining) {
     return notice(
       'error',
-      `Not enough concurrent workers: asked for ${requestedInstances}, ${capacity.remaining} available.`,
+      `Not enough concurrent instances: asked for ${requestedInstances}, ${capacity.remaining} available.`,
       [
         `  This project runs ${runningInstances} of ${capacity.limit} allowed by the ${planName}.`,
         '',
-        `  Stop a worker, deploy fewer, or raise the limit:`,
+        `  Stop an instance, deploy fewer, or raise the limit:`,
         `    supabase ${CLI_NAME} list`,
         `    ${billingUrl(organizationSlug)}`,
       ]
@@ -153,7 +153,7 @@ export const buildCapacityNotice = ({
 
   return notice(
     'info',
-    `${remainingAfter} of ${capacity.limit} concurrent workers will be free after this deploy.`,
+    `${remainingAfter} of ${capacity.limit} concurrent instances will be free after this deploy.`,
     []
   )
 }
@@ -187,23 +187,23 @@ export const buildPlanGateNotice = ({
 
   if (gate === 'size') {
     return notice('error', `Size ${requested} is not available on the ${planName}.`, [
-      `  Deploy at the base size, or upgrade for larger workers.`,
+      `  Deploy at the base size, or upgrade for larger instances.`,
       '',
       ...upgrade,
     ])
   }
 
   if (gate === 'private') {
-    return notice('error', `Private workers are not available on the ${planName}.`, [
-      `  Private workers never suspend, so they consume the quota continuously.`,
-      `  Deploy with \`--exposure public\`, or upgrade to run private workers.`,
+    return notice('error', `Private instances are not available on the ${planName}.`, [
+      `  Private instances never suspend, so they consume the quota continuously.`,
+      `  Deploy with \`--exposure public\`, or upgrade to run private instances.`,
       '',
       ...upgrade,
     ])
   }
 
   return notice('error', `Invocation ran past the ${requested}-minute limit on the ${planName}.`, [
-    `  The worker was stopped mid-request. Split the work into shorter invocations,`,
+    `  The instance was stopped mid-request. Split the work into shorter invocations,`,
     `  or upgrade to remove the per-invocation cap.`,
     '',
     ...upgrade,
@@ -223,7 +223,7 @@ export interface ComputeUsageReportInput {
   /** Formatted date the current rate reaches the quota, or `null` when it does not. */
   projectedExhaustionOn: string | null
   projects: { name: string; vcpuMinutes: number; runningInstances: number }[]
-  concurrentWorkers: number | null
+  concurrentInstances: number | null
 }
 
 const bar = (ratio: number, width = 24) => {
@@ -244,12 +244,12 @@ export const buildUsageReport = ({
   cycleEndsOn,
   projectedExhaustionOn,
   projects,
-  concurrentWorkers,
+  concurrentInstances,
 }: ComputeUsageReportInput): string[] => {
   const ratio = usedVcpuMinutes / includedVcpuMinutes
   const nameWidth = Math.max(...projects.map((project) => project.name.length), 7)
-  const workerCount = (running: number) =>
-    concurrentWorkers === null ? `${running}` : `${running} / ${concurrentWorkers}`
+  const instanceCount = (running: number) =>
+    concurrentInstances === null ? `${running}` : `${running} / ${concurrentInstances}`
 
   return [
     `${organizationName} · ${planName} · cycle ends ${cycleEndsOn}`,
@@ -266,7 +266,7 @@ export const buildUsageReport = ({
         `  ${project.name.padEnd(nameWidth)}`,
         `${String(project.vcpuMinutes).padStart(10)}`,
         `${share.padStart(7)}`,
-        `${workerCount(project.runningInstances).padStart(10)}`,
+        `${instanceCount(project.runningInstances).padStart(10)}`,
       ].join('')
     }),
   ]

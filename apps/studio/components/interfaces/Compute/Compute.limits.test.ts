@@ -72,19 +72,19 @@ describe('pricing RFC conformance', () => {
     expect(includedRuntimeMinutesForSize(COMPUTE_ALPHA_LIMITS, 1)).toBeNull()
   })
 
-  it('gives Free a single concurrent worker', () => {
-    expect(COMPUTE_PLAN_LIMITS.free.concurrentWorkers).toBe(1)
+  it('gives Free a single concurrent instance', () => {
+    expect(COMPUTE_PLAN_LIMITS.free.concurrentInstances).toBe(1)
   })
 
-  it('keeps private workers off Free, whose quota one could not survive', () => {
-    // A private worker never suspends: 500 vCPU-minutes is gone in hours. The RFC does not
-    // name this, but a quota that small only works if Free workers suspend on idle.
-    expect(COMPUTE_PLAN_LIMITS.free.canRunPrivateWorkers).toBe(false)
+  it('keeps private instances off Free, whose quota one could not survive', () => {
+    // A private instance never suspends: 500 vCPU-minutes is gone in hours. The RFC does not
+    // name this, but a quota that small only works if Free instances suspend on idle.
+    expect(COMPUTE_PLAN_LIMITS.free.canRunPrivateInstances).toBe(false)
     expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS.free, 'public')).toBe(true)
     expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS.free, 'private')).toBe(false)
   })
 
-  it('allows private workers on every paid plan', () => {
+  it('allows private instances on every paid plan', () => {
     for (const plan of PAID_PLANS) {
       expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS[plan], 'private')).toBe(true)
     }
@@ -128,7 +128,7 @@ describe('pricing RFC conformance', () => {
         paid.sizes.length !== free.sizes.length ||
         paid.burstTo !== free.burstTo ||
         paid.maxInvocationMinutes !== free.maxInvocationMinutes ||
-        paid.concurrentWorkers !== free.concurrentWorkers
+        paid.concurrentInstances !== free.concurrentInstances
       expect(differs).toBe(true)
     }
   })
@@ -142,33 +142,33 @@ describe('pricing RFC conformance', () => {
 describe('concurrency placeholders', () => {
   const PLATFORM_CEILING = 100
 
-  it('gives Free a single worker, per the RFC', () => {
-    expect(COMPUTE_PLAN_LIMITS.free.concurrentWorkers).toBe(1)
+  it('gives Free a single instance, per the RFC', () => {
+    expect(COMPUTE_PLAN_LIMITS.free.concurrentInstances).toBe(1)
   })
 
   it('climbs with the tier', () => {
-    const free = COMPUTE_PLAN_LIMITS.free.concurrentWorkers!
-    const pro = COMPUTE_PLAN_LIMITS.pro.concurrentWorkers!
-    const team = COMPUTE_PLAN_LIMITS.team.concurrentWorkers!
+    const free = COMPUTE_PLAN_LIMITS.free.concurrentInstances!
+    const pro = COMPUTE_PLAN_LIMITS.pro.concurrentInstances!
+    const team = COMPUTE_PLAN_LIMITS.team.concurrentInstances!
     expect(pro).toBeGreaterThan(free)
     expect(team).toBeGreaterThan(pro)
   })
 
   it('stays under the unverified per-project platform ceiling', () => {
     for (const plan of ALL_PLANS) {
-      const limit = COMPUTE_PLAN_LIMITS[plan].concurrentWorkers
+      const limit = COMPUTE_PLAN_LIMITS[plan].concurrentInstances
       if (limit === null) continue
       expect(limit).toBeLessThanOrEqual(PLATFORM_CEILING)
     }
   })
 
   it('leaves Enterprise uncapped, since it is negotiated', () => {
-    expect(COMPUTE_PLAN_LIMITS.enterprise.concurrentWorkers).toBeNull()
+    expect(COMPUTE_PLAN_LIMITS.enterprise.concurrentInstances).toBeNull()
   })
 
   it('caps the private alpha below every plan', () => {
-    expect(COMPUTE_ALPHA_LIMITS.concurrentWorkers).toBeLessThan(
-      COMPUTE_PLAN_LIMITS.pro.concurrentWorkers!
+    expect(COMPUTE_ALPHA_LIMITS.concurrentInstances).toBeLessThan(
+      COMPUTE_PLAN_LIMITS.pro.concurrentInstances!
     )
   })
 })
