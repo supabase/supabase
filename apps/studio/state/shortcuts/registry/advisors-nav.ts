@@ -1,14 +1,6 @@
 import { SHORTCUT_REFERENCE_GROUPS } from '../referenceGroups'
 import { RegistryDefinations } from '../types'
 
-/**
- * Contextual chords for jumping between Issues categories — `V + <letter>`.
- *
- * Active only while IssuesLayout is mounted (i.e. the user is somewhere
- * under `/project/<ref>/issues/*`). Mirrors the database-nav / auth-nav
- * pattern: the leading `V` (adVisor) is layout-scoped so it doesn't burn a
- * global key. `A` is already in use by Auth.
- */
 export const ADVISORS_NAV_SHORTCUT_IDS = {
   NAV_ADVISORS_HEALTH: 'nav.advisors-health',
   NAV_ADVISORS_SECURITY: 'nav.advisors-security',

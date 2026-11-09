@@ -8,9 +8,6 @@ import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 
 export const Route = createFileRoute('/project/$ref/advisors/rules')({
   component: AdvisorRulesShell,
-  // Opt out of the parent advisors.tsx shell's <IssuesLayout> wrap
-  // — we render our own with no title, plus a PageLayout tab strip,
-  // mirroring the existing AdvisorRulesLayout component.
   staticData: {
     skipAdvisorsLayout: true,
   },
