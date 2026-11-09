@@ -1,7 +1,7 @@
 clispec: '001'
 info:
   id: cli
-  version: 3.0.0
+  version: 3.1.0
   title: Supabase CLI
   language: sh
   source: https://github.com/supabase/cli
@@ -633,7 +633,7 @@ commands:
         default_value: 'false'
   - id: supabase-config-pull
     title: supabase config pull
-    summary: Pull remote config into supabase/config.toml
+    summary: Pull remote config into the project config file
     description: |
 
 
@@ -689,7 +689,7 @@ commands:
         name: Pull from the linked project into the config root
         code: supabase config pull
       - id: example-2
-        name: Pull from the 'staging' branch into [remotes.staging]
+        name: Pull from the 'staging' branch into remotes.staging
         code: supabase config pull --remote=staging
       - id: example-3
         name: Preview the changes without writing the config file
@@ -705,7 +705,7 @@ commands:
         default_value: 'false'
       - id: force
         name: --force
-        description: Write even when supabase/config.toml has uncommitted changes in git.
+        description: Write even when the project config file has uncommitted changes in git.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -1312,7 +1312,7 @@ commands:
         default_value: 'false'
       - id: skip-vault
         name: --skip-vault
-        description: Skip updating vault secrets from config.toml.
+        description: Skip updating vault secrets from the config file.
         default_value: 'false'
   - id: supabase-db-query
     title: supabase db query
@@ -1421,7 +1421,7 @@ commands:
         default_value: 'false'
       - id: sql-paths
         name: --sql-paths <strings>
-        description: Override [db.seed].sql_paths for this reset. May be repeated; each value accepts a SQL file path or glob pattern relative to the supabase directory and force-enables seeding.
+        description: Override db.seed.sql_paths for this reset. May be repeated; each value accepts a SQL file path or glob pattern relative to the supabase directory and force-enables seeding.
         default_value: '[]'
       - id: version
         name: --version <string>
@@ -2219,7 +2219,7 @@ commands:
     flags:
       - id: force
         name: --force
-        description: Overwrite existing supabase/config.toml.
+        description: Write a fresh supabase/config.toml, replacing an existing config.toml and removing any config.json or config.jsonc.
         default_value: 'false'
       - id: interactive
         name: -i, --interactive
@@ -2250,6 +2250,7 @@ commands:
       - supabase-inspect-db-bloat
       - supabase-inspect-db-blocking
       - supabase-inspect-db-calls
+      - supabase-inspect-db-collation-drift
       - supabase-inspect-db-db-stats
       - supabase-inspect-db-index-stats
       - supabase-inspect-db-locks
@@ -2258,8 +2259,10 @@ commands:
       - supabase-inspect-db-replication-slots
       - supabase-inspect-db-role-stats
       - supabase-inspect-db-table-stats
+      - supabase-inspect-db-toast-sizes
       - supabase-inspect-db-traffic-profile
       - supabase-inspect-db-vacuum-stats
+      - supabase-inspect-db-xid-age
     flags: []
   - id: supabase-inspect-db-bloat
     title: supabase inspect db bloat
@@ -2332,6 +2335,30 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db calls [flags]
+    subcommands: []
+    flags:
+      - id: remote
+        name: --remote[=<ref|branch|url>]
+        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        default_value: 'false'
+  - id: supabase-inspect-db-collation-drift
+    title: supabase inspect db collation-drift
+    summary: Show indexes affected by collation version drift
+    description: |-
+      Show indexes affected by collation version drift, with the fix workflow.
+
+      Postgres stores btree indexes on text columns in sorted order, using rules from
+      the system collation library (glibc or ICU). When that library is upgraded the
+      rules can change, and indexes built under the old rules are no longer correctly
+      ordered. Postgres reports no error: queries may quietly return missing rows,
+      sort incorrectly, or let duplicates past a unique constraint.
+
+      The output lists the affected indexes and the exact statements to verify
+      (amcheck), rebuild (REINDEX CONCURRENTLY), and record the new version — in the
+      order they must be run. This command itself is read-only.
+    tags: []
+    links: []
+    usage: supabase inspect db collation-drift [flags]
     subcommands: []
     flags:
       - id: remote
@@ -2492,6 +2519,32 @@ commands:
         name: --remote[=<ref|branch|url>]
         description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
         default_value: 'false'
+  - id: supabase-inspect-db-toast-sizes
+    title: supabase inspect db toast-sizes
+    summary: Show TOAST table sizes and dead chunk counts
+    description: |
+
+
+      This command displays TOAST table sizes and dead chunk counts for every ordinary user table that has a TOAST relation (materialized views and partitioned parents are not listed). When a row exceeds ~2 kB, Postgres compresses and/or moves its largest variable-length values (TEXT, JSONB, bytea) out-of-line into a companion TOAST table. TOAST Size includes the TOAST index; Total Size also includes the table's own indexes. Autovacuum runs on the TOAST table independently from the main heap, so it can accumulate dead chunks even when the parent table looks healthy by its own dead-tuple count.
+
+      A table that appears fine by `vacuum-stats` or `bloat` alone can still have significant TOAST bloat that wastes disk space and slows reads. High `TOAST Dead %` values indicate that autovacuum is not keeping up with the TOAST table and a manual `VACUUM` may be needed.
+
+      ```
+               TABLE          │ TOTAL SIZE │ HEAP SIZE │ TOAST SIZE │ TOAST LIVE CHUNKS │ TOAST DEAD CHUNKS │ TOAST DEAD % │  LAST AUTOVACUUM   │ LAST VACUUM
+      ────────────────────────┼────────────┼───────────┼────────────┼───────────────────┼───────────────────┼──────────────┼────────────────────┼─────────────
+       public.documents       │ 4350 MB    │ 800 MB    │ 3400 MB    │            250000 │             18000 │          6.7 │ 2024-03-01 04:12   │
+       public.media_assets    │ 905 MB     │ 120 MB    │ 770 MB     │             80000 │               200 │          0.2 │ 2024-03-02 01:45   │
+       public.messages        │ 365 MB     │ 280 MB    │ 60 MB      │             95000 │                 0 │          0.0 │ 2024-03-02 03:10   │
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db toast-sizes [flags]
+    subcommands: []
+    flags:
+      - id: remote
+        name: --remote[=<ref|branch|url>]
+        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        default_value: 'false'
   - id: supabase-inspect-db-traffic-profile
     title: supabase inspect db traffic-profile
     summary: Show traffic profile
@@ -2552,6 +2605,32 @@ commands:
     tags: []
     links: []
     usage: supabase inspect db vacuum-stats [flags]
+    subcommands: []
+    flags:
+      - id: remote
+        name: --remote[=<ref|branch|url>]
+        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        default_value: 'false'
+  - id: supabase-inspect-db-xid-age
+    title: supabase inspect db xid-age
+    summary: Show XID age for user tables
+    description: |
+
+
+      This command lists user tables sorted by their transaction ID (XID) age, oldest first. PostgreSQL's transaction ID space wraps around at about 2.1 billion transactions. Once a table's XID age passes `autovacuum_freeze_max_age` (200 million by default), autovacuum forces a freeze on it; if the age keeps growing toward the wraparound limit, PostgreSQL stops assigning new transaction IDs to protect the data. `transactions_remaining` is the headroom to a 2 billion threshold, kept below the real limit as a safety margin.
+
+      Tables with an XID age above 1.5 billion transactions (`transactions_remaining` below 500 million) should be treated as urgent: manual `VACUUM FREEZE` or a tuned autovacuum run is needed. The list covers ordinary user tables only: it leaves out materialized views, TOAST tables and Supabase-managed schemas, so it does not show the database-wide age. Check `SELECT age(datfrozenxid) FROM pg_database WHERE datname = current_database()` for that.
+
+      ```
+                TABLE          │  XID AGE  │ TRANSACTIONS REMAINING
+      ─────────────────────────┼───────────┼────────────────────────
+       public.events           │ 800000000 │           1200000000
+       public.users            │ 500000000 │           1500000000
+       public.sessions         │ 120000000 │           1880000000
+      ```
+    tags: []
+    links: []
+    usage: supabase inspect db xid-age [flags]
     subcommands: []
     flags:
       - id: remote
@@ -2771,13 +2850,15 @@ commands:
     description: |
 
 
-      Connect the Supabase CLI to your Supabase account by signing in with your [personal access token](https://supabase.com/dashboard/account/tokens).
+      Connect the Supabase CLI to your Supabase account by logging in with your [personal access token](https://supabase.com/dashboard/account/tokens).
 
       Your access token is stored securely in native credentials storage (the operating system keyring). If native credentials storage is unavailable, it will be written to a plain text file at `<SUPABASE_HOME or ~/.supabase>/access-token`.
 
       > If this behavior is not desired, such as in a CI environment, you may skip login by specifying the `SUPABASE_ACCESS_TOKEN` environment variable in other commands.
 
       The Supabase CLI uses the stored token to access Management APIs for projects, functions, secrets, etc.
+
+      > The Management API client retries retryable failures up to 5 times by default. Set `SUPABASE_API_MAX_RETRIES` to change that. It counts retries after the first attempt, so `0` sends each request once.
     examples:
       - id: basic-usage
         name: Basic usage
@@ -2814,6 +2895,144 @@ commands:
     usage: supabase logout [flags]
     subcommands: []
     flags: []
+  - id: supabase-logs
+    title: supabase logs
+    summary: Browse local or hosted logs. Arrows select, Enter details, C copies, L loads more logs, and q quits. Custom SQL uses L to rerun. Pipes and machine output read once. Explicit --output-format text disables the viewer. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
+    description: Browse local or hosted logs. Arrows select, Enter details, C copies, L loads more logs, and q quits. Custom SQL uses L to rerun. Pipes and machine output read once. Explicit --output-format text disables the viewer. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
+    examples:
+      - id: example-1
+        name: Browse hosted Postgres errors
+        code: supabase logs --remote --service postgres --level error --since 30m
+      - id: example-2
+        name: Read plain text once
+        code: supabase logs --remote --service auth --search "invalid token" --output-format text
+      - id: example-3
+        name: Export full records as JSON
+        code: supabase logs --remote --service postgres --output-format json
+      - id: example-4
+        name: Query hosted logs with SQL from stdin
+        code: cat errors.sql | supabase logs --remote --file - --output-format json
+    tags:
+      - management-api
+      - local-dev
+    links: []
+    usage: supabase logs [subcommand] [flags]
+    subcommands:
+      - supabase-logs-sources
+    flags:
+      - id: file
+        name: --file <string>
+        description: Read custom hosted log SQL from a file; use - to read stdin.
+        default_value: ''
+      - id: from
+        name: --from <string>
+        description: Start at a UTC timestamp ending in Z.
+        default_value: ''
+      - id: kind
+        name: --kind <[ app | requests | builds ]>
+        description: Compute stream; requires --service compute.
+        default_value: ''
+        accepted_values:
+          - id: app
+            name: app
+            type: '[ app | requests | builds ]'
+          - id: requests
+            name: requests
+            type: '[ app | requests | builds ]'
+          - id: builds
+            name: builds
+            type: '[ app | requests | builds ]'
+      - id: level
+        name: --level <string>
+        description: Severity filter; repeat for several levels.
+        default_value: '[]'
+        accepted_values:
+          - id: error
+            name: error
+            type: string
+          - id: warn
+            name: warn
+            type: string
+          - id: warning
+            name: warning
+            type: string
+          - id: info
+            name: info
+            type: string
+          - id: debug
+            name: debug
+            type: string
+          - id: log
+            name: log
+            type: string
+          - id: notice
+            name: notice
+            type: string
+      - id: limit
+        name: --limit <int>
+        description: Initial filtered history count (default 100, maximum 1000). SQL controls its own LIMIT.
+        default_value: '0'
+      - id: remote
+        name: --remote[=<ref|branch>]
+        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
+        default_value: 'false'
+      - id: resource
+        name: --resource <string>
+        description: Compute name or function ID remotely, or a local instance ID.
+        default_value: ''
+      - id: search
+        name: --search <string>
+        description: Case-insensitive message substring (hosted only).
+        default_value: ''
+      - id: service
+        name: --service <strings>
+        description: Service selector; repeat for multiple services. See logs sources.
+        default_value: '[]'
+      - id: since
+        name: --since <string>
+        description: Duration or UTC timestamp; defaults to 1h. Local stacks also accept start.
+        default_value: ''
+      - id: sql
+        name: --sql <string>
+        description: Custom hosted log SQL; requires --remote. L reruns the query.
+        default_value: ''
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name.
+        default_value: ''
+      - id: stack-id
+        name: --stack-id <string>
+        description: Select a local stack by ID.
+        default_value: ''
+      - id: to
+        name: --to <string>
+        description: Initial end at a UTC timestamp ending in Z. L advances to now.
+        default_value: ''
+  - id: supabase-logs-sources
+    title: supabase logs sources
+    summary: List supported sources and filters. Hosted entries describe capabilities and do not imply that rows exist. Local entries list retained stack instances. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
+    description: List supported sources and filters. Hosted entries describe capabilities and do not imply that rows exist. Local entries list retained stack instances. Use --output-format json|stream-json for structured output; -o/--output is unsupported.
+    tags: []
+    links: []
+    usage: supabase logs sources [flags]
+    subcommands: []
+    flags:
+      - id: remote
+        name: --remote[=<ref|branch>]
+        description: 'Target a remote log source: the linked project, or --remote=<ref|branch>.'
+        default_value: 'false'
+      - id: service
+        name: --service <string>
+        description: Describe one service.
+        default_value: ''
+      - id: stack
+        name: --stack <string>
+        description: Select a local stack by name.
+        default_value: ''
+      - id: stack-id
+        name: --stack-id <string>
+        description: Select a local stack by ID.
+        default_value: ''
   - id: supabase-migration
     title: supabase migration
     summary: Manage database migration scripts
@@ -3282,7 +3501,7 @@ commands:
   - id: supabase-orgs-create
     title: supabase orgs create
     summary: Create an organization
-    description: Create an organization for the signed-in user.
+    description: Create an organization for the logged-in user.
     tags: []
     links: []
     usage: supabase orgs create <name> [flags]
@@ -3291,7 +3510,7 @@ commands:
   - id: supabase-orgs-list
     title: supabase orgs list
     summary: List all organizations
-    description: List all organizations the signed-in user belongs to.
+    description: List all organizations the logged-in user belongs.
     tags: []
     links: []
     usage: supabase orgs list [flags]
@@ -3593,7 +3812,7 @@ commands:
   - id: supabase-projects-list
     title: supabase projects list
     summary: List all projects
-    description: List all Supabase projects the signed-in user can access.
+    description: List all Supabase projects the logged-in user can access.
     examples:
       - id: example-1
         name: List all projects
@@ -3679,7 +3898,7 @@ commands:
         default_value: 'false'
       - id: force
         name: --force
-        description: Write even when supabase/config.toml (or config.json), supabase/migrations, or supabase/functions has uncommitted or untracked changes in git.
+        description: Write even when the project config file, supabase/migrations, or supabase/functions has uncommitted or untracked changes in git.
         default_value: 'false'
       - id: remote
         name: --remote[=<ref|branch>]
@@ -3800,7 +4019,7 @@ commands:
   - id: supabase-seed
     title: supabase seed
     summary: Seed a Supabase project
-    description: Seed a Supabase project from supabase/config.toml.
+    description: Seed a Supabase project from its config file.
     tags:
       - local-dev
     links: []
@@ -3809,8 +4028,8 @@ commands:
     flags: []
   - id: supabase-seed-buckets
     title: supabase seed buckets
-    summary: Seed buckets declared in [storage.buckets]
-    description: Seed buckets declared in [storage.buckets].
+    summary: Seed buckets declared in storage.buckets
+    description: Seed buckets declared in storage.buckets.
     tags: []
     links: []
     usage: supabase seed buckets [flags]
@@ -4070,7 +4289,7 @@ commands:
   - id: supabase-sso-remove
     title: supabase sso remove
     summary: Remove an existing SSO identity provider
-    description: Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from signing in. Please treat this command with care.
+    description: Remove a connection to an already added SSO identity provider. Removing the provider will prevent existing users from logging in. Please treat this command with care.
     examples:
       - id: basic-usage
         name: Remove a provider
@@ -4715,7 +4934,7 @@ commands:
   - id: supabase-whoami
     title: supabase whoami
     summary: Show the current user
-    description: Show information about the currently signed-in user.
+    description: Show information about the currently logged-in user.
     examples:
       - id: example-1
         name: Show the current user
