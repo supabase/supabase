@@ -3,6 +3,10 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ComputeQuotaMetric } from './ComputeQuotaMetric'
+import {
+  COMPUTE_PROFILE_CONTEXT,
+  mockOrgProjectsForCompute,
+} from '@/components/interfaces/Compute/Compute.fixtures'
 import type { OrgPlan, OrgSubscription } from '@/data/subscriptions/types'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -20,7 +24,8 @@ const render = (plan: OrgPlan['id'], relativeToSubscription = true) =>
       slug="acme"
       subscription={onPlan(plan)}
       relativeToSubscription={relativeToSubscription}
-    />
+    />,
+    { profileContext: COMPUTE_PROFILE_CONTEXT }
   )
 
 const setComputeLimitsMode = (mode: 'alpha' | 'plans') => {
@@ -34,7 +39,10 @@ afterEach(() => {
 })
 
 describe('ComputeQuotaMetric', () => {
-  beforeEach(() => setComputeLimitsMode('plans'))
+  beforeEach(() => {
+    mockOrgProjectsForCompute()
+    setComputeLimitsMode('plans')
+  })
 
   it('leads with vCPU-minutes against the included quota', async () => {
     render('pro')
@@ -48,14 +56,14 @@ describe('ComputeQuotaMetric', () => {
     render('pro')
 
     // Concurrency is capped per project, so an org-wide total has nothing to compare against.
-    expect(await screen.findByText('6 instances across the organization')).toBeInTheDocument()
+    expect(await screen.findByText(/^\d+ instances across the organization$/)).toBeInTheDocument()
   })
 
   it('does not compare the org-wide count against the per-project cap', async () => {
     render('free')
 
-    // Free allows 1 instance per project; 6 across the org is not an overage.
-    expect(await screen.findByText('6 instances across the organization')).toBeInTheDocument()
+    // Free allows 1 instance per project; several across the org is not an overage.
+    expect(await screen.findByText(/^\d+ instances across the organization$/)).toBeInTheDocument()
     expect(screen.queryByText(/of 1 concurrent/)).not.toBeInTheDocument()
   })
 

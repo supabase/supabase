@@ -12,8 +12,21 @@ export const computeKeys = {
     instances: { name: string; size: string; declaredInstances: number }[],
     days: number
   ) => ['projects', projectRef, 'compute-usage', instances, days] as const,
-  orgUsage: (orgSlug: string | undefined, projectRef: string | null | undefined, days: number) =>
-    ['organizations', orgSlug, 'compute-usage', projectRef ?? 'all', days] as const,
+  orgUsage: (
+    orgSlug: string | undefined,
+    // The generated figures are seeded per project ref, so the project set is part of the key.
+    projects: { ref: string }[],
+    projectRef: string | null | undefined,
+    days: number
+  ) =>
+    [
+      'organizations',
+      orgSlug,
+      'compute-usage',
+      projects.map((project) => project.ref),
+      projectRef ?? 'all',
+      days,
+    ] as const,
   logs: (
     projectRef: string | undefined,
     name: string | undefined,

@@ -222,8 +222,15 @@ export const computeProjectUsageQueryOptions = ({
  * Org-wide usage                                                      *
  * ------------------------------------------------------------------ */
 
+/** The organization's real projects. Only the usage figures draped over them are mock. */
+export interface ComputeUsageProject {
+  ref: string
+  name: string
+}
+
 export interface ComputeOrgUsageVariables {
   orgSlug?: string
+  projects: ComputeUsageProject[]
   projectRef?: string | null
   days?: number
 }
@@ -236,73 +243,54 @@ export interface ComputeOrgUsage {
   instances: number
 }
 
-/** Stand-in project set until the rollup can report real per-project figures. */
 /**
- * Sized against the RFC's 500 vCPU-minute included quota. Workers here are invocation-shaped
- * — running for minutes at a time, not held open — which is the workload the quota and the
- * per-invocation duration cap describe. The org lands a few times over the quota so the
- * overage path is visible without the figures reading as absurd. Note the 2 vCPU projects
- * consume the quota twice as fast as their runtime alone suggests.
+ * Usage profiles draped over the organization's real projects, so the table names projects a
+ * reader recognises instead of invented ones. Only the figures are mock.
+ *
+ * Shapes are sized against the RFC's 500 vCPU-minute quota. Instances here are
+ * invocation-shaped — running for minutes at a time, not held open — which is the workload
+ * the quota and the per-invocation duration cap describe. A handful of projects land the org
+ * a few times over the quota so the overage path is visible without the figures reading as
+ * absurd. Note the 2 vCPU profiles consume the quota twice as fast as their runtime suggests.
  */
-const MOCK_PROJECTS = [
-  {
-    projectRef: 'prod-api',
-    projectName: 'Production API',
-    size: '4gb-2vcpu',
-    deployments: 1,
-    instances: 2,
-    dutyCycle: 0.007,
-  },
-  {
-    projectRef: 'media-jobs',
-    projectName: 'Media jobs',
-    size: '4gb-2vcpu',
-    deployments: 1,
-    instances: 1,
-    dutyCycle: 0.005,
-  },
-  {
-    projectRef: 'webhooks',
-    projectName: 'Webhook relay',
-    size: '2gb-1vcpu',
-    deployments: 1,
-    instances: 1,
-    dutyCycle: 0.004,
-  },
-  {
-    projectRef: 'staging',
-    projectName: 'Staging',
-    size: '2gb-1vcpu',
-    deployments: 1,
-    instances: 1,
-    dutyCycle: 0.003,
-  },
-  {
-    projectRef: 'sandbox',
-    projectName: 'Sandbox',
-    size: '2gb-1vcpu',
-    deployments: 1,
-    instances: 1,
-    dutyCycle: 0.001,
-  },
+const USAGE_PROFILES = [
+  { size: '4gb-2vcpu', deployments: 1, instances: 2, dutyCycle: 0.007 },
+  { size: '4gb-2vcpu', deployments: 1, instances: 1, dutyCycle: 0.005 },
+  { size: '2gb-1vcpu', deployments: 1, instances: 1, dutyCycle: 0.004 },
+  { size: '2gb-1vcpu', deployments: 1, instances: 1, dutyCycle: 0.003 },
+  { size: '2gb-1vcpu', deployments: 1, instances: 1, dutyCycle: 0.001 },
+] as const
+
+/** Stand-ins for when the real project list has not loaded, or there is none to read. */
+const FALLBACK_PROJECTS: ComputeUsageProject[] = [
+  { ref: 'prod-api', name: 'Production API' },
+  { ref: 'media-jobs', name: 'Media jobs' },
+  { ref: 'webhooks', name: 'Webhook relay' },
+  { ref: 'staging', name: 'Staging' },
+  { ref: 'sandbox', name: 'Sandbox' },
 ]
+
+/** Stable per project, so a project keeps its shape across renders and timeframes. */
+const profileFor = (ref: string) => USAGE_PROFILES[hashSeed(ref) % USAGE_PROFILES.length]
 
 export const computeOrgUsageQueryOptions = ({
   orgSlug,
+  projects: orgProjects,
   projectRef,
   days = 30,
 }: ComputeOrgUsageVariables) =>
   queryOptions({
-    queryKey: computeKeys.orgUsage(orgSlug, projectRef, days),
+    queryKey: computeKeys.orgUsage(orgSlug, orgProjects, projectRef, days),
     queryFn: async (): Promise<ComputeOrgUsage> => {
-      const projects = projectRef
-        ? MOCK_PROJECTS.filter((project) => project.projectRef === projectRef)
-        : MOCK_PROJECTS
+      const source = orgProjects.length > 0 ? orgProjects : FALLBACK_PROJECTS
+      const projects = (projectRef ? source.filter((p) => p.ref === projectRef) : source).map(
+        (project) => ({ ...project, ...profileFor(project.ref) })
+      )
 
       const perProject = projects.map((project) => ({
         project,
         points: generateUsagePoints({
-          seed: `${orgSlug}:${project.projectRef}`,
+          seed: `${orgSlug}:${project.ref}`,
           days,
           size: project.size,
           instances: project.instances,
@@ -319,8 +307,8 @@ export const computeOrgUsageQueryOptions = ({
       const projectRows = perProject.map(({ project, points: projectPoints }) => ({
         size: project.size,
         usage: {
-          projectRef: project.projectRef,
-          projectName: project.projectName,
+          projectRef: project.ref,
+          projectName: project.name,
           deployments: project.deployments,
           instances: project.instances,
           ...sumUsage(projectPoints),

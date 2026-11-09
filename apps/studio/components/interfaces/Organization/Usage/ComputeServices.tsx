@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { AlertTriangleIcon, BarChart2Icon } from 'lucide-react'
 import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -35,7 +34,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import Panel from '@/components/ui/Panel'
 import { SparkBar } from '@/components/ui/SparkBar'
 import type { DataPoint } from '@/data/analytics/constants'
-import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
+import { useComputeOrgUsage } from '@/data/compute/use-compute-org-usage'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 
 const USAGE_WINDOW_DAYS = 30
@@ -45,6 +44,14 @@ const USAGE_WINDOW_DAYS = 30
  * instances were up — and memory tracks vCPU at a fixed 2 GB per vCPU, so neither can diverge
  * from the metered figure. Both are reported rather than metered.
  */
+/** Label left, figure right. The one line a section gets in place of a prose subtitle. */
+const TotalRow = ({ label, value }: { label: string; value: string }) => (
+  <div className="flex items-center justify-between border-b py-1">
+    <p className="text-xs text-foreground-light">{label}</p>
+    <p className="text-xs tabular-nums">{value}</p>
+  </div>
+)
+
 const ComputeBillingDimensions = ({
   runningHours,
   gbHours,
@@ -85,9 +92,11 @@ export const ComputeServices = ({
   subscription,
   currentBillingCycleSelected = true,
 }: ComputeServicesProps) => {
-  const { data, error, isPending, isError, isSuccess } = useQuery(
-    computeOrgUsageQueryOptions({ orgSlug, projectRef, days: USAGE_WINDOW_DAYS })
-  )
+  const { data, error, isPending, isError, isSuccess } = useComputeOrgUsage({
+    orgSlug,
+    projectRef,
+    days: USAGE_WINDOW_DAYS,
+  })
 
   const { limits, limitsLabel, noLimitLabel } = useComputeLimits(subscription?.plan)
   const points = data?.points ?? []
@@ -152,13 +161,21 @@ export const ComputeServices = ({
               </div>
             )}
 
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-sm">vCPU-minutes per day</p>
-              <p className="text-sm text-foreground-light">
-                Reserved vCPU split into CPU used and idle.
-                {cpuUtilization !== null &&
-                  ` ${formatPercentage(cpuUtilization)} of reserved vCPU did work this period.`}
-              </p>
+              <div>
+                <TotalRow
+                  label="Total reserved"
+                  value={formatVcpuMinutes(totalReservedVcpuHours)}
+                />
+                <TotalRow label="CPU used" value={formatVcpuMinutes(totalUsedVcpuHours)} />
+                {cpuUtilization !== null && (
+                  <TotalRow
+                    label="Share of reserved that did work"
+                    value={formatPercentage(cpuUtilization)}
+                  />
+                )}
+              </div>
             </div>
             {hasVcpuUsage ? (
               <UsageBarChart
@@ -175,21 +192,22 @@ export const ComputeServices = ({
               <NoComputeUsage />
             )}
 
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-sm">Running hours by size</p>
-              <p className="text-sm text-foreground-light">
-                {formatComputeHours(totalRunningHours)} this period. Larger sizes reserve more vCPU
-                and memory per hour.
-              </p>
+              <TotalRow label="Total running hours" value={formatComputeHours(totalRunningHours)} />
             </div>
             {bySize.length > 0 ? <ComputeSizeMeters rows={bySize} /> : <NoComputeUsage />}
 
-            <div className="space-y-1">
+            <div className="space-y-2">
               <p className="text-sm">Usage by project</p>
-              <p className="text-sm text-foreground-light">
-                {formatComputeRequests(totalRequests)} requests · {formatPercentage(concentration)}{' '}
-                from the largest project
-              </p>
+              <div>
+                <TotalRow label="Projects with usage" value={byProject.length.toLocaleString()} />
+                <TotalRow label="Total requests" value={formatComputeRequests(totalRequests)} />
+                <TotalRow
+                  label="Share from the largest project"
+                  value={formatPercentage(concentration)}
+                />
+              </div>
             </div>
             {byProject.length > 0 ? <ComputeProjectTable rows={byProject} /> : <NoComputeUsage />}
           </>

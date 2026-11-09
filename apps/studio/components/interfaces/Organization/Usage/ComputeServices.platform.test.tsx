@@ -3,6 +3,11 @@ import { LOCAL_STORAGE_KEYS } from 'common'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ComputeServices } from './ComputeServices'
+import {
+  COMPUTE_MOCK_PROJECTS,
+  COMPUTE_PROFILE_CONTEXT,
+  mockOrgProjectsForCompute,
+} from '@/components/interfaces/Compute/Compute.fixtures'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import { customRender } from '@/tests/lib/custom-render'
 
@@ -25,7 +30,8 @@ const renderOnPlan = (id: string, props: { isUsageBillingEnabled?: boolean } = {
     <ComputeServices
       orgSlug="acme"
       subscription={subscriptionOnPlan(id, props.isUsageBillingEnabled)}
-    />
+    />,
+    { profileContext: COMPUTE_PROFILE_CONTEXT }
   )
 
 const summary = async (name: string) => {
@@ -46,7 +52,10 @@ afterEach(() => {
 })
 
 describe('ComputeServices', () => {
-  beforeEach(() => setComputeLimitsMode('plans'))
+  beforeEach(() => {
+    mockOrgProjectsForCompute()
+    setComputeLimitsMode('plans')
+  })
 
   it('summarizes the metered quota before the charts', async () => {
     renderOnPlan('pro')
@@ -103,7 +112,8 @@ describe('ComputeServices', () => {
         orgSlug="acme"
         subscription={subscriptionOnPlan('pro')}
         currentBillingCycleSelected={false}
-      />
+      />,
+      { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
     const quota = await summary('Compute')
@@ -115,7 +125,9 @@ describe('ComputeServices', () => {
   it('states how much of the reserved vCPU did work', async () => {
     renderOnPlan('pro')
 
-    expect(await screen.findByText(/% of reserved vCPU did work this period/)).toBeInTheDocument()
+    // Totals read as labelled rows rather than a prose subtitle under the heading.
+    expect(await screen.findByText('Share of reserved that did work')).toBeInTheDocument()
+    expect(await screen.findByText('Total reserved')).toBeInTheDocument()
   })
 
   it('renders running hours by size as labelled meters', async () => {
@@ -129,12 +141,15 @@ describe('ComputeServices', () => {
   it('lists projects with their share of org usage', async () => {
     renderOnPlan('pro')
 
-    expect(await screen.findByText('Production API')).toBeInTheDocument()
-    expect(await screen.findByText('1 compute · 2 instances')).toBeInTheDocument()
-    expect(await screen.findByText('Sandbox')).toBeInTheDocument()
-    expect(await screen.findAllByText('1 compute · 1 instance')).not.toHaveLength(0)
+    // Mock figures are draped over the organization's real projects, so the table names
+    // the projects the reader actually has.
+    for (const project of COMPUTE_MOCK_PROJECTS) {
+      expect(await screen.findByText(project.name)).toBeInTheDocument()
+    }
+    expect(await screen.findByText('Projects with usage')).toBeInTheDocument()
+    expect(await screen.findAllByText(/1 compute · \d+ instances?/)).not.toHaveLength(0)
     await waitFor(() => {
-      expect(screen.getByText(/% from the largest project/)).toBeInTheDocument()
+      expect(screen.getByText('Share from the largest project')).toBeInTheDocument()
     })
   })
 
@@ -144,7 +159,8 @@ describe('ComputeServices', () => {
         orgSlug="acme"
         projectRef="webhooks"
         subscription={subscriptionOnPlan('pro')}
-      />
+      />,
+      { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
     expect(await screen.findByText('Webhook relay')).toBeInTheDocument()
@@ -162,7 +178,10 @@ describe('ComputeServices', () => {
 })
 
 describe('ComputeServices in private alpha', () => {
-  beforeEach(() => setComputeLimitsMode('alpha'))
+  beforeEach(() => {
+    mockOrgProjectsForCompute()
+    setComputeLimitsMode('alpha')
+  })
 
   it('labels the allowance as private alpha and drops the overage row', async () => {
     renderOnPlan('pro')

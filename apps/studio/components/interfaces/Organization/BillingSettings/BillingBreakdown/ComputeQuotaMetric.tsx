@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { cn } from 'ui'
@@ -8,7 +7,7 @@ import { USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
 import { includedVcpuHours } from '@/components/interfaces/Compute/Compute.limits'
 import { sumBy } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
-import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
+import { useComputeOrgUsage } from '@/data/compute/use-compute-org-usage'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 
 const USAGE_WINDOW_DAYS = 30
@@ -28,9 +27,11 @@ export const ComputeQuotaMetric = ({
   relativeToSubscription,
   className,
 }: ComputeQuotaMetricProps) => {
-  const { data, isPending } = useQuery(
-    computeOrgUsageQueryOptions({ orgSlug: slug, projectRef, days: USAGE_WINDOW_DAYS })
-  )
+  const { data, isPending } = useComputeOrgUsage({
+    orgSlug: slug,
+    projectRef,
+    days: USAGE_WINDOW_DAYS,
+  })
 
   const { limits } = useComputeLimits(subscription?.plan)
   // The quota is vCPU-minutes, measured against reserved vCPU so instance size counts.
