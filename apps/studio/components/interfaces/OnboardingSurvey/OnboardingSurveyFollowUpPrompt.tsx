@@ -23,7 +23,8 @@ export function OnboardingSurveyFollowUpPrompt() {
   const track = useTrack()
   const { isEligible, orgSlug, orgKind, orgSize, resolveFollowUp } = useOnboardingSurveyFollowUp()
   const { addBanner, dismissBanner } = useBannerStack()
-  const [isDialogOpen, setIsDialogOpen] = useState(false)
+  const [dialogOrgSlug, setDialogOrgSlug] = useState<string>()
+  const isDialogOpen = !!dialogOrgSlug && dialogOrgSlug === orgSlug
   const { mutate: submitOnboardingSurvey, isPending: isSubmitting } = useOnboardingSurveyMutation()
 
   // The new-org form sent nothing for a blank survey, so the org's type and size
@@ -70,7 +71,7 @@ export function OnboardingSurveyFollowUpPrompt() {
                 size="tiny"
                 onClick={() => {
                   track('onboarding_survey_answer_button_clicked', { surface: 'follow_up' })
-                  setIsDialogOpen(true)
+                  setDialogOrgSlug(orgSlug)
                 }}
               >
                 Answer
@@ -91,10 +92,11 @@ export function OnboardingSurveyFollowUpPrompt() {
     })
 
     return () => dismissBanner(BANNER_ID.ONBOARDING_SURVEY_FOLLOW_UP)
-  }, [addBanner, dismissBanner, shouldShowCard, skipFollowUp, track])
+  }, [addBanner, dismissBanner, orgSlug, shouldShowCard, skipFollowUp, track])
 
   const handleDialogDismiss = () => {
-    setIsDialogOpen(false)
+    if (isSubmitting) return
+    setDialogOrgSlug(undefined)
     skipFollowUp('follow_up_closed')
   }
 
@@ -121,7 +123,7 @@ export function OnboardingSurveyFollowUpPrompt() {
       },
       {
         onSuccess: () => {
-          setIsDialogOpen(false)
+          setDialogOrgSlug(undefined)
           resolveFollowUp('submitted')
           toast.success('Thanks for sharing')
         },

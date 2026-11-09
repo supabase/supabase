@@ -42,7 +42,10 @@ export function useOnboardingSurveyFollowUp() {
 
     setActiveOrgCreatedAt(pendingOrgCreatedAt)
     const timeout = setTimeout(() => setActiveOrgCreatedAt(undefined), remainingMs)
-    return () => clearTimeout(timeout)
+    return () => {
+      clearTimeout(timeout)
+      setActiveOrgCreatedAt(undefined)
+    }
   }, [pendingOrgCreatedAt])
 
   const isEligible = !!pendingOrgCreatedAt && activeOrgCreatedAt === pendingOrgCreatedAt

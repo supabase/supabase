@@ -296,8 +296,9 @@ export const NewOrgForm = ({
       const building = form.getValues('building')
       const kind = form.getValues('kind')
       const size = kind === 'COMPANY' ? form.getValues('size') : undefined
-      // Kind always holds a value, so only count it as answered when changed
+      // Kind and size always hold a value, so only count them as answered when changed
       const hasKind = kind.toUpperCase() !== defaultValues.kind.toUpperCase()
+      const hasSize = size !== undefined && size !== defaultValues.size
       const hasBuilding = building !== ''
       const profileId = user.profile?.gotrue_id
 
@@ -306,7 +307,7 @@ export const NewOrgForm = ({
       // Nothing answered: send nothing yet so the creator's follow-up answers
       // aren't dropped (the survey endpoint keeps one response per user and org).
       // Kind/size ride along with the follow-up, since this is their only save path.
-      if (!hasKind && !hasBuilding) {
+      if (!hasKind && !hasSize && !hasBuilding) {
         track(
           'onboarding_survey_dismissed',
           { surface: 'org_form', reason: 'org_form_blank' },
@@ -337,10 +338,12 @@ export const NewOrgForm = ({
           { surface: 'org_form', hasKind, hasBuilding },
           groupOverrides
         )
+        if (profileId) markFollowUpPending({ profileId, orgSlug: slug, kind, size })
       }
     },
     [
       defaultValues.kind,
+      defaultValues.size,
       form,
       showOnboardingSurveyInOrgForm,
       submitOnboardingSurvey,
