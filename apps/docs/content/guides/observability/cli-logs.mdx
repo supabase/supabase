@@ -8,32 +8,52 @@ Use `supabase logs` to inspect local or hosted service events from your terminal
 
 This guide requires Supabase CLI v3.
 
-## Select a log source
+## Query local logs
 
 The command reads your local stack by default. Local reads require the [experimental stack runtime](/docs/guides/local-development/running-multiple-local-projects). Set `SUPABASE_EXPERIMENTAL_STACK=1`, or set `stack = true` under `[experimental]` in your CLI configuration.
 
 ```sh
 supabase logs
-supabase logs --remote
-supabase logs --remote=abcdefghijklmnopqrst --service postgres
-supabase logs --remote=preview-branch --service auth
+supabase logs sources
+supabase logs sources --output-format json
 ```
 
-Use `--remote` for the linked project, `--remote=<ref>` for another project, or `--remote=<branch>` for a branch of the linked project. Hosted reads require authentication and access to that project. Database URLs are unsupported.
+Local reads work while a stack is stopped. They never start a stack or service.
+
+```sh
+supabase logs --stack feature-a --since start
+supabase logs --stack-id stack-id-prefix --service postgres --output-format text
+supabase logs --resource instance-id --since 2d
+```
+
+`--stack` selects an existing stack by name. `--stack-id` accepts an ID or unique prefix. `--service postgres` selects the local `database` service. Local selectors also include service names, instance IDs, and `gateway` when the stack exposes the shared API listener.
+
+`--resource` selects a local instance ID and cannot be combined with `--service`. `--since start` reads from each selected service's latest launch. Local reads do not support `--level`, `--search`, `--kind`, or SQL.
+
+Local source discovery lists existing stack instances and gateway support. A listed source does not guarantee retained events.
+
+## Query remote project logs
+
+Use `--remote` to query the linked project. Select another project with `--remote=<ref>`, or a branch of the linked project with `--remote=<branch>`. Hosted reads require authentication and access to that project. Database URLs are unsupported.
+
+```sh
+supabase logs --remote
+supabase logs --remote=abcdefghijklmnopqrst --service postgres
+supabase logs --remote=feature-branch --service auth
+```
 
 Discover service selectors and supported filters before narrowing your query:
 
 ```sh
 supabase logs sources --remote
 supabase logs sources --remote --service postgres
-supabase logs sources --output-format json
 ```
 
-Hosted discovery describes service capabilities. A listed source does not imply that it contains events. Local discovery lists existing stack instances and gateway support, which also does not guarantee retained events.
+Hosted discovery describes service capabilities. A listed source does not imply that it contains events.
 
 Hosted selectors include `edge`, `postgres`, `postgrest`, `auth`, `auth-audit`, `storage`, `realtime`, `functions`, `function-edge`, `supavisor`, `pgbouncer`, `pg-upgrade`, and experimental `compute`. `functions` selects console events; `function-edge` selects invocation events.
 
-## Filter events
+## Filter logs
 
 ```sh
 supabase logs --remote --service postgres --level error --since 30m
@@ -59,9 +79,25 @@ supabase logs --remote --from 2026-11-01T09:00:00Z --to 2026-11-01T10:00:00Z
 
 Each hosted request can span at most 24 hours. Local ranges have no 24-hour ceiling. The displayed lower bound stays fixed during refreshes. If a later load requires a wider request window, restart with a narrower range.
 
-## Browse interactively
+## Interactive vs JSON output
 
 An interactive terminal opens the browser when you omit `--output-format`. Explicit `--output-format text` always performs one finite read. The browser also stays closed in CI, with `TERM=dumb`, or when stdin or stdout is not a terminal.
+
+Use `--output-format json` for an indented array, or `--output-format stream-json` for newline-delimited JSON. Both formats perform one read and exit.
+
+```sh
+supabase logs --remote --service postgres
+supabase logs --remote --service postgres --output-format json
+supabase logs --remote --service postgres --output-format stream-json
+```
+
+| Format        | Result                                                                                                                                                                        |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `text`        | Plain text. Piped filtered output keeps one event per line, escapes embedded newlines and carriage returns, and avoids hard wrapping.                                         |
+| `json`        | An indented array of full records.                                                                                                                                            |
+| `stream-json` | Newline-delimited JSON events. Filtered reads emit `log-entry` or `log-marker` events with the record in `data`. SQL reads emit a `result` event containing the result array. |
+
+### Use the interactive browser
 
 | Key              | Action                                          |
 | ---------------- | ----------------------------------------------- |
@@ -90,20 +126,14 @@ Pipes and machine-readable output perform one read and exit. The unified command
 ```sh
 supabase logs --remote --service postgres --level error --output-format text
 supabase logs --remote --service postgres --output-format json > postgres.json
-supabase logs --remote --service postgres --output-format stream-json
+supabase logs --remote --service postgres --output-format stream-json > postgres.ndjson
 ```
-
-| Format        | Result                                                                                                                                                                        |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `text`        | Plain text. Piped filtered output keeps one event per line, escapes embedded newlines and carriage returns, and avoids hard wrapping.                                         |
-| `json`        | An indented array of full records.                                                                                                                                            |
-| `stream-json` | Newline-delimited JSON events. Filtered reads emit `log-entry` or `log-marker` events with the record in `data`. SQL reads emit a `result` event containing the result array. |
 
 Hosted records retain IDs, severity, timestamps, and attributes. `service` uses the selector name, such as `postgres`; `source` keeps the original value, such as `postgres_logs`. Local records retain instance IDs, launch IDs, positions, and loss markers. Progress and retry messages go to stderr.
 
 Use `--output-format` for both `logs` and `logs sources`. These commands reject the legacy `-o` and `--output` flags.
 
-## Query hosted logs with SQL
+## Query with SQL
 
 Pass SQL with `--sql`, `--file <path>`, or `--file -` for piped input. SQL requires an explicit hosted target:
 
@@ -132,31 +162,6 @@ In the browser, SQL rows stay in result order. `L` reruns the query from the ori
 
 Queries use a Management API GET endpoint. Server query limits, project retention, and access controls apply. A long SQL file can exceed the server URL limit. The CLI reports that HTTP error without splitting or rewriting the query.
 
-## Read retained local logs
-
-Local reads work while a stack is stopped. They never start a stack or service.
-
-```sh
-supabase logs --stack feature-a --since start
-supabase logs --stack-id stack-id-prefix --service postgres --output-format text
-supabase logs --resource instance-id --since 2d
-```
-
-`--stack` selects an existing stack by name. `--stack-id` accepts an ID or unique prefix. `--service postgres` selects the local `database` service. Local selectors also include service names, instance IDs, and `gateway` when the stack exposes the shared API listener.
-
-`--resource` selects a local instance ID and cannot be combined with `--service`. `--since start` reads from each selected service's latest launch. Local reads do not support `--level`, `--search`, `--kind`, or SQL.
-
-## Read Compute logs
-
-Compute sources require the experimental Compute feature, set with `SUPABASE_EXPERIMENTAL_COMPUTE=true`. Select the Compute name with `--resource`, then choose `app`, `requests`, or `builds` with `--kind`:
-
-```sh
-supabase logs --remote --service compute --resource api --kind requests
-supabase logs --remote --service compute --resource api --kind builds --level error
-```
-
-App output has no reliable severity mapping. Compute level filters require `requests` or `builds`.
-
 ## Command options
 
 Run `supabase logs --help` or `supabase logs sources --help` for the help included with your installed version.
@@ -177,6 +182,8 @@ Run `supabase logs --help` or `supabase logs sources --help` for the help includ
 | `--limit <count>`                 | Set initial filtered history count from 1 to 1000. Default: 100.                                              |
 | `--sql <query>`                   | Query hosted logs with ClickHouse SQL. Requires `--remote`.                                                   |
 | `--file <path>`                   | Read SQL from a file. Use `-` for stdin. Requires `--remote`.                                                 |
+
+Compute sources require `SUPABASE_EXPERIMENTAL_COMPUTE=true`. Compute app output has no reliable severity mapping; `--level` requires `--kind requests` or `--kind builds`.
 
 `supabase logs sources` accepts `--remote`, `--stack`, `--stack-id`, and `--service`. Its `--service` describes one service rather than filtering log rows.
 
