@@ -33,7 +33,6 @@ const mockLints = (lints: Lint[]) =>
 
 describe('homepage issues', () => {
   beforeEach(() => {
-    // Lints only run for a healthy project
     addAPIMock({
       method: 'get',
       path: '/platform/projects/:ref',
@@ -81,13 +80,15 @@ describe('homepage issues', () => {
 
   it('shows four cards but counts them all, so the row stays compact without hiding the total', async () => {
     mockLints(
-      [
-        'unindexed_foreign_keys',
-        'auth_users_exposed',
-        'auth_rls_initplan',
-        'no_primary_key',
-        'unused_index',
-      ].map((name) => makeLint(name, name, 'WARN'))
+      (
+        [
+          'unindexed_foreign_keys',
+          'auth_users_exposed',
+          'auth_rls_initplan',
+          'no_primary_key',
+          'unused_index',
+        ] satisfies LINT_TYPES[]
+      ).map((name) => makeLint(name, name, 'WARN'))
     )
     customRender(<IssuesSection />)
 
@@ -145,9 +146,7 @@ describe('homepage issues', () => {
     })
     customRender(<IssuesSection />)
 
-    expect(
-      await screen.findByRole('button', { name: 'Retry' }, { timeout: 5000 })
-    ).toBeInTheDocument()
+    expect(await screen.findByRole('button', { name: 'Retry' })).toBeInTheDocument()
     expect(screen.queryByText('No open issues')).not.toBeInTheDocument()
   })
 })

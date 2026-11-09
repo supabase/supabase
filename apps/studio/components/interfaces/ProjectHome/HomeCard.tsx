@@ -2,8 +2,6 @@ import Link from 'next/link'
 import type { ReactNode } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, cn } from 'ui'
 
-// Stretches the title's link/button over the whole card so the card is clickable without
-// nesting the header actions inside an interactive element
 const STRETCHED_TARGET_CLASS =
   'block w-full truncate text-left outline-hidden after:absolute after:inset-0 after:rounded-lg focus-visible:after:ring-1 focus-visible:after:ring-foreground-muted'
 
@@ -13,14 +11,12 @@ type HomeCardProps = HomeCardTarget & {
   icon: ReactNode
   label: string
   title: string
-  /** Rendered on the right of the header, above the card's click target */
   actions?: ReactNode
   description?: ReactNode
   meta?: ReactNode
   className?: string
 }
 
-/** Fixed-height card used by the project homepage rows, with its content anchored to the bottom */
 export const HomeCard = ({
   href,
   onClick,
