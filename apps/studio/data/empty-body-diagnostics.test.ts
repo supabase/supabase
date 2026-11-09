@@ -110,6 +110,31 @@ describe('refetchWithoutCache', () => {
 
     expect(result).toEqual({ summary: { requestId: 'uuid-1', error: 'TypeError' } })
   })
+
+  it('gives up with an AbortError when the refetch stalls', async () => {
+    vi.useFakeTimers()
+    try {
+      vi.stubGlobal(
+        'fetch',
+        vi.fn(
+          (request: Request) =>
+            new Promise<Response>((_, reject) => {
+              request.signal.addEventListener('abort', () =>
+                reject(new DOMException('Aborted', 'AbortError'))
+              )
+            })
+        )
+      )
+      const { request } = emptyGet('/platform/a')
+
+      const pending = refetchWithoutCache(request)
+      await vi.advanceTimersByTimeAsync(10_000)
+
+      expect(await pending).toEqual({ summary: { requestId: 'uuid-1', error: 'AbortError' } })
+    } finally {
+      vi.useRealTimers()
+    }
+  })
 })
 
 describe('reportEmptyBodyResponse', () => {

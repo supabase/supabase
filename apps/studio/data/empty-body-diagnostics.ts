@@ -3,6 +3,8 @@ import { IS_PLATFORM } from 'common'
 
 import { uuidv4 } from '@/lib/helpers'
 
+const REFETCH_TIMEOUT_MS = 10_000
+
 const PARAM_AFTER_SEGMENT = new Map([
   ['projects', '{ref}'],
   ['organizations', '{slug}'],
@@ -120,10 +122,19 @@ export async function refetchWithoutCache(
   request: Request
 ): Promise<{ summary: RefetchSummary; response?: Response; body?: string }> {
   const requestId = uuidv4()
+  // The caller awaits this, so bound it while still honoring the caller's own abort
+  const controller = new AbortController()
+  const abort = () => controller.abort()
+  if (request.signal.aborted) abort()
+  request.signal.addEventListener('abort', abort, { once: true })
+  const timeout = setTimeout(abort, REFETCH_TIMEOUT_MS)
+
   try {
     const headers = new Headers(request.headers)
     headers.set('X-Request-Id', requestId)
-    const response = await fetch(new Request(request, { cache: 'no-store', headers }))
+    const response = await fetch(
+      new Request(request, { cache: 'no-store', headers, signal: controller.signal })
+    )
     const buffer = await response.arrayBuffer()
     return {
       response,
@@ -140,6 +151,9 @@ export async function refetchWithoutCache(
     return {
       summary: { requestId, error: errorName(error) },
     }
+  } finally {
+    clearTimeout(timeout)
+    request.signal.removeEventListener('abort', abort)
   }
 }
 
