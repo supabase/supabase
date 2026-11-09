@@ -21,8 +21,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
+import { VerificationInterstitialLogo } from './VerificationInterstitialLogo'
 import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
-import { VerificationInterstitialLogo } from '@/components/layouts/VerificationInterstitialLogo'
 import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import {

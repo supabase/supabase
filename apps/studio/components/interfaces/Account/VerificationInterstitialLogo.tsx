@@ -1,4 +1,4 @@
-import { InterstitialLogoBadge, SupabaseLogo } from './InterstitialLayout'
+import { InterstitialLogoBadge, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
 export const VerificationInterstitialLogo = () => (
   <div className="relative">

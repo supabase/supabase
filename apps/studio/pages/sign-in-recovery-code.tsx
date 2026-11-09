@@ -1,6 +1,6 @@
+import { VerificationInterstitialLogo } from '@/components/interfaces/Account/VerificationInterstitialLogo'
 import { SignInRecoveryCodeForm } from '@/components/interfaces/SignIn/SignInRecoveryCodeForm'
 import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
-import { VerificationInterstitialLogo } from '@/components/layouts/VerificationInterstitialLogo'
 import type { NextPageWithLayout } from '@/types'
 
 const SignInRecoveryCodePage: NextPageWithLayout = () => {
