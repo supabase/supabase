@@ -90,7 +90,7 @@ export function LogFieldRow<TData>({
       {canUseHoverActions && (
         <div
           className={cn(
-            'absolute inset-y-0 right-0 flex items-center gap-0.5 pr-4 opacity-0',
+            'absolute inset-y-0 right-0 flex items-start gap-0.5 pr-4 pt-2 opacity-0',
             'focus-within:opacity-100 group-hover/field:opacity-100'
           )}
         >
