@@ -21,7 +21,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import { InterstitialLayout } from '@/components/layouts/InterstitialLayout'
+import { VerificationInterstitialLogo } from '@/components/layouts/VerificationInterstitialLogo'
 import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import {
@@ -127,7 +128,7 @@ export const IdentityVerification = ({
         >
           <DialogTitle className="sr-only">Identity verification</DialogTitle>
           <InterstitialLayout
-            logo={<SupabaseLogo />}
+            logo={<VerificationInterstitialLogo />}
             title="Verify your identity"
             description="We need to make sure it’s you before making sensitive changes."
           >
