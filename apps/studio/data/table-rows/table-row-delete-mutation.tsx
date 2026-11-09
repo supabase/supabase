@@ -7,12 +7,14 @@ import { getPrimaryKeys } from './utils'
 import type { SupaRow } from '@/components/grid/types'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { DocsButton } from '@/components/ui/DocsButton'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
 import { DOCS_URL } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowDeleteVariables = {
   projectRef: string
@@ -29,13 +31,20 @@ export function getTableRowDeleteSql({
   const { primaryKeys, error } = getPrimaryKeys({ table })
   if (error) throw error
 
-  let queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
-  primaryKeys?.forEach((key) => {
-    const primaryKeyValues = rows.map((x) => x[key])
-    queryChains = queryChains.filter(key, 'in', primaryKeyValues)
-  })
+  const queryChains = new Query().from(table.name, table.schema ?? undefined).delete()
+  if (!primaryKeys || primaryKeys.length === 0) return queryChains.toSql()
 
-  return queryChains.toSql()
+  if (primaryKeys.length === 1) {
+    const [key] = primaryKeys
+    const values = rows.map((row) => row[key])
+    return queryChains.filter(key, 'in', values).toSql()
+  }
+
+  // Composite primary keys must be matched as whole tuples. Filtering each key
+  // column independently matches the cartesian product of the selected values
+  // and would delete rows that were never selected.
+  const tuples = rows.map((row) => primaryKeys.map((key) => row[key]))
+  return queryChains.filter(primaryKeys, 'in', tuples).toSql()
 }
 
 export async function deleteTableRow({
@@ -55,6 +64,7 @@ export async function deleteTableRow({
     connectionString,
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -67,12 +77,12 @@ export const useTableRowDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowDeleteData, ResponseError, TableRowDeleteVariables>,
+  UseCustomMutationOptions<TableRowDeleteData, StudioError, TableRowDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowDeleteData, ResponseError, TableRowDeleteVariables>({
+  return useMutation<TableRowDeleteData, StudioError, TableRowDeleteVariables>({
     mutationFn: (vars) => deleteTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

@@ -8,7 +8,9 @@ import { API_URL } from '@/lib/constants'
 export const mswServer = setupServer(...GlobalAPIMocks)
 
 mswServer.events.on('request:start', ({ request }) => {
-  console.log('[MSW] Outgoing:', request.method, request.url)
+  if (!process.env.CI) {
+    console.log('[MSW] Outgoing:', request.method, request.url)
+  }
 })
 
 // Recursively changes params in an endpoint path segment from {param}
@@ -39,7 +41,7 @@ type SuccessResponse<P extends Endpoints, M extends Methods> = RemapPaths[P][M] 
     ? R201
     : never
 
-// Studio's standard error envelope — what `handleError` and `ResponseError` consume.
+// Studio's standard error envelope — what `handleError` and `StudioError` consume.
 // OpenAPI doesn't document error bodies (4xx/5xx are `content?: never`), so we
 // hardcode this convention to keep error-state tests strongly typed.
 export type APIErrorBody = { message: string }
@@ -69,7 +71,9 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
       response: SuccessResponse<TrimQueryParams<P>, M> | TypedResolver<TrimQueryParams<P>, M>
     }) => {
   const fullPath = `${API_URL}${path}`
-  console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)
+  if (!process.env.CI) {
+    console.log('[MSW] Adding mock:', method.toUpperCase(), fullPath)
+  }
 
   mswServer.use(
     http[method](
@@ -77,7 +81,9 @@ export const addAPIMock = <P extends Endpoints | `${Endpoints}?${string}`, M ext
       isResponseResolver(response)
         ? response
         : ({ request }) => {
-            console.log('[MSW] Handling request:', request.method, request.url, response)
+            if (!process.env.CI) {
+              console.log('[MSW] Handling request:', request.method, request.url, response)
+            }
             return HttpResponse.json(response ?? null)
           }
     )

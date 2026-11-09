@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -51,7 +51,7 @@ export const PauseDisabledState = () => {
           <p className="leading-normal! mb-1!">Recovery options:</p>
           <ul className="flex flex-col gap-y-0.5">
             <li className="flex items-center gap-x-2">
-              <ExternalLink size={14} />
+              <ExternalLinkIcon size={14} />
               <InlineLink
                 href={`${DOCS_URL}/guides/platform/migrating-within-supabase/dashboard-restore`}
               >
@@ -59,7 +59,7 @@ export const PauseDisabledState = () => {
               </InlineLink>
             </li>
             <li className="flex items-center gap-x-2">
-              <ExternalLink size={14} />
+              <ExternalLinkIcon size={14} />
               <InlineLink href={`${DOCS_URL}/guides/local-development/restoring-downloaded-backup`}>
                 Restore the backup on your local machine
               </InlineLink>

@@ -55,8 +55,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   const { rating, messages: rawMessages, projectRef, orgSlug, reason, spanId } = data
 
   let aiOptInLevel: AiOptInLevel = 'disabled'
-  let orgHasHipaaAddon: boolean | undefined
-  let projectIsSensitive: boolean | null | undefined
   let projectRegion: string | undefined
 
   if (!IS_PLATFORM) {
@@ -68,8 +66,6 @@ export async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       const aiDetails = await getAIDetails({ orgSlug, projectRef, authorization })
 
       aiOptInLevel = aiDetails.aiOptInLevel
-      orgHasHipaaAddon = aiDetails.hasHipaaAddon
-      projectIsSensitive = aiDetails.isSensitive
       projectRegion = aiDetails.region
     } catch (error) {
       return res.status(400).json({
@@ -131,11 +127,7 @@ Instructions:
     })
 
     // Log feedback to Braintrust if tracing is enabled and span ID is available
-    if (
-      IS_TRACING_ENABLED &&
-      isTracingAllowed({ orgHasHipaaAddon, projectIsSensitive, projectRegion }) &&
-      spanId
-    ) {
+    if (IS_TRACING_ENABLED && isTracingAllowed({ projectRegion }) && spanId) {
       try {
         const logger = currentLogger()
         logger?.logFeedback({

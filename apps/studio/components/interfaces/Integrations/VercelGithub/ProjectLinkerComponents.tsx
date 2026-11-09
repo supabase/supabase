@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, ChevronDown, Plus, PlusIcon } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon, PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import { HTMLAttributes } from 'react'
 import {
@@ -71,7 +71,6 @@ export const ForeignProjectSelector = ({
     <Popover open={open} onOpenChange={onOpenChange}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           block
           disabled={loadingForeignProjects}
           loading={loadingForeignProjects}
@@ -89,7 +88,7 @@ export const ForeignProjectSelector = ({
           }
           iconRight={
             <span className="grow flex justify-end">
-              <ChevronDown />
+              <ChevronDownIcon />
             </span>
           }
         >
@@ -188,14 +187,13 @@ export const SupabaseProjectSelector = ({
               {project.status === 'INACTIVE' && <Badge>Paused</Badge>}
               {project.status === 'GOING_DOWN' && <Badge>Pausing</Badge>}
             </div>
-            {project.ref === selectedSupabaseProject?.ref && <Check size={16} />}
+            {project.ref === selectedSupabaseProject?.ref && <CheckIcon size={16} />}
           </div>
         )
       }}
       renderTrigger={() => {
         return (
           <Button
-            variant="default"
             block
             disabled={defaultSupabaseProject !== undefined || loadingSupabaseProjects}
             loading={loadingSupabaseProjects}
@@ -203,7 +201,7 @@ export const SupabaseProjectSelector = ({
             iconRight={
               defaultSupabaseProject === undefined ? (
                 <span className="grow flex justify-end">
-                  <ChevronDown />
+                  <ChevronDownIcon />
                 </span>
               ) : null
             }
@@ -230,7 +228,7 @@ export const SupabaseProjectSelector = ({
                 className="cursor-pointer w-full gap-2"
                 onSelect={() => setOpen(false)}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <PlusIcon size={14} strokeWidth={1.5} />
                 <p>Create a new project</p>
               </CommandItemLink>
             </CommandGroup>

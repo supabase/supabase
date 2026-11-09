@@ -39,13 +39,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-add-ons',
         name: 'Add-ons',
-        value: 'Add-ons addons add ons add on add-on',
+        keywords: ['addons', 'add ons', 'add on', 'add-on'],
         route: `/project/${ref}/settings/addons`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-general',
-        name: 'General Settings',
+        name: 'General settings',
         route: `/project/${ref}/settings/general`,
         defaultHidden: true,
       },
@@ -61,13 +61,13 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-database',
-        name: 'Database Settings',
+        name: 'Database settings',
         route: `/project/${ref}/database/settings`,
         defaultHidden: true,
       },
       {
         id: 'nav-project-settings-auth',
-        name: 'Auth Settings',
+        name: 'Auth settings',
         route: authenticationSignInProviders
           ? `/project/${ref}/auth/providers`
           : `/project/${ref}/database/policies`,
@@ -77,7 +77,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-project-settings-webhooks',
-              name: 'Project Webhooks',
+              name: 'Project webhooks',
               route: `/project/${ref}/settings/webhooks`,
               defaultHidden: true,
             } as IRouteCommand,
@@ -95,13 +95,24 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         : []),
       {
         id: 'nav-project-settings-api',
-        name: 'API Settings',
+        name: 'API settings',
         route: `/project/${ref}/integrations/data_api/settings`,
         defaultHidden: true,
       },
       {
+        id: 'nav-project-settings-integration',
+        name: 'Project Integrations',
+        keywords: [
+          'Branch integration',
+          'Vercel integration',
+          'GitHub integration',
+          'AWS PrivateLink',
+        ],
+        route: `/project/${ref}/settings/integrations`,
+      },
+      {
         id: 'nav-project-settings-storage',
-        name: 'Storage Settings',
+        name: 'Storage settings',
         route: `/project/${ref}/storage/settings`,
         defaultHidden: true,
       },
@@ -109,7 +120,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
         ? [
             {
               id: 'nav-project-settings-custom-domains',
-              name: 'Custom Domains',
+              name: 'Custom domains',
               route: `/project/${ref}/settings/general#custom-domains`,
               defaultHidden: true,
             } as IRouteCommand,
@@ -118,7 +129,7 @@ export function useProjectSettingsGotoCommands(options?: CommandOptions) {
       {
         id: 'nav-project-settings-restart-project',
         name: 'Project availability',
-        value: 'project availability restart project pause project resume project',
+        keywords: ['restart project', 'pause project', 'resume project'],
         route: `/project/${ref}/settings/general#restart-project`,
         defaultHidden: true,
       },

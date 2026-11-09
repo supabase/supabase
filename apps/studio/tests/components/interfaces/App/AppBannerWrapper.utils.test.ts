@@ -1,28 +1,22 @@
 import { describe, expect, test } from 'vitest'
 
-import { isLogsOrObservabilityPath } from '@/components/interfaces/App/AppBannerWrapper.utils'
+import { isOrganizationLandingPath } from '@/components/interfaces/App/AppBannerWrapper.utils'
 
-describe('isLogsOrObservabilityPath', () => {
-  test.each([
-    '/project/abc/logs',
-    '/project/abc/logs/',
-    '/project/abc/logs/explorer',
-    '/project/abc/observability',
-    '/project/abc/observability/query-performance',
-  ])('matches %s', (pathname) => {
-    expect(isLogsOrObservabilityPath(pathname)).toBe(true)
+describe('isOrganizationLandingPath', () => {
+  test.each(['/org', '/organizations', '/org/my-org', '/org/my-org/'])('matches %s', (pathname) => {
+    expect(isOrganizationLandingPath(pathname)).toBe(true)
   })
 
   test.each([
     undefined,
     null,
     '',
+    '/',
+    '/sign-in',
     '/project/abc',
-    '/project/abc/editor',
-    '/project/abc/logs-explorer',
-    '/project/abc/functions/my-fn/logs',
-    '/org/abc/logs',
+    '/org/abc/general',
+    '/organizations/new',
   ])('does not match %s', (pathname) => {
-    expect(isLogsOrObservabilityPath(pathname)).toBe(false)
+    expect(isOrganizationLandingPath(pathname)).toBe(false)
   })
 })

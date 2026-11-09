@@ -25,7 +25,7 @@ export const LayoutSidebar = ({
   defaultSize = '30',
 }: LayoutSidebarProps) => {
   const isMobile = useBreakpoint('md')
-  const { activeSidebar } = useSidebarManagerSnapshot()
+  const { activeSidebar, isMaximised } = useSidebarManagerSnapshot()
   const { content: sheetContent, setContent: setMobileSheetContent } = useMobileSheet()
 
   useEffect(() => {
@@ -43,6 +43,9 @@ export const LayoutSidebar = ({
   if (!activeSidebar?.component) return null
   if (isMobile) return null
 
+  // `isMaximised` only has meaning for the AI Assistant sidebar
+  const isMaximisedSidebar = isMaximised && activeSidebar?.id === SIDEBAR_KEYS.AI_ASSISTANT
+
   return (
     <>
       <ResizableHandle withHandle />
@@ -55,8 +58,8 @@ export const LayoutSidebar = ({
         className={cn(
           'border-l bg fixed z-40 right-0 top-0 bottom-0',
           'h-dvh',
-          'md:absolute md:h-auto md:w-1/2',
-          'lg:w-2/5',
+          isMaximisedSidebar ? 'md:absolute md:h-auto md:w-full' : 'md:absolute md:h-auto md:w-1/2',
+          !isMaximisedSidebar && 'lg:w-2/5',
           'xl:relative xl:border-l-0'
         )}
       >

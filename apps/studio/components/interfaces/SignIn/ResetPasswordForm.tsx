@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -80,8 +80,7 @@ export const ResetPasswordForm = () => {
                     disabled={form.formState.isSubmitting}
                     actions={
                       <Button
-                        icon={currentPasswordHidden ? <Eye /> : <EyeOff />}
-                        variant="default"
+                        icon={currentPasswordHidden ? <EyeIcon /> : <EyeOffIcon />}
                         className="w-7"
                         onClick={() => setCurrentPasswordHidden((prev) => !prev)}
                       />
@@ -112,8 +111,7 @@ export const ResetPasswordForm = () => {
                   autoComplete="new-password"
                   actions={
                     <Button
-                      icon={passwordHidden ? <Eye /> : <EyeOff />}
-                      variant="default"
+                      icon={passwordHidden ? <EyeIcon /> : <EyeOffIcon />}
                       className="w-7"
                       onClick={() => setPasswordHidden((prev) => !prev)}
                     />
@@ -141,6 +139,7 @@ export const ResetPasswordForm = () => {
         <Separator className="bg-border" />
 
         <Button
+          variant="primary"
           block
           type="submit"
           size="medium"

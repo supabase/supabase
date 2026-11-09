@@ -1,0 +1,157 @@
+// Canonical list of guide topics. Single source of truth for the `topics`
+// field in src/content.config.ts (so a guide with an unsupported topic fails
+// content validation), the "Topics" nav menu, and the /topics/[topic] pages.
+//
+// `pinned` topics surface as cards on the homepage (see src/pages/index.astro)
+// — keep this to a handful so that section stays a highlights row, not a
+// second copy of the full topic list.
+//
+// `visible` controls whether the topic appears in nav and homepage sections.
+// Topics with `visible: false` still have a working listing page at /topics/[slug].
+// Some topics might not need to be visible to end users since their primary audience
+// is LLM crawlers.
+export const TOPICS = [
+  {
+    name: 'Migration',
+    description: 'Moving data, schemas, or projects onto Supabase.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Comparison',
+    description: 'How Supabase compares to other databases and platforms.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Rundowns',
+    description: 'How different technologies compare across a variety of facets.',
+    pinned: false,
+    visible: false,
+  },
+  {
+    name: 'Troubleshooting',
+    description: 'Common errors and how to resolve them.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Tutorials',
+    description: 'Step-by-step walkthroughs for building with Supabase.',
+    pinned: true,
+    visible: true,
+  },
+  {
+    name: 'Storage',
+    description: 'Uploading, managing, and serving files.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Auth',
+    description: 'Authentication, authorization, and user management.',
+    pinned: true,
+    visible: true,
+  },
+  {
+    name: 'Database',
+    description: 'Postgres schemas, queries, and performance.',
+    pinned: true,
+    visible: true,
+  },
+  {
+    name: 'Edge Functions',
+    description: 'Deploying and running serverless functions.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Queues',
+    description: 'Background jobs and message processing.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Realtime',
+    description: 'Broadcast, presence, and database changes.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'Platform',
+    description: 'Project settings, billing, and infrastructure.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'FAQs',
+    description: 'Frequently asked questions and their answers.',
+    pinned: false,
+    visible: true,
+  },
+] as const
+
+export type Topic = (typeof TOPICS)[number]['name']
+
+type ContentCollection = 'guides' | 'troubleshooting' | 'faqs'
+
+interface ListedTopicsParams {
+  guides: { topics: readonly string[] }[]
+  troubleshooting: { topics: readonly string[] }[]
+}
+
+interface IsInTopicParams {
+  collection: ContentCollection
+  topics: readonly string[]
+  topic: Topic
+}
+
+// zod's `enum()` needs a literal non-empty tuple of strings, which `.map()`
+// can't preserve on its own — this cast is safe because TOPICS is `as const`.
+export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic[]]
+
+export const FORMAT_TOPICS: Topic[] = [
+  'Migration',
+  'Comparison',
+  'Rundowns',
+  'Troubleshooting',
+  'Tutorials',
+]
+
+// the kind of guide picks the cover before its subject does
+export const pickCoverTopic = (topics: Topic[]): Topic | null =>
+  topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
+
+// the topic pages and scripts/generate-markdown.ts both use this, so they list the same entries
+export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boolean => {
+  if (collection !== 'troubleshooting') return topics.includes(topic)
+  // troubleshooting is a content type. other type topics never list it
+  if (topic === 'Troubleshooting') return true
+  return !FORMAT_TOPICS.includes(topic) && topics.includes(topic)
+}
+
+// visible topics with at least one entry. the nav and the homepage only link to these
+export const getListedTopics = ({ guides, troubleshooting }: ListedTopicsParams) =>
+  TOPICS.filter(
+    (topic) =>
+      topic.visible &&
+      (guides.some((guide) =>
+        isInTopic({ collection: 'guides', topics: guide.topics, topic: topic.name })
+      ) ||
+        troubleshooting.some((entry) =>
+          isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+        ))
+  )
+
+// federated collections tag with their own vocabulary, which may not match kb's topics
+export const isKnownTopic = (topic: string): topic is Topic =>
+  TOPIC_NAMES.some((name) => name === topic)
+
+export function getTopicDescription(topic: Topic): string {
+  return TOPICS.find((t) => t.name === topic)!.description
+}
+
+// URL-safe slug for a topic, e.g. "Edge Functions" -> "edge-functions".
+export function topicToSlug(topic: Topic): string {
+  return topic.toLowerCase().replace(/\s+/g, '-')
+}

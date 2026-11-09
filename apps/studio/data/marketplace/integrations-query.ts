@@ -1,9 +1,11 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 import { createMarketplaceClient, type MarketplaceListing } from 'common/marketplace-client'
 
 import { marketplaceIntegrationsKeys } from './keys'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type MarketplaceIntegration = MarketplaceListing
 
@@ -21,7 +23,7 @@ export async function getMarketplaceIntegrations(signal?: AbortSignal) {
 }
 
 export type MarketplaceIntegrationsData = Awaited<ReturnType<typeof getMarketplaceIntegrations>>
-export type MarketplaceIntegrationsError = ResponseError
+export type MarketplaceIntegrationsError = StudioError
 
 export const useMarketplaceIntegrationsQuery = <TData = MarketplaceIntegrationsData>({
   enabled = true,
@@ -30,6 +32,6 @@ export const useMarketplaceIntegrationsQuery = <TData = MarketplaceIntegrationsD
   useQuery<MarketplaceIntegrationsData, MarketplaceIntegrationsError, TData>({
     queryKey: marketplaceIntegrationsKeys.list(),
     queryFn: ({ signal }) => getMarketplaceIntegrations(signal),
-    enabled,
+    enabled: enabled && IS_PLATFORM,
     ...options,
   })

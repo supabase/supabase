@@ -5,8 +5,9 @@ import { oAuthCustomProvidersKeys } from './keys'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthCustomProvidersVariables = {
   projectRef: string | undefined
@@ -25,20 +26,20 @@ export async function getOAuthCustomProviders({
   const { data, error } = await supabaseClient.auth.admin.customProviders.listProviders()
 
   if (error) {
-    let newError = error
     // Non-JSON responses from the API indicate custom providers aren't enabled.
     // Different browsers/SDK versions produce different JSON parse error messages,
     // so we check broadly for JSON parse indicators.
-    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(newError.message)) {
-      newError = new AuthError('Custom providers are not enabled for this project')
+    if (/JSON\.parse|Unexpected token|unexpected.*character/i.test(error.message)) {
+      handleError(new AuthError('Custom providers are not enabled for this project'))
+    } else {
+      handleError(error)
     }
-    handleError(newError)
   }
   return data.providers as CustomOAuthProvider[]
 }
 
 export type OAuthCustomProvidersData = Awaited<ReturnType<typeof getOAuthCustomProviders>>
-export type OAuthCustomProvidersError = ResponseError
+export type OAuthCustomProvidersError = StudioError
 
 export const useOAuthCustomProvidersQuery = <TData = OAuthCustomProvidersData>(
   { projectRef }: OAuthCustomProvidersVariables,

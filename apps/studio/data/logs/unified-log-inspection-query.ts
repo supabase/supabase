@@ -1,5 +1,4 @@
 import { useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -12,6 +11,7 @@ import { analyticsLiteral as lit, safeSql, type SafeLogSqlFragment } from './saf
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
+  useUnifiedLogsBackend,
 } from './unified-logs-infinite-query'
 import {
   getAuthServiceFlowQuery,
@@ -21,8 +21,10 @@ import {
   getStorageServiceFlowQuery,
 } from '@/components/interfaces/UnifiedLogs/Queries/ServiceFlowQueries/ServiceFlow.sql'
 import { LOG_TYPE_TO_SOURCE } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import { getUnifiedLogsScopeCondition } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 // Service flow types - subset of LOG_TYPES that support service flows
 export const SERVICE_FLOW_TYPES = [
@@ -31,6 +33,7 @@ export const SERVICE_FLOW_TYPES = [
   'edge-function',
   'storage',
   'postgres',
+  'supavisor',
 ] as const
 
 export type ServiceFlowType = (typeof SERVICE_FLOW_TYPES)[number]
@@ -47,6 +50,7 @@ const SERVICE_FLOW_TYPE_SOURCE: Record<ServiceFlowType, SafeLogSqlFragment> = {
   'edge-function': lit(LOG_TYPE_TO_SOURCE['edge function']),
   storage: lit(LOG_TYPE_TO_SOURCE.storage),
   postgres: lit(LOG_TYPE_TO_SOURCE.postgres),
+  supavisor: lit(LOG_TYPE_TO_SOURCE.supavisor),
 }
 
 export type UnifiedLogInspectionVariables = {
@@ -185,7 +189,8 @@ export async function getUnifiedLogInspection(
 
   const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
-  if (!useOtel) {
+  const shouldUseOtel = useOtel || !!search.scope
+  if (!shouldUseOtel) {
     let sql: SafeLogSqlFragment
     switch (type) {
       case 'postgrest':
@@ -232,10 +237,12 @@ export async function getUnifiedLogInspection(
   if (!/^[0-9a-fA-F-]{1,64}$/.test(logId)) {
     throw new Error('Invalid logId')
   }
+  const scope = getUnifiedLogsScopeCondition(search.scope)
+  const scopeFilter = scope === null ? safeSql`` : safeSql` AND ${scope}`
   const sql = safeSql`-- unified logs: inspect single log by id
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE id = ${lit(logId)} AND source = ${SERVICE_FLOW_TYPE_SOURCE[type]}
+WHERE id = ${lit(logId)} AND source = ${SERVICE_FLOW_TYPE_SOURCE[type]}${scopeFilter}
 LIMIT 1
 `
 
@@ -254,6 +261,21 @@ LIMIT 1
     return { result: [] }
   }
 
+  // Supavisor rows aren't HTTP requests, so skip the flattened HTTP-shaped entry and
+  // return the raw attributes as `metadata` for the supavisor block and Raw JSON tab.
+  if (type === 'supavisor') {
+    return {
+      result: [
+        {
+          id: row.id,
+          timestamp: row.timestamp,
+          event_message: row.event_message,
+          metadata: row.log_attributes ?? {},
+        },
+      ],
+    }
+  }
+
   const entry = flattenOtelInspectionRow(row) as UnifiedLogInspectionEntry & Record<string, unknown>
 
   // For edge function rows, fetch and aggregate the related `function_logs`
@@ -265,7 +287,7 @@ LIMIT 1
       const fnSql = safeSql`-- unified logs: edge function console logs for execution
 SELECT id, timestamp, source, event_message, severity_text, log_attributes
 FROM logs
-WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${lit(executionId)}
+WHERE source = 'function_logs' AND log_attributes['execution_id'] = ${lit(executionId)}${scopeFilter}
 ORDER BY timestamp ASC
 LIMIT 100
 `
@@ -292,7 +314,7 @@ LIMIT 100
 }
 
 export type UnifiedLogInspectionData = Awaited<ReturnType<typeof getUnifiedLogInspection>>
-export type UnifiedLogInspectionError = ResponseError
+export type UnifiedLogInspectionError = StudioError
 
 export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
   { projectRef, logId, type, search, logTimestampMs }: UnifiedLogInspectionVariables,
@@ -301,7 +323,7 @@ export const useUnifiedLogInspectionQuery = <TData = UnifiedLogInspectionData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogInspectionData, UnifiedLogInspectionError, TData> = {}
 ) => {
-  const useOtel = !!useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend(search)
   return useQuery<UnifiedLogInspectionData, UnifiedLogInspectionError, TData>({
     queryKey: [...logsKeys.serviceFlow(projectRef, search, logId), { otel: useOtel }],
     queryFn: ({ signal }) =>

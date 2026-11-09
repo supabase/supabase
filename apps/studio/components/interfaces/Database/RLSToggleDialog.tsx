@@ -45,12 +45,15 @@ export function RLSToggleDialog({
                 , and existing RLS policies will no longer apply.
               </>
             ) : (
-              'RLS restricts table access until policies allow a request. Existing queries may stop returning rows until policies are added.'
+              <span>
+                RLS restricts table access until policies allow a request. Existing queries may stop
+                returning rows until policies are added.
+              </span>
             )}{' '}
             <InlineLink href={`${DOCS_URL}/guides/database/postgres/row-level-security`}>
               Learn more
             </InlineLink>
-            .
+            <span>.</span>
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>

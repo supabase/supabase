@@ -276,7 +276,11 @@ export const Overview = ({ live }: OverviewProps) => {
                       )}
                     >
                       Blocking {queryBlockingTheMostQueries?.count} other{' '}
-                      {queryBlockingTheMostQueries?.count > 1 ? 'queries' : 'query'}
+                      {queryBlockingTheMostQueries?.count > 1 ? (
+                        <span>queries</span>
+                      ) : (
+                        <span>query</span>
+                      )}
                     </span>
                   </>
                 )}

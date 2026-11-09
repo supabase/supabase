@@ -13,8 +13,8 @@ function useIsFeatureEnabled<T extends Feature | Feature[]>(features: T) {
 
   const disabledFeatures = [
     ...(profile?.disabled_features ?? []),
-    ...((override?.disabled_features ?? []) as Feature[]),
-  ]
+    ...(override?.disabled_features ?? []),
+  ] as Feature[]
 
   // This code branch is to make the type checker happy, it's intentionally
   // the same as the isFeatureEnabled function call below.

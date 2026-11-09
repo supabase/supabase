@@ -2,8 +2,9 @@
 import type * as SupabaseMcp from '@supabase/mcp-server-supabase'
 import type { ToolSet } from 'ai'
 
-import { createInProcessSupabaseMCPClient, createSupabaseMCPClient } from '../supabase-mcp'
+import { createSupabaseMCPClient } from '../supabase-mcp'
 import { filterToolsByOptInLevel, toolSetValidationSchema } from '../tool-filter'
+import { REMOTE_TOOL_CONTRACTS } from './registry'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 /**
@@ -15,27 +16,13 @@ import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
  */
 type SupabaseMcpToolName = keyof typeof SupabaseMcp.supabaseMcpToolSchemas
 
-// UI-executed tools handled locally by Studio (see getStudioTools); the remote
-// MCP server's versions are removed so the UI-controlled Studio versions win.
-const UI_EXECUTED_TOOLS = [
-  'execute_sql',
-  'deploy_edge_function',
-] as const satisfies readonly SupabaseMcpToolName[]
-
-// Read-only tools the assistant relies on from the remote MCP server — the
-// MCP-sourced subset of the allowlist in tool-filter.ts (TOOL_CATEGORY_MAP).
-// `satisfies` gives the compile-time drift guard; the runtime check below also
-// catches a deployed server that returns fewer tools (feature flags / version
-// skew). The allowlist remains the source of truth for what is allowed.
-const EXPECTED_MCP_TOOLS = [
-  'search_docs',
-  'list_tables',
-  'list_extensions',
-  'list_edge_functions',
-  'list_branches',
-  'get_advisors',
-  'query_logs',
-] as const satisfies readonly SupabaseMcpToolName[]
+// The remote tools the assistant relies on: those with a remote contract. Typing the names as
+// `SupabaseMcpToolName` makes an upstream rename/removal a compile-time failure; the runtime
+// check below also catches a deployed server that returns fewer tools (feature flags / version
+// skew).
+const EXPECTED_MCP_TOOLS: readonly SupabaseMcpToolName[] = Object.values(REMOTE_TOOL_CONTRACTS).map(
+  ({ name }) => name
+)
 
 export const getMcpTools = async ({
   accessToken,
@@ -50,22 +37,10 @@ export const getMcpTools = async ({
   // when the request ends. The caller owns that lifecycle via this signal.
   signal: AbortSignal
 }) => {
-  // Connect to the MCP server and fetch its tools, which replace the old local
-  // tools. `USE_REMOTE_MCP` gates the transport: the remote HTTP server (target
-  // state) or the legacy in-process server (fallback during the migration),
-  // defaulting to in-process until an environment opts in. Flip it per
-  // environment (staging → prod → Nimbus) once each one's prerequisites are met
-  // (dashboard-token support on the MCP API, remote MCP enabled for Nimbus);
-  // unset to roll back on the next deploy. Both transports expose the same tool
-  // surface, so the filtering, drift detection, and lifecycle handling below are
-  // transport-agnostic.
-  //
-  // TODO(AI-897): remove in process mcp — once every environment has been
-  // flipped and is stable, delete `createInProcessSupabaseMCPClient` and this
-  // fallback branch.
-  const useRemoteMcp = process.env.USE_REMOTE_MCP === 'true'
-  const createClient = useRemoteMcp ? createSupabaseMCPClient : createInProcessSupabaseMCPClient
-  const mcpClient = await createClient({
+  // Connect to the remote MCP server over HTTP and fetch its tools, replacing
+  // the local tools. A remote failure (outage, timeout, auth) degrades to the
+  // remaining tools in `getTools` rather than breaking the assistant.
+  const mcpClient = await createSupabaseMCPClient({
     accessToken,
     projectRef,
   })
@@ -90,13 +65,29 @@ export const getMcpTools = async ({
   signal.addEventListener('abort', closeClient, { once: true })
 
   try {
-    const availableMcpTools = (await mcpClient.tools()) as ToolSet
+    const remoteTools = (await mcpClient.tools()) as ToolSet
+
+    // Only tools with a remote contract get through, checked before the opt-in filter: local
+    // contracts share names with remote tools (`execute_sql`, `deploy_edge_function`), so the
+    // filter alone would let the remote versions in.
+    const availableMcpTools: ToolSet = {}
+    for (const contract of Object.values(REMOTE_TOOL_CONTRACTS)) {
+      if (!(contract.name in remoteTools)) continue
+      // Reject a malformed entry here: if the opt-in filter below stubbed it, the spread would
+      // turn it into an object and it would pass validation.
+      const remoteTool = remoteTools[contract.name]
+      if (typeof remoteTool !== 'object' || remoteTool === null) {
+        console.error(`MCP tool ${contract.name} is not an object`)
+        throw new Error('Internal error: MCP tools validation failed')
+      }
+      availableMcpTools[contract.name] = { ...remoteTool, needsApproval: contract.needsApproval }
+    }
 
     // Runtime drift detection: `EXPECTED_MCP_TOOLS` is compile-time-checked
     // against the pinned package (see its declaration), but the *deployed* remote
     // server can still return fewer tools than the pinned types — feature flags,
-    // killswitches, or version skew during a bump. `filterToolsByOptInLevel`
-    // drops missing tools silently, so warn to make that observable.
+    // killswitches, or version skew during a bump. A missing tool just drops
+    // out of the selection above, so warn to make that observable.
     const missingExpectedTools = EXPECTED_MCP_TOOLS.filter((name) => !(name in availableMcpTools))
     if (missingExpectedTools.length > 0) {
       console.error(
@@ -105,22 +96,15 @@ export const getMcpTools = async ({
       )
     }
 
-    // Safety gate: `filterToolsByOptInLevel` keeps only tools in the allowlist
-    // (tool-filter.ts TOOL_CATEGORY_MAP) and drops everything else. This — not
-    // the `read_only` query param — is what prevents the remote server's
-    // write/destructive tools (apply_migration, create_branch, ...) from reaching
-    // the assistant. `read_only` is defense-in-depth (those tools throw at
-    // runtime). Do not remove this filter on the assumption `read_only` suffices.
+    // Safety gate: the remote-contract selection above keeps only tools Studio declares and
+    // drops everything else. This, not the `read_only` query param, is what prevents the remote
+    // server's write/destructive tools (apply_migration, create_branch, ...) from reaching the
+    // assistant. `read_only` is defense-in-depth (those tools throw at runtime). Do not remove
+    // the selection on the assumption `read_only` suffices.
     const allowedMcpTools = filterToolsByOptInLevel(availableMcpTools, aiOptInLevel)
 
-    // Remove UI-executed tools handled locally
-    const filteredMcpTools: ToolSet = { ...allowedMcpTools }
-    UI_EXECUTED_TOOLS.forEach((toolName) => {
-      delete filteredMcpTools[toolName]
-    })
-
     // Validate that only known tools are provided
-    const validation = toolSetValidationSchema.safeParse(filteredMcpTools)
+    const validation = toolSetValidationSchema.safeParse(allowedMcpTools)
     if (!validation.success) {
       console.error('MCP tools validation error:', validation.error)
       throw new Error('Internal error: MCP tools validation failed')

@@ -13,10 +13,10 @@ Specific traps to watch for. One-liner per item.
   decisions.
 - **`mdxFlowExpression` / `mdxTextExpression` / `mdxjsEsm` are skipped.**
   Anything wrapped in `{...}` won't appear in markdown output.
-- **`AiPrompt` prompts must be a `prompt={...}` prop, not children.** The
-  schema handler decodes the raw JS string literal from `propsFrom()`
-  (Prettier may emit single-quoted multiline forms). See
-  `internals/markdown-schema/AiPrompt.ts`.
+- **`<AiPrompt id="…" />` carries only an ID.** Prompt text lives in
+  `data/ai-prompts.data.ts`; don't inline prompt strings in MDX. Markdown
+  export handles the `PromptPanel` parts via
+  `internals/markdown-schema/PromptPanel.ts` (drops `PromptCopy`).
 - **`<$Partial>` recursion is silent.** A missing or unreadable partial is
   dropped without error. Check `partials/` paths when content seems missing
   from generated `.md`.
@@ -53,6 +53,8 @@ Specific traps to watch for. One-liner per item.
   destinations. Don't construct `<a>` directly.
 - A `useSendTelemetryEvent()` call inside a render path returns a function;
   don't invoke it directly inside the JSX, build a callback first.
+- `$Show` reads static `enabled-features` flags only. It cannot read PostHog
+  flags. See [feature-flags.md](./feature-flags.md).
 
 ## Data modules
 
@@ -76,15 +78,6 @@ Specific traps to watch for. One-liner per item.
   URLs are passed through. Use it consistently in markdown output to avoid
   broken links.
 
-## Troubleshooting subtree
-
-- `Troubleshooting.utils.common.mjs` is `.mjs` because the troubleshooting
-  sync script can't resolve `.ts` imports cleanly. Don't convert it.
-- Rebasing can resurrect a **stale** version of this file when you reset
-  unrelated changes — verify against current `master` after
-  `git checkout master -- <path>`.
-- The `topics` enum in `TroubleshootingSchema` is hand-maintained. Adding a
-  new product means updating that enum.
 
 ## Build / CI
 

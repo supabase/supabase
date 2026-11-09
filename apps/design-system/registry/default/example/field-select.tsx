@@ -1,11 +1,13 @@
-import { Field, FieldDescription, FieldLabel } from 'ui/src/components/shadcn/ui/field'
 import {
+  Field,
+  FieldDescription,
+  FieldLabel,
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from 'ui/src/components/shadcn/ui/select'
+} from 'ui'
 
 export default function FieldSelect() {
   return (

@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
 import { CloudProvider } from 'shared-data'
@@ -54,13 +53,13 @@ import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query
 import { AddonVariantId } from '@/data/subscriptions/types'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsCloudProvider,
   useIsAwsK8sCloudProvider,
   useIsAwsNimbusCloudProvider,
+  useIsHighAvailability,
   useSelectedProjectQuery,
 } from '@/hooks/misc/useSelectedProject'
 import { GB, PROJECT_STATUS } from '@/lib/constants'
@@ -102,14 +101,10 @@ export function DiskManagementForm({
   const isAws = useIsAwsCloudProvider()
   const isAwsK8s = useIsAwsK8sCloudProvider()
   const isAwsNimbus = useIsAwsNimbusCloudProvider()
-  const { isHighAvailability } = useHighAvailability()
+  const isHighAvailability = useIsHighAvailability()
 
   const { can: canUpdateDiskConfiguration, isSuccess: isPermissionsLoaded } =
-    useAsyncCheckPermissions(PermissionAction.UPDATE, 'projects', {
-      resource: {
-        project_id: project?.id,
-      },
-    })
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE)
 
   const { hasAccess, isSuccess: isEntitlementsLoaded } = useCheckEntitlements(
     'instances.compute_update_available_sizes'
@@ -209,9 +204,10 @@ export function DiskManagementForm({
   const usedPercentage = (usedSize / totalSize) * 100
 
   const disableIopsThroughputConfig =
-    modifiedComputeSize &&
-    !isSpendCapEnabled &&
-    RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize)
+    isHighAvailability ||
+    (modifiedComputeSize &&
+      !isSpendCapEnabled &&
+      RESTRICTED_COMPUTE_FOR_THROUGHPUT_ON_GP3.includes(modifiedComputeSize))
 
   const watchedTotalSize = useWatch({ control: form.control, name: 'totalSize' }) ?? 0
   const watchedStorageType = useWatch({ control: form.control, name: 'storageType' })
@@ -220,7 +216,7 @@ export function DiskManagementForm({
     DISK_LIMITS[DiskType.GP3].minIops
   )
   // Suggested target when prompting a resize, sits above the floor so users
-  // aren't pinned at the minimum between disk-config modifications.
+  // aren't pinned at the minimum during the 4-hour disk-config cooldown.
   const suggestedDiskSizeForCustomIops = PLAN_DETAILS.pro.includedDiskGB.gp3
   const isDiskTooSmallForCustomIops =
     watchedStorageType === 'gp3' && watchedTotalSize < minDiskSizeForCustomIops
@@ -231,10 +227,11 @@ export function DiskManagementForm({
     isRequestingChanges ||
     isPlanUpgradeRequired ||
     isWithinCooldownWindow ||
+    isHighAvailability ||
     !canUpdateDiskConfiguration ||
     !isAws
 
-  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled
+  const disableDiskInputs = disableDiskSizeInput || isSpendCapEnabled || isHighAvailability
 
   // Compute resizing is not supported for High Availability projects during Alpha
   const disableComputeInputs = isPlanUpgradeRequired || isHighAvailability
@@ -585,12 +582,7 @@ export function DiskManagementForm({
                   beforePrice={totalBeforePrice}
                   afterPrice={totalAfterPrice}
                 />
-                <Button
-                  variant="default"
-                  onClick={() => form.reset()}
-                  disabled={!isDirty}
-                  size="medium"
-                >
+                <Button onClick={() => form.reset()} disabled={!isDirty} size="medium">
                   Cancel
                 </Button>
                 <DiskManagementReviewAndSubmitDialog

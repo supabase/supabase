@@ -1,5 +1,5 @@
 import { UIMessage as VercelMessage } from '@ai-sdk/react'
-import { useState } from 'react'
+import { memo, useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import { cn, copyToClipboard } from 'ui'
 
@@ -114,38 +114,59 @@ interface MessageProps {
   rating?: 'positive' | 'negative' | null
 }
 
-export function Message(props: MessageProps) {
+export const Message = memo(function Message(props: MessageProps) {
   const message = props.message
   const { role } = message
   const isUserMessage = role === 'user'
+  let messageState: MessageInfo['state'] = 'idle'
+  if (props.isBeingEdited) messageState = 'editing'
+  else if (props.isAfterEditedMessage) messageState = 'predecessor-editing'
 
-  const messageInfo = {
-    id: props.id,
-    isLoading: props.isLoading,
-    readOnly: props.readOnly,
-    variant: props.variant,
-    isUserMessage,
-    state: props.isBeingEdited
-      ? 'editing'
-      : props.isAfterEditedMessage
-        ? 'predecessor-editing'
-        : 'idle',
-    isLastMessage: props.isLastMessage,
-    rating: props.rating,
-  } satisfies MessageInfo
+  const messageInfo = useMemo<MessageInfo>(
+    () => ({
+      id: props.id,
+      isLoading: props.isLoading,
+      readOnly: props.readOnly,
+      variant: props.variant,
+      isUserMessage,
+      state: messageState,
+      isLastMessage: props.isLastMessage,
+      rating: props.rating,
+    }),
+    [
+      props.id,
+      props.isLoading,
+      props.readOnly,
+      props.variant,
+      isUserMessage,
+      messageState,
+      props.isLastMessage,
+      props.rating,
+    ]
+  )
 
-  const messageActions = {
-    addToolApprovalResponse: props.addToolApprovalResponse,
-    onDelete: props.onDelete,
-    onEdit: props.onEdit,
-    onBranch: props.onBranch,
-    onCancelEdit: props.onCancelEdit,
-    onRate: props.onRate,
-  }
+  const messageActions = useMemo(
+    () => ({
+      addToolApprovalResponse: props.addToolApprovalResponse,
+      onDelete: props.onDelete,
+      onEdit: props.onEdit,
+      onBranch: props.onBranch,
+      onCancelEdit: props.onCancelEdit,
+      onRate: props.onRate,
+    }),
+    [
+      props.addToolApprovalResponse,
+      props.onDelete,
+      props.onEdit,
+      props.onBranch,
+      props.onCancelEdit,
+      props.onRate,
+    ]
+  )
 
   return (
     <MessageProvider messageInfo={messageInfo} messageActions={messageActions}>
       {isUserMessage ? <UserMessage message={message} /> : <AssistantMessage message={message} />}
     </MessageProvider>
   )
-}
+})

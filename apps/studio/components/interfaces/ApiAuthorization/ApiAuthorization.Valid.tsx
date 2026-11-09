@@ -238,6 +238,7 @@ export function ApiAuthorizationValidScreen({
     <>
       <Head>{pageTitle && <title>{pageTitle}</title>}</Head>
       <ApiAuthorizationMainView
+        auth_id={auth_id}
         approvalState={effectiveApprovalState}
         form={form}
         requester={effectiveRequester}

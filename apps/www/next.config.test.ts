@@ -1,6 +1,6 @@
 import type { NextConfig } from 'next'
 import { getPathMatch } from 'next/dist/shared/lib/router/utils/path-match'
-import { describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, onTestFinished, vi } from 'vitest'
 
 vi.mock('@sentry/nextjs', () => ({
   withSentryConfig: (configFn: any) => (typeof configFn === 'function' ? configFn() : configFn),
@@ -14,23 +14,51 @@ describe('next.config.mjs', () => {
     expect(headers).toEqual(
       expect.arrayContaining([
         expect.objectContaining({
-          source: '/(docs|blog)/:path*',
+          source: '/(docs|blog|kb)/:path*',
           headers: [{ key: 'X-Robots-Tag', value: 'all' }],
         }),
         expect.objectContaining({
-          source: '/dashboard/:path*',
+          source: '/dashboard/:path((?!sign-in$|sign-up$).*)',
           headers: [{ key: 'X-Robots-Tag', value: 'noindex' }],
         }),
       ])
     )
   })
 
+  it('keeps sign-in and sign-up indexable while other dashboard paths stay noindex', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+    const noindexRule = headers.find((header) => header.source.startsWith('/dashboard/'))
+    const matches = getPathMatch(noindexRule!.source)
+
+    expect(matches('/dashboard/sign-in')).toBe(false)
+    expect(matches('/dashboard/sign-up')).toBe(false)
+    expect(matches('/dashboard/org')).toBeTruthy()
+    expect(matches('/dashboard/project/abc')).toBeTruthy()
+  })
+
+  it('serves the published CLI schemas with CORS and a short cache', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const headers = (await config.headers?.()) || []
+
+    const schemasHeaders = headers.find((header) => header.source === '/schemas/:path*')
+
+    expect(schemasHeaders?.headers).toEqual(
+      expect.arrayContaining([
+        { key: 'access-control-allow-origin', value: '*' },
+        { key: 'cache-control', value: 'public, max-age=3600' },
+      ])
+    )
+    expect(getPathMatch(schemasHeaders!.source)('/schemas/config/v1.json')).toBeTruthy()
+  })
+
   it('routes the library and permanently redirects the legacy UI URLs', async () => {
     const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
-    const rewrites = (await config.rewrites?.()) || []
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
     const redirects = (await config.redirects?.()) || []
 
-    expect(rewrites).toEqual(
+    expect(afterFiles).toEqual(
       expect.arrayContaining([
         expect.objectContaining({ source: '/library' }),
         expect.objectContaining({ source: '/library/:path*' }),
@@ -59,6 +87,107 @@ describe('next.config.mjs', () => {
     expect(
       redirects.findIndex((redirect) => redirect.source === '/ui/docs/ai-editors-rules/prompts')
     ).toBeLessThan(redirects.findIndex((redirect) => redirect.source === '/ui/:path*'))
+  })
+
+  it('proxies the InstantDB migration app with its basePath prefix intact', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const afterFiles = (rewrites && 'afterFiles' in rewrites && rewrites.afterFiles) || []
+
+    expect(afterFiles).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({
+          source: '/migrate/instantdb',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb',
+        }),
+        expect.objectContaining({
+          source: '/migrate/instantdb/:path*',
+          destination: 'https://instantdb-to-supabase.vercel.app/migrate/instantdb/:path*',
+        }),
+      ])
+    )
+  })
+
+  it('forwards zone prefetches as the page path, so each zone adds the rsc suffix once', async () => {
+    // later tests must not get the production rewrites from the module cache
+    onTestFinished(() => {
+      vi.unstubAllEnvs()
+      vi.resetModules()
+    })
+    vi.resetModules()
+    const zones = [
+      { zone: '/docs', env: 'NEXT_PUBLIC_DOCS_URL', url: 'https://docs.example.com/docs' },
+      {
+        zone: '/library',
+        env: 'NEXT_PUBLIC_LIBRARY_URL',
+        url: 'https://library.example.com/library',
+      },
+      {
+        zone: '/design-system',
+        env: 'NEXT_PUBLIC_DESIGN_SYSTEM_URL',
+        url: 'https://design-system.example.com/design-system',
+      },
+    ]
+    vi.stubEnv('NEXT_PUBLIC_VERCEL_ENV', 'production')
+    for (const { env, url } of zones) vi.stubEnv(env, url)
+    const { default: rewrites } = (await import('./lib/rewrites.js')) as {
+      default: Array<{ source: string; destination: string }>
+    }
+
+    // the first rule rewrites every path to itself, so routing goes on to the next match
+    const forward = (path: string) =>
+      rewrites
+        .filter((rule) => rule.source !== '/:path*')
+        .map((rule) => ({
+          destination: rule.destination,
+          // next matches custom routes with these options
+          params: getPathMatch(rule.source, { strict: true, removeUnnamedParams: true })(path),
+        }))
+        .find((match) => match.params)
+
+    for (const { zone, url } of zones) {
+      expect(
+        forward(`${zone}/guides/auth/architecture.segments/_tree.segment.rsc`),
+        zone
+      ).toMatchObject({
+        destination: `${url}/:path`,
+        params: { path: 'guides/auth/architecture' },
+      })
+      expect(forward(`${zone}.segments/_tree.segment.rsc`), zone).toMatchObject({
+        destination: url,
+      })
+      expect(forward(`${zone}.rsc`), zone).toMatchObject({ destination: url })
+      expect(forward(`${zone}/guides/auth/architecture`), zone).toMatchObject({
+        destination: `${url}/:path*`,
+      })
+    }
+  })
+
+  it('routes unmatched markdown-negotiated paths to the md-404 handler via fallback rewrites', async () => {
+    const { default: config } = (await import('./next.config.mjs')) as { default: NextConfig }
+    const rewrites = await config.rewrites?.()
+    const fallback = (rewrites && 'fallback' in rewrites && rewrites.fallback) || []
+
+    const mdSuffixRule = fallback.find((rule) => rule.destination === '/api-v2/md-404/:path')
+    const acceptRule = fallback.find((rule) => rule.destination === '/api-v2/md-404/:path*')
+
+    expect(mdSuffixRule).toBeDefined()
+    expect(acceptRule?.has).toEqual([
+      { type: 'header', key: 'accept', value: '.*text/(markdown|\\*).*' },
+    ])
+
+    expect(getPathMatch(mdSuffixRule!.source)('/definitely-not-a-page.md')).toBeTruthy()
+    expect(getPathMatch(mdSuffixRule!.source)('/nested/definitely/not-a-page.md')).toBeTruthy()
+    expect(getPathMatch(mdSuffixRule!.source)('/definitely-not-a-page')).toBe(false)
+    expect(getPathMatch(acceptRule!.source)('/definitely-not-a-page')).toBeTruthy()
+
+    const acceptHeaderRegex = new RegExp(`^${acceptRule!.has![0].value}$`)
+    expect(acceptHeaderRegex.test('text/markdown')).toBe(true)
+    expect(acceptHeaderRegex.test('text/html, text/markdown;q=0.9')).toBe(true)
+    expect(acceptHeaderRegex.test('text/*')).toBe(true)
+    expect(
+      acceptHeaderRegex.test('text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8')
+    ).toBe(false)
   })
 
   it('permanently redirects the legacy root markdown aliases to /index.md', async () => {

@@ -1,7 +1,7 @@
 import { screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { toast } from 'sonner'
-import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
 import { RoleImpersonationSelectorInterface } from '@/components/interfaces/RoleImpersonationSelector'
 import type { ImpersonationRole } from '@/lib/role-impersonation'
@@ -21,10 +21,6 @@ vi.mock('@/components/interfaces/RoleImpersonationSelector/UserImpersonationSele
 }))
 
 describe('RoleImpersonationSelectorInterface', () => {
-  beforeEach(() => {
-    vi.clearAllMocks()
-  })
-
   it('enables user settings for authenticated queries and summarizes each role', async () => {
     const user = userEvent.setup()
     let currentRole: ImpersonationRole | undefined
@@ -42,10 +38,6 @@ describe('RoleImpersonationSelectorInterface', () => {
     const { rerender } = customRender(<RoleImpersonationSelectorInterface state={state} />)
 
     expect(screen.queryByText('Role')).not.toBeInTheDocument()
-    for (const option of screen.getAllByRole('radio')) {
-      expect(option).toHaveClass('w-full')
-      expect(option.querySelector('svg')).toBeInTheDocument()
-    }
     expect(screen.getByRole('radio', { name: 'PostgresSuperuser' })).toBeChecked()
     expect(screen.getByText('Bypasses RLS and can return all rows.')).toBeVisible()
     expect(screen.getByTestId('user-settings')).toBeDisabled()

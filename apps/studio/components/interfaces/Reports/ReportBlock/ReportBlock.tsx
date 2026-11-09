@@ -1,7 +1,7 @@
 import { acceptUntrustedSql, safeSql } from '@supabase/pg-meta'
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { toast } from 'sonner'
 
@@ -16,6 +16,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DEFAULT_CHART_CONFIG, QueryBlock } from '@/components/ui/QueryBlock/QueryBlock'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 import { useContentIdQuery } from '@/data/content/content-id-query'
+import { unguarded } from '@/data/fetchers'
 import { usePrimaryDatabase } from '@/data/read-replicas/replicas-query'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { sqlKeys } from '@/data/sql/keys'
@@ -127,6 +128,7 @@ export const ReportBlock = ({
         projectRef,
         connectionString,
         sql: formattedSql,
+        grant: unguarded.migrating,
       })
     },
     enabled: !isLoadingContent && contentError == null && !isLogsSnippet,
@@ -163,7 +165,7 @@ export const ReportBlock = ({
           !disableUpdate ? (
             <ButtonTooltip
               variant="text"
-              icon={<X />}
+              icon={<XIcon />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
               tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -198,7 +200,7 @@ export const ReportBlock = ({
           actions={
             <ButtonTooltip
               variant="text"
-              icon={<X />}
+              icon={<XIcon />}
               className="w-7 h-7"
               onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
               tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -219,7 +221,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="h-7 w-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -235,7 +237,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}
@@ -258,7 +260,7 @@ export const ReportBlock = ({
             !disableUpdate ? (
               <ButtonTooltip
                 variant="text"
-                icon={<X />}
+                icon={<XIcon />}
                 className="w-7 h-7"
                 onClick={() => onRemoveChart({ metric: { key: item.attribute } })}
                 tooltip={{ content: { side: 'bottom', text: 'Remove chart' } }}

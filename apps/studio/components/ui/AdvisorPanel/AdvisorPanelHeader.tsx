@@ -1,4 +1,4 @@
-import { ChevronLeft, X } from 'lucide-react'
+import { ChevronLeftIcon, XIcon } from 'lucide-react'
 import { Badge } from 'ui'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
@@ -30,7 +30,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
       <ButtonTooltip
         variant="text"
         className="w-7 h-7 p-0 flex justify-center items-center"
-        icon={<ChevronLeft size={16} strokeWidth={1.5} aria-hidden={true} />}
+        icon={<ChevronLeftIcon size={16} strokeWidth={1.5} aria-hidden={true} />}
         onClick={onBack}
         tooltip={{ content: { side: 'bottom', text: 'Back to list' } }}
       />
@@ -60,7 +60,7 @@ export const AdvisorPanelHeader = ({ selectedItem, onBack, onClose }: AdvisorPan
       <ButtonTooltip
         variant="text"
         className="w-7 h-7 p-0"
-        icon={<X strokeWidth={1.5} />}
+        icon={<XIcon strokeWidth={1.5} />}
         onClick={onClose}
         tooltip={{ content: { side: 'bottom', text: 'Close Advisor Center' } }}
       />

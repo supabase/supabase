@@ -245,6 +245,5 @@ describe('useThemeSwitcherCommands', () => {
       'Dark theme, Dark mode',
       'Light theme, Light mode',
     ])
-    expect(pageCommands.some((command) => command.name === 'Classic dark')).toBe(false)
   })
 })

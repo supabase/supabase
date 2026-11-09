@@ -1,4 +1,7 @@
+import { SubmitHandler } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
+  Button,
   Dialog,
   DialogContent,
   DialogDescription,
@@ -7,10 +10,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
-} from '@ui/components/shadcn/ui/dialog'
-import { SubmitHandler } from 'react-hook-form'
-import { toast } from 'sonner'
-import { Button } from 'ui'
+} from 'ui'
 
 import {
   CREATE_AWS_MANAGED_ORG_FORM_ID,
@@ -103,6 +103,7 @@ const AwsMarketplaceOrgCreationDialog = ({
         </DialogSection>
         <DialogFooter>
           <Button
+            variant="primary"
             form={CREATE_AWS_MANAGED_ORG_FORM_ID}
             type="submit"
             loading={isCreatingOrganization}

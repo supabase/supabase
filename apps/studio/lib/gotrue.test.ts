@@ -1,12 +1,36 @@
+// @vitest-environment jsdom
 import { describe, expect, it } from 'vitest'
 
 import {
   buildSignUpReturnPath,
   DEFAULT_FALLBACK_PATH,
   DEFAULT_SIGNUP_RETURN_PATH,
+  getReturnToPath,
+  getSignInQuery,
   getSignUpReturnTo,
   validateReturnTo,
 } from './gotrue'
+
+describe('getSignInQuery', () => {
+  it('drops returnTo when it is exactly /new and keeps other params', () => {
+    expect(getSignInQuery({ returnTo: '/new', destination: 'cli' })).toEqual({ destination: 'cli' })
+    expect(getSignInQuery({ returnTo: ['/new', '/other'] })).toEqual({})
+  })
+
+  it('keeps /new with a query string', () => {
+    expect(getSignInQuery({ returnTo: '/new?foo=bar' })).toEqual({ returnTo: '/new?foo=bar' })
+  })
+
+  it('keeps other destinations and params', () => {
+    const query = { returnTo: '/project/ref', destination: 'cli' }
+    expect(getSignInQuery(query)).toEqual(query)
+  })
+
+  it('returns the query unchanged when there is no returnTo', () => {
+    expect(getSignInQuery({})).toEqual({})
+    expect(getSignInQuery({ method: 'github' })).toEqual({ method: 'github' })
+  })
+})
 
 describe('getSignUpReturnTo', () => {
   it('defaults to /new when returnTo is missing', () => {
@@ -101,6 +125,26 @@ describe('buildSignUpReturnPath', () => {
     window.location = { search: '' }
 
     expect(buildSignUpReturnPath(['/join?token=abc', '/other'])).toBe('/join?token=abc')
+  })
+})
+
+describe('getReturnToPath', () => {
+  it('rebuilds a nested returnTo path with the params that rode alongside it', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '?ref=abc&name=OPENAI_API_KEY&returnTo=%2Fmcp%2Fsecrets' }
+
+    expect(getReturnToPath()).toBe('/mcp/secrets?ref=abc&name=OPENAI_API_KEY')
+  })
+
+  it('accepts a multi-segment returnTo rather than falling back', () => {
+    // @ts-ignore
+    delete window.location
+    // @ts-ignore
+    window.location = { search: '?returnTo=%2Fmcp%2Fsecrets' }
+
+    expect(getReturnToPath()).toBe('/mcp/secrets')
   })
 })
 

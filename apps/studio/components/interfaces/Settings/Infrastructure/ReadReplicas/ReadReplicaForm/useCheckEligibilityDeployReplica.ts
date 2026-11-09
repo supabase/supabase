@@ -1,5 +1,6 @@
 import { useParams } from 'common'
 
+import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useOverdueInvoicesQuery } from '@/data/invoices/invoices-overdue-query'
 import {
   getMaxReplicas,
@@ -9,7 +10,11 @@ import {
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useIsAwsK8sCloudProvider, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsHighAvailability,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
 
 export const useCheckEligibilityDeployReplica = () => {
   const { ref: projectRef } = useParams()
@@ -21,18 +26,22 @@ export const useCheckEligibilityDeployReplica = () => {
   const isWalgEnabled = project?.is_physical_backups_enabled
   const isNotOnHigherPlan = !['team', 'enterprise', 'platform'].includes(org?.plan.id ?? '')
   const isProWithSpendCapEnabled = org?.plan.id === 'pro' && !org.usage_billing_enabled
+  const isHighAvailability = useIsHighAvailability()
 
-  const { data: allOverdueInvoices } = useOverdueInvoicesQuery({
+  const overdueInvoicesQuery = useOverdueInvoicesQuery({
     enabled: isNotOnHigherPlan,
   })
+  const allOverdueInvoices = overdueInvoicesQuery.data
   const overdueInvoices = (allOverdueInvoices ?? []).filter(
     (x) => x.organization_id === project?.organization_id
   )
   const hasOverdueInvoices = overdueInvoices.length > 0 && isNotOnHigherPlan
 
-  const { data: databases = [] } = useReadReplicasQuery({ projectRef })
+  const replicasQuery = useReadReplicasQuery({ projectRef })
+  const databases = replicasQuery.data ?? []
 
-  const { data: addons } = useProjectAddonsQuery({ projectRef })
+  const addonsQuery = useProjectAddonsQuery({ projectRef })
+  const addons = addonsQuery.data
   // Will be following the primary's compute size for the time being
   const currentComputeAddon = addons?.selected_addons.find(
     (addon) => addon.type === 'compute_instance'
@@ -49,8 +58,31 @@ export const useCheckEligibilityDeployReplica = () => {
   )
   const currentPgVersion = Number.isNaN(parsedPgVersion) ? undefined : parsedPgVersion
 
+  const upgradeEligibilityQuery = useProjectUpgradeEligibilityQuery({ projectRef })
+  const upgradeEligibility = upgradeEligibilityQuery.data
+  const isCollationLineageCrossed = (upgradeEligibility?.warnings ?? []).some(
+    (warning) => warning.type === 'collation_reindex_required'
+  )
+
+  const queries = [overdueInvoicesQuery, replicasQuery, addonsQuery, upgradeEligibilityQuery]
+  const isLoading = queries.some((query) => query.isLoading)
+  const failedQueries = queries.filter((query) => query.isError)
+  const isError = failedQueries.length > 0
+  const failure: unknown = failedQueries[0]?.error
+  const error =
+    typeof failure === 'object' &&
+    failure !== null &&
+    'message' in failure &&
+    typeof failure.message === 'string'
+      ? { message: failure.message }
+      : null
+  const refetch = () => Promise.all(failedQueries.map((query) => query.refetch()))
+
   const canDeployReplica =
+    !isLoading &&
+    !isError &&
     !isReachedMaxReplicas &&
+    !isCollationLineageCrossed &&
     currentPgVersion !== undefined &&
     currentPgVersion >= 15 &&
     isAWSProvider &&
@@ -59,10 +91,15 @@ export const useCheckEligibilityDeployReplica = () => {
     !hasOverdueInvoices &&
     !isAwsK8s &&
     !isProWithSpendCapEnabled &&
-    !isBelowSmallCompute
+    !isBelowSmallCompute &&
+    !isHighAvailability
 
   return {
     can: canDeployReplica,
+    isLoading,
+    isError,
+    error,
+    refetch,
     hasOverdueInvoices,
     isAWSProvider,
     isAwsK8s,
@@ -71,6 +108,8 @@ export const useCheckEligibilityDeployReplica = () => {
     isWalgNotEnabled: !isWalgEnabled,
     isProWithSpendCapEnabled,
     isReachedMaxReplicas,
+    isHighAvailability,
+    isCollationLineageCrossed,
     maxNumberOfReplicas,
   }
 }

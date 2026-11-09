@@ -1,22 +1,27 @@
 import lodash from 'lodash'
 import type { RegistryItem } from 'shadcn/schema'
 
-const { uniq, uniqBy } = lodash
+import { uniqueInstalledFiles } from '../lib/registry-resolution'
+
+const { uniq } = lodash
 
 const registryItemAppend = (item: RegistryItem, items: RegistryItem[]) => {
   const neededRegDependencies = [
     ...(item.registryDependencies || []),
-    ...items.flatMap((i) => i.registryDependencies),
+    ...items.flatMap((i) => i.registryDependencies ?? []),
   ]
-  const neededDependencies = [...(item.dependencies || []), ...items.flatMap((i) => i.dependencies)]
-  const neededFiles = [...(item.files || []), ...items.flatMap((i) => i.files)]
+  const neededDependencies = [
+    ...(item.dependencies || []),
+    ...items.flatMap((i) => i.dependencies ?? []),
+  ]
+  const neededFiles = [...(item.files || []), ...items.flatMap((i) => i.files ?? [])]
 
   const registryBlock = {
     ...item,
     registryDependencies: uniq(neededRegDependencies),
     dependencies: uniq(neededDependencies),
-    files: uniqBy(neededFiles, (file) => file?.path),
-    docs: (item.docs, items.flatMap((i) => i.docs)).filter(Boolean).join('\n\n'),
+    files: uniqueInstalledFiles(neededFiles, `Registry item "${item.name}"`),
+    docs: [item.docs, ...items.map((i) => i.docs)].filter(Boolean).join('\n\n'),
     // merge all environment variables
     envVars: {
       ...item.envVars,

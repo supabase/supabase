@@ -26,7 +26,7 @@ function Providers({ children }: { children: React.ReactNode }) {
   return (
     <NuqsAdapter>
       <AuthProvider>
-        <FeatureFlagProvider API_URL={API_URL} enabled={IS_PLATFORM}>
+        <FeatureFlagProvider API_URL={API_URL} enabled={{ cc: true, ph: false }}>
           <DevToolbarProvider apiUrl={API_URL}>
             <ThemeProvider>
               <TooltipProvider delayDuration={0}>
@@ -37,6 +37,7 @@ function Providers({ children }: { children: React.ReactNode }) {
                   <WwwCommandMenu />
                   <PageTelemetry
                     API_URL={API_URL}
+                    platform="www"
                     hasAcceptedConsent={hasAcceptedConsent}
                     enabled={IS_PLATFORM}
                   />

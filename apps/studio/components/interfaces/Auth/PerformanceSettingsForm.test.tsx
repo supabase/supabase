@@ -2,7 +2,7 @@ import { screen } from '@testing-library/react'
 import { HttpResponse } from 'msw'
 import { describe, expect, test, vi } from 'vitest'
 
-import { PerformanceSettingsForm } from './PerformanceSettingsForm'
+import { DatabaseFormSchema, PerformanceSettingsForm } from './PerformanceSettingsForm'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
@@ -19,8 +19,14 @@ vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: true, isLoading: false }),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: () => ({ can: true, isLoading: false, isSuccess: true }),
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: () => ({ can: true, isLoading: false, isSuccess: true }),
+  FGA_PERMISSIONS: {
+    PROJECT: {
+      AUTH_CONFIG_READ: 'auth_config_read',
+      AUTH_CONFIG_WRITE: 'auth_config_write',
+    },
+  },
 }))
 
 function mockAuthConfig(overrides: Record<string, unknown>) {
@@ -44,6 +50,38 @@ function mockMaxConnections(maxConnections: number) {
     response: () => HttpResponse.json<any>([{ max_connections: maxConnections }]),
   })
 }
+
+describe('DatabaseFormSchema', () => {
+  test.each([
+    { size: 1, unit: 'percent', valid: true },
+    { size: 100, unit: 'percent', valid: true },
+    { size: 0, unit: 'percent', valid: false },
+    { size: 101, unit: 'percent', valid: false },
+    { size: -5, unit: 'percent', valid: false },
+    { size: '75', unit: 'percent', valid: true },
+    { size: '150', unit: 'percent', valid: false },
+    { size: 1, unit: 'connections', valid: true },
+    // No upper schema bound for an absolute connection count
+    { size: 500, unit: 'connections', valid: true },
+    { size: 0, unit: 'connections', valid: false },
+    { size: 10, unit: 'bytes', valid: false },
+  ])('pool size $size with unit $unit -> valid: $valid', ({ size, unit, valid }) => {
+    const result = DatabaseFormSchema.safeParse({
+      DB_MAX_POOL_SIZE: size,
+      DB_MAX_POOL_SIZE_UNIT: unit,
+    })
+    expect(result.success).toBe(valid)
+  })
+
+  test('explains the percentage bounds when out of range', () => {
+    const result = DatabaseFormSchema.safeParse({
+      DB_MAX_POOL_SIZE: 101,
+      DB_MAX_POOL_SIZE_UNIT: 'percent',
+    })
+    const issue = result.error?.issues.find((i) => i.path[0] === 'DB_MAX_POOL_SIZE')
+    expect(issue?.message).toBe('Percentage must be between 1 and 100')
+  })
+})
 
 describe('PerformanceSettingsForm', () => {
   test('reflects a persisted percentage allocation strategy after loading', async () => {

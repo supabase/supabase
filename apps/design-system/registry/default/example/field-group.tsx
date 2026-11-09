@@ -1,12 +1,12 @@
-import { Checkbox } from 'ui'
 import {
+  Checkbox,
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
   FieldSet,
-} from 'ui/src/components/shadcn/ui/field'
+} from 'ui'
 
 export default function FieldGroupExample() {
   return (

@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppSigningKeyCreateVariables = {
   slug: string
@@ -16,6 +17,7 @@ export async function createPlatformAppSigningKey({
 }: PlatformAppSigningKeyCreateVariables) {
   const { data, error } = await post('/platform/organizations/{slug}/apps/{app_id}/signing-keys', {
     params: { path: { slug, app_id: appId } },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -33,7 +35,7 @@ export const usePlatformAppSigningKeyCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     PlatformAppSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     PlatformAppSigningKeyCreateVariables
   >,
   'mutationFn'
@@ -42,7 +44,7 @@ export const usePlatformAppSigningKeyCreateMutation = ({
 
   return useMutation<
     PlatformAppSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     PlatformAppSigningKeyCreateVariables
   >({
     mutationFn: (vars) => createPlatformAppSigningKey(vars),

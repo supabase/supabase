@@ -1,5 +1,5 @@
 import { useVirtualizer } from '@tanstack/react-virtual'
-import { ChevronUp, Search, X } from 'lucide-react'
+import { ChevronUpIcon, SearchIcon, XIcon } from 'lucide-react'
 import {
   forwardRef,
   useEffect,
@@ -75,7 +75,7 @@ export const BucketsPolicies = ({
               'focus-ring'
             )}
           >
-            <ChevronUp size={14} className={cn(!expanded && 'rotate-180', 'transition')} />
+            <ChevronUpIcon size={14} className={cn(!expanded && 'rotate-180', 'transition')} />
           </CollapsibleTrigger>
         </PageSectionMeta>
         <CollapsibleContent>
@@ -94,14 +94,14 @@ export const BucketsPolicies = ({
                     const str = e.target.value
                     setSearch(str)
                   }}
-                  icon={<Search />}
+                  icon={<SearchIcon />}
                   actions={
                     search ? (
                       <Button
                         size="tiny"
                         variant="text"
                         className="p-0 h-5 w-5"
-                        icon={<X />}
+                        icon={<XIcon />}
                         onClick={() => setSearch('')}
                       />
                     ) : null

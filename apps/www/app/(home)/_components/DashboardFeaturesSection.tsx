@@ -1,7 +1,7 @@
 'use client'
 
 import BrowserFrame from '~/components/BrowserFrame'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useTheme } from 'next-themes'
 import React, { useRef, useState } from 'react'
 import { cn } from 'ui'

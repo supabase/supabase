@@ -6,7 +6,7 @@ import { SkipToContent } from 'ui-patterns/SkipToContent'
 
 import { BannerStack } from '../ui/BannerStack/BannerStack'
 import { LayoutHeader } from './Navigation/LayoutHeader/LayoutHeader'
-import MobileNavigationBar from './Navigation/NavigationBar/MobileNavigationBar'
+import { MobileNavigationBar } from './Navigation/NavigationBar/MobileNavigationBar'
 import { MobileSheetProvider } from './Navigation/NavigationBar/MobileSheetContext'
 import { StudioMobileSheetNav } from './Navigation/NavigationBar/StudioMobileSheetNav'
 import { LayoutSidebar } from './ProjectLayout/LayoutSidebar'
@@ -18,7 +18,6 @@ import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
 import { Sidebar } from '@/components/interfaces/Sidebar'
-import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -45,13 +44,13 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
   const router = useRouter()
   const panelRef = usePanelRef()
   const isMobile = useBreakpoint('md')
+  const isSidebarOverlay = useBreakpoint('xl')
   const appSnap = useAppStateSnapshot()
   const { isMaximised, activeSidebar } = useSidebarManagerSnapshot()
   const { lastVisitedOrganization } = useLastVisitedOrganization()
@@ -77,13 +76,13 @@ export const DefaultLayout = ({
   }, [])
 
   useEffect(() => {
-    if (!isMounted || !panelRef.current || !activeSidebar || isMobile) return
+    if (!isMounted || !panelRef.current || !activeSidebar || isMobile || isSidebarOverlay) return
     if (isMaximised) {
       panelRef.current.collapse()
     } else {
       panelRef.current.resize(`${contentMaxSizePercentage}%`)
     }
-  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile])
+  }, [isMounted, isMaximised, panelRef, activeSidebar, isMobile, isSidebarOverlay])
 
   // This is required to prevent layout shift when rendering resizable panels (they initially render at 50%, then shift
   // to whatever is specified).

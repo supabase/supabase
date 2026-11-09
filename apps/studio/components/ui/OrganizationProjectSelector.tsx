@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useDebounce, useIntersectionObserver } from '@uidotdev/usehooks'
-import { ChevronsUpDown, HelpCircle } from 'lucide-react'
+import { ChevronsUpDownIcon, HelpCircleIcon } from 'lucide-react'
 import { ReactNode, useEffect, useId, useMemo, useRef, useState } from 'react'
 import {
   Button,
@@ -162,7 +162,7 @@ export const OrganizationProjectSelector = ({
           <p className="text-xs text-foreground-lighter">Failed to retrieve projects</p>
           <Tooltip>
             <TooltipTrigger>
-              <HelpCircle size={14} />
+              <HelpCircleIcon size={14} />
             </TooltipTrigger>
             <TooltipContent side="bottom">Error: {projectsError?.message}</TooltipContent>
           </Tooltip>
@@ -276,13 +276,12 @@ export const OrganizationProjectSelector = ({
         ) : (
           <Button
             block
-            variant="default"
             role="combobox"
             size="small"
             aria-expanded={open}
             aria-controls={listboxId}
             className="justify-between"
-            iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+            iconRight={<ChevronsUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
           >
             {isLoadingProjects || isFetching ? (
               <ShimmeringLoader className="w-44 py-2" />

@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { ArrowDownNarrowWide, RefreshCw, Search } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, RefreshCwIcon, SearchIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useMemo, useRef, useState } from 'react'
 import {
@@ -18,12 +18,12 @@ import { PageContainer } from 'ui-patterns/PageContainer'
 import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { CreateBucketModal } from '../CreateBucketModal'
 import { EmptyBucketState } from '../EmptyBucketState'
 import { CreateBucketButton } from '../NewBucketButton'
 import { STORAGE_BUCKET_SORT } from '../Storage.constants'
 import { useStoragePreference } from '../StorageExplorer/useStoragePreference'
 import { BucketsTable } from './BucketsTable'
+import { CreateBucketModal } from './CreateBucketModal'
 import { useFilesBucketsShortcuts } from './useFilesBucketsShortcuts'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -139,13 +139,18 @@ export const FilesBuckets = () => {
                             placeholder="Search for a bucket"
                             value={filterString}
                             onChange={(e) => setFilterString(e.target.value)}
-                            icon={<Search />}
+                            icon={<SearchIcon />}
                           />
                         </ShortcutTooltip>
                         <DropdownMenu>
                           <DropdownMenuTrigger asChild>
-                            <Button variant="default" icon={<ArrowDownNarrowWide />}>
-                              Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                            <Button icon={<ArrowDownNarrowWideIcon />}>
+                              Sorted by{' '}
+                              {sortBucket === 'alphabetical' ? (
+                                <span>name</span>
+                              ) : (
+                                <span>created at</span>
+                              )}
                             </Button>
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="start" className="w-40">
@@ -167,8 +172,7 @@ export const FilesBuckets = () => {
                           side="bottom"
                         >
                           <Button
-                            variant="default"
-                            icon={<RefreshCw />}
+                            icon={<RefreshCwIcon />}
                             loading={isFetchingBuckets}
                             onClick={handleRefresh}
                           >

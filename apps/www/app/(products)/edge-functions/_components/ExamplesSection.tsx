@@ -25,12 +25,12 @@ export function ExamplesSection() {
           What you can build <br />
           <span className="text-foreground">with Edge Functions</span>
         </h3>
-        <Link
+        <a
           href="/docs/guides/functions#examples"
           className="text-sm text-foreground-light hover:text-foreground underline"
         >
           View all examples
-        </Link>
+        </a>
       </div>
 
       {/* Cards */}

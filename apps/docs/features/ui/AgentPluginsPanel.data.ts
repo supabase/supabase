@@ -31,6 +31,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     docsUrl: 'https://cursor.com/docs/plugins',
   },
   {
+    key: 'antigravity',
+    label: 'Antigravity',
+    icon: 'antigravity',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://antigravity.google/docs/plugins/#managing-plugins-by-surface',
+    docsLinkText: 'View Antigravity plugin documentation',
+  },
+  {
     key: 'gemini-cli',
     label: 'Gemini CLI',
     icon: 'gemini-cli',
@@ -62,6 +70,14 @@ export const PLUGIN_CLIENTS: PluginClient[] = [
     hasDistinctDarkIcon: true,
     repoUrl: 'https://github.com/supabase-community/supabase-plugin',
     docsUrl: 'https://www.kimi.com/code/docs/en/kimi-code-cli/customization/plugins.html',
+  },
+  {
+    key: 'omp',
+    label: 'omp',
+    icon: 'omp',
+    repoUrl: 'https://github.com/supabase-community/supabase-plugin',
+    docsUrl: 'https://github.com/can1357/oh-my-pi/blob/main/docs/marketplace.md',
+    docsLinkText: 'View omp plugin docs',
   },
   {
     key: 'vscode',

@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 

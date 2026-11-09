@@ -6,15 +6,17 @@ import { toast } from 'sonner'
 import { fdwKeys } from './keys'
 import type { WrapperMeta } from '@/components/interfaces/Integrations/Wrappers/Wrappers.types'
 import { entityTypeKeys } from '@/data/entity-types/keys'
+import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWDeleteVariables = {
   projectRef?: string
   connectionString?: string | null
-  wrapper: { name: string }
+  wrapper: { id: number; name: string; server_name: string; server_options?: string[] | null }
   wrapperMeta: WrapperMeta
 }
 
@@ -25,7 +27,13 @@ export async function deleteFDW({
   wrapperMeta,
 }: FDWDeleteVariables) {
   const sql = wrapWithTransaction(getDeleteFDWSql({ wrapper, wrapperMeta }))
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    queryKey: ['delete-fdw'],
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -36,12 +44,12 @@ export const useFDWDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<FDWDeleteData, ResponseError, FDWDeleteVariables>,
+  UseCustomMutationOptions<FDWDeleteData, StudioError, FDWDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWDeleteData, ResponseError, FDWDeleteVariables>({
+  return useMutation<FDWDeleteData, StudioError, FDWDeleteVariables>({
     mutationFn: (vars) => deleteFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
@@ -57,9 +65,7 @@ export const useFDWDeleteMutation = ({
     },
     async onError(data, variables, context) {
       if (onError === undefined) {
-        toast.error(
-          `Failed to disable ${variables.wrapper.name} foreign data wrapper: ${data.message}`
-        )
+        toast.error(`Failed to delete ${variables.wrapper.name} connection: ${data.message}`)
       } else {
         onError(data, variables, context)
       }

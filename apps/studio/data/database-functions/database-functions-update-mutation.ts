@@ -6,8 +6,10 @@ import { z } from 'zod'
 
 import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
@@ -29,6 +31,7 @@ export async function updateDatabaseFunction({
     connectionString,
     sql,
     queryKey: ['functions', 'update', func.id.toString()],
+    grant: unguarded.migrating,
   })
 
   return result as z.infer<typeof zod>
@@ -43,14 +46,14 @@ export const useDatabaseFunctionUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionUpdateData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>({
+  return useMutation<DatabaseFunctionUpdateData, StudioError, DatabaseFunctionUpdateVariables>({
     mutationFn: (vars) => updateDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

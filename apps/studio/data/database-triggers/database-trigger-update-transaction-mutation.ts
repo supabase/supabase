@@ -8,8 +8,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseTriggerKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 // [Joshen] Writing this query within FE as the PATCH endpoint from pg-meta only supports updating
 // trigger name and enabled mode. So we'll delete and create the trigger, within a single transaction
@@ -35,6 +37,7 @@ export async function updateDatabaseTrigger({
     connectionString,
     sql,
     queryKey: ['trigger', 'update', originalTrigger.id],
+    grant: unguarded.migrating,
   })
   return updatedTrigger
 }
@@ -48,14 +51,14 @@ export const useDatabaseTriggerUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseTriggerUpdateTxnData,
-    ResponseError,
+    StudioError,
     DatabaseTriggerUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateTxnData, ResponseError, DatabaseTriggerUpdateVariables>({
+  return useMutation<DatabaseTriggerUpdateTxnData, StudioError, DatabaseTriggerUpdateVariables>({
     mutationFn: (vars) => updateDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

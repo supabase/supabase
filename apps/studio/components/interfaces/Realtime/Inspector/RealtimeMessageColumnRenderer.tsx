@@ -1,4 +1,4 @@
-import { AlertTriangle } from 'lucide-react'
+import { AlertTriangleIcon } from 'lucide-react'
 import { Column } from 'react-data-grid'
 import { cn, IconBroadcast, IconDatabaseChanges, IconPresence } from 'ui'
 
@@ -10,7 +10,7 @@ const ICONS = {
   PRESENCE: <IconPresence size="xlarge" />,
   BROADCAST: <IconBroadcast size="xlarge" />,
   POSTGRES: <IconDatabaseChanges size="xlarge" />,
-  SYSTEM: <AlertTriangle size="20" strokeWidth={1} />,
+  SYSTEM: <AlertTriangleIcon size="20" strokeWidth={1} />,
 }
 
 export const ColumnRenderer: Column<LogData, unknown>[] = [

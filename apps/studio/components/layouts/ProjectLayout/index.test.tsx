@@ -1,28 +1,33 @@
-import { render, screen, waitFor } from '@testing-library/react'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
 import { LOCAL_STORAGE_KEYS } from 'common'
-import type { ReactNode } from 'react'
+import { useState, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { MobileSheetProvider } from '../Navigation/NavigationBar/MobileSheetContext'
+import { MobileSheetProvider, useMobileSheet } from '../Navigation/NavigationBar/MobileSheetContext'
 import { ProjectLayout } from './index'
+import type { MobileMenuContentProps } from './LayoutHeader/MobileMenuContent'
 import { STUDIO_PAGE_TITLE_SEPARATOR } from '@/lib/page-title'
 
-const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen } = vi.hoisted(() => ({
-  mockRouter: {
-    pathname: '/project/[ref]/observability/query-performance',
-    asPath: '/project/default/observability/query-performance',
-    push: vi.fn(),
-    replace: vi.fn(),
-  },
-  mockSetSelectedDatabaseId: vi.fn(),
-  mockSetMobileMenuOpen: vi.fn(),
-}))
+const { mockRouter, mockSetSelectedDatabaseId, mockSetMobileMenuOpen, mockViewport } = vi.hoisted(
+  () => ({
+    mockRouter: {
+      pathname: '/project/[ref]/observability/query-performance',
+      asPath: '/project/default/observability/query-performance',
+      push: vi.fn(),
+      replace: vi.fn(),
+    },
+    mockSetSelectedDatabaseId: vi.fn(),
+    mockSetMobileMenuOpen: vi.fn(),
+    mockViewport: { isMobile: false },
+  })
+)
 
 const {
   mockAddBanner,
   mockDismissBanner,
   mockProjectState,
   mockResourceWarningsState,
+  mockOrgPlanState,
   mockBannerDismissedState,
   mockUseLocalStorageQuery,
 } = vi.hoisted(() => ({
@@ -39,6 +44,9 @@ const {
     },
   },
   mockResourceWarningsState: { current: undefined as any[] | undefined },
+  mockOrgPlanState: {
+    current: { id: 'pro', name: 'Pro' } as { id: string; name: string } | undefined,
+  },
   mockBannerDismissedState: { current: false },
   mockUseLocalStorageQuery: vi.fn(),
 }))
@@ -81,9 +89,10 @@ vi.mock('common', () => ({
       `project-integration-banner-dismissed-${ref}-${integrationSource}`,
   },
   isFeatureEnabled: () => false,
+  useFlag: () => false,
 }))
 
-vi.mock('framer-motion', () => ({
+vi.mock('motion/react', () => ({
   AnimatePresence: ({ children }: { children: ReactNode }) => <>{children}</>,
   motion: {
     div: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -91,7 +100,8 @@ vi.mock('framer-motion', () => ({
   },
 }))
 
-vi.mock('ui', () => ({
+vi.mock('ui', async () => ({
+  ...(await import('ui/src/components/shadcn/ui/resizable')),
   cn: (...classes: Array<string | false | null | undefined>) => classes.filter(Boolean).join(' '),
   Alert: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   AlertDescription: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -102,9 +112,6 @@ vi.mock('ui', () => ({
   CommandItem: { displayName: 'CommandItem' },
   CommandList: { displayName: 'CommandList' },
   LogoLoader: () => <div data-testid="logo-loader" />,
-  ResizableHandle: (props: any) => <div {...props} />,
-  ResizablePanel: ({ children, ...props }: any) => <div {...props}>{children}</div>,
-  ResizablePanelGroup: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   Sidebar: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarContent: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarFooter: ({ children, ...props }: any) => <div {...props}>{children}</div>,
@@ -112,8 +119,7 @@ vi.mock('ui', () => ({
   SidebarMenu: ({ children, ...props }: any) => <div {...props}>{children}</div>,
   SidebarMenuButton: (props: any) => <div {...props} />,
   SidebarMenuItem: (props: any) => <div {...props} />,
-  useIsMobile: () => false,
-  usePanelRef: () => undefined,
+  useIsMobile: () => mockViewport.isMobile,
   useSidebar: () => ({ setOpen: vi.fn() }),
 }))
 
@@ -133,7 +139,9 @@ vi.mock('../MainScrollContainerContext', () => ({
 vi.mock('./BuildingState', () => ({ default: () => null }))
 vi.mock('./ConnectingState', () => ({ default: () => null }))
 vi.mock('./LoadingState', () => ({ LoadingState: () => null }))
-vi.mock('./PausedState/ProjectPausedState', () => ({ ProjectPausedState: () => null }))
+vi.mock('./PausedState/ProjectPausedState', () => ({
+  ProjectPausedState: () => <div>Project paused</div>,
+}))
 vi.mock('./PauseFailedState', () => ({ PauseFailedState: () => null }))
 vi.mock('./PausingState', () => ({ PausingState: () => null }))
 vi.mock('./ProductMenuBar', () => ({
@@ -176,7 +184,6 @@ vi.mock('@/hooks/misc/useLocalStorage', () => ({
 vi.mock('@/components/ui/BannerStack/BannerStackProvider', () => ({
   BANNER_ID: {
     FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
-    SELECT_26: 'select-2026-banner',
   },
   useBannerStack: () => ({
     addBanner: mockAddBanner,
@@ -195,7 +202,7 @@ vi.mock('@/data/usage/resource-warnings-query', () => ({
 
 vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({
-    data: { name: 'Organization 1', slug: 'org-1' },
+    data: { name: 'Organization 1', slug: 'org-1', plan: mockOrgPlanState.current },
   }),
 }))
 
@@ -225,6 +232,67 @@ vi.mock('@/state/database-selector', () => ({
   }),
 }))
 
+vi.mock('./LayoutHeader/MobileMenuContent', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('./LayoutHeader/MobileMenuContent')>()
+  return {
+    ...actual,
+    MobileMenuContent: ({
+      currentProductMenuHeader,
+      currentProductMenu,
+    }: MobileMenuContentProps) => (
+      <div>
+        {currentProductMenuHeader}
+        {currentProductMenu}
+      </div>
+    ),
+  }
+})
+
+vi.mock('../Navigation/ProductMenuBar', () => ({
+  ProductMenuBar: ({ children }: { children: ReactNode }) => <>{children}</>,
+}))
+
+const MobileSheetHarness = () => {
+  const { content, openMenu, setContent } = useMobileSheet()
+  return (
+    <>
+      <button tabIndex={0} onClick={openMenu}>
+        Open menu
+      </button>
+      <button tabIndex={0} onClick={() => setContent(<span>Other sheet</span>)}>
+        Open other sheet
+      </button>
+      <div data-testid="mobile-sheet">{content}</div>
+    </>
+  )
+}
+
+const ResourceMenuHarness = () => {
+  const [section, setSection] = useState('Explorer')
+  return (
+    <>
+      <button tabIndex={0} onClick={() => setSection('Chats')}>
+        Change section
+      </button>
+      <ProjectLayout
+        product="Explorer"
+        isBlocking={false}
+        productMenuHeader={<span>{section} header</span>}
+        productMenu={
+          <button
+            tabIndex={0}
+            onClick={() => setSection(section === 'Explorer' ? 'Notebooks' : 'Explorer')}
+          >
+            {section === 'Explorer' ? 'Open notebooks' : 'Return to Explorer'}
+          </button>
+        }
+      >
+        <div />
+      </ProjectLayout>
+    </>
+  )
+}
+
 const renderLayout = () =>
   render(
     <MobileSheetProvider>
@@ -236,6 +304,7 @@ const renderLayout = () =>
 
 describe('ProjectLayout title', () => {
   beforeEach(() => {
+    mockViewport.isMobile = false
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     document.title = ''
@@ -256,9 +325,60 @@ describe('ProjectLayout title', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     document.title = ''
   })
+
+  it('updates the open mobile menu when resource navigation changes without replacing other sheets', () => {
+    mockViewport.isMobile = true
+    render(
+      <MobileSheetProvider>
+        <ResourceMenuHarness />
+        <MobileSheetHarness />
+      </MobileSheetProvider>
+    )
+    expect(screen.getByTestId('mobile-sheet')).toBeEmptyDOMElement()
+    fireEvent.click(screen.getByRole('button', { name: 'Open menu' }))
+    expect(screen.getByText('Explorer header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open notebooks' }))
+    expect(screen.getByText('Notebooks header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Return to Explorer' }))
+    expect(screen.getByText('Explorer header')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Open other sheet' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Change section' }))
+    expect(screen.getByTestId('mobile-sheet')).toHaveTextContent('Other sheet')
+  })
+
+  it.each([false, true])(
+    'keeps sidebar navigation enabled with resizableSidebar=%s and preserves handle availability',
+    (resizableSidebar) => {
+      render(
+        <MobileSheetProvider>
+          <ProjectLayout
+            product="Database"
+            isBlocking={false}
+            resizableSidebar={resizableSidebar}
+            productMenu={<a href="/project/default/database/tables">Tables</a>}
+          >
+            <div>Page Content</div>
+          </ProjectLayout>
+        </MobileSheetProvider>
+      )
+
+      const link = screen.getByRole('link', { name: 'Tables' })
+      expect(link.closest('[aria-disabled="true"]')).toBeNull()
+      link.focus()
+      expect(link).toHaveFocus()
+
+      const handle = screen.getByRole('separator')
+      if (resizableSidebar) {
+        expect(handle).not.toHaveAttribute('aria-disabled')
+        expect(handle).toHaveAttribute('tabindex', '0')
+      } else {
+        expect(handle).toHaveAttribute('aria-disabled', 'true')
+        expect(handle).not.toHaveAttribute('tabindex')
+      }
+    }
+  )
 
   it('sets a composed document title and deduplicates identical section/surface labels', async () => {
     render(
@@ -298,7 +418,7 @@ describe('ProjectLayout title', () => {
     })
   })
 
-  it('renders the Stripe project banner across project surfaces when the selected project is Stripe-connected', () => {
+  it('renders the Stripe project banner with a project-specific dismiss key when the selected project is Stripe-connected', () => {
     mockProjectState.current = {
       ...mockProjectState.current,
       integration_source: 'stripe_projects',
@@ -306,25 +426,33 @@ describe('ProjectLayout title', () => {
 
     renderLayout()
 
-    expect(screen.getByText('This project is connected to Stripe')).toBeTruthy()
+    expect(screen.getByText('This project is connected to Stripe')).toBeInTheDocument()
     expect(
       screen.getByText('Changes made here may affect your connected Stripe project.')
-    ).toBeTruthy()
-    expect(screen.getByTestId('partner-icon')).toBeTruthy()
-  })
-
-  it('uses a project-specific dismiss key for the Stripe project banner', () => {
-    mockProjectState.current = {
-      ...mockProjectState.current,
-      integration_source: 'stripe_projects',
-    }
-
-    renderLayout()
-
+    ).toBeInTheDocument()
+    expect(screen.getByTestId('partner-icon')).toBeInTheDocument()
     expect(mockUseLocalStorageQuery).toHaveBeenCalledWith(
       LOCAL_STORAGE_KEYS.PROJECT_INTEGRATION_BANNER_DISMISSED('default', 'stripe_projects'),
       false
     )
+  })
+
+  it('renders the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+
+    renderLayout()
+
+    expect(screen.getByText('Project paused')).toBeInTheDocument()
+  })
+
+  it('renders the branches page instead of the paused state for a paused project', () => {
+    mockProjectState.current = { ...mockProjectState.current, status: 'INACTIVE' }
+    mockRouter.pathname = '/project/[ref]/branches'
+    mockRouter.asPath = '/project/default/branches'
+
+    renderLayout()
+
+    expect(screen.queryByText('Project paused')).not.toBeInTheDocument()
   })
 })
 
@@ -352,7 +480,6 @@ describe('FREE_MICRO_UPGRADE banner', () => {
   })
 
   afterEach(() => {
-    vi.clearAllMocks()
     mockRouter.pathname = '/project/[ref]/observability/query-performance'
     mockRouter.asPath = '/project/default/observability/query-performance'
     mockProjectState.current = {
@@ -364,10 +491,11 @@ describe('FREE_MICRO_UPGRADE banner', () => {
       integration_source: null,
     }
     mockResourceWarningsState.current = undefined
+    mockOrgPlanState.current = { id: 'pro', name: 'Pro' }
     mockBannerDismissedState.current = false
   })
 
-  it('calls addBanner when project is nano and compute is near exhaustion', async () => {
+  it('calls addBanner when a paid-plan project is nano and compute is near exhaustion', async () => {
     renderLayout()
 
     await waitFor(() => {
@@ -377,41 +505,46 @@ describe('FREE_MICRO_UPGRADE banner', () => {
     })
   })
 
-  it('calls dismissBanner when banner was previously dismissed', async () => {
-    mockBannerDismissedState.current = true
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when compute warnings are cleared', async () => {
-    mockResourceWarningsState.current = [
-      {
-        project: 'default',
-        cpu_exhaustion: false,
-        memory_and_swap_exhaustion: false,
-        disk_space_exhaustion: false,
+  it.each([
+    [
+      'the banner was previously dismissed',
+      () => {
+        mockBannerDismissedState.current = true
       },
-    ]
-
-    renderLayout()
-
-    await waitFor(() => {
-      expect(mockDismissBanner).toHaveBeenCalledWith('free-micro-upgrade-banner')
-    })
-    expect(mockAddBanner).not.toHaveBeenCalledWith(
-      expect.objectContaining({ id: 'free-micro-upgrade-banner' })
-    )
-  })
-
-  it('calls dismissBanner when project is not nano compute', async () => {
-    mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+    ],
+    [
+      'compute warnings are cleared',
+      () => {
+        mockResourceWarningsState.current = [
+          {
+            project: 'default',
+            cpu_exhaustion: false,
+            memory_and_swap_exhaustion: false,
+            disk_space_exhaustion: false,
+          },
+        ]
+      },
+    ],
+    [
+      'the project is not nano compute',
+      () => {
+        mockProjectState.current = { ...mockProjectState.current, infra_compute_size: 'micro' }
+      },
+    ],
+    [
+      'the organization is on the free plan',
+      () => {
+        mockOrgPlanState.current = { id: 'free', name: 'Free' }
+      },
+    ],
+    [
+      'the organization plan is not loaded yet',
+      () => {
+        mockOrgPlanState.current = undefined
+      },
+    ],
+  ])('calls dismissBanner instead of addBanner when %s', async (_, arrange) => {
+    arrange()
 
     renderLayout()
 

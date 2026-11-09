@@ -1,9 +1,11 @@
 ---
 title: Social Authentication
 description: Social authentication block for Tanstack Start
+preview: |-
+  <BlockOverview name="social-auth-tanstack" showFiles>
+    <BlockPreview name="social-auth/auth/login" />
+  </BlockOverview>
 ---
-
-<BlockPreview name="social-auth/auth/login" />
 
 <Callout className="mt-4">
   The block is using GitHub provider by default, but can be easily switched by changing a single
@@ -12,13 +14,15 @@ description: Social authentication block for Tanstack Start
 
 ## Installation
 
-<BlockItem name="social-auth-nextjs" description="All needed components for the social auth flow" />
-
-## Folder structure
+<BlockItem name="social-auth-tanstack" />
 
 This block includes the [Supabase client](/library/docs/tanstack/client). If you already have one installed, you can skip overwriting it.
 
-<RegistryBlock itemName="social-auth-tanstack" />
+<Callout type="info">
+
+This block requires `@tanstack/react-start` 1.168.25 or later.
+
+</Callout>
 
 ## Usage
 
@@ -39,7 +43,7 @@ VITE_SUPABASE_PUBLISHABLE_KEY=
 
 ### Setting up third party providers
 
-We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-login).
+We support a wide variety of social providers that you can use to integrate with your application. The full list is available [here](https://supabase.com/docs/guides/auth/social-sign-in).
 This block uses the PKCE flow with GitHub as the provider. To switch providers, just update the `provider` field in the `supabase.auth.signInWithOAuth` call. Enable the provider you want to use under [Auth Providers](https://supabase.com/dashboard/project/_/auth/providers) in the Supabase Dashboard and add the necessary credentials.
 
 ### Setting up routes and redirect URLs
@@ -57,5 +61,5 @@ If you want to combine this block with the password-based auth, you need to:
 
 ## Further reading
 
-- [Social login](https://supabase.com/docs/guides/auth/social-login)
+- [Social sign-in](https://supabase.com/docs/guides/auth/social-sign-in)
 - [Authentication error codes](https://supabase.com/docs/guides/auth/debugging/error-codes)

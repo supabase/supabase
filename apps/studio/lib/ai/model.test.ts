@@ -70,9 +70,8 @@ describe('getModel', () => {
     expect(error).toEqual(new Error('OPENAI_API_KEY not available'))
   })
 
-  it('returns openai gpt-5.3-codex when hasAccessToAdvanceModel and not throttled', async () => {
+  it('returns openai gpt-5.3-codex with reasoning effort', async () => {
     vi.stubEnv('OPENAI_API_KEY', 'test-key')
-    vi.stubEnv('IS_THROTTLED', 'false')
 
     const { modelParams, error } = await getModel({
       provider: 'openai',

@@ -1,4 +1,4 @@
-import { Download } from 'lucide-react'
+import { DownloadIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import {
@@ -24,7 +24,7 @@ export const TIA = () => {
       </ScaffoldSectionDetail>
       <ScaffoldSectionContent>
         <div className="@lg:flex items-center justify-center h-full">
-          <Button asChild variant="default" iconRight={<Download />}>
+          <Button asChild iconRight={<DownloadIcon />}>
             <a
               href="https://supabase.com/downloads/docs/Supabase+TIA+250314.pdf"
               target="_blank"
