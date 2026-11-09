@@ -51,8 +51,8 @@ const RemoveAuthenticatorConfirmation = ({
   const { data: factors } = useMfaListFactorsQuery()
   const recoveryCodes = useRecoveryCodesGate()
   const { canRemoveFactor, hasRecoveryCodes } = recoveryCodes
-  const verifiedFactorCount = (factors?.totp ?? []).filter(
-    (factor) => factor.status === 'verified'
+  const verifiedFactorCount = (factors?.all ?? []).filter(
+    (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
   ).length
   const lastFactorToBeDeleted = verifiedFactorCount === 1
   const [error, setError] = useState<{ message: string } | null>(null)

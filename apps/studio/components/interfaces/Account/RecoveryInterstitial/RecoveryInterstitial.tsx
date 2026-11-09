@@ -250,7 +250,7 @@ function getCodesDescription(isExhausted: boolean, areCodesSaved: boolean) {
   if (areCodesSaved) return 'Keep your recovery codes somewhere safe.'
   return isExhausted
     ? 'Generate a new set for future use.'
-    : 'Save codes in case you lose access to your authenticator.'
+    : 'Save codes in case you lose access to your MFA methods.'
 }
 
 function getRecoveryCodeTrigger(isExhausted: boolean, areCodesSaved: boolean) {

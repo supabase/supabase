@@ -1,9 +1,16 @@
 import dayjs from 'dayjs'
-import { PlusIcon, RectangleEllipsisIcon } from 'lucide-react'
+import {
+  LockKeyholeIcon,
+  PlusIcon,
+  RectangleEllipsisIcon,
+  ShieldCheckIcon,
+  TrashIcon,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 import {
   PageSection,
   PageSectionAside,
@@ -22,9 +29,11 @@ import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
 import { useRecoveryCodesGate } from './useRecoveryCodesGate'
+import { getPrimarySecurityAction } from '@/components/interfaces/Account/Security/Security.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
+import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
@@ -33,58 +42,64 @@ export const TOTPFactors = () => {
   const [resumeFactorId, setResumeFactorId] = useQueryState('removeAuthenticator', parseAsString)
   const [selectedFactorId, setSelectedFactorId] = useState<string | null | undefined>(undefined)
   const factorToBeDeleted = selectedFactorId === undefined ? resumeFactorId : selectedFactorId
+  const [securityAction, setSecurityAction] = useQueryState('securityAction', parseAsString)
+
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
-
   const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
+  const verifiedFactors = (data?.all ?? []).filter(
+    (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
+  )
+  const hasVerifiedFactors = verifiedFactors.length > 0
   const canAddApp = isSuccess && totpFactors.length < 2
-  const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
 
-  const recoveryCodes = useRecoveryCodesGate({ enabled: totpFactors.length > 0 })
+  const recovery = useAccountRecovery()
+  const findings = recovery.findings
+  const primaryAction = getPrimarySecurityAction({
+    findings: findings.filter((finding) => finding.action !== 'set-password'),
+    isPending: recovery.isPending,
+    isError: recovery.isError,
+    canEnableMfa: recovery.isFactorsSuccess && recovery.verifiedFactorCount === 0,
+  })
+
+  const recoveryCodes = useRecoveryCodesGate({ enabled: hasVerifiedFactors })
   const { codes, status } = recoveryCodes
   const disableDeleteFactor = !recoveryCodes.canRemoveFactor
-
   const factorIdToDelete = totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null
   const isDeleteFactorModalVisible = factorIdToDelete !== null
+  const factorFinding = findings.find((finding) => finding.id === 'single-mfa-factor')
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
-
   const deleteFactorTooltip = recoveryCodes.isError
     ? 'Cannot delete authenticator: recovery code status unavailable'
     : 'Checking recovery code status before deletion'
 
   return (
     <>
-      <PageSection>
+      <PageSection id="mfa" className="scroll-mt-6">
         <PageSectionMeta>
           <PageSectionSummary>
             <PageSectionTitle>Multi-factor authentication</PageSectionTitle>
             <PageSectionDescription>
-              Use an authenticator app (like Google Authenticator or 1Password) to protect your
-              account.
+              Require an extra verification step when you sign in.
             </PageSectionDescription>
           </PageSectionSummary>
-          {canAddApp && (
+          {canAddApp && hasVerifiedFactors && (
             <PageSectionAside>
-              <Button variant="primary" icon={<PlusIcon />} onClick={handleAddNewApp}>
-                Add app
+              <Button
+                variant={
+                  primaryAction === 'add-factor' || primaryAction === 'enable-mfa'
+                    ? 'primary'
+                    : 'default'
+                }
+                icon={<PlusIcon />}
+                onClick={handleAddNewApp}
+              >
+                Add another method
               </Button>
             </PageSectionAside>
           )}
         </PageSectionMeta>
         <PageSectionContent className="flex flex-col gap-4">
-          {shouldShowLockoutWarning && (
-            <Admonition
-              type="warning"
-              layout="responsive"
-              title="Avoid being locked out"
-              description="Add a backup authenticator app now. Losing access to your only app will permanently lock you out of your account."
-              actions={
-                <Button icon={<PlusIcon />} onClick={handleAddNewApp}>
-                  Add another app
-                </Button>
-              }
-            />
-          )}
           {isLoading && (
             <Card>
               <CardContent>
@@ -95,16 +110,38 @@ export const TOTPFactors = () => {
           {isError && (
             <AlertError error={error} subject="Failed to retrieve account security information" />
           )}
-          {isSuccess && (
+          {isSuccess && !hasVerifiedFactors && (
+            <EmptyStatePresentational
+              icon={ShieldCheckIcon}
+              title="Set up multi-factor authentication"
+              description="Add an authenticator to require a second check when you sign in."
+            >
+              <Button
+                variant={primaryAction === 'enable-mfa' ? 'primary' : 'default'}
+                icon={<PlusIcon />}
+                onClick={handleAddNewApp}
+              >
+                Set up MFA
+              </Button>
+            </EmptyStatePresentational>
+          )}
+          {factorFinding && (
+            <Admonition
+              type="warning"
+              layout="responsive"
+              title="Add a backup MFA method"
+              description="Set up an authenticator app on another device so you can still sign in if you lose access to this one."
+            />
+          )}
+          {isSuccess && totpFactors.length > 0 && (
             <Card>
-              {totpFactors.length === 0 ? (
-                <CardContent>
-                  <p className="text-sm text-foreground-lighter">No authenticator apps yet.</p>
-                </CardContent>
-              ) : (
-                <div className="divide-y">
-                  {totpFactors.map((factor) => (
-                    <CardContent key={factor.id} className="flex justify-between items-center py-4">
+              <div className="divide-y">
+                {totpFactors.map((factor) => (
+                  <CardContent key={factor.id} className="flex justify-between items-center py-4">
+                    <div className="flex items-center gap-x-4">
+                      <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-selection">
+                        <LockKeyholeIcon size={18} className="text-foreground-lighter" />
+                      </div>
                       <div>
                         <p className="text-sm">{factor.friendly_name ?? 'No name provided'}</p>
                         <p className="text-sm text-foreground-lighter">
@@ -116,24 +153,24 @@ export const TOTPFactors = () => {
                           />
                         </p>
                       </div>
-                      <ButtonTooltip
-                        size="tiny"
-                        onClick={() => setSelectedFactorId(factor.id)}
-                        loading={isCheckingIdentity && factorToBeDeleted === factor.id}
-                        disabled={disableDeleteFactor || isCheckingIdentity}
-                        tooltip={{
-                          content: {
-                            side: 'top',
-                            text: disableDeleteFactor ? deleteFactorTooltip : undefined,
-                          },
-                        }}
-                      >
-                        Delete
-                      </ButtonTooltip>
-                    </CardContent>
-                  ))}
-                </div>
-              )}
+                    </div>
+                    <ButtonTooltip
+                      size="tiny"
+                      icon={<TrashIcon size={14} />}
+                      aria-label={`Remove MFA method: ${factor.friendly_name ?? 'unnamed'}`}
+                      tooltip={{
+                        content: {
+                          side: 'bottom',
+                          text: disableDeleteFactor ? deleteFactorTooltip : 'Remove MFA method',
+                        },
+                      }}
+                      onClick={() => setSelectedFactorId(factor.id)}
+                      loading={isCheckingIdentity && factorToBeDeleted === factor.id}
+                      disabled={disableDeleteFactor || isCheckingIdentity}
+                    />
+                  </CardContent>
+                ))}
+              </div>
             </Card>
           )}
         </PageSectionContent>
@@ -212,10 +249,12 @@ export const TOTPFactors = () => {
       )}
 
       <AddNewFactorModal
-        visible={isAddNewFactorOpen}
-        onClose={() => setIsAddNewFactorOpen(false)}
+        visible={isAddNewFactorOpen || (securityAction === 'add-factor' && canAddApp)}
+        onClose={() => {
+          setIsAddNewFactorOpen(false)
+          if (securityAction === 'add-factor') void setSecurityAction(null)
+        }}
       />
-
       <DeleteFactorModal
         onCheckingIdentity={setIsCheckingIdentity}
         visible={isDeleteFactorModalVisible}

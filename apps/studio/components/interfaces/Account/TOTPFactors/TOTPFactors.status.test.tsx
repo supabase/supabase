@@ -80,7 +80,7 @@ describe('authenticator removal recovery-status guard', () => {
     renderFactors()
 
     expect(await screen.findByText('Failed to load recovery codes')).toBeInTheDocument()
-    const remove = screen.getByRole('button', { name: 'Delete' })
+    const remove = screen.getByRole('button', { name: 'Remove MFA method: Phone' })
     expect(remove).toBeAriaDisabled()
     fireEvent.click(remove)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -93,16 +93,18 @@ describe('authenticator removal recovery-status guard', () => {
     expect(await screen.findByRole('dialog', { name: 'Remove MFA method' })).toBeInTheDocument()
   })
 
-  test('keeps the session check on Delete without showing an interstitial', async () => {
+  test('keeps the session check on the removal button without showing an interstitial', async () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
     vi.spyOn(auth.mfa, 'getAuthenticatorAssuranceLevel').mockImplementation(
       () => new Promise(() => {})
     )
     renderFactors()
-    const remove = await screen.findByRole('button', { name: 'Delete' })
+    const remove = await screen.findByRole('button', { name: 'Remove MFA method: Phone' })
     await waitFor(() => expect(remove).not.toBeAriaDisabled())
     fireEvent.click(remove)
-    await waitFor(() => expect(screen.getByRole('button', { name: 'Delete' })).toBeDisabled())
+    await waitFor(() =>
+      expect(screen.getByRole('button', { name: 'Remove MFA method: Phone' })).toBeAriaDisabled()
+    )
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     expect(screen.queryByText('Verify your identity')).not.toBeInTheDocument()
   })
@@ -119,7 +121,7 @@ describe('authenticator removal recovery-status guard', () => {
     vi.spyOn(auth.mfa.recoveryCodes, 'getStatus').mockResolvedValue(availableCodes)
     const remove = vi.spyOn(auth.mfa, 'unenroll')
     renderFactors()
-    await screen.findByRole('button', { name: 'Delete' })
+    await screen.findByRole('button', { name: 'Remove MFA method: Phone' })
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
     fireEvent.click(screen.getByRole('button', { name: 'Resume removal' }))
     const dialog = await screen.findByRole('dialog', { name: 'Remove MFA method' })
@@ -135,7 +137,7 @@ describe('authenticator removal recovery-status guard', () => {
     renderFactors()
 
     expect(await screen.findByText('Checking recovery codes')).toBeInTheDocument()
-    const remove = await screen.findByRole('button', { name: 'Delete' })
+    const remove = await screen.findByRole('button', { name: 'Remove MFA method: Phone' })
     expect(remove).toBeAriaDisabled()
     fireEvent.click(remove)
     expect(screen.queryByRole('dialog')).not.toBeInTheDocument()
@@ -157,7 +159,7 @@ describe('authenticator removal recovery-status guard', () => {
     })
     const unenroll = vi.spyOn(auth.mfa, 'unenroll')
     const queryClient = renderFactors()
-    const remove = await screen.findByRole('button', { name: 'Delete' })
+    const remove = await screen.findByRole('button', { name: 'Remove MFA method: Phone' })
     await waitFor(() => expect(remove).not.toBeAriaDisabled())
     fireEvent.click(remove)
     const dialog = await screen.findByRole('dialog', { name: 'Remove MFA method' })
