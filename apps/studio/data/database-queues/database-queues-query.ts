@@ -27,6 +27,8 @@ export async function getDatabaseQueues({ projectRef, connectionString }: Databa
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'list-queues',
     sql: queueSqlQuery,
     queryKey: ['list-queues'],
     grant: unguarded.migrating,

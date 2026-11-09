@@ -126,6 +126,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -140,6 +141,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {

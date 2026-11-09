@@ -33,6 +33,8 @@ export async function sendDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-send',
     sql: safeSql`select * from pgmq.send(${literal(queueName)}, ${literal(payload)}, ${literal(delay)})`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,
