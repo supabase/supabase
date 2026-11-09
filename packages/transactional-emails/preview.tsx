@@ -52,9 +52,10 @@ const indexPage = () => `<!doctype html>
 <body>
 <h1>Compute transactional emails</h1>
 <p class="lede">
-  Prototype. Values are illustrative and the pricing they imply is not settled. Each template
-  is shown with the subject line it would arrive under, since the subject is what decides
-  whether the body is ever read.
+  Prototype. Names read as <code>[slots]</code> rather than a made-up customer, so the
+  template is what gets reviewed. Figures are illustrative and the pricing they imply is not
+  settled. Each template is shown with the subject line it would arrive under, since the
+  subject is what decides whether the body is ever read.
 </p>
 ${templates
   .map(

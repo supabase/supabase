@@ -95,6 +95,6 @@ export const computeQuotaStopped: EmailTemplate<ComputeQuotaStoppedProps> = {
     ...PREVIEW_QUOTA,
     usedVcpuMinutes: 500,
     stoppedInstances: 6,
-    resumesOn: '1 December',
+    resumesOn: '[cycleEndDate]',
   },
 }

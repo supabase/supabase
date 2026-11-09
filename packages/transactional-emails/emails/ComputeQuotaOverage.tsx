@@ -89,7 +89,9 @@ export const computeQuotaOverage: EmailTemplate<ComputeQuotaOverageProps> = {
   previewProps: {
     ...PREVIEW_QUOTA,
     usedVcpuMinutes: 548,
-    overageSoFar: '$0.12',
-    projectedOverage: '$1.40',
+    // Left as slots rather than figures: the Compute rate is not settled, and a preview that
+    // quotes one reads as a quote.
+    overageSoFar: '[overageSoFar]',
+    projectedOverage: '[projectedOverage]',
   },
 }

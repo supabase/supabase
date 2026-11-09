@@ -79,9 +79,9 @@ export const computeAvailable: EmailTemplate<ComputeAvailableProps> = {
   subject: ({ organizationName }) => `Compute is available on ${organizationName}`,
   Template: ComputeAvailable,
   previewProps: {
-    organizationName: 'Northwind',
-    organizationSlug: 'northwind',
-    planName: 'Pro Plan',
+    organizationName: '[orgName]',
+    organizationSlug: '[orgSlug]',
+    planName: '[planName]',
     includedVcpuMinutes: 500,
     concurrentInstances: 10,
   },

@@ -71,9 +71,9 @@ export const computeQuotaReset: EmailTemplate<ComputeQuotaResetProps> = {
   subject: ({ organizationName }) => `Compute quota reset for ${organizationName}`,
   Template: ComputeQuotaReset,
   previewProps: {
-    organizationName: 'Northwind',
-    organizationSlug: 'northwind',
-    planName: 'Pro Plan',
+    organizationName: '[orgName]',
+    organizationSlug: '[orgSlug]',
+    planName: '[planName]',
     includedVcpuMinutes: 500,
     previousCycleUsage: 712,
     resumedInstances: 6,

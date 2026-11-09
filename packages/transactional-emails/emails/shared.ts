@@ -41,19 +41,27 @@ export const formatMinutes = (minutes: number) =>
 export const formatQuota = (used: number, included: number) =>
   `${Math.round(used).toLocaleString('en-US')} of ${formatMinutes(included)}`
 
+/**
+ * Preview values name their slot rather than inventing a customer. A plausible-looking
+ * "Northwind" reads as a mockup of one account and invites review of the example instead of
+ * the template; `[orgName]` says plainly that something gets substituted here.
+ *
+ * Figures stay concrete. A meter needs a number to have a width, and the copy around them
+ * only reads correctly at a realistic magnitude.
+ */
 export const PREVIEW_PROJECTS: ProjectUsageRow[] = [
-  { name: 'checkout-api', usage: '268 vCPU-min', share: 0.62 },
-  { name: 'image-pipeline', usage: '101 vCPU-min', share: 0.23 },
-  { name: 'nightly-sync', usage: '43 vCPU-min', share: 0.1 },
-  { name: 'staging', usage: '20 vCPU-min', share: 0.05 },
+  { name: '[projectName1]', usage: '268 vCPU-min', share: 0.62 },
+  { name: '[projectName2]', usage: '101 vCPU-min', share: 0.23 },
+  { name: '[projectName3]', usage: '43 vCPU-min', share: 0.1 },
+  { name: '[projectName4]', usage: '20 vCPU-min', share: 0.05 },
 ]
 
 export const PREVIEW_QUOTA: ComputeQuotaProps = {
-  organizationName: 'Northwind',
-  organizationSlug: 'northwind',
-  planName: 'Pro Plan',
+  organizationName: '[orgName]',
+  organizationSlug: '[orgSlug]',
+  planName: '[planName]',
   includedVcpuMinutes: 500,
   usedVcpuMinutes: 432,
-  cycleEndsOn: '1 December',
+  cycleEndsOn: '[cycleEndDate]',
   projects: PREVIEW_PROJECTS,
 }

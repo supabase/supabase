@@ -85,14 +85,14 @@ export const computeQuotaProjected: EmailTemplate<ComputeQuotaProjectedProps> = 
   previewProps: {
     ...PREVIEW_QUOTA,
     usedVcpuMinutes: 290,
-    projectedExhaustionOn: '22 November',
+    projectedExhaustionOn: '[projectedDate]',
     dailyBurnRate: 38,
-    leadingProject: 'image-pipeline',
+    leadingProject: '[projectName1]',
     projects: [
-      { name: 'image-pipeline', usage: '184 vCPU-min', share: 0.63 },
-      { name: 'checkout-api', usage: '72 vCPU-min', share: 0.25 },
-      { name: 'nightly-sync', usage: '24 vCPU-min', share: 0.08 },
-      { name: 'staging', usage: '10 vCPU-min', share: 0.04 },
+      { name: '[projectName1]', usage: '184 vCPU-min', share: 0.63 },
+      { name: '[projectName2]', usage: '72 vCPU-min', share: 0.25 },
+      { name: '[projectName3]', usage: '24 vCPU-min', share: 0.08 },
+      { name: '[projectName4]', usage: '10 vCPU-min', share: 0.04 },
     ],
   },
 }
