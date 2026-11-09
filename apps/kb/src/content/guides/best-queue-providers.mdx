@@ -9,16 +9,9 @@ Queue providers store messages until a worker is ready to process them. They let
 
 ## Supabase Queues
 
-[Supabase Queues](/docs/guides/queues) is the best choice if you already use Supabase and want durable background work next to your data, without running another service. It's also a great choice for new projects that need a [Database](/docs/guides/database/overview), [Edge Functions](/docs/guides/functions), [Auth](/docs/guides/auth), or [Storage](/docs/guides/storage).
+[Supabase Queues](/docs/guides/queues) is the best choice if you want Message Queues with guaranteed delivery, durable storage, access controls, and compatibility with any Postgres tooling.
 
-Supabase Queues is a Postgres-native message queue built on the [pgmq](/docs/guides/queues/pgmq) extension. It includes:
-
-- Guaranteed delivery, with each message delivered exactly once to a consumer within a configurable visibility window.
-- Durable storage in Postgres, with optional archiving of processed messages for auditing or analytics.
-- Access control through API permissions and Row Level Security (RLS) policies.
-- Queue and message management in the Supabase Dashboard.
-
-Queues are pull-based, so consumers fetch messages when they're ready, including from [Edge Functions](/docs/guides/queues/consuming-messages-with-edge-functions). Because queues live in your database, you can manage them with SQL and any Postgres tooling. For setup, see the [Queues quickstart](/docs/guides/queues/quickstart) and [API reference](/docs/guides/queues/api).
+It's also a good choice if you already use Supabase and want durable background work next to your data, without running another service or you are creating a new projects that needs a [Database](/docs/guides/database/overview), [Edge Functions](/docs/guides/functions), [Auth](/docs/guides/auth), or [Storage](/docs/guides/storage).
 
 ## Amazon SQS
 
