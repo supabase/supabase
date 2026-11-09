@@ -1343,7 +1343,8 @@ export interface DocsSearchV2AskAiOpenedEvent {
 }
 
 /**
- * User's question was sent to Ask AI in the Search V2 dialog.
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
  *
  * @group Events
  * @source docs
@@ -1352,11 +1353,7 @@ export interface DocsSearchV2AskAiQuestionSubmittedEvent {
   action: 'docs_search_v2_ask_ai_question_submitted'
   properties: {
     /**
-     * The question sent to Ask AI, cut to its first 300 characters.
-     */
-    question: string
-    /**
-     * The length of the full question, in characters.
+     * The length of the question, in characters.
      */
     questionLength: number
     /**

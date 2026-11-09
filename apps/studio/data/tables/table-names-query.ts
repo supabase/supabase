@@ -44,6 +44,8 @@ export async function getTableNames(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-names',
       sql: TABLE_NAMES_SQL,
       queryKey: ['table-names'],
       grant: unguarded.migrating,

@@ -36,6 +36,8 @@ export async function revokeColumnPrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-privileges-revoke',
     sql,
     queryKey: ['column-privileges', 'revoke'],
     grant: unguarded.migrating,

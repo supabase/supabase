@@ -31,7 +31,14 @@ export async function createAndExposeApiSchema({
   const sql = safeSql`create schema if not exists api;
 grant usage on schema api to anon, authenticated;`
 
-  await executeSql({ projectRef, connectionString, sql, grant: unguarded.migrating })
+  await executeSql({
+    projectRef,
+    connectionString,
+    sql,
+    sqlOrigin: 'studio',
+    queryName: 'create-and-expose-api-schema',
+    grant: unguarded.migrating,
+  })
 
   const { db_extra_search_path, db_pool, db_schema, max_rows } = existingPostgrestConfig
 

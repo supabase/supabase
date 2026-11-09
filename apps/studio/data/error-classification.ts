@@ -6,8 +6,10 @@ import {
   NetworkUnreachableError,
   PlatformError,
   RequestAbortedError,
+  StudioSqlError,
   UnclassifiedApiError,
   UnexpectedError,
+  UserSqlError,
   type StudioError,
   type StudioErrorInput,
 } from '@/lib/errors/studio-errors'
@@ -40,6 +42,39 @@ export function classifyResponseError(raw: RawResponseError): StudioError {
     })
   }
   return new UnexpectedError(raw)
+}
+
+// pg-meta formats Postgres errors as `Failed to run sql query: ERROR:  42702: <message>`
+const SQLSTATE_IN_MESSAGE = /\bERROR:\s+([0-9A-Z]{5}):/
+
+/** Who wrote the SQL sent to the pg-meta query endpoint. */
+export type SqlOrigin = 'user' | 'studio'
+
+/**
+ * Classifies an error from the pg-meta query endpoint. Postgres rejecting the SQL comes back as a
+ * 400, which becomes `UserSqlError` or `StudioSqlError` depending on who wrote the SQL.
+ *
+ * A 400 whose message carries a SQLSTATE came from Postgres, so it is a SQL error before any
+ * message-pattern rule runs: user SQL can raise any text, including a pattern's. Other 400s go
+ * through the pattern rules first (a connection timeout has no SQLSTATE) and are SQL errors only
+ * when no rule matches. Other statuses keep their usual classification, and anything that isn't
+ * a response body goes through `classifyError`.
+ */
+export function classifySqlResponseError(
+  error: unknown,
+  { origin, queryName }: { origin: SqlOrigin; queryName?: string }
+): StudioError {
+  const raw = parseResponseErrorBody(error)
+  if (!raw) return classifyError(error)
+
+  const sqlState = raw.code === 400 ? raw.message?.match(SQLSTATE_IN_MESSAGE)?.[1] : undefined
+  if (!sqlState) {
+    const classified = classifyResponseError(raw)
+    if (classified._tag !== 'UnclassifiedApiError' || classified.code !== 400) return classified
+  }
+
+  const input = { ...raw, ...(queryName && { queryName }), ...(sqlState && { sqlState }) }
+  return origin === 'user' ? new UserSqlError(input) : new StudioSqlError(input)
 }
 
 // fetch rejects with a DOMException, which is not an Error subclass in every runtime
@@ -107,6 +142,7 @@ const responseErrorBodySchema = z.object({
   requestPathname: optional(z.string()),
   metadata: optional(z.record(z.string(), z.unknown())),
   formattedError: optional(z.string()),
+  position: optional(z.string()),
 })
 
 /**

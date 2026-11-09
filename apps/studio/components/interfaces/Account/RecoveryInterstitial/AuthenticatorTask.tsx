@@ -24,11 +24,11 @@ export const AuthenticatorTask = ({
   return (
     <>
       <RecoveryTaskRow
-        title={isComplete ? 'Backup authenticator added' : 'Only one authenticator'}
+        title={isComplete ? 'Backup MFA method added' : 'Only one MFA method'}
         description={
           isComplete
-            ? 'Another authenticator is verified for your account.'
-            : 'Add one on another device as a backup.'
+            ? 'Another MFA method is verified for your account.'
+            : 'Set up an authenticator app on another device as a backup.'
         }
         isComplete={isComplete}
       >
@@ -41,7 +41,7 @@ export const AuthenticatorTask = ({
               setIsOpen(true)
             }}
           >
-            Add authenticator
+            Add backup
           </Button>
         )}
       </RecoveryTaskRow>

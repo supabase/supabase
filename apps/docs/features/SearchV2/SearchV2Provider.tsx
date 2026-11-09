@@ -11,7 +11,6 @@ import { flushSync } from 'react-dom'
 
 import { ASK_AI_DIALOG_LABELS, AskAiPanel } from './AskAiPanel'
 import { SearchV2Panel } from './SearchV2Dialog'
-import { ASK_AI_QUESTION_TELEMETRY_LENGTH } from './constants'
 import { useSearchV2Dialog, type SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
@@ -94,7 +93,6 @@ export function SearchV2Provider({ children }: SearchV2ProviderProps) {
       sendTelemetryEvent({
         action: 'docs_search_v2_ask_ai_question_submitted',
         properties: {
-          question: question.slice(0, ASK_AI_QUESTION_TELEMETRY_LENGTH),
           questionLength: question.length,
           questionSource: 'search',
         },

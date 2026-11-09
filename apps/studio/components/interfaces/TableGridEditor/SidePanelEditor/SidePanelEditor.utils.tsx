@@ -97,6 +97,8 @@ const addPrimaryKey = async (
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'primary-keys',
     sql: query,
     queryKey: ['primary-keys'],
     grant: unguarded.migrating,
@@ -114,6 +116,8 @@ const dropConstraint = async (
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'drop-constraint',
     sql: query,
     queryKey: ['drop-constraint'],
     grant: unguarded.migrating,
@@ -135,6 +139,8 @@ const addForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'foreign-keys-add',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -156,6 +162,8 @@ const removeForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'foreign-keys-remove',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -177,6 +185,8 @@ const updateForeignKey = async ({
   return await executeSql({
     projectRef: projectRef,
     connectionString: connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'foreign-keys-update',
     sql: query,
     queryKey: ['foreign-keys'],
     grant: unguarded.migrating,
@@ -366,6 +376,8 @@ export const duplicateTable = async (
   await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-duplicate',
     sql: getDuplicateTableSQL({
       sourceTableName,
       sourceTableSchema,
@@ -391,6 +403,8 @@ export const duplicateTable = async (
     await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'table-duplicate-rows',
       sql: getDuplicateRowsSQL({
         sourceTableName,
         sourceTableSchema,
@@ -406,6 +420,8 @@ export const duplicateTable = async (
       await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-duplicate-identity-sequence',
         sql: getDuplicateIdentitySequenceSQL({
           sourceTableName,
           sourceTableSchema,
@@ -540,6 +556,8 @@ export const createTable = async ({
       await executeSql({
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-create-with-columns',
         sql: safeSql`BEGIN; ${joinSqlFragments(sqlStatements, ';\n')}; COMMIT;`,
         queryKey: ['table', 'create-with-columns'],
         grant: unguarded.migrating,
@@ -666,6 +684,8 @@ export const createTable = async ({
           await executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'sequences-update-batch-create-table',
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
             grant: unguarded.migrating,
@@ -982,6 +1002,8 @@ export async function insertRowsViaSpreadsheet({
             executeSql({
               projectRef,
               connectionString,
+              sqlOrigin: 'studio',
+              queryName: 'table-rows-spreadsheet-import',
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
               grant: unguarded.migrating,
@@ -1031,6 +1053,8 @@ export async function insertRowsViaSpreadsheet({
           executeSql({
             projectRef,
             connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'sequences-update-batch-spreadsheet-import',
             sql: updateSequenceSQL,
             queryKey: ['sequences', 'update-batch'],
             grant: unguarded.migrating,
@@ -1088,6 +1112,8 @@ export async function insertTableRows({
             await executeSql({
               projectRef,
               connectionString,
+              sqlOrigin: 'studio',
+              queryName: 'table-rows-insert-batch',
               sql: insertQuery,
               isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
               grant: unguarded.migrating,
@@ -1145,6 +1171,8 @@ export async function insertTableRows({
     await executeSql({
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'sequences-update-batch-insert-rows',
       sql: updateSequenceSQL,
       queryKey: ['sequences', 'update-batch'],
       grant: unguarded.migrating,

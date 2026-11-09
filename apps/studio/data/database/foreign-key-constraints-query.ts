@@ -60,6 +60,8 @@ export async function getForeignKeyConstraints(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'foreign-key-constraints',
       sql,
       queryKey: ['foreign-key-constraints', schema],
       grant: unguarded.migrating,
