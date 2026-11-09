@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -16,12 +17,12 @@ import { PipelineDestinationReview } from '../../CreatePipeline/PipelineDestinat
 import { PipelineReviewCosts } from '../../CreatePipeline/PipelineReviewCosts'
 import { PipelineValidationAdmonition } from '../../CreatePipeline/PipelineValidationAdmonition'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesIcebergEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
 import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
@@ -62,15 +63,16 @@ import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { AlertError } from '@/components/ui/AlertError'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 const formId = 'destination-editor'
 
@@ -106,16 +108,11 @@ export const DestinationForm = ({
   const isDuckLakeProjectBlocked =
     selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
@@ -134,19 +131,19 @@ export const DestinationForm = ({
   // Compute available destinations based on feature flags
   const availableDestinations = useMemo(() => {
     const destinations = []
-    if (etlEnableBigQuery) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
-    if (etlEnableIceberg)
+    if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (isIcebergEnabled)
       destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
-    if (etlEnableDucklake) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
-    if (etlEnableSnowflake) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
-    if (etlEnableClickHouse) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
+    if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
+    if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
+    if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
   }, [
-    etlEnableBigQuery,
-    etlEnableDucklake,
-    etlEnableIceberg,
-    etlEnableSnowflake,
-    etlEnableClickHouse,
+    isBigQueryEnabled,
+    isDuckLakeEnabled,
+    isIcebergEnabled,
+    isSnowflakeEnabled,
+    isClickHouseEnabled,
   ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
@@ -178,9 +175,17 @@ export const DestinationForm = ({
   // Revealed API keys are only ever consumed as the default catalog token for
   // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
   // destination types.
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' && !editMode }
+  const shouldPrefillCatalogToken = selectedType === 'Analytics Bucket' && !editMode
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef },
+    { variant: 'reveal' }
+  )
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys, enabled: shouldPrefillCatalogToken }
+    )
   )
   const { serviceKey } = apiKeysData ?? {}
   const catalogToken = serviceKey?.api_key ?? ''
@@ -487,17 +492,26 @@ export const DestinationForm = ({
 
   const destinationFields = (
     <>
-      {selectedType === 'BigQuery' && etlEnableBigQuery && (
+      {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'Analytics Bucket' && etlEnableIceberg && (
-        <AnalyticsBucketFields
-          form={form}
-          editMode={editMode}
-          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-        />
+      {selectedType === 'Analytics Bucket' && isIcebergEnabled && (
+        <>
+          {shouldPrefillCatalogToken && (
+            <ApiKeysAccessNote
+              className="px-5 pt-5"
+              grant={apiKeysGrant}
+              fallback="Enter the catalog token manually."
+            />
+          )}
+          <AnalyticsBucketFields
+            form={form}
+            editMode={editMode}
+            onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+          />
+        </>
       )}
-      {selectedType === 'DuckLake' && etlEnableDucklake && (
+      {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>
           <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
             {isManagedDuckLake && isProjectPending && !isProjectFetched
@@ -527,10 +541,10 @@ export const DestinationForm = ({
           <DuckLakeFields form={form} editMode={editMode} />
         </>
       )}
-      {selectedType === 'Snowflake' && etlEnableSnowflake && (
+      {selectedType === 'Snowflake' && isSnowflakeEnabled && (
         <SnowflakeFields form={form} editMode={editMode} />
       )}
-      {selectedType === 'ClickHouse' && etlEnableClickHouse && (
+      {selectedType === 'ClickHouse' && isClickHouseEnabled && (
         <ClickHouseFields form={form} editMode={editMode} />
       )}
     </>

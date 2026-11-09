@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { configKeys } from './keys'
 import { handleError } from '@/data/fetchers'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DeploymentModeResponse = {
   is_cli_mode: boolean
@@ -21,7 +22,7 @@ export async function getDeploymentMode(signal?: AbortSignal): Promise<Deploymen
 }
 
 export type DeploymentModeData = Awaited<ReturnType<typeof getDeploymentMode>>
-export type DeploymentModeError = ResponseError
+export type DeploymentModeError = StudioError
 
 export const useDeploymentModeQuery = <TData = DeploymentModeData>(
   options: UseCustomQueryOptions<DeploymentModeData, DeploymentModeError, TData> = {}

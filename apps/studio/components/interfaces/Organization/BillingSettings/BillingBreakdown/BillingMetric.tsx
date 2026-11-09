@@ -1,10 +1,11 @@
 import { ChevronRightIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { billingMetricUnit, formatUsage } from '../helpers'
 import { Metric, USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -90,11 +91,6 @@ export const BillingMetric = ({
               <div className="group flex items-center gap-1">
                 <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer items-center">
                   <span>{metric.name}</span>
-                  {isLogMetricOnNonPlatformPlan && (
-                    <Badge className="ml-2" variant={'warning'}>
-                      Upcoming
-                    </Badge>
-                  )}
                 </p>
                 {usageMeta.available_in_plan && (
                   <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
@@ -162,12 +158,12 @@ export const BillingMetric = ({
                     strokeWidth={4}
                     className={
                       isUsageBillingEnabled
-                        ? 'text-gray-dark-800'
+                        ? 'text-foreground-lighter'
                         : isExceededLimit
                           ? 'text-red-900'
                           : isApproachingLimit
                             ? 'text-yellow-1000'
-                            : 'text-gray-dark-800'
+                            : 'text-foreground-lighter'
                     }
                   />
                 </svg>
@@ -207,28 +203,32 @@ export const BillingMetric = ({
               </p>
             )}
 
-            {subscription.usage_billing_enabled && isLogMetricOnNonPlatformPlan && (
+            {metric.key === PricingMetric.LOG_QUERYING && isLogMetricOnNonPlatformPlan ? (
               <p className="text-foreground-light">
-                Billing and enforcement of restrictions for this metric will only start after the
-                grace period ends at the start of 2027.
+                We won't enforce this metric until known mis-reporting issues are resolved.{' '}
+                <InlineLink href="https://github.com/orgs/supabase/discussions/50925">
+                  Share feedback on GitHub.
+                </InlineLink>
               </p>
+            ) : (
+              <>
+                {isLogMetricOnNonPlatformPlan && (
+                  <p className="text-foreground-light">
+                    Billing and enforcement will only start after the grace period ends in early
+                    2027.
+                  </p>
+                )}
+                {subscription.usage_billing_enabled === false &&
+                  relativeToSubscription &&
+                  (isApproachingLimit || isExceededLimit) && (
+                    <p className="text-foreground-light">
+                      {isLogMetricOnNonPlatformPlan
+                        ? 'Enforcement will only start after the grace period ends in early 2027. Reduce your usage, upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'
+                        : 'Exceeding your plans included usage will lead to restrictions to your project. Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.'}
+                    </p>
+                  )}
+              </>
             )}
-
-            {subscription.usage_billing_enabled === false &&
-              relativeToSubscription &&
-              (isApproachingLimit || isExceededLimit) &&
-              (isLogMetricOnNonPlatformPlan ? (
-                <p className="text-foreground-light">
-                  Enforcement of restrictions will only start after the grace period ends at the
-                  start of 2027. Reduce your usage, upgrade to a usage-based plan or disable the
-                  spend cap to avoid restrictions.
-                </p>
-              ) : (
-                <p className="text-foreground-light">
-                  Exceeding your plans included usage will lead to restrictions to your project.
-                  Upgrade to a usage-based plan or disable the spend cap to avoid restrictions.
-                </p>
-              ))}
 
             {sortedProjectAllocations && sortedProjectAllocations.length > 0 && (
               <table className="list-disc w-full">

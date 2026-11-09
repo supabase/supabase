@@ -35,7 +35,6 @@ const featureFlags = {
     pipelineCreationWizard: false,
     platformWebhooks: false,
     jitDbAccess: false,
-    marketplaceIntegrations: false,
     explorer: false,
     storageVersioningPrivateAlpha: false,
     sqlEditorManualSaveForced: false,

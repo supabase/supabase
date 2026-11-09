@@ -7,7 +7,8 @@ import type { Policy } from '@/components/interfaces/Database/Policies/PolicyTab
 import { unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type DatabasePoliciesVariables = {
   projectRef?: string
@@ -39,7 +40,7 @@ export async function getDatabasePolicies(
 }
 
 export type DatabasePoliciesData = Awaited<ReturnType<typeof getDatabasePolicies>>
-export type DatabasePoliciesError = ResponseError
+export type DatabasePoliciesError = StudioError
 
 function markSavedPolicySafe(policy: DatabasePoliciesData[number]): Policy {
   return policy as Policy

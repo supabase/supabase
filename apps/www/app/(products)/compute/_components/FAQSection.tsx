@@ -1,7 +1,8 @@
 'use client'
 
+import { FaqAnswer } from '~/components/FaqAnswer'
 import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
+import { Accordion, AccordionItem, AccordionTrigger } from 'ui'
 
 const faqs = [
   {
@@ -27,7 +28,7 @@ const faqs = [
   {
     question: 'Can I attach a persistent disk?',
     answer:
-      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files — both reachable with near-zero intra-region latency and no data-transfer tax. Mountable persistent disks are on the roadmap.',
+      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files, both reachable with near-zero intra-region latency. Mountable persistent disks are on the roadmap.',
   },
   {
     question: 'How will pricing work?',
@@ -54,11 +55,11 @@ export function FAQSection() {
                   <AccordionTrigger>
                     <span className="text-foreground text-left">{faq.question}</span>
                   </AccordionTrigger>
-                  <AccordionContent>
+                  <FaqAnswer>
                     <div className="prose text-foreground-lighter">
                       <ReactMarkdown>{faq.answer}</ReactMarkdown>
                     </div>
-                  </AccordionContent>
+                  </FaqAnswer>
                 </AccordionItem>
               </div>
             ))}

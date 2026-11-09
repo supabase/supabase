@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseQueuesKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseQueuesVariables = {
   projectRef?: string
@@ -29,7 +30,7 @@ export async function getDatabaseQueuesExposePostgrestStatus({
 }
 
 export type DatabaseQueueData = boolean
-export type DatabaseQueueError = ResponseError
+export type DatabaseQueueError = StudioError
 
 export const useQueuesExposePostgrestStatusQuery = <TData = DatabaseQueueData>(
   { projectRef, connectionString }: DatabaseQueuesVariables,

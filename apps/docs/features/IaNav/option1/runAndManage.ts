@@ -14,7 +14,7 @@ export const runAndManage: NavMenuConstant = {
   url: '/guides/platform',
   items: [
     {
-      name: 'Projects, compute and scaling',
+      name: 'Projects, organizations and compute',
       items: [
         {
           name: 'Compute and Disk',
@@ -32,7 +32,7 @@ export const runAndManage: NavMenuConstant = {
           name: 'Transfer, pause or delete a project',
           items: [
             {
-              name: 'Transfer Project',
+              name: 'Transfer to another organization',
               url: '/guides/platform/project-transfer',
               enabled: fullPlatformEnabled,
             },
@@ -83,8 +83,8 @@ export const runAndManage: NavMenuConstant = {
               url: '/guides/platform/sso/testing-best-practices',
             },
             {
-              name: 'Enterprise-managed auth for MCP',
-              url: '/guides/platform/sso/enterprise-mcp-authentication',
+              name: 'Enterprise-Managed Authorization for MCP',
+              url: '/guides/platform/sso/enterprise-mcp-authorization',
             },
           ],
         },
@@ -107,7 +107,7 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Audit logs (team activity)', url: '/guides/security/platform-audit-logs' },
         {
           name: 'Map team members to Postgres roles',
-          url: '/guides/platform/temporary-access#configure-user-access',
+          url: '/guides/platform/team-database-access',
         },
       ],
     },
@@ -116,17 +116,29 @@ export const runAndManage: NavMenuConstant = {
       items: [
         {
           name: 'Compliance: SOC 2, HIPAA, GDPR',
-          enabled: complianceEnabled,
           items: [
-            { name: 'SOC 2 compliance', url: '/guides/security/soc-2-compliance' },
+            {
+              name: 'Shared responsibility model',
+              url: '/guides/deployment/shared-responsibility-model',
+            },
+            {
+              name: 'SOC 2 compliance',
+              url: '/guides/security/soc-2-compliance',
+              enabled: complianceEnabled,
+            },
             {
               name: 'HIPAA compliance',
+              enabled: complianceEnabled,
               items: [
                 { name: 'Overview', url: '/guides/security/hipaa-compliance' },
                 { name: 'HIPAA Projects', url: '/guides/platform/hipaa-projects' },
               ],
             },
-            { name: 'GDPR compliance', url: '/guides/security/gdpr-compliance' },
+            {
+              name: 'GDPR compliance',
+              url: '/guides/security/gdpr-compliance',
+              enabled: complianceEnabled,
+            },
           ],
         },
         { name: 'Secure platform configuration', url: '/guides/security/platform-security' },
@@ -134,12 +146,8 @@ export const runAndManage: NavMenuConstant = {
         { name: 'Security testing', url: '/guides/security/security-testing' },
         { name: 'Securing your npm installs', url: '/guides/security/npm-security' },
         {
-          name: 'Rotate a leaked API key',
-          url: '/guides/security/rotate-leaked-api-keys',
-        },
-        {
           name: 'Production security checklist',
-          url: '/guides/deployment/going-into-prod#security',
+          url: '/guides/security/production-checklist',
         },
       ],
     },

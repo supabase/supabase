@@ -5,7 +5,8 @@ import { listWebhookDeliveries, type WebhookScopeParams } from './platform-webho
 import { toWebhookDelivery } from './platform-webhooks-mappers'
 import type { WebhookDelivery } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
 import { getDeliveriesRefetchInterval } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooksPage.utils'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface WebhookDeliveriesVariables {
   scope: WebhookScopeParams
@@ -32,14 +33,14 @@ export const useWebhookDeliveriesQuery = <TData = WebhookDeliveriesData>(
     isLive = false,
     isAwaitingDelivery = false,
     ...options
-  }: UseCustomQueryOptions<WebhookDeliveriesData, ResponseError, TData> & {
+  }: UseCustomQueryOptions<WebhookDeliveriesData, StudioError, TData> & {
     isLive?: boolean
     isAwaitingDelivery?: boolean
   } = {}
 ) => {
   const { scope, endpointId, size, after, before } = variables
 
-  return useQuery<WebhookDeliveriesData, ResponseError, TData>({
+  return useQuery<WebhookDeliveriesData, StudioError, TData>({
     queryKey: platformWebhooksKeys.deliveries(scope, endpointId, size, after, before),
     queryFn: ({ signal }) =>
       getWebhookDeliveries({ scope, endpointId, size, after, before }, signal),

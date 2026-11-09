@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -41,13 +42,15 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useGrant } from '@/lib/grants'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -76,10 +79,16 @@ export const EdgeFunctionDetails = () => {
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
   )
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
@@ -256,10 +265,15 @@ export const EdgeFunctionDetails = () => {
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
-                      {showKey ? 'Hide' : 'Show'} anon key
+                      {showKey ? <span>Hide</span> : <span>Show</span>} <span>anon key</span>
                     </Button>
                   )}
                 </TabsList>
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholder with your own key."
+                  className="px-6 pb-2"
+                />
                 {invocationTabs.map((tab) => {
                   const code = tab.code({
                     showKey,

@@ -13,6 +13,12 @@ A table in an exposed schema without RLS is readable and writable by any role wi
 
 </Admonition>
 
+<Admonition type="tip">
+
+To control which tables, columns, and schemas the Data API exposes at all, refer to [Securing your API](/docs/guides/api/securing-your-api). To write policies based on roles in JWT claims, refer to [Custom claims and role-based access control (RBAC)](/docs/guides/api/custom-claims-and-role-based-access-control-rbac).
+
+</Admonition>
+
 Use the guide in three parts:
 
 - [Understand Row Level Security](#understand-row-level-security) explains how grants and policies combine to control access.
@@ -608,6 +614,8 @@ Returns the JWT of the user making the request. Anything that you store in the u
 
 - `raw_user_meta_data` - can be updated by the authenticated user using the `supabase.auth.update()` function. It is not a good place to store authorization data.
 - `raw_app_meta_data` - cannot be updated by the user, so it's a good place to store authorization data.
+
+To build role-based policies from custom claims, refer to [Custom claims and role-based access control (RBAC)](/docs/guides/api/custom-claims-and-role-based-access-control-rbac).
 
 The `auth.jwt()` function is extremely versatile. For example, if you store some team data inside `app_metadata`, you can use it to determine whether a particular user belongs to a team. For example, if this was an array of IDs:
 

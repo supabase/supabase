@@ -24,7 +24,13 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { checkIfPrivate, getAddressEndRange, normalize } from './NetworkRestrictions.utils'
+import {
+  checkIfPrivate,
+  getAddressEndRange,
+  getNetworkKey,
+  isIPv4MappedIPv6,
+  normalize,
+} from './NetworkRestrictions.utils'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import InformationBox from '@/components/ui/InformationBox'
 import { useNetworkRestrictionsQuery } from '@/data/network-restrictions/network-restrictions-query'
@@ -61,7 +67,11 @@ const getFormSchema = (type: RestrictionType | undefined) => {
         version: type === 'IPv4' ? 'v4' : 'v6',
         message: `Please enter a valid ${type} address`,
       })
-      .refine((val) => !checkIfPrivate(type, val), 'Private IP addresses are not supported'),
+      .refine((val) => !checkIfPrivate(type, val), 'Private IP addresses are not supported')
+      .refine(
+        (val) => type !== 'IPv6' || !isIPv4MappedIPv6(val),
+        "IPv4-mapped IPv6 addresses aren't supported. Add the address as an IPv4 restriction instead."
+      ),
   })
 }
 
@@ -85,7 +95,6 @@ export const AddRestrictionModal = ({
 
   const { data } = useNetworkRestrictionsQuery({ projectRef: ref }, { enabled: type !== undefined })
   const ipv4Restrictions = data?.config?.dbAllowedCidrs ?? []
-  // @ts-ignore [Joshen] API typing issue
   const ipv6Restrictions = data?.config?.dbAllowedCidrsV6 ?? []
   const restrictedIps = ipv4Restrictions.concat(ipv6Restrictions)
 
@@ -138,7 +147,8 @@ export const AddRestrictionModal = ({
     const address = `${ipAddress}/${cidrBlockSize}`
     const normalizedAddress = normalize(address)
 
-    if (restrictedIps.includes(address) || restrictedIps.includes(normalizedAddress)) {
+    // Compared as networks, as the API does, so a range already stored in another spelling counts too
+    if (restrictedIps.some((ip) => getNetworkKey(ip) === normalizedAddress)) {
       form.setError('ipAddress', { message: `The address ${address} is already restricted` })
       return
     }

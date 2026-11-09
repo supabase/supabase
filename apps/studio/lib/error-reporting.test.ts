@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 import { describe, expect, it, vi } from 'vitest'
 
 import { captureCriticalError } from './error-reporting'
-import { ResponseError } from '@/types'
+import { classifyResponseError } from '@/data/error-classification'
 
 vi.mock('@sentry/nextjs', () => ({
   captureException: vi.fn(),
@@ -28,10 +28,17 @@ describe('captureCriticalError', () => {
     ],
     ['a whitelisted TOTP error', new Error('Invalid TOTP code entered')],
     ['a whitelisted project name error', new Error('name should not contain a . string')],
-    ['a 4XX ResponseError', new ResponseError('Not found', 404, undefined, undefined, '/api/test')],
     [
-      'a ResponseError at the 4XX boundary (499)',
-      new ResponseError('Client closed request', 499, undefined, undefined, '/api/test'),
+      'a 4XX StudioError',
+      classifyResponseError({ message: 'Not found', code: 404, requestPathname: '/api/test' }),
+    ],
+    [
+      'a StudioError at the 4XX boundary (499)',
+      classifyResponseError({
+        message: 'Client closed request',
+        code: 499,
+        requestPathname: '/api/test',
+      }),
     ],
   ])('does not capture %s', (_, error) => {
     captureCriticalError(error, 'context')
@@ -48,18 +55,26 @@ describe('captureCriticalError', () => {
     ],
     ['an unknown object with a message', { message: 'Custom error object' }, 'Custom error object'],
     [
-      'a ResponseError at the 5XX boundary (500)',
-      new ResponseError('Internal server error', 500, undefined, undefined, '/api/test'),
+      'a StudioError at the 5XX boundary (500)',
+      classifyResponseError({
+        message: 'Internal server error',
+        code: 500,
+        requestPathname: '/api/test',
+      }),
       'requestPathname /api/test w/ message: Internal server error',
     ],
     [
-      'a 5XX ResponseError',
-      new ResponseError('Gateway timeout', 504, undefined, undefined, '/api/gateway'),
+      'a 5XX StudioError',
+      classifyResponseError({
+        message: 'Gateway timeout',
+        code: 504,
+        requestPathname: '/api/gateway',
+      }),
       'requestPathname /api/gateway w/ message: Gateway timeout',
     ],
     [
-      'a ResponseError without code or requestPathname',
-      new ResponseError('Unknown error'),
+      'a StudioError without code or requestPathname',
+      classifyResponseError({ message: 'Unknown error' }),
       'Response Error (no code or requestPathname) w/ message: Unknown error',
     ],
   ])('captures %s', (_, error, message) => {

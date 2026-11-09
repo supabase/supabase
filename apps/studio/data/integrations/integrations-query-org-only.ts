@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { Integration } from './integrations.types'
 import { integrationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type IntegrationsVariables = {
   orgSlug?: string
@@ -21,7 +22,7 @@ export async function getIntegrations({ orgSlug }: IntegrationsVariables) {
 
 export type IntegrationsData = Awaited<ReturnType<typeof getIntegrations>>
 export type ProjectIntegrationConnectionsData = Awaited<ReturnType<typeof getIntegrations>>
-export type IntegrationsError = ResponseError
+export type IntegrationsError = StudioError
 
 export const useOrgIntegrationsQuery = <TData = IntegrationsData>(
   { orgSlug }: IntegrationsVariables,

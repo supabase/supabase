@@ -46,11 +46,11 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
   usePipelineCreationPreview: () => ({ isEnabled: state.enabled, isLoading: state.loading }),
 }))
-vi.mock('@/components/interfaces/Database/Replication/useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => true,
-  useIsETLDucklakePrivateAlpha: () => false,
-  useIsETLSnowflakePrivateAlpha: () => false,
-  useIsETLClickHousePrivateAlpha: () => false,
+vi.mock('@/components/interfaces/Database/Replication/useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => true,
+  useIsPipelinesDuckLakeEnabled: () => false,
+  useIsPipelinesSnowflakeEnabled: () => false,
+  useIsPipelinesClickHouseEnabled: () => false,
 }))
 vi.mock('@/components/layouts/Navigation/LayoutHeader/HomeIcon', () => ({
   HomeIcon: () => <a href="/dashboard/projects">Supabase home</a>,

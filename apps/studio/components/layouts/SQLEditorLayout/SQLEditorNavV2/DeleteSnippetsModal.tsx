@@ -95,9 +95,11 @@ export const DeleteSnippetsModal = ({
     >
       <p className="text-sm">
         This action cannot be undone.{' '}
-        {snippets.length === 1
-          ? `Are you sure you want to delete '${snippets[0]?.name}'?`
-          : `Are you sure you want to delete the selected ${snippets.length} quer${snippets.length > 1 ? 'ies' : 'y'}?`}
+        {snippets.length === 1 ? (
+          <span>{`Are you sure you want to delete '${snippets[0]?.name}'?`}</span>
+        ) : (
+          <span>{`Are you sure you want to delete the selected ${snippets.length} quer${snippets.length > 1 ? 'ies' : 'y'}?`}</span>
+        )}
       </p>
     </ConfirmationModal>
   )

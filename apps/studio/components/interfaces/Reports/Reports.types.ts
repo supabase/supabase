@@ -1,7 +1,8 @@
 import type { SafeSqlFragment } from '@supabase/pg-meta'
 
 import type { SafeLogSqlFragment } from '@/data/logs/safe-analytics-sql'
-import type { ResponseError } from '@/types'
+import type { Granularity } from '@/data/reports/report.utils'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export enum Presets {
   API = 'api',
@@ -11,7 +12,7 @@ export enum Presets {
   DATABASE = 'database',
 }
 
-export type MetaQueryResponse = any & { error: ResponseError }
+export type MetaQueryResponse = any & { error: StudioError }
 
 export type BaseReportParams = { iso_timestamp_start: string; iso_timestamp_end: string } & {
   sql?: string
@@ -33,7 +34,7 @@ export interface ReportQueryLogs {
     page?: number,
     pageSize?: number
   ) => SafeLogSqlFragment
-  safeSqlOtel?: (filters: ReportFilterItem[]) => SafeLogSqlFragment
+  safeSqlOtel?: (filters: ReportFilterItem[], granularity?: Granularity) => SafeLogSqlFragment
 }
 
 export interface ReportQueryDb {

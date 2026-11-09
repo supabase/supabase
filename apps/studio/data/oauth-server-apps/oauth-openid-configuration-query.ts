@@ -4,7 +4,8 @@ import { useAuthConfigQuery } from '../auth/auth-config-query'
 import { oauthServerAppKeys } from './keys'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OpenIDConfigurationVariables = {
   projectRef: string | undefined
@@ -47,7 +48,7 @@ export async function getOpenIDConfiguration({
 }
 
 export type OpenIDConfigurationData = Awaited<ReturnType<typeof getOpenIDConfiguration>>
-export type OpenIDConfigurationError = ResponseError
+export type OpenIDConfigurationError = StudioError
 
 export const useOpenIDConfigurationQuery = <TData = OpenIDConfigurationData>(
   { projectRef }: OpenIDConfigurationVariables,

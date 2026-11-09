@@ -4,6 +4,7 @@ import { describe, expect, it, vi } from 'vitest'
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
+  generateReusedRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
   isValueTruncated,
@@ -797,5 +798,88 @@ describe('generateUpdateRowPayload', () => {
     ]
     const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
     expect(payload).toEqual({ price: '90' })
+  })
+})
+
+describe('generateReusedRowFields', () => {
+  const makeField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'col',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: 'copied',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+
+  const reuse = (fields: RowField[]) =>
+    generateReusedRowFields({
+      fields,
+      blankFields: fields.map((field) => ({ ...field, value: undefined })),
+    })
+
+  it('keeps values of plain columns', () => {
+    const [field] = reuse([makeField({ name: 'title', value: 'hello' })])
+    expect(field.value).toBe('hello')
+  })
+
+  it('keeps values with a literal default', () => {
+    const [field] = reuse([makeField({ defaultValue: "'draft'::text", value: 'published' })])
+    expect(field.value).toBe('published')
+  })
+
+  it('keeps values with a literal default containing parentheses', () => {
+    const [field] = reuse([makeField({ defaultValue: "'a(b'::text", value: 'x' })])
+    expect(field.value).toBe('x')
+  })
+
+  it.each([
+    ['primary key', { isPrimaryKey: true }],
+    ['identity', { isIdentity: true }],
+    ['uuid default', { defaultValue: 'gen_random_uuid()' }],
+    ['sequence default', { defaultValue: "nextval('seq'::regclass)" }],
+    ['timestamp default', { defaultValue: 'now()' }],
+    ['CURRENT_TIMESTAMP default', { defaultValue: 'CURRENT_TIMESTAMP' }],
+    ['CURRENT_DATE default', { defaultValue: 'CURRENT_DATE' }],
+    ['CURRENT_USER default', { defaultValue: 'CURRENT_USER' }],
+  ])('clears %s columns', (_, overrides) => {
+    const [field] = reuse([makeField(overrides)])
+    expect(field.value).toBeUndefined()
+  })
+
+  it('clears truncated values', () => {
+    const [field] = reuse([
+      makeField({ format: 'jsonb', value: '{"a":"' + 'x'.repeat(20000) + '...' }),
+    ])
+    expect(field.value).toBeUndefined()
+  })
+
+  it('leaves a boolean with a function default unset so the database evaluates it', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'random() > 0.5', value: 'true' })],
+      blankFields: [makeField({ format: 'bool', value: 'random() > 0.5' })],
+    })
+    expect(field.value).toBeUndefined()
+  })
+
+  it('keeps a boolean with a literal default', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'true', value: 'false' })],
+      blankFields: [makeField({ format: 'bool', value: 'true' })],
+    })
+    expect(field.value).toBe('false')
+  })
+
+  it('uses the blank field value when clearing', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', isPrimaryKey: true, value: 'true' })],
+      blankFields: [makeField({ format: 'bool', value: 'null' })],
+    })
+    expect(field.value).toBe('null')
   })
 })

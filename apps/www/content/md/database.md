@@ -1,6 +1,6 @@
 # Supabase Database
 
-> Every Supabase project is a dedicated Postgres database, trusted by millions of developers. Use it on its own, or with the rest of the Supabase platform.
+> Every Supabase project is a dedicated Postgres database, trusted by millions of developers. Start for free. Use it on its own, or with the rest of the Supabase platform.
 
 Supabase Database gives you a full Postgres database with no compromises. It is not a Postgres-compatible alternative or a shared cluster: every project gets its own dedicated Postgres instance that you can connect to directly with any Postgres client.
 

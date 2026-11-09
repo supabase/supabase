@@ -86,6 +86,7 @@ const GENERIC_REASONS = [
   'server_error',
   'connection_timeout',
   'network_error',
+  'request_aborted',
   'payment_failed',
   'payment_error',
   'oriole_unavailable',
@@ -110,7 +111,16 @@ const STATUS_REASONS: Readonly<Partial<Record<number, FunnelErrorReason>>> = {
 }
 
 export function classifyApiError(origin: FunnelOrigin, error: unknown): FunnelErrorClassification {
-  const err = error as { code?: unknown; status?: unknown; errorType?: unknown; message?: unknown }
+  const err = error as {
+    code?: unknown
+    status?: unknown
+    message?: unknown
+    _tag?: unknown
+    name?: unknown
+  }
+  if (err?._tag === 'RequestAborted' || err?.name === 'AbortError') {
+    return { errorCategory: 'network', errorReason: 'request_aborted' }
+  }
   // GoTrue AuthErrors carry a numeric `status` and a string `code` slug; auth-js uses
   // status 0 for transport failures (AuthRetryableFetchError), which must classify as
   // network_error, so the fallback only accepts positive statuses.
@@ -122,7 +132,7 @@ export function classifyApiError(origin: FunnelOrigin, error: unknown): FunnelEr
         : undefined
   const message = typeof err?.message === 'string' ? err.message : ''
 
-  if (err?.errorType === 'connection-timeout') {
+  if (err?._tag === 'DbConnectionTimeout') {
     return { errorCategory: 'network', errorReason: 'connection_timeout' }
   }
   if (code === undefined) {

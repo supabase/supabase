@@ -2,15 +2,7 @@
 
 import { ChevronDown } from 'lucide-react'
 import type { ElementType, MouseEvent } from 'react'
-import {
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuTrigger,
-} from 'ui'
+import { cn, DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from 'ui'
 
 export interface MobileNavTab {
   label: string
@@ -82,24 +74,22 @@ export const MobileNavTabs = ({
           </button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="start" className="w-(--radix-dropdown-menu-trigger-width)">
-          <DropdownMenuRadioGroup value={selectedLabel} onValueChange={onTabSelect}>
-            {tabs.map((tab) =>
-              isLink(tab) ? (
-                <DropdownMenuItem key={tab.label} asChild inset className="h-10">
-                  <Link href={tab.href}>{tab.label}</Link>
-                </DropdownMenuItem>
+          {tabs.map((tab) => (
+            <DropdownMenuItem
+              key={tab.label}
+              asChild
+              aria-current={tab.label === currentLabel ? 'true' : undefined}
+              className="h-8 w-full text-sm aria-[current=true]:text-foreground"
+            >
+              {isLink(tab) ? (
+                <Link href={tab.href}>{tab.label}</Link>
               ) : (
-                <DropdownMenuRadioItem
-                  key={tab.label}
-                  value={tab.label}
-                  aria-current={tab.label === currentLabel ? 'true' : undefined}
-                  className="h-10 aria-[current=true]:text-foreground"
-                >
+                <button type="button" value={tab.label} onClick={handleTabSelect}>
                   {tab.label}
-                </DropdownMenuRadioItem>
-              )
-            )}
-          </DropdownMenuRadioGroup>
+                </button>
+              )}
+            </DropdownMenuItem>
+          ))}
         </DropdownMenuContent>
       </DropdownMenu>
     </div>

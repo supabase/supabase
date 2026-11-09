@@ -4,7 +4,8 @@ import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: string }
 
@@ -44,7 +45,7 @@ export const replicationPipelineStatusQueryOptions = <TData = ReplicationPipelin
   projectRef,
   pipelineId,
 }: ReplicationPipelinesStatusParams) =>
-  queryOptions<ReplicationPipelineStatusData, ResponseError, TData>({
+  queryOptions<ReplicationPipelineStatusData, StudioError, TData>({
     queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
     queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
     ...replicationPollingOptions,
@@ -82,9 +83,9 @@ export function waitForPipelineStopped(
 
 export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineStatusData>(
   variables: ReplicationPipelinesStatusParams,
-  options: UseCustomQueryOptions<ReplicationPipelineStatusData, ResponseError, TData> = {}
+  options: UseCustomQueryOptions<ReplicationPipelineStatusData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineStatusData, ResponseError, TData>({
+  useQuery<ReplicationPipelineStatusData, StudioError, TData>({
     ...replicationPipelineStatusQueryOptions<TData>(variables),
     ...options,
     enabled:
