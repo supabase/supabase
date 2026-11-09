@@ -17,9 +17,14 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD, includedRuntimeHours } from './Compute.limits'
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD, includedVcpuHours } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
-import { formatComputeHours, formatPercentage, getCpuUtilization } from './ComputeUsage.utils'
+import {
+  formatComputeHours,
+  formatPercentage,
+  formatVcpuMinutes,
+  getCpuUtilization,
+} from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
@@ -69,25 +74,23 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
 
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
 
-  // Runtime is the only metered quota; vCPU-hours and GB-hours price the overage rather
-  // than capping it, so they report alongside instead of carrying a meter of their own.
-  const runtimeAllowanceHours = includedRuntimeHours(limits)
-  const formatRuntime = (hours: number) =>
-    hours < 10 ? `${Math.round(hours * 60).toLocaleString()} min` : formatComputeHours(hours)
+  // The quota is vCPU-minutes, so a larger instance consumes it faster than a smaller one
+  // running just as long. Runtime reports alongside as context.
+  const quotaHours = includedVcpuHours(limits)
 
   const meters: MeterDefinition[] = [
     {
-      label: 'Runtime',
-      description: 'Time workers spend running. Suspended instances accrue nothing.',
-      used: usage?.runningHours ?? 0,
-      included: runtimeAllowanceHours,
+      label: 'Compute',
+      description: 'vCPU reserved while workers run. Suspended instances accrue nothing.',
+      used: usage?.reservedVcpuHours ?? 0,
+      included: quotaHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatRuntime,
+      format: formatVcpuMinutes,
       detail:
         cpuUtilization === null
-          ? `${formatCount(usage?.reservedVcpuHours ?? 0)} vCPU-hrs · ${formatCount(usage?.gbHours ?? 0)} GB-hrs`
-          : `${formatPercentage(cpuUtilization)} CPU used · ${formatCount(usage?.reservedVcpuHours ?? 0)} vCPU-hrs`,
+          ? `${formatComputeHours(usage?.runningHours ?? 0)} runtime`
+          : `${formatPercentage(cpuUtilization)} CPU used · ${formatComputeHours(usage?.runningHours ?? 0)} runtime`,
     },
     {
       label: 'Concurrent workers',

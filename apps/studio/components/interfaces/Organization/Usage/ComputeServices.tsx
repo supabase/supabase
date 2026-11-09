@@ -10,7 +10,7 @@ import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber } from './Usag
 import UsageBarChart from './UsageBarChart'
 import {
   COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
-  includedRuntimeHours,
+  includedVcpuHours,
 } from '@/components/interfaces/Compute/Compute.limits'
 import { formatSize } from '@/components/interfaces/Compute/Compute.utils'
 import {
@@ -21,6 +21,7 @@ import {
   formatGbHours,
   formatPercentage,
   formatVcpuHours,
+  formatVcpuMinutes,
   getCpuUtilization,
   getUsageConcentration,
   sumBy,
@@ -40,32 +41,29 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 
 const USAGE_WINDOW_DAYS = 30
 
-/** The included quota is quoted in minutes, so small runtimes read in minutes too. */
-const formatRuntime = (hours: number) =>
-  hours < 10 ? `${Math.round(hours * 60).toLocaleString()} min` : formatComputeHours(hours)
-
 /**
- * vCPU-hours and GB-hours have no quota of their own — they are the dimensions overage is
- * priced on — so they are reported rather than metered.
+ * Wall-clock runtime and GB-hours carry no quota of their own. Runtime is context — how long
+ * workers were up — and memory tracks vCPU at a fixed 2 GB per vCPU, so neither can diverge
+ * from the metered figure. Both are reported rather than metered.
  */
 const ComputeBillingDimensions = ({
-  reservedVcpuHours,
+  runningHours,
   gbHours,
 }: {
-  reservedVcpuHours: number
+  runningHours: number
   gbHours: number
 }) => (
   <div>
     <div className="flex items-center justify-between border-b py-1">
-      <p className="text-xs text-foreground-light">vCPU-hours in period</p>
-      <p className="text-xs">{formatVcpuHours(reservedVcpuHours)}</p>
+      <p className="text-xs text-foreground-light">Runtime in period</p>
+      <p className="text-xs">{formatComputeHours(runningHours)}</p>
     </div>
     <div className="flex items-center justify-between py-1">
       <p className="text-xs text-foreground-light">GB-hours in period</p>
       <p className="text-xs">{formatGbHours(gbHours)}</p>
     </div>
     <p className="pt-1 text-xs text-foreground-lighter">
-      Priced per vCPU-hour and GB-hour beyond the included runtime.
+      Usage beyond the included quota is priced per vCPU-hour and GB-hour.
     </p>
   </div>
 )
@@ -97,10 +95,12 @@ export const ComputeServices = ({
   const byProject = data?.byProject ?? []
   const bySize = aggregateUsageBySize(data?.instanceRows ?? [])
 
-  const runtimeBurndown = buildComputeBurndown(
+  // The quota is vCPU-minutes, so it is measured against reserved vCPU rather than
+  // wall-clock runtime: a 2 vCPU instance consumes it twice as fast.
+  const quotaBurndown = buildComputeBurndown(
     points,
-    (point) => point.runningHours,
-    includedRuntimeHours(limits),
+    (point) => point.reservedVcpuHours,
+    includedVcpuHours(limits),
     COMPUTE_ALLOWANCE_WARNING_THRESHOLD
   )
 
@@ -126,7 +126,7 @@ export const ComputeServices = ({
         section={{
           name: 'Compute',
           description:
-            'Usage across every compute in the organization. The included quota is runtime — the time workers spend running, summed across all of them. Suspended instances accrue nothing.\nvCPU-hours and GB-hours are what usage beyond the quota is priced on. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
+            'Usage across every compute in the organization. The included quota is counted in vCPU-minutes, so a larger instance consumes it faster than a smaller one running just as long. Suspended instances accrue nothing.\nUsage beyond the quota is priced per vCPU-hour and GB-hour. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
           links: [],
         }}
       >
@@ -139,18 +139,15 @@ export const ComputeServices = ({
             {!projectRef && (
               <div className="space-y-6">
                 <ComputeAllowanceSummary
-                  name="Runtime"
-                  burndown={runtimeBurndown}
-                  format={formatRuntime}
+                  name="Compute"
+                  burndown={quotaBurndown}
+                  format={formatVcpuMinutes}
                   limitsLabel={limitsLabel}
                   noLimitLabel={noLimitLabel}
                   isUsageBillingEnabled={subscription?.usage_billing_enabled ?? false}
                   currentBillingCycleSelected={currentBillingCycleSelected}
                 />
-                <ComputeBillingDimensions
-                  reservedVcpuHours={totalReservedVcpuHours}
-                  gbHours={totalGbHours}
-                />
+                <ComputeBillingDimensions runningHours={totalRunningHours} gbHours={totalGbHours} />
               </div>
             )}
 

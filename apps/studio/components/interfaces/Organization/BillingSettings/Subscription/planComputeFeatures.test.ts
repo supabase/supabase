@@ -8,9 +8,9 @@ const flatten = (features: (string | string[])[]) =>
   features.flatMap((feature) => (typeof feature === 'string' ? [feature] : feature)).join(' | ')
 
 describe('computeFeaturesFor', () => {
-  it('states the included runtime, which the RFC sets at 500 minutes on every plan', () => {
+  it('states the included quota, which the RFC sets at 500 on every plan', () => {
     for (const planId of ['free', 'pro', 'team', 'enterprise'] as const) {
-      expect(flatten(computeFeaturesFor(planId))).toContain('500 minutes of Compute runtime')
+      expect(flatten(computeFeaturesFor(planId))).toContain('500 vCPU-minutes of Compute')
     }
   })
 
@@ -53,7 +53,7 @@ describe('computeFeaturesFor', () => {
   it('tracks Compute.limits rather than restating it', () => {
     // Changing the gating must move the copy, or the two drift apart.
     expect(flatten(computeFeaturesFor('free'))).toContain(
-      `${COMPUTE_PLAN_LIMITS.free.runtimeMinutes} minutes`
+      `${COMPUTE_PLAN_LIMITS.free.vcpuMinutes} vCPU-minutes`
     )
   })
 

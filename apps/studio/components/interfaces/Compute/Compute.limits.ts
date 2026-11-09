@@ -10,17 +10,26 @@ export const DEFAULT_COMPUTE_LIMITS_MODE: ComputeLimitsMode = 'alpha'
 export type ComputeInstanceSize = (typeof COMPUTE_INSTANCE_SIZES)[number]
 
 /**
- * Packaging comes from the pricing RFC. The included quota is runtime — minutes a worker
- * spends running, across all workers — and it is the same on every plan. Tiers differ by
- * concurrency, the burst ceiling, and whether a single invocation is capped. vCPU-hours and
- * GB-hours are the dimensions overage is priced on, not separate quotas, so they are not
- * capped here.
+ * Packaging comes from the pricing RFC. The included quota is the same on every plan; tiers
+ * differ by concurrency, the burst ceiling, and whether a single invocation is capped.
+ *
+ * The quota is denominated in vCPU-minutes rather than wall-clock runtime so that it matches
+ * the dimension overage is priced on. A size-blind runtime quota hands a 4gb-2vcpu instance
+ * twice the resource for the same allowance, which is both a subsidy and an undefined
+ * boundary — you cannot say where overage starts without knowing what the included minutes
+ * consumed. At the 1 vCPU base size the two are numerically identical, so the RFC's "500"
+ * carries over untouched.
+ *
+ * GB-hours are not a second quota: every size, the burst ceiling and the AWS baseline
+ * reservation all sit at a fixed 2 GB per vCPU, so memory cannot diverge from CPU. If a size
+ * with a different ratio ever ships, this becomes a normalised unit — consume
+ * `max(vcpu / 1, gb / 2)` per minute — rather than gaining a second field.
  *
  * `null` means no fixed limit.
  */
 export interface ComputeLimits {
-  /** Included runtime minutes per billing cycle, across all workers. */
-  runtimeMinutes: number | null
+  /** Included vCPU-minutes per billing cycle, across all workers. */
+  vcpuMinutes: number | null
   /** Workers that may run at once. */
   concurrentWorkers: number | null
   /** Sizes the plan may deploy. */
@@ -34,8 +43,11 @@ export interface ComputeLimits {
 /** Every plan starts here; the RFC quotes one base size for both free and paid. */
 const BASE_SIZE: ComputeInstanceSize = '2gb-1vcpu'
 
-/** RFC: included quota is 500 minutes per month, on free and paid alike. */
-export const COMPUTE_INCLUDED_RUNTIME_MINUTES = 500
+/**
+ * RFC: included quota is 500 minutes per month, on free and paid alike. Read as vCPU-minutes,
+ * which is the same figure at the 1 vCPU base size.
+ */
+export const COMPUTE_INCLUDED_VCPU_MINUTES = 500
 
 /** RFC: paid plans burst from the base size up to 4 vCPU / 8 GB. */
 const PAID_BURST_CEILING = { vcpu: 4, memoryGb: 8 }
@@ -48,7 +60,7 @@ const FREE_MAX_INVOCATION_MINUTES = 10
 
 // TODO: confirm the live instance cap with the workers-infra team. API fixtures use 100.
 export const COMPUTE_ALPHA_LIMITS: ComputeLimits = {
-  runtimeMinutes: null,
+  vcpuMinutes: null,
   concurrentWorkers: 2,
   sizes: COMPUTE_INSTANCE_SIZES,
   burstTo: PAID_BURST_CEILING,
@@ -62,35 +74,35 @@ export const COMPUTE_ALPHA_LIMITS: ComputeLimits = {
  */
 export const COMPUTE_PLAN_LIMITS: Record<OrgPlan['id'], ComputeLimits> = {
   free: {
-    runtimeMinutes: COMPUTE_INCLUDED_RUNTIME_MINUTES,
+    vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
     concurrentWorkers: 1,
     sizes: [BASE_SIZE],
     burstTo: null,
     maxInvocationMinutes: FREE_MAX_INVOCATION_MINUTES,
   },
   pro: {
-    runtimeMinutes: COMPUTE_INCLUDED_RUNTIME_MINUTES,
+    vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
     concurrentWorkers: null,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   team: {
-    runtimeMinutes: COMPUTE_INCLUDED_RUNTIME_MINUTES,
+    vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
     concurrentWorkers: null,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   platform: {
-    runtimeMinutes: COMPUTE_INCLUDED_RUNTIME_MINUTES,
+    vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
     concurrentWorkers: null,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
     maxInvocationMinutes: null,
   },
   enterprise: {
-    runtimeMinutes: COMPUTE_INCLUDED_RUNTIME_MINUTES,
+    vcpuMinutes: COMPUTE_INCLUDED_VCPU_MINUTES,
     concurrentWorkers: null,
     sizes: COMPUTE_INSTANCE_SIZES,
     burstTo: PAID_BURST_CEILING,
@@ -116,9 +128,16 @@ export const getComputeLimits = (
   return COMPUTE_PLAN_LIMITS[planId]
 }
 
-/** Included runtime expressed in hours, for comparison against an hours-based rollup. */
-export const includedRuntimeHours = (limits: ComputeLimits): number | null =>
-  limits.runtimeMinutes === null ? null : limits.runtimeMinutes / 60
+/** Included quota in vCPU-hours, for comparison against an hours-based rollup. */
+export const includedVcpuHours = (limits: ComputeLimits): number | null =>
+  limits.vcpuMinutes === null ? null : limits.vcpuMinutes / 60
+
+/** How much wall-clock runtime the quota buys at a given size. */
+export const includedRuntimeMinutesForSize = (
+  limits: ComputeLimits,
+  vcpuPerInstance: number
+): number | null =>
+  limits.vcpuMinutes === null || vcpuPerInstance <= 0 ? null : limits.vcpuMinutes / vcpuPerInstance
 
 export const canPlanDeploySize = (limits: ComputeLimits, size: string): boolean =>
   limits.sizes.some((allowed) => allowed === size)

@@ -232,10 +232,11 @@ export interface ComputeOrgUsage {
 
 /** Stand-in project set until the rollup can report real per-project figures. */
 /**
- * Sized against the RFC's 500-minute included quota. Workers here are invocation-shaped —
- * running for minutes at a time, not held open — which is the workload the quota and the
+ * Sized against the RFC's 500 vCPU-minute included quota. Workers here are invocation-shaped
+ * — running for minutes at a time, not held open — which is the workload the quota and the
  * per-invocation duration cap describe. The org lands a few times over the quota so the
- * overage path is visible without the figures reading as absurd.
+ * overage path is visible without the figures reading as absurd. Note the 2 vCPU projects
+ * consume the quota twice as fast as their runtime alone suggests.
  */
 const MOCK_PROJECTS = [
   {
@@ -244,7 +245,7 @@ const MOCK_PROJECTS = [
     size: '4gb-2vcpu',
     deployments: 1,
     instances: 2,
-    dutyCycle: 0.012,
+    dutyCycle: 0.007,
   },
   {
     projectRef: 'media-jobs',
@@ -252,7 +253,7 @@ const MOCK_PROJECTS = [
     size: '4gb-2vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.008,
+    dutyCycle: 0.005,
   },
   {
     projectRef: 'webhooks',
@@ -260,7 +261,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.006,
+    dutyCycle: 0.004,
   },
   {
     projectRef: 'staging',
@@ -268,7 +269,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.004,
+    dutyCycle: 0.003,
   },
   {
     projectRef: 'sandbox',

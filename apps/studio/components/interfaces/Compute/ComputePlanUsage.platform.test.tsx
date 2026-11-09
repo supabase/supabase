@@ -105,29 +105,29 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters runtime and concurrent workers against what the plan includes', async () => {
+  it('meters the vCPU-minute quota and concurrent workers against the plan', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
     expect(await screen.findByText('Usage')).toBeInTheDocument()
-    expect(await screen.findByText('Runtime')).toBeInTheDocument()
+    expect(await screen.findByText('Compute')).toBeInTheDocument()
     expect(await screen.findByText('Concurrent workers')).toBeInTheDocument()
-    // vCPU-hours and GB-hours price the overage; they are not metered quotas.
+    // GB-hours tracks vCPU at a fixed ratio, so it is not a separate meter.
     expect(screen.queryByText('GB-hours')).not.toBeInTheDocument()
     expect(screen.queryByText('Deployments')).not.toBeInTheDocument()
-    // The RFC includes 500 minutes per cycle on every plan.
-    expect(await screen.findByText(/of 500 min$/)).toBeInTheDocument()
+    // The RFC includes 500 per cycle on every plan, read as vCPU-minutes.
+    expect(await screen.findByText(/of 500 vCPU-min$/)).toBeInTheDocument()
   })
 
-  it('reports CPU utilisation and the billing dimensions alongside runtime', async () => {
+  it('reports CPU utilisation and runtime alongside the metered quota', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText(/\d+% CPU used · [\d,]+ vCPU-hrs/)).toBeInTheDocument()
+    expect(await screen.findByText(/\d+% CPU used · [\d.,]+ hrs runtime/)).toBeInTheDocument()
   })
 
   it('sums instances across computes and names how many computes run them', async () => {
@@ -192,9 +192,9 @@ describe('ComputePlanUsage', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    // Team includes the same 500-minute quota as every other plan; what differs is that
-    // its concurrency is uncapped, which the caption names.
-    expect(await screen.findByText(/of 500 min$/)).toBeInTheDocument()
+    // Team includes the same 500 vCPU-minute quota as every other plan; what differs is
+    // that its concurrency is uncapped, which the caption names.
+    expect(await screen.findByText(/of 500 vCPU-min$/)).toBeInTheDocument()
     expect(await screen.findByText('No fixed limit on the Team Plan')).toBeInTheDocument()
   })
 
@@ -238,7 +238,7 @@ describe('ComputePlanUsage in private alpha', () => {
     expect(instanceMeter.getByText('Over limit')).toBeInTheDocument()
   })
 
-  it('does not meter runtime during the private alpha', async () => {
+  it('does not meter the quota during the private alpha', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
@@ -257,6 +257,6 @@ describe('ComputePlanUsage in private alpha', () => {
     })
 
     expect(await screen.findByLabelText('Concurrent workers: 1 of 2')).toBeInTheDocument()
-    expect(screen.queryByText('Runtime', { selector: 'p' })).not.toBeInTheDocument()
+    expect(screen.queryByText('Compute', { selector: 'p' })).not.toBeInTheDocument()
   })
 })

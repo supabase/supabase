@@ -163,6 +163,17 @@ const round = (value: number) =>
 
 export const formatComputeHours = (hours: number): string => `${round(hours)} hrs`
 
+/**
+ * The included quota is quoted in vCPU-minutes, so usage reads in minutes until it is large
+ * enough that hours are easier to scan.
+ */
+export const formatVcpuMinutes = (vcpuHours: number): string => {
+  const minutes = vcpuHours * 60
+  return minutes < 10_000
+    ? `${Math.round(minutes).toLocaleString()} vCPU-min`
+    : formatVcpuHours(vcpuHours)
+}
+
 export const formatVcpuHours = (hours: number): string => `${round(hours)} vCPU-hrs`
 
 export const formatGbHours = (hours: number): string => `${round(hours)} GB-hrs`

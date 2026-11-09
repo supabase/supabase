@@ -48,10 +48,10 @@ afterEach(() => {
 describe('ComputeServices', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('summarizes runtime before the charts', async () => {
+  it('summarizes the metered quota before the charts', async () => {
     renderOnPlan('pro')
 
-    expect(await screen.findByText('Runtime usage')).toBeInTheDocument()
+    expect(await screen.findByText('Compute usage')).toBeInTheDocument()
     expect(await screen.findByText('vCPU-hours per day')).toBeInTheDocument()
     expect(await screen.findByText('Running hours by size')).toBeInTheDocument()
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
@@ -60,19 +60,19 @@ describe('ComputeServices', () => {
   it('breaks the allowance down the way the other usage sections do', async () => {
     renderOnPlan('pro')
 
-    const runtime = await summary('Runtime')
-    expect(runtime.getByText('Included in Pro Plan')).toBeInTheDocument()
-    // The RFC includes 500 minutes per cycle, on free and paid alike.
-    expect(runtime.getByText('500 min')).toBeInTheDocument()
-    expect(runtime.getByText('Used in period')).toBeInTheDocument()
-    expect(runtime.getByText('Overage in period')).toBeInTheDocument()
+    const quota = await summary('Compute')
+    expect(quota.getByText('Included in Pro Plan')).toBeInTheDocument()
+    // The RFC includes 500 per cycle, read as vCPU-minutes, on free and paid alike.
+    expect(quota.getByText('500 vCPU-min')).toBeInTheDocument()
+    expect(quota.getByText('Used in period')).toBeInTheDocument()
+    expect(quota.getByText('Overage in period')).toBeInTheDocument()
   })
 
-  it('reports vCPU-hours and GB-hours as the dimensions overage is priced on', async () => {
+  it('reports runtime and GB-hours alongside, neither of which is metered', async () => {
     renderOnPlan('pro')
 
-    // They carry no quota of their own, so they report rather than meter.
-    expect(await screen.findByText('vCPU-hours in period')).toBeInTheDocument()
+    // Runtime is context; memory tracks vCPU at a fixed ratio, so neither can diverge.
+    expect(await screen.findByText('Runtime in period')).toBeInTheDocument()
     expect(await screen.findByText('GB-hours in period')).toBeInTheDocument()
   })
 
@@ -80,17 +80,17 @@ describe('ComputeServices', () => {
     // Every plan includes the same 500 minutes, and the stand-in org runs well past it.
     renderOnPlan('free')
 
-    const runtime = await summary('Runtime')
-    expect(runtime.getByText('Exceeded limit')).toHaveClass('text-destructive')
-    const overage = runtime.getByText('Overage in period').parentElement
-    expect(within(overage!).queryByText('0 min')).not.toBeInTheDocument()
+    const quota = await summary('Compute')
+    expect(quota.getByText('Exceeded limit')).toHaveClass('text-destructive')
+    const overage = quota.getByText('Overage in period').parentElement
+    expect(within(overage!).queryByText('0 vCPU-min')).not.toBeInTheDocument()
   })
 
   it('flags an exceeded quota as billable overage when usage billing is on', async () => {
     renderOnPlan('pro', { isUsageBillingEnabled: true })
 
-    const runtime = await summary('Runtime')
-    expect(runtime.getByText('Exceeded limit')).toHaveClass('text-warning')
+    const quota = await summary('Compute')
+    expect(quota.getByText('Exceeded limit')).toHaveClass('text-warning')
   })
 
   it('drops the period rows outside the current billing cycle', async () => {
@@ -102,10 +102,10 @@ describe('ComputeServices', () => {
       />
     )
 
-    const runtime = await summary('Runtime')
-    expect(runtime.getByText('Included in Pro Plan')).toBeInTheDocument()
-    expect(runtime.queryByText('Used in period')).not.toBeInTheDocument()
-    expect(runtime.queryByText('Overage in period')).not.toBeInTheDocument()
+    const quota = await summary('Compute')
+    expect(quota.getByText('Included in Pro Plan')).toBeInTheDocument()
+    expect(quota.queryByText('Used in period')).not.toBeInTheDocument()
+    expect(quota.queryByText('Overage in period')).not.toBeInTheDocument()
   })
 
   it('states how much of the reserved vCPU did work', async () => {
@@ -145,7 +145,7 @@ describe('ComputeServices', () => {
 
     expect(await screen.findByText('Webhook relay')).toBeInTheDocument()
     expect(screen.queryByText('Production API')).not.toBeInTheDocument()
-    expect(screen.queryByText('Runtime usage')).not.toBeInTheDocument()
+    expect(screen.queryByText('Compute usage')).not.toBeInTheDocument()
   })
 
   it('states that Compute is in alpha and nothing is billed', async () => {
@@ -163,10 +163,10 @@ describe('ComputeServices in private alpha', () => {
   it('labels the allowance as private alpha and drops the overage row', async () => {
     renderOnPlan('pro')
 
-    const runtime = await summary('Runtime')
-    expect(runtime.getByText('Included in Private alpha')).toBeInTheDocument()
-    expect(runtime.getByText('Unlimited')).toBeInTheDocument()
-    expect(runtime.getByText('Not metered during private alpha')).toBeInTheDocument()
-    expect(runtime.queryByText('Overage in period')).not.toBeInTheDocument()
+    const quota = await summary('Compute')
+    expect(quota.getByText('Included in Private alpha')).toBeInTheDocument()
+    expect(quota.getByText('Unlimited')).toBeInTheDocument()
+    expect(quota.getByText('Not metered during private alpha')).toBeInTheDocument()
+    expect(quota.queryByText('Overage in period')).not.toBeInTheDocument()
   })
 })

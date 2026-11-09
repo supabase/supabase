@@ -6,7 +6,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { BILLING_BREAKDOWN_METRICS } from '../BillingSettings/BillingBreakdown/BillingBreakdown.constants'
 import { BillingMetric } from '../BillingSettings/BillingBreakdown/BillingMetric'
 import { ComputeMetric } from '../BillingSettings/BillingBreakdown/ComputeMetric'
-import { ComputeRuntimeMetric } from '../BillingSettings/BillingBreakdown/ComputeRuntimeMetric'
+import { ComputeQuotaMetric } from '../BillingSettings/BillingBreakdown/ComputeQuotaMetric'
 import { SectionContent } from './SectionContent'
 import { AlertError } from '@/components/ui/AlertError'
 import {
@@ -258,7 +258,7 @@ export const TotalUsage = ({
                     : 'md:pl-4'
                 )}
               >
-                <ComputeRuntimeMetric
+                <ComputeQuotaMetric
                   slug={orgSlug}
                   projectRef={projectRef}
                   subscription={subscription}

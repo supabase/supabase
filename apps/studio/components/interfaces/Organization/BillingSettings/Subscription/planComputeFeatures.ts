@@ -19,10 +19,10 @@ import type { OrgPlan } from '@/data/subscriptions/types'
 
 const ALPHA_NOTE = 'Private alpha — available by invite'
 
-const formatRuntime = (limits: ComputeLimits) =>
-  limits.runtimeMinutes === null
+const formatQuota = (limits: ComputeLimits) =>
+  limits.vcpuMinutes === null
     ? 'Unmetered during the private alpha'
-    : `${limits.runtimeMinutes.toLocaleString()} minutes of Compute runtime`
+    : `${limits.vcpuMinutes.toLocaleString()} vCPU-minutes of Compute`
 
 const formatConcurrency = (limits: ComputeLimits) =>
   limits.concurrentWorkers === 1
@@ -49,13 +49,13 @@ const computeFeaturesForPlan = (planId: OrgPlan['id']): (string | string[])[] =>
   const limits = COMPUTE_PLAN_LIMITS[planId]
   if (limits === undefined) return []
 
-  const runtime =
-    limits.runtimeMinutes === null || planId === 'free'
-      ? formatRuntime(limits)
-      : `${formatRuntime(limits)}, then pay as you go`
+  const quota =
+    limits.vcpuMinutes === null || planId === 'free'
+      ? formatQuota(limits)
+      : `${formatQuota(limits)}, then pay as you go`
 
   return [
-    [runtime, ALPHA_NOTE],
+    [quota, ALPHA_NOTE],
     // A plan with no concurrency limit has nothing to say here, so it says nothing rather
     // than advertising that the number is undecided.
     ...(limits.concurrentWorkers === null

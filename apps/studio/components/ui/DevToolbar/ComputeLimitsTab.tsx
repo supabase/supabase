@@ -71,7 +71,7 @@ export const ComputeLimitsTab = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Limits</TableHead>
-            <TableHead className="text-right">Runtime min / cycle</TableHead>
+            <TableHead className="text-right">vCPU-min / cycle</TableHead>
             <TableHead className="text-right">Concurrent workers</TableHead>
             <TableHead className="text-right">Sizes</TableHead>
             <TableHead className="text-right">Burst to</TableHead>
@@ -86,7 +86,7 @@ export const ComputeLimitsTab = () => {
                 {id === activeRowId && <span className="ml-2 text-brand">In effect</span>}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.runtimeMinutes)}
+                {formatLimit(limits.vcpuMinutes)}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
                 {formatLimit(limits.concurrentWorkers)}

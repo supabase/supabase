@@ -5,7 +5,7 @@ import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { includedRuntimeHours } from '@/components/interfaces/Compute/Compute.limits'
+import { includedVcpuHours } from '@/components/interfaces/Compute/Compute.limits'
 import { sumBy } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
 import { computeOrgUsageQueryOptions } from '@/data/compute/compute-usage-query'
@@ -13,7 +13,7 @@ import type { OrgSubscription } from '@/data/subscriptions/types'
 
 const USAGE_WINDOW_DAYS = 30
 
-export interface ComputeRuntimeMetricProps {
+export interface ComputeQuotaMetricProps {
   slug: string
   projectRef?: string | null
   subscription: OrgSubscription | undefined
@@ -21,21 +21,20 @@ export interface ComputeRuntimeMetricProps {
   className?: string
 }
 
-export const ComputeRuntimeMetric = ({
+export const ComputeQuotaMetric = ({
   slug,
   projectRef,
   subscription,
   relativeToSubscription,
   className,
-}: ComputeRuntimeMetricProps) => {
+}: ComputeQuotaMetricProps) => {
   const { data, isPending } = useQuery(
     computeOrgUsageQueryOptions({ orgSlug: slug, projectRef, days: USAGE_WINDOW_DAYS })
   )
 
   const { limits } = useComputeLimits(subscription?.plan)
-  // The RFC meters runtime, so that is what the summary leads with. vCPU-hours price the
-  // overage rather than capping it, so they belong in the section, not in this ratio.
-  const runtimeAllowanceHours = includedRuntimeHours(limits)
+  // The quota is vCPU-minutes, measured against reserved vCPU so instance size counts.
+  const quotaHours = includedVcpuHours(limits)
   const concurrentWorkerLimit = limits.concurrentWorkers
 
   if (isPending) {
@@ -46,22 +45,22 @@ export const ComputeRuntimeMetric = ({
     )
   }
 
-  const runtimeHours = sumBy(data?.points ?? [], (point) => point.runningHours)
+  const vcpuHours = sumBy(data?.points ?? [], (point) => point.reservedVcpuHours)
   const instances = data?.instances ?? 0
 
-  const hasLimit = runtimeAllowanceHours !== null && runtimeAllowanceHours > 0
-  const usageRatio = hasLimit ? runtimeHours / runtimeAllowanceHours : 0
+  const hasLimit = quotaHours !== null && quotaHours > 0
+  const usageRatio = hasLimit ? vcpuHours / quotaHours : 0
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
   const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
 
-  const usedMinutes = Math.round(runtimeHours * 60)
+  const usedVcpuMinutes = Math.round(vcpuHours * 60)
   const usageLabel =
     hasLimit && relativeToSubscription
-      ? `${usedMinutes.toLocaleString()} / ${Math.round(runtimeAllowanceHours * 60).toLocaleString()} min`
-      : `${usedMinutes.toLocaleString()} min`
+      ? `${usedVcpuMinutes.toLocaleString()} / ${Math.round(quotaHours * 60).toLocaleString()} vCPU-min`
+      : `${usedVcpuMinutes.toLocaleString()} vCPU-min`
 
   const percentageLabel =
-    !hasLimit || runtimeHours === 0
+    !hasLimit || vcpuHours === 0
       ? ''
       : usageRatio < 0.01
         ? '(<1%)'
@@ -77,7 +76,7 @@ export const ComputeRuntimeMetric = ({
       <Link href={`/org/${slug}/usage#compute-services`} className="block w-full group">
         <div className="group flex items-center gap-1">
           <p className="text-sm text-foreground-light group-hover:text-foreground transition cursor-pointer">
-            Compute Runtime
+            Compute
           </p>
           <span className="text-foreground-muted transition inline-block group-hover:transform group-hover:translate-x-0.5">
             <ChevronRightIcon strokeWidth={1.5} size={16} className="transition" />
