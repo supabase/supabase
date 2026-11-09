@@ -77,7 +77,9 @@ const highestSeverity = (affected: IssueAffectedResource[]) =>
 export function lintsToIssues(lints: Lint[]): Issue[] {
   const lintsByCheck = new Map<string, Lint[]>()
   for (const lint of lints) {
-    lintsByCheck.set(lint.name, [...(lintsByCheck.get(lint.name) ?? []), lint])
+    const checkLints = lintsByCheck.get(lint.name)
+    if (checkLints) checkLints.push(lint)
+    else lintsByCheck.set(lint.name, [lint])
   }
 
   return Array.from(lintsByCheck, ([name, checkLints]) => {
