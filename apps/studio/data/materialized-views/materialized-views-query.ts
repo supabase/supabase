@@ -25,6 +25,8 @@ export async function getMaterializedViews(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'materialized-views',
       sql,
       queryKey: ['materialized-views', schemas].filter(Boolean),
       grant: unguarded.migrating,

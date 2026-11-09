@@ -770,7 +770,6 @@
       "components/interfaces/Auth/Hooks/CreateHookSheet.tsx": 1,
       "components/interfaces/Auth/MfaAuthSettingsForm/MfaAuthSettingsForm.tsx": 1,
       "components/interfaces/Auth/OAuthApps/CreateOrUpdateOAuthAppSheet.tsx": 2,
-      "components/interfaces/Auth/OAuthApps/NewOAuthAppBanner.tsx": 1,
       "components/interfaces/Auth/OAuthApps/OAuthAppsList.tsx": 2,
       "components/interfaces/Auth/OAuthApps/OAuthServerSettingsForm.tsx": 2,
       "components/interfaces/Auth/Passkeys/PasskeysSettingsForm.tsx": 1,

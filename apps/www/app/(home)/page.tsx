@@ -27,6 +27,7 @@ export const metadata: Metadata = {
 export default function HomePage() {
   return (
     <>
+      <link rel="ai-catalog" href="/.well-known/ai-catalog.json" />
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: serializeJsonLd(organizationSchema()) }}

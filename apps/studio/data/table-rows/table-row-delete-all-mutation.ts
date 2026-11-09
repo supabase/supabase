@@ -52,6 +52,8 @@ export async function deleteAllTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-delete-all',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     grant: unguarded.migrating,

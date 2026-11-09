@@ -16,7 +16,6 @@ import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { useAccountRecovery } from '@/hooks/misc/useAccountRecovery'
-import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import {
   clearRecoveryReminderSnooze,
   getRemainingRecoveryGap,
@@ -35,12 +34,11 @@ const LiveRecoveryReminder = ({ onDismiss }: { onDismiss: () => void }) => {
   const { hasLoaded, isConfigCatStale } = useFeatureFlags()
   const flagsReady = hasLoaded === true && !isConfigCatStale
   const isEnabled = useFlag('enableAuthRecoveryCodes')
-  const hasSecuritySettings = useIsFeatureEnabled('account:show_security_settings')
   const { findings, isPending, isFetching, isError, verifiedFactorCount } = useAccountRecovery({
-    enabled: flagsReady && isEnabled && hasSecuritySettings,
+    enabled: flagsReady && isEnabled,
   })
   const isLoading = !flagsReady || isPending || isFetching
-  const isUnavailable = flagsReady && (!isEnabled || !hasSecuritySettings)
+  const isUnavailable = flagsReady && !isEnabled
   const gap = isError || !flagsReady || isPending || isUnavailable ? null : getRecoveryGap(findings)
   let announcement = 'Account recovery check complete'
   if (gap) announcement = 'Account recovery action needed'
@@ -179,7 +177,8 @@ export const RecoveryReminder = ({
       onAction?.(isExhausted ? 'regenerate_codes' : 'generate_codes')
     },
     onComplete: handleCodesSaved,
-    children: getRecoveryCodeTrigger(isExhausted, areCodesSaved),
+    variant: 'primary' as const,
+    size: 'tiny' as const,
   }
   let codesTitle = isExhausted ? 'Recovery codes used up' : 'No recovery codes'
   if (areCodesSaved) codesTitle = 'Recovery codes saved'
@@ -206,8 +205,16 @@ export const RecoveryReminder = ({
           description={getCodesDescription(isExhausted, areCodesSaved)}
           isComplete={areCodesSaved}
         >
-          {isExhausted && <RegenerateRecoveryCodesModal {...flowProps} />}
-          {!isExhausted && <GenerateRecoveryCodesModal {...flowProps} />}
+          {!areCodesSaved && isExhausted && (
+            <RegenerateRecoveryCodesModal
+              {...flowProps}
+              label="Regenerate codes"
+              showIcon={false}
+            />
+          )}
+          {!areCodesSaved && !isExhausted && (
+            <GenerateRecoveryCodesModal {...flowProps} label="Generate codes" />
+          )}
         </RecoveryTaskRow>
         {(startedHasAuthenticatorTask ?? hasAuthenticatorTask) && (
           <AuthenticatorTask
@@ -250,22 +257,5 @@ function getCodesDescription(isExhausted: boolean, areCodesSaved: boolean) {
   if (areCodesSaved) return 'Keep your recovery codes somewhere safe.'
   return isExhausted
     ? 'Generate a new set for future use.'
-    : 'Save codes in case you lose access to your authenticator.'
-}
-
-function getRecoveryCodeTrigger(isExhausted: boolean, areCodesSaved: boolean) {
-  return function RecoveryCodeTrigger({
-    onClick,
-    isPending,
-  }: {
-    onClick: () => void
-    isPending: boolean
-  }) {
-    if (areCodesSaved) return null
-    return (
-      <Button variant="primary" size="tiny" onClick={onClick} loading={isPending}>
-        {isExhausted ? 'Regenerate codes' : 'Generate codes'}
-      </Button>
-    )
-  }
+    : 'Save codes in case you lose access to your MFA methods.'
 }

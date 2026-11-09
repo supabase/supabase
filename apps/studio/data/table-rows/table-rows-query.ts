@@ -258,7 +258,14 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-cursor',
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -290,7 +297,14 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-page',
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -377,6 +391,8 @@ async function getTableRows(
       {
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-rows',
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

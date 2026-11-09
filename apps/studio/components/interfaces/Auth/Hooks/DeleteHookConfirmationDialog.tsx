@@ -53,6 +53,8 @@ export const DeleteHookConfirmationDialog = ({
           await executeSql({
             projectRef,
             connectionString: project!.connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'auth-hook-revoke-permissions',
             sql: joinSqlFragments(revokeStatements, '\n'),
             grant: unguarded.migrating,
           })
