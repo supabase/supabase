@@ -251,6 +251,9 @@ export const PostgrestConfig = () => {
           queryKey: privilegeKeys.exposedFunctionsInfinite(projectRef),
         }),
         queryClient.invalidateQueries({
+          queryKey: privilegeKeys.exposedFunctionsAll(projectRef),
+        }),
+        queryClient.invalidateQueries({
           queryKey: privilegeKeys.exposedFunctionCounts(projectRef),
         }),
         queryClient.invalidateQueries({

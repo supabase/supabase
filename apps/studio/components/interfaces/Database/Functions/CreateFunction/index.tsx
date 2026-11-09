@@ -37,6 +37,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
 
+import { FunctionApiAccessStatus } from '../FunctionApiAccessStatus'
 import { convertArgumentTypes, convertConfigParams } from '../Functions.utils'
 import { CreateFunctionConfigParamsSection } from './CreateFunctionConfigParamsSection'
 import { CreateFunctionHeader } from './CreateFunctionHeader'
@@ -304,6 +305,19 @@ export const CreateFunction = ({
               <SheetSection className={focusedEditor ? 'hidden' : ''}>
                 <FormFieldArgs readonly={isEditing} />
               </SheetSection>
+
+              {isEditing && func && (
+                <>
+                  <Separator className={focusedEditor ? 'hidden' : ''} />
+                  <SheetSection className={focusedEditor ? 'hidden' : ''}>
+                    <FunctionApiAccessStatus
+                      schema={func.schema}
+                      name={func.name}
+                      securityDefiner={func.security_definer}
+                    />
+                  </SheetSection>
+                </>
+              )}
 
               <Separator className={focusedEditor ? 'hidden' : ''} />
 

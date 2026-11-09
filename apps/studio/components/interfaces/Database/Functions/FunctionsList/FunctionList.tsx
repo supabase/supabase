@@ -26,6 +26,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { FunctionExposureBadge } from '../FunctionExposureBadge'
 import { stripInArgModePrefixes } from '../Functions.utils'
 import { getDatabaseTriggersHref, getFilteredFunctions } from './FunctionList.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
@@ -35,7 +36,9 @@ import {
   useDatabaseFunctionsQuery,
   type SavedDatabaseFunction,
 } from '@/data/database-functions/database-functions-query'
+import { useExposedFunctionsQuery } from '@/data/privileges/exposed-functions-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { useIsSchemaExposed } from '@/hooks/misc/useIsSchemaExposed'
 import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -72,6 +75,28 @@ export const FunctionList = ({
     connectionString: project?.connectionString,
     schema,
   })
+
+  const schemaExposure = useIsSchemaExposed({
+    projectRef: project?.ref,
+    schemaName: schema,
+  })
+  const schemaExposed = schemaExposure.data === true
+
+  const { data: grantsByName = {} } = useExposedFunctionsQuery(
+    {
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+    },
+    {
+      enabled: schemaExposed,
+      select: (all) =>
+        Object.fromEntries(
+          all
+            .filter((fn) => fn.schema === schema)
+            .map((fn) => [`${fn.schema}.${fn.name}`, fn] as const)
+        ),
+    }
+  )
 
   const _functions = useMemo(
     () =>
@@ -110,15 +135,22 @@ export const FunctionList = ({
         return (
           <TableRow key={x.id}>
             <TableCell className="truncate">
-              <Button
-                variant="text"
-                className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title"
-                disabled={isLocked || !canUpdateFunctions}
-                onClick={() => editFunction(x)}
-                title={x.name}
-              >
-                {x.name}
-              </Button>
+              <div className="flex items-center gap-2 min-w-0">
+                <Button
+                  variant="text"
+                  className="text-link-table-cell text-sm disabled:opacity-100 disabled:no-underline p-0 hover:bg-transparent title min-w-0"
+                  disabled={isLocked || !canUpdateFunctions}
+                  onClick={() => editFunction(x)}
+                  title={x.name}
+                >
+                  {x.name}
+                </Button>
+                <FunctionExposureBadge
+                  grant={grantsByName[`${x.schema}.${x.name}`]}
+                  schemaExposed={schemaExposed}
+                  securityDefiner={x.security_definer}
+                />
+              </div>
             </TableCell>
             <TableCell className="table-cell text-foreground-light capitalize">{x.type}</TableCell>
             <TableCell className="table-cell">

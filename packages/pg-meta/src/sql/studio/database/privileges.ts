@@ -161,24 +161,23 @@ function getFunctionGrantsCTEs({
     ', '
   )
 
+  // Use has_function_privilege so PUBLIC EXECUTE (Postgres default for new
+  // functions, and grantee oid 0 in ACLs) counts for anon/authenticated/service_role.
+  // Joining aclexplode to pg_roles drops PUBLIC and under-reports exposure.
   return safeSql`
     function_privileges as (
       select
         n.nspname as schema_name,
         p.proname as name,
 
-        -- Aggregate EXECUTE across all overloads + all 3 roles
-        bool_or(pr.rolname = 'anon' and acl.privilege_type = 'EXECUTE') as anon_execute,
-        bool_or(pr.rolname = 'authenticated' and acl.privilege_type = 'EXECUTE') as auth_execute,
-        bool_or(pr.rolname = 'service_role' and acl.privilege_type = 'EXECUTE') as srv_execute
+        -- Aggregate EXECUTE across all overloads (includes PUBLIC grants)
+        bool_or(has_function_privilege('anon', p.oid, 'EXECUTE')) as anon_execute,
+        bool_or(has_function_privilege('authenticated', p.oid, 'EXECUTE')) as auth_execute,
+        bool_or(has_function_privilege('service_role', p.oid, 'EXECUTE')) as srv_execute
 
       from pg_proc p
       join pg_namespace n
         on n.oid = p.pronamespace
-      left join lateral aclexplode(coalesce(p.proacl, acldefault('f', p.proowner))) as acl
-        on true
-      left join pg_roles pr
-        on pr.oid = acl.grantee
       where p.prokind in ('f', 'w')
         ${IGNORED_SCHEMAS_LIST ? safeSql`and n.nspname not in (${IGNORED_SCHEMAS_LIST})` : safeSql``}
         ${search ? safeSql`and (n.nspname || '.' || p.proname) ilike ${literal(`%${search}%`)}` : safeSql``}
@@ -188,6 +187,9 @@ function getFunctionGrantsCTEs({
       select
         schema_name,
         name,
+        anon_execute,
+        auth_execute,
+        srv_execute,
         case
           when anon_execute and auth_execute and srv_execute then 'granted'
           when not (anon_execute or auth_execute or srv_execute) then 'revoked'
@@ -219,7 +221,10 @@ export function getExposedFunctionsSql({
             jsonb_build_object(
               'schema', fg.schema_name,
               'name', fg.name,
-              'status', fg.status
+              'status', fg.status,
+              'anon_execute', fg.anon_execute,
+              'authenticated_execute', fg.auth_execute,
+              'service_role_execute', fg.srv_execute
             )
           )
           from (
@@ -364,7 +369,9 @@ export const buildFunctionPrivilegesSql = (
   const privilegeClause =
     action === 'grant'
       ? safeSql`grant execute on function %I.%I(%s) to anon, authenticated, service_role`
-      : safeSql`revoke all on function %I.%I(%s) from anon, authenticated, service_role`
+      : // Include PUBLIC: default EXECUTE is often via PUBLIC, and revoking only the
+        // named API roles leaves anon/authenticated able to execute.
+        safeSql`revoke all on function %I.%I(%s) from public, anon, authenticated, service_role`
 
   return safeSql`
     do $$
@@ -380,6 +387,48 @@ export const buildFunctionPrivilegesSql = (
         where (n.nspname, p.proname) in (${tuples})
       loop
         execute format('${privilegeClause}', nspname, proname, arg_types);
+      end loop;
+    end $$;
+  `
+}
+
+/**
+ * Revokes EXECUTE from PUBLIC, anon, and authenticated so the function is no
+ * longer callable via the Data API with the publishable key. Leaves
+ * service_role so server-side callers keep working.
+ */
+export const buildRevokePublicFunctionExecuteSql = (schemaNames: string[]): SafeSqlFragment => {
+  if (schemaNames.length === 0) return safeSql``
+
+  const tuples = joinSqlFragments(
+    schemaNames.map((sn) => {
+      const dotIdx = sn.indexOf('.')
+      const schema = sn.slice(0, dotIdx)
+      const name = sn.slice(dotIdx + 1)
+      return safeSql`(${literal(schema)},${literal(name)})`
+    }),
+    ', '
+  )
+
+  return safeSql`
+    do $$
+    declare
+      nspname name;
+      proname name;
+      arg_types text;
+    begin
+      for nspname, proname, arg_types in
+        select n.nspname, p.proname, pg_get_function_identity_arguments(p.oid)
+        from pg_proc p
+        join pg_namespace n on n.oid = p.pronamespace
+        where (n.nspname, p.proname) in (${tuples})
+      loop
+        execute format(
+          'revoke all on function %I.%I(%s) from public, anon, authenticated',
+          nspname,
+          proname,
+          arg_types
+        );
       end loop;
     end $$;
   `

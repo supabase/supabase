@@ -20,6 +20,12 @@ export type ExposedFunction = {
   schema: string
   name: string
   status: 'granted' | 'revoked' | 'custom'
+  /** True when anon can EXECUTE (includes PUBLIC grants). */
+  anon_execute: boolean
+  /** True when authenticated can EXECUTE (includes PUBLIC grants). */
+  authenticated_execute: boolean
+  /** True when service_role can EXECUTE (includes PUBLIC grants). */
+  service_role_execute: boolean
 }
 
 export type ExposedFunctionsResponse = {

@@ -311,11 +311,11 @@ const getCustomGrantsTooltip = ({
   hasPendingRemove: boolean
 }) => {
   if (hasPendingAdd) {
-    return 'This function has custom grants. Saving will override them with standard Data API grants for anon, authenticated, and service_role. Select again to revoke all grants instead.'
+    return 'This function has custom grants. Saving will override them with standard Data API grants for anon, authenticated, and service_role. Select again to revoke public and Data API grants instead.'
   }
 
   if (hasPendingRemove) {
-    return 'This function has custom grants. Saving will revoke all grants for anon, authenticated, and service_role. Select again to override with standard Data API grants instead.'
+    return 'This function has custom grants. Saving will revoke EXECUTE from PUBLIC, anon, authenticated, and service_role. Select again to override with standard Data API grants instead.'
   }
 
   return 'This function has custom grants. Select it to override with standard Data API grants for anon, authenticated, and service_role.'
