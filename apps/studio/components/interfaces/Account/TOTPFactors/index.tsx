@@ -43,8 +43,7 @@ export const TOTPFactors = () => {
   const { codes, status } = recoveryCodes
   const disableDeleteFactor = !recoveryCodes.canRemoveFactor
 
-  const factorIdToDelete =
-    totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null
+  const factorIdToDelete = totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null
   const isDeleteFactorModalVisible = factorIdToDelete !== null
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)

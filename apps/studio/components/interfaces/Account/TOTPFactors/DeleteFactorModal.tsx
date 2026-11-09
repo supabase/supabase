@@ -151,10 +151,7 @@ const RemoveAuthenticatorConfirmation = ({
           error={recoveryCodes.error}
           showInstructions={false}
           additionalActions={
-            <Button
-              loading={recoveryCodes.isFetching}
-              onClick={() => void recoveryCodes.refetch()}
-            >
+            <Button loading={recoveryCodes.isFetching} onClick={() => void recoveryCodes.refetch()}>
               Retry
             </Button>
           }
