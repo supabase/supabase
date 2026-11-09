@@ -3,7 +3,7 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import { reportEmptyBodyResponse } from './empty-body-diagnostics'
+import { refetchWithoutCache, reportEmptyBodyResponse } from './empty-body-diagnostics'
 import {
   classifyError,
   classifyResponseError,
@@ -80,6 +80,11 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  *
  * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
  * short-circuits regardless of transport. Non-empty responses are returned untouched.
+ *
+ * Some browsers (mostly Firefox) also return a 200 with an empty body for GETs that have
+ * data, which would otherwise surface as `{}` and crash components. Before giving up we try
+ * to recover the body: first from the original response (when only the clone was empty),
+ * then by re-fetching JSON GETs once with the HTTP cache bypassed.
  */
 export async function normalizeEmptyBodyResponse(
   response: Response,
@@ -90,18 +95,51 @@ export async function normalizeEmptyBodyResponse(
   }
 
   if (response.headers.has('Content-Length')) {
-    if (source && response.headers.get('Content-Length') === '0') {
-      void reportEmptyBodyResponse({ ...source, response })
+    if (response.headers.get('Content-Length') !== '0') return response
+  } else {
+    const body = await response.clone().text()
+    if (body.length > 0) {
+      return response
     }
-    return response
+
+    // The clone came back empty, check whether the original still has the body
+    const originalBody = await response.text()
+    if (originalBody.length > 0) {
+      if (source)
+        void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'original_body' })
+      return new Response(originalBody, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      })
+    }
   }
 
-  const body = await response.clone().text()
-  if (body.length > 0) {
-    return response
+  const canRefetch =
+    source?.request.method === 'GET' &&
+    (response.headers.get('Content-Type') ?? '').includes('application/json')
+
+  if (source && canRefetch) {
+    const { summary, response: retried, body } = await refetchWithoutCache(source.request)
+    if (retried?.ok && body) {
+      void reportEmptyBodyResponse({
+        ...source,
+        response,
+        recoveredBy: 'refetch',
+        refetch: summary,
+      })
+      return new Response(body, {
+        status: retried.status,
+        statusText: retried.statusText,
+        headers: retried.headers,
+      })
+    }
+    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none', refetch: summary })
+  } else if (source) {
+    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none' })
   }
 
-  if (source) void reportEmptyBodyResponse({ ...source, response })
+  if (response.headers.has('Content-Length')) return response
 
   const headers = new Headers(response.headers)
   headers.set('Content-Length', '0')
