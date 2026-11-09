@@ -47,8 +47,11 @@ const OPTIONS: { value: LogVolumeControl; label: string; description: string }[]
   },
 ]
 
-export const LogVolumeControlSettings = () => {
-  const { ref: projectRef } = useParams()
+interface LogVolumeControlFormProps {
+  projectRef?: string
+}
+
+const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
   const { logVolumeControl, setLogVolumeControl, isLoading } = useLogVolumeControl(projectRef)
 
   const form = useForm<FormValues>({
@@ -133,4 +136,10 @@ export const LogVolumeControlSettings = () => {
       </PageSectionContent>
     </PageSection>
   )
+}
+
+export const LogVolumeControlSettings = () => {
+  const { ref: projectRef } = useParams()
+
+  return <LogVolumeControlForm key={projectRef} projectRef={projectRef} />
 }
