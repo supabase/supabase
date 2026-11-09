@@ -33,6 +33,23 @@ Running `pnpm build` now runs `codegen` first and restores `build` from the cach
 
 Pre/post hooks and `&&` chains hide task ordering from Turborepo, so it can't cache or parallelize the steps. Moving the ordering into `dependsOn` fixes that. However, a script run directly (`pnpm build` in the package, a Vercel build command, a CI step) then skips its prerequisites. `maybe-turbo` keeps those entry points working.
 
+It also leaves one definition of the pipeline. Root scripts such as `pnpm dev:docs` and `pnpm build:docs` already go through Turborepo, so with hooks the same ordering lived in two places: `turbo.jsonc` for root commands and `prebuild`/`predev` for commands run in the package. A step added to one and not the other only broke one of the paths. With `maybe-turbo`, `pnpm dev` in `apps/docs`, `pnpm dev --filter=docs` and `pnpm dev:docs` from the root all run the same task graph.
+
+### Why not call `turbo` from the script directly?
+
+Turborepo runs a task by running the package script with the same name, so a script can't call `turbo run` on itself. Without `maybe-turbo`, every task with prerequisites needs two scripts:
+
+```json
+"build:whatever": "turbo run build:whatever-inner",
+"build:whatever-inner": "node scripts/build-whatever.mjs"
+```
+
+The `turbo.jsonc` task is then defined for the inner name, and callers have to know which name to use. `maybe-turbo` keeps a single script:
+
+```json
+"build:whatever": "maybe-turbo node scripts/build-whatever.mjs"
+```
+
 ## How it works
 
 Turborepo sets `TURBO_HASH` in the environment of every task it runs.

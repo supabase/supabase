@@ -91,6 +91,13 @@ cached by Turbo). Inside Turbo the wrapper runs the command directly.
 Existing commands keep working unchanged. A wrapper with no command (such as
 `codegen:references` or `build:markdown`) only groups its dependencies.
 
+`pnpm dev` in `apps/docs`, `pnpm dev --filter=docs` and `pnpm dev:docs` from the
+repo root run the same task graph. Before the wrapper, the root commands used
+`turbo.jsonc` and package-level commands used `prebuild`/`predev`, so the same
+pipeline was defined twice and could drift. Add new steps to `turbo.jsonc`
+only. See `packages/maybe-turbo/README.md` for why scripts use the wrapper
+instead of calling `turbo` directly.
+
 The R2 asset upload used to be `postbuild`. It now runs from the
 `buildCommand` in `apps/docs/vercel.json`:
 `pnpm build && ./../../scripts/upload-static-assets.sh`.

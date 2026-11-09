@@ -34,6 +34,7 @@ Fix every finding in the package you're changing, or tell the user why one stays
 
 - Express ordering as `dependsOn` in the package's `turbo.jsonc`. Remove the hook or chain it replaces.
 - Wrap a script with `maybe-turbo` (from `packages/maybe-turbo`; add `"maybe-turbo": "workspace:*"` to `devDependencies`) when its task has same-package `dependsOn` entries. Outside turbo, `pnpm <script>` then runs `turbo run <script> --filter=<package>`, so prerequisites still run. Leaf scripts with no dependencies don't need it.
+- Don't split a task into a `turbo run <name>-inner` script plus an inner script. Use `maybe-turbo`, so each task has one script name for callers and `turbo.jsonc`.
 - Put compound commands in one quoted argument: `"typecheck": "maybe-turbo \"next typegen && tsc --noEmit\""`. `maybe-turbo` exits with an error if `&&`, `||`, `;` or `|` appears outside the quotes.
 - A task that only groups other tasks gets a bare `"<name>": "maybe-turbo"` script, so `pnpm <name>` still works.
 - Every wrapped script needs a task in `turbo.jsonc` (the package's or the root's).
