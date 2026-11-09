@@ -413,41 +413,33 @@ describe('openapi-fetch client — empty GET 200', () => {
     })
   })
 
-  it('falls back to {} when the refetch is also empty', async () => {
+  it('throws MalformedResponse when the refetch is also empty, without a diagnostic event', async () => {
     const fetchMock = vi.fn(async () => emptyJson())
     vi.stubGlobal('fetch', fetchMock)
 
-    const { data, error } = await get('/platform/client-a', {})
+    const err = await get('/platform/client-a', {}).catch((e) => e)
 
-    expect(error).toBeUndefined()
-    expect(data).toEqual({})
+    expect(err._tag).toBe('MalformedResponse')
+    expect(err.endpoint).toBe('/platform/client-a')
     expect(fetchMock).toHaveBeenCalledTimes(2)
-    await vi.waitFor(() => expect(sentry.captureMessage).toHaveBeenCalledTimes(1))
-    expect(lastCapture().context).toMatchObject({
-      tags: { endpoint: '/platform/client-a', recovered_by: 'none', probe_has_body: 'false' },
-      extra: { probe_body_length: 0 },
-    })
+    // The thrown error is reported through the query cache instead
+    expect(sentry.captureMessage).not.toHaveBeenCalled()
   })
 
-  it('falls back to {} without throwing when the refetch rejects', async () => {
+  it('throws MalformedResponse when the refetch rejects', async () => {
     const fetchMock = vi
       .fn<(request: Request) => Promise<Response>>()
       .mockImplementationOnce(async () => emptyJson())
       .mockImplementationOnce(async () => Promise.reject(new TypeError('Load failed')))
     vi.stubGlobal('fetch', fetchMock)
 
-    const { data, error } = await get('/platform/client-b', {})
+    const err = await get('/platform/client-b', {}).catch((e) => e)
 
-    expect(error).toBeUndefined()
-    expect(data).toEqual({})
-    await vi.waitFor(() => expect(sentry.captureMessage).toHaveBeenCalledTimes(1))
-    expect(lastCapture().context).toMatchObject({
-      tags: { recovered_by: 'none', probe_has_body: 'error' },
-      extra: { probe_error: 'TypeError' },
-    })
+    expect(err._tag).toBe('MalformedResponse')
+    expect(sentry.captureMessage).not.toHaveBeenCalled()
   })
 
-  it('falls back to {} when the refetch is not ok', async () => {
+  it('throws MalformedResponse when the refetch is not ok', async () => {
     const fetchMock = vi
       .fn<(request: Request) => Promise<Response>>()
       .mockImplementationOnce(async () => emptyJson())
@@ -456,15 +448,10 @@ describe('openapi-fetch client — empty GET 200', () => {
       )
     vi.stubGlobal('fetch', fetchMock)
 
-    const { data, error } = await get('/platform/client-c', {})
+    const err = await get('/platform/client-c', {}).catch((e) => e)
 
-    expect(error).toBeUndefined()
-    expect(data).toEqual({})
-    await vi.waitFor(() => expect(sentry.captureMessage).toHaveBeenCalledTimes(1))
-    expect(lastCapture().context).toMatchObject({
-      tags: { recovered_by: 'none', probe_has_body: 'true' },
-      extra: { probe_status: 401 },
-    })
+    expect(err._tag).toBe('MalformedResponse')
+    expect(sentry.captureMessage).not.toHaveBeenCalled()
   })
 
   it('does not refetch an empty non-JSON response', async () => {
@@ -511,13 +498,10 @@ describe('openapi-fetch client — empty GET 200', () => {
       })
     vi.stubGlobal('fetch', fetchMock)
 
-    const { data } = await get('/platform/f', { signal: controller.signal })
+    const err = await get('/platform/f', { signal: controller.signal }).catch((e) => e)
 
-    expect(data).toEqual({})
-    await vi.waitFor(() => expect(sentry.captureMessage).toHaveBeenCalledTimes(1))
-    expect(lastCapture().context).toMatchObject({
-      tags: { recovered_by: 'none', probe_has_body: 'error' },
-      extra: { probe_error: 'AbortError' },
-    })
+    expect(err._tag).toBe('RequestAborted')
+    expect(fetchMock).toHaveBeenCalledTimes(2)
+    expect(sentry.captureMessage).not.toHaveBeenCalled()
   })
 })

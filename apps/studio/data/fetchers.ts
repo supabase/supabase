@@ -3,7 +3,11 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import { refetchWithoutCache, reportEmptyBodyResponse } from './empty-body-diagnostics'
+import {
+  emptyBodyErrorContext,
+  refetchWithoutCache,
+  reportEmptyBodyResponse,
+} from './empty-body-diagnostics'
 import {
   classifyError,
   classifyResponseError,
@@ -19,7 +23,7 @@ import {
   reportStudioError,
   type StudioSentryContext,
 } from '@/lib/errors/report-studio-error'
-import type { StudioError } from '@/lib/errors/studio-errors'
+import { MalformedResponseError, type StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
 
 // generated from openapi-typescript
@@ -91,7 +95,8 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  * Some browsers (mostly Firefox) also return a 200 with an empty body for GETs that have
  * data, which would otherwise surface as `{}` and crash components. Before giving up we try
  * to recover the body: first from the original response (when only the clone was empty),
- * then by re-fetching JSON GETs once with the HTTP cache bypassed.
+ * then by re-fetching JSON GETs once with the HTTP cache bypassed. If a JSON GET is still empty
+ * it throws `MalformedResponseError` rather than hand callers an empty object they'd crash on.
  */
 export async function normalizeEmptyBodyResponse(
   response: Response,
@@ -141,7 +146,28 @@ export async function normalizeEmptyBodyResponse(
         headers: retried.headers,
       })
     }
-    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none', refetch: summary })
+
+    // A refetch cut short by the caller's abort isn't evidence of a malformed response.
+    if (source.request.signal?.aborted) {
+      throw classifyError(new DOMException('The operation was aborted.', 'AbortError'), {
+        endpoint: source.schemaPath,
+        method: source.request.method,
+      })
+    }
+
+    const error = new MalformedResponseError({
+      message: 'The server returned an empty response.',
+      code: response.status,
+      requestId: source.request.headers.get('X-Request-Id') ?? undefined,
+      endpoint: source.schemaPath,
+      method: source.request.method,
+    })
+    // The query cache reports this error once, with the refetch diagnostics, so the standalone
+    // diagnostic event would be a duplicate.
+    deferStudioErrorReport(error, {
+      context: emptyBodyErrorContext({ request: source.request, response, refetch: summary }),
+    })
+    throw error
   } else if (source) {
     void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none' })
   }

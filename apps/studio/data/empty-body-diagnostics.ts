@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 import { IS_PLATFORM } from 'common'
 
+import type { StudioSentryContext } from '@/lib/errors/report-studio-error'
 import { uuidv4 } from '@/lib/helpers'
 
 const REFETCH_TIMEOUT_MS = 10_000
@@ -63,6 +64,8 @@ function readHeaders(headers: Headers) {
 }
 
 function readBrowserContext() {
+  // The error context is also built when Studio fetches on the server
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return {}
   const navigation = performance.getEntriesByType?.('navigation')[0]
   return {
     visibility_state: document.visibilityState,
@@ -157,7 +160,7 @@ export async function refetchWithoutCache(
   }
 }
 
-function probeTags(refetch?: RefetchSummary) {
+function probeTags(refetch?: RefetchSummary): Record<string, string> {
   if (!refetch) return {}
   if (refetch.error) return { probe_has_body: 'error' }
   return { probe_has_body: (refetch.bodyLength ?? 0) > 0 ? 'true' : 'false' }
@@ -172,6 +175,39 @@ function probeExtra(refetch?: RefetchSummary) {
     probe_content_length: refetch.contentLength,
     probe_content_type: refetch.contentType,
     probe_error: refetch.error,
+  }
+}
+
+function buildContext(request: Request, response: Response) {
+  return {
+    method: request.method,
+    status: response.status,
+    response_type: response.type,
+    redirected: response.redirected,
+    request_id: request.headers.get('X-Request-Id'),
+    ...readHeaders(response.headers),
+    ...readBrowserContext(),
+    ...readResourceTiming(response.url || request.url),
+  }
+}
+
+/**
+ * The same diagnostics `reportEmptyBodyResponse` sends, shaped as Sentry context to attach to the
+ * `MalformedResponse` error thrown when recovery fails. That error is reported through the normal
+ * sampled path, so this carries the refetch probe without a second Sentry event.
+ */
+export function emptyBodyErrorContext({
+  request,
+  response,
+  refetch,
+}: {
+  request: Request
+  response: Response
+  refetch?: RefetchSummary
+}): StudioSentryContext {
+  return {
+    tags: { recovered_by: 'none', ...probeTags(refetch), empty_body_diagnostic: 'true' },
+    extra: { ...buildContext(request, response), ...probeExtra(refetch) },
   }
 }
 
@@ -195,17 +231,6 @@ export async function reportEmptyBodyResponse({
     if (reportedEndpoints.has(endpoint)) return
     reportedEndpoints.add(endpoint)
 
-    const context = {
-      method: request.method,
-      status: response.status,
-      response_type: response.type,
-      redirected: response.redirected,
-      request_id: request.headers.get('X-Request-Id'),
-      ...readHeaders(response.headers),
-      ...readBrowserContext(),
-      ...readResourceTiming(response.url || request.url),
-    }
-
     Sentry.captureMessage('Empty response body on successful API request', {
       level: 'warning',
       fingerprint: ['empty-body-response', endpoint],
@@ -215,7 +240,7 @@ export async function reportEmptyBodyResponse({
         ...probeTags(refetch),
         empty_body_diagnostic: 'true',
       },
-      extra: { ...context, ...probeExtra(refetch) },
+      extra: { ...buildContext(request, response), ...probeExtra(refetch) },
     })
   } catch (error) {
     console.error('Failed to report empty response body', error)
