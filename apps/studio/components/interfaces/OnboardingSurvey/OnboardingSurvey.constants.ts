@@ -6,7 +6,6 @@ export const ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS = 5 * 60 * 1000
 export type OnboardingSurveyOption = {
   value: string
   label: string
-  description?: string
   /** Shown below a divider, e.g. Prefer not to say */
   isOptOut?: boolean
 }
