@@ -102,7 +102,8 @@ export const CreateSecretAPIKeyDialog = () => {
           id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
           onTrigger={openDialog}
           side="bottom"
-          tooltipOpen={visible === 'secret' ? false : undefined}
+          // Hide the shortcut hint while blocked so the permission tooltip shows instead
+          tooltipOpen={visible === 'secret' || !canCreateAPIKeys ? false : undefined}
         >
           <ButtonTooltip
             className="mt-2"

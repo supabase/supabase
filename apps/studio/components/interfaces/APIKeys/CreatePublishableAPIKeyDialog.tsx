@@ -94,7 +94,8 @@ export const CreatePublishableAPIKeyDialog = () => {
         id={SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE}
         onTrigger={openDialog}
         side="bottom"
-        tooltipOpen={visible === 'publishable' ? false : undefined}
+        // Hide the shortcut hint while blocked so the permission tooltip shows instead
+        tooltipOpen={visible === 'publishable' || !canCreateAPIKeys ? false : undefined}
       >
         <ButtonTooltip
           icon={<PlusIcon />}

@@ -1,5 +1,6 @@
 import { toast } from 'sonner'
 
+import { getWriteGrantTooltip } from '@/components/interfaces/APIKeys/APIKeys.utils'
 import { defaultDisabledSmtpFormValues } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.constants'
 import { type ConnectedResource } from '@/components/interfaces/Integrations/Landing/Landing.utils'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
@@ -61,8 +62,18 @@ export const useConnectedResourceMutations = ({
     }
   }
 
+  /** Why a resource can't be removed right now, or undefined if it can. */
+  const getRemoveDisabledReason = (resource: ConnectedResource) => {
+    if (resource.kind !== 'api_key' || apiKeyDeleteGrant.status === 'granted') return undefined
+    return (
+      getWriteGrantTooltip(apiKeyDeleteGrant.status, 'delete') ??
+      'Checking permissions to delete API keys'
+    )
+  }
+
   return {
     removeResource,
+    getRemoveDisabledReason,
     isRemoving: isRevokingApp || isDeletingApiKey || isDeletingSecret || isUpdatingAuthConfig,
   }
 }
