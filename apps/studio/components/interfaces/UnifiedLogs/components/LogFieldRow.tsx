@@ -29,6 +29,8 @@ interface LogFieldRowProps<TData> {
   truncateLabel?: boolean
   onAddFilter?: (operator: LogsFilterOperator) => void
   filterOperators?: readonly LogsFilterOperator[]
+  /** `menu` keeps the dropdown on every device, for surfaces without hover actions. */
+  actionsMode?: 'hover' | 'menu'
   className?: string
 }
 
@@ -44,6 +46,7 @@ export function LogFieldRow<TData>({
   truncateLabel = false,
   onAddFilter,
   filterOperators,
+  actionsMode = 'hover',
   className,
 }: LogFieldRowProps<TData>) {
   const isHoverDevice = useMedia(HOVER_ACTIONS_QUERY, false)
@@ -55,7 +58,7 @@ export function LogFieldRow<TData>({
     onAddFilter,
     filterOperators,
   })
-  const canUseHoverActions = isHoverDevice && !disabled
+  const canUseHoverActions = actionsMode === 'hover' && isHoverDevice && !disabled
   const triggerProps = { role: 'button', tabIndex: disabled ? -1 : 0 } as const
 
   const row = (

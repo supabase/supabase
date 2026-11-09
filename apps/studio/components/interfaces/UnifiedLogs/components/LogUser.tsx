@@ -137,7 +137,7 @@ function SupabaseUser({ userId }: { userId: string }) {
         linkLabel="Open in Authentication"
         className="mx-4 mb-1 mt-3"
       />
-      <UserFields user={user} onFilterByUser={() => setUserFilter(userId)} />
+      <UserFields user={user} onFilterByUser={() => setUserFilter(userId)} actionsMode="hover" />
     </>
   )
 }
