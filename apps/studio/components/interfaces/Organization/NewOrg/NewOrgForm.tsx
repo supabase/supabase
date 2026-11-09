@@ -68,6 +68,7 @@ import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
+import { timeout } from '@/lib/helpers'
 import { useProfile } from '@/lib/profile'
 import {
   classifyApiError,
@@ -76,6 +77,8 @@ import {
 } from '@/lib/telemetry/funnel-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTrackFunnelError } from '@/lib/telemetry/use-track-funnel-error'
+
+const SURVEY_SUBMIT_MAX_WAIT_MS = 3_000
 
 interface NewOrgFormProps {
   onPaymentMethodReset: () => void
@@ -113,7 +116,6 @@ export const NewOrgForm = ({
   const user = useProfile()
   const track = useTrack()
   const { resolvedTheme } = useTheme()
-  const hasTrackedSurveyOpened = useRef(false)
   const { lastVisitedOrganization } = useLastVisitedOrganization()
 
   const isBillingEnabled = useIsFeatureEnabled('billing:all')
@@ -174,16 +176,6 @@ export const NewOrgForm = ({
   // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
   // parent row, so sending them on both paths would swallow the survey call.
   const omitKindFromOrgCreation = showOnboardingSurveyInOrgForm
-
-  useEffect(() => {
-    if (!showOnboardingSurveyInOrgForm) return
-    if (hasTrackedSurveyOpened.current) return
-
-    hasTrackedSurveyOpened.current = true
-    track('onboarding_survey_prompt_opened', {
-      surface: 'org_form',
-    })
-  }, [showOnboardingSurveyInOrgForm, track])
 
   useEffect(() => {
     form.reset({
@@ -401,8 +393,6 @@ export const NewOrgForm = ({
   }
 
   const onOrganizationCreated = async (org: { slug: string }) => {
-    await submitOrganizationSurvey(org.slug)
-
     if (submittedTier.current) {
       track(
         'organization_creation_completed',
@@ -410,6 +400,8 @@ export const NewOrgForm = ({
         { organization: org.slug }
       )
     }
+
+    await Promise.race([submitOrganizationSurvey(org.slug), timeout(SURVEY_SUBMIT_MAX_WAIT_MS)])
 
     const prefilledProjectName = user.profile?.username
       ? user.profile.username + `'s Project`

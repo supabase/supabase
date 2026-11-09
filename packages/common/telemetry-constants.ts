@@ -505,18 +505,6 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
 type OnboardingSurveySurface = 'org_form' | 'follow_up'
 
 /**
- * Onboarding survey prompt UI became visible.
- *
- * @group Events
- * @source studio
- */
-export interface OnboardingSurveyPromptOpenedEvent {
-  action: 'onboarding_survey_prompt_opened'
-  properties: { surface: OnboardingSurveySurface }
-  groups: Partial<TelemetryGroups>
-}
-
-/**
  * User clicked Answer on the onboarding survey follow-up card.
  *
  * @group Events
@@ -4593,7 +4581,6 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
-  | OnboardingSurveyPromptOpenedEvent
   | OnboardingSurveyAnswerButtonClickedEvent
   | OnboardingSurveySubmitButtonClickedEvent
   | OnboardingSurveyDismissedEvent
