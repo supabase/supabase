@@ -29,9 +29,11 @@ export const ProjectCreationStatusAdmonition = ({
         title={isMaintenance ? 'Maintenance in progress' : 'Incident in progress'}
         description={
           <>
-            {isMaintenance ? 'Maintenance' : 'An incident'} may affect project creation
-            {isRegionSpecific ? ' in this region' : ''}. Follow updates on{' '}
-            <InlineLink href={data.pageUrl}>status page</InlineLink>.
+            {isMaintenance ? 'Maintenance' : 'An incident'} <span>may affect project creation</span>
+            {isRegionSpecific ? ' in this region' : ''}
+            <span>. Follow updates on</span>{' '}
+            <InlineLink href={data.pageUrl}>status page</InlineLink>
+            <span>.</span>
           </>
         }
         className="mt-3"

@@ -3,7 +3,7 @@ import { toast } from 'sonner'
 
 import { storageKeys } from '../keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ArchivedObjectRestoreVariables = {
   projectRef: string
@@ -38,12 +38,12 @@ export const useArchivedObjectRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseMutationOptions<void, ResponseError, ArchivedObjectRestoreVariables>,
+  UseMutationOptions<void, StudioError, ArchivedObjectRestoreVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<void, ResponseError, ArchivedObjectRestoreVariables>({
+  return useMutation<void, StudioError, ArchivedObjectRestoreVariables>({
     mutationFn: restoreArchivedObject,
     async onSuccess(data, variables, context, mutationContext) {
       await queryClient.invalidateQueries({

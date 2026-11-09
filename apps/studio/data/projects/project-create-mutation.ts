@@ -8,7 +8,8 @@ import { handleError, post } from '@/data/fetchers'
 import { invalidatePermissionsQueryV2 } from '@/data/permissions/permissions-query-v2'
 import { PROVIDERS } from '@/lib/constants'
 import { captureCriticalError } from '@/lib/error-reporting'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type CreateProjectBody = components['schemas']['CreateProjectBody']
 type CloudProvider = CreateProjectBody['cloud_provider']
@@ -93,13 +94,13 @@ export const useProjectCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectCreateData, ResponseError, ProjectCreateVariables>,
+  UseCustomMutationOptions<ProjectCreateData, StudioError, ProjectCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const { invalidateProjectsQuery } = useInvalidateProjectsInfiniteQuery()
 
-  return useMutation<ProjectCreateData, ResponseError, ProjectCreateVariables>({
+  return useMutation<ProjectCreateData, StudioError, ProjectCreateVariables>({
     mutationFn: (vars) => createProject(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([invalidateProjectsQuery(), invalidatePermissionsQueryV2(queryClient)])

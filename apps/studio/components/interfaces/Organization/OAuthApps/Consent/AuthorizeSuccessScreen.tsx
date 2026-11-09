@@ -45,7 +45,7 @@ export const AuthorizeSuccessScreen = ({
               {grant.projects.map((project, index) => (
                 <span key={project.ref}>
                   {project.name}
-                  {index < grant.projects.length - 1 ? ',' : ''}
+                  {index < grant.projects.length - 1 ? <span>,</span> : ''}
                 </span>
               ))}
             </span>

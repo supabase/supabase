@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseEventTriggerKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseEventTriggerCreateVariables = {
   projectRef: string
@@ -38,7 +39,7 @@ export const useDatabaseEventTriggerCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseEventTriggerCreateData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerCreateVariables
   >,
   'mutationFn'
@@ -47,7 +48,7 @@ export const useDatabaseEventTriggerCreateMutation = ({
 
   return useMutation<
     DatabaseEventTriggerCreateData,
-    ResponseError,
+    StudioError,
     DatabaseEventTriggerCreateVariables
   >({
     mutationFn: (vars) => createDatabaseEventTrigger(vars),

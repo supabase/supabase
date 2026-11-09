@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { stripeAtlasKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type StripeAtlasApplicationVariables = {
   stripeAtlasToken?: string
@@ -71,14 +72,14 @@ export const useStripeAtlasApplicationCompleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     CompleteStripeAtlasApplicationData,
-    ResponseError,
+    StudioError,
     CompleteStripeAtlasApplicationVariables
   >,
   'mutationFn'
 > = {}) =>
   useMutation<
     CompleteStripeAtlasApplicationData,
-    ResponseError,
+    StudioError,
     CompleteStripeAtlasApplicationVariables
   >({
     mutationFn: (args) => completeStripeAtlasApplication(args),

@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { projectKeys } from './keys'
 import { buildPauseStatus, getPauseStatusOverride } from './project-pause-status-override'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectPauseStatusVariables = { ref?: string }
 
@@ -26,7 +27,7 @@ export async function getProjectPausedStatus(
 }
 
 export type ProjectPauseStatusData = Awaited<ReturnType<typeof getProjectPausedStatus>>
-export type ProjectPauseStatusError = ResponseError
+export type ProjectPauseStatusError = StudioError
 
 export const useProjectPauseStatusQuery = <TData = ProjectPauseStatusData>(
   { ref }: ProjectPauseStatusVariables,

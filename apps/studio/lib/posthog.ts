@@ -12,6 +12,6 @@ export async function trackFeatureFlag(body: TrackFeatureFlagVariables) {
   if (!consent || !IS_PLATFORM) return undefined
   const { data, error } = await post(`/platform/telemetry/feature-flags/track`, { body })
 
-  if (error) handleError(error)
+  if (error) handleError(error, { reportImmediately: true })
   return data
 }

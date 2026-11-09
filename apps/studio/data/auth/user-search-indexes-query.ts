@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { authKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type UsersIndexStatusesVariables = {
   projectRef?: string
@@ -15,7 +16,7 @@ type UsersIndexStatusesData = {
   is_valid: boolean
   is_ready: boolean
 }[]
-export type UsersIndexStatusesError = ResponseError
+export type UsersIndexStatusesError = StudioError
 
 export async function getUserIndexStatuses(
   { projectRef, connectionString }: UsersIndexStatusesVariables,

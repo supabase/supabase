@@ -1,13 +1,20 @@
 'use client'
 
-import { SUPABASE_HOST, SupabaseEvent } from '~/lib/eventsTypes'
-import { createContext, ReactNode, useContext, useEffect, useMemo, useState } from 'react'
+import { SupabaseEvent } from '~/lib/eventsTypes'
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useMemo,
+  useState,
+  useSyncExternalStore,
+} from 'react'
 
 interface EventsContextValue {
   allEvents: SupabaseEvent[]
   filteredEvents: SupabaseEvent[]
   featuredEvent: SupabaseEvent | undefined
-  isLoading: boolean
+  isHydrated: boolean
   searchQuery: string
   setSearchQuery: (query: string) => void
   selectedCategories: string[]
@@ -15,19 +22,14 @@ interface EventsContextValue {
   categories: { [key: string]: number }
 }
 
-// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
-// for case-insensitive matching against the tag names returned by Luma.
-const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
-  hackathons: 'hackathon',
-  meetups: 'meetup',
-  events: 'conference',
-}
-
 const EventsContext = createContext<EventsContextValue | undefined>(undefined)
+
+const subscribeToNothing = () => () => {}
 
 interface EventsProviderProps {
   children: ReactNode
   notionEvents: SupabaseEvent[]
+  lumaEvents: SupabaseEvent[]
   mdxEvents: SupabaseEvent[]
   onDemandMdxEvents: SupabaseEvent[]
 }
@@ -35,84 +37,19 @@ interface EventsProviderProps {
 export function EventsProvider({
   children,
   notionEvents,
+  lumaEvents,
   mdxEvents,
   onDemandMdxEvents,
 }: EventsProviderProps) {
-  const [lumaEvents, setLumaEvents] = useState<SupabaseEvent[]>([])
-  const [isLoading, setIsLoading] = useState(true)
   const [searchQuery, setSearchQuery] = useState('')
   const [selectedCategories, setSelectedCategories] = useState<string[]>(['all'])
+  const isHydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  )
 
-  useEffect(() => {
-    const fetchLumaEvents = async () => {
-      try {
-        setIsLoading(true)
-
-        const afterDate = new Date().toISOString()
-        const url = new URL('/api-v2/luma-events', window.location.origin)
-        url.searchParams.append('after', afterDate)
-
-        const res = await fetch(url.toString())
-        const data = await res.json()
-
-        if (data.success) {
-          const transformedEvents: SupabaseEvent[] = data.events.map((event: any) => {
-            // Categorize by the event's Luma tags: `Hackathons` → hackathon,
-            // `Meetups` → meetup, `Events` → conference. Untagged or unrecognized
-            // events fall back to the generic `conference` bucket.
-            const mappedCategories: string[] = (Array.isArray(event?.tags) ? event.tags : [])
-              .map((tag: string) => LUMA_TAG_CATEGORY_MAP[String(tag).trim().toLowerCase()])
-              .filter(Boolean)
-            const categories: string[] =
-              mappedCategories.length > 0 ? Array.from(new Set(mappedCategories)) : ['conference']
-
-            const rawUrl = event?.url || ''
-            let safeUrl: string | undefined
-            try {
-              const parsed = new URL(rawUrl)
-              if (parsed.protocol === 'http:' || parsed.protocol === 'https:') {
-                safeUrl = rawUrl
-              }
-            } catch {
-              // invalid URL
-            }
-
-            return {
-              slug: '',
-              type: 'event',
-              title: event?.name || '',
-              date: event?.start_at || '',
-              description: event?.description || '',
-              thumb: '',
-              cover_url: event?.cover_url || '',
-              path: '',
-              url: safeUrl ?? '',
-              tags: categories,
-              categories,
-              timezone: event?.timezone || 'America/Los_Angeles',
-              location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
-                [event?.city, event?.country].filter(Boolean)
-              ),
-              // All Luma events are Supabase-hosted regardless of which calendar they're from.
-              hosts: [SUPABASE_HOST],
-              source: 'luma' as const,
-              disable_page_build: true,
-              link: safeUrl ? { href: safeUrl, target: '_blank' as const } : undefined,
-            }
-          })
-          setLumaEvents(transformedEvents)
-        }
-      } catch (error) {
-        console.error('Error fetching Luma events:', error)
-      } finally {
-        setIsLoading(false)
-      }
-    }
-
-    fetchLumaEvents()
-  }, [])
-
-  // Merge Notion (server) + mdx (server) + Luma (client) events, showing only today and future.
+  // Merge Notion + mdx + Luma events, showing only today and future.
   const allEvents = useMemo(() => {
     const now = new Date()
     const startOfToday = new Date(
@@ -204,7 +141,7 @@ export function EventsProvider({
     allEvents,
     filteredEvents,
     featuredEvent,
-    isLoading,
+    isHydrated,
     searchQuery,
     setSearchQuery,
     selectedCategories,

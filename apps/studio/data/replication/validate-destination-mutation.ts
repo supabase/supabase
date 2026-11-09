@@ -5,7 +5,8 @@ import { buildCreateDestinationApiConfig } from './create-destination-pipeline-m
 import type { DestinationConfig, TableSyncCopyConfig } from './types'
 import { buildPipelineApiConfig } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ValidateDestinationParams = {
   projectRef: string
@@ -66,11 +67,11 @@ type ValidateDestinationData = Awaited<ReturnType<typeof validateDestination>>
 
 export const useValidateDestinationMutation = (
   options?: Omit<
-    UseCustomMutationOptions<ValidateDestinationData, ResponseError, ValidateDestinationParams>,
+    UseCustomMutationOptions<ValidateDestinationData, StudioError, ValidateDestinationParams>,
     'mutationFn'
   >
 ) => {
-  return useMutation<ValidateDestinationData, ResponseError, ValidateDestinationParams>({
+  return useMutation<ValidateDestinationData, StudioError, ValidateDestinationParams>({
     mutationFn: (vars) => validateDestination(vars),
     ...options,
   })

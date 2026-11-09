@@ -729,6 +729,11 @@ export const examples: Registry = [
     files: ['example/keyboard-shortcut-inline.tsx'],
   },
   {
+    name: 'keyboard-shortcut-keycaps',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-keycaps.tsx'],
+  },
+  {
     name: 'label-demo',
     type: 'components:example',
     registryDependencies: ['label'],
@@ -1572,6 +1577,11 @@ export const examples: Registry = [
     name: 'ai-tools-minimal',
     type: 'components:example',
     files: ['example/ai-tools-minimal.tsx'],
+  },
+  {
+    name: 'ai-tools-horizontal',
+    type: 'components:example',
+    files: ['example/ai-tools-horizontal.tsx'],
   },
   {
     name: 'toc-demo',

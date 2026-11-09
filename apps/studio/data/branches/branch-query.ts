@@ -1,22 +1,26 @@
-import { useQuery } from '@tanstack/react-query'
-
 import { branchKeys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
+import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantForVariants } from '@/lib/grants'
+
+export type BranchGrant = GrantForVariants<'get', '/v1/branches/{branch_id_or_ref}'>
 
 export type BranchVariables = {
   branchRef?: string
   projectRef?: string
+  grant?: BranchGrant
 }
 
-export async function getBranch({ branchRef }: BranchVariables, signal?: AbortSignal) {
-  if (!branchRef) throw new Error('branchRef is required')
-
+async function getBranch(
+  { branchRef, grant }: { branchRef: string; grant: BranchGrant },
+  signal?: AbortSignal
+) {
   const { data, error } = await get(`/v1/branches/{branch_id_or_ref}`, {
     params: { path: { branch_id_or_ref: branchRef } },
     signal,
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
@@ -24,15 +28,24 @@ export async function getBranch({ branchRef }: BranchVariables, signal?: AbortSi
 }
 
 export type BranchData = Awaited<ReturnType<typeof getBranch>>
-export type BranchError = ResponseError
+export type BranchError = StudioError
 
-export const useBranchQuery = <TData = BranchData>(
-  { projectRef, branchRef }: BranchVariables,
-  { enabled = true, ...options }: UseCustomQueryOptions<BranchData, BranchError, TData> = {}
+export const branchQueryOptions = <TData = BranchData>(
+  { projectRef, branchRef, grant }: BranchVariables,
+  options?: GrantedQueryCallerOptions<
+    BranchData,
+    BranchError,
+    TData,
+    ReturnType<typeof branchKeys.detail>
+  >
 ) =>
-  useQuery<BranchData, BranchError, TData>({
-    queryKey: branchKeys.detail(projectRef, branchRef),
-    queryFn: ({ signal }) => getBranch({ branchRef }, signal),
-    enabled: IS_PLATFORM && enabled && Boolean(branchRef),
-    ...options,
-  })
+  grantedQueryOptions(
+    {
+      queryKey: branchKeys.detail(projectRef, branchRef),
+      queryFn:
+        IS_PLATFORM && branchRef && grant
+          ? ({ signal }) => getBranch({ branchRef, grant }, signal)
+          : undefined,
+    },
+    options
+  )

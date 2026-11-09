@@ -33,6 +33,8 @@ import { RegionFlag } from '@/components/ui/RegionFlag'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { formatDatabaseID } from '@/data/read-replicas/replicas.utils'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { getComputeSizeLabel } from '@/lib/compute-labels'
 import { useDatabaseSelectorStateSnapshot } from '@/state/database-selector'
 
 const MAP_WIDTH = 800
@@ -44,6 +46,8 @@ const MapView = () => {
   const { projectHomepageShowInstanceSize } = useIsFeatureEnabled([
     'project_homepage:show_instance_size',
   ])
+  const { data: project } = useSelectedProjectQuery()
+  const computeSize = getComputeSizeLabel(project?.infra_compute_size)
 
   const [mount, setMount] = useState(false)
   const [isPanning, setIsPanning] = useState(false)
@@ -246,7 +250,8 @@ const MapView = () => {
             <div>
               <p className="text-xs text-foreground-light">
                 {databasesInSelectedRegion.length} database
-                {databasesInSelectedRegion.length > 1 ? 's' : ''} deployed in
+                {databasesInSelectedRegion.length > 1 ? <span>s</span> : ''}{' '}
+                <span>deployed in</span>
               </p>
               <p className="text-sm">{selectedRegion.name}</p>
             </div>
@@ -266,12 +271,14 @@ const MapView = () => {
                     >
                       <div className="flex flex-col gap-y-1">
                         <p className="flex items-center gap-x-2">
-                          {database.identifier === ref
-                            ? 'Primary Database'
-                            : `Read Replica ${
-                                database.identifier.length > 0 &&
-                                `(ID: ${formatDatabaseID(database.identifier)})`
-                              }`}
+                          {database.identifier === ref ? (
+                            <span>Primary Database</span>
+                          ) : (
+                            <span>{`Read Replica ${
+                              database.identifier.length > 0 &&
+                              `(ID: ${formatDatabaseID(database.identifier)})`
+                            }`}</span>
+                          )}
                           {database.status === REPLICA_STATUS.ACTIVE_HEALTHY ? (
                             <Badge variant="success">Healthy</Badge>
                           ) : database.status === REPLICA_STATUS.COMING_UP ? (
@@ -286,7 +293,12 @@ const MapView = () => {
                         </p>
                         <div>
                           <p className="text-xs text-foreground-light">
-                            AWS{projectHomepageShowInstanceSize ? ` • ${database.size}` : ''}
+                            AWS
+                            {projectHomepageShowInstanceSize && !!computeSize ? (
+                              <span>{` • ${computeSize}`}</span>
+                            ) : (
+                              ''
+                            )}
                           </p>
                           {database.identifier !== ref && (
                             <p className="text-xs text-foreground-light">

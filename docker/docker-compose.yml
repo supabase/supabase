@@ -14,7 +14,7 @@ services:
 
   studio:
     container_name: supabase-studio
-    image: supabase/studio:2026.10.12-sha-3699278
+    image: supabase/studio:2026.11.02-sha-a05e7ec
     restart: unless-stopped
     healthcheck:
       test:
@@ -69,7 +69,7 @@ services:
   # See: https://github.com/orgs/supabase/discussions/48048
   api-gw:
     container_name: supabase-envoy
-    image: envoyproxy/envoy:v1.39.1
+    image: envoyproxy/envoy:v1.39.6
     restart: unless-stopped
     networks:
       default:
@@ -284,7 +284,7 @@ services:
   realtime:
     # This container name looks inconsistent but is correct because realtime constructs tenant id by parsing the subdomain
     container_name: realtime-dev.supabase-realtime
-    image: supabase/realtime:v2.143.3
+    image: supabase/realtime:v2.148.3
     restart: unless-stopped
     depends_on:
       db:
@@ -330,7 +330,7 @@ services:
   # To use S3 backed storage: docker compose -f docker-compose.yml -f docker-compose.s3.yml up
   storage:
     container_name: supabase-storage
-    image: supabase/storage-api:v1.81.0
+    image: supabase/storage-api:v1.89.12
     restart: unless-stopped
     depends_on:
       db:
@@ -393,7 +393,7 @@ services:
 
   imgproxy:
     container_name: supabase-imgproxy
-    image: darthsim/imgproxy:v3.31.4
+    image: darthsim/imgproxy:v4.0.21
     restart: unless-stopped
     volumes:
       - ./volumes/storage:/var/lib/storage:z
@@ -433,7 +433,8 @@ services:
 
   functions:
     container_name: supabase-edge-functions
-    image: supabase/edge-runtime:v1.77.4
+    image: supabase/edge-runtime:v1.77.9
+    mem_limit: ${FUNCTIONS_MEMORY_LIMIT:-2g}
     restart: unless-stopped
     volumes:
       - ./volumes/functions:/home/deno/functions:z

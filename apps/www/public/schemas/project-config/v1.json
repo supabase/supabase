@@ -1,0 +1,1850 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "$id": "https://supabase.com/schemas/project-config/v1.json",
+  "title": "Supabase hosted project config (ProjectConfig)",
+  "description": "The sparse, hosted-project subset of CliConfig that a Supabase project manages.",
+  "type": "object",
+  "properties": {
+    "api": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable the local PostgREST service.",
+          "default": true
+        },
+        "schemas": {
+          "type": "array",
+          "default": ["public", "graphql_public"],
+          "items": {
+            "type": "string",
+            "description": "Schemas to expose in your API. Tables, views and stored procedures in this schema will get API endpoints."
+          }
+        },
+        "extra_search_path": {
+          "type": "array",
+          "default": ["public", "extensions"],
+          "items": {
+            "type": "string",
+            "description": "Extra schemas to add to the search_path of every request."
+          }
+        },
+        "max_rows": {
+          "type": "number",
+          "description": "The maximum number of rows returned from a view, table, or stored procedure. Limits payload size for accidental or malicious requests.",
+          "default": 1000
+        },
+        "auto_expose_new_tables": {
+          "type": "boolean",
+          "description": "Controls whether newly-created tables, views, sequences and functions in the `public` schema by `postgres` are reachable through the Data API roles (`anon`, `authenticated`, `service_role`) without explicit GRANTs. When unset, new entities are auto-exposed, matching the cloud default. Set to `false` to revoke the default Data API privileges so new entities require explicit GRANTs, matching a cloud project with the \"Default privileges for new entities\" toggle turned off."
+        }
+      },
+      "additionalProperties": true
+    },
+    "auth": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable the local GoTrue service.",
+          "default": true
+        },
+        "site_url": {
+          "type": "string",
+          "description": "The base URL of your website. Used as an allow-list for redirects and for constructing URLs used in emails.",
+          "default": "http://127.0.0.1:3000"
+        },
+        "additional_redirect_urls": {
+          "type": "array",
+          "description": "A list of exact URLs that auth providers are permitted to redirect to post authentication.",
+          "default": ["https://127.0.0.1:3000"],
+          "items": {
+            "type": "string",
+            "description": "A URL that auth providers are permitted to redirect to."
+          }
+        },
+        "jwt_expiry": {
+          "type": "number",
+          "description": "How long tokens are valid for, in seconds. Defaults to 3600 (1 hour), maximum 604,800 seconds (one week).",
+          "default": 3600
+        },
+        "jwt_issuer": {
+          "type": "string",
+          "description": "JWT issuer URL."
+        },
+        "signing_keys_path": {
+          "type": "string",
+          "description": "Path to the JWT signing keys file."
+        },
+        "enable_refresh_token_rotation": {
+          "type": "boolean",
+          "description": "If disabled, the refresh token will never expire.",
+          "default": true
+        },
+        "refresh_token_reuse_interval": {
+          "type": "number",
+          "description": "Allows refresh tokens to be reused after expiry, up to the specified interval in seconds.",
+          "default": 10
+        },
+        "enable_manual_linking": {
+          "type": "boolean",
+          "description": "Allow/disallow testing manual linking of accounts.",
+          "default": false
+        },
+        "enable_signup": {
+          "type": "boolean",
+          "description": "Allow/disallow new user signups to your project. Existing users can still sign in.",
+          "default": true
+        },
+        "enable_anonymous_sign_ins": {
+          "type": "boolean",
+          "description": "Allow/disallow anonymous sign-ins to your project.",
+          "default": false
+        },
+        "minimum_password_length": {
+          "type": "number",
+          "description": "Passwords shorter than this value will be rejected as weak.",
+          "default": 6
+        },
+        "password_requirements": {
+          "type": "string",
+          "enum": [
+            "",
+            "letters_digits",
+            "lower_upper_letters_digits",
+            "lower_upper_letters_digits_symbols"
+          ],
+          "description": "Password character requirements.",
+          "default": ""
+        },
+        "rate_limit": {
+          "type": "object",
+          "properties": {
+            "email_sent": {
+              "type": "number",
+              "description": "Number of emails that can be sent per hour.",
+              "default": 2
+            },
+            "sms_sent": {
+              "type": "number",
+              "description": "Number of SMS messages that can be sent per hour.",
+              "default": 30
+            },
+            "anonymous_users": {
+              "type": "number",
+              "description": "Number of anonymous sign-ins that can be made per hour per IP address.",
+              "default": 30
+            },
+            "token_refresh": {
+              "type": "number",
+              "description": "Number of sessions that can be refreshed in a 5 minute interval per IP address.",
+              "default": 150
+            },
+            "sign_in_sign_ups": {
+              "type": "number",
+              "description": "Number of sign up and sign-in requests that can be made in a 5 minute interval per IP address.",
+              "default": 30
+            },
+            "token_verifications": {
+              "type": "number",
+              "description": "Number of OTP or magic link verifications that can be made in a 5 minute interval per IP address.",
+              "default": 30
+            },
+            "web3": {
+              "type": "number",
+              "description": "Number of Web3 logins that can be made in a 5 minute interval per IP address.",
+              "default": 30
+            }
+          },
+          "additionalProperties": true
+        },
+        "captcha": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable CAPTCHA verification.",
+              "default": false
+            },
+            "provider": {
+              "type": "string",
+              "enum": ["hcaptcha", "turnstile"],
+              "description": "CAPTCHA provider to use."
+            }
+          },
+          "additionalProperties": true
+        },
+        "hook": {
+          "type": "object",
+          "properties": {
+            "mfa_verification_attempt": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the mfa verification hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            },
+            "password_verification_attempt": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the password verification hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            },
+            "custom_access_token": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the custom access token hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            },
+            "send_sms": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the send sms hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            },
+            "send_email": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the send email hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            },
+            "before_user_created": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable or disable the before user created hook.",
+                  "default": false
+                },
+                "uri": {
+                  "type": "string",
+                  "description": "The URI of the postgres function or HTTP endpoint to call."
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "mfa": {
+          "type": "object",
+          "properties": {
+            "totp": {
+              "type": "object",
+              "properties": {
+                "enroll_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow TOTP enrollment for users.",
+                  "default": false
+                },
+                "verify_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow TOTP verification for users.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "phone": {
+              "type": "object",
+              "properties": {
+                "enroll_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow phone enrollment for users.",
+                  "default": false
+                },
+                "verify_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow phone verification for users.",
+                  "default": false
+                },
+                "otp_length": {
+                  "type": "number",
+                  "description": "The length of the OTP code.",
+                  "default": 6
+                },
+                "template": {
+                  "type": "string",
+                  "description": "The template to use for the phone message.",
+                  "default": "Your code is {{ .Code }}"
+                },
+                "max_frequency": {
+                  "type": "string",
+                  "description": "The maximum frequency of the phone messages.",
+                  "default": "5s"
+                }
+              },
+              "additionalProperties": true
+            },
+            "web_authn": {
+              "type": "object",
+              "properties": {
+                "enroll_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow WebAuthn enrollment for users.",
+                  "default": false
+                },
+                "verify_enabled": {
+                  "type": "boolean",
+                  "description": "Allow/disallow WebAuthn verification for users.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "max_enrolled_factors": {
+              "type": "number",
+              "description": "The maximum number of MFA factors a user can enroll in.",
+              "default": 10
+            }
+          },
+          "additionalProperties": true
+        },
+        "sessions": {
+          "type": "object",
+          "properties": {
+            "timebox": {
+              "type": "string",
+              "description": "The timebox for the user session."
+            },
+            "inactivity_timeout": {
+              "type": "string",
+              "description": "The inactivity timeout for the user session."
+            }
+          },
+          "additionalProperties": true,
+          "default": {}
+        },
+        "email": {
+          "type": "object",
+          "properties": {
+            "enable_signup": {
+              "type": "boolean",
+              "description": "Allow/disallow the email provider. When false, users can't sign up or sign in with email (password, magic link or OTP); set `auth.enable_signup = false` to block new signups only.",
+              "default": true
+            },
+            "double_confirm_changes": {
+              "type": "boolean",
+              "description": "If enabled, a user will be required to confirm any email change on both the old and new email addresses.",
+              "default": true
+            },
+            "enable_confirmations": {
+              "type": "boolean",
+              "description": "If enabled, users need to confirm their email address before signing in.",
+              "default": false
+            },
+            "secure_password_change": {
+              "type": "boolean",
+              "description": "If enabled, users will need to reauthenticate or have logged in recently to change their password.",
+              "default": false
+            },
+            "max_frequency": {
+              "type": "string",
+              "description": "Controls the minimum amount of time that must pass before sending another signup confirmation or password reset email.",
+              "default": "1s"
+            },
+            "otp_length": {
+              "type": "number",
+              "description": "Number of characters used in the email OTP.",
+              "default": 6
+            },
+            "otp_expiry": {
+              "type": "number",
+              "description": "Number of seconds before the email OTP expires.",
+              "default": 3600
+            },
+            "smtp": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable SMTP for email delivery.",
+                  "default": false
+                },
+                "host": {
+                  "type": "string",
+                  "description": "Hostname or IP address of the SMTP server."
+                },
+                "port": {
+                  "type": "number",
+                  "description": "Port number of the SMTP server."
+                },
+                "user": {
+                  "type": "string",
+                  "description": "Username for authenticating with the SMTP server."
+                },
+                "admin_email": {
+                  "type": "string",
+                  "description": "Email used as the sender for emails sent from the application."
+                },
+                "sender_name": {
+                  "type": "string",
+                  "description": "Display name used as the sender for emails sent from the application."
+                }
+              },
+              "additionalProperties": true
+            },
+            "template": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string",
+                    "description": "Subject line for the email template.",
+                    "default": ""
+                  },
+                  "content_path": {
+                    "type": "string",
+                    "description": "Path to the HTML template.",
+                    "default": ""
+                  }
+                },
+                "additionalProperties": true
+              },
+              "description": "Custom email template configuration.",
+              "default": {}
+            },
+            "notification": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "object",
+                "properties": {
+                  "enabled": {
+                    "type": "boolean",
+                    "description": "Enable the notification email.",
+                    "default": false
+                  },
+                  "subject": {
+                    "type": "string",
+                    "description": "Subject line for the notification email.",
+                    "default": ""
+                  },
+                  "content_path": {
+                    "type": "string",
+                    "description": "Path to the HTML notification template.",
+                    "default": ""
+                  }
+                },
+                "additionalProperties": true
+              },
+              "description": "Notification email configuration.",
+              "default": {}
+            }
+          },
+          "additionalProperties": true
+        },
+        "sms": {
+          "type": "object",
+          "properties": {
+            "enable_signup": {
+              "type": "boolean",
+              "description": "Allow/disallow the phone provider. When false, users can't sign up or sign in with a phone number (password or SMS OTP); set `auth.enable_signup = false` to block new signups only.",
+              "default": false
+            },
+            "enable_confirmations": {
+              "type": "boolean",
+              "description": "If enabled, users need to confirm their phone number before signing in.",
+              "default": false
+            },
+            "template": {
+              "type": "string",
+              "description": "The template to use for the SMS message.",
+              "default": "Your code is {{ .Code }}"
+            },
+            "max_frequency": {
+              "type": "string",
+              "description": "Controls the minimum amount of time that must pass before sending another sms otp.",
+              "default": "5s"
+            },
+            "otp_length": {
+              "type": "number",
+              "description": "Number of characters used in the SMS OTP.",
+              "default": 6
+            },
+            "otp_expiry": {
+              "type": "number",
+              "description": "Number of seconds before the SMS OTP expires.",
+              "default": 60
+            },
+            "twilio": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable/disable Twilio provider for phone login.",
+                  "default": false
+                },
+                "account_sid": {
+                  "type": "string",
+                  "description": "The account SID for the Twilio API.",
+                  "default": ""
+                },
+                "message_service_sid": {
+                  "type": "string",
+                  "description": "The message service SID for the Twilio API.",
+                  "default": ""
+                },
+                "content_sid": {
+                  "type": "string",
+                  "description": "The content SID of a WhatsApp/Messaging Content Template for the Twilio API."
+                }
+              },
+              "additionalProperties": true
+            },
+            "twilio_verify": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable/disable Twilio Verify provider for phone verification.",
+                  "default": false
+                },
+                "account_sid": {
+                  "type": "string",
+                  "description": "The account SID for the Twilio API."
+                },
+                "message_service_sid": {
+                  "type": "string",
+                  "description": "The message service SID for the Twilio API."
+                }
+              },
+              "additionalProperties": true
+            },
+            "messagebird": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable/disable MessageBird provider for phone login.",
+                  "default": false
+                },
+                "originator": {
+                  "type": "string",
+                  "description": "The originator of the SMS message."
+                }
+              },
+              "additionalProperties": true
+            },
+            "textlocal": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable/disable Textlocal provider for phone login.",
+                  "default": false
+                },
+                "sender": {
+                  "type": "string",
+                  "description": "The sender of the SMS message."
+                }
+              },
+              "additionalProperties": true
+            },
+            "vonage": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable/disable Vonage provider for phone login.",
+                  "default": false
+                },
+                "from": {
+                  "type": "string",
+                  "description": "The sender of the SMS message."
+                },
+                "api_key": {
+                  "type": "string",
+                  "description": "The API key for the Vonage API."
+                }
+              },
+              "additionalProperties": true
+            },
+            "test_otp": {
+              "type": "object",
+              "additionalProperties": {
+                "type": "string"
+              },
+              "description": "Use pre-defined map of phone number to OTP for testing."
+            }
+          },
+          "additionalProperties": true
+        },
+        "external": {
+          "type": "object",
+          "properties": {
+            "apple": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Apple OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Apple OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Apple OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "azure": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Azure OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Azure OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Azure OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "bitbucket": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Bitbucket OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Bitbucket OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Bitbucket OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "discord": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Discord OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Discord OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Discord OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "facebook": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Facebook OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Facebook OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Facebook OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "figma": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Figma OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Figma OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Figma OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "github": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the GitHub OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the GitHub OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the GitHub OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "gitlab": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the GitLab OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the GitLab OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": "https://gitlab.com"
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the GitLab OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "google": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Google OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Google OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Google OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "kakao": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Kakao OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Kakao OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Kakao OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "keycloak": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Keycloak OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Keycloak OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": "",
+                  "examples": ["https://keycloak.example.com/realms/myrealm"]
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Keycloak OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "linkedin_oidc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the LinkedIn OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the LinkedIn OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the LinkedIn OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "notion": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Notion OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Notion OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Notion OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "twitch": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Twitch OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Twitch OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Twitch OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "twitter": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Twitter OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Twitter OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Twitter OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "x": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the X OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the X OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the X OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "slack_oidc": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Slack OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Slack OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Slack OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "spotify": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Spotify OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Spotify OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Spotify OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "workos": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the WorkOS OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the WorkOS OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the WorkOS OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "zoom": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Use the Zoom OAuth provider.",
+                  "default": false
+                },
+                "client_id": {
+                  "type": "string",
+                  "description": "Client ID for the Zoom OAuth provider.",
+                  "default": ""
+                },
+                "url": {
+                  "type": "string",
+                  "description": "The base URL used for constructing the URLs to request authorization and access tokens.",
+                  "default": ""
+                },
+                "redirect_uri": {
+                  "type": "string",
+                  "description": "The URI the Zoom OAuth2 provider will redirect to with the code and state values.",
+                  "default": ""
+                },
+                "skip_nonce_check": {
+                  "type": "boolean",
+                  "description": "If true, the nonce check will be skipped.",
+                  "default": false
+                },
+                "email_optional": {
+                  "type": "boolean",
+                  "description": "If true, authentication succeeds when the provider does not return an email address.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "web3": {
+          "type": "object",
+          "properties": {
+            "solana": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this Web3 provider.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            },
+            "ethereum": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this Web3 provider.",
+                  "default": false
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "oauth_server": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable OAuth server functionality.",
+              "default": false
+            },
+            "authorization_url_path": {
+              "type": "string",
+              "description": "Path for OAuth consent flow UI.",
+              "default": "/oauth/consent"
+            },
+            "allow_dynamic_registration": {
+              "type": "boolean",
+              "description": "Allow dynamic client registration.",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "third_party": {
+          "type": "object",
+          "properties": {
+            "firebase": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this third-party auth provider.",
+                  "default": false
+                },
+                "project_id": {
+                  "type": "string",
+                  "description": "Firebase project ID."
+                }
+              },
+              "additionalProperties": true
+            },
+            "auth0": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this third-party auth provider.",
+                  "default": false
+                },
+                "tenant": {
+                  "type": "string",
+                  "description": "Auth0 tenant."
+                },
+                "tenant_region": {
+                  "type": "string",
+                  "description": "Auth0 tenant region."
+                }
+              },
+              "additionalProperties": true
+            },
+            "aws_cognito": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this third-party auth provider.",
+                  "default": false
+                },
+                "user_pool_id": {
+                  "type": "string",
+                  "description": "AWS Cognito user pool ID."
+                },
+                "user_pool_region": {
+                  "type": "string",
+                  "description": "AWS Cognito user pool region."
+                }
+              },
+              "additionalProperties": true
+            },
+            "clerk": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this third-party auth provider.",
+                  "default": false
+                },
+                "domain": {
+                  "type": "string",
+                  "description": "Clerk domain."
+                }
+              },
+              "additionalProperties": true
+            },
+            "workos": {
+              "type": "object",
+              "properties": {
+                "enabled": {
+                  "type": "boolean",
+                  "description": "Enable this third-party auth provider.",
+                  "default": false
+                },
+                "issuer_url": {
+                  "type": "string",
+                  "description": "WorkOS issuer URL."
+                }
+              },
+              "additionalProperties": true
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "db": {
+      "type": "object",
+      "properties": {
+        "major_version": {
+          "type": "number",
+          "description": "The database major version to use. This has to be the same as your remote database's.",
+          "default": 17
+        },
+        "pooler": {
+          "type": "object",
+          "properties": {
+            "pool_mode": {
+              "type": "string",
+              "enum": ["transaction", "session"],
+              "description": "Specifies when a server connection can be reused by other clients.",
+              "default": "transaction"
+            },
+            "default_pool_size": {
+              "type": "number",
+              "description": "How many server connections to allow per user/database pair.",
+              "default": 20
+            },
+            "max_client_conn": {
+              "type": "number",
+              "description": "Maximum number of client connections allowed.",
+              "default": 100
+            }
+          },
+          "additionalProperties": true
+        },
+        "settings": {
+          "type": "object",
+          "properties": {
+            "effective_cache_size": {
+              "type": "string"
+            },
+            "logical_decoding_work_mem": {
+              "type": "string"
+            },
+            "maintenance_work_mem": {
+              "type": "string"
+            },
+            "max_connections": {
+              "type": "number"
+            },
+            "max_locks_per_transaction": {
+              "type": "number"
+            },
+            "max_parallel_maintenance_workers": {
+              "type": "number"
+            },
+            "max_parallel_workers": {
+              "type": "number"
+            },
+            "max_parallel_workers_per_gather": {
+              "type": "number"
+            },
+            "max_replication_slots": {
+              "type": "number"
+            },
+            "max_slot_wal_keep_size": {
+              "type": "string"
+            },
+            "max_standby_archive_delay": {
+              "type": "string"
+            },
+            "max_standby_streaming_delay": {
+              "type": "string"
+            },
+            "max_wal_size": {
+              "type": "string"
+            },
+            "max_wal_senders": {
+              "type": "number"
+            },
+            "max_worker_processes": {
+              "type": "number"
+            },
+            "session_replication_role": {
+              "type": "string",
+              "enum": ["origin", "replica", "local"],
+              "description": "Session replication role."
+            },
+            "shared_buffers": {
+              "type": "string"
+            },
+            "statement_timeout": {
+              "type": "string"
+            },
+            "track_activity_query_size": {
+              "type": "string"
+            },
+            "track_commit_timestamp": {
+              "type": "boolean"
+            },
+            "wal_keep_size": {
+              "type": "string"
+            },
+            "wal_sender_timeout": {
+              "type": "string"
+            },
+            "work_mem": {
+              "type": "string"
+            }
+          },
+          "additionalProperties": true
+        },
+        "network_restrictions": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable management of network restrictions.",
+              "default": false
+            },
+            "allowed_cidrs": {
+              "type": "array",
+              "description": "Allowed IPv4 CIDR blocks.",
+              "default": ["0.0.0.0/0"],
+              "items": {
+                "type": "string"
+              }
+            },
+            "allowed_cidrs_v6": {
+              "type": "array",
+              "description": "Allowed IPv6 CIDR blocks.",
+              "default": ["::/0"],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": true
+        },
+        "ssl_enforcement": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Reject non-secure connections to the database.",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "storage": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean",
+          "description": "Enable the local Storage service.",
+          "default": true
+        },
+        "file_size_limit": {
+          "type": "string",
+          "description": "The maximum file size allowed.",
+          "default": "50MiB",
+          "examples": ["5MB", "500KB"]
+        },
+        "image_transformation": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable image transformation.",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        },
+        "buckets": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "object",
+            "properties": {
+              "public": {
+                "type": "boolean",
+                "description": "Enable public access to the bucket.",
+                "default": false
+              },
+              "file_size_limit": {
+                "type": "string",
+                "description": "The maximum file size allowed for the bucket.",
+                "default": "50MiB",
+                "examples": ["5MB", "500KB"]
+              },
+              "allowed_mime_types": {
+                "type": "array",
+                "description": "The list of allowed MIME types for the bucket.",
+                "default": [],
+                "items": {
+                  "type": "string",
+                  "description": "A MIME type allowed for the bucket."
+                }
+              },
+              "objects_path": {
+                "type": "string",
+                "description": "The path to the objects in the bucket.",
+                "default": ""
+              }
+            },
+            "additionalProperties": true
+          },
+          "description": "Storage buckets configuration."
+        },
+        "s3_protocol": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Allow connections via S3 compatible clients.",
+              "default": true
+            }
+          },
+          "additionalProperties": true
+        },
+        "analytics": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable analytics buckets.",
+              "default": false
+            },
+            "max_namespaces": {
+              "type": "number",
+              "description": "Maximum number of analytics namespaces.",
+              "default": 5
+            },
+            "max_tables": {
+              "type": "number",
+              "description": "Maximum number of analytics tables.",
+              "default": 10
+            },
+            "max_catalogs": {
+              "type": "number",
+              "description": "Maximum number of analytics catalogs.",
+              "default": 2
+            },
+            "buckets": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "array"
+                  }
+                ]
+              },
+              "description": "Analytics bucket configuration.",
+              "default": {}
+            }
+          },
+          "additionalProperties": true
+        },
+        "vector": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable vector buckets.",
+              "default": true
+            },
+            "max_buckets": {
+              "type": "number",
+              "description": "Maximum number of vector buckets.",
+              "default": 10
+            },
+            "max_indexes": {
+              "type": "number",
+              "description": "Maximum number of vector indexes.",
+              "default": 5
+            },
+            "buckets": {
+              "type": "object",
+              "additionalProperties": {
+                "anyOf": [
+                  {
+                    "type": "object"
+                  },
+                  {
+                    "type": "array"
+                  }
+                ]
+              },
+              "description": "Vector bucket configuration.",
+              "default": {}
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    },
+    "compute": {
+      "type": "object",
+      "patternProperties": {
+        "^[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?$": {
+          "type": "object",
+          "properties": {
+            "runtime": {
+              "type": "string",
+              "description": "Runtime the compute is built on: `dockerfile` to build the directory's own\nDockerfile, or one of the catalog runtimes (`node`, `deno`). Guessed from\nmarker files when unset.",
+              "examples": ["node"]
+            },
+            "size": {
+              "type": "string",
+              "description": "Instance size, denominated by memory. Each size implies its own vCPU count,\nso it is the one dial rather than two.",
+              "examples": ["2gb"]
+            },
+            "exposure": {
+              "type": "string",
+              "description": "How the compute is reached: `public` gives it an internet-facing URL,\n`private` keeps it reachable only from inside the project. Every deploy\nsends a complete spec, so the value recorded here is what keeps a private\ncompute private; `--exposure` overrides it for one deploy. Defaults to\n`public`.",
+              "examples": ["private"]
+            },
+            "instances": {
+              "type": "integer",
+              "minimum": 0,
+              "description": "Number of instances to run. Every deploy sends a complete spec, so a count\nrecorded here is what keeps a scaled compute scaled; `--instances` overrides\nit for one deploy. Defaults to 1.",
+              "examples": [3]
+            },
+            "source": {
+              "type": "string",
+              "description": "Directory holding the compute's code, relative to the project root, when it\ndoes not live at `supabase/compute/<name>/`.",
+              "examples": ["packages/api"]
+            },
+            "exclude": {
+              "type": "array",
+              "description": "Patterns for paths to leave out of the uploaded build context, read the way\n`.gitignore` reads them: a pattern without `/` matches that name at any depth,\none with `/` is anchored at the compute's source directory, a trailing `/`\nmatches directories only, and `**` spans directories. Excluding a directory\nexcludes everything under it; re-inclusion (`!`) is not supported. Only the\npatterns recorded here are excluded, so a compute with no list uploads its source\ndirectory whole.",
+              "examples": [["node_modules", ".env"]],
+              "items": {
+                "type": "string"
+              }
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "description": "Compute-specific configuration keyed by compute name.",
+      "default": {}
+    },
+    "experimental": {
+      "type": "object",
+      "properties": {
+        "webhooks": {
+          "type": "object",
+          "properties": {
+            "enabled": {
+              "type": "boolean",
+              "description": "Enable experimental webhooks.",
+              "default": false
+            }
+          },
+          "additionalProperties": true
+        }
+      },
+      "additionalProperties": true
+    }
+  },
+  "additionalProperties": true
+}

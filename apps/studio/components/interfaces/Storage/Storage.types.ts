@@ -24,6 +24,10 @@ export interface StorageColumn {
   path: string
   status: string
   items: StorageItem[]
+  // Objects the API returned for this column that are hidden from `items`
+  // (e.g. .emptyFolderPlaceholder). The next page offset is items.length plus this, so
+  // local additions and removals to `items` keep the offset in step with the server.
+  hiddenItemsCount?: number
   hasMoreItems?: boolean
   isLoadingMoreItems?: boolean
 }

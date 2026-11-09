@@ -85,7 +85,7 @@ export const PolicyRow = ({
             {displayedRoles.slice(0, 2).map((role, i) => (
               <span key={`policy-${role}-${i}`}>
                 <code>{role}</code>
-                {i < Math.min(displayedRoles.length, 2) - 1 ? ', ' : ' '}
+                {i < Math.min(displayedRoles.length, 2) - 1 ? <span>{', '}</span> : ' '}
               </span>
             ))}
           </div>

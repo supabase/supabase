@@ -369,16 +369,16 @@ export const QueryInsightsTable = ({
               <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
                 <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
-                    All{triageItems.length > 0 && ` (${triageItems.length})`}
+                    All{triageItems.length > 0 && <span>{` (${triageItems.length})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
-                    Errors{errorCount > 0 && ` (${errorCount})`}
+                    Errors{errorCount > 0 && <span>{` (${errorCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
-                    Index{indexCount > 0 && ` (${indexCount})`}
+                    Index{indexCount > 0 && <span>{` (${indexCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
-                    Slow{slowCount > 0 && ` (${slowCount})`}
+                    Slow{slowCount > 0 && <span>{` (${slowCount})`}</span>}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

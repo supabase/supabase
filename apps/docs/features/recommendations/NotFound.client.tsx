@@ -2,32 +2,16 @@
 
 import ButtonCard from '~/components/ButtonCard'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { useDocsSearch, type DocsSearchResult } from 'common'
+import { useDocsSearchV2, type DocsSearchV2Result } from 'common'
 import { usePathname } from 'next/navigation'
 import { useEffect } from 'react'
 import { Button, cn } from 'ui'
-import { useSetCommandMenuOpen } from 'ui-patterns/CommandMenu'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { SearchV2Dialog, useSearchV2Dialog, useSearchV2Variant } from '@/features/SearchV2'
+import { SearchV2Dialog, useSearchV2Dialog } from '@/features/SearchV2'
+import { SEARCH_V2_ENDPOINT } from '@/features/SearchV2/constants'
 
 function SearchButton() {
-  const searchVariant = useSearchV2Variant()
-
-  return searchVariant === 'search-v2-active' ? <SearchV2Button /> : <LegacySearchButton />
-}
-
-function LegacySearchButton() {
-  const setCommandMenuOpen = useSetCommandMenuOpen()
-
-  return (
-    <Button variant="primary" size="small" onClick={() => setCommandMenuOpen(true)}>
-      Search for page
-    </Button>
-  )
-}
-
-function SearchV2Button() {
   const { open, openDialog, handleOpenChange } = useSearchV2Dialog()
 
   return (
@@ -43,11 +27,12 @@ function SearchV2Button() {
 function Recommendations() {
   const pathname = usePathname()
 
-  const { searchState: state, handleDocsSearch: handleSearch } = useDocsSearch()
+  const { searchState: state, handleDocsSearch: handleSearch } = useDocsSearchV2({
+    endpoint: SEARCH_V2_ENDPOINT,
+  })
 
   const loading = state.status === 'initial' || state.status === 'loading'
-  const recommendations =
-    state.status === 'partialResults' || state.status === 'fullResults' ? state.results : []
+  const recommendations = state.status === 'results' ? uniqueByPath(state.results) : []
 
   useEffect(() => {
     if (!pathname) return
@@ -72,6 +57,13 @@ function Recommendations() {
   )
 }
 
+// results are per heading, so a page can match more than once
+function uniqueByPath(results: DocsSearchV2Result[]) {
+  return results.filter(
+    (result, index) => results.findIndex(({ path }) => path === result.path) === index
+  )
+}
+
 function LoadingState() {
   return <GenericSkeletonLoader />
 }
@@ -80,11 +72,7 @@ function NoResults() {
   return <span>No recommendations found.</span>
 }
 
-function RecommendationsList({
-  recommendations,
-}: {
-  recommendations: Array<Omit<DocsSearchResult, 'sections'>>
-}) {
+function RecommendationsList({ recommendations }: { recommendations: DocsSearchV2Result[] }) {
   const pathname = usePathname()
   const sendTelemetryEvent = useSendTelemetryEvent()
 
@@ -93,12 +81,12 @@ function RecommendationsList({
       {recommendations
         .filter(({ title }) => !!title)
         .slice(0, 6)
-        .map(({ path, title, subtitle, description }) => (
+        .map(({ path, title, excerpt }) => (
           <ButtonCard
             key={path}
             to={path}
             title={title}
-            description={subtitle || description || undefined}
+            description={excerpt || undefined}
             onClick={() =>
               sendTelemetryEvent({
                 action: 'docs_404_recommendation_clicked',

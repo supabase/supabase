@@ -11,9 +11,10 @@ import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-que
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import { UseCustomQueryOptions } from '@/types'
 
 export type GetTableRowsCountArgs = {
   table?: SupaTable
@@ -35,7 +36,7 @@ export type TableRowsCountVariables = Omit<GetTableRowsCountArgs, 'table'> & {
 }
 
 export type TableRowsCountData = TableRowsCount
-export type TableRowsCountError = ResponseError
+export type TableRowsCountError = StudioError
 
 export async function getTableRowsCount(
   {

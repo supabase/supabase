@@ -12,14 +12,12 @@ import {
   type CliReferenceSource,
   type OpenApiReferenceSource,
 } from './reference-doc.js'
-import { fetchTroubleshootingSources, type TroubleshootingSource } from './troubleshooting.js'
 
 export type SearchSource =
   | MarkdownSource
   | OpenApiReferenceSource
   | ClientLibReferenceSource
   | CliReferenceSource
-  | TroubleshootingSource
   | IntegrationSource
   | LintWarningsGuideSource
 
@@ -72,6 +70,18 @@ export async function fetchMiddlewareLibReferenceSource() {
     path: '/reference/middleware',
     meta: { title: 'Middleware Reference', language: 'TypeScript' },
     contentDir: 'content/reference/middleware/v1',
+  })
+}
+
+export async function fetchTanstackDbLibReferenceSource() {
+  // TanStack DB is driven by the new reference pipeline. Ingest search sources
+  // from the generated `content/reference/tanstack_db/v1/` outputs so
+  // embeddings never drift from what the renderer shows.
+  return loadClientLibReferenceFromNewPipeline({
+    source: 'tanstack-db-lib',
+    path: '/reference/tanstack_db',
+    meta: { title: 'TanStack DB Reference', language: 'TypeScript' },
+    contentDir: 'content/reference/tanstack_db/v1',
   })
 }
 
@@ -158,6 +168,7 @@ export async function fetchAllSources(fullIndex: boolean) {
   const jsLibReferenceSource = fetchJsLibReferenceSource()
   const serverLibReferenceSource = fullIndex ? fetchServerLibReferenceSource() : []
   const middlewareLibReferenceSource = fullIndex ? fetchMiddlewareLibReferenceSource() : []
+  const tanstackDbLibReferenceSource = fullIndex ? fetchTanstackDbLibReferenceSource() : []
   const dartLibReferenceSource = fullIndex ? fetchDartLibReferenceSource() : []
   const pythonLibReferenceSource = fullIndex ? fetchPythonLibReferenceSource() : []
   const cSharpLibReferenceSource = fullIndex ? fetchCSharpLibReferenceSource() : []
@@ -177,11 +188,6 @@ export async function fetchAllSources(fullIndex: boolean) {
         .then((data) => data.flat())
     : []
 
-  // Load troubleshooting articles from local MDX files
-  const troubleshootingSources = fetchTroubleshootingSources()
-    .then((loaders) => Promise.all(loaders.map((loader) => loader.load())))
-    .then((data) => data.flat())
-
   // Type assertion required because ReferenceLoader.load() returns Promise<BaseSource[]>
   // which widens the inferred union type. All concrete sources in this array are valid
   // SearchSource types (MarkdownSource, OpenApiReferenceSource, etc.).
@@ -193,6 +199,7 @@ export async function fetchAllSources(fullIndex: boolean) {
       jsLibReferenceSource,
       serverLibReferenceSource,
       middlewareLibReferenceSource,
+      tanstackDbLibReferenceSource,
       dartLibReferenceSource,
       pythonLibReferenceSource,
       cSharpLibReferenceSource,
@@ -200,7 +207,6 @@ export async function fetchAllSources(fullIndex: boolean) {
       ktLibReferenceSource,
       cliReferenceSource,
       partnerIntegrationSources,
-      troubleshootingSources,
     ])
   ).flat() as SearchSource[]
 

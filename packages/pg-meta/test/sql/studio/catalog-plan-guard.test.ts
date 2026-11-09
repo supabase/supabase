@@ -19,7 +19,12 @@ import tablePrivileges from '../../../src/pg-meta-table-privileges'
 import * as tables from '../../../src/pg-meta-tables'
 import * as types from '../../../src/pg-meta-types'
 import { assertPlanWithinBudget, explainAnalyze } from '../../db/plan-guard'
-import { buildStressCatalog, STRESS_TABLE_COUNT } from '../../db/stress-catalog'
+import {
+  buildStressCatalog,
+  buildStressFunctions,
+  buildStressTriggers,
+  STRESS_TABLE_COUNT,
+} from '../../db/stress-catalog'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
 /**
@@ -59,8 +64,22 @@ beforeAll(async () => {
   viewId = vId
 }, 120_000)
 
+// Function and trigger search get their own catalog: growing pg_proc/pg_depend/
+// pg_trigger in the shared one shifts the plans of unrelated queries above.
+let searchDb: Awaited<ReturnType<typeof createTestDatabase>> | undefined
+const getSearchDb = async () => {
+  if (!searchDb) {
+    searchDb = await createTestDatabase()
+    await buildStressCatalog(searchDb, STRESS_TABLE_COUNT)
+    await buildStressFunctions(searchDb)
+    await buildStressTriggers(searchDb)
+  }
+  return searchDb
+}
+
 afterAll(async () => {
   await db.cleanup()
+  await searchDb?.cleanup()
   await cleanupRoot()
 })
 
@@ -477,13 +496,29 @@ test('tables.retrieve: composite FKs stay ordinally paired at stress scale', asy
 // A substring (leading-wildcard) ILIKE cannot use pg_class_relname_nsp_index,
 // so one filtered seq scan of pg_class is structurally unavoidable. Everything
 // downstream (privilege checks, policy counts) is capped by the materialized
-// candidate CTE, so no other scaling catalog may be scanned.
+// candidate CTE, so no other scaling catalog may be scanned. Policy name search
+// adds one more: pg_policy has no index usable for a leading-wildcard ILIKE.
 const SEARCH_ENTITIES_BUDGET = {
   allowedSeqScans: {
     pg_class: {
       max: 1,
       reason:
         'substring name search: a leading-wildcard ILIKE cannot use pg_class_relname_nsp_index, so one filtered pass of pg_class is unavoidable',
+    },
+    pg_policy: {
+      max: 1,
+      reason:
+        'policy name search: a leading-wildcard ILIKE cannot use the (polrelid, polname) index, so one filtered pass of pg_policy is unavoidable',
+    },
+    pg_trigger: {
+      max: 1,
+      reason:
+        'trigger name search: a leading-wildcard ILIKE cannot use the (tgrelid, tgname) index, so one filtered pass of pg_trigger is unavoidable',
+    },
+    pg_proc: {
+      max: 1,
+      reason:
+        'function name search: a leading-wildcard ILIKE cannot use pg_proc_proname_args_nsp_index, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
     },
   },
   maxExecutionTimeMs: 500,
@@ -494,6 +529,36 @@ test('getSearchEntitiesSql: broad search (thousands of matches) stays within bud
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 't_1' }))
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)
+
+test('getSearchEntitiesSql: broad policy name search stays within budget', async () => {
+  // Stress policies are named p_<n>, so `p_1` matches a large share of pg_policy
+  const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'p_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 60_000)
+
+test('getSearchEntitiesSql: broad function name search stays within budget', async () => {
+  // `fn_1` matches a large share of both the user's functions and the (same-named)
+  // extension-owned ones, which must be excluded without scanning pg_depend
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'fn_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: broad trigger name search stays within budget', async () => {
+  // `trg_1` matches a large share of the user triggers, in a catalog where the
+  // foreign keys have added many internal triggers that must be skipped
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'trg_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: triggers found through a function stay within budget', async () => {
+  // Matches the `audit_row_fn` function; the triggers that run it (aud_*) only match
+  // through the function, which must share the one pg_trigger pass
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getSearchEntitiesSql({ query: 'audit_row_fn' })
+  )
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
 
 test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))

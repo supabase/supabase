@@ -2,6 +2,7 @@ import type { ContentListingGroup } from '~/lib/content-listings.schema'
 
 import { aiToolsBuildingIntoApp, aiToolsSupportedAgents } from './ai-tools.data'
 import { authGetStarted, authNextSteps, authPricing } from './auth.data'
+import { contributingDetails } from './contributing.data'
 import { databaseGetStarted, databaseMultigresWhatYouGet, databaseNextSteps } from './database.data'
 import {
   functionsExamplesAiMedia,
@@ -35,7 +36,6 @@ import { storageExamples, storageGetStarted, storageResources } from './storage.
 import {
   telemetryAccessWhat,
   telemetryDetect,
-  telemetryDiagnose,
   telemetryExport,
   telemetryHireAgent,
 } from './telemetry.data'
@@ -61,6 +61,7 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   supabaseWayStorageBuild,
   supabaseWayFunctionsBuild,
   supabaseWayProductionBuild,
+  contributingDetails,
   authGetStarted,
   authPricing,
   authNextSteps,
@@ -96,7 +97,6 @@ const ALL_GROUPS: readonly ContentListingGroup[] = [
   storageResources,
   telemetryAccessWhat,
   telemetryDetect,
-  telemetryDiagnose,
   telemetryHireAgent,
   telemetryExport,
 ]

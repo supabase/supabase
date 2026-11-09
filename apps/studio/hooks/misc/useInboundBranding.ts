@@ -1,3 +1,4 @@
+import { useHydrated } from '@tanstack/react-router'
 import { useParams } from 'common'
 import { useMemo } from 'react'
 
@@ -31,11 +32,14 @@ export type InboundBranding = {
  * The focused provider must be enabled and visible in the current flow (`showOnSignIn` /
  * `showOnSignUp`), otherwise there'd be no button to offer and we fall back to the full-option
  * screen.
+ *
+ * Empty until hydration, since search params aren't in the prerendered HTML.
  */
 export function useInboundBranding(flow: 'sign-in' | 'sign-up' = 'sign-in'): InboundBranding {
   const enabledProviders = useEnabledIdentityProviders()
 
-  const { destination: destinationId, method: focusId } = useParams()
+  const params = useParams()
+  const { destination: destinationId, method: focusId } = useHydrated() ? params : {}
 
   const focusProvider = useMemo(
     () =>

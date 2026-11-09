@@ -1,0 +1,56 @@
+{
+  "title": "supabaseCollectionOptions()",
+  "description": "Builds the configuration for a TanStack DB collection backed by a Postgres table. Pass the result to `createCollection()` from `@tanstack/react-db`.",
+  "params": [
+    {
+      "name": "tableName",
+      "isOptional": false,
+      "type": "string",
+      "description": "The Postgres table this collection reads from and writes to."
+    },
+    {
+      "name": "keys",
+      "isOptional": false,
+      "type": "string[]",
+      "description": "The primary key column or columns for the table. Must match the table's primary key."
+    },
+    {
+      "name": "schema",
+      "isOptional": false,
+      "type": "StandardSchemaV1",
+      "description": "A schema used to validate and type each row. Works with any [Standard Schema](https://standardschema.dev) library, such as Zod or Valibot."
+    },
+    {
+      "name": "supabase",
+      "isOptional": false,
+      "type": "SupabaseClient",
+      "description": "The Supabase client instance to query and subscribe through."
+    },
+    {
+      "name": "queryClient",
+      "isOptional": true,
+      "type": "QueryClient",
+      "description": "An existing TanStack Query client to share, if you already use one. If omitted, a shared global client is used."
+    },
+    {
+      "name": "realtime",
+      "isOptional": true,
+      "type": "boolean",
+      "description": "Keep the collection in sync across clients using Supabase Realtime. Defaults to `false`."
+    },
+    {
+      "name": "realtimeUseFilter",
+      "isOptional": true,
+      "type": "boolean",
+      "description": "Experimental. Apply server-side filtering to Realtime updates instead of filtering on the client. Only applies when `realtime` is `true`. Queries that can't be expressed as a Realtime filter, like `or(...)`, fall back to the unfiltered subscription. Defaults to `false`."
+    }
+  ],
+  "notes": "- To receive changes from other clients, enable Realtime for the table in the Table Editor, or run `alter publication supabase_realtime add table todos;`.\n- Create one collection per table.\n- Reads page past your project's max rows setting automatically. The default is 1000 rows. If a collection can grow past it, order by a unique column so pages stay consistent.",
+  "examples": [
+    {
+      "id": "create-collection",
+      "name": "Create a collection",
+      "code": "```tsx\nimport { createCollection } from '@tanstack/react-db'\nimport { supabaseCollectionOptions } from '@supabase-labs/tanstack-db'\nimport { z } from 'zod'\n\nconst todosSchema = z.object({\n  id: z.string(),\n  title: z.string(),\n  completed: z.boolean(),\n})\n\nexport const todos = createCollection(\n  supabaseCollectionOptions({\n    tableName: 'todos',\n    keys: ['id'],\n    schema: todosSchema,\n    supabase,\n    realtime: true,\n  })\n)\n```"
+    }
+  ]
+}
