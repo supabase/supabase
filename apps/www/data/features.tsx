@@ -779,7 +779,7 @@ This feature is particularly valuable for teams looking to optimize their databa
     icon: Zap,
     products: [ADDITIONAL_PRODUCTS.PLATFORM],
     heroImage: 'https://www.youtube-nocookie.com/embed/ogYNmJOFEpk',
-    docsUrl: 'https://supabase.com/docs/guides/database/supavisor',
+    docsUrl: 'https://supabase.com/docs/guides/database/connecting-to-postgres/pooling-and-limits',
     blogUrl: 'https://supabase.com/blog/supavisor-postgres-connection-pooler',
     slug: 'supavisor',
     status: {
@@ -2491,7 +2491,6 @@ By leveraging Role-Based Access Control, you can create a secure, scalable, and 
     heroImage: 'https://www.youtube-nocookie.com/embed/168PHFnxkok',
     docsUrl:
       'https://supabase.com/docs/guides/database/postgres/custom-claims-and-role-based-access-control-rbac',
-    blogUrl: 'https://supabase.com/blog/platform-access-control',
     slug: 'role-based-access-control',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2776,7 +2775,6 @@ This feature is essential for organizations looking to maintain robust security 
     products: [ADDITIONAL_PRODUCTS.STUDIO],
     heroImage: '/images/features/policy-templates.png',
     heroImageLight: '/images/features/policy-templates-light.png',
-    docsUrl: 'https://supabase.com/docs/guides/database/postgres/row-level-security',
     slug: 'policy-templates',
     status: {
       stage: PRODUCT_STAGES.GA,
@@ -2786,7 +2784,6 @@ This feature is essential for organizations looking to maintain robust security 
   {
     title: 'SQL Editor',
     subtitle: 'A powerful interface for writing and executing SQL queries.',
-    ctaLabel: 'Use the SQL Editor',
     description: `
 The SQL Editor in [Supabase Studio](/features?products=studio) provides users with a robust platform for writing, executing, and managing SQL queries directly within their browser. 
 
