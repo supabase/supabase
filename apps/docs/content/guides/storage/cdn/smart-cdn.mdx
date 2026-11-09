@@ -53,3 +53,16 @@ This affects how you should think about serving private assets:
 Token expiry (`expiresIn`) and the object's response cache TTL (`cacheControl`) are independent. Once a response is cached at the edge, that cached response can continue to be served for the same signed URL until the CDN cache duration expires, even if the token in that URL has already expired. If you need to cut off access to an asset, delete the object from the bucket rather than relying on token expiry alone.
 
 For more information about revoking signed URLs, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).
+
+## Authenticated URLs and CDN caching
+
+When you request a private asset through the authenticated endpoint (`/storage/v1/object/authenticated/[bucket]/[asset-name]`), the CDN caches the response based on the user's access at the time of the request, and keeps serving it until the user's access token (JWT) expires.
+
+This means that:
+
+- If you change a user's access, for example by updating an RLS policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request is checked against your current access rules. The purge can take up to 60 seconds to propagate.
+- If a user signs out and a request reuses their old JWT, the user can still access cached files. Signing out ends the Auth session but doesn't invalidate access tokens that were already issued. To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions).
+
+If you need immediate revocation, check the user's session and permissions in your own server code, for example with an [Edge Function](/docs/guides/functions). Because your code handles authorization, you can call the REST API with server-only credentials and still benefit from CDN caching between Storage and your server.
+
+You can also [serve assets through the S3 API](/docs/guides/storage/s3/authentication), which doesn't cache responses.
