@@ -1,7 +1,7 @@
 import type { Provider } from '@supabase/auth-js'
 import { useFlag } from 'common'
 import dayjs from 'dayjs'
-import { EditIcon, MailIcon, UnlinkIcon } from 'lucide-react'
+import { EditIcon, LockIcon, MailIcon, UnlinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -75,7 +75,6 @@ export const AccountIdentities = ({
   const isAddAccountPasswordEnabled = useFlag('enableAccountPassword')
 
   const identities = data?.identities ?? []
-  const isManagedAccount = identities.some((identity) => identity.provider.startsWith('sso'))
   const passwordFinding = evaluateAccountRecovery({
     identities,
     email: data?.email,
@@ -180,7 +179,14 @@ export const AccountIdentities = ({
             <div className="divide-y">
               {identities.map((identity) => {
                 const { identity_id, provider } = identity
+                const isSso = provider.startsWith('sso')
                 const username = identity.identity_data?.user_name
+                const accountLabel = [
+                  !isSso && username !== identity.email ? username : undefined,
+                  identity.email,
+                ]
+                  .filter(Boolean)
+                  .join(' · ')
                 const providerDisplay = getProviderDisplay(provider)
                 const providerName = providerDisplay.displayName
                 const configuredProvider = getConfiguredExternalProvider(provider)
@@ -205,10 +211,12 @@ export const AccountIdentities = ({
                             </Tooltip>
                           )}
                         </div>
-                        <p className="text-sm text-foreground-lighter">
-                          {!!username ? <span>{username} · </span> : null}
-                          {identity.email}
-                        </p>
+                        <p className="text-sm text-foreground-lighter">{accountLabel}</p>
+                        {isSso && (
+                          <p className="text-sm text-foreground-lighter">
+                            Your organization manages how you sign in.
+                          </p>
+                        )}
                       </div>
                     </div>
                     <div className="flex items-center gap-x-1">
@@ -272,11 +280,6 @@ export const AccountIdentities = ({
             </div>
           )}
         </Card>
-        {isSuccess && isManagedAccount && (
-          <p className="text-sm text-foreground-light">
-            Your organization manages how you sign in.
-          </p>
-        )}
 
         <Dialog
           open={!!selectedProviderUpdateEmail}
@@ -326,6 +329,8 @@ export const AccountIdentities = ({
 
 const SignInMethodIcon = ({ provider }: { provider: string }) => {
   const display = getProviderDisplay(provider)
+  const isSso = provider.startsWith('sso')
+  const OutlineIcon = isSso ? LockIcon : MailIcon
   return (
     <div
       className={cn(
@@ -333,8 +338,8 @@ const SignInMethodIcon = ({ provider }: { provider: string }) => {
         display.displayName === 'GitHub' ? 'bg-transparent' : 'bg-selection'
       )}
     >
-      {provider === 'email' ? (
-        <MailIcon size={18} strokeWidth={2.5} />
+      {isSso || provider === 'email' ? (
+        <OutlineIcon size={18} strokeWidth={2.5} className="text-foreground-lighter" />
       ) : (
         <IdentityProviderIcon display={display} size={30} />
       )}
