@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   Auth,
   Compute,
@@ -42,6 +42,7 @@ interface ProductFeatures {
 }
 
 interface OtherFeatures {
+  issuesInbox?: boolean
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
@@ -204,19 +205,24 @@ export const generateOtherRoutes = (
 ): Route[] => {
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
+  const isIssuesInboxEnabled = features?.issuesInbox ?? false
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
 
   return [
-    {
-      key: 'issues',
-      label: 'Issues',
-      disabled: !isProjectActive,
-      icon: <CircleDotIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/issues`),
-      shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
-    },
+    ...(isIssuesInboxEnabled
+      ? [
+          {
+            key: 'issues',
+            label: 'Issues',
+            disabled: !isProjectActive,
+            icon: <CircleDotIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/issues`),
+            shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
+          },
+        ]
+      : []),
     ...(reportsEnabled
       ? [
           {
@@ -265,10 +271,12 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
 
   return generateOtherRoutes(ref, project, {
+    issuesInbox: isIssuesInboxEnabled,
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,

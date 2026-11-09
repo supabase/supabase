@@ -1,3 +1,4 @@
+import { useFlag } from 'common'
 import { CircleDotIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
@@ -14,13 +15,14 @@ import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const { toggleSidebar, activeSidebar } = useSidebarManagerSnapshot()
   const track = useTrack()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
 
-  const { data: lints } = useProjectLintsQuery({ projectRef })
-  const { data: signalItems } = useAdvisorSignals({ projectRef })
+  const { data: lints } = useProjectLintsQuery({ projectRef }, { enabled: isIssuesInboxEnabled })
+  const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: isIssuesInboxEnabled })
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
-    { enabled: IS_PLATFORM }
+    { enabled: IS_PLATFORM && isIssuesInboxEnabled }
   )
   const notifications = useMemo(() => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
@@ -42,6 +44,8 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
     track('header_advisor_button_clicked')
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
+
+  if (!isIssuesInboxEnabled) return null
 
   return (
     <div className="relative">

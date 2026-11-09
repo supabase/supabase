@@ -17,13 +17,14 @@ import { useApiDocsGotoCommands } from '@/components/interfaces/ProjectAPIDocs/P
 
 export function useLayoutNavCommands() {
   const isLoggedIn = useIsLoggedIn()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const computeEnabled = useFlag('compute')
 
   useTableEditorGotoCommands({ enabled: isLoggedIn })
   useSqlEditorGotoCommands({ enabled: isLoggedIn })
   useDatabaseGotoCommands({ enabled: isLoggedIn })
   useAuthGotoCommands({ enabled: isLoggedIn })
-  useIssuesGoToCommands({ enabled: isLoggedIn })
+  useIssuesGoToCommands({ enabled: isLoggedIn && isIssuesInboxEnabled })
   useStorageGotoCommands({ enabled: isLoggedIn })
   useFunctionsGotoCommands({ enabled: isLoggedIn })
   useComputeGotoCommands({ enabled: isLoggedIn && computeEnabled })
