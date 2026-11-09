@@ -57,7 +57,7 @@ describe('unified log inspection scope', () => {
         logId: 'aa11',
         type: 'edge-function',
         search: createUnifiedLogsSearch({}, scope),
-        useOtel: false,
+        useOtel: true,
       })
     ).resolves.toMatchObject({ result: [{ id: 'aa11' }] })
     expect(queries).toHaveLength(2)

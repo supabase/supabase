@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import type { ReactNode } from 'react'
 import { Skeleton } from 'ui'
 
@@ -88,6 +88,12 @@ export function LogDetail({
         </div>
       )}
       {tab === 'raw-json' && <RawJsonView data={rawData} copyLabel="Copy log as JSON" />}
+      {!IS_PLATFORM && row.log_type === 'edge function' && (
+        <p className="px-4 text-sm text-foreground-light">
+          Related logs are from the same worker within the selected time range. A worker can serve
+          multiple requests.
+        </p>
+      )}
       {tab === 'overview' && (
         <LogOverview
           header={overviewHeader}

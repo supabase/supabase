@@ -1,4 +1,4 @@
-import { IS_PLATFORM, useFlag } from 'common'
+import { useFlag } from 'common'
 import { useParams } from 'common/hooks'
 import dayjs from 'dayjs'
 import { CheckIcon, CopyIcon } from 'lucide-react'
@@ -9,6 +9,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { formatErrorRate } from './EdgeFunctionsListItem.utils'
+import { useFunctionObservability } from './useFunctionObservability'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionsLastHourStatsQuery } from '@/data/edge-functions/edge-functions-last-hour-stats-query'
 import {
@@ -24,6 +25,7 @@ interface EdgeFunctionsListItemProps {
 
 export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemProps) => {
   const router = useRouter()
+  const { isAvailable } = useFunctionObservability()
   const { ref } = useParams()
   const [isCopied, setIsCopied] = useState(false)
 
@@ -33,7 +35,7 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
   const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
-    `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
+    `/project/${ref}/functions/${item.slug}${isAvailable ? '' : `/code`}`,
     router
   )
 

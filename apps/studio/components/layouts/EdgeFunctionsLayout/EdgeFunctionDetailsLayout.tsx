@@ -26,8 +26,8 @@ import { PageNav } from 'ui-patterns/PageNav'
 
 import { ProjectLayout } from '../ProjectLayout'
 import EdgeFunctionsLayout from './EdgeFunctionsLayout'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { EdgeFunctionTesterSheet } from '@/components/interfaces/Functions/EdgeFunctionDetails/EdgeFunctionTesterSheet'
+import { useFunctionObservability } from '@/components/interfaces/Functions/useFunctionObservability'
 import { useFunctionsDetailShortcuts } from '@/components/interfaces/Functions/useFunctionsDetailShortcuts'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { NoPermission } from '@/components/ui/NoPermission'
@@ -57,7 +57,8 @@ const EdgeFunctionDetailsLayout = ({
     FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const { isEnabled: isUnifiedLogsEnabled, isAvailable: isObservabilityAvailable } =
+    useFunctionObservability()
 
   const [isOpen, setIsOpen] = useState(false)
   const [isDownloadOpen, setIsDownloadOpen] = useState(false)
@@ -97,7 +98,7 @@ const EdgeFunctionDetailsLayout = ({
 
   const navigationItems = functionSlug
     ? [
-        ...(IS_PLATFORM
+        ...(isObservabilityAvailable
           ? [
               {
                 label: 'Overview',

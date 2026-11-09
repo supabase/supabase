@@ -1,64 +1,97 @@
-import { dehydrate, QueryClient } from '@tanstack/react-query'
-import { waitFor } from '@testing-library/react'
-import { FeatureFlagContext } from 'common'
+import { QueryClient } from '@tanstack/react-query'
+import { screen } from '@testing-library/react'
 import { HttpResponse } from 'msw'
-import { createDynamicRouteParser } from 'next-router-mock/dynamic-routes'
-import { useRouter } from 'next/router'
-import { afterAll, expect, it, vi } from 'vitest'
+import { expect, it } from 'vitest'
 
+import { EdgeFunctionOverview } from './EdgeFunctionOverview'
+import { configKeys } from '@/data/config/keys'
 import type { EdgeFunction } from '@/data/edge-functions/edge-function-query'
+import { edgeFunctionsKeys } from '@/data/edge-functions/keys'
+import { miscKeys } from '@/data/misc/keys'
 import { projectKeys } from '@/data/projects/keys'
-import OverviewPage from '@/pages/project/[ref]/functions/[functionSlug]/index'
 import { createMockProject } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
 
-vi.unmock('common')
-
-const { default: routerMock } =
-  await vi.importMock<typeof import('next-router-mock')>('next/router')
-const removeRouteParser = routerMock.useParser(
-  createDynamicRouteParser([
-    '/project/[ref]/functions/[functionSlug]',
-    '/project/[ref]/functions/[functionSlug]/details',
-  ])
-)
-afterAll(removeRouteParser)
-
-it('redirects the self-hosted overview to function details before feature flags load', async () => {
-  routerMock.setCurrentUrl('/project/default/functions/send-email')
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+function renderOverview(logsEnabled: boolean) {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, staleTime: Infinity } },
+  })
+  queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), {
+    disabled_features: logsEnabled ? [] : ['logs:all'],
+  })
   queryClient.setQueryData(projectKeys.detail('default'), createMockProject({ ref: 'default' }))
+  queryClient.setQueryData(configKeys.settingsV2('default'), {
+    app_config: { endpoint: 'localhost:8000' },
+  })
+  queryClient.setQueryData<EdgeFunction>(edgeFunctionsKeys.detail('default', undefined), {
+    id: 'hello',
+    slug: 'hello',
+    name: 'Hello',
+    version: 1,
+    status: 'ACTIVE',
+    created_at: Date.now() - 3600000,
+    updated_at: Date.now() - 3600000,
+  })
+  return customRender(<EdgeFunctionOverview />, { queryClient })
+}
+
+it('shows setup guidance without querying analytics when logging is disabled', async () => {
+  renderOverview(false)
+  expect(await screen.findByText('Function logs are not enabled')).toBeVisible()
+  expect(screen.queryByText('Usage')).not.toBeInTheDocument()
+})
+
+it('renders invocation metrics and leaves unavailable worker measurements empty', async () => {
   addAPIMock({
     method: 'get',
-    path: '/v1/projects/:ref/functions/:function_slug',
-    response: () =>
-      HttpResponse.json<EdgeFunction>({
-        id: 'function-id',
-        name: 'Send email',
-        slug: 'send-email',
-        status: 'ACTIVE',
-        version: 2,
-        created_at: new Date('2026-03-20T08:00:00Z').valueOf(),
-        updated_at: new Date('2026-03-20T09:00:00Z').valueOf(),
-      }),
+    path: '/platform/projects/:ref/analytics/endpoints/functions.combined-stats',
+    response: ({ request }) => {
+      expect(new URL(request.url).searchParams.get('function_id')).toBe('hello')
+      return HttpResponse.json<{ result: Record<string, number | string | null>[] }>({
+        result: [
+          {
+            timestamp: new Date().toISOString(),
+            requests_count: 2,
+            worker_count: 0,
+            success_count: 1,
+            server_err_count: 1,
+            avg_execution_time: 20,
+            max_execution_time: 30,
+            avg_cpu_time_used: null,
+            max_cpu_time_used: null,
+            avg_memory_used: null,
+            avg_heap_memory_used: null,
+            avg_external_memory_used: null,
+          },
+        ],
+      })
+    },
   })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+    response: () => HttpResponse.json<{ result: never[] }>({ result: [] }),
+  })
+  renderOverview(true)
+  expect(await screen.findByText('20ms')).toBeVisible()
+  expect(screen.getAllByText('No data to show')).toHaveLength(2)
+  expect(screen.getByText(/CPU and memory measured when workers shut down/)).toBeVisible()
+  expect(screen.queryByText('0ms')).not.toBeInTheDocument()
+})
 
-  const OverviewRoute = () => {
-    const { asPath } = useRouter()
-    return asPath === '/project/default/functions/send-email' ? (
-      <OverviewPage dehydratedState={dehydrate(queryClient)} />
-    ) : null
-  }
-
-  customRender(
-    <FeatureFlagContext.Provider value={{ configcat: {}, posthog: {}, hasLoaded: false }}>
-      <OverviewRoute />
-    </FeatureFlagContext.Provider>,
-    { queryClient }
-  )
-
-  await waitFor(() =>
-    expect(routerMock.asPath).toBe('/project/default/functions/send-email/details')
-  )
+it('shows query failures instead of successful empty metrics', async () => {
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref/analytics/endpoints/functions.combined-stats',
+    response: () =>
+      HttpResponse.json<{ message: string }>({ message: 'Analytics unavailable' }, { status: 500 }),
+  })
+  addAPIMock({
+    method: 'post',
+    path: '/platform/projects/:ref/analytics/endpoints/logs.all',
+    response: () => HttpResponse.json<{ result: never[] }>({ result: [] }),
+  })
+  renderOverview(true)
+  expect(await screen.findByText('Unable to load execution time')).toBeVisible()
 })

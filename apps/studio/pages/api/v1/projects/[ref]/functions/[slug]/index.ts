@@ -3,7 +3,6 @@ import { type NextApiRequest, type NextApiResponse } from 'next'
 
 import { apiWrapper } from '@/lib/api/apiWrapper'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
-import { uuidv4 } from '@/lib/helpers'
 
 export default function handlerWithErrorCatching(req: NextApiRequest, res: NextApiResponse) {
   return apiWrapper(req, res, handler, { withAuth: true })
@@ -35,7 +34,7 @@ const handleGet = async (req: NextApiRequest, res: NextApiResponse) => {
   if (!functionsArtifact) return res.status(404).json({ error: { message: `Function not found` } })
 
   const functionResponse = {
-    id: uuidv4(),
+    id: functionsArtifact.slug,
     slug: functionsArtifact.slug,
     version: 1,
     name: functionsArtifact.slug,

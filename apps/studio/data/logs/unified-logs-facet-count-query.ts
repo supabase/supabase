@@ -21,6 +21,7 @@ import {
   getFacetCountCTE,
   getUnifiedLogsCTE,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getFunctionLogsFacetQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.functions'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -50,13 +51,18 @@ export async function getUnifiedLogsFacetCount(
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
   const cteName = quotedIdent(facet.replaceAll('.', '_') + '_count')
 
-  const sql = useOtel
-    ? getFacetCountQuery({ search, facet, facetSearch })
-    : safeSql`
+  let sql
+  if (!useOtel && search.scope) {
+    sql = getFunctionLogsFacetQuery(search, facet, facetSearch)
+  } else if (useOtel) {
+    sql = getFacetCountQuery({ search, facet, facetSearch })
+  } else {
+    sql = safeSql`
 ${getUnifiedLogsCTE(getEffectiveLogTypes(search))},
 ${getFacetCountCTE({ search, facet, facetSearch, cteName })}
 SELECT dimension, value, count from ${cteName};
 `
+  }
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const data = await executeAnalyticsSql({
@@ -70,14 +76,14 @@ SELECT dimension, value, count from ${cteName};
   if (data.error !== undefined) {
     throw new Error(typeof data.error === 'string' ? data.error : data.error.message)
   }
-  return facetRowsSchema
-    .parse(data.result)
-    .sort((a, b) => b.count - a.count)
-    .map((row) => ({
-      label: row.value,
-      value: row.value,
-      count: row.count,
-    }))
+  const counts = new Map<string, number>()
+  for (const row of facetRowsSchema.parse(data.result)) {
+    counts.set(row.value, (counts.get(row.value) ?? 0) + row.count)
+  }
+  return [...counts]
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, !useOtel && search.scope ? 20 : undefined)
+    .map(([value, count]) => ({ label: value, value, count }))
 }
 
 export type UnifiedLogsFacetCountData = Awaited<ReturnType<typeof getUnifiedLogsFacetCount>>

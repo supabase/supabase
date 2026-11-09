@@ -1,3 +1,4 @@
+import { IS_PLATFORM } from 'common'
 import { CheckIcon, ExternalLinkIcon, EyeIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
@@ -22,7 +23,7 @@ import {
   getSinceLastDeployLogRange,
 } from './EdgeFunctionRecentErrors.utils'
 import { EdgeFunctionRecentErrorsActions } from './EdgeFunctionRecentErrorsActions'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { useFunctionObservability } from '@/components/interfaces/Functions/useFunctionObservability'
 import { EmbeddedLogsTable } from '@/components/interfaces/UnifiedLogs/components/EmbeddedLogsTable'
 import type { ColumnSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import {
@@ -51,7 +52,7 @@ export const EdgeFunctionRecentErrors = ({
   updatedAt,
 }: EdgeFunctionRecentErrorsProps) => {
   const router = useRouter()
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const { isEnabled: isUnifiedLogsEnabled } = useFunctionObservability()
   const { isoTimestampStart, isoTimestampEnd } = useMemo(
     () => getSinceLastDeployLogRange(updatedAt),
     [updatedAt]
@@ -75,10 +76,12 @@ export const EdgeFunctionRecentErrors = ({
     { projectRef, search: errorsSearch, pageSize: MAX_VISIBLE_ERRORS },
     { enabled: isQueryEnabled, placeholderData: undefined }
   )
-  const { data: counts } = useUnifiedLogsCountQuery(
-    { projectRef, search: countsSearch },
-    { enabled: isQueryEnabled }
-  )
+  const {
+    data: counts,
+    error: countError,
+    isError: isCountError,
+    isPending: isCountPending,
+  } = useUnifiedLogsCountQuery({ projectRef, search: countsSearch }, { enabled: isQueryEnabled })
 
   const rows = useMemo(() => getUniqueLogRows<ColumnSchema>(data?.pages), [data?.pages])
 
@@ -107,8 +110,8 @@ export const EdgeFunctionRecentErrors = ({
     router.push(getLogsUrl(rows.find((row) => row.id === logId)))
   }
 
-  const isLoading = !functionId || (isQueryEnabled && isPending)
-  const hasNoErrors = !isLoading && !isError && rows.length === 0
+  const isLoading = !functionId || (isQueryEnabled && (isPending || isCountPending))
+  const hasNoErrors = !isLoading && !isError && !isCountError && rows.length === 0
 
   return (
     <PageSection>
@@ -150,10 +153,14 @@ export const EdgeFunctionRecentErrors = ({
                     <span className="text-foreground">
                       {getSinceLastDeployInvocationPhrase(invocationCount)}
                     </span>{' '}
-                    <span>since last deploy and no errors.</span>
+                    <span>
+                      {IS_PLATFORM
+                        ? 'since last deploy and no errors.'
+                        : 'since the last update and no errors.'}
+                    </span>
                   </>
                 ) : (
-                  'Runtime errors since the last deploy will appear here when this function returns a 5xx response.'
+                  'Request and runtime errors will appear here.'
                 )}
               </div>
             </div>
@@ -166,8 +173,8 @@ export const EdgeFunctionRecentErrors = ({
               rows={rows}
               isLoading={isLoading}
               isFetching={isFetching}
-              error={error}
-              isError={isError}
+              error={error ?? countError}
+              isError={isError || isCountError}
               onRowClick={handleOpenLog}
               skeletonRowCount={MAX_VISIBLE_ERRORS}
               columnPreferencesKey={EDGE_FUNCTION_LOGS_VIEW.columnPreferencesKey}

@@ -46,7 +46,7 @@ it('announces when function details load and copies the invoke URL', async () =>
 
   expect(await screen.findByRole('heading', { name: 'Send email' })).toBeVisible()
   expect(screen.getByRole('status')).toBe(status)
-  expect(status).toHaveTextContent('Send email details loaded. Last deployed')
+  expect(status).toHaveTextContent('Send email details loaded. Last updated')
   expect(screen.getByText('https://default.supabase.co/functions/v1/send-email')).toBeVisible()
 
   await user.click(screen.getByRole('button', { name: 'Copy function URL' }))

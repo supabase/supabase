@@ -10,6 +10,8 @@ import { serializeUnifiedLogsSearchParams } from '@/components/interfaces/Unifie
 import type { ChartIntervals } from '@/types'
 
 export type EdgeFunctionChartRawDatum = {
+  requests_count?: string | number
+  worker_count?: string | number
   timestamp: string | number
   success_count?: string | number
   redirect_count?: string | number
@@ -25,6 +27,8 @@ export type EdgeFunctionChartRawDatum = {
 }
 
 export type EdgeFunctionChartDatum = {
+  requests_count?: number
+  worker_count?: number
   timestamp: string
   success_count: number
   redirect_count: number
@@ -276,6 +280,8 @@ export const toEdgeFunctionChartData = (
   rows: EdgeFunctionChartRawDatum[] = []
 ): EdgeFunctionChartDatum[] =>
   rows.map((row) => ({
+    ...(row.requests_count !== undefined && { requests_count: toNumber(row.requests_count) }),
+    ...(row.worker_count !== undefined && { worker_count: toNumber(row.worker_count) }),
     timestamp: String(row.timestamp ?? ''),
     success_count: toNumber(row.success_count),
     redirect_count: toNumber(row.redirect_count),
@@ -310,19 +316,33 @@ export const getInvocationTotals = (data: InvocationChartDatum[]) => {
   }
 }
 
+const weightedMean = (
+  data: EdgeFunctionChartDatum[],
+  field: keyof EdgeFunctionChartDatum,
+  count: 'requests_count' | 'worker_count'
+) => {
+  if (!data.some((row) => row[count] !== undefined)) return meanBy(data, field) || 0
+  const samples = sumBy(data, (row) => row[count] ?? 0)
+  return samples ? sumBy(data, (row) => Number(row[field]) * (row[count] ?? 0)) / samples : 0
+}
+
 export const getExecutionMetrics = (data: EdgeFunctionChartDatum[]) => ({
-  averageExecutionTime: meanBy(data, 'avg_execution_time') ?? 0,
+  averageExecutionTime: weightedMean(data, 'avg_execution_time', 'requests_count'),
   maxExecutionTime: maxBy(data, 'max_execution_time')?.max_execution_time ?? 0,
 })
 
 export const getUsageMetrics = (data: EdgeFunctionChartDatum[]) => {
-  const totalHeapMemory = sumBy(data, 'avg_heap_memory_used')
-  const totalExternalMemory = sumBy(data, 'avg_external_memory_used')
+  const totalHeapMemory = data.some((row) => row.worker_count !== undefined)
+    ? weightedMean(data, 'avg_heap_memory_used', 'worker_count')
+    : sumBy(data, 'avg_heap_memory_used')
+  const totalExternalMemory = data.some((row) => row.worker_count !== undefined)
+    ? weightedMean(data, 'avg_external_memory_used', 'worker_count')
+    : sumBy(data, 'avg_external_memory_used')
 
   return {
-    averageCpuTime: meanBy(data, 'avg_cpu_time_used') ?? 0,
+    averageCpuTime: weightedMean(data, 'avg_cpu_time_used', 'worker_count'),
     maxCpuTime: maxBy(data, 'max_cpu_time_used')?.max_cpu_time_used ?? 0,
-    averageMemoryUsage: meanBy(data, 'avg_memory_used') ?? 0,
+    averageMemoryUsage: weightedMean(data, 'avg_memory_used', 'worker_count'),
     totalHeapMemory,
     totalExternalMemory,
     totalMemoryByType: totalHeapMemory + totalExternalMemory,

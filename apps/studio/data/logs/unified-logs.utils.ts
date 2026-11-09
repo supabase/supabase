@@ -24,7 +24,10 @@ export const unifiedLogsQueryRowSchema = z.object({
   log_count: z.number().nullable(),
   logs: z.array(z.unknown()).nullable(),
   auth_user: z.string().nullish(),
-  metadata: z.record(z.string(), z.unknown()).nullish(),
+  metadata: z.preprocess(
+    (value) => (Array.isArray(value) ? value[0] : value),
+    z.record(z.string(), z.unknown()).nullish()
+  ),
   pipeline_id: z.string().nullish(),
   pipeline_metadata: z.string().nullish(),
 })
@@ -95,7 +98,11 @@ export const mapUnifiedLogRow = (row: UnifiedLogsQueryRow) => {
       : row.metadata
     return { ...mappedRow, pipeline_id: row.pipeline_id ?? null, metadata: metadata ?? null }
   }
-  if (isComputeLog || row.log_type === 'edge function runtime') {
+  if (
+    isComputeLog ||
+    row.log_type === 'edge function runtime' ||
+    (row.log_type === 'edge function' && row.metadata)
+  ) {
     return { ...mappedRow, metadata: row.metadata ?? null }
   }
   return mappedRow

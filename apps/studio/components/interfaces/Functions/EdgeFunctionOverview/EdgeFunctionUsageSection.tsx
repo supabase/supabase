@@ -1,8 +1,10 @@
+import { IS_PLATFORM } from 'common'
 import { useMemo } from 'react'
 import { ChartMetric } from 'ui-patterns/Chart'
 import {
   PageSection,
   PageSectionContent,
+  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -57,12 +59,12 @@ export const EdgeFunctionUsageSection = ({
     <div className="flex flex-wrap gap-x-8 gap-y-4">
       <ChartMetric
         label="Average CPU Time"
-        value={formatMetric(averageCpuTime, 'ms')}
+        value={data.length === 0 || isError ? '–' : formatMetric(averageCpuTime, 'ms')}
         tooltip="Average CPU time usage for the function"
       />
       <ChartMetric
         label="Max CPU Time"
-        value={formatMetric(maxCpuTime, 'ms')}
+        value={data.length === 0 || isError ? '–' : formatMetric(maxCpuTime, 'ms')}
         tooltip="Maximum CPU time usage for the function"
       />
     </div>
@@ -71,17 +73,19 @@ export const EdgeFunctionUsageSection = ({
     <div className="flex flex-wrap gap-x-8 gap-y-4">
       <ChartMetric
         label="Average Memory Usage"
-        value={formatMetric(averageMemoryUsage, 'MB')}
+        value={data.length === 0 || isError ? '–' : formatMetric(averageMemoryUsage, 'MB')}
         tooltip="Average memory usage for the function"
       />
       <ChartMetric
         label="Heap"
-        value={formatRate(totalHeapMemory, totalMemoryByType)}
+        value={data.length === 0 || isError ? '–' : formatRate(totalHeapMemory, totalMemoryByType)}
         tooltip="Share of memory attributed to heap usage over the selected interval"
       />
       <ChartMetric
         label="External"
-        value={formatRate(totalExternalMemory, totalMemoryByType)}
+        value={
+          data.length === 0 || isError ? '–' : formatRate(totalExternalMemory, totalMemoryByType)
+        }
         tooltip="Share of memory attributed to external usage over the selected interval"
       />
     </div>
@@ -92,6 +96,12 @@ export const EdgeFunctionUsageSection = ({
       <PageSectionMeta>
         <PageSectionSummary>
           <PageSectionTitle>Usage</PageSectionTitle>
+          {!IS_PLATFORM && (
+            <PageSectionDescription>
+              CPU and memory measured when workers shut down, across all requests served by each
+              worker.
+            </PageSectionDescription>
+          )}
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
