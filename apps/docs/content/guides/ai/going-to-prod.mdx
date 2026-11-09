@@ -100,7 +100,7 @@ First, a few generic tips which you can pick and choose from:
 
 1. Decide if you are going to use indexes or not. You can skip the rest of this guide if you do not use indexes.
 2. Over-provision RAM during preparation. You can scale down in step `5`, but it's better to start with a larger size to get the best results for RAM requirements. (We'd recommend at least 8XL if you're using Supabase.)
-3. Upload your data to the database. If you use the [`vecs`](/docs/guides/ai/python/api) library, it will automatically generate an index with default parameters.
+3. Upload your data to the database. If you use the [`vecs`](/docs/guides/ai/python-clients#vecs) library, it will automatically generate an index with default parameters.
 4. Run a benchmark using randomly generated queries and observe the results. Again, you can use the `vecs` library with the `ann-benchmarks` tool. Do it with default values for index build parameters, you can later adjust them to get the best results.
 5. Monitor the RAM usage, and save it as a note for yourself. You would likely want to use a compute add-on in the future that has the same amount of RAM that was used at the moment (both actual RAM usage and RAM used for cache and buffers).
 6. Scale down your compute add-on to the one that would have the same amount of RAM used at the moment.

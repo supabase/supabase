@@ -18,3 +18,27 @@ Copy the URI from the **Shared pooler** option.
 </Admonition>
 
 For production python applications with version controlled migrations, we recommend adding first class vector support to your toolchain by [registering the vector type with your ORM](https://github.com/pgvector/pgvector-python). pgvector provides bindings for the most commonly used SQL drivers/libraries including Django, SQLAlchemy, SQLModel, psycopg, asyncpg and Peewee.
+
+## Vecs
+
+Use vecs, the Supabase Python client, to create, index, and query pgvector collections in Postgres. Find the vecs API, concepts, and integration guides.'
+
+[Vecs](https://github.com/supabase/vecs) is a Python client library for managing and querying vector stores in Postgres with the [pgvector extension](https://github.com/pgvector/pgvector). It creates its own schema, so it can live alongside your existing relational data.
+
+With vecs, you can:
+
+- Create collections to store and update vectors.
+- Query vectors by cosine distance, L2 distance, L1 distance, or max inner product.
+- Attach metadata to each vector and filter queries on it.
+
+Install vecs with pip:
+
+```sh
+pip install vecs
+```
+
+## Documentation
+
+The vecs docs are maintained in the [`supabase/vecs`](https://github.com/supabase/vecs) repository.
+
+<FederatedContentListing id="python" type="grid" columns={2} />

@@ -27,6 +27,7 @@ import { ContentListings } from './markdown-schema/ContentListings'
 import { CustomContent } from './markdown-schema/CustomContent'
 import { DatabaseAdvisorsIndex } from './markdown-schema/DatabaseAdvisorsIndex'
 import { ErrorCodes } from './markdown-schema/ErrorCodes'
+import { FederatedContentListing } from './markdown-schema/FederatedContentListing'
 import { IconCheck, IconX } from './markdown-schema/Icons'
 import { Image } from './markdown-schema/Image'
 import { Link } from './markdown-schema/Link'
@@ -206,6 +207,7 @@ const SCHEMA: ComponentSchema = {
   TabPanel,
   MetricsStackCards,
   ContentListings,
+  FederatedContentListing,
   NavData,
   SharedData,
   TerraformProviderSchema,

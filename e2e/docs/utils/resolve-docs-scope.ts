@@ -6,7 +6,6 @@ import { normalizeRepoPath } from '../../shared/paths.ts'
 export const FEDERATED_SECTIONS = [
   'graphql',
   'database/extensions/wrappers',
-  'ai/python',
   'deployment/terraform',
   'deployment/ci',
 ] as const

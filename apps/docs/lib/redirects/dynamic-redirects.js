@@ -89,6 +89,13 @@ export const dynamicRedirects = [
     source: '/docs/guides/getting-started/ai-prompts/:slug',
     destination: '/docs/guides/ai-tools/ai-prompts/:slug',
   },
+  // The vecs pages are now listed on the Python client page and link out to the vecs docs site.
+  {
+    basePath: false,
+    permanent: true,
+    source: '/docs/guides/ai/python/:slug',
+    destination: '/docs/guides/ai/python-clients',
+  },
   // Troubleshooting guides keep their slug on KB, hash suffix included (e.g. `foo-94a76b`,
   // `foo-KnozmQ`), so this is slug to slug. Guides whose KB slug differs are static entries.
   {
