@@ -27,7 +27,7 @@ describe('useOnboardingSurveyVariant', () => {
     const { result } = renderHook(() => useOnboardingSurveyVariant())
 
     expect(result.current.variant).toBe(arm)
-    expect(mockTrackExperimentExposure).toHaveBeenCalledWith('onboardingSurveyPlacement', arm)
+    expect(mockTrackExperimentExposure).toHaveBeenCalledWith('onboarding_survey_placement', arm)
   })
 
   it.each(['org_form_collapsed', 'org_form_expanded', 'dialog', 'toast', false, undefined])(
@@ -39,7 +39,7 @@ describe('useOnboardingSurveyVariant', () => {
 
       expect(result.current.variant).toBeUndefined()
       expect(mockTrackExperimentExposure).toHaveBeenCalledWith(
-        'onboardingSurveyPlacement',
+        'onboarding_survey_placement',
         undefined
       )
     }

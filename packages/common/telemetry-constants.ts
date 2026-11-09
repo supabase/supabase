@@ -32,17 +32,6 @@ export type TableEventAction = (typeof TABLE_EVENT_ACTIONS)[keyof typeof TABLE_E
 export const TABLE_EVENT_VALUES: TableEventAction[] = Object.values(TABLE_EVENT_ACTIONS)
 
 /**
- * Maps PostHog flag key → exposure event-name base. Emitted event becomes
- * `${value}_experiment_exposed`. Snake_case the value for new experiments;
- * legacy camelCase values are kept to avoid breaking saved insights.
- */
-export const EXPERIMENTS = {
-  onboardingSurveyPlacement: 'onboarding_survey_placement',
-} as const
-
-export type ExperimentKey = keyof typeof EXPERIMENTS
-
-/**
  * Triggered when a user signs up. When signing up with Email and Password, this is only triggered once user confirms their email.
  *
  * @group Events
@@ -567,7 +556,7 @@ export interface OnboardingSurveyDismissedEvent {
   action: 'onboarding_survey_dismissed'
   properties: {
     surface: OnboardingSurveySurface
-    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed'
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired'
   }
   groups: Partial<TelemetryGroups>
 }
