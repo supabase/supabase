@@ -27,6 +27,7 @@ import {
 import { TelemetryEvent } from './telemetry-constants'
 import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
+import { setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -67,6 +68,7 @@ export const TelemetryTagManager = () => {
 
 export const PageTelemetry = ({
   API_URL,
+  platform,
   hasAcceptedConsent,
   enabled = true,
   organizationSlug,
@@ -74,6 +76,7 @@ export const PageTelemetry = ({
   sessionReplay,
 }: {
   API_URL: string
+  platform: TelemetryPlatform
   hasAcceptedConsent: boolean
   enabled?: boolean
   organizationSlug?: string
@@ -81,6 +84,8 @@ export const PageTelemetry = ({
   /** Masking policy for session replay. Omit to disable recording. */
   sessionReplay?: SessionRecordingOptions
 }) => {
+  setTelemetryPlatform(platform)
+
   const router = useRouter()
 
   const pagesPathname = router?.pathname

@@ -38,13 +38,15 @@ export const General = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: project?.parent_project_ref,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({
-      projectRef: project?.parent_project_ref,
-      grant: branchesGrant.grant,
-    }),
-    enabled: isBranch,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      {
+        projectRef: project?.parent_project_ref,
+        grant: branchesGrant.grant,
+      },
+      { enabled: isBranch }
+    )
+  )
   const branch = branches?.find((x) => x.project_ref === ref)
   const projectName = isBranch ? branch?.name : project?.name
 

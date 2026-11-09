@@ -53,6 +53,8 @@ Specific traps to watch for. One-liner per item.
   destinations. Don't construct `<a>` directly.
 - A `useSendTelemetryEvent()` call inside a render path returns a function;
   don't invoke it directly inside the JSX, build a callback first.
+- `$Show` reads static `enabled-features` flags only. It cannot read PostHog
+  flags. See [feature-flags.md](./feature-flags.md).
 
 ## Data modules
 

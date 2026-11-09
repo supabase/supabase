@@ -39,12 +39,12 @@ export const MergeTitle = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { refetchOnMount: 'always', refetchOnWindowFocus: true, staleTime: 0 }
+    )
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
 
@@ -83,12 +83,12 @@ export const MergeSubtitle = () => {
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { refetchOnMount: 'always', refetchOnWindowFocus: true, staleTime: 0 }
+    )
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
 
   const subtitle = useMemo(() => {
@@ -147,12 +147,12 @@ export const MergeActions = ({
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', {
     projectRef: parentProjectRef,
   })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef: parentProjectRef, grant: branchesGrant.grant }),
-    refetchOnMount: 'always',
-    refetchOnWindowFocus: true,
-    staleTime: 0,
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef: parentProjectRef, grant: branchesGrant.grant },
+      { refetchOnMount: 'always', refetchOnWindowFocus: true, staleTime: 0 }
+    )
+  )
   const currentBranch = branches?.find((branch) => branch.project_ref === ref)
   const mainBranch = branches?.find((branch) => branch.is_default)
   const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {

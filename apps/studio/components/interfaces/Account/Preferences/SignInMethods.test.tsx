@@ -3,7 +3,7 @@ import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { AccountIdentities } from './AccountIdentities'
+import { SignInMethods } from './SignInMethods'
 import { BASE_PATH } from '@/lib/constants'
 import { customRender } from '@/tests/lib/custom-render'
 import { mswServer } from '@/tests/lib/msw'
@@ -26,7 +26,7 @@ vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
   return {
     ...actual,
-    useParams: () => ({ ref: 'default' }),
+    useParams: () => ({}),
     useFlag: useFlagMock,
   }
 })
@@ -87,14 +87,14 @@ const mockGetUser = (identities: IdentityFixture[]) => {
   })
 }
 
-const renderAccountIdentities = () => {
+const renderSignInMethods = (searchParams = '') => {
   mswServer.use(
     http.get(`${BASE_PATH}/api/enabled-features-overrides`, () =>
       HttpResponse.json({ disabled_features: [] })
     )
   )
 
-  return customRender(<AccountIdentities />)
+  return customRender(<SignInMethods />, { nuqs: { searchParams } })
 }
 
 const openAddPasswordDialog = async () => {
@@ -104,7 +104,7 @@ const openAddPasswordDialog = async () => {
   return await screen.findByRole('dialog')
 }
 
-describe('AccountIdentities', () => {
+describe('SignInMethods', () => {
   beforeEach(() => {
     refreshSessionMock.mockResolvedValue({ data: {}, error: null })
     signOutMock.mockResolvedValue({ error: null })
@@ -114,17 +114,49 @@ describe('AccountIdentities', () => {
   it('offers to add a password when the user only has OAuth identities', async () => {
     mockGetUser([githubIdentity])
 
-    renderAccountIdentities()
+    renderSignInMethods()
 
     expect(await screen.findByRole('button', { name: 'Add password' })).toBeInTheDocument()
-    expect(screen.getByText('Email')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(
+      screen.getByText(
+        `Use ${EMAIL} and a password as another way to sign in if you lose access to GitHub.`
+      )
+    ).toBeInTheDocument()
     expect(screen.queryByRole('link', { name: 'Change password' })).not.toBeInTheDocument()
+  })
+
+  it('keeps multiple OAuth methods without claiming an email sign-in method exists', async () => {
+    mockGetUser([
+      githubIdentity,
+      { ...githubIdentity, identity_id: 'other-id', provider: 'google' },
+    ])
+
+    renderSignInMethods()
+
+    expect(await screen.findByText('google')).toBeInTheDocument()
+    expect(screen.getByText('GitHub')).toBeInTheDocument()
+    expect(screen.queryByText('Email')).not.toBeInTheDocument()
+    expect(screen.getByText(`Add a password to sign in with ${EMAIL}.`)).toBeInTheDocument()
+    expect(screen.getAllByRole('button', { name: 'Add password' })).toHaveLength(1)
+  })
+
+  it('shows a query error instead of offering password setup without account data', async () => {
+    getUserMock.mockResolvedValue({
+      data: { user: null },
+      error: { message: 'Account unavailable' },
+    })
+
+    renderSignInMethods()
+
+    expect(await screen.findByText('Failed to retrieve sign-in methods')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
   it('does not offer to add a password when an email identity exists', async () => {
     mockGetUser([githubIdentity, emailIdentity])
 
-    renderAccountIdentities()
+    renderSignInMethods()
 
     expect(await screen.findByRole('link', { name: 'Change password' })).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
@@ -134,7 +166,7 @@ describe('AccountIdentities', () => {
     useFlagMock.mockReturnValue(false)
     mockGetUser([githubIdentity])
 
-    renderAccountIdentities()
+    renderSignInMethods()
 
     expect(await screen.findByText('GitHub')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
@@ -144,9 +176,10 @@ describe('AccountIdentities', () => {
   it('does not offer to add a password to SSO users', async () => {
     mockGetUser([ssoIdentity])
 
-    renderAccountIdentities()
+    renderSignInMethods()
 
     expect(await screen.findByText('SSO')).toBeInTheDocument()
+    expect(screen.getByText('Your organization manages how you sign in.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
 
@@ -159,7 +192,7 @@ describe('AccountIdentities', () => {
       return { data: { user: { id: 'user-id', email: EMAIL } }, error: null }
     })
 
-    renderAccountIdentities()
+    renderSignInMethods()
     const dialog = await openAddPasswordDialog()
 
     const emailInput = within(dialog).getByLabelText('Email')
@@ -186,7 +219,7 @@ describe('AccountIdentities', () => {
       error: { message: 'Password update failed' },
     })
 
-    renderAccountIdentities()
+    renderSignInMethods()
     const dialog = await openAddPasswordDialog()
 
     fireEvent.change(within(dialog).getByPlaceholderText('••••••••'), {
@@ -202,7 +235,7 @@ describe('AccountIdentities', () => {
   it('does not submit a password that fails validation', async () => {
     mockGetUser([githubIdentity])
 
-    renderAccountIdentities()
+    renderSignInMethods()
     const dialog = await openAddPasswordDialog()
 
     fireEvent.change(within(dialog).getByPlaceholderText('••••••••'), { target: { value: 'weak' } })
@@ -214,5 +247,12 @@ describe('AccountIdentities', () => {
       )
     ).toBeInTheDocument()
     expect(updateUserMock).not.toHaveBeenCalled()
+  })
+  it('opens password setup from a deep link and closes on cancel', async () => {
+    mockGetUser([githubIdentity])
+    renderSignInMethods('?securityAction=set-password&keep=yes')
+    expect(await screen.findByRole('dialog')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
   })
 })

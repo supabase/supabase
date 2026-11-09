@@ -3,8 +3,9 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { sendTelemetryEvent } from './telemetry'
 import { buildTelemetryEventRequest } from './telemetry-event'
 
-const { consent, post } = vi.hoisted(() => ({
+const { consent, platform, post } = vi.hoisted(() => ({
   consent: { value: true },
+  platform: { value: undefined as string | undefined },
   post: vi.fn(() => Promise.resolve()),
 }))
 
@@ -15,6 +16,7 @@ vi.mock('./consent-state', () => ({
 vi.mock('./telemetry-utils', () => ({
   getSharedTelemetryData: () => ({ page_title: 'Page' }),
   getTelemetryCookieOptions: () => ({}),
+  getTelemetryPlatform: () => platform.value,
 }))
 vi.mock('./fetchWrappers', () => ({ post }))
 vi.mock('./auth', () => ({ useUser: () => null }))
@@ -23,6 +25,7 @@ const API_URL = 'https://api.example.com'
 
 beforeEach(() => {
   consent.value = true
+  platform.value = undefined
   post.mockClear()
 })
 
@@ -75,6 +78,19 @@ describe('buildTelemetryEventRequest', () => {
     expect(click?.url).toBe('https://api.example.com/platform/telemetry/event')
     expect(click?.keepalive).toBe(true)
     expect(submit?.keepalive).toBe(false)
+  })
+
+  it("adds the app's platform to custom_properties only once it is set", () => {
+    const event = {
+      action: 'kb_search_submitted',
+      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+    } as const
+    const unset = buildTelemetryEventRequest(API_URL, event)
+    platform.value = 'kb'
+    const set = buildTelemetryEventRequest(API_URL, event)
+
+    expect(unset?.body.custom_properties).toStrictEqual(event.properties)
+    expect(set?.body.custom_properties).toStrictEqual({ ...event.properties, platform: 'kb' })
   })
 })
 

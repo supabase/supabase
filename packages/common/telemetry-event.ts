@@ -3,7 +3,7 @@ import type { components } from 'api-types'
 import { hasConsented } from './consent-state'
 import { ensurePlatformSuffix } from './helpers'
 import type { TelemetryEvent } from './telemetry-constants'
-import { getSharedTelemetryData } from './telemetry-utils'
+import { getSharedTelemetryData, getTelemetryPlatform } from './telemetry-utils'
 
 type EventBody = components['schemas']['TelemetryEventBodyV2']
 
@@ -24,10 +24,14 @@ export function buildTelemetryEventRequest(
 ) {
   if (!hasConsented()) return null
 
+  const platform = getTelemetryPlatform()
   const body: EventBody = {
     ...getSharedTelemetryData(pathname),
     action: event.action,
-    custom_properties: 'properties' in event ? event.properties : {},
+    custom_properties: {
+      ...('properties' in event ? event.properties : {}),
+      ...(platform && { platform }),
+    },
     groups: 'groups' in event ? { ...event.groups } : {},
   }
 

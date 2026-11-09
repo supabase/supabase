@@ -12,7 +12,6 @@ import {
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -21,12 +20,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { AccountConnections } from '@/components/interfaces/Account/Preferences/AccountConnections'
 import { AccountDeletion } from '@/components/interfaces/Account/Preferences/AccountDeletion'
-import { AccountIdentities } from '@/components/interfaces/Account/Preferences/AccountIdentities'
 import { AnalyticsSettings } from '@/components/interfaces/Account/Preferences/AnalyticsSettings'
 import { DashboardSettings } from '@/components/interfaces/Account/Preferences/DashboardSettings'
 import { HotkeySettings } from '@/components/interfaces/Account/Preferences/HotkeySettings'
 import { LanguageSettings } from '@/components/interfaces/Account/Preferences/LanguageSettings'
 import { ProfileInformation } from '@/components/interfaces/Account/Preferences/ProfileInformation'
+import { parseRedirectMessage } from '@/components/interfaces/Account/Preferences/SignInMethods.utils'
 import { ThemeSettings } from '@/components/interfaces/Account/Preferences/ThemeSettings'
 import { TimezoneSettings } from '@/components/interfaces/Account/Preferences/TimezoneSettings'
 import AccountLayout from '@/components/layouts/AccountLayout/AccountLayout'
@@ -69,7 +68,7 @@ const PreferencesPageHeader = ({ description }: { description: string }) => {
 }
 
 const PlatformPreferences = () => {
-  const router = useRouter()
+  const { asPath, query, replace } = useRouter()
   const { t } = useTranslation()
 
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
@@ -81,11 +80,18 @@ const PlatformPreferences = () => {
   const { error, isLoading, isError } = useProfile()
 
   useEffect(() => {
-    const hash = router.asPath.split('#')[1]
+    const hash = asPath.split('#')[1]
+    const isEmailConfirmation = !!parseRedirectMessage(asPath)
+    // Email-change links already sent still return to Preferences (account/me).
+    // Now that sign-in methods are in Security, we need to redirect them there instead.
+    if (isEmailConfirmation) {
+      void replace({ pathname: '/account/security', query, hash })
+      return
+    }
     if (isLoading || !hash) return
 
     document.getElementById(hash)?.scrollIntoView({ block: 'start' })
-  }, [isLoading, router.asPath])
+  }, [asPath, isLoading, query, replace])
 
   return (
     <>
@@ -101,14 +107,9 @@ const PlatformPreferences = () => {
 
         {!isError && (
           <>
-            {isLoading ? (
-              <ProfileLoadingSections showProfileInformation={profileShowInformation} />
-            ) : (
-              <>
-                {profileShowInformation ? <ProfileInformation /> : null}
-                <AccountIdentities />
-              </>
-            )}
+            {profileShowInformation && isLoading && <ProfileLoadingSections />}
+
+            {profileShowInformation && !isLoading && <ProfileInformation />}
 
             <AccountConnections />
 
@@ -132,59 +133,33 @@ const PlatformPreferences = () => {
   )
 }
 
-const ProfileLoadingSections = ({
-  showProfileInformation,
-}: {
-  showProfileInformation: boolean
-}) => (
-  <>
-    {showProfileInformation && (
-      <PageSection>
-        <PageSectionMeta>
-          <PageSectionSummary>
-            <PageSectionTitle>Profile information</PageSectionTitle>
-          </PageSectionSummary>
-        </PageSectionMeta>
-        <PageSectionContent>
-          <Card>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-24" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-20" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-28" descriptionWidth="w-48" />
-            </CardContent>
-            <CardContent>
-              <ProfileFieldLoadingRow labelWidth="w-20" descriptionWidth="w-40" />
-            </CardContent>
-            <CardFooter className="justify-end">
-              <ShimmeringLoader className="h-8 w-16 rounded-md py-0" />
-            </CardFooter>
-          </Card>
-        </PageSectionContent>
-      </PageSection>
-    )}
-
-    <PageSection>
-      <PageSectionMeta>
-        <PageSectionSummary>
-          <PageSectionTitle>Sign-in methods</PageSectionTitle>
-          <PageSectionDescription>
-            Manage the providers linked to your Supabase account and update their details.
-          </PageSectionDescription>
-        </PageSectionSummary>
-      </PageSectionMeta>
-      <PageSectionContent>
-        <Card>
-          <CardContent>
-            <ShimmeringLoader />
-          </CardContent>
-        </Card>
-      </PageSectionContent>
-    </PageSection>
-  </>
+const ProfileLoadingSections = () => (
+  <PageSection>
+    <PageSectionMeta>
+      <PageSectionSummary>
+        <PageSectionTitle>Profile information</PageSectionTitle>
+      </PageSectionSummary>
+    </PageSectionMeta>
+    <PageSectionContent>
+      <Card>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-24" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-20" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-28" descriptionWidth="w-48" />
+        </CardContent>
+        <CardContent>
+          <ProfileFieldLoadingRow labelWidth="w-20" descriptionWidth="w-40" />
+        </CardContent>
+        <CardFooter className="justify-end">
+          <ShimmeringLoader className="h-8 w-16 rounded-md py-0" />
+        </CardFooter>
+      </Card>
+    </PageSectionContent>
+  </PageSection>
 )
 
 const ProfileFieldLoadingRow = ({

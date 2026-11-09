@@ -211,7 +211,7 @@ pipelines").
 Wraps the app with:
 
 - `QueryClientProvider` (React Query)
-- `FeatureFlagProvider`, `ThemeProvider` from `common`
+- `FeatureFlagProvider` (see [feature-flags.md](./feature-flags.md)), `ThemeProvider` from `common`
 - `TooltipProvider` from `ui`
 - `DevToolbar` from `dev-tools`
 - `DocsCommandProvider` / `DocsCommandMenu`
