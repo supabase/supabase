@@ -28,6 +28,7 @@ import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-code
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
+  const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
   const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
@@ -128,7 +129,8 @@ export const TOTPFactors = () => {
                       <ButtonTooltip
                         size="tiny"
                         onClick={() => setFactorToBeDeleted(factor.id)}
-                        disabled={disableDeleteFactor}
+                        loading={isCheckingIdentity && factorToBeDeleted === factor.id}
+                        disabled={disableDeleteFactor || isCheckingIdentity}
                         tooltip={{
                           content: {
                             side: 'top',
@@ -225,6 +227,7 @@ export const TOTPFactors = () => {
       />
 
       <DeleteFactorModal
+        onCheckingIdentity={setIsCheckingIdentity}
         visible={factorToBeDeleted !== null}
         factorId={factorToBeDeleted}
         canRemove={!disableDeleteFactor}
