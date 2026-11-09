@@ -199,7 +199,7 @@ jobs:
 - Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which might leave migrations partially applied.
 - The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so the `ref` input keeps the last run on your most recent commit.
 - If the integration's **Working directory** isn't `.`, set `defaults.run.working-directory` on the `deploy` job to the same path.
-- If a `[remotes]` block names your production project, the integration applies its configuration on each push. To keep that behavior, add a `supabase config push --remote=${{ vars.PROJECT_REF }} --yes` step before `supabase db push`.
+- If a `[remotes]` block names your production project, the integration applies its configuration on each push. To keep that behavior, add a `supabase config push --remote=${{ vars.PROJECT_REF }} --yes` step before `supabase db push`. Before you add the step, run `SUPABASE_ENV=production supabase config diff --remote=<project-ref>` to review the values that `config push` sends.
 - `supabase functions deploy` deploys every function directory in `supabase/functions`, including functions that `config.toml` doesn't declare. It doesn't save the secrets under `[edge_runtime.secrets]`, so set those with `supabase secrets set`.
 - If `config.toml` declares Storage buckets, add a `supabase seed buckets --remote=${{ vars.PROJECT_REF }} --yes` step. With `--yes`, the command also uploads the files in each bucket's `objects_path` and overwrites objects already in the bucket.
 
