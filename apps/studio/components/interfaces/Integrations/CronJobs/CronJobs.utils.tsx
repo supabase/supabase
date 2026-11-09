@@ -28,10 +28,8 @@ const unwrapSqlLiteral = (token: string) => {
 }
 
 /**
- * Splits a parenthesized SQL argument list into its raw top-level arguments, honoring
- * single-quoted SQL string literals (with '' escapes) and nested parentheses. `start` is
- * the index just after the opening parenthesis. Returns the arguments and the index of
- * the matching closing parenthesis, or `undefined` when the parentheses are unbalanced.
+ * Splits a SQL argument list starting after its `(`, respecting quotes and nested parentheses.
+ * Returns the raw arguments and the index of the closing `)`, or undefined if unbalanced.
  */
 const splitSqlArgs = (sql: string, start: number) => {
   const args: string[] = []
@@ -82,17 +80,10 @@ const splitSqlArgs = (sql: string, start: number) => {
   return { args, end: i }
 }
 
-/**
- * Splits the argument list of a `jsonb_build_object(...)` call into its individual
- * values. A naive split on ',' corrupts a header name or value that legitimately
- * contains a comma or parenthesis, which then gets persisted on save and no longer
- * matches what the user entered.
- */
 const parseJsonBuildObjectArgs = (command: string) => {
   const match = command.match(/headers:=jsonb_build_object\s*\(/i)
   if (!match || match.index === undefined) return []
 
-  // Unbalanced parentheses: bail rather than emit mangled fragments.
   const result = splitSqlArgs(command, match.index + match[0].length)
   return result ? result.args.map(unwrapSqlLiteral) : []
 }
@@ -104,18 +95,11 @@ const isJsonBuildObjectOfLiterals = (value: string) => {
   const match = value.match(/^jsonb_build_object\s*\(/i)
   if (!match) return false
   const result = splitSqlArgs(value, match[0].length)
-  // The call has to be the whole value: `jsonb_build_object(...) || ...` is an expression the form can't hold
   if (!result || value.slice(result.end + 1).trim().length > 0) return false
   return result.args.every((arg) => SQL_STRING_LITERAL.test(arg.trim()))
 }
 
-/**
- * Whether a `net.http_get` / `net.http_post` command can be edited through the HTTP form
- * without losing anything. The form rebuilds the command from its fields, so any argument
- * it can't represent (a SQL expression such as a Vault lookup or `||` concatenation, an
- * unknown argument, or extra statements) would be silently dropped or turned into a string.
- * Such commands are edited as a SQL snippet instead.
- */
+// The HTTP form rebuilds the command from its fields, so anything else is edited as a SQL snippet
 const isFormRepresentableHttpCommand = (command: string) => {
   const match = command.match(/^select\s+net\.(http_get|http_post)\s*\(/i)
   if (!match) return false
