@@ -20,7 +20,7 @@ type StartYourProjectButtonProps = {
 export function StartYourProjectButton({
   children = 'Start your project',
   onClick,
-  buttonLocation,
+  buttonLocation = 'no location set',
   size = 'medium',
   variant,
   className,
@@ -34,12 +34,10 @@ export function StartYourProjectButton({
         href={getDashboardCtaHref(isLoggedIn)}
         onClick={(event) => {
           onClick?.(event)
-          if (buttonLocation) {
-            sendTelemetryEvent({
-              action: 'start_project_button_clicked',
-              properties: { buttonLocation },
-            })
-          }
+          sendTelemetryEvent({
+            action: 'start_project_button_clicked',
+            properties: { buttonLocation },
+          })
         }}
       >
         {children}
