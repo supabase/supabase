@@ -162,7 +162,7 @@ To deploy one commit at a time, deploy your production branch from a GitHub Acti
 1. In **Project Settings** > [**Integrations**](/dashboard/project/_/settings/integrations), turn off **Deploy to production**. Preview branches keep working.
 2. In your GitHub repository, add your [personal access token](/docs/guides/platform/personal-access-tokens) and database password as repository secrets named `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
 3. Add your project ref as a repository variable named `PROJECT_REF`.
-4. Add the following workflow to your repository:
+4. Add the following workflow to your repository. If your production branch tracks a Git branch other than `main`, replace `main` with that branch.
 
 ```yaml name=.github/workflows/deploy-production.yaml
 name: Deploy to production
@@ -198,6 +198,8 @@ jobs:
 
 - Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which might leave migrations partially applied.
 - The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so the `ref` input keeps the last run on your most recent commit.
+- If the integration's **Working directory** isn't `.`, set `defaults.run.working-directory` on the `deploy` job to the same path.
+- If a `[remotes]` block names your production project, the integration applied its configuration. To keep applying it, add a `supabase config push --remote=${{ vars.PROJECT_REF }} --yes` step before `supabase db push`.
 - `supabase functions deploy` deploys every function directory in `supabase/functions`, including functions that `config.toml` doesn't declare. It doesn't save the secrets under `[edge_runtime.secrets]`, so set those with `supabase secrets set`.
 - If `config.toml` declares Storage buckets, add a `supabase seed buckets --remote=${{ vars.PROJECT_REF }} --yes` step. With `--yes`, the command also uploads the files in each bucket's `objects_path` and overwrites existing objects.
 
