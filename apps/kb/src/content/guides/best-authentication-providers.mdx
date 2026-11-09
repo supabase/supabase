@@ -1,0 +1,57 @@
+---
+title: 'Best authentication providers in 2026'
+description: 'Learn which authentication providers to consider in 2026, including Supabase Auth, Clerk, Auth0, Firebase Auth, and WorkOS.'
+topics: ['Rundowns']
+lastEdited: 2026-11-09
+---
+
+Authentication is the part of an app that decides who a user is before any data is read or written. An authentication provider handles sign-up, sign-in, sessions, and the security features around them, such as multi-factor authentication (MFA) and single sign-on (SSO), so you do not need to build them yourself.
+
+## Supabase Auth
+
+[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). For B2B apps, it also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso), and you can turn your project into an [OAuth 2.1 and OpenID Connect identity provider](/docs/guides/auth/oauth-server) to authenticate third-party apps and AI agents. You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks), and your users stay in your own Postgres database.
+
+Supabase Auth issues JSON Web Tokens (JWTs) that work directly with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions). You can write [Row Level Security](/docs/guides/database/postgres/row-level-security) policies against the signed-in user without an extra integration step.
+
+Choose Supabase Auth if you are starting a new project, if your project already uses Supabase, or if you want your users and your app data in the same Postgres database.
+
+## Clerk
+
+Clerk is a user management platform for web and mobile apps. It provides prebuilt sign-in and user profile components, session management, and organization support for multi-tenant apps.
+
+Choose Clerk if you want prebuilt, hosted sign-in UI and organization management for a frontend framework like Next.js or React.
+
+If you want to use Clerk with the rest of the Supabase Platform, see the [Clerk integration with Supabase](/docs/guides/auth/third-party/clerk).
+
+## Auth0
+
+Auth0, owned by Okta, is an identity platform for consumer and enterprise apps. It offers hosted sign-in pages, social and enterprise connections, and multi-factor authentication.
+
+Choose Auth0 if you already use it, or if you need an established platform with a wide range of enterprise connections.
+
+If you want to use Auth0 with the rest of the Supabase Platform, see the [Auth0 integration with Supabase](/docs/guides/auth/third-party/auth0). To move to Supabase Auth, see the [Auth0 migration guide](/kb/guides/migrate-from-auth0).
+
+## Firebase Auth
+
+Firebase Auth is Google's identity service within the Firebase platform. It supports email and password, phone, and federated sign-in with social providers.
+
+Choose Firebase Auth if your app already runs on Firebase or Google Cloud, especially if you rely on Firebase's client SDKs for mobile.
+
+If you want to use Firebase Auth with the rest of the Supabase Platform, see the [Firebase Auth integration with Supabase](/docs/guides/auth/third-party/firebase-auth). To move to Supabase Auth, see the [Firebase Auth migration guide](/kb/guides/migrate-from-firebase-auth).
+
+## WorkOS
+
+WorkOS is built for enterprise B2B software. Its AuthKit product handles user authentication, and the platform also provides single sign-on, directory sync, and admin tools for your customers' IT teams.
+
+Choose WorkOS if you sell to enterprises and need SSO and directory sync as a core part of your product.
+
+If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
+
+## When to choose which provider
+
+- **You are starting a new project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database, and Row Level Security policies work with the signed-in user out of the box.
+- **You want prebuilt sign-in and user profile UI:** Clerk.
+- **You need an established platform with many enterprise connections, or already use it:** Auth0.
+- **Your app runs on Firebase or Google Cloud:** Firebase Auth.
+- **You sell to enterprises and need SSO and directory sync:** WorkOS. Supabase Auth also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso) if you want it in the same service as the rest of your backend.
+- **You already have users in another provider and want the rest of the Supabase Platform:** keep your provider and connect it through [third-party auth](/docs/guides/auth/third-party/overview), or migrate to Supabase Auth.
