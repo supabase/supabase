@@ -8,7 +8,6 @@ import { Markdown } from '../Markdown'
 import { formatIssueResource, sortAffected } from './Issues.utils'
 import type { Issue, IssueAffectedResource } from '@/data/issues/issue.types'
 
-// Enough to see the shape of a long list without pushing everything else off the page
 const COLLAPSED_ROW_COUNT = 5
 
 const AffectedResourceFix = ({ affected }: { affected: IssueAffectedResource }) => {
@@ -29,7 +28,6 @@ const AffectedResourceFix = ({ affected }: { affected: IssueAffectedResource }) 
 
 const AffectedResourceRow = ({ affected }: { affected: IssueAffectedResource }) => (
   <TableRow>
-    {/* Names stay on one line; a narrow screen scrolls the table instead */}
     <TableCell className="whitespace-nowrap align-top text-foreground">
       {formatIssueResource(affected.resource)}
     </TableCell>
@@ -83,7 +81,6 @@ const AffectedResourceTable = ({ issue }: { issue: Issue }) => {
   )
 }
 
-/** Every resource the issue is failing on, each with what's wrong and how to fix it. */
 export const IssueAffectedResources = ({ issue }: { issue: Issue }) => {
   if (issue.affected.length === 0) return null
   return <AffectedResourceTable issue={issue} />
