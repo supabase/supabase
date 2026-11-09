@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useForm, useWatch } from 'react-hook-form'
 import {
   Button,
+  cn,
   Dialog,
   DialogContent,
   DialogFooter,
@@ -31,6 +32,7 @@ import {
 import { canPlanDeployAccess, canPlanDeploySize } from './Compute.limits'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize, generateComputeInstanceName } from './Compute.utils'
+import { buildCapacityNotice, formatCliNotice } from './computeCliMessages'
 import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
 import { getComputeCapacity } from './ComputeUsage.utils'
 import { RuntimeBadge } from './RuntimeBadge'
@@ -99,6 +101,18 @@ export const DeployComputeInstanceDialog = ({
   // The cap is enforced by the API, not here — this dialog only writes a CLI snippet. Stating
   // the headroom up front is the difference between planning around the cap and discovering it
   // from a 403.
+  // The same builder the CLI would use, so the dialog shows the message the command will
+  // actually print rather than a dashboard paraphrase of it.
+  const cliNotice = organization
+    ? buildCapacityNotice({
+        runningInstances,
+        concurrentWorkers: limits.concurrentWorkers,
+        requestedInstances: typeof instances === 'number' ? instances : DEFAULT_VALUES.instances,
+        planName: limitsLabel,
+        organizationSlug: organization.slug,
+      })
+    : null
+
   const instancesDescription =
     capacity.limit === null
       ? '1 to 10'
@@ -286,6 +300,19 @@ export const DeployComputeInstanceDialog = ({
             }}
             tabs={['ai', 'cli', 'config']}
           />
+
+          {cliNotice && (
+            <pre
+              className={cn(
+                'mt-3 overflow-x-auto whitespace-pre-wrap rounded border px-3 py-2 font-mono text-xs',
+                cliNotice.severity === 'error'
+                  ? 'border-destructive-400 text-destructive'
+                  : 'border-default text-foreground-light'
+              )}
+            >
+              {formatCliNotice(cliNotice)}
+            </pre>
+          )}
         </DialogSection>
 
         <DialogFooter>
