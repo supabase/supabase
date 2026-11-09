@@ -9,7 +9,6 @@ export const projectKeys = {
   infiniteListByOrg: (
     slug: string | undefined,
     params?: {
-      limit: number
       sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
       search?: string
       statuses?: string[]

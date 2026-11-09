@@ -1,0 +1,45 @@
+{
+  "name": "docs-search",
+  "version": "0.0.0",
+  "license": "MIT",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest --run"
+  },
+  "dependencies": {
+    "common": "workspace:*",
+    "fast-glob": "^3.3.3",
+    "lucide-react": "catalog:",
+    "mdast-util-to-string": "^3.1.1",
+    "radix-ui": "catalog:",
+    "remark-frontmatter": "^5.0.0",
+    "remark-gfm": "^4.0.0",
+    "remark-parse": "^11.0.0",
+    "ui": "workspace:*",
+    "unified": "^11.0.5"
+  },
+  "devDependencies": {
+    "@supabase/supabase-js": "catalog:",
+    "@types/mdast": "^3.0.0",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "cheerio": "^1.0.0-rc.12",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "exports": {
+    "./ingest": "./src/ingest.ts",
+    "./components": "./src/components/index.ts",
+    "./styles.css": "./src/styles.css"
+  },
+  "peerDependencies": {
+    "react": "catalog:"
+  }
+}

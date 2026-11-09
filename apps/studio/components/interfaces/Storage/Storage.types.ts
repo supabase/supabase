@@ -24,6 +24,10 @@ export interface StorageColumn {
   path: string
   status: string
   items: StorageItem[]
+  // Objects the API returned for this column that are hidden from `items`
+  // (e.g. .emptyFolderPlaceholder). The next page offset is items.length plus this, so
+  // local additions and removals to `items` keep the offset in step with the server.
+  hiddenItemsCount?: number
   hasMoreItems?: boolean
   isLoadingMoreItems?: boolean
 }
@@ -37,9 +41,11 @@ export interface StorageItem {
   created_at: string | null
   updated_at: string | null
   last_accessed_at: string | null
+  is_versioned?: boolean | null
   // UI specific properties, not from API
   isCorrupted: boolean
   path?: string
+  archived?: { archivedObjectId?: string }
 }
 
 export type StorageItemWithColumn = StorageItem & { columnIndex: number }

@@ -3,9 +3,10 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCreateInvitationVariables = {
   slug: string
@@ -29,6 +30,7 @@ export async function createOrganizationInvitation({
   const { data, error } = await post('/platform/organizations/{slug}/members/invitations', {
     params: { path: { slug } },
     body: payload,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -44,7 +46,7 @@ export const useOrganizationCreateInvitationMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCreateInvitationVariables
   >,
   'mutationFn'
@@ -53,7 +55,7 @@ export const useOrganizationCreateInvitationMutation = ({
 
   return useMutation<
     OrganizationMemberUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCreateInvitationVariables
   >({
     mutationFn: (vars) => createOrganizationInvitation(vars),

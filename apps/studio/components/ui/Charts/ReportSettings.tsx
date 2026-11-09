@@ -1,4 +1,4 @@
-import { Settings } from 'lucide-react'
+import { SettingsIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Label, Popover, PopoverContent, PopoverTrigger, Switch } from 'ui'
 
@@ -17,7 +17,7 @@ export const ReportSettings = ({ chartId }: ReportSettingsProps) => {
     <Popover open={isOpen} onOpenChange={setIsOpen}>
       <PopoverTrigger asChild>
         <ButtonTooltip
-          icon={<Settings />}
+          icon={<SettingsIcon />}
           className="w-7"
           tooltip={{ content: { side: 'bottom', text: 'Report settings' } }}
         />

@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { cn } from 'ui'
@@ -70,7 +70,7 @@ export const ExampleProject = ({
             'group-hover:right-3 group-hover:text-foreground'
           )}
         >
-          <ChevronRight />
+          <ChevronRightIcon />
         </div>
       </div>
     </Link>

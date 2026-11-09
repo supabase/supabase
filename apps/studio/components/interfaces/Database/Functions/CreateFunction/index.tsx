@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta/src/pg-format'
 import { isEmpty, isNull, keyBy, mapValues, partition } from 'lodash'
-import { Plus, Trash } from 'lucide-react'
+import { PlusIcon, TrashIcon } from 'lucide-react'
 import { useEffect, useMemo, useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -126,6 +126,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -140,6 +141,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -199,8 +201,7 @@ export const CreateFunction = ({
                       label="Schema"
                       description={
                         <>
-                          Tables made in the table editor will be in{' '}
-                          <code className="text-code-inline">public</code>
+                          Tables made in the table editor will be in <code>public</code>
                         </>
                       }
                       layout="horizontal"
@@ -318,8 +319,7 @@ export const CreateFunction = ({
                         <FormLabel className="text-base text-foreground">Definition</FormLabel>
                         <FormDescription className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in{' '}
-                            <code className="text-code-inline">{language}</code>.
+                            The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription>
@@ -461,7 +461,7 @@ export const CreateFunction = ({
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              {isEditing ? 'Save' : 'Create'} function
+              {isEditing ? <span>Save</span> : <span>Create</span>} <span>function</span>
             </Button>
           </SheetFooter>
         </div>
@@ -543,7 +543,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
                 <Tooltip>
                   <TooltipTrigger asChild>
                     <Button
-                      icon={<Trash size={12} />}
+                      icon={<TrashIcon size={12} />}
                       onClick={() => remove(index)}
                       className="h-[34px] w-[34px]"
                       aria-label="Remove argument"
@@ -560,7 +560,7 @@ const FormFieldArgs = ({ readonly }: FormFieldConfigParamsProps) => {
 
         {!readonly && (
           <Button
-            icon={<Plus size={12} />}
+            icon={<PlusIcon size={12} />}
             onClick={() => append({ name: '', type: 'integer' })}
             disabled={readonly}
           >

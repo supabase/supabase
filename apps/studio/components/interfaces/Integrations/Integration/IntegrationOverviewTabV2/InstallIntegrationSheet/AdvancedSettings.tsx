@@ -86,17 +86,16 @@ export const AdvancedSettings = ({
                   description={
                     ext?.installed_version ? (
                       <>
-                        Installed in <code className="text-code-inline">{ext.schema}</code> schema
+                        Installed in <code>{ext.schema}</code> schema
                       </>
                     ) : defaultSchema ? (
                       <>
-                        Must be installed in the{' '}
-                        <code className="text-code-inline">{defaultSchema}</code> schema
+                        Must be installed in the <code>{defaultSchema}</code> schema
                       </>
                     ) : recommendedSchema ? (
                       <>
-                        Use the <code className="text-code-inline">{recommendedSchema}</code> schema
-                        for full compatibility with related features
+                        Use the <code>{recommendedSchema}</code> schema for full compatibility with
+                        related features
                       </>
                     ) : undefined
                   }

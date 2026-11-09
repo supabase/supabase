@@ -36,7 +36,7 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Tutorial',
+    name: 'Tutorials',
     description: 'Step-by-step walkthroughs for building with Supabase.',
     pinned: true,
     visible: true,
@@ -78,8 +78,14 @@ export const TOPICS = [
     visible: true,
   },
   {
-    name: 'Supabase Platform',
+    name: 'Platform',
     description: 'Project settings, billing, and infrastructure.',
+    pinned: false,
+    visible: true,
+  },
+  {
+    name: 'FAQs',
+    description: 'Frequently asked questions and their answers.',
     pinned: false,
     visible: true,
   },
@@ -87,9 +93,59 @@ export const TOPICS = [
 
 export type Topic = (typeof TOPICS)[number]['name']
 
+type ContentCollection = 'guides' | 'troubleshooting' | 'faqs'
+
+interface ListedTopicsParams {
+  guides: { topics: readonly string[] }[]
+  troubleshooting: { topics: readonly string[] }[]
+}
+
+interface IsInTopicParams {
+  collection: ContentCollection
+  topics: readonly string[]
+  topic: Topic
+}
+
 // zod's `enum()` needs a literal non-empty tuple of strings, which `.map()`
 // can't preserve on its own — this cast is safe because TOPICS is `as const`.
 export const TOPIC_NAMES = TOPICS.map((topic) => topic.name) as [Topic, ...Topic[]]
+
+export const FORMAT_TOPICS: Topic[] = [
+  'Migration',
+  'Comparison',
+  'Rundowns',
+  'Troubleshooting',
+  'Tutorials',
+]
+
+// the kind of guide picks the cover before its subject does
+export const pickCoverTopic = (topics: Topic[]): Topic | null =>
+  topics.find((topic) => FORMAT_TOPICS.includes(topic)) ?? topics[0] ?? null
+
+// the topic pages and scripts/generate-markdown.ts both use this, so they list the same entries
+export const isInTopic = ({ collection, topics, topic }: IsInTopicParams): boolean => {
+  if (collection !== 'troubleshooting') return topics.includes(topic)
+  // troubleshooting is a content type. other type topics never list it
+  if (topic === 'Troubleshooting') return true
+  return !FORMAT_TOPICS.includes(topic) && topics.includes(topic)
+}
+
+// visible topics with at least one entry. the nav and the homepage only link to these
+export const getListedTopics = ({ guides, troubleshooting }: ListedTopicsParams) =>
+  TOPICS.filter(
+    (topic) =>
+      topic.visible &&
+      (guides.some((guide) =>
+        isInTopic({ collection: 'guides', topics: guide.topics, topic: topic.name })
+      ) ||
+        troubleshooting.some((entry) =>
+          isInTopic({ collection: 'troubleshooting', topics: entry.topics, topic: topic.name })
+        ))
+  )
+
+// federated collections tag with their own vocabulary, which may not match kb's topics
+export const isKnownTopic = (topic: string): topic is Topic =>
+  TOPIC_NAMES.some((name) => name === topic)
 
 export function getTopicDescription(topic: Topic): string {
   return TOPICS.find((t) => t.name === topic)!.description

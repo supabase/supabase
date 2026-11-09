@@ -6,7 +6,8 @@ import { handleError, post } from '@/data/fetchers'
 import { organizationKeys } from '@/data/organizations/keys'
 import { castOrganizationResponseToOrganization } from '@/data/organizations/organizations-query'
 import { permissionKeys } from '@/data/permissions/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PendingSubscriptionCreateVariables = {
   payment_intent_id: string
@@ -43,7 +44,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     PendingSubscriptionCreateData,
-    ResponseError,
+    StudioError,
     PendingSubscriptionCreateVariables
   >,
   'mutationFn'
@@ -52,7 +53,7 @@ export const useConfirmPendingSubscriptionCreateMutation = ({
 
   return useMutation<
     PendingSubscriptionCreateData,
-    ResponseError,
+    StudioError,
     PendingSubscriptionCreateVariables
   >({
     mutationFn: (vars) => confirmPendingSubscriptionCreate(vars),

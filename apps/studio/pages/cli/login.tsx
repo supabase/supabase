@@ -1,5 +1,5 @@
 import { useIsLoggedIn, useParams } from 'common'
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import Head from 'next/head'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -27,7 +27,7 @@ const PAGE_TITLE = buildStudioPageTitle({ section: 'Authorize CLI', brand: 'Supa
 
 const CliLogo = () => (
   <LogoBox className="bg-black">
-    <Terminal className="size-6 text-white" strokeWidth={2} />
+    <TerminalIcon className="size-6 text-white" strokeWidth={2} />
   </LogoBox>
 )
 

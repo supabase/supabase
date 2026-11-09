@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { oauthAppKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AuthorizedAppsVariables = {
   slug?: string
@@ -30,7 +31,7 @@ export async function getAuthorizedApps({ slug }: AuthorizedAppsVariables) {
 }
 
 export type AuthorizedAppsData = Awaited<ReturnType<typeof getAuthorizedApps>>
-export type AuthorizedAppsError = ResponseError
+export type AuthorizedAppsError = StudioError
 
 export const useAuthorizedAppsQuery = <TData = AuthorizedAppsData>(
   { slug }: AuthorizedAppsVariables,

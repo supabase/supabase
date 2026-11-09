@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { uniqBy } from 'lodash'
-import { Check, Plus } from 'lucide-react'
+import { CheckIcon, PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert,
@@ -147,7 +147,7 @@ const FunctionSelector = ({
                       >
                         <span>{func.name}</span>
                         {value === func.name && (
-                          <Check className="text-primary" size={14} strokeWidth={2} />
+                          <CheckIcon className="text-primary" size={14} strokeWidth={2} />
                         )}
                       </CommandItem>
                     ))}
@@ -160,7 +160,7 @@ const FunctionSelector = ({
                     className="cursor-pointer w-full gap-2"
                     onSelect={() => setOpen(false)}
                   >
-                    <Plus size={14} strokeWidth={1.5} />
+                    <PlusIcon size={14} strokeWidth={1.5} />
                     <p>New function</p>
                   </CommandItemLink>
                 </CommandGroup>

@@ -1,4 +1,4 @@
-import type { Variants } from 'framer-motion'
+import type { Variants } from 'motion/react'
 
 const CARD_VARIANTS: Variants = {
   hidden: { opacity: 0, y: 8 },
@@ -9,15 +9,11 @@ const STAGGER_AFTER_CONTAINER = 0.2
 const STAGGER_BETWEEN_CARDS = 0.08
 
 export interface PlanCardsEntryAnimation {
-  container: { variants?: Variants; initial?: string; animate?: string }
-  card: Variants | undefined
+  container: { variants: Variants; initial: string; animate: string }
+  card: Variants
 }
 
-export function getPlanCardsEntryAnimation(
-  entryDelay: number | undefined
-): PlanCardsEntryAnimation {
-  if (entryDelay === undefined) return { container: {}, card: undefined }
-
+export function getPlanCardsEntryAnimation(entryDelay: number): PlanCardsEntryAnimation {
   return {
     container: {
       variants: {

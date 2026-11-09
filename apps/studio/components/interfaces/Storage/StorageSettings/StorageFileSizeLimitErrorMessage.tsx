@@ -70,8 +70,9 @@ export const StorageFileSizeLimitErrorMessage = ({
                     'cursor-default'
                   )}
                 >
-                  {showOtherCount && `+${otherBuckets.length} `}other bucket
-                  {otherBuckets.length > 1 ? 's' : ''}
+                  {showOtherCount && <span>{`+${otherBuckets.length} `}</span>}
+                  <span>other bucket</span>
+                  {otherBuckets.length > 1 ? <span>s</span> : ''}
                 </span>
               </TooltipTrigger>
               <TooltipContent side="bottom">
@@ -101,7 +102,7 @@ export const StorageFileSizeLimitErrorMessage = ({
             first
           </>
         )}
-        .
+        <span>.</span>
       </p>
     </>
   )

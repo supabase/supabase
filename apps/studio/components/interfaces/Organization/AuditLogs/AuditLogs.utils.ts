@@ -1,12 +1,6 @@
 import dayjs from 'dayjs'
 
 import { DatePickerToFrom } from '@/components/interfaces/Settings/Logs/Logs.types'
-import type { AuditLog } from '@/data/organizations/organization-audit-logs-query'
-
-export function filterByUsers(logs: AuditLog[], userIds: string[]): AuditLog[] {
-  if (userIds.length === 0) return logs
-  return logs.filter((log) => userIds.includes(log.actor.user_id ?? ''))
-}
 
 // [Joshen] Mainly to handle if a single date is selected - currently just for Audit Logs as
 // i'm on the fence if this logic should be within the DatePicker component itself

@@ -1,7 +1,6 @@
 /* eslint-disable turbo/no-undeclared-env-vars */
-import { mkdir, rename, writeFile } from 'node:fs/promises'
+import { mkdir, readFile, rename, writeFile } from 'node:fs/promises'
 import path from 'path'
-import { getHighlighter, loadTheme } from '@shikijs/compat'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypePrettyCode from 'rehype-pretty-code'
 import rehypeSlug from 'rehype-slug'
@@ -13,6 +12,10 @@ import { defineConfig, s } from 'velite'
 import { rehypeComponent } from './lib/rehype-component'
 
 const CODE_OUTPUT_DIR = '.velite/codes'
+
+const codeTheme = JSON.parse(
+  await readFile(path.join(process.cwd(), 'lib/themes/supabase-2.json'), 'utf8')
+)
 
 function toCodeId(slugAsParams) {
   if (!slugAsParams) return 'index'
@@ -118,18 +121,9 @@ export default defineConfig({
       [
         rehypePrettyCode,
         {
-          // Memoized so the (expensive) theme parse + oniguruma WASM init runs once
-          // for the whole build, instead of once per file — velite compiles every
-          // file concurrently, so without this every doc pays that cost redundantly.
-          getHighlighter: (() => {
-            let highlighterPromise
-            return () => {
-              highlighterPromise ??= loadTheme(
-                path.join(process.cwd(), '/lib/themes/supabase-2.json')
-              ).then((theme) => getHighlighter({ theme }))
-              return highlighterPromise
-            }
-          })(),
+          // plugin shares one cached highlighter per theme, lazy language loading needs shiki >= 4.5 (shikijs/shiki#1318)
+          theme: codeTheme,
+          keepBackground: false,
           onVisitLine(node) {
             // Prevent lines from collapsing in `display: grid` mode, and allow empty
             // lines to be copy/pasted
@@ -138,17 +132,18 @@ export default defineConfig({
             }
           },
           onVisitHighlightedLine(node) {
-            node.properties.className.push('line--highlighted')
+            // the plugin strips the `line` class first, leaving className undefined
+            node.properties.className = [...(node.properties.className ?? []), 'line--highlighted']
           },
-          onVisitHighlightedWord(node) {
+          onVisitHighlightedChars(node) {
             node.properties.className = ['word--highlighted']
           },
         },
       ],
       () => (tree) => {
         visit(tree, (node) => {
-          if (node?.type === 'element' && node?.tagName === 'div') {
-            if (!('data-rehype-pretty-code-fragment' in node.properties)) {
+          if (node?.type === 'element' && node?.tagName === 'figure') {
+            if (!('data-rehype-pretty-code-figure' in node.properties)) {
               return
             }
 
@@ -157,7 +152,7 @@ export default defineConfig({
               return
             }
 
-            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'div'
+            preElement.properties['__withMeta__'] = node.children.at(0).tagName === 'figcaption'
             preElement.properties['__rawString__'] = node.__rawString__
 
             if (node.__src__) {

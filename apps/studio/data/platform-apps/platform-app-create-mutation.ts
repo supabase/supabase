@@ -3,8 +3,9 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { platformAppKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type PlatformAppCreateVariables = {
   slug: string
@@ -14,6 +15,7 @@ export async function createPlatformApp({ slug, ...body }: PlatformAppCreateVari
   const { data, error } = await post('/platform/organizations/{slug}/apps', {
     params: { path: { slug } },
     body,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -27,12 +29,12 @@ export const usePlatformAppCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<PlatformAppCreateData, ResponseError, PlatformAppCreateVariables>,
+  UseCustomMutationOptions<PlatformAppCreateData, StudioError, PlatformAppCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<PlatformAppCreateData, ResponseError, PlatformAppCreateVariables>({
+  return useMutation<PlatformAppCreateData, StudioError, PlatformAppCreateVariables>({
     mutationFn: (vars) => createPlatformApp(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: platformAppKeys.list(variables.slug) })

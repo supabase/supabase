@@ -3,8 +3,8 @@ import { useChat } from '@ai-sdk/react'
 import { lastAssistantMessageIsCompleteWithApprovalResponses } from 'ai'
 import { LOCAL_STORAGE_KEYS, useFlag } from 'common'
 import { useParams, useSearchParamsShallow } from 'common/hooks'
-import { AnimatePresence, motion, useReducedMotion } from 'framer-motion'
-import { Eraser, Pencil, X } from 'lucide-react'
+import { EraserIcon, PencilIcon, XIcon } from 'lucide-react'
+import { AnimatePresence, motion, useReducedMotion } from 'motion/react'
 import { Fragment, useCallback, useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
 import { Button, cn, KeyboardShortcut } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -619,7 +619,7 @@ export const AssistantChat = ({
                               size="tiny"
                               onClick={handleClearMessages}
                               className="w-7 h-7"
-                              icon={<Eraser />}
+                              icon={<EraserIcon />}
                               tooltip={{ content: { side: 'bottom', text: 'Clear messages' } }}
                             />
                           </>
@@ -671,13 +671,13 @@ export const AssistantChat = ({
                 >
                   <div className="-translate-x-1/2 bg-alternative dark:bg-muted border rounded-md px-3 py-2 min-w-[180px] flex items-center justify-between gap-x-2">
                     <div className="flex items-center gap-x-2 text-sm text-foreground">
-                      <Pencil size={14} />
+                      <PencilIcon size={14} />
                       <span>Editing message</span>
                     </div>
                     <ButtonTooltip
                       variant="outline"
                       size="tiny"
-                      icon={<X size={14} />}
+                      icon={<XIcon size={14} />}
                       onClick={cancelEdit}
                       className="w-6 h-6 p-0"
                       title="Cancel editing"

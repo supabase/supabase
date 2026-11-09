@@ -1,6 +1,6 @@
 import { keepPreviousData } from '@tanstack/react-query'
 import { useFlag, useParams } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -109,12 +109,12 @@ export const SearchList = ({ search }: SearchListProps) => {
       <div className="flex flex-col grow">
         {isLoadingCounts && (
           <div className="px-4 py-1 pb-2.5">
-            <Loader2 className="animate-spin" size={14} />
+            <Loader2Icon className="animate-spin" size={14} />
           </div>
         )}
         {!isLoadingCounts && hasCounts && (
           <p className="px-4 pb-2 text-sm text-foreground-lighter">
-            {totalNumber} result{totalNumber === 1 ? '' : 's'} found
+            {totalNumber} result{totalNumber === 1 ? '' : <span>s</span>} <span>found</span>
           </p>
         )}
         {isSearchLoading && (

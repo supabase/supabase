@@ -1,4 +1,4 @@
-import { Info } from 'lucide-react'
+import { InfoIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 import { Button, cn, HoverCard, HoverCardContent, HoverCardTrigger } from 'ui'
 
@@ -88,7 +88,7 @@ export const VersionHistoryPolicyRow = ({
           {hasExpiryDays && !hasCap && (
             <span className="font-mono text-xs text-foreground-lighter">— no retention cap</span>
           )}
-          <Info size={13} className="text-foreground-lighter" />
+          <InfoIcon size={13} className="text-foreground-lighter" />
         </button>
       </HoverCardTrigger>
       <HoverCardContent side="top" className="w-72 space-y-1.5 text-xs">

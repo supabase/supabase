@@ -42,7 +42,7 @@ He turned to Postgres, which has two built-in pieces of functionality for emitti
 - The second, Postgres's logical replication, doesn't face the same limitations, and Paul used this approach. This required the introduction of a server to listen to a logical replication slot. Paul chose [Elixir](https://elixir-lang.org) and the [Phoenix Framework](https://www.phoenixframework.org) for the server as it scales exceptionally well, especially when dealing with WebSockets. He named this server "[Realtime](https://github.com/supabase/realtime)," leveraging other open source projects, [cainophile](https://github.com/cainophile/cainophile) and [pgoutput_decoder](https://github.com/cainophile/pgoutput_decoder), to listen to the replication stream and decode changes. From there, the changes were serialized into JSON and sent on their merry way to clients.
 
 Realtime was the very first open source project of Supabase and played a pivotal role in our founding. Over time, we've improved both the performance and security.
-During Launch Week 3, we announced [Realtime RLS](https://supabase.com/blog/realtime-row-level-security-in-postgresql), which allows developers to tap into Postgres's Row Level Security to authorize changes before broadcasting them to clients. This enabled developers to use the same security framework across the entire Supabase stack.
+During Launch Week 3, we announced [Realtime RLS](https://supabase.com/blog/realtime-row-level-security-in-postgresql), which allows developers to tap into Postgres's [Row Level Security](/docs/guides/database/postgres/row-level-security) to authorize changes before broadcasting them to clients. This enabled developers to use the same security framework across the entire Supabase stack.
 
 ## Realtime Channels
 

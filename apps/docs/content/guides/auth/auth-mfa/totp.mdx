@@ -171,7 +171,7 @@ export function EnrollMFA({
 
 ### Add a challenge step to sign in
 
-Once a user has signed in via their first factor (email+password, magic link, one-time password, social login etc.) you need to perform a check if any additional factors need to be verified.
+Once a user has signed in via their first factor (email+password, magic link, one-time password, social sign-in etc.) you need to perform a check if any additional factors need to be verified.
 
 This can be done by using the `supabase.auth.mfa.getAuthenticatorAssuranceLevel()` API. When the user signs in and is redirected back to your app, you should call this method to extract the user's current and next authenticator assurance level (AAL).
 
@@ -186,7 +186,7 @@ Below is a table that explains the combined meaning.
 |        `aal2` | `aal2`     | User has verified their MFA factor.                      |
 |        `aal2` | `aal1`     | User has disabled their MFA factor. (Stale JWT.)         |
 
-#### Example: React
+#### Example: React [#add-a-challenge-step-to-sign-in-example-react]
 
 Adding the challenge step to sign in depends heavily on the architecture of your app. However, a fairly common way to structure React apps is to have a large component (often named `App`) which contains most of the authenticated application logic.
 

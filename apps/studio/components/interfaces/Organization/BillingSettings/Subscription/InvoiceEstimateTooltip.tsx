@@ -1,4 +1,4 @@
-import { HelpCircle } from 'lucide-react'
+import { HelpCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   cn,
@@ -37,7 +37,7 @@ export const InvoiceEstimateTooltip = ({
   return (
     <HoverCard openDelay={50} closeDelay={50}>
       <HoverCardTrigger>
-        <HelpCircle size={12} />
+        <HelpCircleIcon size={12} />
       </HoverCardTrigger>
       <HoverCardContent side="right" align="start" className="w-[400px] -translate-y-6">
         <h4 className="font-medium">Your new monthly invoice</h4>

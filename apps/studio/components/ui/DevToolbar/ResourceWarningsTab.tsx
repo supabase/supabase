@@ -10,6 +10,7 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import type { OverdueInvoicesResponse } from '@/data/invoices/invoices-overdue-query'
 import { invoicesKeys } from '@/data/invoices/keys'
 import { organizationKeys } from '@/data/organizations/keys'
+import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { usageKeys } from '@/data/usage/keys'
 import type { ResourceWarning } from '@/data/usage/resource-warnings-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -40,6 +41,7 @@ export const ResourceWarningsTab = () => {
   const { ref } = useParams()
   const queryClient = useQueryClient()
   const { data: selectedOrg, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
+  const { data: organizations } = useOrganizationsQuery()
   const orgSlug = selectedOrg?.slug
 
   const [isReadOnly, setIsReadOnly] = useState(false)
@@ -150,14 +152,19 @@ export const ResourceWarningsTab = () => {
     // distinguished by organization_id rather than a status enum, so they can't
     // be folded into the restriction_status patch above.
     const selectedOrgId = selectedOrg?.id
-    const overdueInvoices: OverdueInvoicesResponse[] =
-      selectedOrgId === undefined
-        ? []
-        : effectiveOrgWarning === 'overdue_invoices'
-          ? [{ organization_id: selectedOrgId, overdue_invoice_count: 1 }]
-          : effectiveOrgWarning === 'overdue_invoices_from_other_org'
-            ? [{ organization_id: selectedOrgId + 1, overdue_invoice_count: 1 }]
-            : []
+    const overdueInvoices: OverdueInvoicesResponse[] = []
+    if (selectedOrgId !== undefined && effectiveOrgWarning === 'overdue_invoices') {
+      overdueInvoices.push({ organization_id: selectedOrgId, overdue_invoice_count: 1 })
+    }
+    if (selectedOrgId !== undefined && effectiveOrgWarning === 'overdue_invoices_from_other_org') {
+      // Use real orgs so the banner can resolve and name them; fall back to an unknown ID
+      const otherOrgIds = (organizations ?? [])
+        .filter((org) => org.id !== selectedOrgId)
+        .map((org) => org.id)
+      for (const orgId of otherOrgIds.length > 0 ? otherOrgIds : [selectedOrgId + 1]) {
+        overdueInvoices.push({ organization_id: orgId, overdue_invoice_count: 1 })
+      }
+    }
     queryClient.setQueryData(invoicesKeys.overdueInvoices(), overdueInvoices)
 
     hasOverridesRef.current = true

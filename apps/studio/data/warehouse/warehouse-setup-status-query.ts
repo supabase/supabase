@@ -1,12 +1,12 @@
 import { useQuery } from '@tanstack/react-query'
-import { components } from 'api-types'
 
 import { warehouseKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { pipelineIdSchema } from '@/data/replication/pipeline-id'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
-export type WarehouseSetupStatusResponse =
-  components['schemas']['WarehouseSetupStatusResponse_Output']
+export type WarehouseSetupStatusResponse = Awaited<ReturnType<typeof getWarehouseSetupStatus>>
 
 type WarehouseSetupStatusVariables = { projectRef?: string }
 
@@ -24,7 +24,11 @@ async function getWarehouseSetupStatus(
     handleError(error)
   }
 
-  return data
+  return {
+    ...data,
+    pipeline_id:
+      data.pipeline_id === undefined ? undefined : pipelineIdSchema.parse(data.pipeline_id),
+  }
 }
 
 export type WarehouseSetupStatusData = Awaited<ReturnType<typeof getWarehouseSetupStatus>>
@@ -34,9 +38,9 @@ export const useWarehouseSetupStatusQuery = <TData = WarehouseSetupStatusData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<WarehouseSetupStatusData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<WarehouseSetupStatusData, StudioError, TData> = {}
 ) =>
-  useQuery<WarehouseSetupStatusData, ResponseError, TData>({
+  useQuery<WarehouseSetupStatusData, StudioError, TData>({
     queryKey: warehouseKeys.setupStatus(projectRef),
     queryFn: ({ signal }) => getWarehouseSetupStatus({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

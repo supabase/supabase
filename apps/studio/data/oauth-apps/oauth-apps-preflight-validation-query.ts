@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthAppsPreflightValidation, USE_MOCKS } from './mocks'
 import type { OAuthAppsAuthorizePreflightResult } from './types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsPreflightValidationVariables = {
   slug?: string
@@ -26,7 +27,7 @@ export async function getOAuthAppsPreflightValidation({
 export type OAuthAppsPreflightValidationData = Awaited<
   ReturnType<typeof getOAuthAppsPreflightValidation>
 >
-export type OAuthAppsPreflightValidationError = ResponseError
+export type OAuthAppsPreflightValidationError = StudioError
 
 export const useOAuthAppsPreflightValidationQuery = <TData = OAuthAppsPreflightValidationData>(
   { slug, appId }: OAuthAppsPreflightValidationVariables,

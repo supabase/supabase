@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import { AiIconAnimation, Button, Calendar } from 'ui'
 import {
@@ -227,7 +227,7 @@ export const FilterPopoverNew = ({
   const icon = isGenerating ? (
     <AiIconAnimation size={16} loading />
   ) : isRefetching ? (
-    <Loader2
+    <Loader2Icon
       className="animate-spin text-primary h-4 w-4 shrink-0"
       aria-label="Loading table data"
     />

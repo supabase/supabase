@@ -1,5 +1,5 @@
 import type { PGPolicy } from '@supabase/pg-meta'
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Badge,
@@ -73,7 +73,7 @@ export const PolicyTemplates = ({
           onChange={(e) => setSearch(e.target.value)}
         />
         <InputGroupAddon>
-          <Search />
+          <SearchIcon />
         </InputGroupAddon>
       </InputGroup>
 

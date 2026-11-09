@@ -1,4 +1,4 @@
-import { Edit } from 'lucide-react'
+import { EditIcon } from 'lucide-react'
 import React, { useState } from 'react'
 import { Button, cn } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
@@ -102,7 +102,7 @@ const ExplorerToolbarTitle = ({
           className="group/title"
           onClick={handleStartEditing}
           iconRight={
-            <Edit
+            <EditIcon
               size={16}
               strokeWidth={2}
               className="opacity-0 transition group-hover/title:opacity-100 group-focus-visible/title:opacity-100"

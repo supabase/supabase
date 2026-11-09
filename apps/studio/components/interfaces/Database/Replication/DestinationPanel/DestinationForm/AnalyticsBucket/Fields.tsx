@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useWatch, type UseFormReturn } from 'react-hook-form'
 import {
@@ -304,7 +304,7 @@ export const AnalyticsBucketFields = ({
                       <Button
                         className="w-7"
                         aria-label={showCatalogToken ? 'Hide catalog token' : 'Show catalog token'}
-                        icon={showCatalogToken ? <Eye /> : <EyeOff />}
+                        icon={showCatalogToken ? <EyeIcon /> : <EyeOffIcon />}
                         onClick={() => setShowCatalogToken(!showCatalogToken)}
                       />
                     </div>
@@ -421,7 +421,7 @@ export const AnalyticsBucketFields = ({
                     aria-label={
                       showSecretAccessKey ? 'Hide secret access key' : 'Show secret access key'
                     }
-                    icon={showSecretAccessKey ? <Eye /> : <EyeOff />}
+                    icon={showSecretAccessKey ? <EyeIcon /> : <EyeOffIcon />}
                     className="w-7 absolute right-1 top-[4px]"
                     onClick={() => setShowSecretAccessKey(!showSecretAccessKey)}
                   />

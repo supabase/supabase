@@ -1,13 +1,13 @@
 import { useParams } from 'common'
 import {
-  ArrowUpCircle,
-  CircleStop,
-  Edit,
-  Eye,
-  MoreVertical,
-  Play,
-  RotateCcw,
-  Trash,
+  ArrowUpCircleIcon,
+  CircleStopIcon,
+  EditIcon,
+  EyeIcon,
+  MoreVerticalIcon,
+  PlayIcon,
+  RotateCcwIcon,
+  TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { parseAsInteger, useQueryState } from 'nuqs'
@@ -33,17 +33,17 @@ import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import type { ResponseError } from '@/types'
 
 interface RowMenuProps {
   destinationId: number
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   hasUpdate?: boolean
@@ -108,7 +108,7 @@ export const RowMenu = ({
         startPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to start pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -121,7 +121,7 @@ export const RowMenu = ({
         stopPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to stop pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -134,7 +134,7 @@ export const RowMenu = ({
         restartPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to restart pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -150,7 +150,8 @@ export const RowMenu = ({
             </span>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs">
-            Couldn't load status{error?.message ? `: ${error.message}` : '.'}
+            Couldn't load status
+            {error?.message ? <span>{`: ${error.message}`}</span> : <span>.</span>}
           </TooltipContent>
         </Tooltip>
       )}
@@ -162,7 +163,7 @@ export const RowMenu = ({
               variant="default"
               className="w-6.5 hit-area-1"
               aria-label={hasUpdate ? 'Pipeline options, update available' : 'Pipeline options'}
-              icon={<MoreVertical />}
+              icon={<MoreVerticalIcon />}
             />
             {hasUpdate && (
               <span
@@ -176,7 +177,7 @@ export const RowMenu = ({
         <DropdownMenuContent side="bottom" align="end" className="w-44">
           <DropdownMenuItem className="space-x-2" asChild disabled={!pipeline}>
             <Link href={`/project/${projectRef}/database/pipelines/${pipeline?.id}`}>
-              <Eye size={14} />
+              <EyeIcon size={14} />
               <p>View details</p>
             </Link>
           </DropdownMenuItem>
@@ -188,7 +189,7 @@ export const RowMenu = ({
                 onClick={() => onUpdateClick?.()}
                 disabled={isPipelineRequestPending}
               >
-                <ArrowUpCircle size={14} />
+                <ArrowUpCircleIcon size={14} />
                 <p>Update available</p>
                 <span
                   className="ml-auto h-2 w-2 shrink-0 rounded-full bg-primary-bright"
@@ -201,7 +202,7 @@ export const RowMenu = ({
           {showStart && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={onEnablePipeline}>
-                <Play size={14} />
+                <PlayIcon size={14} />
                 <p>Start pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -210,11 +211,11 @@ export const RowMenu = ({
           {showStopAndRestart && (
             <>
               <DropdownMenuItem className="space-x-2" onClick={onRestartPipeline}>
-                <RotateCcw size={14} />
+                <RotateCcwIcon size={14} />
                 <p>Restart pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuItem className="space-x-2" onClick={onDisablePipeline}>
-                <CircleStop size={14} />
+                <CircleStopIcon size={14} />
                 <p>Stop pipeline</p>
               </DropdownMenuItem>
               <DropdownMenuSeparator />
@@ -226,7 +227,7 @@ export const RowMenu = ({
             onClick={() => setEdit(destinationId)}
             disabled={isPipelineRequestPending}
           >
-            <Edit size={14} />
+            <EditIcon size={14} />
             <p>Edit pipeline</p>
           </DropdownMenuItem>
           <DropdownMenuItem
@@ -234,7 +235,7 @@ export const RowMenu = ({
             onClick={onDeleteClick}
             disabled={isPipelineRequestPending}
           >
-            <Trash size={14} />
+            <TrashIcon size={14} />
             <p>Delete pipeline</p>
           </DropdownMenuItem>
         </DropdownMenuContent>

@@ -1,5 +1,5 @@
 import type { Table } from '@tanstack/react-table'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import { LogFieldRow } from './LogFieldRow'
@@ -85,7 +85,7 @@ export function LogFields<TData>({
                 <Button
                   variant="text"
                   className="px-1 [&[data-state=open]_svg]:rotate-180"
-                  icon={<ChevronDown size={12} />}
+                  icon={<ChevronDownIcon size={12} />}
                   aria-label={`Expand ${key}`}
                 />
               </CollapsibleTrigger>

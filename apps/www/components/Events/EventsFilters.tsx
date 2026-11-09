@@ -1,7 +1,7 @@
 import { useBreakpoint } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { startCase } from 'lib/helpers'
 import { ChevronDown, X as CloseIcon, Search } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useRouter } from 'next/compat/router'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'

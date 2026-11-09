@@ -2,6 +2,8 @@ export interface McpFeatureGroup {
   id: string
   name: string
   description: string
+  /** Opt-in groups that the server also leaves off when `features` is omitted. */
+  defaultDisabled?: boolean
 }
 
 export type McpOnCopyCallback = 'url' | 'config' | 'command'
@@ -60,15 +62,6 @@ export interface VSCodeMcpConfig {
     supabase: {
       type: 'http'
       url: string
-    }
-  }
-}
-
-export interface WindsurfMcpConfig {
-  mcpServers: {
-    supabase: {
-      command: 'npx'
-      args: ['-y', 'mcp-remote', string]
     }
   }
 }
@@ -247,7 +240,6 @@ export type McpClientConfig =
   | OpenCodeMcpConfig
   | OtherMcpConfig
   | VSCodeMcpConfig
-  | WindsurfMcpConfig
 
 // Type guards
 export function isVSCodeMcpConfig(config: McpClientConfig): config is VSCodeMcpConfig {

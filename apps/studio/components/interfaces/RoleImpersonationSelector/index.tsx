@@ -1,4 +1,4 @@
-import { Check, Database, UserCheck, UserX } from 'lucide-react'
+import { CheckIcon, DatabaseIcon, UserCheckIcon, UserXIcon } from 'lucide-react'
 import { Separator, ToggleGroup, ToggleGroupItem } from 'ui'
 
 import { UserImpersonationSelector } from './UserImpersonationSelector'
@@ -67,30 +67,30 @@ export const RoleImpersonationSelectorInterface = (
         >
           <ToggleGroupItem value="service_role" className="w-full justify-between text-left">
             <span className="flex min-w-0 items-center gap-3">
-              <Database size={16} strokeWidth={1.5} className="shrink-0" />
+              <DatabaseIcon size={16} strokeWidth={1.5} className="shrink-0" />
               <span className="flex min-w-0 flex-col items-start">
                 <span>{serviceRoleLabel}</span>
                 <span className="text-xs font-normal text-foreground-lighter">Superuser</span>
               </span>
             </span>
-            {selectedOption === 'service_role' && <Check size={14} />}
+            {selectedOption === 'service_role' && <CheckIcon size={14} />}
           </ToggleGroupItem>
 
           <ToggleGroupItem value="anon" className="w-full justify-between text-left">
             <span className="flex min-w-0 items-center gap-3">
-              <UserX size={16} strokeWidth={1.5} className="shrink-0" />
+              <UserXIcon size={16} strokeWidth={1.5} className="shrink-0" />
               <span className="flex min-w-0 flex-col items-start">
                 <span>Anonymous</span>
                 <span className="text-xs font-normal text-foreground-lighter">Not logged in</span>
               </span>
             </span>
-            {selectedOption === 'anon' && <Check size={14} />}
+            {selectedOption === 'anon' && <CheckIcon size={14} />}
           </ToggleGroupItem>
 
           {!disallowAuthenticatedOption && (
             <ToggleGroupItem value="authenticated" className="w-full justify-between text-left">
               <span className="flex min-w-0 items-center gap-3">
-                <UserCheck size={16} strokeWidth={1.5} className="shrink-0" />
+                <UserCheckIcon size={16} strokeWidth={1.5} className="shrink-0" />
                 <span className="flex min-w-0 flex-col items-start">
                   <span>Authenticated</span>
                   <span className="text-xs font-normal text-foreground-lighter">
@@ -98,7 +98,7 @@ export const RoleImpersonationSelectorInterface = (
                   </span>
                 </span>
               </span>
-              {selectedOption === 'authenticated' && <Check size={14} />}
+              {selectedOption === 'authenticated' && <CheckIcon size={14} />}
             </ToggleGroupItem>
           )}
         </ToggleGroup>

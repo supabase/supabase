@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Plus, ShieldCheck } from 'lucide-react'
+import { PlusIcon, ShieldCheckIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useRef } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -18,6 +18,7 @@ import {
   DialogSection,
   DialogSectionSeparator,
   DialogTitle,
+  DialogTrigger,
   Form,
   FormControl,
   FormField,
@@ -86,24 +87,24 @@ export const CreateSecretAPIKeyDialog = () => {
 
   return (
     <Dialog open={visible === 'secret'} onOpenChange={onOpenChange}>
-      <Shortcut
-        id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
-        onTrigger={openDialog}
-        side="bottom"
-        tooltipOpen={visible === 'secret' ? false : undefined}
-      >
-        <Button className="mt-2" icon={<Plus />} onClick={openDialog}>
-          New secret key
-        </Button>
-      </Shortcut>
+      <DialogTrigger asChild>
+        <Shortcut
+          id={SHORTCUT_IDS.API_KEYS_NEW_SECRET}
+          onTrigger={openDialog}
+          side="bottom"
+          tooltipOpen={visible === 'secret' ? false : undefined}
+        >
+          <Button className="mt-2" icon={<PlusIcon />} onClick={openDialog}>
+            New secret key
+          </Button>
+        </Shortcut>
+      </DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Create new secret API key</DialogTitle>
-          <DialogDescription className="grid gap-y-2">
-            <p>
-              Secret API keys allow elevated access to your project's data, bypassing Row-Level
-              security.
-            </p>
+          <DialogDescription>
+            Secret API keys allow elevated access to your project's data, bypassing Row-Level
+            security.
           </DialogDescription>
         </DialogHeader>
         <DialogSectionSeparator />
@@ -148,7 +149,7 @@ export const CreateSecretAPIKeyDialog = () => {
             </form>
           </Form>
           <Alert variant="warning">
-            <ShieldCheck />
+            <ShieldCheckIcon />
             <AlertTitle>Securing your API key</AlertTitle>
             <AlertDescription className="">
               <ul className="list-disc">

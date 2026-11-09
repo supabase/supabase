@@ -1,4 +1,4 @@
-import { ChevronRight, ChevronUp } from 'lucide-react'
+import { ChevronRightIcon, ChevronUpIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
@@ -163,7 +163,7 @@ const EntityList = ({ entities }: { entities: Array<ExposedEntity> }) => {
           className="px-0 h-auto text-xs text-foreground-lighter hover:text-foreground"
         >
           <div className="flex items-center gap-1">
-            {open ? <ChevronUp size={12} /> : <ChevronRight size={12} />}
+            {open ? <ChevronUpIcon size={12} /> : <ChevronRightIcon size={12} />}
             <span>{open ? 'Show less' : `Show ${hiddenEntities.length} more`}</span>
           </div>
         </Button>

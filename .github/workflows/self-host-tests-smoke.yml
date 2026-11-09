@@ -84,6 +84,13 @@ jobs:
           cd docker
           sh tests/test-auth-keys.sh
 
+      - name: Run Edge Functions CORS tests
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd docker
+          sh tests/test-functions-cors.sh
+
       - name: Run S3 protocol tests
         shell: bash
         run: |

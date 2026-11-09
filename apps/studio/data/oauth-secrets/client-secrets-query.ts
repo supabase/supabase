@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { clientSecretKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type Secret =
   components['schemas']['ListOAuthAppClientSecretsResponse_Output']['client_secrets'][0] & {
@@ -44,7 +45,7 @@ export async function getClientSecrets(
 }
 
 export type ClientSecretsData = Awaited<ReturnType<typeof getClientSecrets>>
-export type ClientSecretsError = ResponseError
+export type ClientSecretsError = StudioError
 
 export const useClientSecretsQuery = <TData = ClientSecretsData>(
   { slug, appId }: ClientSecretsVariables,

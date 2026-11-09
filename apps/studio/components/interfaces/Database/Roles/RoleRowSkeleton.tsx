@@ -1,4 +1,4 @@
-import { ChevronUp } from 'lucide-react'
+import { ChevronUpIcon } from 'lucide-react'
 import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -23,7 +23,7 @@ export const RoleRowSkeleton = ({ index }: RoleRowSkeletonProps) => {
     >
       <div className="flex w-full items-center justify-between rounded-sm py-3 px-6 text-foreground">
         <div className="flex items-start space-x-3">
-          <ChevronUp
+          <ChevronUpIcon
             id="collapsible-trigger"
             className="text-border-stronger rotate-180"
             strokeWidth={2}

@@ -2,16 +2,18 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationPipelineReplicationStatusVariables = {
   projectRef?: string
-  pipelineId?: number
+  pipelineId?: string
 }
 
-export type ReplicationPipelineReplicationStatusError = ResponseError
+export type ReplicationPipelineReplicationStatusError = StudioError
 
 export type ReplicationPipelineTableStatus =
   components['schemas']['PipelineReplicationStatusResponse_Output']['table_statuses'][number]
@@ -34,7 +36,7 @@ async function fetchReplicationPipelineReplicationStatus(
     handleError(error)
   }
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 export type ReplicationPipelineReplicationStatusData = Awaited<

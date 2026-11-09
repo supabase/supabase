@@ -1,6 +1,6 @@
 import * as Sentry from '@sentry/nextjs'
 import { useFlag } from 'common'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useReducer } from 'react'
 import { toast } from 'sonner'
@@ -136,7 +136,7 @@ export function SupportFormStatusButton() {
           size="tiny"
           icon={
             isLoading ? (
-              <Loader2 className="animate-spin" />
+              <Loader2Icon className="animate-spin" />
             ) : (
               <div
                 className={cn(

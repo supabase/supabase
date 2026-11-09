@@ -1,4 +1,4 @@
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import Link from 'next/link'
 import {
   Button,
@@ -47,7 +47,6 @@ export function OrganizationDropdownCommandContent({
           routePathname={routePathname}
           hasRouteSlug={hasRouteSlug}
           onClose={onClose}
-          compactPadding={!embedded}
         />
       ))}
     </>
@@ -57,7 +56,7 @@ export function OrganizationDropdownCommandContent({
     return (
       <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
         <div className="flex items-center gap-2 shrink-0 border-b p-2">
-          <Button variant="text" block size="small" asChild>
+          <Button variant="outline" block size="small" asChild>
             <Link
               href="/organizations"
               className="text-xs text-foreground-light hover:text-foreground"
@@ -67,7 +66,7 @@ export function OrganizationDropdownCommandContent({
             </Link>
           </Button>
           {organizationCreationEnabled && (
-            <Button block size="small" asChild icon={<Plus size={14} strokeWidth={1.5} />}>
+            <Button block size="small" asChild icon={<PlusIcon size={14} strokeWidth={1.5} />}>
               <Link
                 href="/new"
                 className="text-xs text-foreground-light hover:text-foreground"
@@ -120,7 +119,7 @@ export function OrganizationDropdownCommandContent({
                 className="cursor-pointer w-full gap-2"
                 onSelect={onClose}
               >
-                <Plus size={14} strokeWidth={1.5} />
+                <PlusIcon size={14} strokeWidth={1.5} />
                 <p>New organization</p>
               </CommandItemLink>
             </CommandGroup>

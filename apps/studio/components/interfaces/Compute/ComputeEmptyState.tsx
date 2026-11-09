@@ -1,19 +1,17 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { BoxPlus } from 'icons'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface ComputeEmptyStateProps {
   onDeploy: () => void
 }
 
 export const ComputeEmptyState = ({ onDeploy }: ComputeEmptyStateProps) => {
-  const { can: canDeployInstances } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
+  const { can: canDeployInstances } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.WORKERS_WRITE
   )
 
   return (
@@ -25,7 +23,7 @@ export const ComputeEmptyState = ({ onDeploy }: ComputeEmptyStateProps) => {
       <ButtonTooltip
         variant="primary"
         size="tiny"
-        icon={<Plus size={14} />}
+        icon={<PlusIcon size={14} />}
         disabled={!canDeployInstances}
         onClick={onDeploy}
         tooltip={{

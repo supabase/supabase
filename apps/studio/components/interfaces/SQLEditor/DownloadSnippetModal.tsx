@@ -1,5 +1,5 @@
 import { snakeCase } from 'lodash'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
 import {
@@ -53,7 +53,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
       caption: (
         <>
           Run this command from your project directory to download the snippet in a new migration
-          named <code className="text-code-inline break-normal">{migrationName}</code>.
+          named <code className="break-normal">{migrationName}</code>.
         </>
       ),
       docLink: {
@@ -70,7 +70,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
         <>
           Run this command from your project directory to download the snippet. If your query
           consists of sample data, append it to the end of{' '}
-          <code className="text-code-inline break-normal">supabase/seed.sql</code>.
+          <code className="break-normal">supabase/seed.sql</code>.
         </>
       ),
       docLink: {
@@ -86,7 +86,7 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
       caption: (
         <>
           Run this command from your project directory to download the snippet into a new SQL file
-          named <code className="text-code-inline break-normal">{migrationName}.sql</code>.
+          named <code className="break-normal">{migrationName}.sql</code>.
         </>
       ),
       cli: generateFileCliCommand(id, migrationName),
@@ -153,14 +153,14 @@ export const DownloadSnippetModal = ({ id, ...props }: DownloadSnippetModalProps
         <DialogSection>
           <div className="flex items-center justify-start gap-x-2">
             {selectedSnippet.docLink && (
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <Link href={selectedSnippet.docLink.href} target="_blank" rel="noreferrer">
                   {selectedSnippet.docLink.label}
                 </Link>
               </Button>
             )}
 
-            <Button asChild icon={<ExternalLink />}>
+            <Button asChild icon={<ExternalLinkIcon />}>
               <Link href={CLI_DOCS_URL} target="_blank" rel="noreferrer">
                 About CLI
               </Link>

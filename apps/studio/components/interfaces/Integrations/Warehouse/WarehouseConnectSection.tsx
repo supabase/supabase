@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Eye, EyeOff, KeyRound, Loader2 } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, KeyRoundIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -104,7 +104,7 @@ const FlightSqlContent = ({ projectRef }: { projectRef: string }) => (
     </FieldRow>
     <FieldRow label="Password">
       <div className="flex justify-end">
-        <Button asChild variant="default" size="tiny" icon={<KeyRound size={14} />}>
+        <Button asChild variant="default" size="tiny" icon={<KeyRoundIcon size={14} />}>
           <Link href={`/project/${projectRef}/settings/database`}>Reset database password</Link>
         </Button>
       </div>
@@ -133,7 +133,7 @@ const DuckLakeSecretRow = ({ name, value }: { name: string; value: string }) => 
             size="tiny"
             className="px-1.5"
             aria-label={`${isRevealed ? 'Hide' : 'Reveal'} ${name}`}
-            icon={isRevealed ? <EyeOff strokeWidth={2} /> : <Eye strokeWidth={2} />}
+            icon={isRevealed ? <EyeOffIcon strokeWidth={2} /> : <EyeIcon strokeWidth={2} />}
             onClick={() => setIsRevealed((value) => !value)}
           />
         </TooltipTrigger>
@@ -297,7 +297,7 @@ const CatalogAccessToggle = ({
             {catalogMutation.isPending ? 'Updating DuckDB catalog access' : ''}
           </span>
           {catalogMutation.isPending && (
-            <Loader2
+            <Loader2Icon
               size={16}
               className="animate-spin text-foreground-muted motion-reduce:animate-none"
               aria-hidden
