@@ -15403,6 +15403,22 @@
                               "required": ["address", "type"]
                             }
                           },
+                          "pending_allowed_cidrs": {
+                            "description": "Present when a change that was never applied is waiting for review. `allowed_cidrs` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it.",
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": {
+                                "address": { "type": "string" },
+                                "type": { "type": "string", "enum": ["v4", "v6"] }
+                              },
+                              "required": ["address", "type"]
+                            }
+                          },
+                          "pending_requested_at": {
+                            "description": "When the change in `pending_allowed_cidrs` was requested.",
+                            "type": "string"
+                          },
                           "updated_at": { "type": "string" },
                           "applied_at": { "type": "string" }
                         },
@@ -16824,14 +16840,27 @@
                     "spec": {
                       "type": "object",
                       "properties": {
-                        "runtime": { "example": "node", "type": "string" },
-                        "size": { "type": "string", "example": "2gb-1vcpu" },
-                        "exposure": { "type": "string", "example": "public" },
+                        "runtime": { "type": "string" },
+                        "size": { "type": "string" },
+                        "exposure": { "type": "string" },
                         "instances": {
                           "type": "integer",
                           "minimum": -9007199254740991,
-                          "maximum": 9007199254740991,
-                          "example": 1
+                          "maximum": 9007199254740991
+                        },
+                        "secrets_scope": {
+                          "anyOf": [
+                            { "type": "string", "enum": ["all", "supabase", "none"] },
+                            {
+                              "type": "array",
+                              "items": {
+                                "type": "object",
+                                "properties": { "secret_name": { "type": "string" } },
+                                "required": ["secret_name"]
+                              }
+                            }
+                          ],
+                          "nullable": true
                         }
                       },
                       "required": ["size", "exposure", "instances"]
@@ -16900,14 +16929,27 @@
                   "spec": {
                     "type": "object",
                     "properties": {
-                      "runtime": { "example": "node", "type": "string" },
-                      "size": { "type": "string", "example": "2gb-1vcpu" },
-                      "exposure": { "type": "string", "example": "public" },
+                      "runtime": { "type": "string" },
+                      "size": { "type": "string" },
+                      "exposure": { "type": "string" },
                       "instances": {
                         "type": "integer",
                         "minimum": -9007199254740991,
-                        "maximum": 9007199254740991,
-                        "example": 1
+                        "maximum": 9007199254740991
+                      },
+                      "secrets_scope": {
+                        "anyOf": [
+                          { "type": "string", "enum": ["all", "supabase", "none"] },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": { "secret_name": { "type": "string" } },
+                              "required": ["secret_name"]
+                            }
+                          }
+                        ],
+                        "nullable": true
                       }
                     },
                     "required": ["size", "exposure", "instances"]
@@ -17015,6 +17057,24 @@
                         "minimum": -9007199254740991,
                         "maximum": 9007199254740991,
                         "example": 1
+                      },
+                      "secrets_scope": {
+                        "anyOf": [
+                          { "type": "string", "enum": ["all", "supabase", "none"] },
+                          {
+                            "type": "array",
+                            "items": {
+                              "type": "object",
+                              "properties": { "secret_name": { "type": "string" } },
+                              "required": ["secret_name"]
+                            },
+                            "examples": [
+                              { "secret_name": "STRIPE_KEY" },
+                              { "secret_name": "AGENT_SECRET" }
+                            ]
+                          }
+                        ],
+                        "nullable": true
                       }
                     },
                     "required": ["size", "exposure", "instances"]
@@ -17583,7 +17643,8 @@
                         "RESTORE_FAILED",
                         "RESTARTING",
                         "PAUSE_FAILED",
-                        "RESIZING"
+                        "RESIZING",
+                        "PROMOTING"
                       ],
                       "description": "Project status"
                     },

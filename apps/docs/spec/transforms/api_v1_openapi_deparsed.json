@@ -992,6 +992,9 @@
           "403": {
             "description": "Forbidden action"
           },
+          "404": {
+            "description": "User not found"
+          },
           "429": {
             "description": "Rate limit exceeded"
           },
@@ -3649,6 +3652,82 @@
           }
         ],
         "x-endpoint-owners": ["infra", "control-plane"],
+        "x-fga-permissions": [["database_network_restrictions_write"]],
+        "x-oauth-scope": "projects:write",
+        "x-scalar-stability": "experimental"
+      }
+    },
+    "/v1/projects/{ref}/network-restrictions/review": {
+      "post": {
+        "description": "This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.\n\nThis endpoint is currently in its **Alpha** stage.",
+        "operationId": "v1-review-network-restrictions",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NetworkRestrictionsReviewRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NetworkRestrictionsResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to resolve the network restrictions review"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Applies or rejects the change in review in a project's network restrictions",
+        "tags": ["Projects"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: projects:write",
+            "position": "after"
+          },
+          {
+            "name": "Alpha",
+            "position": "before"
+          }
+        ],
+        "x-endpoint-owners": ["control-plane"],
         "x-fga-permissions": [["database_network_restrictions_write"]],
         "x-oauth-scope": "projects:write",
         "x-scalar-stability": "experimental"
@@ -10204,6 +10283,74 @@
         "x-endpoint-owners": ["infra", "control-plane"],
         "x-fga-permissions": [["database_config_write"]],
         "x-oauth-scope": "database:write"
+      },
+      "patch": {
+        "operationId": "v1-patch-postgres-config",
+        "parameters": [
+          {
+            "name": "ref",
+            "required": true,
+            "in": "path",
+            "description": "Project ref",
+            "schema": {
+              "minLength": 20,
+              "maxLength": 20,
+              "pattern": "^[a-z]+$",
+              "example": "abcdefghijklmnopqrst",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePostgresConfigBody"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostgresConfigResponse_Output"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden action"
+          },
+          "429": {
+            "description": "Rate limit exceeded"
+          },
+          "500": {
+            "description": "Failed to update project's Postgres config"
+          }
+        },
+        "security": [
+          {
+            "bearer": []
+          }
+        ],
+        "summary": "Partially updates project's Postgres config",
+        "tags": ["Database"],
+        "x-badges": [
+          {
+            "name": "OAuth scope: database:write",
+            "position": "after"
+          }
+        ],
+        "x-endpoint-owners": ["infra", "control-plane"],
+        "x-fga-permissions": [["database_config_write"]],
+        "x-oauth-scope": "database:write"
       }
     },
     "/v1/projects/{ref}/config/realtime": {
@@ -11717,7 +11864,8 @@
               "RESTORE_FAILED",
               "RESTARTING",
               "PAUSE_FAILED",
-              "RESIZING"
+              "RESIZING",
+              "PROMOTING"
             ]
           },
           "db_host": {
@@ -11888,7 +12036,8 @@
               "RESTORE_FAILED",
               "RESTARTING",
               "PAUSE_FAILED",
-              "RESIZING"
+              "RESIZING",
+              "PROMOTING"
             ]
           }
         },
@@ -12005,7 +12154,8 @@
               "RESTORE_FAILED",
               "RESTARTING",
               "PAUSE_FAILED",
-              "RESIZING"
+              "RESIZING",
+              "PROMOTING"
             ]
           },
           "database": {
@@ -12264,7 +12414,8 @@
               "RESTORE_FAILED",
               "RESTARTING",
               "PAUSE_FAILED",
-              "RESIZING"
+              "RESIZING",
+              "PROMOTING"
             ]
           }
         },
@@ -12535,9 +12686,22 @@
           "token_type": {
             "type": "string",
             "enum": ["Bearer"]
+          },
+          "scope": {
+            "description": "Space-delimited scopes granted to the token. Omitted when no scopes were granted.",
+            "example": "projects:read projects:write",
+            "type": "string"
+          },
+          "project_refs": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Project refs the token is limited to. `null` means all projects.",
+            "nullable": true
           }
         },
-        "required": ["access_token", "expires_in", "token_type"]
+        "required": ["access_token", "expires_in", "token_type", "project_refs"]
       },
       "OAuthRevokeTokenBody": {
         "type": "object",
@@ -13440,6 +13604,34 @@
               "dbAllowedCidrsV6": ["2001:db8::/32"]
             }
           },
+          "pending_config": {
+            "description": "Present when a change that was never applied is waiting for review. `config` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it.",
+            "type": "object",
+            "properties": {
+              "dbAllowedCidrs": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              },
+              "dbAllowedCidrsV6": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            },
+            "example": {
+              "dbAllowedCidrs": ["203.0.113.0/24"],
+              "dbAllowedCidrsV6": ["2001:db8::/32"]
+            }
+          },
+          "pending_requested_at": {
+            "description": "When the change in `pending_config` was requested. Send it as `requested_at` to the review endpoint.",
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$"
+          },
           "status": {
             "type": "string",
             "enum": ["stored", "applied"]
@@ -13592,6 +13784,27 @@
           }
         },
         "required": ["entitlement", "config", "status"]
+      },
+      "NetworkRestrictionsReviewRequest": {
+        "type": "object",
+        "properties": {
+          "action": {
+            "type": "string",
+            "enum": ["apply", "reject"],
+            "description": "`apply` replaces the enforced list with the pending one and applies it. `reject` discards the pending one and keeps the enforced list."
+          },
+          "requested_at": {
+            "type": "string",
+            "format": "date-time",
+            "pattern": "^(?:(?:\\d\\d[2468][048]|\\d\\d[13579][26]|\\d\\d0[48]|[02468][048]00|[13579][26]00)-02-29|\\d{4}-(?:(?:0[13578]|1[02])-(?:0[1-9]|[12]\\d|3[01])|(?:0[469]|11)-(?:0[1-9]|[12]\\d|30)|(?:02)-(?:0[1-9]|1\\d|2[0-8])))T(?:(?:[01]\\d|2[0-3]):[0-5]\\d(?::[0-5]\\d(?:\\.\\d+)?)?(?:Z|([+-](?:[01]\\d|2[0-3]):[0-5]\\d)))$",
+            "description": "The `pending_requested_at` of the change being reviewed. Only that change is resolved: if another one has replaced it, the request gets a 409."
+          }
+        },
+        "required": ["action", "requested_at"],
+        "example": {
+          "action": "apply",
+          "requested_at": "2026-10-21T20:31:51.116+00:00"
+        }
       },
       "PgsodiumConfigResponse_Output": {
         "type": "object",
@@ -14221,6 +14434,28 @@
                   "properties": {
                     "type": {
                       "type": "string",
+                      "enum": ["table_using_reg_type"]
+                    },
+                    "schema_name": {
+                      "type": "string"
+                    },
+                    "table_name": {
+                      "type": "string"
+                    },
+                    "column_name": {
+                      "type": "string"
+                    },
+                    "type_name": {
+                      "type": "string"
+                    }
+                  },
+                  "required": ["type", "schema_name", "table_name", "column_name", "type_name"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
                       "enum": ["x86_architecture"]
                     }
                   },
@@ -14279,6 +14514,16 @@
                     "type": {
                       "type": "string",
                       "enum": ["btree_gist_nan_reindex"]
+                    }
+                  },
+                  "required": ["type"]
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["collation_reindex_required"]
                     }
                   },
                   "required": ["type"]
@@ -21301,7 +21546,8 @@
                     "RESTORE_FAILED",
                     "RESTARTING",
                     "PAUSE_FAILED",
-                    "RESIZING"
+                    "RESIZING",
+                    "PROMOTING"
                   ]
                 },
                 "inserted_at": {

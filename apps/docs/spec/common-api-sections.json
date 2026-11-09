@@ -443,6 +443,12 @@
         "type": "operation"
       },
       {
+        "id": "v1-patch-postgres-config",
+        "title": "Patch postgres config",
+        "slug": "v1-patch-postgres-config",
+        "type": "operation"
+      },
+      {
         "id": "v1-read-only-query",
         "title": "Read only query",
         "slug": "v1-read-only-query",
@@ -1220,6 +1226,12 @@
         "id": "v1-restore-a-project",
         "title": "Restore a project",
         "slug": "v1-restore-a-project",
+        "type": "operation"
+      },
+      {
+        "id": "v1-review-network-restrictions",
+        "title": "Review network restrictions",
+        "slug": "v1-review-network-restrictions",
         "type": "operation"
       },
       {
