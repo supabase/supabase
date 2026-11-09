@@ -1,9 +1,16 @@
 'use client'
 
 import { ChevronDownIcon } from 'lucide-react'
-import { Children, isValidElement, useId, useState, type ReactElement, type ReactNode } from 'react'
+import {
+  Children,
+  isValidElement,
+  useId,
+  useState,
+  type ComponentType,
+  type ReactElement,
+  type ReactNode,
+} from 'react'
 import ReactMarkdown from 'react-markdown'
-// shadcn tabs from packages/ui/src/components/shadcn/ui/tabs.tsx
 import { cn, Tabs, TabsContent, TabsIndicator, TabsList, TabsTrigger } from 'ui'
 
 import { CodeCopyButton } from './CodeBlock/CodeBlockControls'
@@ -18,22 +25,18 @@ type PromptCopyProps = {
 
 type PromptContentProps = {
   children: ReactNode
-  /** Draws attention with a text shimmer. Defaults to true. */
   shimmer?: boolean
 }
 
 type PromptProps = {
   children: ReactNode
-  /** Stable tab id. Auto-generated when omitted. */
   value?: string
-  /** When true, content starts collapsed with a show more / show less control. */
   expandable?: boolean
 }
 
 type PromptPanelProps = {
   children: ReactNode
   className?: string
-  /** Runs after a successful copy with the active prompt's value. */
   onCopied?: (value: string) => void
 }
 
@@ -66,7 +69,10 @@ function Prompt(_props: PromptProps) {
 }
 Prompt.displayName = 'Prompt'
 
-function isElementOfType(child: ReactNode, type: { displayName?: string }) {
+function isElementOfType<Props>(
+  child: ReactNode,
+  type: ComponentType<Props>
+): child is ReactElement<Props> {
   return (
     isValidElement(child) &&
     typeof child.type !== 'string' &&
@@ -83,11 +89,11 @@ function collectPrompt(prompt: ReactElement<PromptProps>, index: number): Collec
 
   Children.forEach(prompt.props.children, (child) => {
     if (isElementOfType(child, PromptTitle)) {
-      title = (child as ReactElement<PromptTitleProps>).props.children
+      title = child.props.children
     } else if (isElementOfType(child, PromptCopy)) {
-      copyValue = (child as ReactElement<PromptCopyProps>).props.children
+      copyValue = child.props.children
     } else if (isElementOfType(child, PromptContent)) {
-      const props = (child as ReactElement<PromptContentProps>).props
+      const props = child.props
       content = props.children
       shimmer = props.shimmer !== false
     }
@@ -208,7 +214,6 @@ function PromptBody({
   )
 }
 
-/** Renders a Markdown prompt string as the panel body, with backticks as code chips. */
 function PromptMarkdown({ children }: { children: string }) {
   return (
     <div className="not-prose flex flex-col gap-2 [&_ol]:list-decimal [&_ol]:pl-5 [&_ul]:list-disc [&_ul]:pl-5 [&_li+li]:mt-1">
@@ -217,7 +222,6 @@ function PromptMarkdown({ children }: { children: string }) {
   )
 }
 
-/** Inline code chip for prompt bodies; opts out of the text shimmer. */
 function PromptCode({ children }: { children?: ReactNode }) {
   return <code className="shimmer-none">{children}</code>
 }
@@ -230,22 +234,6 @@ const tabTriggerClassName = cn(
   'group-data-[tab-indicator-ready]/list:data-[state=active]:border-b-transparent'
 )
 
-/**
- * Copyable prompt card. Compose one or more `<Prompt>` children; multiple
- * prompts render as tabs. A single prompt still shows the header + copy
- * button, with the title styled like an inactive tab (no underline).
- *
- * @example
- * ```tsx
- * <PromptPanel>
- *   <Prompt value="prompt" expandable>
- *     <PromptTitle>Agent Prompt</PromptTitle>
- *     <PromptCopy>Plain text copied to the clipboard</PromptCopy>
- *     <PromptContent>Rich content shown in the panel</PromptContent>
- *   </Prompt>
- * </PromptPanel>
- * ```
- */
 function PromptPanel({ children, className, onCopied }: PromptPanelProps) {
   const fallbackId = useId()
   const titleId = useId()
@@ -325,7 +313,6 @@ function PromptPanel({ children, className, onCopied }: PromptPanelProps) {
       )}
     >
       {header}
-      {/* Stack panes in one grid cell so the panel keeps the tallest tab's height. */}
       <div className="grid">
         {prompts.map((prompt) => {
           const isActive = prompt.value === activeTab
@@ -335,7 +322,6 @@ function PromptPanel({ children, className, onCopied }: PromptPanelProps) {
               key={prompt.value}
               value={prompt.value}
               forceMount
-              // pane's own controls remain reachable
               tabIndex={-1}
               inert={!isActive}
               aria-hidden={!isActive}

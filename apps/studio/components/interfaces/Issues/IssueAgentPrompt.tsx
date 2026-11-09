@@ -9,7 +9,6 @@ import {
 
 import { useTrack } from '@/lib/telemetry/track'
 
-// Speaks in advisors, not issues: that's what the MCP server calls them today
 const REVIEW_STEPS = [
   'If the Supabase plugin is not installed or connected, follow https://supabase.com/docs/guides/ai-tools/plugins to set it up for this project.',
   'Retrieve the project’s security, performance and health advisors. Prioritize errors, then warnings, then info.',
