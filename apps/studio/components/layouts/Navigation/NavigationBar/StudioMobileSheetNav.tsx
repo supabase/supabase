@@ -62,7 +62,7 @@ export const StudioMobileSheetNav = ({
       open={content !== null}
       onOpenChange={handleOpenChange}
       shouldCloseOnViewportResize={!activeSidebar}
-      shouldCloseOnQueryChange={shouldCloseOnQueryChange}
+      shouldCloseOnQueryChange={shouldCloseOnQueryChange || typeof content === 'string'}
       onPointerDownOutside={(event) => {
         // Buttons in the floating toolbar (#mobile-nav-actions) render outside this sheet, so
         // Radix treats taps on them as an outside click and closes the sheet before the button's
