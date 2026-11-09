@@ -42,7 +42,7 @@ const MAX_HOMEPAGE_ISSUES = 4
 export const IssuesSection = ({ showEmptyState = false }: { showEmptyState?: boolean }) => {
   const { ref: projectRef } = useParams()
   const isHealthAdvisorInHomepageEnabled = useFlag('healthAdvisorInHomepage')
-  const { issues, error, isLoading, isError, isSuccess, refetch } = useProjectIssues({
+  const { issues, error, isError, isSuccess, refetch } = useProjectIssues({
     projectRef,
     enabled: !showEmptyState,
     includeHealth: isHealthAdvisorInHomepageEnabled,
@@ -61,32 +61,37 @@ export const IssuesSection = ({ showEmptyState = false }: { showEmptyState?: boo
           </Button>
         )}
       </div>
-      {showEmptyState && <EmptyState />}
-      {!showEmptyState && isLoading && <GenericSkeletonLoader />}
-      {!showEmptyState && isError && (
-        <AlertError
-          error={error}
-          subject="Failed to retrieve issues"
-          projectRef={projectRef}
-          additionalActions={
-            <Button variant="default" onClick={() => refetch()}>
-              Retry
-            </Button>
-          }
-        />
-      )}
-      {!showEmptyState && !isLoading && !isError && issues.length === 0 && <EmptyState />}
-      {!showEmptyState && issues.length > 0 && (
-        <Row maxColumns={4} minWidth={280}>
-          {issues.slice(0, MAX_HOMEPAGE_ISSUES).map((issue) => (
-            <IssueCard
-              key={issue.id}
-              issue={issue}
-              issuesCount={issues.length}
-              projectRef={projectRef ?? ''}
+      {showEmptyState ? (
+        <EmptyState />
+      ) : (
+        <>
+          {!isSuccess && !isError && <GenericSkeletonLoader />}
+          {isError && (
+            <AlertError
+              error={error}
+              subject="Failed to retrieve issues"
+              projectRef={projectRef}
+              additionalActions={
+                <Button variant="default" onClick={() => refetch()}>
+                  Retry
+                </Button>
+              }
             />
-          ))}
-        </Row>
+          )}
+          {isSuccess && issues.length === 0 && <EmptyState />}
+          {issues.length > 0 && (
+            <Row maxColumns={4} minWidth={280}>
+              {issues.slice(0, MAX_HOMEPAGE_ISSUES).map((issue) => (
+                <IssueCard
+                  key={issue.id}
+                  issue={issue}
+                  issuesCount={issues.length}
+                  projectRef={projectRef ?? ''}
+                />
+              ))}
+            </Row>
+          )}
+        </>
       )}
     </section>
   )
@@ -151,7 +156,6 @@ const IssueCard = ({
             tooltip={{ content: { text: 'Ask Assistant' } }}
             onClick={handleAskAssistant}
           />
-          {/* Confirms in place with a check, like other copy buttons in Studio */}
           <Tooltip>
             <TooltipTrigger asChild>
               <CopyButton
