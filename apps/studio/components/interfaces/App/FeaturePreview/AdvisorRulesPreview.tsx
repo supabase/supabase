@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import Image from 'next/image'
 
 import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
@@ -7,6 +7,7 @@ import { BASE_PATH } from '@/lib/constants'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
 
   return (
@@ -27,15 +28,19 @@ export const AdvisorRulesPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Allow you to disable advisor rules for your project from the{' '}
-            <InlineLink
-              href={
-                isAdvisorRulesEnabled
-                  ? `/project/${ref}/advisors/rules/security`
-                  : `/project/${ref}/issues?category=security`
-              }
-            >
-              Issues section.
-            </InlineLink>
+            {isAdvisorRulesEnabled || isIssuesInboxEnabled ? (
+              <InlineLink
+                href={
+                  isAdvisorRulesEnabled
+                    ? `/project/${ref}/advisors/rules/security`
+                    : `/project/${ref}/issues?category=security`
+                }
+              >
+                Issues section.
+              </InlineLink>
+            ) : (
+              <span>Issues section.</span>
+            )}
           </li>
         </ul>
       </div>

@@ -1,13 +1,18 @@
+import { QueryClient } from '@tanstack/react-query'
 import { renderHook } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import {
   generateOtherRoutes,
   generateProductRoutes,
   generateSettingsRoutes,
+  useGenerateOtherRoutes,
   useGenerateToolRoutes,
 } from './NavigationBar.utils'
+import { miscKeys } from '@/data/misc/keys'
 import type { Project } from '@/data/projects/project-detail-query'
+import { CustomWrapper } from '@/tests/lib/custom-render'
 
 const REF = 'test-project-ref'
 
@@ -120,11 +125,32 @@ describe('generateProductRoutes', () => {
 })
 
 describe('generateOtherRoutes', () => {
-  it('always includes issues, logs, and integrations', () => {
+  it('includes logs and integrations with Issues hidden by default', () => {
     const routes = generateOtherRoutes(REF, activeProject)
-    expect(keys(routes)).toContain('issues')
+    expect(keys(routes)).not.toContain('issues')
     expect(keys(routes)).toContain('logs')
     expect(keys(routes)).toContain('integrations')
+  })
+
+  it('hides Issues when explicitly disabled', () => {
+    expect(keys(generateOtherRoutes(REF, activeProject, { issuesInbox: false }))).not.toContain(
+      'issues'
+    )
+  })
+
+  it.each([false, true])('wires the Issues flag into generated navigation: %s', (issuesInbox) => {
+    mockUseParams.mockReturnValue({ ref: REF })
+    mockUseSelectedProjectQuery.mockReturnValue({ data: activeProject })
+    const queryClient = new QueryClient()
+    queryClient.setQueryData(miscKeys.enabledFeaturesOverride(), { disabled_features: [] })
+    const { result } = renderHook(() => useGenerateOtherRoutes(), {
+      wrapper: ({ children }) => (
+        <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>
+          <CustomWrapper queryClient={queryClient}>{children}</CustomWrapper>
+        </FeatureFlagContext.Provider>
+      ),
+    })
+    expect(keys(result.current).includes('issues')).toBe(issuesInbox)
   })
 
   it('includes observability when reports are enabled', () => {
@@ -168,13 +194,13 @@ describe('generateOtherRoutes', () => {
   })
 
   it('marks routes as disabled when project is not active', () => {
-    const routes = generateOtherRoutes(REF, inactiveProject)
+    const routes = generateOtherRoutes(REF, inactiveProject, { issuesInbox: true })
     const issuesRoute = routes.find((r) => r.key === 'issues')
     expect(issuesRoute?.disabled).toBe(true)
   })
 
-  it('links the Issues route to the project issues page, where advisor findings now live', () => {
-    const routes = generateOtherRoutes(REF, activeProject)
+  it('links enabled Issues to the project issues page', () => {
+    const routes = generateOtherRoutes(REF, activeProject, { issuesInbox: true })
     const issuesRoute = routes.find((r) => r.key === 'issues')
     expect(issuesRoute?.link).toBe(`/project/${REF}/issues`)
   })

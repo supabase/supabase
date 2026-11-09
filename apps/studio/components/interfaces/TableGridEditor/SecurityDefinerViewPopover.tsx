@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { UnlockIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Popover, PopoverContent, PopoverTrigger } from 'ui'
@@ -13,6 +13,7 @@ export const SecurityDefinerViewPopover = ({
   onAutofix?: () => void
 }) => {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
 
   return (
     <Popover modal={false}>
@@ -39,15 +40,17 @@ export const SecurityDefinerViewPopover = ({
                 Autofix
               </Button>
             )}
-            <Button asChild>
-              <Link
-                target="_blank"
-                rel="noopener noreferrer"
-                href={`/project/${ref}/issues/${lint?.name}`}
-              >
-                Learn more
-              </Link>
-            </Button>
+            {isIssuesInboxEnabled && (
+              <Button asChild>
+                <Link
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  href={`/project/${ref}/issues/${lint?.name}`}
+                >
+                  Learn more
+                </Link>
+              </Button>
+            )}
           </div>
         </div>
       </PopoverContent>
