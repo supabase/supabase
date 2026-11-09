@@ -21,7 +21,7 @@ describe('useOnboardingSurveyVariant', () => {
     mockTrackExperimentExposure.mockClear()
   })
 
-  it.each(['control'])('returns and tracks the %s arm', (arm) => {
+  it.each(['control', 'org_form'])('returns and tracks the %s arm', (arm) => {
     flagState.current = arm
 
     const { result } = renderHook(() => useOnboardingSurveyVariant())

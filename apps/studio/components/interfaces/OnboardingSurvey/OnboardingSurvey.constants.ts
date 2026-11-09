@@ -50,9 +50,9 @@ export const SURVEY_ORG_KIND_OPTIONS: readonly OnboardingSurveyOption[] = (
 
 export const ONBOARDING_SURVEY_EXPERIMENT_ID = 'onboardingSurveyPlacement'
 
-// Users in `control` get the survey and its follow-up; users the flag doesn't
-// assign get the default form.
-export const ONBOARDING_SURVEY_VARIANTS = ['control'] as const
+// `org_form` gets the survey and its follow-up. `control` gets the default form
+// but still records exposure; users the flag doesn't assign record none.
+export const ONBOARDING_SURVEY_VARIANTS = ['control', 'org_form'] as const
 
 export type OnboardingSurveyVariant = (typeof ONBOARDING_SURVEY_VARIANTS)[number]
 

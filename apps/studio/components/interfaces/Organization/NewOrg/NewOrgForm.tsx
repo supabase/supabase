@@ -165,7 +165,7 @@ export const NewOrgForm = ({
   })
 
   const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
-  const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'control'
+  const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'org_form'
   // Skip kind/size on org creation when the survey section is shown: the survey
   // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
   // parent row, so sending them on both paths would swallow the survey call.
