@@ -24,7 +24,6 @@ import { AlertError } from '@/components/ui/AlertError'
 import type { Issue } from '@/data/issues/issue.types'
 import { useProjectIssues } from '@/data/issues/useProjectIssues'
 
-/** The column both the loaded issue and its skeleton render into, so they line up. */
 const IssueDetailLayout = ({
   toolbar,
   header,
@@ -35,7 +34,6 @@ const IssueDetailLayout = ({
   header: ReactNode
   children: ReactNode
 } & Omit<ComponentProps<'div'>, 'className'>) => (
-  // Fills the pane with the same raised surface as an Explorer tab
   <div className="flex h-full flex-col bg-card" {...props}>
     {toolbar}
     <div className="min-h-0 flex-1 overflow-y-auto">
@@ -47,7 +45,6 @@ const IssueDetailLayout = ({
   </div>
 )
 
-/** Severity, category and the docs link, which sit in the same place on every issue. */
 const IssueMeta = ({ issue }: { issue: Issue }) => {
   const CategoryIcon = CATEGORY_ICONS[issue.category]
 
@@ -83,7 +80,6 @@ const IssueMeta = ({ issue }: { issue: Issue }) => {
   )
 }
 
-// Each bar sits in a box the height of the line it stands in for, so nothing shifts on load
 const DESCRIPTION_LINE_WIDTHS = ['w-full', 'w-11/12', 'w-4/5', 'w-2/3']
 
 const IssueDetailSkeleton = () => (
