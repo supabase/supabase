@@ -21,11 +21,34 @@ app.get('/', (c) => {
     response_type: 'code',
   })
 
+  const baseUrl = `${AUTHORIZATION_URL}?${params.toString()}`
+
   return c.html(`
-    <!doctype>
+    <!doctype html>
     <html>
       <body>
-        <a href="${AUTHORIZATION_URL}?${params.toString()}"><button>Login with Supabase</button></a>
+        <form id="login-form">
+          <p>
+            <label>Organization <input type="text" name="organization_slug" /></label>
+          </p>
+          <p>
+            <label>Project <input type="text" name="project_ref" /></label>
+          </p>
+          <button type="submit">Login with Supabase</button>
+        </form>
+        <script>
+          const baseUrl = ${JSON.stringify(baseUrl).replace(/</g, '\\u003c')}
+          document.getElementById('login-form').addEventListener('submit', (event) => {
+            event.preventDefault()
+            const url = new URL(baseUrl)
+            const form = new FormData(event.target)
+            for (const name of ['organization_slug', 'project_ref']) {
+              const value = form.get(name)
+              if (value) url.searchParams.set(name, value)
+            }
+            window.location.href = url.toString()
+          })
+        </script>
       </body>
     </html>
     `)
