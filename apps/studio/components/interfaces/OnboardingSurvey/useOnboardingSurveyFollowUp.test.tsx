@@ -56,10 +56,13 @@ describe('useOnboardingSurveyFollowUp', () => {
     const { result } = renderFollowUpHook()
     await waitFor(() => expect(result.current.isEligible).toBe(true))
 
+    expect(result.current.hasExpired).toBe(false)
+
     await act(async () => {
       await vi.advanceTimersByTimeAsync(ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS)
     })
     expect(result.current.isEligible).toBe(false)
+    expect(result.current.hasExpired).toBe(true)
   })
 
   it('is not eligible when the org was created more than five minutes ago', async () => {
@@ -74,6 +77,7 @@ describe('useOnboardingSurveyFollowUp', () => {
       await vi.advanceTimersByTimeAsync(0)
     })
     expect(result.current.isEligible).toBe(false)
+    expect(result.current.hasExpired).toBe(true)
   })
 
   it.each(['submitted', 'dismissed'] as const)(
@@ -87,6 +91,7 @@ describe('useOnboardingSurveyFollowUp', () => {
       act(() => result.current.resolveFollowUp(status))
 
       await waitFor(() => expect(result.current.isEligible).toBe(false))
+      expect(result.current.hasExpired).toBe(false)
       expect(readStoredState()).toMatchObject({ status })
     }
   )

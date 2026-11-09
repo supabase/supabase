@@ -26,7 +26,7 @@ export function parseFollowUpState(value: unknown): OnboardingSurveyFollowUpStat
 
 /**
  * Records that the org's creator left the survey blank on the new-org form, so
- * the follow-up prompt can ask again. Written to the creator's browser only,
+ * the follow-up card can ask again. Written to the creator's browser only,
  * which is what limits the follow-up to the creator.
  */
 export function markFollowUpPending({

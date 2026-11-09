@@ -16,6 +16,7 @@ const UNKNOWN_STORAGE_KEY = 'supabase-onboarding-survey-follow-up-unknown'
  * Whether the selected org's creator should be asked the onboarding survey
  * again: they left it blank on the new-org form in this browser, haven't
  * answered or skipped since, and the org is less than five minutes old.
+ * `hasExpired` turns true once those five minutes pass with no answer or skip.
  */
 export function useOnboardingSurveyFollowUp() {
   const { profile } = useProfile()
@@ -33,15 +34,22 @@ export function useOnboardingSurveyFollowUp() {
 
   // The window is time-based, so a timer (not render) decides when it closes.
   const [activeOrgCreatedAt, setActiveOrgCreatedAt] = useState<string>()
+  const [expiredOrgCreatedAt, setExpiredOrgCreatedAt] = useState<string>()
 
   useEffect(() => {
     if (!pendingOrgCreatedAt) return
 
     const remainingMs = getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now())
-    if (remainingMs <= 0) return
+    if (remainingMs <= 0) {
+      setExpiredOrgCreatedAt(pendingOrgCreatedAt)
+      return
+    }
 
     setActiveOrgCreatedAt(pendingOrgCreatedAt)
-    const timeout = setTimeout(() => setActiveOrgCreatedAt(undefined), remainingMs)
+    const timeout = setTimeout(() => {
+      setActiveOrgCreatedAt(undefined)
+      setExpiredOrgCreatedAt(pendingOrgCreatedAt)
+    }, remainingMs)
     return () => {
       clearTimeout(timeout)
       setActiveOrgCreatedAt(undefined)
@@ -49,6 +57,7 @@ export function useOnboardingSurveyFollowUp() {
   }, [pendingOrgCreatedAt])
 
   const isEligible = !!pendingOrgCreatedAt && activeOrgCreatedAt === pendingOrgCreatedAt
+  const hasExpired = !!pendingOrgCreatedAt && expiredOrgCreatedAt === pendingOrgCreatedAt
 
   const resolveFollowUp = useCallback(
     (status: Exclude<OnboardingSurveyFollowUpStatus, 'pending'>) => {
@@ -62,6 +71,7 @@ export function useOnboardingSurveyFollowUp() {
 
   return {
     isEligible,
+    hasExpired,
     orgSlug,
     orgKind: followUpState?.kind,
     orgSize: followUpState?.size,

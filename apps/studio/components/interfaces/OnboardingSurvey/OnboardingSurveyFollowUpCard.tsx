@@ -19,18 +19,19 @@ import { useTrack } from '@/lib/telemetry/track'
  * the new-org form. Shows as a card in the banner stack for the first five
  * minutes after the org is created; Answer opens the survey dialog.
  */
-export function OnboardingSurveyFollowUpPrompt() {
+export function OnboardingSurveyFollowUpCard() {
   const track = useTrack()
-  const { isEligible, orgSlug, orgKind, orgSize, resolveFollowUp } = useOnboardingSurveyFollowUp()
+  const { isEligible, hasExpired, orgSlug, orgKind, orgSize, resolveFollowUp } =
+    useOnboardingSurveyFollowUp()
   const { addBanner, dismissBanner } = useBannerStack()
   const [dialogOrgSlug, setDialogOrgSlug] = useState<string>()
   const isDialogOpen = !!dialogOrgSlug && dialogOrgSlug === orgSlug
   const { mutate: submitOnboardingSurvey, isPending: isSubmitting } = useOnboardingSurveyMutation()
 
   // The new-org form sent nothing for a blank survey, so the org's type and size
-  // are saved here whether the creator answers or skips.
+  // are saved here whether the creator answers, skips, or lets the window close.
   const skipFollowUp = useCallback(
-    (reason: 'follow_up_skip' | 'follow_up_closed') => {
+    (reason: 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired') => {
       track('onboarding_survey_dismissed', { surface: 'follow_up', reason })
       resolveFollowUp('dismissed')
       if (orgSlug && orgKind)
@@ -38,6 +39,10 @@ export function OnboardingSurveyFollowUpPrompt() {
     },
     [orgKind, orgSize, orgSlug, resolveFollowUp, submitOnboardingSurvey, track]
   )
+
+  useEffect(() => {
+    if (hasExpired && !isDialogOpen) skipFollowUp('follow_up_expired')
+  }, [hasExpired, isDialogOpen, skipFollowUp])
 
   const pathname = usePathname()
   const shouldShowCard = isEligible && !isDialogOpen && !isProjectCreationPath(pathname)
