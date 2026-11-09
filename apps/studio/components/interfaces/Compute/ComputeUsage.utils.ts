@@ -174,6 +174,27 @@ export const formatVcpuMinutes = (vcpuHours: number): string => {
     : formatVcpuHours(vcpuHours)
 }
 
+/**
+ * Both sides of a quota comparison have to be in one unit, and the allowance is what picks it:
+ * scaling each number on its own size is how "1,067 vCPU-hrs of 500 vCPU-min" happens, which
+ * compares nothing. The unit is written once, after the pair.
+ */
+export const formatVcpuQuota = (usedVcpuHours: number, includedVcpuHours: number | null) => {
+  const anchorHours = includedVcpuHours ?? usedVcpuHours
+  const isMinuteScale = anchorHours * 60 < 10_000
+
+  const value = (hours: number) =>
+    isMinuteScale ? Math.round(hours * 60).toLocaleString() : round(hours)
+  const unit = isMinuteScale ? 'vCPU-min' : 'vCPU-hrs'
+
+  if (includedVcpuHours === null) return `${value(usedVcpuHours)} ${unit}`
+  return `${value(usedVcpuHours)}/${value(includedVcpuHours)} ${unit}`
+}
+
+/** Counts carry no unit, so the pair is all there is to say. */
+export const formatCapacityQuota = (used: number, limit: number | null) =>
+  limit === null ? used.toLocaleString() : `${used.toLocaleString()}/${limit.toLocaleString()}`
+
 export const formatVcpuHours = (hours: number): string => `${round(hours)} vCPU-hrs`
 
 export const formatGbHours = (hours: number): string => `${round(hours)} GB-hrs`

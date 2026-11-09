@@ -20,9 +20,10 @@ import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD, includedVcpuHours } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
 import {
+  formatCapacityQuota,
   formatComputeHours,
   formatPercentage,
-  formatVcpuMinutes,
+  formatVcpuQuota,
   getComputeCapacity,
   getCpuUtilization,
 } from './ComputeUsage.utils'
@@ -70,38 +71,39 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     (total, instance) => total + instance.declaredInstances,
     0
   )
-  const formatCount = (value: number) =>
-    value.toLocaleString(undefined, { maximumFractionDigits: 0 })
-
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
+  const runtime = formatComputeHours(usage?.runningHours ?? 0)
 
   // The quota is vCPU-minutes, so a larger instance consumes it faster than a smaller one
-  // running just as long. Runtime reports alongside as context.
+  // running just as long.
   const quotaHours = includedVcpuHours(limits)
 
+  // Only the headline pair and its status earn a place on the card. Runtime, CPU utilisation
+  // and the compute count are context for someone already reading the number, so they sit in
+  // the tooltip rather than stacking three lines under every bar.
   const meters: MeterDefinition[] = [
     {
       label: 'Compute',
-      description: 'vCPU reserved while workers run. Suspended instances accrue nothing.',
+      description: [
+        'vCPU reserved while workers run. Suspended instances accrue nothing.',
+        cpuUtilization === null
+          ? `${runtime} runtime this period.`
+          : `${runtime} runtime this period, ${formatPercentage(cpuUtilization)} of it spent on CPU.`,
+      ].join(' '),
       used: usage?.reservedVcpuHours ?? 0,
       included: quotaHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatVcpuMinutes,
-      detail:
-        cpuUtilization === null
-          ? `${formatComputeHours(usage?.runningHours ?? 0)} runtime`
-          : `${formatPercentage(cpuUtilization)} CPU used · ${formatComputeHours(usage?.runningHours ?? 0)} runtime`,
+      formatValue: formatVcpuQuota,
     },
     {
       label: 'Concurrent workers',
-      description: 'Instances that may run at once across every compute in this project.',
+      description: `Instances that may run at once across every compute in this project. ${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'} deployed.`,
       used: declaredInstances,
       included: limits.concurrentWorkers,
       limitKind: 'capacity',
       isLoading: false,
-      format: formatCount,
-      detail: `Across ${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'}`,
+      formatValue: formatCapacityQuota,
     },
   ]
 
@@ -137,7 +139,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       </div>
 
       {!isCollapsed && (
-        <div className="grid grid-cols-1 divide-y lg:grid-cols-3 lg:divide-x lg:divide-y-0">
+        <div className="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           {meters.map((meter) => (
             <UsageMeter key={meter.label} {...meter} noLimitLabel={noLimitLabel} />
           ))}
@@ -187,8 +189,8 @@ interface MeterDefinition {
    */
   limitKind: 'allowance' | 'capacity'
   isLoading: boolean
-  format: (value: number) => string
-  detail?: string
+  /** Formats both sides as one string, so the pair cannot end up in two different units. */
+  formatValue: (used: number, included: number | null) => string
 }
 
 const getBarClass = ({ isExceeded, isWarning }: { isExceeded: boolean; isWarning: boolean }) => {
@@ -232,8 +234,8 @@ const getMeterStatus = ({ used, included, limitKind }: MeterDefinition) => {
   }
 }
 
-const formatMeterValue = ({ used, included, format }: MeterDefinition, hasLimit: boolean) =>
-  hasLimit && included !== null ? `${format(used)} of ${format(included)}` : `${format(used)} used`
+const formatMeterValue = ({ used, included, formatValue }: MeterDefinition, hasLimit: boolean) =>
+  formatValue(used, hasLimit ? included : null)
 
 const MeterBar = ({
   meter,
@@ -260,7 +262,7 @@ const MeterBar = ({
 const CompactUsageMeter = (meter: MeterDefinition) => {
   const { hasLimit, headroom, barClass } = getMeterStatus(meter)
   const value = meter.isLoading ? undefined : formatMeterValue(meter, hasLimit)
-  const caption = [value, headroom ?? meter.detail].filter(Boolean).join(' · ')
+  const caption = [value, headroom].filter(Boolean).join(' · ')
 
   return (
     <Tooltip>
@@ -303,9 +305,6 @@ const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel
 
       <MeterBar meter={meter} hasLimit={hasLimit} barClass={barClass} />
 
-      {meter.detail && !isLoading && (
-        <p className="text-xs tabular-nums text-foreground-lighter">{meter.detail}</p>
-      )}
       {isExceeded && <p className="text-xs text-destructive">{headroom ?? 'Over limit'}</p>}
       {isAtCapacity && <p className="text-xs text-warning">{headroom ?? 'At limit'}</p>}
       {isApproaching && <p className="text-xs text-warning">{headroom ?? 'Approaching limit'}</p>}

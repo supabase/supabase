@@ -5,11 +5,13 @@ import { parseComputeSize } from './Compute.utils'
 import {
   aggregateUsageBySize,
   buildComputeBurndown,
+  formatCapacityQuota,
   formatComputeHours,
   formatComputeRequests,
   formatGbHours,
   formatPercentage,
   formatVcpuHours,
+  formatVcpuQuota,
   getComputeCapacity,
   getCpuUtilization,
   getUsageConcentration,
@@ -252,5 +254,35 @@ describe('getComputeCapacity', () => {
 
   it('leaves a single free slot phrased as one', () => {
     expect(getComputeCapacity(9, 10).label).toBe('Room for 1 more')
+  })
+})
+
+describe('formatVcpuQuota', () => {
+  it('reads both sides in the unit the allowance sets', () => {
+    // 1,067 vCPU-hours against a 500 vCPU-minute quota: scaling each side on its own size is
+    // what produced "1,067 vCPU-hrs of 500 vCPU-min", which compares nothing.
+    expect(formatVcpuQuota(1067, 500 / 60)).toBe('64,020/500 vCPU-min')
+  })
+
+  it('states the unit once, after the pair', () => {
+    expect(formatVcpuQuota(7.2, 500 / 60)).toBe('432/500 vCPU-min')
+  })
+
+  it('moves both sides to hours when the allowance is large', () => {
+    expect(formatVcpuQuota(900, 1000)).toBe('900/1,000 vCPU-hrs')
+  })
+
+  it('drops the denominator when there is no allowance', () => {
+    expect(formatVcpuQuota(7.2, null)).toBe('432 vCPU-min')
+  })
+})
+
+describe('formatCapacityQuota', () => {
+  it('writes a count pair without a unit', () => {
+    expect(formatCapacityQuota(7, 10)).toBe('7/10')
+  })
+
+  it('shows the count alone when the plan sets no cap', () => {
+    expect(formatCapacityQuota(7, null)).toBe('7')
   })
 })

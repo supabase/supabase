@@ -118,16 +118,21 @@ describe('ComputePlanUsage', () => {
     expect(screen.queryByText('GB-hours')).not.toBeInTheDocument()
     expect(screen.queryByText('Deployments')).not.toBeInTheDocument()
     // The RFC includes 500 per cycle on every plan, read as vCPU-minutes.
-    expect(await screen.findByText(/of 500 vCPU-min$/)).toBeInTheDocument()
+    expect(await screen.findByText(/^[\d,]+\/500 vCPU-min$/)).toBeInTheDocument()
   })
 
-  it('reports CPU utilisation and runtime alongside the metered quota', async () => {
+  it('keeps runtime and CPU utilisation in the tooltip rather than under the bar', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText(/\d+% CPU used · [\d.,]+ hrs runtime/)).toBeInTheDocument()
+    const computeMeter = await meter('Compute')
+    await computeMeter.findByText(/vCPU-min$/)
+
+    // Only the pair and its status belong on the card; the rest lives behind the info icon.
+    expect(computeMeter.queryByText(/CPU used/)).not.toBeInTheDocument()
+    expect(computeMeter.queryByText(/runtime/)).not.toBeInTheDocument()
   })
 
   it('sums instances across computes and names how many computes run them', async () => {
@@ -144,8 +149,7 @@ describe('ComputePlanUsage', () => {
     )
 
     // Pro allows 10 concurrent workers per project.
-    expect(await screen.findByText('7 of 10')).toBeInTheDocument()
-    expect(await screen.findByText('Across 2 computes')).toBeInTheDocument()
+    expect(await screen.findByText('7/10')).toBeInTheDocument()
     // Three slots left is the actionable form of "70% used".
     expect(await screen.findByText('Room for 3 more')).toBeInTheDocument()
   })
@@ -157,7 +161,7 @@ describe('ComputePlanUsage', () => {
     })
 
     const instanceMeter = await meter('Concurrent workers')
-    expect(await instanceMeter.findByText('1 of 1')).toBeInTheDocument()
+    expect(await instanceMeter.findByText('1/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('No room for more')).toBeInTheDocument()
     expect(instanceMeter.queryByText(/over the limit/)).not.toBeInTheDocument()
   })
@@ -173,7 +177,7 @@ describe('ComputePlanUsage', () => {
     )
 
     const instanceMeter = await meter('Concurrent workers')
-    expect(await instanceMeter.findByText('2 of 1')).toBeInTheDocument()
+    expect(await instanceMeter.findByText('2/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
 
@@ -196,8 +200,8 @@ describe('ComputePlanUsage', () => {
 
     // Team includes the same 500 vCPU-minute quota as every other plan; what differs is the
     // concurrency it allows.
-    expect(await screen.findByText(/of 500 vCPU-min$/)).toBeInTheDocument()
-    expect(await screen.findByText('1 of 50')).toBeInTheDocument()
+    expect(await screen.findByText(/^[\d,]+\/500 vCPU-min$/)).toBeInTheDocument()
+    expect(await screen.findByText('1/50')).toBeInTheDocument()
   })
 
   it('switches the usage timeframe from the dropdown', async () => {
@@ -222,7 +226,7 @@ describe('ComputePlanUsage in private alpha', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByText('1 of 2')).toBeInTheDocument()
+    expect(await screen.findByText('1/2')).toBeInTheDocument()
   })
 
   it('flags concurrent workers over the alpha cap', async () => {
@@ -236,7 +240,7 @@ describe('ComputePlanUsage in private alpha', () => {
     )
 
     const instanceMeter = await meter('Concurrent workers')
-    expect(instanceMeter.getByText('3 of 2')).toBeInTheDocument()
+    expect(instanceMeter.getByText('3/2')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
 
@@ -258,7 +262,7 @@ describe('ComputePlanUsage in private alpha', () => {
       profileContext: PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByLabelText('Concurrent workers: 1 of 2')).toBeInTheDocument()
+    expect(await screen.findByLabelText('Concurrent workers: 1/2')).toBeInTheDocument()
     expect(screen.queryByText('Compute', { selector: 'p' })).not.toBeInTheDocument()
   })
 })

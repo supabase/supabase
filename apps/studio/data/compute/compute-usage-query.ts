@@ -144,6 +144,14 @@ export interface ComputeInstanceUsage {
   size: string
 }
 
+/**
+ * Workers here are invocation-shaped: they run for minutes at a time and suspend in between,
+ * which is the workload the 500 vCPU-minute quota and the per-invocation duration cap
+ * describe. A steadily-held worker would be two orders of magnitude higher and would put
+ * every figure in the product thousands of times over its own allowance.
+ */
+const INVOCATION_DUTY_CYCLE = 0.005
+
 export const computeInstanceUsageQueryOptions = ({
   projectRef,
   name,
@@ -160,9 +168,7 @@ export const computeInstanceUsageQueryOptions = ({
         days,
         size,
         instances,
-        // Private instances never suspend, but exposure isn't known here; a high duty
-        // cycle keeps the series representative of a steadily-used instance.
-        dutyCycle: 0.55,
+        dutyCycle: INVOCATION_DUTY_CYCLE,
         requestsPerRunningHour: 820,
       }),
     }),
@@ -200,7 +206,7 @@ export const computeProjectUsageQueryOptions = ({
           days,
           size: instance.size,
           instances: instance.declaredInstances,
-          dutyCycle: 0.55,
+          dutyCycle: INVOCATION_DUTY_CYCLE,
           requestsPerRunningHour: 820,
         })
       )
