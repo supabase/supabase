@@ -319,7 +319,13 @@ services:
 
       SECRET_KEY_BASE: ${SECRET_KEY_BASE}
       METRICS_JWT_SECRET: ${JWT_SECRET}
+      # Per-deployment Erlang distribution cookie (see RELEASE_COOKIE in .env).
+      RELEASE_COOKIE: ${RELEASE_COOKIE}
       ERL_AFLAGS: -proto_dist inet_tcp
+      # Bind the internal gen_rpc listener to loopback only. This single-node
+      # deployment has no cluster peers, so nothing else on the Docker network
+      # needs to reach it.
+      GEN_RPC_SOCKET_IP: 127.0.0.1
       DNS_NODES: "''"
       RLIMIT_NOFILE: "10000"
       APP_NAME: realtime
