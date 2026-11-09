@@ -143,8 +143,8 @@ describe('ComputePlanUsage', () => {
       { profileContext: PROFILE_CONTEXT }
     )
 
-    // Paid concurrency is undecided in the RFC, so the count reports without a limit.
-    expect(await screen.findByText('7 used')).toBeInTheDocument()
+    // Pro allows 10 concurrent workers per project.
+    expect(await screen.findByText('7 of 10')).toBeInTheDocument()
     expect(await screen.findByText('Across 2 computes')).toBeInTheDocument()
   })
 
@@ -186,16 +186,16 @@ describe('ComputePlanUsage', () => {
     })
   })
 
-  it('includes the same quota on a higher tier, and says concurrency is unlimited there', async () => {
+  it('includes the same quota on a higher tier, with more concurrency', async () => {
     mockOrganizationOnPlan('team', 'Team')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: PROFILE_CONTEXT,
     })
 
-    // Team includes the same 500 vCPU-minute quota as every other plan; what differs is
-    // that its concurrency is uncapped, which the caption names.
+    // Team includes the same 500 vCPU-minute quota as every other plan; what differs is the
+    // concurrency it allows.
     expect(await screen.findByText(/of 500 vCPU-min$/)).toBeInTheDocument()
-    expect(await screen.findByText('No fixed limit on the Team Plan')).toBeInTheDocument()
+    expect(await screen.findByText('1 of 50')).toBeInTheDocument()
   })
 
   it('switches the usage timeframe from the dropdown', async () => {

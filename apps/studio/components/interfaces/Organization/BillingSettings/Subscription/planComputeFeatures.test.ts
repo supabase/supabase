@@ -19,10 +19,17 @@ describe('computeFeaturesFor', () => {
     expect(flatten(computeFeaturesFor('free'))).not.toContain('then pay as you go')
   })
 
-  it('names the concurrency limit on Free and stays silent where there is none', () => {
+  it('names the concurrency limit on each plan that has one', () => {
     expect(flatten(computeFeaturesFor('free'))).toContain('1 concurrent worker')
-    // Paid concurrency is undecided; saying so in a pricing card tells the reader nothing.
-    expect(flatten(computeFeaturesFor('pro'))).not.toMatch(/concurrent worker/i)
+    expect(flatten(computeFeaturesFor('pro'))).toContain('10 concurrent workers')
+    expect(flatten(computeFeaturesFor('team'))).toContain('50 concurrent workers')
+    // Enterprise is negotiated, so there is nothing to state.
+    expect(flatten(computeFeaturesFor('enterprise'))).not.toMatch(/concurrent worker/i)
+  })
+
+  it('says Free workers suspend and paid plans may run private ones', () => {
+    expect(flatten(computeFeaturesFor('free'))).toContain('suspend when idle')
+    expect(flatten(computeFeaturesFor('pro'))).toContain('Public and private workers')
   })
 
   it('restricts Free to the base size and bursts paid plans', () => {

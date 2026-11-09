@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import {
+  canPlanDeployAccess,
   canPlanDeploySize,
   COMPUTE_ALPHA_LIMITS,
   COMPUTE_INCLUDED_VCPU_MINUTES,
@@ -75,11 +76,17 @@ describe('pricing RFC conformance', () => {
     expect(COMPUTE_PLAN_LIMITS.free.concurrentWorkers).toBe(1)
   })
 
-  it('leaves paid concurrency undecided rather than inventing a figure', () => {
-    // RFC: "# Concurrent Workers to be decided each tier (or no limit if capacity is not a
-    // concern)". Null models "not yet decided"; a number here would read as settled.
+  it('keeps private workers off Free, whose quota one could not survive', () => {
+    // A private worker never suspends: 500 vCPU-minutes is gone in hours. The RFC does not
+    // name this, but a quota that small only works if Free workers suspend on idle.
+    expect(COMPUTE_PLAN_LIMITS.free.canRunPrivateWorkers).toBe(false)
+    expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS.free, 'public')).toBe(true)
+    expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS.free, 'private')).toBe(false)
+  })
+
+  it('allows private workers on every paid plan', () => {
     for (const plan of PAID_PLANS) {
-      expect(COMPUTE_PLAN_LIMITS[plan].concurrentWorkers).toBeNull()
+      expect(canPlanDeployAccess(COMPUTE_PLAN_LIMITS[plan], 'private')).toBe(true)
     }
   })
 
@@ -124,5 +131,44 @@ describe('pricing RFC conformance', () => {
         paid.concurrentWorkers !== free.concurrentWorkers
       expect(differs).toBe(true)
     }
+  })
+})
+
+/**
+ * Concurrency is not specified by the RFC — these are working numbers. The assertions check
+ * the shape we want (climbing per tier, bounded by the platform ceiling), not agreed values,
+ * so changing a number does not fail the suite but breaking the ordering does.
+ */
+describe('concurrency placeholders', () => {
+  const PLATFORM_CEILING = 100
+
+  it('gives Free a single worker, per the RFC', () => {
+    expect(COMPUTE_PLAN_LIMITS.free.concurrentWorkers).toBe(1)
+  })
+
+  it('climbs with the tier', () => {
+    const free = COMPUTE_PLAN_LIMITS.free.concurrentWorkers!
+    const pro = COMPUTE_PLAN_LIMITS.pro.concurrentWorkers!
+    const team = COMPUTE_PLAN_LIMITS.team.concurrentWorkers!
+    expect(pro).toBeGreaterThan(free)
+    expect(team).toBeGreaterThan(pro)
+  })
+
+  it('stays under the unverified per-project platform ceiling', () => {
+    for (const plan of ALL_PLANS) {
+      const limit = COMPUTE_PLAN_LIMITS[plan].concurrentWorkers
+      if (limit === null) continue
+      expect(limit).toBeLessThanOrEqual(PLATFORM_CEILING)
+    }
+  })
+
+  it('leaves Enterprise uncapped, since it is negotiated', () => {
+    expect(COMPUTE_PLAN_LIMITS.enterprise.concurrentWorkers).toBeNull()
+  })
+
+  it('caps the private alpha below every plan', () => {
+    expect(COMPUTE_ALPHA_LIMITS.concurrentWorkers).toBeLessThan(
+      COMPUTE_PLAN_LIMITS.pro.concurrentWorkers!
+    )
   })
 })

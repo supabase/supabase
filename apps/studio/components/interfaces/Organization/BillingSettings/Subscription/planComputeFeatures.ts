@@ -31,6 +31,11 @@ const formatConcurrency = (limits: ComputeLimits) =>
 
 const formatSizes = (limits: ComputeLimits) => limits.sizes.map(formatSize).join(', ')
 
+const formatExposure = (limits: ComputeLimits) =>
+  limits.canRunPrivateWorkers
+    ? 'Public and private workers'
+    : 'Public workers, which suspend when idle'
+
 const formatBurst = (limits: ComputeLimits) =>
   limits.burstTo === null
     ? 'Runs at its base size'
@@ -60,8 +65,9 @@ const computeFeaturesForPlan = (planId: OrgPlan['id']): (string | string[])[] =>
     // than advertising that the number is undecided.
     ...(limits.concurrentWorkers === null
       ? []
-      : [[formatConcurrency(limits), 'Running at once across the organization']]),
+      : [[formatConcurrency(limits), 'Running at once per project']]),
     [formatSizes(limits), formatBurst(limits)],
+    formatExposure(limits),
     formatInvocation(limits),
   ]
 }

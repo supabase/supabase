@@ -28,7 +28,7 @@ import {
   COMPUTE_INSTANCE_SIZES,
   COMPUTE_REGION,
 } from './Compute.constants'
-import { canPlanDeploySize } from './Compute.limits'
+import { canPlanDeployAccess, canPlanDeploySize } from './Compute.limits'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize, generateComputeInstanceName } from './Compute.utils'
 import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
@@ -197,8 +197,17 @@ export const DeployComputeInstanceDialog = ({
                       </FormControl>
                       <SelectContent>
                         {ACCESS_OPTIONS.map((option) => (
-                          <SelectItem key={option.value} value={option.value}>
+                          <SelectItem
+                            key={option.value}
+                            value={option.value}
+                            disabled={!canPlanDeployAccess(limits, option.value)}
+                          >
                             {option.label}
+                            {!canPlanDeployAccess(limits, option.value) && (
+                              <span className="ml-2 text-foreground-lighter">
+                                Not in the {limitsLabel}
+                              </span>
+                            )}
                           </SelectItem>
                         ))}
                       </SelectContent>

@@ -44,17 +44,19 @@ describe('ComputeQuotaMetric', () => {
     expect(await screen.findByText(/\/ 500 vCPU-min/)).toBeInTheDocument()
   })
 
-  it('shows how many workers the usage came from', async () => {
+  it('shows how many workers the usage came from, without a denominator', async () => {
     render('pro')
 
-    // Paid concurrency is undecided in the RFC, so there is no denominator to show.
-    expect(await screen.findByText('6 workers')).toBeInTheDocument()
+    // Concurrency is capped per project, so an org-wide total has nothing to compare against.
+    expect(await screen.findByText('6 workers across the organization')).toBeInTheDocument()
   })
 
-  it('shows the concurrency limit on Free, where the RFC sets one', async () => {
+  it('does not compare the org-wide count against the per-project cap', async () => {
     render('free')
 
-    expect(await screen.findByText('6 of 1 concurrent workers')).toBeInTheDocument()
+    // Free allows 1 worker per project; 6 across the org is not an overage.
+    expect(await screen.findByText('6 workers across the organization')).toBeInTheDocument()
+    expect(screen.queryByText(/of 1 concurrent/)).not.toBeInTheDocument()
   })
 
   it('links through to the Compute section of the usage page', async () => {

@@ -35,7 +35,6 @@ export const ComputeQuotaMetric = ({
   const { limits } = useComputeLimits(subscription?.plan)
   // The quota is vCPU-minutes, measured against reserved vCPU so instance size counts.
   const quotaHours = includedVcpuHours(limits)
-  const concurrentWorkerLimit = limits.concurrentWorkers
 
   if (isPending) {
     return (
@@ -66,10 +65,8 @@ export const ComputeQuotaMetric = ({
         ? '(<1%)'
         : `(${(+(usageRatio * 100).toFixed(0)).toLocaleString()}%)`
 
-  const computesLabel =
-    concurrentWorkerLimit === null
-      ? `${instances.toLocaleString()} workers`
-      : `${instances.toLocaleString()} of ${concurrentWorkerLimit.toLocaleString()} concurrent workers`
+  // Concurrency is capped per project, so an org-wide total has no denominator to show here.
+  const computesLabel = `${instances.toLocaleString()} ${instances === 1 ? 'worker' : 'workers'} across the organization`
 
   return (
     <div className={cn('flex items-center justify-between', className)}>
