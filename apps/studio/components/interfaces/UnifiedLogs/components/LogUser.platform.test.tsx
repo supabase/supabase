@@ -229,7 +229,7 @@ describe('LogUser', () => {
     const userActions = userEvent.setup()
     const { urlUpdates } = renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
     await userActions.click(await screen.findByText('User ID'))
-    await userActions.click(await screen.findByRole('menuitem', { name: 'Add filter' }))
+    await userActions.click(await screen.findByRole('menuitem', { name: 'Filter: equals' }))
     expect(urlUpdates.at(-1)).toContain(`user=${USER_ID}`)
   })
 
@@ -238,7 +238,7 @@ describe('LogUser', () => {
     renderUser({ ...baseLog, auth_user: USER_ID }, { users: [user] })
     await userActions.click(await screen.findByText('Providers'))
     expect(await screen.findByRole('menuitem', { name: /Copy/ })).toBeVisible()
-    expect(screen.queryByRole('menuitem', { name: 'Add filter' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('menuitem', { name: /^Filter:/ })).not.toBeInTheDocument()
   })
   it('reports a failed request lookup instead of claiming the request was anonymous', async () => {
     const { queryClient } = renderUser(baseLog, { failTimeline: true })

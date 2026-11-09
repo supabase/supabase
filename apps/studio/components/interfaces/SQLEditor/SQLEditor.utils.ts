@@ -306,6 +306,7 @@ export function buildExecuteParams({
     projectRef,
     connectionString,
     sql: wrapWithRoleImpersonation(formattedSql, impersonatedRoleState),
+    sqlOrigin: 'user' as const,
     autoLimit: appendAutoLimit ? limit : undefined,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(impersonatedRoleState.role),
     isStatementTimeoutDisabled: true as const,

@@ -119,6 +119,8 @@ export interface ProjectLayoutProps {
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
+  /** Starting width of the product menu in pixels, for menus that list more than links */
+  productMenuDefaultSize?: number
   productMenuClassName?: string
 }
 
@@ -135,7 +137,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       children,
       selectedTable,
       resizableSidebar = false,
-
+      productMenuDefaultSize = 256,
       productMenuClassName,
     },
     ref
@@ -312,7 +314,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 panelRef={panelRef}
                 minSize="256px"
                 maxSize={resizableSidebar ? '512px' : '256px'}
-                defaultSize="256px"
+                defaultSize={`${productMenuDefaultSize}px`}
                 groupResizeBehavior="preserve-pixel-size"
                 id="panel-left"
               >

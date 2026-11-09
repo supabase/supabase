@@ -115,7 +115,14 @@ export function generateQueryPerformanceSql({
 
 export const useQueryPerformanceQuery = (props: QueryPerformanceSQLParams) => {
   const { sql, whereSql, orderBySql } = generateQueryPerformanceSql(props)
-  return useDbQuery({ sql, params: undefined, where: whereSql, orderBy: orderBySql })
+  return useDbQuery({
+    sql,
+    sqlOrigin: 'studio',
+    queryName: 'query-performance',
+    params: undefined,
+    where: whereSql,
+    orderBy: orderBySql,
+  })
 }
 
 export interface QueryPerformanceInfiniteHook {
@@ -184,6 +191,8 @@ export const useQueryPerformanceInfiniteQuery = (
           {
             projectRef: project?.ref,
             connectionString: effectiveConnectionString,
+            sqlOrigin: 'studio',
+            queryName: 'query-performance-infinite',
             sql,
             grant: unguarded.migrating,
           },
