@@ -5,17 +5,16 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev:content": "velite dev",
-    "dev:next": "next dev --port 3007",
-    "dev": "pnpm run build:content && run-p dev:content dev:next",
-    "build": "pnpm run build:content && next build --turbopack",
+    "dev:content": "maybe-turbo velite dev",
+    "dev": "maybe-turbo next dev --port 3007",
+    "build": "maybe-turbo next build --turbopack",
     "build:content": "velite build --strict",
     "internal:sync": "tsx ./scripts/sync-internal-content.mts",
     "start": "next start",
     "lint": "eslint .",
     "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite tsconfig.tsbuildinfo",
-    "typecheck": "pnpm build:content && tsc --noEmit"
+    "typecheck": "maybe-turbo tsc --noEmit"
   },
   "dependencies": {
     "common": "workspace:*",

@@ -5,22 +5,20 @@
   "type": "module",
   "scripts": {
     "preinstall": "npx only-allow pnpm",
-    "dev:content": "velite dev",
-    "dev:next": "next dev --port 3004",
-    "dev": "pnpm build:registry && run-p build:content build:markdown build:markdown-index && run-p --race dev:*",
+    "dev:content": "maybe-turbo velite dev",
+    "dev": "maybe-turbo next dev --port 3004",
     "build:content": "velite build --strict",
     "build:registry": "rimraf -G public/r/* && tsx ./scripts/build-registry.mts && shadcn build public/r/registry.json && tsx scripts/clean-registry.ts",
-    "build:markdown": "tsx ./scripts/build-markdown.ts",
+    "build:markdown": "maybe-turbo tsx ./scripts/build-markdown.ts",
     "build:markdown-index": "tsx ./scripts/build-markdown-index.ts",
-    "build:next": "next build --turbopack",
-    "build": "pnpm build:registry && run-p build:content build:markdown build:markdown-index && pnpm build:next",
-    "test": "pnpm build:markdown && vitest",
+    "build": "maybe-turbo next build --turbopack",
+    "test": "maybe-turbo vitest",
     "test:headless-tools": "tsx scripts/test-headless-tools.mts",
     "start": "next start",
     "lint": "eslint .",
     "lint:ratchet": "tsx node_modules/eslint-config-supabase/ratchet-eslint-rules.ts --rules-file node_modules/eslint-config-supabase/ratchet-rules.json",
     "clean": "rimraf .next .turbo tsconfig.tsbuildinfo .contentlayer .velite",
-    "typecheck": "run-p build:content build:markdown && next typegen && tsc --noEmit -p tsconfig.json"
+    "typecheck": "maybe-turbo \"next typegen && tsc --noEmit -p tsconfig.json\""
   },
   "dependencies": {
     "@hookform/resolvers": "^3.1.1",

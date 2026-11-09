@@ -2,6 +2,14 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    // `eslint .` also runs the type-aware rules in eslint.type-checks.config.cjs, which is
+    // its own task so turbo can cache and parallelize it.
+    "lint": {
+      "dependsOn": ["lint:type-checks"],
+    },
+    "lint:type-checks": {
+      "outputs": [],
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
