@@ -94,6 +94,7 @@ export interface ExecuteLogsSqlVariables {
    */
   endpoint: AnalyticsSqlEndpoint
   signal?: AbortSignal
+  headers?: HeadersInit
 }
 
 export interface ExecuteLogsSqlResult {
@@ -107,7 +108,7 @@ export interface ExecuteLogsSqlResult {
  * response. Transport failures throw; a structured 200-body error is returned
  * in `error` alongside empty `rows`.
  *
- * @throws {ResponseError} on transport failure (via `executeAnalyticsSql`).
+ * @throws {StudioError} on transport failure (via `executeAnalyticsSql`).
  */
 export async function executeLogsSql({
   projectRef,
@@ -115,6 +116,7 @@ export async function executeLogsSql({
   range,
   endpoint,
   signal,
+  headers,
 }: ExecuteLogsSqlVariables): Promise<ExecuteLogsSqlResult> {
   const data = await executeAnalyticsSql({
     projectRef,
@@ -124,6 +126,7 @@ export async function executeLogsSql({
     iso_timestamp_end: range.to,
     key: 'sql-editor',
     signal,
+    headers,
   })
 
   const body = (data ?? {}) as { result?: unknown[]; error?: unknown }

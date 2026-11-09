@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { LogOut } from 'lucide-react'
+import { LogOutIcon } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import { useEffect } from 'react'
@@ -138,7 +138,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
                   </>
                 }
               />
-              <Button variant="default" block onClick={() => signOut()}>
+              <Button block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>
@@ -179,7 +179,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
                     className="h-8 w-8 px-0"
                     onClick={() => signOut()}
                     icon={
-                      <LogOut size={16} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <LogOutIcon size={16} strokeWidth={1.5} className="text-foreground-lighter" />
                     }
                     tooltip={{
                       content: {
@@ -215,7 +215,7 @@ export const StripeProjectsLoginPage: NextPageWithLayout = () => {
                 title="Unable to load authorization"
                 description={error?.message}
               />
-              <Button variant="default" block onClick={() => signOut()}>
+              <Button block onClick={() => signOut()}>
                 Sign out
               </Button>
             </div>

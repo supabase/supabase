@@ -1,4 +1,9 @@
 import {
+  createFeedbackOperations,
+  type FeedbackOperationsOptions,
+  type SupabasePlatform,
+} from '@supabase/mcp-server-supabase'
+import {
   ApiKey,
   ApiKeyType,
   ApplyMigrationOptions,
@@ -6,17 +11,20 @@ import {
   DebuggingOperations,
   DevelopmentOperations,
   ExecuteSqlOptions,
-  GetLogsOptions,
+  FeedbackOperations,
+  QueryLogsOptions,
 } from '@supabase/mcp-server-supabase/platform'
+import { isFeatureEnabled, type Feature } from 'common/enabled-features'
+import { getEnabledFeaturesOverrideDisabledList } from 'common/enabled-features/overrides'
 
 import { DEFAULT_EXPOSED_SCHEMAS } from './constants'
 import { generateTypescriptTypes } from './generate-types'
 import { getLints } from './lints'
-import { getLogQuery, retrieveAnalyticsData } from './logs'
+import { retrieveAnalyticsData } from './logs'
 import { applyAndTrackMigrations, listMigrationVersions } from './migrations'
 import { executeQuery } from './query'
 import { getProjectSettings } from './settings'
-import { ResponseError } from '@/types'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 export type GetDatabaseOperationsOptions = {
   headers?: HeadersInit
@@ -104,7 +112,7 @@ export function getDevelopmentOperations({
     async generateTypescriptTypes(_projectRef) {
       const response = await generateTypescriptTypes({ headers })
 
-      if (response instanceof ResponseError) {
+      if (isStudioError(response)) {
         throw response
       }
 
@@ -113,18 +121,42 @@ export function getDevelopmentOperations({
   }
 }
 
+// Logs are disabled by default for self-hosted; enabled via the
+// `docker-compose.logs.yml` override, which sets ENABLED_FEATURES_LOGS_ALL=true.
+function assertLogsEnabled() {
+  const disabledFeatures = getEnabledFeaturesOverrideDisabledList(process.env) as Feature[]
+
+  if (!isFeatureEnabled('logs:all', disabledFeatures)) {
+    throw new Error(
+      'Logs are disabled on this instance. Enable the `docker-compose.logs.yml` override to query logs.'
+    )
+  }
+}
+
 export function getDebuggingOperations({
   headers,
 }: GetDebuggingOperationsOptions): DebuggingOperations {
   return {
-    async getLogs(projectRef: string, options: GetLogsOptions) {
-      const sql = getLogQuery(options.service)
+    // Self-hosted logs are served by Logflare, which speaks BigQuery SQL.
+    logsDialect: 'bigquery',
+    // `query_logs` replaces `get_logs` on self-hosted. Declaring `queryLogs`
+    // makes the MCP server hide `get_logs` from clients (see `getDebuggingTools`
+    // in @supabase/mcp-server-supabase), so this method is never reached over
+    // MCP. The `DebuggingOperations` interface still requires it, so it throws
+    // defensively rather than serving logs.
+    async getLogs() {
+      throw new Error('get_logs is not supported on self-hosted; use query_logs instead.')
+    },
+    async queryLogs(projectRef: string, options: QueryLogsOptions) {
+      assertLogsEnabled()
 
+      // Pass the model's SQL straight through to the Logflare `logs.all`
+      // endpoint, which accepts an arbitrary `sql` param.
       const { data, error } = await retrieveAnalyticsData({
         name: 'logs.all',
         projectRef,
         params: {
-          sql,
+          sql: options.sql,
           iso_timestamp_start: options.iso_timestamp_start,
           iso_timestamp_end: options.iso_timestamp_end,
         },
@@ -160,5 +192,36 @@ export function getDebuggingOperations({
 
       return data.filter((lint) => lint.categories.includes('PERFORMANCE'))
     },
+  }
+}
+
+export type GetFeedbackOperationsOptions = Pick<FeedbackOperationsOptions, 'fetch'>
+
+export function getFeedbackOperations({
+  fetch,
+}: GetFeedbackOperationsOptions = {}): FeedbackOperations {
+  const feedback = createFeedbackOperations({ fetch })
+
+  // Self-hosted project refs aren't Supabase projects, so feedback is sent without one.
+  return {
+    submit: ({ projectId: _projectId, ...input }) => feedback.submit(input),
+    delete: ({ projectId: _projectId, ...input }) => feedback.delete(input),
+  }
+}
+
+export type GetSelfHostedPlatformOptions = {
+  headers?: HeadersInit
+}
+
+// Self-hosted Studio has no notebooks. Without `notebooks` the MCP server registers no notebook tools.
+// https://github.com/supabase/mcp/blob/8af504280d5689537c481924f8a11222ae0ceaeb/packages/mcp-server-supabase/src/server.ts#L374
+export function getSelfHostedPlatform({
+  headers,
+}: GetSelfHostedPlatformOptions): Omit<SupabasePlatform, 'notebooks'> {
+  return {
+    database: getDatabaseOperations({ headers }),
+    development: getDevelopmentOperations({ headers }),
+    debugging: getDebuggingOperations({ headers }),
+    feedback: getFeedbackOperations(),
   }
 }

@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { del, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type APIKeyDeleteVariables = {
   projectRef?: string
@@ -16,8 +17,9 @@ export async function deleteAPIKey(payload: APIKeyDeleteVariables) {
   const { data, error } = await del('/v1/projects/{ref}/api-keys/{id}', {
     params: {
       path: { ref: payload.projectRef, id: payload.id },
-      query: { reveal: false },
+      query: { reveal: 'false' },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -31,12 +33,12 @@ export const useAPIKeyDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<APIKeyDeleteData, ResponseError, APIKeyDeleteVariables>,
+  UseCustomMutationOptions<APIKeyDeleteData, StudioError, APIKeyDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<APIKeyDeleteData, ResponseError, APIKeyDeleteVariables>({
+  return useMutation<APIKeyDeleteData, StudioError, APIKeyDeleteVariables>({
     mutationFn: (vars) => deleteAPIKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

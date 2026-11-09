@@ -1,11 +1,16 @@
 import { proxy, snapshot, useSnapshot } from 'valtio'
+import { z } from 'zod'
 
-export type AdvisorTab = 'all' | 'security' | 'performance' | 'messages'
-export type AdvisorSeverity = 'critical' | 'warning' | 'info'
+export const advisorCategorySchema = z.enum(['security', 'performance', 'health', 'messages'])
+export const advisorSeveritySchema = z.enum(['critical', 'warning', 'info'])
+
+export type AdvisorCategory = z.infer<typeof advisorCategorySchema>
+export type AdvisorSeverity = z.infer<typeof advisorSeveritySchema>
 export type AdvisorItemSource = 'lint' | 'notification' | 'signal'
 
 const createInitialState = () => ({
-  activeTab: 'all' as AdvisorTab,
+  // An empty selection means every category is shown, matching the severity filter
+  categoryFilters: [] as AdvisorCategory[],
   severityFilters: ['critical', 'warning'] as AdvisorSeverity[],
   selectedItemId: undefined as string | undefined,
   selectedItemSource: undefined as AdvisorItemSource | undefined,
@@ -16,23 +21,17 @@ const createInitialState = () => ({
 
 export const advisorState = proxy({
   ...createInitialState(),
-  setActiveTab(tab: AdvisorTab) {
-    advisorState.activeTab = tab
+  setCategoryFilters(categories: AdvisorCategory[]) {
+    advisorState.categoryFilters = categories
   },
   setSeverityFilters(severities: AdvisorSeverity[]) {
     advisorState.severityFilters = severities
-  },
-  clearSeverityFilters() {
-    advisorState.severityFilters = []
   },
   setSelectedItem(id: string | undefined, source?: AdvisorItemSource) {
     advisorState.selectedItemId = id
     advisorState.selectedItemSource = source
   },
-  focusItem({ id, tab, source }: { id: string; tab?: AdvisorTab; source?: AdvisorItemSource }) {
-    if (tab) {
-      advisorState.activeTab = tab
-    }
+  focusItem({ id, source }: { id: string; source?: AdvisorItemSource }) {
     advisorState.selectedItemId = id
     advisorState.selectedItemSource = source
   },
@@ -60,7 +59,15 @@ export const advisorState = proxy({
         break
     }
   },
-  resetNotificationFilters() {
+  /** Clears the filters that hide items within the selected categories, but not the categories themselves. */
+  clearNarrowingFilters() {
+    advisorState.severityFilters = []
+    advisorState.notificationFilterStatuses = []
+    advisorState.notificationFilterPriorities = []
+  },
+  clearFilters() {
+    advisorState.categoryFilters = []
+    advisorState.severityFilters = []
     advisorState.notificationFilterStatuses = []
     advisorState.notificationFilterPriorities = []
   },

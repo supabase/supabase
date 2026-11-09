@@ -4,9 +4,11 @@ import { type CloudProvider } from 'shared-data'
 import { Badge, FormControl, FormField, Switch, useWatch } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { HIGH_AVAILABILITY_INSTANCE_SIZE } from './ProjectCreation.constants'
 import { CreateProjectForm } from './ProjectCreation.schema'
 import Panel from '@/components/ui/Panel'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
+import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 
 interface HighAvailabilityInputProps {
   form: UseFormReturn<CreateProjectForm>
@@ -21,6 +23,7 @@ export const HighAvailabilityInput = ({
 }: HighAvailabilityInputProps) => {
   const { getValues, setValue } = form
   const { hasAccess } = useCheckEntitlements('instances.high_availability')
+  const showHighAvailability = useIsFeatureEnabled('project_creation:show_high_availability')
   const highAvailability = useWatch({ control: form.control, name: 'highAvailability' })
 
   // Fields to revert to when toggling off HA, so previously selected values aren't lost.
@@ -28,10 +31,12 @@ export const HighAvailabilityInput = ({
     cloudProvider: CloudProvider | undefined
     postgresVersionSelection: string | undefined
     dbRegion: string | null
+    instanceSize: string | null
   }>({
     cloudProvider: undefined,
     postgresVersionSelection: undefined,
     dbRegion: null,
+    instanceSize: null,
   })
 
   const handleHighAvailabilityChange = (checked: boolean) => {
@@ -55,6 +60,12 @@ export const HighAvailabilityInput = ({
         beforeHighAvailability.current.dbRegion = currentRegion ?? null
         setValue('dbRegion', highAvailabilityRegionName)
       }
+
+      const currentInstanceSize = getValues('instanceSize')
+      if (currentInstanceSize !== HIGH_AVAILABILITY_INSTANCE_SIZE) {
+        beforeHighAvailability.current.instanceSize = currentInstanceSize ?? null
+        setValue('instanceSize', HIGH_AVAILABILITY_INSTANCE_SIZE)
+      }
     } else {
       if (beforeHighAvailability.current.cloudProvider !== undefined) {
         setValue('cloudProvider', beforeHighAvailability.current.cloudProvider)
@@ -72,6 +83,11 @@ export const HighAvailabilityInput = ({
       if (beforeHighAvailability.current.dbRegion !== null) {
         setValue('dbRegion', beforeHighAvailability.current.dbRegion)
         beforeHighAvailability.current.dbRegion = null
+      }
+
+      if (beforeHighAvailability.current.instanceSize !== null) {
+        setValue('instanceSize', beforeHighAvailability.current.instanceSize)
+        beforeHighAvailability.current.instanceSize = null
       }
     }
   }
@@ -91,7 +107,7 @@ export const HighAvailabilityInput = ({
     setValue('dbRegion', highAvailabilityRegionName)
   }, [highAvailability, highAvailabilityRegionName, getValues, setValue])
 
-  if (!hasAccess) return null
+  if (!hasAccess || !showHighAvailability) return null
 
   return (
     <Panel.Content>

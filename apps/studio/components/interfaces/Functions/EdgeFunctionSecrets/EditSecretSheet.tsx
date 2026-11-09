@@ -1,12 +1,13 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { useLatest } from 'react-use'
 import { toast } from 'sonner'
 import {
   Button,
+  ExpandingTextArea,
   Form,
   FormControl,
   FormField,
@@ -17,7 +18,6 @@ import {
   SheetHeader,
   SheetSection,
   SheetTitle,
-  Textarea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -85,7 +85,7 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
           <SheetTitle>Edit secret</SheetTitle>
         </SheetHeader>
 
-        <SheetSection className="h-full">
+        <SheetSection className="grow min-h-0 overflow-y-auto">
           <Form {...form}>
             <form
               id={FORM_ID}
@@ -118,38 +118,25 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
                   >
                     <FormControl>
                       <div className="relative">
-                        <Textarea
+                        <ExpandingTextArea
                           {...field}
-                          rows={1}
-                          ref={(el) => {
-                            field.ref(el)
-                            if (el) {
-                              el.style.height = 'auto'
-                              el.style.height = Math.max(40, el.scrollHeight) + 'px'
-                            }
-                          }}
+                          value={field.value ?? ''}
                           placeholder="my-secret-value"
                           data-1p-ignore
                           data-lpignore="true"
                           data-form-type="other"
                           data-bwignore
-                          className="min-h-0 resize-none"
+                          className="font-mono max-h-[320px] overflow-y-auto pr-10"
                           style={
                             {
                               WebkitTextSecurity: showSecretValue ? undefined : 'disc',
                             } as React.CSSProperties
                           }
-                          onChange={(e) => {
-                            field.onChange(e)
-                            e.currentTarget.style.height = 'auto'
-                            e.currentTarget.style.height =
-                              Math.max(40, e.currentTarget.scrollHeight) + 'px'
-                          }}
                         />
                         <Button
                           variant="text"
-                          className="absolute right-1 top-1 px-1"
-                          icon={showSecretValue ? <EyeOff /> : <Eye />}
+                          className="absolute right-3 top-2 px-1"
+                          icon={showSecretValue ? <EyeOffIcon /> : <EyeIcon />}
                           onClick={() => setShowSecretValue(!showSecretValue)}
                         />
                       </div>
@@ -162,10 +149,16 @@ export function EditSecretSheet({ secret, visible, onClose }: EditSecretSheetPro
         </SheetSection>
 
         <SheetFooter>
-          <Button disabled={isUpdating} variant="default" onClick={confirmOnClose}>
+          <Button disabled={isUpdating} onClick={confirmOnClose}>
             Cancel
           </Button>
-          <Button form={FORM_ID} type="submit" disabled={!isValid} loading={isUpdating}>
+          <Button
+            variant="primary"
+            form={FORM_ID}
+            type="submit"
+            disabled={!isValid}
+            loading={isUpdating}
+          >
             Save
           </Button>
         </SheetFooter>

@@ -3,13 +3,14 @@ import { components } from 'api-types'
 
 import { oauthAppKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthAppsVariables = {
   slug?: string
 }
 
-export type OAuthApp = components['schemas']['OAuthAppResponse']
+export type OAuthApp = components['schemas']['OAuthAppResponse_Output']
 
 export async function getOAuthApps({ slug }: OAuthAppsVariables) {
   if (!slug) throw new Error('Organization slug is required')
@@ -23,7 +24,7 @@ export async function getOAuthApps({ slug }: OAuthAppsVariables) {
 }
 
 export type OAuthAppsData = Awaited<ReturnType<typeof getOAuthApps>>
-export type OAuthAppsError = ResponseError
+export type OAuthAppsError = StudioError
 
 export const useOAuthAppsQuery = <TData = OAuthAppsData>(
   { slug }: OAuthAppsVariables,

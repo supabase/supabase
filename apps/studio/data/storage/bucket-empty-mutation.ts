@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BucketEmptyVariables = {
   projectRef: string
@@ -29,12 +30,12 @@ export const useBucketEmptyMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BucketEmptyData, ResponseError, BucketEmptyVariables>,
+  UseCustomMutationOptions<BucketEmptyData, StudioError, BucketEmptyVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketEmptyData, ResponseError, BucketEmptyVariables>({
+  return useMutation<BucketEmptyData, StudioError, BucketEmptyVariables>({
     mutationFn: (vars) => emptyBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

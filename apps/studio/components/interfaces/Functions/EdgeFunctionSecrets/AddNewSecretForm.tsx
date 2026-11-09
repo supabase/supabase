@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Eye, EyeOff, Trash } from 'lucide-react'
+import { EyeIcon, EyeOffIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import { SubmitHandler, useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -241,10 +241,9 @@ export const AddNewSecretForm = () => {
                             />
                           </FormControl>
                           <Button
-                            variant="default"
                             className="w-[34px] h-[34px] shrink-0 p-0"
                             aria-label="Remove secret"
-                            icon={<Trash size={12} />}
+                            icon={<TrashIcon size={12} />}
                             disabled={fields.length <= 1}
                             onClick={() => handleRemoveSecret(fieldItem.id, index)}
                           />
@@ -288,7 +287,9 @@ export const AddNewSecretForm = () => {
                                       ? 'Hide secret value'
                                       : 'Show secret value'
                                   }
-                                  icon={isSecretVisible(fieldItem.id) ? <EyeOff /> : <Eye />}
+                                  icon={
+                                    isSecretVisible(fieldItem.id) ? <EyeOffIcon /> : <EyeIcon />
+                                  }
                                   onClick={() => handleToggleSecretVisibility(fieldItem.id)}
                                 />
                               </TooltipTrigger>
@@ -310,9 +311,7 @@ export const AddNewSecretForm = () => {
               </p>
 
               <div className="flex items-center space-x-2">
-                <Button variant="default" onClick={handleAddAnotherSecret}>
-                  Add another
-                </Button>
+                <Button onClick={handleAddAnotherSecret}>Add another</Button>
                 <Button variant="primary" type="submit" disabled={isCreating} loading={isCreating}>
                   {isCreating ? 'Saving...' : fields.length > 1 ? 'Bulk save' : 'Save'}
                 </Button>

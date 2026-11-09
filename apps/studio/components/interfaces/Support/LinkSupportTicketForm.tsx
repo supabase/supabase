@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Link2 } from 'lucide-react'
+import { Link2Icon } from 'lucide-react'
 import { useEffect } from 'react'
 import type { SubmitHandler } from 'react-hook-form'
 import { useForm, useWatch } from 'react-hook-form'
@@ -168,7 +168,7 @@ export const LinkSupportTicketForm = ({
             variant="primary"
             type="submit"
             size="large"
-            icon={<Link2 />}
+            icon={<Link2Icon />}
             loading={isPending}
           >
             Link support ticket to account

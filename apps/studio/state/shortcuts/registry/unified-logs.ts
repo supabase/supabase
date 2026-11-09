@@ -9,7 +9,7 @@ import { RegistryDefinations } from '../types'
  * Grid/detail-panel bindings (prev/next, close) mirror the Logs Explorer
  * (`logs-preview`) and Table Editor patterns so the keyboard model stays
  * consistent across our data-grid surfaces. Copying selected logs reuses the
- * shared `results.copy-*` shortcuts (see `RowSelectionHeader`).
+ * shared `results.copy-*` shortcuts (see `LogSelectionActions`).
  */
 export const UNIFIED_LOGS_SHORTCUT_IDS = {
   UNIFIED_LOGS_RESET_FOCUS: 'unified-logs.reset-focus',
@@ -19,6 +19,8 @@ export const UNIFIED_LOGS_SHORTCUT_IDS = {
   UNIFIED_LOGS_CLEAR_FILTERS: 'unified-logs.clear-filters',
   UNIFIED_LOGS_PREV_ROW: 'unified-logs.prev-row',
   UNIFIED_LOGS_NEXT_ROW: 'unified-logs.next-row',
+  UNIFIED_LOGS_EXTEND_PREV_ROW: 'unified-logs.extend-prev-row',
+  UNIFIED_LOGS_EXTEND_NEXT_ROW: 'unified-logs.extend-next-row',
   UNIFIED_LOGS_CLOSE_PANEL: 'unified-logs.close-panel',
 }
 
@@ -76,6 +78,22 @@ export const unifiedLogsRegistry: RegistryDefinations<UnifiedLogsShortcutId> = {
     id: UNIFIED_LOGS_SHORTCUT_IDS.UNIFIED_LOGS_NEXT_ROW,
     label: 'Next log',
     sequence: ['ArrowDown'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.UNIFIED_LOGS,
+    options: { ignoreInputs: true },
+  },
+  [UNIFIED_LOGS_SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW]: {
+    id: UNIFIED_LOGS_SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_PREV_ROW,
+    label: 'Extend log selection upward',
+    sequence: ['Shift+ArrowUp'],
+    showInSettings: false,
+    referenceGroup: SHORTCUT_REFERENCE_GROUPS.UNIFIED_LOGS,
+    options: { ignoreInputs: true },
+  },
+  [UNIFIED_LOGS_SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW]: {
+    id: UNIFIED_LOGS_SHORTCUT_IDS.UNIFIED_LOGS_EXTEND_NEXT_ROW,
+    label: 'Extend log selection downward',
+    sequence: ['Shift+ArrowDown'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.UNIFIED_LOGS,
     options: { ignoreInputs: true },

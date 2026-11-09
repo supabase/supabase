@@ -30,7 +30,8 @@ import {
   InterstitialLayout,
 } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
-import type { Organization, ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { Organization } from '@/types'
 
 type OrganizationsState_Loading = {
   _tag: 'loading'
@@ -38,7 +39,7 @@ type OrganizationsState_Loading = {
 
 type OrganizationsState_Error = {
   _tag: 'error'
-  error: ResponseError | null
+  error: StudioError | null
 }
 
 type OrganizationsState_Empty = {
@@ -71,6 +72,7 @@ function isExternalRedirectUrl(url: string): boolean {
 }
 
 export interface ApiAuthorizationMainViewProps {
+  auth_id: string
   approvalState: ApprovalState
   form: UseFormReturn<IApprovalFormSchema>
   requester: ApiAuthorizationResponse
@@ -83,6 +85,7 @@ export interface ApiAuthorizationMainViewProps {
 }
 
 export function ApiAuthorizationMainView({
+  auth_id,
   approvalState,
   form,
   requester,
@@ -125,7 +128,7 @@ export function ApiAuthorizationMainView({
               {organizations._tag === 'error' && (
                 <OrganizationsErrorNotice error={organizations.error} />
               )}
-              {organizations._tag === 'empty' && <OrganizationsEmptyState />}
+              {organizations._tag === 'empty' && <OrganizationsEmptyState authId={auth_id} />}
               {organizations._tag === 'not_member' && <NotMemberOfOrganizationNotice />}
               {organizations._tag === 'success' && (
                 <OrganizationSelector
@@ -184,7 +187,7 @@ function OrganizationsLoader(): ReactNode {
 }
 
 interface OrganizationsErrorNoticeProps {
-  error: ResponseError | null
+  error: StudioError | null
 }
 
 function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): ReactNode {
@@ -204,16 +207,21 @@ function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): Rea
   )
 }
 
-function OrganizationsEmptyState(): ReactNode {
+interface OrganizationsEmptyStateProps {
+  authId: string
+}
+
+function OrganizationsEmptyState({ authId }: OrganizationsEmptyStateProps): ReactNode {
+  const returnTo = `/authorize?auth_id=${authId}`
+
   return (
     <Admonition
       type="warning"
       title="No organizations found"
       description="Create an organization before authorizing this request."
       actions={[
-        // [Joshen] JFYI this is a short term solution to guide users with creating an org from here
-        <Button asChild key="new-org" variant="default">
-          <Link href="/new">Create an organization</Link>
+        <Button asChild key="new-org">
+          <Link href={`/new?returnTo=${encodeURIComponent(returnTo)}`}>Create an organization</Link>
         </Button>,
       ]}
     />

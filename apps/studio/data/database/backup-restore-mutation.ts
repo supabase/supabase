@@ -2,8 +2,9 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { components } from '@/data/api'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type BackupRestoreVariables = {
   ref: string
@@ -11,13 +12,14 @@ export type BackupRestoreVariables = {
 }
 
 // [Joshen] Shift to backups RQ query once created
-export type Backup = components['schemas']['BackupsResponse']['backups'][number]
+export type Backup = components['schemas']['BackupsResponse_Output']['backups'][number]
 
 export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables) {
   if (backup.isPhysicalBackup) {
     const { data, error } = await post('/platform/database/{ref}/backups/restore-physical', {
       params: { path: { ref } },
       body: { id: backup.id },
+      grant: unguarded.migrating,
     })
     if (error) throw error
     return data
@@ -26,6 +28,7 @@ export async function restoreFromBackup({ ref, backup }: BackupRestoreVariables)
   const { data, error } = await post('/platform/database/{ref}/backups/restore', {
     params: { path: { ref } },
     body: { id: backup.id },
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -38,10 +41,10 @@ export const useBackupRestoreMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BackupRestoreData, ResponseError, BackupRestoreVariables>,
+  UseCustomMutationOptions<BackupRestoreData, StudioError, BackupRestoreVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<BackupRestoreData, ResponseError, BackupRestoreVariables>({
+  return useMutation<BackupRestoreData, StudioError, BackupRestoreVariables>({
     mutationFn: (vars) => restoreFromBackup(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

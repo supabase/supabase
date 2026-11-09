@@ -181,7 +181,8 @@ Long-running deployments are usually assembled from several upstream points over
 4. Back up your database separately - `update.sh` backs up configuration only.
 5. Apply the update, then resolve conflicts. Most conflicts will be in "vendor files" you never meant to own - `run.sh`, `setup.sh`, `tests/*`, the override templates. For those, copy the new version as-is. The conflicts that need manual editing are usually in the compose configuration you deliberately changed. Your `.env` is never conflicted - `update.sh` appends new keys for you to review separately. The tool surfaces everything for you to triage. Refer to [Resolving conflicts](#resolving-conflicts) for more details.
 6. Handle Postgres. Postgres 17 became the default in v0.6.0. If you are still on Postgres 15, do not recreate straight onto 17 - follow [Upgrade to Postgres 17](/docs/guides/self-hosting/postgres-upgrade-17), or pin Postgres 15 with the `docker-compose.pg15.yml` override. Read the [changelog](https://github.com/supabase/supabase/blob/master/docker/CHANGELOG.md) for the breaking changes across the range you are crossing.
-7. Run `sh run.sh pull`, then `sh run.sh recreate`.
+7. Upgrade the API gateway. Envoy became the default in v0.8.0, replacing Kong. If you customized `volumes/api/kong.yml` or the gateway service, use the Kong override to keep Kong; otherwise the merge switches you to Envoy. The gateway service is renamed from `kong` to `api-gw`, but the `kong` hostname alias still resolves.
+8. Run `sh run.sh pull`, then `sh run.sh recreate`.
 
 <Admonition type="note">
 

@@ -7,7 +7,8 @@ import { contentKeys } from './keys'
 import type { SnippetWithContent } from './sql-folders-query'
 import type { components } from '@/data/api'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpsertContentPayload = Omit<components['schemas']['UpsertContentBody'], 'content'> & {
   id: string
@@ -22,12 +23,16 @@ export type UpsertContentVariables = {
 
 export async function upsertContent(
   { projectRef, payload }: UpsertContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ): Promise<SnippetWithContent | null> {
+  const headers = new Headers(headersInit)
+  headers.set('Version', '2')
+
   const { data, error } = await put('/platform/projects/{ref}/content', {
     params: { path: { ref: projectRef } },
     body: unmapSqlContentField(payload),
-    headers: { Version: '2' },
+    headers,
     signal,
   })
   if (error) handleError(error)
@@ -44,14 +49,14 @@ export const useContentUpsertMutation = ({
   invalidateQueriesOnSuccess = true,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UpsertContentData, ResponseError, UpsertContentVariables>,
+  UseCustomMutationOptions<UpsertContentData, StudioError, UpsertContentVariables>,
   'mutationFn'
 > & {
   invalidateQueriesOnSuccess?: boolean
 } = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpsertContentData, ResponseError, UpsertContentVariables>({
+  return useMutation<UpsertContentData, StudioError, UpsertContentVariables>({
     mutationFn: (args) => upsertContent(args),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

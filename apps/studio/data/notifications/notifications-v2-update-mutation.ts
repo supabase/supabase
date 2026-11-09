@@ -2,7 +2,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type NotificationsUpdateVariables = {
   ids: string[]
@@ -27,11 +28,11 @@ export const useNotificationsV2UpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>,
+  UseCustomMutationOptions<NotificationsUpdateData, StudioError, NotificationsUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<NotificationsUpdateData, ResponseError, NotificationsUpdateVariables>({
+  return useMutation<NotificationsUpdateData, StudioError, NotificationsUpdateVariables>({
     mutationFn: (vars) => updateNotifications(vars),
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({ queryKey: ['notifications'] })

@@ -1,3 +1,5 @@
+import type { Table } from '@tanstack/react-table'
+
 // Operators mirror PostgREST / Table Editor conventions:
 //   `=` / `<>` — exact equality, available on most columns
 //   `~~*` / `!~~*` — ILIKE / NOT ILIKE (case-insensitive substring
@@ -16,13 +18,6 @@ export interface LogsColumnFilterValue {
   values: string[]
 }
 
-export const LOGS_FILTER_OPERATORS = [
-  '=',
-  '<>',
-  '~~*',
-  '!~~*',
-] as const satisfies readonly LogsFilterOperator[]
-
 const OPERATOR_TO_ABBREV: Record<LogsFilterOperator, string> = {
   '=': 'eq',
   '<>': 'neq',
@@ -37,6 +32,11 @@ const ABBREV_TO_OPERATOR: Record<string, LogsFilterOperator> = {
   notilike: '!~~*',
 }
 
+export const logAttributeFilterId = (key: string) => `attribute.${key}`
+
+export const getLogAttributeKey = (id: string): string | undefined =>
+  id.startsWith('attribute.') ? id.slice('attribute.'.length) : undefined
+
 export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilterValue => {
   return (
     typeof value === 'object' &&
@@ -47,26 +47,78 @@ export const isLogsFilterColumnValue = (value: unknown): value is LogsColumnFilt
   )
 }
 
+export interface LogsFilterInput {
+  field: string
+  operator: LogsFilterOperator
+  value: string | number
+}
+
+export const EQUALITY_FILTER_OPERATORS = ['=', '<>'] as const satisfies LogsFilterOperator[]
+
+export const LOGS_FILTER_OPERATOR_LABELS: Record<LogsFilterOperator, string> = {
+  '=': 'Filter: equals',
+  '<>': 'Filter: not equals',
+  '~~*': 'Filter: contains',
+  '!~~*': 'Filter: does not contain',
+}
+
+export const LOGS_FILTER_OPERATOR_VERBS: Record<LogsFilterOperator, string> = {
+  '=': 'equals',
+  '<>': 'does not equal',
+  '~~*': 'contains',
+  '!~~*': 'does not contain',
+}
+
+export const addLogsColumnFilter = (
+  columnFilters: { id: string; value: unknown }[],
+  { field, operator, value }: LogsFilterInput
+): { id: string; value: unknown }[] => {
+  const stringValue = String(value)
+  const index = columnFilters.findIndex((filter) => filter.id === field)
+  const current = index === -1 ? undefined : columnFilters[index].value
+  const existing = isLogsFilterColumnValue(current) ? current : undefined
+  const matchesOperator = existing?.operator === operator
+  if (matchesOperator && existing.values.includes(stringValue)) return columnFilters
+  const next: LogsColumnFilterValue = {
+    operator,
+    values: matchesOperator ? [...existing.values, stringValue] : [stringValue],
+  }
+  if (index === -1) return [...columnFilters, { id: field, value: next }]
+  return columnFilters.map((filter, i) => (i === index ? { id: field, value: next } : filter))
+}
+
+export const addLogsFilter = <TData>(table: Table<TData>, filter: LogsFilterInput) =>
+  table.setColumnFilters((current) => addLogsColumnFilter(current, filter))
+
 export const parseLogsFilterUrlParams = (filter?: string[] | null): LogsFilter[] => {
   if (!Array.isArray(filter)) return []
-  const parsed: LogsFilter[] = []
-  for (const raw of filter) {
+  return filter.flatMap((raw): LogsFilter[] => {
     const [column, abbrev, ...rest] = raw.split(':')
     const operator = ABBREV_TO_OPERATOR[abbrev]
-    if (!column || !operator) continue
-    parsed.push({ column, operator, value: rest.join(':') })
-  }
-  return parsed
+    if (!column || !operator) return []
+    const value = rest.join(':')
+    if (!column.startsWith('attribute.')) return [{ column, operator, value }]
+    try {
+      return [{ column: decodeURIComponent(column), operator, value: decodeURIComponent(value) }]
+    } catch {
+      return []
+    }
+  })
 }
 
 export const logsFiltersToUrlParams = (filters: LogsFilter[]): string[] => {
-  return filters.map((f) => `${f.column}:${OPERATOR_TO_ABBREV[f.operator]}:${f.value}`)
+  return filters.map((filter) => {
+    const isAttributeFilter = filter.column.startsWith('attribute.')
+    const column = isAttributeFilter ? encodeURIComponent(filter.column) : filter.column
+    const value = isAttributeFilter ? encodeURIComponent(filter.value) : filter.value
+    return `${column}:${OPERATOR_TO_ABBREV[filter.operator]}:${value}`
+  })
 }
 
 export const groupLogsFiltersByColumn = (
   filters: LogsFilter[]
 ): Record<string, LogsColumnFilterValue> => {
-  const grouped: Record<string, LogsColumnFilterValue> = {}
+  const grouped: Record<string, LogsColumnFilterValue> = Object.create(null)
   for (const { column, operator, value } of filters) {
     const existing = grouped[column]
     if (!existing) {
@@ -83,10 +135,11 @@ export const groupLogsFiltersByColumn = (
 
 export const logsFiltersToColumnFilters = (
   filters: LogsFilter[]
-): { id: string; value: string[] | LogsColumnFilterValue }[] => {
-  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) =>
-    group.operator === '=' ? { id, value: group.values } : { id, value: group }
-  )
+): { id: string; value: LogsColumnFilterValue }[] => {
+  return Object.entries(groupLogsFiltersByColumn(filters)).map(([id, group]) => ({
+    id,
+    value: group,
+  }))
 }
 
 // Seeds `date` too, so `logsFiltersToColumnFilters` (which only covers the `filter`
@@ -126,11 +179,11 @@ export const buildFilterSearchUpdate = (
   columnFilters: { id: string; value: unknown }[],
   filterFields: { value: string; type: string }[]
 ): Record<string, unknown> => {
-  const filterableNames = new Set(
-    filterFields.filter((field) => field.type !== 'timerange').map((field) => field.value)
+  const timerangeNames = new Set(
+    filterFields.filter((field) => field.type === 'timerange').map((field) => field.value)
   )
   const filterEntries = logsFiltersToUrlParams(
-    columnFiltersToLogsFilters(columnFilters, filterableNames)
+    columnFiltersToLogsFilters(columnFilters.filter(({ id }) => !timerangeNames.has(id)))
   )
   const update: Record<string, unknown> = {
     filter: filterEntries.length > 0 ? filterEntries : null,

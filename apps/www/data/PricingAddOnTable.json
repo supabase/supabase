@@ -12,8 +12,7 @@
         "columns": [
           { "key": "plan", "title": "Compute Size", "value": "Micro" },
           { "key": "pricing", "title": "Price USD", "value": "$10" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "cpu", "title": "Compute", "value": "Shared compute" },
           { "key": "memory", "title": "Memory", "value": "1 GB" },
           {
             "key": "directConnections",
@@ -31,8 +30,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Small" },
           { "key": "pricing", "title": "Price USD", "value": "$15" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "cpu", "title": "Compute", "value": "Shared compute" },
           { "key": "memory", "title": "Memory", "value": "2 GB" },
           {
             "key": "directConnections",
@@ -50,8 +48,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Medium" },
           { "key": "pricing", "title": "Price USD", "value": "$60" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": false },
+          { "key": "cpu", "title": "Compute", "value": "Shared compute" },
           { "key": "memory", "title": "Memory", "value": "4 GB" },
           {
             "key": "directConnections",
@@ -69,8 +66,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "Large" },
           { "key": "pricing", "title": "Price USD", "value": "$110" },
-          { "key": "cpu", "title": "CPU", "value": "2-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 2 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "8 GB" },
           {
             "key": "directConnections",
@@ -88,8 +84,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "XL" },
           { "key": "pricing", "title": "Price USD", "value": "$210" },
-          { "key": "cpu", "title": "CPU", "value": "4-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 4 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "16 GB" },
           {
             "key": "directConnections",
@@ -107,8 +102,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "2XL" },
           { "key": "pricing", "title": "Price USD", "value": "$410" },
-          { "key": "cpu", "title": "CPU", "value": "8-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 8 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "32 GB" },
           {
             "key": "directConnections",
@@ -126,8 +120,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "4XL" },
           { "key": "pricing", "title": "Price USD", "value": "$960" },
-          { "key": "cpu", "title": "CPU", "value": "16-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 16 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "64 GB" },
           {
             "key": "directConnections",
@@ -145,8 +138,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "8XL" },
           { "key": "pricing", "title": "Price USD", "value": "$1,870" },
-          { "key": "cpu", "title": "CPU", "value": "32-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 32 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "128 GB" },
           {
             "key": "directConnections",
@@ -164,8 +156,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "12XL" },
           { "key": "pricing", "title": "Price USD", "value": "$2,800" },
-          { "key": "cpu", "title": "CPU", "value": "48-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 48 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "192 GB" },
           {
             "key": "directConnections",
@@ -183,8 +174,7 @@
         "columns": [
           { "key": "plan", "title": "Plan", "value": "16XL" },
           { "key": "pricing", "title": "Price USD", "value": "$3,730" },
-          { "key": "cpu", "title": "CPU", "value": "64-core ARM" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Dedicated · 64 vCPUs" },
           { "key": "memory", "title": "Memory", "value": "256 GB" },
           {
             "key": "directConnections",
@@ -207,8 +197,7 @@
             "value": "Contact Us",
             "url": "/dashboard/support/new?category=sales&subject=Enquiry%20about%20larger%20instance%20sizes"
           },
-          { "key": "cpu", "title": "CPU", "value": "Custom" },
-          { "key": "dedicated", "title": "Dedicated", "value": true },
+          { "key": "cpu", "title": "Compute", "value": "Custom" },
           { "key": "memory", "title": "Memory", "value": "Custom" },
           {
             "key": "directConnections",

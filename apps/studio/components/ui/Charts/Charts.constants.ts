@@ -5,8 +5,8 @@
 export const CHART_COLORS = {
   TICK: 'var(--background-overlay-hover)',
   AXIS: 'var(--background-overlay-hover)',
-  GREEN_1: 'hsl(var(--brand-default))',
-  GREEN_2: 'hsl(var(--brand-500))',
+  GREEN_1: 'var(--primary-bright)',
+  GREEN_2: 'var(--primary-solid)',
   RED_1: 'hsl(var(--destructive-default))',
   RED_2: 'hsl(var(--destructive-500))',
   REFERENCE_LINE: 'var(--foreground-muted)',
@@ -102,5 +102,4 @@ export const DEFAULT_STACK_COLORS: ValidStackColor[] = [
 export enum DateTimeFormats {
   FULL = 'MMM D, YYYY, hh:mma',
   FULL_SECONDS = 'MMM D, hh:mm:ssa',
-  DATE_ONLY = 'MMM D, YYYY',
 }

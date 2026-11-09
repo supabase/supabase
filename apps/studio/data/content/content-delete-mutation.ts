@@ -5,17 +5,22 @@ import { toast } from 'sonner'
 import type { ContentData } from './content-query'
 import { contentKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type DeleteContentVariables = { projectRef: string; ids: string[] }
 type DeleteContext = { snapshots: [QueryKey, ContentData | undefined][] }
 
 export async function deleteContents(
   { projectRef, ids }: DeleteContentVariables,
-  signal?: AbortSignal
+  signal?: AbortSignal,
+  headersInit?: HeadersInit
 ) {
+  const headers = new Headers(headersInit)
+  headers.set('Version', '2')
+
   const { data, error } = await del('/platform/projects/{ref}/content', {
-    headers: { Version: '2' },
+    headers,
     params: {
       path: { ref: projectRef },
       query: { ids: ids.join(',') },
@@ -39,12 +44,12 @@ export const useContentDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DeleteContentData, ResponseError, DeleteContentVariables, DeleteContext>,
+  UseCustomMutationOptions<DeleteContentData, StudioError, DeleteContentVariables, DeleteContext>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DeleteContentData, ResponseError, DeleteContentVariables, DeleteContext>({
+  return useMutation<DeleteContentData, StudioError, DeleteContentVariables, DeleteContext>({
     mutationFn: (args) => deleteContents(args),
     async onMutate({ projectRef, ids }) {
       await queryClient.cancelQueries({ queryKey: contentKeys.allContentLists(projectRef) })

@@ -1,4 +1,12 @@
-import { Eye, GitBranch, NotebookText, ScrollText, Table2 } from 'lucide-react'
+import {
+  EyeIcon,
+  GitBranchIcon,
+  MessageSquareIcon,
+  NotebookTextIcon,
+  ScrollTextIcon,
+  SquareCodeIcon,
+  Table2Icon,
+} from 'lucide-react'
 import { cn, SQL_ICON } from 'ui'
 
 import type { SqlSnippetSource } from '@/components/interfaces/SQLEditor/querySource'
@@ -18,7 +26,7 @@ export const LogsSnippetIcon = ({
   strokeWidth?: number
   className?: string
 }) => (
-  <ScrollText
+  <ScrollTextIcon
     size={size}
     strokeWidth={strokeWidth}
     className={cn('transition-colors', className)}
@@ -26,7 +34,19 @@ export const LogsSnippetIcon = ({
 )
 
 interface EntityTypeIconProps {
-  type: 'sql' | 'schema' | 'new' | 'r' | 'v' | 'm' | 'f' | 'p' | 'notebook'
+  type:
+    | 'sql'
+    | 'schema'
+    | 'new'
+    | 'r'
+    | 'v'
+    | 'm'
+    | 'f'
+    | 'p'
+    | 'notebook'
+    | 'query'
+    | 'chat'
+    | 'explorer-home'
   size?: number
   strokeWidth?: number
   isActive?: boolean
@@ -73,7 +93,7 @@ export const EntityTypeIcon = ({
 
   if (type === ENTITY_TYPE.TABLE) {
     return (
-      <Table2
+      <Table2Icon
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
@@ -86,12 +106,12 @@ export const EntityTypeIcon = ({
   }
 
   if (type === 'schema') {
-    return <GitBranch size={size} strokeWidth={strokeWidth} />
+    return <GitBranchIcon size={size} strokeWidth={strokeWidth} />
   }
 
   if (type === ENTITY_TYPE.VIEW) {
     return (
-      <Eye
+      <EyeIcon
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
@@ -104,7 +124,15 @@ export const EntityTypeIcon = ({
   }
 
   if (type === 'notebook') {
-    return <NotebookText size={size} strokeWidth={strokeWidth} className={''} />
+    return <NotebookTextIcon size={size} strokeWidth={strokeWidth} className={''} />
+  }
+
+  if (type === 'query') {
+    return <SquareCodeIcon size={size} strokeWidth={strokeWidth} />
+  }
+
+  if (type === 'chat') {
+    return <MessageSquareIcon size={size} strokeWidth={strokeWidth} />
   }
 
   return (

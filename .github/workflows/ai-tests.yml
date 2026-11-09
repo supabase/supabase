@@ -24,9 +24,6 @@ jobs:
   test:
     runs-on: blacksmith-4vcpu-ubuntu-2404
 
-    env:
-      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
-
     defaults:
       run:
         working-directory: ./packages/ai-commands

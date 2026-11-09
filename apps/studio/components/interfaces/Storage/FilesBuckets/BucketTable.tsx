@@ -1,5 +1,5 @@
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useRouter } from 'next/navigation'
 import {
   Badge,
@@ -12,8 +12,12 @@ import {
   TooltipTrigger,
 } from 'ui'
 
+import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { BucketVersioningPill } from '@/components/interfaces/Storage/BucketVersioningPill'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
+import { getBucketVersioningState } from '@/components/interfaces/Storage/StorageVersioning.constants'
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
+import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
 import {
   VirtualizedTableCell,
   VirtualizedTableHead,
@@ -26,12 +30,21 @@ import { createNavigationHandler } from '@/lib/navigation'
 
 type BucketTableMode = 'standard' | 'virtualized'
 
+export const useVersioningColumnSpan = () => (useIsStorageVersioningEnabled() ? 1 : 0)
+
+const BucketVersioningCell = ({ bucket }: { bucket: Bucket }) => {
+  if (getBucketVersioningState(bucket) === 'disabled')
+    return <span className="text-foreground-muted">-</span>
+  return <BucketVersioningPill bucket={bucket} showPrefix={false} />
+}
+
 type BucketTableHeaderProps = {
   mode: BucketTableMode
   hasBuckets?: boolean
 }
 
 export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeaderProps) => {
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
   const BucketTableHeader = mode === 'standard' ? TableHeader : VirtualizedTableHeader
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableHead = mode === 'standard' ? TableHead : VirtualizedTableHead
@@ -50,6 +63,9 @@ export const BucketTableHeader = ({ mode, hasBuckets = true }: BucketTableHeader
         <BucketTableHead className={stickyClasses}>Policies</BucketTableHead>
         <BucketTableHead className={stickyClasses}>File size limit</BucketTableHead>
         <BucketTableHead className={stickyClasses}>Allowed MIME types</BucketTableHead>
+        {isStorageVersioningEnabled && (
+          <BucketTableHead className={stickyClasses}>Versioning</BucketTableHead>
+        )}
         <BucketTableHead className={stickyClasses}>
           <span className="sr-only">Actions</span>
         </BucketTableHead>
@@ -64,18 +80,27 @@ type BucketTableEmptyStateProps = {
 }
 
 export const BucketTableEmptyState = ({ mode, filterString }: BucketTableEmptyStateProps) => {
-  const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
-  const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
+  const versioningColumnSpan = useVersioningColumnSpan()
+
+  if (mode === 'standard') {
+    return (
+      <TableRowNoResults
+        className="[&>td]:hover:bg-inherit"
+        colSpan={5 + versioningColumnSpan}
+        search={filterString}
+      />
+    )
+  }
 
   return (
-    <BucketTableRow className="[&>td]:hover:bg-inherit">
-      <BucketTableCell colSpan={5}>
+    <VirtualizedTableRow className="[&>td]:hover:bg-inherit">
+      <VirtualizedTableCell colSpan={5 + versioningColumnSpan}>
         <p className="text-sm text-foreground">No results found</p>
         <p className="text-sm text-foreground-lighter">
           Your search for “{filterString}” did not return any results
         </p>
-      </BucketTableCell>
-    </BucketTableRow>
+      </VirtualizedTableCell>
+    </VirtualizedTableRow>
   )
 }
 
@@ -94,6 +119,7 @@ export const BucketTableRow = ({
 }: BucketTableRowProps) => {
   const router = useRouter()
   const { getPolicyCount } = useBucketPolicyCount()
+  const isStorageVersioningEnabled = useIsStorageVersioningEnabled()
 
   const BucketTableRow = mode === 'standard' ? TableRow : VirtualizedTableRow
   const BucketTableCell = mode === 'standard' ? TableCell : VirtualizedTableCell
@@ -154,9 +180,15 @@ export const BucketTableRow = ({
         </p>
       </BucketTableCell>
 
+      {isStorageVersioningEnabled && (
+        <BucketTableCell>
+          <BucketVersioningCell bucket={bucket} />
+        </BucketTableCell>
+      )}
+
       <BucketTableCell>
         <div className="flex justify-end items-center h-full">
-          <ChevronRight aria-hidden={true} size={14} className="text-foreground-muted/60" />
+          <ChevronRightIcon aria-hidden={true} size={14} className="text-foreground-muted/60" />
         </div>
         <button tabIndex={-1} className="sr-only">
           Go to bucket details

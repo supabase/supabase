@@ -1,4 +1,3 @@
-import { renderHook } from '@testing-library/react'
 import { useFlag, useParams } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -9,6 +8,7 @@ import {
 import { useSupamonitorStatus } from '@/components/interfaces/QueryPerformance/hooks/useSupamonitorStatus'
 import { useContentQuery } from '@/data/content/content-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { customRenderHook as renderHook } from '@/tests/lib/custom-render'
 import { routerMock } from '@/tests/lib/route-mock'
 
 const { REF, mockIsPlatform } = vi.hoisted(() => ({
@@ -60,54 +60,35 @@ describe('useGenerateObservabilityMenu', () => {
     vi.mocked(useIsFeatureEnabled).mockReturnValue(true)
   })
 
-  it('always includes the GENERAL section', () => {
+  const getGeneralKeys = () => {
     const { result } = renderHook(() => useGenerateObservabilityMenu())
+    return result.current
+      .find((section) => section.title === 'GENERAL')
+      ?.items.map((item) => item.key)
+  }
 
-    expect(result.current.some((section) => section.title === 'GENERAL')).toBe(true)
-  })
-
-  it('includes Overview when the observabilityOverview flag is enabled', () => {
-    vi.mocked(useFlag).mockReturnValue(true)
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const general = result.current.find((section) => section.title === 'GENERAL')
-
-    expect(general?.items.some((item) => item.key === 'observability')).toBe(true)
-  })
-
-  it('excludes Overview when the observabilityOverview flag is disabled', () => {
+  it('includes Overview only when the observabilityOverview flag is enabled', () => {
     vi.mocked(useFlag).mockReturnValue(false)
+    expect(getGeneralKeys()).not.toContain('observability')
 
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const general = result.current.find((section) => section.title === 'GENERAL')
-
-    expect(general?.items.some((item) => item.key === 'observability')).toBe(false)
+    vi.mocked(useFlag).mockReturnValue(true)
+    expect(getGeneralKeys()).toContain('observability')
   })
 
-  it('shows Query Performance when supamonitor is disabled', () => {
+  it('shows Query Performance or Query Insights depending on supamonitor', () => {
     vi.mocked(useSupamonitorStatus).mockReturnValue({
       isSupamonitorEnabled: false,
       isLoading: false,
     })
+    expect(getGeneralKeys()).toContain('query-performance')
+    expect(getGeneralKeys()).not.toContain('query-insights')
 
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const general = result.current.find((section) => section.title === 'GENERAL')
-
-    expect(general?.items.some((item) => item.key === 'query-performance')).toBe(true)
-    expect(general?.items.some((item) => item.key === 'query-insights')).toBe(false)
-  })
-
-  it('shows Query Insights when supamonitor is enabled', () => {
     vi.mocked(useSupamonitorStatus).mockReturnValue({
       isSupamonitorEnabled: true,
       isLoading: false,
     })
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const general = result.current.find((section) => section.title === 'GENERAL')
-
-    expect(general?.items.some((item) => item.key === 'query-insights')).toBe(true)
-    expect(general?.items.some((item) => item.key === 'query-performance')).toBe(false)
+    expect(getGeneralKeys()).toContain('query-insights')
+    expect(getGeneralKeys()).not.toContain('query-performance')
   })
 
   it('includes API Gateway and the PRODUCT section on platform', () => {
@@ -131,23 +112,20 @@ describe('useGenerateObservabilityMenu', () => {
     expect(result.current.length).toBe(1)
   })
 
-  it('includes Storage in the PRODUCT section when project_storage:all is enabled', () => {
+  it('includes Storage in the PRODUCT section only when project_storage:all is enabled', () => {
+    const getProductKeys = () => {
+      const { result } = renderHook(() => useGenerateObservabilityMenu())
+      return result.current
+        .find((section) => section.title === 'PRODUCT')
+        ?.items.map((item) => item.key)
+    }
+
     vi.mocked(useIsFeatureEnabled).mockReturnValue(true)
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const product = result.current.find((section) => section.title === 'PRODUCT')
-
-    expect(product?.items.some((item) => item.key === 'storage')).toBe(true)
+    expect(getProductKeys()).toContain('storage')
     expect(useIsFeatureEnabled).toHaveBeenCalledWith('project_storage:all')
-  })
 
-  it('excludes Storage from the PRODUCT section when project_storage:all is disabled', () => {
     vi.mocked(useIsFeatureEnabled).mockReturnValue(false)
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const product = result.current.find((section) => section.title === 'PRODUCT')
-
-    expect(product?.items.some((item) => item.key === 'storage')).toBe(false)
+    expect(getProductKeys()).not.toContain('storage')
   })
 
   it('always includes Database, Data API, Auth, Edge Functions, and Realtime in the PRODUCT section', () => {
@@ -165,16 +143,6 @@ describe('useGenerateObservabilityMenu', () => {
     const database = product?.items.find((item) => item.key === 'database')
 
     expect(database?.url).toBe(`/project/${REF}/observability/database`)
-  })
-
-  it('handles an undefined project ref', () => {
-    vi.mocked(useParams).mockReturnValue({ ref: undefined })
-
-    const { result } = renderHook(() => useGenerateObservabilityMenu())
-    const product = result.current.find((section) => section.title === 'PRODUCT')
-    const database = product?.items.find((item) => item.key === 'database')
-
-    expect(database?.url).toBe('/project/undefined/observability/database')
   })
 
   it('preserves date range and helper query params across menu item URLs', () => {

@@ -43,7 +43,7 @@ export const OperationQueueSidePanel = () => {
           <SheetHeader>
             <SheetTitle>Pending changes</SheetTitle>
             <SheetDescription>
-              {operations.length} operation{operations.length !== 1 ? 's' : ''}
+              {operations.length} operation{operations.length !== 1 ? <span>s</span> : ''}
             </SheetDescription>
           </SheetHeader>
 
@@ -53,18 +53,13 @@ export const OperationQueueSidePanel = () => {
 
           <SheetFooter className="justify-between!">
             <Button
-              variant="default"
               onClick={snap.closeSidePanel}
               iconRight={<KeyboardShortcut keys={['Meta', '.']} variant="inline" />}
             >
               Close
             </Button>
             <div className="flex space-x-3">
-              <Button
-                variant="default"
-                onClick={confirmOnClose}
-                disabled={isSaving || operations.length === 0}
-              >
+              <Button onClick={confirmOnClose} disabled={isSaving || operations.length === 0}>
                 Discard
               </Button>
               <Button

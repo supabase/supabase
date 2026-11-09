@@ -10,7 +10,7 @@ export default function AdmonitionDemo() {
         title="Set up custom SMTP"
         description="You’re using the built-in email service. This service has rate limits and is not meant to be
         used for production apps."
-        actions={<Button variant="default">Set up SMTP</Button>}
+        actions={<Button>Set up SMTP</Button>}
       />
       <Admonition
         type="destructive"

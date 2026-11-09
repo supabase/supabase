@@ -1,4 +1,5 @@
 import { useParams } from 'common'
+import dayjs from 'dayjs'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -22,7 +23,6 @@ import {
 
 import { BackupsEmpty } from '../BackupsEmpty'
 import { BackupsStorageAlert } from '../BackupsStorageAlert'
-import type { Timezone } from './PITR.types'
 import { getClientTimezone } from './PITR.utils'
 import { PITRForm } from './PITRForm'
 import PITRStatus from './PITRStatus'
@@ -32,6 +32,7 @@ import { usePitrRestoreMutation } from '@/data/database/pitr-restore-mutation'
 import { useSetProjectStatus } from '@/data/projects/project-detail-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { PROJECT_STATUS } from '@/lib/constants'
+import { getTimezoneLabel, type Timezone } from '@/lib/constants/timezones'
 
 export const PITRSelection = () => {
   const router = useRouter()
@@ -100,8 +101,8 @@ export const PITRSelection = () => {
                 settings prior to starting a PITR restore.
               </AlertDescription>
               <div className="flex items-center gap-x-2 mt-2">
-                <Button asChild variant="default">
-                  <Link href={`/project/${ref}/database/replication`}>Manage read replicas</Link>
+                <Button asChild>
+                  <Link href={`/project/${ref}/settings/infrastructure`}>Manage read replicas</Link>
                 </Button>
               </div>
             </Alert>
@@ -135,7 +136,11 @@ export const PITRSelection = () => {
                 <div className="py-2 flex flex-col gap-3">
                   <div>
                     <p className="text-sm font-mono text-foreground-lighter">
-                      {selectedRecoveryPoint?.selectedTimezone.text}
+                      {selectedRecoveryPoint &&
+                        getTimezoneLabel(
+                          selectedRecoveryPoint.selectedTimezone,
+                          dayjs.unix(selectedRecoveryPoint.recoveryTimeTargetUnix)
+                        )}
                     </p>
                     <p className="text-2xl">{selectedRecoveryPoint?.recoveryTimeString}</p>
                   </div>

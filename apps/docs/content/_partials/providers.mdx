@@ -1,17 +1,13 @@
 ## Providers
 
-Supabase Auth works with many popular Auth methods, including Social and Phone Auth using third-party providers. See the following sections for a list of supported third-party providers.
+Supabase Auth works with many popular Auth methods, including social sign-in and phone sign-in with third-party providers. See the following sections for a list of supported third-party providers.
 
-### Social Auth
+### Social sign-in
 
-<AuthProviders type="social" labelledBy="social-auth" />
+<AuthProviders type="social" labelledBy="social-login" />
 
-<Admonition type="note">
+<$Partial path="custom_oauth_providers_note.mdx" />
 
-You can also add any OAuth2 or OIDC-compatible identity provider using [Custom OAuth/OIDC Providers](/docs/guides/auth/custom-oauth-providers).
+### Phone sign-in
 
-</Admonition>
-
-### Phone Auth
-
-<AuthProviders type="phone" labelledBy="phone-auth" />
+<AuthProviders type="phone" labelledBy="phone-sign-in" />

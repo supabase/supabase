@@ -3,8 +3,10 @@ import { InfiniteData, QueryClient, useInfiniteQuery } from '@tanstack/react-que
 
 import { ENTITY_TYPE } from './entity-type-constants'
 import { entityTypeKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type EntityTypesVariables = {
   projectRef?: string
@@ -52,8 +54,11 @@ export async function getEntityTypes(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-types',
       sql,
       queryKey: ['entity-types', ...schemas, page],
+      grant: unguarded.migrating,
     },
     signal
   )
@@ -62,7 +67,7 @@ export async function getEntityTypes(
 }
 
 export type EntityTypesData = Awaited<ReturnType<typeof getEntityTypes>>
-export type EntityTypesError = ResponseError
+export type EntityTypesError = StudioError
 
 export const useEntityTypesQuery = <TData = EntityTypesData>(
   {

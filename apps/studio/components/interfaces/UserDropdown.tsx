@@ -1,4 +1,5 @@
-import { FlaskConical, Loader2, ScrollText, User2 } from 'lucide-react'
+import { useDevToolbar } from 'dev-tools'
+import { FlaskConicalIcon, Loader2Icon, ScrollTextIcon, User2Icon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
@@ -19,6 +20,7 @@ import {
 
 import { ButtonTooltip } from '../ui/ButtonTooltip'
 import { useFeaturePreviewModal } from './App/FeaturePreview/FeaturePreviewContext'
+import { DevToolbarMenuGroup } from './DevToolbarMenuGroup'
 import { TimezoneDropdown } from './UserDropdown/TimezoneDropdown'
 import { ProfileImage } from '@/components/ui/ProfileImage'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
@@ -44,6 +46,8 @@ export function UserDropdown({
 
   const { toggleFeaturePreviewModal } = useFeaturePreviewModal()
   const track = useTrack()
+  const { isAvailable: isDevToolbarAvailable } = useDevToolbar()
+  const shouldShowSectionSeparator = IS_PLATFORM || isDevToolbarAvailable
 
   // The upgrade CTA is org-scoped, so only enable it on routes where an org is in scope.
   // Excludes /account/*, /organizations, /new, marketing routes, etc. Gating the hook here
@@ -64,13 +68,12 @@ export function UserDropdown({
     >
       <DropdownMenuTrigger asChild className={cn('border shrink-0 px-3', triggerClassName)}>
         <ButtonTooltip
-          variant="default"
           className="[&>span]:flex px-0 py-0 rounded-full overflow-hidden h-8 w-8"
           tooltip={{ content: { text: 'Account settings' } }}
         >
           {isLoading ? (
             <div className="w-full h-full flex items-center justify-center">
-              <Loader2 className="animate-spin text-foreground-lighter" size={16} />
+              <Loader2Icon className="animate-spin text-foreground-lighter" size={16} />
             </div>
           ) : (
             <ProfileImage alt={username} src={avatarUrl} className="w-8 h-8 rounded-md" />
@@ -115,7 +118,7 @@ export function UserDropdown({
                     }
                   }}
                 >
-                  <User2 size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <User2Icon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Account
                 </Link>
               </DropdownMenuItem>
@@ -123,7 +126,7 @@ export function UserDropdown({
                 className="flex gap-2 cursor-pointer"
                 onClick={() => toggleFeaturePreviewModal(true)}
               >
-                <FlaskConical size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                <FlaskConicalIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                 Feature previews
               </DropdownMenuItem>
               <DropdownMenuItem className="flex gap-2 cursor-pointer" asChild>
@@ -132,14 +135,17 @@ export function UserDropdown({
                   target="_blank"
                   rel="noopener noreferrer"
                 >
-                  <ScrollText size={14} strokeWidth={1.5} className="text-foreground-lighter" />
+                  <ScrollTextIcon size={14} strokeWidth={1.5} className="text-foreground-lighter" />
                   Changelog
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuSeparator />
             </DropdownMenuGroup>
           </>
         )}
+
+        {shouldShowSectionSeparator && <DropdownMenuSeparator />}
+
+        <DevToolbarMenuGroup />
 
         <DropdownMenuGroup>
           <DropdownMenuLabel>Theme</DropdownMenuLabel>
@@ -193,7 +199,7 @@ export function UserDropdown({
                   router.push('/logout')
                 }}
               >
-                Log out
+                Sign out
               </DropdownMenuItem>
             </DropdownMenuGroup>
           </>

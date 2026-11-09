@@ -27,14 +27,14 @@ mkdir -p ./supabase/tests/database
 Create a new file with the `.sql` extension which will contain the test.
 
 ```bash
-touch ./supabase/tests/database/hello_world.test.sql
+touch ./supabase/tests/database/hello_world_test.sql
 ```
 
 ### Writing tests
 
 All `sql` files use [pgTAP](/docs/guides/database/extensions/pgtap) as the test runner.
 
-Write a test to check that our `auth.users` table has an ID column. Open `hello_world.test.sql` and add the following code:
+Write a test to check that our `auth.users` table has an ID column. Open `hello_world_test.sql` and add the following code:
 
 ```sql
 begin;
@@ -63,7 +63,7 @@ This will produce the following output:
 
 ```bash
 $ supabase test db
-supabase/tests/database/hello_world.test.sql .. ok
+supabase/tests/database/hello_world_test.sql .. ok
 All tests successful.
 Files=1, Tests=1,  1 wallclock secs ( 0.01 usr  0.00 sys +  0.04 cusr  0.02 csys =  0.07 CPU)
 Result: PASS

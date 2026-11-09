@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle, LoaderCircle, X } from 'lucide-react'
+import { AlertCircleIcon, LoaderCircleIcon, XIcon } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 import { Button } from 'ui'
 
@@ -31,7 +31,11 @@ const PreviewFile = ({ item }: { item: StorageItemWithColumn }) => {
   if (isLoading) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <LoaderCircle size={14} strokeWidth={2} className="animate-spin text-foreground-lighter" />
+        <LoaderCircleIcon
+          size={14}
+          strokeWidth={2}
+          className="animate-spin text-foreground-lighter"
+        />
       </div>
     )
   }
@@ -130,6 +134,7 @@ export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) =
       {/* Preview Header */}
       <div className="flex w-full justify-end items-center gap-2 sticky top-0 bg-surface-100 p-4 border-b">
         <Button
+          variant="primary"
           size="tiny"
           onClick={() => onSelect(previewUrl!)}
           disabled={!previewUrl}
@@ -138,7 +143,7 @@ export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) =
           Select
         </Button>
         <div className="text-foreground-lighter transition-colors hover:text-foreground">
-          <X
+          <XIcon
             className="cursor-pointer"
             size={14}
             strokeWidth={2}
@@ -160,7 +165,7 @@ export const PreviewPane = ({ onSelect }: { onSelect: (url: string) => void }) =
           <h5 className="wrap-break-word text-base text-foreground">{file.name}</h5>
           {file.isCorrupted && (
             <div className="flex items-center space-x-2">
-              <AlertCircle size={14} strokeWidth={2} className="text-foreground-light" />
+              <AlertCircleIcon size={14} strokeWidth={2} className="text-foreground-light" />
               <p className="text-sm text-foreground-light">
                 File is corrupted, please delete and reupload this file again
               </p>

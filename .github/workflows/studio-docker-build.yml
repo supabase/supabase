@@ -21,6 +21,10 @@ jobs:
       - uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
         with:
           persist-credentials: false
+          # On push events paths-filter diffs against github.event.before with
+          # local git; without enough history it falls back to a git fetch that
+          # fails unauthenticated (persist-credentials is false).
+          fetch-depth: 50
       - uses: dorny/paths-filter@de90cc6fb38fc0963ad72b210f1f284cd68cea36 # v3.0.2
         id: filter
         with:

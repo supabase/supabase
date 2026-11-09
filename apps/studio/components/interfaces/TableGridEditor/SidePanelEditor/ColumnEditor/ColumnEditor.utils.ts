@@ -13,6 +13,11 @@ import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constrain
 import type { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
 import { uuidv4 } from '@/lib/helpers'
 import type { SafePostgresColumn } from '@/lib/postgres-types'
+import {
+  decodeSensitiveComment,
+  encodeSensitiveComment,
+  isSensitiveComment,
+} from '@/lib/sensitive-column-comment'
 import { trimSafeSqlFragment } from '@/lib/sql'
 import type { DeepReadonly } from '@/lib/type-helpers'
 import type { Dictionary } from '@/types'
@@ -24,31 +29,6 @@ const isImplicitTypeSchema = (schema: string | undefined) =>
 
 export const normalizeFormatSchema = (schema: string | undefined): string | undefined =>
   isImplicitTypeSchema(schema) ? undefined : schema
-
-// Helper functions to encode/decode sensitivity flag in column comments
-const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
-
-const isSensitiveDataInComment = (comment: string | null | undefined): boolean => {
-  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
-}
-
-const encodeCommentWithSensitivityFlag = (
-  comment: string | null | undefined,
-  isSensitive: boolean
-): string | null => {
-  let cleanComment = comment?.replace(SENSITIVE_DATA_MARKER, '').trim() ?? ''
-  if (isSensitive && cleanComment) {
-    return `${SENSITIVE_DATA_MARKER} ${cleanComment}`
-  } else if (isSensitive) {
-    return SENSITIVE_DATA_MARKER
-  }
-  return cleanComment || null
-}
-
-const decodeCommentWithoutSensitivityFlag = (comment: string | null | undefined): string | null => {
-  if (!comment) return null
-  return comment.replace(SENSITIVE_DATA_MARKER, '').trim() || null
-}
 
 export const displayColumnType = (
   format: string,
@@ -127,7 +107,7 @@ export const generateColumnFieldFromPGColumn = (
   const primaryKeyColumns = primary_keys.map((key) => key.name)
   const foreignKey = getColumnForeignKey(column, table, foreignKeys)
   const isArray = column?.data_type === 'ARRAY'
-  const isSensitiveData = isSensitiveDataInComment(column?.comment)
+  const isSensitiveData = isSensitiveComment(column?.comment)
 
   return {
     foreignKey,
@@ -135,7 +115,7 @@ export const generateColumnFieldFromPGColumn = (
     table: column.table,
     schema: column.schema,
     name: column.name,
-    comment: decodeCommentWithoutSensitivityFlag(column?.comment),
+    comment: decodeSensitiveComment(column?.comment),
     format: isArray ? column.format.slice(1) : column.format,
     formatSchema: normalizeFormatSchema(lookupFormatSchema(column, table)),
     defaultValue: column?.default_value as string | null,
@@ -163,10 +143,9 @@ export const generateCreateColumnPayload = (
     table: table.name,
     isIdentity,
     name: field.name.trim(),
-    comment: encodeCommentWithSensitivityFlag(
-      field.comment?.trim(),
-      field.isSensitiveData ?? false
-    ) as string | undefined,
+    comment: encodeSensitiveComment(field.comment?.trim(), field.isSensitiveData ?? false) as
+      | string
+      | undefined,
     type: { schema: field.formatSchema, name: field.format, isArray: field.isArray },
     check: trimSafeSqlFragment(field.check) ?? undefined,
     isUnique: field.isUnique,
@@ -195,10 +174,9 @@ export const generateUpdateColumnPayload = (
 
   // Only append the properties which are getting updated
   const name = field.name.trim()
-  const comment = encodeCommentWithSensitivityFlag(
-    field.comment?.trim(),
-    field.isSensitiveData ?? false
-  ) as string | undefined
+  const comment = encodeSensitiveComment(field.comment?.trim(), field.isSensitiveData ?? false) as
+    | string
+    | undefined
   const check = trimSafeSqlFragment(field.check) ?? undefined
 
   const payload: Partial<UpdateColumnPayload> = {}

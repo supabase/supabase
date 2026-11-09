@@ -26,14 +26,14 @@ const SECTION_PATH_TO_KEY: Record<string, keyof typeof NavItems> = {
   security: 'security',
   'self-hosting': 'self_hosting',
   storage: 'storage',
-  'monitoring-and-debugging': 'telemetry',
+  observability: 'telemetry',
 }
 
-function getSectionMenu(pathname: string) {
+function getSectionMenu(pathname: string, navItems: typeof NavItems) {
   const trimmed = pathname.replace(/^\/guides\/?/, '')
   const top = trimmed.split('/')[0]
   const key = SECTION_PATH_TO_KEY[top] ?? 'gettingstarted'
-  return (NavItems as Record<string, any>)[key]
+  return (navItems as Record<string, any>)[key]
 }
 
 function findMenuItemByUrl(
@@ -53,10 +53,10 @@ function findMenuItemByUrl(
   return null
 }
 
-export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
-  if (pathname.startsWith('/guides/troubleshooting')) {
-    return [{ name: 'Troubleshooting', url: '/guides/troubleshooting' }]
-  }
+export function resolveBreadcrumbs(
+  pathname: string,
+  navItems: typeof NavItems = NavItems
+): BreadcrumbItem[] {
   if (pathname.startsWith('/guides/getting-started/ai-prompts')) {
     return [
       { name: 'Getting started', url: '/guides/getting-started' },
@@ -71,6 +71,6 @@ export function resolveBreadcrumbs(pathname: string): BreadcrumbItem[] {
       { name: 'Agent Skills', url: '/guides/getting-started/ai-skills' },
     ]
   }
-  const menu = getSectionMenu(pathname)
+  const menu = getSectionMenu(pathname, navItems)
   return findMenuItemByUrl(menu, pathname) ?? []
 }

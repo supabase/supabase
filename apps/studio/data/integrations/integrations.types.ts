@@ -1,50 +1,3 @@
-export type VercelFramework =
-  | (
-      | 'blitzjs'
-      | 'nextjs'
-      | 'gatsby'
-      | 'remix'
-      | 'astro'
-      | 'hexo'
-      | 'eleventy'
-      | 'docusaurus-2'
-      | 'docusaurus'
-      | 'preact'
-      | 'solidstart'
-      | 'dojo'
-      | 'ember'
-      | 'vue'
-      | 'scully'
-      | 'ionic-angular'
-      | 'angular'
-      | 'polymer'
-      | 'svelte'
-      | 'sveltekit'
-      | 'sveltekit-1'
-      | 'ionic-react'
-      | 'create-react-app'
-      | 'gridsome'
-      | 'umijs'
-      | 'sapper'
-      | 'saber'
-      | 'stencil'
-      | 'nuxtjs'
-      | 'redwoodjs'
-      | 'hugo'
-      | 'jekyll'
-      | 'brunch'
-      | 'middleman'
-      | 'zola'
-      | 'hydrogen'
-      | 'vite'
-      | 'vitepress'
-      | 'vuepress'
-      | 'parcel'
-      | 'sanity'
-      | 'storybook'
-    )
-  | null
-
 export type VercelGitLink =
   | {
       /**
@@ -142,7 +95,7 @@ export type Imetadata = {
   }
   link?: VercelGitLink
   name: string
-  framework: VercelFramework
+  framework: string | null
 }
 
 export type IntegrationProjectConnection = {

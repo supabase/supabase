@@ -32,9 +32,11 @@ export interface ExtraTab {
 }
 
 export interface DevTelemetryToolbarContextType {
+  isAvailable: boolean
   isEnabled: boolean
   isOpen: boolean
   setIsOpen: (open: boolean) => void
+  enableToolbar: () => void
   events: DevTelemetryEvent[]
   setEvents: Dispatch<SetStateAction<DevTelemetryEvent[]>>
   dismissToolbar: () => void

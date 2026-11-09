@@ -25,10 +25,10 @@ const DeployCheckToast = ({ id }: { id: string | number }) => {
           Not now
         </Button>
         <Button
+          variant="primary"
           onClick={() => {
-            // Document requests carry no skew-protection pin (only built
-            // asset URLs do — see skewProtectionDpl in vite.config.ts), so a
-            // plain reload lands on the latest deployment.
+            // Vercel never pins document navigations to a deployment, so a
+            // plain reload lands on the latest one.
             router.reload()
           }}
         >

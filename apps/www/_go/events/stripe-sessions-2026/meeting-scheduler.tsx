@@ -38,7 +38,7 @@ const page: GoPageInput = {
         <div className="flex flex-wrap gap-4 justify-center mt-6">
           <a
             href="https://supabase.com/dashboard"
-            className="inline-flex items-center justify-center rounded-md bg-brand text-white px-5 py-2.5 text-sm font-medium hover:bg-brand/90 transition-colors"
+            className="inline-flex items-center justify-center rounded-md bg-brand-default text-white px-5 py-2.5 text-sm font-medium hover:bg-brand-default/90 transition-colors"
           >
             Start building with Supabase
           </a>

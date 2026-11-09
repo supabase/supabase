@@ -1,4 +1,11 @@
-import { Box, Cable, Database, KeyRound, Server, Sparkles } from 'lucide-react'
+import {
+  BoxIcon,
+  CableIcon,
+  DatabaseIcon,
+  KeyRoundIcon,
+  ServerIcon,
+  SparklesIcon,
+} from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import type { ConnectMode } from '../ConnectSheet/Connect.types'
@@ -19,41 +26,41 @@ export const CONNECT_ACTIONS: ConnectAction[] = [
     mode: 'framework',
     heading: 'Framework',
     subheading: 'Use a client library',
-    icon: <Box size={16} strokeWidth={1.5} />,
+    icon: <BoxIcon size={16} strokeWidth={1.5} />,
   },
   {
     id: 'server',
     mode: 'server',
     heading: 'Server',
     subheading: 'Build APIs',
-    icon: <Server size={16} strokeWidth={1.5} />,
+    icon: <ServerIcon size={16} strokeWidth={1.5} />,
   },
   {
     id: 'direct',
     mode: 'direct',
     heading: 'Direct',
     subheading: 'Connection string',
-    icon: <Database size={16} strokeWidth={1.5} />,
+    icon: <DatabaseIcon size={16} strokeWidth={1.5} />,
   },
   {
     id: 'orm',
     mode: 'orm',
     heading: 'ORM',
     subheading: 'Third-party library',
-    icon: <Cable size={16} strokeWidth={1.5} />,
+    icon: <CableIcon size={16} strokeWidth={1.5} />,
   },
   {
     id: 'mcp',
     mode: 'mcp',
     heading: 'MCP',
     subheading: 'Connect your agent',
-    icon: <Sparkles size={16} strokeWidth={1.5} />,
+    icon: <SparklesIcon size={16} strokeWidth={1.5} />,
   },
   {
     id: 'api_keys',
     heading: 'API Keys',
     subheading: 'Manage project keys',
-    icon: <KeyRound size={16} strokeWidth={1.5} />,
+    icon: <KeyRoundIcon size={16} strokeWidth={1.5} />,
     href: '/project/[ref]/settings/api-keys',
     requiresActiveProject: false,
   },

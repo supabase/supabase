@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type APIKeyCreateVariables = {
   projectRef?: string
@@ -18,7 +19,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
     params: {
       path: { ref: payload.projectRef },
       query: {
-        reveal: false,
+        reveal: 'false',
       },
     },
     body: {
@@ -29,12 +30,13 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
               role: 'service_role',
             },
           }
-        : name),
+        : {}),
 
       type: payload.type,
       name: payload.name,
       description: payload.description || null,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -48,12 +50,12 @@ export const useAPIKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
+  UseCustomMutationOptions<APIKeyCreateData, StudioError, APIKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>({
+  return useMutation<APIKeyCreateData, StudioError, APIKeyCreateVariables>({
     mutationFn: (vars) => createAPIKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

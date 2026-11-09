@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "dropzone-react",
-  "type": "registry:component",
   "title": "Dropzone (File Upload)",
   "description": "Displays a control for easier uploading of files directly to Supabase Storage.",
   "dependencies": [
@@ -33,5 +32,6 @@
     "VITE_SUPABASE_URL": "",
     "VITE_SUPABASE_PUBLISHABLE_KEY": ""
   },
-  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`."
+  "docs": "You'll need to set the following environment variables in your project: `VITE_SUPABASE_URL` and `VITE_SUPABASE_PUBLISHABLE_KEY`.",
+  "type": "registry:component"
 }

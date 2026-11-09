@@ -1,4 +1,4 @@
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { CheckIcon, ChevronsUpDownIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import {
@@ -56,9 +56,8 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
         <Button
-          variant="default"
           className="text-foreground-light"
-          iconRight={<ChevronsUpDown strokeWidth={1} size={12} />}
+          iconRight={<ChevronsUpDownIcon strokeWidth={1} size={12} />}
         >
           {selectedModel}
         </Button>
@@ -90,7 +89,7 @@ export const ModelSelector = ({ selectedModel, onSelectModel }: ModelSelectorPro
                       </TooltipContent>
                     </Tooltip>
                   ) : (
-                    selectedModel === m.id && <Check className="h-3.5 w-3.5" />
+                    selectedModel === m.id && <CheckIcon className="h-3.5 w-3.5" />
                   )}
                 </CommandItem>
               ))}

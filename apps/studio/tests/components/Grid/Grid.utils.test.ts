@@ -1,3 +1,4 @@
+// @vitest-environment jsdom
 import { copyToClipboard } from 'ui'
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -177,5 +178,15 @@ describe('shared clipboard util', () => {
     await copyToClipboard('hello from safari', onCopy)
     expect(writeText).toHaveBeenCalledWith('hello from safari')
     expect(onCopy).toHaveBeenCalled()
+  })
+
+  test('should not invoke the callback when the Clipboard API is unavailable', async () => {
+    const onCopy = vi.fn()
+
+    vi.stubGlobal('navigator', {})
+
+    await copyToClipboard('no clipboard here', onCopy)
+    expect(onCopy).not.toHaveBeenCalled()
+    expect(toastError).toHaveBeenCalledWith('Unable to copy to clipboard')
   })
 })

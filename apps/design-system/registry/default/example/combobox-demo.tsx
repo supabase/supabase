@@ -1,9 +1,9 @@
 'use client'
 
-import { Check, ChevronsUpDown } from 'lucide-react'
+import { Check } from 'lucide-react'
 import * as React from 'react'
 import {
-  Button,
+  ComboboxTrigger,
   Command,
   CommandEmpty,
   CommandGroup,
@@ -47,18 +47,15 @@ export default function ComboboxDemo() {
   return (
     <Popover open={open} onOpenChange={setOpen}>
       <PopoverTrigger asChild>
-        <Button
-          variant="default"
-          role="combobox"
-          size={'small'}
+        <ComboboxTrigger
           aria-expanded={open}
-          className="w-[200px] justify-between"
-          iconRight={<ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />}
+          data-state={open ? 'open' : 'closed'}
+          className={cn('w-[200px]', !value && 'text-foreground-lighter')}
         >
           {value
             ? frameworks.find((framework) => framework.value === value)?.label
             : 'Select framework...'}
-        </Button>
+        </ComboboxTrigger>
       </PopoverTrigger>
       <PopoverContent className="w-[200px] p-0">
         <Command>

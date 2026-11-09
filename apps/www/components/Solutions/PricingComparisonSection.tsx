@@ -32,7 +32,7 @@ export interface PricingComparisonSectionProps {
 
 const PlanValue = ({ value }: { value: ReactNode | boolean }) => {
   if (value === true) {
-    return <Check className="w-4 h-4 text-brand" strokeWidth={2} aria-label="Included" />
+    return <Check className="w-4 h-4 text-primary" strokeWidth={2} aria-label="Included" />
   }
   if (value === false) {
     return (
