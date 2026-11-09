@@ -71,10 +71,11 @@ export const ComputeLimitsTab = () => {
         <TableHeader>
           <TableRow>
             <TableHead>Limits</TableHead>
-            <TableHead className="text-right">vCPU-hrs / cycle</TableHead>
-            <TableHead className="text-right">GB-hrs / cycle</TableHead>
-            <TableHead className="text-right">Deployments</TableHead>
-            <TableHead className="text-right">Instances / project</TableHead>
+            <TableHead className="text-right">Runtime min / cycle</TableHead>
+            <TableHead className="text-right">Concurrent workers</TableHead>
+            <TableHead className="text-right">Sizes</TableHead>
+            <TableHead className="text-right">Burst to</TableHead>
+            <TableHead className="text-right">Max invocation</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -85,16 +86,21 @@ export const ComputeLimitsTab = () => {
                 {id === activeRowId && <span className="ml-2 text-brand">In effect</span>}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.vcpuHours)}
+                {formatLimit(limits.runtimeMinutes)}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.gbHours)}
+                {formatLimit(limits.concurrentWorkers)}
+              </TableCell>
+              <TableCell className="text-xs text-right">{limits.sizes.join(', ')}</TableCell>
+              <TableCell className="text-xs text-right tabular-nums">
+                {limits.burstTo === null
+                  ? '—'
+                  : `${limits.burstTo.vcpu} vCPU / ${limits.burstTo.memoryGb} GB`}
               </TableCell>
               <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.deployments)}
-              </TableCell>
-              <TableCell className="text-xs text-right tabular-nums">
-                {formatLimit(limits.instances)}
+                {limits.maxInvocationMinutes === null
+                  ? 'Uncapped'
+                  : `${limits.maxInvocationMinutes} min`}
               </TableCell>
             </TableRow>
           ))}

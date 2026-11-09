@@ -28,10 +28,13 @@ import {
   COMPUTE_INSTANCE_SIZES,
   COMPUTE_REGION,
 } from './Compute.constants'
+import { canPlanDeploySize } from './Compute.limits'
 import type { ComputeInstanceAccess } from './Compute.types'
 import { formatSize, generateComputeInstanceName } from './Compute.utils'
 import { ComputeInstanceSnippetTabs } from './ComputeInstanceSnippetTabs'
 import { RuntimeBadge } from './RuntimeBadge'
+import { useComputeLimits } from './useComputeLimits'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 const FORM_ID = 'deploy-instance-form'
 
@@ -73,6 +76,9 @@ export const DeployComputeInstanceDialog = ({
   open,
   onOpenChange,
 }: DeployComputeInstanceDialogProps) => {
+  const { data: organization } = useSelectedOrganizationQuery()
+  const { limits, limitsLabel } = useComputeLimits(organization?.plan)
+
   const form = useForm<DeployComputeInstanceFormValues>({
     mode: 'onBlur',
     resolver: zodResolver(DeployComputeInstanceFormSchema),
@@ -156,8 +162,17 @@ export const DeployComputeInstanceDialog = ({
                       </FormControl>
                       <SelectContent>
                         {COMPUTE_INSTANCE_SIZES.map((value) => (
-                          <SelectItem key={value} value={value}>
+                          <SelectItem
+                            key={value}
+                            value={value}
+                            disabled={!canPlanDeploySize(limits, value)}
+                          >
                             {formatSize(value)}
+                            {!canPlanDeploySize(limits, value) && (
+                              <span className="ml-2 text-foreground-lighter">
+                                Not in the {limitsLabel}
+                              </span>
+                            )}
                           </SelectItem>
                         ))}
                       </SelectContent>

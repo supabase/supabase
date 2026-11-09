@@ -231,30 +231,36 @@ export interface ComputeOrgUsage {
 }
 
 /** Stand-in project set until the rollup can report real per-project figures. */
+/**
+ * Sized against the RFC's 500-minute included quota. Workers here are invocation-shaped —
+ * running for minutes at a time, not held open — which is the workload the quota and the
+ * per-invocation duration cap describe. The org lands a few times over the quota so the
+ * overage path is visible without the figures reading as absurd.
+ */
 const MOCK_PROJECTS = [
   {
     projectRef: 'prod-api',
     projectName: 'Production API',
     size: '4gb-2vcpu',
-    deployments: 2,
-    instances: 3,
-    dutyCycle: 0.6,
+    deployments: 1,
+    instances: 2,
+    dutyCycle: 0.012,
   },
   {
     projectRef: 'media-jobs',
     projectName: 'Media jobs',
     size: '4gb-2vcpu',
-    deployments: 2,
-    instances: 2,
-    dutyCycle: 0.18,
+    deployments: 1,
+    instances: 1,
+    dutyCycle: 0.008,
   },
   {
     projectRef: 'webhooks',
     projectName: 'Webhook relay',
     size: '2gb-1vcpu',
     deployments: 1,
-    instances: 2,
-    dutyCycle: 0.25,
+    instances: 1,
+    dutyCycle: 0.006,
   },
   {
     projectRef: 'staging',
@@ -262,7 +268,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.15,
+    dutyCycle: 0.004,
   },
   {
     projectRef: 'sandbox',
@@ -270,7 +276,7 @@ const MOCK_PROJECTS = [
     size: '2gb-1vcpu',
     deployments: 1,
     instances: 1,
-    dutyCycle: 0.04,
+    dutyCycle: 0.001,
   },
 ]
 

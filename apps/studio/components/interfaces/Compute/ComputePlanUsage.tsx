@@ -17,9 +17,9 @@ import {
 } from 'ui'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 
-import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from './Compute.limits'
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD, includedRuntimeHours } from './Compute.limits'
 import type { ComputeInstance } from './Compute.types'
-import { formatPercentage, getCpuUtilization } from './ComputeUsage.utils'
+import { formatComputeHours, formatPercentage, getCpuUtilization } from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
@@ -69,31 +69,31 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
 
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
 
+  // Runtime is the only metered quota; vCPU-hours and GB-hours price the overage rather
+  // than capping it, so they report alongside instead of carrying a meter of their own.
+  const runtimeAllowanceHours = includedRuntimeHours(limits)
+  const formatRuntime = (hours: number) =>
+    hours < 10 ? `${Math.round(hours * 60).toLocaleString()} min` : formatComputeHours(hours)
+
   const meters: MeterDefinition[] = [
     {
-      label: 'vCPU-hours',
-      description: 'vCPU reserved while instances run. Suspended instances reserve nothing.',
-      used: usage?.reservedVcpuHours ?? 0,
-      included: limits.vcpuHours,
+      label: 'Runtime',
+      description: 'Time workers spend running. Suspended instances accrue nothing.',
+      used: usage?.runningHours ?? 0,
+      included: runtimeAllowanceHours,
       limitKind: 'allowance',
       isLoading: isPending,
-      format: formatCount,
-      detail: cpuUtilization === null ? undefined : `${formatPercentage(cpuUtilization)} CPU used`,
+      format: formatRuntime,
+      detail:
+        cpuUtilization === null
+          ? `${formatCount(usage?.reservedVcpuHours ?? 0)} vCPU-hrs · ${formatCount(usage?.gbHours ?? 0)} GB-hrs`
+          : `${formatPercentage(cpuUtilization)} CPU used · ${formatCount(usage?.reservedVcpuHours ?? 0)} vCPU-hrs`,
     },
     {
-      label: 'GB-hours',
-      description: 'Memory reserved while instances run. Suspended instances reserve nothing.',
-      used: usage?.gbHours ?? 0,
-      included: limits.gbHours,
-      limitKind: 'allowance',
-      isLoading: isPending,
-      format: formatCount,
-    },
-    {
-      label: 'Instances',
-      description: 'Instances declared across every compute in this project.',
+      label: 'Concurrent workers',
+      description: 'Instances that may run at once across every compute in this project.',
       used: declaredInstances,
-      included: limits.instances,
+      included: limits.concurrentWorkers,
       limitKind: 'capacity',
       isLoading: false,
       format: formatCount,
@@ -152,9 +152,7 @@ const UsageTimeframeDropdown = ({
 }) => (
   <DropdownMenu>
     <DropdownMenuTrigger asChild>
-      <Button iconRight={<ChevronDownIcon size={14} />}>
-        {value.label}
-      </Button>
+      <Button iconRight={<ChevronDownIcon size={14} />}>{value.label}</Button>
     </DropdownMenuTrigger>
     <DropdownMenuContent side="bottom" align="end" className="w-40">
       <DropdownMenuRadioGroup
