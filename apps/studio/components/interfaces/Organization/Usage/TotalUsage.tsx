@@ -234,7 +234,7 @@ export const TotalUsage = ({
                       slug={orgSlug}
                       metric={{
                         key: metric,
-                        name: computeUsageMetricLabel(metric) + ' Compute Hours' || metric,
+                        name: computeUsageMetricLabel(metric) + ' Database Compute Hours' || metric,
                         units: 'hours',
                         anchor: 'compute',
                         category: 'Compute',

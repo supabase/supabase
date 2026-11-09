@@ -7,6 +7,7 @@ import { plans as subscriptionsPlans } from 'shared-data/plans'
 
 import { CancellationFlow } from './CancellationFlow'
 import { PlanCards } from './PlanCards'
+import { computeFeaturesFor } from './planComputeFeatures'
 import { PlanUpdateFullScreenShell } from './PlanUpdatePanelShell'
 import { SubscriptionPlanUpdateDialog } from './SubscriptionPlanUpdateDialog'
 import UpgradeSurveyModal from './UpgradeModal'
@@ -212,9 +213,12 @@ export const PlanUpdateSidePanel = () => {
 
   const currentPlanMeta = {
     ...availablePlans.find((p) => p.id === subscription?.plan?.id),
-    features:
-      subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)?.features ||
-      [],
+    features: [
+      ...(subscriptionsPlans.find((plan) => plan.id === `tier_${subscription?.plan?.id}`)
+        ?.features ?? []),
+      // Matches the cards, so a downgrade names the Compute lines it would cost you.
+      ...computeFeaturesFor(subscription?.plan?.id),
+    ],
   }
 
   const stripeProjectsUpgradeCommand = getStripeProjectsUpgradeCommand(

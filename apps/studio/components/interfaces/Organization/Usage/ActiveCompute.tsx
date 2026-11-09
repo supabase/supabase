@@ -35,7 +35,7 @@ const ActiveCompute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) 
     <div id="active-compute" className="scroll-my-12">
       <SectionContent
         section={{
-          name: 'Active Compute Hours',
+          name: 'Active Database Compute Hours',
           description:
             'Amount of active compute hours your projects on scale-to-zero instances consumed. Projects on scale-to-zero instances automatically scale down after a 15m inactivity period.',
           links: billingAll
@@ -56,14 +56,14 @@ const ActiveCompute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) 
               {chartData.length > 0 && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <p className="text-sm">Active Compute Hours usage</p>
+                    <p className="text-sm">Active Database Compute Hours usage</p>
                   </div>
                 </div>
               )}
 
               <div className="flex items-center justify-between border-b last:border-b-0 py-1 last:py-0">
                 <p className="text-sm text-foreground-light">
-                  Active Compute Hours usage in period
+                  Active Database Compute Hours usage in period
                 </p>
                 <p className="text-sm">
                   {chartData.reduce(
@@ -77,7 +77,7 @@ const ActiveCompute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) 
 
             {chartData.length > 0 && notAllValuesZero ? (
               <UsageBarChart
-                name={`Active Compute Hours usage`}
+                name={`Active Database Compute Hours usage`}
                 unit={'hours'}
                 attributes={[{ key: 'active_compute_hours', color: 'blue' }]}
                 data={chartData}

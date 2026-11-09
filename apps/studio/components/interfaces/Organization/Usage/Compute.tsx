@@ -70,9 +70,9 @@ const Compute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) => {
     <div id="compute" className="scroll-my-12">
       <SectionContent
         section={{
-          name: 'Compute Hours',
+          name: 'Database Compute Hours',
           description:
-            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Compute Hours used. Paused projects do not count towards usage.',
+            'Amount of hours your projects were active. Each project is a dedicated server and database.\nPaid plans come with $10 in Compute Credits to cover one project running on Micro Compute or parts of any compute add-on.\nBilling is based on the sum of Database Compute Hours used. Paused projects do not count towards usage.',
           links: billingAll
             ? [
                 {
@@ -95,7 +95,7 @@ const Compute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) => {
               {chartData.length > 0 && (
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-4">
-                    <p className="text-sm">Compute Hours usage</p>
+                    <p className="text-sm">Database Compute Hours usage</p>
                   </div>
                 </div>
               )}
@@ -109,7 +109,7 @@ const Compute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) => {
                     <span className="font-medium">
                       {computeUsageMetricLabel(key.toUpperCase() as ComputeUsageMetric)}
                     </span>{' '}
-                    Compute Hours usage in period
+                    Database Compute Hours usage in period
                   </p>
                   <p className="text-sm">
                     {chartData.reduce((prev, cur) => prev + ((cur[key] as number) ?? 0), 0)} hours
@@ -119,13 +119,13 @@ const Compute = ({ orgDailyStats, isLoadingOrgDailyStats }: ComputeProps) => {
             </div>
 
             <div className="space-y-1">
-              <p className="text-sm">Compute Hours usage per day</p>
+              <p className="text-sm">Database Compute Hours usage per day</p>
               <p className="text-sm text-foreground-light">The data refreshes every hour.</p>
             </div>
 
             {chartData.length > 0 && notAllValuesZero ? (
               <UsageBarChart
-                name={`Compute Hours usage`}
+                name={`Database Compute Hours usage`}
                 unit={'hours'}
                 attributes={attributes}
                 data={chartData}

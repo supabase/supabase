@@ -6,6 +6,7 @@ import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { EnterpriseCard } from './EnterpriseCard'
 import { PlanCard } from './PlanCard'
 import { getPlanCardsEntryAnimation } from './PlanCards.utils'
+import { withComputeFeatures } from './planComputeFeatures'
 import { getPlanChangeType } from '@/components/interfaces/Billing/Subscription/Subscription.utils'
 import type { OrgPlan, PlanId } from '@/data/subscriptions/types'
 import { useTrack } from '@/lib/telemetry/track'
@@ -46,7 +47,9 @@ export function PlanCards({
 
   return (
     <motion.div className="w-full py-6 grid grid-cols-12 gap-3" {...entryAnimation.container}>
-      {subscriptionsPlans.map((plan) => {
+      {subscriptionsPlans.map((basePlan) => {
+        // Compute's lines live in Studio, not shared-data — see planComputeFeatures.
+        const plan = withComputeFeatures(basePlan)
         const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
         const price = planMeta?.price ?? 0
         const isDowngradeOption =
