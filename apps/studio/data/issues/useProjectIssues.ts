@@ -8,14 +8,8 @@ import { useProjectLintsQuery } from '@/data/lint/lint-query'
 type UseProjectIssuesOptions = {
   projectRef?: string
   enabled?: boolean
-  /** Health checks open a live database connection, so a surface can opt out of running them */
   includeHealth?: boolean
 }
-
-/**
- * The project's open issues, derived from the advisor checks that find them. There's no
- * Issues API yet: a check that stops failing simply stops returning an issue.
- */
 export function useProjectIssues({
   projectRef,
   enabled = true,
@@ -29,28 +23,49 @@ export function useProjectIssues({
     { projectRef },
     { enabled: enabled && canRunHealth }
   )
-  const { data: signals } = useAdvisorSignals({ projectRef, enabled })
+  const signalsQuery = useAdvisorSignals({ projectRef, enabled })
 
-  const issues = sortIssues([
-    ...lintsToIssues([
-      ...(lintsQuery.data ?? []),
-      ...(canRunHealth ? (healthQuery.data ?? []) : []),
-    ]),
-    ...signalsToIssues(signals),
-  ])
+  const issues = enabled
+    ? sortIssues([
+        ...lintsToIssues([
+          ...(lintsQuery.data ?? []),
+          ...(canRunHealth ? (healthQuery.data ?? []) : []),
+        ]),
+        ...signalsToIssues(signalsQuery.data),
+      ])
+    : []
 
   const refetch = () =>
-    Promise.all([lintsQuery.refetch(), ...(canRunHealth ? [healthQuery.refetch()] : [])])
+    Promise.all([
+      lintsQuery.refetch(),
+      signalsQuery.refetch(),
+      ...(canRunHealth && healthQuery.isEnabled ? [healthQuery.refetch()] : []),
+    ])
+
+  const error = lintsQuery.error ?? signalsQuery.error ?? (canRunHealth ? healthQuery.error : null)
+  const isError = enabled && error !== null
+  const isLoading =
+    enabled &&
+    (lintsQuery.isLoading || signalsQuery.isLoading || (canRunHealth && healthQuery.isLoading))
+  const isSuccess =
+    enabled &&
+    !isError &&
+    lintsQuery.isSuccess &&
+    signalsQuery.isSuccess &&
+    (!canRunHealth || !healthQuery.isEnabled || healthQuery.isSuccess)
 
   return {
     issues,
-    error: lintsQuery.error,
-    isLoading: lintsQuery.isLoading,
-    isError: lintsQuery.isError,
-    isSuccess: lintsQuery.isSuccess,
-    /** Health results arrive after the rest, so a health issue isn't missing until this settles */
+    error: enabled ? error : null,
+    isLoading,
+    isError,
+    isSuccess,
     isHealthLoading: canRunHealth && healthQuery.isLoading,
-    isFetching: lintsQuery.isFetching || (canRunHealth && healthQuery.isFetching),
+    isFetching:
+      enabled &&
+      (lintsQuery.isFetching ||
+        signalsQuery.isFetching ||
+        (canRunHealth && healthQuery.isFetching)),
     refetch,
   }
 }

@@ -6,7 +6,6 @@ export const DEFAULT_SECTION_ORDER = ['connect', 'usage', 'issues', 'custom-repo
  * sections at their default-relative position.
  */
 export function mergeSectionOrder(stored: string[]): string[] {
-  // Keep the Issues row in the position the user chose for Advisors.
   const renamed = stored.map((id) => (id === 'advisor' ? 'issues' : id))
   const known = [...new Set(renamed.filter((id) => DEFAULT_SECTION_ORDER.includes(id)))]
   const missing = DEFAULT_SECTION_ORDER.filter((id) => !known.includes(id))

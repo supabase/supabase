@@ -5,10 +5,6 @@ import type { ProductMenuGroup } from '@/components/ui/ProductMenu/ProductMenu.t
 import { IS_PLATFORM } from '@/lib/constants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
-/**
- * Not rendered as a menu: the Issues sidebar is the list itself. These entries back the
- * Issues navigation shortcuts, each opening the list filtered to one category.
- */
 export const generateIssuesMenu = ({
   ref,
   isAdvisorRulesEnabled,

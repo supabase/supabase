@@ -49,7 +49,6 @@ export const IssueDetailToolbar = ({ issue }: { issue: Issue }) => {
           }
           onClick={handleAskAssistant}
         />
-        {/* Confirms in place, Copy turning to Copied, like other copy buttons in Studio */}
         <Tooltip>
           <TooltipTrigger asChild>
             <CopyButton

@@ -6,7 +6,7 @@ import { IssueAffectedResources } from './IssueAffectedResources'
 import { lintsToIssues } from '@/data/issues/lint-to-issue'
 import type { Lint } from '@/data/lint/lint-query'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock } from '@/tests/lib/msw'
+import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
 
 const makeLint = (overrides: Partial<Lint> = {}): Lint => ({
   name: 'unused_index',
@@ -31,7 +31,6 @@ const makeLintsOnTables = (count: number) =>
     })
   )
 
-// Body rows only, without the column headings
 const getFindingRows = () => within(screen.getAllByRole('rowgroup')[1]).getAllByRole('row')
 
 const renderIssue = (lints: Lint[]) => {
@@ -43,7 +42,6 @@ describe('IssueAffectedResources', () => {
   it('shows a single finding and its fix without a click, since its detail can name what the row does not', () => {
     renderIssue([makeLint()])
 
-    // The index name is only in the finding's detail
     expect(screen.getByText('posts_slug_idx')).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View index' })).toBeInTheDocument()
     expect(getFindingRows()).toHaveLength(1)
@@ -69,18 +67,10 @@ describe('IssueAffectedResources', () => {
   })
 
   it('still offers the GraphQL revoke with its confirmation, the one fix that changes the database', async () => {
-    // The confirmation reads the project for its connection string
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: { ref: 'default', connectionString: '' } as never,
-    })
+    mockProjectGrantContext({ ref: 'default' })
     renderIssue([
-      makeLint({
-        // Not in the API's lint name type yet
-        name: 'pg_graphql_anon_table_exposed' as Lint['name'],
-        title: 'GraphQL exposed',
-        categories: ['SECURITY'],
+      Object.assign(makeLint({ title: 'GraphQL exposed', categories: ['SECURITY'] }), {
+        name: 'pg_graphql_anon_table_exposed',
       }),
     ])
 
