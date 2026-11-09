@@ -1,0 +1,26 @@
+{
+  "name": "transactional-emails",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Transactional email templates for Supabase platform notifications",
+  "main": "./index.ts",
+  "types": "./index.ts",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf .turbo out tsconfig.tsbuildinfo",
+    "preview": "tsx preview.tsx",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "catalog:",
+    "react-dom": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "tsconfig": "workspace:",
+    "tsx": "catalog:"
+  },
+  "license": "MIT"
+}

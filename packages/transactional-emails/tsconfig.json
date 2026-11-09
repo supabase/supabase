@@ -1,0 +1,10 @@
+{
+  "extends": "tsconfig/react-library.json",
+  "compilerOptions": {
+    "types": ["node"],
+    "module": "esnext",
+    "moduleResolution": "bundler"
+  },
+  "include": ["."],
+  "exclude": ["node_modules", "out"]
+}
