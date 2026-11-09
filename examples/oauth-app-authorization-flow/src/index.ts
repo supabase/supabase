@@ -26,14 +26,65 @@ app.get('/', (c) => {
   return c.html(`
     <!doctype html>
     <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <title>Login with Supabase</title>
+        <style>
+          * { box-sizing: border-box; }
+          body {
+            margin: 0;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f4f4f5;
+            color: #171717;
+            font-family: system-ui, -apple-system, 'Segoe UI', sans-serif;
+          }
+          form {
+            width: 100%;
+            max-width: 360px;
+            padding: 32px;
+            background: #fff;
+            border: 1px solid #e4e4e7;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+          }
+          h1 { margin: 0 0 4px; font-size: 20px; }
+          .hint { margin: 0 0 24px; font-size: 14px; color: #71717a; }
+          label { display: block; margin-bottom: 16px; font-size: 14px; font-weight: 500; }
+          input {
+            display: block;
+            width: 100%;
+            margin-top: 6px;
+            padding: 8px 12px;
+            font: inherit;
+            border: 1px solid #d4d4d8;
+            border-radius: 6px;
+          }
+          input:focus { outline: 2px solid #3ecf8e; outline-offset: 0; border-color: #3ecf8e; }
+          button {
+            width: 100%;
+            margin-top: 8px;
+            padding: 10px 16px;
+            font: inherit;
+            font-weight: 600;
+            color: #fff;
+            background: #3ecf8e;
+            border: 0;
+            border-radius: 6px;
+            cursor: pointer;
+          }
+          button:hover { background: #34b27b; }
+        </style>
+      </head>
       <body>
         <form id="login-form">
-          <p>
-            <label>Organization <input type="text" name="organization_slug" /></label>
-          </p>
-          <p>
-            <label>Project <input type="text" name="project_ref" /></label>
-          </p>
+          <h1>Login with Supabase</h1>
+          <p class="hint">Organization and project are optional.</p>
+          <label>Organization <input type="text" name="organization_slug" /></label>
+          <label>Project <input type="text" name="project_ref" /></label>
           <button type="submit">Login with Supabase</button>
         </form>
         <script>
