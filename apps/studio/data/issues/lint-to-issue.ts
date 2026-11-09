@@ -26,28 +26,37 @@ const CATEGORY_BY_LINT_CATEGORY: Record<Lint['categories'][number], IssueCategor
 
 type LintEntityType = NonNullable<NonNullable<Lint['metadata']>['type']>
 
-const RESOURCE_TYPE_BY_ENTITY: Record<LintEntityType, IssueResource['type']> = {
-  table: 'table',
-  view: 'view',
-  'materialized view': 'materialized_view',
-  'foreign table': 'foreign_table',
-  auth: 'auth',
-  function: 'function',
-  extension: 'extension',
-  compliance: 'project',
-  health: 'project',
-}
+const RESOURCE_TYPE_BY_ENTITY = new Map<string, IssueResource['type']>(
+  Object.entries({
+    table: 'table',
+    view: 'view',
+    'materialized view': 'materialized_view',
+    'foreign table': 'foreign_table',
+    auth: 'auth',
+    function: 'function',
+    extension: 'extension',
+    compliance: 'project',
+    health: 'project',
+    bucket: 'bucket',
+  } satisfies Record<LintEntityType | 'bucket', IssueResource['type']>)
+)
 
 // Lint text escapes backticks for the JSON it travels in
 const unescapeBackticks = (text: string) => text.replace(/\\`/g, '`')
 
 function getLintResource({ metadata }: Lint): IssueResource {
-  const name = metadata?.name ?? metadata?.entity
-  if (!metadata?.type || !name) return { type: 'project', name: 'Project', schema: null }
+  const name = metadata?.entity ?? metadata?.name
+  if (!name) return { type: 'project', name: 'Project', schema: null }
+  const args =
+    metadata && 'arguments' in metadata && typeof metadata.arguments === 'string'
+      ? metadata.arguments
+      : undefined
   return {
-    type: RESOURCE_TYPE_BY_ENTITY[metadata.type],
-    name,
-    schema: metadata.schema ?? null,
+    type:
+      RESOURCE_TYPE_BY_ENTITY.get(metadata?.type ?? '') ??
+      (args !== undefined ? 'function' : 'project'),
+    name: !metadata?.entity && args !== undefined ? `${name}(${args})` : name,
+    schema: metadata?.entity ? null : (metadata?.schema ?? null),
   }
 }
 

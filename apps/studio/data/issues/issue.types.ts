@@ -4,6 +4,7 @@ export type IssueSeverity = 'critical' | 'warning' | 'info'
 export type IssueCategory = 'security' | 'performance' | 'health'
 
 export type IssueResourceType =
+  | 'bucket'
   | 'table'
   | 'view'
   | 'materialized_view'

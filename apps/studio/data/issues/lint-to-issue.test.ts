@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import { lintsToIssues, signalsToIssues, sortIssues } from './lint-to-issue'
+import { summarizeAffected } from '@/components/interfaces/Issues/Issues.utils'
 import type { AdvisorSignalItem } from '@/components/ui/AdvisorPanel/AdvisorPanel.types'
 import type { Lint } from '@/data/lint/lint-query'
 
@@ -77,6 +78,65 @@ describe('lintsToIssues', () => {
     const [issue] = lintsToIssues([makeLint({ metadata: undefined })])
 
     expect(issue.affected[0].resource).toEqual({ type: 'project', name: 'Project', schema: null })
+  })
+
+  it('keeps storage buckets usable in affected-resource summaries', () => {
+    const lints = ['avatars', 'documents'].map((name) => {
+      const lint = makeLint({ cache_key: name })
+      Object.assign(lint, { metadata: { type: 'bucket', schema: 'storage', name } })
+      return lint
+    })
+    const [issue] = lintsToIssues(lints)
+
+    expect(issue.affected.map((item) => item.resource.type)).toEqual(['bucket', 'bucket'])
+    expect(summarizeAffected(issue.affected)).toBe('2 buckets')
+  })
+
+  it('preserves overloaded function signatures when metadata has no type', () => {
+    const lints = ['', 'user_id uuid'].map((args) => {
+      const lint = makeLint({ cache_key: `public_lookup_${args}` })
+      Object.assign(lint, {
+        metadata: { schema: 'public', name: 'lookup', arguments: args, language: 'sql' },
+      })
+      return lint
+    })
+    const [issue] = lintsToIssues(lints)
+
+    expect(issue.affected.map((item) => item.resource)).toEqual([
+      { type: 'function', schema: 'public', name: 'lookup()' },
+      { type: 'function', schema: 'public', name: 'lookup(user_id uuid)' },
+    ])
+    expect(summarizeAffected(issue.affected)).toBe('2 functions')
+  })
+
+  it('keeps named resources with missing or unknown types searchable', () => {
+    const missingType = makeLint({ metadata: { schema: 'public', name: 'posts' } })
+    const unknownType = makeLint({ cache_key: 'unknown' })
+    Object.assign(unknownType, {
+      metadata: { type: 'future resource', schema: 'public', name: 'users' },
+    })
+    const [issue] = lintsToIssues([missingType, unknownType])
+
+    expect(issue.affected.map((item) => item.resource)).toEqual([
+      { type: 'project', schema: 'public', name: 'posts' },
+      { type: 'project', schema: 'public', name: 'users' },
+    ])
+    expect(summarizeAffected(issue.affected)).toBe('2 resources')
+  })
+
+  it('preserves an explicit entity label without adding its schema twice', () => {
+    const [issue] = lintsToIssues([
+      makeLint({
+        metadata: {
+          type: 'function',
+          schema: 'public',
+          name: 'lookup',
+          entity: 'public.lookup(uuid)',
+        },
+      }),
+    ])
+
+    expect(summarizeAffected(issue.affected)).toBe('public.lookup(uuid)')
   })
 
   it('falls back to what the API sent for a check Studio does not know yet', () => {
