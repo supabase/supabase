@@ -20,7 +20,7 @@ export const telemetryAccessWhat: ContentListingGroup = {
     {
       title: 'Logs in the CLI',
       href: '/guides/observability/cli-logs',
-      description: 'Browse, filter, and export logs with the Supabase CLI v3 preview.',
+      description: 'Browse, filter, and export logs with Supabase CLI v3.',
     },
     {
       title: 'Log sources and fields',
