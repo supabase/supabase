@@ -1,4 +1,4 @@
-import { CircleAlert, Database, Download, Loader2, Wind } from 'lucide-react'
+import { CircleAlertIcon, DatabaseIcon, DownloadIcon, Loader2Icon, WindIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
 import { Button, Card, CardContent, CardHeader, CardTitle, Skeleton } from 'ui'
@@ -24,7 +24,7 @@ export const DatabaseDiffPanel = ({
       <div className="flex flex-1 min-h-0 flex-col">
         <div className="flex flex-1 min-h-[400px] flex-col rounded-md border border-border bg-surface-100">
           <div className="flex shrink-0 items-center gap-2 border-b border-border px-4 py-3">
-            <Loader2
+            <Loader2Icon
               size={16}
               strokeWidth={1.5}
               className="animate-spin text-foreground-muted"
@@ -43,7 +43,11 @@ export const DatabaseDiffPanel = ({
   if (error)
     return (
       <div className="p-6 text-center">
-        <CircleAlert size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <CircleAlertIcon
+          size={32}
+          strokeWidth={1.5}
+          className="text-foreground-muted mx-auto mb-8"
+        />
         <h3 className="mb-1">Error loading branch diff</h3>
         <p className="text-sm text-foreground-light">
           Please try again in a few minutes and contact support if the problem persists.
@@ -54,7 +58,7 @@ export const DatabaseDiffPanel = ({
   if (!diffContent || diffContent.trim() === '') {
     return (
       <div className="p-6 text-center">
-        <Wind size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
+        <WindIcon size={32} strokeWidth={1.5} className="text-foreground-muted mx-auto mb-8" />
         <h3 className="mb-1">No changes detected between branches</h3>
         <p className="text-sm text-foreground-light">
           Any changes to your database schema will be shown here for review
@@ -71,14 +75,13 @@ export const DatabaseDiffPanel = ({
             href={`/project/${currentBranchRef}/database/schema`}
             className="flex items-center gap-2"
           >
-            <Database strokeWidth={1.5} size={16} className="text-foreground-muted" />
+            <DatabaseIcon strokeWidth={1.5} size={16} className="text-foreground-muted" />
             Schema Changes
           </Link>
         </CardTitle>
         <Button
-          variant="default"
           size="tiny"
-          icon={<Download strokeWidth={1.5} size={14} className="text-foreground-light" />}
+          icon={<DownloadIcon strokeWidth={1.5} size={14} className="text-foreground-light" />}
           className="mt-0"
           onClick={() => {
             if (!diffContent) return

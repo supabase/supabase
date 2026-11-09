@@ -74,7 +74,7 @@ export function SurveyChannelMixChart({
                         }}
                       />
                       <div
-                        className={`h-full relative ${cohorts[ci].tone === 'accent' ? 'bg-brand' : 'bg-foreground-light'}`}
+                        className={`h-full relative ${cohorts[ci].tone === 'accent' ? 'bg-brand-default' : 'bg-foreground-light'}`}
                         style={{ width: `${v ?? 0}%` }}
                       />
                     </div>

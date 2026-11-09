@@ -1,9 +1,11 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 export type SqlCronGenerateResponse = string
 
@@ -28,7 +30,7 @@ export async function generateSqlCron({ prompt }: SqlCronGenerateVariables) {
   } catch {}
 
   if (!response.ok) {
-    throw new ResponseError(body?.message, response.status)
+    throw classifyResponseError({ message: body?.message, code: response.status })
   }
 
   return body as SqlCronGenerateResponse
@@ -41,10 +43,10 @@ export const useSqlCronGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>,
+  UseCustomMutationOptions<SqlCronGenerateData, StudioError, SqlCronGenerateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlCronGenerateData, ResponseError, SqlCronGenerateVariables>({
+  return useMutation<SqlCronGenerateData, StudioError, SqlCronGenerateVariables>({
     mutationFn: (vars) => generateSqlCron(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

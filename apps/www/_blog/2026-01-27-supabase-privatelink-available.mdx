@@ -49,7 +49,7 @@ PrivateLink is not necessary for every use case. If you're building a side proje
 Supabase PrivateLink is in Beta with some constraints:
 
 - **AWS environments required.** This initial release supports connections to AWS VPCs via PrivateLink. Your workloads need to run in AWS to use PrivateLink.
-- **Database connections only.** PrivateLink works for Postgres and PgBouncer connections. It does not cover the Supabase API, Storage, Auth, or Realtime services. Those still use public endpoints. To establish PrivateLink with a Read Replica, reach out to your account rep.
+- **Database connections only.** PrivateLink works for Postgres and PgBouncer connections. It does not cover the Supabase API, Storage, Auth, or Realtime services. Those still use public endpoints. To establish PrivateLink with a [Read Replica](/docs/guides/platform/read-replicas), reach out to your account rep.
 - **Same region required.** Your AWS VPC must be in the same region as your Supabase project.
 - **Team or Enterprise plan required.** PrivateLink is available on Team and Enterprise plans.
 

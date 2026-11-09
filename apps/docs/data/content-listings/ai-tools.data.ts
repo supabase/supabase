@@ -19,6 +19,7 @@ const ICON_ASSETS: Record<string, { icon: string; hasLightIcon?: boolean }> = {
   'gemini-cli': { icon: '/docs/img/icons/agent-gemini-cli-icon', hasLightIcon: false },
   'github-copilot': { icon: '/docs/img/icons/agent-copilot-icon', hasLightIcon: true },
   kimi: { icon: '/docs/img/icons/agent-kimi-icon', hasLightIcon: true },
+  omp: { icon: '/docs/img/icons/agent-omp-icon', hasLightIcon: false },
   vscode: { icon: '/docs/img/icons/agent-vscode-icon', hasLightIcon: false },
   antigravity: { icon: '/docs/img/icons/agent-antigravity-icon', hasLightIcon: false },
   windsurf: { icon: '/docs/img/icons/agent-devin-icon', hasLightIcon: true },
@@ -46,6 +47,7 @@ const TAGLINES: Record<string, string> = {
   goose: 'Your native open source AI agent — desktop app, CLI, and API.',
   kimi: 'Engineered to drop into any dev workflow and get programming tasks done fast.',
   kiro: 'Move beyond AI coding to agentic engineering.',
+  omp: 'A coding agent with the IDE wired in.',
   opencode: 'The open source AI coding agent.',
   vscode: 'The open source AI code editor — your home for multi-agent development.',
   // Pre-acquisition tagline (Cognition/Devin acquired Windsurf in 2025) — see "Open questions".

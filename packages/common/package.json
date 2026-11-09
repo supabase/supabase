@@ -21,7 +21,7 @@
     "flags": "^4.0.0",
     "lodash": "catalog:",
     "next-themes": "catalog:",
-    "posthog-js": "^1.391.2",
+    "posthog-js": "^1.416.1",
     "react-use": "^17.4.0",
     "valtio": "catalog:"
   },
@@ -33,16 +33,17 @@
     "@typescript/native": "catalog:",
     "@vitest/coverage-v8": "catalog:",
     "@vitest/ui": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "tsconfig": "workspace:*",
     "type-fest": "5.6.0",
     "typescript": "catalog:",
+    "vite": "catalog:",
     "vitest": "catalog:"
   },
   "peerDependencies": {
     "@supabase/auth-js": "catalog:",
     "@supabase/supabase-js": "catalog:",
-    "lucide-react": "*",
+    "lucide-react": "catalog:",
     "next": "catalog:",
     "react": "catalog:",
     "react-dom": "catalog:"

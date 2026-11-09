@@ -30,15 +30,22 @@ import {
 } from '../../Infrastructure/UpgradeWarnings'
 import { ProjectUpgradeAlert } from '../Infrastructure/ProjectUpgradeAlert'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectUpgradeEligibilityQuery } from '@/data/config/project-upgrade-eligibility-query'
 import { useProjectServiceVersionsQuery } from '@/data/projects/project-service-versions'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsK8sCloudProvider,
+  useIsOrioleDb,
+  useSelectedProjectQuery,
+} from '@/hooks/misc/useSelectedProject'
+import { DOCS_URL } from '@/lib/constants'
 
 export const ServiceVersionsSection = () => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
+  const isAwsK8s = useIsAwsK8sCloudProvider()
 
   const { projectAuthAll: authEnabled, projectSettingsDatabaseUpgrades: showDatabaseUpgrades } =
     useIsFeatureEnabled([
@@ -83,6 +90,13 @@ export const ServiceVersionsSection = () => {
 
   const isInactive = project?.status === 'INACTIVE'
   const hasReadReplicas = (databases ?? []).length > 1
+
+  const hasUpgradeAlertOrWarning =
+    !!data?.eligible ||
+    (data?.validation_errors ?? []).length > 0 ||
+    (data?.warnings ?? []).length > 0
+  const canShowLatestVersionHint =
+    isOnLatestVersion && showDatabaseUpgrades && !isAwsK8s && !hasUpgradeAlertOrWarning
 
   return (
     <PageSection id="service-versions">
@@ -141,6 +155,17 @@ export const ServiceVersionsSection = () => {
                           label="Postgres version"
                           layout="vertical"
                           isReactForm={false}
+                          description={
+                            canShowLatestVersionHint ? (
+                              <>
+                                This project is already on the latest version of Postgres that
+                                Supabase supports. Updates will appear here when available.{' '}
+                                <InlineLink href={`${DOCS_URL}/guides/platform/upgrading`}>
+                                  Learn more
+                                </InlineLink>
+                              </>
+                            ) : undefined
+                          }
                         >
                           <InputGroup>
                             <InputGroupInput
@@ -197,7 +222,7 @@ export const ServiceVersionsSection = () => {
                       </>
                     )}
 
-                    {showDatabaseUpgrades && data && data.eligible ? (
+                    {showDatabaseUpgrades && data && data.eligible && !isAwsK8s ? (
                       hasReadReplicas ? (
                         <ReadReplicasWarning latestPgVersion={latestPgVersion} />
                       ) : (

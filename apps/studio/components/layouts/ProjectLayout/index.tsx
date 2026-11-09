@@ -1,13 +1,15 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
   forwardRef,
   Fragment,
+  isValidElement,
   useEffect,
   useLayoutEffect,
+  useRef,
   type PropsWithChildren,
   type ReactNode,
 } from 'react'
@@ -107,6 +109,7 @@ export interface ProjectLayoutProps {
   isBlocking?: boolean
   product?: string
   productMenuBadge?: ReactNode
+  productMenuHeader?: ReactNode
   productMenu?: ReactNode
   browserTitle?: {
     entity?: string
@@ -116,6 +119,8 @@ export interface ProjectLayoutProps {
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
+  /** Starting width of the product menu in pixels, for menus that list more than links */
+  productMenuDefaultSize?: number
   productMenuClassName?: string
 }
 
@@ -126,12 +131,13 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       isBlocking = true,
       product = '',
       productMenuBadge,
+      productMenuHeader,
       productMenu,
       browserTitle,
       children,
       selectedTable,
       resizableSidebar = false,
-
+      productMenuDefaultSize = 256,
       productMenuClassName,
     },
     ref
@@ -152,7 +158,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_space_exhaustion ||
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+    // The free Micro upgrade is only included on paid plans
+    const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
+    const showUpgradeBanner = isPaidPlan && isNanoCompute && isComputeNearExhaustion
 
     const isExplorerEnabled = useFlag('explorer')
 
@@ -174,7 +182,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     )
 
     const { showSidebar } = useAppStateSnapshot()
-    const { setContent: setMobileSheetContent, registerOpenMenu } = useMobileSheet()
+    const {
+      content: mobileSheetContent,
+      setContent: setMobileSheetContent,
+      registerOpenMenu,
+    } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
     const currentSectionKey = getSectionKeyFromPathname(pathname)
@@ -212,6 +224,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/branches') ||
       router.pathname.includes('/project/[ref]/settings') ||
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
@@ -253,19 +266,36 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       })
     }, [addBanner, isExplorerEnabled, isExplorerBannerDismissed, isLocalStorageReady])
 
+    const mobileSheetContentRef = useRef(mobileSheetContent)
     useLayoutEffect(() => {
-      const unregister = registerOpenMenu(() => {
-        setMobileSheetContent(
-          <MobileMenuContent
-            currentProductMenu={productMenu ?? null}
-            currentProduct={product}
-            currentSectionKey={currentSectionKey}
-            onCloseSheet={() => setMobileSheetContent(null)}
-          />
-        )
-      })
+      mobileSheetContentRef.current = mobileSheetContent
+    }, [mobileSheetContent])
+
+    useLayoutEffect(() => {
+      const menu = (
+        <MobileMenuContent
+          currentProductMenu={productMenu ?? null}
+          currentProductMenuHeader={productMenuHeader}
+          currentProduct={product}
+          currentSectionKey={currentSectionKey}
+          onCloseSheet={() => setMobileSheetContent(null)}
+        />
+      )
+      const unregister = registerOpenMenu(() => setMobileSheetContent(menu))
+      // Keep resource navigation in an already open sheet in sync with the layout.
+      const currentContent = mobileSheetContentRef.current
+      if (isValidElement(currentContent) && currentContent.type === MobileMenuContent) {
+        setMobileSheetContent(menu)
+      }
       return unregister
-    }, [registerOpenMenu, productMenu, product, currentSectionKey, setMobileSheetContent])
+    }, [
+      registerOpenMenu,
+      productMenu,
+      productMenuHeader,
+      product,
+      currentSectionKey,
+      setMobileSheetContent,
+    ])
 
     useLayoutEffect(() => {
       mainScrollContainer?.scrollTo({ top: 0, left: 0 })
@@ -282,11 +312,11 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             {productMenu && sideBarIsOpen && (
               <ResizablePanel
                 panelRef={panelRef}
-                minSize={256}
-                maxSize={resizableSidebar ? 512 : 256}
-                defaultSize={256}
+                minSize="256px"
+                maxSize={resizableSidebar ? '512px' : '256px'}
+                defaultSize={`${productMenuDefaultSize}px`}
+                groupResizeBehavior="preserve-pixel-size"
                 id="panel-left"
-                disabled={!resizableSidebar}
               >
                 <AnimatePresence initial={false}>
                   <motion.div
@@ -304,6 +334,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                       <ProductMenuBar
                         title={product}
                         titleBadge={productMenuBadge}
+                        header={productMenuHeader}
                         className={productMenuClassName}
                       >
                         {productMenu}

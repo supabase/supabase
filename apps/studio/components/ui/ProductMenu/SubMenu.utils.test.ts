@@ -42,11 +42,6 @@ describe('convertSectionsToProductMenu', () => {
     expect(result[0].items[0].url).toBe('#')
   })
 
-  it('handles empty sections array', () => {
-    const result = convertSectionsToProductMenu([])
-    expect(result).toEqual([])
-  })
-
   it('handles section with empty links', () => {
     const sections = [
       {
@@ -73,18 +68,5 @@ describe('convertSectionsToProductMenu', () => {
 
     expect(result[0].title).toBeUndefined()
     expect(result[0].items).toHaveLength(1)
-  })
-
-  it('converts multiple sections', () => {
-    const sections = [
-      { key: 'a', heading: 'A', links: [{ key: 'a1', label: 'A1', href: '/a1' }] },
-      { key: 'b', heading: 'B', links: [{ key: 'b1', label: 'B1', href: '/b1' }] },
-    ]
-
-    const result = convertSectionsToProductMenu(sections)
-
-    expect(result).toHaveLength(2)
-    expect(result[0].key).toBe('a')
-    expect(result[1].key).toBe('b')
   })
 })

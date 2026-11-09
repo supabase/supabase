@@ -2,8 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, put, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ToggleLegacyAPIKeysVariables = {
   projectRef?: string
@@ -18,6 +19,7 @@ export async function toggleLegacyAPIKeys(payload: ToggleLegacyAPIKeysVariables)
       path: { ref: payload.projectRef },
       query: { enabled: payload.enabled ? 'true' : 'false' },
     },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -31,12 +33,12 @@ export const useToggleLegacyAPIKeysMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>,
+  UseCustomMutationOptions<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ToggleLegacyAPIKeysData, ResponseError, ToggleLegacyAPIKeysVariables>({
+  return useMutation<ToggleLegacyAPIKeysData, StudioError, ToggleLegacyAPIKeysVariables>({
     mutationFn: (vars) => toggleLegacyAPIKeys(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

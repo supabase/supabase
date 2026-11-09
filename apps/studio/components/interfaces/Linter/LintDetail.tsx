@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 
@@ -95,14 +95,14 @@ export const LintDetail = ({
           <Link
             href={
               lintInfoMap.find((item) => item.name === lint.name)?.docsLink ||
-              `${DOCS_URL}/guides/database/database-linter`
+              `${DOCS_URL}/guides/observability/advisors`
             }
             target="_blank"
             rel="noreferrer"
             className="no-underline"
           >
             <span className="flex items-center gap-2">
-              Learn more <ExternalLink size={14} />
+              Learn more <ExternalLinkIcon size={14} />
             </span>
           </Link>
         </Button>

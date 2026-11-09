@@ -1,6 +1,6 @@
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { CpuIcon, Lock, Microchip } from 'lucide-react'
+import { CpuIcon, LockIcon, MicrochipIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { UseFormReturn, useWatch } from 'react-hook-form'
 import {
@@ -29,11 +29,11 @@ import { BillingChangeBadge } from '../ui/BillingChangeBadge'
 import FormMessage from '../ui/FormMessage'
 import { useShowMicroUpgradeBadge } from './useShowMicroUpgradeBadge'
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { useProjectAddonsQuery } from '@/data/subscriptions/project-addons-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
+import { getComputeCpuLabel } from '@/lib/compute-labels'
 
 const SKELETON_PLACEHOLDER_COUNT = 6
 
@@ -112,8 +112,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
     return getAvailableComputeOptions(availableAddons, project?.cloud_provider)
   }, [availableAddons, project?.cloud_provider])
 
-  const subscriptionPitr = addons?.selected_addons.find((addon) => addon.type === 'pitr')
-
   const showSkeletons = isLoading
   const showLoadError = !isLoading && !!addonsError
   const showComputeOptions = !isLoading && !addonsError
@@ -151,8 +149,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
             {showComputeOptions && (
               <>
                 {availableOptions.map((compute) => {
-                  const lockedMicroDueToPITR =
-                    compute.identifier === 'ci_micro' && !!subscriptionPitr
                   const lockedNanoDueToPlan =
                     org?.plan.id !== 'free' &&
                     project?.infra_compute_size !== 'nano' &&
@@ -160,8 +156,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                   const lockedDueToHighAvailability =
                     isHighAvailability && compute.identifier !== currentComputeVariantId
 
-                  const lockedOption =
-                    lockedNanoDueToPlan || lockedMicroDueToPITR || lockedDueToHighAvailability
+                  const lockedOption = lockedNanoDueToPlan || lockedDueToHighAvailability
 
                   // Nano on a paid plan is billed at the Micro rate
                   const isNanoBilledAsMicro =
@@ -175,16 +170,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       )?.price
                     : compute.price
 
-                  const cpuLabel = (() => {
-                    const cpuCores = compute.meta?.cpu_cores
-                    if (typeof cpuCores === 'number') {
-                      return `${cpuCores}-core CPU`
-                    }
-                    if (cpuCores) {
-                      return `${cpuCores} CPU`
-                    }
-                    return 'CPU'
-                  })()
+                  const cpuLabel = getComputeCpuLabel(compute.identifier, compute.meta?.cpu_cores)
 
                   return (
                     <RadioGroupCardItem
@@ -193,7 +179,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                       key={compute.identifier}
                       value={compute.identifier}
                       className={cn(
-                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 [&_label]:w-full group w-full h-[110px]',
+                        'relative text-sm text-left flex flex-col gap-0 px-0 py-3 group w-full h-[110px]',
                         lockedOption && 'opacity-50'
                       )}
                       disabled={disabled || lockedOption}
@@ -237,7 +223,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                   <div className="flex items-center space-x-1">
                                     {lockedOption && (
                                       <div className="bg border rounded-lg h-7 w-7 flex items-center justify-center">
-                                        <Lock size={14} />
+                                        <LockIcon size={14} />
                                       </div>
                                     )}
                                     {!lockedOption && showComputePrice && (
@@ -251,7 +237,11 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                         <span className="text-foreground-light translate-y-px">
                                           {' '}
                                           /{' '}
-                                          {compute.price_interval === 'monthly' ? 'month' : 'hour'}
+                                          {compute.price_interval === 'monthly' ? (
+                                            <span>month</span>
+                                          ) : (
+                                            <span>hour</span>
+                                          )}
                                         </span>
                                       </>
                                     )}
@@ -261,14 +251,17 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 <div className="w-full">
                                   <div className="px-3 text-sm flex flex-col gap-1">
                                     <div className="text-foreground-light flex gap-2 items-center">
-                                      <Microchip
+                                      <MicrochipIcon
                                         strokeWidth={1}
                                         size={14}
                                         className="text-foreground-lighter"
                                       />
                                       <span>
-                                        {compute.identifier === 'ci_nano' && 'Up to '}
-                                        {compute.meta?.memory_gb ?? 0} GB memory
+                                        {compute.identifier === 'ci_nano' && (
+                                          <span>{'Up to '}</span>
+                                        )}
+                                        {compute.meta?.memory_gb ?? <span>{0}</span>}{' '}
+                                        <span>GB memory</span>
                                       </span>
                                     </div>
                                     <div className="text-foreground-light flex gap-2 items-center">
@@ -288,16 +281,6 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                             <TooltipContent side="bottom" className="w-64 text-center">
                               Compute size can't be changed on High Availability projects during
                               Alpha
-                            </TooltipContent>
-                          )}
-                          {!lockedDueToHighAvailability && lockedMicroDueToPITR && (
-                            <TooltipContent side="bottom" className="w-64 text-center">
-                              Project has PITR enabled which requires a minimum of Small compute.
-                              Please{' '}
-                              <InlineLink href="/project/_/settings/addons?panel=pitr">
-                                disable PITR
-                              </InlineLink>{' '}
-                              first before selecting Micro
                             </TooltipContent>
                           )}
                         </Tooltip>
@@ -330,7 +313,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                         <div className="w-full">
                           <div className="px-3 text-sm flex flex-col gap-1">
                             <div className="text-foreground-light flex gap-2 items-center">
-                              <Microchip
+                              <MicrochipIcon
                                 strokeWidth={1}
                                 size={14}
                                 className="text-foreground-lighter"
@@ -343,7 +326,7 @@ export function ComputeSizeField({ form, disabled }: ComputeSizeFieldProps) {
                                 size={14}
                                 className="text-foreground-lighter"
                               />
-                              <span>Custom CPU</span>
+                              <span>Custom compute</span>
                             </div>
                           </div>
                         </div>

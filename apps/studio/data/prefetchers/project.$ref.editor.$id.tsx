@@ -1,5 +1,4 @@
 import { QueryClient, useQueryClient } from '@tanstack/react-query'
-import { useFlag } from 'common'
 import { useRouter } from 'next/router'
 import { PropsWithChildren, useCallback } from 'react'
 
@@ -11,10 +10,7 @@ import {
 } from '@/components/grid/SupabaseGrid.utils'
 import { Filter, Sort } from '@/components/grid/types'
 import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-query'
-import {
-  PG_META_SCOPED_INTROSPECTION_FLAG,
-  prefetchTableEditor,
-} from '@/data/table-editor/table-editor-query'
+import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { prefetchTableRows } from '@/data/table-rows/table-rows-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { RoleImpersonationState } from '@/lib/role-impersonation'
@@ -30,7 +26,6 @@ interface PrefetchEditorTablePageArgs {
   sorts?: Sort[]
   filters?: Filter[]
   roleImpersonationState?: RoleImpersonationState
-  scoped?: boolean
 }
 
 export function prefetchEditorTablePage({
@@ -42,19 +37,18 @@ export function prefetchEditorTablePage({
   sorts,
   filters,
   roleImpersonationState,
-  scoped,
 }: PrefetchEditorTablePageArgs) {
   return prefetchTableEditor(queryClient, {
     projectRef,
     connectionString,
     id,
-    scoped,
   }).then((entity) => {
     if (entity) {
       const { sorts: localSorts = [], filters: localFilters = [] } =
         loadTableEditorStateFromLocalStorage(projectRef, entity.id) ?? {}
 
-      prefetchTableRows(queryClient, {
+      // Returned so the caller's catch handles it: a cancelled prefetch rejects with CancelledError.
+      return prefetchTableRows(queryClient, {
         projectRef,
         connectionString,
         readReplicaIdentifier,
@@ -64,7 +58,6 @@ export function prefetchEditorTablePage({
         page: 1,
         limit: TABLE_EDITOR_DEFAULT_ROWS_PER_PAGE,
         roleImpersonationState,
-        scoped,
       })
     }
   })
@@ -76,7 +69,6 @@ export function usePrefetchEditorTablePage() {
   const { data: project } = useSelectedProjectQuery()
   const { connectionString, identifier: readReplicaIdentifier } = useConnectionStringForReadOps()
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
-  const scoped = !!useFlag(PG_META_SCOPED_INTROSPECTION_FLAG)
 
   return useCallback(
     ({ id: _id, filters, sorts }: { id?: string; filters?: Filter[]; sorts?: Sort[] }) => {
@@ -96,20 +88,11 @@ export function usePrefetchEditorTablePage() {
         sorts,
         filters,
         roleImpersonationState: roleImpersonationState as RoleImpersonationState,
-        scoped,
       }).catch(() => {
         // eat prefetching errors as they are not critical
       })
     },
-    [
-      connectionString,
-      readReplicaIdentifier,
-      project,
-      queryClient,
-      roleImpersonationState,
-      router,
-      scoped,
-    ]
+    [connectionString, readReplicaIdentifier, project, queryClient, roleImpersonationState, router]
   )
 }
 

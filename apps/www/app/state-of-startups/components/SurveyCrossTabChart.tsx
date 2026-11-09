@@ -37,7 +37,7 @@ const PAD_TOP = 24
 const PAD_BOTTOM = 72
 
 const ACCENT = 'hsl(var(--brand-default))'
-const MUTED = 'hsl(var(--foreground-light))'
+const MUTED = 'var(--foreground-light)'
 
 export function SurveyCrossTabChart({
   title,
@@ -86,7 +86,7 @@ export function SurveyCrossTabChart({
                 x2={W - PAD_RIGHT}
                 y1={y(g)}
                 y2={y(g)}
-                style={{ stroke: 'hsl(var(--border-muted))' }}
+                style={{ stroke: 'var(--border-muted)' }}
                 strokeWidth={1}
               />
               <text

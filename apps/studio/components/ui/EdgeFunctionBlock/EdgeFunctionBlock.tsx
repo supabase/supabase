@@ -1,4 +1,4 @@
-import { Code } from 'lucide-react'
+import { CodeIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { DragEvent, ReactNode } from 'react'
 import { Button, cn } from 'ui'
@@ -81,7 +81,7 @@ export const EdgeFunctionBlock = ({
   return (
     <ReportBlockContainer
       tooltip={tooltip}
-      icon={<Code size={16} strokeWidth={1.5} className="text-foreground-muted" />}
+      icon={<CodeIcon size={16} strokeWidth={1.5} className="text-foreground-muted" />}
       label={label}
       loading={isDeploying}
       draggable={draggable}
@@ -170,7 +170,7 @@ export const EdgeFunctionBlock = ({
                 ) : (
                   <span className="text-foreground">new function</span>
                 )}{' '}
-                is now live at:
+                <span>is now live at:</span>
               </p>
               <CodeBlock
                 language="bash"

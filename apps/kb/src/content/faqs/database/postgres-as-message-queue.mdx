@@ -1,0 +1,11 @@
+---
+title: Can I use Supabase Postgres as a message queue?
+topics: ['Database', 'Queues']
+lastEdited: 2026-10-30
+---
+
+Yes. [Supabase Queues](/docs/guides/queues) is built on the `pgmq` extension and stores messages in Postgres tables, so you can run background jobs without a separate queue service. You send and read messages with SQL, or from your app through the [Data API](/docs/guides/api) if you expose the queue functions in the `pgmq_public` schema.
+
+When a consumer reads a message, it's hidden from other consumers for a set amount of time. If it isn't deleted or archived before then, it shows up again, so work that failed gets retried. Regular queues are as durable as the rest of your database. pgmq can also create unlogged queues, which are faster but can lose messages after a crash, so only use those when losing a message is acceptable.
+
+Keeping the queue in Postgres has a nice side effect: you can enqueue a message in the same transaction as the data change that caused it, so the message only exists if the change commits.

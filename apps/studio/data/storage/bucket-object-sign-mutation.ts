@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type SignBucketObjectParams = {
   projectRef: string
@@ -58,7 +59,8 @@ export const signBucketObjects = async (
     signal,
   })
 
-  if (error) handleError(error)
+  // Called directly by the storage explorer state, not through a mutation
+  if (error) handleError(error, { reportImmediately: true })
   return data ?? []
 }
 
@@ -67,10 +69,10 @@ export const useGetSignBucketObjectMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SignBucketObjectData, ResponseError, SignBucketObjectParams>,
+  UseCustomMutationOptions<SignBucketObjectData, StudioError, SignBucketObjectParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SignBucketObjectData, ResponseError, SignBucketObjectParams>({
+  return useMutation<SignBucketObjectData, StudioError, SignBucketObjectParams>({
     mutationFn: (vars) => signBucketObject(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

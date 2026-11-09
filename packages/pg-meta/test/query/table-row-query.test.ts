@@ -2,7 +2,11 @@ import { afterAll, beforeAll, describe, expect, test } from 'vitest'
 
 import pgMeta from '../../src/index'
 import { Filter, Sort } from '../../src/query'
-import { getDefaultOrderByColumns, getTableRowsSql } from '../../src/query/table-row-query'
+import {
+  getDefaultOrderByColumns,
+  getTableRowsSql,
+  MAX_ARRAY_SIZE,
+} from '../../src/query/table-row-query'
 import { cleanupRoot, createTestDatabase } from '../db/utils'
 
 beforeAll(async () => {
@@ -111,9 +115,15 @@ describe('Table Row Query', () => {
                     case
                       when array_ndims(history) = 1
                       then
-                        (select array_cat(history[1:50]::text[], array['...']::text[]))::text[]
+                        (select array_cat(history[1:50]::text[], array['...'::text]::text[]))::text[]
                       else
-                        history[1:50]::text[]
+                        array_cat(
+                          history[1:50]::text[],
+                          array_fill(
+                            '...'::text,
+                            array(select array_length(history, d) from generate_series(2, array_ndims(history)) as d order by d)
+                          )::text[]
+                        )::text[]
                     end
                   else history::text[]
                 end
@@ -184,9 +194,15 @@ describe('Table Row Query', () => {
                     case
                       when array_ndims(history) = 1
                       then
-                        (select array_cat(history[1:50]::text[], array['...']::text[]))::text[]
+                        (select array_cat(history[1:50]::text[], array['...'::text]::text[]))::text[]
                       else
-                        history[1:50]::text[]
+                        array_cat(
+                          history[1:50]::text[],
+                          array_fill(
+                            '...'::text,
+                            array(select array_length(history, d) from generate_series(2, array_ndims(history)) as d order by d)
+                          )::text[]
+                        )::text[]
                     end
                   else history::text[]
                 end
@@ -230,9 +246,15 @@ describe('Table Row Query', () => {
                     case
                       when array_ndims(history) = 1
                       then
-                        (select array_cat(history[1:50]::text[], array['...']::text[]))::text[]
+                        (select array_cat(history[1:50]::text[], array['...'::text]::text[]))::text[]
                       else
-                        history[1:50]::text[]
+                        array_cat(
+                          history[1:50]::text[],
+                          array_fill(
+                            '...'::text,
+                            array(select array_length(history, d) from generate_series(2, array_ndims(history)) as d order by d)
+                          )::text[]
+                        )::text[]
                     end
                   else history::text[]
                 end
@@ -283,9 +305,15 @@ describe('Table Row Query', () => {
                     case
                       when array_ndims(tags) = 1
                       then
-                        (select array_cat(tags[1:50]::text[], array['...']::text[]))::text[]
+                        (select array_cat(tags[1:50]::text[], array['...'::text]::text[]))::text[]
                       else
-                        tags[1:50]::text[]
+                        array_cat(
+                          tags[1:50]::text[],
+                          array_fill(
+                            '...'::text,
+                            array(select array_length(tags, d) from generate_series(2, array_ndims(tags)) as d order by d)
+                          )::text[]
+                        )::text[]
                     end
                   else tags::text[]
                 end
@@ -321,6 +349,52 @@ describe('Table Row Query', () => {
           },
         ]
       `)
+    })
+
+    withTestDatabase('should add a marker to truncated multi-dimensional arrays', async (db) => {
+      await db.executeQuery(`
+        CREATE TABLE test_multi_dim_table (
+          id SERIAL PRIMARY KEY,
+          grid TEXT[][],
+          cube TEXT[][][],
+          docs JSONB[][]
+        );
+
+        INSERT INTO test_multi_dim_table (grid, cube, docs)
+        SELECT
+          (SELECT array_agg(ARRAY[repeat('a', 300), 'b'])  FROM generate_series(1, 120)),
+          (SELECT array_agg(ARRAY[ARRAY[repeat('a', 300), 'b'], ARRAY['c', 'd']]) FROM generate_series(1, 120)),
+          (SELECT array_agg(ARRAY['{"k": 1}'::jsonb, to_jsonb(repeat('a', 300))]) FROM generate_series(1, 120));
+
+        INSERT INTO test_multi_dim_table (grid, cube, docs)
+        VALUES (ARRAY[ARRAY['a', 'b'], ARRAY['c', 'd']], ARRAY[ARRAY[ARRAY['a']]], ARRAY[ARRAY['{"k": 1}'::jsonb]]);
+      `)
+
+      const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+      const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+      const testTable = tables.find((table) => table.name === 'test_multi_dim_table')
+      expect(testTable).toBeDefined()
+
+      const sql = getTableRowsSql({ table: testTable!, page: 1, limit: 10 })
+      const [truncated, small] = await db.executeQuery(sql)
+
+      expect(truncated.grid).toHaveLength(MAX_ARRAY_SIZE + 1)
+      expect(truncated.grid.at(-1)).toEqual(['...', '...'])
+      expect(truncated.cube).toHaveLength(MAX_ARRAY_SIZE + 1)
+      expect(truncated.cube.at(-1)).toEqual([
+        ['...', '...'],
+        ['...', '...'],
+      ])
+      expect(truncated.docs).toHaveLength(MAX_ARRAY_SIZE + 1)
+      expect(truncated.docs.at(-1)).toEqual([{ truncated: true }, { truncated: true }])
+
+      // arrays under the limit are returned as they are
+      expect(small.grid).toEqual([
+        ['a', 'b'],
+        ['c', 'd'],
+      ])
+      expect(small.cube).toEqual([[['a']]])
+      expect(small.docs).toEqual([[{ k: 1 }]])
     })
 
     withTestDatabase('should generate basic SELECT SQL for a table', async (db) => {
@@ -430,9 +504,15 @@ describe('Table Row Query', () => {
                       case
                         when array_ndims(large_array) = 1
                         then
-                          (select array_cat(large_array[1:10]::text[], array['...']::text[]))::text[]
+                          (select array_cat(large_array[1:10]::text[], array['...'::text]::text[]))::text[]
                         else
-                          large_array[1:10]::text[]
+                          array_cat(
+                            large_array[1:10]::text[],
+                            array_fill(
+                              '...'::text,
+                              array(select array_length(large_array, d) from generate_series(2, array_ndims(large_array)) as d order by d)
+                            )::text[]
+                          )::text[]
                       end
                     else large_array::text[]
                   end
@@ -666,7 +746,13 @@ describe('Table Row Query', () => {
                         then
                           (select array_cat(large_array_jsonb[1:10]::jsonb[], array['{"truncated": true}'::json]::jsonb[]))::jsonb[]
                         else
-                          large_array_jsonb[1:10]::jsonb[]
+                          array_cat(
+                            large_array_jsonb[1:10]::jsonb[],
+                            array_fill(
+                              '{"truncated": true}'::json,
+                              array(select array_length(large_array_jsonb, d) from generate_series(2, array_ndims(large_array_jsonb)) as d order by d)
+                            )::jsonb[]
+                          )::jsonb[]
                       end
                     else large_array_jsonb::jsonb[]
                   end
@@ -679,7 +765,13 @@ describe('Table Row Query', () => {
                         then
                           (select array_cat(large_array_json[1:10]::json[], array['{"truncated": true}'::json]::json[]))::json[]
                         else
-                          large_array_json[1:10]::json[]
+                          array_cat(
+                            large_array_json[1:10]::json[],
+                            array_fill(
+                              '{"truncated": true}'::json,
+                              array(select array_length(large_array_json, d) from generate_series(2, array_ndims(large_array_json)) as d order by d)
+                            )::json[]
+                          )::json[]
                       end
                     else large_array_json::json[]
                   end
@@ -1041,9 +1133,15 @@ describe('Table Row Query', () => {
                     case
                       when array_ndims(large_array) = 1
                       then
-                        (select array_cat(large_array[1:50]::text[], array['...']::text[]))::text[]
+                        (select array_cat(large_array[1:50]::text[], array['...'::text]::text[]))::text[]
                       else
-                        large_array[1:50]::text[]
+                        array_cat(
+                          large_array[1:50]::text[],
+                          array_fill(
+                            '...'::text,
+                            array(select array_length(large_array, d) from generate_series(2, array_ndims(large_array)) as d order by d)
+                          )::text[]
+                        )::text[]
                     end
                   else large_array::text[]
                 end
@@ -1141,6 +1239,46 @@ describe('Table Row Query', () => {
       expect(queryResult.map((row: any) => row.name)).toEqual(['Test Item 1', 'Test Item 3'])
       expect(queryResult.every((row: any) => row.category === 'A')).toBe(true)
     })
+
+    withTestDatabase(
+      'should wrap a bare ilike filter value in wildcards for a contains match',
+      async (db) => {
+        // Create test table and insert data
+        await db.executeQuery(`
+        CREATE TABLE test_sql_filter_ilike (
+          id SERIAL PRIMARY KEY,
+          name TEXT
+        );
+
+        INSERT INTO test_sql_filter_ilike (name) VALUES
+          ('Alizarin'),
+          ('Amber'),
+          ('Coral');
+      `)
+
+        // Get table metadata
+        const { sql: tablesSql, zod: tablesZod } = pgMeta.tables.list()
+        const tables = tablesZod.parse(await db.executeQuery(tablesSql))
+        const testTable = tables.find((table) => table.name === 'test_sql_filter_ilike')
+
+        expect(testTable).toBeDefined()
+
+        // A bare value with no `%`/`_` should be treated as a "contains" search
+        const filters: Filter[] = [{ column: 'name', operator: '~~*', value: 'al' }]
+
+        const sql = getTableRowsSql({
+          table: testTable!,
+          filters,
+          page: 1,
+          limit: 10,
+        })
+
+        expect(sql).toContain(`name::text ~~* '%al%'`)
+
+        const queryResult = await db.executeQuery(sql)
+        expect(queryResult.map((row: any) => row.name).sort()).toEqual(['Alizarin', 'Coral'])
+      }
+    )
 
     withTestDatabase('should generate SQL with sorting', async (db) => {
       // Create test table and insert data
@@ -1682,9 +1820,15 @@ describe('Table Row Query', () => {
                   case
                     when array_ndims("timestamp") = 1
                     then
-                      (select array_cat("timestamp"[1:50]::text[], array['...']::text[]))::text[]
+                      (select array_cat("timestamp"[1:50]::text[], array['...'::text]::text[]))::text[]
                     else
-                      "timestamp"[1:50]::text[]
+                      array_cat(
+                        "timestamp"[1:50]::text[],
+                        array_fill(
+                          '...'::text,
+                          array(select array_length("timestamp", d) from generate_series(2, array_ndims("timestamp")) as d order by d)
+                        )::text[]
+                      )::text[]
                   end
                 else "timestamp"::text[]
               end
@@ -1695,9 +1839,15 @@ describe('Table Row Query', () => {
                   case
                     when array_ndims("PPG") = 1
                     then
-                      (select array_cat("PPG"[1:50]::text[], array['...']::text[]))::text[]
+                      (select array_cat("PPG"[1:50]::text[], array['...'::text]::text[]))::text[]
                     else
-                      "PPG"[1:50]::text[]
+                      array_cat(
+                        "PPG"[1:50]::text[],
+                        array_fill(
+                          '...'::text,
+                          array(select array_length("PPG", d) from generate_series(2, array_ndims("PPG")) as d order by d)
+                        )::text[]
+                      )::text[]
                   end
                 else "PPG"::text[]
               end
@@ -1708,9 +1858,15 @@ describe('Table Row Query', () => {
                   case
                     when array_ndims("ACC") = 1
                     then
-                      (select array_cat("ACC"[1:50]::text[], array['...']::text[]))::text[]
+                      (select array_cat("ACC"[1:50]::text[], array['...'::text]::text[]))::text[]
                     else
-                      "ACC"[1:50]::text[]
+                      array_cat(
+                        "ACC"[1:50]::text[],
+                        array_fill(
+                          '...'::text,
+                          array(select array_length("ACC", d) from generate_series(2, array_ndims("ACC")) as d order by d)
+                        )::text[]
+                      )::text[]
                   end
                 else "ACC"::text[]
               end
@@ -1734,10 +1890,12 @@ describe('Table Row Query', () => {
     const largeRow = queryResult.find((row: any) => row.subject_id === 'subject-large')
     expect(largeRow).toBeDefined()
     expect(largeRow.timestamp).toHaveLength(51) // Has the extra '...' element
-    expect(largeRow.PPG).toHaveLength(50)
+    expect(largeRow.PPG).toHaveLength(51) // Has the extra '...' row
     expect(largeRow.PPG[0]).toHaveLength(6)
-    expect(largeRow.ACC).toHaveLength(50)
+    expect(largeRow.PPG[50]).toEqual(Array(6).fill('...'))
+    expect(largeRow.ACC).toHaveLength(51)
     expect(largeRow.ACC[0]).toHaveLength(6)
+    expect(largeRow.ACC[50]).toEqual(Array(6).fill('...'))
 
     // Test with custom maxArraySize
     const sqlWithCustomSize = getTableRowsSql({
@@ -1750,8 +1908,8 @@ describe('Table Row Query', () => {
     const customSizeResult = await db.executeQuery(sqlWithCustomSize)
     const largeRowCustom = customSizeResult.find((row: any) => row.subject_id === 'subject-large')
     expect(largeRowCustom.timestamp).toHaveLength(11) // Has the extra '...' element
-    expect(largeRowCustom.PPG).toHaveLength(10) // multi-dimentional array are truncated
-    expect(largeRowCustom.ACC).toHaveLength(10)
+    expect(largeRowCustom.PPG).toHaveLength(11) // multi-dimentional arrays get an extra '...' row too
+    expect(largeRowCustom.ACC).toHaveLength(11)
   })
 
   withTestDatabase('should handle reserved keyword "collation" as column name', async (db) => {

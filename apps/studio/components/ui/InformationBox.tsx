@@ -1,4 +1,4 @@
-import { ExternalLink, Maximize2, Minimize2 } from 'lucide-react'
+import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { forwardRef, ReactNode, useState } from 'react'
 import { Button } from 'ui'
@@ -57,9 +57,9 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
                 onClick={() => setIsExpanded(!isExpanded)}
               >
                 {isExpanded ? (
-                  <Minimize2 size={14} strokeWidth={1.5} />
+                  <Minimize2Icon size={14} strokeWidth={1.5} />
                 ) : (
-                  <Maximize2 size={14} strokeWidth={1.5} />
+                  <Maximize2Icon size={14} strokeWidth={1.5} />
                 )}
               </div>
             ) : null}
@@ -75,7 +75,7 @@ const InformationBox = forwardRef<HTMLDivElement, InformationBoxProps>(
 
               {url && (
                 <div>
-                  <Button asChild variant="default" icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLinkIcon />}>
                     <Link href={url} target="_blank" rel="noreferrer">
                       {urlLabel}
                     </Link>

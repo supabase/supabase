@@ -90,6 +90,11 @@ export interface Tab {
 export interface TabCloseConfirmation {
   title: string
   description: string
+  /**
+   * Offers a "don't ask again" checkbox. `onOptOut` runs when the user ticks it
+   * and confirms the close.
+   */
+  optOut?: { label: string; onOptOut: () => void }
 }
 
 /**

@@ -2,9 +2,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { organizationKeys } from './keys'
+import type { OrganizationsData } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug?: string
@@ -14,6 +16,7 @@ export type OrganizationCustomerProfileUpdateVariables = {
   tax_id?: CustomerTaxId | null
   email?: string
   additional_emails?: string[]
+  indirect_tax_registration_declaration?: 'yes' | 'no'
   /** When true, validates the request without persisting changes */
   dry_run?: boolean
 }
@@ -25,6 +28,7 @@ export async function updateOrganizationCustomerProfile({
   tax_id,
   email,
   additional_emails,
+  indirect_tax_registration_declaration,
   dry_run,
 }: OrganizationCustomerProfileUpdateVariables) {
   if (!slug) return console.error('Slug is required')
@@ -45,6 +49,7 @@ export async function updateOrganizationCustomerProfile({
           : {}),
       email,
       additional_emails,
+      indirect_tax_registration_declaration,
       ...(dry_run ? { dry_run } : {}),
     },
   })
@@ -63,7 +68,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationCustomerProfileUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCustomerProfileUpdateVariables
   >,
   'mutationFn'
@@ -72,12 +77,21 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
 
   return useMutation<
     OrganizationCustomerProfileUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCustomerProfileUpdateVariables
   >({
     mutationFn: (vars) => updateOrganizationCustomerProfile(vars),
     async onSuccess(data, variables, context) {
-      const { address, slug, billing_name, tax_id, email, additional_emails, dry_run } = variables
+      const {
+        address,
+        slug,
+        billing_name,
+        tax_id,
+        email,
+        additional_emails,
+        indirect_tax_registration_declaration,
+        dry_run,
+      } = variables
 
       if (dry_run) {
         await onSuccess?.(data, variables, context)
@@ -104,6 +118,16 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
 
       if (tax_id !== undefined) {
         queryClient.setQueryData(organizationKeys.taxId(slug), tax_id)
+      }
+
+      if (indirect_tax_registration_declaration !== undefined) {
+        queryClient.setQueryData<OrganizationsData>(organizationKeys.list(), (previous) =>
+          previous?.map((organization) =>
+            organization.slug === slug
+              ? { ...organization, requires_indirect_tax_declaration: false }
+              : organization
+          )
+        )
       }
 
       // Refetch after a delay to pick up server-canonical values (e.g. normalized tax IDs).

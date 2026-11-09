@@ -2,11 +2,12 @@ import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { platformAppKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PlatformAppInstallation =
-  components['schemas']['ListPlatformAppInstallationsResponse']['installations'][number]
+  components['schemas']['ListPlatformAppInstallationsResponse_Output']['installations'][number]
 
 export async function getPlatformAppInstallations(
   { slug }: { slug?: string },
@@ -17,6 +18,7 @@ export async function getPlatformAppInstallations(
   const { data, error } = await get('/platform/organizations/{slug}/apps/installations', {
     params: { path: { slug } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -24,7 +26,7 @@ export async function getPlatformAppInstallations(
 }
 
 export type PlatformAppInstallationsData = Awaited<ReturnType<typeof getPlatformAppInstallations>>
-export type PlatformAppInstallationsError = ResponseError
+export type PlatformAppInstallationsError = StudioError
 
 export const usePlatformAppInstallationsQuery = <TData = PlatformAppInstallationsData>(
   { slug }: { slug?: string },

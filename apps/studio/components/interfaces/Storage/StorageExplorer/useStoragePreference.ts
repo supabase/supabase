@@ -14,6 +14,7 @@ interface StoragePreference {
   sortBy: STORAGE_SORT_BY
   sortByOrder: STORAGE_SORT_BY_ORDER
   sortBucket: STORAGE_BUCKET_SORT
+  showArchivedInline: boolean
 }
 
 const DEFAULT_PREFERENCES: StoragePreference = {
@@ -21,6 +22,7 @@ const DEFAULT_PREFERENCES: StoragePreference = {
   sortBy: STORAGE_SORT_BY.NAME,
   sortByOrder: STORAGE_SORT_BY_ORDER.ASC,
   sortBucket: STORAGE_BUCKET_SORT.CREATED_AT,
+  showArchivedInline: false,
 }
 
 /**
@@ -64,6 +66,13 @@ export function useStoragePreference(projectRef: string) {
     [setPreference]
   )
 
+  const setShowArchivedInline = useCallback(
+    (showArchivedInline: boolean) => {
+      setPreference((prev) => ({ ...prev, showArchivedInline }))
+    },
+    [setPreference]
+  )
+
   const setSortBucket = useCallback(
     (sortBucket: STORAGE_BUCKET_SORT) => {
       setPreference((prev) => ({ ...prev, sortBucket }))
@@ -76,9 +85,11 @@ export function useStoragePreference(projectRef: string) {
     sortBy: preference.sortBy,
     sortByOrder: preference.sortByOrder,
     sortBucket: preference.sortBucket,
+    showArchivedInline: preference.showArchivedInline,
     setView,
     setSortBy,
     setSortByOrder,
     setSortBucket,
+    setShowArchivedInline,
   }
 }

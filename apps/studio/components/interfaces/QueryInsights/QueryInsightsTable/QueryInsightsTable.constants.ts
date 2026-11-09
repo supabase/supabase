@@ -1,4 +1,4 @@
-import { CircleAlert, Lightbulb } from 'lucide-react'
+import { CircleAlertIcon, LightbulbIcon } from 'lucide-react'
 import type { LucideIcon } from 'lucide-react'
 
 export const ISSUE_DOT_COLORS: Record<
@@ -23,9 +23,9 @@ export const ISSUE_DOT_COLORS: Record<
 }
 
 export const ISSUE_ICONS: Record<string, LucideIcon> = {
-  error: CircleAlert,
-  index: Lightbulb,
-  slow: CircleAlert,
+  error: CircleAlertIcon,
+  index: LightbulbIcon,
+  slow: CircleAlertIcon,
 }
 
 export const QUERY_INSIGHTS_EXPLORER_COLUMNS = [

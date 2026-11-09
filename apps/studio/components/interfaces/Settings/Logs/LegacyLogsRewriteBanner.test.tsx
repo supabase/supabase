@@ -11,7 +11,7 @@ import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
 
-type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse']
+type ProjectDetailResponse = platformComponents['schemas']['ProjectDetailResponse_Output']
 
 const PROJECT_MOCK: ProjectDetailResponse = {
   id: 1,
@@ -75,7 +75,9 @@ describe('LegacyLogsRewriteBanner', () => {
       method: 'post',
       path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
       response: () =>
-        HttpResponse.json<platformComponents['schemas']['AnalyticsResponse']>({ result: [] }),
+        HttpResponse.json<platformComponents['schemas']['AnalyticsResponse_Output']>({
+          result: [],
+        }),
     })
   })
 

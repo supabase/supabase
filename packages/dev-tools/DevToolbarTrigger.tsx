@@ -211,7 +211,6 @@ export function DevToolbarTrigger() {
   return (
     <div style={containerStyle}>
       <Button
-        variant="default"
         rounded
         className={cn(
           'relative h-10 w-10 p-0 shadow-md',
@@ -244,7 +243,7 @@ export function DevToolbarTrigger() {
             className={cn(
               'absolute -top-1 -right-1',
               'inline-flex items-center justify-center',
-              'rounded-full bg-brand text-black',
+              'rounded-full bg-brand-default text-black',
               'text-[9px] font-medium leading-none tracking-tighter tabular-nums',
               eventCountBadge.sizeClass
             )}

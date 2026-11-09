@@ -103,9 +103,9 @@ export const UpdateCustomReportModal = ({
                 control={form.control}
                 name="name"
                 render={({ field }) => (
-                  <FormItemLayout name="name" layout="vertical" label="Name">
+                  <FormItemLayout layout="vertical" label="Name">
                     <FormControl>
-                      <Input {...field} id="name" />
+                      <Input {...field} />
                     </FormControl>
                   </FormItemLayout>
                 )}
@@ -116,11 +116,10 @@ export const UpdateCustomReportModal = ({
                 control={form.control}
                 name="description"
                 render={({ field }) => (
-                  <FormItemLayout name="description" layout="vertical" label="Description">
+                  <FormItemLayout layout="vertical" label="Description">
                     <FormControl>
                       <Textarea
                         {...field}
-                        id="description"
                         rows={4}
                         placeholder="Describe your custom report"
                         className="resize-none"
@@ -131,10 +130,15 @@ export const UpdateCustomReportModal = ({
               />
             </DialogSection>
             <DialogFooter>
-              <Button type="reset" variant="default" onClick={handleCancel} disabled={isUpdating}>
+              <Button type="reset" onClick={handleCancel} disabled={isUpdating}>
                 Cancel
               </Button>
-              <Button type="submit" loading={isUpdating} disabled={isUpdating || !isDirty}>
+              <Button
+                variant="primary"
+                type="submit"
+                loading={isUpdating}
+                disabled={isUpdating || !isDirty}
+              >
                 Save custom report
               </Button>
             </DialogFooter>

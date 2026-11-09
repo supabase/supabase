@@ -168,7 +168,6 @@ const SqlEditor: NextPageWithLayout = () => {
           >
             {!!tabId ? (
               <Button
-                variant="default"
                 className="mt-2"
                 onClick={() => {
                   tabs.handleTabClose({
@@ -182,12 +181,7 @@ const SqlEditor: NextPageWithLayout = () => {
                 Close tab
               </Button>
             ) : (
-              <Button
-                asChild
-                variant="default"
-                className="mt-2"
-                onClick={() => setLastVisitedSnippet(undefined)}
-              >
+              <Button asChild className="mt-2" onClick={() => setLastVisitedSnippet(undefined)}>
                 <Link href={`/project/${ref}/sql`}>Head back</Link>
               </Button>
             )}

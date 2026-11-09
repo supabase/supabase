@@ -12,9 +12,6 @@ export const THRESHOLD_COUNT = 50000
  */
 export const THRESHOLD_ESTIMATE_BYTES = THRESHOLD_COUNT * 200
 
-// FROZEN legacy path: served while the pgMetaScopedIntrospection flag is off.
-// Do not edit -- it must keep matching production behavior until the flag
-// cleanup deletes it. The scoped path reuses this same function.
 export const COUNT_ESTIMATE_SQL: SafeSqlFragment = safeSql`
 CREATE OR REPLACE FUNCTION pg_temp.count_estimate(
     query text

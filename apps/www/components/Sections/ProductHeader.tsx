@@ -53,8 +53,8 @@ const ProductHeader = (props: Types) => {
               })}
           </div>
           <div className="flex flex-row md:flex-row md:items-center">
-            <Button asChild size="medium">
-              <Link
+            <Button variant="primary" asChild size="medium">
+              <a
                 href={getDashboardCtaHref(isLoggedIn)}
                 onClick={() =>
                   sendTelemetryEvent({
@@ -64,10 +64,10 @@ const ProductHeader = (props: Types) => {
                 }
               >
                 Start a project
-              </Link>
+              </a>
             </Button>
             {props.documentation_url && (
-              <Button asChild variant="default" size="medium" icon={<BookOpen />}>
+              <Button asChild size="medium" icon={<BookOpen />}>
                 <Link
                   href={props.documentation_url}
                   as={props.documentation_url}

@@ -210,7 +210,6 @@ export const MonacoEditor = ({
         }}
         options={{
           placeholder,
-          lineDecorationsWidth: 0,
           fixedOverflowWidgets: false,
           lineNumbersMinChars: 5,
           scrollBeyondLastLine: true,

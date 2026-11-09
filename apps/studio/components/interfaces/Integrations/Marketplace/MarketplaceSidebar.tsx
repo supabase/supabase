@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { ArrowUpRight, BookOpen, LayoutGrid, PlusSquare } from 'lucide-react'
+import { ArrowUpRightIcon, BookOpenIcon, LayoutGridIcon, PlusSquareIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { cn } from 'ui'
@@ -42,18 +42,18 @@ const SidebarLink = ({ href, active, icon, label, count, className }: SidebarLin
 
 const HELP_LINKS: Array<{ icon: React.ReactNode; label: string; href: string }> = [
   {
-    icon: <BookOpen className="text-foreground-lighter" size={13} />,
+    icon: <BookOpenIcon className="text-foreground-lighter" size={13} />,
     label: 'Integrations docs',
     href: `${DOCS_URL}/guides/integrations`,
   },
   {
-    icon: <PlusSquare className="text-foreground-lighter" size={13} />,
+    icon: <PlusSquareIcon className="text-foreground-lighter" size={13} />,
     label: 'Build an integration',
     href: `${DOCS_URL}/guides/integrations/build-a-supabase-oauth-integration`,
   },
 ]
 
-export const MarketplaceSidebar = () => {
+export const MarketplaceProductMenu = () => {
   const router = useRouter()
   const { ref } = useParams()
 
@@ -65,11 +65,11 @@ export const MarketplaceSidebar = () => {
   const activeIntegrationId = typeof router.query.id === 'string' ? router.query.id : undefined
 
   return (
-    <aside className="grow flex h-full w-full flex-col gap-y-0.5 overflow-y-auto p-4 text-sm">
+    <div className="flex flex-col gap-y-0.5 overflow-y-auto my-4 xl:px-4 w-full">
       <SidebarLink
         href={baseHref}
         active={isDiscoverActive}
-        icon={<LayoutGrid size={13} />}
+        icon={<LayoutGridIcon size={13} />}
         label="Explore all"
       />
 
@@ -98,7 +98,7 @@ export const MarketplaceSidebar = () => {
                   isActive && 'bg-surface-200 text-foreground'
                 )}
               >
-                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-[4px] border bg-white">
+                <span className="relative flex h-[18px] w-[18px] shrink-0 items-center justify-center overflow-hidden rounded-xs border bg-white">
                   {integration.icon({ className: 'p-0.5' })}
                 </span>
                 <span className="truncate">{integration.name}</span>
@@ -121,9 +121,9 @@ export const MarketplaceSidebar = () => {
             {icon}
             {label}
           </span>
-          <ArrowUpRight size={11} className="opacity-50" />
+          <ArrowUpRightIcon size={11} className="opacity-50" />
         </a>
       ))}
-    </aside>
+    </div>
   )
 }

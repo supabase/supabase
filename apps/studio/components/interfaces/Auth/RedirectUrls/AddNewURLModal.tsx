@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Label } from '@ui/components/shadcn/ui/label'
 import { useParams } from 'common'
 import { useEffect } from 'react'
 import { useForm, useWatch } from 'react-hook-form'
@@ -16,6 +15,7 @@ import {
   DialogSectionSeparator,
   DialogTitle,
   Form,
+  Label,
   ScrollArea,
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -171,6 +171,7 @@ export const AddNewURLModal = ({ visible, allowList, onClose }: AddNewURLModalPr
             </DialogSection>
             <DialogFooter>
               <Button
+                variant="primary"
                 block
                 type="submit"
                 size="small"

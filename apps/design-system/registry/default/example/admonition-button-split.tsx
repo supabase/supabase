@@ -19,7 +19,6 @@ export default function AdmonitionButtonSplitDemo() {
         <div className="flex w-full @lg:w-auto">
           <Button
             type="button"
-            variant="default"
             className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
           >
             Set up SMTP
@@ -28,7 +27,6 @@ export default function AdmonitionButtonSplitDemo() {
             <DropdownMenuTrigger asChild>
               <Button
                 type="button"
-                variant="default"
                 aria-label="More email template editing options"
                 className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
                 icon={<ChevronDown />}

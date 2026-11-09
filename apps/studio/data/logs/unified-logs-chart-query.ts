@@ -1,14 +1,18 @@
 import { keepPreviousData, useQuery } from '@tanstack/react-query'
-import { useFlag } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
 import { logsAllEndpointUrl, pickLogsQueryBuilder } from './logs-endpoint'
-import { UNIFIED_LOGS_QUERY_OPTIONS, UnifiedLogsVariables } from './unified-logs-infinite-query'
+import {
+  UNIFIED_LOGS_QUERY_OPTIONS,
+  UnifiedLogsVariables,
+  useUnifiedLogsBackend,
+} from './unified-logs-infinite-query'
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export async function getUnifiedLogsChart(
   { projectRef, search, useOtel = false }: UnifiedLogsVariables & { useOtel?: boolean },
@@ -154,7 +158,7 @@ export async function getUnifiedLogsChart(
 }
 
 export type UnifiedLogsChartData = Awaited<ReturnType<typeof getUnifiedLogsChart>>
-export type UnifiedLogsChartError = ResponseError
+export type UnifiedLogsChartError = StudioError
 
 export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
   { projectRef, search }: UnifiedLogsVariables,
@@ -163,7 +167,7 @@ export const useUnifiedLogsChartQuery = <TData = UnifiedLogsChartData>(
     ...options
   }: UseCustomQueryOptions<UnifiedLogsChartData, UnifiedLogsChartError, TData> = {}
 ) => {
-  const useOtel = useFlag('otelUnifiedLogs')
+  const useOtel = useUnifiedLogsBackend(search)
   return useQuery<UnifiedLogsChartData, UnifiedLogsChartError, TData>({
     queryKey: [...logsKeys.unifiedLogsChart(projectRef, search), { otel: useOtel }],
     queryFn: ({ signal }) => getUnifiedLogsChart({ projectRef, search, useOtel }, signal),

@@ -2,10 +2,9 @@ import pricingAddOn from '~/data/PricingAddOnTable.json'
 import { Plus, Trash2 } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { plans as allPlans } from 'shared-data/plans'
-import { Button, cn, Slider } from 'ui'
+import { Button, cn, Slider, ToggleGroup, ToggleGroupItem } from 'ui'
 import { ComputeBadge } from 'ui-patterns/ComputeBadge'
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
-import { ToggleGroup, ToggleGroupItem } from 'ui/src/components/shadcn/ui/toggle-group'
 
 const STANDALONE_PLANS = allPlans
   .filter((plan) => plan.planId === 'pro' || plan.planId === 'team')
@@ -210,7 +209,7 @@ const ComputePricingCalculator = ({
                 <div className="w-full flex items-center gap-2">
                   <span className="text-lighter text-xs md:text-[13px]">
                     {findInstanceValueByColumn(activeInstance, 'memory')} RAM /{' '}
-                    {findInstanceValueByColumn(activeInstance, 'cpu')} CPU / Connections: Direct{' '}
+                    {findInstanceValueByColumn(activeInstance, 'cpu')} / Connections: Direct{' '}
                     {findInstanceValueByColumn(activeInstance, 'directConnections')}, Pooler{' '}
                     {findInstanceValueByColumn(activeInstance, 'poolerConnections')}
                   </span>

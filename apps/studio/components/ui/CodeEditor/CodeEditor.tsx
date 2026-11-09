@@ -1,6 +1,6 @@
 import Editor, { EditorProps, Monaco, OnChange, OnMount, useMonaco } from '@monaco-editor/react'
 import { merge, noop } from 'lodash'
-import { Loader2 } from 'lucide-react'
+import { Loader2Icon } from 'lucide-react'
 import type { editor } from 'monaco-editor'
 import { RefObject, useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
@@ -260,13 +260,13 @@ export const CodeEditor = ({
         // injects a second copy of Monaco's CSS onto the shared instance). Without an explicit
         // height, an absolutely-positioned wrapper collapses to 0 and Monaco lays out at ~5px.
         // Order matters: `h-full` is a default, so a caller-supplied height in `className`
-        // (e.g. `h-96`) wins via tailwind-merge instead of being clobbered.
+        // (e.g. `h-96`) wins via `cn` class merging instead of being clobbered.
         className={cn('monaco-editor', 'h-full', className)}
         wrapperProps={{ className: wrapperClassName }}
         value={value ?? undefined}
         language={language}
         defaultValue={defaultValue ?? undefined}
-        loading={loading || <Loader2 className="animate-spin" strokeWidth={2} size={20} />}
+        loading={loading || <Loader2Icon className="animate-spin" strokeWidth={2} size={20} />}
         options={optionsMerged}
         onMount={handleMount}
         onChange={onChangeContent}

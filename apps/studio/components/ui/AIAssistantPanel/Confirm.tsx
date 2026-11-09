@@ -1,4 +1,4 @@
-import { Check, X } from 'lucide-react'
+import { CheckIcon, XIcon } from 'lucide-react'
 import { type PropsWithChildren, type ReactNode } from 'react'
 import { Button, cn } from 'ui'
 
@@ -49,8 +49,8 @@ export const ConfirmFooter = ({
       )}
     >
       <div role="status" className="min-w-0 flex flex-1 items-center gap-2">
-        {outcome === 'success' && <Check className="size-3.5 shrink-0 text-brand" />}
-        {outcome === 'error' && <X className="size-3.5 shrink-0 text-danger" />}
+        {outcome === 'success' && <CheckIcon className="size-3.5 shrink-0 text-primary" />}
+        {outcome === 'error' && <XIcon className="size-3.5 shrink-0 text-destructive" />}
         <span>{message}</span>
       </div>
       {(showActions || action) && (

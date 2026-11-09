@@ -22,7 +22,6 @@ import { AVAILABLE_REPLICA_REGIONS } from '@/components/interfaces/Settings/Infr
 import type { RecommendedComputeForReadReplicas } from '@/components/interfaces/Settings/Infrastructure/ReadReplicas/recommendCompute'
 import { RegionFlag } from '@/components/ui/RegionFlag'
 import { Region, useReadReplicaSetUpMutation } from '@/data/read-replicas/replica-setup-mutation'
-import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
 import { AWS_REGIONS_DEFAULT } from '@/lib/constants'
 
 interface ReadReplicaFormProps {
@@ -39,7 +38,6 @@ export const ReadReplicaForm = ({
   onRecommendCompute,
 }: ReadReplicaFormProps) => {
   const { ref: projectRef } = useParams()
-  const { data } = useReadReplicasQuery({ projectRef })
   const eligibility = useCheckEligibilityDeployReplica()
   const replicaCost = useGetReplicaCost()
 
@@ -73,8 +71,7 @@ export const ReadReplicaForm = ({
     const regionKey = AWS_REGIONS[selectedRegion as AWS_REGIONS_KEYS]?.code
     if (!regionKey) return toast.error('Unable to deploy replica: Unsupported region selected')
 
-    const primary = data?.find((db) => db.identifier === projectRef)
-    setUpReplica({ projectRef, region: regionKey as Region, size: primary?.size ?? 't4g.small' })
+    setUpReplica({ projectRef, region: regionKey as Region })
   }
 
   return (
@@ -140,10 +137,15 @@ export const ReadReplicaForm = ({
       )}
 
       <DialogFooter className="border-t-0">
-        <Button disabled={isSettingUp} variant="default" onClick={onClose}>
+        <Button disabled={isSettingUp} onClick={onClose}>
           Cancel
         </Button>
-        <Button disabled={!canDeployReplica} loading={isSettingUp} onClick={onSubmit}>
+        <Button
+          variant="primary"
+          disabled={!canDeployReplica}
+          loading={isSettingUp}
+          onClick={onSubmit}
+        >
           Add replica
         </Button>
       </DialogFooter>
