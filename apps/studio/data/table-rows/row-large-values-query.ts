@@ -75,6 +75,8 @@ export async function getRowLargeValues(
       sql,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
       grant: unguarded.migrating,
+      sqlOrigin: 'studio',
+      queryName: 'row-large-values',
     },
     signal
   )

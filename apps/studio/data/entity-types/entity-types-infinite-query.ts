@@ -54,6 +54,8 @@ export async function getEntityTypes(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-types',
       sql,
       queryKey: ['entity-types', ...schemas, page],
       grant: unguarded.migrating,
