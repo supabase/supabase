@@ -221,6 +221,7 @@ as $$
 $$;
 
 revoke all on function public.current_user_created_at() from public;
+revoke execute on function public.current_user_created_at() from anon;
 grant execute on function public.current_user_created_at() to authenticated;
 
 create policy "Policy name."
