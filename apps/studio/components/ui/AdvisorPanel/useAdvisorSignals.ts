@@ -69,8 +69,11 @@ export const useAdvisorSignals = ({ projectRef, enabled = true }: UseAdvisorSign
     isEnabled &&
     (!IS_PLATFORM || (projectQuery.isSuccess && (!query.isEnabled || query.isSuccess))) &&
     !isError
-  const refetch = () =>
-    queryClient.invalidateQueries({ queryKey: BannedIPKeys.list(projectRef), exact: true })
+  const refetch = async () => {
+    if (!isEnabled || !IS_PLATFORM) return
+    if (projectQuery.isError) await projectQuery.refetch()
+    await queryClient.invalidateQueries({ queryKey: BannedIPKeys.list(projectRef), exact: true })
+  }
 
   const storageKey = projectRef
     ? createDismissalStorageKey(projectRef)

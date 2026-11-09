@@ -155,6 +155,35 @@ describe('useProjectIssues', () => {
     expect(result.current.isSuccess).toBe(false)
   })
 
+  it('recovers a failed eligibility refresh when checks are rerun', async () => {
+    let isProjectAvailable = false
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () => {
+        if (isProjectAvailable) return HttpResponse.json<ProjectDetail>(project)
+        return HttpResponse.json<APIErrorBody>({ message: 'Project unavailable' }, { status: 500 })
+      },
+    })
+    addAPIMock({
+      method: 'post',
+      path: '/v1/projects/:ref/network-bans/retrieve',
+      response: { banned_ipv4_addresses: ['203.0.113.10'] },
+    })
+    const client = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    client.setQueryData(projectKeys.detail('default'), project)
+    client.setQueryData<Lint[]>(lintKeys.lint('default'), [])
+    await client.invalidateQueries({ queryKey: projectKeys.detail('default') })
+    const { result } = renderIssues({ client })
+    await waitFor(() => expect(result.current.isError).toBe(true))
+    expect(result.current.error?.message).toBe('Project unavailable')
+    isProjectAvailable = true
+    await act(() => result.current.refetch())
+    await waitFor(() => expect(result.current.isSuccess).toBe(true))
+    expect(result.current.isError).toBe(false)
+    expect(result.current.issues).toHaveLength(1)
+  })
+
   it('completes and refreshes on a provider without network bans', async () => {
     addAPIMock({
       method: 'get',
