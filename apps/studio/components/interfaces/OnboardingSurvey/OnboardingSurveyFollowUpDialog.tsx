@@ -24,7 +24,6 @@ import { z } from 'zod'
 
 import {
   BUILDING_OPTIONS,
-  CODING_EXPERIENCE_OPTIONS,
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_OPTIONS,
@@ -38,7 +37,6 @@ const FormSchema = z.object({
   kind: z.string(),
   size: z.string(),
   building: z.string(),
-  coding_experience: z.string(),
 })
 
 export type OnboardingSurveyFollowUpValues = z.infer<typeof FormSchema>
@@ -47,7 +45,6 @@ const defaultValues: OnboardingSurveyFollowUpValues = {
   kind: '',
   size: ORG_SIZE_DEFAULT,
   building: '',
-  coding_experience: '',
 }
 
 type OnboardingSurveyFollowUpDialogProps = {
@@ -70,11 +67,11 @@ export function OnboardingSurveyFollowUpDialog({
     defaultValues,
   })
 
-  const [kind, building, codingExperience] = useWatch({
+  const [kind, building] = useWatch({
     control: form.control,
-    name: ['kind', 'building', 'coding_experience'],
+    name: ['kind', 'building'],
   })
-  const hasAnswer = kind !== '' || building !== '' || codingExperience !== ''
+  const hasAnswer = kind !== '' || building !== ''
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -153,33 +150,6 @@ export function OnboardingSurveyFollowUpDialog({
                                   value={field.value}
                                   onValueChange={field.onChange}
                                   options={BUILDING_OPTIONS}
-                                />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
-                    </FormSectionCollapse>
-                  )}
-                </AnimatePresence>
-
-                <AnimatePresence initial={false}>
-                  {kind !== '' && building !== '' && (
-                    <FormSectionCollapse>
-                      <div className="pt-5">
-                        <FormField
-                          control={form.control}
-                          name="coding_experience"
-                          render={({ field }) => (
-                            <FormItemLayout
-                              label="How comfortable are you working with code?"
-                              layout="vertical"
-                            >
-                              <FormControl>
-                                <OnboardingSurveySelect
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                  options={CODING_EXPERIENCE_OPTIONS}
                                 />
                               </FormControl>
                             </FormItemLayout>

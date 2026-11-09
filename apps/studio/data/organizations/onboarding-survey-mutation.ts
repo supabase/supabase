@@ -2,13 +2,10 @@ import { useMutation } from '@tanstack/react-query'
 import type { components } from 'api-types'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
-// `coding_experience` is accepted by the platform once its OnboardingSurveyBody
-// gains the field; until api-types are regenerated, the API strips it.
-export type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody'] & {
-  coding_experience?: string
-}
+export type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
 
 export type OnboardingSurveyVariables = {
   slug: string
@@ -16,7 +13,6 @@ export type OnboardingSurveyVariables = {
   size?: string
   heard_from?: string
   building?: string
-  coding_experience?: string
 }
 
 const trim = (v?: string) => v?.trim() || undefined
@@ -27,7 +23,6 @@ export function buildOnboardingSurveyPayload({
   size,
   heard_from,
   building,
-  coding_experience,
 }: OnboardingSurveyVariables): OnboardingSurveyBody {
   return {
     slug,
@@ -35,7 +30,6 @@ export function buildOnboardingSurveyPayload({
     size: trim(size),
     heard_from: trim(heard_from),
     building: trim(building),
-    coding_experience: trim(coding_experience),
   }
 }
 
@@ -58,10 +52,10 @@ type SubmitOnboardingSurveyData = Awaited<ReturnType<typeof submitOnboardingSurv
 export const useOnboardingSurveyMutation = ({
   ...options
 }: Omit<
-  UseCustomMutationOptions<SubmitOnboardingSurveyData, ResponseError, OnboardingSurveyVariables>,
+  UseCustomMutationOptions<SubmitOnboardingSurveyData, StudioError, OnboardingSurveyVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SubmitOnboardingSurveyData, ResponseError, OnboardingSurveyVariables>({
+  return useMutation<SubmitOnboardingSurveyData, StudioError, OnboardingSurveyVariables>({
     mutationFn: (vars) => submitOnboardingSurvey(vars),
     ...options,
   })

@@ -5,7 +5,6 @@ import { loadStripe } from '@stripe/stripe-js'
 import { useDebounce } from '@uidotdev/usehooks'
 import { groupBy } from 'lodash'
 import { HelpCircleIcon } from 'lucide-react'
-import { AnimatePresence } from 'motion/react'
 import { useTheme } from 'next-themes'
 import { useRouter } from 'next/router'
 import { parseAsBoolean, parseAsString, useQueryStates } from 'nuqs'
@@ -42,7 +41,6 @@ import {
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_OPTIONS,
-  CODING_EXPERIENCE_OPTIONS,
   ORG_KIND_DEFAULT,
   ORG_KIND_TYPES,
   ORG_SIZE_DEFAULT,
@@ -52,7 +50,6 @@ import {
 import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveySelect } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveySelect'
 import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
-import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { useOnboardingSurveyMutation } from '@/data/organizations/onboarding-survey-mutation'
@@ -91,7 +88,6 @@ const formSchema = organizationDetailsSchema.extend({
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
   building: z.string(),
-  coding_experience: z.string(),
 })
 
 type FormState = z.infer<typeof formSchema>
@@ -165,7 +161,6 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: '',
-      coding_experience: '',
     },
   })
 
@@ -194,7 +189,6 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: form.getValues('building'),
-      coding_experience: form.getValues('coding_experience'),
     })
   }, [defaultValues, form])
 
@@ -238,7 +232,6 @@ export const NewOrgForm = ({
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
   const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
   const selectedOrgKind = useWatch({ control: form.control, name: 'kind' })
-  const selectedBuilding = useWatch({ control: form.control, name: 'building' })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -301,13 +294,11 @@ export const NewOrgForm = ({
       if (!showOnboardingSurveyInOrgForm) return
 
       const building = form.getValues('building')
-      const codingExperience = form.getValues('coding_experience')
       const kind = form.getValues('kind')
       const size = kind === 'COMPANY' ? form.getValues('size') : undefined
       // Kind always holds a value, so only count it as answered when changed
       const hasKind = kind.toUpperCase() !== defaultValues.kind.toUpperCase()
       const hasBuilding = building !== ''
-      const hasCodingExperience = codingExperience !== ''
       const profileId = user.profile?.gotrue_id
 
       const groupOverrides = { organization: slug }
@@ -315,7 +306,7 @@ export const NewOrgForm = ({
       // Nothing answered: send nothing yet so the creator's follow-up answers
       // aren't dropped (the survey endpoint keeps one response per user and org).
       // Kind/size ride along with the follow-up, since this is their only save path.
-      if (!hasKind && !hasBuilding && !hasCodingExperience) {
+      if (!hasKind && !hasBuilding) {
         track(
           'onboarding_survey_dismissed',
           { surface: 'org_form', reason: 'org_form_blank' },
@@ -327,7 +318,7 @@ export const NewOrgForm = ({
 
       track(
         'onboarding_survey_submit_button_clicked',
-        { surface: 'org_form', hasKind, hasBuilding, hasCodingExperience },
+        { surface: 'org_form', hasKind, hasBuilding },
         groupOverrides
       )
 
@@ -339,12 +330,11 @@ export const NewOrgForm = ({
           kind,
           size,
           building: building || undefined,
-          coding_experience: codingExperience || undefined,
         })
       } catch {
         track(
           'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasKind, hasBuilding, hasCodingExperience },
+          { surface: 'org_form', hasKind, hasBuilding },
           groupOverrides
         )
       }
@@ -572,55 +562,26 @@ export const NewOrgForm = ({
     />
   )
 
-  // Org type always has a value, so What are you building? shows right away and
-  // each later question appears once the one before it is answered.
+  // Org type always has a value, so What are you building? shows right away.
   const onboardingSurveyFields = (
-    <div>
-      <div className="flex flex-col gap-y-5">
-        {orgKindField}
-        {orgSizeField}
-        <FormField
-          control={form.control}
-          name="building"
-          render={({ field }) => (
-            <FormItemLayout label="What are you building?" layout="horizontal">
-              <FormControl>
-                <OnboardingSurveySelect
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  options={BUILDING_OPTIONS}
-                />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-      </div>
-      <AnimatePresence initial={false}>
-        {selectedBuilding !== '' && (
-          <FormSectionCollapse>
-            <div className="pt-5">
-              <FormField
-                control={form.control}
-                name="coding_experience"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="How comfortable are you working with code?"
-                    layout="horizontal"
-                  >
-                    <FormControl>
-                      <OnboardingSurveySelect
-                        value={field.value}
-                        onValueChange={field.onChange}
-                        options={CODING_EXPERIENCE_OPTIONS}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
-                )}
+    <div className="flex flex-col gap-y-5">
+      {orgKindField}
+      {orgSizeField}
+      <FormField
+        control={form.control}
+        name="building"
+        render={({ field }) => (
+          <FormItemLayout label="What are you building?" layout="horizontal">
+            <FormControl>
+              <OnboardingSurveySelect
+                value={field.value}
+                onValueChange={field.onChange}
+                options={BUILDING_OPTIONS}
               />
-            </div>
-          </FormSectionCollapse>
+            </FormControl>
+          </FormItemLayout>
         )}
-      </AnimatePresence>
+      />
     </div>
   )
 

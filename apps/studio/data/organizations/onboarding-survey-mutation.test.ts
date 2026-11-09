@@ -26,16 +26,6 @@ describe('buildOnboardingSurveyPayload', () => {
     })
   })
 
-  it('includes coding experience', () => {
-    expect(
-      buildOnboardingSurveyPayload({
-        slug: 'test-org',
-        building: 'b2b_saas',
-        coding_experience: ' intermediate ',
-      })
-    ).toEqual({ slug: 'test-org', building: 'b2b_saas', coding_experience: 'intermediate' })
-  })
-
   it('omits empty optional values', () => {
     expect(
       buildOnboardingSurveyPayload({

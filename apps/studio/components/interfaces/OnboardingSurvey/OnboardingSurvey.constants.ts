@@ -32,35 +32,6 @@ export const BUILDING_OPTIONS: readonly OnboardingSurveyOption[] = [
   PREFER_NOT_TO_SAY_OPTION,
 ]
 
-export const CODING_EXPERIENCE_OPTIONS: readonly OnboardingSurveyOption[] = [
-  {
-    value: 'beginner',
-    label: 'Beginner',
-    description: 'I have little or no experience reading or writing code',
-  },
-  {
-    value: 'learning',
-    label: 'Learning',
-    description: 'I can understand and modify code with guidance',
-  },
-  {
-    value: 'intermediate',
-    label: 'Intermediate',
-    description: 'I can build applications and troubleshoot common issues',
-  },
-  {
-    value: 'advanced',
-    label: 'Advanced',
-    description: 'I can independently build, debug, and maintain production applications',
-  },
-  {
-    value: 'expert',
-    label: 'Expert',
-    description: "I'm comfortable designing complex systems and infrastructure",
-  },
-  PREFER_NOT_TO_SAY_OPTION,
-]
-
 export {
   ORG_KIND_DEFAULT,
   ORG_KIND_TYPES,

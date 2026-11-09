@@ -98,12 +98,7 @@ export function OnboardingSurveyFollowUpPrompt() {
     skipFollowUp('follow_up_closed')
   }
 
-  const handleSubmit = ({
-    kind,
-    size,
-    building,
-    coding_experience,
-  }: OnboardingSurveyFollowUpValues) => {
+  const handleSubmit = ({ kind, size, building }: OnboardingSurveyFollowUpValues) => {
     if (!orgSlug) return
 
     // Unanswered here, the org keeps the type picked on the new-org form
@@ -114,7 +109,6 @@ export function OnboardingSurveyFollowUpPrompt() {
       surface: 'follow_up' as const,
       hasKind: kind !== '',
       hasBuilding: building !== '',
-      hasCodingExperience: coding_experience !== '',
     }
     track('onboarding_survey_submit_button_clicked', surveyProperties)
 
@@ -124,7 +118,6 @@ export function OnboardingSurveyFollowUpPrompt() {
         kind: answeredKind,
         size: answeredSize,
         building: building || undefined,
-        coding_experience: coding_experience || undefined,
       },
       {
         onSuccess: () => {
