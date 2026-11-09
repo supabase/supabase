@@ -47,7 +47,7 @@ const renderFactors = (searchParams = '') => {
       }}
     >
       <ReturnNavigation />
-      <TOTPFactors />
+      <TOTPFactors findings={[]} primaryAction={undefined} />
     </FeatureFlagContext.Provider>,
     { queryClient, nuqs: { searchParams, hasMemory: true } }
   )
