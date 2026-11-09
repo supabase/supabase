@@ -12351,6 +12351,30 @@ export interface components {
       ref: string
     }
     ProjectDetailResponse_Output: {
+      /**
+       * TODO: hand-added stopgap ahead of the backend's `capabilities` field
+       * actually shipping — replace with the real generated output (run this
+       * repo's `pnpm generate` against the deployed API) once the
+       * supabase/platform PR adding `ProjectDetailResponseSchema.capabilities`
+       * is live. Shape mirrors `PlatformCapabilities` in
+       * packages/api-core/src/platform-flavor/index.ts.
+       */
+      capabilities?: {
+        deploysOnK8s: boolean
+        usesWalg: boolean
+        usesFsxVolume: boolean
+        supportsReadReplicas: boolean
+        supportsJitAccess: boolean
+        supportsPauseAndRestore: boolean
+        supportsAddons: boolean
+        exposesMetricsApi: boolean
+        /** @enum {string} */
+        k8sNamespacePrefix: 'cust' | 'ha' | null
+        poolerPort: number
+        allowSslEnforcementConfiguration: boolean
+        hasConnectionPooling: boolean
+        requiresDirectTlsNegotiation: boolean
+      }
       cloud_provider: string
       /** @default null */
       connectionString: string | null

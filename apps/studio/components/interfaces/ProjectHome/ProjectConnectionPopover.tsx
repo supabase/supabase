@@ -23,11 +23,11 @@ import {
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
-import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
+import { appendDirectTlsNegotiationParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import { useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
 import { pluckObjectFields } from '@/lib/helpers'
@@ -83,7 +83,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
     { enabled: IS_PLATFORM && open && !!projectRef }
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
-  const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
 
   const directConnectionString = useMemo(() => {
     if (
@@ -99,8 +99,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       connectionInfo: { ...EMPTY_CONNECTION_INFO, ...connectionInfo },
       metadata: { projectRef },
     }).direct.uri
-    return isHighAvailability ? appendHighAvailabilitySslParams(uri) : uri
-  }, [primaryDatabase, projectRef, isHighAvailability])
+    return capabilities?.requiresDirectTlsNegotiation ? appendDirectTlsNegotiationParams(uri) : uri
+  }, [primaryDatabase, projectRef, capabilities?.requiresDirectTlsNegotiation])
 
   const cliCommands = useMemo(
     () =>

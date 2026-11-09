@@ -36,7 +36,11 @@ import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { useIsDataApiEnabled } from '@/hooks/misc/useIsDataApiEnabled'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useIsAwsCloudProvider, useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
+import {
+  useIsAwsCloudProvider,
+  useIsHighAvailability,
+  useProjectCapabilities,
+} from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { pluckObjectFields } from '@/lib/helpers'
 
@@ -52,17 +56,19 @@ interface ConnectStepsSectionProps {
 function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionStringPooler {
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
-  const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? true
+  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? false
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
-  // Multigres has no pooler, so the pooler config endpoints don't apply
+  // Multigres and Multigres Lite have no pooler, so the pooler config endpoints don't apply
   const { data: pgbouncerConfig } = usePgbouncerConfigQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: supavisorConfig } = useSupavisorConfigurationQuery(
     { projectRef },
-    { enabled: !isHighAvailability }
+    { enabled: hasConnectionPooling }
   )
   const { data: addons } = useProjectAddonsQuery({ projectRef })
   const { ipv4: ipv4Addon } = getAddons(addons?.selected_addons ?? [])
@@ -123,7 +129,8 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
         connectionStringsShared,
         connectionStringsDedicated,
         ipv4Addon: !!ipv4Addon,
-        isHighAvailability,
+        hasConnectionPooling,
+        requiresDirectTlsNegotiation,
       }),
     [
       deploymentMode,
@@ -131,7 +138,8 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
       connectionStringsShared,
       connectionStringsDedicated,
       ipv4Addon,
-      isHighAvailability,
+      hasConnectionPooling,
+      requiresDirectTlsNegotiation,
     ]
   )
 }

@@ -2,20 +2,21 @@ import type { ConnectionStringPooler, DeploymentMode } from './Connect.types'
 import { appendConnectionStringParams } from './ConnectionString.utils'
 
 /**
- * Multigres (high-availability) projects only accept TLS connections with
- * direct SSL negotiation — without these params clients fail with
- * "server closed the connection unexpectedly".
+ * Projects whose capabilities report `requiresDirectTlsNegotiation` (full
+ * Multigres and Multigres Lite) only accept TLS connections with direct SSL
+ * negotiation — without these params clients fail with "server closed the
+ * connection unexpectedly".
  */
-export const HIGH_AVAILABILITY_SSL_PARAMS = 'sslmode=require&sslnegotiation=direct'
+export const DIRECT_TLS_NEGOTIATION_SSL_PARAMS = 'sslmode=require&sslnegotiation=direct'
 
 /**
  * No-op when the URI already carries `sslnegotiation`, so the params are never
  * double-appended.
  */
-export const appendHighAvailabilitySslParams = (uri: string) =>
+export const appendDirectTlsNegotiationParams = (uri: string) =>
   uri.includes('sslnegotiation=')
     ? uri
-    : appendConnectionStringParams(uri, HIGH_AVAILABILITY_SSL_PARAMS)
+    : appendConnectionStringParams(uri, DIRECT_TLS_NEGOTIATION_SSL_PARAMS)
 
 /**
  * The Multigres read-only load balancer listens on this port on the same host
@@ -257,14 +258,21 @@ export const buildConnectionStringPooler = ({
   connectionStringsShared,
   connectionStringsDedicated,
   ipv4Addon,
-  isHighAvailability,
+  hasConnectionPooling,
+  requiresDirectTlsNegotiation,
 }: {
   deploymentMode: DeploymentMode
   connectionInfo: { db_host: string; db_port: number | string }
   connectionStringsShared: { direct: ConnectionStrings; pooler: ConnectionStrings }
   connectionStringsDedicated?: { direct: ConnectionStrings; pooler: ConnectionStrings }
   ipv4Addon: boolean
-  isHighAvailability: boolean
+  /**
+   * Defaults to `true` (classic V2/V3 pooler behaviour) when the backend
+   * hasn't reported capabilities yet, matching this function's pre-capability
+   * fallback of treating an unknown project as non-HA.
+   */
+  hasConnectionPooling: boolean
+  requiresDirectTlsNegotiation: boolean
 }): ConnectionStringPooler => {
   if (deploymentMode.isSelfHosted) {
     const dbHost = connectionInfo.db_host
@@ -296,10 +304,13 @@ export const buildConnectionStringPooler = ({
     }
   }
 
-  if (isHighAvailability) {
-    // Multigres has no pooler (neither Supavisor nor PgBouncer), so every slot
-    // falls back to the direct connection.
-    const directUri = appendHighAvailabilitySslParams(connectionStringsShared.direct.uri)
+  if (!hasConnectionPooling) {
+    // This flavor (full Multigres or Multigres Lite) has no pooler — neither
+    // Supavisor nor PgBouncer — so every slot falls back to the direct
+    // connection.
+    const directUri = requiresDirectTlsNegotiation
+      ? appendDirectTlsNegotiationParams(connectionStringsShared.direct.uri)
+      : connectionStringsShared.direct.uri
     return {
       transactionShared: directUri,
       sessionShared: directUri,
