@@ -23,6 +23,8 @@ export async function deleteVaultSecret({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'vault-secret-delete',
     sql,
     grant: unguarded.migrating,
   })

@@ -42,7 +42,15 @@ export async function getFDWs(
   const sql = getFDWsSql()
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: ['fdws'], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'fdws',
+      queryKey: ['fdws'],
+      grant: unguarded.migrating,
+    },
     signal
   )
 

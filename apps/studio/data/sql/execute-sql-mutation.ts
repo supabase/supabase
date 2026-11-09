@@ -11,6 +11,7 @@ import {
   calculateSummary,
   createNodeTree,
 } from '@/components/interfaces/ExplainVisualizer/ExplainVisualizer.parser'
+import { classifySqlResponseError } from '@/data/error-classification'
 import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data/fetchers'
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
@@ -47,7 +48,20 @@ export type QueryResponseError = {
   severity: string
 }
 
-type ExecuteSqlVariables = {
+/**
+ * Who wrote the SQL, and for Studio SQL, its name in error reports.
+ *
+ * - `'user'`: SQL the user or an AI agent wrote, in whole or in part (SQL editor, AI tools, policy
+ *   and function editors). Its errors are never sent to Sentry.
+ * - `'studio'`: SQL Studio composes. Its errors are reported without the Postgres message, which can
+ *   contain user data, so `queryName` identifies the query instead. Use a static kebab-case name
+ *   (`table-rows`, `trigger-update`), never a value that includes IDs, schemas, or user input.
+ */
+type SqlSource =
+  | { sqlOrigin: 'user'; queryName?: string }
+  | { sqlOrigin: 'studio'; queryName: string }
+
+type ExecuteSqlVariables = SqlSource & {
   projectRef?: string
   grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'> | Unguarded
   connectionString?: string | null
@@ -81,6 +95,8 @@ export async function executeSql<T = any>(
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName,
     grant,
     queryKey,
     handleError,
@@ -209,8 +225,12 @@ export async function executeSql<T = any>(
       error = updatedError as any
     }
 
-    if (handleError !== undefined) return handleError(error as any)
-    else handleErrorFetchers(error)
+    const classified = classifySqlResponseError(error, {
+      origin: sqlOrigin,
+      queryName,
+    })
+    if (handleError !== undefined) return handleError(classified)
+    handleErrorFetchers(classified)
   }
 
   if (
