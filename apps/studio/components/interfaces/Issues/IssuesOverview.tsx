@@ -74,7 +74,7 @@ export const IssuesOverview = () => {
               <ul className="flex flex-col divide-y rounded-md border">
                 {categories.map((category) => {
                   const Icon = CATEGORY_ICONS[category]
-                  // Issues are sorted most severe first, so this opens the one to fix first
+
                   const firstIssue = issues.find((issue) => issue.category === category)
                   const href = firstIssue
                     ? `/project/${ref}/issues/${firstIssue.id}?category=${category}`
