@@ -7,9 +7,6 @@ export const Route = createFileRoute('/project/$ref/advisors')({
 })
 
 type AdvisorsStaticData = {
-  // The `advisors/rules` sub-shell wraps in its own <IssuesLayout> (mirroring the existing
-  // AdvisorRulesLayout component), and the old advisor pages only redirect to /issues.
-  // Without opting out here we'd double-wrap.
   skipAdvisorsLayout?: boolean
 }
 

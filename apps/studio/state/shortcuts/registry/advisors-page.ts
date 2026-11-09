@@ -1,8 +1,5 @@
 import { RegistryDefinations } from '../types'
 
-/**
- * Shortcuts scoped to the Issues pages.
- */
 export const ADVISORS_PAGE_SHORTCUT_IDS = {
   ADVISORS_REFRESH: 'advisors-page.refresh',
 }
