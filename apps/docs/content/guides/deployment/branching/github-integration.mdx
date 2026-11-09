@@ -151,17 +151,17 @@ All other configurations, including API, Auth, and seed files, are ignored by de
 
 <Admonition type="caution">
 
-If you push to your production branch before the previous deployment finishes, production can end up serving an older commit's Edge Functions. Each push starts its own deployment run, and runs for earlier commits aren't queued or canceled. Each function keeps the code from the run that deployed it last, and the checks for both commits still pass. To prevent this, see [Deploy one commit at a time](#deploy-one-commit-at-a-time).
+If you push to your production branch before the previous deployment finishes, production might end up serving Edge Functions from the earlier commit. Each push starts its own deployment run, and Supabase doesn't queue or cancel runs for earlier commits. Each function keeps the code from the run that deployed it last, and the Supabase checks on both commits pass. To keep production on your most recent commit, see [Deploy one commit at a time](#deploy-one-commit-at-a-time).
 
 </Admonition>
 
 ### Deploy one commit at a time
 
-To make sure production always ends on your newest commit, deploy your production branch from a GitHub Actions workflow with a `concurrency` group. GitHub Actions runs one deployment at a time. A push that arrives during a deployment waits for it to finish, and replaces any older push that's still waiting.
+To deploy one commit at a time, deploy your production branch from a GitHub Actions workflow with a `concurrency` group. The group lets only one deployment run at a time. A push that arrives during a deployment waits for it to finish, and replaces any earlier push that's still waiting.
 
 1. In **Project Settings** > [**Integrations**](/dashboard/project/_/settings/integrations), turn off **Deploy to production**. Preview branches keep working.
-2. In your GitHub repository, add your [personal access token](/docs/guides/platform/personal-access-tokens) and database password as the secrets `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
-3. Add your project ref as the repository variable `PROJECT_REF`.
+2. In your GitHub repository, add your [personal access token](/docs/guides/platform/personal-access-tokens) and database password as repository secrets named `SUPABASE_ACCESS_TOKEN` and `SUPABASE_DB_PASSWORD`.
+3. Add your project ref as a repository variable named `PROJECT_REF`.
 4. Add the following workflow to your repository:
 
 ```yaml name=.github/workflows/deploy-production.yaml
@@ -196,8 +196,8 @@ jobs:
       - run: supabase functions deploy --remote=${{ vars.PROJECT_REF }} --yes
 ```
 
-- Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which can leave migrations partially applied.
-- The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so this keeps the last run on your newest commit.
+- Keep `cancel-in-progress: false`. Setting it to `true` stops a running deployment partway through, which might leave migrations partially applied.
+- The `ref` input checks out the tip of the branch when the job starts. GitHub doesn't guarantee the order of runs in a concurrency group, so the `ref` input keeps the last run on your most recent commit.
 - `supabase functions deploy` deploys every function directory in `supabase/functions`, including functions that `config.toml` doesn't declare. It doesn't save the secrets under `[edge_runtime.secrets]`, so set those with `supabase secrets set`.
 - If `config.toml` declares Storage buckets, add a `supabase seed buckets --remote=${{ vars.PROJECT_REF }} --yes` step. With `--yes`, the command also uploads the files in each bucket's `objects_path` and overwrites existing objects.
 
