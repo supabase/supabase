@@ -38,6 +38,8 @@ export async function grantColumnPrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-privileges-grant',
     sql,
     queryKey: ['column-privileges', 'grant'],
     grant: unguarded.migrating,

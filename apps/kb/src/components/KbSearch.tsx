@@ -1,8 +1,5 @@
-import { IS_PLATFORM } from 'common/constants'
 import { useDocsSearchV2 } from 'common/hooks/useDocsSearchV2'
 import { useMountEffect } from 'common/hooks/useMountEffect'
-import type { TelemetryEvent } from 'common/telemetry-constants'
-import { buildTelemetryEventRequest } from 'common/telemetry-event'
 import {
   getVisibleResults,
   SearchDialog,
@@ -13,6 +10,7 @@ import {
 import { useCallback, useEffect, useState } from 'react'
 
 import { KB_SEARCH_MIN_CHARACTERS, KB_SEARCH_URL, reshapeKbResult } from '../lib/search'
+import { sendKbTelemetryEvent } from '../lib/telemetry'
 
 interface KbSearchDialogProps {
   isOpen: boolean
@@ -20,20 +18,6 @@ interface KbSearchDialogProps {
 }
 
 const OPEN_SEARCH_EVENT = 'kb-search:open'
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
-
-const sendKbTelemetryEvent = (event: TelemetryEvent) => {
-  if (!IS_PLATFORM) return
-  const request = buildTelemetryEventRequest(API_URL, event, window.location.pathname)
-  if (!request) return
-  fetch(request.url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json', Version: '2' },
-    credentials: 'include',
-    keepalive: request.keepalive,
-    body: JSON.stringify(request.body),
-  }).catch(() => {})
-}
 
 const LABELS: Partial<SearchLabels> = {
   dialogTitle: 'Search the knowledge base',

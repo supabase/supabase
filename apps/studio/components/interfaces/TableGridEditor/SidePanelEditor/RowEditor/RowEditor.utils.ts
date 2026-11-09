@@ -100,12 +100,80 @@ const isGeneratedDefault = (defaultValue: string | null) => {
   return defaultValue.replace(/'(?:[^']|'')*'/g, "''").includes('(')
 }
 
+// Values the database produces for each new row, so they are never copied
+const isGeneratedOnInsert = (field: RowField) =>
+  field.isPrimaryKey || field.isIdentity || isGeneratedDefault(field.defaultValue)
+
 const shouldClearFieldOnReuse = (field: RowField) =>
-  field.isPrimaryKey ||
-  field.isIdentity ||
-  isGeneratedDefault(field.defaultValue) ||
+  isGeneratedOnInsert(field) ||
   // Truncated values can't be copied faithfully, so don't risk saving a corrupted copy
   isValueTruncated(field.value, field.format)
+
+/**
+ * Names of the fields whose values the grid truncated and that would otherwise be copied, so their
+ * full values need fetching. Fields the database generates are excluded.
+ */
+export const getTruncatedFieldNames = (fields: RowField[]) =>
+  fields
+    .filter(
+      (field) =>
+        !field.isGenerated &&
+        !isGeneratedOnInsert(field) &&
+        isValueTruncated(field.value, field.format)
+    )
+    .map((field) => field.name)
+
+const isSerializedBuffer = (value: unknown): value is { type: 'Buffer'; data: number[] } =>
+  typeof value === 'object' && value !== null && 'data' in value && Array.isArray(value.data)
+
+/**
+ * The primary key columns of a row, as the values to match it by. Bytea values are converted to the
+ * hex form that SQL expects.
+ */
+export const getPrimaryKeyMatch = ({
+  row,
+  table,
+}: {
+  row: Dictionary<unknown>
+  table: PGTable
+}): Record<string, unknown> | undefined => {
+  const primaryKeyNames = (table.primary_keys ?? []).map((key) => key.name)
+  if (primaryKeyNames.length === 0) return undefined
+
+  const match: Record<string, unknown> = {}
+  for (const name of primaryKeyNames) {
+    const value = row[name]
+    if (value === undefined || value === null) return undefined
+    const column = table.columns?.find((x) => x.name === name)
+    match[name] =
+      column?.format === 'bytea' && isSerializedBuffer(value) ? convertByteaToHex(value) : value
+  }
+  return match
+}
+
+/**
+ * Fills in fetched full values. A `null` value means the database withheld it (too large) or it
+ * changed since the grid loaded, so that field is left as is and reported in `unavailable`.
+ */
+export const mergeLargeValues = ({
+  fields,
+  values,
+}: {
+  fields: RowField[]
+  values: Dictionary<unknown>
+}): { fields: RowField[]; unavailable: string[] } => {
+  const unavailable: string[] = []
+  const merged = fields.map((field) => {
+    if (!(field.name in values)) return field
+    const value = values[field.name]
+    if (value === null || value === undefined) {
+      unavailable.push(field.name)
+      return field
+    }
+    return { ...field, value: parseValue(value, field.format) }
+  })
+  return { fields: merged, unavailable }
+}
 
 /**
  * Prepares fields to seed a new row from existing values (duplicating a row, or keeping values
@@ -345,6 +413,8 @@ const isTruncatedMultiDimArray = (value: string) => {
   }
 }
 
+const getByteLength = (value: string) => new TextEncoder().encode(value).length
+
 /**
  * Checks if the value is truncated. The JSON types are usually truncated if they're too big to show in the editor.
  */
@@ -352,7 +422,10 @@ export const isValueTruncated = (value: string | null | undefined, format?: stri
   const isArrayColumn = typeof format === 'string' && format.startsWith('_')
 
   return (
-    (typeof value === 'string' && value.endsWith('...') && value.length > MAX_CHARACTERS) ||
+    // The query truncates when the value exceeds MAX_CHARACTERS bytes but cuts by characters, so a value of
+    // multibyte characters can end up shorter than MAX_CHARACTERS characters. Measuring bytes still tells
+    // truncated values from genuine ones: an untruncated value is at most MAX_CHARACTERS bytes.
+    (typeof value === 'string' && value.endsWith('...') && getByteLength(value) > MAX_CHARACTERS) ||
     // if the value is an array which total representation is > MAX_CHARACTERS
     // we'll select the first MAX_ARRAY_SIZE elements and add a "..." last element at the end of it
     (typeof value === 'string' &&

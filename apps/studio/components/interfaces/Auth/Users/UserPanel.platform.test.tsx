@@ -110,9 +110,25 @@ const renderPanel = (
   }
 }
 
+function setIsHoverDevice(isHoverDevice: boolean) {
+  window.matchMedia = ((query: string) => ({
+    matches: isHoverDevice && query.includes('hover: hover'),
+    media: query,
+    onchange: null,
+    addListener: () => {},
+    removeListener: () => {},
+    addEventListener: () => {},
+    removeEventListener: () => {},
+    dispatchEvent: () => false,
+  })) as unknown as typeof window.matchMedia
+}
+
 describe('UserPanel', () => {
   beforeEach(() => routerMock.setCurrentUrl('/project/default/auth/users'))
-  afterEach(() => localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS))
+  afterEach(() => {
+    localStorage.removeItem(LOCAL_STORAGE_KEYS.UI_PREVIEW_UNIFIED_LOGS)
+    setIsHoverDevice(false)
+  })
 
   it('shows the legacy Logs tab when logs are enabled', async () => {
     const { queryClient } = renderPanel()
@@ -127,6 +143,19 @@ describe('UserPanel', () => {
     expect(await screen.findByRole('tab', { name: 'Overview' })).toBeInTheDocument()
     expect(screen.queryByRole('tab', { name: 'Logs' })).not.toBeInTheDocument()
     expect(screen.getByRole('tab', { name: 'Raw JSON' })).toBeInTheDocument()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  it('keeps the overview copy menu on hover devices', async () => {
+    const user = userEvent.setup()
+    const copy = vi.spyOn(navigator.clipboard, 'writeText')
+    setIsHoverDevice(true)
+    const { queryClient } = renderPanel()
+    const emailField = await screen.findByRole('button', { name: 'Email user@example.com' })
+    emailField.focus()
+    await user.keyboard('{Enter}')
+    await user.click(await screen.findByRole('menuitem', { name: 'Copy Email' }))
+    expect(copy).toHaveBeenLastCalledWith(mockUser.email)
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 

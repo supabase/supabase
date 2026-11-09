@@ -29,6 +29,8 @@ export async function deleteDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queues-delete',
     sql: safeSql`select * from pgmq.drop_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.delete(queueName),
     grant: unguarded.migrating,

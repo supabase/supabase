@@ -69,6 +69,7 @@ The skills in `.agents/skills/` are the source of truth for conventions. Load th
 - `dev-toolbar-review` — `packages/dev-tools`, `packages/common/posthog-client.ts`, `packages/common/feature-flags.tsx`
 - `safe-sql-execution` — any code that builds or executes SQL against user databases
 - `react-hook-form` — writing or modifying any form code, anywhere in the monorepo
+- `turbo-scripts` — `package.json` scripts or `turbo.jsonc` in any app or package (pre/post hooks, script chains, `maybe-turbo`, task inputs, env, caching)
 - `vitest` / `vercel-composition-patterns` — generic unit-testing and React composition references
 
 ## Studio
