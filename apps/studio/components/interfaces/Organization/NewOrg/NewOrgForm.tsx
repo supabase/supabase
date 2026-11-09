@@ -29,7 +29,12 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
-import { organizationDetailsSchema, type OrgKind, type OrgSize } from './OrganizationDetailsFields'
+import {
+  OrganizationDetailsFields,
+  organizationDetailsSchema,
+  type OrgKind,
+  type OrgSize,
+} from './OrganizationDetailsFields'
 import { UpgradeExistingOrganizationCallout } from './UpgradeExistingOrganizationCallout'
 import { ChargeBreakdown } from '@/components/interfaces/Billing/ChargeBreakdown'
 import { getStripeElementsAppearanceOptions } from '@/components/interfaces/Billing/Payment/Payment.utils'
@@ -42,7 +47,6 @@ import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_OPTIONS,
   ORG_KIND_DEFAULT,
-  ORG_KIND_TYPES,
   ORG_SIZE_DEFAULT,
   ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_OPTIONS,
@@ -501,41 +505,17 @@ export const NewOrgForm = ({
     <FormField
       control={form.control}
       name="kind"
-      render={({ field }) =>
-        showOnboardingSurveyInOrgForm ? (
-          <FormItemLayout label="Who is this org for?" layout="horizontal">
-            <FormControl>
-              <OnboardingSurveySelect
-                value={field.value}
-                onValueChange={field.onChange}
-                options={SURVEY_ORG_KIND_OPTIONS}
-              />
-            </FormControl>
-          </FormItemLayout>
-        ) : (
-          <FormItemLayout
-            label="Type"
-            layout="horizontal"
-            description="What best describes your organization?"
-          >
-            <FormControl>
-              <Select value={field.value} onValueChange={field.onChange}>
-                <SelectTrigger className="w-full">
-                  <SelectValue />
-                </SelectTrigger>
-
-                <SelectContent>
-                  {Object.entries(ORG_KIND_TYPES).map(([k, v]) => (
-                    <SelectItem key={k} value={k}>
-                      {v}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </FormControl>
-          </FormItemLayout>
-        )
-      }
+      render={({ field }) => (
+        <FormItemLayout label="Who is this org for?" layout="horizontal">
+          <FormControl>
+            <OnboardingSurveySelect
+              value={field.value}
+              onValueChange={field.onChange}
+              options={SURVEY_ORG_KIND_OPTIONS}
+            />
+          </FormControl>
+        </FormItemLayout>
+      )}
     />
   )
 
@@ -636,32 +616,42 @@ export const NewOrgForm = ({
           footerClasses="rounded-b-md"
         >
           <div className="divide-y divide-border-muted">
-            <Panel.Content>
-              <FormField
+            {showOnboardingSurveyInOrgForm ? (
+              <Panel.Content>
+                <FormField
+                  control={form.control}
+                  name="name"
+                  render={({ field }) => (
+                    <FormItemLayout
+                      label="Name"
+                      layout="horizontal"
+                      description="What's the name of your company or team? You can change this later."
+                    >
+                      <FormControl>
+                        <Input
+                          autoFocus
+                          type="text"
+                          placeholder="Organization name"
+                          data-1p-ignore
+                          data-lpignore="true"
+                          data-form-type="other"
+                          data-bwignore
+                          {...field}
+                        />
+                      </FormControl>
+                    </FormItemLayout>
+                  )}
+                />
+              </Panel.Content>
+            ) : (
+              <OrganizationDetailsFields
                 control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItemLayout
-                    label="Name"
-                    layout="horizontal"
-                    description="What's the name of your company or team? You can change this later."
-                  >
-                    <FormControl>
-                      <Input
-                        autoFocus
-                        type="text"
-                        placeholder="Organization name"
-                        data-1p-ignore
-                        data-lpignore="true"
-                        data-form-type="other"
-                        data-bwignore
-                        {...field}
-                      />
-                    </FormControl>
-                  </FormItemLayout>
+                kind={selectedOrgKind}
+                renderFieldWrapper={(children, field) => (
+                  <Panel.Content key={field}>{children}</Panel.Content>
                 )}
               />
-            </Panel.Content>
+            )}
 
             {isBillingEnabled && (
               <Panel.Content>
@@ -794,7 +784,7 @@ export const NewOrgForm = ({
               <UpgradeExistingOrganizationCallout />
             )}
 
-            {showOnboardingSurveyInOrgForm ? (
+            {showOnboardingSurveyInOrgForm && (
               <Panel.Content>
                 <CollapsibleCardSection
                   title="Help improve Supabase"
@@ -804,11 +794,6 @@ export const NewOrgForm = ({
                   {onboardingSurveyFields}
                 </CollapsibleCardSection>
               </Panel.Content>
-            ) : (
-              <>
-                <Panel.Content>{orgKindField}</Panel.Content>
-                {orgSizeField && <Panel.Content>{orgSizeField}</Panel.Content>}
-              </>
             )}
           </div>
         </Panel>
