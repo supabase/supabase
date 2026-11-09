@@ -9,9 +9,11 @@ Authentication is the part of an app that decides who a user is before any data 
 
 ## Supabase Auth
 
-[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). For B2B apps, it also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso), and you can turn your project into an [OAuth 2.1 and OpenID Connect identity provider](/docs/guides/auth/oauth-server) to authenticate third-party apps and AI agents. You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks), and your users stay in your own Postgres database.
+[Supabase Auth](/docs/guides/auth) is the built-in authentication service for Supabase projects. It supports email and password sign-in, [magic links](/docs/guides/auth/auth-email-passwordless), [phone sign-in](/docs/guides/auth/phone-login), [social sign-in](/docs/guides/auth/social-sign-in), [anonymous sign-ins](/docs/guides/auth/auth-anonymous), and [MFA](/docs/guides/auth/auth-mfa). For B2B apps, it also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso), and you can turn your project into an [OAuth 2.1 and OpenID Connect identity provider](/docs/guides/auth/oauth-server) to authenticate third-party apps and AI agents. You can customize sign-in flows with [Auth Hooks](/docs/guides/auth/auth-hooks).
 
 Supabase Auth issues JSON Web Tokens (JWTs) that work directly with the [Data API](/docs/guides/api), [Storage](/docs/guides/storage), [Realtime](/docs/guides/realtime), and [Edge Functions](/docs/guides/functions). You can write [Row Level Security](/docs/guides/database/postgres/row-level-security) policies against the signed-in user without an extra integration step.
+
+Supabase also offers [pre-built sign-in components](/library?category=Authentication) for Next.js, React Router, TanStack Start, Vue, and more.
 
 Choose Supabase Auth if you are starting a new project, if your project already uses Supabase, or if you want your users and your app data in the same Postgres database.
 
@@ -41,7 +43,7 @@ If you want to use Firebase Auth with the rest of the Supabase Platform, see the
 
 ## WorkOS
 
-WorkOS helps B2B apps meet enterprise requirements. It provides single sign-on (SSO) and directory sync, so your customers' IT teams can connect their own identity provider, and its AuthKit product handles user authentication.
+WorkOS helps B2B provides single sign-on (SSO) and directory sync, so your customers' IT teams can connect their own identity provider, and its AuthKit product handles user authentication.
 
 Choose WorkOS if enterprise customers require SSO and directory sync before they will buy.
 
