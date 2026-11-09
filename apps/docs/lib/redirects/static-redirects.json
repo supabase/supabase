@@ -1145,6 +1145,11 @@
     "permanent": true
   },
   {
+    "source": "/docs/guides/database/triggers",
+    "destination": "/docs/guides/database/postgres/triggers",
+    "permanent": true
+  },
+  {
     "source": "/docs/guides/database/troubleshooting",
     "destination": "/kb/topics/troubleshooting?troubleshooting=database",
     "permanent": true
