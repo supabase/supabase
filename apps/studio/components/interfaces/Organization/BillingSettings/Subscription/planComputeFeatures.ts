@@ -24,12 +24,10 @@ const formatRuntime = (limits: ComputeLimits) =>
     ? 'Unmetered during the private alpha'
     : `${limits.runtimeMinutes.toLocaleString()} minutes of Compute runtime`
 
-const formatConcurrency = (limits: ComputeLimits) => {
-  if (limits.concurrentWorkers === null) return 'Concurrent workers to be confirmed'
-  return limits.concurrentWorkers === 1
+const formatConcurrency = (limits: ComputeLimits) =>
+  limits.concurrentWorkers === 1
     ? '1 concurrent worker'
-    : `${limits.concurrentWorkers.toLocaleString()} concurrent workers`
-}
+    : `${limits.concurrentWorkers?.toLocaleString()} concurrent workers`
 
 const formatSizes = (limits: ComputeLimits) => limits.sizes.map(formatSize).join(', ')
 
@@ -58,7 +56,12 @@ const computeFeaturesForPlan = (planId: OrgPlan['id']): (string | string[])[] =>
 
   return [
     [runtime, ALPHA_NOTE],
-    [formatConcurrency(limits), `${formatSizes(limits)} · ${formatBurst(limits)}`],
+    // A plan with no concurrency limit has nothing to say here, so it says nothing rather
+    // than advertising that the number is undecided.
+    ...(limits.concurrentWorkers === null
+      ? []
+      : [[formatConcurrency(limits), 'Running at once across the organization']]),
+    [formatSizes(limits), formatBurst(limits)],
     formatInvocation(limits),
   ]
 }

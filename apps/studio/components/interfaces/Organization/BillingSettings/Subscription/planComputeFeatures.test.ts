@@ -19,9 +19,10 @@ describe('computeFeaturesFor', () => {
     expect(flatten(computeFeaturesFor('free'))).not.toContain('then pay as you go')
   })
 
-  it('names the concurrency limit on Free and leaves it open on paid', () => {
+  it('names the concurrency limit on Free and stays silent where there is none', () => {
     expect(flatten(computeFeaturesFor('free'))).toContain('1 concurrent worker')
-    expect(flatten(computeFeaturesFor('pro'))).toContain('Concurrent workers to be confirmed')
+    // Paid concurrency is undecided; saying so in a pricing card tells the reader nothing.
+    expect(flatten(computeFeaturesFor('pro'))).not.toMatch(/concurrent worker/i)
   })
 
   it('restricts Free to the base size and bursts paid plans', () => {
