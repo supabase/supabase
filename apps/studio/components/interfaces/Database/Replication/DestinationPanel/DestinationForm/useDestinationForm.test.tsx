@@ -45,7 +45,7 @@ const renderDestinationForm = async () => {
   const view = customRenderHook(
     () => ({
       ...useDestinationForm({ selectedType: 'BigQuery' }),
-      requestStatus: usePipelineRequestStatus().getRequestStatus(8),
+      requestStatus: usePipelineRequestStatus().getRequestStatus('8'),
     }),
     {
       wrapper: ({ children }) => (
@@ -68,7 +68,7 @@ describe('useDestinationForm', () => {
       path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
       response: ({ params }) =>
         HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
-          pipeline_id: Number(params.pipeline_id),
+          pipeline_id: params.pipeline_id!.toString(),
           status: { name: 'stopped' },
         }),
     })
@@ -139,7 +139,7 @@ describe('useDestinationForm', () => {
       response: () => {
         createRequests()
         return HttpResponse.json<components['schemas']['CreateDestinationPipelineResponse_Output']>(
-          { pipeline_id: 8, destination_id: 7 }
+          { pipeline_id: '8', destination_id: 7 }
         )
       },
     })
@@ -346,7 +346,7 @@ describe('useDestinationForm', () => {
           data: formData,
           existingDestination: {
             destinationId: 7,
-            pipelineId: 8,
+            pipelineId: '8',
             enabled,
             statusName: enabled ? 'started' : 'stopped',
           },
@@ -377,7 +377,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },
@@ -407,7 +407,7 @@ describe('useDestinationForm', () => {
         data: formData,
         existingDestination: {
           destinationId: 7,
-          pipelineId: 8,
+          pipelineId: '8',
           enabled: true,
           statusName: 'started',
         },

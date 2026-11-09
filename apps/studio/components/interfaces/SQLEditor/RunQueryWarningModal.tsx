@@ -125,7 +125,8 @@ export const RunQueryWarningModal = ({
       description: (
         <>
           Clients using anon or authenticated keys may be able to access{' '}
-          {tableName ? <code>{tableName}</code> : 'these tables'}.
+          {tableName ? <code>{tableName}</code> : 'these tables'}
+          <span>.</span>
         </>
       ),
     })

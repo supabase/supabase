@@ -35,7 +35,7 @@ export const PermissionPresetSelect = ({
           selection can land in, never one you can pick. */}
       <Select value={activePreset?.id ?? ''} onValueChange={handleSelectPreset}>
         <SelectTrigger aria-label="Permission preset">
-          <span>Preset · {activePreset?.label ?? 'Custom'}</span>
+          <span>Preset · {activePreset?.label ?? <span>Custom</span>}</span>
         </SelectTrigger>
         {/* Pinned to the trigger width, or the Full access description would stretch the dropdown
             far wider than the selects above. */}

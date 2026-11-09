@@ -64,7 +64,7 @@ export function McpConfigPanel({
   const [readonly, setReadonly] = useState(false)
   const supportedFeatures = isPlatform ? FEATURE_GROUPS_PLATFORM : FEATURE_GROUPS_NON_PLATFORM
   const [selectedFeatures, setSelectedFeatures] = useState<string[]>(() =>
-    supportedFeatures.filter((group) => group.id !== 'storage').map((group) => group.id)
+    supportedFeatures.filter((group) => !group.defaultDisabled).map((group) => group.id)
   )
   const [selectedClient, setSelectedClient] = useState(initialSelectedClient ?? MCP_CLIENTS[0])
   const [skipElicitations, setSkipElicitations] = useState<McpSkipElicitation[]>([])
@@ -85,6 +85,9 @@ export function McpConfigPanel({
       if (selectedFeaturesSupported.includes('branching')) {
         eligibleSkipElicitations.push('create_branch')
       }
+    }
+    if (selectedFeaturesSupported.includes('notebooks')) {
+      eligibleSkipElicitations.push('run_notebook', 'delete_notebook')
     }
   }
   const validSkipElicitations = skipElicitations.filter((tool) =>

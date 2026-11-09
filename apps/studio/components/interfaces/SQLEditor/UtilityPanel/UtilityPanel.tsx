@@ -137,7 +137,7 @@ export const UtilityPanel = ({
               <TooltipTrigger>
                 <p className="text-xs">
                   <span className="text-foreground">
-                    {result.rows.length} row{result.rows.length === 1 ? '' : 's'}
+                    {result.rows.length} row{result.rows.length === 1 ? '' : <span>s</span>}
                   </span>
                   <span className="text-foreground-lighter ml-1">
                     {result.autoLimit !== undefined && `(Limited to only ${result.autoLimit} rows)`}

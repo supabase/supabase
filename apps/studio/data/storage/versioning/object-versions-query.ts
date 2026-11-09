@@ -4,7 +4,7 @@ import { components } from 'api-types'
 import { storageKeys } from '../keys'
 import { handleError, post } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 type StorageObject = components['schemas']['StorageObject_Output']
 
@@ -39,7 +39,7 @@ export type ObjectVersionsVariables = {
   lifecyclePolicy?: LifecyclePolicy
 }
 
-export type ObjectVersionsError = ResponseError
+export type ObjectVersionsError = StudioError
 
 // The ceiling the list endpoint accepts.
 const MAX_VERSIONS = 1000

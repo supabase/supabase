@@ -1,10 +1,6 @@
-import { SupportCategories } from '@supabase/shared-types/out/constants'
-import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLinkIcon } from 'lucide-react'
 import {
   Card,
   CardContent,
-  Separator,
   Table,
   TableBody,
   TableCell,
@@ -13,11 +9,9 @@ import {
   TableRow,
 } from 'ui'
 
-import { SupportLink } from '../Support/SupportLink'
 import { ApiKeyPill } from './ApiKeyPill'
 import { CreateNewAPIKeysButton } from './CreateNewAPIKeysButton'
 import { FeatureBanner } from '@/components/ui/FeatureBanner'
-import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { APIKeysData } from '@/data/api-keys/api-keys-query'
 
 // Mock API Keys for demo
@@ -118,47 +112,6 @@ export const ApiKeysCreateCallout = () => {
         <div className="mt-4">
           <CreateNewAPIKeysButton />
         </div>
-      </div>
-    </FeatureBanner>
-  )
-}
-
-export const ApiKeysFeedbackBanner = () => {
-  return (
-    <FeatureBanner
-      storageKey={LOCAL_STORAGE_KEYS.API_KEYS_FEEDBACK_DISMISSED}
-      className="p-0! flex flex-col gap-0"
-      dismissable
-    >
-      <div className="p-5">
-        <p className="text-sm text-foreground">Your new API keys are here</p>
-        <p className="text-sm text-foreground-lighter">
-          We've updated our API keys to better support your application needs.{' '}
-          <InlineLink
-            href="https://github.com/orgs/supabase/discussions/29260"
-            className="inline-flex items-center gap-1"
-          >
-            Join the discussion on GitHub{' '}
-            <ExternalLinkIcon aria-hidden size={14} strokeWidth={1.5} />
-          </InlineLink>
-        </p>
-      </div>
-
-      <Separator className="w-full" />
-
-      <div className="px-5 py-2 bg-surface-200/30">
-        <p className="text-sm text-foreground-lighter">
-          Having trouble with the new API keys?{' '}
-          <SupportLink
-            className={InlineLinkClassName}
-            queryParams={{
-              category: SupportCategories.PROBLEM,
-              subject: 'Help with API keys',
-            }}
-          >
-            Contact support
-          </SupportLink>
-        </p>
       </div>
     </FeatureBanner>
   )

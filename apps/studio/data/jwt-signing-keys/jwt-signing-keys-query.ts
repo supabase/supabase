@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { jwtSigningKeysKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type JWTSigningKey = components['schemas']['SigningKeyResponse_Output']
 
@@ -33,9 +34,9 @@ export type JWTSigningKeysData = Awaited<ReturnType<typeof getJWTSigningKeys>>
 
 export const useJWTSigningKeysQuery = <TData = JWTSigningKeysData>(
   { projectRef }: JWTSigningKeysVariables,
-  { enabled, ...options }: UseCustomQueryOptions<JWTSigningKeysData, ResponseError, TData> = {}
+  { enabled, ...options }: UseCustomQueryOptions<JWTSigningKeysData, StudioError, TData> = {}
 ) =>
-  useQuery<JWTSigningKeysData, ResponseError, TData>({
+  useQuery<JWTSigningKeysData, StudioError, TData>({
     queryKey: jwtSigningKeysKeys.list(projectRef),
     queryFn: ({ signal }) => getJWTSigningKeys({ projectRef }, signal),
     enabled: enabled && !!projectRef,

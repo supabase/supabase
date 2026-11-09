@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { databaseCronJobsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseCronJobToggleVariables = {
   projectRef: string
@@ -39,16 +40,12 @@ export const useDatabaseCronJobToggleMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseCronJobToggleData,
-    ResponseError,
-    DatabaseCronJobToggleVariables
-  >,
+  UseCustomMutationOptions<DatabaseCronJobToggleData, StudioError, DatabaseCronJobToggleVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseCronJobToggleData, ResponseError, DatabaseCronJobToggleVariables>({
+  return useMutation<DatabaseCronJobToggleData, StudioError, DatabaseCronJobToggleVariables>({
     mutationFn: (vars) => toggleDatabaseCronJob(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, searchTerm } = variables

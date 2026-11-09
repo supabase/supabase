@@ -11,7 +11,8 @@ import { unguarded } from '@/data/fetchers'
 import { foreignTableKeys } from '@/data/foreign-tables/keys'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { vaultSecretsKeys } from '@/data/vault/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type FDWUpdateVariables = {
   projectRef?: string
@@ -51,12 +52,12 @@ export const useFDWUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<FDWUpdateData, ResponseError, FDWUpdateVariables>,
+  UseCustomMutationOptions<FDWUpdateData, StudioError, FDWUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<FDWUpdateData, ResponseError, FDWUpdateVariables>({
+  return useMutation<FDWUpdateData, StudioError, FDWUpdateVariables>({
     mutationFn: (vars) => updateFDW(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, skipInvalidation = false } = variables

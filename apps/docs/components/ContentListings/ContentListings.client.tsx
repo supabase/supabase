@@ -137,7 +137,11 @@ function ContentListingProgression({ group }: { group: ContentListingGroup }) {
 function ContentListingGroupHeading({ group }: { group: ContentListingGroup }) {
   if (!group.heading) return null
 
-  return <Heading tag={group.headingLevel ?? 'h2'}>{group.heading}</Heading>
+  return (
+    <Heading tag={group.headingLevel ?? 'h2'} customAnchor={group.headingAnchor}>
+      {group.heading}
+    </Heading>
+  )
 }
 
 function ContentListingsGroup({ group }: { group: ContentListingGroup }) {

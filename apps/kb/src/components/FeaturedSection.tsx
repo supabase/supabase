@@ -1,7 +1,8 @@
 import { ArrowRight } from 'lucide-react'
-import { useId, type CSSProperties } from 'react'
+import { useId } from 'react'
 import { cn } from 'ui'
-import { getNotchMask, getNotchOutline } from 'ui-patterns/Notch'
+import { getNotchStyle } from 'ui-patterns/Notch'
+import { NotchOutline } from 'ui-patterns/Notch/NotchOutline'
 
 import type { FeaturedItem } from '../lib/guides'
 import { bindRevealOnce, REVEAL_GROUP_CLASS, REVEAL_ITEM_CLASS, revealStyle } from '../lib/reveal'
@@ -19,14 +20,7 @@ interface FeaturedCoverProps {
   hasDates: boolean
 }
 
-type NotchStyle = CSSProperties & { '--notch-width': string; '--notch-mask': string }
-
 const NOTCH_WIDTH = 40
-
-const NOTCH_STYLE: NotchStyle = {
-  '--notch-width': `${NOTCH_WIDTH}px`,
-  '--notch-mask': getNotchMask(NOTCH_WIDTH),
-}
 
 export const FeaturedSection = ({ title, items, className }: FeaturedSectionProps) => {
   const headingId = useId()
@@ -70,7 +64,7 @@ export const FeaturedSection = ({ title, items, className }: FeaturedSectionProp
 const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
   <a
     href={item.href}
-    style={NOTCH_STYLE}
+    style={getNotchStyle(NOTCH_WIDTH)}
     className="group/cover relative block rounded-lg focus-ring"
   >
     <div className="drop-shadow-raised">
@@ -79,20 +73,14 @@ const FeaturedCover = ({ item, hasDates }: FeaturedCoverProps) => (
         description={item.description}
         topics={item.topics}
         date={hasDates ? (item.date ?? '') : undefined}
-        className={cn('cover-notch', hasDates ? 'h-115.5' : 'h-107.5')}
+        className={cn('notch-corner shadow-none!', hasDates ? 'h-115.5' : 'h-107.5')}
       />
     </div>
-    <svg
-      aria-hidden
-      width={NOTCH_WIDTH + 8}
-      height="40"
-      viewBox={`0 0 ${NOTCH_WIDTH + 8} 40`}
-      fill="none"
-      className="pointer-events-none absolute right-0 bottom-0 z-20 overflow-visible"
-    >
-      <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-(--background-surface-75)" />
-      <path d={getNotchOutline(NOTCH_WIDTH)} className="stroke-border" />
-    </svg>
+    <NotchOutline
+      width={NOTCH_WIDTH}
+      surfaceClassName="stroke-(--background-surface-75)"
+      className="z-20"
+    />
     <span
       aria-hidden
       className="pointer-events-none absolute right-0 bottom-0 z-20 flex h-8 w-(--notch-width) items-center justify-center overflow-hidden"

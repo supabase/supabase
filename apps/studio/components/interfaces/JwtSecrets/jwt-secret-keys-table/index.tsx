@@ -133,7 +133,13 @@ export const JWTSecretKeysTable = () => {
       },
     })
   const { mutate: deleteJWTSigningKey, isPending: isDeletingJWTSigningKey } =
-    useJWTSigningKeyDeleteMutation({ onSuccess: () => resetDialog(), onError: () => resetDialog() })
+    useJWTSigningKeyDeleteMutation({
+      onSuccess: () => resetDialog(),
+      onError: (error) => {
+        resetDialog()
+        toast.error(`Failed to delete JWT signing key: ${error.message}`)
+      },
+    })
 
   const isPendingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
   const isLoading =

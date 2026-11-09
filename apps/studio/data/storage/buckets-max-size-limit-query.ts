@@ -97,7 +97,6 @@ export const useLargestBucketSizeLimitsCheck = ({
   const { data: estimatedRows, isPending: isEstimatePending } = useQuery<number | undefined>({
     // Query is the same even if connectionString changes, and doesn't correctly
     // track projectRef
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: estimateKey,
     queryFn: () => getBucketNumberEstimate({ projectRef, connectionString }),
     enabled: !!projectRef && !!connectionString,
@@ -110,7 +109,6 @@ export const useLargestBucketSizeLimitsCheck = ({
       queryClient.fetchQuery({
         // Query is the same even if connectionString changes, and doesn't correctly
         // track projectRef
-        // eslint-disable-next-line @tanstack/query/exhaustive-deps
         queryKey: bucketLimitsKey,
         queryFn: () => getBucketsWithLargestSizeLimit({ projectRef, connectionString }),
       }),

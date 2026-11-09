@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { executeSql } from '../sql/execute-sql-mutation'
 import { viewKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ViewsVariables = {
   projectRef?: string
@@ -34,7 +35,7 @@ export async function getViews(
 }
 
 export type ViewsData = Awaited<ReturnType<typeof getViews>>
-export type ViewsError = ResponseError
+export type ViewsError = StudioError
 
 export const useViewsQuery = <TData = ViewsData>(
   { projectRef, connectionString, schemas }: ViewsVariables,

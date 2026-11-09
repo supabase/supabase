@@ -1,6 +1,6 @@
-import { useFlag } from 'common'
 import dayjs from 'dayjs'
 import { PlusIcon, RectangleEllipsisIcon } from 'lucide-react'
+import { parseAsString, useQueryState } from 'nuqs'
 import { useState } from 'react'
 import { Button, Card, CardContent, cn } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -13,7 +13,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import { AddNewFactorModal } from './AddNewFactorModal'
@@ -21,36 +21,36 @@ import { DeleteFactorModal } from './DeleteFactorModal'
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { UnenrollRecoveryCodesModal } from './UnenrollRecoveryCodesModal'
+import { useRecoveryCodesGate } from './useRecoveryCodesGate'
 import { AlertError } from '@/components/ui/AlertError'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useMfaListFactorsQuery } from '@/data/profile/mfa-list-factors-query'
-import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
 import { DATETIME_FORMAT } from '@/lib/constants'
 
 export const TOTPFactors = () => {
+  const [isCheckingIdentity, setIsCheckingIdentity] = useState(false)
   const [isAddNewFactorOpen, setIsAddNewFactorOpen] = useState(false)
-  const [factorToBeDeleted, setFactorToBeDeleted] = useState<string | null>(null)
+  const [resumeFactorId, setResumeFactorId] = useQueryState('removeAuthenticator', parseAsString)
+  const [selectedFactorId, setSelectedFactorId] = useState<string | null | undefined>(undefined)
+  const factorToBeDeleted = selectedFactorId === undefined ? resumeFactorId : selectedFactorId
   const { data, isPending: isLoading, isError, isSuccess, error } = useMfaListFactorsQuery()
-  const enableAuthRecoveryCodes = useFlag('enableAuthRecoveryCodes')
 
-  const totpFactors = data?.totp ?? []
+  const totpFactors = (data?.totp ?? []).filter((factor) => factor.status === 'verified')
   const canAddApp = isSuccess && totpFactors.length < 2
   const shouldShowLockoutWarning = isSuccess && totpFactors.length === 1
-  const shouldVerifyRecoveryCodes = enableAuthRecoveryCodes && totpFactors.length > 0
 
-  const {
-    data: recoveryCodesStatus,
-    error: recoveryCodesError,
-    isError: recoveryCodesIsError,
-    isPending: recoveryCodesIsPending,
-  } = useRecoveryCodesStatusQuery({
-    enabled: shouldVerifyRecoveryCodes,
-  })
-  const { data: codes, status } = recoveryCodesStatus ?? {}
+  const recoveryCodes = useRecoveryCodesGate({ enabled: totpFactors.length > 0 })
+  const { codes, status } = recoveryCodes
+  const disableDeleteFactor = !recoveryCodes.canRemoveFactor
+
+  const factorIdToDelete = totpFactors.find((factor) => factor.id === factorToBeDeleted)?.id ?? null
+  const isDeleteFactorModalVisible = factorIdToDelete !== null
 
   const handleAddNewApp = () => setIsAddNewFactorOpen(true)
 
-  // If recovery codes are enabled, we can't allow to remove an MFA until we know their status
-  const disableDeleteFactor = shouldVerifyRecoveryCodes && recoveryCodesIsPending
+  const deleteFactorTooltip = recoveryCodes.isError
+    ? 'Cannot delete authenticator: recovery code status unavailable'
+    : 'Checking recovery code status before deletion'
 
   return (
     <>
@@ -116,13 +116,20 @@ export const TOTPFactors = () => {
                           />
                         </p>
                       </div>
-                      <Button
+                      <ButtonTooltip
                         size="tiny"
-                        onClick={() => setFactorToBeDeleted(factor.id)}
-                        disabled={disableDeleteFactor}
+                        onClick={() => setSelectedFactorId(factor.id)}
+                        loading={isCheckingIdentity && factorToBeDeleted === factor.id}
+                        disabled={disableDeleteFactor || isCheckingIdentity}
+                        tooltip={{
+                          content: {
+                            side: 'top',
+                            text: disableDeleteFactor ? deleteFactorTooltip : undefined,
+                          },
+                        }}
                       >
                         Delete
-                      </Button>
+                      </ButtonTooltip>
                     </CardContent>
                   ))}
                 </div>
@@ -132,7 +139,7 @@ export const TOTPFactors = () => {
         </PageSectionContent>
       </PageSection>
 
-      {shouldVerifyRecoveryCodes && (
+      {recoveryCodes.isActive && (
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
@@ -144,8 +151,38 @@ export const TOTPFactors = () => {
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent aria-live="polite">
-            {recoveryCodesIsError && (
-              <AlertError subject="Failed to load recovery codes" error={recoveryCodesError} />
+            {recoveryCodes.isPending && (
+              <Card>
+                <CardContent role="status" className="flex items-center gap-4">
+                  <span className="sr-only">Checking recovery codes</span>
+                  <ShimmeringLoader className="size-9 shrink-0 rounded-full py-0" />
+                  <div className="flex flex-1 flex-col gap-2 py-1">
+                    <ShimmeringLoader className="h-3 w-48 py-0" />
+                    <ShimmeringLoader className="h-3 w-40 py-0" />
+                  </div>
+                  <ShimmeringLoader className="h-7 w-24 py-0" />
+                </CardContent>
+              </Card>
+            )}
+            {!recoveryCodes.isPending && recoveryCodes.isFetching && (
+              <p role="status" className="text-sm text-foreground-light">
+                Checking recovery codes…
+              </p>
+            )}
+            {recoveryCodes.isError && (
+              <AlertError
+                subject="Failed to load recovery codes"
+                error={recoveryCodes.error}
+                showInstructions={false}
+                additionalActions={
+                  <Button
+                    loading={recoveryCodes.isFetching}
+                    onClick={() => void recoveryCodes.refetch()}
+                  >
+                    Retry
+                  </Button>
+                }
+              />
             )}
             {status === 'unenrolled' && <GenerateRecoveryCodesModal />}
             {status === 'available' && codes && (
@@ -180,11 +217,13 @@ export const TOTPFactors = () => {
       />
 
       <DeleteFactorModal
-        visible={factorToBeDeleted !== null}
-        factorId={factorToBeDeleted}
-        lastFactorToBeDeleted={totpFactors.length === 1}
-        onClose={() => setFactorToBeDeleted(null)}
-        hasRecoveryCodes={status === 'available'}
+        onCheckingIdentity={setIsCheckingIdentity}
+        visible={isDeleteFactorModalVisible}
+        factorId={factorIdToDelete}
+        onClose={() => {
+          setSelectedFactorId(null)
+          void setResumeFactorId(null)
+        }}
       />
     </>
   )

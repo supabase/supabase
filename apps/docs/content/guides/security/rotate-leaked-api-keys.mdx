@@ -1,0 +1,126 @@
+---
+id: 'rotate-leaked-api-keys'
+title: 'Rotate a leaked or compromised API key'
+description: 'Stop a leaked API key from granting access to your project without breaking the components that use it.'
+---
+
+Replace a leaked secret key or `service_role` key with a new secret key, then retire the compromised key so it stops granting access to your project. To learn what each key type can access, see [API keys](/docs/guides/getting-started/api-keys).
+
+## Prerequisites
+
+Fix the root cause of the leak before you rotate anything. Otherwise the new key can leak the same way. The [OWASP Risk Rating Methodology](https://owasp.org/www-community/OWASP_Risk_Rating_Methodology) helps you judge the severity of the incident and plan your next steps. If someone is actively using the leaked key, retire it right away with the steps in [Retire the compromised key](#retire-the-compromised-key), even though components that still use it stop working until you replace it.
+
+To follow the Management API path, you also need:
+
+- A [personal access token](/dashboard/account/tokens). If you use a [scoped personal access token](/docs/guides/platform/personal-access-tokens), it needs the **API Keys** permission with **Read-write** access. An OAuth application needs the `secrets:read` and `secrets:write` scopes.
+- [`jq`](https://jqlang.org/), to filter the responses.
+
+If you use the Management API, set your project reference and access token in your terminal:
+
+```bash
+export PROJECT_REF="your-project-ref"
+export SUPABASE_ACCESS_TOKEN="your-personal-access-token"
+```
+
+## Create a new secret key
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="rotation-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+Create a new secret key in the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+Create the key. Run this in a local terminal rather than in CI, because the command prints the key value:
+
+```bash
+curl --fail-with-body -X POST "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys?reveal=true" \
+  -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+  -H "Content-Type: application/json" \
+  -d '{"type": "secret", "name": "rotated_secret_key"}' \
+  | jq -er '.api_key'
+```
+
+</TabPanel>
+</Tabs>
+
+## Replace the compromised key
+
+To move your application to the new key:
+
+1. Replace the compromised key with the new secret key everywhere your application uses it. If an Edge Function checks the key with `withSupabase({ auth: 'secret' })`, it accepts only the secret key named `default`. Update it to accept the new key by name, for example `auth: 'secret:rotated_secret_key'`. For details, see [Service-to-service calls](/docs/guides/functions/auth#service-to-service-calls). If a Database Webhook or `pg_net` call sends the legacy `service_role` key on the `Authorization: Bearer` header, send the new secret key on the `apikey` header instead. For details, see [Database Webhooks and `pg_net`](/docs/guides/getting-started/migrating-to-new-api-keys#database-webhooks-and-pgnet).
+2. If the compromised key is a legacy `service_role` key, also replace the legacy `anon` key with a [publishable key](/docs/guides/getting-started/migrating-to-new-api-keys) in your browser and mobile clients. Retiring the compromised key deactivates both legacy keys.
+3. Confirm that every component now uses the new key.
+
+## Retire the compromised key
+
+Unless someone is actively using the leaked key, wait until every component uses the new key before you start. Deleting a secret key can't be undone. If you find a client you missed after you deactivate the legacy keys, move it to a new key rather than re-enabling them, because re-enabling restores the compromised key.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="dashboard"
+  queryGroup="rotation-method"
+>
+<TabPanel id="dashboard" label="Dashboard">
+
+In the [**Settings > API Keys**](/dashboard/project/_/settings/api-keys/) section of the Dashboard, do one of the following:
+
+- For a secret key, delete it.
+- For a legacy `anon` or `service_role` key, deactivate the legacy keys.
+
+</TabPanel>
+<TabPanel id="management-api" label="Management API">
+
+For a secret key:
+
+1. Find the ID of the compromised key:
+
+   ```bash
+   curl "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN" \
+     | jq '.[] | {id, name, type}'
+   ```
+
+   Copy the `id` of the compromised key.
+
+2. Delete the key:
+
+   ```bash
+   export KEY_ID="id-of-the-compromised-key"
+   curl --fail -X DELETE "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys/$KEY_ID" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+3. List the keys again, and confirm the compromised key is gone.
+
+For a legacy `anon` or `service_role` key:
+
+1. Deactivate the legacy keys:
+
+   ```bash
+   curl --fail -X PUT "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys/legacy?enabled=false" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+2. Confirm that the response shows `"enabled": false`:
+
+   ```bash
+   curl --fail "https://api.supabase.com/v1/projects/$PROJECT_REF/api-keys/legacy" \
+     -H "Authorization: Bearer $SUPABASE_ACCESS_TOKEN"
+   ```
+
+</TabPanel>
+</Tabs>
+
+If the compromised key is a legacy `service_role` key, also revoke the legacy JWT secret. The legacy keys are JWTs signed by that secret, so anything that still trusts the secret can accept the leaked key. To move to JWT signing keys and revoke the legacy secret, see [Getting started](/docs/guides/auth/signing-keys#getting-started) in the JWT signing keys guide.
+
+The compromised key no longer grants access to your project.

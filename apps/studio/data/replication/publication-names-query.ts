@@ -3,7 +3,8 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationPublicationNamesParams = { projectRef?: string; sourceId?: number }
 
@@ -33,7 +34,7 @@ export type ReplicationPublicationNamesData = Awaited<
 >
 
 type ReplicationPublicationNamesQueryOptions<TData> = Omit<
-  UseCustomQueryOptions<ReplicationPublicationNamesData, ResponseError, TData>,
+  UseCustomQueryOptions<ReplicationPublicationNamesData, StudioError, TData>,
   'enabled'
 > & { enabled?: boolean }
 
@@ -41,7 +42,7 @@ export const replicationPublicationNamesQueryOptions = <TData = ReplicationPubli
   { projectRef, sourceId }: ReplicationPublicationNamesParams,
   { enabled = true, ...options }: ReplicationPublicationNamesQueryOptions<TData> = {}
 ) =>
-  queryOptions<ReplicationPublicationNamesData, ResponseError, TData>({
+  queryOptions<ReplicationPublicationNamesData, StudioError, TData>({
     queryKey: replicationKeys.publicationNames(projectRef, sourceId),
     queryFn: ({ signal }) => fetchReplicationPublicationNames({ projectRef, sourceId }, signal),
     enabled: enabled && typeof projectRef !== 'undefined' && typeof sourceId !== 'undefined',

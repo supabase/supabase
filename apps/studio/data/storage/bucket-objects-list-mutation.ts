@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ListBucketObjectsParams = {
   projectRef: string
@@ -80,10 +81,10 @@ export const useGetSignBucketObjectMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>,
+  UseCustomMutationOptions<ListBucketObjectsData, StudioError, ListBucketObjectsParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>({
+  return useMutation<ListBucketObjectsData, StudioError, ListBucketObjectsParams>({
     mutationFn: (vars) => listBucketObjects(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)
