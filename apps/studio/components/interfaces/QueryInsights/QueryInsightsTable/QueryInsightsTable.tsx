@@ -185,6 +185,8 @@ export const QueryInsightsTable = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          // The query text comes from pg_stat_statements, so the user wrote it
+          sqlOrigin: 'user',
           grant: unguarded.migrating,
         },
         {

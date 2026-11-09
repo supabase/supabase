@@ -95,6 +95,8 @@ export async function getTableIndexAdvisorSuggestions({
   const { result } = await executeSql<Array<GetTableIndexAdvisorSuggestionsResponse>>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-index-advisor',
     sql,
     grant: unguarded.migrating,
   })

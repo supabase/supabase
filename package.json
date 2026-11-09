@@ -72,7 +72,7 @@
     "supports-color": "^8.0.0",
     "tailwindcss": "catalog:",
     "tsx": "catalog:",
-    "turbo": "2.9.14",
+    "turbo": "2.11.10",
     "@typescript/native": "catalog:",
     "typescript": "catalog:",
     "zod": "catalog:"
