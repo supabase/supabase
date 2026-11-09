@@ -37,8 +37,17 @@ const indexPage = () => `<!doctype html>
   .trigger { font-size: 12px; color: ${theme.foregroundLighter}; margin: 0; line-height: 18px; }
   .id { font-family: ui-monospace, monospace; font-size: 11px; color: ${theme.foregroundLighter}; }
   iframe { width: 100%; height: 820px; border: 1px solid ${theme.border}; border-radius: 8px;
-           background: ${theme.surface}; }
+           background: ${theme.surface}; display: block; }
 </style>
+<script>
+  // Shrink each frame to its own content so short templates do not sit in a tall box.
+  addEventListener('load', () => {
+    for (const frame of document.querySelectorAll('iframe')) {
+      const body = frame.contentDocument?.body
+      if (body) frame.style.height = body.scrollHeight + 24 + 'px'
+    }
+  })
+</script>
 </head>
 <body>
 <h1>Compute transactional emails</h1>
