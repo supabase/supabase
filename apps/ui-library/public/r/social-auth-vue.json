@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "social-auth-vue",
-  "type": "registry:block",
   "title": "Social Auth flow for Vue and Supabase",
   "description": "Social Auth flow for Vue and Supabase",
   "dependencies": [
@@ -18,5 +17,6 @@
       "type": "registry:component",
       "target": "components/login-form.vue"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

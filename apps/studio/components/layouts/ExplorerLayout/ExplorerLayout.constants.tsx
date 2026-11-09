@@ -1,5 +1,5 @@
-import { motion } from 'framer-motion'
-import { MessageSquare, NotebookText } from 'lucide-react'
+import { MessageSquareIcon, NotebookTextIcon } from 'lucide-react'
+import { motion } from 'motion/react'
 import { type ComponentType, type PropsWithChildren } from 'react'
 import { cn } from 'ui'
 import { InnerSideBarFilters, InnerSideBarFilterSearchInput } from 'ui-patterns/InnerSideMenu'
@@ -18,15 +18,15 @@ export const EXPLORER_SECTIONS: Array<{
   {
     type: 'notebook',
     label: 'Notebooks',
-    icon: NotebookText,
+    icon: NotebookTextIcon,
     searchPlaceholder: 'Search notebooks',
   },
-  { type: 'chat', label: 'Chats', icon: MessageSquare, searchPlaceholder: 'Search chats' },
+  { type: 'chat', label: 'Chats', icon: MessageSquareIcon, searchPlaceholder: 'Search chats' },
 ]
 
 export const rowClassName = (isActive: boolean) =>
   cn(
-    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-3 pr-2 text-sm',
+    'group relative flex h-7 w-full items-center gap-2 rounded-md pl-2 pr-2 text-sm',
     isActive
       ? 'bg-selection text-foreground'
       : 'text-foreground-light hover:bg-surface-200 hover:text-foreground'
@@ -58,7 +58,7 @@ export const ExplorerNavResourceWrapper = ({
       transition={LEVEL_TRANSITION}
       className={cn('absolute inset-0 flex flex-col', className)}
     >
-      <div className="p-3 pb-2">
+      <div className="px-3 pt-3">
         <span id="explorer-sidebar-search-label" className="sr-only">
           {searchPlaceholder}
         </span>

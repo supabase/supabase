@@ -85,13 +85,13 @@ function EventRow({ event }: { event: DevTelemetryEvent }) {
             <span
               className={cn(
                 'w-1.5 h-1.5 rounded-[2px] shrink-0',
-                event.source === 'client' ? 'bg-brand' : 'bg-foreground-lighter'
+                event.source === 'client' ? 'bg-brand-default' : 'bg-foreground-lighter'
               )}
             />
             <span
               className={cn(
                 'font-mono text-xs uppercase',
-                event.source === 'client' ? 'text-brand' : 'text-foreground-light'
+                event.source === 'client' ? 'text-primary' : 'text-foreground-light'
               )}
             >
               {event.source}

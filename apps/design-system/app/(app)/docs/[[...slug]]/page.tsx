@@ -3,10 +3,11 @@ import { DocsPager, getBreadcrumbSegments } from '@/components/pager'
 import { SourcePanel } from '@/components/source-panel'
 import { DashboardTableOfContents } from '@/components/toc'
 import { siteConfig } from '@/config/site'
+import { getAllDocs, getDocBySlug, getDocMetaBySlug } from '@/lib/docs'
 import { getTableOfContents } from '@/lib/toc'
 import { absoluteUrl } from '@/lib/utils'
+/* eslint-disable turbo/no-undeclared-env-vars */
 
-import '@/styles/code-block-variables.css'
 import '@/styles/mdx.css'
 
 import { ChevronRight } from 'lucide-react'
@@ -16,8 +17,6 @@ import { notFound } from 'next/navigation'
 import Balancer from 'react-wrap-balancer'
 import { ScrollArea, Separator } from 'ui'
 
-import { allDocs } from '@/.velite'
-
 interface DocPageProps {
   params: Promise<{
     slug: string[]
@@ -26,13 +25,7 @@ interface DocPageProps {
 
 async function getDocFromParams({ params }: { params: { slug: string[] } }) {
   const slug = params.slug?.join('/') || ''
-  const doc = allDocs.find((doc) => doc.slugAsParams === slug)
-
-  if (!doc) {
-    return null
-  }
-
-  return doc
+  return getDocMetaBySlug(slug)
 }
 
 export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
@@ -55,7 +48,7 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
         {
           url: siteConfig.ogImage,
           width: 1200,
-          height: 630,
+          height: 600,
           alt: siteConfig.name,
         },
       ],
@@ -71,14 +64,20 @@ export async function generateMetadata(props: DocPageProps): Promise<Metadata> {
 }
 
 export async function generateStaticParams(): Promise<{ slug: string[] }[]> {
+  if (process.env.NODE_ENV === 'development') {
+    return []
+  }
+
+  const allDocs = await getAllDocs()
   return allDocs.map((doc) => ({
-    slug: doc.slugAsParams.split('/'),
+    slug: doc.slugAsParams ? doc.slugAsParams.split('/') : [],
   }))
 }
 
 export default async function DocPage(props: DocPageProps) {
   const params = await props.params
-  const doc = await getDocFromParams({ params })
+  const slug = params.slug?.join('/') || ''
+  const doc = await getDocBySlug(slug)
 
   if (!doc) {
     notFound()

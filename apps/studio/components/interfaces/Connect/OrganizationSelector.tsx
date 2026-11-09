@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useMemo, useState, type ReactNode } from 'react'
 import { cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SuccessCheck } from 'ui'
 
@@ -122,7 +122,7 @@ export const OrganizationSelector = ({
           <Collapsible open={showMore} onOpenChange={setShowMore}>
             <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>{showMore ? 'Show fewer' : `Show ${overflowOrganizations.length} more`}</span>
-              <ChevronDown className="size-3.5 transition-transform" />
+              <ChevronDownIcon className="size-3.5 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">
@@ -147,7 +147,7 @@ export const OrganizationSelector = ({
           <Collapsible>
             <CollapsibleTrigger className={CONNECT_DISCLOSURE_TRIGGER_CLASSNAME}>
               <span>Organizations that can't be linked</span>
-              <ChevronDown className="size-3.5 transition-transform" />
+              <ChevronDownIcon className="size-3.5 transition-transform" />
             </CollapsibleTrigger>
             <CollapsibleContent className="data-closed:animate-collapsible-up data-open:animate-collapsible-down overflow-hidden">
               <div className="space-y-2 pt-1">
@@ -210,11 +210,11 @@ const ConnectOrganizationButton = ({
         'pointer-events-none shadow-none transition-colors',
         !disabled && !selected && 'group-hover:border-default group-hover:bg-surface-200',
         selected &&
-          'border-brand bg-brand-200/20 dark:bg-brand-300 pr-10 group-hover:border-brand group-hover:bg-brand-200/20'
+          'border-primary-bright bg-primary-bright/10 pr-10 group-hover:border-primary-bright group-hover:bg-primary-bright/10'
       )}
     />
     {selected && (
-      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2" />
+      <SuccessCheck className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 border-primary-bright bg-primary-bright text-black dark:text-black" />
     )}
   </button>
 )

@@ -121,7 +121,7 @@ AlertDialogOverlay.displayName = AlertDialogPrimitive.Overlay.displayName
 
 const AlertDialogContentVariants = cva(
   cn(
-    'relative z-50 w-full max-w-screen border shadow-md dark:shadow-xs',
+    'relative z-50 w-full max-w-screen floating-surface-shadow-md',
     'data-open:animate-overlay-show data-closed:animate-overlay-hide',
     'sm:rounded-lg md:w-full',
     'bg-dash-sidebar'
@@ -215,7 +215,7 @@ const AlertDialogFooter = ({ className, ...props }: React.HTMLAttributes<HTMLDiv
   <div
     data-slot="alert-dialog-footer"
     className={cn(
-      'flex flex-col-reverse sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5 [[data-slot=alert-dialog-body]:has(>[role=alert])+&]:border-t-0',
+      'flex flex-col-reverse gap-y-2 sm:flex-row sm:justify-end sm:space-x-2 border-t py-3 px-5 [[data-slot=alert-dialog-body]:has(>[role=alert])+&]:border-t-0',
       className
     )}
     {...props}
@@ -373,11 +373,7 @@ const AlertDialogCancel = React.forwardRef<
   return (
     <AlertDialogPrimitive.Cancel
       ref={ref}
-      className={cn(
-        buttonVariants({ variant: 'default', size: 'tiny' }),
-        'mt-2 sm:mt-0',
-        className
-      )}
+      className={cn(buttonVariants({ variant: 'default', size: 'tiny' }), className)}
       disabled={disabled || alertDialogContext?.loading}
       {...props}
     />

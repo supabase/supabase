@@ -1,3 +1,4 @@
+import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import {
   buildClickhouseLogsSchemaSection,
   CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS,
@@ -27,7 +28,7 @@ export type AssistantContextMessage = { role: 'assistant'; content: string }
  */
 function buildLogsSnippetContext(): string {
   return [
-    "Some SQL snippets are marked with the dialect 'clickhouse', which means they query the Supabase logs backend, not the Postgres database. Any SQL you write, edit, or debug for that snippet must be ClickHouse SQL against the logs table described below — the database schema and the Postgres tools don't apply to it. To run a logs query, load `logs` knowledge then call `query_logs`; do not use `execute_sql`. Postgres SQL is still the right answer for anything else the user asks about their database, or for non-ClickHouse marked queries.",
+    "Some SQL snippets are marked with the dialect 'clickhouse', which means they query the Supabase logs backend, not the Postgres database. Any SQL you write, edit, or debug for that snippet must be ClickHouse SQL against the logs table described below — the database schema and the Postgres tools don't apply to it. Postgres SQL is still the right answer for anything else the user asks about their database, or for non-ClickHouse marked queries.",
     CLICKHOUSE_LOGS_COMPLETION_INSTRUCTIONS.trim(),
     buildClickhouseLogsSchemaSection().trim(),
   ].join('\n\n')
@@ -45,6 +46,7 @@ export function buildAssistantContextMessages({
   schemasString,
   supportMode,
   includesLogsSnippets,
+  aiOptInLevel,
   now = new Date(),
 }: {
   projectRef?: string
@@ -53,6 +55,8 @@ export function buildAssistantContextMessages({
   supportMode?: boolean
   /** Whether any user message in the conversation attached a logs (ClickHouse) query. */
   includesLogsSnippets?: boolean
+  /** The organization's current opt-in level, so the model doesn't ask for access it already has. */
+  aiOptInLevel?: AiOptInLevel
   /** Injected so tests can pin the clock. Lives here, not the system prompt, so Bedrock can cache the system prompt. */
   now?: Date
 }): AssistantContextMessage[] {
@@ -66,11 +70,18 @@ export function buildAssistantContextMessages({
     })
   }
 
+  if (aiOptInLevel) {
+    messages.push({
+      role: 'assistant',
+      content: `The organization's AI opt-in level is ${aiOptInLevel}.`,
+    })
+  }
+
   if (supportMode) {
     messages.push({
       role: 'assistant',
       content:
-        'This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise. If the user asks for a human, or if the issue cannot be safely resolved, call escalate_to_human with a short reason. Only call resolve_support_conversation after the user explicitly confirms the issue is resolved; otherwise keep helping.',
+        'This is an active support chat. Help the user while they wait for a human agent. Keep guidance practical and concise.',
     })
   }
 

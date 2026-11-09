@@ -75,7 +75,7 @@ npx expo install @legendapp/state@beta @supabase/supabase-js react-native-get-ra
 
 If you don't have a Supabase project already, head over to [database.new](https://database.new) and create a new project.
 
-Next, create a `.env.local` file in the root of your project and add the following env vars. You can find these in your [Supabase dashboard](https://supabase.com/dashboard/project/_/settings/api).
+Next, create a `.env.local` file in the root of your project and add the following env vars. You can find these in your [Supabase dashboard](https://supabase.com/dashboard/project/_/integrations/data_api/overview).
 
 ```bash
 EXPO_PUBLIC_SUPABASE_URL=
@@ -156,7 +156,7 @@ export const todos$ = observable(
 
 ## Setting up the Database Schema
 
-If you haven't alread, install the [Supabase CLI](/docs/guides/cli/getting-started) and run `supabase init` to initialize your project.
+If you haven't alread, install the [Supabase CLI](/docs/guides/local-development/cli/getting-started) and run `supabase init` to initialize your project.
 
 Next, create the initial database migration to set up the `todos` table:
 
@@ -348,7 +348,7 @@ For a tutorial on how to add user management to your Expo React Native applicati
 
 ## Conclusion
 
-Legend-State and Supabase are a powerful combination for building local-first applications. Legend-State pairs nicely with supabase-js, Supabase Auth and Supabase Realtime, allowing you to tap into the full power of the Supabase Stack while building fast and delightful applications that work across web and mobile platforms.
+Legend-State and Supabase are a powerful combination for building local-first applications. Legend-State pairs nicely with supabase-js, [Supabase Auth](/auth) and [Supabase Realtime](/realtime), allowing you to tap into the full power of the Supabase Stack while building fast and delightful applications that work across web and mobile platforms.
 
 Want to learn more about Legend-State? Refer to their [docs](https://legendapp.com/open-source/state/v3/) and make sure to follow Jay Meistrich on [Twitter](https://twitter.com/jmeistrich)!
 

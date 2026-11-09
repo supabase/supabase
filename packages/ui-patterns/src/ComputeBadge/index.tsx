@@ -29,12 +29,12 @@ export function ComputeBadge({ infraComputeSize, className, icon, ...props }: Co
           ? 'bg-surface-75 group-data-[state=open]:bg-surface-75/20 text-foreground-light border border-strong'
           : smallCompute
             ? 'bg-surface-75/50 group-data-[state=open]:bg-surface-75/75 text-foreground-light border border-strong'
-            : 'bg-brand/10 group-data-[state=open]:bg-brand/20 text-brand-600 border border-brand-500',
+            : 'bg-brand-default/10 group-data-[state=open]:bg-brand-default/20 text-brand-600 border border-brand-500',
         // Hover card interaction styles
         'group-data-[state=open]:ring-2',
         smallCompute
           ? 'group-data-[state=open]:ring-foreground-muted/20'
-          : 'group-data-[state=open]:ring-brand/20',
+          : 'group-data-[state=open]:ring-brand-default/20',
         className
       )}
       {...props}

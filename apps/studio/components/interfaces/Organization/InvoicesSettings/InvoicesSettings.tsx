@@ -1,5 +1,11 @@
 import dayjs from 'dayjs'
-import { ChevronLeft, ChevronRight, FileText, Receipt, ScrollText } from 'lucide-react'
+import {
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  FileTextIcon,
+  ReceiptIcon,
+  ScrollTextIcon,
+} from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useInView } from 'react-intersection-observer'
 import { toast } from 'sonner'
@@ -95,8 +101,9 @@ export const InvoicesSettings = () => {
       } else {
         toast.error('Invoice PDF is not available yet. Please try again later.')
       }
-    } catch (error: any) {
-      toast.error(`Failed to fetch the selected invoice: ${error.message}`)
+    } catch (error: unknown) {
+      const msg = error instanceof Error ? error.message : 'unknown error'
+      toast.error(`Failed to fetch the selected invoice: ${msg}`)
     }
   }
 
@@ -175,14 +182,16 @@ export const InvoicesSettings = () => {
           ) : (
             <>
               {invoices.map((x) => {
-                // invoice_pdf can be null. Not reflected in the generated schema yet, but will
-                // be soon
                 const hasInvoicePdf = Boolean(x.invoice_pdf)
 
                 return (
                   <TableRow key={x.id}>
                     <TableCell className="w-2">
-                      <FileText aria-hidden="true" size={16} className="text-foreground-muted" />
+                      <FileTextIcon
+                        aria-hidden="true"
+                        size={16}
+                        className="text-foreground-muted"
+                      />
                     </TableCell>
                     <TableCell>
                       <p>{dayjs(x.period_end * 1000).format('MMM DD, YYYY')}</p>
@@ -215,7 +224,7 @@ export const InvoicesSettings = () => {
                         <ButtonTooltip
                           variant="outline"
                           className="w-7"
-                          icon={<ScrollText size={16} strokeWidth={1.5} />}
+                          icon={<ScrollTextIcon size={16} strokeWidth={1.5} />}
                           aria-label="Download invoice"
                           disabled={!hasInvoicePdf}
                           onClick={() => fetchInvoice(x.id)}
@@ -233,7 +242,7 @@ export const InvoicesSettings = () => {
                           <ButtonTooltip
                             variant="outline"
                             className="w-7"
-                            icon={<Receipt size={16} strokeWidth={1.5} />}
+                            icon={<ReceiptIcon size={16} strokeWidth={1.5} />}
                             aria-label="Download receipt"
                             onClick={() => fetchReceipt(x.id)}
                             tooltip={{ content: { side: 'bottom', text: 'Download receipt' } }}
@@ -259,14 +268,14 @@ export const InvoicesSettings = () => {
           </p>
           <div className="flex items-center gap-x-2" aria-label="Pagination">
             <Button
-              icon={<ChevronLeft />}
+              icon={<ChevronLeftIcon />}
               aria-label="Previous page"
               size="tiny"
               disabled={page === 1}
               onClick={async () => setPage(page - 1)}
             />
             <Button
-              icon={<ChevronRight />}
+              icon={<ChevronRightIcon />}
               aria-label="Next page"
               size="tiny"
               disabled={page * PAGE_LIMIT >= (count ?? 0)}

@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Check, X } from 'lucide-react'
+import { CheckIcon, XIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import {
   Button,
@@ -36,7 +35,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { OAuthAppCreateResponse } from '@/data/oauth/oauth-app-create-mutation'
 import { OAuthApp, useOAuthAppsQuery } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type PublishedAppsSort = 'created:asc' | 'created:desc'
@@ -50,13 +49,11 @@ export const PublishableApps = () => {
   const [selectedAppToUpdate, setSelectedAppToUpdate] = useState<OAuthApp>()
   const [selectedAppToDelete, setSelectedAppToDelete] = useState<OAuthApp>()
 
-  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'approved_oauth_apps'
+  const { can: canReadOAuthApps, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_READ
   )
-  const { can: canCreateOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.CREATE,
-    'approved_oauth_apps'
+  const { can: canCreateOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   const {
@@ -93,7 +90,7 @@ export const PublishableApps = () => {
     <PageSection id="published-apps" className="pt-12">
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Published apps</PageSectionTitle>
+          <PageSectionTitle>Publishable apps</PageSectionTitle>
           <PageSectionDescription>
             Build integrations that extend Supabase's functionality
           </PageSectionDescription>
@@ -156,7 +153,7 @@ export const PublishableApps = () => {
             <div className="absolute top-4 right-4">
               <Button
                 variant="text"
-                icon={<X size={18} />}
+                icon={<XIcon size={18} />}
                 className="px-1"
                 onClick={() => setCreatedApp(undefined)}
                 aria-label="Cancel"
@@ -165,7 +162,7 @@ export const PublishableApps = () => {
             <div className="w-full space-y-4">
               <div className="flex flex-col gap-0">
                 <div className="flex items-center gap-2">
-                  <Check size={14} className="text-brand" strokeWidth={3} />
+                  <CheckIcon size={14} className="text-primary" strokeWidth={3} />
                   <p className="text-sm">You've created your new OAuth application.</p>
                 </div>
                 <p className="text-sm text-foreground-light">
@@ -198,14 +195,14 @@ export const PublishableApps = () => {
                   <TableHead
                     className={cn(
                       hasPublishedApps
-                        ? 'w-[62px] min-w-[62px] max-w-[62px]'
+                        ? 'w-[54px] min-w-[54px] max-w-[54px]'
                         : 'w-0 min-w-0 max-w-0 p-0',
                       !hasPublishedApps && 'text-foreground-muted'
                     )}
                   >
                     <span className="sr-only">Avatar</span>
                   </TableHead>
-                  <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>
+                  <TableHead className={cn(!hasPublishedApps ? 'text-foreground-muted' : 'pl-0')}>
                     Name
                   </TableHead>
                   <TableHead className={cn(!hasPublishedApps && 'text-foreground-muted')}>

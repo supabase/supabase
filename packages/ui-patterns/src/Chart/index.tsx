@@ -269,7 +269,7 @@ const ChartMetric = React.forwardRef<HTMLDivElement, ChartMetricProps>(
             <span
               className={cn(
                 'shrink-0 w-1.5 h-1.5 rounded-full flex',
-                status === 'positive' && 'bg-brand',
+                status === 'positive' && 'bg-brand-default',
                 status === 'negative' && 'bg-destructive',
                 status === 'warning' && 'bg-warning',
                 status === 'default' && 'bg-foreground-lighter'
@@ -448,7 +448,7 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
             {
               demo: {
                 label: 'Demo',
-                color: 'hsl(var(--brand-default))',
+                color: 'var(--primary-bright)',
               },
             } satisfies ChartConfig
           }
@@ -457,7 +457,7 @@ const ChartDisabledState = ({ icon, label, description, actions }: ChartDisabled
           <BarChart data={demoData}>
             <XAxis dataKey="period_start" hide />
             <YAxis hide />
-            <Bar dataKey="demo" fill="hsl(var(--brand-default))" />
+            <Bar dataKey="demo" fill="var(--primary-bright)" />
           </BarChart>
         </ChartContainer>
       </div>
@@ -528,7 +528,7 @@ const ChartValueDifferential = React.forwardRef<HTMLDivElement, ChartValueDiffer
         ref={ref}
         className={cn(
           variant === 'positive'
-            ? 'text-brand'
+            ? 'text-primary'
             : variant === 'negative'
               ? 'text-destructive'
               : 'text-foreground-light',
@@ -584,8 +584,8 @@ const ChartSparkline = React.forwardRef<HTMLDivElement, ChartSparklineProps>(
           <AreaChart data={data} margin={{ top: 5, left: 0, right: 0, bottom: 0 }}>
             <defs>
               <linearGradient id="sparklineGradient" x1="0" y1="0" x2="0" y2="1">
-                <stop offset="5%" stopColor="hsl(var(--brand-default))" stopOpacity={0.8} />
-                <stop offset="95%" stopColor="hsl(var(--brand-default))" stopOpacity={0} />
+                <stop offset="5%" stopColor="var(--primary-bright)" stopOpacity={0.8} />
+                <stop offset="95%" stopColor="var(--primary-bright)" stopOpacity={0} />
               </linearGradient>
             </defs>
             <RechartsTooltip content={<ChartSparklineTooltip />} />
@@ -594,7 +594,7 @@ const ChartSparkline = React.forwardRef<HTMLDivElement, ChartSparklineProps>(
               dataKey={dataKey || 'value'}
               fill="url(#sparklineGradient)"
               fillOpacity={0.1}
-              stroke="hsl(var(--brand-default))"
+              stroke="var(--primary-bright)"
               strokeWidth={1.5}
             />
           </AreaChart>

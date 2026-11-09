@@ -17,7 +17,7 @@ toc_depth: 3
 
 There has been a growing trend of supply chain attacks on Node Package Manager (NPM). In addition, we have seen other creative attacks, including a typosquat package named `supabase-javascript` that appeared on npm, copying our name to phish developers. We reported it. npm took it down a few hours later, long enough that the package picked up real downloads.
 
-If you build on Supabase, this matters to you. Edge Functions pull from npm. The Supabase CLI is on npm. `supabase-js`, `@supabase/ssr`, and `@supabase/server` are all on npm. Any of these is a credential leak waiting for the wrong update to land.
+If you build on Supabase, this matters to you. [Edge Functions](/docs/guides/functions) pull from npm. The [Supabase CLI](/docs/guides/local-development/cli/getting-started) is on npm. `supabase-js`, `@supabase/ssr`, and `@supabase/server` are all on npm. Any of these is a credential leak waiting for the wrong update to land.
 
 This post lays out what we are doing about it and what you should do today.
 

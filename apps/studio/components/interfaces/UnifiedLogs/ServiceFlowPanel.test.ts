@@ -1,11 +1,11 @@
 import { describe, expect, it } from 'vitest'
 
-import { getLogDataForMetadataVisibility } from './ServiceFlowPanel'
+import { getLogDataForMetadataVisibility } from './ServiceFlowPanel.utils'
 
 describe('getLogDataForMetadataVisibility', () => {
   const logData = {
     id: 'worker-log',
-    metadata: { source: 'worker_guest_logs', worker: 'api' },
+    metadata: { subservice: 'worker_guest_logs', worker: 'api' },
     raw_log_data: {
       event_message: 'Worker failed',
       metadata: { request_id: 'request-id' },

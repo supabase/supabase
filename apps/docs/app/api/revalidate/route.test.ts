@@ -121,8 +121,8 @@ describe('_handleRevalidateRequest', () => {
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
     expect(revalidateTag).toHaveBeenCalledTimes(2)
-    expect(revalidateTag).toHaveBeenCalledWith('graphql')
-    expect(revalidateTag).toHaveBeenCalledWith('wrappers')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql', { expire: 0 })
+    expect(revalidateTag).toHaveBeenCalledWith('wrappers', { expire: 0 })
   })
 
   it('should return 429 if last revalidation was less than 6 hours ago with basic permissions', async () => {
@@ -164,7 +164,7 @@ describe('_handleRevalidateRequest', () => {
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
-    expect(revalidateTag).toHaveBeenCalledWith('graphql')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql', { expire: 0 })
   })
 
   it('should revalidate regardless of last revalidation time with override permissions', async () => {
@@ -185,6 +185,6 @@ describe('_handleRevalidateRequest', () => {
 
     const response = await _handleRevalidateRequest(request)
     expect(response.status).toBe(204)
-    expect(revalidateTag).toHaveBeenCalledWith('graphql')
+    expect(revalidateTag).toHaveBeenCalledWith('graphql', { expire: 0 })
   })
 })

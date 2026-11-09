@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import {
   JwtSecretUpdateError,
   JwtSecretUpdateProgress,
@@ -7,18 +6,18 @@ import {
 } from '@supabase/shared-types/out/events'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
-  AlertCircle,
-  ChevronDown,
-  CloudOff,
-  ExternalLink,
-  Hourglass,
-  Key,
-  Lightbulb,
-  Loader2,
-  PenTool,
-  Power,
-  RefreshCw,
-  TriangleAlert,
+  AlertCircleIcon,
+  ChevronDownIcon,
+  CloudOffIcon,
+  ExternalLinkIcon,
+  HourglassIcon,
+  KeyIcon,
+  LightbulbIcon,
+  Loader2Icon,
+  PenToolIcon,
+  PowerIcon,
+  RefreshCwIcon,
+  TriangleAlertIcon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState, type Dispatch, type SetStateAction } from 'react'
@@ -65,7 +64,7 @@ import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-muta
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
 import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 import { uuidv4 } from '@/lib/helpers'
 
@@ -86,13 +85,11 @@ export const JWTSettings = () => {
   const [isCreatingKey, setIsCreatingKey] = useState<boolean>(false)
   const [isRegeneratingKey, setIsGeneratingKey] = useState<boolean>(false)
 
-  const { can: canReadJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'field.jwt_secret'
+  const { can: canReadJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
-  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.projects.update_jwt'
+  const { can: canGenerateNewJWTSecret } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.ADMIN_WRITE
   )
 
   const { data } = useJwtSecretUpdatingStatusQuery({ projectRef }, { enabled: IS_PLATFORM })
@@ -100,7 +97,9 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
   const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
     { projectRef },
     { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
@@ -167,7 +166,7 @@ export const JWTSettings = () => {
           <div className="space-y-6">
             {isError ? (
               <div className="flex items-center justify-center py-8 space-x-2">
-                <AlertCircle size={16} strokeWidth={1.5} />
+                <AlertCircleIcon size={16} strokeWidth={1.5} />
                 <p className="text-sm text-foreground-light">Failed to retrieve JWT settings</p>
               </div>
             ) : (
@@ -189,14 +188,14 @@ export const JWTSettings = () => {
                     {legacyAPIKeysStatus && legacyAPIKeysStatus.enabled && (
                       <p className="leading-normal!">
                         <em className="text-warning not-italic">
-                          This includes the <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline">service_role</code> JWT based API keys.
+                          This includes the <code>anon</code> and <code>service_role</code> JWT
+                          based API keys.
                         </em>{' '}
                         Consider switching to publishable and secret API keys to disable them.
                       </p>
                     )}
 
-                    <Button asChild icon={<ExternalLink />} className="mt-2">
+                    <Button asChild icon={<ExternalLinkIcon />} className="mt-2">
                       <Link href={`/project/${projectRef}/settings/api-keys`}>Go to API keys</Link>
                     </Button>
                   </Admonition>
@@ -250,7 +249,7 @@ export const JWTSettings = () => {
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">
-                  <Loader2 className="animate-spin" size={14} />
+                  <Loader2Icon className="animate-spin" size={14} />
                   <p className="text-sm">Updating JWT secret: {jwtSecretUpdateProgressMessage}</p>
                 </div>
               )}
@@ -271,7 +270,7 @@ export const JWTSettings = () => {
                       ? 'How to migrate to the new API keys?'
                       : 'How to change your JWT secret?'}
                   </p>
-                  <ChevronDown size={14} className="transition-transform duration-200" />
+                  <ChevronDownIcon size={14} className="transition-transform duration-200" />
                 </CollapsibleTrigger>
                 <CollapsibleContent className="border-t p-4">
                   <p className="text-sm text-foreground-light text-balance mb-2">
@@ -303,10 +302,10 @@ export const JWTSettings = () => {
                             API Keys
                           </InlineLink>
                           , create a publishable key and secret key, then swap them into your apps
-                          in place of <code className="text-code-inline">anon</code> and{' '}
-                          <code className="text-code-inline break-keep!">service_role</code>{' '}
-                          respectively. Watch the "Last used" indicators to confirm no traffic still
-                          depends on the legacy keys.
+                          in place of <code>anon</code> and{' '}
+                          <code className="break-keep!">service_role</code> respectively. Watch the
+                          "Last used" indicators to confirm no traffic still depends on the legacy
+                          keys.
                         </p>
                       </li>
                       <li>
@@ -318,13 +317,10 @@ export const JWTSettings = () => {
                           to start signing new JWTs with the standby key.
                         </p>
                         <p className="text-foreground-lighter">
-                          Existing <code className="text-code-inline">anon</code>,{' '}
-                          <code className="text-code-inline">service_role</code>, and active user
+                          Existing <code>anon</code>, <code>service_role</code>, and active user
                           JWTs stay valid. Before rotating, switch any code that verifies JWTs
-                          directly against the legacy secret (e.g.{' '}
-                          <code className="text-code-inline">jose</code>,{' '}
-                          <code className="text-code-inline">jsonwebtoken</code>) to{' '}
-                          <code className="text-code-inline">supabase.auth.getClaims()</code> or a
+                          directly against the legacy secret (e.g. <code>jose</code>,{' '}
+                          <code>jsonwebtoken</code>) to <code>supabase.auth.getClaims()</code> or a
                           JWKS-based verifier, and disable the "Verify JWT" setting on any affected
                           Edge Functions.
                         </p>
@@ -357,14 +353,14 @@ export const JWTSettings = () => {
                       </li>
                       <li>
                         Improve app's performance by using public keys to verify JWTs instead of
-                        calling <code className="text-code-inline">getUser()</code>.
+                        calling <code>getUser()</code>.
                       </li>
                     </ul>
                   )}
 
                   <div className="flex flex-row gap-x-2 mt-4">
                     {disableLegacyJwtSecretRotation ? (
-                      <Button icon={<ExternalLink className="size-4" />} asChild>
+                      <Button icon={<ExternalLinkIcon className="size-4" />} asChild>
                         <Link
                           href={`${DOCS_URL}/guides/auth/signing-keys#getting-started`}
                           target="_blank"
@@ -378,7 +374,7 @@ export const JWTSettings = () => {
                         <DropdownMenuTrigger asChild>
                           <ButtonTooltip
                             disabled={!canGenerateNewJWTSecret}
-                            iconRight={<ChevronDown size={14} />}
+                            iconRight={<ChevronDownIcon size={14} />}
                             loading={isUpdatingJwtSecret}
                             tooltip={{
                               content: {
@@ -397,7 +393,7 @@ export const JWTSettings = () => {
                             className="space-x-2"
                             onClick={() => setIsGeneratingKey(true)}
                           >
-                            <RefreshCw size={16} />
+                            <RefreshCwIcon size={16} />
                             <p>Generate a random secret</p>
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
@@ -405,7 +401,7 @@ export const JWTSettings = () => {
                             className="space-x-2"
                             onClick={() => setIsCreatingKey(true)}
                           >
-                            <PenTool size={16} />
+                            <PenToolIcon size={16} />
                             <p>Create my own secret</p>
                           </DropdownMenuItem>
                         </DropdownMenuContent>
@@ -436,14 +432,14 @@ export const JWTSettings = () => {
       >
         <ul className="space-y-4 text-sm">
           <li className="flex gap-2 bg border rounded-md p-4">
-            <Lightbulb size={24} className="shrink-0 text-brand" />
+            <LightbulbIcon size={24} className="shrink-0 text-primary" />
 
             <div className="flex flex-col gap-2">
               <p>Use new JWT Signing Keys and API Keys instead</p>
               <p className="text-foreground-light">
                 Consider using a combination of the JWT Signing Keys and API Keys features to
                 achieve the same effect.{' '}
-                <em className="text-brand not-italic">
+                <em className="text-primary not-italic">
                   Some or all of the warnings listed below might not apply when using these features
                 </em>
                 .
@@ -451,7 +447,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <CloudOff size={24} className="text-foreground-light shrink-0" />
+            <CloudOffIcon size={24} className="text-foreground-light shrink-0" />
 
             <div className="flex flex-col gap-2">
               <p>Your application will experience significant downtime</p>
@@ -476,7 +472,7 @@ export const JWTSettings = () => {
           </li>
 
           <li className="flex gap-2 px-4">
-            <Power size={24} className="text-foreground-light shrink-0" />
+            <PowerIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Your project and database will be restarted</p>
               <p className="text-foreground-light">
@@ -488,7 +484,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <Hourglass size={24} className="text-foreground-light shrink-0" />
+            <HourglassIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>20-minute cooldown period</p>
               <p className="text-foreground-light">
@@ -498,7 +494,7 @@ export const JWTSettings = () => {
             </div>
           </li>
           <li className="flex gap-2 px-4">
-            <TriangleAlert size={24} className="text-foreground-light shrink-0" />
+            <TriangleAlertIcon size={24} className="text-foreground-light shrink-0" />
             <div className="flex flex-col gap-2">
               <p>Irreversible change! This cannot be undone!</p>
               <p className="text-foreground-light">
@@ -551,7 +547,13 @@ export const JWTSettings = () => {
                       description="Minimally 32 characters long, '@' and '$' are not allowed."
                     >
                       <FormControl>
-                        <Input copy reveal icon={<Key />} className="w-full text-left" {...field} />
+                        <Input
+                          copy
+                          reveal
+                          icon={<KeyIcon />}
+                          className="w-full text-left"
+                          {...field}
+                        />
                       </FormControl>
                     </FormItemLayout>
                   )}

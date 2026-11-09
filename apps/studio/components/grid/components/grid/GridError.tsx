@@ -1,6 +1,6 @@
 import { useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useCallback } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -14,12 +14,13 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { COST_THRESHOLD_ERROR } from '@/data/sql/execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
+import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
-import { ResponseError } from '@/types'
 
-export const GridError = ({ error }: { error?: ResponseError | null }) => {
+export const GridError = ({ error }: { error?: StudioError | null }) => {
   const { id: _id } = useParams()
   const tableId = _id ? Number(_id) : undefined
 
@@ -139,7 +140,7 @@ const FilterError = ({ removeAllFilters }: { removeAllFilters: () => void }) => 
   )
 }
 
-const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
+const InvalidOrderingOperatorError = ({ error }: { error: StudioError }) => {
   const { sorts, onApplySorts } = useTableSort()
   const invalidDataType = (error.message ?? '').split('type ').pop() ?? ''
   const formattedInvalidDataType = invalidDataType.includes('json')
@@ -154,15 +155,21 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
     >
       <p className="mb-0!">
         Unable to retrieve results as sorting is not supported on{' '}
-        {sorts.length > 1 ? 'one of the selected columns' : 'the selected column'} due to its data
-        type. ({formattedInvalidDataType})
+        {sorts.length > 1 ? (
+          <span>one of the selected columns</span>
+        ) : (
+          <span>the selected column</span>
+        )}{' '}
+        <span>due to its data type. (</span>
+        {formattedInvalidDataType}
+        <span>)</span>
       </p>
       <p className="mb-2!">
         Remove any sorts on columns with the data type {formattedInvalidDataType} applying the sorts
         again.
       </p>
       <p className="text-sm text-foreground-lighter prose max-w-full mb-4!">
-        Error: <code className="text-code-inline">{error.message}</code>
+        Error: <code>{error.message}</code>
       </p>
 
       <Button onClick={() => onApplySorts([])}>Remove sorts</Button>
@@ -170,7 +177,7 @@ const InvalidOrderingOperatorError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
+const IcebergUnauthorizedError = ({ error }: { error: StudioError }) => {
   const { ref } = useParams()
 
   return (
@@ -194,12 +201,16 @@ const IcebergUnauthorizedError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const GeneralError = ({ error }: { error: ResponseError }) => {
+const GeneralError = ({ error }: { error: StudioError }) => {
   const { filters } = useTableFilter()
+  const { data: project } = useSelectedProjectQuery()
+  const { data: org } = useSelectedOrganizationQuery()
 
   return (
     <AlertError
       error={error}
+      projectRef={project?.ref}
+      orgSlug={org?.slug}
       className="pointer-events-auto"
       subject="Failed to retrieve rows from table"
     >
@@ -213,17 +224,17 @@ const GeneralError = ({ error }: { error: ResponseError }) => {
   )
 }
 
-const ExpandError = ({ error }: { error: ResponseError }) => {
+const ExpandError = ({ error }: { error: StudioError }) => {
   return (
     <Collapsible>
       <CollapsibleTrigger className="mt-2 group font-normal p-0 [&[data-state=open]>div>svg]:-rotate-180!">
         <div className="flex items-center gap-x-2 w-full cursor-pointer">
           <span className="font-mono uppercase tracking-tight">View error</span>
-          <ChevronDown className="transition-transform" size={14} />
+          <ChevronDownIcon className="transition-transform" size={14} />
         </div>
       </CollapsibleTrigger>
       <CollapsibleContent className="mt-1">
-        <code className="text-code-inline">{error.message}</code>
+        <code>{error.message}</code>
       </CollapsibleContent>
     </Collapsible>
   )

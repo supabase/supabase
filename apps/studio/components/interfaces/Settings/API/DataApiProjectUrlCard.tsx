@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircleIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useEffectEvent } from 'react'
 import { Alert, AlertTitle } from 'ui'
@@ -93,7 +93,7 @@ export const DataApiProjectUrlCard = () => {
           </div>
         ) : isError ? (
           <Alert variant="destructive">
-            <AlertCircle size={16} />
+            <AlertCircleIcon size={16} />
             <AlertTitle>Failed to retrieve project URL</AlertTitle>
           </Alert>
         ) : (

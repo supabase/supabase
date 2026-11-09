@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { toString as CronToString } from 'cronstrue'
-import { Edit3, List } from 'lucide-react'
+import { Edit3Icon, ListIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -85,7 +85,7 @@ export const CronJobPage = () => {
       with command{' '}
       <Tooltip>
         <TooltipTrigger asChild>
-          <code className="text-code-inline max-w-[200px] inline-block truncate align-bottom cursor-pointer">
+          <code className="max-w-[200px] inline-block truncate align-bottom cursor-pointer">
             {job.command}
           </code>
         </TooltipTrigger>
@@ -94,7 +94,7 @@ export const CronJobPage = () => {
           align="center"
           className="min-w-[200px] max-w-[400px] text-wrap p-0"
         >
-          <p className="text-xs font-mono px-2 py-1 border-b bg-surface-100">Command</p>
+          <p className="text-xs font-mono px-2 py-1 border-b bg-muted">Command</p>
           <CodeBlock
             hideLineNumbers
             language="sql"
@@ -115,12 +115,17 @@ export const CronJobPage = () => {
     <Button
       key="edit"
       variant="outline"
-      icon={<Edit3 strokeWidth={1.5} size="14" />}
+      icon={<Edit3Icon strokeWidth={1.5} size="14" />}
       onClick={() => setIsEditSheetOpen(true)}
     >
       Edit
     </Button>,
-    <Button key="view-logs" asChild variant="outline" icon={<List strokeWidth={1.5} size="14" />}>
+    <Button
+      key="view-logs"
+      asChild
+      variant="outline"
+      icon={<ListIcon strokeWidth={1.5} size="14" />}
+    >
       <Link
         target="_blank"
         rel="noopener noreferrer"

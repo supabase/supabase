@@ -41,6 +41,12 @@ For configuration information, see [Postgres SSL Enforcement](/docs/guides/platf
 
 </Admonition>
 
+### TLS for project APIs
+
+All HTTP APIs of your project, including Auth, the Data API, Storage, Realtime, and Edge Functions, accept only HTTPS connections using TLS 1.2 or TLS 1.3.
+
+For supported cipher suites, see [TLS for project APIs](/docs/guides/security/tls).
+
 ### Network restrictions
 
 Each Supabase project comes with configurable restrictions on the IP ranges that are allowed to connect to Postgres and its pooler ("your database"). These restrictions are enforced before traffic reaches the database. If a connection is not restricted by IP, it still needs to authenticate successfully with valid database credentials.

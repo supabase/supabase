@@ -13,7 +13,7 @@ description: >-
 
 Improves **existing** Supabase docs pages: structure, order, connective text, and clarity.
 
-**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers lint, build, and PR triage.
+**Not this skill:** [`write-the-docs`](../write-the-docs/SKILL.md) drafts net-new content or product-grounded rewrites from intent and code. [`review-the-docs`](../review-the-docs/SKILL.md) covers build and PR triage.
 
 **Output is one pull request, with one change type per commit.** A reviewer reads the style diff apart from the structure diff without holding several PRs in their head. Split into a stack of PRs only when the requester asks for one, or approves the split you offer because the diff turned out large. Phase 0 covers when to raise it, and [reference/stacked-prs.md](reference/stacked-prs.md) covers the mechanics.
 
@@ -21,14 +21,14 @@ Improves **existing** Supabase docs pages: structure, order, connective text, an
 
 1. **Read before you rewrite.** Open the target page and nearby pages of the same type. Name the reader's goal and the page type before moving sections.
 2. **Don't invent product truth. Verify it, in its own PR.** Style and structure work preserves behavior claims, UI labels, and positioning as written. Correcting a claim is PR 3 work, and adding one belongs to the additions branches above it. Those PRs follow [`write-the-docs`](../write-the-docs/SKILL.md) grounding rules: read the code, separate shipped behavior from product intent, and flag what you inferred.
-3. **Follow CONTRIBUTING.md and WORD_LIST.md** for voice, terminology, and formatting. See [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md) and [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md).
+3. **Follow the [style guide](../../../apps/docs/style-guide/README.md)** for voice, terminology, structure, and components.
 4. **Prefer brevity.** Use broad strokes when mechanical detail doesn't help the reader's task. Cut redundancy. Don't over-explain.
-5. **Reuse sibling skills.** Get IA and architecture from [`ask-the-docs`](../ask-the-docs/SKILL.md). Get validation and self-review from [`review-the-docs`](../review-the-docs/SKILL.md). Apply the shared pitfalls in [`write-the-docs/reference/common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md) rather than duplicating them here.
+5. **Reuse sibling skills.** Get IA and architecture from [`ask-the-docs`](../ask-the-docs/SKILL.md). Get validation and self-review from [`review-the-docs`](../review-the-docs/SKILL.md). Apply the style guide's [timeless documentation](../../../apps/docs/style-guide/03-page-structure.md#write-timeless-documentation) rather than duplicating it here.
 6. **One change type per diff.** A diff that mixes reworded prose with moved sections is unreviewable, because the reader can't tell a move from a rewrite. Separate them by commit in a single PR, or by branch in a stack.
 
 ## Phase 0: Size and split
 
-1. Identify the document type per CONTRIBUTING.md. The types are explainer, tutorial, guide, reference, and troubleshooting.
+1. Identify the document type per [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#document-types). The types are explainer, tutorial, guide, reference, and troubleshooting.
 2. State the reader's goal and prerequisites in one or two lines.
 3. Note structural problems: mixed information types interrupting a procedure, missing intro navigation on a long page, weak transitions, redundancy, or over-explained mechanics.
 4. Sort the diagnosis into the buckets below. **Drop any bucket that comes back empty, and say so.** Style, structure, and technical revision take one commit or branch each. Additions take as many as the content needs, so the edit has no fixed size. A style edit plus a structural edit is the common shape, because most pages that need restructuring are already correct. Two buckets is a complete result, not a truncated one.
@@ -52,20 +52,20 @@ Inline changes only. Nothing in this PR moves a line from one place to another.
 **Rewrite:**
 
 - Use second person, present tense, short paragraphs, and ordered steps for sequential actions.
-- Put procedures in procedure format, per the Procedures section of CONTRIBUTING.md. Start each step with an imperative verb, keep one action or a closely related set per step, present 7 ± 2 steps per chunk, and group anything longer into named phases or smaller procedures.
-- Apply the inline rules in CONTRIBUTING.md for admonitions, emphasis, links, lists, and the "Styling, formatting, and grammar" section.
+- Put procedures in procedure format. Per-step formatting is in [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md#procedures); how many steps to present at once and when to split into phases is in [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#chunking).
+- Apply [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md) for admonitions, emphasis, links, and lists, and [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md) for person, tense, and sentence-level grammar.
 - Keep code samples executable in their stated context, and mark intentionally omitted code. Prefer partials under `apps/docs/content/_partials/` over copied blocks.
 - **Check the alt text on every image, and open the image to do it.** Alt text on an existing page usually names the topic rather than describing the picture, and a topic name is what the nearby heading already says. Describe what a reader who can't see it would need: the labeled parts, the relationships between them, and any values the diagram carries. This is a rewrite of existing text, so it belongs in this PR.
 
 **Cut:**
 
 - Restated points and mechanical over-explanation.
-- The shared pitfalls in [`common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md): timelessness, internal planning context in shipped MDX, redundancy, single-item lists, and admonition restatement.
-- Terminology that doesn't match [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md). Crawl the list for terms already on the page, not only the ones you introduce. An existing page is where nonconforming terminology accumulates.
+- Time-anchored language and unshipped features: [timeless documentation](../../../apps/docs/style-guide/03-page-structure.md#write-timeless-documentation). Internal planning context in shipped MDX: [keep internal context out](../../../apps/docs/style-guide/03-page-structure.md#keep-internal-context-out). Repeated points: [brevity](../../../apps/docs/style-guide/01-voice-and-tone.md#brevity). Single-item lists and restated admonitions: [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md).
+- Terminology that doesn't match [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md). Run both passes from [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent): [Phrase groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) gives you every literal term list in one read, then `grep '^### ' WORD_LIST.md` and open only the entries matching words on the page. Cover terms already on the page, not only the ones you introduce. An existing page is where nonconforming terminology accumulates.
 
 ## PR 2: Structure
 
-Apply the **Mixed information types**, **Navigation**, and **Cross-references and glue** guidance in the Guides section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md).
+Apply [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md) — section grouping, navigation, and glue. This section is the procedure for doing that on an existing page; the rules live in the guide.
 
 **Work in this order, and settle the outline before you move a line.** A restructure invalidates every branch above it in the stack, so each revision costs a full restack, and a restack is where content gets dropped in conflict resolution. Reworking the shape twice costs far more than getting it right once.
 
@@ -77,36 +77,19 @@ Write the matched heading texts down. For the rest of this PR they are immutable
 
 ### 2. Classify every substantial section
 
-Each one is **procedural** (the reader performs actions), **contextual** (the reader needs to understand something before acting), or **reference** (the reader looks something up).
+Classify each one against the information types in [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#information-types), then collapse them into the three buckets you'll group by: **procedural** (Procedure), **contextual** (Concept and Process), and **reference** (Structure and Fact). A principle or a fact usually rides along in the section it qualifies rather than getting one of its own.
 
-**Classify by what the reader is doing, not by what the section is about.** Subject matter is the trap: on a page about tables every section is "about tables", so grouping by topic produces one task-named bucket that quietly collects the background as well. A reader opens a section on schemas to understand something, not to do something, so it is context no matter how much it is about tables.
+The guide has the two rules that decide the hard cases: classify by what the reader is doing rather than what the section is about, and split a section that serves two types instead of filing it under the larger half.
 
-**A section serving two classes gets split, not filed under the larger half.** Give the new half a heading, keep the heading text of the half that stays, and cross-reference the two. One cross-reference costs less than a reader hunting for the half they need.
+Write the bucket for every section down before moving anything. A page where every section lands in one bucket is a page that wasn't really classified.
 
 ### 3. Write the target outline before touching the file
 
 Produce the whole heading tree, with levels, and check it against the locked list from step 1. Put it in front of the requester along with the Phase 0 diagnosis. The outline is the artifact that gets revised, not the page.
 
-Order the groups: a short conceptual opener when the page serves newcomers, then procedures, then context, then reference. The action path runs uninterrupted and the background sits after it.
+Order the groups per [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md#grouping-sections), which has the order that works and a worked outline. A short concept opener can precede the procedure group; keep that group uninterrupted, and put the remaining background after it.
 
-A guide about database tables settled here:
-
-```
-## What is a table?                    <- short conceptual opener
-## Creating and managing tables        <- procedures
-### Creating tables
-### Securing your tables
-### Loading data
-### Joining tables with foreign keys
-## How tables are organized            <- context
-### Primary keys
-### Relationships between tables
-### Schemas
-## Reference
-### Data types
-```
-
-"Joining tables with foreign keys" held both classes. The steps kept the heading and stayed in the procedures group; the idea of a relational database moved to "Relationships between tables" in the context group.
+When a section held two types and you split it in step 2, the half that keeps the original heading text stays in its original group, so the locked anchor from step 1 survives. The new half takes a new heading and moves to the group its type belongs to.
 
 ### 4. Move, then add the glue the new shape needs
 
@@ -187,7 +170,7 @@ Run this per change type, before you submit the commit or branch that carries it
 - [ ] Section groups follow information type, and procedures aren't interrupted by long context
 - [ ] Intro navigation is present only when the page needs it, and links resolve
 - [ ] Connective text is selective, not link spam
-- [ ] Voice matches CONTRIBUTING.md and WORD_LIST.md
+- [ ] Voice matches [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md) and terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md)
 - [ ] Every image has alt text that describes the image, checked against the image itself
 - [ ] No invented behavior or positioning
 - [ ] Shared pitfalls checklist considered
@@ -196,7 +179,7 @@ Run this per change type, before you submit the commit or branch that carries it
 
 **Frontmatter `title`.** It follows the same sentence-case rule as a heading. Renaming it moves a navigation label and a search entry, not just a line of prose, so it clears this same gate and lands in PR 2 rather than PR 1.
 
-**Lint and format.** Follow [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md). Then run the [`review-the-docs`](../review-the-docs/SKILL.md) local self-review: `pnpm lint:mdx`, plus `pnpm build:guides-markdown` when a guide, explainer, or tutorial changed.
+**Format and build.** Follow [`write-the-docs/reference/drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md). Then run the [`review-the-docs`](../review-the-docs/SKILL.md) local self-review, plus `pnpm build:guides-markdown` when a guide, explainer, or tutorial changed.
 
 `build:guides-markdown` writes `apps/docs/public/markdown/manifest.json`, which the repo tracks and commits as `[]`. Discard that file before committing. It's a build artifact, not part of the edit.
 
@@ -209,13 +192,14 @@ Run this per change type, before you submit the commit or branch that carries it
 
 **Style and structure:**
 
-- Mixed information types, navigation, and glue: the Guides section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md)
-- Procedure format: the Procedures section of [`apps/docs/CONTRIBUTING.md`](../../../apps/docs/CONTRIBUTING.md)
-- Terminology: [`apps/docs/WORD_LIST.md`](../../../apps/docs/WORD_LIST.md)
+- Style guide entry point: [`style-guide/README.md`](../../../apps/docs/style-guide/README.md)
+- Section grouping, navigation, glue, and chunking: [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
+- Procedure format and other components: [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
+- Terminology: [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md)
 
 **Sibling skills:**
 
-- Pitfalls and drafting mechanics: [`common-pitfalls.md`](../write-the-docs/reference/common-pitfalls.md), [`drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md)
+- Drafting mechanics: [`drafting-mechanics.md`](../write-the-docs/reference/drafting-mechanics.md)
 - Runnable verification: [`test-the-docs`](../test-the-docs/SKILL.md)
 - Architecture and IA: [`ask-the-docs`](../ask-the-docs/SKILL.md)
 - Net-new drafts: [`write-the-docs`](../write-the-docs/SKILL.md)

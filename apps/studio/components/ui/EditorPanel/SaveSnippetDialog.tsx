@@ -34,8 +34,7 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
 
   const isApiKeySet = !!check?.hasKey
 
-  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { mutate: generateTitle, isPending: isGenerating } = useSqlTitleGenerateMutation({
@@ -78,18 +77,16 @@ export const SaveSnippetDialog = ({ open, sql, onOpenChange, onSave }: SaveSnipp
           <div className="flex justify-end">
             <ButtonTooltip
               size="tiny"
-              disabled={isGenerating || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut}
+              disabled={isGenerating || !isApiKeySet || isAiOptedOut}
               onClick={() => generateTitle({ sql })}
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: isHipaaProjectDisallowed
-                    ? 'This feature is not available for HIPAA projects.'
-                    : isAiOptedOut
-                      ? 'Your organization has opted out of AI features.'
-                      : isApiKeySet
-                        ? undefined
-                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                  text: isAiOptedOut
+                    ? 'Your organization has opted out of AI features.'
+                    : isApiKeySet
+                      ? undefined
+                      : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
                 },
               }}
             >

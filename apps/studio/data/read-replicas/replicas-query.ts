@@ -7,7 +7,9 @@ import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { EMPTY_ARR } from '@/lib/void'
+import type { UseCustomQueryOptions } from '@/types'
 
 /**
  * Unless explicitly defined here, caps default to `READ_REPLICAS_MAX_COUNT`.
@@ -47,11 +49,11 @@ export async function getReadReplicas(
   })
 
   if (error) handleError(error)
-  return data
+  return Array.isArray(data) ? data : EMPTY_ARR
 }
 
 export type ReadReplicasData = Awaited<ReturnType<typeof getReadReplicas>>
-export type ReadReplicasError = ResponseError
+export type ReadReplicasError = StudioError
 
 export const useReadReplicasQuery = <TData = ReadReplicasData>(
   { projectRef }: ReadReplicasVariables,

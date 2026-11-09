@@ -1,8 +1,8 @@
 'use client'
 
-import { NavigationMenu as NavigationMenuPrimitive } from 'radix-ui'
 import { cva } from 'class-variance-authority'
 import { ChevronDown } from 'lucide-react'
+import { NavigationMenu as NavigationMenuPrimitive } from 'radix-ui'
 import * as React from 'react'
 
 import { cn } from '../../../lib/utils/cn'

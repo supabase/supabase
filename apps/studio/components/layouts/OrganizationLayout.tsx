@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { ExternalLink, XIcon } from 'lucide-react'
+import { ExternalLinkIcon, XIcon } from 'lucide-react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import type { PropsWithChildren } from 'react'
@@ -151,7 +151,7 @@ const OrganizationLayoutContent = ({
           </div>
           <div className="flex items-center gap-2">
             {selectedRedirectQuery?.data?.url && (
-              <Button asChild iconRight={<ExternalLink />}>
+              <Button asChild iconRight={<ExternalLinkIcon />}>
                 <a href={selectedRedirectQuery.data.url} target="_blank" rel="noopener noreferrer">
                   Manage
                 </a>
@@ -168,7 +168,7 @@ const OrganizationLayoutContent = ({
           </div>
         </Alert>
       )}
-      <main className="h-full w-full overflow-y-auto flex flex-col">{children}</main>
+      <main className="relative h-full w-full overflow-y-auto flex flex-col">{children}</main>
     </div>
   )
 }

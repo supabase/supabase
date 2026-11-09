@@ -1,5 +1,5 @@
 import { format } from 'date-fns'
-import { CalendarIcon, ExternalLink } from 'lucide-react'
+import { CalendarIcon, ExternalLinkIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { useFormContext, type Control } from 'react-hook-form'
 import ReactMarkdown from 'react-markdown'
@@ -291,7 +291,7 @@ const FormField = ({
                       {description ? <Markdown content={description} /> : null}
                       {properties.link && (
                         <span>
-                          <Button asChild size="tiny" icon={<ExternalLink />}>
+                          <Button asChild size="tiny" icon={<ExternalLinkIcon />}>
                             <a href={properties.link} target="_blank" rel="noreferrer noopener">
                               Documentation
                             </a>

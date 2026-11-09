@@ -1,4 +1,4 @@
-import { Check, Lightbulb, Table2 } from 'lucide-react'
+import { CheckIcon, LightbulbIcon, Table2Icon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import {
   Accordion,
@@ -227,7 +227,9 @@ export const QueryIndexes = ({
         <div className="mb-4 flex flex-col gap-y-1">
           <h4 className="mb-2">Indexes in use</h4>
           <p className="text-sm text-foreground-light">
-            This query is using the following index{(usedIndexes ?? []).length > 1 ? 's' : ''}:
+            This query is using the following index
+            {(usedIndexes ?? []).length > 1 ? <span>s</span> : ''}
+            <span>:</span>
           </p>
         </div>
         {isLoading && <GenericSkeletonLoader />}
@@ -258,7 +260,7 @@ export const QueryIndexes = ({
                   className="flex items-center gap-x-4 bg-surface-100 border first:rounded-tl first:rounded-tr border-b-0 last:border-b last:rounded-b px-2 py-2"
                 >
                   <div className="flex items-center gap-x-2">
-                    <Table2 size={14} className="text-foreground-light" />
+                    <Table2Icon size={14} className="text-foreground-light" />
                     <span className="text-xs font-mono text-foreground-light">
                       {index.schema}.{index.table}
                     </span>
@@ -300,7 +302,7 @@ export const QueryIndexes = ({
                     />
                   ) : (index_statements ?? []).length === 0 ? (
                     <Alert className="[&>svg]:rounded-full">
-                      <Check />
+                      <CheckIcon />
                       <AlertTitle>This query is optimized</AlertTitle>
                       <AlertDescription>
                         Recommendations for indexes will show here
@@ -311,18 +313,22 @@ export const QueryIndexes = ({
                       {isLinterWarning ? (
                         <Alert
                           variant="default"
-                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-brand my-3"
+                          className="border-brand-400 bg-alternative [&>svg]:p-0.5 [&>svg]:bg-transparent [&>svg]:text-primary my-3"
                         >
-                          <Lightbulb />
+                          <LightbulbIcon />
                           <AlertTitle>
                             We have {index_statements.length} index recommendation
-                            {index_statements.length > 1 ? 's' : ''}
+                            {index_statements.length > 1 ? <span>s</span> : ''}
                           </AlertTitle>
                           <AlertDescription>
                             You can improve this query's performance by{' '}
-                            <span className="text-brand">{totalImprovement.toFixed(2)}%</span> by
+                            <span className="text-primary">{totalImprovement.toFixed(2)}%</span> by
                             adding the following suggested{' '}
-                            {index_statements.length > 1 ? 'indexes' : 'index'}
+                            {index_statements.length > 1 ? (
+                              <span>indexes</span>
+                            ) : (
+                              <span>index</span>
+                            )}
                           </AlertDescription>
                         </Alert>
                       ) : (
@@ -380,7 +386,7 @@ export const QueryIndexes = ({
                     />
                   </CollapsibleContent>
                   <CollapsibleTrigger className="text-xs py-1.5 border-t text-foreground-light bg-studio w-full rounded-b-md">
-                    View {showStartupCosts ? 'less' : 'more'}
+                    View {showStartupCosts ? <span>less</span> : <span>more</span>}
                   </CollapsibleTrigger>
                 </Collapsible>
               </div>

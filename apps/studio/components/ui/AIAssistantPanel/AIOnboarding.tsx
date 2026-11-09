@@ -1,4 +1,4 @@
-import { MessageSquarePlus } from 'lucide-react'
+import { MessageSquarePlusIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 import { CHAT_TEMPLATES, codeSnippetPrompts } from './AIAssistant.prompts'
@@ -30,7 +30,7 @@ export const AIOnboarding = ({
   if (hasSuggestions) {
     templates = suggestionPrompts.map((suggestion) => ({
       title: suggestion.label,
-      icon: MessageSquarePlus,
+      icon: MessageSquarePlusIcon,
       initialMessage: suggestion.description,
     }))
   } else if (sqlSnippets && sqlSnippets.length > 0) {
@@ -60,7 +60,7 @@ export const AIOnboarding = ({
                 key={template.title}
                 type="button"
                 tabIndex={0}
-                className="rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-brand"
+                className="rounded-md text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
                 onClick={() => {
                   onValueChange(template.initialMessage)
                   onFocusInput?.()

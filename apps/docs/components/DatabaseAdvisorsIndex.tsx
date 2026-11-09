@@ -1,5 +1,6 @@
 import { readFile } from 'node:fs/promises'
 import { join } from 'node:path'
+import { healthAdvisors } from '~/data/health-advisors.data'
 import { MDXRemoteBase } from '~/features/docs/MdxBase'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
 import { GENERATED_DIRECTORY } from '~/lib/docs'
@@ -25,7 +26,7 @@ export async function DatabaseAdvisorsIndex() {
 
   return (
     <Tabs listClassNames="flex flex-wrap gap-2 [&>button]:m-0!" queryGroup="lint">
-      {lints.map((lint) => (
+      {[...healthAdvisors, ...lints].map((lint) => (
         <TabPanel key={lint.path} id={lint.path} label={capitalize(lint.path.replace(/_/g, ' '))}>
           <section id={lint.path}>
             <MDXRemoteBase source={lint.content} />

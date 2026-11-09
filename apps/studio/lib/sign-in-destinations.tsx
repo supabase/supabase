@@ -1,4 +1,4 @@
-import { Terminal } from 'lucide-react'
+import { TerminalIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
 
 /**
@@ -21,7 +21,7 @@ export type SignInDestination = {
 const CLI_DESTINATION: SignInDestination = {
   id: 'cli',
   displayName: 'Supabase CLI',
-  icon: <Terminal className="size-6 text-foreground" strokeWidth={2} />,
+  icon: <TerminalIcon className="size-6 text-foreground" strokeWidth={2} />,
 }
 
 // Statically-branded sign-in destinations. To add a new one, declare its config above and add it

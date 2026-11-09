@@ -14,7 +14,7 @@ export type DucklakeApiConfig = {
   metadata_schema?: string
 }
 
-// Fields entered when configuring DuckLake manually (always present in the validation data).
+// Fields entered when connecting to an existing DuckLake catalog and storage.
 const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeCatalogUrl',
   'ducklakeDataPath',
@@ -25,14 +25,11 @@ const DUCKLAKE_INPUT_FIELD_PATHS = [
   'ducklakeMetadataSchema',
 ] as const
 
-// Fields entered only in "Use Supabase" mode (optional in the validation data).
-const DUCKLAKE_SUPABASE_FIELD_PATHS = [
-  'ducklakeCatalogProjectRef',
-  'ducklakeStorageProjectRef',
-  'ducklakeStorageBucket',
-] as const
+// Fields entered only in managed mode.
+const DUCKLAKE_SUPABASE_FIELD_PATHS = ['ducklakeStorageBucket'] as const
 
 type DucklakeFieldPath =
+  | 'ducklakeMode'
   | (typeof DUCKLAKE_INPUT_FIELD_PATHS)[number]
   | (typeof DUCKLAKE_SUPABASE_FIELD_PATHS)[number]
 
@@ -52,11 +49,9 @@ type DucklakeValidationData = Pick<
     >
   >
 
-// Required fields per mode. "Use Supabase" only needs project refs + a bucket; the catalog URL and
-// S3 credentials are resolved by the platform API.
+// Managed mode only needs a bucket. The platform API resolves the current project's catalog and
+// storage credentials.
 const DUCKLAKE_SUPABASE_REQUIRED_FIELDS: DucklakeValidationIssue[] = [
-  { path: 'ducklakeCatalogProjectRef', message: 'Catalog project is required.' },
-  { path: 'ducklakeStorageProjectRef', message: 'Storage project is required.' },
   { path: 'ducklakeStorageBucket', message: 'Bucket is required.' },
 ]
 
@@ -89,10 +84,18 @@ const getMissingRequiredFieldIssues = (
 
 export const getDucklakeValidationIssues = (
   data: DucklakeValidationData,
-  options: { secretsOptional?: boolean } = {}
+  options: { secretsOptional?: boolean; isOrioleDb?: boolean } = {}
 ): DucklakeValidationIssue[] => {
   if (data.ducklakeMode === DUCKLAKE_MODE_SUPABASE) {
     const issues = getMissingRequiredFieldIssues(data, DUCKLAKE_SUPABASE_REQUIRED_FIELDS)
+
+    if (options.isOrioleDb) {
+      issues.push({
+        path: 'ducklakeMode',
+        message:
+          'OrioleDB cannot host a DuckLake metadata catalog. Enter connection details for a catalog using standard Postgres.',
+      })
+    }
 
     if (data.ducklakeMetadataSchema && !METADATA_SCHEMA_PATTERN.test(data.ducklakeMetadataSchema)) {
       issues.push(METADATA_SCHEMA_ISSUE)

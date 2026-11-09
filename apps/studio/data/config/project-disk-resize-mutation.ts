@@ -1,9 +1,10 @@
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { usageKeys } from '@/data/usage/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ProjectDiskResizeVariables = {
   projectRef: string
@@ -18,6 +19,7 @@ export async function resizeProjectDisk({ projectRef, volumeSize }: ProjectDiskR
   const { data, error } = await post('/platform/projects/{ref}/resize', {
     params: { path: { ref: projectRef } },
     body: payload,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data
@@ -35,12 +37,12 @@ export const useProjectDiskResizeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>,
+  UseCustomMutationOptions<ProjectDiskResizeData, StudioError, ProjectDiskResizeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<ProjectDiskResizeData, ResponseError, ProjectDiskResizeVariables>({
+  return useMutation<ProjectDiskResizeData, StudioError, ProjectDiskResizeVariables>({
     mutationFn: (vars) => resizeProjectDisk(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

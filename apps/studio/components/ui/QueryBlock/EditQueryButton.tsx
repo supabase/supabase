@@ -1,4 +1,4 @@
-import { Edit } from 'lucide-react'
+import { EditIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentProps } from 'react'
 import {
@@ -56,7 +56,7 @@ export const EditQueryButton = ({
         variant={variant}
         size="tiny"
         className={cn('w-7 h-7', className)}
-        icon={<Edit size={14} strokeWidth={1.5} />}
+        icon={<EditIcon size={14} strokeWidth={1.5} />}
         tooltip={tooltip}
         onClick={() => {
           editorPanelState.setActiveSnippetId(id)
@@ -71,7 +71,7 @@ export const EditQueryButton = ({
       variant={variant}
       size="tiny"
       className={cn('w-7 h-7', className)}
-      icon={<Edit size={14} strokeWidth={1.5} />}
+      icon={<EditIcon size={14} strokeWidth={1.5} />}
       onClick={() => {
         if (isInlineEditorEnabled) {
           // This component needs to be updated to work with local EditorPanel state
@@ -96,7 +96,7 @@ export const EditQueryButton = ({
           size="tiny"
           disabled={!sql}
           className={cn('w-7 h-7', className)}
-          icon={<Edit size={14} strokeWidth={1.5} />}
+          icon={<EditIcon size={14} strokeWidth={1.5} />}
           tooltip={!!sql ? tooltip : { content: { side: 'bottom', text: undefined } }}
         />
       </DropdownMenuTrigger>

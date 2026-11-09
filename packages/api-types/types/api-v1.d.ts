@@ -40,8 +40,10 @@ export interface paths {
       cookie?: never
     }
     /**
-     * [Beta] Diffs a database branch
+     * Diffs a database branch
      * @description Diffs the specified database branch
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     get: operations['v1-diff-a-branch']
     put?: never
@@ -139,7 +141,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Authorize user through oauth */
+    /**
+     * Authorize user through oauth
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-authorize-user']
     put?: never
     post?: never
@@ -178,7 +185,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Revoke oauth app authorization and it's corresponding tokens */
+    /**
+     * Revoke oauth app authorization and it's corresponding tokens
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-revoke-token']
     delete?: never
     options?: never
@@ -196,8 +208,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Exchange auth code for user's access and refresh token
+     * Exchange auth code for user's access and refresh token
      * @description Supports `authorization_code`, `refresh_token`, and `urn:ietf:params:oauth:grant-type:jwt-bearer` grant types. The `jwt-bearer` grant type (IDJAG — identity-directed JWT assertion) is in beta and available on Team and Enterprise plans only.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-exchange-oauth-token']
     delete?: never
@@ -471,7 +485,6 @@ export interface paths {
     }
     /**
      * Gets project performance advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-performance-advisors']
@@ -492,7 +505,6 @@ export interface paths {
     }
     /**
      * Gets project security advisors.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-security-advisors']
@@ -560,14 +572,7 @@ export interface paths {
     /**
      * Gets project's logs
      * @deprecated
-     * @description Executes a SQL query on the project's logs.
-     *
-     *     Either the `iso_timestamp_start` and `iso_timestamp_end` parameters must be provided.
-     *     If both are not provided, only the last 1 minute of logs will be queried.
-     *     The timestamp range must be no more than 24 hours and is rounded to the nearest minute. If the range is more than 24 hours, a validation error will be thrown.
-     *
-     *     Note: Unless the `sql` parameter is provided, only edge_logs will be queried. See the [log query docs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#logs-explorer) for all available sources.
-     *
+     * @description This endpoint has been removed and always responds with `410 Gone`. Use `GET /v1/projects/{ref}/analytics/endpoints/logs` instead. See the [migration guide](https://supabase.com/changelog/48235-migration-of-supabase-management-api-logs-all-analytics-endpoint-to-logs-endpoint).
      */
     get: operations['v1-get-project-logs-all']
     put?: never
@@ -807,9 +812,19 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Create a login role for CLI with temporary password */
+    /**
+     * Create a login role for CLI with temporary password
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-create-login-role']
-    /** [Beta] Delete existing login roles used by CLI */
+    /**
+     * Delete existing login roles used by CLI
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-login-roles']
     options?: never
     head?: never
@@ -1012,7 +1027,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Partially updates project's Postgres config */
+    patch: operations['v1-patch-postgres-config']
     trace?: never
   }
   '/v1/projects/{ref}/config/disk': {
@@ -1127,11 +1143,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's custom hostname config */
+    /**
+     * Gets project's custom hostname config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-hostname-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's custom hostname configuration */
+    /**
+     * Deletes a project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-Delete hostname config']
     options?: never
     head?: never
@@ -1147,7 +1173,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a custom hostname for a project. */
+    /**
+     * Activates a custom hostname for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-custom-hostname']
     delete?: never
     options?: never
@@ -1164,7 +1195,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's custom hostname configuration */
+    /**
+     * Updates project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-hostname-config']
     delete?: never
     options?: never
@@ -1181,7 +1217,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Attempts to verify the DNS configuration for project's custom hostname configuration */
+    /**
+     * Attempts to verify the DNS configuration for project's custom hostname configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-verify-dns-config']
     delete?: never
     options?: never
@@ -1305,7 +1346,6 @@ export interface paths {
     }
     /**
      * Gets database metadata for the given project.
-     * @deprecated
      * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
      */
     get: operations['v1-get-database-metadata']
@@ -1529,7 +1569,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Run sql query */
+    /**
+     * Run sql query
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-run-a-query']
     delete?: never
     options?: never
@@ -1547,8 +1592,10 @@ export interface paths {
     get?: never
     put?: never
     /**
-     * [Beta] Run a sql query as supabase_read_only_user
+     * Run a sql query as supabase_read_only_user
      * @description All entity references must be schema qualified.
+     *
+     *     This endpoint is currently in its **Beta** stage.
      */
     post: operations['v1-read-only-query']
     delete?: never
@@ -1566,7 +1613,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Enables Database Webhooks on the project */
+    /**
+     * Enables Database Webhooks on the project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-enable-database-webhook']
     delete?: never
     options?: never
@@ -1695,9 +1747,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's temporary access configuration. */
+    /**
+     * Get project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-jit-access-config']
-    /** [Beta] Update project's temporary access configuration. */
+    /**
+     * Update project's temporary access configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-jit-access-config']
     post?: never
     delete?: never
@@ -1716,7 +1778,12 @@ export interface paths {
     get?: never
     put?: never
     post?: never
-    /** [Beta] Remove network bans. */
+    /**
+     * Remove network bans.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-delete-network-bans']
     options?: never
     head?: never
@@ -1732,7 +1799,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans */
+    /**
+     * Gets project's network bans
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans']
     delete?: never
     options?: never
@@ -1749,7 +1821,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Gets project's network bans with additional information about which databases they affect */
+    /**
+     * Gets project's network bans with additional information about which databases they affect
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-list-all-network-bans-enriched']
     delete?: never
     options?: never
@@ -1764,14 +1841,24 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's network restrictions */
+    /**
+     * Gets project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-network-restrictions']
     put?: never
     post?: never
     delete?: never
     options?: never
     head?: never
-    /** [Alpha] Updates project's network restrictions by adding or removing CIDRs */
+    /**
+     * Updates project's network restrictions by adding or removing CIDRs
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
     patch: operations['v1-patch-network-restrictions']
     trace?: never
   }
@@ -1784,8 +1871,35 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Updates project's network restrictions */
+    /**
+     * Updates project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-update-network-restrictions']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/v1/projects/{ref}/network-restrictions/review': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /**
+     * Applies or rejects the change in review in a project's network restrictions
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Alpha** stage.
+     */
+    post: operations['v1-review-network-restrictions']
     delete?: never
     options?: never
     head?: never
@@ -1816,9 +1930,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets project's pgsodium config */
+    /**
+     * Gets project's pgsodium config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-pgsodium-config']
-    /** [Beta] Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible. */
+    /**
+     * Updates project's pgsodium config. Updating the root_key can cause all data encrypted with the older key to become inaccessible.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-pgsodium-config']
     post?: never
     delete?: never
@@ -1854,7 +1978,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Remove a read replica */
+    /**
+     * Remove a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-remove-a-read-replica']
     delete?: never
     options?: never
@@ -1871,7 +2000,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Set up a read replica */
+    /**
+     * Set up a read replica
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-setup-a-read-replica']
     delete?: never
     options?: never
@@ -2000,9 +2134,19 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Get project's SSL enforcement configuration. */
+    /**
+     * Get project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-ssl-enforcement-config']
-    /** [Beta] Update project's SSL enforcement configuration. */
+    /**
+     * Update project's SSL enforcement configuration.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     put: operations['v1-update-ssl-enforcement-config']
     post?: never
     delete?: never
@@ -2057,7 +2201,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Upgrades the project's Postgres version */
+    /**
+     * Upgrades the project's Postgres version
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-upgrade-postgres-version']
     delete?: never
     options?: never
@@ -2072,7 +2221,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Returns the project's eligibility for upgrades */
+    /**
+     * Returns the project's eligibility for upgrades
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-eligibility']
     put?: never
     post?: never
@@ -2089,7 +2243,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the latest status of the project's upgrade */
+    /**
+     * Gets the latest status of the project's upgrade
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-postgres-upgrade-status']
     put?: never
     post?: never
@@ -2106,11 +2265,21 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets current vanity subdomain config */
+    /**
+     * Gets current vanity subdomain config
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-vanity-subdomain-config']
     put?: never
     post?: never
-    /** [Beta] Deletes a project's vanity subdomain configuration */
+    /**
+     * Deletes a project's vanity subdomain configuration
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     delete: operations['v1-deactivate-vanity-subdomain-config']
     options?: never
     head?: never
@@ -2126,7 +2295,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Activates a vanity subdomain for a project. */
+    /**
+     * Activates a vanity subdomain for a project.
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-activate-vanity-subdomain-config']
     delete?: never
     options?: never
@@ -2143,7 +2317,12 @@ export interface paths {
     }
     get?: never
     put?: never
-    /** [Beta] Checks vanity subdomain availability */
+    /**
+     * Checks vanity subdomain availability
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     post: operations['v1-check-vanity-subdomain-availability']
     delete?: never
     options?: never
@@ -2158,7 +2337,12 @@ export interface paths {
       path?: never
       cookie?: never
     }
-    /** [Beta] Gets the list of available regions that can be used for a new project */
+    /**
+     * Gets the list of available regions that can be used for a new project
+     * @description This is an **experimental** endpoint. It is subject to change or removal in future versions. Use it with caution, as it may not remain supported or stable.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
     get: operations['v1-get-available-regions']
     put?: never
     post?: never
@@ -2605,6 +2789,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     BranchResponse_Output: {
       /** Format: date-time */
@@ -2644,6 +2829,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       project_ref: string
       /** Format: date-time */
       review_requested_at?: string
@@ -3326,8 +3512,9 @@ export interface components {
       }[]
     }
     JitAuthorizeAccessResponse_Output: {
+      act?: string
       /** Format: uuid */
-      user_id: string
+      user_id?: string
       user_role: {
         allowed_networks?: {
           allowed_cidrs?: {
@@ -3638,10 +3825,46 @@ export interface components {
         dbAllowedCidrs?: string[]
         dbAllowedCidrsV6?: string[]
       }
+      /**
+       * @description Present when a change that was never applied is waiting for review. `config` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it.
+       * @example {
+       *       "dbAllowedCidrs": [
+       *         "203.0.113.0/24"
+       *       ],
+       *       "dbAllowedCidrsV6": [
+       *         "2001:db8::/32"
+       *       ]
+       *     }
+       */
+      pending_config?: {
+        dbAllowedCidrs?: string[]
+        dbAllowedCidrsV6?: string[]
+      }
+      /**
+       * Format: date-time
+       * @description When the change in `pending_config` was requested. Send it as `requested_at` to the review endpoint.
+       */
+      pending_requested_at?: string
       /** @enum {string} */
       status: 'stored' | 'applied'
       /** Format: date-time */
       updated_at?: string
+    }
+    /** @example {
+     *       "action": "apply",
+     *       "requested_at": "2026-10-21T20:31:51.116+00:00"
+     *     } */
+    NetworkRestrictionsReviewRequest: {
+      /**
+       * @description `apply` replaces the enforced list with the pending one and applies it. `reject` discards the pending one and keeps the enforced list.
+       * @enum {string}
+       */
+      action: 'apply' | 'reject'
+      /**
+       * Format: date-time
+       * @description The `pending_requested_at` of the change being reviewed. Only that change is resolved: if another one has replaced it, the request gets a 409.
+       */
+      requested_at: string
     }
     NetworkRestrictionsV2Response_Output: {
       /** Format: date-time */
@@ -3714,8 +3937,15 @@ export interface components {
     OAuthTokenResponse_Output: {
       access_token: string
       expires_in: number
+      /** @description Project refs the token is limited to. `null` means all projects. */
+      project_refs: string[] | null
       /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
       refresh_token?: string
+      /**
+       * @description Space-delimited scopes granted to the token. Omitted when no scopes were granted.
+       * @example projects:read projects:write
+       */
+      scope?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -3833,6 +4063,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponseV1_Output: {
@@ -3872,6 +4103,8 @@ export interface components {
       message: string
     }
     PostgresConfigResponse_Output: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -3905,6 +4138,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
       shared_buffers?: string
@@ -3923,6 +4158,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       jwt_secret?: string
       max_rows: number
@@ -4021,6 +4260,14 @@ export interface components {
             type: 'active_replication_slot'
           }
         | {
+            column_name: string
+            schema_name: string
+            table_name: string
+            /** @enum {string} */
+            type: 'table_using_reg_type'
+            type_name: string
+          }
+        | {
             /** @enum {string} */
             type: 'x86_architecture'
           }
@@ -4046,6 +4293,10 @@ export interface components {
             /** @enum {string} */
             type: 'btree_gist_nan_reindex'
           }
+        | {
+            /** @enum {string} */
+            type: 'collation_reindex_required'
+          }
       )[]
     }
     ProjectUpgradeInitiateResponse_Output: {
@@ -4057,6 +4308,11 @@ export interface components {
       override_enabled: boolean
     }
     RealtimeConfigResponse_Output: {
+      /**
+       * Format: date-time
+       * @description If set, the Realtime service has been suspended by an admin.
+       */
+      admin_suspended_at: string | null
       /** @description Sets connection pool size for Realtime Authorization */
       connection_pool: number | null
       /** @description Sets maximum number of bytes per second rate per channel limit */
@@ -4082,7 +4338,7 @@ export interface components {
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend: boolean | null
     }
-    RegionsInfo_Output: {
+    RegionsInfoV1_Output: {
       all: {
         smartGroup: {
           /** @enum {string} */
@@ -4277,7 +4533,7 @@ export interface components {
          * @description Deprecated: Rely on root-level favorite property instead.
          */
         favorite?: boolean
-        schema_version: string
+        schema_version?: string
         sql: string
       }
       description: string | null
@@ -4783,6 +5039,8 @@ export interface components {
      *       "statement_timeout": "60000ms"
      *     } */
     UpdatePostgresConfigBody: {
+      autovacuum_max_workers?: number
+      autovacuum_work_mem?: string
       /** @description Default unit: s */
       checkpoint_timeout?: string
       'cron.log_statement'?: boolean
@@ -4816,6 +5074,8 @@ export interface components {
       max_wal_senders?: number
       max_wal_size?: string
       max_worker_processes?: number
+      'pg_net.batch_size'?: number
+      'pg_stat_statements.max'?: number
       restart_database?: boolean
       /** @enum {string} */
       session_replication_role?: 'origin' | 'replica' | 'local'
@@ -5388,6 +5648,10 @@ export interface components {
       db_pool: number | null
       /** @description If `null`, the value is automatically configured to 10. */
       db_pool_acquisition_timeout: number | null
+      /** @description If `null`, the value is automatically configured to 30. */
+      db_pool_max_idletime: number | null
+      /** @description If `null`, the value is automatically configured to 1800. */
+      db_pool_max_lifetime: number | null
       db_schema: string
       max_rows: number
     }
@@ -5466,6 +5730,9 @@ export interface components {
           | 'log_auth_error_rate_high'
           | 'log_storage_error_rate_high'
           | 'log_edge_function_error_rate_high'
+          | 'realtime_authorization_timeouts'
+          | 'realtime_postgres_changes_spike'
+          | 'realtime_concurrent_users_near_limit'
           | 'project_not_active'
           | 'advisor_check_unavailable'
         /** Format: date-time */
@@ -5523,6 +5790,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     V1ProjectWithDatabaseResponse_Output: {
       /** @description Creation timestamp */
@@ -5578,6 +5846,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
     }
     /** @example {
      *       "query": "select * from pg_stat_activity limit 1;"
@@ -5685,12 +5954,44 @@ export interface components {
        */
       schedule_for: string
     }
+    /**
+     * Format: binary
+     * @description Raw Brotli-compressed ESZIP binary file.
+     *
+     *     **Validation requirements** - The file must start with the four magic bytes `EZBR` (hex: `45 5A 42 52`).
+     *     - The `ezbr_sha256` query parameter must contain the SHA-256 hash of the uploaded ESZIP payload.
+     *
+     *     **Example**
+     *     ```javascript
+     *     import { readFile } from 'node:fs/promises';
+     *     import { brotliCompress } from 'node:zlib';
+     *     import { promisify } from 'node:util';
+     *     import { createHash } from 'node:crypto';
+     *
+     *     const compress = promisify(brotliCompress);
+     *     const marker = Buffer.from('EZBR', 'ascii');
+     *
+     *     const file = await readFile('./function.eszip');
+     *     const compressed = await compress(file);
+     *
+     *     const payload = Buffer.concat([marker, compressed]);
+     *
+     *     const ezbr_sha256 = createHash('sha256')
+     *       .update(payload)
+     *       .digest('hex');
+     *
+     *     console.log(ezbr_sha256);
+     *     ```
+     *
+     *
+     */
+    V1UpdateFunctionBodyEszip: string
     /** @example {
      *       "name": "Hello World",
      *       "body": "Deno.serve(() => new Response('Hello again!'))",
      *       "verify_jwt": true
      *     } */
-    V1UpdateFunctionBody: {
+    V1UpdateFunctionBodyJson: {
       body?: string
       name?: string
       verify_jwt?: boolean
@@ -5713,6 +6014,8 @@ export interface components {
       db_extra_search_path?: string
       db_pool?: number
       db_pool_acquisition_timeout?: number
+      db_pool_max_idletime?: number
+      db_pool_max_lifetime?: number
       db_schema?: string
       max_rows?: number
     }
@@ -6443,6 +6746,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description User not found */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -7453,12 +7763,7 @@ export interface operations {
   }
   'v1-get-project-logs-all': {
     parameters: {
-      query?: {
-        iso_timestamp_end?: string
-        iso_timestamp_start?: string
-        /** @description Custom SQL query to execute on the logs. See [querying logs](https://supabase.com/docs/guides/monitoring-and-debugging/logs#querying-with-the-logs-explorer) for more details. */
-        sql?: string
-      }
+      query?: never
       header?: never
       path: {
         /** @description Project ref */
@@ -7468,14 +7773,6 @@ export interface operations {
     }
     requestBody?: never
     responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['AnalyticsResponse_Output']
-        }
-      }
       /** @description Unauthorized */
       401: {
         headers: {
@@ -7483,15 +7780,15 @@ export interface operations {
         }
         content?: never
       }
-      /** @description Usage exceeded. Enable additional usage to continue querying */
-      402: {
+      /** @description Forbidden action */
+      403: {
         headers: {
           [name: string]: unknown
         }
         content?: never
       }
-      /** @description Forbidden action */
-      403: {
+      /** @description This endpoint has been removed */
+      410: {
         headers: {
           [name: string]: unknown
         }
@@ -7813,6 +8110,13 @@ export interface operations {
         }
         content?: never
       }
+      /** @description API key not found for project */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
       /** @description Rate limit exceeded */
       429: {
         headers: {
@@ -7858,6 +8162,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -7913,6 +8224,13 @@ export interface operations {
       }
       /** @description Forbidden action */
       403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description API key not found for project */
+      404: {
         headers: {
           [name: string]: unknown
         }
@@ -9688,6 +10006,60 @@ export interface operations {
     }
   }
   'v1-update-postgres-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePostgresConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-postgres-config': {
     parameters: {
       query?: never
       header?: never
@@ -12180,8 +12552,8 @@ export interface operations {
     }
     requestBody: {
       content: {
-        'application/json': components['schemas']['V1UpdateFunctionBody']
-        'application/vnd.denoland.eszip': string
+        'application/json': components['schemas']['V1UpdateFunctionBodyJson']
+        'application/vnd.denoland.eszip': components['schemas']['V1UpdateFunctionBodyEszip']
       }
     }
     responses: {
@@ -12840,6 +13212,60 @@ export interface operations {
         content?: never
       }
       /** @description Failed to update project network restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-review-network-restrictions': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['NetworkRestrictionsReviewRequest']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['NetworkRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to resolve the network restrictions review */
       500: {
         headers: {
           [name: string]: unknown
@@ -14263,7 +14689,7 @@ export interface operations {
           [name: string]: unknown
         }
         content: {
-          'application/json': components['schemas']['RegionsInfo_Output']
+          'application/json': components['schemas']['RegionsInfoV1_Output']
         }
       }
     }

@@ -1,7 +1,6 @@
 'use client'
 
 import { cva } from 'class-variance-authority'
-import { Tabs as TabsPrimitive } from 'radix-ui'
 import {
   Children,
   isValidElement,
@@ -13,7 +12,7 @@ import {
   useState,
   type KeyboardEvent,
 } from 'react'
-import { cn } from 'ui'
+import { cn, TabsContent, TabsIndicator, TabsList, Tabs as TabsRoot, TabsTrigger } from 'ui'
 
 import { useTocRerenderTrigger } from '../docs/GuidesMdx.state'
 import { useStickyTabs, UseStickyTabsOptions } from './useStickyTabs'
@@ -39,10 +38,15 @@ export interface TabsProps {
 export const tabsListVariants = cva(cn('flex'), {
   variants: {
     type: {
-      pills: 'space-x-1',
-      underlined: 'items-center border-b border-secondary',
-      cards: '',
-      'rounded-pills': 'flex-wrap gap-2',
+      pills: 'border-b-0 space-x-1',
+      // fix focus ring so it is not clipped
+      underlined: cn(
+        'relative items-center',
+        'ps-(--tab-lead) -ms-(--tab-lead) [--tab-track-inset:var(--tab-lead)]',
+        '[--tab-track:var(--border-secondary)]'
+      ),
+      cards: 'border-b-0',
+      'rounded-pills': 'border-b-0 flex-wrap gap-2',
     },
     scrollable: {
       true: 'overflow-auto whitespace-nowrap no-scrollbar mask-fadeout-right',
@@ -55,15 +59,18 @@ export const tabsListVariants = cva(cn('flex'), {
 
 export const tabsTriggerListVariants = cva(
   cn(
-    'relative cursor-pointer flex items-center space-x-2 text-center transition-colors focus-ring [&_img]:m-0 [&_img]:size-3.5 [&_svg]:size-3.5'
+    'relative cursor-pointer flex items-center gap-2 text-center transition-colors',
+    'focus-inset rounded-md',
+    '[&_img]:m-0 [&_img]:size-3.5 [&_svg]:size-3.5'
   ),
   {
     variants: {
       type: {
-        pills: 'shadow-xs rounded-sm border',
-        underlined: 'text-foreground-lighter',
-        cards: '',
-        'rounded-pills': 'shadow-xs rounded-full',
+        pills: 'border-b-0 data-[state=active]:border-b-stronger shadow-xs rounded-sm border',
+        underlined: 'text-foreground-lighter data-[state=active]:shadow-none',
+        cards: 'border-b-0',
+        'rounded-pills':
+          'border-b-0 data-[state=active]:border-b-foreground shadow-xs rounded-full',
       },
       size: {
         tiny: 'text-xs px-2.5 py-1',
@@ -94,8 +101,9 @@ export const tabsTriggerListVariants = cva(
       {
         type: 'underlined',
         isActive: true,
-        className: '!text-foreground border-b-2 border-foreground',
+        className: '!text-foreground',
       },
+      { type: 'underlined', className: 'py-3 first:-ms-(--tab-lead)' },
       {
         type: 'rounded-pills',
         isActive: true,
@@ -110,6 +118,14 @@ export const tabsTriggerListVariants = cva(
     ],
   }
 )
+
+const TAB_LEAD: Record<NonNullable<TabsProps['size']>, string> = {
+  tiny: 'calc(var(--spacing) * 2.5)',
+  small: 'calc(var(--spacing) * 3)',
+  medium: 'calc(var(--spacing) * 4)',
+  large: 'calc(var(--spacing) * 4)',
+  xlarge: 'calc(var(--spacing) * 6)',
+}
 
 const isString = (maybeStr: unknown): maybeStr is string => typeof maybeStr === 'string'
 
@@ -208,12 +224,13 @@ export const Tabs = ({
     ]
   )
   return (
-    <TabsPrimitive.Root
+    <TabsRoot
       value={activeTab}
       className={cn('w-full justify-between space-y-4', baseClassNames)}
       ref={observedRef}
     >
-      <TabsPrimitive.List
+      <TabsList
+        style={{ '--tab-lead': TAB_LEAD[size] } as React.CSSProperties}
         className={tabsListVariants({
           type,
           scrollable,
@@ -227,7 +244,7 @@ export const Tabs = ({
           const isActive = activeTab === tab.props.id
 
           return (
-            <TabsPrimitive.Trigger
+            <TabsTrigger
               onKeyDown={(e: KeyboardEvent<HTMLButtonElement>) => {
                 if (e.key === 'Enter') {
                   e.preventDefault()
@@ -242,13 +259,14 @@ export const Tabs = ({
               {tab.props.icon}
               <span>{tab.props.label}</span>
               {tab.props.iconRight}
-            </TabsPrimitive.Trigger>
+            </TabsTrigger>
           )
         })}
         {addOnAfter}
-      </TabsPrimitive.List>
+        {type === 'underlined' ? <TabsIndicator /> : null}
+      </TabsList>
       {childrenArr}
-    </TabsPrimitive.Root>
+    </TabsRoot>
   )
 }
 
@@ -263,12 +281,8 @@ interface TabPanelProps {
 
 export const TabPanel = ({ children, id, className }: TabPanelProps) => {
   return (
-    <TabsPrimitive.Content
-      value={id}
-      className={cn('focus:outline-hidden transition-height', className)}
-      tabIndex={-1}
-    >
+    <TabsContent value={id} className={cn('mt-0 focus:outline-hidden', className)} tabIndex={-1}>
       {children}
-    </TabsPrimitive.Content>
+    </TabsContent>
   )
 }

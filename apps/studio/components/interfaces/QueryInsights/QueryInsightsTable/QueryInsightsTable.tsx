@@ -1,12 +1,12 @@
 import { safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
 import { wrapWithRollback } from '@supabase/pg-meta/src/query'
 import { useParams } from 'common'
-import { Search, TextSearch, X } from 'lucide-react'
+import { SearchIcon, TextSearchIcon, XIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { parseAsArrayOf, parseAsString, useQueryStates } from 'nuqs'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { DataGridHandle, Row } from 'react-data-grid'
-import { Button, cn, Tabs, TabsList, TabsTrigger } from 'ui'
+import { Button, cn, FloatingPlate, Tabs, TabsList, TabsTrigger } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -28,6 +28,7 @@ import { FilterPill } from '@/components/interfaces/QueryPerformance/components/
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -184,6 +185,9 @@ export const QueryInsightsTable = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          // The query text comes from pg_stat_statements, so the user wrote it
+          sqlOrigin: 'user',
+          grant: unguarded.migrating,
         },
         {
           onSuccess(data) {
@@ -367,16 +371,16 @@ export const QueryInsightsTable = ({
               <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
                 <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
-                    All{triageItems.length > 0 && ` (${triageItems.length})`}
+                    All{triageItems.length > 0 && <span>{` (${triageItems.length})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
-                    Errors{errorCount > 0 && ` (${errorCount})`}
+                    Errors{errorCount > 0 && <span>{` (${errorCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
-                    Index{indexCount > 0 && ` (${indexCount})`}
+                    Index{indexCount > 0 && <span>{` (${indexCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
-                    Slow{slowCount > 0 && ` (${slowCount})`}
+                    Slow{slowCount > 0 && <span>{` (${slowCount})`}</span>}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>
@@ -384,7 +388,7 @@ export const QueryInsightsTable = ({
               <Input
                 size="tiny"
                 autoComplete="off"
-                icon={<Search className="h-4 w-4" />}
+                icon={<SearchIcon className="h-4 w-4" />}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 name="search"
@@ -397,7 +401,7 @@ export const QueryInsightsTable = ({
                       key="clear"
                       size="tiny"
                       variant="text"
-                      icon={<X className="h-4 w-4" />}
+                      icon={<XIcon className="h-4 w-4" />}
                       onClick={() => setSearchQuery('')}
                       className="p-0 h-5 w-5"
                     />
@@ -422,13 +426,15 @@ export const QueryInsightsTable = ({
               : 'opacity-0 translate-y-4 pointer-events-none',
           ].join(' ')}
         >
-          <Button
-            size="tiny"
-            className="rounded-full shadow-md"
-            onClick={() => onCurrentSelectQuery?.(null)}
-          >
-            Clear query
-          </Button>
+          <FloatingPlate rounded="full">
+            <Button
+              size="tiny"
+              className="rounded-full shadow-md"
+              onClick={() => onCurrentSelectQuery?.(null)}
+            >
+              Clear query
+            </Button>
+          </FloatingPlate>
         </div>
         {isLoading ? (
           <div className="px-6 py-4">
@@ -476,7 +482,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No issues found</p>
                       <p className="text-foreground-light">
@@ -532,7 +538,7 @@ export const QueryInsightsTable = ({
                 },
                 noRowsFallback: (
                   <div className="absolute top-20 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-                    <TextSearch className="text-foreground-muted" strokeWidth={1} />
+                    <TextSearchIcon className="text-foreground-muted" strokeWidth={1} />
                     <div className="text-center">
                       <p className="text-foreground">No queries found</p>
                       <p className="text-foreground-light">

@@ -39,7 +39,7 @@ Dashboard backups are only available for older projects that still use logical b
           <StepHikeCompact.Details title="Configure your new project" fullWidth>
                 In your new project:
 
-                - If you were using Webhooks, enable [Database Webhooks](/dashboard/project/_/database/hooks).
+                - If you were using Webhooks, enable [Database Webhooks](/dashboard/project/_/integrations/webhooks/overview).
                 - If you were using any extensions, enable the [Extensions](/dashboard/project/_/database/extensions).
                 - If you were using Replication for Realtime, enable [Publication](/dashboard/project/_/database/publications) where needed.
           </StepHikeCompact.Details>
@@ -68,7 +68,7 @@ Here are some things that are not stored directly in your database and will requ
 
       <Admonition type="note">
 
-        Use the [Session pooler](/dashboard/project/_?showConnect=true&method=session) connection string by default. If your ISP supports IPv6 or you have the IPv4 add-on enabled, use the direct connection string.
+        Use the direct connection string. If your ISP doesn't support IPv6 and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address) enabled, use the [Session pooler](/dashboard/project/_?showConnect=true&method=session) connection string instead.
 
       </Admonition>
 
@@ -79,7 +79,7 @@ Here are some things that are not stored directly in your database and will requ
 
       Direct connection string:
       ```bash
-        postgresql://postgres.[PROJECT-REF]:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.com:5432/postgres
+        postgresql://postgres:[YOUR-PASSWORD]@db.[PROJECT-REF].supabase.co:5432/postgres
       ```
     </StepHikeCompact.Details>
 

@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion } from 'framer-motion'
 import { ChevronDown, Filter, Key, List } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
@@ -499,7 +499,7 @@ export function VisualDemo() {
                               <Key
                                 size={12}
                                 strokeWidth={2}
-                                className="text-brand rotate-45 shrink-0"
+                                className="text-primary rotate-45 shrink-0"
                               />
                             )}
                             <span className="text-foreground text-xs truncate font-medium">

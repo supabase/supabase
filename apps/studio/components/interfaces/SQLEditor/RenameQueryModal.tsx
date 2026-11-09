@@ -63,8 +63,7 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
   const tabsSnap = useTabsStateSnapshot()
   const isSQLSnippet = snippet.type === 'sql'
 
-  // Orgs on HIPAA plans or that have disabled AI should not have access to Supabase AI
-  const { aiOptInLevel, isHipaaProjectDisallowed } = useOrgAiOptInLevel()
+  const { aiOptInLevel } = useOrgAiOptInLevel()
   const isAiOptedOut = aiOptInLevel === 'disabled'
 
   const { id, name, description } = snippet
@@ -180,19 +179,15 @@ const RenameQueryForm = ({ snippet, onCancel, onComplete }: RenameQueryFormProps
             <ButtonTooltip
               onClick={() => generateTitle()}
               size="tiny"
-              disabled={
-                isTitleGenerationLoading || !isApiKeySet || isHipaaProjectDisallowed || isAiOptedOut
-              }
+              disabled={isTitleGenerationLoading || !isApiKeySet || isAiOptedOut}
               tooltip={{
                 content: {
                   side: 'bottom',
-                  text: isHipaaProjectDisallowed
-                    ? 'This feature is not available for HIPAA projects.'
-                    : isAiOptedOut
-                      ? 'Your organization has opted out of AI features.'
-                      : isApiKeySet
-                        ? undefined
-                        : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
+                  text: isAiOptedOut
+                    ? 'Your organization has opted out of AI features.'
+                    : isApiKeySet
+                      ? undefined
+                      : 'Add your "OPENAI_API_KEY" to your environment variables to use this feature.',
                 },
               }}
             >

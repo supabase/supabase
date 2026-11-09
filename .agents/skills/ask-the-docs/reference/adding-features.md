@@ -44,9 +44,8 @@ building parallel ones.
 | Telemetry                                   | `useSendTelemetryEvent` + `packages/common/telemetry-constants.ts`                                          |
 | Validation / schemas                        | `zod` schemas under `apps/docs/lib/`                                                                        |
 | Code samples in MDX                         | `$CodeSample` directive                                                                                     |
-| Build steps                                 | `prebuild` / `postbuild` chain in `apps/docs/package.json`                                                  |
+| Build steps                                 | Turbo `dependsOn` graph in `apps/docs/turbo.jsonc`                                                  |
 | CI checks                                   | Existing workflows under `.github/workflows/`. See [`ci-and-lint.md`](./ci-and-lint.md).                    |
-| Lint rules for MDX content                  | `supa-mdx-lint` configuration — extend it, don't add a new lint job                                         |
 
 If something close to what you need already exists, **the default is to
 extend it**, not to build alongside.
@@ -88,10 +87,10 @@ Antipatterns to avoid:
 - Two extraction paths that serialize the same content differently.
 - A bespoke link-wrapper component when `<Link>` + `<GlassPanel>` already
   covers the pattern — compose at the call site instead.
-- New custom build steps that run alongside the existing `prebuild` /
-  `postbuild` chain when a hook already exists.
-- A new CI workflow when `docs_lint`, `Docs Tests`, or the existing
-  typecheck/prettier jobs could absorb the check. See
+- New custom build steps that run alongside the existing turbo
+  task graph when a `dependsOn` entry already fits.
+- A new CI workflow when `Docs Tests` or the existing typecheck/prettier jobs
+  could absorb the check. See
   [`ci-and-lint.md`](./ci-and-lint.md).
 - A new content vocabulary (custom front-matter block, novel MDX directive,
   new YAML schema) when a React component + partial would express the same

@@ -1,13 +1,15 @@
 import { useQuery } from '@tanstack/react-query'
 import type { components } from 'api-types'
+import { useFlag } from 'common'
 
 import { lintKeys } from './keys'
 import type { Lint } from './lint-query'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { IS_PLATFORM, PROJECT_STATUS } from '@/lib/constants'
+import { PROJECT_STATUS } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { EMPTY_ARR } from '@/lib/void'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { UseCustomQueryOptions } from '@/types'
 
 type AdvisorLintName =
   components['schemas']['V2RunProjectAdvisorsBody']['data']['attributes']['lints'][number]['name']
@@ -15,7 +17,7 @@ type AdvisorLintName =
 /**
  * Health lints are on-demand only on the API side — each one opens a live database
  * connection or queries the metrics/logs store — so the endpoint runs only the lints it
- * is asked for. We request the checks that mean the project is actually broken, and leave
+ * is asked for. We request the checks that report a problem with the project, and leave
  * out the diagnostic ones (`db_connection_failing`, `instance_telemetry_lost`), which
  * describe the state of our own probes more than the state of the project.
  */
@@ -28,6 +30,9 @@ export const HEALTH_LINT_NAMES = [
   'log_storage_error_rate_high',
   'log_edge_function_error_rate_high',
   'instance_alert_firing',
+  'realtime_authorization_timeouts',
+  'realtime_postgres_changes_spike',
+  'realtime_concurrent_users_near_limit',
 ] as const satisfies readonly AdvisorLintName[]
 
 /**
@@ -56,6 +61,7 @@ export async function getProjectHealthLints(
       },
     },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -65,7 +71,7 @@ export async function getProjectHealthLints(
 }
 
 export type ProjectHealthLintsData = Awaited<ReturnType<typeof getProjectHealthLints>>
-export type ProjectHealthLintsError = ResponseError
+export type ProjectHealthLintsError = StudioError
 
 export const useProjectHealthLintsQuery = <TData = ProjectHealthLintsData>(
   { projectRef }: ProjectHealthLintsVariables,
@@ -74,13 +80,14 @@ export const useProjectHealthLintsQuery = <TData = ProjectHealthLintsData>(
     ...options
   }: UseCustomQueryOptions<ProjectHealthLintsData, ProjectHealthLintsError, TData> = {}
 ) => {
-  const { data: project } = useSelectedProjectQuery()
+  const { data: project } = useSelectedProjectQuery({ enabled: enabled !== false })
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const isActive = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
   return useQuery<ProjectHealthLintsData, ProjectHealthLintsError, TData>({
     queryKey: lintKeys.healthLints(projectRef),
     queryFn: ({ signal }) => getProjectHealthLints({ projectRef }, signal),
-    enabled: enabled && IS_PLATFORM && typeof projectRef !== 'undefined' && isActive,
+    enabled: enabled && isHealthAdvisorEnabled && typeof projectRef !== 'undefined' && isActive,
     // Every run costs a live database connection plus a metrics and a logs query, so keep
     // repeat mounts (homepage row, advisor panel) on one result and don't retry failures.
     staleTime: 60_000,

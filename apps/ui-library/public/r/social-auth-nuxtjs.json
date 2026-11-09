@@ -1,7 +1,6 @@
 {
   "$schema": "https://ui.shadcn.com/schema/registry-item.json",
   "name": "social-auth-nuxtjs",
-  "type": "registry:block",
   "title": "Social Auth flow for Nuxt and Supabase",
   "description": "Social Auth flow for Nuxt and Supabase",
   "dependencies": [
@@ -57,5 +56,6 @@
       "type": "registry:file",
       "target": "server/routes/auth/oauth.ts"
     }
-  ]
+  ],
+  "type": "registry:block"
 }

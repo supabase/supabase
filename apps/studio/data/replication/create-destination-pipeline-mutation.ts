@@ -2,7 +2,9 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { components } from 'api-types'
 import { toast } from 'sonner'
 
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import type {
   BigQueryDestinationConfig,
   BigQueryTableOption,
@@ -17,7 +19,8 @@ import {
   isDucklakeSupabaseConfig,
 } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type CreateDestinationPipelineBody =
   components['schemas']['CreateReplicationDestinationPipelineBody']
@@ -189,7 +192,7 @@ async function createDestinationPipeline(
   })
 
   if (error) handleError(error)
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type CreateDestinationPipelineData = Awaited<ReturnType<typeof createDestinationPipeline>>
@@ -201,34 +204,32 @@ export const useCreateDestinationPipelineMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     CreateDestinationPipelineData,
-    ResponseError,
+    StudioError,
     CreateDestinationPipelineParams
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<CreateDestinationPipelineData, ResponseError, CreateDestinationPipelineParams>(
-    {
-      mutationFn: (vars) => createDestinationPipeline(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef } = variables
+  return useMutation<CreateDestinationPipelineData, StudioError, CreateDestinationPipelineParams>({
+    mutationFn: (vars) => createDestinationPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
 
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-        ])
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef),
+      ])
 
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to create destination or pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      if (onError === undefined) {
+        toast.error(`Failed to create destination or pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

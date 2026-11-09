@@ -2,8 +2,8 @@ import 'swiper/css'
 
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
 import SectionContainer from '~/components/Layouts/SectionContainer'
-import { AnimatePresence, motion, useAnimation } from 'framer-motion'
 import { ArrowUpRight } from 'lucide-react'
+import { AnimatePresence, motion, useAnimation } from 'motion/react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { useEffect, useState, type ReactNode } from 'react'
@@ -33,7 +33,7 @@ const Tab = ({ isActive, label, paragraph, onClick, progress, intervalDuration }
       {isActive && (
         <motion.div
           className={[
-            'absolute inset-0 w-full right-full bg-brand h-full transition-opacity',
+            'absolute inset-0 w-full right-full bg-brand-default h-full transition-opacity',
             progress! > 99.7 ? 'opacity-0' : 'opacity-100',
           ].join(' ')}
           style={{ x: `${progress! - 100}%` }}

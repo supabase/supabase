@@ -21,6 +21,7 @@ import { getRevokePermissionStatements } from './hooks.utils'
 import { CodeEditor } from '@/components/ui/CodeEditor/CodeEditor'
 import { useAuthConfigQuery } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -52,7 +53,10 @@ export const DeleteHookConfirmationDialog = ({
           await executeSql({
             projectRef,
             connectionString: project!.connectionString,
+            sqlOrigin: 'studio',
+            queryName: 'auth-hook-revoke-permissions',
             sql: joinSqlFragments(revokeStatements, '\n'),
+            grant: unguarded.migrating,
           })
           toast.success(`Successfully deleted ${hook.title}`)
         } catch (error) {
@@ -100,8 +104,10 @@ export const DeleteHookConfirmationDialog = ({
             <AlertDialogDescription asChild>
               <div className="space-y-2">
                 <p>
-                  The {willLockTemplates ? 'default' : 'built-in'} email templates will be used when
-                  sending authentication-related emails.
+                  The {willLockTemplates ? <span>default</span> : <span>built-in</span>}{' '}
+                  <span>
+                    email templates will be used when sending authentication-related emails.
+                  </span>
                 </p>
                 {willLockTemplates && (
                   <p>Email templates cannot be edited on the Free plan without custom SMTP.</p>

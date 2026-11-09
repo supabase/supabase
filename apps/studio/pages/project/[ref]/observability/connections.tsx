@@ -1,5 +1,5 @@
 import dayjs from 'dayjs'
-import { CirclePause, CirclePlay } from 'lucide-react'
+import { CirclePauseIcon, CirclePlayIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Badge, Button, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
@@ -95,7 +95,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             <Tooltip>
               <TooltipTrigger className="flex items-center">
                 <Badge variant="success">
-                  <span className="h-1.5 w-1.5 bg-brand rounded-full animate-pulse" />
+                  <span className="h-1.5 w-1.5 bg-brand-default rounded-full animate-pulse" />
                   <span>Live</span>
                 </Badge>
               </TooltipTrigger>
@@ -113,7 +113,7 @@ export const DatabaseConnections: NextPageWithLayout = () => {
             <Button
               variant={live ? 'default' : 'primary'}
               onClick={handleToggleLive}
-              icon={live ? <CirclePause /> : <CirclePlay />}
+              icon={live ? <CirclePauseIcon /> : <CirclePlayIcon />}
             >
               {live ? 'Pause' : 'Live'}
             </Button>

@@ -208,7 +208,7 @@ onMounted(async () => {
 })
 </script>`,
     lang: 'vue' as const,
-    docsUrl: '/docs/guides/getting-started/quickstarts/vuejs',
+    docsUrl: '/docs/guides/getting-started/quickstarts/vue',
   },
   {
     name: 'Nuxt',
@@ -250,7 +250,7 @@ const frameworkExamples: Record<
     },
     {
       title: 'Auth & User Management',
-      description: 'Email, social login, and user profiles.',
+      description: 'Email, social sign-in, and user profiles.',
       url: '/docs/guides/auth/quickstarts/react',
       icon: 'Users',
     },
@@ -307,7 +307,7 @@ const frameworkExamples: Record<
     {
       title: 'Auth with Vue',
       description: 'Email and OAuth authentication.',
-      url: '/docs/guides/getting-started/quickstarts/vuejs',
+      url: '/docs/guides/getting-started/quickstarts/vue',
       icon: 'KeyRound',
     },
   ],

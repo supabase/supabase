@@ -1,5 +1,5 @@
 import { IS_PLATFORM } from 'common'
-import { MoreHorizontal, PlugZap, TrashIcon } from 'lucide-react'
+import { MoreHorizontalIcon, PlugZapIcon, TrashIcon } from 'lucide-react'
 import { cloneElement, useEffect, useRef, useState } from 'react'
 import {
   Button,
@@ -25,7 +25,7 @@ import { useEnabledLogDrainTypes } from './useEnabledLogDrainTypes'
 import { VoteLink } from './VoteLink'
 import { AlertError } from '@/components/ui/AlertError'
 import { LogDrainData } from '@/data/log-drains/log-drains-query'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export function LogDrainsList({
   logDrains,
@@ -40,7 +40,7 @@ export function LogDrainsList({
   logDrains: LogDrainData[] | undefined
   isLoading: boolean
   isError: boolean
-  error: ResponseError | null
+  error: StudioError | null
   isDeleting?: boolean
   onNewDrainClick: (src: LogDrainType) => void
   onDeleteDrain: (drain: LogDrainData) => void
@@ -148,13 +148,13 @@ export function LogDrainsList({
                         <Button
                           variant="text"
                           className="px-1 opacity-50 hover:opacity-100 bg-transparent! shrink-0"
-                          icon={<MoreHorizontal />}
+                          icon={<MoreHorizontalIcon />}
                         />
                       </DropdownMenuTrigger>
                       <DropdownMenuContent className="max-w-[160px]" align="end">
                         {onTestDrain && (
                           <DropdownMenuItem onClick={() => onTestDrain(drain)}>
-                            <PlugZap className="h-4 w-4 mr-2" />
+                            <PlugZapIcon className="h-4 w-4 mr-2" />
                             Test connection
                           </DropdownMenuItem>
                         )}

@@ -5,13 +5,13 @@ description: 'Learn how to check Storage Logs'
 sidebar_label: 'Debugging'
 ---
 
-The [Storage Logs](/dashboard/project/_/logs/storage-logs) provide a convenient way to examine all incoming request logs to your Storage service. You can filter by time and keyword searches.
+Open [Logs](/dashboard/project/_/logs) and select **Storage** as the log type to inspect Storage service events. Filter by time and event message to find a request.
 
-For more advanced filtering needs, use the [SQL Editor](/dashboard/project/_/sql/new?skip=true&source=logs) with the query source set to **Logs** to query the Storage logs directly. A Logs query runs ClickHouse SQL rather than Postgres SQL. Every log line is a row in the `logs` table, tagged by a `source` column, with structured fields in a `log_attributes` map.
+For more advanced filtering needs, use the [Explorer](/dashboard/project/_/explorer) after selecting **Run SQL**, query source **Logs**, and a time range to query the Storage logs directly. A Logs query runs ClickHouse SQL rather than Postgres SQL. Every log line is a row in the `logs` table, tagged by a `source` column, with structured fields in a `log_attributes` map.
 
 <Admonition type="note">
   
-For more details on filtering the log tables, see [Query and filter logs](/docs/guides/observability/advanced-log-filtering)
+For more details on filtering the log tables, see [Query logs with SQL](/docs/guides/observability/advanced-log-filtering)
 
 </Admonition>
 

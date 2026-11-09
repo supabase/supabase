@@ -1,4 +1,4 @@
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import type { FieldPath, FieldValues, UseFormReturn } from 'react-hook-form'
 import { Button, Card, CardContent, FormControl, FormField, SheetSection } from 'ui'
@@ -64,7 +64,7 @@ export const InstallationSettings = <
                         <Button
                           asChild
                           key={action.label}
-                          icon={isExternal ? <ExternalLink /> : undefined}
+                          icon={isExternal ? <ExternalLinkIcon /> : undefined}
                         >
                           <Link
                             href={action.href}

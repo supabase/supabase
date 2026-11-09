@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS, useParams } from 'common'
-import { AlertCircle, XIcon } from 'lucide-react'
+import { AlertCircleIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { toast } from 'sonner'
@@ -19,7 +19,7 @@ import {
 import PrivilegesHead from '@/components/interfaces/Database/Privileges/PrivilegesHead'
 import PrivilegesTable from '@/components/interfaces/Database/Privileges/PrivilegesTable'
 import { ProtectedSchemaWarning } from '@/components/interfaces/Database/ProtectedSchemaWarning'
-import DatabaseLayout from '@/components/layouts/DatabaseLayout/DatabaseLayout'
+import { DatabaseLayout } from '@/components/layouts/DatabaseLayout/DatabaseLayout'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { ScaffoldContainer, ScaffoldSection } from '@/components/layouts/Scaffold'
 import { AlertError } from '@/components/ui/AlertError'
@@ -242,10 +242,10 @@ const PrivilegesPage: NextPageWithLayout = () => {
             <>
               {!diffWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>
                     Changes to column privileges will not be reflected in migrations when running{' '}
-                    <code className="text-code-inline">supabase db diff</code>.
+                    <code>supabase db diff</code>.
                   </AlertTitle>
                   <AlertDescription>
                     Column privileges are not supported in the current version of the Supabase CLI.
@@ -267,18 +267,14 @@ const PrivilegesPage: NextPageWithLayout = () => {
 
               {!selectStarWarningDismissed && (
                 <Alert variant="warning">
-                  <AlertCircle strokeWidth={2} />
+                  <AlertCircleIcon strokeWidth={2} />
                   <AlertTitle>Changing column privileges can break existing queries.</AlertTitle>
                   <AlertDescription>
                     If you remove a column privilege for a role, that role will lose all access to
                     that column.
                     <br />
-                    All operations selecting <code className="text-code-inline">
-                      *
-                    </code> (including <code className="text-code-inline">returning *</code> for{' '}
-                    <code className="text-code-inline">insert</code>,{' '}
-                    <code className="text-code-inline">update</code>, and{' '}
-                    <code className="text-code-inline">delete</code>) will fail.
+                    All operations selecting <code>*</code> (including <code>returning *</code> for{' '}
+                    <code>insert</code>, <code>update</code>, and <code>delete</code>) will fail.
                   </AlertDescription>
                   <Button
                     variant="outline"

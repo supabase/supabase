@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   assistantMessageMetadataSchema,
+  isTimedOutMessage,
   messagesIncludeLogsSnippets,
 } from '@/lib/ai/assistant-message-metadata'
 
@@ -10,8 +11,8 @@ function userMessage(id: string, text: string, metadata?: unknown): UIMessage {
   return { id, role: 'user', parts: [{ type: 'text', text }], metadata } as UIMessage
 }
 
-function assistantMessage(id: string, text: string): UIMessage {
-  return { id, role: 'assistant', parts: [{ type: 'text', text }] } as UIMessage
+function assistantMessage(id: string, text: string, metadata?: unknown): UIMessage {
+  return { id, role: 'assistant', parts: [{ type: 'text', text }], metadata } as UIMessage
 }
 
 describe('assistantMessageMetadataSchema', () => {
@@ -86,5 +87,25 @@ describe('messagesIncludeLogsSnippets', () => {
       messagesIncludeLogsSnippets([userMessage('1', 'hi', { containsLogsSnippets: 'yes' })])
     ).toBe(false)
     expect(messagesIncludeLogsSnippets([userMessage('1', 'hi', 'not an object')])).toBe(false)
+  })
+})
+
+describe('isTimedOutMessage', () => {
+  it('detects an assistant response the server stopped at the deadline', () => {
+    expect(isTimedOutMessage(assistantMessage('1', 'partial', { timedOut: true }))).toBe(true)
+  })
+
+  it('is false for a completed response', () => {
+    expect(isTimedOutMessage(assistantMessage('1', 'done'))).toBe(false)
+    expect(isTimedOutMessage(assistantMessage('1', 'done', { timedOut: false }))).toBe(false)
+  })
+
+  it('ignores the flag on user messages', () => {
+    expect(isTimedOutMessage(userMessage('1', 'hi', { timedOut: true }))).toBe(false)
+  })
+
+  it('is false rather than throwing on a missing message or malformed metadata', () => {
+    expect(isTimedOutMessage(undefined)).toBe(false)
+    expect(isTimedOutMessage(assistantMessage('1', 'partial', { timedOut: 'yes' }))).toBe(false)
   })
 })

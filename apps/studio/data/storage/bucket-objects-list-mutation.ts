@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { components } from '@/data/api'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ListBucketObjectsParams = {
   projectRef: string
@@ -41,15 +42,49 @@ export const listBucketObjects = async (
 
 type ListBucketObjectsData = Awaited<ReturnType<typeof listBucketObjects>>
 
+type ListBucketObjectsV2Params = {
+  projectRef: string
+  bucketId?: string
+  prefix: string
+  cursor?: string
+  options?: Omit<components['schemas']['GetObjectsV2Body'], 'prefix' | 'cursor' | 'with_delimiter'>
+}
+
+export const listBucketObjectsV2 = async (
+  { projectRef, bucketId, prefix, cursor, options }: ListBucketObjectsV2Params,
+  signal?: AbortSignal
+) => {
+  if (!bucketId) throw new Error('bucketId is required')
+
+  const { data, error } = await post('/platform/storage/{ref}/buckets/{id}/objects/list-v2', {
+    params: {
+      path: {
+        ref: projectRef,
+        id: bucketId,
+      },
+    },
+    body: {
+      prefix,
+      cursor,
+      with_delimiter: true,
+      ...options,
+    },
+    signal,
+  })
+
+  if (error) handleError(error)
+  return data
+}
+
 export const useGetSignBucketObjectMutation = ({
   onSuccess,
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>,
+  UseCustomMutationOptions<ListBucketObjectsData, StudioError, ListBucketObjectsParams>,
   'mutationFn'
 > = {}) => {
-  return useMutation<ListBucketObjectsData, ResponseError, ListBucketObjectsParams>({
+  return useMutation<ListBucketObjectsData, StudioError, ListBucketObjectsParams>({
     mutationFn: (vars) => listBucketObjects(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

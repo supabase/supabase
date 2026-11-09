@@ -42,18 +42,20 @@ const ProjectsPage: NextPageWithLayout = () => {
             }
           />
         ) : (
-          <div className="flex flex-col gap-y-4 xl:flex-row xl:gap-x-6">
-            <div className="flex flex-col gap-y-4 flex-1 min-w-0">
-              <HomePageActions />
-              <ProjectList />
+          <div className="space-y-5">
+            <div className="flex flex-col gap-y-4 xl:flex-row xl:gap-x-6">
+              <div className="flex flex-col gap-y-4 flex-1 min-w-0">
+                <HomePageActions />
+                <ProjectList />
+              </div>
+              {showOrgProjectsListUsageCard && (
+                <aside className="xl:w-80 xl:shrink-0">
+                  <ul className="list-none p-0 m-0">
+                    <PlanUsageCard />
+                  </ul>
+                </aside>
+              )}
             </div>
-            {showOrgProjectsListUsageCard && (
-              <aside className="xl:w-80 xl:shrink-0">
-                <ul className="list-none p-0 m-0">
-                  <PlanUsageCard />
-                </ul>
-              </aside>
-            )}
           </div>
         )}
       </ScaffoldSection>

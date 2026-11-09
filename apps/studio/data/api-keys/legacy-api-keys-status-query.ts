@@ -1,9 +1,10 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { apiKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
+import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface LegacyAPIKeysStatusVariables {
   projectRef?: string
@@ -18,6 +19,7 @@ async function getLegacyAPIKeysStatus(
   const { data, error } = await get(`/v1/projects/{ref}/api-keys/legacy`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -31,9 +33,9 @@ export const useLegacyAPIKeysStatusQuery = <TData = LegacyAPIKeysStatusData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<LegacyAPIKeysStatusData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<LegacyAPIKeysStatusData, StudioError, TData> = {}
 ) =>
-  useQuery<LegacyAPIKeysStatusData, ResponseError, TData>({
+  useQuery<LegacyAPIKeysStatusData, StudioError, TData>({
     queryKey: apiKeysKeys.status(projectRef),
     queryFn: ({ signal }) => getLegacyAPIKeysStatus({ projectRef }, signal),
     enabled: IS_PLATFORM && enabled && typeof projectRef !== 'undefined',

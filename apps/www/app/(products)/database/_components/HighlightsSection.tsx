@@ -4,6 +4,8 @@ import Image from 'next/image'
 import Link from 'next/link'
 import { Badge, Button } from 'ui'
 
+import { isCrossZoneHref } from '@/lib/cross-zone'
+
 type Highlight = {
   title: string
   badge?: string
@@ -67,7 +69,7 @@ export function HighlightsSection() {
                 <ul className="flex flex-col text-foreground-lighter text-sm gap-1.5">
                   {highlight.features.map((feature) => (
                     <li key={feature} className="flex items-start gap-2">
-                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-brand" />
+                      <Check className="w-3.5 h-3.5 mt-0.5 shrink-0 stroke-2 text-primary" />
                       <span>{feature}</span>
                     </li>
                   ))}
@@ -75,7 +77,11 @@ export function HighlightsSection() {
               </div>
               <div className="mt-6">
                 <Button size="small" asChild>
-                  <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  {isCrossZoneHref(highlight.cta.href) ? (
+                    <a href={highlight.cta.href}>{highlight.cta.label}</a>
+                  ) : (
+                    <Link href={highlight.cta.href}>{highlight.cta.label}</Link>
+                  )}
                 </Button>
               </div>
             </div>

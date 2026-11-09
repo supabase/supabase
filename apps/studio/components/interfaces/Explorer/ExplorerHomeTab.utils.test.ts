@@ -19,6 +19,7 @@ describe('isSqlStatement', () => {
     'SHOW ALL;',
     'set search_path to public',
     "SET TIME ZONE 'UTC'",
+    'select * from a;\n\nselect * from b;',
   ])('returns true for %s', (message) => {
     expect(isSqlStatement(message)).toBe(true)
   })
@@ -34,6 +35,7 @@ describe('isSqlStatement', () => {
     'Show me my tables',
     'Set up RLS on my users table',
     'With my current schema, what tables should I add?',
+    'select * from colors;\n\nhelp me figure out what is wrong with this',
   ])('returns false for %s', (message) => {
     expect(isSqlStatement(message)).toBe(false)
   })

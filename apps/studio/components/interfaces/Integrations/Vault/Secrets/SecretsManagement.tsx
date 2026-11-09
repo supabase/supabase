@@ -1,7 +1,6 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { sortBy } from 'lodash'
-import { RefreshCw, Search, X } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon, XIcon } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import DataGrid, { Row } from 'react-data-grid'
@@ -14,6 +13,9 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 
@@ -25,7 +27,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useVaultSecretsQuery } from '@/data/vault/vault-secrets-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 import { onSearchInputEscape } from '@/lib/keyboard'
@@ -41,9 +43,8 @@ export const SecretsManagement = () => {
   const [, setShowAddSecretModal] = useQueryState('new', parseAsBoolean.withDefault(false))
   const [selectedSort, setSelectedSort] = useState<'updated_at' | 'name'>('updated_at')
 
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'tables'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const {
@@ -65,7 +66,8 @@ export const SecretsManagement = () => {
         ? allSecrets.filter(
             (secret) =>
               (secret?.name ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
-              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
+              (secret?.id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase()) ||
+              (secret?.key_id ?? '').toLowerCase().includes(searchValue.trim().toLowerCase())
           )
         : allSecrets
 
@@ -108,20 +110,28 @@ export const SecretsManagement = () => {
                 size="tiny"
                 className="w-52"
                 placeholder="Search by name or key ID"
-                icon={<Search />}
+                icon={<SearchIcon />}
                 value={searchValue ?? ''}
                 onChange={(e) => setSearchValue(e.target.value)}
                 onKeyDown={onSearchInputEscape(searchValue ?? '', setSearchValue)}
                 actions={[
                   searchValue && (
-                    <Button
-                      key="clear"
-                      size="tiny"
-                      variant="text"
-                      icon={<X />}
-                      onClick={() => setSearchValue('')}
-                      className="p-0 h-5 w-5"
-                    />
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          key="clear"
+                          size="tiny"
+                          variant="text"
+                          icon={<XIcon />}
+                          onClick={() => setSearchValue('')}
+                          className="p-0 h-5 w-5"
+                          aria-label="Clear search"
+                          // Tooltip repeats the label; screen readers would read it twice
+                          aria-describedby={undefined}
+                        />
+                      </TooltipTrigger>
+                      <TooltipContent side="bottom">Clear search</TooltipContent>
+                    </Tooltip>
                   ),
                 ]}
               />
@@ -144,7 +154,7 @@ export const SecretsManagement = () => {
             </div>
 
             <div className="flex items-center gap-x-2">
-              <Button icon={<RefreshCw />} loading={isRefetching} onClick={() => refetch()}>
+              <Button icon={<RefreshCwIcon />} loading={isRefetching} onClick={() => refetch()}>
                 Refresh
               </Button>
               <DocsButton href={`${DOCS_URL}/guides/database/vault`} />

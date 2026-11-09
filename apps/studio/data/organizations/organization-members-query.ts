@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 
 import { organizationKeys } from './keys'
 import type { components } from '@/data/api'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationMembersVariables = {
   slug?: string
@@ -26,6 +27,7 @@ export async function getOrganizationMembers(
     get('/platform/organizations/{slug}/members/invitations', {
       params: { path: { slug } },
       signal,
+      grant: unguarded.migrating,
     }),
   ])
 
@@ -33,10 +35,12 @@ export async function getOrganizationMembers(
   const { data: orgInvites, error: orgInvitesError } = invites
 
   if (orgMembersError) handleError(orgMembersError)
-  if (orgInvitesError) handleError(orgInvitesError)
+  // Project-scoped members are not permitted to read org invitations (403)
+  // Treat that as "no invitations visible" instead of failing to load the list of members
+  if (orgInvitesError && (orgInvitesError as StudioError).code !== 403) handleError(orgInvitesError)
 
   // Remap invite data to look like existing members data
-  const invitedMembers = orgInvites.invitations.map((invite) => {
+  const invitedMembers = (orgInvites?.invitations ?? []).map((invite) => {
     const member = {
       invited_at: invite.invited_at,
       invited_id: invite.id,
@@ -51,7 +55,7 @@ export async function getOrganizationMembers(
 }
 
 export type OrganizationMembersData = Awaited<ReturnType<typeof getOrganizationMembers>>
-export type OrganizationMembersError = ResponseError
+export type OrganizationMembersError = StudioError
 
 export const useOrganizationMembersQuery = <TData = OrganizationMembersData>(
   { slug }: OrganizationMembersVariables,

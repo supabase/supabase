@@ -59,9 +59,6 @@ git diff --name-only master...HEAD
 3. **Run type-specific checks** from the matching sections below on the current branch (no checkout step). Typical commands:
 
 ```bash
-# Content / tutorial MDX (lints the whole content/ tree; no per-file scoping)
-cd apps/docs && pnpm lint:mdx
-
 # Pipeline / schema handler
 cd apps/docs && pnpm build:guides-markdown
 # inspect public/markdown/guides/ for affected pages
@@ -109,17 +106,17 @@ Inspect changed files from `gh pr view` or:
 gh pr diff <number> --repo supabase/supabase --name-only
 ```
 
-| PR type                     | Path signals                                                                                     | Primary skill section                                          |
-| --------------------------- | ------------------------------------------------------------------------------------------------ | -------------------------------------------------------------- |
-| **Markdown-schema handler** | `apps/docs/internals/markdown-schema/`, `generate-guides-markdown.ts`                            | [Schema handler review](#schema-handler-review)                |
-| **Pipeline / internals**    | `apps/docs/internals/` (not just one new handler)                                                | [Pipeline review](#pipeline-review)                            |
-| **Content-only MDX**        | `apps/docs/content/**` only                                                                      | [Content review](#content-review)                              |
-| **Tutorial / quickstart**   | `apps/docs/content/guides/**/tutorials/`, `quickstarts/`, plus `examples/`                       | [Tutorial review](#tutorial-review) → also `work-linear-issue` |
-| **Example app only**        | `examples/**` without matching MDX                                                               | [Example review](#example-review)                              |
-| **Studio ↔ docs links**     | `apps/studio/**`                                                                                 | [Studio review](#studio-review)                                |
-| **Docs UI / components**    | `apps/docs/components/`, `apps/docs/features/` (no pipeline)                                     | [Component review](#component-review)                          |
-| **Docs tooling**            | `.agents/skills/`, `apps/docs/AGENTS.md`, `apps/docs/CONTRIBUTING.md`, `apps/docs/DEVELOPERS.md` | [Docs tooling review](#docs-tooling-review)                    |
-| **Mixed**                   | Multiple path groups above                                                                       | Run each applicable section; note overlap                      |
+| PR type                     | Path signals                                                                                                               | Primary skill section                                          |
+| --------------------------- | -------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------- |
+| **Markdown-schema handler** | `apps/docs/internals/markdown-schema/`, `generate-guides-markdown.ts`                                                      | [Schema handler review](#schema-handler-review)                |
+| **Pipeline / internals**    | `apps/docs/internals/` (not just one new handler)                                                                          | [Pipeline review](#pipeline-review)                            |
+| **Content-only MDX**        | `apps/docs/content/**` only                                                                                                | [Content review](#content-review)                              |
+| **Tutorial / quickstart**   | `apps/docs/content/guides/**/tutorials/`, `quickstarts/`, plus `examples/`                                                 | [Tutorial review](#tutorial-review) → also `work-linear-issue` |
+| **Example app only**        | `examples/**` without matching MDX                                                                                         | [Example review](#example-review)                              |
+| **Studio ↔ docs links**     | `apps/studio/**`                                                                                                           | [Studio review](#studio-review)                                |
+| **Docs UI / components**    | `apps/docs/components/`, `apps/docs/features/` (no pipeline)                                                               | [Component review](#component-review)                          |
+| **Docs tooling**            | `.agents/skills/`, `apps/docs/AGENTS.md`, `apps/docs/CONTRIBUTING.md`, `apps/docs/DEVELOPERS.md`, `apps/docs/style-guide/` | [Docs tooling review](#docs-tooling-review)                    |
+| **Mixed**                   | Multiple path groups above                                                                                                 | Run each applicable section; note overlap                      |
 
 When a PR spans types (e.g. schema handler + component refactor), run **all** matching sections.
 
@@ -205,13 +202,22 @@ Verify both guides and reference output when `generate-reference-markdown.ts` or
 
 MDX prose, partials, navigation — no pipeline or example changes.
 
-```bash
-cd apps/docs
-pnpm lint:mdx    # lints the whole content/ tree; filter the output to your changed paths
-```
+Check the prose against the [style guide](../../../apps/docs/style-guide/README.md) yourself. No CI or local
+check covers style or terminology. CodeRabbit reviews style, terminology, and
+structure on `apps/docs/content/**/*.mdx`, but only once the PR is open.
+
+Check [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md) against the finished page last, using the
+two-pass protocol in [Use with an AI agent](../../../apps/docs/style-guide/WORD_LIST.md#use-with-an-ai-agent): [Phrase
+groups](../../../apps/docs/style-guide/WORD_LIST.md#phrase-groups) for the literal term lists, then `grep '^### '
+WORD_LIST.md` and read only the entries matching words on the page. Include terms
+the author didn't introduce.
 
 Checklist:
 
+- [ ] Voice follows [`01-voice-and-tone.md`](../../../apps/docs/style-guide/01-voice-and-tone.md)
+- [ ] Section grouping and chunking follow [`03-page-structure.md`](../../../apps/docs/style-guide/03-page-structure.md)
+- [ ] Components follow [`02-elements.md`](../../../apps/docs/style-guide/02-elements.md)
+- [ ] Terminology matches [`WORD_LIST.md`](../../../apps/docs/style-guide/WORD_LIST.md)
 - [ ] Frontmatter valid (`title`, `description` where required)
 - [ ] Internal links resolve (`/docs/guides/...`, not broken anchors)
 - [ ] `$CodeSample` paths match existing example directories
@@ -228,9 +234,6 @@ Compare PR preview URL (from Vercel/deployment comment) against production for v
 Tutorial MDX plus matching example app. **Read [`work-linear-issue`](https://github.com/supabase/docs-agent-skills/blob/main/.claude/skills/work-linear-issue/SKILL.md)** for full platform E2E — review is not complete without it when auth flows are involved.
 
 ```bash
-# MDX lint
-cd apps/docs && pnpm lint:mdx    # then check output for content/guides/getting-started/tutorials/<path>
-
 # Example build (from work-linear-issue)
 cd examples/<example-dir>
 npm install && npm run build
@@ -298,7 +301,8 @@ Checklist:
 - [ ] `.claude/skills` is still a single Git symlink to `../.agents/skills` — no per-skill symlinks or copies under `.claude/`
 - [ ] Cross-skill links resolve: relative for in-repo skills; absolute `docs-agent-skills` URLs only for skills that remain in that private repo
 - [ ] No personal vault paths, Obsidian references, or private-process-only instructions
-- [ ] `apps/docs/CONTRIBUTING.md` / `DEVELOPERS.md` pointers match skill names and checklist stages
+- [ ] `apps/docs/CONTRIBUTING.md` / `DEVELOPERS.md` / `AGENTS.md` pointers match skill names and checklist stages
+- [ ] A style rule added to a skill belongs in `apps/docs/style-guide/` instead, with the skill pointing at it
 - [ ] Reference files under a skill stay near the ~250-line guideline (split if bloated)
 
 ```bash

@@ -4,8 +4,10 @@ import { z } from 'zod'
 
 import { databaseKeys } from './keys'
 import { filterProtectedSchemaIndexAdvisorResult } from '@/components/interfaces/QueryPerformance/IndexAdvisor/index-advisor.utils'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GetIndexAdvisorResultVariables = {
   projectRef?: string
@@ -54,7 +56,10 @@ export async function getIndexAdvisorResult({
   const { result: results } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'retrieve-index-advisor-result',
     sql: safeSql`set search_path to public, extensions; select * from index_advisor(${literal(query)});`,
+    grant: unguarded.migrating,
   })
 
   if (!results || results.length === 0) {
@@ -76,7 +81,7 @@ export async function getIndexAdvisorResult({
 }
 
 export type GetIndexAdvisorResultData = Awaited<ReturnType<typeof getIndexAdvisorResult>>
-export type GetIndexAdvisorResultError = ResponseError
+export type GetIndexAdvisorResultError = StudioError
 
 export const useGetIndexAdvisorResult = <TData = GetIndexAdvisorResultData>(
   { projectRef, connectionString, query }: GetIndexAdvisorResultVariables,

@@ -1,7 +1,7 @@
 import { useParams } from 'common'
 import Link from 'next/link'
 import { useMemo } from 'react'
-import { Button } from 'ui'
+import { Button, FloatingPlate } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Footer } from '@/components/grid/components/footer/Footer'
@@ -66,15 +66,17 @@ export const TableDefinition = ({ entity }: TableDefinitionProps) => {
   return (
     <>
       <div className="grow overflow-y-auto border-t border-muted relative">
-        <Button asChild className="absolute top-2 right-5 z-10">
-          <Link
-            href={`/project/${ref}/sql/new?content=${encodeURIComponent(
-              formattedDefinition ?? ''
-            )}`}
-          >
-            Open in SQL Editor
-          </Link>
-        </Button>
+        <FloatingPlate className="absolute top-2 right-5 z-10">
+          <Button asChild>
+            <Link
+              href={`/project/${ref}/sql/new?content=${encodeURIComponent(
+                formattedDefinition ?? ''
+              )}`}
+            >
+              Open in SQL Editor
+            </Link>
+          </Button>
+        </FloatingPlate>
 
         <CodeEditor isReadOnly language="pgsql" value={formattedDefinition} />
       </div>

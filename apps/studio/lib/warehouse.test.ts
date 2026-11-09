@@ -1,10 +1,18 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import {
   getDuckLakeSetupScript,
   parseWarehouseCatalogUrl,
   type WarehouseCatalogConnection,
 } from './warehouse'
+
+const environment = vi.hoisted(() => ({ isStagingOrLocal: false }))
+vi.mock('@/lib/constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@/lib/constants')>()),
+  get IS_STAGING_OR_LOCAL() {
+    return environment.isStagingOrLocal
+  },
+}))
 
 const CREDENTIALS = {
   data_path: 's3://warehouse/',
@@ -43,6 +51,51 @@ describe('parseWarehouseCatalogUrl', () => {
       user: 'postgres',
       password: 'pwd',
     })
+  })
+
+  test('preserves the hostname and decodes the IPv6 hostaddr', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@db.example.supabase.co:5432/postgres?sslmode=require&hostaddr=2001%3Adb8%3A%3A1'
+    )
+
+    expect(connection).toMatchObject({
+      host: 'db.example.supabase.co',
+      hostaddr: '2001:db8::1',
+    })
+    expect(connection).not.toBeNull()
+    if (connection === null) return
+
+    const script = getDuckLakeSetupScript({ credentials: CREDENTIALS, connection })
+    expect(script).toContain("HOST 'db.example.supabase.co',")
+    expect(script).toContain("HOSTADDR '2001:db8::1',")
+  })
+
+  test('removes URI brackets from legacy IPv6 hosts', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@[2001:db8::1]:5432/postgres'
+    )
+
+    expect(connection?.host).toBe('2001:db8::1')
+    expect(connection).not.toBeNull()
+    if (connection === null) return
+
+    const script = getDuckLakeSetupScript({ credentials: CREDENTIALS, connection })
+    expect(script).toContain("HOST '2001:db8::1',")
+    expect(script).not.toContain('HOSTADDR')
+    expect(script).not.toContain('[2001:db8::1]')
+  })
+
+  test('preserves IPv4 catalog hosts', () => {
+    expect(parseWarehouseCatalogUrl('postgres://postgres:pwd@192.0.2.1:5432/postgres')?.host).toBe(
+      '192.0.2.1'
+    )
+  })
+
+  test('ignores an empty hostaddr', () => {
+    const connection = parseWarehouseCatalogUrl(
+      'postgres://postgres:pwd@db.example.supabase.co/postgres?hostaddr='
+    )
+    expect(connection?.hostaddr).toBeUndefined()
   })
 
   test('decodes percent-encoded credentials', () => {
@@ -86,6 +139,7 @@ describe('getDuckLakeSetupScript', () => {
     expect(script).toContain(`REGION '${CREDENTIALS.s3_region}'`)
     expect(script).toContain(`ENDPOINT '${CREDENTIALS.s3_endpoint}'`)
     expect(script).toContain(`HOST '${CONNECTION.host}'`)
+    expect(script).not.toContain('HOSTADDR')
     expect(script).toContain(`PORT ${CONNECTION.port}`)
     expect(script).toContain(`DATABASE '${CONNECTION.database}'`)
     expect(script).toContain(`USER '${CONNECTION.user}'`)
@@ -99,5 +153,24 @@ describe('getDuckLakeSetupScript', () => {
   test('binds the metadata secret into the DuckLake secret', () => {
     expect(script).toContain("'SECRET': 'ducklake_metadata'")
     expect(script).toContain("METADATA_PATH ''")
+  })
+})
+
+describe('Warehouse Flight SQL connections', () => {
+  test.each([
+    { isStagingOrLocal: false, domain: 'supabase.co' },
+    { isStagingOrLocal: true, domain: 'supabase.red' },
+  ])('uses $domain for every connection format', async ({ isStagingOrLocal, domain }) => {
+    environment.isStagingOrLocal = isStagingOrLocal
+    vi.resetModules()
+    const warehouse = await import('./warehouse')
+    const hostname = `project-ref.warehouse.${domain}`
+    expect(warehouse.getWarehouseFlightSqlEndpoint('project-ref')).toBe(hostname)
+    expect(warehouse.getWarehouseFlightSqlConnectionString('project-ref')).toBe(
+      `flightsql://postgres:[YOUR-PASSWORD]@${hostname}:443?tls=enabled`
+    )
+    expect(warehouse.getWarehouseUsqlCommand('project-ref')).toBe(
+      `usql -X -W 'flightsql://postgres@${hostname}:443?tls=enabled'`
+    )
   })
 })

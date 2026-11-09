@@ -28,10 +28,10 @@ import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
 import { isTableLike } from '@/data/table-editor/table-editor-types'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useCsvFileDrop } from '@/hooks/ui/useCsvFileDrop'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { useTrack } from '@/lib/telemetry/track'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 import { useTableEditorTableStateSnapshot } from '@/state/table-editor-table'
-import { ResponseError } from '@/types'
 
 const rowKeyGetter = (row: SupaRow) => {
   return row?.idx ?? -1
@@ -39,7 +39,7 @@ const rowKeyGetter = (row: SupaRow) => {
 
 interface IGrid extends GridProps {
   rows: SupaRow[]
-  error: ResponseError | null
+  error: StudioError | null
   isDisabled?: boolean
   isLoading: boolean
   isSuccess: boolean
@@ -309,7 +309,9 @@ export const Grid = memo(
                     <div
                       className={cn(
                         'flex flex-col items-center justify-center w-full h-full mt-9 transition',
-                        isTableEmpty && isDraggedOver && 'border-2 border-dashed border-brand'
+                        isTableEmpty &&
+                          isDraggedOver &&
+                          'border-2 border-dashed border-primary-bright'
                       )}
                     >
                       <p className="text-sm text-light pointer-events-auto">This table is empty</p>

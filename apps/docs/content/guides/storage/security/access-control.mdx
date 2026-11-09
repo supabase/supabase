@@ -20,11 +20,11 @@ If you need different `SELECT` policies for different Storage actions, such as l
 
 <Admonition type="note">
 
-The RLS policies required for different operations are documented [here](/docs/reference/javascript/storage-createbucket)
+The RLS policies required for different operations are documented [here](/docs/reference/javascript/file-buckets-createbucket)
 
 </Admonition>
 
-For example, the only RLS policy required for [uploading](/docs/reference/javascript/storage-from-upload) objects is to grant the `INSERT` permission to the `storage.objects` table.
+For example, the only RLS policy required for [uploading](/docs/reference/javascript/file-buckets-upload) objects is to grant the `INSERT` permission to the `storage.objects` table.
 
 To allow overwriting files using the `upsert` functionality you will need to additionally grant `SELECT` and `UPDATE` permissions.
 

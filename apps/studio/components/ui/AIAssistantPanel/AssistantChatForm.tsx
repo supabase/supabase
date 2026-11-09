@@ -1,7 +1,8 @@
 import { useBreakpoint } from 'common'
-import { ArrowUp, Loader2, Square } from 'lucide-react'
-import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, useRef } from 'react'
-import { cn, ExpandingTextArea } from 'ui'
+import { ArrowUpIcon, Loader2Icon, SquareIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
+import { ChangeEvent, FormEvent, forwardRef, KeyboardEvent, memo, ReactNode, useRef } from 'react'
+import { Button, cn, ExpandingTextArea } from 'ui'
 
 import { ButtonTooltip } from '../ButtonTooltip'
 import { formatAttachedSnippets } from './AIAssistant.utils'
@@ -49,6 +50,18 @@ export interface FormProps {
   selectedModel?: AssistantModelId
   /* Callback when a model is chosen */
   onSelectModel?: (model: AssistantModelId) => void
+  /* Icon for the submit button when not loading, defaults to an up arrow */
+  submitIcon?: ReactNode
+  /* Label for the submit button when not loading, used for both aria-label and tooltip text, defaults to "Send message" */
+  submitLabel?: string
+  /**
+   * An additional action shown beside the main submit button, transitioned in/out with
+   * Motion. Pass undefined to hide it (e.g. when the input doesn't match its condition).
+   */
+  secondaryAction?: {
+    label: string
+    onClick: () => void
+  }
 }
 
 const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
@@ -70,6 +83,9 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
       isEditing = false,
       selectedModel,
       onSelectModel,
+      submitIcon = <ArrowUpIcon />,
+      submitLabel = 'Send message',
+      secondaryAction,
       ...props
     },
     _ref
@@ -108,7 +124,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
           ref={formRef}
           {...props}
           onSubmit={handleSubmit}
-          className={cn('relative', className)}
+          className={cn('relative rounded-lg', className)}
         >
           {sqlSnippets && sqlSnippets.length > 0 && (
             <SnippetRow
@@ -134,7 +150,7 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
           />
           <div
             className={cn(
-              'absolute inset-x-1.5 bottom-1.5 flex items-center pointer-events-none',
+              'absolute inset-x-2 bottom-2 flex items-center pointer-events-none',
               showModelSelector ? 'justify-between' : 'justify-end'
             )}
           >
@@ -144,32 +160,57 @@ const AssistantChatFormComponent = forwardRef<HTMLFormElement, FormProps>(
               </div>
             )}
 
-            <div className="flex gap-3 items-center pointer-events-auto">
+            <div className="flex gap-x-1.5 items-center pointer-events-auto">
+              <AnimatePresence>
+                {!loading && secondaryAction && (
+                  <motion.div
+                    key="secondary-action"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 0.8 }}
+                    transition={{ duration: 0.15 }}
+                  >
+                    <Button
+                      type="button"
+                      variant="outline"
+                      aria-label={secondaryAction.label}
+                      onClick={secondaryAction.onClick}
+                      className="h-7 rounded-full"
+                    >
+                      {secondaryAction.label}
+                    </Button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
               {loading ? (
                 onStop ? (
                   <ButtonTooltip
                     variant="outline"
                     aria-label="Stop response"
-                    icon={<Square fill="currentColor" className="scale-75" />}
+                    icon={<SquareIcon fill="currentColor" className="scale-75" />}
                     onClick={onStop}
                     className="w-7 h-7 rounded-full p-0 text-center flex items-center justify-center"
                     tooltip={{ content: { side: 'top', text: 'Stop response' } }}
                   />
                 ) : (
-                  <Loader2 size={22} className="animate-spin size-7 text-muted" strokeWidth={1} />
+                  <Loader2Icon
+                    size={22}
+                    className="animate-spin size-7 text-muted"
+                    strokeWidth={1}
+                  />
                 )
               ) : (
                 <ButtonTooltip
                   type="submit"
                   variant={canSubmit ? 'primary' : 'default'}
-                  aria-label="Send message"
-                  icon={<ArrowUp />}
+                  aria-label={submitLabel}
+                  icon={submitIcon}
                   disabled={!canSubmit}
                   className={cn(
                     'w-7 h-7 rounded-full p-0 text-center flex items-center justify-center',
                     !canSubmit ? 'opacity-50' : 'opacity-100'
                   )}
-                  tooltip={{ content: { side: 'top', text: 'Send message' } }}
+                  tooltip={{ content: { side: 'top', text: submitLabel } }}
                 />
               )}
             </div>

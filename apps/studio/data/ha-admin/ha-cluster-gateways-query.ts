@@ -4,10 +4,10 @@ import { z } from 'zod'
 import { getHaAdmin, parseHaAdminResponse } from './get-ha-admin'
 import { haAdminKeys } from './keys'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type HaClusterGatewaysVariables = { projectRef?: string }
-export type HaClusterGatewaysError = ResponseError
+export type HaClusterGatewaysError = StudioError
 
 // Every field is optional because proto3 JSON omits zero values.
 const multigatewaySchema = z.object({

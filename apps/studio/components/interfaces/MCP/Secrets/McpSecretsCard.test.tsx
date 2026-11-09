@@ -34,7 +34,8 @@ describe('McpSecretsCard', () => {
     const user = userEvent.setup()
     const { rerender } = renderCard({ status: 'form', request })
 
-    await user.type(secretField(), 'sk-for-the-first-request')
+    await user.click(secretField())
+    await user.paste('sk-for-the-first-request')
     await user.click(screen.getByRole('button', { name: 'Show secret value' }))
     expect(secretField().value).toBe('sk-for-the-first-request')
     expect(secretField().type).toBe('text')
@@ -58,7 +59,8 @@ describe('McpSecretsCard', () => {
     const user = userEvent.setup()
     const { rerender } = renderCard({ status: 'form', request })
 
-    await user.type(secretField(), 'sk-for-project-a')
+    await user.click(secretField())
+    await user.paste('sk-for-project-a')
 
     rerender(
       <McpSecretsCard
@@ -80,7 +82,8 @@ describe('McpSecretsCard', () => {
     const user = userEvent.setup()
     const { rerender } = renderCard({ status: 'form', request })
 
-    await user.type(secretField(), 'sk-still-being-typed')
+    await user.click(secretField())
+    await user.paste('sk-still-being-typed')
 
     rerender(
       <McpSecretsCard
@@ -110,7 +113,8 @@ describe('McpSecretsCard', () => {
     expect(liveRegion).toHaveAttribute('aria-live', 'polite')
     expect(liveRegion).toBeEmptyDOMElement()
 
-    await user.type(secretField(), 'not-a-real-prefix')
+    await user.click(secretField())
+    await user.paste('not-a-real-prefix')
 
     await waitFor(() => expect(liveRegion).toHaveTextContent(/usually start with sk-/))
     expect(screen.getByRole('status')).toBe(liveRegion)
@@ -149,7 +153,8 @@ describe('McpSecretsCard', () => {
       />
     )
 
-    await user.type(secretField(), '  sk-padded  ')
+    await user.click(secretField())
+    await user.paste('  sk-padded  ')
     fireEvent.click(screen.getByRole('button', { name: 'Save' }))
 
     await waitFor(() => expect(onSave).toHaveBeenCalledWith('  sk-padded  '))

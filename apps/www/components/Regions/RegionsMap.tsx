@@ -109,7 +109,7 @@ export const RegionsMap = ({
                 onMouseLeave={() => onRegionHover(undefined)}
                 onClick={() => onRegionSelect(region.code)}
               >
-                {isSelected && <circle r={4} className="animate-ping fill-brand" />}
+                {isSelected && <circle r={4} className="animate-ping fill-brand-default" />}
                 <circle
                   r={isHighlighted ? 4 : 3.5}
                   strokeWidth={1}
@@ -118,7 +118,7 @@ export const RegionsMap = ({
                     isSelected
                       ? 'fill-brand-500 stroke-brand-600'
                       : isHighlighted
-                        ? 'fill-brand stroke-brand-600'
+                        ? 'fill-brand-default stroke-brand-600'
                         : 'fill-brand-600 stroke-brand-400'
                   )}
                 />

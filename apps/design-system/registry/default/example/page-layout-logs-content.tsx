@@ -141,7 +141,7 @@ export function PageLayoutLogsContent() {
               <TableCell
                 className={cn(
                   'font-mono text-xs',
-                  status === '500' ? 'text-destructive' : 'text-brand'
+                  status === '500' ? 'text-destructive' : 'text-primary'
                 )}
               >
                 {status}

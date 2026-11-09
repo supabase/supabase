@@ -102,6 +102,7 @@
   "project_connection:show_warehouse": true,
 
   "project_creation:show_advanced_config": true,
+  "project_creation:show_high_availability": true,
 
   "project_homepage:show_instance_size": true,
   "project_homepage:show_examples": true,

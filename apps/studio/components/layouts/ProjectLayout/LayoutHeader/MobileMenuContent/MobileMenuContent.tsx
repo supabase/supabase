@@ -2,10 +2,10 @@
 
 import { useFlag, useParams } from 'common'
 import { Home } from 'icons'
-import { ChevronLeft } from 'lucide-react'
+import { ChevronLeftIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import React, { useMemo } from 'react'
-import { Button, cn, Separator, SidebarGroup, SidebarMenu } from 'ui'
+import { Button, cn, Separator, SheetTitle, SidebarGroup, SidebarMenu } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { resolveSectionDisplay } from './MobileMenuContent.utils'
@@ -133,6 +133,7 @@ export function MobileMenuContent({
 
   return (
     <div className="flex flex-col h-full bg-background">
+      <SheetTitle className="sr-only">Project menu</SheetTitle>
       {viewLevel === 'section' && sectionLabel && (
         <div
           className={cn(
@@ -142,7 +143,7 @@ export function MobileMenuContent({
           <Button
             variant="text"
             className="p-1! justify-start"
-            icon={<ChevronLeft size={20} />}
+            icon={<ChevronLeftIcon size={20} />}
             onClick={handleBackToTop}
             aria-label="Back to menu"
             block

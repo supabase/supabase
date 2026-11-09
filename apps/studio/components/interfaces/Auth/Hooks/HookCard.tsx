@@ -1,5 +1,11 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { BookOpen, Check, Edit, MoreVertical, Trash, Webhook } from 'lucide-react'
+import {
+  BookOpenIcon,
+  CheckIcon,
+  EditIcon,
+  MoreVerticalIcon,
+  TrashIcon,
+  WebhookIcon,
+} from 'lucide-react'
 import {
   Badge,
   Button,
@@ -13,7 +19,7 @@ import { Input } from 'ui-patterns/DataInputs/Input'
 
 import { Hook } from './hooks.constants'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
 
 interface HookCardProps {
@@ -23,12 +29,14 @@ interface HookCardProps {
 }
 
 export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) => {
-  const { can: canUpdateAuthHook } = useAsyncCheckPermissions(PermissionAction.AUTH_EXECUTE, '*')
+  const { can: canUpdateAuthHook } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_HOOKS_WRITE
+  )
 
   return (
     <div className="bg-surface-100 border-default overflow-hidden border shadow-sm px-5 py-4 flex flex-row first:rounded-t-md last:rounded-b-md space-x-4">
       <div>
-        <Webhook size={21} strokeWidth="1" />
+        <WebhookIcon size={21} strokeWidth="1" />
       </div>
       <div className="flex flex-col grow overflow-y-auto w-full">
         <span className="text-sm text-foreground">{hook.title}</span>
@@ -117,8 +125,8 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
         <div className="flex items-center gap-x-2">
           {hook.enabled ? (
             <Badge className="space-x-1" variant="success">
-              <div className="h-3.5 w-3.5 bg-brand rounded-full flex justify-center items-center">
-                <Check className="h-2 w-2 text-background-overlay " strokeWidth={6} />
+              <div className="h-3.5 w-3.5 bg-brand-default rounded-full flex justify-center items-center">
+                <CheckIcon className="h-2 w-2 text-background-overlay " strokeWidth={6} />
               </div>
               <span>Enabled</span>
             </Badge>
@@ -131,7 +139,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
             <DropdownMenuTrigger asChild>
               <Button
                 className="px-1"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
                 aria-label={`Open actions for ${hook.title}`}
               />
             </DropdownMenuTrigger>
@@ -149,7 +157,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   },
                 }}
               >
-                <Edit size={12} />
+                <EditIcon size={12} />
                 <span>Edit hook</span>
               </DropdownMenuItemTooltip>
               <DropdownMenuItem asChild className="gap-x-2">
@@ -158,7 +166,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   rel="noreferrer noopener"
                   href={`${DOCS_URL}/guides/auth/auth-hooks/${hook.docSlug}`}
                 >
-                  <BookOpen size={12} />
+                  <BookOpenIcon size={12} />
                   <span>Documentation</span>
                 </a>
               </DropdownMenuItem>
@@ -176,7 +184,7 @@ export const HookCard = ({ hook, onSelectEdit, onSelectDelete }: HookCardProps) 
                   },
                 }}
               >
-                <Trash size={12} />
+                <TrashIcon size={12} />
                 <span>Delete hook</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>

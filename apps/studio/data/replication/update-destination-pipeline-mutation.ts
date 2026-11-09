@@ -3,6 +3,7 @@ import { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { optionalSecret } from './destination-secret-utils'
+import { invalidateReplicationPipelineQueries } from './invalidate-pipeline-queries'
 import { replicationKeys } from './keys'
 import type {
   BigQueryDestinationConfig,
@@ -18,7 +19,8 @@ import {
   isDucklakeSupabaseConfig,
 } from './utils'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type UpdateDestinationPipelineBody =
   components['schemas']['UpdateReplicationDestinationPipelineBody']
@@ -164,7 +166,7 @@ export const buildUpdateDestinationApiConfig = (
 
 export type UpdateDestinationPipelineParams = {
   destinationId: number
-  pipelineId: number
+  pipelineId: string
   projectRef: string
   destinationName: string
   destinationConfig: DestinationConfig
@@ -217,42 +219,39 @@ export const useUpdateDestinationPipelineMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     UpdateDestinationPipelineData,
-    ResponseError,
+    StudioError,
     UpdateDestinationPipelineParams
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<UpdateDestinationPipelineData, ResponseError, UpdateDestinationPipelineParams>(
-    {
-      mutationFn: (vars) => updateDestinationPipeline(vars),
-      async onSuccess(data, variables, context) {
-        const { projectRef, destinationId, pipelineId } = variables
+  return useMutation<UpdateDestinationPipelineData, StudioError, UpdateDestinationPipelineParams>({
+    mutationFn: (vars) => updateDestinationPipeline(vars),
+    async onSuccess(data, variables, context) {
+      const { projectRef } = variables
+      // These prefixes include list, editor, pipeline status, and table metrics caches.
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
+        invalidateReplicationPipelineQueries(queryClient, projectRef),
+      ])
 
-        await Promise.all([
-          // Invalidate lists
-          queryClient.invalidateQueries({ queryKey: replicationKeys.destinations(projectRef) }),
-          queryClient.invalidateQueries({ queryKey: replicationKeys.pipelines(projectRef) }),
-          // Invalidate item-level caches used by the editor panel
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.destinationById(projectRef, destinationId),
-          }),
-          queryClient.invalidateQueries({
-            queryKey: replicationKeys.pipelineById(projectRef, pipelineId),
-          }),
-        ])
-
-        await onSuccess?.(data, variables, context)
-      },
-      async onError(data, variables, context) {
-        if (onError === undefined) {
-          toast.error(`Failed to update destination or pipeline: ${data.message}`)
-        } else {
-          onError(data, variables, context)
-        }
-      },
-      ...options,
-    }
-  )
+      await onSuccess?.(data, variables, context)
+    },
+    async onError(data, variables, context) {
+      // Settings may commit before runtime recreation fails.
+      await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: replicationKeys.destinations(variables.projectRef),
+        }),
+        invalidateReplicationPipelineQueries(queryClient, variables.projectRef),
+      ])
+      if (onError === undefined) {
+        toast.error(`Failed to update destination or pipeline: ${data.message}`)
+      } else {
+        onError(data, variables, context)
+      }
+    },
+    ...options,
+  })
 }

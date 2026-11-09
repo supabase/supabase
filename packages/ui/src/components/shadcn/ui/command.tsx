@@ -28,7 +28,7 @@ interface CommandDialogProps extends DialogPrimitive.DialogProps {}
 const CommandDialog = ({ children, ...props }: CommandDialogProps) => {
   return (
     <Dialog {...props}>
-      <DialogContent className="overflow-hidden p-0 shadow-lg">
+      <DialogContent className="overflow-hidden p-0">
         <Command className="**:[[cmdk-group-heading]]:px-2 **:[[cmdk-group-heading]]:font-medium [&_[cmdk-group-heading]]:text-foreground-muted [&_[cmdk-group]:not([hidden])_~[cmdk-group]]:pt-0 **:[[cmdk-group]]:px-2 [&_[cmdk-input-wrapper]_svg]:h-5 [&_[cmdk-input-wrapper]_svg]:w-5 **:[[cmdk-input]]:h-12 **:[[cmdk-item]]:px-2 **:[[cmdk-item]]:py-3 [&_[cmdk-item]_svg]:h-5 [&_[cmdk-item]_svg]:w-5">
           {children}
         </Command>
@@ -57,12 +57,12 @@ const CommandInput = React.forwardRef<
     },
     ref
   ) => (
-    <div className={cn('flex items-center border-b px-4', wrapperClassName)} cmdk-input-wrapper="">
+    <div className={cn('flex items-center border-b px-3', wrapperClassName)} cmdk-input-wrapper="">
       {showSearchIcon && <Search className="h-4 w-4 shrink-0 opacity-50" aria-hidden />}
       <CommandPrimitive.Input
         ref={ref}
         className={cn(
-          'flex h-9 w-full rounded-md bg-transparent py-3 text-sm outline-hidden placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
+          'flex h-9 w-full rounded-md bg-transparent py-3 pl-2 text-sm outline-hidden placeholder:text-muted disabled:cursor-not-allowed disabled:opacity-50 border-none focus:ring-0',
           className
         )}
         {...props}
@@ -163,7 +163,7 @@ const CommandItem = React.forwardRef<
   <CommandPrimitive.Item
     ref={ref}
     className={cn(
-      'relative flex cursor-default select-none items-center rounded-xs px-2 py-1.5 text-xs outline-hidden data-[selected=true]:bg-overlay-hover data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
+      'relative flex cursor-default select-none items-center rounded-item px-2 py-1.5 text-xs outline-hidden data-[selected=true]:bg-overlay-hover data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50',
       className
     )}
     {...props}

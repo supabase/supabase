@@ -1,7 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
-import { Plus } from 'lucide-react'
+import { PlusIcon } from 'lucide-react'
 import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 import {
@@ -16,6 +15,7 @@ import {
   DialogTitle,
   DialogTrigger,
   Form,
+  FormControl,
   FormField,
   Tooltip,
   TooltipContent,
@@ -27,7 +27,7 @@ import { z } from 'zod'
 
 import { useProjectStorageConfigQuery } from '@/data/config/project-storage-config-query'
 import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsProjectActive } from '@/hooks/misc/useSelectedProject'
 
 interface CreateCredentialModalProps {
@@ -40,9 +40,8 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
   const isProjectActive = useIsProjectActive()
   const [showSuccess, setShowSuccess] = useState(false)
 
-  const { can: canCreateCredentials } = useAsyncCheckPermissions(
-    PermissionAction.STORAGE_ADMIN_WRITE,
-    '*'
+  const { can: canCreateCredentials } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.STORAGE_CONFIG_WRITE
   )
 
   const { data: config } = useProjectStorageConfigQuery({ projectRef })
@@ -51,7 +50,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
 
   const FormSchema = z.object({
     description: z.string().min(3, {
-      message: 'Description must be at least 3 characters long',
+      message: 'Name must be at least 3 characters long',
     }),
   })
   const form = useForm<z.infer<typeof FormSchema>>({
@@ -88,7 +87,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         <TooltipTrigger asChild>
           <DialogTrigger asChild>
             <Button
-              icon={<Plus size={14} />}
+              icon={<PlusIcon size={14} />}
               disabled={disableCreation}
               className="pointer-events-auto"
             >
@@ -110,6 +109,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
       </Tooltip>
 
       <DialogContent
+        size="small"
         onInteractOutside={(e) => {
           if (showSuccess) e.preventDefault()
         }}
@@ -117,10 +117,10 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         {showSuccess ? (
           <>
             <DialogHeader>
-              <DialogTitle>Save your new S3 access keys</DialogTitle>
+              <DialogTitle>Save your new access key</DialogTitle>
               <DialogDescription>
-                You won't be able to see them again. If you lose these access keys, you'll need to
-                create a new ones.
+                Copy the access key ID and secret now. The secret won't be shown again. If you lose
+                it, create a new access key.
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
@@ -128,7 +128,7 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
               <FormItemLayout label="Access key ID" isReactForm={false}>
                 <Input className="input-mono" readOnly copy value={createS3KeyData?.access_key} />
               </FormItemLayout>
-              <FormItemLayout label={'Secret access key'} isReactForm={false}>
+              <FormItemLayout label="Secret access key" isReactForm={false}>
                 <Input className="input-mono" readOnly copy value={createS3KeyData?.secret_key} />
               </FormItemLayout>
             </DialogSection>
@@ -146,10 +146,9 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
         ) : (
           <>
             <DialogHeader>
-              <DialogTitle>Create new S3 access keys</DialogTitle>
+              <DialogTitle>Create new access key</DialogTitle>
               <DialogDescription>
-                S3 access keys provide full access to all S3 operations across all buckets and
-                bypass any existing RLS policies.
+                This access key grants full access to every bucket and bypasses RLS policies.
               </DialogDescription>
             </DialogHeader>
             <DialogSectionSeparator />
@@ -159,20 +158,22 @@ export const CreateCredentialModal = ({ visible, onOpenChange }: CreateCredentia
                   <FormField
                     name="description"
                     render={({ field }) => (
-                      <FormItemLayout label="Description">
-                        <Input
-                          autoComplete="off"
-                          placeholder="My test key"
-                          type="text"
-                          {...field}
-                        />
+                      <FormItemLayout label="Name">
+                        <FormControl>
+                          <Input
+                            autoComplete="off"
+                            placeholder="My test key"
+                            type="text"
+                            {...field}
+                          />
+                        </FormControl>
                       </FormItemLayout>
                     )}
                   />
                 </DialogSection>
                 <DialogFooter>
                   <Button variant="primary" type="submit" loading={isCreating}>
-                    Create access key
+                    Create
                   </Button>
                 </DialogFooter>
               </form>

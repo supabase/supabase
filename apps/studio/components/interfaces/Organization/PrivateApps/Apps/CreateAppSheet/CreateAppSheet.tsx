@@ -1,5 +1,5 @@
 import type { components } from 'api-types'
-import { Copy, Download, Key, Plus, RotateCcw, X } from 'lucide-react'
+import { CopyIcon, DownloadIcon, KeyIcon, PlusIcon, RotateCcwIcon, XIcon } from 'lucide-react'
 import { useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import {
@@ -184,7 +184,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         <Button
                           size="tiny"
                           className="p-1"
-                          icon={<RotateCcw size={16} />}
+                          icon={<RotateCcwIcon size={16} />}
                           onClick={() => setSelectedPermissions([])}
                           disabled={isLoading}
                         />
@@ -195,7 +195,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         modal
                       >
                         <PopoverTrigger asChild>
-                          <Button size="tiny" icon={<Plus size={14} />} disabled={isLoading}>
+                          <Button size="tiny" icon={<PlusIcon size={14} />} disabled={isLoading}>
                             Add permission
                           </Button>
                         </PopoverTrigger>
@@ -219,7 +219,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                           onCheckedChange={() => toggle(perm.id)}
                                           onClick={(e) => e.stopPropagation()}
                                         />
-                                        <Key size={12} className="text-foreground-lighter" />
+                                        <KeyIcon size={12} className="text-foreground-lighter" />
                                         <span className="font-medium text-foreground">
                                           {perm.label}
                                         </span>
@@ -260,7 +260,7 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                                 variant="text"
                                 size="tiny"
                                 className="p-1"
-                                icon={<X size={16} />}
+                                icon={<XIcon size={16} />}
                                 disabled={isLoading}
                                 onClick={() =>
                                   setSelectedPermissions((prev) => prev.filter((p) => p !== id))
@@ -311,14 +311,14 @@ export function CreateAppSheet({ visible, onClose, onCreated }: CreateAppSheetPr
                         <div className="flex items-center gap-2">
                           <Button
                             size="tiny"
-                            icon={<Copy size={12} />}
+                            icon={<CopyIcon size={12} />}
                             onClick={() => copy(generatedKey.private_key, { withToast: true })}
                           >
                             Copy
                           </Button>
                           <Button
                             size="tiny"
-                            icon={<Download size={12} />}
+                            icon={<DownloadIcon size={12} />}
                             onClick={() => {
                               const blob = new Blob([generatedKey.private_key], {
                                 type: 'text/plain',

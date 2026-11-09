@@ -1,5 +1,5 @@
 import { AuthUsersSearchSubmittedEvent } from 'common/telemetry-constants'
-import { Search, X } from 'lucide-react'
+import { SearchIcon, XIcon } from 'lucide-react'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { Dispatch, forwardRef, SetStateAction } from 'react'
 import {
@@ -97,7 +97,7 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
   return (
     <div className="flex items-center">
       <div className="text-xs h-[26px] flex items-center px-1.5 border border-strong rounded-l-md bg-surface-300">
-        <Search size={14} />
+        <SearchIcon size={14} />
       </div>
 
       <Select
@@ -177,7 +177,7 @@ export const UsersSearch = forwardRef<HTMLInputElement, UsersSearchProps>(functi
               size="tiny"
               variant="text"
               className="p-0 h-5 w-5"
-              icon={<X className={cn(searchInvalid ? 'text-red-900' : '')} />}
+              icon={<XIcon className={cn(searchInvalid ? 'text-red-900' : '')} />}
               onClick={() => {
                 setSearch('')
                 setFilterKeywords('')

@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { formatRelative } from 'date-fns'
-import { BadgeCheck, RefreshCwIcon } from 'lucide-react'
+import { BadgeCheckIcon, RefreshCwIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button, Card, CardContent, CardHeader, CardTitle } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -33,7 +33,7 @@ export const StripeSyncSettingsPage = () => {
   if (!installed || uninstalling) {
     return (
       <ConstrainedIntegrationTabScaffold>
-        <PageSection>
+        <PageSection className="py-0">
           <Admonition type="default" description="Stripe Sync Engine is not installed." />
         </PageSection>
       </ConstrainedIntegrationTabScaffold>
@@ -82,7 +82,7 @@ export const StripeSyncSettingsPage = () => {
                     ) : (
                       <>
                         <div className="flex items-center gap-x-3 text-foreground-light">
-                          <BadgeCheck size={14} />
+                          <BadgeCheckIcon size={14} />
                           <p>All up to date</p>
                         </div>
                         {syncState.closed_at && (
@@ -110,8 +110,8 @@ export const StripeSyncSettingsPage = () => {
                   <h5 className="text-sm">View Stripe data in Table Editor</h5>
                   <p className="text-sm text-foreground-light text-balance">
                     The Stripe Sync Engine stores all synced data in the{' '}
-                    <code className="text-code-inline break-keep!">stripe</code> schema. You can
-                    view and query this data directly in the Table Editor.
+                    <code className="break-keep!">stripe</code> schema. You can view and query this
+                    data directly in the Table Editor.
                   </p>
                 </div>
 

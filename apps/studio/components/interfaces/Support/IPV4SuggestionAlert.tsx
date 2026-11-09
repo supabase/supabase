@@ -1,11 +1,11 @@
-import { ExternalLink, HelpCircle } from 'lucide-react'
+import { ExternalLinkIcon, HelpCircleIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
 
 export const IPV4SuggestionAlert = () => {
   return (
     <Alert variant="default">
-      <HelpCircle strokeWidth={2} />
+      <HelpCircleIcon strokeWidth={2} />
       <AlertTitle>Connection issues?</AlertTitle>
       <AlertDescription className="grid gap-3">
         <p>
@@ -17,7 +17,7 @@ export const IPV4SuggestionAlert = () => {
           questions.
         </p>
         <p>
-          <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+          <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
             <Link
               target="_blank"
               rel="noreferrer"

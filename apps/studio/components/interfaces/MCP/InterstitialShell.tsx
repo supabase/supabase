@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import { cn, Skeleton } from 'ui'
+import { Skeleton } from 'ui'
 
 import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
 
@@ -36,19 +36,6 @@ export const InterstitialShellSkeleton = ({ children }: { children: ReactNode })
   </InterstitialShell>
 )
 
-export const InterstitialFooter = ({
-  children,
-  align = 'center',
-}: {
-  children: ReactNode
-  align?: 'center' | 'start'
-}) => (
-  <p
-    className={cn(
-      'text-xs text-foreground-light',
-      align === 'center' ? 'text-center' : 'text-left'
-    )}
-  >
-    {children}
-  </p>
+export const InterstitialFooter = ({ children }: { children: ReactNode }) => (
+  <p className="text-center text-xs text-foreground-light">{children}</p>
 )

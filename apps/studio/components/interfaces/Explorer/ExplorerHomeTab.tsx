@@ -1,21 +1,64 @@
-import { NotebookText, SquareCode } from 'lucide-react'
-import { useState } from 'react'
+import { useParams } from 'common'
+import { Loader2Icon, NotebookTextIcon, SquareCodeIcon } from 'lucide-react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import { cn } from 'ui'
 
 import { isSqlStatement } from './ExplorerHomeTab.utils'
+import { ExplorerOnboarding } from './ExplorerOnboarding'
 import { useCreateChat, useCreateNotebook, useCreateQuery } from './hooks'
 import { NOTEBOOK_TEMPLATES } from './templates'
+import { useExplorerPreferences } from '@/components/interfaces/Account/Preferences/useExplorerPreferences'
 import { ActionCard } from '@/components/layouts/Tabs/ActionCard'
 import { CHAT_TEMPLATES } from '@/components/ui/AIAssistantPanel/AIAssistant.prompts'
 import { AssistantAgentHarnessFooter } from '@/components/ui/AIAssistantPanel/AssistantAgentHarnessFooter'
 import { AssistantChatForm } from '@/components/ui/AIAssistantPanel/AssistantChatForm'
 
 export const ExplorerHomeTab = () => {
+  const { home, hasCompletedOnboarding, isReady } = useExplorerPreferences()
+
+  if (!isReady) return <ExplorerHomeLoading />
+  if (!hasCompletedOnboarding) return <ExplorerOnboarding />
+  if (home === 'query') return <ExplorerHomeQuery />
+
+  return <ExplorerHomeContent />
+}
+
+export const ExplorerHomeLoading = () => (
+  <div
+    role="status"
+    aria-label="Opening Explorer"
+    className="flex h-full items-center justify-center bg-surface-100"
+  >
+    <Loader2Icon
+      size={18}
+      className="animate-spin motion-reduce:animate-none text-foreground-muted"
+    />
+  </div>
+)
+
+const ExplorerHomeQuery = () => {
+  const { ref } = useParams()
+  const { createQuery, projectRef } = useCreateQuery()
+  const openedProjectRef = useRef<string | undefined>(undefined)
+
+  const openQuery = useEffectEvent(() => {
+    if (!ref || ref !== projectRef || openedProjectRef.current === ref) return
+    openedProjectRef.current = ref
+    createQuery({ replace: true })
+  })
+
+  useEffect(() => openQuery(), [ref, projectRef])
+
+  return <ExplorerHomeLoading />
+}
+
+const ExplorerHomeContent = () => {
   const { createNotebook } = useCreateNotebook()
   const { createQuery } = useCreateQuery()
   const { createChat } = useCreateChat()
 
   const [value, setValue] = useState<string>('')
+  const isSqlQuery = isSqlStatement(value)
 
   return (
     <div className="flex flex-col h-full">
@@ -36,10 +79,14 @@ export const ExplorerHomeTab = () => {
             placeholder="Explore your data, check project health, create a notebook..."
             value={value}
             onValueChange={(e) => setValue(e.target.value)}
-            onSubmit={(message) =>
-              isSqlStatement(message)
-                ? createQuery({ sql: message, autoRun: true })
-                : createChat({ initialMessage: message })
+            onSubmit={(message) => createChat({ initialMessage: message })}
+            secondaryAction={
+              isSqlQuery
+                ? {
+                    label: 'Run SQL',
+                    onClick: () => createQuery({ sql: value, autoRun: true }),
+                  }
+                : undefined
             }
           />
           <AssistantAgentHarnessFooter />
@@ -47,14 +94,14 @@ export const ExplorerHomeTab = () => {
           <section className="mt-6">
             <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
               <ActionCard
-                icon={<SquareCode className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                icon={<SquareCodeIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title="Run SQL"
                 description="Write and run an ad-hoc query"
                 bgColor="bg-blue-500"
                 onClick={() => createQuery()}
               />
               <ActionCard
-                icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                 title="Create a notebook"
                 description="Combine notes, queries, and results"
                 bgColor="bg-blue-500"
@@ -70,7 +117,7 @@ export const ExplorerHomeTab = () => {
               {NOTEBOOK_TEMPLATES.map((template) => (
                 <ActionCard
                   key={template.title}
-                  icon={<NotebookText className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
+                  icon={<NotebookTextIcon className="h-4 w-4 text-foreground" strokeWidth={1.5} />}
                   title={template.title}
                   description={template.description}
                   bgColor="bg-blue-500"

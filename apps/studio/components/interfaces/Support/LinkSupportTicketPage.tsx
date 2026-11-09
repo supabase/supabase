@@ -1,4 +1,4 @@
-import { Check, Mail } from 'lucide-react'
+import { CheckIcon, MailIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
@@ -58,9 +58,9 @@ function LinkSupportTicketSuccess() {
     <div className="w-full flex flex-col items-center">
       <div className="flex flex-col items-center gap-y-4 py-8">
         <div className="relative">
-          <Mail strokeWidth={1.5} size={60} className="text-brand" />
-          <div className="h-6 w-6 rounded-full bg-brand absolute bottom-1 -right-1.5 flex items-center justify-center">
-            <Check strokeWidth={4} size={16} className="text-contrast" />
+          <MailIcon strokeWidth={1.5} size={60} className="text-primary" />
+          <div className="h-6 w-6 rounded-full bg-brand-default absolute bottom-1 -right-1.5 flex items-center justify-center">
+            <CheckIcon strokeWidth={4} size={16} className="text-contrast" />
           </div>
         </div>
         <div className="flex items-center flex-col gap-y-2 text-center">

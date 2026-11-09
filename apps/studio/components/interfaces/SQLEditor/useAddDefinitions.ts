@@ -2,10 +2,11 @@ import { Monaco } from '@monaco-editor/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { LOCAL_STORAGE_KEYS } from 'common'
 import type { IDisposable } from 'monaco-editor'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
-import getPgsqlCompletionProvider from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
-import getPgsqlSignatureHelpProvider from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import { getPgsqlCompletionProvider } from '@/components/ui/CodeEditor/Providers/PgSQLCompletionProvider'
+import { getPgsqlSignatureHelpProvider } from '@/components/ui/CodeEditor/Providers/PgSQLSignatureHelpProvider'
+import type { PgInfo } from '@/components/ui/CodeEditor/Providers/Providers.types'
 import { useDatabaseFunctionsQuery } from '@/data/database-functions/database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
 import { useKeywordsQuery } from '@/data/database/keywords-query'
@@ -95,6 +96,8 @@ export const useAddDefinitions = (
     { enabled: enabled && intellisenseEnabled }
   )
 
+  const pgInfoRef = useRef<PgInfo | null>(null)
+
   const filteredSchemas = useSchemasFilteredForHighAvailability(schemas)
 
   const isPgInfoReady =
@@ -104,6 +107,15 @@ export const useAddDefinitions = (
     isSchemasSuccess &&
     isKeywordsSuccess &&
     isFunctionsSuccess
+
+  if (isPgInfoReady && tableColumns && keywords && functions) {
+    pgInfoRef.current = {
+      tableColumns,
+      schemas: filteredSchemas,
+      keywords,
+      functions,
+    }
+  }
 
   // Keeps `sharedPgInfoRef` current for the registered pgsql completion/signature-help
   // providers. Runs in an effect — not render — so only committed tree state writes the

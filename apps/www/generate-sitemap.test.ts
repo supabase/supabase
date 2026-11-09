@@ -29,11 +29,11 @@ function writeFixture(files: Record<string, string>): string {
   return dir
 }
 
-function runGenerator(fixtureDir: string) {
+function runGenerator(fixtureDir: string, env: Partial<NodeJS.ProcessEnv> = {}) {
   return spawnSync(process.execPath, [GENERATOR], {
     cwd: fixtureDir,
     encoding: 'utf-8',
-    env: { ...process.env, TZ: 'UTC' },
+    env: { ...process.env, TZ: 'UTC', VERCEL: undefined, ...env },
     timeout: SPAWN_TIMEOUT_MS,
   })
 }
@@ -145,11 +145,14 @@ describe('generate-sitemap lastmod', () => {
     expect(entryFor('https://supabase.com/customers/acme')?.lastmod).toBe('2024-05-16')
   })
 
-  it('emits no lastmod for events, static pages, and the proxied evals app', () => {
+  it('emits no lastmod for events, static pages, and the proxied apps', () => {
     for (const loc of [
       'https://supabase.com/events/webinar',
       'https://supabase.com/company',
       'https://supabase.com/evals',
+      'https://supabase.com/migrate/instantdb',
+      'https://supabase.com/dashboard/sign-in',
+      'https://supabase.com/dashboard/sign-up',
     ]) {
       const entry = entryFor(loc)
       expect(entry, loc).toBeDefined()
@@ -186,7 +189,113 @@ describe('generate-sitemap lastmod', () => {
     const index = fs.readFileSync(path.join(fixtureDir, 'public', 'sitemap.xml'), 'utf-8')
     expect(index).toContain('<loc>https://supabase.com/sitemap_www.xml</loc>')
     expect(index).toContain('<loc>https://supabase.com/docs/sitemap.xml</loc>')
+    expect(index).toContain('<loc>https://supabase.com/library/sitemap.xml</loc>')
   })
+})
+
+describe('generate-sitemap App Router pages', () => {
+  it.each(['app/page.tsx', 'app/(home)/page.tsx'])(
+    'includes only static page URLs without lastmod, with homepage at %s',
+    (homepage) => {
+      const dir = writeFixture({
+        [homepage]: '',
+        'app/(group)/example/page.tsx': '',
+        'app/(marketing)/guides/(topics)/start/page.tsx': '',
+        'app/blog/example/page.tsx': '',
+        'app/events/example/page.tsx': '',
+        'app/reference/index/page.tsx': '',
+        'app/things/[slug]/page.tsx': '',
+        'app/things/[slug]/details/page.tsx': '',
+        'app/(group)/[...slug]/page.tsx': '',
+        'app/optional/[[...slug]]/page.tsx': '',
+        'app/example/layout.tsx': '',
+        'app/api/route.ts': '',
+        'app/loading.tsx': '',
+        'pages/company.tsx': '',
+      })
+      const result = runGenerator(dir)
+      expect(result.status, result.stderr).toBe(0)
+      const entries = urlEntries(fs.readFileSync(path.join(dir, 'public/sitemap_www.xml'), 'utf-8'))
+      expect(entries.sort((a, b) => a.loc.localeCompare(b.loc))).toEqual(
+        [
+          '',
+          '/blog/example',
+          '/company',
+          '/dashboard/sign-in',
+          '/dashboard/sign-up',
+          '/evals',
+          '/events/example',
+          '/example',
+          '/guides/start',
+          '/migrate/instantdb',
+          '/reference/index',
+        ].map((route) => ({ loc: `https://supabase.com${route}`, lastmod: undefined }))
+      )
+    },
+    SPAWN_TIMEOUT_MS
+  )
+})
+
+describe('generate-sitemap prerendered feature pages', () => {
+  const prerenderManifest = (routes: Record<string, string>) =>
+    JSON.stringify({
+      version: 4,
+      routes: Object.fromEntries(
+        Object.entries(routes).map(([route, srcRoute]) => [route, { srcRoute }])
+      ),
+      dynamicRoutes: {},
+    })
+
+  it(
+    'lists every prerendered /features/[slug] page from the prerender manifest',
+    () => {
+      const dir = writeFixture({
+        'pages/features/[slug].tsx': '',
+        '.next/prerender-manifest.json': prerenderManifest({
+          '/features/social-sign-in': '/features/[slug]',
+          '/features/auth-hooks': '/features/[slug]',
+          '/customers/acme': '/customers/[slug]',
+        }),
+      })
+      const result = runGenerator(dir, { VERCEL: '1' })
+      expect(result.status, result.stderr).toBe(0)
+      const entries = urlEntries(fs.readFileSync(path.join(dir, 'public/sitemap_www.xml'), 'utf-8'))
+      expect(entries.map((entry) => entry.loc)).toEqual([
+        'https://supabase.com/features/auth-hooks',
+        'https://supabase.com/features/social-sign-in',
+        'https://supabase.com/evals',
+        'https://supabase.com/migrate/instantdb',
+        'https://supabase.com/dashboard/sign-in',
+        'https://supabase.com/dashboard/sign-up',
+      ])
+    },
+    SPAWN_TIMEOUT_MS
+  )
+
+  it(
+    'fails the build on Vercel when the manifest has no feature pages',
+    () => {
+      const dir = writeFixture({
+        '.next/prerender-manifest.json': prerenderManifest({
+          '/customers/acme': '/customers/[slug]',
+        }),
+      })
+      const result = runGenerator(dir, { VERCEL: '1' })
+      expect(result.status).not.toBe(0)
+      expect(result.stderr).toContain('No prerendered /features/[slug] pages found')
+    },
+    SPAWN_TIMEOUT_MS
+  )
+
+  it(
+    'fails the build on Vercel when there is no prerender manifest',
+    () => {
+      const result = runGenerator(writeFixture({ 'pages/company.tsx': '' }), { VERCEL: '1' })
+      expect(result.status).not.toBe(0)
+      expect(result.stderr).toContain('No prerendered /features/[slug] pages found')
+    },
+    SPAWN_TIMEOUT_MS
+  )
 })
 
 describe('frontmatter dates in sitemap and blog JSON-LD', () => {
