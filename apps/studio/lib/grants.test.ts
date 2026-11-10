@@ -10,6 +10,7 @@ import {
   useGrant,
   type Grant,
   type GrantFor,
+  type GrantForVariants,
   type GrantResult,
 } from './grants'
 import { projectKeys } from '@/data/projects/keys'
@@ -49,6 +50,7 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 
 const ORG_SLUG = 'test-org'
 const BRANCHES = 'GET /v1/projects/{ref}/branches'
+const PG_META_QUERY = 'POST /platform/pg-meta/{ref}/query'
 const DELETE_BRANCH = 'DELETE /v1/branches/{branch_id_or_ref}'
 const PROFILE_CONTEXT = createMockProfileContext()
 
@@ -203,6 +205,23 @@ describe('getGrant', () => {
     expect(
       getGrant(undefined, BRANCHES, { projectRef: 'proj', permissionsProjectRef: 'proj' }).status
     ).toBe('granted')
+  })
+
+  test('requires database_write for the write variant of the pg-meta query', () => {
+    const readOnly = permissionsFor({ permissions: ['database_read'] })
+    const readWrite = permissionsFor({ permissions: ['database_read', 'database_write'] })
+
+    expect(getGrant(readOnly, PG_META_QUERY, scope, { variant: 'write' })).toEqual({
+      status: 'denied',
+    })
+    expect(getGrant(readWrite, PG_META_QUERY, scope, { variant: 'write' }).status).toBe('granted')
+    expect(getGrant(readOnly, PG_META_QUERY, scope, { variant: 'read' }).status).toBe('granted')
+  })
+
+  test('GrantForVariants is the union of the variant grants', () => {
+    expectTypeOf<GrantForVariants<'POST', '/platform/pg-meta/{ref}/query'>>().toEqualTypeOf<
+      Grant<typeof PG_META_QUERY, 'read'> | Grant<typeof PG_META_QUERY, 'write'>
+    >()
   })
 
   test('denies an unknown variant at runtime', () => {
