@@ -39,7 +39,7 @@
 /apps/studio/csp.ts                                                 @supabase/security
 /apps/studio/components/interfaces/Billing/Payment                  @supabase/security
 /apps/studio/components/interfaces/Organization/Documents/          @supabase/security
-/apps/studio/pages/new/index.tsx                                    @supabase/security
+/apps/studio/routes/_app/new/index.tsx                              @supabase/security
 
 /apps/studio/lib/ai/                                                @supabase/ai
 /apps/studio/pages/api/ai/                                          @supabase/ai
