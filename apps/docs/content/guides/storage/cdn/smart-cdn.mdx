@@ -56,13 +56,14 @@ For more information about revoking signed URLs, see [URL Signing Keys](/docs/gu
 
 ## Authenticated URLs and CDN caching
 
-When you request a private asset through the authenticated endpoint (`/storage/v1/object/authenticated/[bucket]/[asset-name]`), the CDN caches the response based on the user's access at the time of the request, and keeps serving it until the user's access token (JWT) expires.
+When you request a private asset through the authenticated endpoint (`/storage/v1/object/authenticated/[bucket]/[asset-name]`), access is allowed until the user's access token (JWT) expires. The CDN caches the response based on the user's access at the time of the request, and keeps serving it until the JWT expires.
 
 This means that:
 
-- If you change a user's access, for example by updating an RLS policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request is checked against your current access rules. The purge can take up to 60 seconds to propagate.
-- If a user signs out and a request reuses their old JWT, the user can still access cached files. Signing out ends the Auth session but doesn't invalidate access tokens that were already issued. To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions).
+- If you change a user's access, for example by updating an RLS policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is checked against your current access rules. The purge can take up to 60 seconds to propagate.
+- A CDN purge doesn't clear browser caches. A browser can reuse a cached asset without sending a request to Storage until its `cacheControl` TTL expires.
+- If a user signs out and a request reuses their old JWT, the user can still access files. Signing out ends the Auth session but doesn't invalidate access tokens that were already issued. To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions).
 
-If you need immediate revocation, check the user's session and permissions in your own server code, for example with an [Edge Function](/docs/guides/functions). Because your code handles authorization, you can call the REST API with server-only credentials and still benefit from CDN caching between Storage and your server.
+To revoke access immediately, check the user's session and permissions in your own server code, for example with an [Edge Function](/docs/guides/functions). Because your code handles authorization, you can call the REST API with a secret API key (or the legacy `service_role` key) and still benefit from CDN caching between Storage and your server.
 
-You can also [serve assets through the S3 API](/docs/guides/storage/s3/authentication), which doesn't cache responses.
+You can also [serve assets through the S3 API](/docs/guides/storage/s3/authentication), which doesn't cache responses. Requests that use a session token can still succeed after sign-out until the user's JWT expires, so S3 doesn't give you immediate revocation either.
