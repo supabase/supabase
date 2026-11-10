@@ -1,6 +1,7 @@
-import { AuthError, type Session } from '@supabase/supabase-js'
+import { AuthError, AuthRetryableFetchError, type Session } from '@supabase/supabase-js'
 import { screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
+import { Toaster } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { BASE_PATH } from '@/lib/constants'
@@ -96,6 +97,24 @@ describe('SignInMfaPage', () => {
 
     expect(await screen.findByText('Two-factor authentication')).toBeInTheDocument()
     expect(routerMock.pathname).toBe('/sign-in-mfa')
+  })
+
+  test('returns to sign-in quietly when the stored session cannot refresh', async () => {
+    mockAuth({ initializeError: CALLBACK_ERROR })
+    vi.spyOn(auth, 'getSession').mockResolvedValue({
+      data: { session: null },
+      error: new AuthRetryableFetchError('unavailable', 503),
+    })
+    customRender(
+      <>
+        <SignInMfaPage dehydratedState={undefined} />
+        <Toaster />
+      </>
+    )
+
+    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
+    expect(routerMock.query).toEqual({ method: 'github', returnTo: '/org' })
+    expect(screen.queryByText(/Failed to initialize authentication/)).not.toBeInTheDocument()
   })
 
   test('returns to sign-in when there is no session', async () => {

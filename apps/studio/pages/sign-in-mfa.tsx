@@ -40,7 +40,8 @@ const SignInMfaPage: NextPageWithLayout = () => {
     auth
       .initialize()
       .then(async ({ error: callbackError }) => {
-        const token = await getAccessToken()
+        // A session that can't be refreshed counts as no session.
+        const token = await getAccessToken().catch(() => undefined)
 
         // A successful password retry can create a session after initialization cached an error.
         // With no session, show the callback error on the sign-in page.
