@@ -8,6 +8,11 @@ import type { Attribute } from './Usage.constants'
 import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
 import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from '@/components/interfaces/Compute/Compute.limits'
+import {
+  COMPUTE_OVERAGE_RATES,
+  estimateComputeOverage,
+  type ComputeOverageEstimate,
+} from '@/components/interfaces/Compute/Compute.pricing'
 import { formatSize } from '@/components/interfaces/Compute/Compute.utils'
 import {
   aggregateUsageBySize,
@@ -28,19 +33,16 @@ import type {
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { SparkBar } from '@/components/ui/SparkBar'
 import type { DataPoint } from '@/data/analytics/constants'
 import { useComputeOrgUsage } from '@/data/compute/use-compute-org-usage'
 import type { OrgSubscription } from '@/data/subscriptions/types'
+import { formatCurrency } from '@/lib/helpers'
 
 const USAGE_WINDOW_DAYS = 30
 
-/**
- * Wall-clock runtime and GB-hours carry no quota of their own. Runtime is context — how long
- * instances were up — and memory tracks vCPU at a fixed 2 GB per vCPU, so neither can diverge
- * from the metered figure. Both are reported rather than metered.
- */
 /** Label left, figure right. The one line a section gets in place of a prose subtitle. */
 const TotalRow = ({ label, value }: { label: string; value: string }) => (
   <div className="flex items-center justify-between border-b py-1">
@@ -49,24 +51,90 @@ const TotalRow = ({ label, value }: { label: string; value: string }) => (
   </div>
 )
 
+/** Rates are sub-dollar, so they need cents precision where a total does not. */
+const formatRate = (rate: number) => `$${rate.toFixed(2)}`
+
+/**
+ * A quantity shown next to the rate it is multiplied by. The usual formatter drops decimals
+ * above ten, which leaves "19 vCPU-hrs × $0.15" sitting beside a $2.88 that it does not
+ * produce — so a reader checking the arithmetic finds it wrong.
+ */
+const formatBillableHours = (hours: number) => hours.toFixed(1)
+
+const DimensionRow = ({
+  label,
+  detail,
+  value,
+  isTotal = false,
+}: {
+  label: string
+  detail?: string
+  value: string
+  isTotal?: boolean
+}) => (
+  <div
+    className={cn(
+      'flex items-center justify-between gap-4 py-1',
+      isTotal ? 'border-t' : 'border-b'
+    )}
+  >
+    <p className="text-xs text-foreground-light">
+      {label}
+      {detail && <span className="ml-2 text-foreground-lighter">{detail}</span>}
+    </p>
+    <p className={cn('text-xs tabular-nums', isTotal && 'text-foreground')}>{value}</p>
+  </div>
+)
+
+/**
+ * What the period reported, and what the part past the quota would cost.
+ *
+ * Saying usage is "priced per vCPU-hour and GB-hour" without showing either rate leaves the
+ * reader to guess the one number they came for. The breakdown also makes the shape of the
+ * bill legible: the quota counts vCPU-hours alone, but the rate card prices memory too, so
+ * the same overage is billed on both dimensions at a fixed 2 GB per vCPU.
+ */
 const ComputeBillingDimensions = ({
   runningHours,
   gbHours,
+  overage,
 }: {
   runningHours: number
   gbHours: number
+  overage: ComputeOverageEstimate | null
 }) => (
   <div>
-    <div className="flex items-center justify-between border-b py-1">
-      <p className="text-xs text-foreground-light">Runtime in period</p>
-      <p className="text-xs">{formatComputeHours(runningHours)}</p>
-    </div>
-    <div className="flex items-center justify-between py-1">
-      <p className="text-xs text-foreground-light">GB-hours in period</p>
-      <p className="text-xs">{formatGbHours(gbHours)}</p>
-    </div>
+    <DimensionRow label="Runtime in period" value={formatComputeHours(runningHours)} />
+    <DimensionRow
+      label="GB-hours in period"
+      value={formatGbHours(gbHours)}
+      isTotal={overage === null}
+    />
+
+    {overage !== null && (
+      <>
+        <DimensionRow
+          label="Compute over quota"
+          detail={`${formatBillableHours(overage.vcpuHours)} vCPU-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perVcpuHour)}`}
+          value={formatCurrency(overage.vcpuCost) ?? '—'}
+        />
+        <DimensionRow
+          label="Memory over quota"
+          detail={`${formatBillableHours(overage.gbHours)} GB-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perGbHour)}`}
+          value={formatCurrency(overage.gbCost) ?? '—'}
+        />
+        <DimensionRow
+          label="Estimated overage"
+          value={formatCurrency(overage.total) ?? '—'}
+          isTotal
+        />
+      </>
+    )}
+
     <p className="pt-1 text-xs text-foreground-lighter">
-      Usage beyond the included quota is priced per vCPU-hour and GB-hour.
+      Usage beyond the included quota is priced per vCPU-hour and GB-hour.{' '}
+      {COMPUTE_OVERAGE_RATES.isIllustrative && 'Rates shown are experimental and not final. '}
+      <InlineLink href="https://supabase.com/pricing">See pricing</InlineLink>
     </p>
   </div>
 )
@@ -116,6 +184,7 @@ export const ComputeServices = ({
   const totalRequests = sumBy(points, (point) => point.requests)
   const cpuUtilization = getCpuUtilization(totalUsedVcpuHours, totalReservedVcpuHours)
   const hasVcpuUsage = totalReservedVcpuHours > 0
+  const overage = estimateComputeOverage(totalReservedVcpuHours, limits.vcpuHours)
 
   const vcpuChartData: DataPoint[] = points.map((point) => ({
     period_start: point.timestamp,
@@ -151,7 +220,11 @@ export const ComputeServices = ({
                   isUsageBillingEnabled={subscription?.usage_billing_enabled ?? false}
                   currentBillingCycleSelected={currentBillingCycleSelected}
                 />
-                <ComputeBillingDimensions runningHours={totalRunningHours} gbHours={totalGbHours} />
+                <ComputeBillingDimensions
+                  runningHours={totalRunningHours}
+                  gbHours={totalGbHours}
+                  overage={overage}
+                />
               </div>
             )}
 
@@ -331,22 +404,11 @@ const pluralize = (count: number, singular: string) =>
   `${count.toLocaleString()} ${singular}${count === 1 ? '' : 's'}`
 
 /**
- * Ranked bars, not meters.
- *
- * The bar on each row shows that project's share of the organization's vCPU-hours, scaled to
- * the largest row so the column reads as a bar chart lying on one baseline. Scaling it to the
- * org total instead would make the top row sit at 61% of its track, which reads as progress
- * toward a limit — and the column next to it genuinely is a ratio against a limit, so the two
- * would wear the same mark for different jobs.
- *
- * The share is not printed. The figure beside the bar already gives the amount, and a second
- * percentage next to "CPU used" invited the two to be read against the same denominator when
- * one is a share of the org and the other a share of what the project reserved.
+ * Rows are ranked by vCPU-hours, which is the comparison the reader wants; a bar alongside
+ * them was read as progress toward a limit rather than a share of the total, so the figures
+ * carry it alone.
  */
 const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
-  const totalReservedVcpuHours = sumBy(rows, (row) => row.reservedVcpuHours)
-  const largestReservedVcpuHours = Math.max(...rows.map((row) => row.reservedVcpuHours), 0)
-
   return (
     <div className="divide-y border-b">
       <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
@@ -355,10 +417,6 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
         <span className="col-span-2 text-right">CPU used</span>
       </div>
       {rows.map((row) => {
-        const share =
-          totalReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / totalReservedVcpuHours
-        const relativeToLargest =
-          largestReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / largestReservedVcpuHours
         const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)
 
         return (
@@ -369,21 +427,9 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
                 {pluralize(row.deployments, 'compute')} · {pluralize(row.instances, 'instance')}
               </p>
             </div>
-            <div className="col-span-5 flex items-center justify-end gap-3">
-              <span
-                className="h-1 w-full max-w-24 overflow-hidden rounded-full bg-surface-400"
-                role="img"
-                aria-label={`${formatPercentage(share)} of the organization's vCPU-hours`}
-              >
-                <span
-                  className="block h-full rounded-full bg-foreground-light"
-                  style={{ width: formatPercentage(relativeToLargest) }}
-                />
-              </span>
-              <p className="text-sm tabular-nums text-foreground-light">
-                {formatDecimal(row.reservedVcpuHours)}
-              </p>
-            </div>
+            <p className="col-span-5 text-right text-sm tabular-nums text-foreground-light">
+              {formatDecimal(row.reservedVcpuHours)}
+            </p>
             <p className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
               {cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
             </p>

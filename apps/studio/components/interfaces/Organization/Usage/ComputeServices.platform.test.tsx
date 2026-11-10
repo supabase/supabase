@@ -164,14 +164,28 @@ describe('ComputeServices', () => {
     expect(within(table!).getAllByText(/vCPU-hrs/)).toHaveLength(1)
   })
 
-  it("carries each project's share on the bar rather than printing a second percentage", async () => {
+  it('ranks projects by the figures alone, with no bar to read as progress', async () => {
     renderOnPlan('pro')
 
     await screen.findByText('Usage by project')
-    const bars = await screen.findAllByRole('img', {
-      name: /% of the organization's vCPU-hours/,
-    })
-    expect(bars.length).toBeGreaterThan(0)
+    expect(
+      screen.queryByRole('img', { name: /% of the organization's vCPU-hours/ })
+    ).not.toBeInTheDocument()
+  })
+
+  it('prices the overage it reports, and links out for the rest', async () => {
+    renderOnPlan('pro')
+
+    // The quota counts vCPU-hours; the rate card prices the memory pinned to them as well.
+    expect(await screen.findByText('Compute over quota')).toBeInTheDocument()
+    expect(await screen.findByText('Memory over quota')).toBeInTheDocument()
+    expect(await screen.findByText('Estimated overage')).toBeInTheDocument()
+
+    // Each line states the rate it applied rather than leaving the reader to infer it.
+    expect(await screen.findByText(/vCPU-hrs × \$0\.\d\d/)).toBeInTheDocument()
+
+    const pricing = await screen.findByRole('link', { name: 'See pricing' })
+    expect(pricing).toHaveAttribute('href', 'https://supabase.com/pricing')
   })
 
   it('narrows to a single project and hides the org allowance', async () => {
