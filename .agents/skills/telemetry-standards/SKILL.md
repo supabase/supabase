@@ -18,8 +18,7 @@ reviewing PRs that touch tracking or when implementing new tracking.
 
 **Approved verbs only** (canonical list — derived from `packages/common/telemetry-constants.ts`):
 opened, clicked, submitted, created, removed, updated, intended, evaluated, added,
-enabled, disabled, copied, exposed, failed, converted, closed, completed, applied, sent, moved,
-reported (passive measurements only, e.g. `web_vital_reported`; never for user actions)
+enabled, disabled, copied, exposed, failed, converted, closed, completed, applied, sent, moved
 
 **Flag these:**
 

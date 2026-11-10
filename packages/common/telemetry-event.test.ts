@@ -82,7 +82,7 @@ describe('buildTelemetryEventRequest', () => {
 
   it('sends web vitals with keepalive so they survive the page being hidden', () => {
     const request = buildTelemetryEventRequest(API_URL, {
-      action: 'web_vital_reported',
+      action: 'web_vital_evaluated',
       properties: {
         metricName: 'LCP',
         metricValue: 1200,

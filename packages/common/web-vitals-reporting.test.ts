@@ -98,7 +98,7 @@ describe('useWebVitalsReporting', () => {
     METRIC_NAMES.forEach((name) => expect(registrationCount(name)).toBe(1))
   })
 
-  it('reports a metric as a web_vital_reported event for the landing page', async () => {
+  it('reports a metric as a web_vital_evaluated event for the landing page', async () => {
     const { render } = await setup()
     await render({ apiUrl: API_URL, enabled: true })
     await vi.waitFor(() => expect(registrationCount('INP')).toBe(1))
@@ -117,7 +117,7 @@ describe('useWebVitalsReporting', () => {
     expect(sendTelemetryEvent).toHaveBeenCalledWith(
       API_URL,
       {
-        action: 'web_vital_reported',
+        action: 'web_vital_evaluated',
         properties: {
           metricName: 'INP',
           metricValue: 312,

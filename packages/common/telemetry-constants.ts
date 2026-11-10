@@ -4556,8 +4556,8 @@ export interface AccountRecoveryReminderClosedEvent {
  * @source Browser performance observers (`web-vitals`), after the user has accepted telemetry consent
  * @page All Studio pages (platform only)
  */
-export interface WebVitalReportedEvent {
-  action: 'web_vital_reported'
+export interface WebVitalEvaluatedEvent {
+  action: 'web_vital_evaluated'
   properties: {
     /** Which metric this report is for */
     metricName: 'LCP' | 'CLS' | 'INP' | 'TTFB' | 'FCP'
@@ -4576,7 +4576,7 @@ export interface WebVitalReportedEvent {
  * @hidden
  */
 export type TelemetryEvent =
-  | WebVitalReportedEvent
+  | WebVitalEvaluatedEvent
   | AccountRecoveryReminderExposedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent

@@ -14,7 +14,7 @@ function reportWebVital(apiUrl: string, pathname: string, metric: Metric) {
   sendTelemetryEvent(
     apiUrl,
     {
-      action: 'web_vital_reported',
+      action: 'web_vital_evaluated',
       properties: {
         metricName: metric.name,
         metricValue: metric.value,
@@ -28,7 +28,7 @@ function reportWebVital(apiUrl: string, pathname: string, metric: Metric) {
 }
 
 /**
- * Reports LCP, CLS, INP, TTFB and FCP for the current page load as `web_vital_reported`
+ * Reports LCP, CLS, INP, TTFB and FCP for the current page load as `web_vital_evaluated`
  * telemetry events.
  *
  * Nothing is loaded or observed until `enabled` is true, so pass the consent state. The
