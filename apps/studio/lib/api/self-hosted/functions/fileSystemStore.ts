@@ -9,7 +9,7 @@ export class FileSystemFunctionsArtifactStore {
   constructor(private folderPath: string) {}
 
   async getFunctions(): Promise<FunctionArtifact[]> {
-    const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    const dirEntries = await this.readFunctionsFolder()
 
     const functionsFolders = dirEntries.filter((dir) => dir.isDirectory() && dir.name !== 'main')
     const functionsArtifacts = await Promise.all(
@@ -20,7 +20,7 @@ export class FileSystemFunctionsArtifactStore {
   }
 
   async getFunctionBySlug(slug: string): Promise<FunctionArtifact | undefined> {
-    const dirEntries = await readdir(this.folderPath, { withFileTypes: true })
+    const dirEntries = await this.readFunctionsFolder()
 
     const functionFolder = dirEntries.find(
       (dir) => dir.isDirectory() && dir.name !== 'main' && dir.name === slug
@@ -56,6 +56,16 @@ export class FileSystemFunctionsArtifactStore {
     )
 
     return fileEntries
+  }
+
+  /** Reads the functions folder. A folder that does not exist yet has no functions. */
+  private async readFunctionsFolder(): Promise<Dirent[]> {
+    try {
+      return await readdir(this.folderPath, { withFileTypes: true })
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code === 'ENOENT') return []
+      throw error
+    }
   }
 }
 
