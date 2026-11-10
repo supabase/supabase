@@ -93,7 +93,7 @@ const LogVolumeControlForm = ({ projectRef }: LogVolumeControlFormProps) => {
                       <FormItemLayout
                         layout="flex-row-reverse"
                         label="Log volume control"
-                        description="Show all logs or only errors. Logs are still collected and stored."
+                        description="This is more than a filter. This reduces ingest and costs."
                         className="[&>div]:md:w-1/2"
                       >
                         <FormControl>
