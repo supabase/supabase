@@ -129,34 +129,25 @@ const BucketPage: NextPageWithLayout = () => {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setModalDisplayed('edit')}
-                  >
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('edit')}>
                     <SettingsIcon size={12} />
                     <p>Bucket settings</p>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setModalDisplayed('empty')}
-                  >
-                    <FolderOpenIcon size={12} />
-                    <p>Empty bucket</p>
-                  </DropdownMenuItem>
                   {IS_PLATFORM && (
                     <DropdownMenuItem
-                      className="flex items-center space-x-2"
+                      className="gap-x-2"
                       onClick={() => setModalDisplayed('purgeCDNCache')}
                     >
                       <RefreshCwIcon size={12} />
                       <p>Purge CDN cache</p>
                     </DropdownMenuItem>
                   )}
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setModalDisplayed('delete')}
-                  >
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('empty')}>
+                    <FolderOpenIcon size={12} />
+                    <p>Empty bucket</p>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('delete')}>
                     <Trash2Icon size={12} />
                     <p>Delete bucket</p>
                   </DropdownMenuItem>
