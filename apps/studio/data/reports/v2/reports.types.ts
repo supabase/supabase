@@ -1,5 +1,6 @@
 import { YAxisProps } from 'recharts'
 
+import type { ChartHeaderProps } from '@/components/ui/Charts/ChartHeader'
 import { AnalyticsInterval } from '@/data/analytics/constants'
 
 export type ReportDataProviderAttribute = {
@@ -49,4 +50,6 @@ export interface ReportConfig<FiltersType = any> {
   xAxisKey?: string
   yAxisKey?: string
   showNewBadge?: boolean
+  /** Extra stats (e.g. warning and error counts) shown beside the chart's total */
+  getHeaderStats?: ChartHeaderProps['getHeaderStats']
 }

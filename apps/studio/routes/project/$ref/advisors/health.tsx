@@ -4,25 +4,33 @@ import { useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { IssuesCategoryRedirect } from '@/components/interfaces/Issues/IssuesCategoryRedirect'
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
 import { lintInfoMap, parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
 import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
-import LinterFilters from '@/components/interfaces/Linter/LinterFilters'
-import LintPageTabs from '@/components/interfaces/Linter/LintPageTabs'
+import { LinterFilters } from '@/components/interfaces/Linter/LinterFilters'
+import { LintPageTabs } from '@/components/interfaces/Linter/LintPageTabs'
 import { useAdvisorPageShortcuts } from '@/components/interfaces/Linter/useAdvisorPageShortcuts'
+import { LegacyAdvisorsLayout } from '@/components/layouts/AdvisorsLayout/LegacyAdvisorsLayout'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { useProjectHealthLintsQuery } from '@/data/lint/health-lints-query'
 import { Lint } from '@/data/lint/lint-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 
 export const Route = createFileRoute('/project/$ref/advisors/health')({
-  component: ProjectHealthLints,
-  staticData: {
-    advisorsLayoutTitle: 'Linter',
-  },
+  component: AdvisorsHealthRoute,
+  staticData: { skipAdvisorsLayout: true },
 })
 
-function ProjectHealthLints() {
+function AdvisorsHealthRoute() {
+  return (
+    <LegacyAdvisorsLayout>
+      <AdvisorsHealthPage />
+    </LegacyAdvisorsLayout>
+  )
+}
+
+const ProjectHealthLints = () => {
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   if (!isHealthAdvisorEnabled) {
@@ -106,5 +114,14 @@ const ProjectHealthLintsContent = () => {
         isLoading={isLoading}
       />
     </div>
+  )
+}
+
+function AdvisorsHealthPage() {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  return isIssuesInboxEnabled ? (
+    <IssuesCategoryRedirect category="health" />
+  ) : (
+    <ProjectHealthLints />
   )
 }
