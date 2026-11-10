@@ -38,6 +38,15 @@ describe('buildQuotaNotice', () => {
     expect(formatCliNotice(result!)).toContain('Instances keep running')
   })
 
+  it('costs the overage rather than only naming the rate', () => {
+    const text = formatCliNotice(buildQuotaNotice({ ...QUOTA, usedVcpuHours: 9.1 })!)
+
+    // 0.77 vCPU-hrs past an 8.33 allowance, billed on vCPU and the memory pinned to it.
+    expect(text).toMatch(/0\.8 vCPU-hrs over quota, about \$\d+\.\d\d so far/)
+    expect(text).toContain('Rates are experimental')
+    expect(text).toContain('https://supabase.com/pricing')
+  })
+
   it('fails the command when the spend cap makes the quota a hard stop', () => {
     const result = buildQuotaNotice({
       ...QUOTA,

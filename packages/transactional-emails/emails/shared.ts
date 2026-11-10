@@ -34,6 +34,8 @@ export const usageUrl = (slug: string) => dashboardUrl(`/org/${slug}/usage#compu
 
 export const billingUrl = (slug: string) => dashboardUrl(`/org/${slug}/billing`)
 
+export const PRICING_URL = 'https://supabase.com/pricing'
+
 /**
  * Compute reads in vCPU-hours everywhere, below an hour included, so small values keep two
  * decimals rather than rounding to nothing.

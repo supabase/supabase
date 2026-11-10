@@ -1,28 +1,44 @@
 import { EmailLayout } from '../components/Layout'
 import { Button, Heading, Hr, Section, Text } from '../components/Primitives'
-import { Callout, ProjectUsageTable, UsageMeter } from '../components/UsageMeter'
+import { CostBreakdown, ProjectUsageTable, UsageMeter } from '../components/UsageMeter'
 import { theme } from '../theme'
 import {
   billingUrl,
   formatHours,
   formatQuota,
   PREVIEW_QUOTA,
+  PRICING_URL,
   usageUrl,
   type ComputeQuotaProps,
   type EmailTemplate,
 } from './shared'
 
 interface ComputeQuotaOverageProps extends ComputeQuotaProps {
-  /** Formatted overage so far this cycle, e.g. "$4.20". */
-  overageSoFar: string
-  /** Projected overage by the end of the cycle, at the current rate. */
-  projectedOverage: string
+  /**
+   * The overage, already costed. The billing system supplies these; a template that worked
+   * them out from a rate would be a second place for the rate to be wrong.
+   */
+  overage: {
+    vcpuHours: string
+    vcpuRate: string
+    vcpuCost: string
+    gbHours: string
+    gbRate: string
+    gbCost: string
+    total: string
+    /** Projected total by the end of the cycle, at the current rate. */
+    projectedTotal: string
+  }
 }
 
 /**
  * Nothing is broken here: the spend cap is off, which is an explicit choice to pay for
  * headroom. So this is information, not an alarm — no warning colour on the primary message,
  * and no call to upgrade ahead of the number they actually want, which is the cost.
+ *
+ * The cost is itemised rather than quoted as a total, matching the usage page. The same
+ * overage bills on two dimensions, and the memory line being exactly twice the vCPU one is
+ * the clearest statement of why.
  */
 const ComputeQuotaOverage = ({
   organizationName,
@@ -32,11 +48,10 @@ const ComputeQuotaOverage = ({
   usedVcpuHours,
   cycleEndsOn,
   projects,
-  overageSoFar,
-  projectedOverage,
+  overage,
 }: ComputeQuotaOverageProps) => (
   <EmailLayout
-    preview={`Compute past the quota is now billed. ${overageSoFar} so far, about ${projectedOverage} by ${cycleEndsOn}.`}
+    preview={`Compute past the quota is now billed. ${overage.total} so far, about ${overage.projectedTotal} by ${cycleEndsOn}.`}
     organizationName={organizationName}
     footerNote="Sent once per billing cycle, when usage first passes the included quota."
   >
@@ -51,15 +66,39 @@ const ComputeQuotaOverage = ({
         label="Compute"
         value={formatQuota(usedVcpuHours, includedVcpuHours)}
         ratio={1}
-        caption={`${formatHours(usedVcpuHours - includedVcpuHours)} over the quota`}
+        // Reads the costed figure rather than recomputing it, so the meter and the cost line
+        // below cannot print the same quantity at two precisions.
+        caption={`${overage.vcpuHours} over the quota`}
       />
 
       <Hr />
 
-      <Callout tone="neutral">
-        <strong>{overageSoFar} this cycle so far.</strong> At the current rate, about{' '}
-        {projectedOverage} by {cycleEndsOn}.
-      </Callout>
+      <Text small muted>
+        What that costs
+      </Text>
+      <CostBreakdown
+        lines={[
+          {
+            label: 'Compute over quota',
+            detail: `${overage.vcpuHours} × ${overage.vcpuRate}`,
+            amount: overage.vcpuCost,
+          },
+          {
+            label: 'Memory over quota',
+            detail: `${overage.gbHours} × ${overage.gbRate}`,
+            amount: overage.gbCost,
+          },
+          { label: 'This cycle so far', amount: overage.total, isTotal: true },
+        ]}
+      />
+      <Text small muted>
+        At the current rate, about {overage.projectedTotal} by {cycleEndsOn}.{' '}
+        <a href={PRICING_URL} style={{ color: theme.foregroundLight }}>
+          See pricing
+        </a>
+      </Text>
+
+      <Hr />
 
       <Text small muted>
         Where it went
@@ -89,9 +128,17 @@ export const computeQuotaOverage: EmailTemplate<ComputeQuotaOverageProps> = {
   previewProps: {
     ...PREVIEW_QUOTA,
     usedVcpuHours: 9.1,
-    // Left as slots rather than figures: the Compute rate is not settled, and a preview that
-    // quotes one reads as a quote.
-    overageSoFar: '[overageSoFar]',
-    projectedOverage: '[projectedOverage]',
+    // Mirrors the illustrative rates the usage page shows, applied to 0.77 vCPU-hrs over an
+    // 8.33 allowance. Experimental, like everything else about the pricing here.
+    overage: {
+      vcpuHours: '0.8 vCPU-hrs',
+      vcpuRate: '$0.15',
+      vcpuCost: '$0.12',
+      gbHours: '1.5 GB-hrs',
+      gbRate: '$0.02',
+      gbCost: '$0.03',
+      total: '$0.15',
+      projectedTotal: '$1.40',
+    },
   },
 }

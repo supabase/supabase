@@ -1,3 +1,4 @@
+import { estimateComputeOverage } from './Compute.pricing'
 import {
   COMPUTE_CAPACITY_WARNING_SLOTS,
   formatVcpuHours,
@@ -69,6 +70,10 @@ export interface ComputeQuotaCliInput {
 
 const usageUrl = (slug: string) => `https://supabase.com/dashboard/org/${slug}/usage`
 const billingUrl = (slug: string) => `https://supabase.com/dashboard/org/${slug}/billing`
+const PRICING_URL = 'https://supabase.com/pricing'
+
+/** Cents matter at these amounts, and a terminal has no currency formatter to inherit. */
+const formatCliCurrency = (amount: number) => `$${amount.toFixed(2)}`
 
 /**
  * Attached to writes — `push`, `new` — and to nothing else. Returns `null` below the
@@ -95,9 +100,18 @@ export const buildQuotaNotice = ({
   }
 
   if (remaining <= 0) {
+    // Naming the rate without applying it leaves the one number they want unanswered, which
+    // is the same gap the usage page had. Both surfaces now cost the overage.
+    const overage = estimateComputeOverage(usedVcpuHours, includedVcpuHours)
+
     return notice('warning', 'Compute past the included quota is billing overage.', [
       `  ${formatVcpuQuota(usedVcpuHours, includedVcpuHours)} used on the ${planName}.`,
-      `  Instances keep running. Usage beyond the quota is billed at the Compute rate.`,
+      ...(overage === null
+        ? []
+        : [
+            `  ${overage.vcpuHours.toFixed(1)} vCPU-hrs over quota, about ${formatCliCurrency(overage.total)} so far.`,
+          ]),
+      `  Instances keep running. Rates are experimental: ${PRICING_URL}`,
       '',
       `    ${usageUrl(organizationSlug)}`,
     ])

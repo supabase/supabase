@@ -192,3 +192,62 @@ export const Callout = ({ tone, children }: CalloutProps) => {
     </table>
   )
 }
+
+export interface CostLine {
+  label: string
+  /** The arithmetic behind the amount, e.g. "0.8 vCPU-hrs × $0.15". */
+  detail?: string
+  amount: string
+  isTotal?: boolean
+}
+
+/**
+ * The overage, itemised. Mirrors the breakdown in the usage page rather than quoting a bare
+ * total: the quota counts vCPU-hours alone, but the rate card prices the memory pinned to
+ * them as well, so a reader who only sees one figure cannot tell where it came from.
+ */
+export const CostBreakdown = ({ lines }: { lines: CostLine[] }) => (
+  <table
+    width="100%"
+    cellPadding={0}
+    cellSpacing={0}
+    role="presentation"
+    style={{ borderCollapse: 'collapse', marginBottom: '16px' }}
+  >
+    <tbody>
+      {lines.map((line) => (
+        <tr key={line.label}>
+          <td
+            style={{
+              padding: '8px 0',
+              borderTop: `1px solid ${theme.border}`,
+              fontSize: '13px',
+              color: line.isTotal ? theme.foreground : theme.foregroundLight,
+              fontWeight: line.isTotal ? 600 : 400,
+            }}
+          >
+            {line.label}
+            {line.detail && (
+              <span style={{ marginLeft: '8px', color: theme.foregroundLighter }}>
+                {line.detail}
+              </span>
+            )}
+          </td>
+          <td
+            align="right"
+            style={{
+              padding: '8px 0',
+              borderTop: `1px solid ${theme.border}`,
+              fontSize: '13px',
+              fontFamily: font.mono,
+              color: line.isTotal ? theme.foreground : theme.foregroundLight,
+              whiteSpace: 'nowrap',
+            }}
+          >
+            {line.amount}
+          </td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+)
