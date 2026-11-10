@@ -186,11 +186,10 @@ export const parseCronJobCommand = (
 ): CronJobType => {
   const command = originalCommand.replaceAll('$$', ' ').replaceAll(/\n/g, ' ').trim()
 
-  if (command.toLocaleLowerCase().match(/^select\s+net\./)) {
-    if (!isFormRepresentableHttpCommand(command)) {
-      return { type: 'sql_snippet', snippet: originalCommand }
-    }
-
+  if (
+    command.toLocaleLowerCase().match(/^select\s+net\./) &&
+    isFormRepresentableHttpCommand(command)
+  ) {
     const methodMatch = command.match(/select\s+net\.([^']+)\(\s*url:=/i)
     const method = methodMatch?.[1] || ''
 
