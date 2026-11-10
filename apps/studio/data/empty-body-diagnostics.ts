@@ -1,20 +1,7 @@
-import * as Sentry from '@sentry/nextjs'
-import { IS_PLATFORM } from 'common'
-
 import type { StudioSentryContext } from '@/lib/errors/report-studio-error'
 import { uuidv4 } from '@/lib/helpers'
 
 const REFETCH_TIMEOUT_MS = 10_000
-
-const PARAM_AFTER_SEGMENT = new Map([
-  ['projects', '{ref}'],
-  ['organizations', '{slug}'],
-  ['branches', '{branch}'],
-])
-
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const NUMERIC_ID_PATTERN = /^\d+$/
-const LONG_ID_PATTERN = /^[A-Za-z0-9]{20,}$/
 
 const RESPONSE_HEADERS = [
   'content-type',
@@ -28,33 +15,11 @@ const RESPONSE_HEADERS = [
   'x-request-id',
 ]
 
-const reportedEndpoints = new Set<string>()
-
 let isRestoredFromBfcache = false
 if (typeof window !== 'undefined') {
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) isRestoredFromBfcache = true
   })
-}
-
-export function templateEndpointPath(path: string): string {
-  const [pathname = ''] = path.split(/[?#]/)
-  const segments = pathname.split('/')
-  return segments
-    .map((segment, index) => {
-      if (segment.length === 0 || segment.startsWith('{')) return segment
-      const param = PARAM_AFTER_SEGMENT.get(segments[index - 1] ?? '')
-      if (param) return param
-      if (
-        UUID_PATTERN.test(segment) ||
-        NUMERIC_ID_PATTERN.test(segment) ||
-        LONG_ID_PATTERN.test(segment)
-      ) {
-        return '{id}'
-      }
-      return segment
-    })
-    .join('/')
 }
 
 function readHeaders(headers: Headers) {
@@ -108,8 +73,6 @@ export type RefetchSummary = {
   contentType?: string | null
   error?: string
 }
-
-export type RecoveredBy = 'original_body' | 'refetch' | 'none'
 
 // DOMException (e.g. AbortError) is not an `Error` instance in every runtime
 function errorName(error: unknown) {
@@ -192,9 +155,8 @@ function buildContext(request: Request, response: Response) {
 }
 
 /**
- * The same diagnostics `reportEmptyBodyResponse` sends, shaped as Sentry context to attach to the
- * `MalformedResponse` error thrown when recovery fails. That error is reported through the normal
- * sampled path, so this carries the refetch probe without a second Sentry event.
+ * Sentry context for the `MalformedResponse` error thrown when recovery fails: the original
+ * response, browser state and the refetch probe. Empty bodies that recover aren't reported.
  */
 export function emptyBodyErrorContext({
   request,
@@ -208,41 +170,5 @@ export function emptyBodyErrorContext({
   return {
     tags: { recovered_by: 'none', ...probeTags(refetch), empty_body_diagnostic: 'true' },
     extra: { ...buildContext(request, response), ...probeExtra(refetch) },
-  }
-}
-
-export async function reportEmptyBodyResponse({
-  request,
-  response,
-  schemaPath,
-  recoveredBy,
-  refetch,
-}: {
-  request: Request
-  response: Response
-  schemaPath: string
-  recoveredBy: RecoveredBy
-  refetch?: RefetchSummary
-}): Promise<void> {
-  try {
-    if (!IS_PLATFORM || request.method !== 'GET') return
-
-    const endpoint = templateEndpointPath(schemaPath)
-    if (reportedEndpoints.has(endpoint)) return
-    reportedEndpoints.add(endpoint)
-
-    Sentry.captureMessage('Empty response body on successful API request', {
-      level: 'warning',
-      fingerprint: ['empty-body-response', endpoint],
-      tags: {
-        endpoint,
-        recovered_by: recoveredBy,
-        ...probeTags(refetch),
-        empty_body_diagnostic: 'true',
-      },
-      extra: { ...buildContext(request, response), ...probeExtra(refetch) },
-    })
-  } catch (error) {
-    console.error('Failed to report empty response body', error)
   }
 }

@@ -3,11 +3,7 @@ import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import {
-  emptyBodyErrorContext,
-  refetchWithoutCache,
-  reportEmptyBodyResponse,
-} from './empty-body-diagnostics'
+import { emptyBodyErrorContext, refetchWithoutCache } from './empty-body-diagnostics'
 import {
   classifyError,
   classifyResponseError,
@@ -117,8 +113,6 @@ export async function normalizeEmptyBodyResponse(
     // The clone came back empty, check whether the original still has the body
     const originalBody = await response.text()
     if (originalBody.length > 0) {
-      if (source)
-        void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'original_body' })
       return new Response(originalBody, {
         status: response.status,
         statusText: response.statusText,
@@ -134,12 +128,6 @@ export async function normalizeEmptyBodyResponse(
   if (source && canRefetch) {
     const { summary, response: retried, body } = await refetchWithoutCache(source.request)
     if (retried?.ok && body) {
-      void reportEmptyBodyResponse({
-        ...source,
-        response,
-        recoveredBy: 'refetch',
-        refetch: summary,
-      })
       return new Response(body, {
         status: retried.status,
         statusText: retried.statusText,
@@ -162,14 +150,11 @@ export async function normalizeEmptyBodyResponse(
       endpoint: source.schemaPath,
       method: source.request.method,
     })
-    // The query cache reports this error once, with the refetch diagnostics, so the standalone
-    // diagnostic event would be a duplicate.
+    // The query cache reports this error once, after the last retry, with the refetch diagnostics
     deferStudioErrorReport(error, {
       context: emptyBodyErrorContext({ request: source.request, response, refetch: summary }),
     })
     throw error
-  } else if (source) {
-    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none' })
   }
 
   if (response.headers.has('Content-Length')) return response
