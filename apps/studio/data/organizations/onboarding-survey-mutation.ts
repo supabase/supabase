@@ -46,14 +46,14 @@ export async function submitOnboardingSurvey(variables: OnboardingSurveyVariable
 
 type SubmitOnboardingSurveyData = Awaited<ReturnType<typeof submitOnboardingSurvey>>
 
-export const useOnboardingSurveyMutation = ({
-  ...options
-}: Omit<
-  UseCustomMutationOptions<SubmitOnboardingSurveyData, StudioError, OnboardingSurveyVariables>,
-  'mutationFn'
-> = {}) => {
+export const useOnboardingSurveyMutation = (
+  options: Omit<
+    UseCustomMutationOptions<SubmitOnboardingSurveyData, StudioError, OnboardingSurveyVariables>,
+    'mutationFn'
+  > = {}
+) => {
   return useMutation<SubmitOnboardingSurveyData, StudioError, OnboardingSurveyVariables>({
-    mutationFn: (vars) => submitOnboardingSurvey(vars),
+    mutationFn: submitOnboardingSurvey,
     ...options,
   })
 }
