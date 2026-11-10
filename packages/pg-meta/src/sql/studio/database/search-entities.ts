@@ -1,6 +1,12 @@
 import { DEFAULT_SYSTEM_SCHEMAS } from '../../../constants'
 import { escapeIlikeLiteral } from '../../../helpers'
 import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+import {
+  EXTENSION_FUNCTIONS_CTE,
+  hasTableAccess,
+  triggerActivation,
+  triggerEvents,
+} from './catalog-helpers'
 
 // Postgres identifiers are capped at 63 bytes, so a longer search string can
 // never match a name. Callers should skip the request entirely in that case.
@@ -10,27 +16,6 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 // privilege checks run. Kept well above `limit` so that the odd relation the
 // role can't access doesn't starve the result set.
 const CANDIDATE_LIMIT = 50
-
-// Mirrors what the table list endpoints expose: the role owns the table or has
-// some privilege on it (or one of its columns). Triggers are listed through
-// information_schema.triggers, which does not count SELECT.
-const hasTableAccess = (
-  oid: SafeSqlFragment,
-  owner: SafeSqlFragment,
-  { includeSelect = true }: { includeSelect?: boolean } = {}
-) => {
-  const tablePrivileges = includeSelect
-    ? safeSql`'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
-    : safeSql`'INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
-  const columnPrivileges = includeSelect
-    ? safeSql`'SELECT, INSERT, UPDATE, REFERENCES'`
-    : safeSql`'INSERT, UPDATE, REFERENCES'`
-  return safeSql`(
-  pg_has_role(${owner}, 'USAGE')
-  or has_table_privilege(${oid}, ${tablePrivileges})
-  or has_any_column_privilege(${oid}, ${columnPrivileges})
-)`
-}
 
 // For things that hang off a table (policies, triggers). Name matches rank by
 // their own name. Ones pulled in through a matched table group by that table
@@ -261,16 +246,7 @@ export const getSearchEntitiesSql = ({
       order by ${TABLE_RELATED_ORDER}
       limit ${literal(limit)}
     ),
-    -- Built once from the pg_depend reference index (cost follows extension members,
-    -- not matches). A per-row not exists probe is slower and can seq scan pg_depend.
-    extension_functions as materialized (
-      select d.objid
-      from pg_depend d
-      where d.refclassid = 'pg_extension'::regclass
-        and d.refobjid in (select e.oid from pg_extension e)
-        and d.classid = 'pg_proc'::regclass
-        and d.deptype = 'e'
-    ),
+    ${EXTENSION_FUNCTIONS_CTE},
     function_candidates as materialized (
       select
         p.oid,
@@ -448,22 +424,8 @@ export const getSearchEntitiesSql = ({
             jsonb_build_object(
               'id', t.id,
               'name', t.name,
-              'activation', case
-                when (t.tgtype & 2) <> 0 then 'BEFORE'
-                when (t.tgtype & 64) <> 0 then 'INSTEAD OF'
-                else 'AFTER'
-              end,
-              'events', to_jsonb(
-                array_remove(
-                  array[
-                    case when (t.tgtype & 4) <> 0 then 'INSERT' end,
-                    case when (t.tgtype & 16) <> 0 then 'UPDATE' end,
-                    case when (t.tgtype & 8) <> 0 then 'DELETE' end,
-                    case when (t.tgtype & 32) <> 0 then 'TRUNCATE' end
-                  ],
-                  null
-                )
-              ),
+              'activation', ${triggerActivation(safeSql`t.tgtype`)},
+              'events', ${triggerEvents(safeSql`t.tgtype`)},
               'schema', t.schema,
               'table', t.table_name,
               'table_id', t.table_id,

@@ -5,7 +5,7 @@ import { Skeleton } from 'ui'
 
 import { LogOverview } from '../ServiceFlow/LogOverview'
 import { getLogDataForMetadataVisibility } from '../ServiceFlowPanel.utils'
-import { logAttributeFilterId } from '../UnifiedLogs.filters'
+import { addLogsFilter, logAttributeFilterId } from '../UnifiedLogs.filters'
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { getLogTypeSource, getRawLogData, getRowTimestampMs } from '../UnifiedLogs.utils'
@@ -94,13 +94,8 @@ export function LogDetail({
           attributes={attributes}
           onAddAttributeFilter={
             isOtel
-              ? (key, value) => {
-                  const id = logAttributeFilterId(key)
-                  table.setColumnFilters((current) => [
-                    ...current.filter((filter) => filter.id !== id),
-                    { id, value: { operator: '=', values: [value] } },
-                  ])
-                }
+              ? (key, value, operator) =>
+                  addLogsFilter(table, { field: logAttributeFilterId(key), operator, value })
               : undefined
           }
           data={row}

@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -24,6 +25,7 @@ export type DatabasePolicyUpdateVariables = {
     check?: SafeSqlFragment
     roles?: string[]
   }
+  sqlOrigin: SqlOrigin
 }
 
 export async function updateDatabasePolicy({
@@ -31,6 +33,7 @@ export async function updateDatabasePolicy({
   connectionString,
   originalPolicy,
   payload,
+  sqlOrigin,
 }: DatabasePolicyUpdateVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
@@ -40,6 +43,8 @@ export async function updateDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName: 'database-policy-update',
     queryKey: ['policy', 'update', originalPolicy.id],
     grant: unguarded.migrating,
   })

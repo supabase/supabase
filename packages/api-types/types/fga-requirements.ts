@@ -191,6 +191,7 @@ export const fgaRequirements = {
   'PATCH /v1/projects/{ref}/config/auth': [['auth_config_write', 'project_admin_write']],
   'PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}': [['auth_signing_keys_write']],
   'PATCH /v1/projects/{ref}/config/database/pooler': [['database_pooling_config_write']],
+  'PATCH /v1/projects/{ref}/config/database/postgres': [['database_config_write']],
   'PATCH /v1/projects/{ref}/config/realtime': [['realtime_config_write']],
   'PATCH /v1/projects/{ref}/config/storage': [['storage_config_write']],
   'PATCH /v1/projects/{ref}/database/backups/schedule': [['backups_write']],

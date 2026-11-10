@@ -1,5 +1,7 @@
 import { safeLocalStorage } from '../safe-storage'
 
+const ONBOARDING_SURVEY_FOLLOW_UP_PREFIX = 'supabase-onboarding-survey-follow-up-'
+
 export const LOCAL_STORAGE_KEYS = {
   /**
    * STUDIO
@@ -129,6 +131,9 @@ export const LOCAL_STORAGE_KEYS = {
   SCOPED_TOKENS_MIGRATION_ADMONITION_DISMISSED: 'scoped-tokens-migration-admonition-dismissed',
   STORAGE_PUBLIC_BUCKET_SELECT_POLICY_WARNING_DISMISSED: (ref: string, bucketId: string) =>
     `storage-public-bucket-select-policy-warning-dismissed-${ref}-${bucketId}`,
+  ONBOARDING_SURVEY_FOLLOW_UP: (profileId: string, orgSlug: string) =>
+    `${ONBOARDING_SURVEY_FOLLOW_UP_PREFIX}${profileId}-${orgSlug}`,
+
   /**
    * COMMON
    */
@@ -184,7 +189,13 @@ const LOCAL_STORAGE_KEYS_ALLOWLIST = [
 export function clearLocalStorage() {
   for (const key of safeLocalStorage.keys()) {
     const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
-    if (!LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) && !isRecoveryReminder) {
+    // Per-profile, and holds the new org's type and size until the follow-up saves them
+    const isOnboardingSurveyFollowUp = key.startsWith(ONBOARDING_SURVEY_FOLLOW_UP_PREFIX)
+    if (
+      !LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) &&
+      !isRecoveryReminder &&
+      !isOnboardingSurveyFollowUp
+    ) {
       safeLocalStorage.removeItem(key)
     }
   }

@@ -228,7 +228,7 @@ export const getReportAttributesV2: (
     {
       id: 'cpu-usage',
       label: 'CPU usage',
-      docsUrl: `${DOCS_URL}/guides/telemetry/reports#cpu-usage`,
+      docsUrl: `${DOCS_URL}/guides/observability/reports#cpu-usage`,
       syncId: 'database-reports',
       format: '%',
       valuePrecision: 2,
