@@ -14,7 +14,7 @@ import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-type OrganizationResponse = components['schemas']['OrganizationResponse']
+type OrganizationResponse = components['schemas']['OrganizationResponse_Output']
 type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
 
 const PROFILE_ID = 'user-1'
