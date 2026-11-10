@@ -502,6 +502,69 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
+  properties: { surface: 'follow_up' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Submit. Fires before the backend mutation; pair with
+ * OnboardingSurveySubmitFailedEvent for failure rate. The platform's own
+ * `onboarding_survey_submitted` event tracks actual completions.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitButtonClickedEvent {
+  action: 'onboarding_survey_submit_button_clicked'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User dismissed the onboarding survey.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyDismissedEvent {
+  action: 'onboarding_survey_dismissed'
+  properties: {
+    surface: OnboardingSurveySurface
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Onboarding survey submit failed.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitFailedEvent {
+  action: 'onboarding_survey_submit_failed'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
 /**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
@@ -3160,6 +3223,11 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * Heading of the section the command was listed under, e.g. `Related resources`.
+     * Absent when the command was not listed under one, as on a command menu sub-page.
+     */
+    command_section?: string
+    /**
      * The search query that was active when the command was clicked
      */
     search_query?: string
@@ -4516,6 +4584,10 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
+  | OnboardingSurveySubmitButtonClickedEvent
+  | OnboardingSurveyDismissedEvent
+  | OnboardingSurveySubmitFailedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
