@@ -48,7 +48,7 @@ Other rules:
 - New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for code that still imports `next/*`.
 - `withAuth()` HOC → TanStack `beforeLoad` on the containing route/layout. Apply this at shared-layout level where possible.
 - Body moves and `pages/...` deletions happen in the FE-3106 cleanup PRs; mark each entry `[x] A→done` as its page is deleted.
-- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
+- Not migrated via this list: `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
 
 **Legend**
 
