@@ -129,12 +129,11 @@ function rawTextLoader(): Plugin {
 // editorWorkerService / graphql workers on the main thread ("Could not
 // create web worker(s)..." console warning). graphiql also ships
 // `setup-workers/vite`, which imports the same three workers via Vite's
-// `?worker` suffix; importing that unconditionally would break the Next
-// build, so the swap happens here instead of in app source.
+// `?worker` suffix, but those imports don't belong in the server graph, so
+// the swap happens here (client builds only) instead of in app source.
 //
 // SSR resolution is left untouched: neither variant's `getWorker` ever runs
-// during SSR, and the webpack flavor is a plain global assignment while the
-// vite flavor's `?worker` imports don't belong in the server graph.
+// during SSR, and the webpack flavor is a plain global assignment.
 function graphiqlViteWorkers(): Plugin {
   return {
     name: 'studio-graphiql-vite-workers',

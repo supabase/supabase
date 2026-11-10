@@ -10,8 +10,8 @@ export const Route = createFileRoute('/')({
     next: typeof search.next === 'string' ? search.next : undefined,
   }),
   beforeLoad: ({ search, location }) => {
-    // Next's redirects() carries the incoming query and hash through to the
-    // destination — deep links like `/?next=new-project&projectName=x` must
+    // Carry the incoming query and hash through to the destination — deep
+    // links like `/?next=new-project&projectName=x` must
     // keep `projectName`. Only the consumed `next` param is dropped (and only
     // when it matched); everything else passes through.
     const carried = (shouldConsumeNext: boolean) => {
