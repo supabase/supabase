@@ -1,25 +1,27 @@
-import { NextPage } from 'next'
+import { Link, useLocation, useNavigate } from '@tanstack/react-router'
 import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
-import Link from 'next/link'
-import { useRouter } from 'next/router'
 import { Button } from 'ui'
 
 import { SupportLink } from '@/components/interfaces/Support/SupportLink'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useSignOut } from '@/lib/auth'
+import { BASE_PATH } from '@/lib/constants'
 
-const Error500: NextPage = () => {
-  const router = useRouter()
+export function ServerErrorPage() {
+  const { pathname } = useLocation()
+  const navigate = useNavigate()
   const signOut = useSignOut()
   const { resolvedTheme } = useTheme()
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
+  const headBackPath = lastVisitedOrganization
+    ? `/org/${lastVisitedOrganization}`
+    : '/organizations'
 
   const onClickLogout = async () => {
     await signOut()
-    await router.push('/sign-in')
-    router.reload()
+    await navigate({ to: '/sign-in' })
+    window.location.reload()
   }
 
   return (
@@ -28,12 +30,12 @@ const Error500: NextPage = () => {
         <nav className="relative flex items-center justify-between sm:h-10">
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
-              <Link href="/projects">
-                <Image
+              <Link to="/organizations">
+                <img
                   src={
                     resolvedTheme?.includes('dark')
-                      ? `${router.basePath}/img/supabase-dark.svg`
-                      : `${router.basePath}/img/supabase-light.svg`
+                      ? `${BASE_PATH}/img/supabase-dark.svg`
+                      : `${BASE_PATH}/img/supabase-light.svg`
                   }
                   alt=""
                   height={24}
@@ -52,15 +54,9 @@ const Error500: NextPage = () => {
         </p>
       </div>
       <div className="flex items-center space-x-4">
-        {router.pathname !== '/organizations' ? (
+        {pathname !== '/organizations' ? (
           <Button variant="primary" asChild>
-            <Link
-              href={
-                !!lastVisitedOrganization ? `/org/${lastVisitedOrganization}` : '/organizations'
-              }
-            >
-              Head back
-            </Link>
+            <Link to={headBackPath}>Head back</Link>
           </Button>
         ) : (
           <Button variant="primary" onClick={onClickLogout}>
@@ -74,5 +70,3 @@ const Error500: NextPage = () => {
     </div>
   )
 }
-
-export default Error500
