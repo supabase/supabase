@@ -117,16 +117,13 @@ export const Indexes = () => {
   })
 
   const tables = Array.from(new Set((allIndexes || []).map((x) => x.table))).sort()
+  const hasFilters = search.length > 0 || tablesFilter.length > 0
 
   const sortedIndexes = sortBy(allIndexes ?? [], (index) => index.name.toLocaleLowerCase())
   const indexes = sortedIndexes.filter((index) => {
-    if (tablesFilter.length > 0 && !tablesFilter.includes(index.table)) {
-      return false
-    }
-    if (search.length > 0 && !(index.name.includes(search) || index.table.includes(search))) {
-      return false
-    }
-    return true
+    const matchesSearch = !search || index.name.includes(search) || index.table.includes(search)
+    const matchesTables = !tablesFilter.length || tablesFilter.includes(index.table)
+    return matchesSearch && matchesTables
   })
 
   const onConfirmDeleteIndex = (index: DatabaseIndex) => {
@@ -212,6 +209,12 @@ export const Indexes = () => {
               onChange={setTablesFilter}
               showSearch
             />
+            <div role="status" aria-live="polite" aria-atomic="true" className="sr-only">
+              {isSuccessIndexes &&
+                `Showing ${indexes.length} of ${sortedIndexes.length} indexes${
+                  tablesFilter.length > 0 ? ` for selected tables: ${tablesFilter.join(', ')}` : ''
+                }`}
+            </div>
 
             {!isSchemaLocked && (
               <Shortcut
@@ -254,7 +257,7 @@ export const Indexes = () => {
                     </TableRow>
                   </TableHeader>
                   <TableBody>
-                    {indexes.length === 0 && search.length === 0 && (
+                    {indexes.length === 0 && !hasFilters && (
                       <TableRow>
                         <TableCell colSpan={4}>
                           <p className="text-sm text-foreground">No indexes created yet</p>
@@ -264,8 +267,17 @@ export const Indexes = () => {
                         </TableCell>
                       </TableRow>
                     )}
-                    {indexes.length === 0 && search.length > 0 && (
-                      <TableRowNoResults colSpan={4} search={search} />
+                    {indexes.length === 0 && hasFilters && (
+                      <TableRowNoResults colSpan={4} search={search}>
+                        {search.length === 0 ? (
+                          <>
+                            <p className="text-sm text-foreground">No results found</p>
+                            <p className="text-sm text-foreground-light">
+                              No indexes match the selected tables
+                            </p>
+                          </>
+                        ) : undefined}
+                      </TableRowNoResults>
                     )}
                     {indexes.length > 0 &&
                       indexes.map((index) => (
