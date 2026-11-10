@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 
+import { PlatformWebhooksPage } from '@/components/interfaces/Platform/Webhooks'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import OrgWebhooksSettingsPage from '@/pages/org/[slug]/webhooks/index'
 
 export const Route = createFileRoute('/_app/org/$slug/webhooks/')({
   component: OrgWebhooks,
@@ -13,7 +13,11 @@ export const Route = createFileRoute('/_app/org/$slug/webhooks/')({
 function OrgWebhooks() {
   return (
     <OrganizationSettingsLayout>
-      <OrgWebhooksSettingsPage dehydratedState={undefined} />
+      <OrgWebhooksSettingsPage />
     </OrganizationSettingsLayout>
   )
+}
+
+function OrgWebhooksSettingsPage() {
+  return <PlatformWebhooksPage scope="organization" />
 }
