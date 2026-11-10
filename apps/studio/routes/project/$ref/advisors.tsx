@@ -8,9 +8,8 @@ export const Route = createFileRoute('/project/$ref/advisors')({
 
 type AdvisorsStaticData = {
   advisorsLayoutTitle?: string
-  // The `advisors/rules` sub-shell wraps in its own <AdvisorsLayout>
-  // (mirroring the existing AdvisorRulesLayout component). Without
-  // opting out here we'd double-wrap.
+  // The `advisors/rules` sub-shell wraps in its own <AdvisorsLayout>.
+  // Without opting out here we'd double-wrap.
   skipAdvisorsLayout?: boolean
 }
 

@@ -1,9 +1,8 @@
 import { screen } from '@testing-library/react'
-import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ApiKeysLegacyPage from '@/pages/project/[ref]/settings/api-keys/legacy'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/settings/api-keys/legacy'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const { mockIsPlatform, mockUseHighAvailability } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -20,21 +19,6 @@ vi.mock('common', async () => {
   }
 })
 
-vi.mock('@/components/layouts/DefaultLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/APIKeys/APIKeysLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
 vi.mock('@/components/ui/ProjectSettings/DisplayApiSettings', () => ({
   DisplayApiSettings: () => <div>DisplayApiSettings</div>,
 }))
@@ -47,32 +31,38 @@ vi.mock('@/hooks/misc/useHighAvailability', () => ({
   useHighAvailability: mockUseHighAvailability,
 }))
 
-describe('/project/[ref]/settings/api-keys/legacy', () => {
+const renderLegacyApiKeys = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/settings/api-keys/legacy',
+    url: '/project/default/settings/api-keys/legacy',
+  })
+
+describe('/project/$ref/settings/api-keys/legacy', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
     mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
   })
 
-  it('renders both legacy keys and the disable toggle on platform', () => {
-    customRender(<ApiKeysLegacyPage dehydratedState={{}} />)
+  it('renders both legacy keys and the disable toggle on platform', async () => {
+    await renderLegacyApiKeys()
 
     expect(screen.getByText('DisplayApiSettings')).toBeInTheDocument()
     expect(screen.getByText('ToggleLegacyApiKeysPanel')).toBeInTheDocument()
   })
 
-  it('renders legacy keys but hides the disable toggle on self-hosted', () => {
+  it('renders legacy keys but hides the disable toggle on self-hosted', async () => {
     mockIsPlatform.value = false
 
-    customRender(<ApiKeysLegacyPage dehydratedState={{}} />)
+    await renderLegacyApiKeys()
 
     expect(screen.getByText('DisplayApiSettings')).toBeInTheDocument()
     expect(screen.queryByText('ToggleLegacyApiKeysPanel')).not.toBeInTheDocument()
   })
 
-  it('hides the legacy keys entirely on High Availability projects', () => {
+  it('hides the legacy keys entirely on High Availability projects', async () => {
     mockUseHighAvailability.mockReturnValue({ isHighAvailability: true, isPending: false })
 
-    customRender(<ApiKeysLegacyPage dehydratedState={{}} />)
+    await renderLegacyApiKeys()
 
     expect(
       screen.getByText('Legacy API keys are unavailable on High Availability projects')

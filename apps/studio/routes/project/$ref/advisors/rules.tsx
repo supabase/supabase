@@ -9,20 +9,12 @@ import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 export const Route = createFileRoute('/project/$ref/advisors/rules')({
   component: AdvisorRulesShell,
   // Opt out of the parent advisors.tsx shell's <AdvisorsLayout> wrap
-  // — we render our own with no title, plus a PageLayout tab strip,
-  // mirroring the existing AdvisorRulesLayout component.
+  // — we render our own with no title, plus a PageLayout tab strip.
   staticData: {
     skipAdvisorsLayout: true,
   },
 })
 
-// Body inlined from `components/layouts/AdvisorsLayout/AdvisorRulesLayout.tsx`
-// minus its outer <DefaultLayout> wrap (already provided by the
-// `routes/project/$ref.tsx` shell). The Next-side AdvisorRulesLayout
-// keeps working unchanged for the pages router; we duplicate the
-// PageLayout config here so the TanStack route can re-use the same
-// title + nav + feature-preview badge without coupling to the
-// component's DefaultLayout-wrapping shape.
 function AdvisorRulesShell() {
   const { ref } = useParams()
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()

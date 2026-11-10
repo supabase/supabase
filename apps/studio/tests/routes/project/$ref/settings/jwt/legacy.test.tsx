@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import JWTKeysLegacyPage from '@/pages/project/[ref]/settings/jwt/legacy'
-import { customRender as render } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/settings/jwt/legacy'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const { mockUseIsFeatureEnabled, mockUseJwtSecretUpdatingStatusQuery } = vi.hoisted(() => ({
   mockUseIsFeatureEnabled: vi.fn(),
@@ -26,16 +26,6 @@ vi.mock('@/data/config/jwt-secret-updating-status-query', () => ({
   useJwtSecretUpdatingStatusQuery: mockUseJwtSecretUpdatingStatusQuery,
 }))
 
-vi.mock('@/components/layouts/DefaultLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
-vi.mock('@/components/layouts/ProjectSettingsLayout/SettingsLayout', () => ({
-  __esModule: true,
-  default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-}))
-
 vi.mock('@/components/layouts/JWTKeys/JWTKeysLayout', () => ({
   __esModule: true,
   default: ({ children }: { children: ReactNode }) => <div>{children}</div>,
@@ -45,22 +35,28 @@ vi.mock('@/components/interfaces/JwtSecrets/jwt-settings', () => ({
   JWTSettings: () => <div>JWTSettings</div>,
 }))
 
-describe('/project/[ref]/settings/jwt/legacy', () => {
+const renderLegacyJwtKeys = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/settings/jwt/legacy',
+    url: '/project/project-ref/settings/jwt/legacy',
+  })
+
+describe('/project/$ref/settings/jwt/legacy', () => {
   beforeEach(() => {
     mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsLegacyJwtKeys: true })
     mockUseJwtSecretUpdatingStatusQuery.mockReturnValue({ data: undefined })
   })
 
-  it('renders the JWT settings when legacy JWT keys are enabled', () => {
-    render(<JWTKeysLegacyPage dehydratedState={{}} />)
+  it('renders the JWT settings when legacy JWT keys are enabled', async () => {
+    await renderLegacyJwtKeys()
 
     expect(screen.getByText('JWTSettings')).toBeInTheDocument()
   })
 
-  it('hides the JWT settings when legacy JWT keys are disabled', () => {
+  it('hides the JWT settings when legacy JWT keys are disabled', async () => {
     mockUseIsFeatureEnabled.mockReturnValue({ projectSettingsLegacyJwtKeys: false })
 
-    render(<JWTKeysLegacyPage dehydratedState={{}} />)
+    await renderLegacyJwtKeys()
 
     expect(screen.queryByText('JWTSettings')).not.toBeInTheDocument()
   })

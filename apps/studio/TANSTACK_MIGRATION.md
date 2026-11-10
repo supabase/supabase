@@ -97,7 +97,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
 - [x] `routes/project/$ref/advisors.tsx` — AdvisorsLayout (reads `advisorsLayoutTitle` from leaf staticData). Honours `skipAdvisorsLayout: true` opt-out for the rules sub-shell, which provides its own AdvisorsLayout-less-DefaultLayout wrap. Scans whole match chain (same pattern as functions.tsx).
-- [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component is untouched.
+- [x] `routes/project/$ref/advisors/rules.tsx` — sub-shell that inlines the inner body of `AdvisorRulesLayout` (AdvisorsLayout + PageLayout with title/tabs/feature-preview badge), minus the outer DefaultLayout (already provided by the parent project shell). Sets `skipAdvisorsLayout: true` on its own staticData. **Delta vs plan:** the existing `AdvisorRulesLayout` component wraps in DefaultLayout + AdvisorsLayout internally, so reusing it as-is would double-wrap both. Inlined the inner part; the Next-side component was deleted with the rules pages.
 - [x] `routes/project/$ref/settings.tsx` — SettingsLayout (reads `settingsLayoutTitle` from leaf staticData). Honours `skipSettingsLayout: true` for `settings/api` (redirect-only page). Adds a sub-shell at `routes/project/$ref/settings/api-keys.tsx` providing `ApiKeysLayout` for both api-keys leaves; `jwt/index` wraps in `JWTKeysLayout` inline since `jwt/legacy` doesn't share it.
 - [x] `routes/project/$ref/integrations.tsx` — ProjectMarketplaceLayout (no staticData; all 4 leaves share identical layout). Layout is `withAuth(({ children }) => <ProjectLayout productMenu={<MarketplaceProductMenu />}>{children}</ProjectLayout>)`, so the shell just wraps `<Outlet />` once.
 - [x] `routes/project/$ref/sql.tsx` — EditorBaseLayout + SQLEditorLayout. Twin of editor.tsx; all four leaves share identical layout props so the shell hardcodes them (no `staticData` overrides). EditorBaseLayout wraps in ProjectLayoutWithAuth; SQLEditorLayout adds its own `withAuth` HOC but no extra ProjectLayout — same shape as the table editor (auth check runs twice but no double render).
@@ -298,35 +298,35 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 ### Project shell — `/issues/*`
 
 - [x] `routes/project/$ref/issues.tsx` — IssuesLayout (issue list in the product sidebar).
-- [x] A `routes/project/$ref/issues/index.tsx` ← `pages/project/[ref]/issues/index.tsx`
-- [x] A `routes/project/$ref/issues/$id.tsx` ← `pages/project/[ref]/issues/[id].tsx`
+- [x] A→done `routes/project/$ref/issues/index.tsx` ← `pages/project/[ref]/issues/index.tsx`
+- [x] A→done `routes/project/$ref/issues/$id.tsx` ← `pages/project/[ref]/issues/[id].tsx`
 
 ### Project shell — `/advisors/*`
 
-- [x] A `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
-- [x] A `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
-- [x] A `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
-- [x] A `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
-- [x] A `routes/project/$ref/advisors/rules/security.tsx` ← `pages/project/[ref]/advisors/rules/security.tsx`
+- [x] A→done `routes/project/$ref/advisors/health.tsx` ← `pages/project/[ref]/advisors/health.tsx`
+- [x] A→done `routes/project/$ref/advisors/performance.tsx` ← `pages/project/[ref]/advisors/performance.tsx`
+- [x] A→done `routes/project/$ref/advisors/security.tsx` ← `pages/project/[ref]/advisors/security.tsx`
+- [x] A→done `routes/project/$ref/advisors/rules/performance.tsx` ← `pages/project/[ref]/advisors/rules/performance.tsx`
+- [x] A→done `routes/project/$ref/advisors/rules/security.tsx` ← `pages/project/[ref]/advisors/rules/security.tsx`
 
 ### Project shell — `/settings/*`
 
-- [x] A `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
-- [x] A `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
-- [x] A `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — page is a useEffect redirect)
-- [x] A `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
-- [x] A `routes/project/$ref/settings/code-configuration.tsx` ← `pages/project/[ref]/settings/code-configuration.tsx`
-- [x] A `routes/project/$ref/settings/infrastructure/index.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
-- [x] A `routes/project/$ref/settings/infrastructure/replica/$replicaId.tsx` ← `pages/project/[ref]/settings/infrastructure/replica/[replicaId].tsx`
-- [x] A `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
-- [x] A `routes/project/$ref/settings/log-drains.tsx` ← `pages/project/[ref]/settings/log-drains.tsx`
-- [x] A `routes/project/$ref/settings/api-keys/index.tsx` ← `pages/project/[ref]/settings/api-keys/index.tsx` (under `api-keys.tsx` sub-shell with ApiKeysLayout)
-- [x] A `routes/project/$ref/settings/api-keys/legacy.tsx` ← `pages/project/[ref]/settings/api-keys/legacy.tsx` (under `api-keys.tsx` sub-shell)
-- [x] A `routes/project/$ref/settings/billing/usage.tsx` ← `pages/project/[ref]/settings/billing/usage.tsx`
-- [x] A `routes/project/$ref/settings/jwt/index.tsx` ← `pages/project/[ref]/settings/jwt/index.tsx` (wraps in JWTKeysLayout inline)
-- [x] A `routes/project/$ref/settings/jwt/legacy.tsx` ← `pages/project/[ref]/settings/jwt/legacy.tsx`
-- [x] A `routes/project/$ref/settings/webhooks/index.tsx` ← `pages/project/[ref]/settings/webhooks/index.tsx`
-- [x] A `routes/project/$ref/settings/webhooks/$endpointId.tsx` ← `pages/project/[ref]/settings/webhooks/[endpointId].tsx`
+- [x] A→done `routes/project/$ref/settings/general.tsx` ← `pages/project/[ref]/settings/general.tsx`
+- [x] A→done `routes/project/$ref/settings/addons.tsx` ← `pages/project/[ref]/settings/addons.tsx`
+- [x] A→done `routes/project/$ref/settings/api.tsx` ← `pages/project/[ref]/settings/api.tsx` (sets `skipSettingsLayout: true` — redirect-only page)
+- [x] A→done `routes/project/$ref/settings/dashboard.tsx` ← `pages/project/[ref]/settings/dashboard.tsx`
+- [x] A→done `routes/project/$ref/settings/code-configuration.tsx` ← `pages/project/[ref]/settings/code-configuration.tsx`
+- [x] A→done `routes/project/$ref/settings/infrastructure/index.tsx` ← `pages/project/[ref]/settings/infrastructure.tsx`
+- [x] A→done `routes/project/$ref/settings/infrastructure/replica/$replicaId.tsx` ← `pages/project/[ref]/settings/infrastructure/replica/[replicaId].tsx`
+- [x] A→done `routes/project/$ref/settings/integrations.tsx` ← `pages/project/[ref]/settings/integrations.tsx`
+- [x] A→done `routes/project/$ref/settings/log-drains.tsx` ← `pages/project/[ref]/settings/log-drains.tsx`
+- [x] A→done `routes/project/$ref/settings/api-keys/index.tsx` ← `pages/project/[ref]/settings/api-keys/index.tsx` (under `api-keys.tsx` sub-shell with ApiKeysLayout)
+- [x] A→done `routes/project/$ref/settings/api-keys/legacy.tsx` ← `pages/project/[ref]/settings/api-keys/legacy.tsx` (under `api-keys.tsx` sub-shell)
+- [x] A→done `routes/project/$ref/settings/billing/usage.tsx` ← `pages/project/[ref]/settings/billing/usage.tsx`
+- [x] A→done `routes/project/$ref/settings/jwt/index.tsx` ← `pages/project/[ref]/settings/jwt/index.tsx` (wraps in JWTKeysLayout inline)
+- [x] A→done `routes/project/$ref/settings/jwt/legacy.tsx` ← `pages/project/[ref]/settings/jwt/legacy.tsx`
+- [x] A→done `routes/project/$ref/settings/webhooks/index.tsx` ← `pages/project/[ref]/settings/webhooks/index.tsx`
+- [x] A→done `routes/project/$ref/settings/webhooks/$endpointId.tsx` ← `pages/project/[ref]/settings/webhooks/[endpointId].tsx`
 
 ### Project shell — `/integrations/*`
 
