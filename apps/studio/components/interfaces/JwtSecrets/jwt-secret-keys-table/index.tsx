@@ -59,6 +59,17 @@ import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
 
+type LegacyRevokeBlockedReason = 'denied' | 'error' | 'enabled'
+
+const LEGACY_REVOKE_BLOCKED_DESCRIPTION = {
+  denied:
+    "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled. You don't have permission to check or change that setting.",
+  error:
+    "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled, and we couldn't check their status. Try again later.",
+  enabled:
+    "It's not possible to revoke the legacy JWT secret unless you have already disabled JWT-based legacy API keys. This is because revoking the JWT secret invalidates the JWT-based legacy API keys.",
+} satisfies Record<LegacyRevokeBlockedReason, string>
+
 const JWTSecretKeysTableHeader = ({
   showLastRotatedAt = false,
 }: {
@@ -187,7 +198,7 @@ export const JWTSecretKeysTable = () => {
   const isLegacyAPIKeysStatusUnknown = legacyAPIKeysStatus === undefined
   const isRevokingLegacyKey = legacyKey?.id !== undefined && legacyKey.id === selectedKey?.id
   const canConfirmRevoke = !isRevokingLegacyKey || isLegacyAPIKeysKnownDisabled
-  const legacyRevokeBlockedReason =
+  const legacyRevokeBlockedReason: LegacyRevokeBlockedReason =
     isLegacyAPIKeysStatusUnknown && legacyStatusGrant.status === 'denied'
       ? 'denied'
       : isLegacyAPIKeysStatusUnknown && isLegacyAPIKeysStatusError
@@ -589,12 +600,7 @@ export const JWTSecretKeysTable = () => {
               <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
             </AlertDialogHeader>
             <AlertDialogDescription>
-              {legacyRevokeBlockedReason === 'denied' &&
-                "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled. You don't have permission to check or change that setting."}
-              {legacyRevokeBlockedReason === 'error' &&
-                "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled, and we couldn't check their status. Try again later."}
-              {legacyRevokeBlockedReason === 'enabled' &&
-                "It's not possible to revoke the legacy JWT secret unless you have already disabled JWT-based legacy API keys. This is because revoking the JWT secret invalidates the JWT-based legacy API keys."}
+              {LEGACY_REVOKE_BLOCKED_DESCRIPTION[legacyRevokeBlockedReason]}
             </AlertDialogDescription>
             <AlertDialogFooter>
               <AlertDialogCancel>OK</AlertDialogCancel>
