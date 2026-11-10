@@ -24,6 +24,7 @@ const renderModal = (conflicts: Partial<UploadConflicts>) => {
   return { onCancel, onConfirm }
 }
 
+// Copy variants (counts, archived, suspended wording) are covered by UploadConflictModal.utils.test.ts
 describe('UploadConflictModal', () => {
   it('stays closed when nothing clashes', () => {
     renderModal({})
@@ -75,22 +76,7 @@ describe('UploadConflictModal', () => {
     expect(onConfirm).not.toHaveBeenCalled()
   })
 
-  it('says the retention only holds once when versioning is suspended', () => {
-    renderModal({ liveNames: ['photo.png'], isVersioningSuspended: true })
-
-    expect(screen.getByText('Replace existing file')).toBeInTheDocument()
-    expect(screen.getByText(/one last time/)).toBeInTheDocument()
-  })
-
   describe('archived conflicts', () => {
-    it('offers a restore rather than a replace', () => {
-      renderModal({ archivedNames: ['icon-1.svg'] })
-
-      expect(screen.getByText('icon-1.svg already exists and is archived')).toBeInTheDocument()
-      expect(screen.getByText('Restore and add a new version')).toBeInTheDocument()
-      expect(screen.queryByText('Replace existing file')).not.toBeInTheDocument()
-    })
-
     it('still reports the choice as a replace, which is what the upload does', async () => {
       const { onConfirm } = renderModal({ archivedNames: ['icon-1.svg'] })
 

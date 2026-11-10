@@ -60,3 +60,54 @@ describe('getUnifiedLogs forward pagination', () => {
     )
   })
 })
+
+describe('getUnifiedLogs page size', () => {
+  it('fetches only the requested number of rows per page', async () => {
+    vi.useFakeTimers()
+    vi.setSystemTime(now)
+    const rows = Array.from({ length: 20 }, (_, index) =>
+      createRow(`log-${String(index).padStart(3, '0')}`, (now.getTime() - 1000 - index) * 1000)
+    )
+    const requests = mockLogs(rows, true)
+
+    const page = await getUnifiedLogs({
+      projectRef: 'default',
+      search,
+      useOtel: true,
+      pageSize: 5,
+      pageParam: null,
+    })
+
+    expect(requests[0].sql).toMatch(/LIMIT 5$/)
+    expect(page.data).toHaveLength(5)
+    expect(page.nextCursor).not.toBeNull()
+  })
+})
+
+describe('getUnifiedLogs final page', () => {
+  it.each([
+    { pageSize: 5, rowCount: 4 },
+    { pageSize: 1, rowCount: 0 },
+  ])(
+    'stops loading more logs when the final $pageSize-row page contains $rowCount rows',
+    async ({ pageSize, rowCount }) => {
+      vi.useFakeTimers()
+      vi.setSystemTime(now)
+      const rows = Array.from({ length: rowCount }, (_, index) =>
+        createRow(`log-${index}`, (now.getTime() - 1000 - index) * 1000)
+      )
+      mockLogs(rows, true)
+
+      const page = await getUnifiedLogs({
+        projectRef: 'default',
+        search,
+        useOtel: true,
+        pageSize,
+        pageParam: { cursor: now.getTime(), direction: 'next' },
+      })
+
+      expect(page.data).toHaveLength(rowCount)
+      expect(page.nextCursor).toBeNull()
+    }
+  )
+})

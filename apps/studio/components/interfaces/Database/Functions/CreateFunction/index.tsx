@@ -126,6 +126,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -140,6 +141,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -199,8 +201,7 @@ export const CreateFunction = ({
                       label="Schema"
                       description={
                         <>
-                          Tables made in the table editor will be in{' '}
-                          <code className="text-code-inline">public</code>
+                          Tables made in the table editor will be in <code>public</code>
                         </>
                       }
                       layout="horizontal"
@@ -318,8 +319,7 @@ export const CreateFunction = ({
                         <FormLabel className="text-base text-foreground">Definition</FormLabel>
                         <FormDescription className="text-sm text-foreground-light">
                           <p>
-                            The language below should be written in{' '}
-                            <code className="text-code-inline">{language}</code>.
+                            The language below should be written in <code>{language}</code>.
                           </p>
                           {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
                         </FormDescription>
@@ -461,7 +461,7 @@ export const CreateFunction = ({
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              {isEditing ? 'Save' : 'Create'} function
+              {isEditing ? <span>Save</span> : <span>Create</span>} <span>function</span>
             </Button>
           </SheetFooter>
         </div>

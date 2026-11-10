@@ -6,7 +6,7 @@ Supabase Auth provides a complete user management system without any external au
 
 ## Key Features
 
-- **Social login**: 20+ providers out of the box (Google, GitHub, Apple, Azure/Microsoft, Facebook, Twitter, Discord, GitLab, and more), enabled with one click
+- **Social sign-in**: 20+ providers out of the box (Google, GitHub, Apple, Azure/Microsoft, Facebook, Twitter, Discord, GitLab, and more), enabled with one click
 - **Email/password**: built-in email signup with confirmation, password reset, and email change flows
 - **Phone/OTP**: SMS-based authentication with one-time passwords
 - **Magic links**: passwordless email authentication
@@ -15,7 +15,7 @@ Supabase Auth provides a complete user management system without any external au
 - **User management dashboard**: view, create, edit, and delete users from the Supabase Dashboard
 - **Enterprise SSO**: SAML 2.0 support for enterprise single sign-on
 - **Multi-factor authentication**: TOTP-based MFA for additional account security
-- **Custom OAuth scopes**: request additional permissions when using social login providers
+- **Custom OAuth scopes**: request additional permissions when using social sign-in providers
 - **Server-side auth**: helpers for Next.js, SvelteKit, Remix, and other server frameworks
 - **Auth hooks**: customize authentication flows with database functions or Edge Functions
 

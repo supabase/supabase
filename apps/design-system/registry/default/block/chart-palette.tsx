@@ -50,7 +50,12 @@ function TokenCard({
     <div className="border-default bg-surface-100 flex flex-col gap-4 rounded-lg border p-4">
       <div className="flex flex-col gap-1">
         <div className="text-foreground text-sm">{title}</div>
-        <code className="text-foreground-lighter break-all font-mono text-xs">{token}</code>
+        <code
+          data-code-style="plain"
+          className="text-foreground-lighter break-all font-mono text-xs"
+        >
+          {token}
+        </code>
       </div>
       <div className="flex gap-3">{children}</div>
       {note && <p className="text-foreground-lighter text-xs">{note}</p>}

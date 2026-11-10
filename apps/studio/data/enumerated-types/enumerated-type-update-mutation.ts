@@ -3,8 +3,10 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { enumeratedTypesKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EnumeratedTypeUpdateVariables = {
   projectRef: string
@@ -24,7 +26,14 @@ export async function updateEnumeratedType({
   values = [],
 }: EnumeratedTypeUpdateVariables) {
   const sql = getUpdateEnumeratedTypeSQL({ schema, name, description, values })
-  const { result } = await executeSql({ projectRef, connectionString, sql })
+  const { result } = await executeSql({
+    projectRef,
+    connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'enumerated-type-update',
+    sql,
+    grant: unguarded.migrating,
+  })
   return result
 }
 
@@ -35,12 +44,12 @@ export const useEnumeratedTypeUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EnumeratedTypeUpdateData, ResponseError, EnumeratedTypeUpdateVariables>,
+  UseCustomMutationOptions<EnumeratedTypeUpdateData, StudioError, EnumeratedTypeUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EnumeratedTypeUpdateData, ResponseError, EnumeratedTypeUpdateVariables>({
+  return useMutation<EnumeratedTypeUpdateData, StudioError, EnumeratedTypeUpdateVariables>({
     mutationFn: (vars) => updateEnumeratedType(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

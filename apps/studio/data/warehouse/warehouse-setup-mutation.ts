@@ -5,7 +5,9 @@ import { toast } from 'sonner'
 import { warehouseKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
 import { replicationKeys } from '@/data/replication/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { pipelineIdSchema } from '@/data/replication/pipeline-id'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WarehouseSetupBody = components['schemas']['WarehouseSetupBody']
 
@@ -25,7 +27,10 @@ async function setupWarehouse({ projectRef, body }: WarehouseSetupVariables) {
     handleError(error)
   }
 
-  return data
+  return {
+    ...data,
+    pipeline_id: data.pipeline_id === null ? null : pipelineIdSchema.parse(data.pipeline_id),
+  }
 }
 
 export type WarehouseSetupData = Awaited<ReturnType<typeof setupWarehouse>>
@@ -35,12 +40,12 @@ export const useWarehouseSetupMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<WarehouseSetupData, ResponseError, WarehouseSetupVariables>,
+  UseCustomMutationOptions<WarehouseSetupData, StudioError, WarehouseSetupVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WarehouseSetupData, ResponseError, WarehouseSetupVariables>({
+  return useMutation<WarehouseSetupData, StudioError, WarehouseSetupVariables>({
     mutationFn: (vars) => setupWarehouse(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

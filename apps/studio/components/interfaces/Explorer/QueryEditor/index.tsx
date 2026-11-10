@@ -55,7 +55,7 @@ import {
   type LogsSourceParameters,
 } from '@/data/content/notebooks/notebook-schema'
 import { useDatabaseEventTriggersQuery } from '@/data/database-event-triggers/database-event-triggers-query'
-import { isValidConnString } from '@/data/fetchers'
+import { isValidConnString, unguarded } from '@/data/fetchers'
 import { useExecuteLogsSqlMutation } from '@/data/logs/execute-logs-sql-mutation'
 import {
   acceptUntrustedLogsSql,
@@ -336,10 +336,12 @@ export const QueryEditor = forwardRef<QueryEditorHandle, QueryEditorProps>(funct
       projectRef: project.ref,
       connectionString,
       sql: wrapWithRoleImpersonation(limitedSql.sql, roleImpersonationState),
+      sqlOrigin: 'user',
       autoLimit: limitedSql.appendAutoLimit ? rowLimit : undefined,
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
       isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+      grant: unguarded.migrating,
     }).then(
       (data) => {
         trackRunResult()

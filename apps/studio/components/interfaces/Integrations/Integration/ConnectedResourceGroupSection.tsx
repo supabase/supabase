@@ -60,6 +60,7 @@ export const ResourceGroupSection = ({
             >
               <div className="flex min-w-0 flex-col">
                 <code
+                  data-code-style="plain"
                   className="truncate font-mono text-sm text-foreground"
                   title={item.identifier}
                 >

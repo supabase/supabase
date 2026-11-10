@@ -1,17 +1,15 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useEffect } from 'react'
 import { Card, CardContent, CardFooter, Form } from 'ui'
 
 import { AIOptInLevelSelector } from './AIOptInLevelSelector'
 import { FormActions } from '@/components/ui/Forms/FormActions'
 import { useAIOptInForm } from '@/hooks/forms/useAIOptInForm'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const DataPrivacyForm = () => {
   const { form, onSubmit, isUpdating, currentOptInLevel } = useAIOptInForm()
-  const { can: canUpdateOrganization } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'organizations'
+  const { can: canUpdateOrganization } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.ADMIN_WRITE
   )
 
   const permissionsHelperText = !canUpdateOrganization

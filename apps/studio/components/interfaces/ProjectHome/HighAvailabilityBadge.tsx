@@ -22,7 +22,7 @@ export function HighAvailabilityBadge({ size = 'default' }: HighAvailabilityBadg
             'bg-purple-400 text-purple-1100 dark:bg-purple-100'
           )}
         >
-          {size === 'small' ? 'HA' : 'High Availability'}
+          {size === 'small' ? <span>HA</span> : <span>High Availability</span>}
           <span className="animate-badge-shimmer pointer-events-none absolute inset-0 bg-gradient-to-br from-transparent via-white/35 to-transparent blur-md" />
         </div>
       </HoverCardTrigger>

@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import dayjs from 'dayjs'
 import { CheckIcon, KeyIcon, TrashIcon } from 'lucide-react'
@@ -12,7 +11,7 @@ import CopyButton from '@/components/ui/CopyButton'
 import { useClientSecretDeleteMutation } from '@/data/oauth-secrets/client-secret-delete-mutation'
 import { Secret, useClientSecretsQuery } from '@/data/oauth-secrets/client-secrets-query'
 import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface SecretRowProps {
   secret: Secret
@@ -22,7 +21,9 @@ export interface SecretRowProps {
 export const SecretRow = ({ secret, appId }: SecretRowProps) => {
   const { slug } = useParams()
   const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const { can: canManageSecrets } = useAsyncCheckPermissions(PermissionAction.UPDATE, 'oauth_apps')
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
+  )
 
   const { data } = useClientSecretsQuery({ slug, appId })
   const secrets = data?.client_secrets ?? []
@@ -72,7 +73,8 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
             </div>
             <div className="flex flex-col gap-0">
               <p className="text-sm text-foreground-lighter">
-                Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()} by {generatedByName}
+                Added {isNew ? <span>now</span> : dayjs(secret.created_at).fromNow()}{' '}
+                <span>by</span> {generatedByName}
               </p>
               {secret.last_used_at && (
                 <p className="text-sm text-foreground-lighter">

@@ -1,5 +1,4 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useCallback, useEffect, useRef, useState } from 'react'
@@ -23,12 +22,10 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { IntegrationOverviewTab } from '../../Integration/IntegrationOverviewTab'
 import { RequiredExtensionsSection } from '../../Integration/RequiredExtensionsSection'
 import { InstallationError } from './InstallationError'
 import { IntegrationInstalledActions, IntegrationNotInstalledActions } from './IntegrationActions'
 import {
-  canInstall as checkCanInstall,
   hasInstallError,
   hasUninstallError,
   isInstallDone,
@@ -38,12 +35,11 @@ import {
   isUninstalling,
 } from './stripe-sync-status'
 import { StripeSyncChangesCard } from './StripeSyncChangesCard'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { useStripeSyncStatus } from '@/components/interfaces/Integrations/templates/StripeSyncEngine/useStripeSyncStatus'
 import { useStripeSyncInstallMutation } from '@/data/database-integrations/stripe/stripe-sync-install-mutation'
 import { useStripeSyncUninstallMutation } from '@/data/database-integrations/stripe/stripe-sync-uninstall-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useTrack } from '@/lib/telemetry/track'
 
@@ -51,7 +47,7 @@ const installFormSchema = z.object({
   stripeSecretKey: z.string().min(1, 'Stripe API key is required'),
 })
 
-const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolean }) => {
+const StripeSyncContent = () => {
   const track = useTrack()
   const hasTrackedInstallFailed = useRef(false)
   const { data: project } = useSelectedProjectQuery()
@@ -77,9 +73,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   } = useStripeSyncStatus()
 
   // Check permissions for managing function secrets
-  const { can: canManageSecrets } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_SECRET_WRITE,
-    '*'
+  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
   )
 
   const installed = isInstalled(installationStatus)
@@ -135,7 +130,6 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   const installing = (installInProgress || isInstallRequested || isInstallInitiated) && !timedOut
   const uninstalling =
     (uninstallInProgress || isUninstallRequested || isUninstallInitiated) && !timedOut
-  const canInstall = checkCanInstall(installationStatus) && !installed && !installing
 
   const hasError = (uninstallError || installError) && ((!uninstalling && !installing) || timedOut)
 
@@ -219,12 +213,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
             isUpgrade={upgradeAvailable}
           />
           <IntegrationNotInstalledActions
-            hideInstallCTA={hideInstallCTA}
-            installing={installing}
-            canInstall={canInstall}
             isUninstallRequested={isUninstallRequested}
             handleUninstall={handleUninstall}
-            setShouldShowInstallSheet={setShouldShowInstallSheet}
           />
         </>
       ) : (
@@ -264,7 +254,8 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
             >
               <SheetHeader>
                 <SheetTitle>
-                  {upgradeAvailable ? 'Upgrade' : 'Install'} Stripe Sync Engine
+                  {upgradeAvailable ? <span>Upgrade</span> : <span>Install</span>}{' '}
+                  <span>Stripe Sync Engine</span>
                 </SheetTitle>
               </SheetHeader>
               <SheetSection className="flex-1 flex flex-col gap-y-6">
@@ -376,7 +367,7 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
         </p>
         <ul className="list-disc pl-5 mt-2 text-sm text-foreground-light space-y-1">
           <li>
-            Remove the <code className="text-code-inline">stripe</code> schema and all tables
+            Remove the <code>stripe</code> schema and all tables
           </li>
           <li>Delete all synced Stripe data</li>
           <li>Remove the associated Edge Functions</li>
@@ -390,23 +381,9 @@ const StripeSyncContent = ({ hideInstallCTA = false }: { hideInstallCTA?: boolea
   )
 }
 
-export const StripeSyncEngineOverviewTab = () => {
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
-
-  if (isMarketplaceEnabled) {
-    return (
-      <>
-        <RequiredExtensionsSection />
-        <StripeSyncContent hideInstallCTA />
-      </>
-    )
-  }
-
-  return (
-    <IntegrationOverviewTab>
-      <div className="px-4 md:px-10 max-w-4xl space-y-4">
-        <StripeSyncContent />
-      </div>
-    </IntegrationOverviewTab>
-  )
-}
+export const StripeSyncEngineOverviewTab = () => (
+  <>
+    <RequiredExtensionsSection />
+    <StripeSyncContent />
+  </>
+)

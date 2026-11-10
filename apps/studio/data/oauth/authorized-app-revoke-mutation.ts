@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { oauthAppKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuthorizedAppRevokeVariables = {
   id: string
@@ -29,12 +30,12 @@ export const useAuthorizedAppRevokeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>,
+  UseCustomMutationOptions<AuthorizedAppRevokeData, StudioError, AuthorizedAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthorizedAppRevokeData, ResponseError, AuthorizedAppRevokeVariables>({
+  return useMutation<AuthorizedAppRevokeData, StudioError, AuthorizedAppRevokeVariables>({
     mutationFn: (vars) => revokeAuthorizedApp(vars),
     async onSuccess(data, variables, context) {
       const { orgSlug: slug } = variables

@@ -1,5 +1,6 @@
 import { z } from 'zod'
 
+import { CREATE_NOTEBOOK_PROMPT_GUIDANCE } from './create-notebook-prompt'
 import { notebookMutationOutputSchema } from './notebook-mutation-output'
 import type { ToolContract } from './types'
 import { agentNotebookSchema } from '@/data/content/notebooks/notebook-schema'
@@ -19,6 +20,11 @@ export const contract = {
   inputSchema,
   outputSchema: notebookMutationOutputSchema,
   minOptInLevel: 'schema',
+  availability: {
+    environments: new Set(['platform']),
+    requires: new Set(['explorer']),
+  },
   needsApproval: true,
+  promptGuidance: CREATE_NOTEBOOK_PROMPT_GUIDANCE,
   toModelOutput: ({ id, name }) => ({ id, name }),
 } as const satisfies ToolContract

@@ -90,9 +90,8 @@ const CronJobRunDetailsOverflowDialog = ({
         <DialogSection className="flex flex-col gap-y-2">
           <p className="text-sm">
             The dashboard fetches data for the cron jobs overview by running a join between the{' '}
-            <code className="text-code-inline">cron.job</code> and{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> tables to
-            show each cron job's latest run.
+            <code>cron.job</code> and <code className="break-keep!">cron.job_run_details</code>{' '}
+            tables to show each cron job's latest run.
           </p>
 
           <p className="text-sm">
@@ -102,12 +101,12 @@ const CronJobRunDetailsOverflowDialog = ({
               <TooltipContent side="bottom" className="flex flex-col gap-y-1">
                 <p>Estimated cost: {queryCost?.toLocaleString()}</p>
                 <p className="text-foreground-light">
-                  Determined via the <code className="text-code-inline">EXPLAIN</code> command
+                  Determined via the <code>EXPLAIN</code> command
                 </p>
               </TooltipContent>
             </Tooltip>{' '}
             exceeds safety thresholds, likely due to the size of{' '}
-            <code className="text-code-inline break-keep!">cron.job_run_details</code> table.
+            <code className="break-keep!">cron.job_run_details</code> table.
           </p>
         </DialogSection>
 
@@ -120,8 +119,8 @@ const CronJobRunDetailsOverflowDialog = ({
 
           <p className="text-sm">
             We recommend removing the old run history now, then scheduling a cron job that keeps
-            trimming the <code className="text-code-inline">cron.job_run_details</code> table
-            automatically. This also prevents unnecessary bloat on the database.
+            trimming the <code>cron.job_run_details</code> table automatically. This also prevents
+            unnecessary bloat on the database.
           </p>
 
           <div className="flex flex-col gap-y-2 text-sm">

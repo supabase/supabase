@@ -1,12 +1,13 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { z } from 'zod'
 
+import { createUnifiedLogsSearch } from '../UnifiedLogs.utils'
 import {
   buildColumnFilterValues,
   buildFilterGroup,
   buildFilterProperties,
   filterPropertySchema,
   formatTimeRangeValue,
+  getLogAttributeSources,
   getUserFilterValue,
   TIME_RANGE_PROPERTY,
   USER_PROPERTY,
@@ -40,36 +41,16 @@ describe('buildFilterProperties', () => {
     expect(names).toEqual(['date', 'log_type', 'event_message', 'pathname', USER_PROPERTY])
   })
 
-  it('gives the event_message column pattern (ILIKE) operators', () => {
-    const eventMessage = buildFilterProperties({ fields }).find(
-      (property) => property.name === 'event_message'
+  it.each([
+    ['event_message', ['~~*', '!~~*']],
+    ['log_type', ['=', '<>']],
+    ['pathname', ['=', '<>', '~~*', '!~~*']],
+  ])('gives the %s column the %j operators', (name, operators) => {
+    const property = buildFilterProperties({ fields }).find((property) => property.name === name)
+    const operatorValues = property?.operators?.map((operator) =>
+      typeof operator === 'string' ? operator : operator.value
     )
-    expect(eventMessage?.operators).toEqual([
-      { label: 'iLike', value: '~~*', group: 'pattern' },
-      { label: 'Not iLike', value: '!~~*', group: 'pattern' },
-    ])
-  })
-
-  it('gives every other column comparison operators', () => {
-    const logType = buildFilterProperties({ fields }).find(
-      (property) => property.name === 'log_type'
-    )
-    expect(logType?.operators).toEqual([
-      { label: 'Equals', value: '=', group: 'comparison' },
-      { label: 'Not equal', value: '<>', group: 'comparison' },
-    ])
-  })
-
-  it('gives pathname both comparison and pattern (ILIKE) operators', () => {
-    const pathname = buildFilterProperties({ fields }).find(
-      (property) => property.name === 'pathname'
-    )
-    expect(pathname?.operators).toEqual([
-      { label: 'Equals', value: '=', group: 'comparison' },
-      { label: 'Not equal', value: '<>', group: 'comparison' },
-      { label: 'iLike', value: '~~*', group: 'pattern' },
-      { label: 'Not iLike', value: '!~~*', group: 'pattern' },
-    ])
+    expect(operatorValues).toEqual(operators)
   })
 
   it('defaults a column without options to an empty array', () => {
@@ -102,20 +83,16 @@ describe('buildFilterProperties', () => {
 })
 
 describe('getUserFilterValue', () => {
-  const resultSchema = z.string().optional()
-
-  it('returns the user condition value coerced to a string, validated by schema', () => {
+  it('returns the user condition value', () => {
     const result = getUserFilterValue([
       { propertyName: 'log_type', value: 'postgres', operator: '=' },
       { propertyName: USER_PROPERTY, value: 'abc@example.com', operator: '=' },
     ])
-    expect(() => resultSchema.parse(result)).not.toThrow()
     expect(result).toBe('abc@example.com')
   })
 
   it('coerces a non-string condition value to a string', () => {
     const result = getUserFilterValue([{ propertyName: USER_PROPERTY, value: 42, operator: '=' }])
-    expect(() => resultSchema.parse(result)).not.toThrow()
     expect(result).toBe('42')
   })
 
@@ -123,7 +100,6 @@ describe('getUserFilterValue', () => {
     const result = getUserFilterValue([
       { propertyName: 'log_type', value: 'postgres', operator: '=' },
     ])
-    expect(() => resultSchema.parse(result)).not.toThrow()
     expect(result).toBeUndefined()
   })
 
@@ -271,5 +247,31 @@ describe('time range labels', () => {
   it('preserves incomplete values while editing', () => {
     expect(formatTimeRangeValue('unfinished')).toBe('unfinished')
     expect(formatTimeRangeValue(null)).toBe('')
+  })
+})
+
+describe('attribute discovery scope', () => {
+  it('intersects the selected types with fixed resource scope', () => {
+    const search = createUnifiedLogsSearch(
+      { filter: ['log_type:neq:edge function runtime'] },
+      {
+        filters: [
+          { column: 'log_type', operator: '=', value: 'edge function' },
+          { column: 'log_type', operator: '=', value: 'edge function runtime' },
+          { column: 'function_id', operator: '=', value: 'fn-1' },
+        ],
+      }
+    )
+    expect(getLogAttributeSources(search)).toEqual(['function_edge_logs'])
+  })
+
+  it('does not discover sources that cannot match a scoped user filter', () => {
+    const search = createUnifiedLogsSearch(
+      { user: 'user-1' },
+      {
+        filters: [{ column: 'log_type', operator: '=', value: 'edge function' }],
+      }
+    )
+    expect(getLogAttributeSources(search)).toEqual([])
   })
 })

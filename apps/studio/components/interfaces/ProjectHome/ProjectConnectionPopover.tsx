@@ -1,4 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import {
   CheckIcon,
   ChevronDownIcon,
@@ -24,12 +24,12 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { getConnectionStrings } from '@/components/interfaces/Connect/DatabaseSettings.utils'
 import { appendHighAvailabilitySslParams } from '@/components/interfaces/ConnectSheet/DatabaseSettings.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useIsHighAvailability } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { pluckObjectFields } from '@/lib/helpers'
 
 const DB_FIELDS = ['db_host', 'db_name', 'db_port', 'db_user'] as const
@@ -38,6 +38,21 @@ const EMPTY_CONNECTION_INFO = {
   db_host: '',
   db_port: '',
   db_name: '',
+}
+
+const getPublishableKeyDisplay = ({
+  grantStatus,
+  isLoadingKeys,
+  publishableKey,
+}: {
+  grantStatus: 'loading' | 'granted' | 'denied' | 'error'
+  isLoadingKeys: boolean
+  publishableKey?: string
+}) => {
+  if (grantStatus === 'loading' || isLoadingKeys) return 'Loading publishable key...'
+  if (grantStatus === 'denied') return "You don't have permission to view API keys."
+  if (grantStatus === 'error') return 'Failed to check API key permissions'
+  return publishableKey ?? 'Publishable key unavailable'
 }
 
 interface ProjectConnectionPopoverProps {
@@ -49,16 +64,17 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
-  const { isLoading: isLoadingPermissions, can: canReadAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const isLoadingPermissions = apiKeysGrant.status === 'loading'
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
 
   const { data: projectUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
 
-  const { data, isLoading: isLoadingKeys } = useAPIKeys(
-    { projectRef },
-    { enabled: open && canReadAPIKeys }
+  const { data, isLoading: isLoadingKeys } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      { enabled: open, select: getKeys }
+    )
   )
   const { publishableKey } = data ?? {}
 
@@ -118,12 +134,11 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
             {
               label: 'Publishable key',
               value: publishableKey?.api_key ?? '',
-              displayValue:
-                isLoadingPermissions || isLoadingKeys
-                  ? 'Loading publishable key...'
-                  : canReadAPIKeys
-                    ? (publishableKey?.api_key ?? 'Publishable key unavailable')
-                    : "You don't have permission to view API keys.",
+              displayValue: getPublishableKeyDisplay({
+                grantStatus: apiKeysGrant.status,
+                isLoadingKeys,
+                publishableKey: publishableKey?.api_key,
+              }),
               disabled:
                 isLoadingPermissions ||
                 isLoadingKeys ||
@@ -155,6 +170,7 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
         : []),
     ],
     [
+      apiKeysGrant.status,
       canReadAPIKeys,
       cliCommands,
       directConnectionString,

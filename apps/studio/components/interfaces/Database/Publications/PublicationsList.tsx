@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { AlertCircleIcon, InfoIcon, SearchIcon } from 'lucide-react'
 import Link from 'next/link'
@@ -27,7 +26,7 @@ import InformationBox from '@/components/ui/InformationBox'
 import { NoSearchResults } from '@/components/ui/NoSearchResults'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { onSearchInputEscape } from '@/lib/keyboard'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -74,9 +73,8 @@ export const PublicationsList = () => {
     },
   })
 
-  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'publications'
+  const { can: canUpdatePublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const publicationEvents: PublicationEvent[] = [
@@ -245,9 +243,11 @@ export const PublicationsList = () => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-          sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
-          {toggleListenEventValue?.publication.name}?
+          Are you sure you want to{' '}
+          {toggleListenEventValue?.currentStatus ? <span>stop</span> : <span>start</span>}{' '}
+          <span>sending</span> {toggleListenEventValue?.event.event.toLowerCase()}{' '}
+          <span>events for</span> {toggleListenEventValue?.publication.name}
+          <span>?</span>
         </p>
       </ConfirmationModal>
     </>

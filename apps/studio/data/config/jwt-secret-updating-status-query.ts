@@ -4,7 +4,8 @@ import { useEffect } from 'react'
 
 import { configKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type JwtSecretUpdatingStatusVariables = {
   projectRef?: string
@@ -45,7 +46,7 @@ export async function getJwtSecretUpdatingStatus(
 }
 
 export type JwtSecretUpdatingStatusData = Awaited<ReturnType<typeof getJwtSecretUpdatingStatus>>
-export type JwtSecretUpdatingStatusError = ResponseError
+export type JwtSecretUpdatingStatusError = StudioError
 
 export const useJwtSecretUpdatingStatusQuery = <TData = JwtSecretUpdatingStatusData>(
   { projectRef }: JwtSecretUpdatingStatusVariables,

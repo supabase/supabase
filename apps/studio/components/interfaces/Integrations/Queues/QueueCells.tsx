@@ -80,7 +80,8 @@ export const QueueSizeCell = ({ queue }: QueueCellProps) => {
         <Loader2Icon className="animate-spin" size={16} />
       ) : (
         <span>
-          {metrics?.queue_length} {metrics?.method === 'estimated' ? '(Approximate)' : null}
+          {metrics?.queue_length}{' '}
+          {metrics?.method === 'estimated' ? <span>(Approximate)</span> : null}
         </span>
       )}
     </div>

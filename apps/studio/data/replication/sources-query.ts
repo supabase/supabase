@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { replicationKeys } from './keys'
 import { checkReplicationFeatureFlagRetry } from './utils'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationSourcesParams = { projectRef?: string }
 
@@ -31,9 +32,9 @@ export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<ReplicationSourcesData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationSourcesData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationSourcesData, ResponseError, TData>({
+  useQuery<ReplicationSourcesData, StudioError, TData>({
     queryKey: replicationKeys.sources(projectRef),
     queryFn: ({ signal }) => fetchReplicationSources({ projectRef }, signal),
     enabled: enabled && typeof projectRef !== 'undefined',

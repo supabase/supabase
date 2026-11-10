@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
@@ -24,7 +23,7 @@ import { useDiskAttributesQuery } from '@/data/config/disk-attributes-query'
 import { useCloneBackupsQuery } from '@/data/projects/clone-query'
 import { useCloneStatusQuery } from '@/data/projects/clone-status-query'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import {
   useIsAwsK8sCloudProvider,
@@ -64,13 +63,10 @@ export const RestoreToNewProject = () => {
 
   const isActiveHealthy = project?.status === PROJECT_STATUS.ACTIVE_HEALTHY
 
-  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'physical_backups'
-  )
-  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.restore.prepare'
+  const { can: canReadPhysicalBackups, isSuccess: isPermissionsLoaded } =
+    useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.BACKUPS_READ)
+  const { can: canTriggerPhysicalBackups } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
   const PITR_ENABLED = cloneBackups?.pitr_enabled
   const PHYSICAL_BACKUPS_ENABLED = project?.is_physical_backups_enabled
@@ -277,8 +273,11 @@ export const RestoreToNewProject = () => {
           <AlertTitle>Restoration in progress</AlertTitle>
           <AlertDescription>
             <p>
-              The new project {(restoringClone?.target_project as any)?.name || ''} is currently
-              being created. You'll be able to restore again once the project is ready.
+              The new project {(restoringClone?.target_project as any)?.name || ''}{' '}
+              <span>
+                is currently being created. You'll be able to restore again once the project is
+                ready.
+              </span>
             </p>
             <Button asChild className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>

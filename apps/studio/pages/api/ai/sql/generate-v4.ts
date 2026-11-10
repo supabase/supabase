@@ -5,6 +5,7 @@ import { IS_PLATFORM } from 'common'
 import type { NextApiRequest, NextApiResponse } from 'next'
 import z from 'zod'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { getAIDetails } from '@/lib/ai/ai-details'
@@ -204,7 +205,10 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         {
           projectRef,
           connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'ai-sql-generate-schemas',
           sql: pgMetaSchemasList.sql,
+          grant: unguarded.migrating,
         },
         undefined,
         {
@@ -236,7 +240,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       isHighComplianceProject,
       includesLogsSnippets,
-      isExplorerEnabled: explorerEnabled,
       requestedModel,
       effectiveModel,
       systemProviderOptions,

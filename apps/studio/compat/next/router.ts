@@ -9,7 +9,7 @@ import {
 import { useMemo } from 'react'
 
 import { getRouterEventsProxy } from './_router-events'
-import { splitInternalUrl } from '@/lib/internal-url'
+import { isAbsoluteUrl, splitInternalUrl } from '@/lib/internal-url'
 
 // Next's pages-router exposes `router.pathname` as the route *pattern*
 // (e.g. `/project/[ref]/sql/[id]`), not the resolved URL. TanStack's
@@ -177,8 +177,10 @@ export function resolveUrl(url: string | UrlObject): string {
 // So we strip the origin AND the basePath when present; otherwise
 // `router.push('/dashboard/...')` would double-prefix to
 // `/dashboard/dashboard/...`. Mirrors the equivalent logic in
-// `splitInternalUrl` (@/lib/internal-url). Cross-origin URLs pass through
-// untouched so TanStack hands them to the browser as external.
+// `splitInternalUrl` (@/lib/internal-url). Cross-origin URLs, and
+// same-origin URLs outside the basePath (e.g. `https://supabase.com/docs`
+// under `/dashboard`), pass through untouched and are handed to the browser
+// as a document navigation in `navigate()` below.
 const NEXT_PUBLIC_BASE_PATH = process.env.NEXT_PUBLIC_BASE_PATH ?? ''
 
 // Strip a leading basePath segment from a path-shape URL (no origin).
@@ -202,6 +204,8 @@ function toRelativeSameOrigin(url: string): string {
     try {
       const parsed = new URL(url)
       if (parsed.origin !== window.location.origin) return url
+      // Same origin but outside the basePath → another app on this origin.
+      if (NEXT_PUBLIC_BASE_PATH && stripBasePath(parsed.pathname) === parsed.pathname) return url
       pathname = parsed.pathname
       search = parsed.search
       hash = parsed.hash
@@ -294,6 +298,16 @@ export function useRouter() {
       // route tree's strict typing: Next-style hrefs are free-form strings
       // that can't satisfy the route-path union at compile time.
       const { to, search, hash } = splitInternalUrl(target)
+      // External target (absolute URL left untouched above). TanStack's
+      // navigate only treats `href` with a scheme as external; an absolute
+      // `to` gets resolved as a relative path segment instead
+      // (`/project/x/https:/...`). Protocol-relative URLs are resolved to a
+      // full URL first, since TanStack blocks `//host` document navigations.
+      if (isAbsoluteUrl(to)) {
+        const href = to.startsWith('//') ? new URL(to, window.location.href).href : to
+        await router.navigate({ href, reloadDocument: true, replace: options?._replace })
+        return true
+      }
       await router.navigate<AnyRouter, string>({
         to,
         search: search ?? {},
@@ -379,6 +393,7 @@ export function useRouter() {
           // `<string, string>` (TFrom, TTo) loosens `to` to a plain string
           // for the same free-form-href reason as `navigate` above.
           const { to, search, hash } = splitInternalUrl(toRelativeSameOrigin(url))
+          if (isAbsoluteUrl(to)) return
           await router.preloadRoute<string, string>({
             to,
             search: search ?? {},

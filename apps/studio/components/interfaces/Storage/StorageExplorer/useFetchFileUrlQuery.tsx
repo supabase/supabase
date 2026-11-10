@@ -4,7 +4,8 @@ import { getPublicUrlForBucketObject } from '@/data/storage/bucket-object-get-pu
 import { signBucketObject } from '@/data/storage/bucket-object-sign-mutation'
 import { Bucket } from '@/data/storage/buckets-query'
 import { storageKeys } from '@/data/storage/keys'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 const DEFAULT_EXPIRY = 7 * 24 * 60 * 60 // in seconds, default to 1 week
 
@@ -49,9 +50,9 @@ type UseFileUrlQueryVariables = {
 
 export const useFetchFileUrlQuery = (
   { path, projectRef, bucket, versionId }: UseFileUrlQueryVariables,
-  { ...options }: UseCustomQueryOptions<string, ResponseError> = {}
+  { ...options }: UseCustomQueryOptions<string, StudioError> = {}
 ) => {
-  return useQuery<string, ResponseError, string>({
+  return useQuery<string, StudioError, string>({
     queryKey: storageKeys.fileUrl({
       projectRef,
       isBucketPublic: bucket.public,

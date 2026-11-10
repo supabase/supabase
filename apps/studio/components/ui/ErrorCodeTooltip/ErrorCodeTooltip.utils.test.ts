@@ -2,7 +2,6 @@ import { ERROR_CODE_DOCS_URLS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
 import { getErrorCodeInfo } from './ErrorCodeTooltip.utils'
-import { Service } from '@/data/graphql/graphql'
 
 describe('getErrorCodeInfo', () => {
   describe('when service is undefined', () => {
@@ -15,7 +14,7 @@ describe('getErrorCodeInfo', () => {
 
   describe('when service is Storage (not in shared-data)', () => {
     it('returns no definition and no docsUrl', () => {
-      const result = getErrorCodeInfo('some_code', Service.Storage)
+      const result = getErrorCodeInfo('some_code', 'STORAGE')
       expect(result.definition).toBeUndefined()
       expect(result.docsUrl).toBeUndefined()
     })
@@ -23,47 +22,47 @@ describe('getErrorCodeInfo', () => {
 
   describe('auth service', () => {
     it('returns definition for a known error code', () => {
-      const result = getErrorCodeInfo('bad_jwt', Service.Auth)
+      const result = getErrorCodeInfo('bad_jwt', 'AUTH')
       expect(result.definition).toBeDefined()
       expect(result.definition?.description).toBeTypeOf('string')
     })
 
     it('returns the auth docs URL', () => {
-      const result = getErrorCodeInfo('bad_jwt', Service.Auth)
+      const result = getErrorCodeInfo('bad_jwt', 'AUTH')
       expect(result.docsUrl).toBe(ERROR_CODE_DOCS_URLS['auth'])
     })
 
     it('returns undefined definition for an unknown error code', () => {
-      const result = getErrorCodeInfo('not_a_real_code', Service.Auth)
+      const result = getErrorCodeInfo('not_a_real_code', 'AUTH')
       expect(result.definition).toBeUndefined()
     })
 
     it('returns definition for a numeric HTTP error code', () => {
-      const result = getErrorCodeInfo('429', Service.Auth)
+      const result = getErrorCodeInfo('429', 'AUTH')
       expect(result.definition).toBeDefined()
       expect(result.definition?.description).toBeTypeOf('string')
     })
 
     it('returns undefined for a numeric code not in HTTP_ERROR_CODES', () => {
-      const result = getErrorCodeInfo('999', Service.Auth)
+      const result = getErrorCodeInfo('999', 'AUTH')
       expect(result.definition).toBeUndefined()
     })
   })
 
   describe('realtime service', () => {
     it('returns the realtime docs URL', () => {
-      const result = getErrorCodeInfo('TopicNameRequired', Service.Realtime)
+      const result = getErrorCodeInfo('TopicNameRequired', 'REALTIME')
       expect(result.docsUrl).toBe(ERROR_CODE_DOCS_URLS['realtime'])
     })
 
     it('returns definition for a known realtime error code', () => {
-      const result = getErrorCodeInfo('TopicNameRequired', Service.Realtime)
+      const result = getErrorCodeInfo('TopicNameRequired', 'REALTIME')
       expect(result.definition).toBeDefined()
       expect(result.definition?.description).toBeTypeOf('string')
     })
 
     it('returns undefined definition for an unknown realtime error code', () => {
-      const result = getErrorCodeInfo('not_a_real_code', Service.Realtime)
+      const result = getErrorCodeInfo('not_a_real_code', 'REALTIME')
       expect(result.definition).toBeUndefined()
     })
   })

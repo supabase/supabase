@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { ArrowRightIcon } from 'lucide-react'
 import { UseFormReturn } from 'react-hook-form'
 import {
@@ -29,8 +28,7 @@ import {
 import { useDiskManagementReviewChanges } from './DiskManagementReviewAndSubmitDialog.hooks'
 import { TaxDisclaimer } from '@/components/interfaces/Billing/TaxDisclaimer'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { formatCurrency } from '@/lib/helpers'
 
 interface DiskManagementReviewAndSubmitDialogProps {
@@ -56,12 +54,8 @@ export const DiskManagementReviewAndSubmitDialog = ({
   message,
   buttonSize = 'medium',
 }: DiskManagementReviewAndSubmitDialogProps) => {
-  const { data: project } = useSelectedProjectQuery()
-
-  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'projects',
-    { resource: { project_id: project?.id } }
+  const { can: canUpdateDiskConfiguration } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE
   )
 
   const isDirty = !!Object.keys(form.formState.dirtyFields).length
@@ -265,7 +259,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {numReplicas > 0 && (
               <div className="py-2 text-xs text-foreground-muted">
                 Price change includes primary database and {numReplicas} replica
-                {numReplicas > 1 ? 's' : ''}
+                {numReplicas > 1 ? <span>s</span> : ''}
               </div>
             )}
           </div>

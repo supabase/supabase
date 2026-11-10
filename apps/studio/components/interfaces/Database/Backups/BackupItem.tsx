@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { DownloadIcon } from 'lucide-react'
 import { Badge, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
@@ -8,7 +7,7 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useBackupDownloadMutation } from '@/data/database/backup-download-mutation'
 import type { DatabaseBackup } from '@/data/database/backups-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 interface BackupItemProps {
   index: number
@@ -26,9 +25,8 @@ export const BackupItem = ({
   onSelectBackup,
 }: BackupItemProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissions(
-    PermissionAction.INFRA_EXECUTE,
-    'queue_job.restore.prepare'
+  const { can: canTriggerScheduledBackups } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.BACKUPS_WRITE
   )
 
   const { mutate: downloadBackup, isPending: isDownloading } = useBackupDownloadMutation({
@@ -80,7 +78,7 @@ export const BackupItem = ({
               disabled={!canTriggerScheduledBackups || isDownloading}
               onClick={() => {
                 if (!projectRef) return console.error('Project ref is required')
-                downloadBackup({ ref: projectRef, backup })
+                downloadBackup({ ref: projectRef, backupId: backup.id })
               }}
               tooltip={{
                 content: {
@@ -117,9 +115,11 @@ export const BackupItem = ({
             <Badge variant="default">{backup.isPhysicalBackup ? 'Physical' : 'Logical'}</Badge>
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {backup.isPhysicalBackup
-              ? 'File-level backups of your entire database.'
-              : 'SQL-based backups of your entire database.'}{' '}
+            {backup.isPhysicalBackup ? (
+              <span>File-level backups of your entire database.</span>
+            ) : (
+              <span>SQL-based backups of your entire database.</span>
+            )}{' '}
             <InlineLink href="https://supabase.com/blog/postgresql-physical-logical-backups">
               Learn more
             </InlineLink>
