@@ -631,6 +631,16 @@ export default defineConfig(({ command, mode }) => {
           find: /^@sentry\/nextjs$/,
           replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
         },
+        // `safe-buffer` (via `randombytes`, used by `generate-password-browser`
+        // and the auth hooks sheet) does `require('buffer').Buffer`. Vite
+        // stubs the Node built-in with an empty module in the browser, so
+        // `Buffer` is undefined and it crashes with "Cannot read properties
+        // of undefined (reading 'from')" — e.g. on /new/[slug]. Point it at
+        // the userland polyfill by absolute path.
+        {
+          find: /^buffer$/,
+          replacement: path.resolve(rootDir, 'node_modules/buffer/index.js'),
+        },
       ],
     },
     ...(basePath && { base: basePath }),

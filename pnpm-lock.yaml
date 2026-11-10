@@ -1198,6 +1198,9 @@ importers:
       braintrust:
         specifier: ^3.37.2
         version: 3.37.2(@aws-sdk/credential-provider-web-identity@3.972.38)(@types/react@19.2.14)(supports-color@8.1.1)(zod@3.25.76)
+      buffer:
+        specifier: ^6.0.3
+        version: 6.0.3
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
