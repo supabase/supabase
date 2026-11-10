@@ -30,6 +30,14 @@ export function FilterSideBar({
 
   const panelRef = usePanelRef()
 
+  // Compared against the table's defaults rather than against "no filters at
+  // all": a view whose defaults include a filter (unified logs excludes noisy
+  // rows by default) still needs Reset once the user turns that filter off.
+  const defaultColumnFilters = table.initialState.columnFilters ?? []
+  const hasResettableFilters =
+    !!user ||
+    JSON.stringify(table.getState().columnFilters) !== JSON.stringify(defaultColumnFilters)
+
   useEffect(() => {
     if (isFilterBarOpen) {
       panelRef.current?.expand()
@@ -62,9 +70,7 @@ export function FilterSideBar({
             <p className="text-foreground text-lg">Logs</p>
             <Badge variant="default">Beta</Badge>
           </div>
-          {table.getState().columnFilters.length || user ? (
-            <DataTableResetButton onReset={() => setUser(null)} />
-          ) : null}
+          {hasResettableFilters && <DataTableResetButton onReset={() => setUser(null)} />}
         </div>
       </div>
 

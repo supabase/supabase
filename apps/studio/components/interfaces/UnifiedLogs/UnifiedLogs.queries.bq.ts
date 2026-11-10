@@ -6,7 +6,12 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import {
+  DEFAULT_LOG_TYPES,
+  EXCLUDE_FILTER_FIELD,
+  LOG_EXCLUSION_RULES,
+  type LogExclusionRuleId,
+} from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -61,6 +66,33 @@ export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] =>
 }
 
 /**
+ * Row-matching condition per exclusion rule (see LOG_EXCLUSION_RULES), against
+ * the `pathname` / `status` columns the unified-logs CTE projects. `COALESCE`
+ * keeps a null pathname or status (postgres, pipelines) from turning
+ * `NOT (…)` into null, which WHERE would read as false and quietly drop those
+ * rows.
+ */
+const EXCLUSION_RULE_CONDITION: Record<LogExclusionRuleId, SafeLogSqlFragment> = Object.fromEntries(
+  Object.entries(LOG_EXCLUSION_RULES).map(([id, { pathname, statuses }]) => [
+    id,
+    safeSql`COALESCE(pathname = ${lit(pathname)} AND status IN (${joinSqlFragments(
+      statuses.map((status) => lit(status)),
+      ','
+    )}), FALSE)`,
+  ])
+) as Record<LogExclusionRuleId, SafeLogSqlFragment>
+
+const isExclusionRuleId = (value: string): value is LogExclusionRuleId =>
+  value in EXCLUSION_RULE_CONDITION
+
+/** Matches a row against the given rules — the rows the `exclude` filter hides. */
+const exclusionMatchCondition = (values: readonly string[]): SafeLogSqlFragment | null => {
+  const rules = values.filter(isExclusionRuleId).map((id) => EXCLUSION_RULE_CONDITION[id])
+  if (rules.length === 0) return null
+  return safeSql`(${joinSqlFragments(rules, ' OR ')})`
+}
+
+/**
  * Builds WHERE-clause fragments from the parsed `filter` URL array. Identifier-
  * position keys are validated via `quotedIdent()` (regex allowlist) and value-
  * position inputs via `analyticsLiteral` — both throw on disallowed input, in
@@ -84,6 +116,16 @@ const buildConditions = (
   for (const [key, { operator, values }] of Object.entries(grouped)) {
     if (key === excludeKey) continue
     if (values.length === 0) continue
+
+    if (key === EXCLUDE_FILTER_FIELD) {
+      // `exclude:eq:<rule id>` means "hide these rows". Only `=` carries that
+      // meaning, so a hand-crafted URL using any other operator is dropped
+      // rather than silently inverted.
+      if (operator !== '=') continue
+      const match = exclusionMatchCondition(values)
+      if (match) conditions.push(safeSql`NOT ${match}`)
+      continue
+    }
 
     try {
       // `key` is interpolated as a column identifier. `quotedIdent()` rejects
@@ -522,6 +564,9 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
   const effectiveLogTypes = getEffectiveLogTypes(search)
   const logTypeConditions = buildConditions(search, 'log_type')
   const levelConditions = buildConditions(search, 'level')
+  // Scanned with the exclusion's own predicate dropped, so the count reports
+  // how many logs each rule hides whether or not it is currently applied.
+  const exclusionConditions = buildConditions(search, EXCLUDE_FILTER_FIELD)
   const logTypeWhere: SafeLogSqlFragment =
     logTypeConditions.length > 0
       ? safeSql`WHERE ${joinSqlFragments(logTypeConditions, ' AND ')}`
@@ -530,6 +575,23 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     levelConditions.length > 0
       ? safeSql`WHERE ${joinSqlFragments(levelConditions, ' AND ')}`
       : safeSql`WHERE level IS NOT NULL`
+  const exclusionWhere: SafeLogSqlFragment =
+    exclusionConditions.length > 0
+      ? safeSql`WHERE ${joinSqlFragments(exclusionConditions, ' AND ')}`
+      : safeSql``
+  const exclusionSelects = joinSqlFragments(
+    Object.entries(EXCLUSION_RULE_CONDITION).map(
+      ([id, condition]) => safeSql`COUNTIF(${condition}) AS ${quotedIdent(id)}`
+    ),
+    ', '
+  )
+  const exclusionRows = joinSqlFragments(
+    Object.keys(EXCLUSION_RULE_CONDITION).map(
+      (id) =>
+        safeSql`SELECT ${lit(EXCLUDE_FILTER_FIELD)}, ${lit(id)}, ${quotedIdent(id)} FROM exclusion_counts`
+    ),
+    ' UNION ALL '
+  )
 
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)},
@@ -559,6 +621,13 @@ level_counts AS (
   ${levelWhere}
 ),
 
+-- Single COUNTIF pass for the rows each exclusion rule hides
+exclusion_counts AS (
+  SELECT ${exclusionSelects}
+  FROM unified_logs
+  ${exclusionWhere}
+),
+
 -- Variable facets: open-ended values still need GROUP BY
 ${getFacetCountCTE({ search, facet: 'method', cteName: safeSql`method_count` })},
 ${getFacetCountCTE({ search, facet: 'status', cteName: safeSql`status_count` })},
@@ -578,6 +647,7 @@ UNION ALL SELECT 'level', 'error', error_count FROM level_counts
 UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
 UNION ALL SELECT dimension, value, count FROM pipeline_id_count
+UNION ALL ${exclusionRows}
 `
 }
 

@@ -4,11 +4,14 @@ import { useState } from 'react'
 import { Checkbox, cn, Label, Skeleton } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
-import { formatCompactNumber } from '../DataTable.utils'
+import { findTableColumn, formatCompactNumber, setColumnFilterValue } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
-import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import {
+  EXCLUDE_FILTER_FIELD,
+  SEARCH_PARAMS_PARSER,
+} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { isLogsFilterColumnValue } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 
 export function DataTableFilterCheckbox<TData>({
@@ -37,7 +40,7 @@ export function DataTableFilterCheckbox<TData>({
   const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
     useDataTable()
 
-  const column = table.getColumn(value)
+  const column = findTableColumn(table, value)
   // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
   const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
@@ -107,7 +110,9 @@ export function DataTableFilterCheckbox<TData>({
                       const newValues = checked
                         ? [...filters, option.value]
                         : filters.filter((value) => option.value !== value)
-                      column?.setFilterValue(
+                      setColumnFilterValue(
+                        table,
+                        value,
                         newValues.length ? { operator: '=', values: newValues } : undefined
                       )
                     }}
@@ -144,7 +149,7 @@ export function DataTableFilterCheckbox<TData>({
                         <Skeleton className="h-4 w-4" />
                       ) : facetedValue?.has(option.value) ? (
                         formatCompactNumber(facetedValue.get(option.value) || 0)
-                      ) : ['log_type', 'method', 'level'].includes(value) ? (
+                      ) : ['log_type', 'method', 'level', EXCLUDE_FILTER_FIELD].includes(value) ? (
                         '0'
                       ) : null}
                     </span>
@@ -153,7 +158,10 @@ export function DataTableFilterCheckbox<TData>({
                       type="button"
                       tabIndex={0}
                       onClick={() =>
-                        column?.setFilterValue({ operator: '=', values: [option.value] })
+                        setColumnFilterValue(table, value, {
+                          operator: '=',
+                          values: [option.value],
+                        })
                       }
                       className={cn(
                         'text-xs text-muted-foreground hover:text-foreground',

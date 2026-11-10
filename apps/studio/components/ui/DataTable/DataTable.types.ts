@@ -44,7 +44,12 @@ export type Timerange = {
 
 export type Base<TData> = {
   label: string
-  value: keyof TData
+  /**
+   * A column id on the row, or — for a filter that has no column of its own,
+   * like a server-side exclusion rule — a standalone filter id. The union with
+   * `string` keeps the row's keys as autocomplete suggestions.
+   */
+  value: keyof TData | (string & {})
   /**
    * Defines if the accordion in the filter bar is open by default
    */

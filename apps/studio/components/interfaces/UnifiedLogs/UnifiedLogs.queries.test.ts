@@ -841,3 +841,84 @@ describe('Pipelines logs', () => {
     }
   )
 })
+
+describe('metrics scrape exclusion (FE-4969)', () => {
+  const METRICS_PATH = `'/customer/v1/privileged/metrics'`
+  const EXCLUDE_FILTER = 'exclude:eq:successful_metrics_scrapes'
+  const whereOf = (sql: string) => sql.split(/\bWHERE\b/)[1] ?? ''
+
+  describe('ClickHouse', () => {
+    it('hides only the successful scrapes, leaving every other status on that path', () => {
+      const where = whereOf(getUnifiedLogsQuery(withFilters(EXCLUDE_FILTER)))
+      expect(where).toContain(`NOT (coalesce(`)
+      expect(where).toContain(METRICS_PATH)
+      expect(where).toContain(`IN ('200')`)
+    })
+
+    it('emits no exclusion predicate when the filter is absent', () => {
+      expect(getUnifiedLogsQuery(baseSearch)).not.toContain(METRICS_PATH)
+    })
+
+    it('applies the exclusion to the chart so the histogram matches the list', () => {
+      expect(getLogsChartQuery(withFilters(EXCLUDE_FILTER))).toContain(METRICS_PATH)
+    })
+
+    it('combines with the other filters rather than replacing them', () => {
+      const where = whereOf(getUnifiedLogsQuery(withFilters(EXCLUDE_FILTER, 'level:eq:error')))
+      expect(where).toContain(METRICS_PATH)
+      expect(where).toContain(`IN ('error')`)
+    })
+
+    it('ignores an operator other than `=`, which has no exclusion meaning', () => {
+      expect(
+        getUnifiedLogsQuery(withFilters('exclude:neq:successful_metrics_scrapes'))
+      ).not.toContain(METRICS_PATH)
+    })
+
+    it('ignores an unknown rule id rather than emitting an empty NOT ()', () => {
+      const sql = getUnifiedLogsQuery(withFilters('exclude:eq:not_a_rule'))
+      expect(sql).not.toContain(METRICS_PATH)
+      expect(sql).not.toContain('NOT ()')
+    })
+
+    it('counts the hidden rows with the exclusion itself lifted', () => {
+      const sql = getLogsCountQuery(withFilters(EXCLUDE_FILTER))
+      const branch = sql.split(/\bUNION ALL\b/).find((b) => b.includes(`'exclude'`)) ?? ''
+      expect(branch).toContain(`arrayJoin(['exclude'])`)
+      expect(branch).toContain(`'successful_metrics_scrapes'`)
+      expect(whereOf(branch)).not.toContain('NOT (coalesce(')
+    })
+
+    it('keeps the other facet counts restricted to the visible rows', () => {
+      const sql = getLogsCountQuery(withFilters(EXCLUDE_FILTER))
+      const branch = sql.split(/\bUNION ALL\b/).find((b) => b.includes(`facet = 'total'`)) ?? ''
+      expect(whereOf(branch)).toContain('NOT (coalesce(')
+    })
+  })
+
+  describe('BigQuery', () => {
+    it('hides only the successful scrapes', () => {
+      // The outer WHERE is the one after the unified_logs CTE; the CTE body has
+      // WHERE clauses of its own.
+      const where = getUnifiedLogsQueryBQ(withFilters(EXCLUDE_FILTER)).split('FROM unified_logs')[1]
+      expect(where).toContain(`NOT (COALESCE(pathname = ${METRICS_PATH}`)
+      expect(where).toContain(`status IN ('200')`)
+    })
+
+    it('never emits the rule id as a column reference', () => {
+      expect(getUnifiedLogsQueryBQ(withFilters(EXCLUDE_FILTER))).not.toContain('`exclude`')
+    })
+
+    it('applies the exclusion to the chart so the histogram matches the list', () => {
+      expect(getLogsChartQueryBQ(withFilters(EXCLUDE_FILTER))).toContain(METRICS_PATH)
+    })
+
+    it('counts the hidden rows with the exclusion itself lifted', () => {
+      const sql = getLogsCountQueryBQ(withFilters(EXCLUDE_FILTER))
+      const cte = sql.split('exclusion_counts AS (')[1]?.split('),')[0] ?? ''
+      expect(cte).toContain('COUNTIF(COALESCE(pathname =')
+      expect(cte).not.toContain('NOT (COALESCE(')
+      expect(sql).toContain(`SELECT 'exclude', 'successful_metrics_scrapes'`)
+    })
+  })
+})

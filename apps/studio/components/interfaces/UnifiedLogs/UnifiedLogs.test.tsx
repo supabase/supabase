@@ -5,6 +5,7 @@ import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
+import type { OnUrlUpdateFunction } from 'nuqs/adapters/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
@@ -753,5 +754,145 @@ describe('UnifiedLogs', () => {
         'vertical'
       )
     )
+  })
+  describe('successful metrics scrape exclusion', () => {
+    const EXCLUSIONS_KEY = LOCAL_STORAGE_KEYS.UNIFIED_LOGS_EXCLUSIONS('default')
+    const METRICS_PATH = "'/customer/v1/privileged/metrics'"
+    const EXCLUDE_PARAM = 'exclude:eq:successful_metrics_scrapes'
+
+    afterEach(() => localStorage.removeItem(EXCLUSIONS_KEY))
+
+    /** Records every analytics query, and reports 12 hidden scrapes for the Exclude facet. */
+    const mockAnalytics = (queries: string[]) =>
+      addAPIMock({
+        method: 'post',
+        path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
+        response: async ({ request }) => {
+          const { sql } = z.object({ sql: z.string() }).parse(await request.json())
+          queries.push(sql)
+          return HttpResponse.json<AnalyticsResponse>({
+            result: sql.includes('facet counts')
+              ? [{ facet: 'exclude', value: 'successful_metrics_scrapes', count: 12 }]
+              : [],
+          })
+        },
+      })
+
+    const renderLogs = (onUrlUpdate?: OnUrlUpdateFunction) =>
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+        >
+          <UnifiedLogs />
+        </FeatureFlagContext.Provider>,
+        { nuqs: { hasMemory: true, onUrlUpdate } }
+      )
+
+    const excludeCheckbox = () =>
+      screen.getByRole('checkbox', { name: /Successful metrics scrapes/ })
+    const rowQueries = (queries: string[]) => queries.filter((sql) => sql.includes('row list'))
+    const lastRowQuery = (queries: string[]) => rowQueries(queries).at(-1)
+
+    it('hides them on a fresh load, across the list, chart and counts', async () => {
+      const queries: string[] = []
+      mockAnalytics(queries)
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await waitFor(() => {
+        for (const kind of ['row list', 'severity chart', 'facet counts']) {
+          const sql = queries.filter((q) => q.includes(kind)).at(-1)
+          expect(sql).toContain(METRICS_PATH)
+        }
+      })
+      // Only the successful scrapes go — every other status on that path stays.
+      expect(lastRowQuery(queries)).toContain("IN ('200')")
+      expect(excludeCheckbox()).toBeChecked()
+    })
+
+    it('shows the hidden count and a removable chip while it is on', async () => {
+      mockAnalytics([])
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      expect(await screen.findByText('12')).toBeInTheDocument()
+      expect(screen.getByTestId('filter-condition-exclude')).toBeInTheDocument()
+      expect(screen.getByTestId('filter-value-exclude')).toHaveValue('Successful metrics scrapes')
+    })
+
+    it('writes the exclusion to the URL so it travels with a shared link', async () => {
+      const onUrlUpdate = vi.fn()
+      mockAnalytics([])
+      renderLogs(onUrlUpdate)
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(onUrlUpdate.mock.lastCall?.[0]?.searchParams.get('filter')).toBe(EXCLUDE_PARAM)
+      })
+    })
+
+    it('shows the scrapes again when unchecked, and remembers that for the project', async () => {
+      const user = userEvent.setup()
+      const queries: string[] = []
+      mockAnalytics(queries)
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await waitFor(() => expect(lastRowQuery(queries)).toContain(METRICS_PATH))
+
+      await user.click(excludeCheckbox())
+
+      expect(excludeCheckbox()).not.toBeChecked()
+      expect(screen.queryByTestId('filter-condition-exclude')).not.toBeInTheDocument()
+      await waitFor(() => expect(lastRowQuery(queries)).not.toContain(METRICS_PATH))
+      await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
+    }, 15_000)
+
+    it('stays off after a reload once the user has unchecked it', async () => {
+      localStorage.setItem(EXCLUSIONS_KEY, '[]')
+      const queries: string[] = []
+      mockAnalytics(queries)
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await waitFor(() => expect(rowQueries(queries).length).toBeGreaterThan(0))
+      expect(lastRowQuery(queries)).not.toContain(METRICS_PATH)
+      expect(excludeCheckbox()).not.toBeChecked()
+    })
+
+    it('unchecks the box when the filter bar chip is removed', async () => {
+      const user = userEvent.setup()
+      mockAnalytics([])
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await user.click(screen.getByTestId('filter-remove-exclude'))
+
+      await waitFor(() => expect(excludeCheckbox()).not.toBeChecked())
+    })
+
+    it('turns back on when the sidebar filters are reset', async () => {
+      const user = userEvent.setup()
+      const onUrlUpdate = vi.fn()
+      mockAnalytics([])
+      renderLogs(onUrlUpdate)
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await user.click(excludeCheckbox())
+      await waitFor(() => expect(excludeCheckbox()).not.toBeChecked())
+      await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
+
+      // Reset stays reachable even though the exclusion was the only filter.
+      await user.click(screen.getByRole('button', { name: /Reset/ }))
+
+      expect(excludeCheckbox()).toBeChecked()
+      expect(screen.getByTestId('filter-condition-exclude')).toBeInTheDocument()
+      await waitFor(() => {
+        expect(onUrlUpdate.mock.lastCall?.[0]?.searchParams.get('filter')).toBe(EXCLUDE_PARAM)
+      })
+      await waitFor(() =>
+        expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('["successful_metrics_scrapes"]')
+      )
+    }, 15_000)
   })
 })

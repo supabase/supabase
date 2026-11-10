@@ -1,11 +1,25 @@
 import { cn } from 'ui'
 
-import { LOG_TYPES_LABELS, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
+import {
+  EXCLUDE_FILTER_FIELD,
+  LOG_EXCLUSION_RULES,
+  LOG_TYPES_LABELS,
+  METHODS,
+  STATUS_CODE_LABELS,
+} from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
 import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
+
+const FacetOptionLabel = (props: Option) => (
+  <div className="flex items-center w-full justify-between gap-2">
+    <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
+      {props.label}
+    </span>
+  </div>
+)
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -16,6 +30,14 @@ export const filterFields = [
     type: 'timerange',
     defaultOpen: true,
     commandDisabled: true,
+  },
+  {
+    label: 'Exclude',
+    value: EXCLUDE_FILTER_FIELD,
+    type: 'checkbox',
+    defaultOpen: true,
+    options: Object.entries(LOG_EXCLUSION_RULES).map(([value, { label }]) => ({ label, value })),
+    component: FacetOptionLabel,
   },
   {
     label: 'Log Type',
@@ -38,15 +60,7 @@ export const filterFields = [
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
             : [],
     })),
-    component: (props: Option) => {
-      return (
-        <div className="flex items-center w-full justify-between gap-2">
-          <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
-            {props.label}
-          </span>
-        </div>
-      )
-    },
+    component: FacetOptionLabel,
   },
   {
     label: 'Level',

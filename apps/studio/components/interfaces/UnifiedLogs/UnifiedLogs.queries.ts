@@ -1,6 +1,12 @@
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from './UnifiedLogs.constants'
+import {
+  DEFAULT_LOG_TYPES,
+  EXCLUDE_FILTER_FIELD,
+  LOG_EXCLUSION_RULES,
+  LOG_TYPE_TO_SOURCE,
+  type LogExclusionRuleId,
+} from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -156,6 +162,44 @@ const logTypeWhereCondition = (logTypes: string[]): SafeLogSqlFragment => {
 }
 
 /**
+ * Row-matching condition per exclusion rule (see LOG_EXCLUSION_RULES). Matches
+ * on the same expressions the `pathname` and `status` filters use, so a rule
+ * covers exactly the rows a user would see under those facets. `coalesce` keeps
+ * a null status (compute, pipelines) from turning `NOT (…)` into null, which
+ * WHERE would read as false and quietly drop those rows.
+ */
+const EXCLUSION_RULE_CONDITION: Record<LogExclusionRuleId, SafeLogSqlFragment> = Object.fromEntries(
+  Object.entries(LOG_EXCLUSION_RULES).map(([id, { pathname, statuses }]) => [
+    id,
+    safeSql`coalesce((${HTTP_PATH_EXPR}) = ${lit(pathname)} AND (${STATUS_EXPR}) IN (${joinSqlFragments(
+      statuses.map((status) => lit(status)),
+      ','
+    )}), 0)`,
+  ])
+) as Record<LogExclusionRuleId, SafeLogSqlFragment>
+
+const isExclusionRuleId = (value: string): value is LogExclusionRuleId =>
+  value in EXCLUSION_RULE_CONDITION
+
+/** Matches a row against the given rules — the rows the `exclude` filter hides. */
+const exclusionMatchCondition = (values: readonly string[]): SafeLogSqlFragment | null => {
+  const rules = values.filter(isExclusionRuleId).map((id) => EXCLUSION_RULE_CONDITION[id])
+  if (rules.length === 0) return null
+  return safeSql`(${joinSqlFragments(rules, ' OR ')})`
+}
+
+/** `'successful_metrics_scrapes'` for a hidden row, `''` otherwise — the `exclude` facet value. */
+const EXCLUSION_FACET_EXPR: SafeLogSqlFragment = safeSql`multiIf(${joinSqlFragments(
+  [
+    ...Object.entries(EXCLUSION_RULE_CONDITION).map(
+      ([id, condition]) => safeSql`${condition}, ${lit(id)}`
+    ),
+    safeSql`''`,
+  ],
+  ', '
+)})`
+
+/**
  * Translates one (column, values, operator) group from the parsed `filter` URL
  * param into an underlying SQL condition. The OTEL endpoint rejects queries
  * that reference derived aliases like `log_type` or `level` in WHERE for some
@@ -187,6 +231,14 @@ const translateFilter = (
   }
 
   switch (key) {
+    case EXCLUDE_FILTER_FIELD: {
+      // `exclude:eq:<rule id>` means "hide these rows". Only `=` carries that
+      // meaning, so a hand-crafted URL using any other operator is dropped
+      // rather than silently inverted.
+      if (operator !== '=') return null
+      const match = exclusionMatchCondition(values)
+      return match === null ? null : safeSql`NOT ${match}`
+    }
     case 'pipeline_id':
       return safeSql`(source = 'etl_replication_logs' AND ${PIPELINE_ID_OTEL_SQL} ${inOp} ${inList(values)})`
     case 'log_type': {
@@ -595,6 +647,10 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
     method: METHOD_EXPR,
     status: STATUS_EXPR,
     pipeline_id: safeSql`if(source = 'etl_replication_logs', ${PIPELINE_ID_OTEL_SQL}, null)`,
+    // Counts the rows each exclusion rule covers. Scanned with its own filter
+    // dropped (see below), so the sidebar reports how many logs are hidden
+    // whether the exclusion is currently on or off.
+    [EXCLUDE_FILTER_FIELD]: EXCLUSION_FACET_EXPR,
   }
 
   const scanBlock = (
@@ -625,7 +681,7 @@ HAVING value != ''
   // A filtered facet gets its own scan so it can exclude its own filter and
   // still count its other values; the rest share the base scan.
   const baseFacets: (keyof typeof VALUE_EXPR)[] = ['total']
-  for (const facet of ['level', 'method', 'status', 'pipeline_id'] as const) {
+  for (const facet of ['level', 'method', 'status', 'pipeline_id', EXCLUDE_FILTER_FIELD] as const) {
     if (grouped[facet]) blocks.push(scanBlock([facet], whereFor(facet)))
     else baseFacets.push(facet)
   }

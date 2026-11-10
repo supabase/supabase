@@ -1,5 +1,7 @@
 import type { Table } from '@tanstack/react-table'
 
+import { EXCLUDE_FILTER_FIELD } from './UnifiedLogs.constants'
+
 // Operators mirror PostgREST / Table Editor conventions:
 //   `=` / `<>` — exact equality, available on most columns
 //   `~~*` / `!~~*` — ILIKE / NOT ILIKE (case-insensitive substring
@@ -153,6 +155,43 @@ export const buildDefaultColumnFilters = (search: {
   ).filter((f) => f.id !== 'date')
   if (search.date?.length === 2) filters.push({ id: 'date', value: search.date })
   return filters
+}
+
+/** The rule ids an `exclude` column filter currently holds, in filter order. */
+export const getExclusionValues = (columnFilters: { id: string; value: unknown }[]): string[] => {
+  const value = columnFilters.find(({ id }) => id === EXCLUDE_FILTER_FIELD)?.value
+  return isLogsFilterColumnValue(value) ? value.values.map(String) : []
+}
+
+/** The column-filter entry for a set of exclusion rule ids, or none when empty. */
+export const exclusionColumnFilters = (
+  values: readonly string[]
+): { id: string; value: LogsColumnFilterValue }[] =>
+  values.length === 0
+    ? []
+    : [{ id: EXCLUDE_FILTER_FIELD, value: { operator: '=', values: [...values] } }]
+
+/**
+ * Seeds the default exclusions into a URL `filter` param that doesn't carry any
+ * exclusion state yet — a first visit, or a link shared before the feature
+ * existed. A URL that already names the field wins, so unchecking the box (which
+ * drops the entry while persisting the choice) isn't undone on the next render.
+ */
+export const withDefaultExclusions = (
+  filter: string[] | null | undefined,
+  defaults: readonly string[]
+): string[] | null | undefined => {
+  if (defaults.length === 0) return filter
+  const current = filter ?? []
+  if (parseLogsFilterUrlParams(current).some(({ column }) => column === EXCLUDE_FILTER_FIELD)) {
+    return filter
+  }
+  return [
+    ...current,
+    ...logsFiltersToUrlParams(
+      defaults.map((value) => ({ column: EXCLUDE_FILTER_FIELD, operator: '=', value }))
+    ),
+  ]
 }
 
 export const columnFiltersToLogsFilters = (

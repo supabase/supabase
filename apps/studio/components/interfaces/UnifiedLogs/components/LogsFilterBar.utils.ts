@@ -7,7 +7,12 @@ import {
 } from 'ui-patterns/FilterBar'
 import { z } from 'zod'
 
-import { DEFAULT_LOG_TYPES, LOG_TYPE_TO_SOURCE } from '../UnifiedLogs.constants'
+import {
+  DEFAULT_LOG_TYPES,
+  EXCLUDE_FILTER_FIELD,
+  LOG_EXCLUSION_RULES,
+  LOG_TYPE_TO_SOURCE,
+} from '../UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -72,6 +77,14 @@ const PATTERN_OPERATORS: FilterProperty['operators'] = [
   { label: 'Not iLike', value: '!~~*', group: 'pattern' },
 ]
 
+const EQUALS_OPERATOR: FilterProperty['operators'] = [
+  { label: 'Equals', value: '=', group: 'comparison' },
+]
+
+/** Reads an exclusion rule id back as its sidebar label, so the chip stays legible. */
+const formatExclusionValue = (value: FilterCondition['value']): string =>
+  LOG_EXCLUSION_RULES[String(value) as keyof typeof LOG_EXCLUSION_RULES]?.label ?? String(value)
+
 export const buildFilterProperties = ({
   fields,
   userOptions,
@@ -95,6 +108,18 @@ export const buildFilterProperties = ({
       }
       // event_message only supports substring matching (it's free text); pathname
       // supports both exact segment matching and substring matching.
+      // The exclusion rules are a fixed on/off set — `not equals` has no
+      // meaning for them, so only equality is offered.
+      if (field.value === EXCLUDE_FILTER_FIELD) {
+        return {
+          label: field.label,
+          name: field.value,
+          type: 'string',
+          options: field.options ?? [],
+          operators: EQUALS_OPERATOR,
+          formatValue: formatExclusionValue,
+        }
+      }
       const operators =
         field.value === 'event_message'
           ? PATTERN_OPERATORS

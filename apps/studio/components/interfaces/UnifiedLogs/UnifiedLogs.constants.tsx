@@ -53,6 +53,36 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   pipelines: 'etl_replication_logs',
 }
 
+// Filter field backing the sidebar's "Exclude" section. Not a column on the log
+// row — it reads as a filter (`exclude:eq:<rule id>`) so it shares the URL
+// params, the filter bar chips and the facet counts with every other filter.
+export const EXCLUDE_FILTER_FIELD = 'exclude'
+
+/**
+ * Noise-reduction rules offered under "Exclude". A rule hides the rows matching
+ * *all* of its clauses; everything else on that pathname (errors included)
+ * still shows. Widening a rule — say to every 2xx — is a matter of adding to
+ * `statuses` here, nothing else needs to change.
+ */
+export const LOG_EXCLUSION_RULES = {
+  successful_metrics_scrapes: {
+    label: 'Successful metrics scrapes',
+    pathname: '/customer/v1/privileged/metrics',
+    statuses: ['200'],
+  },
+} as const
+
+export type LogExclusionRuleId = keyof typeof LOG_EXCLUSION_RULES
+
+const LOG_EXCLUSION_RULE_IDS = Object.keys(LOG_EXCLUSION_RULES) as LogExclusionRuleId[]
+
+/**
+ * Checked on a fresh load, and what the sidebar's Reset button restores to.
+ * Module-level so it stays referentially stable across renders (it seeds both
+ * `useLocalStorageQuery` and the table's `initialState`).
+ */
+export const DEFAULT_LOG_EXCLUSIONS: string[] = [...LOG_EXCLUSION_RULE_IDS]
+
 const parseAsSort = createParser({
   parse(queryValue: string) {
     const [id, desc] = queryValue.split(SORT_DELIMITER)
