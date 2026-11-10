@@ -84,7 +84,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="npm_initiate" label="npm">
               ```bash
               npm init -y
-              npm install prisma@7 tsx @types/pg --save-dev
+              npm install prisma@7 tsx typescript @types/pg --save-dev
               npm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               npx tsc --init
@@ -95,10 +95,11 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="pnpm_initiate" label="pnpm">
               ```bash
               pnpm init
-              pnpm install prisma@7 tsx @types/pg --save-dev --allow-build=prisma --allow-build=@prisma/engines --allow-build=esbuild
+              # --allow-build needs pnpm 10.4 or later. Earlier versions run the build scripts without it.
+              pnpm install prisma@7 tsx typescript @types/pg --save-dev --allow-build=prisma --allow-build=@prisma/engines --allow-build=esbuild
               pnpm install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
-              pnpx tsc --init
+              pnpm exec tsc --init
 
               pnpm exec prisma init
               ```
@@ -106,7 +107,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="yarn_initiate" label="yarn">
               ```bash
               yarn init -y
-              yarn add prisma@7 tsx @types/pg --save-dev
+              yarn add prisma@7 tsx typescript @types/pg --save-dev
               yarn add @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               yarn tsc --init
@@ -117,7 +118,7 @@ If you plan to solely use Prisma instead of the Supabase Data API (PostgREST), t
             <TabPanel id="bun_initiate" label="bun">
               ```bash
               bun init -y
-              bun install prisma@7 tsx @types/pg --save-dev
+              bun install prisma@7 tsx typescript @types/pg --save-dev
               bun install @prisma/client@7 @prisma/adapter-pg@7 dotenv pg
 
               bunx tsc --init
