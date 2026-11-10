@@ -107,7 +107,7 @@ export const DeleteAccountButton = () => {
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
         <Button variant="danger" loading={!accountEmail}>
-          Request to delete account
+          Request deletion
         </Button>
       </DialogTrigger>
       <DialogContent className="w-[500px]!">
