@@ -49,6 +49,14 @@ Choose WorkOS if enterprise customers require SSO and directory sync before they
 
 If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkOS integration with Supabase](/docs/guides/auth/third-party/workos).
 
+## Better Auth
+
+Better Auth is an open source authentication library for TypeScript apps. It runs inside your own app instead of as a hosted service, and stores users and sessions in your own database.
+
+Choose Better Auth if you want authentication to run as a library inside your TypeScript app, with its logic in your own codebase instead of a separate service.
+
+Every Supabase project is a full Postgres database, so Better Auth can connect to it directly. To store Better Auth users and sessions in Supabase, see [Set up Better Auth with Supabase Declarative Schema](/kb/guides/setup-better-auth-with-declarative-schema).
+
 ## When to choose which provider
 
 - **You are starting a new project, or already use Supabase:** Supabase Auth. Your users live in your Postgres database and Row Level Security policies work out of the box.
@@ -56,4 +64,5 @@ If you want to use WorkOS with the rest of the Supabase Platform, see the [WorkO
 - **You need an established platform with many enterprise connections, or already use it:** Auth0.
 - **Your app runs on Firebase or Google Cloud:** Firebase Auth.
 - **Enterprise customers require SSO and directory sync:** WorkOS. Supabase Auth also supports [SAML 2.0 single sign-on](/docs/guides/auth/enterprise-sso) if you want it in the same service as the rest of your backend.
+- **You want authentication to run as a library inside your TypeScript app, instead of as a separate service:** Better Auth. You can use it with a Supabase Postgres database.
 - **You already have users in another provider and want the rest of the Supabase Platform:** keep your provider and connect it through [third-party auth](/docs/guides/auth/third-party/overview), or migrate to Supabase Auth.
