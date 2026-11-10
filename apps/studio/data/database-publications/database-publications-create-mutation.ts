@@ -41,6 +41,8 @@ export async function createDatabasePublication({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'publication-create',
     sql,
     queryKey: ['publication', 'create'],
     grant: unguarded.migrating,

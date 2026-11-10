@@ -128,6 +128,7 @@ export const ReportBlock = ({
         projectRef,
         connectionString,
         sql: formattedSql,
+        sqlOrigin: 'user',
         grant: unguarded.migrating,
       })
     },

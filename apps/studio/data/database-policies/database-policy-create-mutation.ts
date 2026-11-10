@@ -4,6 +4,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -24,12 +25,14 @@ export type DatabasePolicyCreateVariables = {
   projectRef: string
   connectionString?: string | null
   payload: CreatePolicyBody
+  sqlOrigin: SqlOrigin
 }
 
 export async function createDatabasePolicy({
   projectRef,
   connectionString,
   payload,
+  sqlOrigin,
 }: DatabasePolicyCreateVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
@@ -39,6 +42,8 @@ export async function createDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName: 'database-policy-create',
     queryKey: ['policy', 'create'],
     grant: unguarded.migrating,
   })

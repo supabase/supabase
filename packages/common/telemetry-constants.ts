@@ -1023,6 +1023,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'kb'
   | 'ask_ai_answer'
 
 /**
@@ -1031,7 +1032,7 @@ export type MarkdownAffordancePageType =
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
@@ -1047,7 +1048,7 @@ export interface CopyAsMarkdownClickedEvent {
  * User clicked the sidebar link to set up an AI coding agent with Supabase.
  *
  * @group Events
- * @source docs
+ * @source docs, kb
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
@@ -1073,7 +1074,7 @@ export interface PreferredSourceClickedEvent {
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
@@ -1280,7 +1281,8 @@ export interface DocsSearchV2AskAiOpenedEvent {
 }
 
 /**
- * User's question was sent to Ask AI in the Search V2 dialog.
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
  *
  * @group Events
  * @source docs
@@ -1289,11 +1291,7 @@ export interface DocsSearchV2AskAiQuestionSubmittedEvent {
   action: 'docs_search_v2_ask_ai_question_submitted'
   properties: {
     /**
-     * The question sent to Ask AI, cut to its first 300 characters.
-     */
-    question: string
-    /**
-     * The length of the full question, in characters.
+     * The length of the question, in characters.
      */
     questionLength: number
     /**
