@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { CircleDotIcon } from 'lucide-react'
+import { CircleAlertIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -69,7 +69,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
           },
         }}
       >
-        <CircleDotIcon
+        <CircleAlertIcon
           size={16}
           strokeWidth={1.5}
           className={cn(
