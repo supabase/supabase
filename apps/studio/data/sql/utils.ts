@@ -33,7 +33,7 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
 // Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
 // can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
 // -- line comments and /* */ block comments
-const LITERALS_AND_COMMENTS =
+export const LITERALS_AND_COMMENTS =
   /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
 
 /** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */

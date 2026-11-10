@@ -1,12 +1,36 @@
+import { LITERALS_AND_COMMENTS, stripLiteralsAndComments } from '@/data/sql/utils'
+
 /**
  * LLMs sometimes emit MySQL-style `\'` escapes in SQL. PostgreSQL doesn't
  * treat backslash as an escape character, so replace `\'` → `''`.
  * Dollar-quoted strings (e.g. `$$...$$`) are left untouched.
+ *
+ * SQL that can't contain a misescaped quote is returned unchanged, so a valid
+ * literal ending in a backslash, like `'\'` in `replace(path, '\', '/')`, isn't
+ * rewritten into a different string.
  */
 export function fixSqlBackslashEscapes(sql: string): string {
+  if (!hasMisescapedQuote(sql)) return sql
   return sql.replace(/\$([^$]*)\$[\s\S]*?\$\1\$|\\'/g, (match, dollarTag) =>
     dollarTag !== undefined ? match : "''"
   )
+}
+
+/**
+ * True when the SQL only makes sense if a `\'` was meant as an escaped quote. In
+ * PostgreSQL a `\'` ends a '..' string, so `'it\'s'` scans as the string `'it\'`
+ * followed by stray text. That shows up as a quote or backslash outside every
+ * literal and comment, or as a string ending in a backslash that runs straight
+ * into a word character.
+ */
+function hasMisescapedQuote(sql: string): boolean {
+  if (/['\\]/.test(stripLiteralsAndComments(sql))) return true
+
+  return Array.from(sql.matchAll(LITERALS_AND_COMMENTS)).some((match) => {
+    const literal = match[0]
+    const nextChar = sql.charAt(match.index + literal.length)
+    return literal.startsWith("'") && literal.endsWith("\\'") && /\w/.test(nextChar)
+  })
 }
 
 /**
