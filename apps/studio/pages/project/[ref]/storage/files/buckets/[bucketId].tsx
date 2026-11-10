@@ -45,6 +45,7 @@ import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
+import { IS_PLATFORM } from '@/lib/constants'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 
@@ -143,13 +144,15 @@ const BucketPage: NextPageWithLayout = () => {
                     <FolderOpenIcon size={12} />
                     <p>Empty bucket</p>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setModalDisplayed('purgeCDNCache')}
-                  >
-                    <RefreshCwIcon size={12} />
-                    <p>Purge CDN cache</p>
-                  </DropdownMenuItem>
+                  {IS_PLATFORM && (
+                    <DropdownMenuItem
+                      className="flex items-center space-x-2"
+                      onClick={() => setModalDisplayed('purgeCDNCache')}
+                    >
+                      <RefreshCwIcon size={12} />
+                      <p>Purge CDN cache</p>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     className="flex items-center space-x-2"
                     onClick={() => setModalDisplayed('delete')}
@@ -222,11 +225,13 @@ const BucketPage: NextPageWithLayout = () => {
             bucket={bucket}
             onClose={() => closeModal()}
           />
-          <PurgeBucketCDNCacheModal
-            visible={modalDisplayed === 'purgeCDNCache'}
-            bucket={bucket}
-            onClose={() => closeModal()}
-          />
+          {IS_PLATFORM && (
+            <PurgeBucketCDNCacheModal
+              visible={modalDisplayed === 'purgeCDNCache'}
+              bucket={bucket}
+              onClose={() => closeModal()}
+            />
+          )}
         </>
       )}
     </StorageExplorerStateContextProvider>
