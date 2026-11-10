@@ -40,17 +40,19 @@ export const SecurityDefinerViewPopover = ({
                 Autofix
               </Button>
             )}
-            {isIssuesInboxEnabled && (
-              <Button asChild>
-                <Link
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  href={`/project/${ref}/issues/${lint?.name}`}
-                >
-                  Learn more
-                </Link>
-              </Button>
-            )}
+            <Button asChild>
+              <Link
+                target="_blank"
+                rel="noopener noreferrer"
+                href={
+                  isIssuesInboxEnabled
+                    ? `/project/${ref}/issues/${lint?.name}`
+                    : `/project/${ref}/advisors/security?preset=${lint?.level}&id=${lint?.cache_key}`
+                }
+              >
+                Learn more
+              </Link>
+            </Button>
           </div>
         </div>
       </PopoverContent>

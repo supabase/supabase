@@ -9,12 +9,17 @@ export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
   const isIssuesInboxEnabled = useFlag('issuesInbox')
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
+  const overviewHref = isIssuesInboxEnabled
+    ? `/project/${ref}/issues?category=security`
+    : `/project/${ref}/advisors/security`
+  const href = isAdvisorRulesEnabled ? `/project/${ref}/advisors/rules/security` : overviewHref
 
   return (
     <div>
       <p className="text-sm text-foreground-light mb-4">
-        Turn off specific checks or categories to stop them showing up in Issues or email
-        notifications. This could be useful for checks that might not apply to your project.
+        {isIssuesInboxEnabled
+          ? 'Turn off specific checks or categories to stop them showing up in Issues or email notifications. This could be useful for checks that might not apply to your project.'
+          : 'Disable specific Advisor categories or rules to prevent them from showing up in Advisor reports or email notifications. This could be useful for rules that might not be applicable to your project.'}
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
@@ -28,19 +33,9 @@ export const AdvisorRulesPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Allow you to disable advisor rules for your project from the{' '}
-            {isAdvisorRulesEnabled || isIssuesInboxEnabled ? (
-              <InlineLink
-                href={
-                  isAdvisorRulesEnabled
-                    ? `/project/${ref}/advisors/rules/security`
-                    : `/project/${ref}/issues?category=security`
-                }
-              >
-                Issues section.
-              </InlineLink>
-            ) : (
-              <span>Issues section.</span>
-            )}
+            <InlineLink href={href}>
+              {isIssuesInboxEnabled ? 'Issues section.' : 'Advisors section.'}
+            </InlineLink>
           </li>
         </ul>
       </div>

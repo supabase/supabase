@@ -78,13 +78,17 @@ export const ComplianceConfig = () => {
             <div className="space-y-2 max-w-2xl">
               <p className="text-sm">Apply additional compliance controls to project</p>
               <p className="text-sm text-foreground-light">
-                Raise additional{' '}
+                <span>
+                  {isIssuesInboxEnabled ? 'Raise additional ' : 'Enable security warnings in the '}
+                </span>
                 {isIssuesInboxEnabled ? (
                   <InlineLink href={`/project/${ref}/issues?category=security`}>
                     security issues
                   </InlineLink>
                 ) : (
-                  <span>security issues</span>
+                  <InlineLink href={`/project/${ref}/advisors/security`}>
+                    Security Advisor
+                  </InlineLink>
                 )}
                 <span> to enforce requirements for managing sensitive data.</span>
               </p>

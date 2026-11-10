@@ -1,5 +1,7 @@
 import { useHotkeyRegistrations, type SequenceRegistrationView } from '@tanstack/react-hotkeys'
+import { useFlag } from 'common'
 import { CircleXIcon } from 'lucide-react'
+import { useRouter } from 'next/router'
 import { Fragment, useMemo, useState } from 'react'
 import {
   Button,
@@ -179,9 +181,20 @@ const ShortcutSequence = ({ sequence }: Pick<ActiveShortcutDefinition, 'sequence
 )
 
 function ShortcutsReferenceSheetContent() {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const router = useRouter()
+  const isLegacyAdvisors = !isIssuesInboxEnabled && router.pathname.includes('/advisors')
   const [search, setSearch] = useState('')
   const activeShortcuts = useActiveShortcuts()
-  const groups = filterGroups(groupDefinitions(activeShortcuts), search)
+  const shortcutGroups = groupDefinitions(activeShortcuts).map((group) => {
+    const isAdvisorGroup =
+      group.group === SHORTCUT_REFERENCE_GROUPS.NAVIGATION_ADVISORS ||
+      group.group === 'advisors-page'
+    return isLegacyAdvisors && isAdvisorGroup
+      ? { ...group, label: group.label.replace('Issues', 'Advisors') }
+      : group
+  })
+  const groups = filterGroups(shortcutGroups, search)
 
   return (
     <>

@@ -132,10 +132,24 @@ describe('generateOtherRoutes', () => {
     expect(keys(routes)).toContain('integrations')
   })
 
-  it('hides Issues when explicitly disabled', () => {
+  it.each([false, undefined])('restores Advisors when Issues is %s', (issuesInbox) => {
+    const route = generateOtherRoutes(REF, activeProject, { issuesInbox }).find(
+      (route) => route.key === 'advisors'
+    )
+    expect(route?.label).toBe('Advisors')
+    expect(route?.link).toBe(`/project/${REF}/advisors/security`)
+
     expect(keys(generateOtherRoutes(REF, activeProject, { issuesInbox: false }))).not.toContain(
       'issues'
     )
+  })
+
+  it('opens the Health Advisor when health checks are enabled and Issues is off', () => {
+    const route = generateOtherRoutes(REF, activeProject, {
+      issuesInbox: false,
+      isHealthAdvisorEnabled: true,
+    }).find((route) => route.key === 'advisors')
+    expect(route?.link).toBe(`/project/${REF}/advisors/health`)
   })
 
   it.each([false, true])('wires the Issues flag into generated navigation: %s', (issuesInbox) => {
@@ -151,6 +165,7 @@ describe('generateOtherRoutes', () => {
       ),
     })
     expect(keys(result.current).includes('issues')).toBe(issuesInbox)
+    expect(keys(result.current).includes('advisors')).toBe(!issuesInbox)
   })
 
   it('includes observability when reports are enabled', () => {
