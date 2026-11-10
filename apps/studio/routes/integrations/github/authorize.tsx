@@ -1,13 +1,39 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
+import { useEffect } from 'react'
 
-import GitHubIntegrationAuthorize from '@/pages/integrations/github/authorize'
+import { useGitHubAuthorizationCreateMutation } from '@/data/integrations/github-authorization-create-mutation'
 
 export const Route = createFileRoute('/integrations/github/authorize')({
-  component: GitHubAuthorizeRoute,
+  component: GitHubIntegrationAuthorize,
 })
 
-// Placed at top-level — the Next page has no getLayout (renders bare),
-// so adding AppLayout/DefaultLayout via _app would be a behaviour change.
-function GitHubAuthorizeRoute() {
-  return <GitHubIntegrationAuthorize />
+// Top-level rather than under _app: this page renders bare, without
+// AppLayout/DefaultLayout.
+function GitHubIntegrationAuthorize() {
+  const { code, state, setup_action } = useParams()
+
+  const { mutate, isSuccess, isError, isPending } = useGitHubAuthorizationCreateMutation({
+    onSuccess() {
+      window.close()
+    },
+  })
+
+  useEffect(() => {
+    if (code && state) {
+      mutate({ code, state })
+    } else if (setup_action === 'install') {
+      window.close()
+    }
+  }, [code, state, mutate, setup_action])
+
+  return (
+    <div className="h-screen flex flex-col justify-center items-center gap-4">
+      <h2>Completing GitHub Authorization...</h2>
+
+      {isSuccess && <p>You can now close this window.</p>}
+      {isPending && <p>Authorizing...</p>}
+      {isError && <p>Unable to authorize. Please try again.</p>}
+    </div>
+  )
 }
