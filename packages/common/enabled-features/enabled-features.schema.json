@@ -407,6 +407,11 @@
       "description": "Enable the project reports page"
     },
 
+    "ai_sre:all": {
+      "type": "boolean",
+      "description": "Enable the project AI SRE page"
+    },
+
     "sdk:auth": {
       "type": "boolean",
       "description": "Enable Auth SDK docs"
@@ -536,6 +541,7 @@
     "project_connection:show_warehouse",
     "quickstarts:hide_nimbus",
     "reports:all",
+    "ai_sre:all",
     "sdk:auth",
     "sdk:csharp",
     "sdk:dart",

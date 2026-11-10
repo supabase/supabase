@@ -9,7 +9,14 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { BlocksIcon, LightbulbIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
+import {
+  BlocksIcon,
+  HeartPulseIcon,
+  LightbulbIcon,
+  ListIcon,
+  SettingsIcon,
+  TelescopeIcon,
+} from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -46,6 +53,7 @@ interface OtherFeatures {
   unifiedLogs?: boolean
   showReports?: boolean
   showLogs?: boolean
+  showAiSre?: boolean
   isHealthAdvisorEnabled?: boolean
 }
 
@@ -208,6 +216,7 @@ export const generateOtherRoutes = (
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
+  const aiSreEnabled = features?.showAiSre ?? false
   const isHealthAdvisorEnabled = features?.isHealthAdvisorEnabled ?? false
 
   return [
@@ -223,6 +232,18 @@ export const generateOtherRoutes = (
           : `/project/${ref}/advisors/${isHealthAdvisorEnabled ? 'health' : 'security'}`),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
+    ...(aiSreEnabled
+      ? [
+          {
+            key: 'ai-sre',
+            label: 'AI SRE',
+            disabled: !isProjectActive,
+            icon: <HeartPulseIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/ai-sre`),
+            shortcutId: SHORTCUT_IDS.NAV_AI_SRE,
+          },
+        ]
+      : []),
     ...(reportsEnabled
       ? [
           {
@@ -273,12 +294,14 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
+  const aiSreEnabled = useIsFeatureEnabled('ai_sre:all')
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
 
   return generateOtherRoutes(ref, project, {
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
+    showAiSre: aiSreEnabled,
     isHealthAdvisorEnabled,
   })
 }
