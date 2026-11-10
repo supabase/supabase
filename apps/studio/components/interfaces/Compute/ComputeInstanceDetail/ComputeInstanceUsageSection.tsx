@@ -1,7 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { ArrowUpRightIcon } from 'lucide-react'
+import Link from 'next/link'
 import type { ReactNode } from 'react'
-import type { ChartConfig } from 'ui'
+import { Button, type ChartConfig } from 'ui'
 import {
   Chart,
   ChartCard,
@@ -14,6 +16,7 @@ import {
 } from 'ui-patterns/Chart'
 import {
   PageSection,
+  PageSectionAside,
   PageSectionContent,
   PageSectionDescription,
   PageSectionMeta,
@@ -129,6 +132,20 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             are estimates while Compute is in alpha.
           </PageSectionDescription>
         </PageSectionSummary>
+        {projectRef && (
+          <PageSectionAside>
+            <Button asChild iconRight={<ArrowUpRightIcon />}>
+              {/*
+                Observability has no Compute page yet. The link is here because this is where
+                someone goes looking for it: these two cards answer "what did this deployment
+                consume", and the next question is always "why", which is Observability's.
+              */}
+              <Link href={`/project/${projectRef}/observability/compute`}>
+                View in Observability
+              </Link>
+            </Button>
+          </PageSectionAside>
+        )}
       </PageSectionMeta>
       <PageSectionContent>
         {/*

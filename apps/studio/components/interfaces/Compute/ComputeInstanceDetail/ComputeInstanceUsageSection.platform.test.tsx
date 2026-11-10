@@ -50,6 +50,13 @@ describe('ComputeInstanceUsageSection', () => {
     expect(within(card!).queryByText(/GB-hrs/)).not.toBeInTheDocument()
   })
 
+  it('points at the Compute page in Observability for the detail behind the totals', async () => {
+    customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
+
+    const link = await screen.findByRole('link', { name: /View in Observability/ })
+    expect(link).toHaveAttribute('href', '/project/default/observability/compute')
+  })
+
   it('states that figures are estimates while Compute is in alpha', async () => {
     customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
