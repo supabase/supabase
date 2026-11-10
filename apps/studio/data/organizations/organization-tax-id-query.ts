@@ -4,7 +4,8 @@ import { components } from 'api-types'
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationTaxIdVariables = {
   slug?: string
@@ -26,7 +27,7 @@ export async function getOrganizationTaxId(
 }
 
 export type OrganizationTaxIdData = Awaited<ReturnType<typeof getOrganizationTaxId>>
-export type OrganizationTaxIdError = ResponseError
+export type OrganizationTaxIdError = StudioError
 
 export const useOrganizationTaxIdQuery = <TData = OrganizationTaxIdData>(
   { slug }: OrganizationTaxIdVariables,

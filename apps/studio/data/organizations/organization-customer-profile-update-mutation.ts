@@ -5,7 +5,8 @@ import { organizationKeys } from './keys'
 import type { OrganizationsData } from './organizations-query'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationCustomerProfileUpdateVariables = {
   slug?: string
@@ -67,7 +68,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationCustomerProfileUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCustomerProfileUpdateVariables
   >,
   'mutationFn'
@@ -76,7 +77,7 @@ export const useOrganizationCustomerProfileUpdateMutation = ({
 
   return useMutation<
     OrganizationCustomerProfileUpdateData,
-    ResponseError,
+    StudioError,
     OrganizationCustomerProfileUpdateVariables
   >({
     mutationFn: (vars) => updateOrganizationCustomerProfile(vars),

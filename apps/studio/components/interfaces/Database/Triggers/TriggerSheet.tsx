@@ -481,7 +481,7 @@ export const TriggerSheet = ({
               type="submit"
               loading={isCreating || isUpdating}
             >
-              {isEditing ? 'Save' : 'Create'} trigger
+              {isEditing ? <span>Save</span> : <span>Create</span>} <span>trigger</span>
             </Button>
           </SheetFooter>
 

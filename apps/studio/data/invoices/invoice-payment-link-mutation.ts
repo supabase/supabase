@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { invoicesKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type InvoicePaymentLinkGetVariables = {
   slug?: string
@@ -39,16 +40,12 @@ export const useInvoicePaymentLinkGetMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    InvoicePaymentLinkGetData,
-    ResponseError,
-    InvoicePaymentLinkGetVariables
-  >,
+  UseCustomMutationOptions<InvoicePaymentLinkGetData, StudioError, InvoicePaymentLinkGetVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<InvoicePaymentLinkGetData, ResponseError, InvoicePaymentLinkGetVariables>({
+  return useMutation<InvoicePaymentLinkGetData, StudioError, InvoicePaymentLinkGetVariables>({
     mutationFn: (vars) => updateInvoicePaymentLink(vars),
     async onError(error, variables, context) {
       // In case of an error, there is a good chance that the invoice status has changed, so we invalidate the cache to reflect the updated status

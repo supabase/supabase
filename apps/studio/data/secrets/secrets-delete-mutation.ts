@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { secretsKeys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SecretsDeleteVariables = {
   projectRef?: string
@@ -30,11 +31,11 @@ export const useSecretsDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SecretsDeleteData, ResponseError, SecretsDeleteVariables>,
+  UseCustomMutationOptions<SecretsDeleteData, StudioError, SecretsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<SecretsDeleteData, ResponseError, SecretsDeleteVariables>({
+  return useMutation<SecretsDeleteData, StudioError, SecretsDeleteVariables>({
     mutationFn: (vars) => deleteSecrets(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

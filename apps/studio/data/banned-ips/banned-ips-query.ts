@@ -5,7 +5,8 @@ import { BannedIPKeys } from './keys'
 import { handleError, post, unguarded } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROVIDERS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type BannedIPVariables = { projectRef?: string }
 
@@ -23,7 +24,7 @@ export async function getBannedIPs({ projectRef }: BannedIPVariables, signal: Ab
 }
 
 export type IPData = Awaited<ReturnType<typeof getBannedIPs>>
-export type IPError = ResponseError
+export type IPError = StudioError
 
 export const useBannedIPsQuery = <TData = IPData>(
   { projectRef }: BannedIPVariables,

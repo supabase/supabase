@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { configKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DiskAutoscaleCustomConfigVariables = {
   projectRef?: string
@@ -26,7 +27,7 @@ export async function getDiskAutoscaleCustomConfig(
 }
 
 export type DiskAutoscaleCustomConfigData = Awaited<ReturnType<typeof getDiskAutoscaleCustomConfig>>
-export type DiskAutoscaleCustomConfigError = ResponseError
+export type DiskAutoscaleCustomConfigError = StudioError
 
 export const useDiskAutoscaleCustomConfigQuery = <TData = DiskAutoscaleCustomConfigData>(
   { projectRef }: DiskAutoscaleCustomConfigVariables,

@@ -50,7 +50,7 @@ const ExplorerMobileMenu = ({ initialSection }: { initialSection: ExplorerResour
       <MobileMenuContent
         currentProduct="Explorer"
         currentSectionKey="explorer"
-        currentProductMenu={<span>{section ?? 'Home'} content</span>}
+        currentProductMenu={<span>{`${section ?? 'Home'} content`}</span>}
         currentProductMenuHeader={
           <ExplorerNavHeader
             section={section}

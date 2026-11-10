@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { replicaKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 // [Joshen] Is it possible to import this from the code gen?
 // https://github.com/supabase/platform/blob/develop/api/src/routes/platform/projects/ref/databases-statuses.dto.ts#L7
@@ -39,7 +40,7 @@ export async function getReadReplicasStatuses(
 }
 
 export type ReadReplicasStatusesData = Awaited<ReturnType<typeof getReadReplicasStatuses>>
-export type ReadReplicasStatusesError = ResponseError
+export type ReadReplicasStatusesError = StudioError
 
 export const useReadReplicasStatusesQuery = <TData = ReadReplicasStatusesData>(
   { projectRef }: ReadReplicasStatusesVariables,

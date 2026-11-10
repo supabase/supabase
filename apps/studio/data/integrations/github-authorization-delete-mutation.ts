@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { integrationKeys } from './keys'
 import { del, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export async function deleteGitHubAuthorization(signal?: AbortSignal) {
   const { data, error } = await del('/platform/integrations/github/authorization', { signal })
@@ -19,11 +20,11 @@ export const useGitHubAuthorizationDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<GitHubAuthorizationDeleteData, ResponseError, void>,
+  UseCustomMutationOptions<GitHubAuthorizationDeleteData, StudioError, void>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<GitHubAuthorizationDeleteData, ResponseError, void>({
+  return useMutation<GitHubAuthorizationDeleteData, StudioError, void>({
     mutationFn: () => deleteGitHubAuthorization(),
     async onSuccess(data, variables, context) {
       queryClient.removeQueries({ queryKey: integrationKeys.githubAuthorization() })

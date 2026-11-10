@@ -6,7 +6,8 @@ import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type PublicBucketsWithSelectPoliciesVariables = {
   projectRef?: string
@@ -37,6 +38,8 @@ async function getPublicBucketsWithSelectPolicies({
   const { result } = await executeSql<PublicBucketSelectPolicy[]>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'public-buckets-with-select-policies',
     sql: safeSql`
       SELECT b.id AS bucket_id, b.name AS bucket_name, p.policyname
       FROM storage.buckets b
@@ -73,7 +76,7 @@ async function getPublicBucketsWithSelectPolicies({
 export type PublicBucketsWithSelectPoliciesData = Awaited<
   ReturnType<typeof getPublicBucketsWithSelectPolicies>
 >
-export type PublicBucketsWithSelectPoliciesError = ResponseError
+export type PublicBucketsWithSelectPoliciesError = StudioError
 
 export const usePublicBucketsWithSelectPoliciesQuery = <
   TData = PublicBucketsWithSelectPoliciesData,

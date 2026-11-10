@@ -7,7 +7,8 @@ import { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionDeleteVariables = {
   projectRef: string
@@ -25,6 +26,8 @@ export async function deleteDatabaseFunction({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'functions-delete',
     sql,
     queryKey: ['functions', 'delete', func.id.toString()],
     grant: unguarded.migrating,
@@ -42,14 +45,14 @@ export const useDatabaseFunctionDeleteMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionDeleteData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionDeleteVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionDeleteData, ResponseError, DatabaseFunctionDeleteVariables>({
+  return useMutation<DatabaseFunctionDeleteData, StudioError, DatabaseFunctionDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

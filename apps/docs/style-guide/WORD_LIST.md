@@ -260,6 +260,10 @@ official product term.
 
 Write _data type_, not _datatype_.
 
+### dedicated pooler
+
+Lowercase. Runs on PgBouncer. Not _Dedicated Pooler_ or _PgBouncer pooler_.
+
 ### deprecate
 
 Use _deprecated_ when use is discouraged, usually because support will end. Don't
@@ -602,6 +606,10 @@ Write _on-premises_, not _on-premise_, _on premise_, or _on prem_.
 
 ## P
 
+### paid plan
+
+Name the lowest plan: _Pro Plan and above_, not _paid plans_.
+
 ### performant
 
 Use a measurable or specific description, such as _lower latency_, _uses less
@@ -702,6 +710,10 @@ Use _setup_ as a noun or adjective and _set up_ as a verb.
 
 - **Recommended**: Complete the setup to set up authentication.
 - **Not recommended**: Setup authentication.
+
+### shared pooler
+
+Lowercase. Runs on Supavisor. Not _Shared Pooler_ or _Supavisor pooler_.
 
 ### sign in and sign-in
 

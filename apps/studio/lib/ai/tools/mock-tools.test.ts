@@ -1,7 +1,9 @@
 import { describe, expect, it, vi } from 'vitest'
 
+import { createTool as createCreateNotebookTool } from './create-notebook.server'
+import { createTool as createDeleteNotebookTool } from './delete-notebook.server'
 import { getMockTools, MOCK_NOTEBOOKS_DATA } from './mock-tools'
-import { getNotebookTools } from './notebook-tools'
+import { createTool as createUpdateNotebookTool } from './update-notebook.server'
 import type { AgentNotebook } from '@/data/content/notebooks/notebook-schema'
 import { createSearchDocsTool } from '@/lib/ai/tools/search-docs-tool'
 import type * as SearchDocsToolModule from '@/lib/ai/tools/search-docs-tool'
@@ -123,7 +125,12 @@ describe('ai/tools/mock-tools getMockTools', () => {
 
     it('overrides needsApproval to false for notebook mutations, unlike the real tools', async () => {
       const mockTools = await getMockTools(undefined)
-      const realTools = getNotebookTools({ aiOptInLevel: 'schema' })
+      const ctx = { aiOptInLevel: 'schema' } as const
+      const realTools = {
+        create_notebook: createCreateNotebookTool(ctx),
+        update_notebook: createUpdateNotebookTool(ctx),
+        delete_notebook: createDeleteNotebookTool(ctx),
+      }
 
       for (const name of ['create_notebook', 'update_notebook', 'delete_notebook'] as const) {
         expect(realTools[name].needsApproval).toBe(true)

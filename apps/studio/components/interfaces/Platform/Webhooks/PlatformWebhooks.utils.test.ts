@@ -1,10 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import type { WebhookDelivery, WebhookEndpoint } from './PlatformWebhooks.types'
+import type { WebhookEndpoint } from './PlatformWebhooks.types'
 import {
-  filterWebhookDeliveries,
   filterWebhookEndpoints,
   getWebhookEndpointDisplayName,
+  isTestDelivery,
 } from './PlatformWebhooks.utils'
 
 const createEndpoint = (overrides: Partial<WebhookEndpoint> = {}): WebhookEndpoint => ({
@@ -16,20 +16,6 @@ const createEndpoint = (overrides: Partial<WebhookEndpoint> = {}): WebhookEndpoi
   customHeaders: [],
   createdBy: 'user@supabase.io',
   createdAt: '2026-03-16T00:00:00.000Z',
-  ...overrides,
-})
-
-const createDelivery = (overrides: Partial<WebhookDelivery> = {}): WebhookDelivery => ({
-  id: 'delivery-1',
-  endpointId: 'endpoint-1',
-  eventId: 'event-1',
-  eventType: 'v1.project.updated',
-  eventPayload: {},
-  status: 'success',
-  responseCode: 200,
-  responseBody: null,
-  responseHeaders: null,
-  attemptAt: '2026-03-16T00:00:00.000Z',
   ...overrides,
 })
 
@@ -67,26 +53,10 @@ describe('PlatformWebhooks.utils', () => {
     expect(filterWebhookEndpoints(endpoints, 'alerts')).toEqual([endpoints[1]])
   })
 
-  it('filters deliveries by event type, status, and response code, sorted newest first', () => {
-    const deliveries = [
-      createDelivery({
-        id: 'a',
-        eventType: 'v1.project.updated',
-        status: 'success',
-        responseCode: 200,
-        attemptAt: '2026-03-16T00:00:00.000Z',
-      }),
-      createDelivery({
-        id: 'b',
-        eventType: 'v1.project.paused',
-        status: 'failure',
-        responseCode: 500,
-        attemptAt: '2026-03-17T00:00:00.000Z',
-      }),
-    ]
-
-    expect(filterWebhookDeliveries(deliveries, '')).toEqual([deliveries[1], deliveries[0]])
-    expect(filterWebhookDeliveries(deliveries, 'paused')).toEqual([deliveries[1]])
-    expect(filterWebhookDeliveries(deliveries, '500')).toEqual([deliveries[1]])
+  it('treats a delivery as a test only when is_test is exactly true', () => {
+    expect(isTestDelivery({ eventPayload: { is_test: true } })).toBe(true)
+    expect(isTestDelivery({ eventPayload: { is_test: false } })).toBe(false)
+    expect(isTestDelivery({ eventPayload: { is_test: 'true' } })).toBe(false)
+    expect(isTestDelivery({ eventPayload: {} })).toBe(false)
   })
 })

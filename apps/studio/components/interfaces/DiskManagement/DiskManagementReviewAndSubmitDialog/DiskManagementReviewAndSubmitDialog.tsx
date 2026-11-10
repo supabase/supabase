@@ -259,7 +259,7 @@ export const DiskManagementReviewAndSubmitDialog = ({
             {numReplicas > 0 && (
               <div className="py-2 text-xs text-foreground-muted">
                 Price change includes primary database and {numReplicas} replica
-                {numReplicas > 1 ? 's' : ''}
+                {numReplicas > 1 ? <span>s</span> : ''}
               </div>
             )}
           </div>

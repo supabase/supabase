@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GetInvolvedIndexesFromSelectQueryVariables = {
   projectRef?: string
@@ -33,6 +34,8 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-explain-query'],
+      sqlOrigin: 'studio',
+      queryName: 'involved-indexes-explain-query',
       sql: safeSql`
         create or replace function pg_temp.explain_query(query text) returns jsonb
         language plpgsql
@@ -116,6 +119,8 @@ export async function getInvolvedIndexesInSelectQuery({
       projectRef,
       connectionString,
       queryKey: ['involved-indexes-names'],
+      sqlOrigin: 'studio',
+      queryName: 'involved-indexes-names',
       sql: safeSql`select schemaname as schema, tablename as table, indexname as name from pg_indexes where indexname in (${joinSqlFragments(involvedIndexes.map(literal), ', ')});`,
       grant: unguarded.migrating,
     })
@@ -129,7 +134,7 @@ export async function getInvolvedIndexesInSelectQuery({
 export type GetInvolvedIndexesFromSelectQueryData = Awaited<
   ReturnType<typeof getInvolvedIndexesInSelectQuery>
 >
-export type GetInvolvedIndexesFromSelectQueryError = ResponseError
+export type GetInvolvedIndexesFromSelectQueryError = StudioError
 
 export const useGetIndexesFromSelectQuery = <TData = GetInvolvedIndexesFromSelectQueryData>(
   { projectRef, connectionString, query }: GetInvolvedIndexesFromSelectQueryVariables,

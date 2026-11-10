@@ -6,7 +6,8 @@ import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueueMessageSendVariables = {
   projectRef: string
@@ -32,6 +33,8 @@ export async function sendDatabaseQueueMessage({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queue-messages-send',
     sql: safeSql`select * from pgmq.send(${literal(queueName)}, ${literal(payload)}, ${literal(delay)})`,
     queryKey: databaseQueuesKeys.create(),
     grant: unguarded.migrating,
@@ -49,18 +52,14 @@ export const useDatabaseQueueMessageSendMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseQueueMessageSendData,
-    ResponseError,
+    StudioError,
     DatabaseQueueMessageSendVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    DatabaseQueueMessageSendData,
-    ResponseError,
-    DatabaseQueueMessageSendVariables
-  >({
+  return useMutation<DatabaseQueueMessageSendData, StudioError, DatabaseQueueMessageSendVariables>({
     mutationFn: (vars) => sendDatabaseQueueMessage(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables

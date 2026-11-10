@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import { splitInternalUrl } from './internal-url'
+import { isAbsoluteUrl, splitInternalUrl } from './internal-url'
 
 describe('splitInternalUrl (compat shim URL splitting)', () => {
   it('splits pathname, search, and hash', () => {
@@ -61,6 +61,14 @@ describe('splitInternalUrl (compat shim URL splitting)', () => {
     })
   })
 
+  it('normalizes any same-origin absolute URL when no basePath is configured', () => {
+    expect(splitInternalUrl(`${window.location.origin}/docs/guides`)).toEqual({
+      to: '/docs/guides',
+      search: undefined,
+      hash: undefined,
+    })
+  })
+
   it('leaves cross-origin and protocol-relative URLs untouched', () => {
     expect(splitInternalUrl('https://supabase.com/docs#install')).toEqual({
       to: 'https://supabase.com/docs#install',
@@ -111,6 +119,41 @@ describe('splitInternalUrl with a configured basePath', () => {
     expect(split('/dashboard-other/x').to).toBe('/dashboard-other/x')
   })
 
+  it('leaves same-origin absolute URLs outside the basePath untouched', async () => {
+    // Next only treats an absolute URL as local when it is same-origin AND
+    // under the basePath. `https://supabase.com/docs` from `/dashboard` must
+    // not become `to: '/docs'` (TanStack would prefix it to `/dashboard/docs`).
+    vi.stubEnv('NEXT_PUBLIC_BASE_PATH', '/dashboard')
+    vi.resetModules()
+    const { splitInternalUrl: split } = await import('./internal-url')
+    const docs = `${window.location.origin}/docs/guides/platform/manage-your-usage/compute#top`
+    expect(split(docs)).toEqual({ to: docs })
+    expect(split(`${window.location.origin}/dashboard-other/x`)).toEqual({
+      to: `${window.location.origin}/dashboard-other/x`,
+    })
+  })
+
+  it('still strips same-origin absolute URLs under the basePath', async () => {
+    vi.stubEnv('NEXT_PUBLIC_BASE_PATH', '/dashboard')
+    vi.resetModules()
+    const { splitInternalUrl: split } = await import('./internal-url')
+    expect(split(`${window.location.origin}/dashboard/project/abc?schema=public`)).toEqual({
+      to: '/project/abc',
+      search: { schema: 'public' },
+      hash: undefined,
+    })
+    expect(split(`${window.location.origin}/dashboard`).to).toBe('/')
+  })
+
+  it('keeps relative inputs outside the basePath internal', async () => {
+    // Relative hrefs are always local in Next; studio code writes them
+    // basepath-relative, so `/docs` here is a studio path, not the docs app.
+    vi.stubEnv('NEXT_PUBLIC_BASE_PATH', '/dashboard')
+    vi.resetModules()
+    const { splitInternalUrl: split } = await import('./internal-url')
+    expect(split('/docs/x').to).toBe('/docs/x')
+  })
+
   it('passes already basepath-relative inputs through unchanged', async () => {
     // The router shim strips origin + basePath *before* splitting, so the
     // input here is already relative. Double-stripping must be a no-op for
@@ -123,5 +166,15 @@ describe('splitInternalUrl with a configured basePath', () => {
       search: { s: 'select 1' },
       hash: undefined,
     })
+  })
+})
+
+describe('isAbsoluteUrl', () => {
+  it('detects URLs that carry their own origin', () => {
+    expect(isAbsoluteUrl('https://supabase.com/docs')).toBe(true)
+    expect(isAbsoluteUrl('mailto:support@supabase.com')).toBe(true)
+    expect(isAbsoluteUrl('//supabase.com/docs')).toBe(true)
+    expect(isAbsoluteUrl('/project/abc')).toBe(false)
+    expect(isAbsoluteUrl('?tab=1')).toBe(false)
   })
 })

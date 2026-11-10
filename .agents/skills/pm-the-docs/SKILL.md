@@ -21,6 +21,7 @@ Backs the Frame and Shape stages of the "Write the docs" checklist (mirrored in 
 - Deciding content type, IA placement, or prerequisites for a page (Shape).
 - Judging whether a launch spans multiple product repos (CLI, Auth, migrations, platform, …) — see [reference/universe-lookup.md](reference/universe-lookup.md).
 - Unsure whether a docs question is self-serve or needs a docs PM's sign-off.
+- Deciding whether a docs change should ship behind a feature flag or A/B test.
 
 **Not for** drafting content itself (see [`write-the-docs`](../write-the-docs/SKILL.md)), restructuring existing pages (see [`edit-the-docs`](../edit-the-docs/SKILL.md)), running snippets (see [`test-the-docs`](../test-the-docs/SKILL.md)), or docs-app architecture/IA placement mechanics (see [`ask-the-docs`](../ask-the-docs/SKILL.md)).
 
@@ -45,6 +46,15 @@ Backs the Frame and Shape stages of the "Write the docs" checklist (mirrored in 
 Self-serve when the checklist is clear, standards exist, and you already know the stage and audience.
 
 Escalate to your docs team's PM when scope or stage is unclear, you need a review path, the bar is ambiguous, or the launch touches cross-cutting surfaces (quickstarts, API keys, tutorials, onboarding, platform concepts) — see the full "Ask the Docs PM" section in the checklist mirror.
+
+A static `enabled-features` flag (show or hide content at build time) needs no PostHog flag and no A/B test. Add it in your PR by following the [enabled-features README](../../../packages/common/enabled-features/README.md). The flag file is shared with Studio and www, so keep changes to docs keys.
+
+Experiment requests (a PostHog flag with A/B testing) depend on Supabase access. Run the [capability gate](reference/universe-lookup.md#capability-gate) first. Use the same `gh api repos/supabase/universe` probe.
+
+- **Supabase org access:** Send the request to Docs Engineering through a DOCS issue in Linear. Docs Engineering creates and wires the PostHog flag, and you work with them to start A/B user testing. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) for the process.
+- **No access (OSS):** Do not tell the user to file a Linear issue or open the Notion page. Suggest the experiment in the PR description or a GitHub issue, and say why the change may need an A/B test. A Supabase team member decides and files the request. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL. Record `feature flags: staff-only (OSS)` in the Frame/Shape summary. This is a valid outcome, not a blocker.
+
+For the code view, see [`ask-the-docs` `reference/feature-flags.md`](../ask-the-docs/reference/feature-flags.md).
 
 ## Related skills
 

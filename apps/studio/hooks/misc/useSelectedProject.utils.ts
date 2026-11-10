@@ -6,7 +6,7 @@ export const ORIOLEDB_PUBLIC_BETA_VERSION = 'supabase-postgres-17.11.0.001-oriol
 
 // Sortable [major, minor, patch, build] key parsed from a dbVersion string like
 // `supabase-postgres-17.11.0.001-orioledb` or `supabase-postgres-arm64-17.11.0.001`.
-const APP_VERSION_KEY_RE = /^supabase-postgres-(?:arm64-|x86_64-)?(\d+)\.(\d+)\.(\d+)\.(\d+)/
+const APP_VERSION_KEY_RE = /^supabase-postgres-(?:[a-z][a-z0-9_]*-)?(\d+)\.(\d+)\.(\d+)\.(\d+)/
 
 export type AppVersionKey = [number, number, number, number]
 

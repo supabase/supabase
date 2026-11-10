@@ -32,7 +32,7 @@ export const ActionCard = (card: {
           {typeof card.description === 'string' ? (
             <pre className="text-xs text-foreground-light font-sans">{card.description}</pre>
           ) : (
-            card.description
+            <span>{card.description}</span>
           )}
         </div>
       </div>

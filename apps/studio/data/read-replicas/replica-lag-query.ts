@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { replicaKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 export type ReplicationLagVariables = {
   id: string
@@ -22,6 +23,8 @@ export async function getReplicationLag(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'replica-lag',
       sql,
       queryKey: ['replica-lag', id],
       grant: unguarded.migrating,
@@ -33,7 +36,7 @@ export async function getReplicationLag(
 }
 
 export type ReplicationLagData = Awaited<ReturnType<typeof getReplicationLag>>
-export type ReplicationLagError = ResponseError
+export type ReplicationLagError = StudioError
 
 export const useReplicationLagQuery = <TData = ReplicationLagData>(
   { projectRef, connectionString, id }: ReplicationLagVariables,

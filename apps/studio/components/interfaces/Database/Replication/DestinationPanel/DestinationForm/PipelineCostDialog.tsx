@@ -123,7 +123,7 @@ export const PipelineCostDialog = ({
                 <p className="text-sm text-foreground-light">
                   This pipeline will replicate{' '}
                   <span className="text-foreground">
-                    {tableCount} {tableCount === 1 ? 'table' : 'tables'}
+                    {tableCount} {tableCount === 1 ? <span>table</span> : <span>tables</span>}
                   </span>
                   {publicationName ? (
                     <>
@@ -135,7 +135,7 @@ export const PipelineCostDialog = ({
                       publication
                     </>
                   ) : null}
-                  .
+                  <span>.</span>
                 </p>
 
                 <div className="flex flex-col gap-y-2">
@@ -180,7 +180,7 @@ export const PipelineCostDialog = ({
                             <TableRow>
                               <TableCell colSpan={3} className="text-xs text-foreground-lighter">
                                 +{hiddenTableCount} more{' '}
-                                {hiddenTableCount === 1 ? 'table' : 'tables'}
+                                {hiddenTableCount === 1 ? <span>table</span> : <span>tables</span>}
                               </TableCell>
                             </TableRow>
                           )}
@@ -252,8 +252,12 @@ export const PipelineCostDialog = ({
                       className="shrink-0 text-right font-mono text-lg font-semibold text-foreground"
                       translate="no"
                     >
-                      {copyEstimate?.isComplete ? formatCurrency(initialSyncTotal) : 'Unavailable'}
-                      {copyEstimate?.isComplete && hasRowFilteredTables ? '*' : null}
+                      {copyEstimate?.isComplete ? (
+                        formatCurrency(initialSyncTotal)
+                      ) : (
+                        <span>Unavailable</span>
+                      )}
+                      {copyEstimate?.isComplete && hasRowFilteredTables ? <span>*</span> : null}
                     </span>
                   </div>
 

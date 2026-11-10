@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { tableRowKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowTruncateVariables = {
   projectRef: string
@@ -29,6 +30,8 @@ export async function truncateTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-truncate',
     sql,
     grant: unguarded.migrating,
   })
@@ -43,12 +46,12 @@ export const useTableRowTruncateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowTruncateData, ResponseError, TableRowTruncateVariables>,
+  UseCustomMutationOptions<TableRowTruncateData, StudioError, TableRowTruncateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<TableRowTruncateData, ResponseError, TableRowTruncateVariables>({
+  return useMutation<TableRowTruncateData, StudioError, TableRowTruncateVariables>({
     mutationFn: (vars) => truncateTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

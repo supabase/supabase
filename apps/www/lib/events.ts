@@ -19,6 +19,8 @@
  */
 import fs from 'fs'
 import path from 'path'
+import * as Sentry from '@sentry/nextjs'
+import type { LumaPayloadEvent, LumaTag } from '~/app/api-v2/luma-events/route'
 import matter from 'gray-matter'
 import { queryDatabase } from 'lib/notion'
 
@@ -183,6 +185,113 @@ export const getNotionEvents = async (): Promise<SupabaseEvent[]> => {
       .filter((e): e is SupabaseEvent => e !== null)
   } catch (error) {
     console.error('Error fetching Notion events:', error)
+    return []
+  }
+}
+
+interface LumaResponse {
+  entries: { event: LumaPayloadEvent; tags?: (string | LumaTag)[] }[]
+  has_more: boolean
+  next_cursor?: string
+}
+
+export async function fetchLumaCalendar(
+  apiKey: string,
+  after: string | null,
+  before: string | null
+) {
+  const lumaUrl = new URL('https://public-api.lu.ma/public/v1/calendar/list-events')
+  if (after) lumaUrl.searchParams.append('after', after)
+  if (before) lumaUrl.searchParams.append('before', before)
+
+  const response = await fetch(lumaUrl.toString(), {
+    method: 'GET',
+    headers: {
+      accept: 'application/json',
+      'x-luma-api-key': apiKey,
+    },
+    signal: AbortSignal.timeout(10_000),
+  })
+
+  if (!response.ok) {
+    throw new Error(`Luma API error: ${response.status} ${response.statusText}`)
+  }
+
+  const data: LumaResponse = await response.json()
+
+  return data.entries
+    .filter(({ event }) => event.visibility === 'public')
+    .map(({ event, tags }) => ({
+      id: event.api_id,
+      tags: (tags ?? [])
+        .map((tag) => (typeof tag === 'string' ? tag : tag?.name))
+        .filter((name): name is string => Boolean(name)),
+      start_at: event.start_at,
+      end_at: event.end_at,
+      name: event.name,
+      city: event.geo_address_json?.city,
+      country: event.geo_address_json?.country,
+      url: event.url,
+      timezone: event.timezone,
+      cover_url: event.cover_url,
+      description: event.description,
+      hosts: event.hosts || [],
+    }))
+}
+
+// Maps Luma event tags to the app's category vocabulary. Keys are lowercased
+// for case-insensitive matching against the tag names returned by Luma.
+const LUMA_TAG_CATEGORY_MAP: Record<string, string> = {
+  hackathons: 'hackathon',
+  meetups: 'meetup',
+  events: 'conference',
+}
+
+export const getLumaEvents = async (): Promise<SupabaseEvent[]> => {
+  const apiKey = process.env.LUMA_API_KEY
+
+  if (!apiKey) {
+    console.error('LUMA_API_KEY is not set')
+    return []
+  }
+
+  try {
+    const lumaEvents = await fetchLumaCalendar(apiKey, new Date().toISOString(), null)
+
+    return lumaEvents.map((event): SupabaseEvent => {
+      const mappedCategories = event.tags
+        .map((tag) => LUMA_TAG_CATEGORY_MAP[tag.trim().toLowerCase()])
+        .filter(Boolean)
+      const categories =
+        mappedCategories.length > 0 ? Array.from(new Set(mappedCategories)) : ['conference']
+      const safeUrl = isSafeHttpUrl(event.url) ? event.url : undefined
+
+      return {
+        slug: '',
+        type: 'event',
+        title: event.name || '',
+        date: event.start_at || '',
+        description: event.description || '',
+        thumb: '',
+        cover_url: event.cover_url || '',
+        path: '',
+        url: safeUrl ?? '',
+        tags: categories,
+        categories,
+        timezone: event.timezone || 'America/Los_Angeles',
+        location: new Intl.ListFormat('en', { style: 'narrow', type: 'unit' }).format(
+          [event.city, event.country].filter(Boolean)
+        ),
+        // All Luma events are Supabase-hosted regardless of which calendar they're from.
+        hosts: [SUPABASE_HOST],
+        source: 'luma',
+        disable_page_build: true,
+        link: safeUrl ? { href: safeUrl, target: '_blank' } : undefined,
+      }
+    })
+  } catch (error) {
+    Sentry.captureException(error)
+    console.error('Error fetching Luma events:', error)
     return []
   }
 }
