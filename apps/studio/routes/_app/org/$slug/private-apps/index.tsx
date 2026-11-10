@@ -1,8 +1,34 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PlusIcon } from 'lucide-react'
+import { useState } from 'react'
+import { Button } from 'ui'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import {
+  PageHeader,
+  PageHeaderDescription,
+  PageHeaderMeta,
+  PageHeaderSummary,
+  PageHeaderTitle,
+} from 'ui-patterns/PageHeader'
+import {
+  PageSection,
+  PageSectionAside,
+  PageSectionContent,
+  PageSectionDescription,
+  PageSectionMeta,
+  PageSectionSummary,
+  PageSectionTitle,
+} from 'ui-patterns/PageSection'
 
-import { PrivateAppsProvider } from '@/components/interfaces/Organization/PrivateApps/PrivateAppsContext'
+import { AppsList } from '@/components/interfaces/Organization/PrivateApps/Apps/AppsList/AppsList'
+import { CreateAppSheet } from '@/components/interfaces/Organization/PrivateApps/Apps/CreateAppSheet/CreateAppSheet'
+import {
+  PrivateAppsProvider,
+  usePrivateApps,
+} from '@/components/interfaces/Organization/PrivateApps/PrivateAppsContext'
 import { OrganizationSettingsLayout } from '@/components/layouts/ProjectLayout/OrganizationSettingsLayout'
-import PrivateAppsPage from '@/pages/org/[slug]/private-apps/index'
+import { Shortcut } from '@/components/ui/Shortcut'
+import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 export const Route = createFileRoute('/_app/org/$slug/private-apps/')({
   component: OrgPrivateApps,
@@ -15,8 +41,75 @@ function OrgPrivateApps() {
   return (
     <OrganizationSettingsLayout>
       <PrivateAppsProvider>
-        <PrivateAppsPage dehydratedState={undefined} />
+        <PrivateAppsPage />
       </PrivateAppsProvider>
     </OrganizationSettingsLayout>
   )
+}
+
+function PrivateAppsContent() {
+  const { apps, isLoading } = usePrivateApps()
+  const [showCreate, setShowCreate] = useState(false)
+
+  return (
+    <>
+      <PageHeader size="default">
+        <PageHeaderMeta>
+          <PageHeaderSummary>
+            <PageHeaderTitle>Private Apps</PageHeaderTitle>
+            <PageHeaderDescription>
+              Create private apps to generate scoped access tokens for your organization
+            </PageHeaderDescription>
+          </PageHeaderSummary>
+        </PageHeaderMeta>
+      </PageHeader>
+
+      <PageContainer size="default" className="pb-16">
+        <PageSection id="apps">
+          <PageSectionMeta>
+            <PageSectionSummary>
+              <PageSectionTitle>Apps</PageSectionTitle>
+              <PageSectionDescription>
+                Registered private apps and their credentials
+              </PageSectionDescription>
+            </PageSectionSummary>
+            {!isLoading && apps.length > 0 && (
+              <PageSectionAside>
+                <Shortcut
+                  id={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+                  onTrigger={() => setShowCreate(true)}
+                  side="bottom"
+                  tooltipOpen={showCreate ? false : undefined}
+                >
+                  <Button
+                    variant="primary"
+                    icon={<PlusIcon size={14} />}
+                    onClick={() => setShowCreate(true)}
+                  >
+                    Create app
+                  </Button>
+                </Shortcut>
+              </PageSectionAside>
+            )}
+          </PageSectionMeta>
+          <PageSectionContent>
+            <AppsList
+              onCreateApp={() => setShowCreate(true)}
+              createShortcutId={SHORTCUT_IDS.ORG_PRIVATE_APPS_CREATE}
+            />
+          </PageSectionContent>
+        </PageSection>
+      </PageContainer>
+
+      <CreateAppSheet
+        visible={showCreate}
+        onClose={() => setShowCreate(false)}
+        onCreated={() => setShowCreate(false)}
+      />
+    </>
+  )
+}
+
+function PrivateAppsPage() {
+  return <PrivateAppsContent />
 }
