@@ -11,12 +11,17 @@ To get started copy the example env file using `cp .env.local.example .env.local
 Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the repository
 root. Vercel uses the app's `build` script by default.
 
-`prebuild` refreshes remote content before Turbo hashes it. Turbo caches
-`build:next` (Next.js, sitemaps, and the customer RSS feed). The outer `build`
-task stays uncached so content preparation can't be skipped.
+`build` is a Turbo task (`maybe-turbo` makes `pnpm build` run it through Turbo), and
+`turbo.jsonc` declares what runs before it: `docs#build:guides-markdown` (which
+fetches the federated docs guides) and `content:build` (which refreshes the
+changelog, GitHub stars, RSS feeds and agent-skills index). The remote fetches
+aren't cached, so content is refreshed on every build. Turbo hashes the files they
+write after they finish and caches the `build` output (Next.js, sitemaps, and the
+customer RSS feed).
 
 Production cache reuse requires the same commit and inputs, including
-`VERCEL_GIT_COMMIT_SHA`. Running `build:next` directly skips content preparation.
+`VERCEL_GIT_COMMIT_SHA`. `pnpm typecheck` and `pnpm dev` run `content:build:core`
+first in the same way.
 
 Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
 artifact restoration using real pnpm and Turbo with fixture generators and a
