@@ -46,16 +46,15 @@ const defaultValues: OnboardingSurveyFollowUpValues = {
 type OnboardingSurveyFollowUpDialogProps = {
   open: boolean
   isSubmitting: boolean
-  onOpenChange: (open: boolean) => void
-  onSkip: () => void
+  /** Skip, or the dialog closing any other way */
+  onClose: () => void
   onSubmit: (values: OnboardingSurveyFollowUpValues) => void
 }
 
 export function OnboardingSurveyFollowUpDialog({
   open,
   isSubmitting,
-  onOpenChange,
-  onSkip,
+  onClose,
   onSubmit,
 }: OnboardingSurveyFollowUpDialogProps) {
   const form = useForm<OnboardingSurveyFollowUpValues>({
@@ -70,7 +69,7 @@ export function OnboardingSurveyFollowUpDialog({
   const hasAnswer = kind !== '' || building !== ''
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>Tell us about your organization</DialogTitle>
@@ -161,7 +160,7 @@ export function OnboardingSurveyFollowUpDialog({
         </Form>
 
         <DialogFooter className="px-5 py-4">
-          <Button variant="default" disabled={isSubmitting} onClick={onSkip}>
+          <Button variant="default" disabled={isSubmitting} onClick={onClose}>
             Skip
           </Button>
           <Button form={FORM_ID} type="submit" loading={isSubmitting} disabled={!hasAnswer}>

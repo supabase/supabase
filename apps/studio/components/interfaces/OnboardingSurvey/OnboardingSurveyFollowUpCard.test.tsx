@@ -1,4 +1,4 @@
-import { act, fireEvent, screen, waitFor } from '@testing-library/react'
+import { act, fireEvent, screen, waitFor, within } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { delay, HttpResponse } from 'msw'
@@ -151,5 +151,33 @@ describe('OnboardingSurveyFollowUpCard', () => {
     })
     expect(requests).toHaveLength(1)
     expect(screen.queryByRole('button', { name: 'Skip' })).toBeNull()
+  })
+
+  it('defers the expiry save while the dialog is open, then saves once on close', async () => {
+    markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'COMPANY', size: '10' })
+    const requests = mockSurveyEndpoint(204)
+
+    renderCard()
+    fireEvent.click(await screen.findByRole('button', { name: 'Answer' }))
+    const dialog = await screen.findByRole('dialog')
+
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS)
+    })
+    expect(requests).toHaveLength(0)
+    expect(readStoredState()).toMatchObject({ status: 'pending' })
+
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Skip' }))
+
+    await waitFor(() => expect(requests).toEqual([{ slug: ORG_SLUG, kind: 'COMPANY', size: '10' }]))
+    expect(readStoredState()).toMatchObject({ status: 'dismissed' })
+    expect(track).toHaveBeenCalledWith('onboarding_survey_dismissed', {
+      surface: 'follow_up',
+      reason: 'follow_up_closed',
+    })
+    expect(track).not.toHaveBeenCalledWith('onboarding_survey_dismissed', {
+      surface: 'follow_up',
+      reason: 'follow_up_expired',
+    })
   })
 })

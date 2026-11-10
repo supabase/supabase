@@ -81,11 +81,7 @@ export function OnboardingSurveyFollowUpCard() {
       isDismissed: false,
       priority: 1,
       content: (
-        <BannerCard
-          onDismiss={() => {
-            skipFollowUp('follow_up_skip')
-          }}
-        >
+        <BannerCard onDismiss={() => skipFollowUp('follow_up_skip')}>
           <div className="flex flex-col gap-y-4">
             <div className="flex flex-col gap-y-1 mb-2">
               <p className="text-sm font-medium">Help improve Supabase</p>
@@ -104,13 +100,7 @@ export function OnboardingSurveyFollowUpCard() {
               >
                 Answer
               </Button>
-              <Button
-                variant="default"
-                size="tiny"
-                onClick={() => {
-                  skipFollowUp('follow_up_skip')
-                }}
-              >
+              <Button variant="default" size="tiny" onClick={() => skipFollowUp('follow_up_skip')}>
                 Skip
               </Button>
             </div>
@@ -122,7 +112,7 @@ export function OnboardingSurveyFollowUpCard() {
     return () => dismissBanner(BANNER_ID.ONBOARDING_SURVEY_FOLLOW_UP)
   }, [addBanner, dismissBanner, orgSlug, shouldShowCard, skipFollowUp, track])
 
-  const handleDialogDismiss = () => {
+  const handleDialogClose = () => {
     if (isSubmitting) return
     setDialogOrgSlug(undefined)
     skipFollowUp('follow_up_closed')
@@ -131,9 +121,10 @@ export function OnboardingSurveyFollowUpCard() {
   const handleSubmit = ({ kind, size, building }: OnboardingSurveyFollowUpValues) => {
     if (!orgSlug) return
 
-    // Unanswered here, the org keeps the type picked on the new-org form
+    // Unanswered here, the org keeps the type and size picked on the new-org form
     const answeredKind = kind || orgKind
-    const answeredSize = kind ? (kind === 'COMPANY' ? size : undefined) : orgSize
+    const companySize = kind === 'COMPANY' ? size : undefined
+    const answeredSize = kind ? companySize : orgSize
 
     const surveyProperties = {
       surface: 'follow_up' as const,
@@ -168,10 +159,7 @@ export function OnboardingSurveyFollowUpCard() {
       key={orgSlug}
       open={isDialogOpen}
       isSubmitting={isSubmitting}
-      onOpenChange={(open) => {
-        if (!open) handleDialogDismiss()
-      }}
-      onSkip={handleDialogDismiss}
+      onClose={handleDialogClose}
       onSubmit={handleSubmit}
     />
   )
