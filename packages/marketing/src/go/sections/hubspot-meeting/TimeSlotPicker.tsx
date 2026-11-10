@@ -126,7 +126,7 @@ function ScrollFadeList({ children }: { children: React.ReactNode }) {
 
   const onRef = useCallback(
     (el: HTMLDivElement | null) => {
-      ;(ref as React.MutableRefObject<HTMLDivElement | null>).current = el
+      ref.current = el
       if (el) {
         updateFades()
       }
