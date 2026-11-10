@@ -47,7 +47,6 @@ import { getArchivedObjectsUnderFolder } from './archivedOverlay.utils'
 import { useFileExplorerContextMenu } from './FileExplorerRowContextMenu'
 import { FileExplorerRowEditing } from './FileExplorerRowEditing'
 import { pickFile } from './pickFile'
-import { PurgeBucketObjectCDNCacheModal } from './PurgeBucketObjectCDNCacheModal'
 import {
   copyStorageExplorerUrl,
   copyStoragePath,
@@ -56,6 +55,7 @@ import {
 import { useStorageExplorerNavigation } from './StorageExplorerNavigation'
 import { useCopyUrl } from './useCopyUrl'
 import { useIsStorageVersioningEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { PurgeBucketObjectCDNCacheModal } from '@/components/interfaces/Storage/FilesBuckets/PurgeBucketObjectCDNCacheModal'
 import { useArchivedObjectRestoreMutation } from '@/data/storage/versioning/archived-object-restore-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
