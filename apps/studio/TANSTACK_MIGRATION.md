@@ -330,30 +330,30 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/integrations/*`
 
-- [x] `routes/project/$ref/integrations/index.tsx` ← `pages/project/[ref]/integrations/index.tsx`
-- [x] `routes/project/$ref/integrations/$id/index.tsx` ← `pages/project/[ref]/integrations/[id]/index.tsx`
-- [x] `routes/project/$ref/integrations/$id/$pageId/index.tsx` ← `pages/project/[ref]/integrations/[id]/[pageId]/index.tsx`
-- [x] `routes/project/$ref/integrations/$id/$pageId/$childId/index.tsx` ← `pages/project/[ref]/integrations/[id]/[pageId]/[childId]/index.tsx`
+- [x] A→done `routes/project/$ref/integrations/index.tsx` ← `pages/project/[ref]/integrations/index.tsx`
+- [x] A→done `routes/project/$ref/integrations/$id/index.tsx` ← `pages/project/[ref]/integrations/[id]/index.tsx`
+- [x] A→done `routes/project/$ref/integrations/$id/$pageId/index.tsx` ← `pages/project/[ref]/integrations/[id]/[pageId]/index.tsx`
+- [x] A→done `routes/project/$ref/integrations/$id/$pageId/$childId/index.tsx` ← `pages/project/[ref]/integrations/[id]/[pageId]/[childId]/index.tsx`
 
 ### Project shell — `/sql/*`
 
-- [x] A `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
-- [x] A `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
-- [x] A `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
-- [x] A `routes/project/$ref/sql/examples.tsx` ← `pages/project/[ref]/sql/examples.tsx`
+- [x] A→done `routes/project/$ref/sql/index.tsx` ← `pages/project/[ref]/sql/index.tsx`
+- [x] A→done `routes/project/$ref/sql/$id.tsx` ← `pages/project/[ref]/sql/[id].tsx`
+- [x] A→done `routes/project/$ref/sql/templates.tsx` ← `pages/project/[ref]/sql/templates.tsx`
+- [x] A→done `routes/project/$ref/sql/examples.tsx` ← `pages/project/[ref]/sql/examples.tsx`
 
 ### Project shell — `/editor/*`
 
-- [x] A `routes/project/$ref/editor/index.tsx` ← `pages/project/[ref]/editor/index.tsx`
-- [x] A `routes/project/$ref/editor/$id.tsx` ← `pages/project/[ref]/editor/[id].tsx`
-- [x] A `routes/project/$ref/editor/new.tsx` ← `pages/project/[ref]/editor/new.tsx`
+- [x] A→done `routes/project/$ref/editor/index.tsx` ← `pages/project/[ref]/editor/index.tsx`
+- [x] A→done `routes/project/$ref/editor/$id.tsx` ← `pages/project/[ref]/editor/[id].tsx`
+- [x] A→done `routes/project/$ref/editor/new.tsx` ← `pages/project/[ref]/editor/new.tsx`
 
 ### Project shell — `/explorer/*`
 
-- [x] A `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
-- [x] A `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
-- [x] A `routes/project/$ref/explorer/chat/$id.tsx` ← `pages/project/[ref]/explorer/chat/[id].tsx`
-- [x] A `routes/project/$ref/explorer/query/$id.tsx` ← `pages/project/[ref]/explorer/query/[id].tsx`
+- [x] A→done `routes/project/$ref/explorer/index.tsx` ← `pages/project/[ref]/explorer/index.tsx`
+- [x] A→done `routes/project/$ref/explorer/notebook/$id.tsx` ← `pages/project/[ref]/explorer/notebook/[id].tsx`
+- [x] A→done `routes/project/$ref/explorer/chat/$id.tsx` ← `pages/project/[ref]/explorer/chat/[id].tsx`
+- [x] A→done `routes/project/$ref/explorer/query/$id.tsx` ← `pages/project/[ref]/explorer/query/[id].tsx`
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 

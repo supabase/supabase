@@ -1,12 +1,8 @@
 import { screen } from '@testing-library/react'
-import mockRouter from 'next-router-mock'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import ProjectExplorerPage from '@/pages/project/[ref]/explorer/index'
-import { customRender } from '@/tests/lib/custom-render'
-
-// `common`'s useParams and `next/router` are globally mocked in vitestSetup.ts
-// to `{ ref: 'default' }` and `next-router-mock` respectively.
+import { Route } from '@/routes/project/$ref/explorer/index'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const mocks = vi.hoisted(() => ({
   activatePinnedTab: vi.fn(),
@@ -54,120 +50,130 @@ const mockHistory = (explorer?: { type: 'notebook' | 'query' | 'chat'; id: strin
   })
 }
 
-describe('ProjectExplorerPage', () => {
+const renderExplorer = () =>
+  renderRoute(Route, { routeId: '/project/$ref/explorer/', url: '/project/default/explorer' })
+
+describe('/project/$ref/explorer', () => {
   beforeEach(() => {
     vi.clearAllMocks()
-    mockRouter.setCurrentUrl('/project/default/explorer')
-    vi.spyOn(mockRouter, 'replace')
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: false, isLoading: false })
     mocks.assistantSnapshot.mockReturnValue({ isInitialized: true, chats: {} })
   })
 
-  it('shows the checking state until dashboard history has loaded', () => {
+  it('shows the checking state until dashboard history has loaded', async () => {
     mocks.useDashboardHistory.mockReturnValue({
       history: {},
       isHistoryLoaded: false,
       setLastVisitedExplorerTab: mocks.setLastVisitedExplorerTab,
     })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    await renderExplorer()
 
     expect(mocks.activatePinnedTab).not.toHaveBeenCalled()
     expect(screen.getByText('Checking last tab')).toBeInTheDocument()
   })
 
-  it('activates the Home tab when there is no last visited Explorer tab', () => {
+  it('activates the Home tab when there is no last visited Explorer tab', async () => {
     mockHistory(undefined)
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
     expect(mocks.activatePinnedTab).toHaveBeenCalled()
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(screen.getByText('Explorer home')).toBeInTheDocument()
   })
 
-  it('redirects to the last visited query tab when its draft still exists', () => {
+  it('redirects to the last visited query tab when its draft still exists', async () => {
     mocks.restoreDraft.mockReturnValue(true)
     mockHistory({ type: 'query', id: 'query-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
     expect(mocks.restoreDraft).toHaveBeenCalledWith({ id: 'query-1', projectRef: 'default' })
-    expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/query/query-1')
+    await vi.waitFor(() =>
+      expect(router.state.location.pathname).toBe('/project/default/explorer/query/query-1')
+    )
+    expect(router.history.length).toBe(1)
     expect(mocks.activatePinnedTab).not.toHaveBeenCalled()
   })
 
-  it('falls back to Home and forgets the entry when the query draft is gone', () => {
+  it('falls back to Home and forgets the entry when the query draft is gone', async () => {
     mocks.restoreDraft.mockReturnValue(false)
     mockHistory({ type: 'query', id: 'query-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
     expect(mocks.activatePinnedTab).toHaveBeenCalled()
   })
 
-  it('redirects to the last visited chat tab when the chat still exists', () => {
+  it('redirects to the last visited chat tab when the chat still exists', async () => {
     mocks.assistantSnapshot.mockReturnValue({
       isInitialized: true,
       chats: { 'chat-1': { id: 'chat-1', name: 'Investigate' } },
     })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/chat/chat-1')
+    await vi.waitFor(() =>
+      expect(router.state.location.pathname).toBe('/project/default/explorer/chat/chat-1')
+    )
+    expect(router.history.length).toBe(1)
   })
 
-  it('waits for chat hydration before deciding', () => {
+  it('waits for chat hydration before deciding', async () => {
     mocks.assistantSnapshot.mockReturnValue({ isInitialized: false, chats: {} })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(mocks.activatePinnedTab).not.toHaveBeenCalled()
     expect(screen.getByText('Checking last tab')).toBeInTheDocument()
   })
 
-  it('falls back to Home when the last visited chat was deleted', () => {
+  it('falls back to Home when the last visited chat was deleted', async () => {
     mocks.assistantSnapshot.mockReturnValue({ isInitialized: true, chats: {} })
     mockHistory({ type: 'chat', id: 'chat-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
     expect(mocks.activatePinnedTab).toHaveBeenCalled()
   })
 
-  it('shows the checking state while the last visited notebook is still loading', () => {
+  it('shows the checking state while the last visited notebook is still loading', async () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: false, isLoading: true })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(screen.getByText('Checking last tab')).toBeInTheDocument()
   })
 
-  it('redirects to the last visited notebook once it is confirmed to exist', () => {
+  it('redirects to the last visited notebook once it is confirmed to exist', async () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: false, isLoading: false })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).toHaveBeenCalledWith('/project/default/explorer/notebook/notebook-1')
+    await vi.waitFor(() =>
+      expect(router.state.location.pathname).toBe('/project/default/explorer/notebook/notebook-1')
+    )
+    expect(router.history.length).toBe(1)
   })
 
-  it('falls back to Home when the last visited notebook no longer exists', () => {
+  it('falls back to Home when the last visited notebook no longer exists', async () => {
     mocks.useLoadNotebook.mockReturnValue({ isNotFound: true, isLoading: false })
     mockHistory({ type: 'notebook', id: 'notebook-1' })
 
-    customRender(<ProjectExplorerPage dehydratedState={undefined} />)
+    const { router } = await renderExplorer()
 
-    expect(mockRouter.replace).not.toHaveBeenCalled()
+    expect(router.history.location.pathname).toBe('/project/default/explorer')
     expect(mocks.setLastVisitedExplorerTab).toHaveBeenCalledWith(undefined)
     expect(mocks.activatePinnedTab).toHaveBeenCalled()
   })
