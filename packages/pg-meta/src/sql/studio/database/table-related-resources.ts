@@ -33,6 +33,16 @@ export type TableRelatedTrigger = {
   schema: string
 }
 
+export type TableRelatedIndex = {
+  id: number
+  name: string
+  schema: string
+  /** Covered columns in index order; an expression column reads `(expression)`. */
+  columns: string[]
+  is_primary: boolean
+  is_unique: boolean
+}
+
 export type TableRelatedFunction = {
   id: number
   schema: string
@@ -44,6 +54,7 @@ export type TableRelatedFunction = {
 export type TableRelatedResourcesResult = {
   policies: TableRelatedPolicy[]
   triggers: TableRelatedTrigger[]
+  indexes: TableRelatedIndex[]
 }
 
 export type TableReferencingFunctionsResult = {
@@ -64,7 +75,8 @@ const targetTable = ({ schema, name }: TableArgs) => safeSql`target_table as (
     )`
 
 /**
- * Policies and triggers of one table, for the command menu's "Related resources".
+ * Policies, triggers and indexes of one table, for the command menu's
+ * "Related resources". All three are index probes keyed by the table's oid.
  *
  * Kept apart from functions (see `getTableReferencingFunctionsSql`) because
  * those are far slower to find, and this half should render immediately.
@@ -88,6 +100,27 @@ export const getTableRelatedResourcesSql = ({
       where not t.tgisinternal
         and ${hasTableAccess(safeSql`tt.oid`, safeSql`tt.relowner`, { includeSelect: false })}
       order by t.tgname
+      limit ${literal(RELATED_LIMIT)}
+    ),
+    table_indexes as (
+      select
+        i.indexrelid as oid,
+        ic.relname,
+        i.indisprimary,
+        i.indisunique,
+        tt.nspname,
+        -- Columns in index order. indkey holds 0 for an expression, which has
+        -- no pg_attribute row, so those come back as (expression).
+        (
+          select array_agg(coalesce(a.attname, '(expression)') order by k.ord)
+          from unnest(i.indkey) with ordinality as k(attnum, ord)
+          left join pg_attribute a on a.attrelid = tt.oid and a.attnum = k.attnum
+        ) as columns
+      from target_table tt
+      join pg_index i on i.indrelid = tt.oid
+      join pg_class ic on ic.oid = i.indexrelid
+      where i.indislive
+      order by ic.relname
       limit ${literal(RELATED_LIMIT)}
     )
     select
@@ -127,7 +160,25 @@ export const getTableRelatedResourcesSql = ({
           from table_triggers t
         ),
         '[]'::jsonb
-      ) as triggers
+      ) as triggers,
+      coalesce(
+        (
+          select jsonb_agg(
+            jsonb_build_object(
+              'id', i.oid::int8,
+              'name', i.relname,
+              'schema', i.nspname,
+              -- array_agg yields null for an index with no key columns
+              'columns', coalesce(to_jsonb(i.columns), '[]'::jsonb),
+              'is_primary', i.indisprimary,
+              'is_unique', i.indisunique
+            )
+            order by i.relname
+          )
+          from table_indexes i
+        ),
+        '[]'::jsonb
+      ) as indexes
   `
 
 /**
