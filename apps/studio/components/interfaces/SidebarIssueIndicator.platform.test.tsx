@@ -1,6 +1,8 @@
 import { QueryClient } from '@tanstack/react-query'
 import { screen, waitFor } from '@testing-library/react'
+import type { components } from 'api-types'
 import { FeatureFlagContext } from 'common'
+import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { SidebarIssueIndicator } from './SidebarIssueIndicator'
@@ -30,8 +32,10 @@ const makeLint = (category: Lint['categories'][number], level: Lint['level']): L
   cache_key: 'finding',
 })
 
-function renderIndicator(routeKey: 'issues' | 'advisors' = 'issues') {
-  const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+function renderIndicator(
+  routeKey: 'issues' | 'advisors' = 'issues',
+  queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+) {
   customRender(
     <FeatureFlagContext.Provider value={{ configcat: { healthAdvisor: true }, posthog: {} }}>
       <a href={`/project/default/${routeKey}`}>
@@ -90,24 +94,35 @@ describe('sidebar issue indicator', () => {
     })
     renderIndicator()
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Warning issues')
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
+    await waitFor(() => expect(screen.getByRole('status')).toHaveTextContent('Warning issues'))
     expect(screen.getByRole('link', { name: 'Issues Warning issues' })).toHaveAttribute(
       'href',
       '/project/default/issues'
     )
   })
 
-  it('announces health-only critical issues on the Issues link', async () => {
+  it('announces cached health issues without running on-demand health checks', async () => {
+    let healthRequests = 0
     addAPIMock({
       method: 'post',
       path: '/v2/projects/:ref/advisors/run',
-      response: {
-        data: { type: 'project_advisors', attributes: { lints: [makeLint('HEALTH', 'ERROR')] } },
+      response: () => {
+        healthRequests += 1
+        return HttpResponse.json<components['schemas']['V2ProjectAdvisorsResponse_Output']>({
+          data: { type: 'project_advisors', attributes: { lints: [] } },
+        })
       },
     })
-    renderIndicator()
+    const queryClient = new QueryClient({ defaultOptions: { queries: { retry: false } } })
+    queryClient.setQueryData(lintKeys.healthLints('default'), [makeLint('HEALTH', 'ERROR')], {
+      updatedAt: 1,
+    })
+    renderIndicator('issues', queryClient)
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
 
-    expect(await screen.findByRole('status')).toHaveTextContent('Critical issues')
+    expect(healthRequests).toBe(0)
+    expect(screen.getByRole('status')).toHaveTextContent('Critical issues')
     expect(screen.getByRole('link', { name: 'Issues Critical issues' })).toBeInTheDocument()
   })
 
@@ -121,7 +136,7 @@ describe('sidebar issue indicator', () => {
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
 
     expect(screen.getByRole('link', { name: 'Issues' })).toBeInTheDocument()
-    expect(screen.queryByRole('status')).not.toBeInTheDocument()
+    expect(screen.getByRole('status')).toBeEmptyDOMElement()
   })
 
   it('keeps Advisors on legacy lint checks without requesting Issues health or signal checks', async () => {

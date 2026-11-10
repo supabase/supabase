@@ -12,23 +12,19 @@ export const SidebarIssueIndicator = ({ routeKey }: { routeKey: 'issues' | 'advi
 
 const IssuesIndicator = () => {
   const { ref } = useParams()
-  const { issues } = useProjectIssues({ projectRef: ref })
+  const { issues } = useProjectIssues({ projectRef: ref, runHealthChecks: false })
   const hasErrors = issues.some((issue) => issue.severity === 'critical')
   const hasWarnings = issues.some((issue) => issue.severity === 'warning')
+  let status = ''
+  if (hasErrors) status = 'Critical issues'
+  else if (hasWarnings) status = 'Warning issues'
 
   return (
     <>
       <ActiveDot hasErrors={hasErrors} hasWarnings={hasWarnings} />
-      {hasErrors && (
-        <span className="sr-only" role="status">
-          Critical issues
-        </span>
-      )}
-      {!hasErrors && hasWarnings && (
-        <span className="sr-only" role="status">
-          Warning issues
-        </span>
-      )}
+      <span className="sr-only" role="status">
+        {status}
+      </span>
     </>
   )
 }
