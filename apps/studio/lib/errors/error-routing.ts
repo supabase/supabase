@@ -50,7 +50,7 @@ export const ERROR_ROUTING = {
     user: { sentrySampleRate: SAMPLE_USER_FAULT }, // reason `offline`
     platform: { sentrySampleRate: SAMPLE_OTHER },
   },
-  MalformedResponse: { platform: { sentrySampleRate: SAMPLE_OTHER } },
+  MalformedResponse: { platform: { sentrySampleRate: SAMPLE_ALWAYS } },
   PlatformError: { platform: { sentrySampleRate: SAMPLE_OTHER } },
   UnclassifiedApiError: { studio: { sentrySampleRate: SAMPLE_OWNED } },
   DbConnectionTimeout: { platform: { sentrySampleRate: SAMPLE_OTHER } },
