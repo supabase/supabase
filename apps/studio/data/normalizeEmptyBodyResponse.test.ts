@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
+vi.mock('@sentry/react', () => ({ captureException: vi.fn() }))
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
 vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost' }))
 vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))

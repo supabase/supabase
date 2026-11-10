@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { IS_PLATFORM } from 'common'
 
 import { uuidv4 } from '@/lib/helpers'

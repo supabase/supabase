@@ -1,5 +1,5 @@
 import { getMultipartBoundary, parseMultipartStream } from '@mjackson/multipart-parser'
-import * as Sentry from '@sentry/nextjs'
+import * as Sentry from '@sentry/react'
 import { useQuery } from '@tanstack/react-query'
 
 import { edgeFunctionsKeys } from './keys'

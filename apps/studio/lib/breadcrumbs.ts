@@ -1,4 +1,4 @@
-import type * as Sentry from '@sentry/nextjs'
+import type * as Sentry from '@sentry/react'
 
 import { RingBuffer } from './ringBuffer'
 
