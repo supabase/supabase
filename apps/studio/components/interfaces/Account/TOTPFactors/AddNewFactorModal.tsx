@@ -11,6 +11,7 @@ import {
   DialogFooter,
   DialogHeader,
   DialogSection,
+  DialogSectionSeparator,
   DialogTitle,
   Form,
   FormControl,
@@ -124,6 +125,7 @@ export const AddNewFactorModal = ({
           handleClose()
         }}
       />
+
       <RecoveryCodesModal
         open={isRecoveryCodesModalOpen}
         onOpenChange={(open) => {
@@ -133,11 +135,13 @@ export const AddNewFactorModal = ({
         }}
         mutation={recoveryCodesGenerateMutation}
       />
-      <Dialog open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
+
+      <Dialog open open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
         <DialogContent size="small" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Add another MFA method?</DialogTitle>
           </DialogHeader>
+          <DialogSectionSeparator />
           <DialogSection>
             <p className="text-sm text-foreground-light">
               Your recovery codes are saved. Set up another authenticator app on a different device
