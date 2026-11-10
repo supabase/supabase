@@ -10,12 +10,12 @@ export const OrganizationDeletePanel = () => {
 
   return selectedOrganization?.managed_by !== 'vercel-marketplace' ? (
     <Admonition
-      type="danger"
+      type="destructive"
       title="Deleting this organization will also remove its projects"
-      description="Make sure you have made a backup of your projects if you want to keep your data."
-      actions={<DeleteOrganizationButton />}
-      layout="responsive"
-    />
+      description="Make sure you have made a backup of your projects if you want to keep your data"
+    >
+      <DeleteOrganizationButton />
+    </Admonition>
   ) : (
     <PartnerManagedResource
       managedBy={MANAGED_BY.VERCEL_MARKETPLACE}

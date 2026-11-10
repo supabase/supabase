@@ -95,6 +95,7 @@ describe('DeleteAccountButton', () => {
     await user.click(screen.getByRole('button', { name: 'Request deletion' }))
     const dialog = within(await screen.findByRole('dialog', { name: 'Request account deletion' }))
     const copy = await dialog.findByRole('button', { name: profile.primary_email })
+    expect(copy).toHaveAttribute('type', 'button')
     await user.click(copy)
 
     expect(await navigator.clipboard.readText()).toBe(profile.primary_email)
