@@ -1,7 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { EmailTemplates } from '@/components/interfaces/Auth/EmailTemplates/EmailTemplates'
 import { AuthEmailsLayout } from '@/components/layouts/AuthLayout/AuthEmailsLayout'
-import TemplatesPage from '@/pages/project/[ref]/auth/templates/index'
+import { NoPermission } from '@/components/ui/NoPermission'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export const Route = createFileRoute('/project/$ref/auth/templates/')({
   component: AuthTemplatesIndexRoute,
@@ -17,7 +22,31 @@ export const Route = createFileRoute('/project/$ref/auth/templates/')({
 function AuthTemplatesIndexRoute() {
   return (
     <AuthEmailsLayout>
-      <TemplatesPage dehydratedState={undefined} />
+      <TemplatesPage />
     </AuthEmailsLayout>
+  )
+}
+
+function TemplatesPage() {
+  const { can: canReadAuthSettings, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_READ
+  )
+
+  if (isPermissionsLoaded && !canReadAuthSettings) {
+    return <NoPermission isFullPage resourceText="access your project's email settings" />
+  }
+
+  return (
+    <PageContainer size="default" className="pb-16">
+      {!isPermissionsLoaded ? (
+        <PageSection>
+          <PageSectionContent>
+            <GenericSkeletonLoader />
+          </PageSectionContent>
+        </PageSection>
+      ) : (
+        <EmailTemplates />
+      )}
+    </PageContainer>
   )
 }
