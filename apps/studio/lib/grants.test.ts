@@ -7,6 +7,8 @@ import { beforeEach, describe, expect, expectTypeOf, test, vi } from 'vitest'
 import {
   ensureGrant,
   getGrant,
+  getWriteGrantToastMessage,
+  getWriteGrantTooltip,
   useGrant,
   type Grant,
   type GrantFor,
@@ -210,6 +212,48 @@ describe('getGrant', () => {
 
     const result = getGrant(data, BRANCHES, scope, { variant: 'write' as never })
     expect(result).toEqual({ status: 'denied' })
+  })
+})
+
+describe('getWriteGrantTooltip', () => {
+  test('explains a denied grant using the action and resource', () => {
+    expect(getWriteGrantTooltip('denied', 'create', 'API keys')).toBe(
+      'You need additional permissions to create API keys'
+    )
+    expect(getWriteGrantTooltip('denied', 'add', 'third-party auth integrations')).toBe(
+      'You need additional permissions to add third-party auth integrations'
+    )
+  })
+
+  test('explains a grant check that failed', () => {
+    expect(getWriteGrantTooltip('error', 'delete', 'signing keys')).toBe(
+      'Failed to check permissions to delete signing keys'
+    )
+  })
+
+  test('returns undefined while loading or granted', () => {
+    expect(getWriteGrantTooltip('loading', 'create', 'API keys')).toBeUndefined()
+    expect(getWriteGrantTooltip('granted', 'create', 'API keys')).toBeUndefined()
+  })
+})
+
+describe('getWriteGrantToastMessage', () => {
+  test('reuses the tooltip text for a denied grant', () => {
+    expect(getWriteGrantToastMessage('denied', 'create', 'API keys')).toBe(
+      getWriteGrantTooltip('denied', 'create', 'API keys')
+    )
+  })
+
+  test('reuses the tooltip text for a grant check that failed', () => {
+    expect(getWriteGrantToastMessage('error', 'delete', 'signing keys')).toBe(
+      'Failed to check permissions to delete signing keys'
+    )
+  })
+
+  test('asks the user to retry while the grant is loading', () => {
+    expect(getWriteGrantToastMessage('loading', 'add', 'third-party auth integrations')).toBe(
+      'Still checking permissions to add third-party auth integrations. Try again in a moment.'
+    )
   })
 })
 
