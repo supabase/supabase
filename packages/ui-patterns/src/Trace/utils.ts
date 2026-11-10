@@ -1,4 +1,4 @@
-import type { Span, TimeScale, TimeWindow, TraceIndex } from './types'
+import type { Span, TimeScale, TimeTick, TimeWindow, TraceIndex } from './types'
 
 export function buildTraceIndex(
   spans: readonly Span[],
@@ -69,6 +69,87 @@ export function buildTraceIndex(
   }
 }
 
+const SECOND = 1000
+const MINUTE = 60 * SECOND
+const HOUR = 60 * MINUTE
+const TARGET_TICK_SPACING = 80
+
+const TICK_STEPS = [
+  0.001,
+  0.002,
+  0.005,
+  0.01,
+  0.02,
+  0.05,
+  0.1,
+  0.2,
+  0.5,
+  1,
+  2,
+  5,
+  10,
+  20,
+  50,
+  100,
+  200,
+  500,
+  SECOND,
+  2 * SECOND,
+  5 * SECOND,
+  10 * SECOND,
+  15 * SECOND,
+  30 * SECOND,
+  MINUTE,
+  2 * MINUTE,
+  5 * MINUTE,
+  10 * MINUTE,
+  15 * MINUTE,
+  30 * MINUTE,
+  HOUR,
+]
+
+export function niceTickStep(durationMs: number, maxTicks: number): number {
+  const raw = durationMs / maxTicks
+  const step = TICK_STEPS.find((candidate) => candidate >= raw)
+  return step ?? Math.ceil(raw / HOUR) * HOUR
+}
+
+function formatScaled(ms: number, unitMs: number, suffix: string, stepMs: number): string {
+  const digits = Math.max(0, -Math.floor(Math.log10(stepMs / unitMs) + 1e-9))
+  return `${Number((ms / unitMs).toFixed(digits))}${suffix}`
+}
+
+export function formatMs(ms: number, stepMs: number): string {
+  if (ms === 0) return '0ms'
+  if (ms < 1) return formatScaled(ms, 0.001, 'µs', stepMs)
+  if (ms < SECOND) return formatScaled(ms, 1, 'ms', stepMs)
+  if (ms < MINUTE) return formatScaled(ms, SECOND, 's', stepMs)
+  if (ms < HOUR) {
+    const minutes = Math.floor(ms / MINUTE)
+    const seconds = Math.round((ms - minutes * MINUTE) / SECOND)
+    return seconds === 0 ? `${minutes}m` : `${minutes}m ${seconds}s`
+  }
+  const hours = Math.floor(ms / HOUR)
+  const minutes = Math.round((ms - hours * HOUR) / MINUTE)
+  return minutes === 0 ? `${hours}h` : `${hours}h ${minutes}m`
+}
+
+function computeTicks([start, end]: TimeWindow, width: number): TimeTick[] {
+  const durationMs = end - start
+  if (!(durationMs > 0) || !(width > 0)) return []
+
+  const stepMs = niceTickStep(durationMs, Math.max(1, Math.floor(width / TARGET_TICK_SPACING)))
+  const ticks: TimeTick[] = []
+  for (let offset = 0; offset <= durationMs + 1e-9; offset += stepMs) {
+    ticks.push({
+      ms: start + offset,
+      fraction: offset / durationMs,
+      label: formatMs(offset, stepMs),
+    })
+  }
+  return ticks
+}
+
 export function createTimeScale(window: TimeWindow, width: number): TimeScale {
   const [start, end] = window
   const durationMs = Math.max(0, end - start)
@@ -77,6 +158,7 @@ export function createTimeScale(window: TimeWindow, width: number): TimeScale {
     window,
     width,
     durationMs,
+    ticks: computeTicks(window, width),
     toFraction,
     toX: (ms) => toFraction(ms) * width,
     toMs: (x) => (width > 0 ? start + (x / width) * durationMs : start),
