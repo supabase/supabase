@@ -19,16 +19,38 @@ export const getDuplicateTableSQL = ({
   return joinSqlFragments([createSql, commentSql], '\n')
 }
 
+/**
+ * Builds the row-copy statement for a duplicated table.
+ *
+ * Callers must exclude generated columns, because Postgres rejects explicit
+ * values for them. `OVERRIDING SYSTEM VALUE` preserves the source ids for
+ * GENERATED ALWAYS AS IDENTITY columns.
+ */
 export const getDuplicateRowsSQL = ({
+  columns,
   duplicatedTableName,
   sourceTableName,
   sourceTableSchema,
 }: {
+  /**
+   * Columns to copy. Callers should omit generated columns because Postgres
+   * does not allow explicit values for them. When omitted, all columns are
+   * copied.
+   */
+  columns?: string[]
   duplicatedTableName: string
   sourceTableName: string
   sourceTableSchema: string
 }): SafeSqlFragment => {
-  return safeSql`INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)} SELECT * FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
+  const columnList =
+    columns && columns.length > 0
+      ? safeSql` (${joinSqlFragments(columns.map(ident), ',')})`
+      : safeSql``
+  const selectList =
+    columns && columns.length > 0 ? joinSqlFragments(columns.map(ident), ',') : safeSql`*`
+  // OVERRIDING SYSTEM VALUE keeps the source ids for GENERATED ALWAYS AS
+  // IDENTITY columns instead of failing on the explicit value.
+  return safeSql`INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)}${columnList} OVERRIDING SYSTEM VALUE SELECT ${selectList} FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
 }
 
 export const getTableEditorSql = ({ id }: { id?: number }): SafeSqlFragment => {
