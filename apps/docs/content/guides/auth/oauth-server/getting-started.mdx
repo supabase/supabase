@@ -165,7 +165,7 @@ Your authorization UI should:
 1. **Extract authorization_id** - Get the `authorization_id` from the URL query parameters
 2. **Authenticate the user** - If not already signed in, redirect to your sign-in page (preserving the authorization_id)
 3. **Retrieve authorization details** - Use `supabase.auth.oauth.getAuthorizationDetails(authorization_id)` to get client information including requested scopes
-4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested
+4. **Display consent screen** - Show the user what app is requesting access and what scopes/permissions are being requested (available as a [pre-built component](/library/docs/nextjs/oauth-consent))
 5. **Handle user decision** - Call either `approveAuthorization(authorization_id)` or `denyAuthorization(authorization_id)` based on user choice
 
 The authorization details include a `scope` field (singular) containing a space-separated string of scopes requested by the client (e.g., `"openid email profile"`). You should display these scopes to the user so they understand what information will be shared.
