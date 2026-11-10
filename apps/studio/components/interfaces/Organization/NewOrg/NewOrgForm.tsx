@@ -99,6 +99,8 @@ const formSchema = organizationDetailsSchema.extend({
 
 type FormState = z.infer<typeof formSchema>
 
+type OrgSubmission = { values: FormState; hasSurveyInOrgForm: boolean }
+
 const stripePromise = loadStripe(STRIPE_PUBLIC_KEY)
 
 const FORM_ID = 'new-org-form'
@@ -172,10 +174,13 @@ export const NewOrgForm = ({
 
   const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
   const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'org_form'
-  // Skip kind/size on org creation when the survey section is shown: the survey
-  // endpoint saves them after creation, and it dedupes on (user, org_slug) at the
-  // parent row, so sending them on both paths would swallow the survey call.
-  const omitKindFromOrgCreation = showOnboardingSurveyInOrgForm
+  // What was submitted and whether the survey was on the form, fixed at submit:
+  // the survey step runs after creation (much later after a card confirmation),
+  // when the form values and flag may have moved on. With the survey on the
+  // form, kind/size are left out of org creation: the survey endpoint saves them
+  // and keeps only the first response per user and org, so sending them on both
+  // paths would swallow the survey call.
+  const orgSubmission = useRef<OrgSubmission | null>(null)
 
   useEffect(() => {
     form.reset({
@@ -287,13 +292,13 @@ export const NewOrgForm = ({
 
   const submitOrganizationSurvey = useCallback(
     async (slug: string) => {
-      if (!showOnboardingSurveyInOrgForm) return
+      const submission = orgSubmission.current
+      if (!submission?.hasSurveyInOrgForm) return
 
-      const building = form.getValues('building')
-      const kind = form.getValues('kind')
-      const size = kind === 'COMPANY' ? form.getValues('size') : undefined
+      const { building, kind } = submission.values
+      const size = kind === 'COMPANY' ? submission.values.size : undefined
       // Kind and size always hold a value, so only count them as answered when changed
-      const hasKind = kind.toUpperCase() !== defaultValues.kind.toUpperCase()
+      const hasKind = kind !== defaultValues.kind.toUpperCase()
       const hasSize = size !== undefined && size !== defaultValues.size
       const hasBuilding = building !== ''
       const profileId = user.profile?.gotrue_id
@@ -319,8 +324,8 @@ export const NewOrgForm = ({
         groupOverrides
       )
 
-      // Always persist kind/size: omitKindFromOrgCreation removes them from the
-      // org creation payload for survey variants, so this is the only save path.
+      // Always persist kind/size: they're left out of the org creation payload
+      // when the survey is on the form, so this is their only save path.
       try {
         await submitOnboardingSurvey({
           slug,
@@ -337,15 +342,7 @@ export const NewOrgForm = ({
         if (profileId) markFollowUpPending({ profileId, orgSlug: slug, kind, size })
       }
     },
-    [
-      defaultValues.kind,
-      defaultValues.size,
-      form,
-      showOnboardingSurveyInOrgForm,
-      submitOnboardingSurvey,
-      track,
-      user.profile?.gotrue_id,
-    ]
+    [defaultValues.kind, defaultValues.size, submitOnboardingSurvey, track, user.profile?.gotrue_id]
   )
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
@@ -364,15 +361,16 @@ export const NewOrgForm = ({
     // Reset payment intent secret to ensure another attempt works as expected
     setPaymentIntentSecret('')
 
-    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded') {
+    const submission = orgSubmission.current
+    if (paymentIntentConfirmation.paymentIntent?.status === 'succeeded' && submission) {
       await confirmPendingSubscriptionChange({
         payment_intent_id: paymentIntentConfirmation.paymentIntent.id,
-        name: form.getValues('name'),
-        ...(omitKindFromOrgCreation
+        name: submission.values.name,
+        ...(submission.hasSurveyInOrgForm
           ? {}
           : {
-              kind: form.getValues('kind'),
-              size: form.getValues('size'),
+              kind: submission.values.kind,
+              size: submission.values.size,
             }),
       })
     } else {
@@ -432,7 +430,7 @@ export const NewOrgForm = ({
   const submittedTier = useRef<'tier_free' | 'tier_pro' | 'tier_payg' | 'tier_team' | null>(null)
 
   async function createOrg(
-    formValues: z.infer<typeof formSchema>,
+    { values: formValues, hasSurveyInOrgForm }: OrgSubmission,
     paymentMethodId?: string,
     customerData?: {
       address: CustomerAddress | null
@@ -450,7 +448,7 @@ export const NewOrgForm = ({
 
     createOrganization({
       name: formValues.name,
-      ...(omitKindFromOrgCreation
+      ...(hasSurveyInOrgForm
         ? {}
         : {
             kind: formValues.kind,
@@ -468,9 +466,11 @@ export const NewOrgForm = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof formSchema>> = async (formValues) => {
     setNewOrgLoading(true)
+    const submission = { values: formValues, hasSurveyInOrgForm: showOnboardingSurveyInOrgForm }
+    orgSubmission.current = submission
 
     if (formValues.plan === 'FREE') {
-      await createOrg(formValues)
+      await createOrg(submission)
       return
     }
 
@@ -481,7 +481,7 @@ export const NewOrgForm = ({
     }
 
     setPaymentMethod(result.paymentMethod)
-    createOrg(formValues, result.paymentMethod.id, {
+    createOrg(submission, result.paymentMethod.id, {
       address: result.address,
       billing_name: result.customerName,
       tax_id: result.taxId,
