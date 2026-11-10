@@ -116,9 +116,6 @@
         // Read by the Nitro server behind `pnpm start`. Declared so the turbo
         // env lint rule passes even though turbo doesn't drive `start`.
         "PORT",
-        // Gates the TanStack vs Next path in vercel.ts and
-        // scripts/dispatch.js (the dev/build/start dispatcher).
-        "STUDIO_FRAMEWORK",
         // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
         // to gate Vite-only `import.meta.glob`). Not a real process env var
         // but turbo's `no-undeclared-env-vars` lint flags any `env.SSR` access.
@@ -134,9 +131,6 @@
         "S3_PROTOCOL_ACCESS_KEY_SECRET",
       ],
       "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**/*",
         // TanStack Start via Nitro: node server and Vercel Build Output.
         ".output/**",
         ".vercel/output/**",

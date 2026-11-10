@@ -22,7 +22,7 @@ Load the skills matching the task; stack them when a task spans areas:
 
 ## TanStack Start migration
 
-Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start (`routes/**`). Both runtimes ship side-by-side; the `STUDIO_FRAMEWORK` env var selects which one `pnpm dev`/`build` runs (default: `next`, resolved in `scripts/dispatch.js`). Full route map and strategy: `TANSTACK_MIGRATION.md`.
+Studio is migrating from the Next.js pages router (`pages/**`) to TanStack Start (`routes/**`). `pnpm dev`/`build` run TanStack Start only; the Next build is retired and the remaining `pages/**` files are plain modules re-exported by their routes until they're moved (FE-3106). Full route map and strategy: `TANSTACK_MIGRATION.md`.
 
 - **Never delete a page file.** Most `routes/**` files are thin wrappers re-exporting the default export of their `pages/**` counterpart, so the Next file is load-bearing for both runtimes until the final cleanup pass.
 - Pure page-body edits propagate to the route automatically. Mirror a change by hand into the corresponding `routes/**` file only when it touches what the route duplicates: `getLayout`/layout wrapping, page titles or other `staticData` (incl. `skip*Layout` flags), `withAuth`, or redirect paths.

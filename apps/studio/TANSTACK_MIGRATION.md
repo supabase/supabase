@@ -7,10 +7,11 @@ Temporary tracking doc. Delete once migration is done.
 Throughout this migration both runtimes coexist in the same workspace:
 
 - The Next.js pages router (`pages/...`) and the TanStack route tree
-  (`routes/...`) ship **at the same time**. The Vite/TanStack build is
-  what we run today; the Next build (`build:next` / `dev:next` scripts
-  in `apps/studio/package.json`) stays alive as a fallback so we can
-  bisect regressions and ship either runtime if needed.
+  (`routes/...`) shipped **at the same time** until FE-3106 retired the
+  Next build (`build:next` / `dev:next`, `scripts/dispatch.js` and the
+  `STUDIO_FRAMEWORK` switch). `pnpm dev`/`build`/`start` now run the
+  Vite/TanStack build only, and the cleanup pass moves the remaining
+  `pages/...` bodies into their routes.
 - **Do not delete any `apps/studio/pages/...` file during the per-route
   migration.** Path A pages re-export their `pages/` default export, so
   the Next file is load-bearing for both runtimes. Removing it breaks
