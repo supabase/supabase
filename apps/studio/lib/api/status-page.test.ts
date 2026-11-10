@@ -2,6 +2,7 @@ import { http, HttpResponse } from 'msw'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { mswServer } from '@/tests/lib/msw'
+import { getRouteHandler } from '@/tests/lib/server-route'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -293,8 +294,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
       )
     )
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe(
       'public, s-maxage=300, stale-while-revalidate=300'
@@ -307,8 +313,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
     vi.stubEnv('INCIDENT_IO_STATUS_PAGE_ID', '')
     mswServer.use(http.get(WIDGET_URL, () => HttpResponse.json(widgetFixture())))
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe(
       'public, s-maxage=60, stale-while-revalidate=60'
@@ -319,8 +330,13 @@ describe('GET /api/status-page route Cache-Control header', () => {
     stubHappyEnv()
     mswServer.use(http.get(WIDGET_URL, () => new HttpResponse(null, { status: 503 })))
 
-    const { GET } = await import('../../app/api/status-page/route')
-    const response = await GET()
+    const { Route } = await import('@/routes/api/status-page')
+    const response = await getRouteHandler(
+      Route,
+      'GET'
+    )({
+      request: new Request('http://localhost/api/status-page'),
+    })
 
     expect(response.headers.get('Cache-Control')).toBe('no-store')
   })
