@@ -14,7 +14,7 @@ imgThumb: '2026-11-10-set-up-supabase-for-every-expo-environment-in-one-command/
 toc_depth: 2
 ---
 
-Supabase is available as an integration in the EAS CLI. Run `eas integrations:supabase:connect` in an Expo project and it creates a Supabase project, installs the SDK, and writes your keys to every Expo environment. The next build and the next update have a working backend, with no trip through the Supabase Dashboard.
+Supabase is available as an integration in the EAS CLI. Run `eas integrations:supabase:connect` in an Expo project, and it creates a Supabase project, installs the SDK, and writes your keys to every Expo environment. The next build and the next update have a working backend, with no trip through the Supabase Dashboard.
 
 [Expo](https://expo.dev) is the open source framework and cloud platform that 80% of React Native developers use to build, ship, and update their apps from one codebase. Supabase has been the database behind a large share of those apps for years. Expo's team built this integration so connecting the two is a step the CLI runs rather than a guide a developer follows.
 
@@ -22,7 +22,15 @@ Supabase is available as an integration in the EAS CLI. Run `eas integrations:su
 eas integrations:supabase:connect
 ```
 
-{/* TODO: add video embed once the video is ready */}
+<div className="video-container">
+  <iframe
+    className="w-full"
+    src="https://www.youtube-nocookie.com/embed/7YcgyXsUea4"
+    title="Set up Supabase for every Expo environment in one command"
+    allow="accelerometer; autoplay; clipboard-write; encrypted-media; fullscreen; gyroscope; picture-in-picture; web-share"
+    allowFullScreen
+  />
+</div>
 
 ## Setup is one step
 
@@ -30,7 +38,7 @@ Every new Expo app on Supabase used to start the same way. You created a project
 
 ## Preview builds get their own database
 
-A Supabase project holds one environment's data, so the integration gives each Expo environment its own. Add `--environment preview` and Preview gets a separate project with separate keys while Production keeps the first one. Preview builds and over-the-air updates work against preview data, and production data is untouched. Development can point at a local Supabase stack on your machine. The boundary is in place from the first build and the tooling enforces it.
+A Supabase project holds one environment's data, so the integration gives each Expo environment its own. Add `--environment preview` and Preview gets a separate project with separate keys while Production keeps the first one. Preview builds and over-the-air updates work against preview data, and production data is untouched. Development can point at a local Supabase stack on your machine. The boundary is in place from the first build, and the tooling enforces it.
 
 ## Security findings in your build logs
 
@@ -50,7 +58,9 @@ The project the CLI creates is the same full backend every Supabase app gets, so
 
 ## Why Expo built Supabase into the EAS CLI
 
-{/* TODO: add Expo quote and attribution. Format as a bare `>` blockquote with no literal quote marks, then `— **Name**, Title, Expo` as a paragraph after it. */}
+> Just about every new Expo app uses Supabase as a backend. We wanted getting there to take one command: `eas integrations:supabase:connect` creates the project, installs the SDK, and writes the keys into your EAS environment. Each environment can get its own Supabase project, so preview builds never touch production data.
+
+— **Joe Ryan**, CRO, Expo
 
 ## Get started
 
