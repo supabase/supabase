@@ -57,7 +57,7 @@ Other rules:
 - New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for pages we re-export.
 - `withAuth()` HOC → TanStack `beforeLoad` on the containing route/layout. Apply this at shared-layout level where possible.
 - **Never** delete a `pages/...` file mid-migration — both runtimes need to keep working. Body-moves and Next-file deletions are reserved for the cleanup pass at the very end, after every entry in this checklist is `[x]`. See "Runtime model" above.
-- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
+- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`. The catch-alls are under "Deferred / revisit".
 
 **Legend**
 
@@ -619,16 +619,14 @@ for the Vite pipeline:
 
 ## Deferred / revisit
 
-- ~~`pages/org/_/[[...routeSlug]].tsx`~~ landed as `routes/org.[_].tsx` + `routes/org.[_].$.tsx`. **Naming delta:** path-as-filename form (not `routes/org/[_]/index.tsx`) because the index-file form trips a router-generator bug at `getRouteNodes.js:132` — when an `index.tsx` has a bracket-escaped _parent_ segment, `originalRoutePath` gets wiped wholesale and the escape info is lost, so `_` gets stripped as pathless. The path-as-filename form keeps the last segment non-index and avoids the bug branch entirely. Next page accepts either Next-style `routeSlug` (string[]) or TanStack-style `_splat` (string) and normalises to the array shape.
-- ~~`pages/project/_/[[...routeSlug]].tsx`~~ landed as `routes/project.[_].tsx` + `routes/project.[_].$.tsx`. Same naming-delta rationale as the org catch-alls above.
+- [x] A→done `routes/org.[_].tsx` + `routes/org.[_].$.tsx` ← `pages/org/_/[[...routeSlug]].tsx`. Both render `SelectOrganizationPage` (`components/interfaces/Organization/`); the splat route passes `_splat` as the trailing path. **Naming delta:** path-as-filename form (not `routes/org/[_]/index.tsx`) because the index-file form trips a router-generator bug at `getRouteNodes.js:132` — when an `index.tsx` has a bracket-escaped _parent_ segment, `originalRoutePath` gets wiped wholesale and the escape info is lost, so `_` gets stripped as pathless.
+- [x] A→done `routes/project.[_].tsx` + `routes/project.[_].$.tsx` ← `pages/project/_/[[...routeSlug]].tsx`, rendering `SelectProjectPage` (`components/interfaces/Home/ProjectList/`). Same naming delta as the org catch-alls.
 
 ### Cleanup checklist (after every `pages/...` file is gone)
 
 - Switch `routes/index.tsx` redirects from `href` to `to` — all targets
   now live in the TanStack tree.
 - Remove the Vite alias for `usePreventNavigationOnUnsavedChanges` and replace the original Next hook with the native implementation in `compat/usePreventNavigationOnUnsavedChanges.ts`.
-- Drop the `_splat` / `routeSlug` normalisation block from
-  `pages/org/_/[[...routeSlug]].tsx` + `pages/project/_/[[...routeSlug]].tsx` (only there to keep both runtimes mounting the same body).
 - Remove `RouteValidationWrapper` + `next/router` compat shim usage from `__root.tsx`.
 - Remove `compat/next/` directory entirely once no `next/*` import remains in workspace source.
 - Lift `manualChunks` pins (`class-variance-authority`, `lucide-react`, `react-vendor`) once the structural fix in `packages/ui` lands — see CIRCULAR_IMPORTS.md. Keep `assertNoChunkCycles`; just clear `KNOWN_CHUNK_CYCLES`.
