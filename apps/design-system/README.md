@@ -36,31 +36,18 @@ Doc pages load compiled MDX from `.velite/codes/*.json` per document. Metadata l
 
 ### Alternative commands
 
-You can also run the development server and content watcher separately. Build the registry and content first, because `dev:next` and `dev:content` do not:
+`pnpm dev` runs through Turborepo: it builds the registry and content, then starts the Next.js development server and the Velite content watcher together. You can run the prerequisite steps on their own:
 
 ```bash
 pnpm build:registry
 pnpm build:content
-
-# Run only the Next.js development server
-pnpm dev:next
-
-# Run only the Velite content watcher (in a separate terminal shell)
-pnpm dev:content
 ```
 
-From the repo root, `pnpm dev:design-system` runs the same `dev` script. If you split the watchers from the root, build first:
-
-```bash
-pnpm --filter=design-system build:registry
-pnpm --filter=design-system build:content
-pnpm --filter=design-system dev:next
-pnpm --filter=design-system dev:content
-```
+From the repo root, `pnpm dev:design-system` runs the same `dev` script.
 
 ### Watching for MDX changes
 
-The `dev` command watches MDX files and hot-reloads them. If you are running `pnpm dev:next` on its own, also run `pnpm dev:content` in another terminal.
+The `dev` command watches MDX files and hot-reloads them. To run only the watcher, use `pnpm dev:content`.
 
 ### Adding components
 
