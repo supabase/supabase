@@ -4481,6 +4481,24 @@ export interface AccountRecoveryReminderClosedEvent {
 }
 
 /**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
@@ -4488,6 +4506,8 @@ export type TelemetryEvent =
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent

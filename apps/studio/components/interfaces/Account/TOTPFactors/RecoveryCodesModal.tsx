@@ -23,6 +23,7 @@ import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
+import { useTrack } from '@/lib/telemetry/track'
 
 interface RecoveryCodesModalProps<T>
   extends
@@ -42,6 +43,7 @@ export const RecoveryCodesModal = <T = unknown,>({
   ...props
 }: RecoveryCodesModalProps<T>) => {
   const queryClient = useQueryClient()
+  const track = useTrack()
   const [copied, setCopied] = useState(false)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
@@ -71,6 +73,7 @@ export const RecoveryCodesModal = <T = unknown,>({
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
+    track('recovery_codes_download_clicked')
   }
 
   useEffect(() => {
@@ -155,7 +158,10 @@ export const RecoveryCodesModal = <T = unknown,>({
                     onClick={() =>
                       copyToClipboard(
                         codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                        () => setCopiedToClipboard(true)
+                        () => {
+                          setCopiedToClipboard(true)
+                          track('recovery_codes_copied')
+                        }
                       )
                     }
                   >

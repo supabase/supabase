@@ -1,6 +1,6 @@
 import { AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor } from '@testing-library/react'
-import { describe, expect, test, vi } from 'vitest'
+import { describe, expect, onTestFinished, test, vi } from 'vitest'
 
 import { GenerateRecoveryCodesModal } from './GenerateRecoveryCodesModal'
 import { RecoveryCodesModal } from './RecoveryCodesModal'
@@ -8,11 +8,13 @@ import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
 
-const { mockCopyToClipboard } = vi.hoisted(() => ({
+const { mockCopyToClipboard, mockTrack } = vi.hoisted(() => ({
   mockCopyToClipboard: vi.fn((_value: string, callback: () => void) => {
     return callback()
   }),
+  mockTrack: vi.fn(),
 }))
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mockTrack }))
 vi.mock('ui', async (importOriginal) => ({
   ...(await importOriginal<typeof import('ui')>()),
   copyToClipboard: mockCopyToClipboard,
@@ -53,7 +55,22 @@ describe('GenerateRecoveryCodesModal', () => {
     expect(screen.queryByRole('button', { name: 'Close' })).not.toBeInTheDocument()
   })
 
-  test('generate the recovery codes and allow users to copy them', async () => {
+  test('lets users copy and download generated recovery codes and tracks both actions', async () => {
+    const downloadClick = vi
+      .spyOn(HTMLAnchorElement.prototype, 'click')
+      .mockImplementation(() => {})
+    vi.stubGlobal(
+      'URL',
+      class extends URL {
+        static createObjectURL = vi.fn(() => 'blob:recovery-codes')
+        static revokeObjectURL = vi.fn()
+      }
+    )
+    onTestFinished(() => {
+      downloadClick.mockRestore()
+      vi.unstubAllGlobals()
+    })
+
     vi.spyOn(auth.mfa.recoveryCodes, 'generate').mockResolvedValue({
       data: {
         id: 'some_id',
@@ -71,9 +88,13 @@ describe('GenerateRecoveryCodesModal', () => {
     await screen.findByText('WTO2-4T5X-BEUL-VJMI')
     await screen.findByText('KYYF-SP3E-QJYD-J53T')
 
-    // Users have to copy the codes before they can close the modal
     expect(await screen.findByRole('button', { name: 'Done' })).toBeDisabled()
-    fireEvent.click(await screen.findByRole('button', { name: 'Copy' }))
+    const copyButton = screen.getByRole('button', { name: 'Copy' })
+    mockCopyToClipboard.mockImplementationOnce(() => {})
+    fireEvent.click(copyButton)
+    expect(mockTrack).not.toHaveBeenCalled()
+
+    fireEvent.click(copyButton)
     fireEvent.click(
       screen.getByRole('checkbox', { name: 'I have saved my recovery codes somewhere safe' })
     )
@@ -81,6 +102,12 @@ describe('GenerateRecoveryCodesModal', () => {
       codes.map((code) => formatRecoveryCode(code)).join('\n'),
       expect.any(Function)
     )
+    fireEvent.click(screen.getByRole('button', { name: 'Download' }))
+    expect(downloadClick).toHaveBeenCalledOnce()
+    expect(mockTrack.mock.calls).toEqual([
+      ['recovery_codes_copied'],
+      ['recovery_codes_download_clicked'],
+    ])
 
     // Done button is now enabled and closes the modal
     const doneButton = await screen.findByRole('button', { name: 'Done' })
