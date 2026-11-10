@@ -2408,6 +2408,9 @@ importers:
       valtio:
         specifier: 'catalog:'
         version: 2.3.2(@types/react@19.2.14)(react@19.2.6)
+      web-vitals:
+        specifier: ^6.2.1
+        version: 6.2.1
     devDependencies:
       '@types/lodash':
         specifier: 4.17.5

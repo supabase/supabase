@@ -4549,9 +4549,34 @@ export interface AccountRecoveryReminderClosedEvent {
 }
 
 /**
+ * A Core Web Vital or related timing metric measured by the browser for the current page load.
+ * Sent once the metric is final, typically when the page is hidden or unloaded.
+ *
+ * @group Events
+ * @source Browser performance observers (`web-vitals`), after the user has accepted telemetry consent
+ * @page All Studio pages (platform only)
+ */
+export interface WebVitalReportedEvent {
+  action: 'web_vital_reported'
+  properties: {
+    /** Which metric this report is for */
+    metricName: 'LCP' | 'CLS' | 'INP' | 'TTFB' | 'FCP'
+    /** Metric value: milliseconds for LCP, INP, TTFB and FCP; unitless score for CLS */
+    metricValue: number
+    /** web-vitals rating bucket for the value */
+    metricRating: 'good' | 'needs-improvement' | 'poor'
+    /** Unique id of the metric instance, shared by repeat reports for the same page load */
+    metricId: string
+    /** How the page load was initiated (e.g. navigate, reload, back-forward) */
+    navigationType: string
+  }
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | WebVitalReportedEvent
   | AccountRecoveryReminderExposedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent

@@ -80,6 +80,21 @@ describe('buildTelemetryEventRequest', () => {
     expect(submit?.keepalive).toBe(false)
   })
 
+  it('sends web vitals with keepalive so they survive the page being hidden', () => {
+    const request = buildTelemetryEventRequest(API_URL, {
+      action: 'web_vital_reported',
+      properties: {
+        metricName: 'LCP',
+        metricValue: 1200,
+        metricRating: 'good',
+        metricId: 'v6-1',
+        navigationType: 'navigate',
+      },
+    })
+    expect(request?.keepalive).toBe(true)
+    expect(request?.body).not.toHaveProperty('groups.project')
+  })
+
   it("adds the app's platform to custom_properties only once it is set", () => {
     const event = {
       action: 'kb_search_submitted',

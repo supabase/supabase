@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/nextjs'
-import { PageTelemetry, posthogClient, useParams, useUser } from 'common'
+import { PageTelemetry, posthogClient, useParams, useUser, useWebVitalsReporting } from 'common'
 import { useEffect, useRef } from 'react'
 import { useConsentToast } from 'ui-patterns/consent'
 
@@ -19,6 +19,8 @@ export function Telemetry() {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const user = useUser()
+
+  useWebVitalsReporting({ apiUrl: API_URL, enabled: IS_PLATFORM && hasAcceptedConsent })
 
   // Project ref from the URL params, mirroring the backend's `request.params.ref`
   const { ref: projectRef } = useParams()
