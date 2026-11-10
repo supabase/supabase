@@ -49,7 +49,8 @@ export const PurgeBucketObjectCDNCacheModal = ({
   return (
     <PurgeCDNCacheDialog
       visible={visible}
-      title={`Purge “${path}” CDN cache`}
+      title="Purge CDN cache for file"
+      description={`The CDN cache for the file "${path}" will be purged.`}
       status={status}
       isPurging={isPurgingBucketCDNCache}
       onConfirm={onConfirm}

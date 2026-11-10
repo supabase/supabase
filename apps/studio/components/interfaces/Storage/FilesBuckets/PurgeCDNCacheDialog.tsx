@@ -15,7 +15,7 @@ import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganizati
 interface PurgeCDNCacheDialogProps {
   visible: boolean
   title: string
-  /** Announced to screen readers while the purge is in progress */
+  description: string
   status: string
   isPurging: boolean
   onConfirm: () => void
@@ -26,6 +26,7 @@ export const PurgeCDNCacheDialog = ({
   visible,
   title,
   status,
+  description,
   isPurging,
   onConfirm,
   onClose,
@@ -67,6 +68,7 @@ export const PurgeCDNCacheDialog = ({
               ) : (
                 <>
                   <p>
+                    {description + ' '}
                     Invalidation can take <strong className="font-bold">up to 60 seconds</strong> to
                     propagate across all CDN edge nodes worldwide.
                   </p>
