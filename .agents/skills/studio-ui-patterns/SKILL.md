@@ -98,6 +98,8 @@ Docs: `apps/design-system/content/docs/ui-patterns/navigation.mdx`
 - Use `NavMenu` for a horizontal list of related views within a consistent page layout
 - Activating an item must trigger a **URL change** — no local-only tab state
 
+For feature-flagged replacements in Studio, verify both states: off preserves existing navigation and destinations; on exposes the replacement. Treat intentionally hidden surfaces as explicit exceptions.
+
 ## Cards
 
 - Group related information in cards
