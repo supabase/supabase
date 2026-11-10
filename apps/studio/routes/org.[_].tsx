@@ -6,8 +6,9 @@ export const Route = createFileRoute('/org/_')({
   component: OrgWildcardIndexRoute,
 })
 
-// Matches `/org/_` exactly. The companion splat route at
-// `org.[_].$.tsx` handles `/org/_/...`.
+// Matches `/org/_`, and is also the parent of the splat route in
+// `org.[_].$.tsx` (`/org/_/...`). It renders no `<Outlet>`, so this
+// component renders for both.
 //
 // `[_]` is TanStack's escape syntax for a literal underscore in the URL
 // (otherwise an unescaped `_` segment is treated as a pathless layout).

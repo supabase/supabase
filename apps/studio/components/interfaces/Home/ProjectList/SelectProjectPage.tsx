@@ -31,8 +31,15 @@ import { withAuth } from '@/hooks/misc/withAuth'
 // like a proxy to the project specific pages, and we let those pages handle
 // any route validation logic instead
 
-function SelectProject({ routeSlug }: { routeSlug?: string[] }) {
-  const { searchStr } = useLocation()
+function SelectProject() {
+  const { pathname, searchStr } = useLocation()
+  // `/project/_/billing` → ['billing']; the splat route nests under the `/project/_` route,
+  // which renders this page, so the trailing path is read from the location
+  const trailingSegments = pathname
+    .replace(/^\/project\/_\/?/, '')
+    .split('/')
+    .filter(Boolean)
+  const routeSlug = trailingSegments.length > 0 ? trailingSegments : undefined
   const { slug } = useParams()
 
   const { lastVisitedOrganization } = useLastVisitedOrganization()
