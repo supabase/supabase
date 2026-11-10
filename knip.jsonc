@@ -83,10 +83,6 @@
         // named as a webpack/turbopack loader string in next.config.ts
         // (`loaders: ['raw-loader']`)
         "raw-loader",
-        // aliased in vite.config.ts (`resolve.alias`) so `safe-buffer`'s
-        // `require('buffer')` resolves to the npm polyfill, not Vite's empty
-        // browser stub
-        "buffer",
         // runtime hooks for @sentry/nextjs / OpenTelemetry Node
         // instrumentation. Must be direct deps under pnpm's strict isolation
         // (#35030).
