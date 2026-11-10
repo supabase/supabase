@@ -43,7 +43,7 @@ describe('IssueAgentPrompt', () => {
       'false'
     )
 
-    await user.click(screen.getByRole('button', { name: 'Copy Agent prompt' }))
+    await user.click(screen.getByRole('button', { name: 'Copy Agent review prompt' }))
 
     await waitFor(async () => {
       const copiedPrompt = await navigator.clipboard.readText()

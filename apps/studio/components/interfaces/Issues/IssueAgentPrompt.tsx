@@ -29,7 +29,7 @@ export const IssueAgentPrompt = ({ projectRef }: { projectRef: string }) => {
   return (
     <PromptPanel onCopied={() => track('ai_prompt_copied', { source: 'issues_overview' })}>
       <Prompt value="issues" expandable>
-        <PromptTitle>Agent prompt</PromptTitle>
+        <PromptTitle>Agent review prompt</PromptTitle>
         <PromptCopy>{prompt}</PromptCopy>
         <PromptContent>
           <PromptMarkdown>{prompt}</PromptMarkdown>
