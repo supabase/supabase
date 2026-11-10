@@ -42,6 +42,6 @@
 /apps/studio/routes/_app/new/index.tsx                              @supabase/security
 
 /apps/studio/lib/ai/                                                @supabase/ai
-/apps/studio/pages/api/ai/                                          @supabase/ai
+/apps/studio/routes/api/ai/                                         @supabase/ai
 
 /packages/shared-data/compute-disk-limits.ts @supabase/platform

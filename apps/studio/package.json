@@ -215,7 +215,6 @@
     "msw": "^2.3.0",
     "next-router-mock": "^0.9.13",
     "nitro": "3.0.260903-beta",
-    "node-mocks-http": "^1.17.2",
     "postcss": "catalog:",
     "raw-loader": "^4.0.2",
     "require-in-the-middle": "^8.0.0",
