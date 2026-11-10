@@ -31,7 +31,7 @@ import {
 } from 'ui-patterns/PageSection'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AddPasswordRow } from './AddPasswordRow'
+import { AddPasswordNotice } from './AddPasswordNotice'
 import {
   ChangeEmailAddressForm,
   GitHubChangeEmailAddress,
@@ -153,7 +153,7 @@ export const SignInMethods = ({
       <PageSectionContent className="flex flex-col gap-4">
         {isError && <AlertError error={error} subject="Failed to retrieve sign-in methods" />}
         {isSuccess && showAddPasswordRow && !!data.email && (
-          <AddPasswordRow
+          <AddPasswordNotice
             email={data.email}
             providerName={
               hasSingleOAuthIdentity ? getProviderName(identities[0]?.provider) : undefined
@@ -179,8 +179,7 @@ export const SignInMethods = ({
                 ]
                   .filter(Boolean)
                   .join(' · ')
-                const providerDisplay = getProviderDisplay(provider)
-                const providerName = providerDisplay.displayName
+                const providerName = getProviderName(provider)
                 const configuredProvider = getConfiguredExternalProvider(provider)
                 const canUpdateEmail = !configuredProvider
 
@@ -282,9 +281,17 @@ export const SignInMethods = ({
           <DialogContent>
             <DialogHeader className="border-b">
               <DialogTitle>
-                {selectedProviderUpdateEmail !== 'email'
-                  ? `Updating email address for ${getProviderName(selectedProviderUpdateEmail)} identity`
-                  : 'Update email address'}
+                {selectedProviderUpdateEmail !== 'email' ? (
+                  <>
+                    Update email address for{' '}
+                    <span className="capitalize">
+                      {getProviderName(selectedProviderUpdateEmail)}
+                    </span>{' '}
+                    identity
+                  </>
+                ) : (
+                  'Update email address'
+                )}
               </DialogTitle>
             </DialogHeader>
             {selectedProviderUpdateEmail === 'github' ? (
