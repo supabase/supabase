@@ -1,9 +1,10 @@
+import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { afterEach, describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import { DeleteAccountButton } from './DeleteAccountButton'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -58,25 +59,42 @@ describe('DeleteAccountButton', () => {
 
     const requestDialog = within(screen.getByRole('dialog', { name: 'Request account deletion' }))
     const submit = requestDialog.getByRole('button', { name: 'Submit deletion request' })
+    const submitSpy = vi.fn()
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: async ({ request }) => {
+        submitSpy(await request.json())
+        return HttpResponse.json<{ result: 'ok' }>({ result: 'ok' })
+      },
+    })
+
     fireEvent.change(confirmation, { target: { value: 'different@example.com' } })
     fireEvent.click(submit)
     expect(
       await requestDialog.findByText('Enter the email address shown above')
     ).toBeInTheDocument()
+    expect(submitSpy).not.toHaveBeenCalled()
 
-    addAPIMock({
-      method: 'post',
-      path: '/platform/feedback/send',
-      response: { result: 'ok' },
-    })
     fireEvent.change(confirmation, { target: { value: profile.primary_email } })
     fireEvent.click(submit)
     await waitForElementToBeRemoved(() =>
       screen.queryByRole('dialog', { name: 'Request account deletion' })
     )
+
+    expect(submitSpy).toHaveBeenCalledExactlyOnceWith(
+      expect.objectContaining({
+        subject: 'Account Deletion Request',
+        message: 'I want to delete my account.',
+        category: SupportCategories.ACCOUNT_DELETION,
+        severity: 'Low',
+        allowSupportAccess: false,
+        verified: true,
+      })
+    )
   })
 
-  test('copies the account email when copy confirmation is enabled', async () => {
+  test('copies the account email without changing the confirmation input', async () => {
     const user = userEvent.setup()
     addAPIMock({ method: 'get', path: '/platform/organizations', response: [] })
 
@@ -96,10 +114,13 @@ describe('DeleteAccountButton', () => {
     const dialog = within(await screen.findByRole('dialog', { name: 'Request account deletion' }))
     const copy = await dialog.findByRole('button', { name: profile.primary_email })
     expect(copy).toHaveAttribute('type', 'button')
+    const confirmation = dialog.getByRole('textbox')
+    const draft = 'account@'
+    await user.type(confirmation, draft)
     await user.click(copy)
 
     expect(await navigator.clipboard.readText()).toBe(profile.primary_email)
-    expect(dialog.getByRole('textbox')).toHaveValue('')
+    expect(confirmation).toHaveValue(draft)
   })
 
   test('offers only dismissal when the account still belongs to an organization', async () => {
