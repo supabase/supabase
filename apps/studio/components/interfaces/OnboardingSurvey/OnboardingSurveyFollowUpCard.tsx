@@ -1,5 +1,5 @@
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
@@ -21,33 +21,45 @@ import { useTrack } from '@/lib/telemetry/track'
  */
 export function OnboardingSurveyFollowUpCard() {
   const track = useTrack()
-  const { isEligible, hasExpired, orgSlug, orgKind, orgSize, resolveFollowUp } =
+  const { isEligible, hasExpired, orgSlug, orgKind, orgSize, resolveFollowUp, reopenFollowUp } =
     useOnboardingSurveyFollowUp()
   const { addBanner, dismissBanner } = useBannerStack()
   const [dialogOrgSlug, setDialogOrgSlug] = useState<string>()
   const isDialogOpen = !!dialogOrgSlug && dialogOrgSlug === orgSlug
-  const { mutate: submitOnboardingSurvey, isPending: isSubmitting } = useOnboardingSurveyMutation()
+  const {
+    mutate: submitOnboardingSurvey,
+    mutateAsync: submitOnboardingSurveyAsync,
+    isPending: isSubmitting,
+  } = useOnboardingSurveyMutation()
+
+  // One skip save per org per mount: a failed save puts the follow-up back to
+  // pending for the next page load, which would otherwise re-trigger it here.
+  const skipSaveOrgSlugs = useRef(new Set<string>())
+  const [failedSkipOrgSlugs, setFailedSkipOrgSlugs] = useState<string[]>([])
+  const hasFailedSkip = !!orgSlug && failedSkipOrgSlugs.includes(orgSlug)
 
   // The new-org form sent nothing for a blank survey, so the org's type and size
   // are saved here whether the creator answers, skips, or lets the window close.
   const skipFollowUp = useCallback(
     (reason: 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired') => {
+      if (orgSlug && skipSaveOrgSlugs.current.has(orgSlug)) return
+
       track('onboarding_survey_dismissed', { surface: 'follow_up', reason })
       resolveFollowUp('dismissed')
-      if (orgSlug && orgKind)
-        submitOnboardingSurvey(
-          { slug: orgSlug, kind: orgKind, size: orgSize },
-          {
-            onError: () =>
-              track('onboarding_survey_submit_failed', {
-                surface: 'follow_up',
-                hasKind: false,
-                hasBuilding: false,
-              }),
-          }
-        )
+      if (orgSlug && orgKind) {
+        skipSaveOrgSlugs.current.add(orgSlug)
+        submitOnboardingSurveyAsync({ slug: orgSlug, kind: orgKind, size: orgSize }).catch(() => {
+          track('onboarding_survey_submit_failed', {
+            surface: 'follow_up',
+            hasKind: true,
+            hasBuilding: false,
+          })
+          setFailedSkipOrgSlugs((previous) => [...previous, orgSlug])
+          reopenFollowUp()
+        })
+      }
     },
-    [orgKind, orgSize, orgSlug, resolveFollowUp, submitOnboardingSurvey, track]
+    [orgKind, orgSize, orgSlug, reopenFollowUp, resolveFollowUp, submitOnboardingSurveyAsync, track]
   )
 
   useEffect(() => {
@@ -55,7 +67,8 @@ export function OnboardingSurveyFollowUpCard() {
   }, [hasExpired, isDialogOpen, skipFollowUp])
 
   const pathname = usePathname()
-  const shouldShowCard = isEligible && !isDialogOpen && !isProjectCreationPath(pathname)
+  const shouldShowCard =
+    isEligible && !hasFailedSkip && !isDialogOpen && !isProjectCreationPath(pathname)
 
   useEffect(() => {
     if (!shouldShowCard) {

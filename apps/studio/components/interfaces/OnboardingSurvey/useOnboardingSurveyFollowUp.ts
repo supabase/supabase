@@ -69,6 +69,17 @@ export function useOnboardingSurveyFollowUp() {
     [setStoredState]
   )
 
+  // Undoes a dismissal whose save failed, keeping the original org details and
+  // creation time, so the next page load retries it
+  const reopenFollowUp = useCallback(() => {
+    setStoredState((previous: unknown) => {
+      const previousState = parseFollowUpState(previous)
+      return previousState?.status === 'dismissed'
+        ? { ...previousState, status: 'pending' }
+        : previous
+    })
+  }, [setStoredState])
+
   return {
     isEligible,
     hasExpired,
@@ -76,5 +87,6 @@ export function useOnboardingSurveyFollowUp() {
     orgKind: followUpState?.kind,
     orgSize: followUpState?.size,
     resolveFollowUp,
+    reopenFollowUp,
   }
 }
