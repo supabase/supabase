@@ -1,6 +1,4 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import ScopedTokensPage from '@/pages/account/tokens/scoped'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/_app/account/tokens/scoped')({
   component: AccountScopedTokensPage,
@@ -11,5 +9,5 @@ export const Route = createFileRoute('/_app/account/tokens/scoped')({
 })
 
 function AccountScopedTokensPage() {
-  return <ScopedTokensPage dehydratedState={undefined} />
+  return <Navigate to="/account/tokens" replace />
 }
