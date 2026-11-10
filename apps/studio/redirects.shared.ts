@@ -283,6 +283,11 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
     permanent: true,
   },
   {
+    source: '/project/:ref/advisors',
+    destination: '/project/:ref/advisors/security',
+    permanent: true,
+  },
+  {
     source: '/project/:ref/advisors/query-performance',
     destination: '/project/:ref/observability/query-performance',
     permanent: true,
@@ -299,7 +304,7 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/linter',
-    destination: '/project/:ref/database/security-advisor',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {

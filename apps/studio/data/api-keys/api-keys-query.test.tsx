@@ -69,7 +69,11 @@ describe('apiKeysQueryOptions', () => {
 
     // Invalidate through the delete mutation.
     const { result } = customRenderHook(() => useAPIKeyDeleteMutation(), { queryClient })
-    await result.current.mutateAsync({ projectRef: PROJECT_REF, id: 'anon-id' })
+    await result.current.mutateAsync({
+      projectRef: PROJECT_REF,
+      grant: testGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef: PROJECT_REF }),
+      id: 'anon-id',
+    })
 
     await waitFor(() => expect(getCount).toBe(2))
     await waitFor(() => {
