@@ -65,6 +65,26 @@ describe('parseCronJobCommand', () => {
       case: 'an HTTP request in positional notation',
       command: `SELECT net.http_post( 'https://webhook.site/dacc2028-a588-462c-9597-c8968e61d0fa', '{"message":"Hello from Supabase"}'::jsonb, '{}'::jsonb, '{"Content-Type":"application/json"}'::jsonb );`,
     },
+    {
+      case: 'an HTTP request whose header value is a SQL expression',
+      command: `select net.http_post( url:='https://random_project_ref.supabase.co/functions/v1/_', headers:=jsonb_build_object('Authorization', 'Bearer ' || (SELECT decrypted_secret FROM vault.decrypted_secrets WHERE name = 'secret')), body:='{}'::jsonb, timeout_milliseconds:=5000 );`,
+    },
+    {
+      case: 'an HTTP request with concatenated header objects',
+      command: `select net.http_post( url:='https://example.com/api', headers:=jsonb_build_object('a', '1') || jsonb_build_object('b', to_char(now(), 'YYYY')), timeout_milliseconds:=5000 );`,
+    },
+    {
+      case: 'an HTTP request with a non-literal body',
+      command: `select net.http_post( url:='https://example.com/api', body:=jsonb_build_object('at', now()), timeout_milliseconds:=5000 );`,
+    },
+    {
+      case: 'an HTTP request with an argument the form does not support',
+      command: `select net.http_get( url:='https://example.com/api', params:=jsonb_build_object('a', '1') );`,
+    },
+    {
+      case: 'an HTTP request followed by another statement',
+      command: `select net.http_get( url:='https://example.com/api' ); select 1;`,
+    },
   ])('falls back to a sql snippet for $case', ({ command }) => {
     expect(parseCronJobCommand(command, REF)).toStrictEqual({
       type: 'sql_snippet',
