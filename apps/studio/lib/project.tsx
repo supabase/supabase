@@ -1,10 +1,5 @@
-import generator from 'generate-password-browser'
+import { generateRandomString } from '@/lib/random'
 
-export const generateStrongPassword = () => {
-  const password = generator.generate({
-    length: 16,
-    numbers: true,
-    uppercase: true,
-  })
-  return password
-}
+const PASSWORD_CHARSET = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
+
+export const generateStrongPassword = () => generateRandomString(16, PASSWORD_CHARSET)

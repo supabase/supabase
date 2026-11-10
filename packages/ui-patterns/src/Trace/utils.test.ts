@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 
 import type { Span } from './types'
-import { buildTraceIndex, createTimeScale } from './utils'
+import { buildTraceIndex, createTimeScale, formatMs, niceTickStep } from './utils'
 
 const span = (id: string, startMs: number, endMs: number | null, parentId: string | null = null) =>
   ({
@@ -58,5 +58,46 @@ describe('createTimeScale', () => {
     const scale = createTimeScale([5, 5], 500)
     expect(scale.toX(5)).toBe(0)
     expect(scale.toMs(100)).toBe(5)
+  })
+})
+
+describe('ticks', () => {
+  it('picks the smallest nice step that fits the width', () => {
+    expect(niceTickStep(1000, 10)).toBe(100)
+    expect(niceTickStep(1000, 3)).toBe(500)
+    expect(niceTickStep(7_200_000 * 4, 2)).toBe(14_400_000)
+  })
+
+  it('formats labels with enough precision for the step', () => {
+    expect(formatMs(0, 100)).toBe('0ms')
+    expect(formatMs(0.5, 0.5)).toBe('500µs')
+    expect(formatMs(250, 50)).toBe('250ms')
+    expect(formatMs(1200, 200)).toBe('1.2s')
+    expect(formatMs(2000, 1000)).toBe('2s')
+    expect(formatMs(90_000, 30_000)).toBe('1m 30s')
+    expect(formatMs(5_400_000, 1_800_000)).toBe('1h 30m')
+  })
+
+  it('places ticks as fractions of the window', () => {
+    const { ticks } = createTimeScale([100, 1100], 800)
+    expect(ticks.map((tick) => tick.label)).toEqual([
+      '0ms',
+      '100ms',
+      '200ms',
+      '300ms',
+      '400ms',
+      '500ms',
+      '600ms',
+      '700ms',
+      '800ms',
+      '900ms',
+      '1s',
+    ])
+    expect(ticks[1]).toMatchObject({ ms: 200, fraction: 0.1 })
+  })
+
+  it('has no ticks for an empty window or zero width', () => {
+    expect(createTimeScale([5, 5], 800).ticks).toEqual([])
+    expect(createTimeScale([0, 100], 0).ticks).toEqual([])
   })
 })
