@@ -89,7 +89,8 @@ export function PolicySearchResults({ query }: PolicySearchResultsProps) {
           </span>
         ) : (
           <span>
-            Total: {totalPolicies.toLocaleString()} polic{totalPolicies !== 1 ? 'ies' : 'y'}
+            Total: {totalPolicies.toLocaleString()} polic
+            {totalPolicies !== 1 ? <span>ies</span> : <span>y</span>}
           </span>
         )}
       </div>

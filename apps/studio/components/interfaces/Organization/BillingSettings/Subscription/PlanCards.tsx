@@ -2,6 +2,7 @@ import { motion } from 'motion/react'
 import { useRouter } from 'next/router'
 import { plans as subscriptionsPlans } from 'shared-data/plans'
 
+import { AwsMarketplacePurchaseCallout } from './AwsMarketplacePurchaseCallout'
 import { EnterpriseCard } from './EnterpriseCard'
 import { PlanCard } from './PlanCard'
 import { getPlanCardsEntryAnimation } from './PlanCards.utils'
@@ -21,6 +22,7 @@ export interface PlanCardsProps {
   selectedOrganization: Organization | undefined
   /** Seconds to wait before the cards stagger in. */
   entryDelay: number
+  showAwsMarketplacePurchase?: boolean
   onSelectTier: (tier: 'tier_free' | 'tier_pro' | 'tier_team') => void
 }
 
@@ -34,6 +36,7 @@ export function PlanCards({
   hasOrioleProjects,
   selectedOrganization,
   entryDelay,
+  showAwsMarketplacePurchase = false,
   onSelectTier,
 }: PlanCardsProps) {
   const router = useRouter()
@@ -42,7 +45,7 @@ export function PlanCards({
   const entryAnimation = getPlanCardsEntryAnimation(entryDelay)
 
   return (
-    <motion.div className="py-6 grid grid-cols-12 gap-3" {...entryAnimation.container}>
+    <motion.div className="w-full py-6 grid grid-cols-12 gap-3" {...entryAnimation.container}>
       {subscriptionsPlans.map((plan) => {
         const planMeta = availablePlans.find((p) => p.id === plan.id.split('tier_')[1])
         const price = planMeta?.price ?? 0
@@ -91,6 +94,11 @@ export function PlanCards({
           />
         )
       })}
+      {showAwsMarketplacePurchase && (
+        <motion.div className="col-span-12" variants={entryAnimation.card}>
+          <AwsMarketplacePurchaseCallout />
+        </motion.div>
+      )}
     </motion.div>
   )
 }

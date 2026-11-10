@@ -1,20 +1,7 @@
-import { House, LifeBuoy, Menu } from 'lucide-react'
+import { House, LifeBuoy } from 'lucide-react'
 import { useState } from 'react'
-import {
-  buttonVariants,
-  cn,
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuGroup,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuRadioGroup,
-  DropdownMenuRadioItem,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  GithubIcon,
-  singleThemes,
-} from 'ui'
+import { DropdownMenuItem, DropdownMenuSeparator, GithubIcon } from 'ui'
+import { TopNavDropdown, TopNavThemeGroup } from 'ui-patterns/TopNav/TopNavDropdown'
 
 export interface HeaderMenuProps {
   className?: string
@@ -75,42 +62,17 @@ export const HeaderMenu = ({ className }: HeaderMenuProps) => {
   const { choice, onChoiceChange } = useThemeChoice()
 
   return (
-    <DropdownMenu modal={false}>
-      <DropdownMenuTrigger asChild>
-        <button
-          type="button"
-          className={cn(
-            buttonVariants({ variant: 'default' }),
-            'size-7.5 min-w-7.5 space-x-0 border-default bg-transparent px-0 text-foreground-light',
-            'hover:border-strong hover:bg-overlay-hover/50! data-open:border-stronger data-open:bg-overlay-hover/30',
-            className
-          )}
-        >
-          <Menu aria-hidden className="size-4.5" strokeWidth={1} />
-          <span className="sr-only">Open menu</span>
-        </button>
-      </DropdownMenuTrigger>
-      <DropdownMenuContent side="bottom" align="end" className="w-52">
-        {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
-          <DropdownMenuItem key={href} asChild className="gap-2">
-            <a href={href} target="_blank" rel="noreferrer noopener">
-              <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
-              {label}
-            </a>
-          </DropdownMenuItem>
-        ))}
-        <DropdownMenuSeparator />
-        <DropdownMenuGroup>
-          <DropdownMenuLabel>Theme</DropdownMenuLabel>
-          <DropdownMenuRadioGroup value={choice} onValueChange={onChoiceChange}>
-            {singleThemes.map((theme) => (
-              <DropdownMenuRadioItem key={theme.value} value={theme.value}>
-                {theme.name}
-              </DropdownMenuRadioItem>
-            ))}
-          </DropdownMenuRadioGroup>
-        </DropdownMenuGroup>
-      </DropdownMenuContent>
-    </DropdownMenu>
+    <TopNavDropdown className={className}>
+      {EXTERNAL_LINKS.map(({ label, href, Icon }) => (
+        <DropdownMenuItem key={href} asChild className="gap-2">
+          <a href={href} target="_blank" rel="noreferrer noopener">
+            <Icon aria-hidden className="size-4 text-foreground-lighter" strokeWidth={1.5} />
+            {label}
+          </a>
+        </DropdownMenuItem>
+      ))}
+      <DropdownMenuSeparator />
+      <TopNavThemeGroup value={choice} onValueChange={onChoiceChange} />
+    </TopNavDropdown>
   )
 }

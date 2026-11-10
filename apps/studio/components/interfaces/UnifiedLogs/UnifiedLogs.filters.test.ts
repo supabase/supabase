@@ -1,13 +1,19 @@
 import { describe, expect, it } from 'vitest'
+import { z } from 'zod'
 
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
+  addLogsColumnFilter,
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
+  groupLogsFiltersByColumn,
+  logAttributeFilterId,
   logsFiltersToColumnFilters,
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
 } from './UnifiedLogs.filters'
+import { serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 
 describe('columnFiltersToLogsFilters', () => {
   it('serializes a bare string[] (defensive fallback for un-wrapped input) using the default `=` operator', () => {
@@ -158,5 +164,130 @@ describe('buildDefaultColumnFilters', () => {
     const range = [new Date('2026-05-08T00:00:00Z'), new Date('2026-05-08T01:00:00Z')]
     const columnFilters = buildDefaultColumnFilters({ filter: ['date:eq:123'], date: range })
     expect(columnFilters).toEqual([{ id: 'date', value: range }])
+  })
+})
+
+describe('attribute filter URLs', () => {
+  it.each([
+    'request_id',
+    'attribute.status',
+    'attribute.request:header',
+    'attribute.a%3Ab',
+    '__proto__',
+    'constructor',
+  ])('preserves %s when changing a builtin filter after reload', (column) => {
+    const original = [{ column, operator: '<>' as const, value: "value:with'quotes\\and:colons" }]
+    const params = logsFiltersToUrlParams(original)
+    const reloaded = buildDefaultColumnFilters({ filter: params })
+    const update = buildFilterSearchUpdate(
+      [...reloaded, { id: 'method', value: ['POST'] }],
+      [
+        { value: 'method', type: 'checkbox' },
+        { value: 'date', type: 'timerange' },
+      ]
+    )
+    expect(parseLogsFilterUrlParams(z.array(z.string()).nullable().parse(update.filter))).toEqual([
+      ...original,
+      { column: 'method', operator: '=', value: 'POST' },
+    ])
+  })
+
+  it('keeps attributes named like builtins and nested attribute prefixes distinct', () => {
+    const columns = [
+      'status',
+      logAttributeFilterId('status'),
+      logAttributeFilterId('attribute.status'),
+    ]
+    const grouped = groupLogsFiltersByColumn(
+      columns.map((column, index) => ({ column, operator: '=', value: String(index) }))
+    )
+    expect(Object.values(grouped).map(({ values }) => values)).toEqual([['0'], ['1'], ['2']])
+  })
+})
+
+it.each(['comma,value:colon%percent', 'literal%2C:comma,plus+space value'])(
+  'round-trips attribute keys and %s through the public logs URL',
+  (value) => {
+    const original = [
+      {
+        column: logAttributeFilterId('request.headers.x:custom,%2C'),
+        operator: '<>' as const,
+        value,
+      },
+    ]
+    const url = serializeUnifiedLogsSearchParams('/project/abc/logs', {
+      filter: logsFiltersToUrlParams(original),
+    })
+    const params = new URL(url, 'https://example.com').searchParams
+    const parsed = SEARCH_PARAMS_PARSER.filter.parse(params.get('filter') ?? '')
+    expect(parseLogsFilterUrlParams(parsed)).toEqual(original)
+  }
+)
+
+it('ignores malformed attribute encodings without losing valid neighboring or legacy filters', () => {
+  expect(
+    parseLogsFilterUrlParams([
+      'attribute.request_id:eq:req-1',
+      'attribute.broken%:eq:ignored',
+      'event_message:ilike:100% ready:now',
+      'attribute.trace_id:eq:%C3%28',
+      'attribute.span_id:neq:span%3A1',
+    ])
+  ).toEqual([
+    { column: 'attribute.request_id', operator: '=', value: 'req-1' },
+    { column: 'event_message', operator: '~~*', value: '100% ready:now' },
+    { column: 'attribute.span_id', operator: '<>', value: 'span:1' },
+  ])
+})
+
+describe('addLogsColumnFilter', () => {
+  const pathname = { field: 'pathname', operator: '=', value: '/rest/v1/todos' } as const
+
+  it('adds a filter for a column that has none', () => {
+    expect(addLogsColumnFilter([], pathname)).toEqual([
+      { id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } },
+    ])
+  })
+
+  it('keeps values with special characters intact', () => {
+    const value = `/rest/v1/todos?name=eq."O'Brien"&x=a:b`
+    expect(addLogsColumnFilter([], { ...pathname, value })).toEqual([
+      { id: 'pathname', value: { operator: '=', values: [value] } },
+    ])
+  })
+
+  it('collects a second value under the same operator, in place', () => {
+    const current = [
+      { id: 'method', value: { operator: '=', values: ['GET'] } },
+      { id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } },
+    ]
+    expect(addLogsColumnFilter(current, { field: 'method', operator: '=', value: 'POST' })).toEqual(
+      [{ id: 'method', value: { operator: '=', values: ['GET', 'POST'] } }, current[1]]
+    )
+  })
+
+  it('leaves an already applied filter untouched rather than duplicating it', () => {
+    const current = [{ id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } }]
+    expect(addLogsColumnFilter(current, pathname)).toEqual(current)
+  })
+
+  it('replaces the values when the operator changes, since a column holds one operator', () => {
+    const current = [{ id: 'pathname', value: { operator: '=', values: ['/health'] } }]
+    expect(addLogsColumnFilter(current, { ...pathname, operator: '<>' })).toEqual([
+      { id: 'pathname', value: { operator: '<>', values: ['/rest/v1/todos'] } },
+    ])
+  })
+
+  it('replaces an unwrapped legacy value (bare string[]) with the wrapped shape', () => {
+    const current = [{ id: 'log_type', value: ['postgres'] }]
+    expect(
+      addLogsColumnFilter(current, { field: 'log_type', operator: '=', value: 'auth' })
+    ).toEqual([{ id: 'log_type', value: { operator: '=', values: ['auth'] } }])
+  })
+
+  it('stringifies numeric values so they match the column filter shape', () => {
+    expect(addLogsColumnFilter([], { field: 'status', operator: '<>', value: 500 })).toEqual([
+      { id: 'status', value: { operator: '<>', values: ['500'] } },
+    ])
   })
 })

@@ -84,7 +84,7 @@ vi.mock('@/data/organizations/organization-query', () => ({
 
 vi.mock('@/data/subscriptions/org-subscription-query', () => ({
   useOrgSubscriptionQuery: () => ({
-    data: { plan: { id: 'free', name: 'Free' } },
+    data: { plan: { id: 'free', name: 'Free' }, billing_via_partner: false },
     isSuccess: true,
   }),
 }))
@@ -212,7 +212,7 @@ describe('PlanUpdateSidePanel', () => {
     it('renders the full-screen shell', () => {
       render(<PlanUpdateSidePanel />)
 
-      expect(screen.getByRole('button', { name: /Go back to Studio/ })).toBeInTheDocument()
+      expect(screen.getByRole('button', { name: /Back/ })).toBeInTheDocument()
       expect(screen.getByRole('link', { name: /Compare plans/ })).toBeInTheDocument()
     })
 
@@ -223,6 +223,32 @@ describe('PlanUpdateSidePanel', () => {
         screen.getByText('Perfect for passion projects & simple websites.')
       ).toBeInTheDocument()
       expect(screen.getByText('Everything in the Free Plan, plus:')).toBeInTheDocument()
+    })
+
+    it('offers AWS Marketplace as a separate purchasing route', () => {
+      render(<PlanUpdateSidePanel />)
+
+      expect(screen.getByText('Prefer purchasing through AWS Marketplace?')).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'View options' })).toHaveAttribute(
+        'href',
+        'https://supabase.com/aws-marketplace'
+      )
+    })
+
+    it('does not offer AWS Marketplace for partner-billed organizations', () => {
+      mockSelectedOrganization.mockReturnValue(
+        createMockOrganization({
+          slug: 'aws-org',
+          billing_partner: 'aws_marketplace',
+          managed_by: MANAGED_BY.AWS_MARKETPLACE,
+        })
+      )
+
+      render(<PlanUpdateSidePanel />)
+
+      expect(
+        screen.queryByText('Prefer purchasing through AWS Marketplace?')
+      ).not.toBeInTheDocument()
     })
 
     it('does not render gap rows', () => {

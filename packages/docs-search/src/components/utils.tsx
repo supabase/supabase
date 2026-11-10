@@ -5,6 +5,8 @@ import type { SearchResult, SearchState } from './types'
 interface GetIsSearchingParams {
   searchState: SearchState
   query: string
+  /** Same threshold the panel submits with: a query this short never reaches the search. */
+  minCharacters?: number
 }
 
 /** Common English prepositions/articles/conjunctions, excluded from highlighting so a query like "the mcp server" doesn't bold "the". */
@@ -95,7 +97,7 @@ function highlightMatches(text: string, query: string): ReactNode {
 }
 
 // drives the loading beam: on while a request is in flight or about to be sent
-function getIsSearching({ searchState, query }: GetIsSearchingParams): boolean {
+function getIsSearching({ searchState, query, minCharacters = 0 }: GetIsSearchingParams): boolean {
   if (searchState.status === 'loading') return true
   if (searchState.status === 'error') return false
 
@@ -103,7 +105,16 @@ function getIsSearching({ searchState, query }: GetIsSearchingParams): boolean {
   const settledQuery = 'query' in searchState ? searchState.query : null
 
   // so a search is on its way and the beam starts on the keystroke, not when the request fires
-  return trimmedQuery !== '' && trimmedQuery !== settledQuery
+  return canSubmitQuery(trimmedQuery, minCharacters) && trimmedQuery !== settledQuery
+}
+
+/**
+ * Whether a query is long enough to be submitted: it has to be longer than `minCharacters`,
+ * so a `minCharacters` of 2 holds the search back until the third character. Expects the
+ * query already trimmed, so whitespace never counts toward the threshold.
+ */
+function canSubmitQuery(trimmedQuery: string, minCharacters: number): boolean {
+  return trimmedQuery.length > minCharacters
 }
 
 /** The results to show: the settled ones, or the previous ones while a new search is loading. */
@@ -120,4 +131,11 @@ function getHighlightQuery(searchState: SearchState): string {
   return ''
 }
 
-export { formatHeadingPath, getHighlightQuery, getIsSearching, getVisibleResults, highlightMatches }
+export {
+  canSubmitQuery,
+  formatHeadingPath,
+  getHighlightQuery,
+  getIsSearching,
+  getVisibleResults,
+  highlightMatches,
+}

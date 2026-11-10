@@ -174,7 +174,7 @@ export const SSOConfig = () => {
         user_name_mapping: values.userNameMapping.map((item) => item.value).filter(Boolean),
         join_org_on_signup_enabled: values.joinOrgOnSignup,
         join_org_on_signup_role: roleOnJoin,
-        idjag_issuer_url: values.idjagIssuerUrl || undefined,
+        idjag_issuer_url: values.idjagIssuerUrl || null,
       },
     }
 
@@ -421,14 +421,15 @@ export const SSOConfig = () => {
                       <span className="text-foreground font-semibold">{ssoConfig.domains[0]}</span>
                     </>
                   )}
-                  .
+                  <span>.</span>
                 </p>
 
                 {ssoMemberCount > 0 && (
                   <div className="rounded-md bg-destructive/10 border border-destructive/30 p-3">
                     <p className="text-sm text-foreground">
                       <span className="font-semibold">
-                        {ssoMemberCount} organization member{ssoMemberCount !== 1 ? 's' : ''}
+                        {ssoMemberCount} organization member
+                        {ssoMemberCount !== 1 ? <span>s</span> : ''}
                       </span>{' '}
                       who authenticate via SSO will be{' '}
                       <span className="font-semibold">permanently removed</span> from this

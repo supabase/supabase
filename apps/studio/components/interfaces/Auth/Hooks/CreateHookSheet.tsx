@@ -43,6 +43,7 @@ import { InlineLink } from '@/components/ui/InlineLink'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { AuthConfigResponse } from '@/data/auth/auth-config-query'
 import { useAuthHooksUpdateMutation } from '@/data/auth/auth-hooks-update-mutation'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
@@ -218,7 +219,10 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
         executeSql({
           projectRef,
           connectionString: project!.connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'auth-hook-update-permissions',
           sql: joinSqlFragments(statements, '\n'),
+          grant: unguarded.migrating,
         })
       }
       onClose()
@@ -452,10 +456,12 @@ revoke execute on function ${ident(schema)}.${ident(functionName)} from authenti
                                 No function with a single JSON/B argument
                                 <br />
                                 and JSON/B
-                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED'
-                                  ? ' or void'
-                                  : ''}{' '}
-                                return type found in this schema.
+                                {definition.enabledKey === 'HOOK_SEND_EMAIL_ENABLED' ? (
+                                  <span>{' or void'}</span>
+                                ) : (
+                                  ''
+                                )}{' '}
+                                <span>return type found in this schema.</span>
                               </span>
                             }
                           />

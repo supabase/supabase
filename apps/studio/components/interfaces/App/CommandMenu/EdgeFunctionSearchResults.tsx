@@ -72,7 +72,8 @@ export function EdgeFunctionSearchResults({ query }: EdgeFunctionSearchResultsPr
           </span>
         ) : (
           <span>
-            Total: {totalFunctions.toLocaleString()} function{totalFunctions !== 1 ? 's' : ''}
+            Total: {totalFunctions.toLocaleString()} function
+            {totalFunctions !== 1 ? <span>s</span> : ''}
           </span>
         )}
       </div>

@@ -20,6 +20,31 @@ function selectOptOut(tool: string) {
   })
 }
 
+describe('McpConfigPanel default feature groups', () => {
+  it('enables feedback by default only for hosted connections', () => {
+    const { container, rerender } = render(<McpConfigPanel {...props} />, {
+      wrapper: TooltipProvider,
+    })
+    expect(container.textContent).toMatch(/features=[^&\s"]*feedback/)
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*storage/)
+
+    // Older local Studio versions reject unknown groups with a 400.
+    rerender(<McpConfigPanel {...props} isPlatform={false} />)
+    expect(container.textContent).toContain('features=docs')
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*feedback/)
+  })
+
+  it('enables notebooks by default only for hosted connections', () => {
+    const { container, rerender } = render(<McpConfigPanel {...props} />, {
+      wrapper: TooltipProvider,
+    })
+    expect(container.textContent).toMatch(/features=[^&\s"]*notebooks/)
+
+    rerender(<McpConfigPanel {...props} isPlatform={false} />)
+    expect(container.textContent).not.toMatch(/features=[^&\s"]*notebooks/)
+  })
+})
+
 describe('McpConfigPanel opt-out transitions', () => {
   it('permanently clears cost opt-outs when a connection becomes project scoped', () => {
     const { container, rerender } = render(<McpConfigPanel {...props} />, {
@@ -65,6 +90,7 @@ describe('McpConfigPanel opt-out transitions', () => {
     { feature: 'Database', tool: 'execute_sql' },
     { feature: 'Account', tool: 'create_branch' },
     { feature: 'Branching', tool: 'create_branch' },
+    { feature: 'Notebooks', tool: 'delete_notebook' },
   ])('does not restore $tool after removing and readding $feature', ({ feature, tool }) => {
     const { container } = render(<McpConfigPanel {...props} />, { wrapper: TooltipProvider })
     selectOptOut(tool)

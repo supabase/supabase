@@ -2,8 +2,10 @@ import { getCronJobsSql } from '@supabase/pg-meta'
 import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 
 import { databaseCronJobsKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { COST_THRESHOLD_ERROR, executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 // The value is intentionally high because the data grid needs to overflow so that `onScroll` event work and trigger
 // the infinite loading. If the value is too low, there won't be enough items to overflow and trigger the event.
@@ -36,16 +38,19 @@ export async function getDatabaseCronJobs({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-jobs',
     sql: getCronJobsSql({ searchTerm, page, limit: CRON_JOBS_PAGE_LIMIT }),
     queryKey: ['cron-jobs'],
     preflightCheck: true,
+    grant: unguarded.migrating,
   })
 
   return result
 }
 
 type DatabaseCronJobsInfiniteData = CronJob[]
-type DatabaseCronJobsInfiniteError = ResponseError
+type DatabaseCronJobsInfiniteError = StudioError
 
 export const useCronJobsInfiniteQuery = <TData = DatabaseCronJobsInfiniteData>(
   { projectRef, connectionString, searchTerm }: DatabaseCronJobRunsVariables,

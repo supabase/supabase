@@ -19,7 +19,7 @@ import { SparkBar } from '@/components/ui/SparkBar'
 import type { OrgSubscription } from '@/data/subscriptions/types'
 import type { OrgMetricsUsage, OrgUsageResponse } from '@/data/usage/org-usage-query'
 import { USAGE_APPROACHING_THRESHOLD } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export interface AttributeUsageProps {
   slug: string
@@ -30,7 +30,7 @@ export interface AttributeUsageProps {
   chartMeta: ChartMeta
   subscription?: OrgSubscription
 
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   isSuccess: boolean
@@ -181,7 +181,7 @@ const AttributeUsage = ({
                       {currentBillingCycleSelected && usageMeta && (
                         <div className="flex items-center justify-between py-1">
                           <p className="text-xs text-foreground-light">
-                            {attribute.chartPrefix || 'Used '} in period
+                            {attribute.chartPrefix || <span>{'Used '}</span>} <span>in period</span>
                           </p>
                           <p className="text-xs">
                             {attribute.unit === 'bytes' || attribute.unit === 'gigabytes'
@@ -211,7 +211,7 @@ const AttributeUsage = ({
                 <div className="space-y-1">
                   <p className="text-sm">
                     {attribute.chartPrefix || ''} {attribute.name}{' '}
-                    {attribute.chartSuffix || 'per day'}
+                    {attribute.chartSuffix || <span>per day</span>}
                   </p>
                   {attribute.chartDescription.split('\n').map((paragraph, idx) => (
                     <p key={`para-${idx}`} className="text-sm text-foreground-light">

@@ -8,6 +8,7 @@ import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
 import { InlineLink } from '@/components/ui/InlineLink'
+import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { Lint } from '@/data/lint/lint-query'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
@@ -91,7 +92,10 @@ export const GraphqlExposureLintCTA = ({
     executeSql({
       projectRef,
       connectionString: project?.connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'graphql-exposure-revoke',
       sql: revokeSql,
+      grant: unguarded.migrating,
     })
   }
 

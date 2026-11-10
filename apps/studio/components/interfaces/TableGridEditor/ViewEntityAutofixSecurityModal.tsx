@@ -7,6 +7,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { SimpleCodeBlock } from 'ui-patterns/SimpleCodeBlock'
 
 import { useViewDefinitionQuery } from '@/data/database/view-definition-query'
+import { unguarded } from '@/data/fetchers'
 import { lintKeys } from '@/data/lint/keys'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { Entity, isViewLike } from '@/data/table-editor/table-editor-types'
@@ -56,7 +57,10 @@ export const ViewEntityAutofixSecurityModal = ({
     execute({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'view-security-invoker-autofix',
       sql,
+      grant: unguarded.migrating,
     })
   }
 

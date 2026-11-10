@@ -48,6 +48,7 @@ import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialo
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useDatabasePolicyUpdateMutation } from '@/data/database-policies/database-policy-update-mutation'
 import { databasePoliciesKeys } from '@/data/database-policies/keys'
+import { unguarded } from '@/data/fetchers'
 import { QueryResponseError, useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
@@ -218,11 +219,13 @@ export const PolicyEditorPanel = memo(function ({
       setError(undefined)
       executeMutation({
         sql,
+        sqlOrigin: 'user',
         projectRef: selectedProject?.ref,
         connectionString: selectedProject?.connectionString,
         handleError: (error) => {
           throw error
         },
+        grant: unguarded.migrating,
       })
     } else if (selectedProject !== undefined) {
       const updatedRoles = roles.length === 0 ? ['public'] : roles.split(', ')
@@ -263,6 +266,7 @@ export const PolicyEditorPanel = memo(function ({
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
         originalPolicy: selectedPolicy,
+        sqlOrigin: 'user',
         // The Save click is the explicit user gesture that promotes editor content
         // to executable SQL.
         payload: {

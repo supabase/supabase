@@ -218,6 +218,7 @@ export const CreateCronJobSheet = ({ open, selectedCronJob, onClose }: CreateCro
         projectRef: project!.ref,
         connectionString: project?.connectionString,
         query,
+        sqlOrigin: 'user',
         searchTerm: searchQuery,
         // [Joshen] Only need to invalidate a specific cron job if in the job's previous run tab
         identifier: !!jobId ? jobId : undefined,

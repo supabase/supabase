@@ -28,6 +28,7 @@ import { FilterPill } from '@/components/interfaces/QueryPerformance/components/
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { FilterPopover } from '@/components/ui/FilterPopover'
 import { TwoOptionToggle } from '@/components/ui/TwoOptionToggle'
+import { unguarded } from '@/data/fetchers'
 import { useExecuteSqlMutation } from '@/data/sql/execute-sql-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -184,6 +185,9 @@ export const QueryInsightsTable = ({
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           sql: wrapWithRollback(safeSql`EXPLAIN ANALYZE ${requestQuery}`),
+          // The query text comes from pg_stat_statements, so the user wrote it
+          sqlOrigin: 'user',
+          grant: unguarded.migrating,
         },
         {
           onSuccess(data) {
@@ -367,16 +371,16 @@ export const QueryInsightsTable = ({
               <Tabs value={filter} onValueChange={(v) => setFilter(v as IssueFilter)}>
                 <TabsList className="flex gap-x-4 rounded-none mt-0! pt-0 border-none!">
                   <TabsTrigger value="all" className="text-xs py-3 border-b font-mono uppercase">
-                    All{triageItems.length > 0 && ` (${triageItems.length})`}
+                    All{triageItems.length > 0 && <span>{` (${triageItems.length})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="error" className="text-xs py-3 border-b font-mono uppercase">
-                    Errors{errorCount > 0 && ` (${errorCount})`}
+                    Errors{errorCount > 0 && <span>{` (${errorCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="index" className="text-xs py-3 border-b font-mono uppercase">
-                    Index{indexCount > 0 && ` (${indexCount})`}
+                    Index{indexCount > 0 && <span>{` (${indexCount})`}</span>}
                   </TabsTrigger>
                   <TabsTrigger value="slow" className="text-xs py-3 border-b font-mono uppercase">
-                    Slow{slowCount > 0 && ` (${slowCount})`}
+                    Slow{slowCount > 0 && <span>{` (${slowCount})`}</span>}
                   </TabsTrigger>
                 </TabsList>
               </Tabs>

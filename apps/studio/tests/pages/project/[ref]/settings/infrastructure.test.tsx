@@ -11,10 +11,10 @@ import InfrastructurePage from '@/pages/project/[ref]/settings/infrastructure'
 import { createMockOrganizationResponse } from '@/tests/helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock } from '@/tests/lib/msw'
+import { mockPermissions } from '@/tests/lib/msw-permissions'
 
 type ProjectDetailResponse = components['schemas']['ProjectDetailResponse_Output']
 type ProjectAddonsResponse = components['schemas']['ProjectAddonsResponse_Output']
-type PermissionsV2Response = components['schemas']['UserPermissionsResponse_Output']
 
 const PROJECT_REF = 'project-ref'
 const ORGANIZATION_SLUG = 'acme'
@@ -178,30 +178,26 @@ function mockInfrastructureEndpoints() {
       ],
     },
   })
-  addAPIMock({
-    method: 'get',
-    path: '/platform/profile/permissions/v2',
-    response: {
-      organizations: [
-        {
-          slug: ORGANIZATION_SLUG,
-          role: 'administrator',
-          permissions: [],
-          projects: [
-            {
-              ref: PROJECT_REF,
-              role: 'administrator',
-              permissions: [
-                FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
-                FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
-                FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
-                FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
-              ],
-            },
-          ],
-        },
-      ],
-    } satisfies PermissionsV2Response,
+  mockPermissions({
+    organizations: [
+      {
+        slug: ORGANIZATION_SLUG,
+        role: 'administrator',
+        permissions: [],
+        projects: [
+          {
+            ref: PROJECT_REF,
+            role: 'administrator',
+            permissions: [
+              FGA_PERMISSIONS.PROJECT.ADMIN_WRITE,
+              FGA_PERMISSIONS.PROJECT.OPERATIONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_ADDONS_WRITE,
+              FGA_PERMISSIONS.PROJECT.INFRA_DISK_CONFIG_WRITE,
+            ],
+          },
+        ],
+      },
+    ],
   })
   addAPIMock({
     method: 'get',
@@ -281,6 +277,29 @@ function mockInfrastructureEndpoints() {
           variant: COMPUTE_VARIANTS[0],
         },
       ],
+    },
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/platform/stripe/invoices/overdue',
+    response: [],
+  })
+  addAPIMock({
+    method: 'get',
+    path: '/v1/projects/:ref/upgrade/eligibility',
+    response: {
+      eligible: true,
+      current_app_version: 'supabase-postgres-17.6.1.100',
+      current_app_version_release_channel: 'ga',
+      latest_app_version: 'supabase-postgres-17.6.1.100',
+      target_upgrade_versions: [],
+      duration_estimate_hours: 1,
+      legacy_auth_custom_roles: [],
+      objects_to_be_dropped: [],
+      unsupported_extensions: [],
+      user_defined_objects_in_internal_schemas: [],
+      validation_errors: [],
+      warnings: [],
     },
   })
   addAPIMock({

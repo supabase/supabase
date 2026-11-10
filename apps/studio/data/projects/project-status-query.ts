@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { projectKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectStatusVariables = {
   projectRef?: string
@@ -24,7 +25,7 @@ export async function getProjectStatus(
 }
 
 export type ProjectStatusData = Awaited<ReturnType<typeof getProjectStatus>>
-export type ProjectStatusError = ResponseError
+export type ProjectStatusError = StudioError
 
 export const useProjectStatusQuery = <TData = ProjectStatusData>(
   { projectRef }: ProjectStatusVariables,

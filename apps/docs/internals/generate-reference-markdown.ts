@@ -124,6 +124,13 @@ const REFERENCES: Ref[] = [
     contentDir: path.join(process.cwd(), 'content/reference/middleware/v1'),
   },
   {
+    kind: 'sdk-new',
+    title: 'TanStack DB Reference',
+    outFile: 'tanstack_db.md',
+    mdxDir: path.join(MDX_ROOT, 'tanstack_db'),
+    contentDir: path.join(process.cwd(), 'content/reference/tanstack_db/v1'),
+  },
+  {
     kind: 'sdk-legacy',
     title: 'Kotlin Client Library Reference',
     outFile: 'kotlin.md',

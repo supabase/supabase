@@ -17,6 +17,7 @@ import {
   GitBranch,
   Globe,
   Image,
+  KeyRound,
   Lock,
   Mail,
   MessageCircle,
@@ -1778,7 +1779,7 @@ Supabase’s Image Transformations feature enables developers to dynamically man
 3. Resize modes: Choose from ‘cover’, ‘contain’, or ‘fill’ to control how images fit within specified dimensions.
 4. Automatic format optimization: Automatically convert images to WebP format for supported browsers, enhancing load times and reducing egress usage.
 5. Flexible implementation: Utilize with public URLs, signed URLs, or direct downloads to fit various access control needs ([Server-side Auth](/features/server-side-auth)).
-6. [Next.js integration](/nextjs): Leverage a custom loader for optimized image handling in Next.js applications.
+6. [Next.js integration](/docs/guides/storage/serving/image-transformations#nextjs-loader): Leverage a custom loader for optimized image handling in Next.js applications.
 7. Self-hosting option: Deploy your own image transformation service using Imgproxy for greater control and customization.
 
 
@@ -2352,6 +2353,56 @@ By utilizing the Supabase Management API, you can create more efficient, scalabl
     heroImageLight: '/images/features/management-api-light.png',
     docsUrl: 'https://supabase.com/docs/reference/api/introduction',
     slug: 'management-api',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
+    },
+  },
+  {
+    title: 'Personal Access Tokens',
+    subtitle: 'Limit a token to the organizations, projects, and permissions its job needs.',
+    description: `
+Personal Access Tokens authenticate your CLI, scripts, CI pipelines, and AI coding agents to your Supabase account. You can limit each token to the organizations, projects, and permissions its job needs, instead of handing a tool access to everything you can reach.
+
+Tokens you create in the Dashboard are scoped by default. Access is checked on every request and never exceeds your own role.
+
+## Key benefits
+1. Least privilege: Give a CI pipeline or coding agent a token limited to one project and the permissions its job needs.
+2. Contained leaks: A leaked token exposes only what it was scoped to, not your whole account.
+3. Review before you create: A review screen shows what a token can reach before you create it.
+4. Expiry: Set an expiry date so a temporary tool doesn't hold a token forever.
+5. Bounded by your role: A token never has more access than you do. If you lose access to a project, the token does too.
+6. Works where you work: Use a token with the CLI, the Management API, and the Supabase MCP server.
+
+## Personal Access Tokens are particularly valuable for:
+- CI pipelines that deploy a single project
+- AI coding agents connected through the Supabase MCP server
+- Scripts and tools that do one narrow task
+- Developers who belong to several organizations and want a token that reaches only one
+
+## Frequently asked questions
+
+### Can I change a token's scope after I create it?
+
+No. A token's scope is fixed when you create it. To change it, create a replacement token.
+
+### Can I scope the token that Supabase login creates?
+
+Not yet. \`supabase login\` in the browser creates a token with full account access today. Create the token in the Dashboard and pass it with \`supabase login --token\`.
+
+### What happens if I lose access to a project?
+
+The token loses that access too. If your access is restored, the token works again.
+
+Get started with the [Personal Access Tokens documentation](https://supabase.com/docs/guides/platform/personal-access-tokens).
+`,
+    icon: KeyRound,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/features/personal-access-tokens.png',
+    heroImageLight: '/images/features/personal-access-tokens-light.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/personal-access-tokens',
+    blogUrl: 'https://supabase.com/blog/scope-your-personal-access-tokens',
+    slug: 'personal-access-tokens',
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: false,
@@ -3063,7 +3114,7 @@ OrioleDB is a PostgreSQL storage extension built on its pluggable storage framew
 ## Key benefits:
 1. Fully integrated: A drop-in replacement for PostgreSQL’s Heap storage, enabling easy adoption without major changes to existing workflows.
 2. Enhanced scalability: Eliminates buffer mapping bottlenecks and utilizes lock-less page reading, significantly improving vertical scalability and hardware utilization.
-3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in benchmarks, particularly under high-load and large-scale scenarios.
+3. Superior performance: Proven to outperform PostgreSQL Heap by up to 5.5x in [benchmarks](https://dbarena.com), particularly under high-load and large-scale scenarios.
 4. Reduced maintenance overhead: Undo log-based MVCC eliminates storage bloat and removes the need for VACUUM, preventing common performance degradation.
 5. Efficient storage management: Built-in compression reduces storage requirements by up to 5x, enabling more cost-effective data handling.
 6. Modern write-ahead logging (WAL): Row-level WAL supports parallelism and is designed for future active-active multi-master configurations.
@@ -3224,6 +3275,51 @@ Yes, the MCP Server can perform actions like creating tables, running queries, a
     status: {
       stage: PRODUCT_STAGES.GA,
       availableOnSelfHosted: true,
+    },
+  },
+  {
+    title: 'Enterprise-Managed Authorization for MCP',
+    subtitle: "Govern how your company's AI tools access Supabase through MCP.",
+    description: `
+Enterprise-Managed Authorization for MCP puts your company in charge of which AI tools can connect to Supabase instead of each employee. After the Supabase organization's owner or admin approves Claude, your identity provider or Claude confirms the identity of each employee who uses it. From then on, an employee who signs in to Claude sees Supabase already connected with the role they already have. There is no consent screen to click through and no token to create or share.
+
+## Key benefits
+1. Approve once: One approval by an owner or admin covers the whole organization. Members never see a consent screen.
+2. Same permissions as the Supabase Dashboard: Access is scoped to the signed-in member. A developer gets developer access and a read-only member gets read-only access.
+3. No tokens to manage: Access follows the member's sign-in and short-lived tokens expire on their own.
+4. Revoke in one place: Revoke Claude for the whole organization under Authorized apps in the Supabase Dashboard. To offboard one member, remove them from your Supabase organization and from your identity provider or Claude organization, whichever one issues their access.
+5. No IdP support required: Claude can issue the identity assertion when your IdP cannot.
+6. Standards-based: Supabase implements the MCP Enterprise-Managed Authorization extension on top of OAuth. Your security team reviews one open specification and the same setup works across any identity provider or AI tool that adopts it.
+
+## When to use it
+- Developers share personal access tokens because every Claude connection needs an owner or admin to approve it
+- Your security team needs one place to control which AI tools can reach Supabase and which employees can use them
+
+## How it works
+There are two ways to issue the identity assertion that Claude presents to Supabase:
+- Identity provider: Your IdP signs an identity assertion for each member and applies its own policy before issuing one. Okta supports this today and the [launch blog post](/blog/enterprise-managed-auth-for-the-supabase-mcp-server) walks through that setup.
+- Claude-issued (Claude auto-connect, in beta): Claude signs the assertion for any current member of your Claude organization. Use this when your IdP does not support the extension yet. Nothing changes in your IdP.
+
+A member signs in to Claude and Claude obtains the assertion from the issuer you registered. Supabase verifies the assertion against that issuer, confirms the member belongs to your organization with a matching SSO identity, and issues a short-lived access token bound to that member. When a token expires, Claude repeats the exchange rather than refreshing the token and the member never reconnects by hand.
+
+## Get started
+Requires a Supabase Team or Enterprise plan with SSO configured and a Claude Team or Enterprise plan. Setup takes about ten minutes once SSO is configured. Your identity provider must issue these identity assertions or Claude issues them for you. Each member must have signed in to Supabase through SSO at least once with the email they use in Claude.
+
+1. Authorize Claude: An owner or admin connects Claude to Supabase and approves it for the organization.
+2. Turn on managed authorization in Claude: An admin opens the Supabase connector, turns on managed authorization, and picks the identity source.
+3. Register the issuer in Supabase: The same owner or admin opens the SSO page in organization settings, expands Advanced settings, and enters the issuer URL for the identity source picked in step 2.
+
+From then on, every member with a matching Supabase account is connected the next time they use Claude.
+`,
+    icon: ShieldCheck,
+    products: [ADDITIONAL_PRODUCTS.PLATFORM],
+    heroImage: '/images/blog/2026-11-03-claude-issued-enterprise-managed-auth-for-mcp/og.png',
+    docsUrl: 'https://supabase.com/docs/guides/platform/sso/enterprise-mcp-authorization',
+    blogUrl: '/blog/claude-issued-enterprise-managed-auth-for-mcp',
+    slug: 'enterprise-managed-auth-for-mcp',
+    status: {
+      stage: PRODUCT_STAGES.GA,
+      availableOnSelfHosted: false,
     },
   },
   {

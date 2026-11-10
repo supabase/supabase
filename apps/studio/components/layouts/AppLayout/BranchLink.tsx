@@ -16,8 +16,9 @@ export function BranchLink({ branch, isSelected, onClose }: BranchLinkProps) {
   const track = useTrack()
   const router = useRouter()
   const sanitizedRoute = sanitizeRoute(router.route, router.query)
-  const href =
-    sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`
+  const href = router.route.startsWith('/project/[ref]/branches')
+    ? `/project/${branch.project_ref}`
+    : (sanitizedRoute?.replace('[ref]', branch.project_ref) ?? `/project/${branch.project_ref}`)
 
   return (
     <CommandItemLink

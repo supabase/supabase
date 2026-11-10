@@ -172,7 +172,7 @@ export const UtilityActions = ({
                       : 'fill-none stroke-foreground-light'
                   }
                 />
-                {isFavorite ? 'Remove from' : 'Add to'} favorites
+                {isFavorite ? <span>Remove from</span> : <span>Add to</span>} <span>favorites</span>
               </DropdownMenuItem>
             </>
           )}
@@ -257,7 +257,7 @@ export const UtilityActions = ({
               )}
             </TooltipTrigger>
             <TooltipContent side="bottom">
-              {isFavorite ? 'Remove from' : 'Add to'} favorites
+              {isFavorite ? <span>Remove from</span> : <span>Add to</span>} <span>favorites</span>
             </TooltipContent>
           </Tooltip>
         )}

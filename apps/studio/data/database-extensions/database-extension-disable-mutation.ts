@@ -4,8 +4,10 @@ import { toast } from 'sonner'
 
 import { databaseExtensionsKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseExtensionDisableVariables = {
   projectRef: string
@@ -27,8 +29,11 @@ export async function disableDatabaseExtension({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'extension-delete',
     sql,
     queryKey: ['extension', 'delete', id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -43,18 +48,14 @@ export const useDatabaseExtensionDisableMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseExtensionDisableData,
-    ResponseError,
+    StudioError,
     DatabaseExtensionDisableVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    DatabaseExtensionDisableData,
-    ResponseError,
-    DatabaseExtensionDisableVariables
-  >({
+  return useMutation<DatabaseExtensionDisableData, StudioError, DatabaseExtensionDisableVariables>({
     mutationFn: (vars) => disableDatabaseExtension(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables
