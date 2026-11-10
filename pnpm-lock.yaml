@@ -1009,6 +1009,9 @@ importers:
       '@ai-sdk/amazon-bedrock':
         specifier: 5.0.55
         version: 5.0.55(zod@3.25.76)
+      '@ai-sdk/anthropic':
+        specifier: 4.0.38
+        version: 4.0.38(zod@3.25.76)
       '@ai-sdk/mcp':
         specifier: 2.0.31
         version: 2.0.31(zod@3.25.76)

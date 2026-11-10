@@ -4446,9 +4446,49 @@ export interface AccountRecoveryReminderClosedEvent {
 }
 
 /**
+ * The AI SRE settings were saved on the AI SRE settings page.
+ *
+ * @group Events
+ * @source User clicks "Save settings" on the AI SRE settings page
+ * @page /project/[ref]/ai-sre/settings
+ */
+export interface AiSreSettingsUpdatedEvent {
+  action: 'ai_sre_settings_updated'
+  properties: {
+    /** Whether the AI SRE is enabled after the save */
+    enabled: boolean
+    /** How often the AI SRE runs: hourly, daily, or weekly */
+    cadence: string
+    /** How far the agent may act on a connected repo: read_only, draft_pr, or merge_pr */
+    githubAccessLevel: string
+  }
+  groups: TelemetryGroups
+}
+
+/**
+ * The "Run now" button was clicked on the AI SRE overview page.
+ *
+ * @group Events
+ * @source User clicks "Run now" on the AI SRE overview page
+ * @page /project/[ref]/ai-sre
+ */
+export interface AiSreRunButtonClickedEvent {
+  action: 'ai_sre_run_button_clicked'
+  properties: {
+    /** How far the agent may act on a connected repo: read_only, draft_pr, or merge_pr */
+    githubAccessLevel: string
+    /** Whether a GitHub repository is connected to the project */
+    hasGithubConnection: boolean
+  }
+  groups: TelemetryGroups
+}
+
+/**
  * @hidden
  */
 export type TelemetryEvent =
+  | AiSreSettingsUpdatedEvent
+  | AiSreRunButtonClickedEvent
   | AccountRecoveryReminderExposedEvent
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent

@@ -121,6 +121,8 @@
 
   "reports:all": true,
 
+  "ai_sre:all": true,
+
   "sdk:auth": true,
   "sdk:csharp": true,
   "sdk:dart": true,
