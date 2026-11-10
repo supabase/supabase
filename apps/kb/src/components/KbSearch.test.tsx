@@ -227,6 +227,21 @@ describe('KbSearch telemetry', () => {
     ])
   })
 
+  it('sends kb_search_closed with result_navigated when Enter opens a result', () => {
+    renderWithState(resultsState)
+    const input = document.querySelector<HTMLInputElement>('[role="dialog"] input')!
+    act(() => {
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Enter', bubbles: true }))
+    })
+
+    expect(sentWith('kb_search_closed')).toEqual([
+      expect.objectContaining({
+        custom_properties: { closeReason: 'result_navigated' },
+        keepalive: true,
+      }),
+    ])
+  })
+
   it('sends nothing without consent', () => {
     consentState.hasConsented = false
     renderWithState(resultsState)
