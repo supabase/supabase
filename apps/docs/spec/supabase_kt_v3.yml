@@ -5143,6 +5143,7 @@ functions:
           channel.subscribe(blockUntilSubscribed = true)
           // send your own state
           channel.track(PresenceState(username = "John"))
+          ```
         description: |
           You have two methods you can use to listen for presence updates:
           - `presenceDataFlow` takes care of caching presences based on their id and automatically emits the updated list.
