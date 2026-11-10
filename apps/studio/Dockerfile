@@ -39,7 +39,8 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/pnpm-lock.yaml ./
 COPY ./patches/ ./patches
 
-# No need to clean cache because production uses standalone build
+# The production stage copies only the self-contained build output, so the
+# install cache never reaches the final image.
 RUN pnpm install --frozen-lockfile
 
 # dev contains dependencies and source code not compiled
