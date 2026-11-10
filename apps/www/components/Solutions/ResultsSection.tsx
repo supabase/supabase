@@ -23,7 +23,7 @@ const ResultsSection: FC<ResultsSectionProps> = (props) => {
           <h2 className="h2 m-0!">{props.heading}</h2>
           <p className="p text-foreground-lighter!">{props.subheading}</p>
         </div>
-        <ul className="flex flex-wrap gap-4 md:gap-12">
+        <ul role="list" className="flex flex-wrap gap-4 md:gap-12">
           {props.highlights.map((highlight) => (
             <HighlightItem key={highlight.heading} highlight={highlight} />
           ))}
