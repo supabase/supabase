@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
@@ -6,12 +7,13 @@ import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 
 import type { Commands } from './Functions.types'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
   closable?: boolean
@@ -27,10 +29,16 @@ export const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
   )
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
@@ -108,6 +116,11 @@ export const TerminalInstructions = forwardRef<
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
         <CommandRender commands={commands} className="my-4" />
+        <ApiKeysAccessNote
+          grant={apiKeysGrant}
+          fallback="Replace the placeholder with your own key."
+          className="mb-4"
+        />
         {tokens && tokens.length === 0 ? (
           <div className="py-4 space-y-3 border-t">
             <div>

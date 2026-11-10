@@ -5,34 +5,68 @@
     "lint": {
       "env": ["GITHUB_TOKEN"],
     },
+    // Generated files that tasks downstream of the uncached content tasks read. They're written
+    // after turbo starts, so inputs list them in "jit" mode: they're hashed once the content tasks
+    // have run, and a cache hit can't restore output built from stale remote content.
+
+    // Fetches remote content (GitHub stars, open job count, the private changelog repo) and
+    // writes .generated/, the RSS feeds, the changelog markdown and the .md content bundle. Not
+    // cached: the inputs are remote.
+    "content:build:core": {
+      "cache": false,
+      // `next build` rewrites the tracked customers feed. Hashing it would change this task's hash
+      // after every build, which feeds into the build's own hash.
+      "inputs": ["$TURBO_DEFAULT$", "!public/customers-rss.xml"],
+      "passThroughEnv": [
+        "CHANGELOG_SYNC_APP_ID",
+        "CHANGELOG_SYNC_APP_INSTALLATION_ID",
+        "CHANGELOG_SYNC_APP_PRIVATE_KEY",
+        "GITHUB_TOKEN",
+        // Makes missing changelog credentials an error instead of a warning.
+        "VERCEL",
+      ],
+    },
+    // Also refreshes the agent-skills index (a tracked file) from the latest GitHub release.
+    "content:build": {
+      "dependsOn": ["content:build:core"],
+      "cache": false,
+      "inputs": ["$TURBO_DEFAULT$", "!public/customers-rss.xml"],
+      "passThroughEnv": ["AGENT_SKILLS_GITHUB_TOKEN", "VERCEL_ENV"],
+    },
+    "dev": {
+      "dependsOn": ["content:build:core"],
+    },
     "typecheck": {
-      "env": ["GITHUB_TOKEN"],
+      "dependsOn": ["^typecheck", "content:build:core"],
+      "inputs": [
+        "$TURBO_DEFAULT$",
+        { "mode": "jit", "globs": [".generated/**", "app/api-v2/md/content.generated.ts"] },
+      ],
     },
     "build": {
-      // pnpm's prebuild refreshes remote content before the nested build:next run hashes it.
-      // postbuild uploads assets on every deployment, including build:next cache hits.
-      "cache": false,
-      "dependsOn": [],
-      "outputs": [],
-      "passThroughEnv": ["*"],
-    },
-    "build:next": {
-      "dependsOn": ["^build"],
+      // docs#build:guides-markdown fetches the federated guides itself (uncached) and writes the
+      // guide content and markdown that www reads, so it must run before the inputs are hashed.
+      "dependsOn": ["^build", "docs#build:guides-markdown", "content:build"],
       "inputs": [
         "$TURBO_DEFAULT$",
         "!public/customers-rss.xml",
         ".env*",
-        ".generated/**",
-        "app/api-v2/md/content.generated.ts",
-        "public/rss.xml",
-        "public/changelog-rss.xml",
-        "public/changelog-rss/**",
-        "public/changelog.md",
-        "public/changelog/**",
-        "public/.well-known/agent-skills/index.json",
-        "$TURBO_ROOT$/apps/docs/content/guides/**",
-        "$TURBO_ROOT$/apps/docs/public/markdown/guides/**",
         "$TURBO_ROOT$/apps/studio/components/ui/TwoOptionToggle.tsx",
+        {
+          "mode": "jit",
+          "globs": [
+            ".generated/**",
+            "app/api-v2/md/content.generated.ts",
+            "public/rss.xml",
+            "public/changelog-rss.xml",
+            "public/changelog-rss/**",
+            "public/changelog.md",
+            "public/changelog/**",
+            "public/.well-known/agent-skills/index.json",
+            "$TURBO_ROOT$/apps/docs/content/guides/**",
+            "$TURBO_ROOT$/apps/docs/public/markdown/guides/**",
+          ],
+        },
       ],
       "env": [
         "NEXT_PUBLIC_*",
@@ -59,8 +93,6 @@
         "NOTION_FORMS_API_KEY",
         "OPENAI_API_KEY",
         "EMAIL_REPORT_SLACK_WEBHOOK",
-        "FORCE_ASSET_CDN",
-        "SITE_NAME",
         "LUMA_API_KEY",
         "LUMA_HACKATHONS_API_KEY",
         "NEXT_RUNTIME",

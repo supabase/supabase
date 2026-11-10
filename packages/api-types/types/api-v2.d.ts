@@ -1509,13 +1509,17 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            /** @example public */
             exposure: string
-            /** @example 1 */
             instances: number
-            /** @example node */
             runtime?: string
-            /** @example 2gb-1vcpu */
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             size: string
           }
           state_reason?: string
@@ -1926,6 +1930,14 @@ export interface components {
             instances: number
             /** @example node */
             runtime?: string
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             /** @example 2gb-1vcpu */
             size: string
           }
@@ -1953,13 +1965,17 @@ export interface components {
           instances_error?: string
           secret_generation: string
           spec: {
-            /** @example public */
             exposure: string
-            /** @example 1 */
             instances: number
-            /** @example node */
             runtime?: string
-            /** @example 2gb-1vcpu */
+            secrets_scope?:
+              | (
+                  | ('all' | 'supabase' | 'none')
+                  | {
+                      secret_name: string
+                    }[]
+                )
+              | null
             size: string
           }
           state_reason?: string
@@ -2186,6 +2202,11 @@ export interface components {
             id: number
             username: string
           } | null
+          /**
+           * Format: uri
+           * @description Dashboard link for this notebook.
+           */
+          url: string
         }
         id: string
         /**
@@ -2351,6 +2372,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
         }
         /**
          * @description Project ref
@@ -2501,6 +2523,11 @@ export interface components {
             id: number
             username: string
           } | null
+          /**
+           * Format: uri
+           * @description Dashboard link for this notebook.
+           */
+          url: string
         }
         id: string
         /**
@@ -2708,6 +2735,14 @@ export interface components {
               applied_at?: string
               /** @enum {string} */
               entitlement: 'disallowed' | 'allowed'
+              /** @description Present when a change that was never applied is waiting for review. `allowed_cidrs` is the list the project enforces. Apply or reject the change with `POST /v1/projects/{ref}/network-restrictions/review`; submitting a new config also replaces it. */
+              pending_allowed_cidrs?: {
+                address: string
+                /** @enum {string} */
+                type: 'v4' | 'v6'
+              }[]
+              /** @description When the change in `pending_allowed_cidrs` was requested. */
+              pending_requested_at?: string
               /**
                * @description Whether the allowlist below is applied to the project or only stored.
                * @enum {string}

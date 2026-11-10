@@ -1,0 +1,54 @@
+---
+title: 'Best vector database providers in 2026'
+description: 'Compare vector database providers for 2026, including Supabase with pgvector, Pinecone, Qdrant, Weaviate, and Milvus, to pick one for your app.'
+topics: ['Rundowns']
+lastEdited: 2026-11-04
+---
+
+A vector database stores embeddings. These are numerical representations of text, images, or other data. It finds the stored items closest in meaning to a query. Retrieval-augmented generation (RAG), semantic search, and recommendations all depend on this kind of similarity search.
+
+Vector databases come in two broad forms. Some are dedicated systems built only for vector search. Others, like Postgres with the [`pgvector` extension](/docs/guides/database/extensions/pgvector), add vector search to a general-purpose database. The right choice depends on your data volume, how much infrastructure you want to run, and whether your vectors need to live next to your other application data.
+
+## Supabase
+
+[Supabase](/docs/guides/ai) is a Postgres development platform. It runs vector search through the `pgvector` extension, so embeddings are stored in regular tables next to your users, rows, and other data.
+
+Because the vectors sit in Postgres, you can:
+
+- Filter similarity results with ordinary SQL `WHERE` clauses.
+- Apply [Row Level Security](/docs/guides/database/postgres/row-level-security) policies to vector data.
+- Combine semantic search with keyword search in a [single query](/docs/guides/ai/hybrid-search).
+- Store and query embeddings through the [Data API](/docs/guides/api) or from [Edge Functions](/docs/guides/functions).
+
+Supabase is a good fit if you already use Postgres or want one backend for relational data, [authentication](/docs/guides/auth), [storage](/docs/guides/storage), and vectors.
+
+## Pinecone
+
+Pinecone is a closed-source, managed vector database. Pinecone is a common choice for teams that want vector search with little operational work and great developer experience.
+
+See the [Pinecone documentation](https://docs.pinecone.io/).
+
+## Qdrant
+
+Qdrant is an open-source vector database. You can self-host it, or use Qdrant Cloud as a managed service. Qdrant Cloud has a `Free forever` tier, which makes it a good choice for prototyping.
+
+See the [Qdrant documentation](https://qdrant.tech/documentation/).
+
+## Weaviate
+
+Weaviate is an open-source vector database. You can self-host it, or use Weaviate Cloud as a managed service. Weaviate Cloud has a free tier, which makes it a good choice for prototyping.
+
+See the [Weaviate documentation](https://docs.weaviate.io/weaviate).
+
+## Milvus
+
+Milvus is an open-source vector database designed for large-scale workloads. You can run it yourself, or use a managed Milvus service such as Zilliz Cloud. It fits teams that care about performance and availability.
+
+See the [Milvus documentation](https://milvus.io/docs).
+
+## Choosing a provider
+
+- If you already run Postgres or want one backend for everything, choose **Supabase**. It keeps vectors next to your relational data, auth, and storage.
+- If you want a fully managed vector service and a provider known for developer experience, choose **Pinecone**.
+- If you want open source, but a managed cloud offering with a free tier, choose **Qdrant** or **Weaviate**.
+- If you expect very large collections and performance is the most important consideration for you, choose **Milvus**.

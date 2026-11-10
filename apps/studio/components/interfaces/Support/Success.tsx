@@ -53,8 +53,9 @@ export const Success = ({
               <span className="font-medium text-foreground">{projectName}</span>.{' '}
             </>
           )}
-          We&apos;ll reach out at{' '}
-          <span className="font-medium text-foreground">{respondToEmail}</span>.
+          <span>We&apos;ll reach out at</span>{' '}
+          <span className="font-medium text-foreground">{respondToEmail}</span>
+          <span>.</span>
         </p>
       </div>
 

@@ -1,11 +1,12 @@
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useCallback, useEffect, useRef, useState } from 'react'
 
 import { useRevealedSecret } from '@/components/interfaces/APIKeys/useRevealedSecret'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useLatest } from '@/hooks/misc/useLatest'
+import { useGrant } from '@/lib/grants'
 
 const AUTO_HIDE_MS = 10_000
 const SECRET_MASK = '••••••••••••••••••••'
@@ -33,6 +34,8 @@ export interface ConnectServerEnvSecret {
 export interface UseConnectServerEnvResult {
   isLoading: boolean
   canReadAPIKeys: boolean
+  /** Result of the api-keys grant, for rendering denied and error states. */
+  apiKeysGrant: ReturnType<typeof useGrant<'GET /v1/projects/{ref}/api-keys'>>
   apiUrl: string
   publishableKey: string
 
@@ -47,9 +50,9 @@ export interface UseConnectServerEnvResult {
 export function useConnectServerEnv(): UseConnectServerEnvResult {
   const { ref: projectRef } = useParams()
 
-  const { can: canReadAPIKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
+  const isLoadingPermission = apiKeysGrant.status === 'loading'
 
   const [isRevealed, setIsRevealed] = useState(false)
   // So async callbacks below can check the current reveal state after an
@@ -62,9 +65,8 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     ? new URL(JWKS_DISCOVERY_PATH, apiUrl).href
     : `your-project-url${JWKS_DISCOVERY_PATH}`
 
-  const { data: keys, isLoading: isLoadingKeys } = useAPIKeys(
-    { projectRef },
-    { enabled: canReadAPIKeys }
+  const { data: keys, isLoading: isLoadingKeys } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
   )
   const publishableKey = keys?.publishableKey?.api_key ?? keys?.anonKey?.api_key ?? ''
   const secretKey = keys?.secretKey ?? keys?.serviceKey
@@ -77,6 +79,7 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
     isLoading: isRevealing,
     reveal,
     clear,
+    revealGrant,
   } = useRevealedSecret({ projectRef, id: secretKey?.id ?? undefined })
 
   // toggle() and getSecretValue() can both decide to reveal before either
@@ -147,12 +150,13 @@ export function useConnectServerEnv(): UseConnectServerEnvResult {
   return {
     isLoading: isLoadingUrl || isLoadingKeys || isLoadingPermission,
     canReadAPIKeys,
+    apiKeysGrant,
     apiUrl: resolvedUrl,
     publishableKey: publishableKey || 'your-publishable-key',
     jwksUrl,
     secret: {
       exists: !!secretKey,
-      canReveal: canReadAPIKeys,
+      canReveal: canReadAPIKeys && revealGrant.status === 'granted',
       isRevealed,
       isRevealing,
       maskedValue,

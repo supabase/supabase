@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useMemo } from 'react'
@@ -16,19 +17,19 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
-import { APIKeysData, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
+import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
+import { useGrant } from '@/lib/grants'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys, isLoading: isLoadingPermissions } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ
-  )
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
 
   const {
     data: apiKeysData = [],
@@ -36,7 +37,8 @@ export const PublishableAPIKeys = () => {
     isSuccess: isSuccessApiKeys,
     isPending: isLoadingApiKeys,
     isError: isErrorApiKeys,
-  } = useAPIKeysQuery({ projectRef, reveal: false }, { enabled: canReadAPIKeys })
+  } = useQuery(apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }))
+  const isLoadingGrant = apiKeysGrant.status === 'loading'
 
   const newApiKeys = useMemo(
     () => apiKeysData.filter(({ type }) => type === 'publishable' || type === 'secret') ?? [],
@@ -54,7 +56,7 @@ export const PublishableAPIKeys = () => {
   )
 
   const showSelfHostedEmptyState =
-    !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys && !isLoadingPermissions
+    !IS_PLATFORM && publishableApiKeys.length === 0 && !isLoadingApiKeys
 
   const [deleteId, setDeleteId] = useQueryState('deletePublishableKey', parseAsString)
   const apiKeyToDelete = publishableApiKeys?.find((key) => key.id === deleteId)
@@ -73,7 +75,14 @@ export const PublishableAPIKeys = () => {
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'publishable' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deleteAPIKey({ projectRef, id: apiKey.id })
+    if (!deleteGrant.grant) {
+      toast.error(
+        getWriteGrantTooltip(deleteGrant.status, 'delete') ??
+          'Still checking permissions to delete API keys. Try again in a moment.'
+      )
+      return
+    }
+    deleteAPIKey({ projectRef, id: apiKey.id, grant: deleteGrant.grant })
   }
 
   useEffect(() => {
@@ -91,9 +100,11 @@ export const PublishableAPIKeys = () => {
         actions={IS_PLATFORM ? <CreatePublishableAPIKeyDialog /> : null}
       />
 
-      {!canReadAPIKeys && !isLoadingPermissions ? (
+      {apiKeysGrant.status === 'denied' ? (
         <NoPermission resourceText="view API keys" />
-      ) : isLoadingApiKeys || isLoadingPermissions ? (
+      ) : apiKeysGrant.status === 'error' ? (
+        <AlertError error={apiKeysGrant.error} subject="Failed to check API key permissions" />
+      ) : isLoadingGrant || isLoadingApiKeys ? (
         <GenericSkeletonLoader />
       ) : isErrorApiKeys ? (
         <AlertError error={error} subject="Failed to load API keys" />

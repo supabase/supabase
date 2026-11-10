@@ -18,6 +18,11 @@ export const telemetryAccessWhat: ContentListingGroup = {
       description: 'Filter, inspect, and export events in the unified Logs view.',
     },
     {
+      title: 'Logs in the CLI',
+      href: '/guides/observability/cli-logs',
+      description: 'Browse, filter, and export logs with Supabase CLI v3.',
+    },
+    {
       title: 'Log sources and fields',
       href: '/guides/observability/log-field-reference',
       description: 'Look up sources, ClickHouse query fields, and capture limits.',

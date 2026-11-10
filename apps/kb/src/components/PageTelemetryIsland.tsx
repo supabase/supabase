@@ -9,6 +9,7 @@ import { useFirstTouchStore } from 'common/hooks/useFirstTouchStore'
 import { handlePageLeaveTelemetry, handlePageTelemetry } from 'common/page-telemetry'
 import { posthogClient } from 'common/posthog-client'
 import { clearFirstTouchData, getFirstTouchData } from 'common/telemetry-first-touch-store'
+import { setTelemetryPlatform } from 'common/telemetry-utils'
 import { useEffect, useRef } from 'react'
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? ''
@@ -29,6 +30,8 @@ function markFirstPageviewSent() {
 }
 
 export function PageTelemetryIsland() {
+  setTelemetryPlatform('kb')
+
   const { hasAccepted } = useConsentState()
   const hasSentRef = useRef(false)
   const enabled = IS_PLATFORM && hasAccepted

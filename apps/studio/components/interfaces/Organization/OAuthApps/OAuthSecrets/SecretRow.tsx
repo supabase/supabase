@@ -73,7 +73,8 @@ export const SecretRow = ({ secret, appId }: SecretRowProps) => {
             </div>
             <div className="flex flex-col gap-0">
               <p className="text-sm text-foreground-lighter">
-                Added {isNew ? 'now' : dayjs(secret.created_at).fromNow()} by {generatedByName}
+                Added {isNew ? <span>now</span> : dayjs(secret.created_at).fromNow()}{' '}
+                <span>by</span> {generatedByName}
               </p>
               {secret.last_used_at && (
                 <p className="text-sm text-foreground-lighter">

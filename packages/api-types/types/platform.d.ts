@@ -1660,6 +1660,40 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/hipaa': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /** Gets the HIPAA status for an organization */
+    get: operations['HipaaController_getStatus']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/hipaa/agreements/accept': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Accepts the HIPAA BAA and enables the HIPAA add-on */
+    post: operations['HipaaController_acceptAgreement']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/members': {
     parameters: {
       query?: never
@@ -1917,6 +1951,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/authorizations/{id}/preflight': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Preflight an oauth app authorization request
+     * @description Returns the grant that approving the authorization would replace and, for member-bound apps, whether the user's organization-level role covers the app's scopes. Project-scoped roles are only checked on approval.
+     *
+     *     This endpoint is currently in its **Beta** stage.
+     */
+    get: operations['OrganizationOAuthAuthorizationsController_preflightAuthorizationRequest']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/payments': {
     parameters: {
       query?: never
@@ -1985,6 +2041,23 @@ export interface paths {
     get: operations['OrganizationProjectsController_getOrganizationProjects']
     put?: never
     post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/organizations/{slug}/restrictions/recheck': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    get?: never
+    put?: never
+    /** Re-evaluates a restricted organization and lifts the restriction if it is now within its plan limits */
+    post: operations['OrgRestrictionsController_recheck']
     delete?: never
     options?: never
     head?: never
@@ -5292,6 +5365,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/warehouse/{ref}/metrics': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * Get Warehouse metrics over a time range
+     * @description Return up to eight allowlisted measurements from regional metrics storage, scoped to the authorized project and its stored Warehouse compute placement. Specify attribute or attributes with ISO startDate/endDate and an optional interval. Each measurement retains its units, dimensions, coverage and availability in the metrics array. Source cadence and default interval are one minute. Missing/stale samples are null, not zero. Does not require the source database to be healthy. No raw queries or backend selection are accepted. An unconfigured or unavailable regional reader never falls back to central storage.
+     */
+    get: operations['WarehouseMetricsController_getMetrics']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/warehouse/{ref}/refresh-schema': {
     parameters: {
       query?: never
@@ -5450,6 +5543,47 @@ export interface paths {
 export type webhooks = Record<string, never>
 export interface components {
   schemas: {
+    AcceptHipaaAgreementBody: {
+      /** @enum {boolean} */
+      accepted: true
+      legal_entity_address: {
+        city?: string | null
+        country: string
+        line1: string
+        line2?: string | null
+        postal_code?: string | null
+        state?: string | null
+      }
+      legal_entity_name: string
+      signatory_name: string
+      signatory_title: string
+    }
+    AcceptHipaaAgreementResponse_Output: {
+      agreement: {
+        accepted_at: string
+        /** @enum {string} */
+        agreement_type: 'hipaa_baa'
+        legal_entity_address: {
+          city?: string | null
+          country: string
+          line1: string
+          line2?: string | null
+          postal_code?: string | null
+          state?: string | null
+        }
+        legal_entity_name: string
+        signatory_email: string
+        signatory_name: string
+        signatory_title: string
+        /** @enum {string} */
+        status: 'accepted'
+      }
+      hipaa_addon: {
+        enabled_at: string
+        /** @enum {string} */
+        status: 'enabled'
+      }
+    }
     AccessControlPermission: {
       actions: string[] | null
       condition:
@@ -5518,6 +5652,11 @@ export interface components {
     }
     /** @default {} */
     ApproveAuthorizationBody: {
+      /**
+       * @description Allows creation of partial grants, i.e. those where the user is missing permissions for some requested scopes. Ignored if not supported by the app.
+       * @default false
+       */
+      partial?: boolean
       /** @description The projects that the authorization will be scoped to; if omitted, all of the organization projects will be in scope. */
       project_refs?: string[]
     }
@@ -5581,6 +5720,31 @@ export interface components {
         timestamp: number
       }[]
       retention_period: number
+    }
+    AuthorizationPreflightResponse_Output: {
+      /** @description The grant that approving this authorization would replace, if any */
+      existing_grant: {
+        approved_at: string
+        approved_scopes: string[]
+        grant_id: string
+        /** @description Projects the grant is limited to, or null when it covers all projects */
+        project_refs: string[] | null
+      } | null
+      /** @description Set when the user's organization role doesn't cover the scopes the app requested for all projects; null otherwise */
+      validation_failure: {
+        /** @description Scopes requested by the OAuth app that the role does not allow */
+        failed_scopes: string[]
+        /** @description The highest-privilege organization role of the user */
+        role: {
+          /**
+           * @description The role level; `no-access` means the user has no role at the level that was checked
+           * @enum {string}
+           */
+          name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+        }
+        /** @enum {string} */
+        scope_target: 'all_projects'
+      } | null
     }
     BackendConnectionTest_Output: {
       'connected?': boolean
@@ -6375,8 +6539,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -6533,8 +6697,12 @@ export interface components {
       }[]
     }
     CreateOAuthAppBody: {
+      allow_partial_grants?: boolean
+      /** @enum {string} */
+      grant_kind?: 'organization_bound' | 'member_bound'
       icon?: string
       name: string
+      project_scoping_mode?: boolean
       redirect_uris: string[]
       scopes: (
         | 'analytics:read'
@@ -6737,8 +6905,8 @@ export interface components {
     }
     CreatePipelineResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
     }
@@ -7041,6 +7209,7 @@ export interface components {
       db_sql?: string
       /** @enum {string} */
       desired_instance_size?:
+        | 'nano'
         | 'micro'
         | 'small'
         | 'medium'
@@ -8195,8 +8364,8 @@ export interface components {
        */
       destination_id: number
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
     }
@@ -8964,6 +9133,35 @@ export interface components {
       /** @description Blob SHA of the config file, to detect changes between requests. */
       sha: string
     }
+    GetHipaaStatusResponse_Output: {
+      addon_enabled: boolean
+      agreement: {
+        accepted_at: string | null
+        document_url: string | null
+        id: string
+        legal_entity_address: {
+          city?: string | null
+          country: string
+          line1: string
+          line2?: string | null
+          postal_code?: string | null
+          state?: string | null
+        } | null
+        legal_entity_name: string | null
+        signatory_email: string | null
+        signatory_name: string | null
+        signatory_title: string | null
+        /** @enum {string} */
+        status: 'pending' | 'accepted' | 'terminated' | 'cancelled'
+        terminated_at: string | null
+      } | null
+      self_serve_eligibility: {
+        /** @enum {string} */
+        status: 'eligible' | 'upgrade_required' | 'contact_sales'
+      }
+      /** @enum {string} */
+      status: 'not_enabled' | 'pending_agreement' | 'incomplete' | 'enabled' | 'disabled'
+    }
     GetJwtSecretUpdateStatus_Output: {
       update_status: {
         change_tracking_id: string
@@ -8973,12 +9171,17 @@ export interface components {
       } | null
     }
     GetOAuthAuthorizationResponse_Output: {
+      allow_partial_grants: boolean
+      app_id: string
       approved_at?: string
       approved_organization_slug?: string
       domain: string
       expires_at: string
+      /** @enum {string} */
+      grant_kind: 'organization_bound' | 'member_bound'
       icon?: string
       name: string
+      project_scoping_mode: boolean
       redirect_uri: string
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
@@ -10379,14 +10582,18 @@ export interface components {
       unread_count: number
     }
     OAuthAppResponse_Output: {
+      allow_partial_grants?: boolean
       app_id?: string
       authorized_at?: string
       client_id?: string
       created_at?: string
       created_by?: string
+      /** @enum {string} */
+      grant_kind?: 'organization_bound' | 'member_bound'
       icon?: string
       id: string
       name: string
+      project_scoping_mode?: boolean
       redirect_uris?: string[]
       /** @enum {string} */
       registration_type: 'manual' | 'dynamic'
@@ -10562,6 +10769,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
     }
     OrganizationResponse_Output: {
@@ -11047,8 +11255,8 @@ export interface components {
         write_lag?: number | null
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Table statuses */
@@ -11291,8 +11499,8 @@ export interface components {
        */
       destination_name: string
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       id: string
       /**
@@ -11440,8 +11648,8 @@ export interface components {
          */
         destination_name: string
         /**
-         * @description Pipeline id
-         * @example 1012
+         * @description Pipeline ID
+         * @example 03dg2o5teb2eucxr9ggh3uie6
          */
         id: string
         /**
@@ -11468,8 +11676,8 @@ export interface components {
     }
     PipelineStatusResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Pipeline status */
@@ -11496,8 +11704,8 @@ export interface components {
         name: string
       } | null
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Current pipeline version */
@@ -11907,6 +12115,7 @@ export interface components {
           | 'RESTARTING'
           | 'PAUSE_FAILED'
           | 'RESIZING'
+          | 'PROMOTING'
       }[]
       billed_via_partner: boolean
       breakdown: {
@@ -11953,6 +12162,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -12200,6 +12410,7 @@ export interface components {
         | 'RESTARTING'
         | 'PAUSE_FAILED'
         | 'RESIZING'
+        | 'PROMOTING'
       subscription_id: string
       updated_at: string
       volumeSizeGb?: number | null
@@ -12406,11 +12617,15 @@ export interface components {
       path: string
     }
     PutOAuthAppResponse_Output: {
+      allow_partial_grants: boolean
       client_id: string
       created_at: string
+      /** @enum {string} */
+      grant_kind: 'organization_bound' | 'member_bound'
       icon?: string
       id: string
       name: string
+      project_scoping_mode: boolean
       redirect_uris: string[]
       website: string
     }
@@ -12553,6 +12768,49 @@ export interface components {
       private_only?: boolean | null
       /** @description Disables the Realtime service for this project when true. Set to false to re-enable it. */
       suspend?: boolean | null
+    }
+    RecheckRestrictionsResponse_Output: {
+      billing_period_end: string | null
+      /** Format: date-time */
+      checked_at: string
+      message: string | null
+      /** @enum {string} */
+      result: 'lifted' | 'still_restricted' | 'not_restricted' | 'not_eligible' | 'not_recheckable'
+      /** @description Set with `not_recheckable`: recorded violations only support can review. Empty when the organization usage cannot be measured; `message` says so. */
+      unrecheckable_violations: (
+        | 'exceed_db_size_quota'
+        | 'exceed_egress_quota'
+        | 'exceed_cached_egress_quota'
+        | 'exceed_edge_functions_count_quota'
+        | 'exceed_edge_functions_invocations_quota'
+        | 'exceed_monthly_active_users_quota'
+        | 'exceed_realtime_connection_count_quota'
+        | 'exceed_realtime_message_count_quota'
+        | 'exceed_storage_size_quota'
+        | 'exceed_log_query_quota'
+        | 'overdue_payment'
+      )[]
+      violations: {
+        /** @enum {string} */
+        aggregation: 'sum' | 'period_average' | 'period_max'
+        current: number
+        limit: number
+        /** @enum {string} */
+        type:
+          | 'exceed_db_size_quota'
+          | 'exceed_egress_quota'
+          | 'exceed_cached_egress_quota'
+          | 'exceed_edge_functions_count_quota'
+          | 'exceed_edge_functions_invocations_quota'
+          | 'exceed_monthly_active_users_quota'
+          | 'exceed_realtime_connection_count_quota'
+          | 'exceed_realtime_message_count_quota'
+          | 'exceed_storage_size_quota'
+          | 'exceed_log_query_quota'
+          | 'overdue_payment'
+        /** @enum {string} */
+        unit: 'gigabyte' | 'count'
+      }[]
     }
     RegionsInfoPlatform_Output: {
       all: {
@@ -12740,8 +12998,8 @@ export interface components {
     }
     RollbackTablesResponse_Output: {
       /**
-       * @description Pipeline id
-       * @example 1012
+       * @description Pipeline ID
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string
       /** @description Rolled back tables */
@@ -13167,6 +13425,7 @@ export interface components {
     TelemetryFeatureFlagBody: {
       feature_flag_name: string
       feature_flag_value: unknown
+      platform?: string
     }
     TelemetryGroupsIdentityBody: {
       organization_slug?: string
@@ -13280,6 +13539,7 @@ export interface components {
             | 'RESTARTING'
             | 'PAUSE_FAILED'
             | 'RESIZING'
+            | 'PROMOTING'
           usage: number
         }[]
         description: string
@@ -13429,6 +13689,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13552,6 +13813,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13759,6 +14021,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -13882,6 +14145,7 @@ export interface components {
                       | 'RESTARTING'
                       | 'PAUSE_FAILED'
                       | 'RESIZING'
+                      | 'PROMOTING'
                     total_pre_tax_amount?: number
                     total_usage: number
                     variants: {
@@ -17040,6 +17304,104 @@ export interface components {
       /** @enum {string} */
       status: 'accepted'
     }
+    WarehouseMetricsResponse_Output: {
+      metrics: {
+        /** @enum {string} */
+        aggregation: 'rate' | 'sum' | 'mean' | 'p50' | 'p95' | 'p99' | 'occupied'
+        /** @enum {string} */
+        availability:
+          | 'ok'
+          | 'partial'
+          | 'stale'
+          | 'no_data'
+          | 'insufficient_data'
+          | 'not_provisioned'
+          | 'disabled'
+          | 'unavailable'
+        definition: string
+        effective: {
+          end: number
+          rate_window_seconds: number
+          start: number
+          step: number
+        }
+        /** @description Latest observed source sample timestamp in Unix seconds; not the query evaluation timestamp. */
+        last_sample_at: number | null
+        /** @enum {string} */
+        metric:
+          | 'query_rate'
+          | 'query_error_rate'
+          | 'query_timeout_rate'
+          | 'query_canceled_rate'
+          | 'query_duration_mean'
+          | 'query_duration_p50'
+          | 'query_duration_p95'
+          | 'query_duration_p99'
+          | 'duckdb_duration_mean'
+          | 'assignment_wait_mean'
+          | 'assignment_wait_p95'
+          | 'query_in_flight'
+          | 'admission_rejection_rate'
+          | 'worker_admission_limit'
+          | 'worker_admission_active'
+          | 'worker_admission_pending'
+          | 'worker_admission_occupied'
+          | 'activation_rate'
+          | 'activation_duration_mean'
+          | 'activation_duration_p95'
+          | 'rpc_rate'
+          | 'rpc_duration_mean'
+          | 'rpc_duration_p95'
+        project_ref: string
+        requested: {
+          end: number
+          /** @enum {string} */
+          metric:
+            | 'query_rate'
+            | 'query_error_rate'
+            | 'query_timeout_rate'
+            | 'query_canceled_rate'
+            | 'query_duration_mean'
+            | 'query_duration_p50'
+            | 'query_duration_p95'
+            | 'query_duration_p99'
+            | 'duckdb_duration_mean'
+            | 'assignment_wait_mean'
+            | 'assignment_wait_p95'
+            | 'query_in_flight'
+            | 'admission_rejection_rate'
+            | 'worker_admission_limit'
+            | 'worker_admission_active'
+            | 'worker_admission_pending'
+            | 'worker_admission_occupied'
+            | 'activation_rate'
+            | 'activation_duration_mean'
+            | 'activation_duration_p95'
+            | 'rpc_rate'
+            | 'rpc_duration_mean'
+            | 'rpc_duration_p95'
+          start: number
+          step?: number
+        }
+        scrape_interval_seconds: number
+        series: {
+          /** @description Grid point coverage, not proof that every worker was scraped. */
+          coverage: {
+            expected_points: number
+            returned_points: number
+          }
+          labels: {
+            [key: string]: string
+          }
+          points: {
+            timestamp: number
+            value: number | null
+          }[]
+        }[]
+        /** @enum {string} */
+        unit: 'per_second' | 'seconds' | 'queries' | 'grants'
+      }[]
+    }
     WarehouseSetupBody: {
       /**
        * @description Supabase project to use for both the DuckLake PostgreSQL catalog and Supabase Storage. Defaults to this project on first setup and to the configured destination on later requests. The destination must be active and healthy, and another project requires SQL and Storage admin write permissions. An existing destination cannot be changed through setup. Ignored when targets is empty.
@@ -17085,8 +17447,8 @@ export interface components {
     }
     WarehouseSetupResponse_Output: {
       /**
-       * @description Warehouse replication pipeline id, or null when Warehouse disable has been requested
-       * @example 101
+       * @description Warehouse replication pipeline ID, or null when Warehouse disable has been requested
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id: string | null
       /** @description Tables with Warehouse copies */
@@ -17176,8 +17538,8 @@ export interface components {
         wrapper_installed: boolean
       } | null
       /**
-       * @description Warehouse replication pipeline id when it exists
-       * @example 101
+       * @description Warehouse replication pipeline ID when it exists
+       * @example 03dg2o5teb2eucxr9ggh3uie6
        */
       pipeline_id?: string
       /**
@@ -22832,6 +23194,96 @@ export interface operations {
       }
     }
   }
+  HipaaController_getStatus: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['GetHipaaStatusResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  HipaaController_acceptAgreement: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['AcceptHipaaAgreementBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AcceptHipaaAgreementResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   MembersController_getMembers: {
     parameters: {
       query?: never
@@ -23908,6 +24360,53 @@ export interface operations {
       }
     }
   }
+  OrganizationOAuthAuthorizationsController_preflightAuthorizationRequest: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Oauth authorization id */
+        id: string
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['AuthorizationPreflightResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action. When the failure is an insufficient organization role, the body is `role_validation_failed` with the missing role details. */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['OAuthRoleValidationFailureResponse']
+        }
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PaymentsController_getPaymentMethods: {
     parameters: {
       query?: never
@@ -24119,6 +24618,8 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
+        /** @description A comma-separated list of project refs to filter by. Accepts up to 100 refs. Refs of projects that do not exist or are not accessible are omitted from the response. */
+        refs?: string
         /** @description Search projects by name, or by exact project ref */
         search?: string
         /** @description Sort order for projects */
@@ -24147,6 +24648,63 @@ export interface operations {
       }
       /** @description Failed to retrieve projects */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  OrgRestrictionsController_recheck: {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['RecheckRestrictionsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to recheck restrictions */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Usage could not be measured */
+      503: {
         headers: {
           [name: string]: unknown
         }
@@ -30950,6 +31508,7 @@ export interface operations {
       query: {
         cloud_provider: 'AWS' | 'AWS_K8S' | 'AWS_NIMBUS'
         desired_instance_size?:
+          | 'nano'
           | 'micro'
           | 'small'
           | 'medium'
@@ -31173,8 +31732,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31239,8 +31798,8 @@ export interface operations {
       path: {
         /** @description Destination id */
         destination_id: number
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31676,8 +32235,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31729,8 +32288,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31793,8 +32352,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31867,8 +32426,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31920,8 +32479,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -31987,8 +32546,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32053,8 +32612,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32113,8 +32672,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32166,8 +32725,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32226,8 +32785,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -32279,8 +32838,8 @@ export interface operations {
       query?: never
       header?: never
       path: {
-        /** @description Pipeline id */
-        pipeline_id: string | number
+        /** @description Pipeline ID */
+        pipeline_id: string
         /** @description Project ref */
         ref: string
       }
@@ -36450,6 +37009,129 @@ export interface operations {
       }
       /** @description Unexpected error while updating Warehouse catalog. */
       500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  WarehouseMetricsController_getMetrics: {
+    parameters: {
+      query: {
+        attribute?:
+          | 'query_rate'
+          | 'query_error_rate'
+          | 'query_timeout_rate'
+          | 'query_canceled_rate'
+          | 'query_duration_mean'
+          | 'query_duration_p50'
+          | 'query_duration_p95'
+          | 'query_duration_p99'
+          | 'duckdb_duration_mean'
+          | 'assignment_wait_mean'
+          | 'assignment_wait_p95'
+          | 'query_in_flight'
+          | 'admission_rejection_rate'
+          | 'worker_admission_limit'
+          | 'worker_admission_active'
+          | 'worker_admission_pending'
+          | 'worker_admission_occupied'
+          | 'activation_rate'
+          | 'activation_duration_mean'
+          | 'activation_duration_p95'
+          | 'rpc_rate'
+          | 'rpc_duration_mean'
+          | 'rpc_duration_p95'
+        /** @description Up to 8 distinct measurements, as a comma-separated list or array. */
+        attributes?:
+          | string
+          | (
+              | 'query_rate'
+              | 'query_error_rate'
+              | 'query_timeout_rate'
+              | 'query_canceled_rate'
+              | 'query_duration_mean'
+              | 'query_duration_p50'
+              | 'query_duration_p95'
+              | 'query_duration_p99'
+              | 'duckdb_duration_mean'
+              | 'assignment_wait_mean'
+              | 'assignment_wait_p95'
+              | 'query_in_flight'
+              | 'admission_rejection_rate'
+              | 'worker_admission_limit'
+              | 'worker_admission_active'
+              | 'worker_admission_pending'
+              | 'worker_admission_occupied'
+              | 'activation_rate'
+              | 'activation_duration_mean'
+              | 'activation_duration_p95'
+              | 'rpc_rate'
+              | 'rpc_duration_mean'
+              | 'rpc_duration_p95'
+            )[]
+        /** @description No later than now; clock skew up to 60 seconds is clamped to server time. */
+        endDate: string
+        /** @description Defaults to 1m; effective step increases to stay within 1441 points per series. */
+        interval?: '1m' | '5m' | '10m' | '30m' | '1h' | '1d'
+        /** @description Within the last 30 days; overruns up to 60 seconds are clamped for request delay. */
+        startDate: string
+      }
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['WarehouseMetricsResponse_Output']
+        }
+      }
+      /** @description Invalid attribute selection, batch size, range, interval or query parameter. */
+      400: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Project not found. */
+      404: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Warehouse feature unavailable, placement read failed, or query capacity exhausted. */
+      503: {
         headers: {
           [name: string]: unknown
         }

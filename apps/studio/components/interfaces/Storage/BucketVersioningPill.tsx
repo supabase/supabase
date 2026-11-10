@@ -37,7 +37,7 @@ export const BucketVersioningPill = ({ bucket, showPrefix = true }: BucketVersio
         <span tabIndex={0} className="shrink-0">
           <Badge variant={variant}>
             <FileStackIcon size={12} aria-hidden />
-            {showPrefix ? `Versioning ${state.toLowerCase()}` : state}
+            {showPrefix ? <span>{`Versioning ${state.toLowerCase()}`}</span> : state}
           </Badge>
         </span>
       </TooltipTrigger>

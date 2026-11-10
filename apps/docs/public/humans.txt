@@ -4,6 +4,7 @@ Supabase is 100% remote.
 
 Aaron Brooks
 Aaron Byrne
+Adam Howard
 Adam Mohammed
 Adam Mokan
 Adam Whitlock
@@ -23,6 +24,7 @@ Alexis Aguilar
 Ali Waseem
 Alice Crosbie
 Allan S
+Alpar Torok
 Amir Issaei
 Amogh Rao
 Amy Q
@@ -47,6 +49,7 @@ Barry Roodt
 Ben Fritsch
 Beng Eu
 Benjamin Coenen
+Benoit Ammermann
 Beth Long
 Bobbie Soedirgo
 Brad Deam
@@ -158,6 +161,7 @@ Hieu Pham
 Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
+Ilya Kobets
 Inian P
 Iryna Deans
 Isaac Dawson
@@ -187,11 +191,13 @@ Joey Freeland
 Joey Lei
 John Fitzgerald
 John Jarvis
+John Kerry
 John Murret
 Joel Martin
 Johan Bergström
 John Pena
 Jon M
+Jonathan Eng
 Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
@@ -228,7 +234,6 @@ Laurence Isla
 Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
-Leonardo Santiago
 Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
@@ -272,6 +277,7 @@ Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro
@@ -284,6 +290,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Patrick Knight
 Paul Bauer
 Paul Copplestone
 Paul Ibeabuchi
@@ -311,6 +318,7 @@ Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
+Roman Gruhn
 Roman Hernandez
 Ronan Lehane
 Rory Hunter
@@ -361,6 +369,7 @@ Terry Sutton
 Terry Wilcox
 Thanya Nitithatsanakul
 Thomas E
+Thomas Krennwallner
 Tim Frietas
 Tim Palmer
 Timothy Lim

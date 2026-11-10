@@ -186,7 +186,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                          {errorCount} table error{errorCount === 1 ? '' : <span>s</span>}
                         </span>
                       </>
                     )}

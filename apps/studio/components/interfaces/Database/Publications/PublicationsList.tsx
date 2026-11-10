@@ -243,9 +243,11 @@ export const PublicationsList = () => {
         }}
       >
         <p className="text-sm text-foreground-light">
-          Are you sure you want to {toggleListenEventValue?.currentStatus ? 'stop' : 'start'}{' '}
-          sending {toggleListenEventValue?.event.event.toLowerCase()} events for{' '}
-          {toggleListenEventValue?.publication.name}?
+          Are you sure you want to{' '}
+          {toggleListenEventValue?.currentStatus ? <span>stop</span> : <span>start</span>}{' '}
+          <span>sending</span> {toggleListenEventValue?.event.event.toLowerCase()}{' '}
+          <span>events for</span> {toggleListenEventValue?.publication.name}
+          <span>?</span>
         </p>
       </ConfirmationModal>
     </>
