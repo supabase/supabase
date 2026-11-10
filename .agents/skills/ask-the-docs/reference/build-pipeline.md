@@ -30,8 +30,6 @@ flowchart TB
     SM --> DOC
     RD --> DOC
   end
-
-  DOC --> CDN["upload-static-assets.sh<br/>(R2, production-style deploys)<br/>run by vercel.json buildCommand"]
 ```
 
 ## Commands
@@ -98,10 +96,6 @@ pipeline was defined twice and could drift. Add new steps to `turbo.jsonc`
 only. See `packages/maybe-turbo/README.md` for why scripts use the wrapper
 instead of calling `turbo` directly.
 
-The R2 asset upload used to be `postbuild`. It now runs from the
-`buildCommand` in `apps/docs/vercel.json`:
-`pnpm build && ./../../scripts/upload-static-assets.sh`.
-
 ## Codegen scripts
 
 - **`codegen:graphql`** — generates GraphQL types from schema.
@@ -130,8 +124,7 @@ For how agents consume these outputs, see
 ## Deploy vs CI
 
 - **Production build** for the site is **Vercel**; `apps/docs/vercel.json`
-  sets `buildCommand` to `pnpm build && ./../../scripts/upload-static-assets.sh`
-  (the Turbo graph above, then the R2 CDN upload on production-style deploys).
+  sets `buildCommand` to `pnpm build` (the Turbo graph above).
 - **GitHub Actions** mostly run **tests** (`test:docs` → Turbo), **lint**,
   **sync** jobs, and **smoke** tests — not a separate full production build
   graph in the way Turbo does locally. See [`ci-and-lint.md`](./ci-and-lint.md).
