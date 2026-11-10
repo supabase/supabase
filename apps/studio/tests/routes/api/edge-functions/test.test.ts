@@ -1,22 +1,23 @@
-import { createMocks } from 'node-mocks-http'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-import handler from '../../../../pages/api/edge-functions/test'
+import { Route } from '@/routes/api/edge-functions/test'
+import { getRouteHandler } from '@/tests/lib/server-route'
 
 vi.mock('common', () => ({ IS_PLATFORM: true }))
 
-const createRequest = (
+const testEdgeFunction = (
   url = 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test',
   headers: Record<string, string> = {}
 ) =>
-  createMocks({
-    method: 'POST',
-    body: {
-      url,
+  getRouteHandler(
+    Route,
+    'POST'
+  )({
+    request: new Request('http://localhost/api/edge-functions/test', {
       method: 'POST',
-      body: '{}',
-      headers,
-    },
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ url, method: 'POST', body: '{}', headers }),
+    }),
   })
 
 describe('/api/edge-functions/test', () => {
@@ -41,12 +42,10 @@ describe('/api/edge-functions/test', () => {
         })
       )
     )
-    const { req, res } = createRequest()
+    const response = await testEdgeFunction()
 
-    await handler(req, res)
-
-    expect(res._getStatusCode()).toBe(200)
-    expect(JSON.parse(res._getData())).toEqual({
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({
       status: 401,
       headers: {
         'content-type': 'application/json',
@@ -61,11 +60,9 @@ describe('/api/edge-functions/test', () => {
     headers.append('set-cookie', 'session=one; Path=/; HttpOnly')
     headers.append('set-cookie', 'csrf=two; Path=/; SameSite=Lax')
     vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response(null, { headers })))
-    const { req, res } = createRequest()
+    const response = await testEdgeFunction()
 
-    await handler(req, res)
-
-    expect(JSON.parse(res._getData())).toEqual({
+    expect(await response.json()).toEqual({
       status: 200,
       headers: {
         'set-cookie': ['session=one; Path=/; HttpOnly', 'csrf=two; Path=/; SameSite=Lax'],
@@ -102,12 +99,10 @@ describe('/api/edge-functions/test', () => {
         })
       )
     )
-    const { req, res } = createRequest()
+    const response = await testEdgeFunction()
 
-    await handler(req, res)
-
-    expect(res._getStatusCode()).toBe(200)
-    expect(JSON.parse(res._getData())).toEqual({
+    expect(response.status).toBe(200)
+    expect(await response.json()).toEqual({
       status,
       headers: { 'content-type': contentType },
       body,
@@ -117,13 +112,11 @@ describe('/api/edge-functions/test', () => {
   it('rejects invalid URLs without making an upstream request', async () => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
-    const { req, res } = createRequest('https://example.com/functions/v1/test')
-
-    await handler(req, res)
+    const response = await testEdgeFunction('https://example.com/functions/v1/test')
 
     expect(fetchMock).not.toHaveBeenCalled()
-    expect(res._getStatusCode()).toBe(400)
-    expect(JSON.parse(res._getData())).toEqual({
+    expect(response.status).toBe(400)
+    expect(await response.json()).toEqual({
       status: 400,
       error: { message: 'Provided URL is not a valid Supabase edge function URL' },
     })
@@ -132,12 +125,10 @@ describe('/api/edge-functions/test', () => {
   it('forwards the supplied headers without rewriting Authorization', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null))
     vi.stubGlobal('fetch', fetchMock)
-    const { req, res } = createRequest(undefined, {
+    await testEdgeFunction(undefined, {
       apikey: 'sb_publishable_test_key',
       Authorization: 'Bearer user-token',
     })
-
-    await handler(req, res)
 
     expect(fetchMock).toHaveBeenCalledTimes(1)
     expect(fetchMock.mock.calls[0][1].headers).toEqual({
@@ -150,9 +141,7 @@ describe('/api/edge-functions/test', () => {
   it('lets a supplied header replace the default whatever its casing', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null))
     vi.stubGlobal('fetch', fetchMock)
-    const { req, res } = createRequest(undefined, { 'content-type': 'text/plain' })
-
-    await handler(req, res)
+    await testEdgeFunction(undefined, { 'content-type': 'text/plain' })
 
     expect(fetchMock.mock.calls[0][1].headers).toEqual({ 'content-type': 'text/plain' })
   })
@@ -160,9 +149,7 @@ describe('/api/edge-functions/test', () => {
   it('drops empty header values', async () => {
     const fetchMock = vi.fn().mockResolvedValue(new Response(null))
     vi.stubGlobal('fetch', fetchMock)
-    const { req, res } = createRequest(undefined, { apikey: '', 'x-kept': 'value' })
-
-    await handler(req, res)
+    await testEdgeFunction(undefined, { apikey: '', 'x-kept': 'value' })
 
     expect(fetchMock.mock.calls[0][1].headers).toEqual({
       'Content-Type': 'application/json',
@@ -172,12 +159,10 @@ describe('/api/edge-functions/test', () => {
 
   it('returns fetch failures as proxy errors', async () => {
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('Connection refused')))
-    const { req, res } = createRequest()
+    const response = await testEdgeFunction()
 
-    await handler(req, res)
-
-    expect(res._getStatusCode()).toBe(500)
-    expect(JSON.parse(res._getData())).toEqual({
+    expect(response.status).toBe(500)
+    expect(await response.json()).toEqual({
       status: 500,
       error: { message: 'Connection refused' },
     })
