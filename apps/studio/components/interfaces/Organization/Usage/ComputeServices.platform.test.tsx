@@ -153,6 +153,27 @@ describe('ComputeServices', () => {
     })
   })
 
+  it('states the unit in the header and not again on every row', async () => {
+    renderOnPlan('pro')
+
+    const header = await screen.findByText('vCPU-hrs')
+    const table = header.closest('div')?.parentElement
+    expect(table).not.toBeNull()
+
+    // One "vCPU-hrs" in the whole table: the column header's.
+    expect(within(table!).getAllByText(/vCPU-hrs/)).toHaveLength(1)
+  })
+
+  it("carries each project's share on the bar rather than printing a second percentage", async () => {
+    renderOnPlan('pro')
+
+    await screen.findByText('Usage by project')
+    const bars = await screen.findAllByRole('img', {
+      name: /% of the organization's vCPU-hours/,
+    })
+    expect(bars.length).toBeGreaterThan(0)
+  })
+
   it('narrows to a single project and hides the org allowance', async () => {
     customRender(
       <ComputeServices

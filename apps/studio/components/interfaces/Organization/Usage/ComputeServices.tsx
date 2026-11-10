@@ -14,6 +14,7 @@ import {
   buildComputeBurndown,
   formatComputeHours,
   formatComputeRequests,
+  formatDecimal,
   formatGbHours,
   formatPercentage,
   formatVcpuHours,
@@ -329,47 +330,59 @@ const ComputeSizeMeters = ({ rows }: { rows: ComputeUsageBySize[] }) => {
 const pluralize = (count: number, singular: string) =>
   `${count.toLocaleString()} ${singular}${count === 1 ? '' : 's'}`
 
+/**
+ * Ranked bars, not meters.
+ *
+ * The bar on each row shows that project's share of the organization's vCPU-hours, scaled to
+ * the largest row so the column reads as a bar chart lying on one baseline. Scaling it to the
+ * org total instead would make the top row sit at 61% of its track, which reads as progress
+ * toward a limit — and the column next to it genuinely is a ratio against a limit, so the two
+ * would wear the same mark for different jobs.
+ *
+ * The share is not printed. The figure beside the bar already gives the amount, and a second
+ * percentage next to "CPU used" invited the two to be read against the same denominator when
+ * one is a share of the org and the other a share of what the project reserved.
+ */
 const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
   const totalReservedVcpuHours = sumBy(rows, (row) => row.reservedVcpuHours)
+  const largestReservedVcpuHours = Math.max(...rows.map((row) => row.reservedVcpuHours), 0)
 
   return (
     <div className="divide-y border-b">
       <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
-        <span className="col-span-6">Project</span>
-        <span className="col-span-4 text-right">vCPU-hrs</span>
+        <span className="col-span-5">Project</span>
+        <span className="col-span-5 text-right">vCPU-hrs</span>
         <span className="col-span-2 text-right">CPU used</span>
       </div>
       {rows.map((row) => {
         const share =
           totalReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / totalReservedVcpuHours
+        const relativeToLargest =
+          largestReservedVcpuHours <= 0 ? 0 : row.reservedVcpuHours / largestReservedVcpuHours
         const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)
 
         return (
           <div key={row.projectRef} className="grid grid-cols-12 items-center gap-4 py-1.5">
-            <div className="col-span-6 min-w-0">
+            <div className="col-span-5 min-w-0">
               <p className="truncate text-sm text-foreground">{row.projectName}</p>
               <p className="truncate text-xs text-foreground-lighter">
                 {pluralize(row.deployments, 'compute')} · {pluralize(row.instances, 'instance')}
               </p>
             </div>
-            <div className="col-span-4 flex flex-col items-end gap-1">
-              <p className="text-sm tabular-nums text-foreground-light">
-                {formatVcpuHours(row.reservedVcpuHours)}
-              </p>
-              <div
-                className="flex items-center gap-2"
-                aria-label={`${formatPercentage(share)} of organization vCPU-hours`}
+            <div className="col-span-5 flex items-center justify-end gap-3">
+              <span
+                className="h-1 w-full max-w-24 overflow-hidden rounded-full bg-surface-400"
+                role="img"
+                aria-label={`${formatPercentage(share)} of the organization's vCPU-hours`}
               >
-                <span aria-hidden className="h-1 w-12 overflow-hidden rounded-full bg-surface-400">
-                  <span
-                    className="block h-full rounded-full bg-foreground-light"
-                    style={{ width: formatPercentage(share) }}
-                  />
-                </span>
-                <span className="text-xs tabular-nums text-foreground-lighter">
-                  {formatPercentage(share)}
-                </span>
-              </div>
+                <span
+                  className="block h-full rounded-full bg-foreground-light"
+                  style={{ width: formatPercentage(relativeToLargest) }}
+                />
+              </span>
+              <p className="text-sm tabular-nums text-foreground-light">
+                {formatDecimal(row.reservedVcpuHours)}
+              </p>
             </div>
             <p className="col-span-2 text-right text-sm tabular-nums text-foreground-light">
               {cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}

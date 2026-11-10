@@ -156,12 +156,12 @@ export const aggregateUsageBySize = (
  * carry small values rather than rounding them to nothing: 0.04 is a real figure against an
  * 8.33 allowance, and "0.0" is not.
  */
-const round = (value: number) => {
+export const formatDecimal = (value: number) => {
   const maximumFractionDigits = value < 1 ? 2 : value < 10 ? 1 : 0
   return value.toLocaleString(undefined, { maximumFractionDigits })
 }
 
-export const formatComputeHours = (hours: number): string => `${round(hours)} hrs`
+export const formatComputeHours = (hours: number): string => `${formatDecimal(hours)} hrs`
 
 /**
  * Both sides of a quota comparison have to read in one unit — scaling each number on its own
@@ -169,17 +169,17 @@ export const formatComputeHours = (hours: number): string => `${round(hours)} hr
  * written once, after the pair.
  */
 export const formatVcpuQuota = (usedVcpuHours: number, includedVcpuHours: number | null) => {
-  if (includedVcpuHours === null) return `${round(usedVcpuHours)} vCPU-hrs`
-  return `${round(usedVcpuHours)}/${round(includedVcpuHours)} vCPU-hrs`
+  if (includedVcpuHours === null) return `${formatDecimal(usedVcpuHours)} vCPU-hrs`
+  return `${formatDecimal(usedVcpuHours)}/${formatDecimal(includedVcpuHours)} vCPU-hrs`
 }
 
 /** Counts carry no unit, so the pair is all there is to say. */
 export const formatCapacityQuota = (used: number, limit: number | null) =>
   limit === null ? used.toLocaleString() : `${used.toLocaleString()}/${limit.toLocaleString()}`
 
-export const formatVcpuHours = (hours: number): string => `${round(hours)} vCPU-hrs`
+export const formatVcpuHours = (hours: number): string => `${formatDecimal(hours)} vCPU-hrs`
 
-export const formatGbHours = (hours: number): string => `${round(hours)} GB-hrs`
+export const formatGbHours = (hours: number): string => `${formatDecimal(hours)} GB-hrs`
 
 export const formatPercentage = (ratio: number): string => `${Math.round(ratio * 100)}%`
 
