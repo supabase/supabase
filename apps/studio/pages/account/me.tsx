@@ -34,7 +34,8 @@ import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
-import { useTranslation } from '@/lib/i18n/LocaleProvider'
+import type { MessageKey } from '@/lib/i18n/messages/en'
+import { TranslatedText } from '@/lib/i18n/TranslatedText'
 import { useProfile } from '@/lib/profile'
 import type { NextPageWithLayout } from '@/types'
 
@@ -52,15 +53,17 @@ User.getLayout = (page) => (
 
 export default User
 
-const PreferencesPageHeader = ({ description }: { description: string }) => {
-  const { t } = useTranslation()
-
+const PreferencesPageHeader = ({ description }: { description: MessageKey }) => {
   return (
     <PageHeader size="small">
       <PageHeaderMeta>
         <PageHeaderSummary>
-          <PageHeaderTitle>{t('account.preferences.title')}</PageHeaderTitle>
-          <PageHeaderDescription>{description}</PageHeaderDescription>
+          <PageHeaderTitle>
+            <TranslatedText messageKey="account.preferences.title" />
+          </PageHeaderTitle>
+          <PageHeaderDescription>
+            <TranslatedText messageKey={description} />
+          </PageHeaderDescription>
         </PageHeaderSummary>
       </PageHeaderMeta>
     </PageHeader>
@@ -69,7 +72,6 @@ const PreferencesPageHeader = ({ description }: { description: string }) => {
 
 const PlatformPreferences = () => {
   const { asPath, query, replace } = useRouter()
-  const { t } = useTranslation()
 
   const { profileShowInformation, profileShowAnalyticsAndMarketing, profileShowAccountDeletion } =
     useIsFeatureEnabled([
@@ -95,7 +97,7 @@ const PlatformPreferences = () => {
 
   return (
     <>
-      <PreferencesPageHeader description={t('account.preferences.description.platform')} />
+      <PreferencesPageHeader description="account.preferences.description.platform" />
       <PageContainer size="small">
         {isError && (
           <Card>
@@ -183,11 +185,9 @@ const ProfileFieldLoadingRow = ({
 )
 
 const SelfHostedPreferences = () => {
-  const { t } = useTranslation()
-
   return (
     <>
-      <PreferencesPageHeader description={t('account.preferences.description.selfHosted')} />
+      <PreferencesPageHeader description="account.preferences.description.selfHosted" />
       <PageContainer size="small">
         <ThemeSettings />
 

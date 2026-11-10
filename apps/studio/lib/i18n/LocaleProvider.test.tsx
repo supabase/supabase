@@ -76,21 +76,21 @@ describe('LocaleProvider', () => {
     expect(result.current.locale).toBe('en')
   })
 
-  it('mirrors the language onto <html lang> and restores the original when unmounted', async () => {
-    // Stands in for whatever the page was served with. It differs from both supported languages,
-    // so a missing cleanup can't pass by accident. Strict Mode runs every effect twice.
-    document.documentElement.lang = 'fr'
+  it('preserves the English document language when the preference changes', async () => {
+    document.documentElement.lang = 'en'
 
     const { result, unmount } = await renderTranslation(JSON.stringify('ja'), {
       isStrictMode: true,
     })
-    expect(document.documentElement.lang).toBe('ja')
+    expect(result.current.locale).toBe('ja')
+    expect(document.documentElement.lang).toBe('en')
 
     act(() => result.current.setLocale('en'))
-    await waitFor(() => expect(document.documentElement.lang).toBe('en'))
+    await waitFor(() => expect(result.current.locale).toBe('en'))
+    expect(document.documentElement.lang).toBe('en')
 
     unmount()
-    expect(document.documentElement.lang).toBe('fr')
+    expect(document.documentElement.lang).toBe('en')
   })
 })
 

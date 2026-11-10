@@ -21,13 +21,25 @@ export const interpolate = (message: string, params?: MessageParams): string => 
 }
 
 /**
- * Builds a `translate` function over the given catalogs. It looks a key up in the requested
- * locale, then in the default locale, then falls back to the key itself, so a missing
- * translation never renders as blank text.
+ * Resolves a message and its actual language together, including English fallback.
+ * A missing message falls back to the key itself rather than rendering blank text.
  */
-export const createTranslate =
+export const createResolveMessage =
   (catalogs: Catalogs) =>
-  (locale: Locale, key: MessageKey, params?: MessageParams): string =>
-    interpolate(catalogs[locale][key] ?? catalogs[DEFAULT_LOCALE][key] ?? key, params)
+  (locale: Locale, key: MessageKey, params?: MessageParams): { text: string; lang: Locale } => {
+    const message = catalogs[locale][key]
+    return {
+      text: interpolate(message ?? catalogs[DEFAULT_LOCALE][key] ?? key, params),
+      lang: message === undefined ? DEFAULT_LOCALE : locale,
+    }
+  }
 
-export const translate = createTranslate({ en, ja })
+export const createTranslate = (catalogs: Catalogs) => {
+  const resolve = createResolveMessage(catalogs)
+  return (locale: Locale, key: MessageKey, params?: MessageParams): string =>
+    resolve(locale, key, params).text
+}
+
+const catalogs = { en, ja }
+export const resolveMessage = createResolveMessage(catalogs)
+export const translate = createTranslate(catalogs)

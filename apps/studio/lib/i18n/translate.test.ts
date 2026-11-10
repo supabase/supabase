@@ -1,6 +1,12 @@
 import { describe, expect, it } from 'vitest'
 
-import { createTranslate, getPlaceholders, interpolate, translate } from './translate'
+import {
+  createResolveMessage,
+  createTranslate,
+  getPlaceholders,
+  interpolate,
+  translate,
+} from './translate'
 
 describe('getPlaceholders', () => {
   it('lists placeholder names in order of appearance', () => {
@@ -104,5 +110,45 @@ describe('translate', () => {
     expect(translate('ja', 'account.preferences.timezone.autoDetectWithZone', params)).toBe(
       '自動検出（Asia/Tokyo）'
     )
+  })
+})
+
+describe('resolved message language', () => {
+  it('reports the message language, including English fallback', () => {
+    const resolve = createResolveMessage({
+      en: {
+        'account.preferences.title': 'Preferences',
+        'account.preferences.language.title': 'Language',
+      },
+      ja: { 'account.preferences.title': '環境設定' },
+    })
+
+    expect(resolve('ja', 'account.preferences.title')).toStrictEqual({
+      text: '環境設定',
+      lang: 'ja',
+    })
+    expect(resolve('ja', 'account.preferences.language.title')).toStrictEqual({
+      text: 'Language',
+      lang: 'en',
+    })
+  })
+
+  it('preserves the fallback language when interpolating parameters', () => {
+    const resolve = createResolveMessage({
+      en: { 'account.preferences.timezone.autoDetectWithZone': 'Auto detect ({timezone})' },
+      ja: {},
+    })
+
+    expect(
+      resolve('ja', 'account.preferences.timezone.autoDetectWithZone', { timezone: 'Asia/Tokyo' })
+    ).toStrictEqual({ text: 'Auto detect (Asia/Tokyo)', lang: 'en' })
+  })
+
+  it('marks a missing-key fallback as English', () => {
+    const resolve = createResolveMessage({ en: {}, ja: {} })
+    expect(resolve('ja', 'account.preferences.title')).toStrictEqual({
+      text: 'account.preferences.title',
+      lang: 'en',
+    })
   })
 })

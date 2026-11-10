@@ -34,13 +34,15 @@ import {
 import { useTimezone } from '@/lib/datetime'
 import { guessLocalTimezone } from '@/lib/dayjs'
 import { useTranslation } from '@/lib/i18n/LocaleProvider'
+import { resolveMessage } from '@/lib/i18n/translate'
+import { TranslatedText } from '@/lib/i18n/TranslatedText'
 import { useTrack } from '@/lib/telemetry/track'
 
 const AUTO_OPTION_VALUE = '__auto__'
 
 export const TimezoneSettings = () => {
   const track = useTrack()
-  const { t } = useTranslation()
+  const { locale } = useTranslation()
   const listboxId = useId()
   const [open, setOpen] = useState(false)
   const { timezone, storedTimezone, setTimezone, isAutoDetected } = useTimezone()
@@ -51,6 +53,16 @@ export const TimezoneSettings = () => {
   const browserTimezone = useMemo(() => guessLocalTimezone(), [])
 
   const triggerLabel = useMemo(() => getTimezoneLabelByIana(timezone), [timezone])
+  const label = resolveMessage(locale, 'account.preferences.timezone.label')
+  const autoDetect = resolveMessage(locale, 'account.preferences.timezone.autoDetect')
+  const autoDetectWithZone = resolveMessage(
+    locale,
+    'account.preferences.timezone.autoDetectWithZone',
+    {
+      timezone,
+    }
+  )
+  const searchPlaceholder = resolveMessage(locale, 'account.preferences.timezone.searchPlaceholder')
 
   const handleSelect = (nextStored: string) => {
     setTimezone(nextStored)
@@ -68,9 +80,11 @@ export const TimezoneSettings = () => {
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>{t('account.preferences.timezone.title')}</PageSectionTitle>
+          <PageSectionTitle>
+            <TranslatedText messageKey="account.preferences.timezone.title" />
+          </PageSectionTitle>
           <PageSectionDescription>
-            {t('account.preferences.timezone.description')}
+            <TranslatedText messageKey="account.preferences.timezone.description" />
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
@@ -79,17 +93,24 @@ export const TimezoneSettings = () => {
           <CardContent>
             <FormItemLayout
               isReactForm={false}
-              label={t('account.preferences.timezone.label')}
+              label={<span lang={label.lang}>{label.text}</span>}
               layout="flex-row-reverse"
               description={
-                isAutoDetected
-                  ? t('account.preferences.timezone.descriptionAuto', { timezone: browserTimezone })
-                  : t('account.preferences.timezone.descriptionManual')
+                isAutoDetected ? (
+                  <TranslatedText
+                    messageKey="account.preferences.timezone.descriptionAuto"
+                    params={{ timezone: browserTimezone }}
+                  />
+                ) : (
+                  <TranslatedText messageKey="account.preferences.timezone.descriptionManual" />
+                )
               }
             >
               <Popover open={open} onOpenChange={setOpen}>
                 <PopoverTrigger asChild>
                   <ComboboxTrigger
+                    aria-label={label.text}
+                    lang={label.lang}
                     aria-expanded={open}
                     aria-controls={listboxId}
                     data-state={open ? 'open' : 'closed'}
@@ -97,10 +118,11 @@ export const TimezoneSettings = () => {
                   >
                     <span className="flex min-w-0 items-center gap-2">
                       <GlobeIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
-                      <span className="truncate">
-                        {isAutoDetected
-                          ? t('account.preferences.timezone.autoDetectWithZone', { timezone })
-                          : triggerLabel}
+                      <span
+                        className="truncate"
+                        lang={isAutoDetected ? autoDetectWithZone.lang : 'en'}
+                      >
+                        {isAutoDetected ? autoDetectWithZone.text : triggerLabel}
                       </span>
                     </span>
                   </ComboboxTrigger>
@@ -108,21 +130,25 @@ export const TimezoneSettings = () => {
                 <PopoverContent id={listboxId} className="w-[--radix-popover-trigger-width] p-0">
                   <Command>
                     <CommandInput
-                      placeholder={t('account.preferences.timezone.searchPlaceholder')}
+                      placeholder={searchPlaceholder.text}
+                      lang={searchPlaceholder.lang}
                       className="h-9"
                     />
                     <CommandList>
-                      <CommandEmpty>{t('account.preferences.timezone.empty')}</CommandEmpty>
+                      <CommandEmpty>
+                        <TranslatedText messageKey="account.preferences.timezone.empty" />
+                      </CommandEmpty>
                       <CommandGroup>
                         <ScrollArea className="h-72">
                           <CommandItem
                             key={AUTO_OPTION_VALUE}
-                            value={`${t('account.preferences.timezone.autoDetect')} ${browserTimezone}`}
+                            lang={autoDetect.lang}
+                            value={`${autoDetect.text} ${browserTimezone}`}
                             onSelect={() => handleSelect('')}
                           >
                             <div className="flex flex-col">
-                              <span>{t('account.preferences.timezone.autoDetect')}</span>
-                              <span className="text-xs text-foreground-lighter">
+                              <span>{autoDetect.text}</span>
+                              <span lang="en" className="text-xs text-foreground-lighter">
                                 {browserTimezone}
                               </span>
                             </div>
@@ -139,6 +165,7 @@ export const TimezoneSettings = () => {
                             return (
                               <CommandItem
                                 key={ianaName}
+                                lang="en"
                                 // CommandItem matches against the `value` prop for the input filter — include
                                 // both the human label and the IANA name so search works for either.
                                 value={`${getTimezoneLabel(entry)} ${ianaName}`}

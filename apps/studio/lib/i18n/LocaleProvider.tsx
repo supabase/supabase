@@ -1,5 +1,5 @@
 import { LOCAL_STORAGE_KEYS } from 'common'
-import { createContext, useContext, useEffect, useMemo, type ReactNode } from 'react'
+import { createContext, useContext, useMemo, type ReactNode } from 'react'
 
 import { DEFAULT_LOCALE, parseLocale, type Locale } from './locales'
 import type { MessageKey } from './messages/en'
@@ -18,10 +18,9 @@ interface LocaleContextValue {
 const LocaleContext = createContext<LocaleContextValue | undefined>(undefined)
 
 /**
- * Holds the dashboard language. The choice is stored in localStorage (like the timezone) and
- * mirrored onto `<html lang>`, so screen readers and the browser (hyphenation, font selection,
- * spell check) treat the page in the right language. A stored value that isn't a supported
- * locale is treated as English.
+ * Holds the preferred language for translated messages and saves it in localStorage.
+ * The document stays in English while most of Studio is untranslated; translated content
+ * declares its own language. A stored value that isn't supported is treated as English.
  */
 export const LocaleProvider = ({ children }: { children: ReactNode }) => {
   const [storedLocale, setStoredLocale] = useLocalStorageQuery<unknown>(
@@ -29,15 +28,6 @@ export const LocaleProvider = ({ children }: { children: ReactNode }) => {
     DEFAULT_LOCALE
   )
   const locale = parseLocale(storedLocale)
-
-  useEffect(() => {
-    const previousLang = document.documentElement.lang
-    document.documentElement.lang = locale
-
-    return () => {
-      document.documentElement.lang = previousLang
-    }
-  }, [locale])
 
   const value = useMemo<LocaleContextValue>(
     () => ({

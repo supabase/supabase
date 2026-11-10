@@ -19,28 +19,38 @@ import {
 
 import { useTranslation } from '@/lib/i18n/LocaleProvider'
 import { LOCALE_LABELS, LOCALES, parseLocale } from '@/lib/i18n/locales'
+import { resolveMessage } from '@/lib/i18n/translate'
+import { TranslatedText } from '@/lib/i18n/TranslatedText'
 
 export const LanguageSettings = () => {
-  const { t, locale, setLocale } = useTranslation()
-  const label = t('account.preferences.language.label')
+  const { locale, setLocale } = useTranslation()
+  const label = resolveMessage(locale, 'account.preferences.language.label')
 
   return (
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>{t('account.preferences.language.title')}</PageSectionTitle>
+          <PageSectionTitle>
+            <TranslatedText messageKey="account.preferences.language.title" />
+          </PageSectionTitle>
           <PageSectionDescription>
-            {t('account.preferences.language.description')}
+            <TranslatedText messageKey="account.preferences.language.description" />
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
         <Card>
           <CardContent>
-            <FormItemLayout isReactForm={false} label={label} layout="flex-row-reverse">
+            <FormItemLayout
+              isReactForm={false}
+              label={<span lang={label.lang}>{label.text}</span>}
+              layout="flex-row-reverse"
+            >
               <Select value={locale} onValueChange={(value) => setLocale(parseLocale(value))}>
-                <SelectTrigger aria-label={label}>
-                  <SelectValue />
+                <SelectTrigger aria-label={label.text} lang={label.lang}>
+                  <SelectValue>
+                    <span lang={locale}>{LOCALE_LABELS[locale]}</span>
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {LOCALES.map((value) => (
