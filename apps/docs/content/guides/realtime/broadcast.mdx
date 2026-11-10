@@ -34,6 +34,8 @@ Regardless if it's public or private, the Realtime service connects to your data
 
 For Authorization, we insert a message and try to read it, and rollback the transaction to verify that the Row Level Security (RLS) policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in [Authorization](/docs/guides/realtime/authorization).
 
+To see Broadcast in action, try the demo app at [multiplayer.dev](https://multiplayer.dev).
+
 ## Subscribe to messages
 
 You can use the Supabase client libraries to receive Broadcast messages.
