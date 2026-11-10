@@ -1,5 +1,5 @@
 import { usePathname } from 'next/navigation'
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useEffectEvent, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { Button } from 'ui'
 
@@ -62,9 +62,12 @@ export function OnboardingSurveyFollowUpCard() {
     [orgKind, orgSize, orgSlug, reopenFollowUp, resolveFollowUp, submitOnboardingSurveyAsync, track]
   )
 
+  // Only the window closing (or the dialog closing after it) triggers the
+  // expiry save, not a change in what the save sends
+  const onExpire = useEffectEvent(() => skipFollowUp('follow_up_expired'))
   useEffect(() => {
-    if (hasExpired && !isDialogOpen) skipFollowUp('follow_up_expired')
-  }, [hasExpired, isDialogOpen, skipFollowUp])
+    if (hasExpired && !isDialogOpen) onExpire()
+  }, [hasExpired, isDialogOpen])
 
   const pathname = usePathname()
   const shouldShowCard =
