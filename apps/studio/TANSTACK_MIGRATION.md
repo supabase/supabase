@@ -357,28 +357,28 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Auth shell — `/sign-in`, `/sign-up`, etc.
 
-- [x] A `routes/_auth/sign-in.tsx` ← `pages/sign-in.tsx`
-- [x] A `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
-- [x] A `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
-- [x] A `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
-- [x] A `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
-- [x] A `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
-- [x] A `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
-- [x] A `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
-- [x] A `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
-- [x] A `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
-- [x] A `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
+- [x] A→done `routes/_auth/sign-in.tsx` ← `pages/sign-in.tsx`
+- [x] A→done `routes/_auth/sign-up.tsx` ← `pages/sign-up.tsx`
+- [x] A→done `routes/_auth/sign-in-sso.tsx` ← `pages/sign-in-sso.tsx`
+- [x] A→done `routes/_auth/sign-in-partner.tsx` ← `pages/sign-in-partner.tsx`
+- [x] A→done `routes/_auth/sign-in-mfa.tsx` ← `pages/sign-in-mfa.tsx` (page inlines SignInLayout)
+- [x] A→done `routes/_auth/sign-in-recovery-code.tsx` ← `pages/sign-in-recovery-code.tsx` (page inlines SignInLayout)
+- [x] A→done `routes/_auth/forgot-password.tsx` ← `pages/forgot-password.tsx`
+- [x] A→done `routes/_auth/forgot-password-mfa.tsx` ← `pages/forgot-password-mfa.tsx` (page inlines ForgotPasswordLayout)
+- [x] A→done `routes/_auth/reset-password.tsx` ← `pages/reset-password.tsx` (page default already withAuth-wrapped)
+- [x] A→done `routes/_auth/cli/login.tsx` ← `pages/cli/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
+- [x] A→done `routes/_auth/partners/stripe/projects/login.tsx` ← `pages/partners/stripe/projects/login.tsx` (page inlines APIAuthorizationLayout, withAuth)
 
 ### Standalone (no shared shell)
 
 - [x] B `routes/index.tsx` — redirect-only root route. Mirrors the Next.js `redirects()` rules in `next.config.ts`: platform sends users to `/org` (or `/new/new-project` when deep-linked with `?next=new-project`), self-hosted sends them to `/project/default`. **Follow-up:** the redirect targets currently use `href` (full reload) because they were on the Next side when this was written; switch to `to` now that all of them live in the TanStack tree.
-- [x] A `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
-- [x] A `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
-- [x] A `routes/logout.tsx` ← `pages/logout.tsx`
-- [x] A `routes/maintenance.tsx` ← `pages/maintenance.tsx`
-- [x] A `routes/verify-email.tsx` ← `pages/verify-email.tsx`
-- [x] A `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
-- [x] A `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
+- [x] A→done `routes/authorize.tsx` ← `pages/authorize.tsx` (APIAuthorizationLayout)
+- [x] A→done `routes/redeem.tsx` ← `pages/redeem.tsx` (RedeemCreditsLayout)
+- [x] A→done `routes/logout.tsx` ← `pages/logout.tsx`
+- [x] A→done `routes/maintenance.tsx` ← `pages/maintenance.tsx`
+- [x] A→done `routes/verify-email.tsx` ← `pages/verify-email.tsx`
+- [x] A→done `routes/support/csat.tsx` ← `pages/support/csat.tsx` (pre-auth support satisfaction survey; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
+- [x] A→done `routes/mcp/secrets.tsx` ← `pages/mcp/secrets.tsx` (MCP elicitation URL-mode handoff; page brings its own `InterstitialLayout`, so it stays outside `_app/`.)
 
 ### Error pages (handled at root)
 

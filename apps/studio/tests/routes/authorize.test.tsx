@@ -2,8 +2,8 @@ import { screen } from '@testing-library/react'
 import { afterEach, describe, expect, test, vi } from 'vitest'
 
 import type { ProfileContextType } from '@/lib/profile'
-import APIAuthorizationPage from '@/pages/authorize'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/authorize'
+import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('@/hooks/misc/withAuth', () => ({
   withAuth: (Component: React.ComponentType) => Component,
@@ -20,17 +20,6 @@ vi.mock('common', async (importOriginal) => {
     useFlag: (key: string) => key === 'enableScopedOAuthConsent' && flags.consent,
   }
 })
-
-const routerPushMock = vi.fn()
-const useRouterMock = vi.fn(() => ({
-  isReady: false,
-  push: routerPushMock,
-  query: {},
-}))
-
-vi.mock('next/router', () => ({
-  useRouter: () => useRouterMock(),
-}))
 
 const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   profile: {
@@ -53,25 +42,29 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
   isSuccess: true,
 }
 
-describe('APIAuthorizationPage', () => {
+const renderAuthorize = (url = '/authorize') =>
+  renderRoute(Route, {
+    routeId: '/authorize',
+    url,
+    profileContext: DEFAULT_PROFILE_CONTEXT,
+  })
+
+describe('/authorize', () => {
   afterEach(() => {
     flags.consent = false
     params.current = {}
   })
 
-  test('renders loading interstitial while router is not ready', () => {
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+  test('renders loading interstitial while the authorization request loads', async () => {
+    flags.consent = true
+
+    await renderAuthorize()
+
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  test('renders the legacy component when the enableScopedOAuthConsent flag is off', () => {
-    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
-
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+  test('renders the legacy component when the enableScopedOAuthConsent flag is off', async () => {
+    await renderAuthorize()
 
     expect(screen.getByText('Missing authorization link')).toBeInTheDocument()
     expect(screen.queryByText(/is connected/)).not.toBeInTheDocument()
@@ -79,15 +72,8 @@ describe('APIAuthorizationPage', () => {
 
   test('preselects projects from repeated project_ref params', async () => {
     flags.consent = true
-    useRouterMock.mockReturnValue({
-      isReady: true,
-      push: routerPushMock,
-      query: { project_ref: ['northwindstorefront1', 'northwindcms1'] },
-    })
 
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+    await renderAuthorize('/authorize?project_ref=northwindstorefront1&project_ref=northwindcms1')
 
     expect(await screen.findByText('northwind-storefront')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
@@ -95,15 +81,8 @@ describe('APIAuthorizationPage', () => {
 
   test('normalises a single project_ref param to a one-item preselection', async () => {
     flags.consent = true
-    useRouterMock.mockReturnValue({
-      isReady: true,
-      push: routerPushMock,
-      query: { project_ref: 'northwindcms1' },
-    })
 
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+    await renderAuthorize('/authorize?project_ref=northwindcms1')
 
     expect(await screen.findByText('northwind-cms')).toBeInTheDocument()
     expect(screen.getByRole('button', { name: /Authorize Vercel/ })).toBeEnabled()
@@ -112,11 +91,8 @@ describe('APIAuthorizationPage', () => {
   test('org_bound_all renders without a picker and covers every project', async () => {
     flags.consent = true
     params.current = { mock_scenario: 'org_bound_all' }
-    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+    await renderAuthorize()
 
     expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
@@ -126,11 +102,8 @@ describe('APIAuthorizationPage', () => {
   test('user_bound_all renders without a picker and covers every project', async () => {
     flags.consent = true
     params.current = { mock_scenario: 'user_bound_all' }
-    useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 
-    customRender(<APIAuthorizationPage dehydratedState={{}} />, {
-      profileContext: DEFAULT_PROFILE_CONTEXT,
-    })
+    await renderAuthorize()
 
     expect(await screen.findByText('All projects, including future ones')).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()

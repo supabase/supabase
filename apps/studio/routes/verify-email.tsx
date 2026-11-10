@@ -1,11 +1,19 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import VerifyEmailPage from '@/pages/verify-email'
+import { SupportEmailVerification } from '@/components/interfaces/SupportEmailVerification/SupportEmailVerification'
+import { buildStudioPageTitle } from '@/lib/page-title'
 
 export const Route = createFileRoute('/verify-email')({
-  component: VerifyEmailRoute,
+  component: VerifyEmailPage,
 })
 
-function VerifyEmailRoute() {
-  return <VerifyEmailPage dehydratedState={undefined} />
+const PAGE_TITLE = buildStudioPageTitle({ section: 'Email Verification', brand: 'Supabase' })
+
+function VerifyEmailPage() {
+  return (
+    <>
+      <title>{PAGE_TITLE}</title>
+      <SupportEmailVerification />
+    </>
+  )
 }
