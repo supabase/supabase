@@ -15,6 +15,16 @@ describe('getFallbackEntrypointPath', () => {
       expect(getFallbackEntrypointPath(files)).toBe('index.ts')
     }
   )
+  it.each([
+    ['helpers/index.ts', 'index.ts', 'index.ts'],
+    ['helpers/main.ts', 'main.ts', 'main.ts'],
+    ['helpers/index.ts', 'main.ts', 'main.ts'],
+    ['src/helpers/index.ts', 'src/index.ts', 'src/index.ts'],
+  ])('prefers %s → %s by path depth', (first, second, expected) => {
+    expect(
+      getFallbackEntrypointPath([{ name: first }, { name: second }])
+    ).toBe(expected)
+  })
 })
 
 describe('formatFunctionBodyToFiles', () => {
