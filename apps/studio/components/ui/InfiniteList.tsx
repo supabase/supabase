@@ -300,6 +300,20 @@ export const InfiniteListItems = <
   )
 }
 
+/**
+ * Keeps an index rendered and scrolled into view. For keyboard-driven lists, where the
+ * active row can be well outside the rendered window after a jump.
+ */
+export const ScrollIndexIntoView = ({ index }: { index: number }) => {
+  const { virtualizer } = useVirtualizerContext()
+
+  useEffect(() => {
+    virtualizer.scrollToIndex(index, { align: 'auto' })
+  }, [index, virtualizer])
+
+  return null
+}
+
 type InfiniteListDefaultProps<Item, ItemComponentProps extends object = Record<string, never>> = {
   className?: string
   items: Item[]
@@ -310,6 +324,8 @@ type InfiniteListDefaultProps<Item, ItemComponentProps extends object = Record<s
   hasNextPage?: boolean
   isLoadingNextPage?: boolean
   onLoadNextPage?: () => void
+  /** Index to keep rendered and in view, for a list being driven by the keyboard */
+  activeIndex?: number
   ItemComponent: ComponentType<RowComponentBaseProps<Item> & ItemComponentProps>
   LoaderComponent: ComponentType<{ style?: CSSProperties }>
 }
@@ -327,6 +343,7 @@ export const InfiniteListDefault = <
   hasNextPage = false,
   isLoadingNextPage = false,
   onLoadNextPage = () => {},
+  activeIndex,
   ItemComponent,
   LoaderComponent,
 }: InfiniteListDefaultProps<Item, ItemComponentProps>) => {
@@ -349,6 +366,7 @@ export const InfiniteListDefault = <
           LoaderComponent={LoaderComponent}
         />
       </InfiniteListSizer>
+      {activeIndex !== undefined && <ScrollIndexIntoView index={activeIndex} />}
     </InfiniteListScrollWrapper>
   )
 }
