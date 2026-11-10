@@ -547,6 +547,7 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
     'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_USER_FAULT',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }

@@ -6,7 +6,7 @@ import { z } from 'zod'
 
 import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
-import type { SqlOrigin } from '@/data/error-classification'
+import { isUserFaultForSql } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -17,7 +17,6 @@ export type DatabaseFunctionUpdateVariables = {
   connectionString?: string | null
   func: SavedDatabaseFunction
   payload: PGFunctionUpdate
-  sqlOrigin: SqlOrigin
 }
 
 export async function updateDatabaseFunction({
@@ -25,7 +24,6 @@ export async function updateDatabaseFunction({
   connectionString,
   func,
   payload,
-  sqlOrigin,
 }: DatabaseFunctionUpdateVariables) {
   const { sql, zod } = pgMeta.functions.update(func, payload)
 
@@ -33,8 +31,10 @@ export async function updateDatabaseFunction({
     projectRef,
     connectionString,
     sql,
-    sqlOrigin,
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
     queryName: 'database-function-update',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'update', func.id.toString()],
     grant: unguarded.migrating,
   })

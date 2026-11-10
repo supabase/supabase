@@ -5,7 +5,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
-import type { SqlOrigin } from '@/data/error-classification'
+import { isUserFaultForSql } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -15,14 +15,12 @@ export type DatabaseFunctionCreateVariables = {
   projectRef: string
   connectionString?: string | null
   payload: PGFunctionCreate
-  sqlOrigin: SqlOrigin
 }
 
 export async function createDatabaseFunction({
   projectRef,
   connectionString,
   payload,
-  sqlOrigin,
 }: DatabaseFunctionCreateVariables) {
   const { sql, zod } = pgMeta.functions.create(payload)
 
@@ -30,8 +28,10 @@ export async function createDatabaseFunction({
     projectRef,
     connectionString,
     sql,
-    sqlOrigin,
+    // Studio composes the statement, but the user wrote the expressions and bodies Postgres parses
+    sqlOrigin: 'studio',
     queryName: 'database-function-create',
+    isUserFaultSqlState: isUserFaultForSql,
     queryKey: ['functions', 'create'],
     grant: unguarded.migrating,
   })
