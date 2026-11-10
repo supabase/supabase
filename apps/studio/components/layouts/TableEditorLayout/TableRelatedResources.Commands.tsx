@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { FunctionSquareIcon, ListOrderedIcon, ShieldIcon, ZapIcon } from 'lucide-react'
+import { FunctionSquareIcon, ListTreeIcon, ShieldIcon, ZapIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useCommandMenuOpen, useCurrentPage, useRegisterCommands } from 'ui-patterns/CommandMenu'
 
@@ -100,7 +100,7 @@ export function useTableRelatedResourcesCommands() {
     ...indexes.map((index) => ({
       id: `related-index-${index.id}`,
       name: index.name,
-      icon: () => <ListOrderedIcon />,
+      icon: () => <ListTreeIcon />,
       badge: () => <Badge>{formatRelatedIndexDetails(index)}</Badge>,
       route: getIndexEditorRoute(projectRef, index),
     })),
