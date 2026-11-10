@@ -2,7 +2,7 @@
 
 A dashboard for managing your self-hosted Supabase project, and used on our [hosted platform](https://supabase.com/dashboard). Built with:
 
-- [Next.js](https://nextjs.org/)
+- [TanStack Start](https://tanstack.com/start)
 - [Tailwind](https://tailwindcss.com/)
 
 ## What's included
