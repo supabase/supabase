@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { pipelineIdSchema } from './pipeline-id'
@@ -34,6 +34,18 @@ async function fetchReplicationPipelines(
 export type ReplicationPipelinesData = Awaited<ReturnType<typeof fetchReplicationPipelines>>
 export type Pipeline = ReplicationPipelinesData['pipelines'][0]
 
+export const replicationPipelinesQueryOptions = <TData = ReplicationPipelinesData>({
+  projectRef,
+  clusterId,
+}: ReplicationPipelinesParams) =>
+  queryOptions<ReplicationPipelinesData, StudioError, TData>({
+    queryKey: replicationKeys.pipelines(projectRef, clusterId),
+    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef, clusterId }, signal),
+    enabled: typeof projectRef !== 'undefined',
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+  })
+
 export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
   { projectRef, clusterId: requestedClusterId }: ReplicationPipelinesParams,
   {
@@ -43,11 +55,8 @@ export const useReplicationPipelinesQuery = <TData = ReplicationPipelinesData>(
 ) => {
   const clusterId = useReplicationClusterId(requestedClusterId)
   return useQuery<ReplicationPipelinesData, StudioError, TData>({
-    queryKey: replicationKeys.pipelines(projectRef, clusterId),
-    queryFn: ({ signal }) => fetchReplicationPipelines({ projectRef, clusterId }, signal),
+    ...replicationPipelinesQueryOptions<TData>({ projectRef, clusterId }),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnWindowFocus: false,
-    retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
 }

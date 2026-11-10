@@ -1,4 +1,4 @@
-import { useQuery } from '@tanstack/react-query'
+import { queryOptions, useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { checkReplicationFeatureFlagRetry } from './utils'
@@ -28,6 +28,19 @@ async function fetchReplicationSources(
 
 export type ReplicationSourcesData = Awaited<ReturnType<typeof fetchReplicationSources>>
 
+export const replicationSourcesQueryOptions = <TData = ReplicationSourcesData>({
+  projectRef,
+  clusterId,
+}: ReplicationSourcesParams) =>
+  queryOptions<ReplicationSourcesData, StudioError, TData>({
+    queryKey: replicationKeys.sources(projectRef, clusterId),
+    queryFn: ({ signal }) => fetchReplicationSources({ projectRef, clusterId }, signal),
+    enabled: typeof projectRef !== 'undefined',
+    refetchOnMount: false,
+    refetchOnWindowFocus: false,
+    retry: checkReplicationFeatureFlagRetry,
+  })
+
 export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
   { projectRef, clusterId: requestedClusterId }: ReplicationSourcesParams,
   {
@@ -37,12 +50,8 @@ export const useReplicationSourcesQuery = <TData = ReplicationSourcesData>(
 ) => {
   const clusterId = useReplicationClusterId(requestedClusterId)
   return useQuery<ReplicationSourcesData, StudioError, TData>({
-    queryKey: replicationKeys.sources(projectRef, clusterId),
-    queryFn: ({ signal }) => fetchReplicationSources({ projectRef, clusterId }, signal),
+    ...replicationSourcesQueryOptions<TData>({ projectRef, clusterId }),
     enabled: enabled && typeof projectRef !== 'undefined',
-    refetchOnMount: false,
-    refetchOnWindowFocus: false,
-    retry: checkReplicationFeatureFlagRetry,
     ...options,
   })
 }

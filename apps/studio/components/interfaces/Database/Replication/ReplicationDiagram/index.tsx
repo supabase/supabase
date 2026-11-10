@@ -1,11 +1,17 @@
+import { useQueries } from '@tanstack/react-query'
 import { Background, ColorMode, ReactFlow, ReactFlowProvider, useReactFlow } from '@xyflow/react'
 import { useParams } from 'common'
 import { useTheme } from 'next-themes'
-import { useEffect, useMemo } from 'react'
+import { useCallback, useEffect, useMemo } from 'react'
 
 import { PrimaryDatabaseNode, ReplicationNode } from './Nodes'
 import { getDagreGraphLayout } from './ReplicationDiagram.utils'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
+import {
+  replicationDestinationsQueryOptions,
+  type ReplicationDestinationsData,
+} from '@/data/replication/destinations-query'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { timeout } from '@/lib/helpers'
 
 import '@xyflow/react/dist/style.css'
@@ -33,25 +39,51 @@ const ReplicationDiagramContent = () => {
   const { resolvedTheme } = useTheme()
   const { ref: projectRef = 'default' } = useParams()
 
-  const {
-    data,
-    error: destinationsError,
-    isSuccess: isSuccessDestinations,
-    isError: isErrorDestinations,
-  } = useReplicationDestinationsQuery({
-    projectRef,
+  const { groups } = useReplicationClusterGroups()
+  const combineDestinations = useCallback(
+    (
+      results: {
+        data?: ReplicationDestinationsData
+        isPending: boolean
+        isError: boolean
+        error: StudioError | null
+      }[]
+    ) => ({
+      destinations: results.flatMap((result, index) => {
+        const { clusterId } = groups[index]
+        return (result.data?.destinations ?? []).map((destination) => ({
+          // Destination IDs are only unique within a cluster.
+          nodeId: clusterId === undefined ? `${destination.id}` : `${clusterId}:${destination.id}`,
+          destinationId: destination.id.toString(),
+          clusterId,
+        }))
+      }),
+      isSuccessDestinations: results.every((result) => !result.isPending),
+      skipRenderingDestinations: results.some(
+        (result) => result.isError && checkLocalPipelinesNotSetUp(result.error)
+      ),
+    }),
+    [groups]
+  )
+  const { destinations, isSuccessDestinations, skipRenderingDestinations } = useQueries({
+    queries: groups.map(({ clusterId }) =>
+      replicationDestinationsQueryOptions({ projectRef, clusterId })
+    ),
+    combine: combineDestinations,
   })
-  const destinations = useMemo(() => data?.destinations ?? [], [data])
-  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
-  const skipRenderingDestinations = isErrorDestinations && isLocalPipelinesNotSetUp
 
   const nodes = useMemo(() => {
     return [
-      { id: projectRef, type: 'primary', data: {}, position: { x: 0, y: 5 } },
-      ...destinations.map((x) => ({
-        id: x.id.toString(),
+      {
+        id: projectRef,
+        type: 'primary',
+        data: { hasDestinations: destinations.length > 0 },
+        position: { x: 0, y: 5 },
+      },
+      ...destinations.map(({ nodeId, destinationId, clusterId }) => ({
+        id: nodeId,
         type: 'replication',
-        data: {},
+        data: { destinationId, clusterId },
         position: { x: 0, y: 0 },
       })),
     ]
@@ -60,13 +92,13 @@ const ReplicationDiagramContent = () => {
   const edges = useMemo(() => {
     const shiftEdgeEnd = destinations.length > 1
 
-    return destinations.map((x) => ({
-      id: `${projectRef}-${x.id}`,
+    return destinations.map(({ nodeId, destinationId, clusterId }) => ({
+      id: `${projectRef}-${nodeId}`,
       source: projectRef,
-      target: x.id.toString(),
+      target: nodeId,
       type: 'smoothstep',
       className: 'cursor-default!',
-      data: { identifier: x.id.toString(), shiftEdgeEnd },
+      data: { identifier: destinationId, clusterId, shiftEdgeEnd },
     }))
   }, [destinations, projectRef])
 

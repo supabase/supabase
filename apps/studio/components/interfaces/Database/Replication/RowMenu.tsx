@@ -10,7 +10,7 @@ import {
   TrashIcon,
 } from 'lucide-react'
 import Link from 'next/link'
-import { parseAsInteger, useQueryState } from 'nuqs'
+import { parseAsInteger, parseAsString, useQueryState } from 'nuqs'
 import { toast } from 'sonner'
 import {
   Button,
@@ -35,6 +35,7 @@ import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import { useReplicationClusterId } from '@/state/replication-cluster'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
@@ -64,12 +65,15 @@ export const RowMenu = ({
   onUpdateClick,
 }: RowMenuProps) => {
   const { ref: projectRef } = useParams()
+  const clusterId = useReplicationClusterId()
   const statusName = getStatusName(pipelineStatus)
 
   const [, setEdit] = useQueryState(
     'edit',
     parseAsInteger.withOptions({ history: 'push', clearOnDefault: true })
   )
+  // Destination IDs are only unique within a cluster, so the edit panel needs the row's cluster.
+  const [, setEditClusterId] = useQueryState('cluster_id', parseAsString)
 
   const { mutateAsync: startPipeline } = useStartPipelineMutation({ onError: () => {} })
   const { mutateAsync: stopPipeline } = useStopPipelineMutation({ onError: () => {} })
@@ -179,7 +183,7 @@ export const RowMenu = ({
             <Link
               href={withReplicationCluster(
                 `/project/${projectRef}/database/pipelines/${pipeline?.id}`,
-                pipeline?.cluster_id
+                clusterId
               )}
             >
               <EyeIcon size={14} />
@@ -229,7 +233,10 @@ export const RowMenu = ({
 
           <DropdownMenuItem
             className="space-x-2"
-            onClick={() => setEdit(destinationId)}
+            onClick={() => {
+              void setEditClusterId(clusterId ?? null)
+              void setEdit(destinationId)
+            }}
             disabled={isPipelineRequestPending}
           >
             <EditIcon size={14} />

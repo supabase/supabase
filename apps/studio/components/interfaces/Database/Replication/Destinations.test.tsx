@@ -1,13 +1,14 @@
 import { QueryClient } from '@tanstack/react-query'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen, waitFor, within } from '@testing-library/react'
 import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
 import { useQueryState } from 'nuqs'
-import { beforeEach, expect, test, vi } from 'vitest'
+import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { Destinations } from './Destinations'
 import { replicationKeys } from '@/data/replication/keys'
+import { PipelineRequestStatusProvider } from '@/state/replication-pipeline-request-status'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 
@@ -63,6 +64,8 @@ vi.mock('./DestinationPanel/DestinationPanel', () => ({
     return type ? <h2>Creation sheet: {type}</h2> : null
   },
 }))
+const SINGAPORE = { cluster_id: '1', region_code: 'ap-southeast-1', region_name: 'Singapore' }
+const FRANKFURT = { cluster_id: '2', region_code: 'eu-central-1', region_name: 'Frankfurt' }
 let isEnabled = false
 let enableGate: Promise<void> | undefined
 beforeEach(() => {
@@ -84,6 +87,15 @@ beforeEach(() => {
       HttpResponse.json<{ disabled_features: string[] }>({ disabled_features: [] })
     )
   )
+  addAPIMock({
+    method: 'get',
+    path: '/platform/replication/regions',
+    response: () =>
+      HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+        default_cluster_id: '1',
+        regions: [SINGAPORE],
+      }),
+  })
   addAPIMock({
     method: 'get',
     path: '/platform/projects/:ref',
@@ -294,7 +306,6 @@ test.each([false, true])('opens the wizard with the shortcut (TanStack: %s)', as
     expect(options.navigate).toHaveBeenCalledWith({
       to: '/project/$ref/database/pipelines/new',
       params: { ref: 'default' },
-      search: { cluster_id: undefined },
     })
   else expect(options.push).toHaveBeenCalledWith('/project/default/database/pipelines/new')
 })
@@ -340,4 +351,183 @@ test('keeps request-access creation in the sheet when no wizard destination is a
   ).toBeInTheDocument()
   expect(options.push).not.toHaveBeenCalled()
   expect(options.navigate).not.toHaveBeenCalled()
+})
+
+describe('regions', () => {
+  const clusterOf = (request: Request) =>
+    new URL(request.url).searchParams.get('cluster_id') ?? 'omitted'
+  const regionName = (cluster: string) => (cluster === '2' ? 'Frankfurt' : 'Singapore')
+
+  const mockRegionResources = ({ failingCluster }: { failingCluster?: string } = {}) => {
+    const statusRequests: string[] = []
+    isEnabled = true
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations',
+      response: ({ request }) => {
+        const cluster = clusterOf(request)
+        if (cluster === failingCluster)
+          return HttpResponse.json<APIErrorBody>(
+            { message: 'Cluster unavailable' },
+            { status: 503 }
+          )
+        return HttpResponse.json<components['schemas']['DestinationsResponse_Output']>({
+          destinations: [
+            {
+              id: 1,
+              name: `${regionName(cluster)} sync`,
+              tenant_id: 'tenant',
+              config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
+            },
+          ],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/destinations/:destination_id',
+      response: ({ request }) =>
+        HttpResponse.json<components['schemas']['DestinationResponse_Output']>({
+          id: 1,
+          name: `${regionName(clusterOf(request))} sync`,
+          tenant_id: 'tenant',
+          config: { big_query: { project_id: 'project', dataset_id: 'dataset' } },
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines',
+      response: ({ request }) => {
+        const cluster = clusterOf(request)
+        return HttpResponse.json<components['schemas']['PipelinesResponse_Output']>({
+          pipelines: [
+            {
+              id: cluster === '2' ? 'frankfurtpipeline' : '42',
+              cluster_id: cluster === '2' ? '2' : '1',
+              tenant_id: 'tenant',
+              source_id: 42,
+              source_name: 'default',
+              destination_id: 1,
+              destination_name: `${regionName(cluster)} sync`,
+              replicator_id: 1,
+              config: { publication_name: 'publication' },
+            },
+          ],
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/status',
+      response: ({ request, params }) => {
+        statusRequests.push(`${params.pipeline_id}:${clusterOf(request)}`)
+        return HttpResponse.json<components['schemas']['PipelineStatusResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          status: { name: 'started' },
+        })
+      },
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/replication-status',
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['PipelineReplicationStatusResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          table_statuses: [],
+        }),
+    })
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/:ref/pipelines/:pipeline_id/version',
+      response: ({ params }) =>
+        HttpResponse.json<components['schemas']['PipelineVersionResponse_Output']>({
+          pipeline_id: String(params.pipeline_id),
+          version: { id: 1, name: 'v1' },
+        }),
+    })
+    return { statusRequests }
+  }
+
+  const mockRegions = () =>
+    addAPIMock({
+      method: 'get',
+      path: '/platform/replication/regions',
+      response: () =>
+        HttpResponse.json<components['schemas']['PipelineRegionsResponse_Output']>({
+          default_cluster_id: '1',
+          regions: [SINGAPORE, FRANKFURT],
+        }),
+    })
+
+  const renderRegions = () =>
+    customRender(
+      <PipelineRequestStatusProvider>
+        <Destinations />
+      </PipelineRequestStatusProvider>,
+      {
+        // Replication queries retry transient failures; skip the backoff in tests.
+        queryClient: new QueryClient({
+          defaultOptions: { queries: { retry: false, retryDelay: 0 } },
+        }),
+        nuqs: { hasMemory: true },
+      }
+    )
+
+  test('shows a single region like before, without region labels or cluster_id', async () => {
+    const { statusRequests } = mockRegionResources()
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(screen.queryByText('ap-southeast-1')).not.toBeInTheDocument()
+    await waitFor(() => expect(statusRequests).toContain('42:omitted'))
+    expect(statusRequests.every((request) => request.endsWith(':omitted'))).toBe(true)
+  })
+
+  test('groups pipelines by region and routes each pipeline to its own cluster', async () => {
+    mockRegions()
+    const { statusRequests } = mockRegionResources()
+    renderRegions()
+
+    const singapore = (await screen.findByText('Singapore sync')).closest('tr')
+    const frankfurt = (await screen.findByText('Frankfurt sync')).closest('tr')
+    expect(screen.getByText('ap-southeast-1')).toBeInTheDocument()
+    expect(screen.getByText('eu-central-1')).toBeInTheDocument()
+    await waitFor(() =>
+      expect(statusRequests).toEqual(expect.arrayContaining(['42:omitted', 'frankfurtpipeline:2']))
+    )
+    expect(statusRequests).not.toContain('frankfurtpipeline:omitted')
+    expect(statusRequests).not.toContain('42:1')
+
+    fireEvent.pointerDown(within(frankfurt!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    expect(await screen.findByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+      'href',
+      '/project/default/database/pipelines/frankfurtpipeline?cluster_id=2'
+    )
+    fireEvent.keyDown(document.activeElement ?? document.body, { key: 'Escape' })
+    fireEvent.pointerDown(within(singapore!).getByRole('button', { name: 'Pipeline options' }), {
+      button: 0,
+      ctrlKey: false,
+    })
+    await waitFor(() =>
+      expect(screen.getByRole('menuitem', { name: 'View details' })).toHaveAttribute(
+        'href',
+        '/project/default/database/pipelines/42'
+      )
+    )
+  })
+
+  test('keeps other regions visible when one region fails', async () => {
+    mockRegions()
+    mockRegionResources({ failingCluster: '2' })
+    renderRegions()
+
+    expect(await screen.findByText('Singapore sync')).toBeInTheDocument()
+    expect(
+      await screen.findByText('Failed to retrieve pipelines in Frankfurt (eu-central-1)')
+    ).toBeInTheDocument()
+    expect(screen.queryByRole('heading', { name: 'Add a pipeline' })).not.toBeInTheDocument()
+  })
 })

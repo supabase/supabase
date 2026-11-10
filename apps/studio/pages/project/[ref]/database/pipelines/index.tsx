@@ -12,7 +12,6 @@ import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { Destinations } from '@/components/interfaces/Database/Replication/Destinations'
-import { PipelineClusterSelector } from '@/components/interfaces/Database/Replication/PipelineClusterSelector'
 import { ReplicationDiagram } from '@/components/interfaces/Database/Replication/ReplicationDiagram'
 import { InstanceConfiguration } from '@/components/interfaces/Settings/Infrastructure/InfrastructureConfiguration/InstanceConfiguration'
 import { PipelinesLayout } from '@/components/layouts/DatabaseLayout/PipelinesLayout'
@@ -22,6 +21,7 @@ import { UnknownInterface } from '@/components/ui/UnknownInterface'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { DOCS_URL } from '@/lib/constants'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import type { NextPageWithLayout } from '@/types'
 
 const DatabasePipelinesPage: NextPageWithLayout = () => {
@@ -76,7 +76,6 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
       <PageContainer size="large">
         <PageSection>
           <PageSectionContent className="flex flex-col gap-12">
-            <PipelineClusterSelector />
             {isPending ? (
               <>
                 <p className="sr-only" role="status">
@@ -103,10 +102,11 @@ const DatabasePipelinesPage: NextPageWithLayout = () => {
                 </div>
               </>
             ) : (
-              <>
+              // The list spans every region, so it ignores any cluster in the URL.
+              <ReplicationClusterProvider clusterId={undefined}>
                 <ReplicationDiagram />
                 <Destinations />
-              </>
+              </ReplicationClusterProvider>
             )}
           </PageSectionContent>
         </PageSection>

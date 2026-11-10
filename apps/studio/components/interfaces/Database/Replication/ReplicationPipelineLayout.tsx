@@ -56,7 +56,10 @@ import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DocsButton } from '@/components/ui/DocsButton'
-import { withReplicationCluster } from '@/data/replication/cluster-path'
+import {
+  getReplicationRegionLabel,
+  useReplicationClusterGroups,
+} from '@/data/replication/clusters-query'
 import { useDeleteDestinationPipelineMutation } from '@/data/replication/delete-destination-pipeline-mutation'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
@@ -84,8 +87,10 @@ const LIFECYCLE_BY_STATUS: Partial<
 }
 
 export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
-  const clusterId = useReplicationClusterId()
   const { ref: projectRef, pipelineId } = useParams()
+  const clusterId = useReplicationClusterId()
+  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const region = groups.find((group) => group.clusterId === clusterId)?.region
   const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
   const router = useRouter()
   const [showUpdateVersionModal, setShowUpdateVersionModal] = useState(false)
@@ -204,7 +209,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       })
       setShowDeleteDestination(false)
       toast.success(`Deleted pipeline "${pipeline.destination_name}"`)
-      router.push(withReplicationCluster(`/project/${projectRef}/database/pipelines`, clusterId))
+      router.push(`/project/${projectRef}/database/pipelines`)
     } catch (error) {
       toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {
@@ -233,14 +238,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
           <BreadcrumbList>
             <BreadcrumbItem>
               <BreadcrumbLink asChild>
-                <Link
-                  href={withReplicationCluster(
-                    `/project/${projectRef}/database/pipelines`,
-                    clusterId
-                  )}
-                >
-                  Pipelines
-                </Link>
+                <Link href={`/project/${projectRef}/database/pipelines`}>Pipelines</Link>
               </BreadcrumbLink>
             </BreadcrumbItem>
             <BreadcrumbSeparator />
@@ -308,6 +306,16 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     <span>{destinationType ?? pipeline?.destination_name ?? 'Unknown'}</span>
                   )}
                 </span>
+                {hasMultipleRegions && region && (
+                  <>
+                    <span aria-hidden className="text-foreground-lighter">
+                      &middot;
+                    </span>
+                    <span className="text-foreground-light">
+                      {getReplicationRegionLabel(region)}
+                    </span>
+                  </>
+                )}
               </PageHeaderDescription>
             </PageHeaderSummary>
 

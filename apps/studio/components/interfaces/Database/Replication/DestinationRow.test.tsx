@@ -322,9 +322,7 @@ describe('DestinationRow', () => {
     )
     await userEvent.click(row!)
 
-    expect(routerMock.asPath).toBe(
-      `/project/default/database/pipelines/${PIPELINE_ID}?cluster_id=1`
-    )
+    expect(routerMock.asPath).toBe(`/project/default/database/pipelines/${PIPELINE_ID}`)
   })
 
   test.each(['click', 'keyboard'])(
@@ -362,7 +360,7 @@ describe('DestinationRow', () => {
     await userEvent.click(screen.getByRole('button', { name: 'Pipeline options' }))
     expect(screen.getByRole('menuitem', { name: 'View details' })).toHaveAttribute(
       'href',
-      `/project/default/database/pipelines/${PIPELINE_ID}?cluster_id=1`
+      `/project/default/database/pipelines/${PIPELINE_ID}`
     )
 
     expect(routerMock.asPath).toBe('/project/default/database/pipelines')

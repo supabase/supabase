@@ -66,6 +66,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
+import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
@@ -84,6 +85,7 @@ interface DestinationFormProps {
   checkIsDirtyRef?: RefObject<() => boolean>
   onClose: () => void
   onCancel?: () => void
+  onRegionChange?: (clusterId: string | undefined) => void
 }
 
 export const DestinationForm = ({
@@ -94,6 +96,7 @@ export const DestinationForm = ({
   checkIsDirtyRef,
   onClose,
   onCancel = onClose,
+  onRegionChange,
 }: DestinationFormProps) => {
   const { ref: projectRef } = useParams()
   const isOrioleDb = useIsOrioleDb({ enabled: selectedType === 'DuckLake' })
@@ -125,6 +128,9 @@ export const DestinationForm = ({
   const validationSectionRef = useRef<HTMLDivElement>(null)
 
   const editMode = !!existingDestination
+  const { hasMultipleRegions } = useReplicationClusterGroups()
+  // Publications are listed through the region's source, so the region is chosen first.
+  const canSelectRegion = !editMode && hasMultipleRegions && onRegionChange !== undefined
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const shouldShowConnectionSection = isCreationPreviewEnabled && !editMode
 
@@ -588,12 +594,18 @@ export const DestinationForm = ({
 
                       <div className="flex flex-col gap-y-4">
                         <DestinationNameInput form={form} destinationType={selectedType} />
+                        {canSelectRegion && (
+                          <PipelineRegionField
+                            destinationType={selectedType}
+                            onRegionChange={onRegionChange}
+                          />
+                        )}
                         <PublicationSelection
                           form={form}
                           onSelectNewPublication={() => setPublicationPanelVisible(true)}
                         />
                         <TableCopySelection form={form} editMode={editMode} />
-                        <PipelineRegionField destinationType={selectedType} />
+                        {!canSelectRegion && <PipelineRegionField destinationType={selectedType} />}
                       </div>
                     </div>
 

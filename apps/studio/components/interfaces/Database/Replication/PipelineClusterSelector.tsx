@@ -1,37 +1,49 @@
 import { useQuery } from '@tanstack/react-query'
 import { parseAsString, useQueryState } from 'nuqs'
-import { Label, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from 'ui'
+import { useEffect, useRef } from 'react'
+import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
-import { AlertError } from '@/components/ui/AlertError'
+import { PipelineRegionSelect } from './DestinationPanel/DestinationForm/PipelineRegionField'
+import { usePreferredPipelineClusterId } from './usePreferredPipelineClusterId'
 import { replicationClustersQueryOptions } from '@/data/replication/clusters-query'
-import { IS_PLATFORM } from '@/lib/constants'
 import { useReplicationClusterId } from '@/state/replication-cluster'
 
-export const PipelineClusterSelector = () => {
-  const [, setClusterId] = useQueryState('cluster_id', parseAsString)
-  const { data, isError, error } = useQuery(replicationClustersQueryOptions())
-
+/** Picks the region a new pipeline is created in. Hidden when there is only one region. */
+export const PipelineClusterSelector = ({ onChange }: { onChange?: () => void }) => {
+  const [urlClusterId, setClusterId] = useQueryState(
+    'cluster_id',
+    parseAsString.withOptions({ history: 'replace' })
+  )
+  const { data } = useQuery(replicationClustersQueryOptions())
   const clusterId = useReplicationClusterId()
+  const preferredCluster = usePreferredPipelineClusterId()
 
-  if (!IS_PLATFORM) return null
-  if (isError) return <AlertError error={error} subject="Failed to load pipeline clusters" />
+  // Starts in the project's region once, without overriding a deep link or a later choice.
+  const appliedPreferenceRef = useRef(false)
+  useEffect(() => {
+    if (appliedPreferenceRef.current || !preferredCluster.isReady) return
+    appliedPreferenceRef.current = true
+    if (urlClusterId === null && preferredCluster.clusterId !== undefined) {
+      void setClusterId(preferredCluster.clusterId)
+    }
+  }, [preferredCluster.isReady, preferredCluster.clusterId, urlClusterId, setClusterId])
+
   if (!data || data.regions.length <= 1) return null
 
   return (
-    <div className="flex items-center gap-3">
-      <Label htmlFor="pipeline-cluster">Cluster</Label>
-      <Select value={clusterId} onValueChange={(value) => void setClusterId(value)}>
-        <SelectTrigger id="pipeline-cluster" className="w-64" aria-label="Pipeline cluster">
-          <SelectValue placeholder="Loading clusters..." />
-        </SelectTrigger>
-        <SelectContent>
-          {data.regions.map((cluster) => (
-            <SelectItem key={cluster.cluster_id} value={cluster.cluster_id}>
-              <span>{cluster.region ? `${cluster.name} (${cluster.region})` : cluster.name}</span>
-            </SelectItem>
-          ))}
-        </SelectContent>
-      </Select>
-    </div>
+    <FormItemLayout
+      isReactForm={false}
+      layout="horizontal"
+      label="Pipeline region"
+      description="The pipeline runs from this region. Destination connections originate here."
+    >
+      <PipelineRegionSelect
+        value={clusterId ?? data.default_cluster_id}
+        onValueChange={(value) => {
+          void setClusterId(value === data.default_cluster_id ? null : value)
+          onChange?.()
+        }}
+      />
+    </FormItemLayout>
   )
 }

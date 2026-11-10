@@ -27,6 +27,7 @@ import { PipelineRegionReadonly } from '../DestinationPanel/DestinationForm/Pipe
 import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionReview } from './PipelineConnectionReview'
 import { PipelineValidationAdmonition } from './PipelineValidationAdmonition'
+import { useReplicationClusterGroups } from '@/data/replication/clusters-query'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 
 const MaskedUrl = ({ value, label }: { value: string; label: string }) => {
@@ -61,6 +62,7 @@ export const PipelineDestinationReview = ({
   onEditConnection?: () => void
   validationFailures?: ValidationFailure[]
 }) => {
+  const { hasMultipleRegions } = useReplicationClusterGroups()
   const [
     name,
     projectId,
@@ -215,7 +217,11 @@ export const PipelineDestinationReview = ({
             isReactForm={false}
             layout="horizontal"
             label="Pipeline region"
-            description={`${type} connections originate in the selected cluster.`}
+            description={
+              hasMultipleRegions
+                ? `The pipeline runs from this region. ${type} connections originate here.`
+                : `All pipelines run from this region. ${type} connections originate here.`
+            }
           >
             <PipelineRegionReadonly />
           </FormItemLayout>

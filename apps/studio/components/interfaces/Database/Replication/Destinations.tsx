@@ -4,8 +4,8 @@ import { useFeatureFlags, useParams } from 'common'
 import { MoreVerticalIcon, PlusIcon, SearchIcon, WorkflowIcon, XIcon } from 'lucide-react'
 import { useRouter as useNextRouter } from 'next/compat/router'
 import Link from 'next/link'
-import { parseAsStringEnum, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { parseAsInteger, parseAsStringEnum, useQueryState } from 'nuqs'
+import { useEffect, useRef, useState } from 'react'
 import {
   Button,
   Card,
@@ -17,6 +17,7 @@ import {
   DropdownMenuTrigger,
   Table,
   TableBody,
+  TableCell,
   TableHead,
   TableHeader,
   TableHeadSort,
@@ -24,7 +25,7 @@ import {
 } from 'ui'
 import { Input } from 'ui-patterns/DataInputs/Input'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
-import { GenericTableLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericTableLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DestinationPanel } from './DestinationPanel/DestinationPanel'
 import { DestinationType } from './DestinationPanel/DestinationPanel.types'
@@ -32,6 +33,7 @@ import { DestinationRow } from './DestinationRow'
 import { DisablePipelinesDialog } from './DisablePipelinesDialog'
 import { EnablePipelinesModal } from './EnablePipelinesCallout'
 import { getStatusName } from './Pipeline.utils'
+import { useUrlReplicationClusterId } from './PipelineClusterScope'
 import { PipelineStatusName } from './Replication.constants'
 import {
   useIsPipelinesBigQueryEnabled,
@@ -45,21 +47,29 @@ import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
-import { withReplicationCluster } from '@/data/replication/cluster-path'
-import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
+import {
+  getReplicationRegionLabel,
+  useReplicationClusterGroups,
+  type ReplicationRegion,
+} from '@/data/replication/clusters-query'
+import {
+  replicationDestinationsQueryOptions,
+  type ReplicationDestinationsData,
+} from '@/data/replication/destinations-query'
 import { replicationKeys } from '@/data/replication/keys'
 import {
   replicationPipelineStatusQueryOptions,
   type ReplicationPipelineStatusData,
 } from '@/data/replication/pipeline-status-query'
 import { fetchReplicationPipelineVersion } from '@/data/replication/pipeline-version-query'
-import { useReplicationPipelinesQuery } from '@/data/replication/pipelines-query'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { replicationPipelinesQueryOptions, type Pipeline } from '@/data/replication/pipelines-query'
+import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { onSearchInputEscape } from '@/lib/keyboard'
-import { useReplicationClusterId } from '@/state/replication-cluster'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
@@ -99,8 +109,51 @@ const compareStatusNames = (
   return direction === 'asc' ? comparison : -comparison
 }
 
+const RegionRows = ({
+  region,
+  error,
+  isLoading,
+  hasRows,
+}: {
+  region?: ReplicationRegion
+  error: StudioError | null
+  isLoading: boolean
+  hasRows: boolean
+}) => {
+  if (!error && !isLoading && !hasRows) return null
+
+  return (
+    <>
+      <TableRow className="bg-surface-75 hover:bg-surface-75">
+        <TableCell colSpan={6} className="py-2 text-xs text-foreground-light">
+          <span className="font-medium text-foreground">{region?.region_name}</span>
+          {region?.region_code && (
+            <span className="ml-2 font-mono text-foreground-lighter">{region.region_code}</span>
+          )}
+        </TableCell>
+      </TableRow>
+      {isLoading && (
+        <TableRow>
+          <TableCell colSpan={6}>
+            <ShimmeringLoader />
+          </TableCell>
+        </TableRow>
+      )}
+      {error && (
+        <TableRow>
+          <TableCell colSpan={6}>
+            <AlertError
+              error={error}
+              subject={`Failed to retrieve pipelines in ${getReplicationRegionLabel(region)}`}
+            />
+          </TableCell>
+        </TableRow>
+      )}
+    </>
+  )
+}
+
 export const Destinations = () => {
-  const clusterId = useReplicationClusterId()
   const queryClient = useQueryClient()
   const router = useTanStackRouter({ warn: false })
   const nextRouter = useNextRouter()
@@ -117,13 +170,15 @@ export const Destinations = () => {
 
   useRedirectLegacyReadReplicaDestination()
 
-  const prefetchedRef = useRef(false)
+  const prefetchedClustersRef = useRef(new Set<string>())
   const searchInputRef = useRef<HTMLInputElement>(null)
   const [filterString, setFilterString] = useState<string>('')
   const [showEnablePipelinesDialog, setShowEnablePipelinesDialog] = useState(false)
   const pendingCreationTypeRef = useRef<DestinationType | null>(null)
   const [showDisablePipelinesDialog, setShowDisablePipelinesDialog] = useState(false)
 
+  const [edit] = useQueryState('edit', parseAsInteger)
+  const editClusterId = useUrlReplicationClusterId()
   const [, setDestinationType] = useQueryState(
     'destinationType',
     parseAsStringEnum<DestinationType>([
@@ -138,45 +193,70 @@ export const Destinations = () => {
     })
   )
 
-  const {
-    data: destinationsData,
-    error: destinationsError,
-    isPending: isDestinationsLoading,
-    isError: isDestinationsError,
-    isSuccess: isDestinationsSuccess,
-  } = useReplicationDestinationsQuery({
-    projectRef,
+  const { groups, hasMultipleRegions } = useReplicationClusterGroups()
+  const destinationResults = useQueries({
+    queries: groups.map(({ clusterId }) =>
+      replicationDestinationsQueryOptions({ projectRef, clusterId })
+    ),
   })
-  const destinations = useMemo(
-    () => destinationsData?.destinations ?? [],
-    [destinationsData?.destinations]
-  )
-  const hasDestinations = isDestinationsSuccess && destinationsData?.destinations.length > 0
-  const filteredDestinations = useMemo(
-    () =>
-      filterString.length === 0
-        ? destinations
-        : destinations.filter((destination) =>
-            destination.name.toLowerCase().includes(filterString.toLowerCase())
-          ),
-    [destinations, filterString]
-  )
+  const pipelineResults = useQueries({
+    queries: groups.map(({ clusterId }) =>
+      replicationPipelinesQueryOptions({ projectRef, clusterId })
+    ),
+  })
+  const sourceResults = useQueries({
+    queries: groups.map(({ clusterId }) =>
+      replicationSourcesQueryOptions({ projectRef, clusterId })
+    ),
+  })
 
-  const { data: pipelinesData, isSuccess: isPipelinesSuccess } = useReplicationPipelinesQuery({
-    projectRef,
+  const filterDestinations = <T extends { name: string }>(destinations: T[]) =>
+    filterString.length === 0
+      ? destinations
+      : destinations.filter((destination) =>
+          destination.name.toLowerCase().includes(filterString.toLowerCase())
+        )
+
+  const clusterResults = groups.map((group, index) => {
+    const destinationsResult = destinationResults[index]
+    const pipelinesResult = pipelineResults[index]
+    const destinations = destinationsResult.data?.destinations ?? []
+    return {
+      group,
+      destinationsResult,
+      pipelinesResult,
+      destinations,
+      filteredDestinations: filterDestinations(destinations),
+      pipelines: pipelinesResult.data?.pipelines ?? [],
+      hasError:
+        destinationsResult.isError && !checkLocalPipelinesNotSetUp(destinationsResult.error),
+    }
   })
-  const pipelines = useMemo(() => pipelinesData?.pipelines ?? [], [pipelinesData?.pipelines])
+
+  const { error: destinationsError, isError: isDestinationsError } = destinationResults[0]
+  const isDestinationsLoading = destinationResults.every((result) => result.isPending)
+  const hasDestinations = clusterResults.some(({ destinations }) => destinations.length > 0)
+  const hasFilteredDestinations = clusterResults.some(
+    ({ filteredDestinations }) => filteredDestinations.length > 0
+  )
+  const hasClusterErrors = clusterResults.some(({ hasError }) => hasError)
 
   // Sorting by status needs every pipeline's status up here, not just inside each row. These share
   // the rows' query keys, so each status is still only fetched once.
   const statusByPipelineId = useQueries({
-    queries: pipelines.map((pipeline) =>
-      replicationPipelineStatusQueryOptions({ projectRef, pipelineId: pipeline.id, clusterId })
+    queries: clusterResults.flatMap(({ group, pipelines }) =>
+      pipelines.map((pipeline) =>
+        replicationPipelineStatusQueryOptions({
+          projectRef,
+          pipelineId: pipeline.id,
+          clusterId: group.clusterId,
+        })
+      )
     ),
     combine: combinePipelineStatuses,
   })
 
-  const getDestinationStatus = (destinationId: number) => {
+  const getDestinationStatus = (pipelines: Pipeline[], destinationId: number) => {
     const pipeline = pipelines.find((p) => p.destination_id === destinationId)
     return pipeline === undefined ? undefined : statusByPipelineId.get(pipeline.id)
   }
@@ -196,45 +276,53 @@ export const Destinations = () => {
 
   // Not memoized: the status map is rebuilt whenever a pipeline status refetches, so a useMemo
   // here would never hit. Sorting a handful of destinations per render costs nothing.
-  const sortedDestinations = [...filteredDestinations].sort((a, b) => {
-    if (sortColumn === 'status') {
-      const nameComparison = a.name.localeCompare(b.name)
+  const sortDestinations = (
+    destinations: ReplicationDestinationsData['destinations'],
+    pipelines: Pipeline[]
+  ) =>
+    [...destinations].sort((a, b) => {
+      if (sortColumn === 'status') {
+        const nameComparison = a.name.localeCompare(b.name)
 
-      return (
-        compareStatusNames(getDestinationStatus(a.id), getDestinationStatus(b.id), sortDirection) ||
-        (sortDirection === 'asc' ? nameComparison : -nameComparison)
-      )
-    }
+        return (
+          compareStatusNames(
+            getDestinationStatus(pipelines, a.id),
+            getDestinationStatus(pipelines, b.id),
+            sortDirection
+          ) || (sortDirection === 'asc' ? nameComparison : -nameComparison)
+        )
+      }
 
-    const comparison = a.name.localeCompare(b.name)
-    return sortDirection === 'asc' ? comparison : -comparison
-  })
+      const comparison = a.name.localeCompare(b.name)
+      return sortDirection === 'asc' ? comparison : -comparison
+    })
 
   const {
-    data: sourcesData,
     isSuccess: isSourcesSuccess,
     isError: isSourcesError,
     error: sourcesError,
     refetch: refetchSources,
-  } = useReplicationSourcesQuery({
-    projectRef,
-  })
-  const externalReplicationSource = useMemo(
-    () => sourcesData?.sources.find((source) => source.name === projectRef),
-    [projectRef, sourcesData?.sources]
+  } = sourceResults[0]
+  const hasExternalReplicationSource = sourceResults.some(
+    ({ data }) => data?.sources.some((source) => source.name === projectRef) === true
   )
-  const replicationNotEnabled = isSourcesSuccess && !externalReplicationSource
+  const replicationNotEnabled = isSourcesSuccess && !hasExternalReplicationSource
 
   const canDisablePipelines =
     isSourcesSuccess &&
-    isDestinationsSuccess &&
-    isPipelinesSuccess &&
-    !!externalReplicationSource &&
-    destinations.length === 0 &&
-    pipelines.length === 0
+    hasExternalReplicationSource &&
+    clusterResults.every(
+      ({ destinationsResult, pipelinesResult, destinations, pipelines }) =>
+        destinationsResult.isSuccess &&
+        pipelinesResult.isSuccess &&
+        destinations.length === 0 &&
+        pipelines.length === 0
+    )
 
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(destinationsError)
-  const hasErrorsFetchingData = !isLocalPipelinesNotSetUp && isDestinationsError
+  const hasErrorsFetchingData = hasMultipleRegions
+    ? hasClusterErrors
+    : !isLocalPipelinesNotSetUp && isDestinationsError
 
   const canCreate = isSourcesSuccess && !isCreationGateLoading
   const isCheckingPipelineStatus = isCreationGateLoading || (!isSourcesSuccess && !isSourcesError)
@@ -244,10 +332,7 @@ export const Destinations = () => {
 
   const canLinkToWizard =
     isWizardEnabled && hasWizardDestination && !!projectRef && !replicationNotEnabled && canCreate
-  const wizardHref = withReplicationCluster(
-    `/project/${projectRef}/database/pipelines/new`,
-    clusterId
-  )
+  const wizardHref = `/project/${projectRef}/database/pipelines/new`
 
   const openCreation = (type: DestinationType) => {
     if (isWizardEnabled && hasWizardDestination && projectRef) {
@@ -255,7 +340,6 @@ export const Destinations = () => {
         void router.navigate({
           to: '/project/$ref/database/pipelines/new',
           params: { ref: projectRef },
-          search: { cluster_id: clusterId },
         })
       else void nextRouter?.push(wizardHref)
     } else {
@@ -283,8 +367,7 @@ export const Destinations = () => {
     pendingCreationTypeRef.current = null
     if (
       type &&
-      queryClient.getQueryState(replicationKeys.sources(projectRef, clusterId))?.status ===
-        'success'
+      queryClient.getQueryState(replicationKeys.sources(projectRef))?.status === 'success'
     ) {
       openCreation(type)
     }
@@ -302,25 +385,26 @@ export const Destinations = () => {
   useShortcut(SHORTCUT_IDS.LIST_PAGE_RESET_FILTERS, () => setFilterString(''))
 
   useEffect(() => {
-    if (
-      projectRef &&
-      !prefetchedRef.current &&
-      pipelinesData?.pipelines &&
-      pipelinesData.pipelines.length > 0 &&
-      isPipelinesSuccess
-    ) {
-      prefetchedRef.current = true
-      pipelinesData.pipelines.forEach((p) => {
+    if (!projectRef) return
+    clusterResults.forEach(({ group, pipelinesResult, pipelines }) => {
+      const prefetchKey = group.clusterId ?? 'default'
+      if (!pipelinesResult.isSuccess || prefetchedClustersRef.current.has(prefetchKey)) return
+      if (pipelines.length === 0) return
+      prefetchedClustersRef.current.add(prefetchKey)
+      pipelines.forEach((p) => {
         if (!p?.id) return
         queryClient.prefetchQuery({
-          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, clusterId),
+          queryKey: replicationKeys.pipelinesVersion(projectRef, p.id, group.clusterId),
           queryFn: ({ signal }) =>
-            fetchReplicationPipelineVersion({ projectRef, pipelineId: p.id, clusterId }, signal),
+            fetchReplicationPipelineVersion(
+              { projectRef, pipelineId: p.id, clusterId: group.clusterId },
+              signal
+            ),
           staleTime: Infinity,
         })
       })
-    }
-  }, [projectRef, pipelinesData?.pipelines, isPipelinesSuccess, queryClient, clusterId])
+    })
+  }, [projectRef, clusterResults, queryClient])
 
   return (
     <div className="w-full space-y-4">
@@ -441,7 +525,7 @@ export const Destinations = () => {
           />
         )}
 
-        {hasErrorsFetchingData && (
+        {hasErrorsFetchingData && !hasMultipleRegions && (
           <AlertError error={destinationsError} subject="Failed to retrieve pipelines" />
         )}
 
@@ -449,51 +533,73 @@ export const Destinations = () => {
           <GenericTableLoader headers={[null, 'Name', 'Status', 'Lag', 'Publication', null]} />
         )}
 
-        {!isDestinationsLoading && hasDestinations && (
-          <Card>
-            <CardContent className="p-0">
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead key="type" className="w-[40px]" />
-                    <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
-                      <TableHeadSort
-                        column="name"
-                        currentSort={sort}
-                        onSortChange={handleSortChange}
+        {!isDestinationsLoading &&
+          (hasDestinations || (hasMultipleRegions && hasClusterErrors)) && (
+            <Card>
+              <CardContent className="p-0">
+                <Table>
+                  <TableHeader>
+                    <TableRow>
+                      <TableHead key="type" className="w-[40px]" />
+                      <TableHead key="name" className="w-[250px]" aria-sort={getAriaSort('name')}>
+                        <TableHeadSort
+                          column="name"
+                          currentSort={sort}
+                          onSortChange={handleSortChange}
+                        >
+                          Name
+                        </TableHeadSort>
+                      </TableHead>
+                      <TableHead
+                        key="status"
+                        className="w-[150px]"
+                        aria-sort={getAriaSort('status')}
                       >
-                        Name
-                      </TableHeadSort>
-                    </TableHead>
-                    <TableHead key="status" className="w-[150px]" aria-sort={getAriaSort('status')}>
-                      <TableHeadSort
-                        column="status"
-                        currentSort={sort}
-                        onSortChange={handleSortChange}
+                        <TableHeadSort
+                          column="status"
+                          currentSort={sort}
+                          onSortChange={handleSortChange}
+                        >
+                          Status
+                        </TableHeadSort>
+                      </TableHead>
+                      <TableHead key="lag" className="w-[150px]">
+                        Lag
+                      </TableHead>
+                      <TableHead key="publication">Publication</TableHead>
+                      <TableHead key="actions" />
+                    </TableRow>
+                  </TableHeader>
+                  <TableBody>
+                    {clusterResults.map((result) => (
+                      <ReplicationClusterProvider
+                        key={result.group.clusterId ?? 'default'}
+                        clusterId={result.group.clusterId}
                       >
-                        Status
-                      </TableHeadSort>
-                    </TableHead>
-                    <TableHead key="lag" className="w-[150px]">
-                      Lag
-                    </TableHead>
-                    <TableHead key="publication">Publication</TableHead>
-                    <TableHead key="actions" />
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {sortedDestinations.map((destination) => (
-                    <DestinationRow key={destination.id} destinationId={destination.id} />
-                  ))}
+                        {hasMultipleRegions && (
+                          <RegionRows
+                            region={result.group.region}
+                            error={result.hasError ? result.destinationsResult.error : null}
+                            isLoading={result.destinationsResult.isPending}
+                            hasRows={result.filteredDestinations.length > 0}
+                          />
+                        )}
+                        {sortDestinations(result.filteredDestinations, result.pipelines).map(
+                          (destination) => (
+                            <DestinationRow key={destination.id} destinationId={destination.id} />
+                          )
+                        )}
+                      </ReplicationClusterProvider>
+                    ))}
 
-                  {!isDestinationsLoading &&
-                    filteredDestinations.length === 0 &&
-                    hasDestinations && <TableRowNoResults colSpan={6} search={filterString} />}
-                </TableBody>
-              </Table>
-            </CardContent>
-          </Card>
-        )}
+                    {!isDestinationsLoading && !hasFilteredDestinations && hasDestinations && (
+                      <TableRowNoResults colSpan={6} search={filterString} />
+                    )}
+                  </TableBody>
+                </Table>
+              </CardContent>
+            </Card>
+          )}
 
         {!isDestinationsLoading && !hasDestinations && !hasErrorsFetchingData && (
           <EmptyStatePresentational
@@ -518,7 +624,9 @@ export const Destinations = () => {
         )}
       </div>
 
-      <DestinationPanel />
+      <ReplicationClusterProvider clusterId={edit === null ? undefined : editClusterId}>
+        <DestinationPanel />
+      </ReplicationClusterProvider>
 
       <EnablePipelinesModal
         open={showEnablePipelinesDialog}

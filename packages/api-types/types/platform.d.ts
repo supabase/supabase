@@ -4262,6 +4262,26 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/replication/regions': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List available pipeline regions
+     * @description Returns available pipeline locations with display names, AWS region codes, and stable cluster IDs for routing.
+     */
+    get: operations['PipelineRegionsController_getRegions']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/replication/v2/{ref}/sources/{source_id}/publications': {
     parameters: {
       query?: never
@@ -5446,26 +5466,6 @@ export interface paths {
     patch?: never
     trace?: never
   }
-  '/platform/replication/regions': {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    /**
-     * List available pipeline regions
-     * @description Returns the clusters available in this environment, their region codes, and display names.
-     */
-    get: operations['PipelineRegionsController_getRegions']
-    put?: never
-    post?: never
-    delete?: never
-    options?: never
-    head?: never
-    patch?: never
-    trace?: never
-  }
 }
 export type webhooks = Record<string, never>
 export interface components {
@@ -5979,7 +5979,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -6019,7 +6019,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -6154,7 +6154,7 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: null | 'path' | 'vhost'
+                  s3_url_style?: 'path' | 'vhost' | null
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @default true
@@ -6279,7 +6279,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: null | 'path' | 'vhost'
+                        s3_url_style?: 'path' | 'vhost' | null
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @default true
@@ -6659,13 +6659,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -7248,7 +7248,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -7288,7 +7288,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -7423,7 +7423,7 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: null | 'path' | 'vhost'
+                  s3_url_style?: 'path' | 'vhost' | null
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @default true
@@ -7548,7 +7548,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: null | 'path' | 'vhost'
+                        s3_url_style?: 'path' | 'vhost' | null
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @default true
@@ -7681,13 +7681,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -8284,7 +8284,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -8324,7 +8324,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -8580,7 +8580,7 @@ export interface components {
                                * @example day
                                * @enum {string}
                                */
-                              granularity?: 'day' | 'hour' | 'month' | 'year'
+                              granularity?: 'hour' | 'day' | 'month' | 'year'
                               /**
                                * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                                * @enum {string}
@@ -8620,7 +8620,7 @@ export interface components {
                                * @example day
                                * @enum {string}
                                */
-                              granularity?: 'day' | 'hour' | 'month' | 'year'
+                              granularity?: 'hour' | 'day' | 'month' | 'year'
                               /**
                                * @description Partition by the time at which BigQuery ingests each row
                                * @enum {string}
@@ -11021,6 +11021,18 @@ export interface components {
     PgbouncerStatusResponse_Output: {
       active: boolean
     }
+    PipelineRegionsResponse_Output: {
+      /** @description Configured default for this environment, used only when cluster_id is omitted. Invalid supplied IDs never fall back to it. */
+      default_cluster_id: string
+      regions: {
+        /** @description Immutable cluster ID stored in pipeline placements. Use this ID in requests; display names and region codes are not identifiers. */
+        cluster_id: string
+        /** @description Region code, or null for local development. */
+        region_code: string | null
+        /** @description Display name only. Renaming it does not change the cluster ID or routing. */
+        region_name: string
+      }[]
+    }
     PipelineReplicationStatusResponse_Output: {
       /** @description Stats about apply worker lag */
       apply_lag?: {
@@ -11059,7 +11071,7 @@ export interface components {
          * @example reserved
          * @enum {string|null}
          */
-        wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
+        wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
         /**
          * @description Write lag expressed in milliseconds.
          * @example 1500
@@ -11179,7 +11191,7 @@ export interface components {
            * @example reserved
            * @enum {string|null}
            */
-          wal_status?: 'extended' | 'lost' | null | 'reserved' | 'unknown' | 'unreserved'
+          wal_status?: 'reserved' | 'extended' | 'unreserved' | 'lost' | 'unknown' | null
           /**
            * @description Write lag expressed in milliseconds.
            * @example 1500
@@ -11188,10 +11200,10 @@ export interface components {
         } | null
       }[]
     }
+    /** @description Pipeline */
     PipelineResponse_Output: {
       /**
-       * @description ETL cluster containing this pipeline.
-       * @default default
+       * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
        * @example 1
        */
       cluster_id: string
@@ -11220,13 +11232,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -11345,8 +11357,7 @@ export interface components {
       /** @description List of pipelines */
       pipelines: {
         /**
-         * @description ETL cluster containing this pipeline.
-         * @default default
+         * @description Stable ID of the ETL cluster containing this pipeline; independent of its display name.
          * @example 1
          */
         cluster_id: string
@@ -11375,13 +11386,13 @@ export interface components {
            * @example error
            * @enum {string|null}
            */
-          invalidated_slot_behavior?: 'error' | null | 'recreate'
+          invalidated_slot_behavior?: 'error' | 'recreate' | null
           /**
            * @description Replicator log level
            * @example info
            * @enum {string|null}
            */
-          log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+          log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
           /** @description Maximum number of copy connections per table */
           max_copy_connections_per_table?: number | null
           /** @description Maximum number of table sync workers */
@@ -11509,7 +11520,7 @@ export interface components {
          * @example started
          * @enum {string}
          */
-        name: 'failed' | 'started' | 'starting' | 'stopped' | 'stopping' | 'unknown'
+        name: 'stopped' | 'starting' | 'started' | 'stopping' | 'unknown' | 'failed'
       }
     }
     PipelineVersionResponse_Output: {
@@ -12305,7 +12316,7 @@ export interface components {
       config:
         | {
             /** @description Data-change operations to publish */
-            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
             /**
              * @description PostgreSQL 18+ generated-column publication behavior
              * @enum {string}
@@ -12318,7 +12329,7 @@ export interface components {
           }
         | {
             /** @description Data-change operations to publish */
-            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
             /**
              * @description PostgreSQL 18+ generated-column publication behavior
              * @enum {string}
@@ -12333,7 +12344,7 @@ export interface components {
           }
         | {
             /** @description Data-change operations to publish */
-            operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+            operations: ('insert' | 'update' | 'delete' | 'truncate')[]
             /**
              * @description PostgreSQL 18+ generated-column publication behavior
              * @enum {string}
@@ -12381,7 +12392,7 @@ export interface components {
          * @description Whether the table can own partitions
          * @enum {string}
          */
-        kind: 'partitioned_table' | 'table'
+        kind: 'table' | 'partitioned_table'
         /**
          * @description Table name
          * @example orders
@@ -12448,12 +12459,12 @@ export interface components {
     PutPublicationBody:
       | {
           /** @description Data-change operations to publish */
-          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+          operations: ('insert' | 'update' | 'delete' | 'truncate')[]
           /**
            * @description PostgreSQL 18+ generated-column publication behavior
            * @enum {string|null}
            */
-          publish_generated_columns?: 'none' | null | 'stored'
+          publish_generated_columns?: 'none' | 'stored' | null
           /** @description Whether partition changes use the partition root identity */
           publish_via_partition_root?: boolean
           /** @enum {string} */
@@ -12461,12 +12472,12 @@ export interface components {
         }
       | {
           /** @description Data-change operations to publish */
-          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+          operations: ('insert' | 'update' | 'delete' | 'truncate')[]
           /**
            * @description PostgreSQL 18+ generated-column publication behavior
            * @enum {string|null}
            */
-          publish_generated_columns?: 'none' | null | 'stored'
+          publish_generated_columns?: 'none' | 'stored' | null
           /** @description Whether partition changes use the partition root identity */
           publish_via_partition_root?: boolean
           /** @description Schemas whose tables are published */
@@ -12476,12 +12487,12 @@ export interface components {
         }
       | {
           /** @description Data-change operations to publish */
-          operations: ('delete' | 'insert' | 'truncate' | 'update')[]
+          operations: ('insert' | 'update' | 'delete' | 'truncate')[]
           /**
            * @description PostgreSQL 18+ generated-column publication behavior
            * @enum {string|null}
            */
-          publish_generated_columns?: 'none' | null | 'stored'
+          publish_generated_columns?: 'none' | 'stored' | null
           /** @description Whether partition changes use the partition root identity */
           publish_via_partition_root?: boolean
           tables: {
@@ -12539,7 +12550,7 @@ export interface components {
          * @description Whether the table can own partitions
          * @enum {string}
          */
-        kind: 'partitioned_table' | 'table'
+        kind: 'table' | 'partitioned_table'
         /**
          * @description Table name
          * @example orders
@@ -14268,7 +14279,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -14308,7 +14319,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -14338,7 +14349,7 @@ export interface components {
                * @example replacing_merge_tree
                * @enum {string|null}
                */
-              engine?: 'merge_tree' | null | 'replacing_merge_tree'
+              engine?: 'merge_tree' | 'replacing_merge_tree' | null
               /** @description ClickHouse password. Omit for passwordless access. */
               password?: string | null
               /**
@@ -14442,7 +14453,7 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: null | 'path' | 'vhost'
+                  s3_url_style?: 'path' | 'vhost' | null
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @example false
@@ -14565,7 +14576,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: null | 'path' | 'vhost'
+                        s3_url_style?: 'path' | 'vhost' | null
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @example false
@@ -15076,13 +15087,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -15436,7 +15447,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -15476,7 +15487,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -15506,7 +15517,7 @@ export interface components {
                * @example replacing_merge_tree
                * @enum {string|null}
                */
-              engine?: 'merge_tree' | null | 'replacing_merge_tree'
+              engine?: 'merge_tree' | 'replacing_merge_tree' | null
               /** @description ClickHouse password. Omit for passwordless access. */
               password?: string | null
               /**
@@ -15610,7 +15621,7 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: null | 'path' | 'vhost'
+                  s3_url_style?: 'path' | 'vhost' | null
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @example false
@@ -15733,7 +15744,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: null | 'path' | 'vhost'
+                        s3_url_style?: 'path' | 'vhost' | null
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @example false
@@ -15865,13 +15876,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -16326,7 +16337,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by a replicated `DATE`, `TIMESTAMP`, or `DATETIME` column
                              * @enum {string}
@@ -16366,7 +16377,7 @@ export interface components {
                              * @example day
                              * @enum {string}
                              */
-                            granularity?: 'day' | 'hour' | 'month' | 'year'
+                            granularity?: 'hour' | 'day' | 'month' | 'year'
                             /**
                              * @description Partition by the time at which BigQuery ingests each row
                              * @enum {string}
@@ -16501,7 +16512,7 @@ export interface components {
                    * @example path
                    * @enum {string|null}
                    */
-                  s3_url_style?: null | 'path' | 'vhost'
+                  s3_url_style?: 'path' | 'vhost' | null
                   /**
                    * @description Whether to use SSL for S3-compatible storage
                    * @default true
@@ -16626,7 +16637,7 @@ export interface components {
                          * @example path
                          * @enum {string|null}
                          */
-                        s3_url_style?: null | 'path' | 'vhost'
+                        s3_url_style?: 'path' | 'vhost' | null
                         /**
                          * @description Whether to use SSL for S3-compatible storage
                          * @default true
@@ -16754,13 +16765,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -16892,13 +16903,13 @@ export interface components {
          * @example error
          * @enum {string|null}
          */
-        invalidated_slot_behavior?: 'error' | null | 'recreate'
+        invalidated_slot_behavior?: 'error' | 'recreate' | null
         /**
          * @description Replicator log level
          * @example info
          * @enum {string|null}
          */
-        log_level?: 'debug' | 'error' | 'info' | null | 'trace' | 'warn'
+        log_level?: 'trace' | 'debug' | 'info' | 'warn' | 'error' | null
         /** @description Maximum number of copy connections per table */
         max_copy_connections_per_table?: number | null
         /** @description Maximum number of table sync workers */
@@ -17375,18 +17386,6 @@ export interface components {
         | 'FUNCTIONS_FAILED'
       updated_at: string
       workdir: string | null
-    }
-    PipelineRegionsResponse_Output: {
-      /** @description Cluster used when a request omits cluster_id. */
-      default_cluster_id: string
-      regions: {
-        /** @description Stable cluster identity used by the API and placement directory. */
-        cluster_id: string
-        /** @description Display name; independent of the cluster identity and region code. */
-        name: string
-        /** @description Region code, or null for local development. */
-        region: string | null
-      }[]
     }
   }
   responses: never
@@ -31033,7 +31032,7 @@ export interface operations {
   DestinationsController_getDestinations: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31087,7 +31086,7 @@ export interface operations {
   DestinationsController_createDestination: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31154,7 +31153,7 @@ export interface operations {
   DestinationsPipelinesController_createDestinationPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31228,7 +31227,7 @@ export interface operations {
   DestinationsPipelinesController_updateDestinationPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31297,7 +31296,7 @@ export interface operations {
   DestinationsPipelinesController_deleteDestinationPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31378,7 +31377,7 @@ export interface operations {
   DestinationsController_getDestination: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31434,7 +31433,7 @@ export interface operations {
   DestinationsController_updateDestination: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31501,7 +31500,7 @@ export interface operations {
   DestinationsController_deleteDestination: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31578,7 +31577,7 @@ export interface operations {
   DestinationsController_validateDestination: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31636,7 +31635,7 @@ export interface operations {
   PipelinesController_getPipelines: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31690,7 +31689,7 @@ export interface operations {
   PipelinesController_createPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31757,7 +31756,7 @@ export interface operations {
   PipelinesController_getPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31813,7 +31812,7 @@ export interface operations {
   PipelinesController_updatePipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31880,7 +31879,7 @@ export interface operations {
   PipelinesController_deletePipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -31957,7 +31956,7 @@ export interface operations {
   PipelinesController_getPipelineReplicationStatus: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32013,7 +32012,7 @@ export interface operations {
   PipelinesController_restartPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32083,7 +32082,7 @@ export interface operations {
   PipelinesController_rollbackTables: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32152,7 +32151,7 @@ export interface operations {
   PipelinesController_startPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32215,7 +32214,7 @@ export interface operations {
   PipelinesController_getPipelineStatus: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32271,7 +32270,7 @@ export interface operations {
   PipelinesController_stopPipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32334,7 +32333,7 @@ export interface operations {
   PipelinesController_getPipelineVersion: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32390,7 +32389,7 @@ export interface operations {
   PipelinesController_updatePipelineVersion: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32457,7 +32456,7 @@ export interface operations {
   PipelinesController_validatePipeline: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32515,7 +32514,7 @@ export interface operations {
   SourcesController_getSources: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32569,7 +32568,7 @@ export interface operations {
   SourcesController_createSource: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32632,7 +32631,7 @@ export interface operations {
   SourcesController_getPublications: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32688,7 +32687,7 @@ export interface operations {
   SourcesController_createPublication: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32754,10 +32753,7 @@ export interface operations {
   }
   SourcesController_updatePublication: {
     parameters: {
-      query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
-        cluster_id?: string
-      }
+      query?: never
       header?: never
       path: {
         /** @description Publication name */
@@ -32824,7 +32820,7 @@ export interface operations {
   SourcesController_deletePublication: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -32895,10 +32891,7 @@ export interface operations {
   }
   SourcesController_getCostEstimate: {
     parameters: {
-      query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
-        cluster_id?: string
-      }
+      query?: never
       header?: never
       path: {
         /** @description Publication name */
@@ -32954,7 +32947,7 @@ export interface operations {
   SourcesController_getTables: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33010,7 +33003,7 @@ export interface operations {
   TenantsController_deleteTenant: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33085,7 +33078,7 @@ export interface operations {
   TenantsSourcesController_createTenantSource: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33145,10 +33138,29 @@ export interface operations {
       }
     }
   }
+  PipelineRegionsController_getRegions: {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PipelineRegionsResponse_Output']
+        }
+      }
+    }
+  }
   V2SourcesController_getPublications: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33204,7 +33216,7 @@ export interface operations {
   V2SourcesController_getPublication: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33269,7 +33281,7 @@ export interface operations {
   V2SourcesController_putPublication: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33349,7 +33361,7 @@ export interface operations {
   V2SourcesController_deletePublication: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -33421,7 +33433,7 @@ export interface operations {
   V2SourcesController_getTables: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
         /** @description Restrict results to this schema */
         schema?: string
@@ -33479,7 +33491,7 @@ export interface operations {
   V2SourcesController_getTableColumns: {
     parameters: {
       query?: {
-        /** @description ETL cluster ID. Defaults to the default cluster in this environment. */
+        /** @description Stable cluster ID from /platform/replication/regions; display names are not IDs. Only omission uses the environment default_cluster_id. Supplied IDs absent from the registry fail to resolve. */
         cluster_id?: string
       }
       header?: never
@@ -37033,25 +37045,6 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
-      }
-    }
-  }
-  PipelineRegionsController_getRegions: {
-    parameters: {
-      query?: never
-      header?: never
-      path?: never
-      cookie?: never
-    }
-    requestBody?: never
-    responses: {
-      200: {
-        headers: {
-          [name: string]: unknown
-        }
-        content: {
-          'application/json': components['schemas']['PipelineRegionsResponse_Output']
-        }
       }
     }
   }

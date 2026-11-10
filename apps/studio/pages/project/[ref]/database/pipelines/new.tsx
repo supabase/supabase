@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { useFeatureFlags, useParams } from 'common'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
@@ -14,17 +15,14 @@ import {
   useIsPipelinesDuckLakeEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '@/components/interfaces/Database/Replication/useIsPipelinesEnabled'
-import { withReplicationCluster } from '@/data/replication/cluster-path'
-import { useReplicationSourcesQuery } from '@/data/replication/sources-query'
+import { replicationSourcesQueryOptions } from '@/data/replication/sources-query'
 import { useHighAvailability } from '@/hooks/misc/useHighAvailability'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { withAuth } from '@/hooks/misc/withAuth'
-import { useReplicationClusterId } from '@/state/replication-cluster'
 import type { NextPageWithLayout } from '@/types'
 
 const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
-  const clusterId = useReplicationClusterId()
   const { ref } = useParams()
   const router = useRouter()
   const { hasLoaded } = useFeatureFlags()
@@ -39,12 +37,14 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   const isProjectAccessLoading =
     isLoading || (isEnabled && (!hasLoaded || isOrganizationPending || isPending))
   const canAccessFlow = isEnabled && !isHighAvailability && canUseReplication
-  const sources = useReplicationSourcesQuery(
-    { projectRef: ref },
-    { enabled: !isProjectAccessLoading && canAccessFlow, refetchOnMount: 'always' }
-  )
+  // Enablement lives in the default cluster; the flow adds a source to another region on demand.
+  const sources = useQuery({
+    ...replicationSourcesQueryOptions({ projectRef: ref }),
+    enabled: !!ref && !isProjectAccessLoading && canAccessFlow,
+    refetchOnMount: 'always',
+  })
   const hasSource = sources.data?.sources.some((source) => source.name === ref) === true
-  const listHref = withReplicationCluster(`/project/${ref}/database/pipelines`, clusterId)
+  const listHref = `/project/${ref}/database/pipelines`
   const isAccessLoading =
     !ref || isProjectAccessLoading || (canAccessFlow && !sources.isFetchedAfterMount)
   const canOpenFlow = canAccessFlow && sources.isSuccess && hasSource
@@ -56,7 +56,7 @@ const PipelineCreationPage: NextPageWithLayout<Record<string, never>> = () => {
   }, [isAccessLoading, canOpenFlow, isEnabled, listHref, router])
   const handleClose = () => {
     if (!ref) return
-    void router.push(withReplicationCluster(`/project/${ref}/database/pipelines`, clusterId))
+    void router.push(`/project/${ref}/database/pipelines`)
   }
 
   let statusMessage = 'Pipeline creation ready'

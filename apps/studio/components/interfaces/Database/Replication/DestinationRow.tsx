@@ -109,7 +109,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
     ? createNavigationHandler(
         withReplicationCluster(
           `/project/${projectRef}/database/pipelines/${pipeline.id}`,
-          pipeline.cluster_id ?? clusterId
+          clusterId
         ),
         router
       )

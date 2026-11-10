@@ -14,7 +14,7 @@ type ReplicationCostEstimateParams = {
 }
 
 async function fetchReplicationCostEstimate(
-  { projectRef, sourceId, publicationName, clusterId }: ReplicationCostEstimateParams,
+  { projectRef, sourceId, publicationName }: ReplicationCostEstimateParams,
   signal?: AbortSignal
 ) {
   if (!projectRef) throw new Error('projectRef is required')
@@ -26,7 +26,6 @@ async function fetchReplicationCostEstimate(
     {
       params: {
         path: { ref: projectRef, source_id: sourceId, publication_name: publicationName },
-        query: { cluster_id: clusterId },
       },
       signal,
     }
@@ -56,7 +55,7 @@ export const useReplicationCostEstimateQuery = <TData = ReplicationCostEstimateD
   return useQuery<ReplicationCostEstimateData, StudioError, TData>({
     queryKey: replicationKeys.costEstimate(projectRef, sourceId, publicationName, clusterId),
     queryFn: ({ signal }) =>
-      fetchReplicationCostEstimate({ projectRef, sourceId, publicationName, clusterId }, signal),
+      fetchReplicationCostEstimate({ projectRef, sourceId, publicationName }, signal),
     enabled:
       enabled &&
       typeof projectRef !== 'undefined' &&

@@ -17,6 +17,7 @@ import {
 
 type EdgeData = {
   identifier: string
+  clusterId: string | undefined
   shiftEdgeEnd: boolean
 }
 
@@ -33,14 +34,14 @@ export const SmoothstepEdge = ({
 }: EdgeProps) => {
   const { ref: projectRef = 'default' } = useParams()
   const prefersReducedMotion = useReducedMotion()
-  const { identifier, shiftEdgeEnd } = (data || {}) as EdgeData
+  const { identifier, clusterId, shiftEdgeEnd } = (data || {}) as EdgeData
 
-  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef })
+  const { data: pipelinesData } = useReplicationPipelinesQuery({ projectRef, clusterId })
   const pipeline = (pipelinesData?.pipelines ?? []).find(
     (p) => p.destination_id.toString() === identifier
   )
   const { data: pipelineStatusData } = useReplicationPipelineStatusQuery(
-    { projectRef, pipelineId: pipeline?.id },
+    { projectRef, pipelineId: pipeline?.id, clusterId },
     { enabled: !!pipeline?.id }
   )
   const { getRequestStatus } = usePipelineRequestStatus()
