@@ -51,7 +51,11 @@ export function useTableRelatedResourcesCommands() {
     id: Number.isFinite(tableId) ? tableId : undefined,
   })
 
-  const grantResult = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
+  const grantResult = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
 
   const canShowSection = isOpen && isRootLevel
 
