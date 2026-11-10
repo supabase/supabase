@@ -2,6 +2,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { Elements } from '@stripe/react-stripe-js'
 import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '@stripe/stripe-js'
 import { loadStripe } from '@stripe/stripe-js'
+import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
 import { groupBy } from 'lodash'
 import { HelpCircleIcon } from 'lucide-react'
@@ -51,7 +52,10 @@ import {
   ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_OPTIONS,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
-import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
+import {
+  getFollowUpStorageKey,
+  markFollowUpPending,
+} from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveySelect } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveySelect'
 import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -66,6 +70,7 @@ import { SetupIntentResponse } from '@/data/stripe/setup-intent-mutation'
 import { useConfirmPendingSubscriptionCreateMutation } from '@/data/subscriptions/org-subscription-confirm-pending-create'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
+import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 import { PRICING_TIER_LABELS_ORG, STRIPE_PUBLIC_KEY } from '@/lib/constants'
 import { validateReturnTo } from '@/lib/gotrue'
 import { timeout } from '@/lib/helpers'
@@ -289,6 +294,7 @@ export const NewOrgForm = ({
     },
   })
   const { mutateAsync: submitOnboardingSurvey } = useOnboardingSurveyMutation()
+  const queryClient = useQueryClient()
 
   const submitOrganizationSurvey = useCallback(
     async (slug: string) => {
@@ -305,6 +311,16 @@ export const NewOrgForm = ({
 
       const groupOverrides = { organization: slug }
 
+      const markSurveyFollowUpPending = () => {
+        if (!profileId) return
+        markFollowUpPending({ profileId, orgSlug: slug, kind, size })
+        // A slow survey call can fail after the redirect to the new org, once the
+        // follow-up card has already read (and cached) this key as empty
+        queryClient.invalidateQueries({
+          queryKey: getLocalStorageQueryKey(getFollowUpStorageKey(profileId, slug)),
+        })
+      }
+
       // Nothing answered: send nothing yet so the creator's follow-up answers
       // aren't dropped (the survey endpoint keeps one response per user and org).
       // Kind/size ride along with the follow-up, since this is their only save path.
@@ -314,7 +330,7 @@ export const NewOrgForm = ({
           { surface: 'org_form', reason: 'org_form_blank' },
           groupOverrides
         )
-        if (profileId) markFollowUpPending({ profileId, orgSlug: slug, kind, size })
+        markSurveyFollowUpPending()
         return
       }
 
@@ -339,10 +355,17 @@ export const NewOrgForm = ({
           { surface: 'org_form', hasKind, hasBuilding },
           groupOverrides
         )
-        if (profileId) markFollowUpPending({ profileId, orgSlug: slug, kind, size })
+        markSurveyFollowUpPending()
       }
     },
-    [defaultValues.kind, defaultValues.size, submitOnboardingSurvey, track, user.profile?.gotrue_id]
+    [
+      defaultValues.kind,
+      defaultValues.size,
+      queryClient,
+      submitOnboardingSurvey,
+      track,
+      user.profile?.gotrue_id,
+    ]
   )
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({

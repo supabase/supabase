@@ -7,6 +7,7 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.constants'
 import { getFollowUpStorageKey, markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
 import { useOnboardingSurveyFollowUp } from './useOnboardingSurveyFollowUp'
+import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 
 const PROFILE_ID = 'user-1'
 const ORG_SLUG = 'new-org'
@@ -24,7 +25,7 @@ const renderFollowUpHook = () => {
   const wrapper = ({ children }: PropsWithChildren) => (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   )
-  return renderHook(() => useOnboardingSurveyFollowUp(), { wrapper })
+  return { queryClient, ...renderHook(() => useOnboardingSurveyFollowUp(), { wrapper }) }
 }
 
 const readStoredState = () =>
@@ -48,6 +49,23 @@ describe('useOnboardingSurveyFollowUp', () => {
       await vi.advanceTimersByTimeAsync(0)
     })
     expect(result.current.isEligible).toBe(false)
+  })
+
+  it('picks up a follow-up marked after the key was read, once its query is invalidated', async () => {
+    const { result, queryClient } = renderFollowUpHook()
+    await act(async () => {
+      await vi.advanceTimersByTimeAsync(0)
+    })
+    expect(result.current.isEligible).toBe(false)
+
+    markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG })
+    await act(async () => {
+      await queryClient.invalidateQueries({
+        queryKey: getLocalStorageQueryKey(getFollowUpStorageKey(PROFILE_ID, ORG_SLUG)),
+      })
+    })
+
+    await waitFor(() => expect(result.current.isEligible).toBe(true))
   })
 
   it('is eligible while the org is less than five minutes old, then expires', async () => {
