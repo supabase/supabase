@@ -76,13 +76,18 @@ export const REFERENCES = {
     name: 'Flutter',
     library: 'supabase-dart',
     libPath: 'dart',
-    versions: ['v2', 'v1'],
+    // The first version is the default. The beta v3 stays behind it until it is stable.
+    versions: ['v2', 'v3', 'v1'],
     icon: 'reference-dart',
     meta: {
+      v3: {
+        // Dart v3 and v2 are driven by the new reference pipeline
+        // (`scripts/build-reference-content.ts` + `spec/reference/dart/<version>/`).
+        // They intentionally have no `specFile`, so the legacy YAML loader skips them.
+        libId: 'reference_dart_v3',
+        beta: true,
+      },
       v2: {
-        // Dart v2 is driven by the new reference pipeline
-        // (`scripts/build-reference-content.ts` + `spec/reference/dart/v2/`).
-        // It intentionally has no `specFile`, so the legacy YAML loader skips it.
         libId: 'reference_dart_v2',
       },
       v1: {
@@ -222,6 +227,10 @@ export const REFERENCES = {
     icon: 'self-hosting',
   },
 } as const
+
+export function isBetaVersion(sdkId: string, version: string): boolean {
+  return REFERENCES[sdkId]?.meta?.[version]?.beta === true
+}
 
 export const clientSdkIds = Object.keys(REFERENCES).filter(
   (reference) => REFERENCES[reference].type === 'sdk' && REFERENCES[reference].enabled !== false

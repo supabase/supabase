@@ -1,8 +1,8 @@
 'use client'
 
+import { isBetaVersion, REFERENCES } from '~/content/navigation.references'
 import { ChevronDown } from 'lucide-react'
 import { useRouter } from 'next/navigation'
-
 import {
   Badge,
   DropdownMenu,
@@ -11,8 +11,6 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from 'ui'
-
-import { REFERENCES } from '~/content/navigation.references'
 
 const RevVersionDropdown = ({
   library,
@@ -29,6 +27,9 @@ const RevVersionDropdown = ({
   if (!versions || versions.length <= 1) {
     return null
   }
+
+  const stableVersions = versions.filter((version) => !isBetaVersion(library, version))
+  const betaVersions = versions.filter((version) => isBetaVersion(library, version))
 
   const onSelectVersion = (version: string) => {
     if (version === versions[0]) {
@@ -61,8 +62,25 @@ const RevVersionDropdown = ({
         </div>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start" side="bottom" className="w-48">
+        {betaVersions.length > 0 && (
+          <>
+            <DropdownMenuLabel className="text-xs">Beta releases</DropdownMenuLabel>
+            {betaVersions.map((version) => (
+              <DropdownMenuItem
+                key={version}
+                onClick={() => onSelectVersion(version)}
+                className="justify-between flex"
+              >
+                <span className={`${currentVersion === version ? 'font-bold' : ''}`}>
+                  Version {version}.0
+                </span>
+                <Badge variant="warning">Beta</Badge>
+              </DropdownMenuItem>
+            ))}
+          </>
+        )}
         <DropdownMenuLabel className="text-xs">Stable releases</DropdownMenuLabel>
-        {versions.map((version, index) => (
+        {stableVersions.map((version, index) => (
           <DropdownMenuItem
             key={version}
             onClick={() => onSelectVersion(version)}

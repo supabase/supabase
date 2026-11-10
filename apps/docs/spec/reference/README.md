@@ -152,12 +152,17 @@ straight onto the functions.json entry, so the renderer shows params, examples,
 and notes exactly as the YAML did, with no typeSpec round-trip. The `content`
 field is absent for real TypeDoc dumps, so JavaScript output is unchanged.
 
-The generated dump (`spec/reference/dart/v2/supabase_flutter.json`) is gitignored
-like every other dump; `pnpm codegen:references:new` regenerates it from the
-committed YAML before the content build (and a `make generate.dart.v2` target
-mirrors that for manual runs). Overview/header blocks (e.g. "Using filters",
-"Auth MFA") and the top-level markdown sections live as hand-authored partials
-under `spec/reference/dart/v2/partials/`, exactly like the JavaScript lib.
+The generated dumps (`spec/reference/dart/<version>/supabase_flutter.json`, for
+v2 and v3) are gitignored like every other dump; `pnpm codegen:references:new`
+regenerates them from the committed YAML before the content build, and
+`pnpm codegen:references:dart` runs that step on its own. Overview/header
+blocks (e.g. "Using filters", "Auth MFA") and the top-level markdown sections
+live as hand-authored partials under `spec/reference/dart/<version>/partials/`,
+exactly like the JavaScript lib.
+
+The page renders the top-level markdown sections from `docs/ref/dart/<id>.mdx`
+for the default version and from `docs/ref/dart/<version>/<id>.mdx` for any other
+version, so edit those files as well when you change an `.mdx` partial.
 
 `$ref` values are constructed as `<package>.<module…>.<class…>.<member>`,
 following TypeDoc's module (kind 2), namespace (kind 4), class (kind 128) and
