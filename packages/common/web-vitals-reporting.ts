@@ -10,6 +10,11 @@ import { sendTelemetryEvent } from './telemetry'
 // are dropped if consent is revoked after registration.
 let hasRegisteredObservers = false
 
+// The metrics describe the page load, so they belong to the page it started on. That page
+// is recorded on first mount, before consent, because consent can arrive after the user
+// has navigated elsewhere.
+let landingPathname: string | undefined
+
 function reportWebVital(apiUrl: string, pathname: string, metric: Metric) {
   sendTelemetryEvent(
     apiUrl,
@@ -36,14 +41,17 @@ function reportWebVital(apiUrl: string, pathname: string, metric: Metric) {
  */
 export function useWebVitalsReporting({ apiUrl, enabled }: { apiUrl: string; enabled: boolean }) {
   useEffect(() => {
+    // Only reads the location; nothing is observed or sent until consent
+    landingPathname ??= window.location.pathname
+
     if (!enabled || hasRegisteredObservers) return
 
     hasRegisteredObservers = true
-    const landingPathname = window.location.pathname
+    const pathname = landingPathname
 
     import('web-vitals')
       .then(({ onLCP, onCLS, onINP, onTTFB, onFCP }) => {
-        const report = (metric: Metric) => reportWebVital(apiUrl, landingPathname, metric)
+        const report = (metric: Metric) => reportWebVital(apiUrl, pathname, metric)
 
         onLCP(report)
         onCLS(report)
