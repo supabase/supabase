@@ -12,18 +12,15 @@ Run `pnpm build` from `apps/www`, or `pnpm build --filter=www` from the reposito
 root. Vercel uses the app's `build` script by default.
 
 `prebuild` refreshes remote content before Turbo hashes it. Turbo caches
-`build:next` (Next.js, sitemaps, and the customer RSS feed), then `postbuild`
-uploads assets even on cache hits. The outer `build` task stays uncached so
-neither preparation nor upload can be skipped. Uploads run after caching because
-the upload script removes `.next/static`.
+`build:next` (Next.js, sitemaps, and the customer RSS feed). The outer `build`
+task stays uncached so content preparation can't be skipped.
 
-Production cache reuse requires the same commit and inputs: CDN URLs include
-`VERCEL_GIT_COMMIT_SHA`. Set `FORCE_ASSET_CDN=-1` to disable local uploads.
-Running `build:next` directly skips content preparation and uploads.
+Production cache reuse requires the same commit and inputs, including
+`VERCEL_GIT_COMMIT_SHA`. Running `build:next` directly skips content preparation.
 
 Run `pnpm exec vitest run turbo-build.test.ts` to check cache invalidation and
-asset restoration using real pnpm, Turbo, and the upload script with fixture
-generators, a stub compiler, and a fake AWS CLI.
+artifact restoration using real pnpm and Turbo with fixture generators and a
+stub compiler.
 
 ## Best practices
 

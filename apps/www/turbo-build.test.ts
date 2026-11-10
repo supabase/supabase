@@ -45,8 +45,8 @@ const write = (file, value) => {
 const event = (value) => fs.appendFileSync(path.join(root, '.checks/events'), value + '\\n');
 `
 
-// Run the real pnpm lifecycle, Turbo binary/config, and uploader. Only remote
-// generators, Next compilation, and the aws executable are fixture stand-ins.
+// Run the real pnpm lifecycle and Turbo binary/config. Only remote generators
+// and Next compilation are fixture stand-ins.
 json('package.json', { name: 'fixture', private: true, packageManager: 'pnpm@11.13.1' })
 write('pnpm-workspace.yaml', 'packages:\n  - apps/*\n  - packages/*\n')
 write(
@@ -142,22 +142,19 @@ write('.next/cache/temporary', 'not a deploy artifact');
 write('public/customers-rss.xml', content);
 `
 )
-executable(
-  'node_modules/.bin/aws',
-  helpers +
-    `
-event('upload:' + process.argv[4]);
-if (!fs.existsSync('.next/static/chunk.js')) throw new Error('Upload is missing restored static assets');
-for (const file of ['public/rss.xml', 'public/customers-rss.xml', 'public/sitemap.xml', 'public/sitemap_www.xml', 'public/.well-known/agent-skills/index.json', '../docs/public/markdown/guides/example.md']) {
-  if (!fs.existsSync(file)) throw new Error('Missing deployment artifact: ' + file);
+const deploymentArtifacts = [
+  'apps/www/.next/static/chunk.js',
+  'apps/www/public/rss.xml',
+  'apps/www/public/customers-rss.xml',
+  'apps/www/public/sitemap.xml',
+  'apps/www/public/sitemap_www.xml',
+  'apps/www/public/.well-known/agent-skills/index.json',
+  'apps/docs/public/markdown/guides/example.md',
+]
+
+function missingArtifacts() {
+  return deploymentArtifacts.filter((file) => !fs.existsSync(path.join(fixture, file)))
 }
-`
-)
-write(
-  'scripts/upload-static-assets.sh',
-  fs.readFileSync(path.join(repoRoot, 'scripts/upload-static-assets.sh'), 'utf8')
-)
-fs.chmodSync(path.join(fixture, 'scripts/upload-static-assets.sh'), 0o755)
 fs.symlinkSync(
   path.join(repoRoot, 'node_modules/.bin/turbo'),
   path.join(fixture, 'node_modules/.bin/turbo')
@@ -176,13 +173,7 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
       env: {
         ...process.env,
         CI: 'true',
-        FORCE_ASSET_CDN: '1',
-        VERCEL_ENV: 'preview',
         VERCEL_GIT_COMMIT_SHA: '1111111111111111111111111111111111111111',
-        SITE_NAME: 'www',
-        ASSET_CDN_S3_ENDPOINT: 'https://example.invalid',
-        AWS_ACCESS_KEY_ID: 'test-access-key-id',
-        AWS_SECRET_ACCESS_KEY: 'test-secret-access-key',
         PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${process.env.PATH}`,
         ...env,
       },
@@ -194,22 +185,14 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
 afterAll(() => fs.rmSync(fixture, { recursive: true, force: true }))
 
 describe('www deployment build lifecycle', () => {
-  it('builds fresh artifacts before uploading them', () => {
+  it('prepares content before compiling', () => {
     const result = build()
     expect(result.status, result.output).toBe(0)
-    expect(events()).toEqual([
-      'docs:fetch',
-      'docs:markdown',
-      'www:content',
-      'compile',
-      'sitemap',
-      'upload:.next/static',
-      'upload:public',
-    ])
-    expect(fs.existsSync(path.join(app, '.next/static/chunk.js'))).toBe(false)
+    expect(events()).toEqual(['docs:fetch', 'docs:markdown', 'www:content', 'compile', 'sitemap'])
+    expect(missingArtifacts()).toEqual([])
   }, 90_000)
 
-  it('restores compiled assets and sitemaps and still uploads on a cache hit', () => {
+  it('restores compiled assets and sitemaps on a cache hit', () => {
     fs.rmSync(path.join(app, '.next'), { recursive: true, force: true })
     fs.rmSync(path.join(app, 'public'), { recursive: true, force: true })
     const result = build()
@@ -217,7 +200,7 @@ describe('www deployment build lifecycle', () => {
     expect(result.output).toContain('cache hit')
     expect(events().filter((event) => event === 'compile')).toHaveLength(1)
     expect(events().filter((event) => event === 'docs:fetch')).toHaveLength(2)
-    expect(events().filter((event) => event.startsWith('upload:'))).toHaveLength(4)
+    expect(missingArtifacts()).toEqual([])
     expect(fs.existsSync(path.join(app, '.next/cache/temporary'))).toBe(false)
   }, 90_000)
 
@@ -262,27 +245,19 @@ describe('www deployment build lifecycle', () => {
     expect(events().filter((event) => event === 'compile')).toHaveLength(count + 1)
   }, 90_000)
 
-  it('also refreshes content and uploads through the root Turbo build', () => {
+  it('also refreshes content through the root Turbo build', () => {
     const count = events().filter((event) => event === 'compile').length
     const result = build({}, true)
     expect(result.status, result.output).toBe(0)
     expect(events().filter((event) => event === 'compile')).toHaveLength(count)
-    expect(events().slice(-5)).toEqual([
-      'docs:fetch',
-      'docs:markdown',
-      'www:content',
-      'upload:.next/static',
-      'upload:public',
-    ])
+    expect(events().slice(-3)).toEqual(['docs:fetch', 'docs:markdown', 'www:content'])
   }, 90_000)
 
   it.each([{ FIXTURE_FAIL_PREPARE: '1' }, { NEXT_PUBLIC_FIXTURE_FAIL_BUILD: '1' }])(
-    'does not upload after an earlier build stage fails: %j',
+    'fails the build when an earlier stage fails: %j',
     (env) => {
-      const uploads = events().filter((event) => event.startsWith('upload:')).length
       const result = build(env)
       expect(result.status, result.output).not.toBe(0)
-      expect(events().filter((event) => event.startsWith('upload:'))).toHaveLength(uploads)
     },
     90_000
   )

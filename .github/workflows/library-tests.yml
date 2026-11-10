@@ -47,6 +47,7 @@ jobs:
           cache: 'pnpm'
 
       - run: pnpm install --frozen-lockfile
+      - run: pnpm --filter common test
       - run: pnpm --filter library test
       - run: pnpm --filter library build:registry
       - name: Check generated registry
