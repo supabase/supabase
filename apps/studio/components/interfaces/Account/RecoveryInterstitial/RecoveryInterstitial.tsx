@@ -190,12 +190,13 @@ export const RecoveryReminder = ({
   return (
     <InterstitialLayout
       logo={
-        <div className="relative">
-          <SupabaseLogo />
-          <InterstitialLogoBadge className="bg-warning-600 text-warning-200">
-            <WarningIcon className="size-3.5" />
-          </InterstitialLogoBadge>
-        </div>
+        <SupabaseLogo
+          badge={
+            <InterstitialLogoBadge variant="warning">
+              <WarningIcon />
+            </InterstitialLogoBadge>
+          }
+        />
       }
       title="Secure your account"
       description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
