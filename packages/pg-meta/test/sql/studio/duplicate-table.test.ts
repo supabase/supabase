@@ -62,3 +62,38 @@ withTestDatabase(
     ])
   }
 )
+
+withTestDatabase(
+  'duplicates rows into a table that only has generated columns',
+  async ({ executeQuery }) => {
+    await executeQuery(`
+      create table public.generated_only (
+        value text generated always as ('constant') stored
+      );
+      insert into public.generated_only default values;
+      insert into public.generated_only default values;
+    `)
+
+    await executeQuery(
+      getDuplicateTableSQL({
+        sourceTableName: 'generated_only',
+        sourceTableSchema: 'public',
+        duplicatedTableName: 'generated_only_copy',
+      })
+    )
+
+    // An empty column list copies no explicit columns, so Postgres fills the
+    // generated values instead of receiving rejected explicit values.
+    await executeQuery(
+      getDuplicateRowsSQL({
+        sourceTableName: 'generated_only',
+        sourceTableSchema: 'public',
+        duplicatedTableName: 'generated_only_copy',
+        columns: [],
+      })
+    )
+
+    const rows = await executeQuery(`select * from public.generated_only_copy`)
+    expect(rows).toEqual([{ value: 'constant' }, { value: 'constant' }])
+  }
+)

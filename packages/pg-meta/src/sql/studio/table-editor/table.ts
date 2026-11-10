@@ -35,7 +35,8 @@ export const getDuplicateRowsSQL = ({
   /**
    * Columns to copy. Callers should omit generated columns because Postgres
    * does not allow explicit values for them. When omitted, all columns are
-   * copied.
+   * copied. An explicit empty list copies no columns and lets Postgres fill
+   * defaults and generated values.
    */
   columns?: string[]
   duplicatedTableName: string
@@ -47,7 +48,11 @@ export const getDuplicateRowsSQL = ({
       ? safeSql` (${joinSqlFragments(columns.map(ident), ',')})`
       : safeSql``
   const selectList =
-    columns && columns.length > 0 ? joinSqlFragments(columns.map(ident), ',') : safeSql`*`
+    columns !== undefined
+      ? columns.length > 0
+        ? joinSqlFragments(columns.map(ident), ',')
+        : safeSql``
+      : safeSql`*`
   // OVERRIDING SYSTEM VALUE keeps the source ids for GENERATED ALWAYS AS
   // IDENTITY columns instead of failing on the explicit value.
   return safeSql`INSERT INTO ${ident(sourceTableSchema)}.${ident(duplicatedTableName)}${columnList} OVERRIDING SYSTEM VALUE SELECT ${selectList} FROM ${ident(sourceTableSchema)}.${ident(sourceTableName)};`
