@@ -1,4 +1,5 @@
 import { screen } from '@testing-library/react'
+import { FeatureFlagContext } from 'common'
 import { beforeEach, describe, expect, it } from 'vitest'
 
 import { IssuesOverview } from './IssuesOverview'
@@ -33,14 +34,23 @@ describe('IssuesOverview', () => {
     })
   })
 
-  it('opens the most severe issue in a category, so a click lands on something to fix', async () => {
-    customRender(<IssuesOverview />)
+  it.each([false, undefined, true])(
+    'keeps direct Issues content usable when the flag is %s',
+    async (issuesInbox) => {
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{ configcat: issuesInbox === undefined ? {} : { issuesInbox }, posthog: {} }}
+        >
+          <IssuesOverview />
+        </FeatureFlagContext.Provider>
+      )
 
-    expect(await screen.findByRole('link', { name: /Security/ })).toHaveAttribute(
-      'href',
-      '/project/default/issues/rls_disabled_in_public?category=security'
-    )
-  })
+      expect(await screen.findByRole('link', { name: /Security/ })).toHaveAttribute(
+        'href',
+        '/project/default/issues/rls_disabled_in_public?category=security'
+      )
+    }
+  )
 
   it('falls back to the filtered list for a category with nothing open', async () => {
     customRender(<IssuesOverview />)
