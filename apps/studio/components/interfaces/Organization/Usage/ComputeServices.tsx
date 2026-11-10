@@ -96,51 +96,70 @@ const DimensionRow = ({
  */
 const ComputeBillingDimensions = ({
   runningHours,
+  reservedVcpuHours,
   gbHours,
   overage,
 }: {
   runningHours: number
+  reservedVcpuHours: number
   gbHours: number
   overage: ComputeOverageEstimate | null
-}) => (
-  <div>
-    <DimensionRow label="Runtime in period" value={formatComputeHours(runningHours)} />
-    <DimensionRow
-      label="GB-hours in period"
-      value={formatGbHours(gbHours)}
-      isTotal={overage === null}
-    />
+}) => {
+  // The bridge between runtime and the metered figure. Without it the page shows two
+  // hour-like numbers — 18.6 hrs and 27.5 vCPU-hrs — and nothing that explains the gap,
+  // because the multiplier is the instance size and that appears nowhere near either.
+  const meanVcpu = runningHours > 0 ? reservedVcpuHours / runningHours : 0
 
-    {overage !== null && (
-      <>
+  return (
+    <div>
+      <DimensionRow label="Runtime in period" value={formatComputeHours(runningHours)} />
+      {runningHours > 0 && (
         <DimensionRow
-          label="Compute over quota"
-          detail={`${formatBillableHours(overage.vcpuHours)} vCPU-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perVcpuHour)}`}
-          value={formatCurrency(overage.vcpuCost) ?? '—'}
+          label="Counted as"
+          // Both operands and the product, to a precision that reconciles. Leaning on the
+          // rounded runtime in the row above would leave a reader multiplying 19 × 1.48 and
+          // landing somewhere other than the figure printed beside it.
+          detail={`${formatBillableHours(runningHours)} hrs × ${meanVcpu.toFixed(2)} vCPU average`}
+          value={`${formatBillableHours(reservedVcpuHours)} vCPU-hrs`}
         />
-        <DimensionRow
-          label="Memory over quota"
-          detail={`${formatBillableHours(overage.gbHours)} GB-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perGbHour)}`}
-          value={formatCurrency(overage.gbCost) ?? '—'}
-        />
-        <DimensionRow
-          label="Estimated overage"
-          value={formatCurrency(overage.total) ?? '—'}
-          isTotal
-        />
-      </>
-    )}
+      )}
+      <DimensionRow
+        label="GB-hours in period"
+        value={formatGbHours(gbHours)}
+        isTotal={overage === null}
+      />
 
-    <p className="pt-1 text-xs text-foreground-lighter">
-      Usage beyond the included quota is priced per vCPU-hour and GB-hour.{' '}
-      {COMPUTE_OVERAGE_RATES.isIllustrative && 'Rates shown are experimental and not final. '}
-      <InlineLink href="https://supabase.com/pricing">See pricing</InlineLink>
-    </p>
-  </div>
-)
+      {overage !== null && (
+        <>
+          <DimensionRow
+            label="Compute over quota"
+            detail={`${formatBillableHours(overage.vcpuHours)} vCPU-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perVcpuHour)}`}
+            value={formatCurrency(overage.vcpuCost) ?? '—'}
+          />
+          <DimensionRow
+            label="Memory over quota"
+            detail={`${formatBillableHours(overage.gbHours)} GB-hrs × ${formatRate(COMPUTE_OVERAGE_RATES.perGbHour)}`}
+            value={formatCurrency(overage.gbCost) ?? '—'}
+          />
+          <DimensionRow
+            label="Estimated overage"
+            value={formatCurrency(overage.total) ?? '—'}
+            isTotal
+          />
+        </>
+      )}
+
+      <p className="pt-1 text-xs text-foreground-lighter">
+        Usage beyond the included quota is priced per vCPU-hour and GB-hour.{' '}
+        {COMPUTE_OVERAGE_RATES.isIllustrative && 'Rates shown are experimental and not final. '}
+        <InlineLink href="https://supabase.com/pricing">See pricing</InlineLink>
+      </p>
+    </div>
+  )
+}
 
 const VCPU_CHART_ATTRIBUTES: Attribute[] = [
-  { key: 'usedVcpuHours', name: 'CPU used', color: 'white' },
+  { key: 'usedVcpuHours', name: 'Active CPU', color: 'white' },
   { key: 'idleVcpuHours', name: 'Reserved, idle', color: 'muted' },
 ]
 
@@ -222,6 +241,7 @@ export const ComputeServices = ({
                 />
                 <ComputeBillingDimensions
                   runningHours={totalRunningHours}
+                  reservedVcpuHours={totalReservedVcpuHours}
                   gbHours={totalGbHours}
                   overage={overage}
                 />
@@ -232,10 +252,10 @@ export const ComputeServices = ({
               <p className="text-sm">vCPU-hours per day</p>
               <div>
                 <TotalRow label="Total reserved" value={formatVcpuHours(totalReservedVcpuHours)} />
-                <TotalRow label="CPU used" value={formatVcpuHours(totalUsedVcpuHours)} />
+                <TotalRow label="Active CPU" value={formatVcpuHours(totalUsedVcpuHours)} />
                 {cpuUtilization !== null && (
                   <TotalRow
-                    label="Share of reserved that did work"
+                    label="Active share of reserved"
                     value={formatPercentage(cpuUtilization)}
                   />
                 )}
@@ -414,7 +434,7 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
       <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
         <span className="col-span-5">Project</span>
         <span className="col-span-5 text-right">vCPU-hrs</span>
-        <span className="col-span-2 text-right">CPU used</span>
+        <span className="col-span-2 text-right">Active CPU</span>
       </div>
       {rows.map((row) => {
         const cpuUtilization = getCpuUtilization(row.usedVcpuHours, row.reservedVcpuHours)

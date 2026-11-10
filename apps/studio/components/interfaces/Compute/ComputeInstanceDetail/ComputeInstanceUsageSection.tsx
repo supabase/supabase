@@ -42,7 +42,7 @@ const DATE_TIME_FORMAT = 'MMM D, YYYY'
  */
 const CPU_CHART_CONFIG = {
   reservedVcpuHours: { label: 'Reserved', color: 'var(--foreground-muted)' },
-  usedVcpuHours: { label: 'CPU used', color: 'var(--primary-bright)' },
+  usedVcpuHours: { label: 'Active CPU', color: 'var(--primary-bright)' },
 } satisfies ChartConfig
 
 const MEMORY_CHART_CONFIG = {
@@ -95,7 +95,7 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
         tooltip="Running hours multiplied by the vCPU each instance size reserves. This is what the quota counts."
       />
       <ChartMetric
-        label="CPU used"
+        label="Active CPU"
         value={cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
         tooltip="Share of reserved vCPU that did work. The rest was idle, e.g. waiting on I/O."
       />

@@ -114,7 +114,7 @@ describe('ComputePlanUsage', () => {
     await computeMeter.findByText(/vCPU-hrs$/)
 
     // Only the pair and its status belong on the card; the rest lives behind the info icon.
-    expect(computeMeter.queryByText(/CPU used/)).not.toBeInTheDocument()
+    expect(computeMeter.queryByText(/Active CPU/)).not.toBeInTheDocument()
     expect(computeMeter.queryByText(/runtime/)).not.toBeInTheDocument()
   })
 

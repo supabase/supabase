@@ -126,8 +126,26 @@ describe('ComputeServices', () => {
     renderOnPlan('pro')
 
     // Totals read as labelled rows rather than a prose subtitle under the heading.
-    expect(await screen.findByText('Share of reserved that did work')).toBeInTheDocument()
+    expect(await screen.findByText('Active share of reserved')).toBeInTheDocument()
     expect(await screen.findByText('Total reserved')).toBeInTheDocument()
+  })
+
+  it('does not call the reservation and the work inside it both "used"', async () => {
+    renderOnPlan('pro')
+
+    // "Used in period" is the reservation the quota counts; the part of it that did work is
+    // several times smaller, so the two cannot share a word.
+    await screen.findByText('Used in period')
+    expect(screen.queryByText('CPU used')).not.toBeInTheDocument()
+    expect(await screen.findAllByText('Active CPU')).not.toHaveLength(0)
+  })
+
+  it('bridges runtime to the metered figure with the instance size that produced it', async () => {
+    renderOnPlan('pro')
+
+    expect(await screen.findByText('Runtime in period')).toBeInTheDocument()
+    expect(await screen.findByText('Counted as')).toBeInTheDocument()
+    expect(await screen.findByText(/× \d+\.\d\d vCPU average/)).toBeInTheDocument()
   })
 
   it('renders running hours by size as labelled meters', async () => {

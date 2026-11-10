@@ -27,7 +27,7 @@ describe('ComputeInstanceUsageSection', () => {
 
     expect(await screen.findByText('Running hours')).toBeInTheDocument()
     expect(await screen.findAllByText('vCPU-hours')).not.toHaveLength(0)
-    expect(await screen.findByText('CPU used')).toBeInTheDocument()
+    expect(await screen.findByText('Active CPU')).toBeInTheDocument()
     expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Requests')).toBeInTheDocument()
   })
@@ -35,7 +35,7 @@ describe('ComputeInstanceUsageSection', () => {
   it('splits usage into CPU and memory, with no instance-count chart', async () => {
     customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
 
-    await screen.findByText('CPU used')
+    await screen.findByText('Active CPU')
     // The instance count is in the header and the list; a chart of it said nothing more.
     expect(screen.queryByText('Instances')).not.toBeInTheDocument()
   })
