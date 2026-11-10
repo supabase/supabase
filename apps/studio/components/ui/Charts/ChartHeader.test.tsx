@@ -94,6 +94,23 @@ describe('header stats', () => {
     expect(getStat('Errors')).toHaveTextContent('1,200')
   })
 
+  it('shows the counts for the locally hovered point when hover is not synced', () => {
+    render(
+      <TooltipProvider>
+        <ChartHeader
+          title="Edge Function Status Codes"
+          syncId={SYNC_ID}
+          data={data}
+          focusedIndex={2}
+          getHeaderStats={statusCodesReport.getHeaderStats}
+        />
+      </TooltipProvider>
+    )
+
+    expect(getStat('Warnings')).toHaveTextContent('0')
+    expect(getStat('Errors')).toHaveTextContent('1,200')
+  })
+
   it('does not show stats when the chart does not provide them', () => {
     render(
       <TooltipProvider>

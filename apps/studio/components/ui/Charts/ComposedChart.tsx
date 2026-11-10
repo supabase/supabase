@@ -476,6 +476,7 @@ export function ComposedChart({
         title={title}
         showNewBadge={showNewBadge}
         getHeaderStats={getHeaderStats}
+        focusedIndex={focusDataIndex}
         format={format}
         hideHighlightedLabel={hideHighlightedLabel}
         hideHighlightArea={hideHighlightArea}

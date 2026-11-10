@@ -66,6 +66,11 @@ export interface ChartHeaderProps {
    * row while a point is hovered.
    */
   getHeaderStats?: (rows: Record<string, unknown>[]) => ChartHeaderStat[]
+  /**
+   * Index of the point hovered on this chart. Used for `getHeaderStats` when hover isn't synced
+   * across charts, in which case the shared hover state doesn't reach the header.
+   */
+  focusedIndex?: number | null
 }
 
 export const ChartHeader = ({
@@ -101,6 +106,7 @@ export const ChartHeader = ({
   showNewBadge,
   isMemoryChart,
   getHeaderStats,
+  focusedIndex,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
@@ -260,7 +266,9 @@ export const ChartHeader = ({
     </div>
   )
 
-  const hoveredRow = syncId && isHovered && hoveredIndex !== null ? data?.[hoveredIndex] : undefined
+  const syncedIndex = syncId && isHovered ? hoveredIndex : null
+  const statsIndex = syncedIndex ?? focusedIndex ?? null
+  const hoveredRow = statsIndex !== null ? data?.[statsIndex] : undefined
   const headerStats = getHeaderStats?.(hoveredRow ? [hoveredRow] : (data ?? []))
 
   const highlighted = (
