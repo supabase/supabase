@@ -30,11 +30,17 @@ export function trimTrailingSemicolons(sql: SafeSqlFragment): SafeSqlFragment {
   return sql.replace(/;+\s*$/, '') as SafeSqlFragment
 }
 
+// A dollar-quote delimiter: `$$` or `$tag$`. As in Postgres, the tag is a letter or underscore
+// followed by letters, digits or underscores (so `$1` stays a parameter), and is case-sensitive.
+export const DOLLAR_QUOTE_DELIMITER = String.raw`\$(?:[A-Za-z_][A-Za-z_0-9]*)?\$`
+
 // Quoted text and comments, matched left to right so a quote inside a comment (or the reverse)
 // can't desync the scan: E'..' strings, '..' strings, "..." identifiers, $tag$..$tag$ bodies,
 // -- line comments and /* */ block comments
-export const LITERALS_AND_COMMENTS =
-  /\be'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(\$[a-z_]*\$)[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\//gi
+export const LITERALS_AND_COMMENTS = new RegExp(
+  String.raw`\b[eE]'(?:[^'\\]|\\.|'')*'|'(?:[^']|'')*'|"(?:[^"]|"")*"|(${DOLLAR_QUOTE_DELIMITER})[\s\S]*?\1|--[^\n]*|\/\*[\s\S]*?\*\/`,
+  'g'
+)
 
 /** Keeps only the SQL tokens, so keywords inside literals and comments aren't mistaken for syntax. */
 export const stripLiteralsAndComments = (sql: string) => sql.replace(LITERALS_AND_COMMENTS, ' ')

@@ -1,9 +1,20 @@
-import { LITERALS_AND_COMMENTS, stripLiteralsAndComments } from '@/data/sql/utils'
+import {
+  DOLLAR_QUOTE_DELIMITER,
+  LITERALS_AND_COMMENTS,
+  stripLiteralsAndComments,
+} from '@/data/sql/utils'
+
+// A dollar-quoted body (kept as-is) or a `\'` to rewrite. It shares the delimiter rule with
+// LITERALS_AND_COMMENTS, so the guard and the rewrite agree on which text is dollar-quoted.
+const DOLLAR_QUOTED_BODY_OR_BACKSLASH_QUOTE = new RegExp(
+  String.raw`(${DOLLAR_QUOTE_DELIMITER})[\s\S]*?\1|\\'`,
+  'g'
+)
 
 /**
  * LLMs sometimes emit MySQL-style `\'` escapes in SQL. PostgreSQL doesn't
  * treat backslash as an escape character, so replace `\'` → `''`.
- * Dollar-quoted strings (e.g. `$$...$$`) are left untouched.
+ * Dollar-quoted strings (e.g. `$$...$$`, `$fn1$...$fn1$`) are left untouched.
  *
  * SQL that can't contain a misescaped quote is returned unchanged, so a valid
  * literal ending in a backslash, like `'\'` in `replace(path, '\', '/')`, isn't
@@ -11,8 +22,8 @@ import { LITERALS_AND_COMMENTS, stripLiteralsAndComments } from '@/data/sql/util
  */
 export function fixSqlBackslashEscapes(sql: string): string {
   if (!hasMisescapedQuote(sql)) return sql
-  return sql.replace(/\$([^$]*)\$[\s\S]*?\$\1\$|\\'/g, (match, dollarTag) =>
-    dollarTag !== undefined ? match : "''"
+  return sql.replace(DOLLAR_QUOTED_BODY_OR_BACKSLASH_QUOTE, (match, delimiter) =>
+    delimiter !== undefined ? match : "''"
   )
 }
 
@@ -22,6 +33,9 @@ export function fixSqlBackslashEscapes(sql: string): string {
  * followed by stray text. That shows up as a quote or backslash outside every
  * literal and comment, or as a string ending in a backslash that runs straight
  * into a word character.
+ *
+ * Only '..' strings are checked for that second case. In an E'..' escape string,
+ * `\'` is PostgreSQL's own escaped quote, so `E'it\'s'` is already valid.
  */
 function hasMisescapedQuote(sql: string): boolean {
   if (/['\\]/.test(stripLiteralsAndComments(sql))) return true
