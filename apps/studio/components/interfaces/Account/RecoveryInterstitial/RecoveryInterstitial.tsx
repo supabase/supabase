@@ -3,7 +3,7 @@ import { useFeatureFlags, useFlag, useUser } from 'common'
 import { ArrowRightIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Button, CardFooter } from 'ui'
-import { AdmonitionTypeIcon } from 'ui-patterns/Admonition'
+import { WarningIcon } from 'ui-patterns/Admonition'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenerateRecoveryCodesModal } from '../TOTPFactors/GenerateRecoveryCodesModal'
@@ -11,7 +11,11 @@ import { RegenerateRecoveryCodesModal } from '../TOTPFactors/RegenerateRecoveryC
 import { AuthenticatorTask } from './AuthenticatorTask'
 import { getRecoveryGap, type RecoveryGap } from './RecoveryInterstitial.utils'
 import { RecoveryTaskRow } from './RecoveryTaskRow'
-import { InterstitialLayout, SupabaseLogo } from '@/components/layouts/InterstitialLayout'
+import {
+  InterstitialLayout,
+  InterstitialLogoBadge,
+  SupabaseLogo,
+} from '@/components/layouts/InterstitialLayout'
 import { AlertError } from '@/components/ui/AlertError'
 import { profileKeys } from '@/data/profile/keys'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
@@ -186,12 +190,13 @@ export const RecoveryReminder = ({
   return (
     <InterstitialLayout
       logo={
-        <div className="relative">
-          <SupabaseLogo />
-          <span className="absolute -top-2 -right-2 scale-80">
-            <AdmonitionTypeIcon type="warning" />
-          </span>
-        </div>
+        <SupabaseLogo
+          badge={
+            <InterstitialLogoBadge variant="warning">
+              <WarningIcon />
+            </InterstitialLogoBadge>
+          }
+        />
       }
       title="Secure your account"
       description="Complete the following tasks to reduce the risk of being locked out of your Supabase account."
