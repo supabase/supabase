@@ -21,8 +21,7 @@
     "sync:partner-form": "node scripts/syncPartnerIntakeForm.mjs",
     "test": "vitest --run",
     "test:watch": "vitest watch",
-    "test:partner-form-sync": "vitest run --config vitest.sync.config.ts",
-    "postbuild": "./../../scripts/upload-static-assets.sh"
+    "test:partner-form-sync": "vitest run --config vitest.sync.config.ts"
   },
   "dependencies": {
     "@bsmnt/scrollytelling": "^0.3.3",
