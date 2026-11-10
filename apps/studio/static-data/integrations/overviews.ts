@@ -2,10 +2,9 @@
  * Registry of integration overview markdown, keyed by integration id
  * (= directory name under `static-data/integrations/`).
  *
- * The import specifiers must stay as string literals: both bundlers can only
- * code-split and apply their md-as-string loaders (raw-loader rule in
- * next.config.ts, `mdRawLoader` plugin in vite.config.ts) to imports they can
- * statically analyze. A template-literal specifier like
+ * The import specifiers must stay as string literals: the bundler can only
+ * code-split and apply its md-as-string loader (`rawTextLoader` plugin in
+ * vite.config.ts) to imports it can statically analyze. A template-literal specifier like
  * ``import(`@/static-data/integrations/${id}/overview.md`)`` happens to work
  * under webpack/turbopack (context modules) but is left untouched by
  * Vite/Rolldown and throws `TypeError: Failed to resolve module specifier`

@@ -9,7 +9,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { guessLocalTimezone } from '@/lib/dayjs'
 
 // dayjs.extend is idempotent. Extending here removes the implicit dependency
-// on _app.tsx running first (e.g. Storybook, isolated scripts).
+// on routes/__root.tsx running first (e.g. Storybook, isolated scripts).
 dayjs.extend(utc)
 dayjs.extend(timezone)
 dayjs.extend(relativeTime)

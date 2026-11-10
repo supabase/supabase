@@ -28,9 +28,7 @@
         // it is traced already.
         "router.tsx",
         "start.ts",
-        // Route modules are real entry points. Keeping them as entries (not
-        // ignores) means components reachable only from the TanStack tree stay
-        // traced as the Next `pages/**` tree is dismantled.
+        // Route modules are real entry points.
         "routes/**/*.{ts,tsx}",
         // Next.js compat shims. Reached only through the `nextShims` aliases in
         // vite.config.ts (`next/link` -> compat/next/link.tsx), which knip
@@ -80,10 +78,7 @@
         // vite.config.ts resolves 'lodash-es/package.json' by string via
         // createRequire to build the SSR lodash -> lodash-es alias
         "lodash-es",
-        // named as a webpack/turbopack loader string in next.config.ts
-        // (`loaders: ['raw-loader']`)
-        "raw-loader",
-        // runtime hooks for @sentry/nextjs / OpenTelemetry Node
+        // runtime hooks for Sentry / OpenTelemetry Node
         // instrumentation. Must be direct deps under pnpm's strict isolation
         // (#35030).
         "import-in-the-middle",

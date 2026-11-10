@@ -1,11 +1,5 @@
-// Shared Sentry client-side configuration for BOTH Studio builds:
-//
-//   - Next (pages router): `instrumentation-client.ts` — a Next convention
-//     file, auto-loaded by Next only — calls `Sentry.init` with these options.
-//   - TanStack Start (Vite): `sentry.tanstack.ts` calls `Sentry.init`
-//     with these options from `getRouter()` (router.tsx). TanStack Start does
-//     not load Next's convention files, so without its own init every
-//     `Sentry.captureException` there would be a silent no-op.
+// Sentry client-side configuration. `sentry.tanstack.ts` calls `Sentry.init`
+// with these options from `getRouter()` (router.tsx).
 //
 // Keep every shared option in this builder so the two runtimes cannot drift.
 //
@@ -89,8 +83,8 @@ export function isChallengeExpiredError(error: unknown, event: Sentry.Event): bo
 }
 
 // Tag errors whose stack trace only contains third-party frames (browser extensions,
-// injected scripts, etc.). This uses build-time code annotation via the applicationKey
-// in next.config.ts to reliably distinguish our code from third-party code.
+// injected scripts, etc.). This relies on build-time code annotation via the
+// `supabase-studio` applicationKey to reliably distinguish our code from third-party code.
 // We use 'apply-tag' instead of 'drop' so that beforeSend can exempt error boundary
 // crashes — these may originate in third-party code but are caused by first-party bugs.
 function buildThirdPartyErrorFilterIntegration(): Integration {
@@ -105,8 +99,7 @@ export interface SentryClientOptionsParams {
    * Whether to include `thirdPartyErrorFilterIntegration`.
    *
    * Only enable this on builds whose bundler annotates stack frames with the
-   * `supabase-studio` applicationKey (the Next build does, via
-   * `withSentryConfig` in next.config.ts). On a build WITHOUT the annotation
+   * `supabase-studio` applicationKey. On a build WITHOUT the annotation
    * no frame carries first-party metadata, so the integration tags EVERY
    * event `third_party_code: true` and `beforeSend` would then drop all
    * non-error-boundary events.

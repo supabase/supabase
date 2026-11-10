@@ -26,7 +26,6 @@
         "NEXT_PUBLIC_GOTRUE_URL",
         "NEXT_PUBLIC_VERCEL_BRANCH_URL",
         "NEXT_PUBLIC_GOOGLE_MAPS_KEY",
-        "NEXT_RUNTIME",
         "NIMBUS_PROD_PROJECTS_URL",
         "NIMBUS_PROD_PROJECTS_URL_WS",
         "NODE_ENV",
@@ -54,7 +53,7 @@
         "NEXT_PUBLIC_MCP_URL",
         "NEXT_PUBLIC_IS_NIMBUS",
         "NEXT_PUBLIC_ONGOING_INCIDENT",
-        // These envs are technically passthrough env vars because they're only used on the server side of Nextjs
+        // These envs are technically passthrough env vars because they're only used on the server side
         "PLATFORM_PG_META_URL",
         "STUDIO_PG_META_URL",
         "PG_META_CRYPTO_KEY",
