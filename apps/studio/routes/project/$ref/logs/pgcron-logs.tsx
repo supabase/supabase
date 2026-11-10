@@ -1,12 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 
-import PgCronLogsPage from '@/pages/project/[ref]/logs/pgcron-logs'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 
 export const Route = createFileRoute('/project/$ref/logs/pgcron-logs')({
-  component: PgCronLogsRoute,
+  component: LogPage,
   staticData: { logsLayoutTitle: 'PgCron Logs' },
 })
 
-function PgCronLogsRoute() {
-  return <PgCronLogsPage dehydratedState={undefined} />
+function LogPage() {
+  const { ref } = useParams()
+
+  return (
+    <LogsPreviewer
+      condensedLayout
+      queryType="pg_cron"
+      projectRef={ref as string}
+      tableName={LogsTableName.PG_CRON}
+    />
+  )
 }

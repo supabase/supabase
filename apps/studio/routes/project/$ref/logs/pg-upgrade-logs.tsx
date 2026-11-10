@@ -1,12 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 
-import PgUpgradeLogsPage from '@/pages/project/[ref]/logs/pg-upgrade-logs'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 
 export const Route = createFileRoute('/project/$ref/logs/pg-upgrade-logs')({
-  component: PgUpgradeLogsRoute,
+  component: LogPage,
   staticData: { logsLayoutTitle: 'Postgres Version Upgrade' },
 })
 
-function PgUpgradeLogsRoute() {
-  return <PgUpgradeLogsPage dehydratedState={undefined} />
+function LogPage() {
+  const { ref } = useParams()
+  return <LogsPreviewer condensedLayout queryType="pg_upgrade" projectRef={ref as string} />
 }

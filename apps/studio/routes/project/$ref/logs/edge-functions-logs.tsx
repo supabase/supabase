@@ -1,12 +1,23 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { useParams } from 'common'
 
-import EdgeFunctionsLogsPage from '@/pages/project/[ref]/logs/edge-functions-logs'
+import { LogsTableName } from '@/components/interfaces/Settings/Logs/Logs.constants'
+import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 
 export const Route = createFileRoute('/project/$ref/logs/edge-functions-logs')({
-  component: EdgeFunctionsLogsRoute,
+  component: LogPage,
   staticData: { logsLayoutTitle: 'Edge Functions Logs' },
 })
 
-function EdgeFunctionsLogsRoute() {
-  return <EdgeFunctionsLogsPage dehydratedState={undefined} />
+function LogPage() {
+  const { ref } = useParams()
+
+  return (
+    <LogsPreviewer
+      condensedLayout
+      queryType="fn_edge"
+      projectRef={ref as string}
+      tableName={LogsTableName.FN_EDGE}
+    />
+  )
 }
