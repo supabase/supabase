@@ -1,8 +1,9 @@
 import { IS_PLATFORM, useParams } from 'common'
 import { ExternalLinkIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { PageContainer } from 'ui-patterns/PageContainer'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EdgeFunctionIntervalSelector } from './EdgeFunctionIntervalSelector'
 import { EdgeFunctionInvocationsSection } from './EdgeFunctionInvocationsSection'
@@ -21,9 +22,12 @@ import type { EdgeFunctionChartRawDatum } from './EdgeFunctionOverview.utils'
 import { EdgeFunctionOverviewHeader } from './EdgeFunctionOverviewHeader'
 import { EdgeFunctionPerformanceSection } from './EdgeFunctionPerformanceSection'
 import { EdgeFunctionRecentErrors } from './EdgeFunctionRecentErrors'
+import { toAlertError } from './EdgeFunctionRecentErrors.utils'
 import { EdgeFunctionUsageSection } from './EdgeFunctionUsageSection'
 import { useEdgeFunctionOverviewShortcuts } from './useEdgeFunctionOverviewShortcuts'
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { FunctionObservabilityDisabled } from '@/components/interfaces/Functions/FunctionObservabilityDisabled'
+import { useFunctionObservability } from '@/components/interfaces/Functions/useFunctionObservability'
+import { AlertError } from '@/components/ui/AlertError'
 import { NoPermission } from '@/components/ui/NoPermission'
 import {
   FunctionsCombinedStatsVariables,
@@ -36,7 +40,12 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 export const EdgeFunctionOverview = () => {
   const router = useRouter()
   const { ref: projectRef, functionSlug } = useParams()
-  const { isEnabled: isUnifiedLogsEnabled } = useUnifiedLogsPreview()
+  const {
+    isEnabled: isUnifiedLogsEnabled,
+    isAvailable: isObservabilityAvailable,
+    isLoading: isLoadingObservability,
+    error: observabilityError,
+  } = useFunctionObservability()
 
   const [interval, setInterval] = useState<string>('1hr')
   const selectedInterval =
@@ -59,7 +68,7 @@ export const EdgeFunctionOverview = () => {
       interval: selectedInterval.key as FunctionsCombinedStatsVariables['interval'],
     },
     {
-      enabled: IS_PLATFORM,
+      enabled: isObservabilityAvailable,
     }
   )
 
@@ -81,7 +90,7 @@ export const EdgeFunctionOverview = () => {
   const {
     data: combinedStatsChartData,
     error: combinedStatsError,
-    isError: isErrorCombinedStats,
+    isError: isErrorTimeseries,
   } = useFillTimeseriesSorted({
     data: combinedStatsData,
     timestampKey: 'timestamp',
@@ -106,19 +115,23 @@ export const EdgeFunctionOverview = () => {
     defaultValue: 0,
   })
 
+  const isErrorCombinedStats = combinedStatsResults.isError || isErrorTimeseries
+  const chartError = toAlertError(combinedStatsResults.error ?? combinedStatsError)
+
   const chartData = useMemo(
-    () => toEdgeFunctionChartData(combinedStatsChartData),
-    [combinedStatsChartData]
+    () => toEdgeFunctionChartData(IS_PLATFORM ? combinedStatsChartData : combinedStatsData),
+    [combinedStatsChartData, combinedStatsData]
   )
+  const usageData = IS_PLATFORM ? chartData : chartData.filter((row) => (row.worker_count ?? 0) > 0)
+  const performanceData = IS_PLATFORM
+    ? chartData
+    : chartData.filter((row) => (row.requests_count ?? 0) > 0)
   const invocationChartData = useMemo(() => getInvocationChartData(chartData), [chartData])
   const { totalInvocationCount, totalWarningCount, totalErrorCount } = useMemo(
     () => getInvocationTotals(invocationChartData),
     [invocationChartData]
   )
-  const { averageExecutionTime, maxExecutionTime } = useMemo(
-    () => getExecutionMetrics(chartData),
-    [chartData]
-  )
+  const { averageExecutionTime, maxExecutionTime } = getExecutionMetrics(performanceData)
   const {
     averageCpuTime,
     maxCpuTime,
@@ -126,7 +139,7 @@ export const EdgeFunctionOverview = () => {
     totalHeapMemory,
     totalExternalMemory,
     totalMemoryByType,
-  } = useMemo(() => getUsageMetrics(chartData), [chartData])
+  } = getUsageMetrics(usageData)
   const invocationUpdateAnnotation = useMemo(
     () =>
       getInvocationUpdateAnnotation({
@@ -154,7 +167,7 @@ export const EdgeFunctionOverview = () => {
   useEdgeFunctionOverviewShortcuts({
     onSetInterval: setInterval,
     onRefresh: () => {
-      combinedStatsResults.refetch()
+      if (isObservabilityAvailable) combinedStatsResults.refetch()
     },
     onOpenLogs: () => {
       router.push(
@@ -169,18 +182,16 @@ export const EdgeFunctionOverview = () => {
     FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_READ
   )
 
-  useEffect(() => {
-    if (!IS_PLATFORM && projectRef && functionSlug) {
-      router.replace(`/project/${projectRef}/functions/${functionSlug}/details`)
-    }
-  }, [functionSlug, projectRef, router])
-
   if (!canReadFunction && !permissionsLoading) {
     return <NoPermission isFullPage resourceText="access this edge function" />
   }
 
-  if (!IS_PLATFORM) {
-    return null
+  if (!IS_PLATFORM && isLoadingObservability) return <ShimmeringLoader className="m-6 h-40" />
+  if (observabilityError)
+    return <AlertError error={observabilityError} subject="Failed to load logging configuration" />
+
+  if (!isObservabilityAvailable) {
+    return <FunctionObservabilityDisabled />
   }
 
   return (
@@ -202,7 +213,7 @@ export const EdgeFunctionOverview = () => {
           functionError={functionError}
           isLoadingChart={combinedStatsResults.isLoading}
           isErrorChart={isErrorCombinedStats}
-          chartErrorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          chartErrorMessage={chartError?.message ?? 'Unknown error'}
           chartData={invocationChartData}
           onChartClick={(timestamp) => {
             if (!projectRef || !functionSlug) return
@@ -229,21 +240,21 @@ export const EdgeFunctionOverview = () => {
         />
 
         <EdgeFunctionPerformanceSection
-          data={chartData}
+          data={performanceData}
           dateTimeFormat={dateTimeFormat}
           isLoading={combinedStatsResults.isLoading}
           isError={isErrorCombinedStats}
-          errorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          errorMessage={chartError?.message ?? 'Unknown error'}
           averageExecutionTime={averageExecutionTime}
           maxExecutionTime={maxExecutionTime}
         />
 
         <EdgeFunctionUsageSection
-          data={chartData}
+          data={usageData}
           dateTimeFormat={dateTimeFormat}
           isLoading={combinedStatsResults.isLoading}
           isError={isErrorCombinedStats}
-          errorMessage={combinedStatsError?.message ?? 'Unknown error'}
+          errorMessage={chartError?.message ?? 'Unknown error'}
           averageCpuTime={averageCpuTime}
           maxCpuTime={maxCpuTime}
           averageMemoryUsage={averageMemoryUsage}

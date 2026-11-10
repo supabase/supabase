@@ -11,6 +11,7 @@ import {
 } from './unified-logs-infinite-query'
 import { getLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsCountQuery as getLogsCountQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getFunctionLogsCountQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.functions'
 import { FacetMetadataSchema } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.schema'
 import { handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -28,7 +29,10 @@ export async function getUnifiedLogsCount(
     throw new Error('projectRef is required for getUnifiedLogsCount')
   }
 
-  const sql = pickLogsQueryBuilder(useOtel, getLogsCountQuery, getLogsCountQueryBq)(search)
+  const sql =
+    !useOtel && search.scope
+      ? getFunctionLogsCountQuery(search)
+      : pickLogsQueryBuilder(useOtel, getLogsCountQuery, getLogsCountQueryBq)(search)
   const { isoTimestampStart, isoTimestampEnd } = getUnifiedLogsISOStartEnd(search)
 
   const endpoint = logsAllEndpointUrl(useOtel)
@@ -54,14 +58,14 @@ export async function getUnifiedLogsCount(
       const count = Number(row.count || 0)
 
       if (facet === 'total' && value === 'all') {
-        totalRowCount = count
+        totalRowCount += count
       }
 
       if (!countsByFacet[facet]) {
         countsByFacet[facet] = new Map()
       }
 
-      countsByFacet[facet].set(value, count)
+      countsByFacet[facet].set(value, (countsByFacet[facet].get(value) ?? 0) + count)
     })
   }
 

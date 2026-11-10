@@ -45,12 +45,12 @@ export const EdgeFunctionPerformanceSection = ({
     <div className="flex flex-wrap gap-x-8 gap-y-4">
       <ChartMetric
         label="Average Execution Time"
-        value={formatMetric(averageExecutionTime, 'ms')}
+        value={data.length === 0 || isError ? '–' : formatMetric(averageExecutionTime, 'ms')}
         tooltip="Average execution time of function invocations"
       />
       <ChartMetric
         label="Max Execution Time"
-        value={formatMetric(maxExecutionTime, 'ms')}
+        value={data.length === 0 || isError ? '–' : formatMetric(maxExecutionTime, 'ms')}
         tooltip="Maximum execution time of function invocations"
       />
     </div>

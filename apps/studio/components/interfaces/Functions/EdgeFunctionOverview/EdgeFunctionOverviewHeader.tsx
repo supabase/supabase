@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import dayjs from 'dayjs'
 import { ClockIcon } from 'lucide-react'
 import type { ReactNode } from 'react'
@@ -44,7 +44,7 @@ export const EdgeFunctionOverviewHeader = ({ actions }: EdgeFunctionOverviewHead
   let detailsStatus = ''
   if (isLoadingFunction) detailsStatus = 'Loading function details'
   if (selectedFunction) {
-    detailsStatus = `${selectedFunction.name} details loaded. Last deployed ${updatedRelative ?? 'status unavailable'}.`
+    detailsStatus = `${selectedFunction.name} details loaded. Last ${IS_PLATFORM ? 'deployed' : 'updated'} ${updatedRelative ?? 'status unavailable'}.`
   }
 
   return (
@@ -94,7 +94,9 @@ export const EdgeFunctionOverviewHeader = ({ actions }: EdgeFunctionOverviewHead
                   )}
                   {updatedRelative && (
                     <div className="px-4 py-2 space-y-1">
-                      <h3 className="heading-meta text-foreground-light">Last deployed</h3>
+                      <h3 className="heading-meta text-foreground-light">
+                        {IS_PLATFORM ? 'Last deployed' : 'Last updated'}
+                      </h3>
                       <TimestampInfo
                         className="text-sm"
                         label={updatedRelative}

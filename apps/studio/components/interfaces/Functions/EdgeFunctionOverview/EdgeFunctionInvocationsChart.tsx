@@ -1,3 +1,4 @@
+import { IS_PLATFORM } from 'common'
 import { RocketIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import {
@@ -121,7 +122,7 @@ export const EdgeFunctionInvocationsChart = ({
               </span>
             </TooltipTrigger>
             <TooltipContent side="top" align="center">
-              Deployment at {formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}
+              <span>{`${IS_PLATFORM ? 'Deployment' : 'Update'} at ${formatChartTimestamp(updateAnnotation.updatedAt, dateTimeFormat)}`}</span>
             </TooltipContent>
           </Tooltip>
         )}

@@ -2,23 +2,30 @@ import { useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 
-import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import {
   EDGE_FUNCTION_LOGS_VIEW,
   getEdgeFunctionLogsScope,
 } from '@/components/interfaces/Functions/EdgeFunctionOverview/EdgeFunctionOverview.utils'
+import { FunctionObservabilityDisabled } from '@/components/interfaces/Functions/FunctionObservabilityDisabled'
 import { useFunctionLogsMigration } from '@/components/interfaces/Functions/useFunctionLogsMigration'
+import { useFunctionObservability } from '@/components/interfaces/Functions/useFunctionObservability'
 import { LogsPreviewer } from '@/components/interfaces/Settings/Logs/LogsPreviewer'
 import { UnifiedLogs } from '@/components/interfaces/UnifiedLogs/UnifiedLogs'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import EdgeFunctionDetailsLayout from '@/components/layouts/EdgeFunctionsLayout/EdgeFunctionDetailsLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import type { NextPageWithLayout } from '@/types'
 
 export const LogPage: NextPageWithLayout = () => {
   const router = useRouter()
   const { ref, functionSlug } = useParams()
-  const { isEnabled: isUnifiedLogsEnabled, isLoading: isLoadingPreview } = useUnifiedLogsPreview()
+  const {
+    isEnabled: isUnifiedLogsEnabled,
+    isLoading: isLoadingPreview,
+    isAvailable,
+    error: observabilityError,
+  } = useFunctionObservability()
 
   const { data: selectedFunction, isPending: isLoading } = useEdgeFunctionQuery({
     projectRef: ref,
@@ -38,6 +45,10 @@ export const LogPage: NextPageWithLayout = () => {
     isEnabled: isUnifiedLogsEnabled,
     isLoading: isLoadingPreview,
   })
+
+  if (observabilityError)
+    return <AlertError error={observabilityError} subject="Failed to load logging configuration" />
+  if (!isLoadingPreview && !isAvailable) return <FunctionObservabilityDisabled />
 
   if (selectedFunction === undefined || isLoading || isLoadingPreview || isMigrating) return null
 

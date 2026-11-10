@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { IS_PLATFORM } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -8,6 +9,7 @@ import {
   type OtelLogRow,
 } from './otel-inspection.utils'
 import { analyticsLiteral as lit, safeSql, type SafeLogSqlFragment } from './safe-analytics-sql'
+import { getSelfHostedFunctionInspection } from './self-hosted-function-inspection'
 import {
   getUnifiedLogsISOStartEnd,
   UNIFIED_LOGS_QUERY_OPTIONS,
@@ -189,7 +191,11 @@ export async function getUnifiedLogInspection(
 
   const { isoTimestampStart, isoTimestampEnd } = getInspectionISOStartEnd(search, logTimestampMs)
 
-  const shouldUseOtel = useOtel || !!search.scope
+  if (!IS_PLATFORM && !useOtel && type === 'edge-function' && search.scope) {
+    return getSelfHostedFunctionInspection({ projectRef, logId, search }, signal)
+  }
+
+  const shouldUseOtel = useOtel || (IS_PLATFORM && !!search.scope)
   if (!shouldUseOtel) {
     let sql: SafeLogSqlFragment
     switch (type) {

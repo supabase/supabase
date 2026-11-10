@@ -4,7 +4,7 @@ import {
   useInfiniteQuery,
   useQueryClient,
 } from '@tanstack/react-query'
-import { useFeatureFlags } from 'common'
+import { IS_PLATFORM, useFeatureFlags } from 'common'
 
 import { executeAnalyticsSql } from './execute-analytics-sql'
 import { logsKeys } from './keys'
@@ -17,6 +17,7 @@ import {
 } from './unified-logs.utils'
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getUnifiedLogsQuery as getUnifiedLogsQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getFunctionLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.functions'
 import {
   PageParam,
   QuerySearchParamsType,
@@ -58,7 +59,7 @@ type UnifiedLogsPageVariables = UnifiedLogsVariables & {
 export const useUnifiedLogsBackend = (search?: QuerySearchParamsType) => {
   const { otelUnifiedLogs = true } = useFeatureFlags().configcat
   const isOtelEnabled = typeof otelUnifiedLogs === 'boolean' ? otelUnifiedLogs : true
-  return isOtelEnabled || !!search?.scope
+  return !IS_PLATFORM && search?.scope ? false : isOtelEnabled || !!search?.scope
 }
 
 export const getUnifiedLogsISOStartEnd = (
@@ -122,7 +123,8 @@ export async function getUnifiedLogs(
   }
 
   const endpoint = logsAllEndpointUrl(useOtel)
-  const idColumn = useOtel ? safeSql`toString(id)` : safeSql`id`
+  let idColumn = useOtel ? safeSql`toString(id)` : safeSql`id`
+  if (!useOtel && search.scope) idColumn = safeSql`JSON_VALUE(id, '$')`
   const cursorTimestamp = (cursor: RowCursor) => {
     const rawTimestamp = String(cursor.timestamp)
     const isIsoTimestamp = /[T-]/.test(rawTimestamp)
@@ -131,6 +133,14 @@ export async function getUnifiedLogs(
       timestamp = useOtel
         ? safeSql`parseDateTime64BestEffort(${analyticsLiteral(rawTimestamp)}, 9, 'UTC')`
         : safeSql`CAST(${analyticsLiteral(rawTimestamp)} AS TIMESTAMP)`
+    } else if (!useOtel && search.scope) {
+      const micros = Number(rawTimestamp)
+      const iso =
+        new Date(Math.floor(micros / 1000)).toISOString().slice(0, 19) +
+        '.' +
+        String(micros % 1_000_000).padStart(6, '0') +
+        'Z'
+      timestamp = safeSql`CAST(${analyticsLiteral(iso)} AS TIMESTAMP)`
     } else {
       timestamp = useOtel
         ? safeSql`fromUnixTimestamp64Micro(${analyticsLiteral(Number(rawTimestamp))})`
@@ -155,7 +165,13 @@ export async function getUnifiedLogs(
         ? safeSql`${paginationFilter} AND ${boundaryFilter}`
         : boundaryFilter
     }
-    const sql = safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(pageSize)}`
+    const isSelfHostedScope = !useOtel && !!search.scope
+    const sql = isSelfHostedScope
+      ? getFunctionLogsQuery(search, paginationFilter).map(
+          (query) =>
+            safeSql`${query} ORDER BY timestamp DESC, id DESC LIMIT ${analyticsLiteral(pageSize)}`
+        )
+      : safeSql`${buildQuery(search, paginationFilter)} ORDER BY timestamp DESC, ${idColumn} DESC LIMIT ${analyticsLiteral(pageSize)}`
     const data = await executeAnalyticsSql({
       projectRef,
       endpoint,
@@ -167,7 +183,14 @@ export async function getUnifiedLogs(
     })
 
     if (data.error) handleError(new Error(data.error as string))
-    return parseUnifiedLogsQueryRows(data?.result)
+    const rows = parseUnifiedLogsQueryRows(data?.result)
+    if (!isSelfHostedScope) return rows
+    return rows
+      .sort(
+        (a, b) =>
+          Number(b.timestamp) - Number(a.timestamp) || (a.id < b.id ? 1 : a.id > b.id ? -1 : 0)
+      )
+      .slice(0, pageSize)
   }
 
   let page = await fetchPage(pageParam?.row)

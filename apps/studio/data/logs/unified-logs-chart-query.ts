@@ -11,6 +11,7 @@ import {
 import { parseLogsFilterUrlParams } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 import { getLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { getLogsChartQuery as getLogsChartQueryBq } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.bq'
+import { getFunctionLogsChartQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries.functions'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { UseCustomQueryOptions } from '@/types'
 
@@ -44,7 +45,10 @@ export async function getUnifiedLogsChart(
   }
 
   // Get SQL query from utility function (with dynamic bucketing)
-  const sql = pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
+  const sql =
+    !useOtel && search.scope
+      ? getFunctionLogsChartQuery(search)
+      : pickLogsQueryBuilder(useOtel, getLogsChartQuery, getLogsChartQueryBq)(search)
 
   const endpoint = logsAllEndpointUrl(useOtel)
   const data = await executeAnalyticsSql({
@@ -109,6 +113,12 @@ export async function getUnifiedLogsChart(
         if (!isActive('error')) dataPoint.error = 0
       }
 
+      const previous = dataByTimestamp.get(milliseconds)
+      if (previous) {
+        dataPoint.success += previous.success
+        dataPoint.warning += previous.warning
+        dataPoint.error += previous.error
+      }
       dataByTimestamp.set(milliseconds, dataPoint)
     })
   }

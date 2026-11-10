@@ -8,6 +8,8 @@
  *
  * See .agents/skills/safe-sql-execution/SKILL.md for the full security model.
  */
+import type { platformComponents } from 'api-types'
+
 import type { SafeLogSqlFragment } from './safe-analytics-sql'
 import { get, handleError, post } from '@/data/fetchers'
 
@@ -24,7 +26,7 @@ export interface ExecuteAnalyticsSqlVariables {
   projectRef: string
   endpoint: AnalyticsSqlEndpoint
   /** Must carry the `SafeLogSqlFragment` brand — plain strings are rejected at compile time. */
-  sql: SafeLogSqlFragment
+  sql: SafeLogSqlFragment | readonly SafeLogSqlFragment[]
   iso_timestamp_start: string
   iso_timestamp_end: string
   /** Defaults to 'post'. Use 'get' to preserve wire behavior when migrating legacy GET callers. */
@@ -48,7 +50,32 @@ export async function executeAnalyticsSql({
   key,
   signal,
   headers: headersInit,
-}: ExecuteAnalyticsSqlVariables) {
+}: ExecuteAnalyticsSqlVariables): Promise<
+  platformComponents['schemas']['AnalyticsResponse_Output']
+> {
+  if (typeof sql !== 'string') {
+    const responses = await Promise.all(
+      sql.map((query) =>
+        executeAnalyticsSql({
+          projectRef,
+          endpoint,
+          sql: query,
+          iso_timestamp_start,
+          iso_timestamp_end,
+          method,
+          key,
+          signal,
+          headers: headersInit,
+        })
+      )
+    )
+    for (const response of responses) {
+      if (response.error)
+        handleError(typeof response.error === 'string' ? new Error(response.error) : response.error)
+    }
+    return { result: responses.flatMap((response) => response.result ?? []) }
+  }
+
   const headers = headersInit !== undefined ? new Headers(headersInit) : undefined
 
   if (method === 'get') {
