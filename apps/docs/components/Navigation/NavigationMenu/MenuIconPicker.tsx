@@ -30,7 +30,6 @@ import {
   IconMenuSwift,
   IconSecurity,
   IconSupport,
-  IconTroubleshooting,
   IconUI,
 } from './MenuIcons'
 
@@ -96,8 +95,6 @@ function getMenuIcon(menuKey: string, width: number = 16, height: number = 16, c
       return <IconSecurity width={width} height={height} className={className} />
     case 'telemetry':
       return <Telescope width={width} height={height} className={className} />
-    case 'troubleshooting':
-      return <IconTroubleshooting width={width} height={height} className={className} />
     case 'changelog':
       return <ScrollText width={width} height={height} className={className} />
     case 'contributing':

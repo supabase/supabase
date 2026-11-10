@@ -5,7 +5,7 @@ import { getAuthenticatorDbSchemasOverride } from './authenticator-role-config-q
 import { databaseKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type AuthenticatorRoleConfigVariables = {
   projectRef?: string
@@ -26,6 +26,8 @@ export async function getAuthenticatorRoleConfig(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'authenticator-role-config',
       sql: getAuthenticatorRoleConfigSql,
       queryKey: ['authenticator-role-config'],
       grant: unguarded.migrating,
@@ -39,14 +41,13 @@ export async function getAuthenticatorRoleConfig(
 }
 
 export type AuthenticatorRoleConfigData = Awaited<ReturnType<typeof getAuthenticatorRoleConfig>>
-export type AuthenticatorRoleConfigError = ResponseError
+export type AuthenticatorRoleConfigError = StudioError
 
 export const authenticatorRoleConfigQueryOptions = ({
   projectRef,
   connectionString,
 }: AuthenticatorRoleConfigVariables) =>
   queryOptions({
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps -- connection string doesn't change the result of the query
     queryKey: databaseKeys.authenticatorRoleConfig(projectRef),
     queryFn: ({ signal }) => getAuthenticatorRoleConfig({ projectRef, connectionString }, signal),
     // The fix for this override is usually applied outside the Dashboard (SQL editor, another

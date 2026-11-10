@@ -12,6 +12,7 @@ import viteReact from '@vitejs/plugin-react'
 import { nitro } from 'nitro/vite'
 import { defineConfig, loadEnv, type Plugin } from 'vite'
 
+import { PRERENDERED_ROUTES } from './lib/prerendered-routes'
 import { vercelSpaRoutes } from './scripts/vercel-spa-routes'
 import { getSecurityHeaders } from './security-headers'
 
@@ -533,8 +534,9 @@ export default defineConfig(({ command, mode }) => {
   // ends up with a bare `process.env` reference.
   publicEnvDefines['process.env.MAINTENANCE_MODE'] = JSON.stringify(env.MAINTENANCE_MODE ?? '')
 
-  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) reads
-  // these at runtime in the browser. When a var is unset it gets no define
+  // Sentry init (lib/sentry-client-options.ts, reached via router.tsx) and the
+  // error sample rates (lib/errors/error-routing.ts) read these at runtime in
+  // the browser. When a var is unset it gets no define
   // entry above, which would leave a literal `process.env.*` in the built
   // bundle — and an undeclared `process` throws in the browser. Inline
   // `undefined` as the fallback, mirroring how Next inlines unset
@@ -543,6 +545,8 @@ export default defineConfig(({ command, mode }) => {
     'NEXT_PUBLIC_SENTRY_DSN',
     'NEXT_PUBLIC_SENTRY_ENVIRONMENT',
     'NEXT_PUBLIC_VERCEL_GIT_COMMIT_SHA',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OTHER',
+    'NEXT_PUBLIC_SENTRY_SAMPLE_RATE_OWNED',
   ]) {
     publicEnvDefines[`process.env.${key}`] ??= 'undefined'
   }
@@ -552,6 +556,8 @@ export default defineConfig(({ command, mode }) => {
   // root path. vercel-spa-routes rewrites the browser's prefixed asset URLs
   // to that root path, including assets retained from older deployments.
   const basePath = env.NEXT_PUBLIC_BASE_PATH || undefined
+  // Self-hosted sign-in redirects straight to the default project, so there's nothing to prerender.
+  const prerenderedRoutes = env.NEXT_PUBLIC_IS_PLATFORM === 'true' ? PRERENDERED_ROUTES : []
   const shouldUploadSourceMaps =
     process.env.SKIP_ASSET_UPLOAD !== '1' && !!process.env.SENTRY_AUTH_TOKEN
 
@@ -735,6 +741,10 @@ export default defineConfig(({ command, mode }) => {
             if (id.includes('packages/ui/src/components/shadcn/ui/slider.tsx')) {
               return 'ui-slider'
             }
+            // Keep Avatar in its own chunk to prevent a users-page import cycle through ui.
+            if (id.includes('packages/ui/src/components/shadcn/ui/avatar.tsx')) {
+              return 'ui-avatar'
+            }
             return undefined
           },
         },
@@ -830,7 +840,7 @@ export default defineConfig(({ command, mode }) => {
         },
         // Documents from the static shell; only /api/* and /_serverFn/*
         // invoke the function.
-        modules: [vercelSpaRoutes({ basePath })],
+        modules: [vercelSpaRoutes({ basePath, prerenderedRoutes })],
         ...(!process.env.VERCEL && { routeRules: { '/**': { headers: securityHeaders } } }),
       }),
       tanstackStart({
@@ -838,6 +848,10 @@ export default defineConfig(({ command, mode }) => {
         spa: {
           enabled: true,
         },
+        // Only the listed pages: crawling would follow their links into signed-in pages
+        // such as /organizations.
+        prerender: { crawlLinks: false, autoStaticPathsDiscovery: false },
+        pages: prerenderedRoutes.map((path) => ({ path, prerender: { enabled: true } })),
         // Set `configuredBasepath` so `deriveRouterBasepath` short-circuits
         // its slash-stripping branch. See the basePath comment above.
         ...(basePath && { router: { basepath: basePath } }),

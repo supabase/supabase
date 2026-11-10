@@ -267,7 +267,9 @@ export const NamespaceWithTables = ({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent side="bottom">
-                  <p>Postgres schema{tables.length === 0 && ' that will be created'}</p>
+                  <p>
+                    Postgres schema{tables.length === 0 && <span>{' that will be created'}</span>}
+                  </p>
                 </TooltipContent>
               </Tooltip>
             </>
@@ -282,7 +284,7 @@ export const NamespaceWithTables = ({
                   <Loader2Icon size={14} className="animate-spin" />
                   <p className="text-sm">
                     Connecting {publicationTablesNotSyncedToNamespaceTables.length} table
-                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? 's' : ''}
+                    {publicationTablesNotSyncedToNamespaceTables.length > 1 ? <span>s</span> : ''}
                   </p>
                 </div>
               </TooltipTrigger>

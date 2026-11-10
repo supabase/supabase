@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { oauthServerAppKeys } from './keys'
 import { handleError } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createProjectSupabaseClient } from '@/lib/project-supabase-client'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthServerAppDeleteVariables = {
   clientId: string | undefined
@@ -35,12 +36,12 @@ export const useOAuthServerAppDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppDeleteData, ResponseError, OAuthServerAppDeleteVariables>,
+  UseCustomMutationOptions<OAuthAppDeleteData, StudioError, OAuthServerAppDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppDeleteData, ResponseError, OAuthServerAppDeleteVariables>({
+  return useMutation<OAuthAppDeleteData, StudioError, OAuthServerAppDeleteVariables>({
     mutationFn: (vars) => deleteOAuthServerApp(vars),
     onSuccess: async (data, variables, context) => {
       const { projectRef, clientEndpoint } = variables

@@ -146,7 +146,7 @@ export function ViewTokenSheet({ visible, tokenId, onClose }: ViewTokenSheetProp
           )}
         >
           <p className="truncate" title={`View access for ${token?.name ?? 'Unknown'}`}>
-            View access for {token?.name ?? 'Unknown'}
+            View access for {token?.name ?? <span>Unknown</span>}
           </p>
           <TokenDocsButtons />
         </SheetHeader>

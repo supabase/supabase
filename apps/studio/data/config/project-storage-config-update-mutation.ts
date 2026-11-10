@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { configKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type StorageConfigUpdatePayload = components['schemas']['UpdateStorageConfigBody']
 
@@ -36,7 +37,7 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     ProjectStorageConfigUpdateUpdateData,
-    ResponseError,
+    StudioError,
     ProjectStorageConfigUpdateUpdateVariables
   >,
   'mutationFn'
@@ -45,7 +46,7 @@ export const useProjectStorageConfigUpdateUpdateMutation = ({
 
   return useMutation<
     ProjectStorageConfigUpdateUpdateData,
-    ResponseError,
+    StudioError,
     ProjectStorageConfigUpdateUpdateVariables
   >({
     mutationFn: (vars) => updateProjectStorageConfigUpdate(vars),

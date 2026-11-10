@@ -16,6 +16,16 @@ export const contract = {
   inputSchema,
   outputSchema: z.string(),
   minOptInLevel: null,
+  availability: {
+    environments: new Set(['platform', 'self-hosted']),
+  },
   needsApproval: false,
+  promptGuidance: `Before writing SQL or answering questions about the following topics, call \`load_knowledge\` to load detailed knowledge:
+- \`pg_best_practices\` — PostgreSQL best practices. Always load before writing any SQL, even simple queries.
+- \`logs\` — ClickHouse SQL against the project's logs table.
+- \`rls\` — Row Level Security policies for database tables.
+- \`storage\` — Supabase Storage buckets, public/private bucket access, and \`storage.objects\` policies. Always load before creating Storage buckets or \`storage.objects\` policies.
+- \`edge_functions\` — Supabase Edge Functions
+- \`realtime\` — Supabase Realtime`,
   toModelOutput: (output: string) => output,
 } as const satisfies ToolContract

@@ -4,7 +4,8 @@ import { platformWebhooksKeys } from './keys'
 import { listWebhookEndpoints, type WebhookScopeParams } from './platform-webhooks-fetchers'
 import { toWebhookEndpoint } from './platform-webhooks-mappers'
 import type { WebhookEndpoint } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface WebhookEndpointsVariables {
   scope: WebhookScopeParams
@@ -27,11 +28,11 @@ export const useWebhookEndpointsQuery = <TData = WebhookEndpointsData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<WebhookEndpointsData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<WebhookEndpointsData, StudioError, TData> = {}
 ) => {
   const { scope, limit, offset } = variables
 
-  return useQuery<WebhookEndpointsData, ResponseError, TData>({
+  return useQuery<WebhookEndpointsData, StudioError, TData>({
     queryKey: platformWebhooksKeys.endpoints(scope, limit, offset),
     queryFn: ({ signal }) => getWebhookEndpoints({ scope, limit, offset }, signal),
     enabled,

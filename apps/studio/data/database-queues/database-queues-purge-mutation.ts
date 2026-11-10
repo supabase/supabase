@@ -6,7 +6,8 @@ import { databaseQueuesKeys } from './keys'
 import { isQueueNameValid } from '@/components/interfaces/Integrations/Queues/Queues.utils'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseQueuePurgeVariables = {
   projectRef: string
@@ -28,6 +29,8 @@ export async function purgeDatabaseQueue({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-queues-purge',
     sql: safeSql`select * from pgmq.purge_queue(${literal(queueName)});`,
     queryKey: databaseQueuesKeys.purge(queueName),
     grant: unguarded.migrating,
@@ -43,12 +46,12 @@ export const useDatabaseQueuePurgeMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>,
+  UseCustomMutationOptions<DatabaseQueuePurgeData, StudioError, DatabaseQueuePurgeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseQueuePurgeData, ResponseError, DatabaseQueuePurgeVariables>({
+  return useMutation<DatabaseQueuePurgeData, StudioError, DatabaseQueuePurgeVariables>({
     mutationFn: (vars) => purgeDatabaseQueue(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, queueName } = variables

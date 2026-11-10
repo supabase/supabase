@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type SendUpgradeFeedbackVariables = {
   orgSlug?: string
@@ -38,10 +39,10 @@ export const useSendUpgradeFeedbackMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>,
+  UseCustomMutationOptions<SendUpgradeFeedbackData, StudioError, SendUpgradeFeedbackVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SendUpgradeFeedbackData, ResponseError, SendUpgradeFeedbackVariables>({
+  return useMutation<SendUpgradeFeedbackData, StudioError, SendUpgradeFeedbackVariables>({
     mutationFn: (vars) => sendUpgradeFeedback(vars),
     async onError(data, variables, context) {
       if (onError === undefined) {

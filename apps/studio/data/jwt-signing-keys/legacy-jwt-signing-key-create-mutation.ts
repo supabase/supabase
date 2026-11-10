@@ -2,11 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
-import { handleError, post, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type LegacyJWTSigningKeyCreateGrant = GrantFor<
+  'post',
+  '/v1/projects/{ref}/config/auth/signing-keys/legacy'
+>
 
 interface LegacyJWTSigningKeyCreateVariables {
   projectRef?: string
+  grant: LegacyJWTSigningKeyCreateGrant
 }
 
 export async function createLegacyJWTSigningKey(payload: LegacyJWTSigningKeyCreateVariables) {
@@ -16,7 +24,7 @@ export async function createLegacyJWTSigningKey(payload: LegacyJWTSigningKeyCrea
     params: {
       path: { ref: payload.projectRef },
     },
-    grant: unguarded.migrating,
+    grant: payload.grant,
   })
 
   if (error) handleError(error)
@@ -32,7 +40,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     LegacyJWTSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     LegacyJWTSigningKeyCreateVariables
   >,
   'mutationFn'
@@ -41,7 +49,7 @@ export const useLegacyJWTSigningKeyCreateMutation = ({
 
   return useMutation<
     LegacyJWTSigningKeyCreateData,
-    ResponseError,
+    StudioError,
     LegacyJWTSigningKeyCreateVariables
   >({
     mutationFn: (vars) => createLegacyJWTSigningKey(vars),

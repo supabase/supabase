@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { LogsTableName } from './Logs.constants'
 import type { Filters, LogData } from './Logs.types'
@@ -11,6 +11,7 @@ import {
   formatLogsAsJson,
   formatLogsAsMarkdown,
   genChartQuery,
+  genCountQuery,
   genDefaultQuery,
   getAuthLogSeverity,
   parseMultigresEventMessage,
@@ -139,6 +140,27 @@ describe('Logs.utils', () => {
   })
 
   describe('buildLogsPrompt', () => {
+    test.each([
+      '2026-10-27T10:15:00.000000',
+      '2026-10-27 10:15:00.000000',
+      '2026-10-27T10:15:00Z',
+      '2026-10-27T11:15:00+01:00',
+    ])(
+      'preserves the UTC log time in Assistant prompts regardless of the local timezone: %s',
+      (timestamp) => {
+        vi.stubEnv('TZ', 'Europe/Madrid')
+        try {
+          expect(new Date('2026-10-27T10:15:00').getTimezoneOffset()).toBe(-60)
+          const prompt = buildLogsPrompt([
+            { id: 'log', timestamp, event_message: 'Function failed' },
+          ])
+          expect(prompt).toContain('**Timestamp:** 2026-10-27T10:15:00.000Z')
+        } finally {
+          vi.unstubAllEnvs()
+        }
+      }
+    )
+
     test('builds prompt with single log', () => {
       const rows: LogData[] = [createLog({ id: '1', event_message: 'error occurred' })]
       const result = buildLogsPrompt(rows)
@@ -342,6 +364,31 @@ describe('Logs.utils', () => {
   })
 
   describe('genChartQuery', () => {
+    test.each([150, '03dg2o5teb2eucxr9ggh3uie6', "opaque' OR '1'='1"])(
+      'reads pipeline %s through the table alias in every legacy query',
+      (pipelineId) => {
+        const params = {
+          iso_timestamp_start: '2026-10-30T10:00:00Z',
+          iso_timestamp_end: '2026-10-30T11:00:00Z',
+        }
+        // Legacy links can carry numeric IDs in the JSON filters query parameter.
+        const filters: Filters = JSON.parse(JSON.stringify({ pipeline_id: pipelineId }))
+        const expectedId = String(pipelineId).replaceAll("'", "''")
+        for (const sql of [
+          genChartQuery(LogsTableName.PIPELINES, params, filters),
+          genDefaultQuery(LogsTableName.PIPELINES, filters),
+          genCountQuery(LogsTableName.PIPELINES, filters),
+        ]) {
+          expect(sql).toContain('etl_replication_logs t')
+          expect(sql).toContain("json_value(to_json_string(t), '$.pipeline_id_v2')")
+          expect(sql).toContain('cast(t.pipeline_id as string)')
+          expect(sql).not.toContain('etl_replication_logs.pipeline_id')
+          expect(sql).not.toContain('to_json_string(etl_replication_logs)')
+          expect(sql).toContain(`= '${expectedId}'`)
+        }
+      }
+    )
+
     // Regression: an unparseable iso_timestamp_start used to reach
     // startOffset.toISOString() as an Invalid Date and throw RangeError.
     test('falls back to minute buckets for an unparseable time range without throwing', () => {

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { edgeFunctionsKeys } from './keys'
 import { del, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EdgeFunctionsDeleteVariables = {
   projectRef: string
@@ -31,12 +32,12 @@ export const useEdgeFunctionDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>,
+  UseCustomMutationOptions<EdgeFunctionsDeleteData, StudioError, EdgeFunctionsDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EdgeFunctionsDeleteData, ResponseError, EdgeFunctionsDeleteVariables>({
+  return useMutation<EdgeFunctionsDeleteData, StudioError, EdgeFunctionsDeleteVariables>({
     mutationFn: (vars) => deleteEdgeFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

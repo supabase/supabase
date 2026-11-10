@@ -2,12 +2,9 @@ import { FEATURE_GROUPS_NON_PLATFORM, FEATURE_GROUPS_PLATFORM } from 'ui-pattern
 
 import type { ConnectSchema, StepDefinition } from './Connect.types'
 
-/**
- * MCP feature groups enabled by default on platform (Storage is excluded to keep
- * tool counts manageable).
- */
+/** MCP feature groups enabled by default on platform. */
 export const DEFAULT_MCP_FEATURES = FEATURE_GROUPS_PLATFORM.filter(
-  (group) => group.id !== 'storage'
+  (group) => !group.defaultDisabled
 ).map((group) => group.id)
 
 const NON_PLATFORM_MCP_FEATURE_IDS = new Set(FEATURE_GROUPS_NON_PLATFORM.map((group) => group.id))

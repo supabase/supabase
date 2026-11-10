@@ -8,10 +8,12 @@ import {
   gateLogTypeOptions,
   getComputeLogsAvailability,
   getEventMessageDisplay,
+  getFacetValueCount,
   getLogRowClassName,
   getLogTypeVisibility,
   getRawLogData,
   getUniqueLogRows,
+  isOfferedFilter,
   parseMultigresEventMessage,
   toQuerySearchParams,
   wrapIlikePattern,
@@ -57,6 +59,12 @@ describe('buildUnifiedLogsUrl', () => {
       buildUnifiedLogsUrl({ projectRef: 'abc', logType: 'storage', start: new Date() })
     )
     expect(params.has('date')).toBe(false)
+  })
+
+  it('opens a log when given its id', () => {
+    const { params } = parse(buildUnifiedLogsUrl({ projectRef: 'abc', user: 'u', logId: 'log-1' }))
+    expect(params.get('id')).toBe('log-1')
+    expect(params.get('user')).toBe('u')
   })
 })
 
@@ -215,6 +223,42 @@ const FUNCTION_SCOPE: UnifiedLogsScope = {
     { column: 'function_id', operator: '=', value: 'fn-123' },
   ],
 }
+
+describe('getFacetValueCount', () => {
+  const facets = {
+    level: {
+      total: 7,
+      rows: [
+        { value: 'error', total: 3 },
+        { value: 'success', total: 4 },
+      ],
+    },
+  }
+
+  it("reads one value's count from a facet", () => {
+    expect(getFacetValueCount(facets, 'level', 'error')).toBe(3)
+  })
+
+  it('counts zero for values and facets the query found nothing for', () => {
+    expect(getFacetValueCount(facets, 'level', 'warning')).toBe(0)
+    expect(getFacetValueCount(facets, 'log_type', 'edge function')).toBe(0)
+    expect(getFacetValueCount(undefined, 'level', 'error')).toBe(0)
+  })
+})
+
+describe('isOfferedFilter', () => {
+  it('offers every filter when the view lists none', () => {
+    expect(isOfferedFilter('user')).toBe(true)
+    expect(isOfferedFilter('pathname')).toBe(true)
+  })
+
+  it('offers only the listed filters', () => {
+    const offeredFilters = ['date', 'level']
+    expect(isOfferedFilter('level', offeredFilters)).toBe(true)
+    expect(isOfferedFilter('user', offeredFilters)).toBe(false)
+    expect(isOfferedFilter('pathname', offeredFilters)).toBe(false)
+  })
+})
 
 describe('getLogTypeVisibility', () => {
   it('hides edge function runtime logs from the project-wide view and keeps other gates', () => {
@@ -379,11 +423,12 @@ describe('getUniqueLogRows', () => {
 
 describe('getLogRowClassName', () => {
   it('distinguishes errors and dims logs received before live mode started', () => {
-    const errorRow = { level: 'error' as const, timestamp: 1000 }
+    const errorRow = { level: 'error' as const, timestamp: 1_000_000, date: new Date(1000) }
 
     expect(getLogRowClassName(errorRow)).toContain('bg-destructive/5')
     expect(getLogRowClassName(errorRow)).toContain('opacity-100')
     expect(getLogRowClassName(errorRow, 2000)).toContain('opacity-50')
+    expect(getLogRowClassName(errorRow, 500)).toContain('opacity-100')
   })
 })
 

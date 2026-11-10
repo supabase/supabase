@@ -27,6 +27,8 @@ export const getBucketNumberEstimate = async ({
       projectRef,
       connectionString,
       queryKey,
+      sqlOrigin: 'studio',
+      queryName: 'buckets-max-size-limit-estimate',
       sql,
       grant: unguarded.migrating,
     })
@@ -56,6 +58,8 @@ const getBucketsWithLargestSizeLimit = async ({
     projectRef,
     connectionString,
     queryKey: key,
+    sqlOrigin: 'studio',
+    queryName: 'buckets-largest-size-limit',
     sql,
     grant: unguarded.migrating,
   })
@@ -97,7 +101,6 @@ export const useLargestBucketSizeLimitsCheck = ({
   const { data: estimatedRows, isPending: isEstimatePending } = useQuery<number | undefined>({
     // Query is the same even if connectionString changes, and doesn't correctly
     // track projectRef
-    // eslint-disable-next-line @tanstack/query/exhaustive-deps
     queryKey: estimateKey,
     queryFn: () => getBucketNumberEstimate({ projectRef, connectionString }),
     enabled: !!projectRef && !!connectionString,
@@ -110,7 +113,6 @@ export const useLargestBucketSizeLimitsCheck = ({
       queryClient.fetchQuery({
         // Query is the same even if connectionString changes, and doesn't correctly
         // track projectRef
-        // eslint-disable-next-line @tanstack/query/exhaustive-deps
         queryKey: bucketLimitsKey,
         queryFn: () => getBucketsWithLargestSizeLimit({ projectRef, connectionString }),
       }),

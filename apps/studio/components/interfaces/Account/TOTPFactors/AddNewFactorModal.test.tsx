@@ -2,6 +2,7 @@ import { AuthApiError, AuthError } from '@supabase/auth-js'
 import { QueryClient } from '@tanstack/react-query'
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { useFlag } from 'common'
+import { HttpResponse } from 'msw'
 import { useState } from 'react'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
@@ -9,6 +10,7 @@ import { AddNewFactorModal } from '@/components/interfaces/Account/TOTPFactors/A
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -32,8 +34,17 @@ async function enrollFactor() {
   await screen.findByText('Verify authenticator app: Backup')
 }
 
+beforeEach(() => {
+  vi.mocked(useFlag).mockReturnValue(false)
+  addAPIMock({
+    method: 'get',
+    path: '/platform/projects/:ref',
+    response: () =>
+      HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+  })
+})
+
 describe('AddNewFactorModal completion', () => {
-  beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('canceling an unverified factor does not complete the task', async () => {
     vi.spyOn(auth.mfa, 'unenroll').mockResolvedValue({ data: { id: 'backup-factor' }, error: null })
     const onComplete = vi.fn()

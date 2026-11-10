@@ -49,7 +49,7 @@ async function verifyFactor() {
   })
   await userEvent.type(screen.getByRole('textbox', { name: 'Authentication code' }), '123456')
   fireEvent.click(screen.getByRole('button', { name: 'Confirm' }))
-  await screen.findByText('Backup authenticator added')
+  await screen.findByText('Backup MFA method added')
 }
 
 const response = {
@@ -81,6 +81,16 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
+  beforeEach(() => {
+    vi.mocked(useFlag).mockReturnValue(false)
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
+  })
+
   test('dismisses an untouched reminder only after the resolved check finishes', async () => {
     const onDismiss = vi.fn()
     const { rerender } = customRender(<RecoveryReminder gap="missing" onDismiss={onDismiss} />)
@@ -100,7 +110,6 @@ describe('RecoveryReminder', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
-  beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('shimmers until a resolved check dismisses the untouched reminder', async () => {
     const onDismiss = vi.fn()
     const { rerender } = customRender(
@@ -121,13 +130,13 @@ describe('RecoveryReminder', () => {
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
     expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add backup' }))
     await enrollFactor()
     fireEvent.click(screen.getByRole('button', { name: 'Cancel' }))
     await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument())
-    expect(screen.getByRole('button', { name: 'Add authenticator' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Add backup' })).toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Generate codes' })).toBeInTheDocument()
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add backup' }))
     await enrollFactor()
     rerender(<RecoveryReminder gap={null} onDismiss={vi.fn()} hasAuthenticatorTask />)
     await verifyFactor()
@@ -189,7 +198,7 @@ describe('RecoveryReminder', () => {
     const { rerender } = customRender(
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask />
     )
-    fireEvent.click(screen.getByRole('button', { name: 'Add authenticator' }))
+    fireEvent.click(screen.getByRole('button', { name: 'Add backup' }))
     await enrollFactor()
     rerender(<RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />)
     expect(screen.getByRole('dialog')).toBeInTheDocument()
@@ -201,7 +210,7 @@ describe('RecoveryReminder', () => {
       <RecoveryReminder gap="missing" onDismiss={vi.fn()} hasAuthenticatorTask={false} />
     )
     expect(screen.getByText('No recovery codes')).toBeInTheDocument()
-    expect(screen.queryByRole('button', { name: 'Add authenticator' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add backup' })).not.toBeInTheDocument()
     expect(screen.getByRole('button', { name: 'Skip for now' })).toBeInTheDocument()
   })
 
@@ -248,12 +257,6 @@ describe('RecoveryReminder', () => {
   })
 
   test('returns to the reminder on error and allows retry', async () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
-    })
     vi.spyOn(auth.mfa.recoveryCodes, 'generate')
       .mockResolvedValueOnce({ data: null, error: new AuthError('generation failed') })
       .mockResolvedValue(response)
@@ -291,12 +294,6 @@ describe('RecoveryReminder', () => {
   })
 
   test('does not claim the account is safe when recovery checks fail', () => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
-    })
     customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isError />)
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
     expect(

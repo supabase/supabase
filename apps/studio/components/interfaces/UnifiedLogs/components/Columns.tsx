@@ -44,6 +44,8 @@ export function generateDynamicColumns({
   const hideMethod = shouldHideColumn(data, 'method')
   const hidePathname = shouldHideColumn(data, 'pathname')
   const hideEventMessage = shouldHideColumn(data, 'event_message')
+  const hidePipelineId = shouldHideColumn(data, 'pipeline_id')
+  const onlyPipelinesLogs = data.length > 0 && data.every((row) => row.log_type === 'pipelines')
 
   const columns: ColumnDef<ColumnSchema>[] = [
     {
@@ -214,6 +216,23 @@ export function generateDynamicColumns({
         return value
       },
     },
+    {
+      accessorKey: 'pipeline_id',
+      header: 'Pipeline ID',
+      filterFn: () => true,
+      enableSorting: false,
+      size: 105,
+      minSize: 105,
+      cell: ({ row }) => (
+        <span className="font-mono text-xs" title={row.original.pipeline_id ?? undefined}>
+          {row.original.pipeline_id}
+        </span>
+      ),
+      meta: {
+        cellClassName: 'w-[105px] hidden md:table-cell',
+        headerClassName: 'w-[105px] hidden md:table-cell',
+      },
+    },
     // Event message column - controlled by columnVisibility
     {
       accessorKey: 'event_message',
@@ -242,7 +261,8 @@ export function generateDynamicColumns({
                   </span>
                 </TooltipTrigger>
                 <TooltipContent>
-                  {logCount} {logCount === 1 ? 'log' : 'logs'} for this execution
+                  {logCount} {logCount === 1 ? <span>log</span> : <span>logs</span>}{' '}
+                  <span>for this execution</span>
                 </TooltipContent>
               </Tooltip>
             )}
@@ -262,10 +282,9 @@ export function generateDynamicColumns({
       minSize: 200,
       maxSize: 400,
       meta: {
-        // Widest column — hidden until `lg`. No width class so it keeps flexing to
-        // fill remaining space once shown.
-        cellClassName: 'font-mono tracking-tight hidden lg:table-cell',
-        headerClassName: 'hidden lg:table-cell',
+        // Pipeline messages remain visible on narrow screens as the primary content.
+        cellClassName: cn('font-mono tracking-tight', !onlyPipelinesLogs && 'hidden lg:table-cell'),
+        headerClassName: cn(!onlyPipelinesLogs && 'hidden lg:table-cell'),
       },
     },
   ]
@@ -275,6 +294,8 @@ export function generateDynamicColumns({
     method: !hideMethod,
     pathname: !hidePathname,
     event_message: !hideEventMessage,
+    pipeline_id: !hidePipelineId,
+    ...(onlyPipelinesLogs ? { status: false } : {}),
   }
 
   return { columns, columnVisibility }

@@ -1,28 +1,33 @@
-import { queryOptions } from '@tanstack/react-query'
 import { components } from 'api-types'
 
 import { keys } from './keys'
-import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import { get, handleError } from '@/data/fetchers'
+import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+
+export type ThirdPartyAuthIntegrationsGrant = GrantFor<
+  'get',
+  '/v1/projects/{ref}/config/auth/third-party-auth'
+>
 
 export type ThirdPartyAuthIntegrationsVariables = {
   projectRef?: string
+  grant?: ThirdPartyAuthIntegrationsGrant
 }
 
-export type ThirdPartyAuthIntegrationsError = ResponseError
+export type ThirdPartyAuthIntegrationsError = StudioError
 
 export type ThirdPartyAuthIntegration = components['schemas']['ThirdPartyAuth_Output']
 
 async function getThirdPartyAuthIntegrations(
-  { projectRef }: ThirdPartyAuthIntegrationsVariables,
+  { projectRef, grant }: { projectRef: string; grant: ThirdPartyAuthIntegrationsGrant },
   signal?: AbortSignal
 ) {
-  if (!projectRef) throw new Error('projectRef is required')
-
   const { data, error } = await get('/v1/projects/{ref}/config/auth/third-party-auth', {
     params: { path: { ref: projectRef } },
     signal,
-    grant: unguarded.migrating,
+    grant,
   })
 
   if (error) handleError(error)
@@ -33,13 +38,22 @@ export type ThirdPartyAuthIntegrationsData = Awaited<
   ReturnType<typeof getThirdPartyAuthIntegrations>
 >
 
-export const thirdPartyAuthIntegrationsQueryOptions = (
-  { projectRef }: ThirdPartyAuthIntegrationsVariables,
-  { enabled = true }: { enabled?: boolean } = { enabled: true }
-) => {
-  return queryOptions({
-    queryKey: keys.integrations(projectRef),
-    queryFn: ({ signal }) => getThirdPartyAuthIntegrations({ projectRef }, signal),
-    enabled: enabled && typeof projectRef !== 'undefined',
-  })
-}
+export const thirdPartyAuthIntegrationsQueryOptions = <TData = ThirdPartyAuthIntegrationsData>(
+  { projectRef, grant }: ThirdPartyAuthIntegrationsVariables,
+  options?: GrantedQueryCallerOptions<
+    ThirdPartyAuthIntegrationsData,
+    ThirdPartyAuthIntegrationsError,
+    TData,
+    ReturnType<typeof keys.integrations>
+  >
+) =>
+  grantedQueryOptions(
+    {
+      queryKey: keys.integrations(projectRef),
+      queryFn:
+        projectRef && grant
+          ? ({ signal }) => getThirdPartyAuthIntegrations({ projectRef, grant }, signal)
+          : undefined,
+    },
+    options
+  )

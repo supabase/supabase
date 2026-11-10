@@ -5,7 +5,8 @@ import { z } from 'zod'
 import { databaseKeys } from '@/data/database/keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DatabaseFunctionsVariables = {
   projectRef?: string
@@ -44,6 +45,8 @@ export async function getDatabaseFunctions(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'database-functions',
       sql: pgMetaFunctionsList.sql,
       queryKey: ['database-functions'],
       grant: unguarded.migrating,
@@ -56,7 +59,7 @@ export async function getDatabaseFunctions(
 }
 
 export type DatabaseFunctionsData = Awaited<ReturnType<typeof getDatabaseFunctions>>
-export type DatabaseFunctionsError = ResponseError
+export type DatabaseFunctionsError = StudioError
 
 export const useDatabaseFunctionsQuery = <TData = DatabaseFunctionsData>(
   vars: DatabaseFunctionsVariables,

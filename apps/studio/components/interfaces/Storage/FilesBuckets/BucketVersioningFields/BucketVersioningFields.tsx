@@ -20,12 +20,10 @@ interface BucketVersioningFieldsProps {
   initialRetentionDays?: number | null
   initialMaxVersions?: number | null
   isPublicBucket?: boolean
-  /** The bucket's stored lifecycle policy is still being fetched. */
   isLoadingPolicy?: boolean
-  /** The stored policy holds rules these fields cannot represent, so it is left alone. */
   isUnsupportedPolicy?: boolean
-  /** The bucket's stored lifecycle policy could not be fetched. */
   policyError?: { message: string } | null
+  bucketName?: string
 }
 
 export const BucketVersioningFields = ({
@@ -37,6 +35,7 @@ export const BucketVersioningFields = ({
   isLoadingPolicy = false,
   isUnsupportedPolicy = false,
   policyError,
+  bucketName,
 }: BucketVersioningFieldsProps) => {
   const { control } = form
 
@@ -45,13 +44,11 @@ export const BucketVersioningFields = ({
   const maxVersions = useWatch({ control, name: 'max_noncurrent_versions' })
   const expirationMode = useWatch({ control, name: 'expiration_mode' })
 
-  // Turning the switch off suspends rather than disables, so this is a heads-up.
   const isSuspending = !isVersioningEnabled && initialVersioningState !== 'disabled'
-
-  // A suspended bucket keeps expiring the versions it still holds, so the policy stays editable.
   const canEditLifecycle = isVersioningEnabled || initialVersioningState === 'suspended'
 
-  // A bound nobody has read, or that the fields only partly represent, can't be compared against.
+  // bounds are only known if the policy is loaded and supported,
+  // otherwise we can't know if the user is tightening or loosening retention
   const hasKnownBounds = !isLoadingPolicy && !isUnsupportedPolicy && !policyError
 
   const tightening = getRetentionTightening({
@@ -151,6 +148,7 @@ export const BucketVersioningFields = ({
                 isLoading={isLoadingPolicy}
                 isUnsupported={isUnsupportedPolicy}
                 error={policyError}
+                bucketName={bucketName}
               />
             </FormSectionCollapse>
           )}

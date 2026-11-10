@@ -3,6 +3,7 @@ import { fgaRequirements, type FgaGuardedEndpoint } from 'api-types'
 import { useIsLoggedIn } from 'common'
 import { useMemo } from 'react'
 
+import { classifyError } from '@/data/error-classification'
 import {
   permissionsQueryOptionsV2,
   usePermissionsQueryV2,
@@ -11,8 +12,8 @@ import {
 import { prefetchProjectDetail } from '@/data/projects/project-detail-query'
 import { doPermissionsCheckV2, usePermissionScopeV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { IS_PLATFORM } from '@/lib/constants'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { fgaRefinements, type FgaRefinementMap, type FgaRefinements } from '@/lib/fga-refinements'
-import { ResponseError } from '@/types'
 
 export type VariantOf<E extends FgaGuardedEndpoint> = FgaRefinements extends {
   readonly [K in E]: { readonly variants: infer Vs }
@@ -39,7 +40,38 @@ export type GrantResult<E extends FgaGuardedEndpoint, V extends VariantOf<E> = n
   | { status: 'loading'; grant?: never }
   | { status: 'granted'; grant: Grant<E, V> }
   | { status: 'denied'; grant?: never }
-  | { status: 'error'; error: ResponseError; grant?: never }
+  | { status: 'error'; error: StudioError; grant?: never }
+
+/**
+ * Tooltip text for a write action that is disabled by its grant, e.g.
+ * `getWriteGrantTooltip(grant.status, 'create', 'signing keys')`. Returns undefined while the grant
+ * is loading or granted.
+ */
+export function getWriteGrantTooltip(
+  status: GrantResult<FgaGuardedEndpoint, never>['status'],
+  action: string,
+  resource: string
+) {
+  if (status === 'denied') return `You need additional permissions to ${action} ${resource}`
+  if (status === 'error') return `Failed to check permissions to ${action} ${resource}`
+  return undefined
+}
+
+/**
+ * Toast text for a write action that did nothing because its grant is missing, e.g.
+ * `toast.error(getWriteGrantToastMessage(grant.status, 'create', 'signing keys'))`. Unlike the
+ * tooltip, it always returns a message, including while permissions are still loading.
+ */
+export function getWriteGrantToastMessage(
+  status: Exclude<GrantResult<FgaGuardedEndpoint, never>['status'], 'granted'>,
+  action: string,
+  resource: string
+) {
+  return (
+    getWriteGrantTooltip(status, action, resource) ??
+    `Still checking permissions to ${action} ${resource}. Try again in a moment.`
+  )
+}
 
 export type GrantScope = {
   organizationSlug?: string
@@ -61,6 +93,14 @@ export type GrantFor<
   V extends VariantOfKey<EndpointKey<M, P>> = never,
 > = EndpointKey<M, P> extends FgaGuardedEndpoint ? Grant<EndpointKey<M, P>, V> : never
 
+type GrantForVariant<E extends FgaGuardedEndpoint, V> = V extends VariantOf<E> ? Grant<E, V> : never
+
+/** A grant for any one of an endpoint's variants, or `never` if the endpoint isn't annotated. */
+export type GrantForVariants<M extends string, P extends string> =
+  EndpointKey<M, P> extends FgaGuardedEndpoint
+    ? GrantForVariant<EndpointKey<M, P>, VariantOf<EndpointKey<M, P>>>
+    : never
+
 function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
   endpoint: E,
   variant: V | undefined,
@@ -80,7 +120,7 @@ function mintGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E>>(
  * Pure check of `permissions` against the endpoint's requirements (and the variant's, if given),
  * evaluated against `permissionsProjectRef`. The minted grant records both refs.
  */
-export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export function getGrant<E extends FgaGuardedEndpoint, const V extends VariantOf<E> = never>(
   permissions: PermissionsV2Data | undefined,
   endpoint: E,
   scope: ResolvedGrantScope,
@@ -120,7 +160,7 @@ export function getGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = 
  * Mints a grant for the current user, resolving organization and project from the URL unless
  * `scope` overrides them. Self-hosted always grants.
  */
-export function useGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export function useGrant<E extends FgaGuardedEndpoint, const V extends VariantOf<E> = never>(
   endpoint: E,
   scope: GrantScope,
   opts?: { variant?: V }
@@ -194,7 +234,10 @@ async function resolveGrantScope(
  * permissions and project details, fetching them otherwise. Pass `permissionsProjectRef` to skip
  * resolving a branch's parent project.
  */
-export async function ensureGrant<E extends FgaGuardedEndpoint, V extends VariantOf<E> = never>(
+export async function ensureGrant<
+  E extends FgaGuardedEndpoint,
+  const V extends VariantOf<E> = never,
+>(
   queryClient: QueryClient,
   endpoint: E,
   scope: GrantScope & { permissionsProjectRef?: string | null },
@@ -202,7 +245,7 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
 ): Promise<
   | { status: 'granted'; grant: Grant<E, V> }
   | { status: 'denied' }
-  | { status: 'error'; error: ResponseError }
+  | { status: 'error'; error: StudioError }
 > {
   try {
     const [permissions, resolvedScope] = await Promise.all([
@@ -211,10 +254,6 @@ export async function ensureGrant<E extends FgaGuardedEndpoint, V extends Varian
     ])
     return getGrant(permissions, endpoint, resolvedScope, opts)
   } catch (error) {
-    const responseError =
-      error instanceof ResponseError
-        ? error
-        : new ResponseError(error instanceof Error ? error.message : undefined)
-    return { status: 'error', error: responseError }
+    return { status: 'error', error: classifyError(error) }
   }
 }
