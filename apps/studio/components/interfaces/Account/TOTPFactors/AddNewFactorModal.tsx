@@ -1,6 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
+import type { RecoveryCodesSurface } from 'common/telemetry-constants'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -25,6 +26,7 @@ type TOTP = { qr_code: string; secret: string; uri: string }
 
 interface AddNewFactorModalProps {
   visible: boolean
+  recoveryCodesSurface?: RecoveryCodesSurface
   onClose: () => void
   onComplete?: () => void
   onRecoveryCodesSaved?: () => void
@@ -32,6 +34,7 @@ interface AddNewFactorModalProps {
 
 export const AddNewFactorModal = ({
   visible,
+  recoveryCodesSurface = 'mfa_setup',
   onClose,
   onComplete,
   onRecoveryCodesSaved,
@@ -91,6 +94,7 @@ export const AddNewFactorModal = ({
       />
       <RecoveryCodesModal
         open={isRecoveryCodesModalOpen}
+        surface={recoveryCodesSurface}
         onOpenChange={(open) => {
           setIsRecoveryCodesModalOpen(open)
           // A successful close is allowed only after the save acknowledgement.
