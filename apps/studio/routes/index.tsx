@@ -2,8 +2,7 @@ import { createFileRoute, redirect, type AnyRouter } from '@tanstack/react-route
 
 import { IS_PLATFORM } from '@/lib/constants'
 
-// `/` is never rendered — it always redirects. Mirrors the Next.js
-// `redirects()` rules in next.config.ts: platform sends users to `/org`
+// `/` is never rendered — it always redirects: platform sends users to `/org`
 // (or `/new/new-project` when deep-linked with `?next=new-project`),
 // self-hosted sends them straight to `/project/default`.
 export const Route = createFileRoute('/')({
