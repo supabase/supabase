@@ -458,12 +458,7 @@ export const UnifiedLogs = ({
       if (!facetsField) return field
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
-      if (
-        field.value === 'log_type' ||
-        field.value === 'method' ||
-        field.value === 'level' ||
-        field.value === EXCLUDE_FILTER_FIELD
-      ) {
+      if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
         const fieldWithCounts = {
           ...field,
           options: field.options.map((x) => {

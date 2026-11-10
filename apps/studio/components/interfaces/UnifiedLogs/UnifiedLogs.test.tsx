@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
+import userEvent, { type UserEvent } from '@testing-library/user-event'
 import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
@@ -788,8 +788,12 @@ describe('UnifiedLogs', () => {
         { nuqs: { hasMemory: true, onUrlUpdate } }
       )
 
-    const excludeCheckbox = () =>
-      screen.getByRole('checkbox', { name: /Successful metrics scrapes/ })
+    /** The toggle lives under API Gateway, beside the other per-source noise options. */
+    const expandApiGateway = async (user: UserEvent) => {
+      const apiGateway = screen.getByRole('checkbox', { name: /API Gateway/ }).closest('div')
+      await user.click(within(apiGateway!).getByRole('button', { name: 'Expand' }))
+    }
+    const excludeCheckbox = () => screen.getByRole('checkbox', { name: /^Metrics/ })
     const rowQueries = (queries: string[]) => queries.filter((sql) => sql.includes('row list'))
     const lastRowQuery = (queries: string[]) => rowQueries(queries).at(-1)
 
@@ -801,23 +805,35 @@ describe('UnifiedLogs', () => {
       expect(await screen.findByText('No results found')).toBeInTheDocument()
       await waitFor(() => {
         for (const kind of ['row list', 'severity chart', 'facet counts']) {
-          const sql = queries.filter((q) => q.includes(kind)).at(-1)
-          expect(sql).toContain(METRICS_PATH)
+          expect(queries.filter((q) => q.includes(kind)).at(-1)).toContain(METRICS_PATH)
         }
       })
       // Only the successful scrapes go — every other status on that path stays.
       expect(lastRowQuery(queries)).toContain("IN ('200')")
-      expect(excludeCheckbox()).toBeChecked()
     })
 
-    it('shows the hidden count and a removable chip while it is on', async () => {
+    it('shows the toggle unchecked under API Gateway, with the hidden count', async () => {
+      const user = userEvent.setup()
       mockAnalytics([])
       renderLogs()
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+
+      expect(excludeCheckbox()).not.toBeChecked()
       expect(await screen.findByText('12')).toBeInTheDocument()
-      expect(screen.getByTestId('filter-condition-exclude')).toBeInTheDocument()
-      expect(screen.getByTestId('filter-value-exclude')).toHaveValue('Successful metrics scrapes')
+    })
+
+    it('filters silently, like the other per-source options', async () => {
+      const user = userEvent.setup()
+      mockAnalytics([])
+      renderLogs()
+
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      // No chip in the top filter bar, and not offered as a filterable property.
+      expect(screen.queryByTestId('filter-condition-exclude')).not.toBeInTheDocument()
+      await user.click(screen.getByTestId('filter-bar-freeform-input'))
+      expect(screen.queryByRole('option', { name: /Exclude/ })).not.toBeInTheDocument()
     })
 
     it('writes the exclusion to the URL so it travels with a shared link', async () => {
@@ -831,7 +847,7 @@ describe('UnifiedLogs', () => {
       })
     })
 
-    it('shows the scrapes again when unchecked, and remembers that for the project', async () => {
+    it('shows the rows again when checked, and remembers that for the project', async () => {
       const user = userEvent.setup()
       const queries: string[] = []
       mockAnalytics(queries)
@@ -839,16 +855,17 @@ describe('UnifiedLogs', () => {
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
       await waitFor(() => expect(lastRowQuery(queries)).toContain(METRICS_PATH))
+      await expandApiGateway(user)
 
       await user.click(excludeCheckbox())
 
-      expect(excludeCheckbox()).not.toBeChecked()
-      expect(screen.queryByTestId('filter-condition-exclude')).not.toBeInTheDocument()
+      expect(excludeCheckbox()).toBeChecked()
       await waitFor(() => expect(lastRowQuery(queries)).not.toContain(METRICS_PATH))
       await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
     }, 15_000)
 
-    it('stays off after a reload once the user has unchecked it', async () => {
+    it('stays shown after a reload once the user has opted in', async () => {
+      const user = userEvent.setup()
       localStorage.setItem(EXCLUSIONS_KEY, '[]')
       const queries: string[] = []
       mockAnalytics(queries)
@@ -857,36 +874,25 @@ describe('UnifiedLogs', () => {
       expect(await screen.findByText('No results found')).toBeInTheDocument()
       await waitFor(() => expect(rowQueries(queries).length).toBeGreaterThan(0))
       expect(lastRowQuery(queries)).not.toContain(METRICS_PATH)
-      expect(excludeCheckbox()).not.toBeChecked()
+      await expandApiGateway(user)
+      expect(excludeCheckbox()).toBeChecked()
     })
 
-    it('unchecks the box when the filter bar chip is removed', async () => {
-      const user = userEvent.setup()
-      mockAnalytics([])
-      renderLogs()
-
-      expect(await screen.findByText('No results found')).toBeInTheDocument()
-      await user.click(screen.getByTestId('filter-remove-exclude'))
-
-      await waitFor(() => expect(excludeCheckbox()).not.toBeChecked())
-    })
-
-    it('turns back on when the sidebar filters are reset', async () => {
+    it('hides them again when the sidebar filters are reset', async () => {
       const user = userEvent.setup()
       const onUrlUpdate = vi.fn()
       mockAnalytics([])
       renderLogs(onUrlUpdate)
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
       await user.click(excludeCheckbox())
-      await waitFor(() => expect(excludeCheckbox()).not.toBeChecked())
       await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
 
       // Reset stays reachable even though the exclusion was the only filter.
       await user.click(screen.getByRole('button', { name: /Reset/ }))
 
-      expect(excludeCheckbox()).toBeChecked()
-      expect(screen.getByTestId('filter-condition-exclude')).toBeInTheDocument()
+      expect(excludeCheckbox()).not.toBeChecked()
       await waitFor(() => {
         expect(onUrlUpdate.mock.lastCall?.[0]?.searchParams.get('filter')).toBe(EXCLUDE_PARAM)
       })

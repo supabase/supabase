@@ -5,6 +5,12 @@ export type Option = {
   label: string
   value: string
   options?: Option[]
+  /**
+   * Backs a nested option with a column filter rather than the default boolean
+   * search param. The box reads as "show these rows" like its siblings, so the
+   * filter value is applied while the box is *un*checked.
+   */
+  exclusionFilter?: { field: string; value: string }
 }
 
 export type DatePreset = {
@@ -62,6 +68,8 @@ export type Base<TData> = {
   hasAsyncSearch?: boolean
   /** Defines if the filter should be present in the filter nav */
   hidden?: boolean
+  /** Keeps the field out of the top filter bar — no property, and no chip. */
+  hiddenInFilterBar?: boolean
 }
 
 export type DataTableCheckboxFilterField<TData> = Base<TData> & Checkbox

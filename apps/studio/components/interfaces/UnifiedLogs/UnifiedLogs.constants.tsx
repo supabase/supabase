@@ -59,14 +59,14 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
 export const EXCLUDE_FILTER_FIELD = 'exclude'
 
 /**
- * Noise-reduction rules offered under "Exclude". A rule hides the rows matching
- * *all* of its clauses; everything else on that pathname (errors included)
- * still shows. Widening a rule — say to every 2xx — is a matter of adding to
- * `statuses` here, nothing else needs to change.
+ * Noise-reduction rules, surfaced as nested options under their log type. A
+ * rule hides the rows matching *all* of its clauses; everything else on that
+ * pathname (errors included) still shows. Widening a rule — say to every 2xx —
+ * is a matter of adding to `statuses` here, nothing else needs to change.
  */
 export const LOG_EXCLUSION_RULES = {
   successful_metrics_scrapes: {
-    label: 'Successful metrics scrapes',
+    label: 'Metrics',
     pathname: '/customer/v1/privileged/metrics',
     statuses: ['200'],
   },

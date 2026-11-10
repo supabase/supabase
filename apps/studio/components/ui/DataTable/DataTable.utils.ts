@@ -9,7 +9,9 @@ import { LEVELS } from './DataTable.constants'
  * doesn't warn.
  */
 export function findTableColumn<TData>(table: Table<TData>, id: string) {
-  return table.getAllColumns().find((column) => column.id === id)
+  // Flat, not `getAllColumns()`: the latter only walks the top level, so it
+  // would miss a leaf under a grouped column def.
+  return table.getAllFlatColumns().find((column) => column.id === id)
 }
 
 /**
@@ -20,7 +22,9 @@ export function findTableColumn<TData>(table: Table<TData>, id: string) {
  */
 export function setColumnFilterValue<TData>(table: Table<TData>, id: string, value: unknown) {
   table.setColumnFilters((current) => {
-    if (value === undefined) return current.filter((filter) => filter.id !== id)
+    // Mirrors TanStack's auto-remove: an undefined or empty value clears the
+    // filter rather than storing a no-op entry.
+    if (value === undefined || value === '') return current.filter((filter) => filter.id !== id)
     if (current.some((filter) => filter.id === id)) {
       return current.map((filter) => (filter.id === id ? { id, value } : filter))
     }

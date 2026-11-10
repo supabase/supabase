@@ -32,14 +32,6 @@ export const filterFields = [
     commandDisabled: true,
   },
   {
-    label: 'Exclude',
-    value: EXCLUDE_FILTER_FIELD,
-    type: 'checkbox',
-    defaultOpen: true,
-    options: Object.entries(LOG_EXCLUSION_RULES).map(([value, { label }]) => ({ label, value })),
-    component: FacetOptionLabel,
-  },
-  {
     label: 'Log Type',
     value: 'log_type',
     type: 'checkbox',
@@ -48,13 +40,22 @@ export const filterFields = [
       label,
       value,
       options:
-        // [Joshen] Nested options are treated as just boolean toggles atm for simplicity
+        // [Joshen] Nested options are boolean toggles over a search param, or
+        // — via `exclusionFilter` — over a column filter.
         // Refer to DataTableFilterCheckbox for their logic
         value === 'edge'
           ? [
               { label: 'Auth', value: 'edge_auth' },
               { label: 'Storage', value: 'edge_storage' },
               { label: 'Postgrest', value: 'edge_postgrest' },
+              // Unchecked by default — the metrics endpoint is scraped once a
+              // minute and its successful responses carry no information.
+              // Failures on that path are never hidden.
+              ...Object.entries(LOG_EXCLUSION_RULES).map(([ruleId, rule]) => ({
+                label: rule.label,
+                value: ruleId,
+                exclusionFilter: { field: EXCLUDE_FILTER_FIELD, value: ruleId },
+              })),
             ]
           : value === 'postgres'
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
@@ -148,6 +149,18 @@ export const filterFields = [
     options: [],
     hasDynamicOptions: true,
     hasAsyncSearch: true,
+  },
+  {
+    // Renders nowhere: the toggle lives under API Gateway, alongside the other
+    // "hide a noisy subset of this source" options, and filters silently like
+    // they do. Declared here only so the `exclude` filter id is recognised as a
+    // builtin rather than mistaken for a log attribute.
+    label: 'Exclude',
+    value: EXCLUDE_FILTER_FIELD,
+    type: 'checkbox',
+    options: [],
+    hidden: true,
+    hiddenInFilterBar: true,
   },
   {
     label: 'Event message',
