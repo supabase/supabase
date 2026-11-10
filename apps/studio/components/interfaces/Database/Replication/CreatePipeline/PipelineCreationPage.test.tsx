@@ -1,18 +1,18 @@
 import { QueryClient } from '@tanstack/react-query'
-import { fireEvent, screen } from '@testing-library/react'
+import { act, fireEvent, screen } from '@testing-library/react'
 import type { components } from 'api-types'
 import { delay, HttpResponse } from 'msw'
+import { useSyncExternalStore } from 'react'
 import { beforeEach, expect, it, vi } from 'vitest'
 
 import { replicationKeys } from '@/data/replication/keys'
-import PipelineCreationPage from '@/pages/project/[ref]/database/pipelines/new'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/database/pipelines/new'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const state = vi.hoisted(() => ({
   hasProjectRef: true,
-  push: vi.fn(),
-  replace: vi.fn(),
+  navigate: vi.fn(),
   enabled: false,
   loading: false,
   flagsLoaded: true,
@@ -20,17 +20,42 @@ const state = vi.hoisted(() => ({
   isHighAvailability: false,
   canUseReplication: true,
 }))
-vi.mock('next/router', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('next/router')>()),
-  useRouter: () => ({
-    push: state.push,
-    replace: state.replace,
-    events: { on: vi.fn(), off: vi.fn() },
-  }),
+// lets the mocked hooks re-render the page when a test changes `state` after mounting
+const stateStore = vi.hoisted(() => {
+  const listeners = new Set<() => void>()
+  let version = 0
+  return {
+    subscribe: (listener: () => void) => {
+      listeners.add(listener)
+      return () => {
+        listeners.delete(listener)
+      }
+    },
+    getVersion: () => version,
+    notify: () => {
+      version += 1
+      listeners.forEach((listener) => listener())
+    },
+  }
+})
+const useStateVersion = () => useSyncExternalStore(stateStore.subscribe, stateStore.getVersion)
+const setState = (overrides: Partial<typeof state>) =>
+  act(() => {
+    Object.assign(state, overrides)
+    stateStore.notify()
+  })
+
+// navigation is asserted on the calls so the page's transient states stay observable
+vi.mock('@tanstack/react-router', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('@tanstack/react-router')>()),
+  useNavigate: () => state.navigate,
 }))
 vi.mock('common', async (importOriginal) => ({
   ...(await importOriginal<typeof import('common')>()),
-  useParams: () => ({ ref: state.hasProjectRef ? 'default' : undefined }),
+  useParams: () => {
+    useStateVersion()
+    return { ref: state.hasProjectRef ? 'default' : undefined }
+  },
   useFeatureFlags: () => ({ hasLoaded: state.flagsLoaded }),
 }))
 vi.mock('@/hooks/misc/withAuth', () => ({ withAuth: (component: unknown) => component }))
@@ -44,7 +69,10 @@ vi.mock('@/hooks/misc/useIsFeatureEnabled', () => ({
   useIsFeatureEnabled: () => state.canUseReplication,
 }))
 vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () => ({
-  usePipelineCreationPreview: () => ({ isEnabled: state.enabled, isLoading: state.loading }),
+  usePipelineCreationPreview: () => {
+    useStateVersion()
+    return { isEnabled: state.enabled, isLoading: state.loading }
+  },
 }))
 vi.mock('@/components/interfaces/Database/Replication/useIsPipelinesEnabled', () => ({
   useIsPipelinesBigQueryEnabled: () => true,
@@ -72,6 +100,14 @@ vi.mock('./PipelineCreationFlow', () => ({
   ),
 }))
 
+const pipelinesList = { to: '/project/$ref/database/pipelines', params: { ref: 'default' } }
+const renderPage = (options?: { queryClient?: QueryClient }) =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/database/pipelines/new',
+    url: '/project/default/database/pipelines/new',
+    ...options,
+  })
+
 const mockSources = (sources: components['schemas']['SourcesResponse_Output']['sources']) =>
   addAPIMock({
     method: 'get',
@@ -79,8 +115,7 @@ const mockSources = (sources: components['schemas']['SourcesResponse_Output']['s
     response: () => HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources }),
   })
 beforeEach(() => {
-  state.push.mockClear()
-  state.replace.mockClear()
+  state.navigate.mockClear()
   mockSources([
     {
       id: 42,
@@ -105,7 +140,7 @@ beforeEach(() => {
   })
 })
 it('renders the page body when the preview and project allow access', async () => {
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(await screen.findByText('Wizard form')).toBeInTheDocument()
 })
 it.each([
@@ -115,29 +150,31 @@ it.each([
   { enabled: false },
   { canUseReplication: false },
   { isHighAvailability: true },
-])('does not expose the wizard when %o', (overrides) => {
+])('does not expose the wizard when %o', async (overrides) => {
   Object.assign(state, overrides)
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })
 
-it('falls back when the preview is off even if organisation and project queries stay pending', () => {
+it('falls back when the preview is off even if organisation and project queries stay pending', async () => {
   state.enabled = false
   state.orgPending = true
   state.flagsLoaded = false
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(screen.getByRole('status', { name: 'Pipeline creation status' })).toHaveTextContent(
     'Opening Pipelines…'
   )
-  expect(state.replace).toHaveBeenCalledWith(
-    '/project/default/database/pipelines?destinationType=BigQuery'
-  )
+  expect(state.navigate).toHaveBeenCalledWith({
+    ...pipelinesList,
+    search: { destinationType: 'BigQuery' },
+    replace: true,
+  })
 })
 
 it('returns through the shared router without reloading the toast host', async () => {
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   fireEvent.click(await screen.findByRole('button', { name: 'Wizard form' }))
-  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+  expect(state.navigate).toHaveBeenCalledWith(pipelinesList)
 })
 
 it.each(['disabled', 'error'])(
@@ -154,20 +191,20 @@ it.each(['disabled', 'error'])(
             { status: 503 }
           ),
       })
-    customRender(<PipelineCreationPage />)
+    await renderPage()
     expect(await screen.findByText('Returning to Pipelines…')).toBeInTheDocument()
     expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-    expect(state.replace).toHaveBeenCalledWith('/project/default/database/pipelines')
+    expect(state.navigate).toHaveBeenCalledWith({ ...pipelinesList, replace: true })
   }
 )
 
-it.each([false, true])('waits for the project reference (preview: %s)', (enabled) => {
+it.each([false, true])('waits for the project reference (preview: %s)', async (enabled) => {
   state.enabled = enabled
   state.hasProjectRef = false
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(screen.queryByText('Returning to Pipelines…')).not.toBeInTheDocument()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
-  expect(state.replace).not.toHaveBeenCalled()
+  expect(state.navigate).not.toHaveBeenCalled()
 })
 it('rechecks cached enablement before allowing direct entry', async () => {
   const queryClient = new QueryClient()
@@ -186,7 +223,7 @@ it('rechecks cached enablement before allowing direct entry', async () => {
       return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources: [] })
     },
   })
-  customRender(<PipelineCreationPage />, { queryClient })
+  await renderPage({ queryClient })
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
   expect(screen.queryByText('Returning to Pipelines…')).not.toBeInTheDocument()
   finish?.()
@@ -195,26 +232,26 @@ it('rechecks cached enablement before allowing direct entry', async () => {
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
 })
 
-it('keeps the header and disabled destination step visible while preview access loads', () => {
+it('keeps the header and disabled destination step visible while preview access loads', async () => {
   state.loading = true
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(screen.getByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
   expect(screen.getByRole('button', { name: 'Continue' })).toBeDisabled()
   expect(screen.getByRole('button', { name: 'Cancel' })).toBeDisabled()
   fireEvent.click(screen.getByRole('button', { name: 'Close' }))
-  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+  expect(state.navigate).toHaveBeenCalledWith(pipelinesList)
 })
 
-it('uses the shared router for loading header links with their existing base path', () => {
+it('uses the shared router for loading header links with their existing base path', async () => {
   state.loading = true
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   const home = screen.getByRole('link', { name: 'Supabase home' })
 
   fireEvent.click(home)
 
-  expect(state.push).toHaveBeenCalledWith(`${window.location.origin}/dashboard/projects`)
-  expect(state.replace).not.toHaveBeenCalled()
+  expect(state.navigate).toHaveBeenCalledTimes(1)
+  expect(state.navigate).toHaveBeenCalledWith({ to: '/dashboard/projects', search: {}, hash: '' })
 })
 
 it('keeps the header visible while source enablement loads', async () => {
@@ -226,7 +263,7 @@ it('keeps the header visible while source enablement loads', async () => {
       return HttpResponse.json<components['schemas']['SourcesResponse_Output']>({ sources: [] })
     },
   })
-  customRender(<PipelineCreationPage />)
+  await renderPage()
   expect(await screen.findByRole('navigation', { name: 'Pipeline creation' })).toBeInTheDocument()
   expect(screen.getByRole('heading', { name: 'Choose a destination' })).toBeInTheDocument()
   expect(screen.queryByText('Wizard form')).not.toBeInTheDocument()
@@ -234,45 +271,41 @@ it('keeps the header visible while source enablement loads', async () => {
 
 it('keeps the same live status when loading finishes and the wizard is ready', async () => {
   state.loading = true
-  const { rerender } = customRender(<PipelineCreationPage />)
+  await renderPage()
   const status = screen.getByRole('status', { name: 'Pipeline creation status' })
   expect(status).toHaveTextContent('Loading pipeline creation…')
 
-  state.loading = false
-  rerender(<PipelineCreationPage />)
+  setState({ loading: false })
 
   expect(await screen.findByText('Wizard form')).toBeInTheDocument()
   expect(screen.getByRole('status', { name: 'Pipeline creation status' })).toBe(status)
   expect(status).toHaveTextContent('Pipeline creation ready')
 })
 
-it('keeps the same live status when loading finishes with a redirect', () => {
+it('keeps the same live status when loading finishes with a redirect', async () => {
   state.loading = true
-  const { rerender } = customRender(<PipelineCreationPage />)
+  await renderPage()
   const status = screen.getByRole('status', { name: 'Pipeline creation status' })
   expect(status).toHaveTextContent('Loading pipeline creation…')
 
-  state.loading = false
-  state.enabled = false
-  rerender(<PipelineCreationPage />)
+  setState({ loading: false, enabled: false })
 
   expect(screen.getByRole('status', { name: 'Pipeline creation status' })).toBe(status)
   expect(status).toHaveTextContent('Opening Pipelines…')
 })
 
-it('only navigates on Close once the project reference is available', () => {
+it('only navigates on Close once the project reference is available', async () => {
   state.hasProjectRef = false
   state.loading = true
-  const { rerender } = customRender(<PipelineCreationPage />)
+  await renderPage()
   const close = screen.getByRole('button', { name: 'Close' })
   expect(close).toBeEnabled()
   fireEvent.click(close)
-  expect(state.push).not.toHaveBeenCalled()
+  expect(state.navigate).not.toHaveBeenCalled()
 
-  state.hasProjectRef = true
-  rerender(<PipelineCreationPage />)
+  setState({ hasProjectRef: true })
 
   expect(close).toBeEnabled()
   fireEvent.click(close)
-  expect(state.push).toHaveBeenCalledWith('/project/default/database/pipelines')
+  expect(state.navigate).toHaveBeenCalledWith(pipelinesList)
 })

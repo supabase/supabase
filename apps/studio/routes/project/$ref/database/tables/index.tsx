@@ -1,14 +1,88 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { LOCAL_STORAGE_KEYS, useParams } from 'common'
+import { useState } from 'react'
+import { PageContainer } from 'ui-patterns/PageContainer'
+import { PageSection, PageSectionContent } from 'ui-patterns/PageSection'
 
-import DatabaseTables from '@/pages/project/[ref]/database/tables/index'
+import { TableList } from '@/components/interfaces/Database/Tables/TableList'
+import DeleteConfirmationDialogs from '@/components/interfaces/TableGridEditor/DeleteConfirmationDialogs'
+import { SidePanelEditor } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor'
+import { PageLayout } from '@/components/layouts/PageLayout/PageLayout'
+import { AutoEnableRLSNotice } from '@/components/ui/AutoEnableRLSNotice'
+import { Entity, isTableLike, postgresTableToEntity } from '@/data/table-editor/table-editor-types'
+import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
+import { useTableEditorStateSnapshot } from '@/state/table-editor'
+import { TableEditorTableStateContextProvider } from '@/state/table-editor-table'
 
 export const Route = createFileRoute('/project/$ref/database/tables/')({
-  component: DatabaseTablesIndexRoute,
+  component: DatabaseTables,
   staticData: {
     databaseLayoutTitle: 'Tables',
   },
 })
 
-function DatabaseTablesIndexRoute() {
-  return <DatabaseTables dehydratedState={undefined} />
+function DatabaseTables() {
+  const { ref: projectRef } = useParams()
+  const snap = useTableEditorStateSnapshot()
+  const [selectedTableToEdit, setSelectedTableToEdit] = useState<Entity>()
+
+  const [isAutoEnableRLSMinimized] = useLocalStorageQuery(
+    LOCAL_STORAGE_KEYS.RLS_EVENT_TRIGGER_BANNER_DISMISSED(projectRef ?? ''),
+    false
+  )
+
+  return (
+    <>
+      <PageLayout
+        title="Database Tables"
+        size="large"
+        primaryActions={isAutoEnableRLSMinimized && <AutoEnableRLSNotice iconOnly />}
+      >
+        <PageContainer size="large">
+          <PageSection>
+            {!isAutoEnableRLSMinimized && <AutoEnableRLSNotice />}
+
+            <PageSectionContent>
+              <TableList
+                onAddTable={snap.onAddTable}
+                onEditTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onEditTable()
+                }}
+                onDeleteTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDeleteTable()
+                }}
+                onDuplicateTable={(table) => {
+                  setSelectedTableToEdit(postgresTableToEntity(table))
+                  snap.onDuplicateTable()
+                }}
+              />
+            </PageSectionContent>
+          </PageSection>
+        </PageContainer>
+      </PageLayout>
+
+      {projectRef !== undefined &&
+        selectedTableToEdit !== undefined &&
+        isTableLike(selectedTableToEdit) && (
+          <TableEditorTableStateContextProvider
+            key={`table-editor-table-${selectedTableToEdit.id}`}
+            projectRef={projectRef}
+            table={selectedTableToEdit}
+          >
+            <DeleteConfirmationDialogs selectedTable={selectedTableToEdit} />
+          </TableEditorTableStateContextProvider>
+        )}
+
+      <SidePanelEditor
+        includeColumns
+        selectedTable={
+          selectedTableToEdit !== undefined && isTableLike(selectedTableToEdit)
+            ? selectedTableToEdit
+            : undefined
+        }
+      />
+    </>
+  )
 }

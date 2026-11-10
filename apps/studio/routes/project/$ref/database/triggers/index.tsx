@@ -1,11 +1,11 @@
-import { createFileRoute } from '@tanstack/react-router'
-
-import DatabaseTriggersIndexPage from '@/pages/project/[ref]/database/triggers/index'
+import { createFileRoute, Navigate } from '@tanstack/react-router'
 
 export const Route = createFileRoute('/project/$ref/database/triggers/')({
-  component: DatabaseTriggersIndexRoute,
+  component: DatabaseTriggersIndexPage,
 })
 
-function DatabaseTriggersIndexRoute() {
-  return <DatabaseTriggersIndexPage dehydratedState={undefined} />
+function DatabaseTriggersIndexPage() {
+  const { ref } = Route.useParams()
+
+  return <Navigate to="/project/$ref/database/triggers/data" params={{ ref }} replace />
 }
