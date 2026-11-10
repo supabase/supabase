@@ -284,14 +284,9 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/advisors',
-    destination: '/project/:ref/issues',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
-  ...['security', 'performance', 'health'].map((category) => ({
-    source: `/project/:ref/advisors/${category}`,
-    destination: `/project/:ref/issues?category=${category}`,
-    permanent: true,
-  })),
   {
     source: '/project/:ref/advisors/query-performance',
     destination: '/project/:ref/observability/query-performance',
@@ -309,17 +304,17 @@ export const SHARED_REDIRECTS: StudioRedirect[] = [
   },
   {
     source: '/project/:ref/database/linter',
-    destination: '/project/:ref/issues?category=security',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {
     source: '/project/:ref/database/security-advisor',
-    destination: '/project/:ref/issues?category=security',
+    destination: '/project/:ref/advisors/security',
     permanent: true,
   },
   {
     source: '/project/:ref/database/performance-advisor',
-    destination: '/project/:ref/issues?category=performance',
+    destination: '/project/:ref/advisors/performance',
     permanent: true,
   },
   {

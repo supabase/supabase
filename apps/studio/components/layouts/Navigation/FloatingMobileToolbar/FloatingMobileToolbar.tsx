@@ -1,4 +1,4 @@
-import { useFlag, useParams, useViewport } from 'common'
+import { useParams, useViewport } from 'common'
 import { MenuIcon, SearchIcon, XIcon } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
 import { useRef } from 'react'
@@ -17,7 +17,6 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { HelpButton } from '@/components/ui/HelpPanel/HelpButton'
 
 export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boolean }) => {
-  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const navRef = useRef<HTMLElement | null>(null)
   const sheet = useFloatingToolbarSheet(hideMobileMenu)
   const drag = useFloatingToolbarDrag(navRef)
@@ -86,11 +85,9 @@ export const FloatingMobileToolbar = ({ hideMobileMenu }: { hideMobileMenu?: boo
           <span key="help" data-sidebar-id={SIDEBAR_KEYS.HELP_PANEL}>
             <HelpButton />
           </span>
-          {isIssuesInboxEnabled && (
-            <span key="advisor" data-sidebar-id={SIDEBAR_KEYS.ADVISOR_PANEL}>
-              <AdvisorButton projectRef={projectRef} />
-            </span>
-          )}
+          <span key="advisor" data-sidebar-id={SIDEBAR_KEYS.ADVISOR_PANEL}>
+            <AdvisorButton projectRef={projectRef} />
+          </span>
           {!!projectRef && (
             <>
               <span key="editor" data-sidebar-id={SIDEBAR_KEYS.EDITOR_PANEL}>

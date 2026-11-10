@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { CircleAlertIcon } from 'lucide-react'
+import { CircleAlertIcon, LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -17,12 +17,12 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
   const track = useTrack()
   const isIssuesInboxEnabled = useFlag('issuesInbox')
 
-  const { data: lints } = useProjectLintsQuery({ projectRef }, { enabled: isIssuesInboxEnabled })
-  const { data: signalItems } = useAdvisorSignals({ projectRef, enabled: isIssuesInboxEnabled })
+  const { data: lints } = useProjectLintsQuery({ projectRef })
+  const { data: signalItems } = useAdvisorSignals({ projectRef })
 
   const { data: notificationsData } = useNotificationsV2Query(
     { filters: {}, limit: 20 },
-    { enabled: IS_PLATFORM && isIssuesInboxEnabled }
+    { enabled: IS_PLATFORM }
   )
   const notifications = useMemo(() => {
     return notificationsData?.pages.flatMap((page) => page) ?? []
@@ -45,7 +45,8 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
     toggleSidebar(SIDEBAR_KEYS.ADVISOR_PANEL)
   }
 
-  if (!isIssuesInboxEnabled) return null
+  const label = isIssuesInboxEnabled ? 'Issues' : 'Advisor Center'
+  const Icon = isIssuesInboxEnabled ? CircleAlertIcon : LightbulbIcon
 
   return (
     <div className="relative">
@@ -55,8 +56,6 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         id="advisor-center-trigger"
         className={cn(
           'rounded-full w-[32px] h-[32px] flex items-center justify-center p-0 group',
-          // Critical fill/border only when idle — selected matches the other
-          // header circles (foreground fill, no destructive outline).
           hasCriticalIssues &&
             !isOpen &&
             'bg-destructive-200 border-destructive-500 hover:border-destructive',
@@ -65,11 +64,11 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
         onClick={handleClick}
         tooltip={{
           content: {
-            text: 'Issues',
+            text: label,
           },
         }}
       >
-        <CircleAlertIcon
+        <Icon
           size={16}
           strokeWidth={1.5}
           className={cn(
@@ -77,13 +76,12 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
             isOpen && 'text-background group-hover:text-background'
           )}
         />
-        <span className="sr-only">Issues</span>
+        <span className="sr-only">{label}</span>
       </ButtonTooltip>
       {hasCriticalIssues ? (
         <span
           className={cn(
             'absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full',
-            // Slightly lighter on the inverted selected fill in light mode only.
             isOpen ? 'bg-destructive-500 dark:bg-destructive' : 'bg-destructive'
           )}
         />

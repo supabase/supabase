@@ -9,7 +9,14 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { BlocksIcon, CircleAlertIcon, ListIcon, SettingsIcon, TelescopeIcon } from 'lucide-react'
+import {
+  BlocksIcon,
+  CircleAlertIcon,
+  LightbulbIcon,
+  ListIcon,
+  SettingsIcon,
+  TelescopeIcon,
+} from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -42,6 +49,7 @@ interface ProductFeatures {
 }
 
 interface OtherFeatures {
+  isHealthAdvisorEnabled?: boolean
   issuesInbox?: boolean
   isPlatform?: boolean
   unifiedLogs?: boolean
@@ -206,23 +214,27 @@ export const generateOtherRoutes = (
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
   const isIssuesInboxEnabled = features?.issuesInbox ?? false
+  const legacyCategory = features?.isHealthAdvisorEnabled ? 'health' : 'security'
+  const advisorDestination = isIssuesInboxEnabled
+    ? `/project/${ref}/issues`
+    : `/project/${ref}/advisors/${legacyCategory}`
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
 
   return [
-    ...(isIssuesInboxEnabled
-      ? [
-          {
-            key: 'issues',
-            label: 'Issues',
-            disabled: !isProjectActive,
-            icon: <CircleAlertIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-            link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/issues`),
-            shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
-          },
-        ]
-      : []),
+    {
+      key: isIssuesInboxEnabled ? 'issues' : 'advisors',
+      label: isIssuesInboxEnabled ? 'Issues' : 'Advisors',
+      disabled: !isProjectActive,
+      icon: isIssuesInboxEnabled ? (
+        <CircleAlertIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+      ) : (
+        <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+      ),
+      link: ref && (isProjectBuilding ? buildingUrl : advisorDestination),
+      shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
+    },
     ...(reportsEnabled
       ? [
           {
@@ -272,11 +284,13 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { data: project } = useSelectedProjectQuery()
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
   const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
 
   return generateOtherRoutes(ref, project, {
     issuesInbox: isIssuesInboxEnabled,
+    isHealthAdvisorEnabled,
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,

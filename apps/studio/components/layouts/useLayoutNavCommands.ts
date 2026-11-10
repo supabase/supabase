@@ -1,6 +1,7 @@
 import { useFlag, useIsLoggedIn } from 'common'
 
 import { useStorageGotoCommands } from '../interfaces/Storage/Storage.Commands'
+import { useAdvisorsGoToCommands } from './AdvisorsLayout/Advisors.Commands'
 import { useAuthGotoCommands } from './AuthLayout/Auth.Commands'
 import { useBillingGotoCommands } from './BillingLayout/Billing.Commands'
 import { useComputeGotoCommands } from './ComputeLayout/Compute.Commands'
@@ -24,6 +25,7 @@ export function useLayoutNavCommands() {
   useSqlEditorGotoCommands({ enabled: isLoggedIn })
   useDatabaseGotoCommands({ enabled: isLoggedIn })
   useAuthGotoCommands({ enabled: isLoggedIn })
+  useAdvisorsGoToCommands({ enabled: isLoggedIn && !isIssuesInboxEnabled })
   useIssuesGoToCommands({ enabled: isLoggedIn && isIssuesInboxEnabled })
   useStorageGotoCommands({ enabled: isLoggedIn })
   useFunctionsGotoCommands({ enabled: isLoggedIn })

@@ -44,7 +44,9 @@ export function MobileMenuContent({
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-  const activeRoute = getPathSegment(pathname, 3)
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const sectionKey = getPathSegment(pathname, 3)
+  const activeRoute = sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
   const { viewLevel, selectedSectionKey, handleTopLevelClick, handleBackToTop } =
     useMobileMenuNavigation({

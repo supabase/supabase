@@ -21,26 +21,32 @@ const lint: Lint = {
 }
 
 describe('Security Definer view guidance', () => {
-  it.each([false, true])('shows the Issues link only when enabled: %s', (issuesInbox) => {
-    const onAutofix = vi.fn()
-    customRender(
-      <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>
-        <SecurityDefinerViewPopover lint={lint} onAutofix={onAutofix} />
-      </FeatureFlagContext.Provider>
-    )
-
-    fireEvent.click(screen.getByRole('button', { name: 'Security Definer view' }))
-
-    expect(screen.getByText('Secure your view')).toBeInTheDocument()
-    if (issuesInbox) {
-      expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
-        'href',
-        '/project/default/issues/security_definer_view'
+  it.each([false, true])(
+    'links to the selected finding in the active variant: %s',
+    (issuesInbox) => {
+      const onAutofix = vi.fn()
+      customRender(
+        <FeatureFlagContext.Provider value={{ configcat: { issuesInbox }, posthog: {} }}>
+          <SecurityDefinerViewPopover lint={lint} onAutofix={onAutofix} />
+        </FeatureFlagContext.Provider>
       )
-    } else {
-      expect(screen.queryByRole('link', { name: 'Learn more' })).not.toBeInTheDocument()
+
+      fireEvent.click(screen.getByRole('button', { name: 'Security Definer view' }))
+
+      expect(screen.getByText('Secure your view')).toBeInTheDocument()
+      if (issuesInbox) {
+        expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
+          'href',
+          '/project/default/issues/security_definer_view'
+        )
+      } else {
+        expect(screen.getByRole('link', { name: 'Learn more' })).toHaveAttribute(
+          'href',
+          '/project/default/advisors/security?preset=ERROR&id=security_definer_view_public_accounts'
+        )
+      }
+      fireEvent.click(screen.getByRole('button', { name: 'Autofix' }))
+      expect(onAutofix).toHaveBeenCalledOnce()
     }
-    fireEvent.click(screen.getByRole('button', { name: 'Autofix' }))
-    expect(onAutofix).toHaveBeenCalledOnce()
-  })
+  )
 })

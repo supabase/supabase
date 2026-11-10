@@ -18,6 +18,8 @@ import type { Notification } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const itemLabel = isIssuesInboxEnabled ? 'issues' : 'advisories'
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
@@ -26,8 +28,8 @@ const NoProjectNotice = () => {
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
           {isHealthAdvisorEnabled
-            ? 'Select a project to view its security, performance and health issues'
-            : 'Select a project to view its security and performance issues'}
+            ? `Select a project to view its security, performance and health ${itemLabel}`
+            : `Select a project to view its security and performance ${itemLabel}`}
         </p>
       </div>
     </div>
@@ -63,6 +65,7 @@ export const AdvisorPanelBody = ({
   hasProjectRef = true,
   projectNameByRef,
 }: AdvisorPanelBodyProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   // Notifications are the only items that exist without a project, so the notice replaces
   // the list whenever the user has narrowed to categories that need one.
   const needsProject =
@@ -84,7 +87,9 @@ export const AdvisorPanelBody = ({
       <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
         <AlertTriangleIcon className="text-destructive" />
         <div className="flex flex-col items-center justify-center">
-          <h4 className="text-base font-normal text-foreground-light">Error loading issues</h4>
+          <h4 className="text-base font-normal text-foreground-light">
+            {isIssuesInboxEnabled ? 'Error loading issues' : 'Error loading advisories'}
+          </h4>
           <p className="text-sm text-foreground-lighter">Please try again later.</p>
         </div>
       </div>

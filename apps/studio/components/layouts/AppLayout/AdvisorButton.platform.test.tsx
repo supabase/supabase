@@ -3,6 +3,8 @@ import { FeatureFlagContext } from 'common'
 import { afterEach, beforeEach, describe, expect, it } from 'vitest'
 
 import { AdvisorButton } from './AdvisorButton'
+import { FloatingMobileToolbar } from '@/components/layouts/Navigation/FloatingMobileToolbar/FloatingMobileToolbar'
+import { MobileSheetProvider } from '@/components/layouts/Navigation/NavigationBar/MobileSheetContext'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { sidebarManagerState, useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 import { customRender } from '@/tests/lib/custom-render'
@@ -35,7 +37,7 @@ describe('Issues trigger discovery', () => {
     })
   })
 
-  it.each([false, undefined])('hides the trigger when the flag is %s', (issuesInbox) => {
+  it.each([false, undefined])('opens Advisor Center when the flag is %s', async (issuesInbox) => {
     customRender(
       <FeatureFlagContext.Provider
         value={{ configcat: issuesInbox === undefined ? {} : { issuesInbox }, posthog: {} }}
@@ -46,6 +48,10 @@ describe('Issues trigger discovery', () => {
     )
 
     expect(screen.queryByRole('button', { name: 'Issues' })).not.toBeInTheDocument()
+    await act(async () => {
+      fireEvent.click(screen.getByRole('button', { name: 'Advisor Center' }))
+    })
+    expect(screen.getByText('Issues panel content')).toBeInTheDocument()
   })
 
   it('opens the registered Issues panel when enabled', async () => {
@@ -62,4 +68,28 @@ describe('Issues trigger discovery', () => {
 
     expect(screen.getByText('Issues panel content')).toBeInTheDocument()
   })
+  it.each([false, undefined, true])(
+    'opens the matching panel from the mobile toolbar: %s',
+    async (issuesInbox) => {
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{ configcat: issuesInbox === undefined ? {} : { issuesInbox }, posthog: {} }}
+        >
+          <MobileSheetProvider>
+            <FloatingMobileToolbar />
+            <PanelHost />
+          </MobileSheetProvider>
+        </FeatureFlagContext.Provider>
+      )
+      await act(async () => {
+        fireEvent.click(
+          screen.getByRole('button', { name: issuesInbox ? 'Issues' : 'Advisor Center' })
+        )
+      })
+      expect(screen.getByText('Issues panel content')).toBeInTheDocument()
+      expect(
+        screen.queryByRole('button', { name: issuesInbox ? 'Advisor Center' : 'Issues' })
+      ).not.toBeInTheDocument()
+    }
+  )
 })

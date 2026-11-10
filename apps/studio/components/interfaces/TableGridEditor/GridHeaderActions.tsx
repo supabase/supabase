@@ -332,16 +332,18 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                       }
                     />
 
-                    {isIssuesInboxEnabled && (
-                      <Button asChild>
-                        <Link
-                          target="_blank"
-                          href={`/project/${ref}/issues/${matchingMaterializedViewLint?.name}`}
-                        >
-                          Learn more
-                        </Link>
-                      </Button>
-                    )}
+                    <Button asChild>
+                      <Link
+                        target="_blank"
+                        href={
+                          isIssuesInboxEnabled
+                            ? `/project/${ref}/issues/${matchingMaterializedViewLint?.name}`
+                            : `/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`
+                        }
+                      >
+                        Learn more
+                      </Link>
+                    </Button>
                   </div>
                 </div>
               </PopoverContent>
