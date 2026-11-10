@@ -1,9 +1,11 @@
-import { CircleStop, EllipsisVertical, Plus } from 'lucide-react'
+import { CircleStop, Edit, EllipsisVertical, Plus, RotateCcw, Trash } from 'lucide-react'
+import type { ReactNode } from 'react'
 import {
   Button,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
   Tooltip,
   TooltipContent,
@@ -11,7 +13,7 @@ import {
   TooltipTrigger,
 } from 'ui'
 
-function MoreActions({ label, actions }: { label: string; actions: string[] }) {
+function MoreActions({ label, children }: { label: string; children: ReactNode }) {
   return (
     <DropdownMenu>
       <Tooltip>
@@ -28,10 +30,8 @@ function MoreActions({ label, actions }: { label: string; actions: string[] }) {
         </TooltipTrigger>
         <TooltipContent>More actions</TooltipContent>
       </Tooltip>
-      <DropdownMenuContent align="end">
-        {actions.map((action) => (
-          <DropdownMenuItem key={action}>{action}</DropdownMenuItem>
-        ))}
+      <DropdownMenuContent align="end" className="w-40">
+        {children}
       </DropdownMenuContent>
     </DropdownMenu>
   )
@@ -40,9 +40,14 @@ function MoreActions({ label, actions }: { label: string; actions: string[] }) {
 export default function ButtonMoreActionsDemo() {
   return (
     <TooltipProvider>
-      <div className="flex flex-wrap items-center gap-6">
+      <div className="flex flex-wrap items-center gap-10">
         <div className="flex items-center gap-2">
-          <MoreActions label="More pipeline list actions" actions={['Pipeline settings']} />
+          <MoreActions label="More pipeline list actions">
+            <DropdownMenuItem>Pipelines usage</DropdownMenuItem>
+            <DropdownMenuItem>Pipelines settings</DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem>Disable Pipelines</DropdownMenuItem>
+          </MoreActions>
           <Button type="button" variant="primary" icon={<Plus />}>
             Add pipeline
           </Button>
@@ -51,10 +56,21 @@ export default function ButtonMoreActionsDemo() {
           <Button type="button" icon={<CircleStop />}>
             Stop
           </Button>
-          <MoreActions
-            label="More actions for this pipeline"
-            actions={['View logs', 'Edit pipeline']}
-          />
+          <MoreActions label="More actions for this pipeline">
+            <DropdownMenuItem className="gap-x-2">
+              <RotateCcw size={14} aria-hidden="true" />
+              Restart pipeline
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem className="gap-x-2">
+              <Edit size={14} aria-hidden="true" />
+              Edit pipeline
+            </DropdownMenuItem>
+            <DropdownMenuItem className="gap-x-2">
+              <Trash size={14} aria-hidden="true" />
+              Delete pipeline
+            </DropdownMenuItem>
+          </MoreActions>
         </div>
       </div>
     </TooltipProvider>

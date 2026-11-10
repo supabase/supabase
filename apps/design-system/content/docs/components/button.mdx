@@ -143,9 +143,11 @@ Use a single labeled button with a chevron when clicking anywhere on the button 
 
 ### Button with more actions
 
-Keep the main action visible and put other actions for the same item or section in a separate ellipsis menu. For example, “Add pipeline” creates a pipeline, while the menu offers settings for the pipeline list. At row level, “Stop” stays visible while “View logs” and “Edit pipeline” go in the menu.
+Keep the main action visible and put other actions for the same item or section in a separate ellipsis menu. For example, “Add pipeline” creates a pipeline, while the menu offers usage and settings for Pipelines. At the individual pipeline level, “Stop” stays visible while “Restart pipeline”, “Edit pipeline”, and “Delete pipeline” go in the menu.
 
-Use a primary or default button for the visible action based on its importance on the page. Keep a gap between the controls so they read as separate buttons. Give the icon-only trigger an accessible name that identifies its context, such as “More actions for this pipeline”. For table rows, see [Multiple actions](./table#multiple-actions).
+Use a primary or default button for the visible action based on its importance on the page. Keep a gap between the controls so they read as separate buttons. The order of the buttons depends on their context.
+
+Give the icon-only trigger an accessible name that identifies its context, such as “More actions for this pipeline”, and a short tooltip such as “More actions”. For table rows, see [Multiple actions](./table#multiple-actions).
 
 <ComponentPreview name="button-more-actions" peekCode />
 
