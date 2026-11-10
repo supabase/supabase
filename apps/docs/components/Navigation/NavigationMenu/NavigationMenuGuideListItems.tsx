@@ -3,10 +3,10 @@ import {
   NavSectionContent,
   NavSectionList,
 } from '~/components/Navigation/NavSection'
+import { useDocsPathname } from '~/features/IaNav'
 import { useTheme } from 'next-themes'
 import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { usePathname } from 'next/navigation'
 import { Accordion } from 'radix-ui'
 import React, { useEffect, useRef } from 'react'
 
@@ -46,7 +46,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
   id: string
   url: string
 }) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
 
   return (
     <span
@@ -62,7 +62,7 @@ const HeaderLink = React.memo(function HeaderLink(props: {
 })
 
 const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
   const { resolvedTheme } = useTheme()
   const childItems = props.subItem.items ?? []
   const activeItem =
@@ -214,7 +214,7 @@ const ContentAccordionLink = React.memo(function ContentAccordionLink(props: any
 })
 
 const ContentLink = React.memo(function ContentLink(props: any) {
-  const pathname = usePathname()
+  const pathname = useDocsPathname()
 
   return (
     <li className="mb-1.5">

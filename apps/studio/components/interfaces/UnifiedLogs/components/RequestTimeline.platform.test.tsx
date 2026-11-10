@@ -385,7 +385,7 @@ describe('request timeline tab', () => {
     const field = await screen.findByRole('button', { name: `User ID ${userId}` })
     field.focus()
     await user.keyboard('{Enter}')
-    expect(await screen.findByRole('menuitem', { name: 'Add filter' })).toHaveFocus()
+    expect(await screen.findByRole('menuitem', { name: 'Filter: equals' })).toHaveFocus()
     await user.keyboard('{ArrowDown}')
     expect(screen.getByRole('menuitem', { name: 'Copy User ID' })).toHaveFocus()
     expect(onSelectRow).not.toHaveBeenCalled()

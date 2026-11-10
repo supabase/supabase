@@ -26,6 +26,8 @@ export async function terminateSession({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'terminate-session',
     sql,
     queryKey: ['terminate-session'],
     grant: unguarded.migrating,

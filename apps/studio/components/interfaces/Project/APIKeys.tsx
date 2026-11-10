@@ -14,7 +14,7 @@ import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
-import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { legacyAPIKeysStatusQueryOptions } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useGrant } from '@/lib/grants'
@@ -23,7 +23,8 @@ export const APIKeys = () => {
   const { ref: projectRef } = useParams()
   // Shows the publishable (or anon) key, which `reveal=false` returns in full, so a plain grant is enough
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const isGranted = apiKeysGrant.status === 'granted'
+  const legacyStatusGrant = useGrant('GET /v1/projects/{ref}/api-keys/legacy', { projectRef })
+  const isGranted = apiKeysGrant.status === 'granted' && legacyStatusGrant.status === 'granted'
 
   const {
     data: settings,
@@ -32,18 +33,16 @@ export const APIKeys = () => {
     isPending: isProjectSettingsLoading,
   } = useProjectSettingsV2Query({ projectRef })
 
-  const { data: legacyAPIKeysStatusData, isPending: isLoadingAPIKeysStatus } =
-    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: isGranted })
+  const { data: legacyAPIKeysStatusData, isPending: isLoadingAPIKeysStatus } = useQuery(
+    legacyAPIKeysStatusQueryOptions({ projectRef, grant: legacyStatusGrant.grant })
+  )
 
   const {
     data: apiKeysData,
     error: errorAPIKeys,
     isError: isErrorAPIKeys,
     isPending: isLoadingAPIKeys,
-  } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  } = useQuery(apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys }))
   const { anonKey, serviceKey, publishableKey, secretKey } = apiKeysData ?? {}
 
   const hasNewAPIKeys = !!publishableKey && !!secretKey
@@ -60,10 +59,14 @@ export const APIKeys = () => {
     { enabled: !isProjectSettingsLoading && isApiKeysEmpty }
   )
 
-  const isDenied = apiKeysGrant.status === 'denied'
-  const isGrantError = apiKeysGrant.status === 'error'
+  const isDenied = apiKeysGrant.status === 'denied' || legacyStatusGrant.status === 'denied'
+  const grantError =
+    (apiKeysGrant.status === 'error' ? apiKeysGrant.error : undefined) ??
+    (legacyStatusGrant.status === 'error' ? legacyStatusGrant.error : undefined)
+  const isGrantError = grantError !== undefined
   const isLoading =
     apiKeysGrant.status === 'loading' ||
+    legacyStatusGrant.status === 'loading' ||
     isProjectSettingsLoading ||
     (isGranted && (isLoadingAPIKeys || isLoadingAPIKeysStatus))
   const isError =
@@ -115,12 +118,7 @@ export const APIKeys = () => {
                     ? 'Failed to update JWT secret'
                     : ''
           }
-          error={
-            (isGrantError ? apiKeysGrant.error : undefined) ??
-            errorAPIKeys ??
-            projectSettingsError ??
-            jwtSecretUpdateError
-          }
+          error={grantError ?? errorAPIKeys ?? projectSettingsError ?? jwtSecretUpdateError}
         />
       ) : showJwtLoading ? (
         <CardContent>

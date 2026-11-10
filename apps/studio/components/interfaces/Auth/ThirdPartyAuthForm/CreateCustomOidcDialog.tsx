@@ -21,9 +21,11 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { findCiOidcProviders, isValidOidcIssuerUrl } from './ThirdPartyAuthForm.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
 import { DOCS_URL } from '@/lib/constants'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateCustomOidcIntegrationDialogProps {
   visible: boolean
@@ -48,6 +50,9 @@ export const CreateCustomOidcIntegrationDialog = ({
   onClose,
 }: CreateCustomOidcIntegrationDialogProps) => {
   const { ref: projectRef } = useParams()
+  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -71,7 +76,17 @@ export const CreateCustomOidcIntegrationDialog = ({
   })
 
   const onSubmit: SubmitHandler<FormValues> = (values) => {
-    createAuthIntegration({ projectRef: projectRef!, oidcIssuerUrl: values.issuerUrl })
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
+      )
+      return
+    }
+    createAuthIntegration({
+      projectRef: projectRef!,
+      grant: createGrant.grant,
+      oidcIssuerUrl: values.issuerUrl,
+    })
   }
 
   return (
@@ -134,15 +149,25 @@ export const CreateCustomOidcIntegrationDialog = ({
           <Button disabled={isPending} onClick={handleClose}>
             Cancel
           </Button>
-          <Button
+          <ButtonTooltip
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !createGrant.grant}
             loading={isPending}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: getWriteGrantTooltip(
+                  createGrant.status,
+                  'add',
+                  'third-party auth integrations'
+                ),
+              },
+            }}
           >
             Add provider
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>

@@ -25,6 +25,8 @@ export async function runDatabaseCronJobCommand({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    // EXECUTE runs the job's stored command, which the user wrote
+    sqlOrigin: 'user',
     sql: safeSql`DO $$
 DECLARE
   job_command text;

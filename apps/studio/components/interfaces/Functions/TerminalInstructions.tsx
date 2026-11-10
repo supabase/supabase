@@ -30,11 +30,15 @@ export const TerminalInstructions = forwardRef<
 
   const { data: tokens } = useAccessTokensQuery()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
-  const { data: apiKeyData } = useQuery({
-    ...apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }),
-    // A skipped query still returns cached data, so ignore it unless the grant is granted
-    select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
-  })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
+  )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: endpoint } = useProjectApiUrl({ projectRef })
