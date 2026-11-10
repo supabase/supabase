@@ -136,7 +136,7 @@ export const AddNewFactorModal = ({
         mutation={recoveryCodesGenerateMutation}
       />
 
-      <Dialog open open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
+      <Dialog open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
         <DialogContent size="small" aria-describedby={undefined}>
           <DialogHeader>
             <DialogTitle>Add another MFA method?</DialogTitle>
