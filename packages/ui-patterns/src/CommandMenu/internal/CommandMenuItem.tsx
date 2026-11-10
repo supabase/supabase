@@ -47,11 +47,6 @@ data-[disabled=true]:opacity-50
 
 interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem> {
   command: ICommand
-  /**
-   * Heading of the section this command is listed under, reported in telemetry so
-   * clicks can be attributed to the section that surfaced them. Commands rendered
-   * outside a section, as on a sub-page, leave this unset.
-   */
   section?: string
 }
 
