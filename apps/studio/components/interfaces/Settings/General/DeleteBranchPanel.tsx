@@ -57,7 +57,7 @@ export const DeleteBranchPanel = () => {
         <PageSectionSummary>
           <PageSectionTitle>Delete branch</PageSectionTitle>
           <PageSectionDescription>
-            Permanently remove this branch and its database
+            Permanently remove this branch and its database.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>

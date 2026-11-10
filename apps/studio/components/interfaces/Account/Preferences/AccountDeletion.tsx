@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -15,25 +15,20 @@ export const AccountDeletion = () => {
     <PageSection>
       <PageSectionMeta>
         <PageSectionSummary>
-          <PageSectionTitle>Danger zone</PageSectionTitle>
+          <PageSectionTitle>Delete account</PageSectionTitle>
           <PageSectionDescription>
-            Permanently delete your Supabase account and data.
+            Permanently remove your Supabase account and its data.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <Alert variant="destructive">
-          <CriticalIcon />
-          <AlertTitle>Request account deletion</AlertTitle>
-          <AlertDescription>
-            Deleting your account is permanent and cannot be undone. Your data will be deleted
-            within 30 days, but we may retain some metadata and logs for longer where required or
-            permitted by law.
-          </AlertDescription>
-          <AlertDescription className="mt-3">
-            <DeleteAccountButton />
-          </AlertDescription>
-        </Alert>
+        <Admonition
+          type="danger"
+          title="Deleting your account is permanent"
+          description="Your data will be deleted within 30 days, but we may retain some metadata and logs for longer where required or permitted by law."
+          actions={<DeleteAccountButton />}
+          layout="responsive"
+        />
       </PageSectionContent>
     </PageSection>
   )
