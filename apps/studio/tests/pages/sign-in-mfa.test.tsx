@@ -58,6 +58,19 @@ function mockAuth({
   })
 }
 
+function mockAuditLogin() {
+  const onAuditLogin = vi.fn()
+  addAPIMock({
+    method: 'post',
+    path: '/platform/profile/audit-login',
+    response: () => {
+      onAuditLogin()
+      return new HttpResponse(null, { status: 201 })
+    },
+  })
+  return onAuditLogin
+}
+
 describe('SignInMfaPage', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
@@ -93,11 +106,21 @@ describe('SignInMfaPage', () => {
     expect(routerMock.query).toEqual({ method: 'github', returnTo: '/org' })
   })
 
-  test('continues to the return path when the session is already at AAL2', async () => {
-    addAPIMock({ method: 'post', path: '/platform/profile/audit-login' })
+  test('records the sign-in and continues when the session is already at AAL2', async () => {
+    const onAuditLogin = mockAuditLogin()
     mockAuth({ session: SESSION, currentLevel: 'aal2' })
     customRender(<SignInMfaPage dehydratedState={undefined} />)
 
     await waitFor(() => expect(routerMock.pathname).toBe('/org'))
+    await waitFor(() => expect(onAuditLogin).toHaveBeenCalled())
+  })
+
+  test('continues without recording a sign-in when an AAL2 session outlived a failed callback', async () => {
+    const onAuditLogin = mockAuditLogin()
+    mockAuth({ initializeError: CALLBACK_ERROR, session: SESSION, currentLevel: 'aal2' })
+    customRender(<SignInMfaPage dehydratedState={undefined} />)
+
+    await waitFor(() => expect(routerMock.pathname).toBe('/org'))
+    expect(onAuditLogin).not.toHaveBeenCalled()
   })
 })

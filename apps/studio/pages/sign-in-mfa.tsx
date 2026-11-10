@@ -39,12 +39,12 @@ const SignInMfaPage: NextPageWithLayout = () => {
   useEffect(() => {
     auth
       .initialize()
-      .then(async ({ error }) => {
+      .then(async ({ error: callbackError }) => {
         const token = await getAccessToken()
 
         // A successful password retry can create a session after initialization cached an error.
         // With no session, show the callback error on the sign-in page.
-        if (error && !token) {
+        if (callbackError && !token) {
           return router.replace({ pathname: '/sign-in', query: router.query })
         }
 
@@ -60,8 +60,11 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            onSignInTracked()
-            addLoginEvent({})
+            // After a failed callback, this session is an existing one, not a new sign-in.
+            if (!callbackError) {
+              onSignInTracked()
+              addLoginEvent({})
+            }
 
             await queryClient.resetQueries()
             router.push(getReturnToPath())
