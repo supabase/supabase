@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { Eye, EyeOff } from 'lucide-react'
+import { EyeIcon, EyeOffIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
@@ -200,7 +200,7 @@ export const EditSecretModal = () => {
                             title={showSecretValue ? `Hide secret value` : `Show secret value`}
                             aria-label={showSecretValue ? `Hide secret value` : `Show secret value`}
                             className="absolute right-1 top-1 w-7"
-                            icon={showSecretValue ? <EyeOff /> : <Eye />}
+                            icon={showSecretValue ? <EyeOffIcon /> : <EyeIcon />}
                             onClick={() => setShowSecretValue(!showSecretValue)}
                           />
                         </div>

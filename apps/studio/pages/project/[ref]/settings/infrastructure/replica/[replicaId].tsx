@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import { Database } from 'icons'
-import { Loader2, Trash } from 'lucide-react'
+import { Loader2Icon, TrashIcon } from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -91,7 +91,7 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
           {isSuccessDatabases && (
             <>
               <Badge variant={STATUS_BADGE_VARIANT[statusLabel] ?? 'default'}>{statusLabel}</Badge>
-              {isInTransition && <Loader2 size={14} className="animate-spin" />}
+              {isInTransition && <Loader2Icon size={14} className="animate-spin" />}
             </>
           )}
         </div>
@@ -123,7 +123,7 @@ const InfrastructureReadReplicaPage: NextPageWithLayout = () => {
       secondaryActions={
         <ButtonTooltip
           className="w-7"
-          icon={<Trash />}
+          icon={<TrashIcon />}
           disabled={!replica}
           tooltip={{
             content: { side: 'bottom', text: 'Drop replica' },

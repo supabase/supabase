@@ -1,8 +1,9 @@
 import { useQuery } from '@tanstack/react-query'
 
 import { jwtSigningKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface LegacyJWTSigningKeyVariables {
   projectRef?: string
@@ -17,6 +18,7 @@ async function getLegacyJWTSigningKey(
   const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys/legacy`, {
     params: { path: { ref: projectRef } },
     signal,
+    grant: unguarded.migrating,
   })
 
   if (error) {
@@ -30,9 +32,9 @@ export type LegacyJWTSigningKeyData = Awaited<ReturnType<typeof getLegacyJWTSign
 
 export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
   { projectRef }: LegacyJWTSigningKeyVariables,
-  { enabled, ...options }: UseCustomQueryOptions<LegacyJWTSigningKeyData, ResponseError, TData> = {}
+  { enabled, ...options }: UseCustomQueryOptions<LegacyJWTSigningKeyData, StudioError, TData> = {}
 ) =>
-  useQuery<LegacyJWTSigningKeyData, ResponseError, TData>({
+  useQuery<LegacyJWTSigningKeyData, StudioError, TData>({
     queryKey: jwtSigningKeysKeys.legacy(projectRef),
     queryFn: ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
     enabled: enabled && !!projectRef,

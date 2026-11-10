@@ -108,12 +108,12 @@ begin
   end if;
 
   if new_owner is not null then
-    execute(format('alter schema %I owner to %I;', old.nspname, new_owner));
+    execute format('alter schema %I owner to %I;', old.nspname, new_owner);
   end if;
 
   -- Using the same name in the rename clause gives an error, so only do it if the new name is different.
   if new_name is not null and new_name != old.nspname then
-    execute(format('alter schema %I rename to %I;', old.nspname, new_name));
+    execute format('alter schema %I rename to %I;', old.nspname, new_name);
   end if;
 end
 $$;
@@ -148,7 +148,11 @@ begin
     raise exception 'Cannot find schema with id %', id;
   end if;
 
-  execute(format('drop schema %I %s;', old.nspname, case when cascade then 'cascade' else 'restrict' end));
+  if cascade then
+    execute format('drop schema %I cascade;', old.nspname);
+  else
+    execute format('drop schema %I restrict;', old.nspname);
+  end if;
 end
 $$;
 `

@@ -1,5 +1,5 @@
 import type { Row } from '@tanstack/react-table'
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, ResizableHandle, ResizablePanel } from 'ui'
 
@@ -31,7 +31,9 @@ export const LogsListPanel = ({ selectedRow }: { selectedRow?: Row<ColumnSchema>
             </div>
             <Button
               onClick={() => setOpenState(!open)}
-              icon={<ChevronDown className={cn('w-4 h-4', !open ? 'rotate-180' : 'rotate-0')} />}
+              icon={
+                <ChevronDownIcon className={cn('w-4 h-4', !open ? 'rotate-180' : 'rotate-0')} />
+              }
             >
               {open ? 'Close' : 'Open'}
             </Button>

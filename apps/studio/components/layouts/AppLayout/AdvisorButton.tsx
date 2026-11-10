@@ -1,4 +1,4 @@
-import { Lightbulb } from 'lucide-react'
+import { LightbulbIcon } from 'lucide-react'
 import { useMemo } from 'react'
 import { cn } from 'ui'
 
@@ -65,7 +65,7 @@ export const AdvisorButton = ({ projectRef }: { projectRef?: string }) => {
           },
         }}
       >
-        <Lightbulb
+        <LightbulbIcon
           size={16}
           strokeWidth={1.5}
           className={cn(

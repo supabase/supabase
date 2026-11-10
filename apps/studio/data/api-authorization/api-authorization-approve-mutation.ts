@@ -1,7 +1,8 @@
 import { useMutation } from '@tanstack/react-query'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type ApiAuthorizationApproveVariables = {
   id: string
@@ -32,13 +33,13 @@ export const useApiAuthorizationApproveMutation = (
   options: Omit<
     UseCustomMutationOptions<
       ApiAuthorizationApproveData,
-      ResponseError,
+      StudioError,
       ApiAuthorizationApproveVariables
     >,
     'mutationFn'
   > = {}
 ) => {
-  return useMutation<ApiAuthorizationApproveData, ResponseError, ApiAuthorizationApproveVariables>({
+  return useMutation<ApiAuthorizationApproveData, StudioError, ApiAuthorizationApproveVariables>({
     mutationFn: (vars) => approveApiAuthorization(vars),
     ...options,
   })

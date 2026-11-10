@@ -52,7 +52,7 @@ The selected range is applied to the query. The **Logs** query source chooses Cl
 
 ### Terminal access [#cli]
 
-The Supabase CLI does not query ClickHouse logs. Use the Management API command above. For live database statistics, use [`supabase inspect db`](/docs/guides/observability/inspect).
+Supabase CLI v2 does not query ClickHouse logs. Use the Management API command above. [Supabase CLI v3](/docs/guides/observability/cli-logs#query-with-sql) supports ClickHouse queries with `supabase logs --remote --sql`. For live database statistics, use [`supabase inspect db`](/docs/guides/observability/inspect).
 
 ## Sources and fields [#logs-explorer]
 

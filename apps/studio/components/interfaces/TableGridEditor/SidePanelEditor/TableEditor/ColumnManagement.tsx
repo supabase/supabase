@@ -14,7 +14,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable'
 import { isEmpty, noop, partition } from 'lodash'
-import { Edit, ExternalLink, HelpCircle, Key, Trash } from 'lucide-react'
+import { EditIcon, ExternalLinkIcon, HelpCircleIcon, KeyIcon, TrashIcon } from 'lucide-react'
 import { useState } from 'react'
 import {
   Alert,
@@ -169,7 +169,7 @@ export const ColumnManagement = ({
         <div className="flex items-center justify-between w-full">
           <h5>Columns</h5>
           <div className="flex items-center gap-x-2">
-            <Button asChild icon={<ExternalLink size={12} strokeWidth={2} />}>
+            <Button asChild icon={<ExternalLinkIcon size={12} strokeWidth={2} />}>
               <a
                 href={`${DOCS_URL}/guides/database/tables#data-types`}
                 target="_blank"
@@ -183,10 +183,10 @@ export const ColumnManagement = ({
                 <div className="py-3 border-r" />
                 {hasImportContent ? (
                   <div className="flex items-center gap-x-2">
-                    <Button icon={<Edit />} onClick={onSelectImportData}>
+                    <Button icon={<EditIcon />} onClick={onSelectImportData}>
                       Edit content
                     </Button>
-                    <Button variant="danger" icon={<Trash />} onClick={onClearImportContent}>
+                    <Button variant="danger" icon={<TrashIcon />} onClick={onClearImportContent}>
                       Remove content
                     </Button>
                   </div>
@@ -226,7 +226,7 @@ export const ColumnManagement = ({
         {primaryKeyColumns.length > 1 && (
           <InformationBox
             block
-            icon={<Key size={16} />}
+            icon={<KeyIcon size={16} />}
             title="Composite primary key selected"
             description="The columns that you've selected will be grouped as a primary key, and will serve as the unique identifier for the rows in your table"
           />
@@ -249,7 +249,11 @@ export const ColumnManagement = ({
                     aria-label="Show help for column Name"
                     className="w-6.5 px-0"
                     icon={
-                      <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <HelpCircleIcon
+                        size={15}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                     }
                   />
                 </TooltipTrigger>
@@ -271,7 +275,11 @@ export const ColumnManagement = ({
                     aria-label="Show help for column Default value"
                     className="w-6.5 px-0"
                     icon={
-                      <HelpCircle size={15} strokeWidth={1.5} className="text-foreground-lighter" />
+                      <HelpCircleIcon
+                        size={15}
+                        strokeWidth={1.5}
+                        className="text-foreground-lighter"
+                      />
                     }
                   />
                 </TooltipTrigger>

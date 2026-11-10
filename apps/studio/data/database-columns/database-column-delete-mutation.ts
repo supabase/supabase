@@ -3,10 +3,12 @@ import { PGColumn } from '@supabase/pg-meta/src/pg-meta-columns'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { viewKeys } from '@/data/views/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseColumnDeleteVariables = {
   projectRef: string
@@ -26,8 +28,11 @@ export async function deleteDatabaseColumn({
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-delete',
     sql,
     queryKey: ['column', 'delete', column.id],
+    grant: unguarded.migrating,
   })
 
   return result
@@ -40,11 +45,11 @@ export const useDatabaseColumnDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseColumnDeleteData, ResponseError, DatabaseColumnDeleteVariables>,
+  UseCustomMutationOptions<DatabaseColumnDeleteData, StudioError, DatabaseColumnDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<DatabaseColumnDeleteData, ResponseError, DatabaseColumnDeleteVariables>({
+  return useMutation<DatabaseColumnDeleteData, StudioError, DatabaseColumnDeleteVariables>({
     mutationFn: (vars) => deleteDatabaseColumn(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, column } = variables

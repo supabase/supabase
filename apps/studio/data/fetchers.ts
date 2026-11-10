@@ -1,30 +1,44 @@
-import * as Sentry from '@sentry/nextjs'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { getAccessToken, IS_PLATFORM } from 'common'
 import createClient from 'openapi-fetch'
 
 import type { paths } from './api'
-import { reportEmptyBodyResponse } from './empty-body-diagnostics'
-import { ERROR_PATTERNS } from './error-patterns'
+import { refetchWithoutCache, reportEmptyBodyResponse } from './empty-body-diagnostics'
+import {
+  classifyError,
+  classifyResponseError,
+  parseJsonObject,
+  parseResponseErrorBody,
+  parseRetryAfterSeconds,
+  readResponseError,
+} from './error-classification'
+import { guardMethod, type GuardedClientMethod } from './guarded-fetch'
 import { API_URL } from '@/lib/constants'
+import {
+  deferStudioErrorReport,
+  reportStudioError,
+  type StudioSentryContext,
+} from '@/lib/errors/report-studio-error'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { uuidv4 } from '@/lib/helpers'
-import { ResponseError } from '@/types'
-import { UnknownAPIResponseError } from '@/types/api-errors'
-import { ErrorMetadata } from '@/types/base'
 
 // generated from openapi-typescript
 
 const DEFAULT_HEADERS = { Accept: 'application/json' }
 
+// The OpenAPI path pattern of each in-flight request, recorded by `onRequest` (which receives
+// `schemaPath`) and read by `fetchHandler`, which only sees the `Request`.
+const requestEndpoints = new WeakMap<Request, string>()
+
 export const fetchHandler: typeof fetch = async (input, init) => {
   try {
     return await fetch(input, init)
-  } catch (err: any) {
-    if (err instanceof TypeError && err.message === 'Failed to fetch') {
-      console.error(err)
-      throw new Error('Unable to reach the server. Please check your network or try again later.')
-    }
-    throw err
+  } catch (err) {
+    const request = typeof Request !== 'undefined' && input instanceof Request ? input : undefined
+    throw classifyError(err, {
+      endpoint: request ? requestEndpoints.get(request) : undefined,
+      method: request?.method ?? init?.method,
+    })
   }
 }
 
@@ -73,6 +87,11 @@ export async function constructHeaders(headersInit?: HeadersInit | undefined) {
  *
  * Normalize empty-body success responses by setting `Content-Length: 0` so the parser
  * short-circuits regardless of transport. Non-empty responses are returned untouched.
+ *
+ * Some browsers (mostly Firefox) also return a 200 with an empty body for GETs that have
+ * data, which would otherwise surface as `{}` and crash components. Before giving up we try
+ * to recover the body: first from the original response (when only the clone was empty),
+ * then by re-fetching JSON GETs once with the HTTP cache bypassed.
  */
 export async function normalizeEmptyBodyResponse(
   response: Response,
@@ -83,18 +102,51 @@ export async function normalizeEmptyBodyResponse(
   }
 
   if (response.headers.has('Content-Length')) {
-    if (source && response.headers.get('Content-Length') === '0') {
-      void reportEmptyBodyResponse({ ...source, response })
+    if (response.headers.get('Content-Length') !== '0') return response
+  } else {
+    const body = await response.clone().text()
+    if (body.length > 0) {
+      return response
     }
-    return response
+
+    // The clone came back empty, check whether the original still has the body
+    const originalBody = await response.text()
+    if (originalBody.length > 0) {
+      if (source)
+        void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'original_body' })
+      return new Response(originalBody, {
+        status: response.status,
+        statusText: response.statusText,
+        headers: response.headers,
+      })
+    }
   }
 
-  const body = await response.clone().text()
-  if (body.length > 0) {
-    return response
+  const canRefetch =
+    source?.request.method === 'GET' &&
+    (response.headers.get('Content-Type') ?? '').includes('application/json')
+
+  if (source && canRefetch) {
+    const { summary, response: retried, body } = await refetchWithoutCache(source.request)
+    if (retried?.ok && body) {
+      void reportEmptyBodyResponse({
+        ...source,
+        response,
+        recoveredBy: 'refetch',
+        refetch: summary,
+      })
+      return new Response(body, {
+        status: retried.status,
+        statusText: retried.statusText,
+        headers: retried.headers,
+      })
+    }
+    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none', refetch: summary })
+  } else if (source) {
+    void reportEmptyBodyResponse({ ...source, response, recoveredBy: 'none' })
   }
 
-  if (source) void reportEmptyBodyResponse({ ...source, response })
+  if (response.headers.has('Content-Length')) return response
 
   const headers = new Headers(response.headers)
   headers.set('Content-Length', '0')
@@ -105,19 +157,21 @@ export async function normalizeEmptyBodyResponse(
   })
 }
 
-function pgMetaGuard(request: Request) {
+function pgMetaGuard(request: Request, schemaPath: string) {
   // Only check for /platform/pg-meta/ endpoints
   if (request.url.includes('/platform/pg-meta/')) {
     // If there is no valid `x-connection-encrypted`, pg-meta will necesseraly fail to connect to the target database
     // in such case, we save the hops and throw a 421 response instead
     if (!isValidConnString(request.headers.get('x-connection-encrypted'))) {
       const retryAfterHeader = request.headers.get('Retry-After')
-      throw new ResponseError(
-        'API Error: happened while trying to acquire connection to the database',
-        400,
-        request.headers.get('X-Request-Id') ?? undefined,
-        retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-      )
+      throw classifyResponseError({
+        message: 'API Error: happened while trying to acquire connection to the database',
+        code: 400,
+        requestId: request.headers.get('X-Request-Id') ?? undefined,
+        retryAfter: parseRetryAfterSeconds(retryAfterHeader),
+        endpoint: schemaPath,
+        method: request.method,
+      })
     }
     if (!request.headers.get('x-pg-application-name')) {
       request.headers.set('x-pg-application-name', DEFAULT_PLATFORM_APPLICATION_NAME)
@@ -126,14 +180,59 @@ function pgMetaGuard(request: Request) {
   return request
 }
 
+async function readBodyText(response: Response): Promise<string> {
+  try {
+    return await response.text()
+  } catch {
+    // unreadable body: classify by status alone
+    return ''
+  }
+}
+
+/**
+ * Turns every non-OK response into a JSON object body that `parseResponseErrorBody` can read.
+ * openapi-fetch builds `error` only from the returned body, so the fields extracted by
+ * `readResponseError` are serialized over the original JSON object body (some callers read
+ * other fields from it directly).
+ */
+async function buildErrorResponse(
+  response: Response,
+  { request, schemaPath }: { request: Request; schemaPath: string }
+): Promise<Response> {
+  const text = await readBodyText(response.clone())
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text,
+    requestId: request.headers.get('X-Request-Id') ?? undefined,
+    endpoint: schemaPath,
+    method: request.method,
+  })
+
+  // Keep the original body's other fields: some callers read the openapi-fetch `error` directly
+  const original = parseJsonObject(text)
+
+  const headers = new Headers(response.headers)
+  // The old length no longer matches, and `Content-Length: 0` makes openapi-fetch skip the body
+  headers.delete('Content-Length')
+  headers.set('Content-Type', 'application/json')
+
+  return new Response(JSON.stringify({ ...original, ...raw }), {
+    status: response.status,
+    statusText: response.statusText,
+    headers,
+  })
+}
+
 // Middleware
 client.use(
   {
     // Middleware to add authorization headers to the request
-    async onRequest({ request }) {
+    async onRequest({ request, schemaPath }) {
+      requestEndpoints.set(request, schemaPath)
       const headers = await constructHeaders()
       headers.forEach((value, key) => request.headers.set(key, value))
-      return pgMetaGuard(request)
+      return pgMetaGuard(request, schemaPath)
     },
   },
   {
@@ -143,124 +242,54 @@ client.use(
         return normalizeEmptyBodyResponse(response, { request, schemaPath })
       }
 
-      // handle errors
-      try {
-        // attempt to parse the response body as JSON
-        let body = await response.clone().json()
-
-        // add code field to body
-        body.code = response.status
-
-        body.requestId = request.headers.get('X-Request-Id')
-
-        const retryAfterHeader =
-          response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset')
-        body.retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-        const requestUrl = new URL(request.url)
-        body.requestPathname = requestUrl.pathname
-
-        return new Response(JSON.stringify(body), {
-          headers: response.headers,
-          status: response.status,
-          statusText: response.statusText,
-        })
-      } catch {
-        // noop
-      }
-
-      return response
+      return buildErrorResponse(response, { request, schemaPath })
     },
   }
 )
 
-export const {
-  GET: get,
-  POST: post,
-  PUT: put,
-  PATCH: patch,
-  DELETE: del,
-  HEAD: head,
-  TRACE: trace,
-  OPTIONS: options,
-} = client
+export const get = guardMethod('get', client.GET) as GuardedClientMethod<paths, 'get'>
+export const post = guardMethod('post', client.POST) as GuardedClientMethod<paths, 'post'>
+export const put = guardMethod('put', client.PUT) as GuardedClientMethod<paths, 'put'>
+export const patch = guardMethod('patch', client.PATCH) as GuardedClientMethod<paths, 'patch'>
+export const del = guardMethod('delete', client.DELETE) as GuardedClientMethod<paths, 'delete'>
+export const { HEAD: head, TRACE: trace, OPTIONS: options } = client
+
+export { unguarded, type Unguarded } from './guarded-fetch'
 
 type HandleErrorOptions = {
   alwaysCapture?: boolean
-  sentryContext?: Parameters<typeof Sentry.captureException>[1]
+  sentryContext?: StudioSentryContext
+  /**
+   * For callers outside React Query. Inside queries and mutations the query cache reports the
+   * error after the last retry, so leave this unset there.
+   */
+  reportImmediately?: boolean
 }
 
+/**
+ * Classifies an error (API response bodies by status and pattern) and throws it. Query and mutation
+ * functions call this so React Query receives a tagged error in its `error` state. Reporting to
+ * Sentry follows the error's routing (or always, with `alwaysCapture`). It happens in the query
+ * cache after the last retry, or right away with `reportImmediately`.
+ */
 export const handleError = (error: unknown, options: HandleErrorOptions = {}): never => {
-  if (error && typeof error === 'object') {
-    if (options.alwaysCapture) {
-      Sentry.captureException(error, options.sentryContext)
-    }
-    const errorMessage =
-      'msg' in error && typeof error.msg === 'string'
-        ? error.msg
-        : 'message' in error && typeof error.message === 'string'
-          ? error.message
-          : undefined
-
-    const errorCode = 'code' in error && typeof error.code === 'number' ? error.code : undefined
-    const requestId =
-      'requestId' in error && typeof error.requestId === 'string' ? error.requestId : undefined
-    const retryAfter =
-      'retryAfter' in error && typeof error.retryAfter === 'number' ? error.retryAfter : undefined
-    const requestPathname =
-      'requestPathname' in error && typeof error.requestPathname === 'string'
-        ? error.requestPathname
-        : undefined
-    const metadata =
-      'metadata' in error && typeof error.metadata === 'object' && !!error.metadata
-        ? (error.metadata as ErrorMetadata)
-        : undefined
-    const formattedError =
-      'formattedError' in error && typeof error.formattedError === 'string'
-        ? error.formattedError
-        : undefined
-
-    if (errorMessage) {
-      const matched = ERROR_PATTERNS.find(({ pattern }) => pattern.test(errorMessage))
-      throw matched
-        ? new matched.ErrorClass(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
-        : new UnknownAPIResponseError(
-            errorMessage,
-            errorCode,
-            requestId,
-            retryAfter,
-            requestPathname,
-            metadata,
-            formattedError
-          )
-    }
+  const raw = parseResponseErrorBody(error)
+  const classified = raw ? classifyResponseError(raw) : classifyError(error)
+  if (options.reportImmediately) {
+    reportStudioError(classified, options.sentryContext, { force: options.alwaysCapture })
+  } else {
+    deferStudioErrorReport(classified, {
+      context: options.sentryContext,
+      force: options.alwaysCapture,
+    })
   }
-
-  if (error !== null && typeof error === 'object' && 'stack' in error) {
-    console.error(error.stack)
-  }
-
-  // the error doesn't have a message or msg property, so we can't throw it as an error. Log it via Sentry so that we can
-  // add handling for it.
-  Sentry.captureException(error, options.sentryContext)
-
-  // throw a generic error if we don't know what the error is. The message is intentionally vague because it might show
-  // up in the UI.
-  throw new UnknownAPIResponseError(undefined)
+  throw classified
 }
 
 // [Joshen] The methods below are brought over from lib/common/fetch because we still need them
 // primarily for our own endpoints in the dashboard repo. So consolidating all the fetch methods into here.
 
-async function handleFetchResponse<T>(response: Response): Promise<T | ResponseError> {
+async function handleFetchResponse<T>(response: Response): Promise<T | StudioError> {
   const contentType = response.headers.get('Content-Type')
   if (contentType === 'application/octet-stream') return response as any
   try {
@@ -273,14 +302,14 @@ async function handleFetchResponse<T>(response: Response): Promise<T | ResponseE
       return resTxt as any
     }
   } catch (e) {
-    return handleError(response) as T | ResponseError
+    return handleError(response, { reportImmediately: true }) as T | StudioError
   }
 }
 
 async function handleFetchHeadResponse<T>(
   response: Response,
   headers: string[]
-): Promise<T | ResponseError> {
+): Promise<T | StudioError> {
   try {
     const res = {} as any
     headers.forEach((header: string) => {
@@ -288,42 +317,38 @@ async function handleFetchHeadResponse<T>(
     })
     return res
   } catch (e) {
-    return handleError(response) as T | ResponseError
+    return handleError(response, { reportImmediately: true }) as T | StudioError
   }
 }
 
-async function handleFetchError(response: unknown): Promise<ResponseError> {
-  let resJson: any = {}
-
-  if (response instanceof Error) {
-    resJson = response
-  }
+async function handleFetchError(response: unknown): Promise<StudioError> {
+  let error: StudioError
 
   if (response instanceof Response) {
-    resJson = await response.json()
+    error = await classifyFetchResponse(response)
+  } else {
+    // No response to read, e.g. a fetch failure or an aborted request
+    error = classifyError(response)
   }
-
-  const status = response instanceof Response ? response.status : undefined
-
-  const message =
-    resJson.message ??
-    resJson.msg ??
-    resJson.error ??
-    `An error has occurred: ${status ?? 'Unknown error'}`
-  const retryAfterHeader =
-    response instanceof Response
-      ? (response.headers.get('Retry-After') ?? response.headers.get('X-RateLimit-Reset'))
-      : null
-  const retryAfter = retryAfterHeader ? parseInt(retryAfterHeader) : undefined
-
-  let error = new ResponseError(message, status, undefined, retryAfter)
 
   // @ts-expect-error - [Alaister] many of our local api routes check `if (response.error)`.
   // This is a fix to keep those checks working without breaking changes.
-  // In future we should check for `if (response instanceof ResponseError)` instead.
+  // In future we should check for `if (isStudioError(response))` instead.
   error.error = error
 
   return error
+}
+
+async function classifyFetchResponse(response: Response): Promise<StudioError> {
+  const raw = readResponseError({
+    status: response.status,
+    headers: response.headers,
+    text: await readBodyText(response),
+  })
+  return classifyResponseError({
+    ...raw,
+    message: raw.message ?? `An error has occurred: ${response.status}`,
+  })
 }
 
 /**
@@ -332,7 +357,7 @@ async function handleFetchError(response: unknown): Promise<ResponseError> {
 export async function fetchGet<T = any>(
   url: string,
   options?: { [prop: string]: any }
-): Promise<T | ResponseError> {
+): Promise<T | StudioError> {
   try {
     const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
     const headers = await constructHeaders({
@@ -347,7 +372,7 @@ export async function fetchGet<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -363,7 +388,7 @@ export async function fetchPost<T = any>(
   url: string,
   data: { [prop: string]: any },
   options?: { [prop: string]: any }
-): Promise<T | ResponseError> {
+): Promise<T | StudioError> {
   try {
     const { headers: otherHeaders, abortSignal, ...otherOptions } = options ?? {}
     const headers = await constructHeaders({
@@ -379,7 +404,7 @@ export async function fetchPost<T = any>(
       ...otherOptions,
       signal: abortSignal,
     })
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchResponse(response)
   } catch (error) {
     return handleFetchError(error)
@@ -393,7 +418,7 @@ export async function fetchHeadWithTimeout<T = any>(
   url: string,
   headersToRetrieve: string[],
   options?: { [prop: string]: any }
-): Promise<T | ResponseError> {
+): Promise<T | StudioError> {
   try {
     const timeout = options?.timeout ?? 60000
 
@@ -412,7 +437,7 @@ export async function fetchHeadWithTimeout<T = any>(
       signal: AbortSignal.timeout(timeout),
     })
 
-    if (!response.ok) return handleFetchError(response)
+    if (!response.ok) return await handleFetchError(response)
     return handleFetchHeadResponse(response, headersToRetrieve)
   } catch (error) {
     return handleFetchError(error)

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { constructHeaders } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type GenerateAttachmentURLsResponse = {
   title: string
@@ -54,12 +55,12 @@ export const useGenerateAttachmentURLsMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     GenerateAttachmentURLsData,
-    ResponseError,
+    StudioError,
     GenerateAttachmentURLsVariables
   >,
   'mutationFn'
 > = {}) => {
-  return useMutation<GenerateAttachmentURLsData, ResponseError, GenerateAttachmentURLsVariables>({
+  return useMutation<GenerateAttachmentURLsData, StudioError, GenerateAttachmentURLsVariables>({
     mutationFn: (vars) => generateAttachmentURLs(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

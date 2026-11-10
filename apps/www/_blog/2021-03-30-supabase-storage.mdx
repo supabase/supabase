@@ -97,7 +97,7 @@ For Authorization, we wanted to avoid creating a new DSL like Firebase. Instead,
 
 ![One True Language](/images/blog/storage/true-language.png)
 
-To do this, we leverage Postgres' Row Level Security. We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
+To do this, we leverage Postgres' [Row Level Security](/docs/guides/database/postgres/row-level-security). We create a table for `buckets` and `objects` inside each Supabase project. These tables are namespaced in a separate schema called `storage`.
 
 The idea is simple - if a user is able to `select` from the `objects` table, they can retrieve the object too. Using Postgres' Row Level Security, you can define fine-grained Policies to determine access levels for different users.
 

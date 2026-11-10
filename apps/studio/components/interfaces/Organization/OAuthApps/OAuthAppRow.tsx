@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Edit, MoreVertical, Trash } from 'lucide-react'
+import { EditIcon, MoreVerticalIcon, TrashIcon } from 'lucide-react'
 import {
   Button,
   DropdownMenu,
@@ -17,7 +16,7 @@ import { TimestampInfo } from 'ui-patterns/TimestampInfo'
 
 import CopyButton from '@/components/ui/CopyButton'
 import type { OAuthApp } from '@/data/oauth/oauth-apps-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 
 export interface OAuthAppRowProps {
   app: OAuthApp
@@ -26,13 +25,11 @@ export interface OAuthAppRowProps {
 }
 
 export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowProps) => {
-  const { can: canUpdateOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'approved_oauth_apps'
+  const { can: canUpdateOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
-  const { can: canDeleteOAuthApps } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'approved_oauth_apps'
+  const { can: canDeleteOAuthApps } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.CONFIG_WRITE
   )
 
   return (
@@ -68,7 +65,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
       <TableCell className="text-right">
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
-            <Button icon={<MoreVertical />} className="px-1" />
+            <Button icon={<MoreVerticalIcon />} className="px-1" />
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" side="bottom" className="w-32">
             <Tooltip>
@@ -81,7 +78,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                     if (canUpdateOAuthApps) onSelectEdit()
                   }}
                 >
-                  <Edit size={16} />
+                  <EditIcon size={16} />
                   <p>Edit app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>
@@ -102,7 +99,7 @@ export const OAuthAppRow = ({ app, onSelectEdit, onSelectDelete }: OAuthAppRowPr
                     if (canDeleteOAuthApps) onSelectDelete()
                   }}
                 >
-                  <Trash size={16} />
+                  <TrashIcon size={16} />
                   <p>Delete app</p>
                 </DropdownMenuItem>
               </TooltipTrigger>

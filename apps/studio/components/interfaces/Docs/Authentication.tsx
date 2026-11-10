@@ -1,13 +1,13 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 
 import CodeSnippet from './CodeSnippet'
 import { DocSection } from './DocSection'
 import Snippets from './Snippets'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useGrant } from '@/lib/grants'
 
 interface AuthenticationProps {
   selectedLang: 'bash' | 'js'
@@ -16,8 +16,10 @@ interface AuthenticationProps {
 
 const Authentication = ({ selectedLang, showApiKey }: AuthenticationProps) => {
   const { ref: projectRef } = useParams()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
+  )
   const { anonKey, serviceKey } = apiKeyData ?? {}
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })

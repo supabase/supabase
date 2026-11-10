@@ -1,4 +1,4 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import { Badge, cn } from 'ui'
 
 import PartnerIcon from '@/components/ui/PartnerIcon'
@@ -31,7 +31,7 @@ export function ProjectRowLink({ project, selectedRef }: ProjectRowLinkProps) {
         {isPaused && <Badge className="ml-2">Paused</Badge>}
         <PartnerIcon organization={{ managed_by: managedBy }} />
       </span>
-      {isSelected && <Check size={16} />}
+      {isSelected && <CheckIcon size={16} />}
     </div>
   )
 }

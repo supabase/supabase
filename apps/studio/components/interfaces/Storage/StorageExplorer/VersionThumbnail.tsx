@@ -1,4 +1,4 @@
-import { Archive, File, Film, Image as ImageIcon, Music, RotateCcw } from 'lucide-react'
+import { ArchiveIcon, FileIcon, FilmIcon, ImageIcon, MusicIcon, RotateCcwIcon } from 'lucide-react'
 import { cn } from 'ui'
 
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
@@ -12,12 +12,12 @@ const MimeTypeIcon = ({ mimeType, size }: { mimeType?: string; size: number }) =
     return <ImageIcon size={size} className="text-foreground-lighter" />
   }
   if (mimeType?.includes('audio')) {
-    return <Music size={size} className="text-foreground-lighter" />
+    return <MusicIcon size={size} className="text-foreground-lighter" />
   }
   if (mimeType?.includes('video')) {
-    return <Film size={size} className="text-foreground-lighter" />
+    return <FilmIcon size={size} className="text-foreground-lighter" />
   }
-  return <File size={size} className="text-foreground-lighter" />
+  return <FileIcon size={size} className="text-foreground-lighter" />
 }
 
 /** Falls back to the generic icon while the URL is in flight or if it fails. */
@@ -88,9 +88,9 @@ export const VersionThumbnail = ({
       {canShowImage && (
         <ThumbnailImage path={path} versionId={versionId} mimeType={mimeType} size={size} />
       )}
-      {!canShowImage && isCurrent && <RotateCcw size={size} className="text-brand" />}
+      {!canShowImage && isCurrent && <RotateCcwIcon size={size} className="text-brand" />}
       {!canShowImage && !isCurrent && isDeleteMarker && (
-        <Archive size={size} className="text-foreground-muted" />
+        <ArchiveIcon size={size} className="text-foreground-muted" />
       )}
       {!canShowImage && !isCurrent && !isDeleteMarker && (
         <MimeTypeIcon mimeType={mimeType} size={size} />

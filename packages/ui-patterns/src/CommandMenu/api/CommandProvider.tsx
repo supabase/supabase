@@ -95,7 +95,7 @@ function CloseOnNavigation({ children }: PropsWithChildren) {
 
     legacyRouter.events.on('routeChangeComplete', completeNavigation)
     return () => legacyRouter.events.off('routeChangeComplete', completeNavigation)
-  }, [isUsingLegacyRouting, legacyRouter])
+  }, [completeNavigation, isUsingLegacyRouting, legacyRouter])
 
   return (
     <CrossCompatRouterContext.Provider value={ctx}>{children}</CrossCompatRouterContext.Provider>

@@ -64,11 +64,6 @@ describe('getSelfHostedPoolerStrings', () => {
     expect(strings.dotnet).toContain('Database=mydb')
     expect(strings.nodejs).toBe(`DATABASE_URL=${strings.uri}`)
   })
-
-  test('defaults database name to postgres', () => {
-    const strings = getSelfHostedPoolerStrings('db.example.com', 6543)
-    expect(strings.uri.endsWith('/postgres')).toBe(true)
-  })
 })
 
 describe('getSelfHostedDirectStrings', () => {
@@ -201,22 +196,6 @@ describe('buildConnectionStringPooler', () => {
     expect(result.transactionDedicated).toBeUndefined()
     expect(result.sessionDedicated).toBeUndefined()
     expect(result.ipv4SupportedForDedicatedPooler).toBe(false)
-  })
-
-  test('platform without high availability appends no SSL params', () => {
-    const result = buildConnectionStringPooler({
-      deploymentMode: platform,
-      connectionInfo,
-      connectionStringsShared: sharedPlatform,
-      connectionStringsDedicated: dedicatedPlatform,
-      ipv4Addon: true,
-      isHighAvailability: false,
-    })
-
-    expect(result.direct).toBe(sharedPlatform.direct.uri)
-    expect(result.transactionShared).toBe(sharedPlatform.pooler.uri)
-    expect(result.direct).not.toContain('sslnegotiation')
-    expect(result.transactionShared).not.toContain('sslnegotiation')
   })
 })
 

@@ -12,8 +12,6 @@ export interface WebhookHeader {
 
 export interface WebhookEndpoint {
   id: string
-  // No `name` field in the real API — client-only until backend adds one.
-  name: string
   url: string
   description: string
   enabled: boolean
@@ -27,10 +25,8 @@ export interface WebhookDelivery {
   id: string
   endpointId: string
   eventId: string
-  // Only present when fetched via the single-delivery endpoint (drill-down view) —
-  // the deliveries *list* endpoint doesn't return either, so list rows leave these unset.
-  eventType?: string
-  eventPayload?: Record<string, unknown>
+  eventType: string
+  eventPayload: Record<string, unknown>
   status: WebhookDeliveryStatus
   responseCode: number
   responseBody: string | Record<string, string> | null
@@ -50,7 +46,6 @@ export interface PlatformWebhooksState {
 }
 
 export interface UpsertWebhookEndpointInput {
-  name: string
   url: string
   description: string
   enabled: boolean

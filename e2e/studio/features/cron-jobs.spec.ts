@@ -356,8 +356,11 @@ test.describe('Cron Jobs', () => {
         await page.getByRole('link', { name: 'Overview', exact: true }).click()
         await page.waitForURL(/.*\/integrations\/cron\/overview/)
 
-        // Verify we're on the overview page
-        await expect(page.getByText('Schedule recurring Jobs in Postgres')).toBeVisible()
+        // Verify we're on the overview page. The hero renders the description twice (one per
+        // breakpoint, one is hidden), so only match the visible one.
+        await expect(
+          page.getByText('Schedule recurring Jobs in Postgres').filter({ visible: true })
+        ).toBeVisible()
       })
     })
   })

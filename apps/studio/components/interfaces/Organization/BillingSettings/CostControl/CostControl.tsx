@@ -1,6 +1,5 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useFlag, useParams } from 'common'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
 import Image from 'next/image'
 import Link from 'next/link'
@@ -21,7 +20,7 @@ import { NoPermission } from '@/components/ui/NoPermission'
 import PartnerIcon from '@/components/ui/PartnerIcon'
 import { PARTNER_TO_NAME } from '@/components/ui/PartnerManagedResource'
 import { useOrgSubscriptionQuery } from '@/data/subscriptions/org-subscription-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { BASE_PATH, DOCS_URL } from '@/lib/constants'
 import { MANAGED_BY } from '@/lib/constants/infrastructure'
@@ -35,9 +34,8 @@ export const CostControl = () => {
 
   const projectUpdateDisabled = useFlag('disableProjectCreationAndUpdate')
 
-  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissions(
-    PermissionAction.BILLING_READ,
-    'stripe.subscriptions'
+  const { isSuccess: isPermissionsLoaded, can: canReadSubscriptions } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.ORGANIZATION.BILLING_READ
   )
 
   const {
@@ -78,7 +76,7 @@ export const CostControl = () => {
                 >
                   <div className="flex items-center space-x-2 opacity-50 hover:opacity-100 transition">
                     <p className="text-sm m-0">Spend cap</p>
-                    <ExternalLink size={16} strokeWidth={1.5} />
+                    <ExternalLinkIcon size={16} strokeWidth={1.5} />
                   </div>
                 </Link>
               </div>
@@ -127,15 +125,18 @@ export const CostControl = () => {
                         } plan`}
                         description={
                           <>
-                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                            times. Your projects will never become unresponsive. Only when your{' '}
+                            {currentPlan?.name || ''}{' '}
+                            <span>
+                              plan requires you to have spend cap off at all times. Your projects
+                              will never become unresponsive. Only when your
+                            </span>{' '}
                             <Link
                               href={`/org/${slug}/usage`}
                               className="text-green-900 transition hover:text-green-1000"
                             >
                               included usage
                             </Link>{' '}
-                            is exceeded will you be charged for any additional usage.
+                            <span>is exceeded will you be charged for any additional usage.</span>
                           </>
                         }
                       />
@@ -168,7 +169,8 @@ export const CostControl = () => {
                     </div>
                     <div>
                       <p className="mb-1">
-                        Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
+                        Spend cap is{' '}
+                        {isUsageBillingEnabled ? <span>disabled</span> : <span>enabled</span>}
                       </p>
                       <p className="text-sm text-foreground-light">
                         {isUsageBillingEnabled ? (

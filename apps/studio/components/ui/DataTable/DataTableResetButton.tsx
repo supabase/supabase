@@ -1,4 +1,4 @@
-import { X } from 'lucide-react'
+import { XIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { useDataTable } from './providers/DataTableProvider'
@@ -28,7 +28,7 @@ export function DataTableResetButton({ onReset }: DataTableResetButtonProps) {
       label="Reset filters"
       side="left"
     >
-      <Button size="tiny" onClick={reset} icon={<X />}>
+      <Button size="tiny" onClick={reset} icon={<XIcon />}>
         Reset
       </Button>
     </ShortcutTooltip>

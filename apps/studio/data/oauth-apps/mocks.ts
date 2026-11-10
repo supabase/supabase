@@ -13,6 +13,7 @@ import type {
   OAuthOrganizationRole,
   OAuthOrgAppDetails,
   OAuthScope,
+  OAuthValidationRole,
 } from './types'
 import { isPreflightValidationFailure, isWriteScope } from './types'
 import type { OrganizationRole } from '@/data/organization-members/organization-roles-query'
@@ -73,10 +74,11 @@ const VERCEL_SCOPES: OAuthScope[] = [
   'environment:read',
   'environment:write',
   'secrets:read',
-  'secrets:write',
   'projects:read',
   'edge_functions:read',
   'storage:read',
+  'analytics:read',
+  'analytics:write',
 ]
 
 const VERCEL_REQUEST: OAuthAppsAuthorizeRequest = {
@@ -279,7 +281,15 @@ const MOCK_ORGANIZATION_PROJECTS: Record<string, OAuthAppsAuthorizeOrganizationP
 }
 
 const TAILSPIN_VERCEL_EXISTING_GRANT: OAuthExistingGrant = {
-  approved_scopes: ['database:read', 'database:write', 'projects:read'],
+  approved_scopes: [
+    'database:read',
+    'database:write',
+    'analytics:read',
+    'projects:read',
+    'secrets:read',
+    'secrets:write',
+    'rest:read',
+  ],
   project_refs: ['tailspinshop1', 'tailspindeleted1'],
   approved_at: '2026-08-14T09:12:00.000Z',
 }
@@ -379,20 +389,18 @@ const MOCK_APP_GRANTS: Record<string, ListOrgAppGrantsResponse> = {
         approved_scopes: ['database:read', 'database:write', 'projects:read'],
         approved_at: '2026-08-18T09:12:00.000Z',
       },
-      ...Array(50)
-        .keys()
-        .map((index) => ({
-          grant_id: `grant-vercel-developer-${index}`,
-          kind: 'member_bound' as const,
-          user: {
-            gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
-            email: `developer${index}@example.com`,
-            avatar_url: 'https://avatars.example/developer.png',
-          },
-          projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
-          approved_scopes: ['projects:read'],
-          approved_at: '2026-08-16T11:30:00.000Z',
-        })),
+      ...Array.from({ length: 50 }, (_, index) => ({
+        grant_id: `grant-vercel-developer-${index}`,
+        kind: 'member_bound' as const,
+        user: {
+          gotrue_id: `b1d3e2f4-0000-4000-8000-0000000000${index.toString().padStart(2, '0')}`,
+          email: `developer${index}@example.com`,
+          avatar_url: 'https://avatars.example/developer.png',
+        },
+        projects: [{ ref: 'northwindcms1', name: 'northwind-cms' }],
+        approved_scopes: ['projects:read'],
+        approved_at: '2026-08-16T11:30:00.000Z',
+      })),
     ],
     pagination: { next_cursor: null },
   },
@@ -536,6 +544,17 @@ const ROLE_VALIDATED_SCENARIOS = new Set<string>([
   OAUTH_APPS_MOCK_SCENARIOS.kemalBotOrgWide,
 ])
 
+const VALIDATION_ROLE_NAMES: Record<string, OAuthValidationRole['name']> = {
+  [OWNER_ROLE.name]: 'owner',
+  [ADMINISTRATOR_ROLE.name]: 'administrator',
+  [DEVELOPER_ROLE.name]: 'developer',
+  [READ_ONLY_ROLE.name]: 'read-only',
+}
+
+function toValidationRole(role: OrganizationRole): OAuthValidationRole {
+  return { name: VALIDATION_ROLE_NAMES[role.name] ?? 'no-access' }
+}
+
 function isReadOnlyRole(role: OrganizationRole) {
   return role.id === READ_ONLY_ROLE.id
 }
@@ -556,7 +575,10 @@ function evaluateGrantEligibility(
       status: 'error',
       error_code: 'role_validation_failed',
       message: `Your ${organization.default_role.name} role cannot install this app for the organization.`,
-      validation: { scope_target: 'organization', role: organization.default_role },
+      validation: {
+        scope_target: 'organization',
+        role: toValidationRole(organization.default_role),
+      },
     }
   }
 
@@ -570,7 +592,7 @@ function evaluateGrantEligibility(
     message: `Your ${organization.default_role.name} role cannot satisfy this app's scopes for all projects.`,
     validation: {
       scope_target: 'all_projects',
-      role: organization.default_role,
+      role: toValidationRole(organization.default_role),
       failed_scopes: failedScopes,
     },
   }
@@ -617,10 +639,9 @@ export function getMockOAuthAppsAuthorizeApproveResult(
     message: `Your role is read-only on ${blocked.length} of the selected projects.`,
     validation: {
       scope_target: 'projects',
-      failures: blocked.map(({ name, ref, role }) => ({
+      failures: blocked.map(({ ref, role }) => ({
         ref,
-        name,
-        role,
+        role: toValidationRole(role),
         failed_scopes: failedScopes,
       })),
     },

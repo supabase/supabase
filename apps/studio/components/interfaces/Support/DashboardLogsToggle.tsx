@@ -1,4 +1,4 @@
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
 import { useMemo, useState } from 'react'
 import type { UseFormReturn } from 'react-hook-form'
 import {
@@ -59,7 +59,7 @@ export function DashboardLogsToggle({
                     'group flex items-center gap-x-1 group-data-open:text-foreground hover:text-foreground transition'
                   }
                 >
-                  <ChevronRight
+                  <ChevronRightIcon
                     size={14}
                     className="transition-all group-data-open:rotate-90 text-foreground-muted -ml-1"
                   />

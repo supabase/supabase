@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { FileCode, Sparkles, Terminal, type LucideIcon } from 'lucide-react'
+import { FileCodeIcon, SparklesIcon, TerminalIcon, type LucideIcon } from 'lucide-react'
 import { useState } from 'react'
 import { cn } from 'ui'
 
@@ -28,12 +28,12 @@ const TAB_LABEL: Record<ComputeInstanceSnippetTab, string> = {
 }
 
 const TAB_ICON: Record<ComputeInstanceSnippetTab, LucideIcon> = {
-  ai: Sparkles,
-  config: FileCode,
-  cli: Terminal,
-  curl: Terminal,
-  js: FileCode,
-  python: FileCode,
+  ai: SparklesIcon,
+  config: FileCodeIcon,
+  cli: TerminalIcon,
+  curl: TerminalIcon,
+  js: FileCodeIcon,
+  python: FileCodeIcon,
 }
 
 interface ComputeInstanceSnippetTabsProps {

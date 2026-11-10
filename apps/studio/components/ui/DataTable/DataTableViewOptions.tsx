@@ -1,4 +1,4 @@
-import { GripVertical, Settings2 } from 'lucide-react'
+import { GripVerticalIcon, Settings2Icon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
   Checkbox,
@@ -43,7 +43,7 @@ export function DataTableViewOptions() {
           aria-expanded={open}
           aria-controls={listboxId}
           className="w-[26px]"
-          icon={<Settings2 className="text-foreground" />}
+          icon={<Settings2Icon className="text-foreground" />}
           tooltip={{ content: { side: 'bottom', text: 'Toggle column visibility' } }}
         />
       </PopoverTrigger>
@@ -86,7 +86,7 @@ export function DataTableViewOptions() {
                             size="tiny"
                             className="ml-auto size-5 text-muted-foreground hover:text-foreground focus:bg-muted focus:text-foreground"
                           >
-                            <GripVertical className="size-4" aria-hidden="true" />
+                            <GripVerticalIcon className="size-4" aria-hidden="true" />
                           </SortableDragHandle>
                         ) : null}
                       </CommandItem>

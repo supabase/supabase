@@ -10,8 +10,7 @@ export const DataApiDisabledAlert = () => {
           With this setting disabled, you will not be able to query any schemas via the Data API.
         </p>
         <p>
-          You will see errors from the Postgrest endpoint{' '}
-          <code className="text-code-inline">/rest/v1/</code>.
+          You will see errors from the Postgrest endpoint <code>/rest/v1/</code>.
         </p>
       </AlertDescription>
     </Alert>

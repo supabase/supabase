@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ExternalLink, RefreshCw } from 'lucide-react'
+import { ExternalLinkIcon, RefreshCwIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -83,7 +83,7 @@ const ComputePage: NextPageWithLayout = () => {
                 title={`You don't have access to ${PRODUCT_NAME} yet`}
                 description="Join the waitlist to get early access."
                 actions={
-                  <Button asChild icon={<ExternalLink />}>
+                  <Button asChild icon={<ExternalLinkIcon />}>
                     <a
                       href="https://supabase.com/compute"
                       target="_blank"
@@ -104,7 +104,7 @@ const ComputePage: NextPageWithLayout = () => {
                 subject="Failed to retrieve compute instances"
                 additionalActions={
                   <Button
-                    icon={<RefreshCw />}
+                    icon={<RefreshCwIcon />}
                     loading={isManuallyRefreshing}
                     onClick={handleManualRefresh}
                   >

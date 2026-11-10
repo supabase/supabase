@@ -1,4 +1,4 @@
-import { Search } from 'lucide-react'
+import { SearchIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { Label } from 'ui'
 
@@ -40,7 +40,7 @@ export function DataTableFilterInput<TData>({ value: _value }: DataTableInputFil
       </Label>
       <InputWithAddons
         placeholder="Search"
-        leading={<Search className="h-4 w-4" />}
+        leading={<SearchIcon className="h-4 w-4" />}
         containerClassName="h-9 rounded-sm"
         name={value}
         id={value}

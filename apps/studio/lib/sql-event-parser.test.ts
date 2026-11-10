@@ -4,326 +4,72 @@ import { describe, expect, it } from 'vitest'
 import { sqlEventParser } from './sql-event-parser'
 
 describe('SQL Event Parser', () => {
-  describe('CREATE TABLE detection', () => {
-    it('detects basic CREATE TABLE', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TABLE users (id INT PRIMARY KEY)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
+  const { TableCreated, TableDataAdded, TableRLSEnabled } = TABLE_EVENT_ACTIONS
 
-    it('detects CREATE TABLE with schema', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TABLE public.users (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
-
-    it('detects CREATE TABLE IF NOT EXISTS', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TABLE IF NOT EXISTS users (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('handles quoted identifiers', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TABLE "public"."user_table" (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: 'public',
-        tableName: 'user_table',
-      })
-    })
-
-    it('returns empty array for non-matching SQL', () => {
-      const results = sqlEventParser.getTableEvents('SELECT * FROM users')
-      expect(results).toHaveLength(0)
-    })
-
-    it('detects CREATE TEMPORARY TABLE', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TEMPORARY TABLE temp_users (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'temp_users',
-      })
-    })
-
-    it('detects CREATE TEMP TABLE', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TEMP TABLE temp_users (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'temp_users',
-      })
-    })
-
-    it('detects CREATE UNLOGGED TABLE', () => {
-      const results = sqlEventParser.getTableEvents('CREATE UNLOGGED TABLE fast_table (id INT)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'fast_table',
-      })
-    })
-
-    it('detects CREATE TEMP TABLE IF NOT EXISTS', () => {
-      const results = sqlEventParser.getTableEvents(
-        'CREATE TEMP TABLE IF NOT EXISTS temp_users (id INT)'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'temp_users',
-      })
-    })
+  it.each([
+    // CREATE TABLE
+    ['CREATE TABLE users (id INT PRIMARY KEY)', TableCreated, undefined, 'users'],
+    ['CREATE TABLE public.users (id INT)', TableCreated, 'public', 'users'],
+    ['CREATE TABLE IF NOT EXISTS users (id INT)', TableCreated, undefined, 'users'],
+    ['CREATE TABLE "public"."user_table" (id INT)', TableCreated, 'public', 'user_table'],
+    ['CREATE TEMPORARY TABLE temp_users (id INT)', TableCreated, undefined, 'temp_users'],
+    ['CREATE TEMP TABLE temp_users (id INT)', TableCreated, undefined, 'temp_users'],
+    ['CREATE UNLOGGED TABLE fast_table (id INT)', TableCreated, undefined, 'fast_table'],
+    ['CREATE TEMP TABLE IF NOT EXISTS temp_users (id INT)', TableCreated, undefined, 'temp_users'],
+    ['CREATE TABLE table123 (id INT)', TableCreated, undefined, 'table123'],
+    // INSERT
+    ["INSERT INTO users (name) VALUES ('John')", TableDataAdded, undefined, 'users'],
+    ["INSERT INTO public.users (name) VALUES ('John')", TableDataAdded, 'public', 'users'],
+    ['INSERT INTO "auth"."users" (id) VALUES (1)', TableDataAdded, 'auth', 'users'],
+    // COPY ... FROM
+    ["COPY users FROM '/tmp/users.csv'", TableDataAdded, undefined, 'users'],
+    ["COPY public.users FROM '/tmp/users.csv' WITH CSV HEADER", TableDataAdded, 'public', 'users'],
+    ['COPY "auth"."users" FROM STDIN', TableDataAdded, 'auth', 'users'],
+    // SELECT INTO / CREATE TABLE AS
+    ['SELECT * INTO new_users FROM users', TableCreated, undefined, 'new_users'],
+    ['SELECT id, name INTO public.new_users FROM users', TableCreated, 'public', 'new_users'],
+    ['SELECT * INTO "backup"."users_2024" FROM users', TableCreated, 'backup', 'users_2024'],
+    ['CREATE TABLE new_users AS SELECT * FROM users', TableCreated, undefined, 'new_users'],
+    [
+      'CREATE TABLE IF NOT EXISTS new_users AS SELECT * FROM users WHERE active = true',
+      TableCreated,
+      undefined,
+      'new_users',
+    ],
+    // RLS
+    ['ALTER TABLE users ENABLE ROW LEVEL SECURITY', TableRLSEnabled, undefined, 'users'],
+    ['ALTER TABLE users ENABLE RLS', TableRLSEnabled, undefined, 'users'],
+    ['ALTER TABLE public.users ENABLE ROW LEVEL SECURITY', TableRLSEnabled, 'public', 'users'],
+    [
+      'ALTER TABLE users ADD COLUMN test INT, ENABLE ROW LEVEL SECURITY',
+      TableRLSEnabled,
+      undefined,
+      'users',
+    ],
+    [
+      'ALTER TABLE IF EXISTS public."Conversations" ENABLE ROW LEVEL SECURITY',
+      TableRLSEnabled,
+      'public',
+      'Conversations',
+    ],
+    ['ALTER TABLE ONLY public.users ENABLE ROW LEVEL SECURITY', TableRLSEnabled, 'public', 'users'],
+    [
+      'ALTER TABLE IF EXISTS ONLY public.users ENABLE ROW LEVEL SECURITY',
+      TableRLSEnabled,
+      'public',
+      'users',
+    ],
+  ])('detects %s', (sql, type, schema, tableName) => {
+    expect(sqlEventParser.getTableEvents(sql)).toEqual([{ type, schema, tableName }])
   })
 
-  describe('INSERT detection', () => {
-    it('detects basic INSERT INTO', () => {
-      const results = sqlEventParser.getTableEvents("INSERT INTO users (name) VALUES ('John')")
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('detects INSERT with schema', () => {
-      const results = sqlEventParser.getTableEvents(
-        "INSERT INTO public.users (name) VALUES ('John')"
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
-
-    it('handles quoted identifiers', () => {
-      const results = sqlEventParser.getTableEvents('INSERT INTO "auth"."users" (id) VALUES (1)')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: 'auth',
-        tableName: 'users',
-      })
-    })
-
-    it('returns empty array for non-matching SQL', () => {
-      const results = sqlEventParser.getTableEvents('UPDATE users SET name = "John"')
-      expect(results).toHaveLength(0)
-    })
-  })
-
-  describe('COPY detection', () => {
-    it('detects basic COPY FROM', () => {
-      const results = sqlEventParser.getTableEvents("COPY users FROM '/tmp/users.csv'")
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('detects COPY with schema', () => {
-      const results = sqlEventParser.getTableEvents(
-        "COPY public.users FROM '/tmp/users.csv' WITH CSV HEADER"
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
-
-    it('handles quoted identifiers', () => {
-      const results = sqlEventParser.getTableEvents('COPY "auth"."users" FROM STDIN')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableDataAdded,
-        schema: 'auth',
-        tableName: 'users',
-      })
-    })
-
-    it('returns empty array for COPY TO', () => {
-      const results = sqlEventParser.getTableEvents("COPY users TO '/tmp/users.csv'")
-      expect(results).toHaveLength(0)
-    })
-
-    it('returns empty array for non-matching SQL', () => {
-      const results = sqlEventParser.getTableEvents('SELECT * FROM users')
-      expect(results).toHaveLength(0)
-    })
-  })
-
-  describe('SELECT INTO detection', () => {
-    it('detects SELECT INTO', () => {
-      const results = sqlEventParser.getTableEvents('SELECT * INTO new_users FROM users')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'new_users',
-      })
-    })
-
-    it('detects SELECT INTO with schema', () => {
-      const results = sqlEventParser.getTableEvents(
-        'SELECT id, name INTO public.new_users FROM users'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: 'public',
-        tableName: 'new_users',
-      })
-    })
-
-    it('detects CREATE TABLE AS SELECT', () => {
-      const results = sqlEventParser.getTableEvents('CREATE TABLE new_users AS SELECT * FROM users')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'new_users',
-      })
-    })
-
-    it('detects CREATE TABLE IF NOT EXISTS AS SELECT', () => {
-      const results = sqlEventParser.getTableEvents(
-        'CREATE TABLE IF NOT EXISTS new_users AS SELECT * FROM users WHERE active = true'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'new_users',
-      })
-    })
-
-    it('handles quoted identifiers', () => {
-      const results = sqlEventParser.getTableEvents(
-        'SELECT * INTO "backup"."users_2024" FROM users'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: 'backup',
-        tableName: 'users_2024',
-      })
-    })
-
-    it('returns empty array for regular SELECT', () => {
-      const results = sqlEventParser.getTableEvents('SELECT * FROM users')
-      expect(results).toHaveLength(0)
-    })
-  })
-
-  describe('RLS detection', () => {
-    it('detects ALTER TABLE ENABLE ROW LEVEL SECURITY', () => {
-      const results = sqlEventParser.getTableEvents('ALTER TABLE users ENABLE ROW LEVEL SECURITY')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('detects short form ENABLE RLS', () => {
-      const results = sqlEventParser.getTableEvents('ALTER TABLE users ENABLE RLS')
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('detects with schema', () => {
-      const results = sqlEventParser.getTableEvents(
-        'ALTER TABLE public.users ENABLE ROW LEVEL SECURITY'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
-
-    it('handles other ALTER TABLE statements in between', () => {
-      const results = sqlEventParser.getTableEvents(
-        'ALTER TABLE users ADD COLUMN test INT, ENABLE ROW LEVEL SECURITY'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: undefined,
-        tableName: 'users',
-      })
-    })
-
-    it('returns empty array for disabling RLS', () => {
-      const results = sqlEventParser.getTableEvents('ALTER TABLE users DISABLE ROW LEVEL SECURITY')
-      expect(results).toHaveLength(0)
-    })
-
-    it('detects ALTER TABLE IF EXISTS ENABLE ROW LEVEL SECURITY', () => {
-      const results = sqlEventParser.getTableEvents(
-        'ALTER TABLE IF EXISTS public."Conversations" ENABLE ROW LEVEL SECURITY'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: 'public',
-        tableName: 'Conversations',
-      })
-    })
-
-    it('detects ALTER TABLE ONLY ENABLE ROW LEVEL SECURITY', () => {
-      const results = sqlEventParser.getTableEvents(
-        'ALTER TABLE ONLY public.users ENABLE ROW LEVEL SECURITY'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
-
-    it('detects ALTER TABLE IF EXISTS ONLY ENABLE ROW LEVEL SECURITY', () => {
-      const results = sqlEventParser.getTableEvents(
-        'ALTER TABLE IF EXISTS ONLY public.users ENABLE ROW LEVEL SECURITY'
-      )
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableRLSEnabled,
-        schema: 'public',
-        tableName: 'users',
-      })
-    })
+  it.each([
+    'SELECT * FROM users',
+    'UPDATE users SET name = "John"',
+    "COPY users TO '/tmp/users.csv'",
+    'ALTER TABLE users DISABLE ROW LEVEL SECURITY',
+  ])('returns no events for %s', (sql) => {
+    expect(sqlEventParser.getTableEvents(sql)).toEqual([])
   })
 
   describe('ReDoS protection', () => {
@@ -406,28 +152,6 @@ describe('SQL Event Parser', () => {
       const sql = 'CREATE TABLE 用户表 (id INT)'
       const results = sqlEventParser.getTableEvents(sql)
       expect(results).toHaveLength(0)
-    })
-
-    it('handles identifiers with numbers', () => {
-      const sql = 'CREATE TABLE table123 (id INT)'
-      const results = sqlEventParser.getTableEvents(sql)
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'table123',
-      })
-    })
-
-    it('handles identifiers with underscores', () => {
-      const sql = 'CREATE TABLE user_accounts (id INT)'
-      const results = sqlEventParser.getTableEvents(sql)
-      expect(results).toHaveLength(1)
-      expect(results[0]).toEqual({
-        type: TABLE_EVENT_ACTIONS.TableCreated,
-        schema: undefined,
-        tableName: 'user_accounts',
-      })
     })
 
     it('handles escaped quotes in identifiers', () => {

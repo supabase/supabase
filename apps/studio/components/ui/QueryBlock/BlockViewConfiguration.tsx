@@ -1,4 +1,4 @@
-import { BarChart2, Settings2, Table } from 'lucide-react'
+import { BarChart2Icon, Settings2Icon, TableIcon } from 'lucide-react'
 import {
   Checkbox,
   Label,
@@ -43,7 +43,7 @@ export const BlockViewConfiguration = ({
           id="help-popover-button"
           variant="text"
           className="px-1"
-          icon={<Settings2 size={14} strokeWidth={1.5} />}
+          icon={<Settings2Icon size={14} strokeWidth={1.5} />}
           tooltip={{ content: { side: 'bottom', text: 'View data' } }}
         />
       </PopoverTrigger>
@@ -59,11 +59,11 @@ export const BlockViewConfiguration = ({
             }}
           >
             <ToggleGroupItem className="w-full" value="table" aria-label="Show as table">
-              <Table className="h-4 w-4" />
+              <TableIcon className="h-4 w-4" />
               <p className="text-xs ml-2">As table</p>
             </ToggleGroupItem>
             <ToggleGroupItem className="w-full" value="chart" aria-label="Show as chart">
-              <BarChart2 className="h-4 w-4" />
+              <BarChart2Icon className="h-4 w-4" />
               <p className="text-xs ml-2">As chart</p>
             </ToggleGroupItem>
           </ToggleGroup>
@@ -76,7 +76,7 @@ export const BlockViewConfiguration = ({
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, xKey: value })}
               >
                 <SelectTrigger className="text-left">
-                  X Axis {chartConfig?.xKey && `- ${chartConfig.xKey}`}
+                  X Axis {chartConfig?.xKey && <span>{`- ${chartConfig.xKey}`}</span>}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -95,7 +95,7 @@ export const BlockViewConfiguration = ({
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, yKey: value })}
               >
                 <SelectTrigger className="text-left">
-                  Y Axis {chartConfig?.yKey && `- ${chartConfig.yKey}`}
+                  Y Axis {chartConfig?.yKey && <span>{`- ${chartConfig.yKey}`}</span>}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

@@ -8,7 +8,8 @@ import type {
   UpsertWebhookEndpointInput,
   WebhookEndpoint,
 } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointUpdateVariables = {
   scope: WebhookScopeParams
@@ -29,9 +30,7 @@ async function updateEndpoint({
   })
   if (!result?.data) throw new Error('Endpoint was updated but no data was returned')
 
-  // See the comment in platform-webhook-endpoint-create-mutation.ts — `name` isn't
-  // persisted by the server, so it's carried through from what the user submitted.
-  return { ...toWebhookEndpoint(result.data), name: input.name }
+  return toWebhookEndpoint(result.data)
 }
 
 type WebhookEndpointUpdateData = Awaited<ReturnType<typeof updateEndpoint>>
@@ -41,16 +40,12 @@ export const useWebhookEndpointUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    WebhookEndpointUpdateData,
-    ResponseError,
-    WebhookEndpointUpdateVariables
-  >,
+  UseCustomMutationOptions<WebhookEndpointUpdateData, StudioError, WebhookEndpointUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointUpdateData, ResponseError, WebhookEndpointUpdateVariables>({
+  return useMutation<WebhookEndpointUpdateData, StudioError, WebhookEndpointUpdateVariables>({
     mutationFn: updateEndpoint,
     async onSuccess(data, variables, context) {
       await Promise.all([

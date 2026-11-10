@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { Check, ExternalLink, FlaskConical, Square } from 'lucide-react'
+import { CheckIcon, ExternalLinkIcon, FlaskConicalIcon, SquareIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useMemo } from 'react'
 import { useLatest } from 'react-use'
@@ -114,7 +114,7 @@ export function useFeaturePreviewCommands() {
                 ? `${preview.name}, Feature preview, now the default, can't be turned off`
                 : `${preview.name}, Feature preview, Toggle ${preview.name}`,
               action: () => toggleFeaturePreview(preview),
-              icon: () => (flagsRef.current[preview.key] ? <Check /> : <Square />),
+              icon: () => (flagsRef.current[preview.key] ? <CheckIcon /> : <SquareIcon />),
               badge: preview.isForced
                 ? () => (
                     <Badge
@@ -133,7 +133,7 @@ export function useFeaturePreviewCommands() {
               name: `${preview.name}: View details`,
               value: `${preview.name}, About, Learn more, Description, Feedback, Discussion`,
               action: () => openFeaturePreviewDetails(preview.key),
-              icon: () => <ExternalLink />,
+              icon: () => <ExternalLinkIcon />,
               defaultHidden: true,
             },
           ]),
@@ -150,7 +150,7 @@ export function useFeaturePreviewCommands() {
         name: 'Feature previews...',
         value: 'Feature previews, Try new features, Early access, Opt in, Opt out, Beta features',
         action: () => setPage(FEATURE_PREVIEWS_PAGE_NAME),
-        icon: () => <FlaskConical />,
+        icon: () => <FlaskConicalIcon />,
       },
     ],
     { enabled: visiblePreviews.length > 0 }

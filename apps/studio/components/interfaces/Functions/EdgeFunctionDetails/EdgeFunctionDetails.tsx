@@ -1,5 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useParams } from 'common'
 import { useRouter } from 'next/router'
 import { useEffect, useMemo, useState } from 'react'
@@ -42,13 +42,15 @@ import z from 'zod'
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useEdgeFunctionQuery } from '@/data/edge-functions/edge-function-query'
 import { useEdgeFunctionDeleteMutation } from '@/data/edge-functions/edge-functions-delete-mutation'
 import { useEdgeFunctionUpdateMutation } from '@/data/edge-functions/edge-functions-update-mutation'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
+import { useGrant } from '@/lib/grants'
 
 const FormSchema = z.object({
   name: z.string().min(0, 'Name is required'),
@@ -71,15 +73,22 @@ export const EdgeFunctionDetails = () => {
   const [selectedTab, setSelectedTab] = useState(invocationTabs[0].id)
   const [showDeleteModal, setShowDeleteModal] = useState(false)
 
-  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissions(
-    PermissionAction.FUNCTIONS_WRITE,
-    '*'
+  const { can: canUpdateEdgeFunctionPermission } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_WRITE
   )
 
   const canUpdateEdgeFunction = IS_PLATFORM && canUpdateEdgeFunctionPermission
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
+  )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
   const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
@@ -187,12 +196,8 @@ export const EdgeFunctionDetails = () => {
                                   <em className="text-foreground not-italic">
                                     only by the legacy secret
                                   </em>{' '}
-                                  in the{' '}
-                                  <code className="text-code-inline break-keep!">
-                                    Authorization
-                                  </code>{' '}
-                                  header. The <code className="text-code-inline">anon</code> key
-                                  satisfies this.
+                                  in the <code className="break-keep!">Authorization</code> header.
+                                  The <code>anon</code> key satisfies this.
                                 </p>
                                 <p>
                                   Recommended: OFF with JWT and custom auth logic in your function
@@ -260,10 +265,15 @@ export const EdgeFunctionDetails = () => {
                       className="ml-auto -translate-y-2 translate-x-3"
                       onClick={() => setShowKey(!showKey)}
                     >
-                      {showKey ? 'Hide' : 'Show'} anon key
+                      {showKey ? <span>Hide</span> : <span>Show</span>} <span>anon key</span>
                     </Button>
                   )}
                 </TabsList>
+                <ApiKeysAccessNote
+                  grant={apiKeysGrant}
+                  fallback="Replace the placeholder with your own key."
+                  className="px-6 pb-2"
+                />
                 {invocationTabs.map((tab) => {
                   const code = tab.code({
                     showKey,

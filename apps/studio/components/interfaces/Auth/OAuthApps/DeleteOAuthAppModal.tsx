@@ -40,8 +40,7 @@ export const DeleteOAuthAppModal = ({
       visible={visible}
       title={
         <>
-          Confirm to delete OAuth app{' '}
-          <code className="text-code-inline">{selectedApp?.client_name}</code>
+          Confirm to delete OAuth app <code>{selectedApp?.client_name}</code>
         </>
       }
       confirmLabel="Confirm delete"

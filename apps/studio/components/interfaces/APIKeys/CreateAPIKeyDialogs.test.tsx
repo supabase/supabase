@@ -50,7 +50,6 @@ describe('API key create dialogs', () => {
       expect.objectContaining({
         id: SHORTCUT_IDS.API_KEYS_NEW_PUBLISHABLE,
         onTrigger: expect.any(Function),
-        side: 'bottom',
       }),
       undefined
     )
@@ -70,7 +69,6 @@ describe('API key create dialogs', () => {
         id: SHORTCUT_IDS.API_KEYS_CREATE_PUBLISHABLE,
         onTrigger: expect.any(Function),
         options: { enabled: true },
-        side: 'top',
       }),
       undefined
     )
@@ -86,7 +84,6 @@ describe('API key create dialogs', () => {
       expect.objectContaining({
         id: SHORTCUT_IDS.API_KEYS_NEW_SECRET,
         onTrigger: expect.any(Function),
-        side: 'bottom',
       }),
       undefined
     )
@@ -106,7 +103,6 @@ describe('API key create dialogs', () => {
         id: SHORTCUT_IDS.API_KEYS_CREATE_SECRET,
         onTrigger: expect.any(Function),
         options: { enabled: true },
-        side: 'top',
       }),
       undefined
     )

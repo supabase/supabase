@@ -20,29 +20,17 @@ function entriesWith(fieldId: string, values: CustomFieldEntry['values']): Array
 }
 
 describe('readCustomFieldFlag', () => {
-  test('matches via value_option', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_option: { value: 'true' } }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(true)
-  })
-
-  test('matches via value_text', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_text: 'true' }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(true)
-  })
-
-  test('matches via value_numeric (non-zero → true)', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '5' }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(true)
-  })
-
-  test('value_numeric of 0 → false', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '0' }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(false)
-  })
-
-  test('value_numeric negative → false', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '-5' }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(false)
+  test.each<[string, CustomFieldEntry['values'], boolean]>([
+    ['value_option', [{ value_option: { value: 'true' } }], true],
+    ['value_text', [{ value_text: 'true' }], true],
+    ['non-zero value_numeric', [{ value_numeric: '5' }], true],
+    ['zero value_numeric', [{ value_numeric: '0' }], false],
+    ['negative value_numeric', [{ value_numeric: '-5' }], false],
+    ['uppercase value_option', [{ value_option: { value: 'TRUE' } }], true],
+    ['mixed-case "Yes"', [{ value_text: 'Yes' }], true],
+    ['whitespace-padded value', [{ value_text: ' true ' }], true],
+  ])('reads %s', (_, values, expected) => {
+    expect(readCustomFieldFlag(entriesWith(FIELD_ID, values), FIELD_ID)).toBe(expected)
   })
 
   test('missing entry → false', () => {
@@ -54,50 +42,18 @@ describe('readCustomFieldFlag', () => {
     const entries = entriesWith(FIELD_ID, [{ value_text: 'true' }])
     expect(readCustomFieldFlag(entries, '')).toBe(false)
   })
-
-  test('is case-insensitive', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_option: { value: 'TRUE' } }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(true)
-
-    const entries2 = entriesWith(FIELD_ID, [{ value_text: 'Yes' }])
-    expect(readCustomFieldFlag(entries2, FIELD_ID)).toBe(true)
-  })
-
-  test('trims whitespace', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_text: ' true ' }])
-    expect(readCustomFieldFlag(entries, FIELD_ID)).toBe(true)
-  })
 })
 
 describe('readCustomFieldNumber', () => {
-  test('reads a valid positive value via value_numeric', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '7' }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(7)
-  })
-
-  test('reads a valid positive value via value_option', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_option: { value: '3' } }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(3)
-  })
-
-  test('reads a valid positive value via value_text', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_text: '10' }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(10)
-  })
-
-  test('0 → null', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '0' }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(null)
-  })
-
-  test('negative number → null', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_numeric: '-5' }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(null)
-  })
-
-  test('non-numeric string (NaN) → null', () => {
-    const entries = entriesWith(FIELD_ID, [{ value_text: 'not-a-number' }])
-    expect(readCustomFieldNumber(entries, FIELD_ID)).toBe(null)
+  test.each<[string, CustomFieldEntry['values'], number | null]>([
+    ['value_numeric', [{ value_numeric: '7' }], 7],
+    ['value_option', [{ value_option: { value: '3' } }], 3],
+    ['value_text', [{ value_text: '10' }], 10],
+    ['zero as null', [{ value_numeric: '0' }], null],
+    ['negative as null', [{ value_numeric: '-5' }], null],
+    ['non-numeric as null', [{ value_text: 'not-a-number' }], null],
+  ])('reads %s', (_, values, expected) => {
+    expect(readCustomFieldNumber(entriesWith(FIELD_ID, values), FIELD_ID)).toBe(expected)
   })
 
   test('empty fieldId → null', () => {

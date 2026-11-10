@@ -1,4 +1,4 @@
-import { LoaderCircle } from 'lucide-react'
+import { LoaderCircleIcon } from 'lucide-react'
 import SVG from 'react-inlinesvg'
 
 import { useFetchFileUrlQuery } from './useFetchFileUrlQuery'
@@ -54,7 +54,7 @@ export const FilePreview = ({ path, mimeType, size, versionId }: FilePreviewProp
   if (isPending) {
     return (
       <div className="flex h-full w-full items-center justify-center text-foreground-lighter">
-        <LoaderCircle size={14} className="animate-spin text-foreground-lighter" />
+        <LoaderCircleIcon size={14} className="animate-spin text-foreground-lighter" />
       </div>
     )
   }

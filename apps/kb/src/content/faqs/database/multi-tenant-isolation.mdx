@@ -1,0 +1,11 @@
+---
+title: Can Supabase isolate tenant data in a multi-tenant SaaS app?
+topics: ['Database', 'Auth']
+lastEdited: 2026-10-30
+---
+
+Yes. The common setup is a shared schema where every tenant-owned table has a `tenant_id` column, and [Row Level Security](/docs/guides/database/postgres/row-level-security) makes Postgres enforce it on every query. A policy compares the row's `tenant_id` with a claim in the user's JWT, so the database itself refuses to return another tenant's rows, even if your app forgets a filter.
+
+These policies can cover writes as well as reads. A policy's `using` clause controls which rows a query can see, and its `with check` clause controls what can be inserted or updated, which is what stops a user from writing a row into someone else's tenant. Test your policies like you test code. [`supabase test db`](/docs/reference/cli/supabase-test) runs database tests for exactly this.
+
+If all access goes through your own server and an ORM, you can enforce isolation in the app instead. Then every query and every write has to go through code that sets and checks the tenant. For more details, see [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security).

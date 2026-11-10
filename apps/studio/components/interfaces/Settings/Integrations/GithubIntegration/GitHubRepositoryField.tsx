@@ -1,4 +1,4 @@
-import { ChevronDown, PlusIcon, RefreshCw } from 'lucide-react'
+import { ChevronDownIcon, PlusIcon, RefreshCwIcon } from 'lucide-react'
 import { useMemo, useState, type ComponentProps, type ReactNode } from 'react'
 import { useWatch, type FieldValues, type Path, type UseFormReturn } from 'react-hook-form'
 import {
@@ -137,7 +137,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                     className="justify-start h-[34px] w-full [&>div:last-child]:ml-auto"
                     disabled={disabled || isLoading}
                     loading={!!gitHubAuthorization && isLoading}
-                    iconRight={<ChevronDown />}
+                    iconRight={<ChevronDownIcon />}
                   >
                     {selectedRepository?.name ||
                       selectedRepositoryName ||
@@ -205,7 +205,7 @@ export const GitHubRepositoryField = <TFormValues extends FieldValues>({
                               openInstallGitHubIntegrationWindow('authorize', refetch)
                             }}
                           >
-                            <RefreshCw size={16} className="mt-0.5 shrink-0" />
+                            <RefreshCwIcon size={16} className="mt-0.5 shrink-0" />
                             <div className="text-xs text-foreground-light">
                               Re-authorize GitHub with SSO to show all repositories
                             </div>

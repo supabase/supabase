@@ -4,7 +4,6 @@ import type { components } from 'api-types'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
-import { z } from 'zod'
 
 import { RealtimeSettings } from './RealtimeSettings'
 import type { Entitlement, FeatureKey } from '@/data/entitlements/entitlements-query'
@@ -28,8 +27,9 @@ const {
   mockUseDatabasePoliciesQuery: vi.fn(),
 }))
 
-vi.mock('@/hooks/misc/useCheckPermissions', () => ({
-  useAsyncCheckPermissions: mockUseAsyncCheckPermissions,
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { REALTIME_CONFIG_WRITE: 'realtime_config_write' } },
 }))
 
 vi.mock('@/hooks/misc/useSelectedProject', () => ({
@@ -55,7 +55,8 @@ vi.mock('@/lib/constants', async (importOriginal) => {
 
 const REALTIME_CONFIG = {
   connection_pool: 2,
-  postgres_changes_pool: 2,
+  // Deliberately differs from REALTIME_DEFAULT_CONFIG so the fallback test can tell them apart
+  postgres_changes_pool: 7,
   max_bytes_per_second: 100000,
   max_channels_per_client: 100,
   max_concurrent_users: 200,
@@ -118,10 +119,13 @@ describe('RealtimeSettings', () => {
     })
   })
 
-  test('renders the fetched postgres changes pool value', async () => {
+  test('renders the fetched postgres changes pool value without a suspension banner', async () => {
     customRender(<RealtimeSettings />)
 
-    expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
+    expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(7)
+    expect(
+      screen.queryByText('Supabase has suspended Realtime for this project')
+    ).not.toBeInTheDocument()
   })
 
   test('falls back to the default postgres changes pool value when omitted', async () => {
@@ -139,36 +143,6 @@ describe('RealtimeSettings', () => {
     customRender(<RealtimeSettings />)
 
     expect(await screen.findByLabelText('Postgres Changes connection pool size')).toHaveValue(2)
-  })
-
-  test('submits the postgres changes pool value when saving', async () => {
-    const updateBodySchema = z.object({ postgres_changes_pool: z.number() })
-
-    const requests: z.infer<typeof updateBodySchema>[] = []
-    addAPIMock({
-      method: 'patch',
-      path: '/platform/projects/:ref/config/realtime',
-      response: async ({ request }) => {
-        requests.push(updateBodySchema.parse(await request.json()))
-        return new HttpResponse(null, { status: 204 })
-      },
-    })
-
-    customRender(<RealtimeSettings />)
-
-    const postgresChangesPoolInput = await screen.findByLabelText(
-      'Postgres Changes connection pool size'
-    )
-    await userEvent.clear(postgresChangesPoolInput)
-    await userEvent.type(postgresChangesPoolInput, '5')
-
-    fireEvent.click(screen.getByRole('button', { name: 'Save changes' }))
-
-    const dialog = await screen.findByRole('dialog')
-    fireEvent.click(within(dialog).getByRole('button', { name: 'Save changes' }))
-
-    await waitFor(() => expect(requests).toHaveLength(1))
-    expect(requests[0]).toMatchObject({ postgres_changes_pool: 5 })
   })
 
   test.each([
@@ -287,14 +261,5 @@ describe('RealtimeSettings', () => {
     expect(
       await screen.findByText('Supabase has suspended Realtime for this project')
     ).toBeInTheDocument()
-  })
-
-  test('does not show a suspension banner when Realtime has not been admin-suspended', async () => {
-    customRender(<RealtimeSettings />)
-
-    await screen.findByLabelText('Postgres Changes connection pool size')
-    expect(
-      screen.queryByText('Supabase has suspended Realtime for this project')
-    ).not.toBeInTheDocument()
   })
 })

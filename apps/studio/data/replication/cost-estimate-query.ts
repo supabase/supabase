@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationCostEstimateParams = {
   projectRef?: string
@@ -41,9 +42,9 @@ export const useReplicationCostEstimateQuery = <TData = ReplicationCostEstimateD
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<ReplicationCostEstimateData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<ReplicationCostEstimateData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationCostEstimateData, ResponseError, TData>({
+  useQuery<ReplicationCostEstimateData, StudioError, TData>({
     queryKey: replicationKeys.costEstimate(projectRef, sourceId, publicationName),
     queryFn: ({ signal }) =>
       fetchReplicationCostEstimate({ projectRef, sourceId, publicationName }, signal),

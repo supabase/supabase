@@ -37,14 +37,7 @@ describe('getVisibleDefaultEdgeFunctionSecrets', () => {
     (secret) => secret.name
   )
 
-  it('always includes runtime secrets', () => {
-    const result = getVisibleDefaultEdgeFunctionSecrets(new Set())
-    for (const name of runtimeNames) {
-      expect(result.map((secret) => secret.name)).toContain(name)
-    }
-  })
-
-  it('falls back to the full hardcoded list when API returned no static defaults', () => {
+  it('falls back to the full hardcoded list (incl. runtime secrets) when API returned no static defaults', () => {
     const result = getVisibleDefaultEdgeFunctionSecrets(new Set())
     expect(result.map((secret) => secret.name)).toEqual([...staticNames, ...runtimeNames])
   })

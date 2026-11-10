@@ -1,6 +1,6 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import { RotateCcw } from 'lucide-react'
+import { RotateCcwIcon } from 'lucide-react'
 import { useFormState, useWatch, type UseFormReturn } from 'react-hook-form'
 import {
   Button,
@@ -170,7 +170,7 @@ export function DiskSizeField({ form, disableInput }: DiskSizeFieldProps) {
                     }}
                     title="Reset"
                   >
-                    <RotateCcw className="h-4 w-4" aria-hidden="true" />
+                    <RotateCcwIcon className="h-4 w-4" aria-hidden="true" />
                   </InputGroupButton>
                 ) : null}
               </InputGroupAddon>

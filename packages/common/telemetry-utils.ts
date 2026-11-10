@@ -1,6 +1,18 @@
 import { IS_PROD } from './constants'
 import { isBrowser } from './helpers'
 
+export type TelemetryPlatform = 'studio' | 'www' | 'docs' | 'kb' | 'learn' | 'ui-library'
+
+let telemetryPlatform: TelemetryPlatform | undefined
+
+export function setTelemetryPlatform(platform: TelemetryPlatform) {
+  telemetryPlatform = platform
+}
+
+export function getTelemetryPlatform() {
+  return telemetryPlatform
+}
+
 export function getTelemetryCookieOptions() {
   if (typeof window === 'undefined') return 'path=/; SameSite=Lax'
   if (!IS_PROD) return 'path=/; SameSite=Lax'

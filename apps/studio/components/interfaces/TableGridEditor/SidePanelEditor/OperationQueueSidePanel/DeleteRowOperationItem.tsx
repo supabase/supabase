@@ -1,5 +1,5 @@
 import { useQueryClient } from '@tanstack/react-query'
-import { Undo2 } from 'lucide-react'
+import { Undo2Icon } from 'lucide-react'
 import { Card, CardContent, CardHeader } from 'ui'
 
 import { formatOperationItemValue } from './OperationQueueSidePanel.utils'
@@ -50,7 +50,7 @@ export const DeleteRowOperationItem = ({
       <CardHeader className="py-2 px-3 flex flex-row gap-2 border-b border-destructive-500 space-y-0 items-center">
         <div className="min-w-0 flex-1 flex items-start gap-2">
           <div className="min-w-0 flex-1">
-            <code className="text-code-inline dark:bg-surface-300 dark:border-foreground-muted/50">
+            <code className="dark:bg-surface-300 dark:border-foreground-muted/50">
               {fullTableName}
             </code>
             <div className="text-xs text-foreground mt-1 ml-0.5">
@@ -64,7 +64,7 @@ export const DeleteRowOperationItem = ({
           variant="text"
           aria-label="Discard change"
           className="w-7"
-          icon={<Undo2 />}
+          icon={<Undo2Icon />}
           onClick={handleDelete}
           tooltip={{
             content: {

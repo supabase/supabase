@@ -23,6 +23,7 @@ vi.mock('@supabase/mcp-server-supabase', () => ({
   createSupabaseMcpServer: vi.fn().mockReturnValue({
     connect: vi.fn().mockResolvedValue(undefined),
   }),
+  createFeedbackOperations: vi.fn().mockReturnValue({}),
 }))
 
 describe('/api/mcp', () => {
@@ -32,7 +33,7 @@ describe('/api/mcp', () => {
   })
 
   describe('Method handling', async () => {
-    it('should handle POST requests', async () => {
+    it('should handle POST requests without a features parameter', async () => {
       const { req, res } = createMocks({
         method: 'POST',
         query: {},
@@ -42,6 +43,7 @@ describe('/api/mcp', () => {
       await handler(req, res)
 
       expect(res._getStatusCode()).not.toBe(405)
+      expect(res._getStatusCode()).not.toBe(400)
     })
 
     it('should return 405 for non-POST methods', async () => {
@@ -72,6 +74,30 @@ describe('/api/mcp', () => {
       expect(res._getStatusCode()).not.toBe(400)
     })
 
+    it('should accept the feedback feature group', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        query: { features: 'feedback' },
+        body: {},
+      })
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).not.toBe(400)
+    })
+
+    it('should reject the notebooks feature group', async () => {
+      const { req, res } = createMocks({
+        method: 'POST',
+        query: { features: 'notebooks' },
+        body: {},
+      })
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(400)
+    })
+
     it('should reject invalid feature groups', async () => {
       const { req, res } = createMocks({
         method: 'POST',
@@ -83,18 +109,6 @@ describe('/api/mcp', () => {
 
       expect(res._getStatusCode()).toBe(400)
       expect(JSON.parse(res._getData())).toHaveProperty('error')
-    })
-
-    it('should work without features parameter', async () => {
-      const { req, res } = createMocks({
-        method: 'POST',
-        query: {},
-        body: {},
-      })
-
-      await handler(req, res)
-
-      expect(res._getStatusCode()).not.toBe(400)
     })
   })
 })

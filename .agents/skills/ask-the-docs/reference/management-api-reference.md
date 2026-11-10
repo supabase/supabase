@@ -104,7 +104,7 @@ API update also runs it after refreshing the live inputs.
 ## Related
 
 - [`build-pipeline.md`](./build-pipeline.md) — where `codegen:references`
-  sits in prebuild.
+  sits in the turbo graph.
 - [`app-map.md`](./app-map.md) — reference vs guides routing.
 - [`known-issues.md`](./known-issues.md) — reference pages avoid standard
   MDX; length / modularization direction.

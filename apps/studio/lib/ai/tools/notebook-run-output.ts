@@ -1,7 +1,7 @@
 import type { JSONValue } from 'ai'
 import { z } from 'zod'
 
-import { lowerOptInLevel, optInLevelSchema } from '../tool-filter'
+import { lowerOptInLevel, optInLevelSchema } from '../opt-in-level'
 import type { AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 
 const jsonValueSchema: z.ZodType<JSONValue> = z.lazy(() =>

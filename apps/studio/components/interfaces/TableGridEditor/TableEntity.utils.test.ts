@@ -288,21 +288,7 @@ describe('TableEntity.utils: getTablePoliciesUrl', () => {
     )
   })
 
-  it('preserves special characters in the table name', () => {
-    const url = getTablePoliciesUrl('abc', 'public', 'user_data&secret=1')
-    const parsed = new URL(url, 'http://example.com')
-    expect(parsed.searchParams.get('search')).toBe('user_data&secret=1')
-    expect(parsed.searchParams.get('schema')).toBe('public')
-  })
-
-  it('preserves special characters in the schema', () => {
-    const url = getTablePoliciesUrl('abc', 'my schema+x', 'users')
-    const parsed = new URL(url, 'http://example.com')
-    expect(parsed.searchParams.get('schema')).toBe('my schema+x')
-    expect(parsed.searchParams.get('search')).toBe('users')
-  })
-
-  it('encodes both the table name and schema together', () => {
+  it('preserves special characters in the table name and schema', () => {
     const url = getTablePoliciesUrl('abc', 'a&b=c', 'd e+f')
     const parsed = new URL(url, 'http://example.com')
     expect(parsed.searchParams.get('search')).toBe('d e+f')

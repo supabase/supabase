@@ -44,7 +44,7 @@ values (
       <DialogContent aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
-            Insert data into <code className="text-code-inline">{table}</code>
+            Insert data into <code>{table}</code>
           </DialogTitle>
         </DialogHeader>
 
@@ -53,7 +53,7 @@ values (
         <DialogSection className="flex flex-col gap-y-2">
           <p className="text-sm">
             The Iceberg Foreign Data Wrapper (FDW) supports inserting data into Iceberg tables using
-            standard SQL <code className="text-code-inline">INSERT</code> statements.
+            standard SQL <code>INSERT</code> statements.
           </p>
           <p className="text-sm">
             Use the following SQL snippet to insert data into your iceberg table:

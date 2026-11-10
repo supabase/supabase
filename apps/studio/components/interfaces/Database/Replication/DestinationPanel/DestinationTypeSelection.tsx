@@ -10,16 +10,18 @@ import {
 } from 'ui'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 
+import { PipelineDestinationSelection } from '../CreatePipeline/PipelineDestinationSelection'
 import { DestinationLogo } from '../DestinationLogo'
 import { useDestinationInformation } from '../useDestinationInformation'
 import {
-  useIsETLBigQueryPrivateAlpha,
-  useIsETLClickHousePrivateAlpha,
-  useIsETLDucklakePrivateAlpha,
-  useIsETLIcebergPrivateAlpha,
-  useIsETLSnowflakePrivateAlpha,
-} from '../useIsETLPrivateAlpha'
+  useIsPipelinesBigQueryEnabled,
+  useIsPipelinesClickHouseEnabled,
+  useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesIcebergEnabled,
+  useIsPipelinesSnowflakeEnabled,
+} from '../useIsPipelinesEnabled'
 import { DestinationType } from './DestinationPanel.types'
+import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 
 interface DestinationTypeOption {
   value: DestinationType
@@ -35,11 +37,12 @@ interface DestinationTypeGroup {
 }
 
 export const DestinationTypeSelection = () => {
-  const etlEnableBigQuery = useIsETLBigQueryPrivateAlpha()
-  const etlEnableIceberg = useIsETLIcebergPrivateAlpha()
-  const etlEnableDucklake = useIsETLDucklakePrivateAlpha()
-  const etlEnableSnowflake = useIsETLSnowflakePrivateAlpha()
-  const etlEnableClickHouse = useIsETLClickHousePrivateAlpha()
+  const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
+  const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
+  const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
+  const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
+  const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
 
   const [urlDestinationType, setDestinationType] = useQueryState(
     'destinationType',
@@ -76,28 +79,28 @@ export const DestinationTypeSelection = () => {
           label: 'BigQuery',
           description: 'Replicate changes to BigQuery for analytics and BI',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('BigQuery', etlEnableBigQuery),
+          enabled: isOptionVisible('BigQuery', isBigQueryEnabled),
         },
         {
           value: 'DuckLake',
           label: 'DuckLake',
           description: 'Replicate changes to DuckLake for open lakehouse storage',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('DuckLake', etlEnableDucklake),
+          enabled: isOptionVisible('DuckLake', isDuckLakeEnabled),
         },
         {
           value: 'Snowflake',
           label: 'Snowflake',
           description: 'Replicate changes to Snowflake for cloud data warehousing',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('Snowflake', etlEnableSnowflake),
+          enabled: isOptionVisible('Snowflake', isSnowflakeEnabled),
         },
         {
           value: 'ClickHouse',
           label: 'ClickHouse',
           description: 'Replicate changes to ClickHouse for real-time analytics',
           stage: 'Public Alpha',
-          enabled: isOptionVisible('ClickHouse', etlEnableClickHouse),
+          enabled: isOptionVisible('ClickHouse', isClickHouseEnabled),
         },
       ],
     },
@@ -109,7 +112,7 @@ export const DestinationTypeSelection = () => {
           label: 'Analytics Bucket',
           description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
           stage: 'Deprecated',
-          enabled: isOptionVisible('Analytics Bucket', etlEnableIceberg),
+          enabled: isOptionVisible('Analytics Bucket', isIcebergEnabled),
         },
       ],
     },
@@ -137,11 +140,26 @@ export const DestinationTypeSelection = () => {
   const typeDescription =
     !editMode || stageDescription ? (
       <span>
-        {!editMode && 'Destination type cannot be changed after creation.'}
-        {!editMode && stageDescription ? ' ' : null}
-        {stageDescription}
+        {[!editMode && 'Destination type cannot be changed after creation.', stageDescription]
+          .filter(Boolean)
+          .join(' ')}
       </span>
     ) : undefined
+
+  if (isCreationPreviewEnabled && !editMode) {
+    const availableDestinations = options.map(({ value }) => value)
+    return (
+      <div className="p-5">
+        <PipelineDestinationSelection
+          availableDestinations={availableDestinations}
+          value={destinationType ?? null}
+          onChange={(value) => setDestinationType(value)}
+          renderLogo={(type) => <DestinationLogo type={type} />}
+        />
+        <p className="mt-3 text-sm text-foreground-lighter">{typeDescription}</p>
+      </div>
+    )
+  }
 
   return (
     <>

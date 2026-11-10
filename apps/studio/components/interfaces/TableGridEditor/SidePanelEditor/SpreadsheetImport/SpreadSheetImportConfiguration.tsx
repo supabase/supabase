@@ -1,4 +1,4 @@
-import { ChevronDown } from 'lucide-react'
+import { ChevronDownIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger, SidePanel } from 'ui'
 import { MultiSelector } from 'ui-patterns/multi-select'
@@ -35,7 +35,7 @@ const SpreadsheetImportConfiguration = ({
               variant="text"
               aria-label="Toggle import configuration"
               icon={
-                <ChevronDown
+                <ChevronDownIcon
                   size={18}
                   strokeWidth={2}
                   className={cn('text-foreground-light', expandConfiguration && 'rotate-180')}

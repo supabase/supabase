@@ -70,10 +70,10 @@ export default function SonnerDemo() {
       <Button
         onClick={() =>
           toast(
-            <>
+            <div className="flex gap-2 items-center">
               <div>A custom toast with default styling</div>
               <Button>Hello world</Button>
-            </>
+            </div>
           )
         }
       >

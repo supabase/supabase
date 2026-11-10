@@ -43,7 +43,7 @@ export const OperationQueueSidePanel = () => {
           <SheetHeader>
             <SheetTitle>Pending changes</SheetTitle>
             <SheetDescription>
-              {operations.length} operation{operations.length !== 1 ? 's' : ''}
+              {operations.length} operation{operations.length !== 1 ? <span>s</span> : ''}
             </SheetDescription>
           </SheetHeader>
 

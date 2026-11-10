@@ -1,4 +1,4 @@
-import { Check, Copy } from 'lucide-react'
+import { CheckIcon, CopyIcon } from 'lucide-react'
 import { useEffect, useState, type RefObject } from 'react'
 import { copyToClipboard } from 'ui'
 
@@ -140,7 +140,7 @@ export function CopyPromptButton({ stepsContainerRef, customPrompt }: CopyPrompt
   return (
     <>
       <ButtonTooltip
-        icon={showCopied ? <Check strokeWidth={2} className="text-primary" /> : <Copy />}
+        icon={showCopied ? <CheckIcon strokeWidth={2} className="text-primary" /> : <CopyIcon />}
         onClick={() => {
           const textToCopy = customPrompt ?? buildConnectPrompt(stepsContainerRef.current)
           copyToClipboard(textToCopy, () => setShowCopied(true))
