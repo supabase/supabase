@@ -1,30 +1,17 @@
-import type { NextApiRequest, NextApiResponse } from 'next'
-import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { toWebHandler } from '@/compat/next/api'
-import handler from '@/pages/api/get-deployment-commit'
+import { Route } from '@/routes/api/get-deployment-commit'
+import { getRouteHandler } from '@/tests/lib/server-route'
 
 const SHA = '0123456789abcdef0123456789abcdef01234567'
 const COMMIT_URL = `https://api.github.com/repos/supabase/supabase/git/commits/${SHA}`
 const fetchMock = vi.fn<typeof fetch>()
 
-async function invokeNext() {
-  const { req, res } = createMocks<NextApiRequest, NextApiResponse>({
-    method: 'GET',
-    query: { sha: 'untrusted-request-sha' },
-    headers: { authorization: 'Bearer test-session', cookie: 'session=test-session' },
-  })
-  await handler(req, res)
-  return {
-    status: res._getStatusCode(),
-    body: res._getJSONData(),
-    cacheControl: res.getHeader('Cache-Control'),
-  }
-}
-
-async function invokeTanstack() {
-  const response = await toWebHandler(handler)({
+async function invoke() {
+  const response = await getRouteHandler(
+    Route,
+    'GET'
+  )({
     request: new Request(
       'https://studio.example/api/get-deployment-commit?sha=untrusted-request-sha',
       {
@@ -52,10 +39,7 @@ afterEach(() => {
   vi.restoreAllMocks()
 })
 
-describe.each([
-  { runtime: 'Next.js', invoke: invokeNext },
-  { runtime: 'TanStack adapter', invoke: invokeTanstack },
-])('$runtime deployment metadata', ({ invoke }) => {
+describe('/api/get-deployment-commit', () => {
   it.each([
     ['2026-09-29T19:28:49Z', '2026-09-29T19:28:49.000Z'],
     ['2026-09-29T15:28:49-04:00', '2026-09-29T19:28:49.000Z'],

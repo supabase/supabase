@@ -1,15 +1,24 @@
-import { createMocks } from 'node-mocks-http'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import handler from '../../../../../../pages/api/v1/projects/[ref]/api-keys'
+import { Route } from '@/routes/api/v1/projects/$ref/api-keys'
 import { mswServer } from '@/tests/lib/msw'
+import { getRouteHandler } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/constants', () => ({
   IS_PLATFORM: false,
   API_URL: 'https://api.example.com',
 }))
 
-describe('/api/v1/projects/[ref]/api-keys', () => {
+const requestApiKeys = (method = 'GET', search = '') =>
+  getRouteHandler(
+    Route,
+    'GET'
+  )({
+    request: new Request(`http://localhost/api/v1/projects/default/api-keys${search}`, { method }),
+    params: { ref: 'default' },
+  })
+
+describe('/api/v1/projects/$ref/api-keys', () => {
   beforeEach(() => {
     // The handler does not hit the network; disable MSW so unrelated unhandled-request errors don't fire.
     mswServer.close()
@@ -22,16 +31,14 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
 
   describe('Method handling', () => {
     it('should return 405 for non-GET methods', async () => {
-      const { req, res } = createMocks({ method: 'POST', query: { ref: 'default' } })
+      const response = await requestApiKeys('POST')
 
-      await handler(req, res)
-
-      expect(res._getStatusCode()).toBe(405)
-      expect(JSON.parse(res._getData())).toEqual({
+      expect(response.status).toBe(405)
+      expect(await response.json()).toEqual({
         data: null,
         error: { message: 'Method POST Not Allowed' },
       })
-      expect(res.getHeader('Allow')).toEqual(['GET'])
+      expect(response.headers.get('Allow')).toBe('GET')
     })
   })
 
@@ -42,11 +49,10 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
       vi.stubEnv('SUPABASE_SECRET_KEY', '')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      expect(res._getStatusCode()).toBe(200)
-      const data = JSON.parse(res._getData())
+      expect(response.status).toBe(200)
+      const data = await response.json()
       expect(data).toHaveLength(2)
       expect(data[0]).toMatchObject({
         name: 'anon',
@@ -68,10 +74,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
       vi.stubEnv('SUPABASE_SECRET_KEY', '')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       expect(data[0].api_key).toBe('')
       expect(data[1].api_key).toBe('')
     })
@@ -82,10 +87,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_abc')
       vi.stubEnv('SUPABASE_SECRET_KEY', '')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       expect(data).toHaveLength(3)
       expect(data[2]).toEqual({
         name: 'publishable',
@@ -105,10 +109,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       expect(data).toHaveLength(3)
       expect(data[2]).toEqual({
         name: 'secret',
@@ -129,10 +132,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       // <= 15 chars: the prefix would otherwise equal the whole secret.
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_xyz')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       const secret = data.find((k: { id: string }) => k.id === 'secret')
       expect(secret.api_key).toBe('')
       expect(secret.prefix).toBe('')
@@ -144,13 +146,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', '')
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const { req, res } = createMocks({
-        method: 'GET',
-        query: { ref: 'default', reveal: 'true' },
-      })
-      await handler(req, res)
+      const response = await requestApiKeys('GET', '?reveal=true')
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       expect(data.find((k: { id: string }) => k.id === 'secret')?.api_key).toBe(
         'sb_secret_abcdefghijklmnop'
       )
@@ -162,10 +160,9 @@ describe('/api/v1/projects/[ref]/api-keys', () => {
       vi.stubEnv('SUPABASE_PUBLISHABLE_KEY', 'sb_publishable_abc')
       vi.stubEnv('SUPABASE_SECRET_KEY', 'sb_secret_abcdefghijklmnop')
 
-      const { req, res } = createMocks({ method: 'GET', query: { ref: 'default' } })
-      await handler(req, res)
+      const response = await requestApiKeys()
 
-      const data = JSON.parse(res._getData())
+      const data = await response.json()
       expect(data).toHaveLength(4)
       expect(data.map((k: { id: string }) => k.id)).toEqual([
         'anon',
