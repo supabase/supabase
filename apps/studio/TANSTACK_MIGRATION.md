@@ -83,7 +83,7 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 - [x] `routes/project/$ref/storage.tsx` — StorageLayout + StorageBucketsLayout (reads `storageLayoutTitle`, optional `skipStorageBucketsLayout`, `storageBucketsLayoutTitle`, `storageBucketsLayoutHideSubtitle` from leaf `staticData`). **Delta vs plan:** the shell wraps in BOTH StorageLayout and StorageBucketsLayout by default — every storage page except bucket-detail pages uses both. Bucket-detail pages set `skipStorageBucketsLayout: true`. `/storage/s3` uses `storageBucketsLayout{Title,HideSubtitle}` to override the inner header.
 - [x] `routes/project/$ref/realtime.tsx` — RealtimeLayout (reads `realtimeLayoutTitle` from leaf `staticData`)
 - [x] `routes/project/$ref/functions.tsx` — EdgeFunctionsLayout (reads `functionsLayoutTitle` from leaf `staticData`). Honours `skipFunctionsLayout: true` opt-out for the `$functionSlug` subtree, whose `EdgeFunctionDetailsLayout` already wraps `EdgeFunctionsLayout` internally — same pattern as auth.tsx. Sub-shell at `routes/project/$ref/functions/$functionSlug.tsx` provides `EdgeFunctionDetailsLayout` for all 5 slug leaves (reads `edgeFunctionDetailsTitle` from leaf staticData).
-- [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. Hoisted `BranchesPageWrapper` and `MergeRequestsPageWrapper` to top-level exports in their respective `pages/...` files so the route files can import + re-use the same wrapping.
+- [x] `routes/project/$ref/branches.tsx` — BranchLayout only. **Delta vs plan:** the per-page `PageLayout` (with different titles + primary/secondary actions) stays in each leaf. `BranchesPageWrapper` and `MergeRequestsPageWrapper` live in their respective leaf route files and wrap the page body there.
 - [x] `routes/project/$ref/logs.tsx` — LogsLayout (reads `logsLayoutTitle` from leaf staticData). Honours `skipLogsLayout: true` for `logs/index` (page handles its own ProjectLayout-wrapped content for the UnifiedLogs / no-permission cases). Refactored `pages/.../logs/index.tsx` to move the inline `<DefaultLayout>` into `getLayout` so it isn't duplicated when the TanStack project shell already provides DefaultLayout.
 - [x] `routes/project/$ref/observability.tsx` — ObservabilityLayout (reads `observabilityLayoutTitle` from leaf staticData)
 - [x] `routes/project/$ref/compute.tsx` — ComputeLayout (reads `computeLayoutTitle` from leaf `staticData`). Flag-gated: `ComputeLayout` itself redirects to the project home when `useFlag('compute')` is off, so the shell needs no extra guard.
@@ -209,44 +209,44 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/storage/*`
 
-- [x] A `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
-- [x] A `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
-- [x] A `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
-- [x] A `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
-- [x] A `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
-- [x] A `routes/project/$ref/storage/files/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [x] A `routes/project/$ref/storage/analytics/index.tsx` ← `pages/project/[ref]/storage/analytics/index.tsx`
-- [x] A `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
-- [x] A `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
-- [x] A `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/s3.tsx` ← `pages/project/[ref]/storage/s3.tsx`
+- [x] A→done `routes/project/$ref/storage/signing-keys.tsx` ← `pages/project/[ref]/storage/signing-keys.tsx`
+- [x] A→done `routes/project/$ref/storage/files/index.tsx` ← `pages/project/[ref]/storage/files/index.tsx`
+- [x] A→done `routes/project/$ref/storage/files/policies.tsx` ← `pages/project/[ref]/storage/files/policies.tsx`
+- [x] A→done `routes/project/$ref/storage/files/settings.tsx` ← `pages/project/[ref]/storage/files/settings.tsx`
+- [x] A→done `routes/project/$ref/storage/files/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/files/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/analytics/index.tsx` ← `pages/project/[ref]/storage/analytics/index.tsx`
+- [x] A→done `routes/project/$ref/storage/analytics/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/analytics/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
+- [x] A→done `routes/project/$ref/storage/vectors/index.tsx` ← `pages/project/[ref]/storage/vectors/index.tsx`
+- [x] A→done `routes/project/$ref/storage/vectors/buckets/$bucketId.tsx` ← `pages/project/[ref]/storage/vectors/buckets/[bucketId].tsx` (sets `skipStorageBucketsLayout: true`)
 
 ### Project shell — `/realtime/*`
 
-- [x] A `routes/project/$ref/realtime/inspector.tsx` ← `pages/project/[ref]/realtime/inspector.tsx`
-- [x] A `routes/project/$ref/realtime/policies.tsx` ← `pages/project/[ref]/realtime/policies.tsx`
-- [x] A `routes/project/$ref/realtime/settings.tsx` ← `pages/project/[ref]/realtime/settings.tsx`
+- [x] A→done `routes/project/$ref/realtime/inspector.tsx` ← `pages/project/[ref]/realtime/inspector.tsx`
+- [x] A→done `routes/project/$ref/realtime/policies.tsx` ← `pages/project/[ref]/realtime/policies.tsx`
+- [x] A→done `routes/project/$ref/realtime/settings.tsx` ← `pages/project/[ref]/realtime/settings.tsx`
 
 ### Project shell — `/compute/*`
 
-- [x] A `routes/project/$ref/compute/index.tsx` ← `pages/project/[ref]/compute/index.tsx`
-- [x] A `routes/project/$ref/compute/$name.tsx` ← `pages/project/[ref]/compute/[name].tsx`
-- [x] A `routes/project/$ref/compute/secrets.tsx` ← `pages/project/[ref]/compute/secrets.tsx`
+- [x] A→done `routes/project/$ref/compute/index.tsx` ← `pages/project/[ref]/compute/index.tsx`
+- [x] A→done `routes/project/$ref/compute/$name.tsx` ← `pages/project/[ref]/compute/[name].tsx`
+- [x] A→done `routes/project/$ref/compute/secrets.tsx` ← `pages/project/[ref]/compute/secrets.tsx`
 
 ### Project shell — `/functions/*`
 
-- [x] A `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in exported `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
-- [x] A `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
-- [x] A `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx` (route wraps in exported `SecretsPageWrapper`)
-- [x] A `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
-- [x] A `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
+- [x] A→done `routes/project/$ref/functions/index.tsx` ← `pages/project/[ref]/functions/index.tsx` (route wraps in `EdgeFunctionsIndexPageWrapper` for the inline PageHeader + actions)
+- [x] A→done `routes/project/$ref/functions/new.tsx` ← `pages/project/[ref]/functions/new.tsx`
+- [x] A→done `routes/project/$ref/functions/secrets.tsx` ← `pages/project/[ref]/functions/secrets.tsx` (route wraps in `SecretsPageWrapper`)
+- [x] A→done `routes/project/$ref/functions/$functionSlug/index.tsx` ← `pages/project/[ref]/functions/[functionSlug]/index.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/code.tsx` ← `pages/project/[ref]/functions/[functionSlug]/code.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/details.tsx` ← `pages/project/[ref]/functions/[functionSlug]/details.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/invocations.tsx` ← `pages/project/[ref]/functions/[functionSlug]/invocations.tsx`
+- [x] A→done `routes/project/$ref/functions/$functionSlug/logs.tsx` ← `pages/project/[ref]/functions/[functionSlug]/logs.tsx`
 
 ### Project shell — `/branches/*`
 
-- [x] A `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx` (route wraps in exported `BranchesPageWrapper` to preserve the page's `PageLayout` + Create-branch action)
-- [x] A `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx` (route wraps in exported `MergeRequestsPageWrapper`)
+- [x] A→done `routes/project/$ref/branches/index.tsx` ← `pages/project/[ref]/branches/index.tsx` (route wraps in `BranchesPageWrapper` to preserve the page's `PageLayout` + Create-branch action)
+- [x] A→done `routes/project/$ref/branches/merge-requests.tsx` ← `pages/project/[ref]/branches/merge-requests.tsx` (route wraps in `MergeRequestsPageWrapper`)
 
 ### Project shell — `/logs/*`
 

@@ -4,9 +4,9 @@ import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import type { ProjectStorageConfigData } from '@/data/config/project-storage-config-query'
 import { API_URL } from '@/lib/constants'
-import StorageVectorsPage from '@/pages/project/[ref]/storage/vectors'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/storage/vectors/index'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const { mockIsPlatform } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
@@ -68,6 +68,12 @@ const mockStorageConfig = (vectorBucketsEnabled: boolean) => {
   })
 }
 
+const renderVectorsPage = () =>
+  renderRoute(Route, {
+    routeId: '/project/$ref/storage/vectors/',
+    url: '/project/default/storage/vectors',
+  })
+
 const mockDeploymentMode = (isCli: boolean) => {
   mswServer.use(
     http.get(`${API_URL}/platform/deployment-mode`, () => HttpResponse.json({ is_cli_mode: isCli }))
@@ -82,7 +88,7 @@ describe('StorageVectorsPage', () => {
   test('platform + not enabled: shows upgrade plan', async () => {
     mockStorageConfig(false)
 
-    customRender(<StorageVectorsPage dehydratedState={undefined} />)
+    await renderVectorsPage()
 
     expect(await screen.findByText('buckets-upgrade-plan-vector')).toBeInTheDocument()
     expect(screen.queryByText('vectors-buckets')).not.toBeInTheDocument()
@@ -91,7 +97,7 @@ describe('StorageVectorsPage', () => {
   test('platform + enabled: shows vector buckets', async () => {
     mockStorageConfig(true)
 
-    customRender(<StorageVectorsPage dehydratedState={undefined} />)
+    await renderVectorsPage()
 
     expect(await screen.findByText('vectors-buckets')).toBeInTheDocument()
   })
@@ -100,7 +106,7 @@ describe('StorageVectorsPage', () => {
     mockIsPlatform.value = false
     mockDeploymentMode(true)
 
-    customRender(<StorageVectorsPage dehydratedState={undefined} />)
+    await renderVectorsPage()
 
     expect(await screen.findByText('vectors-buckets')).toBeInTheDocument()
   })
@@ -109,7 +115,7 @@ describe('StorageVectorsPage', () => {
     mockIsPlatform.value = false
     mockDeploymentMode(false)
 
-    const { container } = customRender(<StorageVectorsPage dehydratedState={undefined} />)
+    const { container } = await renderVectorsPage()
 
     // `useDeploymentMode` defaults to CLI during its loading window, so the page
     // briefly renders before resolving to self-hosted — wait for it to settle.
