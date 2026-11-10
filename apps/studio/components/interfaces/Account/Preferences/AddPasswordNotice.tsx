@@ -41,7 +41,7 @@ const defaultValues: FormValues = { password: '' }
  * Auth creates the email identity for the user's current email when the password is
  * saved.
  */
-export const AddPasswordRow = ({
+export const AddPasswordNotice = ({
   email,
   providerName,
   isPrimary = false,
