@@ -89,7 +89,7 @@ describe('matchRedirect moved Studio routes', () => {
   })
 
   it.each(['security', 'performance', 'health'])(
-    'redirects old %s advisors before rendering',
+    'leaves %s advisors to the flag-aware page',
     (category) => {
       for (const isPlatform of [true, false]) {
         expect(
@@ -98,18 +98,12 @@ describe('matchRedirect moved Studio routes', () => {
             search: { severity: 'critical' },
             isPlatform,
           })
-        ).toEqual({
-          destination: `/project/${ref}/issues?category=${category}&severity=critical`,
-          permanent: true,
-        })
+        ).toBeNull()
       }
     }
   )
 
   it.each([
-    ['advisors/security', 'security'],
-    ['advisors/performance', 'performance'],
-    ['advisors/health', 'health'],
     ['database/security-advisor', 'security'],
     ['database/performance-advisor', 'performance'],
     ['database/linter', 'security'],
@@ -123,7 +117,7 @@ describe('matchRedirect moved Studio routes', () => {
           isPlatform,
         })
       ).toEqual({
-        destination: `/project/${ref}/issues?category=${category}&id=opaque-key&preset=WARN#finding`,
+        destination: `/project/${ref}/advisors/${category}?id=opaque-key&preset=WARN#finding`,
         permanent: true,
       })
     }
@@ -132,7 +126,7 @@ describe('matchRedirect moved Studio routes', () => {
   it('redirects the advisor root while leaving check settings and Issues alone', () => {
     expect(
       matchRedirect({ pathname: `/project/${ref}/advisors`, search: {}, isPlatform: true })
-    ).toEqual({ destination: `/project/${ref}/issues`, permanent: true })
+    ).toEqual({ destination: `/project/${ref}/advisors/security`, permanent: true })
     expect(
       matchRedirect({
         pathname: `/project/${ref}/advisors/rules/security`,
