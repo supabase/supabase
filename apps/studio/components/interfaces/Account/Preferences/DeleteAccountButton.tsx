@@ -1,8 +1,6 @@
-import { zodResolver } from '@hookform/resolvers/zod'
 import { SupportCategories } from '@supabase/shared-types/out/constants'
 import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { useState } from 'react'
-import { useForm, useWatch } from 'react-hook-form'
 import { toast } from 'sonner'
 import {
   Button,
@@ -14,18 +12,10 @@ import {
   DialogHeader,
   DialogSection,
   DialogTitle,
-  DialogTrigger,
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  Input,
 } from 'ui'
-import * as z from 'zod'
 
 import { NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
+import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useSendSupportTicketMutation } from '@/data/feedback/support-ticket-send'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useProfile } from '@/lib/profile'
@@ -65,20 +55,11 @@ export const DeleteAccountButton = () => {
   const belongsToOrganizations = isSuccess && organizations.length > 0
   const canRequestDeletion = isSuccess && organizations.length === 0
 
-  const accountEmail = profile?.primary_email
-  const FormSchema = z.object({ account: z.string() })
-  const form = useForm<z.infer<typeof FormSchema>>({
-    mode: 'onBlur',
-    reValidateMode: 'onBlur',
-    resolver: zodResolver(FormSchema),
-    defaultValues: { account: '' },
-  })
-  const account = useWatch({ control: form.control, name: 'account' })
+  const organizationCheckDescription = isCheckingOrganizations
+    ? 'Checking your organization memberships…'
+    : 'Could not check your organization memberships.'
 
-  const handleOpenChange = (open: boolean) => {
-    if (open) form.reset()
-    setIsOpen(open)
-  }
+  const accountEmail = profile?.primary_email
 
   const { mutate: submitSupportTicket, isPending } = useSendSupportTicketMutation({
     onSuccess: () => {
@@ -94,8 +75,8 @@ export const DeleteAccountButton = () => {
     },
   })
 
-  const handleSubmitDeletionRequest = ({ account }: z.infer<typeof FormSchema>) => {
-    if (!canRequestDeletion || !accountEmail || account !== accountEmail || isPending) return
+  const handleSubmitDeletionRequest = () => {
+    if (!canRequestDeletion || !accountEmail || isPending) return
 
     if (hasActiveDeletionRequest()) {
       return toast.error('You have already submitted a deletion request within the last 30 days.')
@@ -115,85 +96,76 @@ export const DeleteAccountButton = () => {
   }
 
   return (
-    <Dialog open={isOpen} onOpenChange={handleOpenChange}>
-      <DialogTrigger asChild>
-        <Button variant="danger" loading={!accountEmail}>
-          Request deletion
-        </Button>
-      </DialogTrigger>
-      <DialogContent size="small" hideClose={belongsToOrganizations}>
-        <DialogHeader>
-          <DialogTitle>
-            {belongsToOrganizations ? 'Leave all organizations first' : 'Request account deletion?'}
-          </DialogTitle>
-        </DialogHeader>
+    <>
+      <Button
+        variant="danger"
+        loading={!accountEmail}
+        aria-haspopup="dialog"
+        onClick={() => setIsOpen(true)}
+      >
+        Request deletion
+      </Button>
 
-        <DialogSection className="border-t">
+      {canRequestDeletion && accountEmail ? (
+        <TextConfirmModal
+          visible={isOpen}
+          size="small"
+          variant="destructive"
+          title="Request account deletion"
+          confirmString={accountEmail}
+          confirmPlaceholder="Type your email address in here"
+          confirmLabel="Submit deletion request"
+          errorMessage="Enter the email address shown above"
+          input={{ autoFocus: true, disabled: isPending }}
+          loading={isPending}
+          onConfirm={handleSubmitDeletionRequest}
+          onCancel={() => setIsOpen(false)}
+        >
           <DialogDescription className="text-foreground">
-            {isCheckingOrganizations && 'Checking your organization memberships…'}
-            {hasOrganizationCheckFailed && 'Could not check your organization memberships.'}
-            {belongsToOrganizations &&
-              'Leave or delete every organization you belong to before requesting account deletion.'}
-            {canRequestDeletion && 'Deleting your account is permanent and cannot be undone.'}
+            Deleting your account is permanent and cannot be undone.
           </DialogDescription>
-        </DialogSection>
+        </TextConfirmModal>
+      ) : (
+        <Dialog open={isOpen} onOpenChange={setIsOpen}>
+          <DialogContent size="small" hideClose={belongsToOrganizations}>
+            <DialogHeader>
+              <DialogTitle>
+                {belongsToOrganizations
+                  ? 'Leave all organizations first'
+                  : 'Request account deletion'}
+              </DialogTitle>
+            </DialogHeader>
 
-        {hasOrganizationCheckFailed && (
-          <DialogFooter>
-            <Button
-              variant="primary"
-              loading={isFetchingOrganizations}
-              onClick={() => refetchOrganizations()}
-            >
-              Retry
-            </Button>
-          </DialogFooter>
-        )}
+            <DialogSection className="border-t">
+              <DialogDescription className="text-foreground">
+                {belongsToOrganizations
+                  ? 'Leave or delete every organization you belong to before requesting account deletion.'
+                  : organizationCheckDescription}
+              </DialogDescription>
+            </DialogSection>
 
-        {belongsToOrganizations && (
-          <DialogFooter>
-            <DialogClose asChild>
-              <Button variant="default">Close</Button>
-            </DialogClose>
-          </DialogFooter>
-        )}
-
-        {canRequestDeletion && (
-          <Form {...form}>
-            <form
-              id="account-deletion-request"
-              onSubmit={form.handleSubmit(handleSubmitDeletionRequest)}
-            >
-              <DialogSection className="pt-0">
-                <FormField
-                  name="account"
-                  control={form.control}
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Enter your email address to confirm</FormLabel>
-                      <FormControl>
-                        <Input {...field} autoFocus autoComplete="off" disabled={isPending} />
-                      </FormControl>
-                      <FormDescription>Use {accountEmail}.</FormDescription>
-                    </FormItem>
-                  )}
-                />
-              </DialogSection>
-
+            {hasOrganizationCheckFailed && (
               <DialogFooter>
                 <Button
-                  variant="danger"
-                  type="submit"
-                  loading={isPending}
-                  disabled={account !== accountEmail || isPending}
+                  variant="primary"
+                  loading={isFetchingOrganizations}
+                  onClick={() => refetchOrganizations()}
                 >
-                  Submit deletion request
+                  Retry
                 </Button>
               </DialogFooter>
-            </form>
-          </Form>
-        )}
-      </DialogContent>
-    </Dialog>
+            )}
+
+            {belongsToOrganizations && (
+              <DialogFooter>
+                <DialogClose asChild>
+                  <Button variant="default">Close</Button>
+                </DialogClose>
+              </DialogFooter>
+            )}
+          </DialogContent>
+        </Dialog>
+      )}
+    </>
   )
 }

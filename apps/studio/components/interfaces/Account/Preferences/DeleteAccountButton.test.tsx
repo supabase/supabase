@@ -1,7 +1,9 @@
-import { fireEvent, screen, within } from '@testing-library/react'
+import { fireEvent, screen, waitForElementToBeRemoved, within } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
+import { FeatureFlagContext, LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { HttpResponse } from 'msw'
-import { describe, expect, test } from 'vitest'
+import { afterEach, describe, expect, test } from 'vitest'
 
 import { DeleteAccountButton } from './DeleteAccountButton'
 import { createMockOrganizationResponse } from '@/tests/helpers'
@@ -15,11 +17,15 @@ const profile = createMockProfile({ primary_email: 'account@example.com' })
 
 function openDeletionDialog() {
   customRender(<DeleteAccountButton />, { profileContext: createMockProfileContext({ profile }) })
-  fireEvent.click(screen.getByRole('button', { name: 'Request account deletion' }))
+  fireEvent.click(screen.getByRole('button', { name: 'Request deletion' }))
   return within(screen.getByRole('dialog'))
 }
 
 describe('DeleteAccountButton', () => {
+  afterEach(() => {
+    safeLocalStorage.removeItem(LOCAL_STORAGE_KEYS.ACCOUNT_DELETION_REQUEST)
+  })
+
   test('keeps the request form hidden until the organization check succeeds', async () => {
     const initialCheck = Promise.withResolvers<void>()
     addAPIMock({
@@ -45,16 +51,54 @@ describe('DeleteAccountButton', () => {
       response: [],
     })
     fireEvent.click(retry)
-    const email = await dialog.findByRole('textbox', {
-      name: 'Enter your email address to confirm',
+    const confirmation = await screen.findByRole('textbox', {
+      name: `Type ${profile.primary_email} to confirm.`,
     })
-    const submit = dialog.getByRole('button', { name: 'Submit deletion request' })
-    expect(submit).toBeDisabled()
+    expect(confirmation).toHaveAttribute('placeholder', 'Type your email address in here')
 
-    fireEvent.change(email, {
-      target: { value: profile.primary_email },
+    const requestDialog = within(screen.getByRole('dialog', { name: 'Request account deletion' }))
+    const submit = requestDialog.getByRole('button', { name: 'Submit deletion request' })
+    fireEvent.change(confirmation, { target: { value: 'different@example.com' } })
+    fireEvent.click(submit)
+    expect(
+      await requestDialog.findByText('Enter the email address shown above')
+    ).toBeInTheDocument()
+
+    addAPIMock({
+      method: 'post',
+      path: '/platform/feedback/send',
+      response: { result: 'ok' },
     })
-    expect(submit).toBeEnabled()
+    fireEvent.change(confirmation, { target: { value: profile.primary_email } })
+    fireEvent.click(submit)
+    await waitForElementToBeRemoved(() =>
+      screen.queryByRole('dialog', { name: 'Request account deletion' })
+    )
+  })
+
+  test('copies the account email when copy confirmation is enabled', async () => {
+    const user = userEvent.setup()
+    addAPIMock({ method: 'get', path: '/platform/organizations', response: [] })
+
+    customRender(
+      <FeatureFlagContext.Provider
+        value={{
+          configcat: { textConfirmationModalClickToCopy: true },
+          posthog: {},
+          hasLoaded: true,
+        }}
+      >
+        <DeleteAccountButton />
+      </FeatureFlagContext.Provider>,
+      { profileContext: createMockProfileContext({ profile }) }
+    )
+    await user.click(screen.getByRole('button', { name: 'Request deletion' }))
+    const dialog = within(await screen.findByRole('dialog', { name: 'Request account deletion' }))
+    const copy = await dialog.findByRole('button', { name: profile.primary_email })
+    await user.click(copy)
+
+    expect(await navigator.clipboard.readText()).toBe(profile.primary_email)
+    expect(dialog.getByRole('textbox')).toHaveValue('')
   })
 
   test('offers only dismissal when the account still belongs to an organization', async () => {
