@@ -47,12 +47,18 @@ data-[disabled=true]:opacity-50
 
 interface CommandItemProps extends React.ComponentPropsWithoutRef<typeof CommandItem> {
   command: ICommand
+  /**
+   * Heading of the section this command is listed under, reported in telemetry so
+   * clicks can be attributed to the section that surfaced them. Commands rendered
+   * outside a section, as on a sub-page, leave this unset.
+   */
+  section?: string
 }
 
 const CommandMenuItem = forwardRef<
   React.ElementRef<typeof CommandItem>,
   PropsWithChildren<CommandItemProps>
->(({ children, className, command: _command, ...props }, ref) => {
+>(({ children, className, command: _command, section, ...props }, ref) => {
   const router = useCrossCompatRouter()
   const setIsOpen = useSetCommandMenuOpen()
   const resetCommandMenu = useResetCommandMenu()
@@ -70,6 +76,7 @@ const CommandMenuItem = forwardRef<
           command_name: command.name,
           command_value: command.value,
           command_type: isActionCommand(command) ? ('action' as const) : ('route' as const),
+          command_section: section,
           search_query: query || undefined,
           result_path: isRouteCommand(command) ? command.route : undefined,
           app: telemetryContext.app,
