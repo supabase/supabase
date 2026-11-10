@@ -1,39 +1,45 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { useMemo, useState } from 'react'
 import { LoadingLine } from 'ui'
 
+import { IssuesCategoryRedirect } from '@/components/interfaces/Issues/IssuesCategoryRedirect'
 import { LINTER_LEVELS } from '@/components/interfaces/Linter/Linter.constants'
-import { lintInfoMap } from '@/components/interfaces/Linter/Linter.utils'
+import { lintInfoMap, parseLinterLevel } from '@/components/interfaces/Linter/Linter.utils'
 import { LinterDataGrid } from '@/components/interfaces/Linter/LinterDataGrid'
-import LinterFilters from '@/components/interfaces/Linter/LinterFilters'
+import { LinterFilters } from '@/components/interfaces/Linter/LinterFilters'
 import { LinterPageFooter } from '@/components/interfaces/Linter/LinterPageFooter'
-import LintPageTabs from '@/components/interfaces/Linter/LintPageTabs'
+import { LintPageTabs } from '@/components/interfaces/Linter/LintPageTabs'
 import { useAdvisorPageShortcuts } from '@/components/interfaces/Linter/useAdvisorPageShortcuts'
+import { LegacyAdvisorsLayout } from '@/components/layouts/AdvisorsLayout/LegacyAdvisorsLayout'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { Lint, useProjectLintsQuery } from '@/data/lint/lint-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
 
 export const Route = createFileRoute('/project/$ref/advisors/performance')({
-  component: ProjectLints,
-  staticData: {
-    advisorsLayoutTitle: 'Linter',
-  },
+  component: AdvisorsPerformanceRoute,
+  staticData: { skipAdvisorsLayout: true },
 })
 
-function ProjectLints() {
+function AdvisorsPerformanceRoute() {
+  return (
+    <LegacyAdvisorsLayout>
+      <AdvisorsPerformancePage />
+    </LegacyAdvisorsLayout>
+  )
+}
+
+const ProjectLints = () => {
   const { preset, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-
-  // need to maintain a list of filters for each tab
   const [filters, setFilters] = useState<{ level: LINTER_LEVELS; filters: string[] }[]>([
     { level: LINTER_LEVELS.ERROR, filters: [] },
     { level: LINTER_LEVELS.WARN, filters: [] },
     { level: LINTER_LEVELS.INFO, filters: [] },
   ])
   const [currentTab, setCurrentTab] = useState<LINTER_LEVELS>(
-    (preset as LINTER_LEVELS) ?? LINTER_LEVELS.ERROR
+    parseLinterLevel(preset) ?? LINTER_LEVELS.ERROR
   )
   const {
     data,
@@ -47,13 +53,11 @@ function ProjectLints() {
   const activeLints = useMemo(() => {
     return [...(data ?? [])]?.filter((x) => x.categories.includes('PERFORMANCE'))
   }, [data])
-  const currentTabFilters = (filters.find((filter) => filter.level === currentTab)?.filters ||
-    []) as string[]
+  const currentTabFilters = filters.find((filter) => filter.level === currentTab)?.filters ?? []
   const filteredLints = activeLints
     .filter((x) => x.level === currentTab)
     .filter((x) => (currentTabFilters.length > 0 ? currentTabFilters.includes(x.name) : x))
   const filterOptions = lintInfoMap
-    // only show filters for lint types which are present in the results and not ignored
     .filter((item) =>
       activeLints.some((lint) => lint.name === item.name && lint.level === currentTab)
     )
@@ -106,4 +110,9 @@ function ProjectLints() {
       <LinterPageFooter isLoading={isLoading} isRefetching={isRefetching} refetch={refetch} />
     </div>
   )
+}
+
+function AdvisorsPerformancePage() {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  return isIssuesInboxEnabled ? <IssuesCategoryRedirect category="performance" /> : <ProjectLints />
 }

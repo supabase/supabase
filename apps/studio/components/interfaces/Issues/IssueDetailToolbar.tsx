@@ -1,4 +1,4 @@
-import { CircleDotIcon } from 'lucide-react'
+import { CircleAlertIcon } from 'lucide-react'
 import { AiIconAnimation, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { buildIssuePrompt, getIssueTelemetryProperties } from './Issues.utils'
@@ -33,7 +33,7 @@ export const IssueDetailToolbar = ({ issue }: { issue: Issue }) => {
   return (
     <ExplorerToolbar aria-label="Issue toolbar" className="md:h-(--header-height)">
       <ExplorerToolbarIcon>
-        <CircleDotIcon size={16} strokeWidth={2} />
+        <CircleAlertIcon size={16} strokeWidth={2} />
       </ExplorerToolbarIcon>
       <ExplorerToolbarTitle className="text-foreground-light">{issue.title}</ExplorerToolbarTitle>
       <ExplorerToolbarActions>

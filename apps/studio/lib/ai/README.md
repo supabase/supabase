@@ -134,7 +134,6 @@ The chat Assistant shares code with other Studio AI features, but those have sep
 - [routes/api/ai/code/complete.ts](../../routes/api/ai/code/complete.ts) handles code completions.
 - [routes/api/ai/onboarding/design.ts](../../routes/api/ai/onboarding/design.ts) handles onboarding design.
 - [data/ai/](../../data/ai/) contains client queries and mutations for AI helpers and feedback. The chat transport itself lives in `ai-assistant-state.tsx`.
-- [routes/api/ai/](../../routes/api/ai/) contains the corresponding TanStack API adapters.
 
 ## Local development and validation
 

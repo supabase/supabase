@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
-vi.mock('@sentry/nextjs', () => ({ captureException: vi.fn() }))
+const sentry = vi.hoisted(() => ({ captureException: vi.fn(), captureMessage: vi.fn() }))
+vi.mock('@sentry/nextjs', () => sentry)
 vi.mock('common', () => ({ IS_PLATFORM: false, getAccessToken: vi.fn() }))
 vi.mock('@/lib/constants', () => ({ API_URL: 'http://localhost' }))
 vi.mock('@/lib/helpers', () => ({ uuidv4: () => 'test-uuid' }))
@@ -15,6 +16,8 @@ const source = (method = 'GET') => ({
 
 // Import after mocks are set up
 const { normalizeEmptyBodyResponse, client } = await import('./fetchers')
+const { MalformedResponseError } = await import('@/lib/errors/studio-errors')
+const { reportQueryError } = await import('@/lib/errors/report-studio-error')
 
 describe('normalizeEmptyBodyResponse', () => {
   it('adds Content-Length: 0 to an empty 201 that omits it (HTTP/3 case)', async () => {
@@ -72,7 +75,11 @@ describe('normalizeEmptyBodyResponse', () => {
 })
 
 describe('normalizeEmptyBodyResponse — recovery', () => {
-  afterEach(() => vi.unstubAllGlobals())
+  afterEach(() => {
+    vi.unstubAllGlobals()
+    sentry.captureException.mockClear()
+    sentry.captureMessage.mockClear()
+  })
 
   it('refetches an empty JSON GET with cache: no-store and returns the retried body', async () => {
     const fetchMock = vi.fn<(request: Request) => Promise<Response>>(
@@ -104,18 +111,112 @@ describe('normalizeEmptyBodyResponse — recovery', () => {
     ['rejects', async () => Promise.reject(new TypeError('Load failed'))],
     ['is not ok', async () => new Response('{"message":"nope"}', { status: 401 })],
     ['is empty', async () => new Response(null, { status: 200 })],
-  ])('falls back to an empty Content-Length: 0 response when the refetch %s', async (_, impl) => {
+  ])('throws MalformedResponseError when the refetch %s', async (_, impl) => {
     vi.stubGlobal('fetch', vi.fn(impl))
     const empty = new Response(null, {
       status: 200,
       headers: { 'Content-Type': 'application/json' },
     })
 
+    const err = await normalizeEmptyBodyResponse(empty, source()).catch((e) => e)
+
+    expect(err).toBeInstanceOf(MalformedResponseError)
+    expect(err._tag).toBe('MalformedResponse')
+    expect(err.reason).toBe('empty_body')
+    expect(err.endpoint).toBe('/platform/profile')
+    expect(err.method).toBe('GET')
+    expect(err.requestId).toBe('original-uuid')
+    expect(err.code).toBe(200)
+  })
+
+  it('throws RequestAborted instead when the caller aborted during recovery', async () => {
+    const controller = new AbortController()
+    const request = new Request('http://localhost/platform/profile', {
+      headers: { 'X-Request-Id': 'original-uuid' },
+      signal: controller.signal,
+    })
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => {
+        controller.abort()
+        return Promise.reject(new DOMException('The operation was aborted.', 'AbortError'))
+      })
+    )
+    const empty = new Response(null, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    const err = await normalizeEmptyBodyResponse(empty, {
+      request,
+      schemaPath: '/platform/profile',
+    }).catch((e) => e)
+
+    expect(err._tag).toBe('RequestAborted')
+    expect(err.endpoint).toBe('/platform/profile')
+  })
+
+  it('throws when the empty JSON GET advertises Content-Length: 0', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(null, { status: 200 }))
+    )
+    const empty = new Response(null, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json', 'Content-Length': '0' },
+    })
+
+    await expect(normalizeEmptyBodyResponse(empty, source())).rejects.toBeInstanceOf(
+      MalformedResponseError
+    )
+  })
+
+  it('does not throw for an empty 201 or a 204 on non-GET requests', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const created = new Response(null, { status: 201 })
+    const noContent = new Response(null, { status: 204 })
+
+    const normalized = await normalizeEmptyBodyResponse(created, source('POST'))
+
+    expect(normalized.headers.get('Content-Length')).toBe('0')
+    expect(await normalizeEmptyBodyResponse(noContent, source('DELETE'))).toBe(noContent)
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('does not throw for an empty JSON-less GET response', async () => {
+    const fetchMock = vi.fn()
+    vi.stubGlobal('fetch', fetchMock)
+    const empty = new Response(null, { status: 200 })
+
     const normalized = await normalizeEmptyBodyResponse(empty, source())
 
-    expect(normalized.status).toBe(200)
     expect(normalized.headers.get('Content-Length')).toBe('0')
-    expect(await normalized.text()).toBe('')
+  })
+
+  it('carries the refetch diagnostics to the query cache report', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(async () => new Response(null, { status: 200 }))
+    )
+    const empty = new Response(null, {
+      status: 200,
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    const err = await normalizeEmptyBodyResponse(empty, source()).catch((e) => e)
+    reportQueryError(err)
+
+    expect(sentry.captureException).toHaveBeenCalledTimes(1)
+    const [captured, context] = sentry.captureException.mock.lastCall ?? []
+    expect(captured).toBe(err)
+    expect(context.tags).toMatchObject({
+      error_tag: 'MalformedResponse',
+      endpoint: '/platform/profile',
+      recovered_by: 'none',
+      probe_has_body: 'false',
+    })
+    expect(context.extra).toMatchObject({ probe_status: 200, probe_body_length: 0 })
   })
 
   it('does not refetch an empty non-JSON GET', async () => {
@@ -200,5 +301,25 @@ describe('openapi-fetch client — empty 201 without Content-Length (HTTP/3)', (
     expect(error).toBeUndefined()
     expect(data).toEqual({})
     expect(response.status).toBe(201)
+  })
+})
+
+describe('openapi-fetch client — empty JSON GET', () => {
+  afterEach(() => vi.unstubAllGlobals())
+
+  it('rejects with the same MalformedResponseError instead of resolving empty data', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn(
+        async () =>
+          new Response(null, { status: 200, headers: { 'Content-Type': 'application/json' } })
+      )
+    )
+
+    const err = await client.GET('/platform/profile' as any, {}).catch((e) => e)
+
+    expect(err).toBeInstanceOf(MalformedResponseError)
+    expect(err.endpoint).toBe('/platform/profile')
+    expect(err.method).toBe('GET')
   })
 })
