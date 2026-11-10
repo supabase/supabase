@@ -57,8 +57,12 @@ function useConnectionStringPooler(deploymentMode: DeploymentMode): ConnectionSt
   const { ref: projectRef } = useParams()
   const { hasAccess: allowPgBouncerSelection } = useCheckEntitlements('dedicated_pooler')
   const capabilities = useProjectCapabilities()
-  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? true
-  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? false
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behaviour for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
+  const isHighAvailability = useIsHighAvailability()
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
+  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const { data: settings } = useProjectSettingsV2Query({ projectRef })
   // Multigres and Multigres Lite have no pooler, so the pooler config endpoints don't apply

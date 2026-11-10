@@ -27,7 +27,7 @@ import { appendDirectTlsNegotiationParams } from '@/components/interfaces/Connec
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { useReadReplicasQuery } from '@/data/read-replicas/replicas-query'
-import { useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
+import { useIsHighAvailability, useProjectCapabilities } from '@/hooks/misc/useSelectedProject'
 import { IS_PLATFORM } from '@/lib/constants'
 import { useGrant } from '@/lib/grants'
 import { pluckObjectFields } from '@/lib/helpers'
@@ -84,6 +84,11 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   )
   const primaryDatabase = databases?.find((db) => db.identifier === projectRef)
   const capabilities = useProjectCapabilities()
+  const isHighAvailability = useIsHighAvailability()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behaviour for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
+  const requiresDirectTlsNegotiation = capabilities?.requiresDirectTlsNegotiation ?? isHighAvailability
 
   const directConnectionString = useMemo(() => {
     if (
@@ -99,8 +104,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
       connectionInfo: { ...EMPTY_CONNECTION_INFO, ...connectionInfo },
       metadata: { projectRef },
     }).direct.uri
-    return capabilities?.requiresDirectTlsNegotiation ? appendDirectTlsNegotiationParams(uri) : uri
-  }, [primaryDatabase, projectRef, capabilities?.requiresDirectTlsNegotiation])
+    return requiresDirectTlsNegotiation ? appendDirectTlsNegotiationParams(uri) : uri
+  }, [primaryDatabase, projectRef, requiresDirectTlsNegotiation])
 
   const cliCommands = useMemo(
     () =>

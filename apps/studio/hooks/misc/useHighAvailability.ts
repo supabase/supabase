@@ -45,7 +45,12 @@ export function useSchemasFilteredForHighAvailability<T extends { name: string }
   schemas: T[] | undefined
 ): T[] {
   const capabilities = useProjectCapabilities()
-  const shouldHideMultigresSchema = capabilities?.hasConnectionPooling === false
+  const isHighAvailability = useIsHighAvailability()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behaviour for already-correct HA/Multigres projects
+  // doesn't regress while the backend capabilities field is still rolling out.
+  const shouldHideMultigresSchema =
+    capabilities !== undefined ? capabilities.hasConnectionPooling === false : isHighAvailability
 
   return useMemo(
     () => filterSchemasForHighAvailability(schemas ?? [], shouldHideMultigresSchema),
