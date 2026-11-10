@@ -14,7 +14,6 @@ import {
   formatVcpuQuota,
   getComputeCapacity,
   getCpuUtilization,
-  getUsageConcentration,
   toGbHours,
   toVcpuHours,
   type ComputeUsagePoint,
@@ -163,21 +162,6 @@ describe('aggregateUsageBySize', () => {
   })
 })
 
-describe('getUsageConcentration', () => {
-  it('reports the share taken by the largest consumer', () => {
-    expect(getUsageConcentration([75, 25])).toBeCloseTo(0.75, 10)
-  })
-
-  it('reports 1 when a single project accounts for everything', () => {
-    expect(getUsageConcentration([40])).toBe(1)
-  })
-
-  it('returns 0 rather than NaN when there is no usage', () => {
-    expect(getUsageConcentration([])).toBe(0)
-    expect(getUsageConcentration([0, 0])).toBe(0)
-  })
-})
-
 describe('getCpuUtilization', () => {
   it('reports the share of reserved vCPU that did work', () => {
     expect(getCpuUtilization(25, 100)).toBeCloseTo(0.25, 10)
@@ -259,22 +243,23 @@ describe('getComputeCapacity', () => {
 })
 
 describe('formatVcpuQuota', () => {
-  it('reads both sides in the unit the allowance sets', () => {
-    // 1,067 vCPU-hours against a 500 vCPU-minute quota: scaling each side on its own size is
-    // what produced "1,067 vCPU-hrs of 500 vCPU-min", which compares nothing.
-    expect(formatVcpuQuota(1067, 500 / 60)).toBe('64,020/500 vCPU-min')
-  })
-
   it('states the unit once, after the pair', () => {
-    expect(formatVcpuQuota(7.2, 500 / 60)).toBe('432/500 vCPU-min')
+    expect(formatVcpuQuota(7.2, 500 / 60)).toBe('7.2/8.3 vCPU-hrs')
   })
 
-  it('moves both sides to hours when the allowance is large', () => {
-    expect(formatVcpuQuota(900, 1000)).toBe('900/1,000 vCPU-hrs')
+  it('keeps both sides in vCPU-hours however far apart they are', () => {
+    // Scaling each side on its own magnitude is what produced "1,067 vCPU-hrs of 500
+    // vCPU-min", which compares nothing.
+    expect(formatVcpuQuota(1067, 500 / 60)).toBe('1,067/8.3 vCPU-hrs')
+  })
+
+  it('carries sub-hour figures rather than rounding them to nothing', () => {
+    expect(formatVcpuQuota(0.04, 500 / 60)).toBe('0.04/8.3 vCPU-hrs')
+    expect(formatVcpuQuota(0.72, 500 / 60)).toBe('0.72/8.3 vCPU-hrs')
   })
 
   it('drops the denominator when there is no allowance', () => {
-    expect(formatVcpuQuota(7.2, null)).toBe('432 vCPU-min')
+    expect(formatVcpuQuota(7.2, null)).toBe('7.2 vCPU-hrs')
   })
 })
 

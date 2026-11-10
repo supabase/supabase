@@ -20,9 +20,9 @@ export interface ComputeQuotaProps {
   organizationName: string
   organizationSlug: string
   planName: string
-  /** Included vCPU-minutes for the cycle. */
-  includedVcpuMinutes: number
-  usedVcpuMinutes: number
+  /** Included vCPU-hours for the cycle. Fractional: the allowance is under nine hours. */
+  includedVcpuHours: number
+  usedVcpuHours: number
   /** Formatted date the current billing cycle ends. */
   cycleEndsOn: string
   projects: ProjectUsageRow[]
@@ -34,12 +34,18 @@ export const usageUrl = (slug: string) => dashboardUrl(`/org/${slug}/usage#compu
 
 export const billingUrl = (slug: string) => dashboardUrl(`/org/${slug}/billing`)
 
-export const formatMinutes = (minutes: number) =>
-  `${Math.round(minutes).toLocaleString('en-US')} vCPU-min`
+/**
+ * Compute reads in vCPU-hours everywhere, below an hour included, so small values keep two
+ * decimals rather than rounding to nothing.
+ */
+export const formatHours = (hours: number) => {
+  const maximumFractionDigits = hours < 1 ? 2 : hours < 10 ? 1 : 0
+  return `${hours.toLocaleString('en-US', { maximumFractionDigits })} vCPU-hrs`
+}
 
-/** "432 of 500 vCPU-min" — the unit belongs once, on the figure that carries it. */
+/** "7.2 of 8.33 vCPU-hrs" — the unit belongs once, on the figure that carries it. */
 export const formatQuota = (used: number, included: number) =>
-  `${Math.round(used).toLocaleString('en-US')} of ${formatMinutes(included)}`
+  `${used.toLocaleString('en-US', { maximumFractionDigits: used < 10 ? 1 : 0 })} of ${formatHours(included)}`
 
 /**
  * Preview values name their slot rather than inventing a customer. A plausible-looking
@@ -50,18 +56,18 @@ export const formatQuota = (used: number, included: number) =>
  * only reads correctly at a realistic magnitude.
  */
 export const PREVIEW_PROJECTS: ProjectUsageRow[] = [
-  { name: '[projectName1]', usage: '268 vCPU-min', share: 0.62 },
-  { name: '[projectName2]', usage: '101 vCPU-min', share: 0.23 },
-  { name: '[projectName3]', usage: '43 vCPU-min', share: 0.1 },
-  { name: '[projectName4]', usage: '20 vCPU-min', share: 0.05 },
+  { name: '[projectName1]', usage: '4.5 vCPU-hrs', share: 0.62 },
+  { name: '[projectName2]', usage: '1.7 vCPU-hrs', share: 0.23 },
+  { name: '[projectName3]', usage: '0.72 vCPU-hrs', share: 0.1 },
+  { name: '[projectName4]', usage: '0.33 vCPU-hrs', share: 0.05 },
 ]
 
 export const PREVIEW_QUOTA: ComputeQuotaProps = {
   organizationName: '[orgName]',
   organizationSlug: '[orgSlug]',
   planName: '[planName]',
-  includedVcpuMinutes: 500,
-  usedVcpuMinutes: 432,
+  includedVcpuHours: 500 / 60,
+  usedVcpuHours: 7.2,
   cycleEndsOn: '[cycleEndDate]',
   projects: PREVIEW_PROJECTS,
 }

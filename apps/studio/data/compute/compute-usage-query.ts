@@ -146,7 +146,7 @@ export interface ComputeInstanceUsage {
 
 /**
  * Workers here are invocation-shaped: they run for minutes at a time and suspend in between,
- * which is the workload the 500 vCPU-minute quota and the per-invocation duration cap
+ * which is the workload the included vCPU-hour quota and the per-invocation duration cap
  * describe. A steadily-held worker would be two orders of magnitude higher and would put
  * every figure in the product thousands of times over its own allowance.
  */
@@ -247,7 +247,7 @@ export interface ComputeOrgUsage {
  * Usage profiles draped over the organization's real projects, so the table names projects a
  * reader recognises instead of invented ones. Only the figures are mock.
  *
- * Shapes are sized against the RFC's 500 vCPU-minute quota. Instances here are
+ * Shapes are sized against the RFC's included quota. Instances here are
  * invocation-shaped — running for minutes at a time, not held open — which is the workload
  * the quota and the per-invocation duration cap describe. A handful of projects land the org
  * a few times over the quota so the overage path is visible without the figures reading as

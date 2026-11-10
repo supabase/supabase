@@ -7,10 +7,7 @@ import { SectionContent } from './SectionContent'
 import type { Attribute } from './Usage.constants'
 import { ChartTooltipValueFormatter, ChartYFormatterCompactNumber } from './Usage.utils'
 import UsageBarChart from './UsageBarChart'
-import {
-  COMPUTE_ALLOWANCE_WARNING_THRESHOLD,
-  includedVcpuHours,
-} from '@/components/interfaces/Compute/Compute.limits'
+import { COMPUTE_ALLOWANCE_WARNING_THRESHOLD } from '@/components/interfaces/Compute/Compute.limits'
 import { formatSize } from '@/components/interfaces/Compute/Compute.utils'
 import {
   aggregateUsageBySize,
@@ -19,9 +16,8 @@ import {
   formatComputeRequests,
   formatGbHours,
   formatPercentage,
-  formatVcpuMinutes,
+  formatVcpuHours,
   getCpuUtilization,
-  getUsageConcentration,
   sumBy,
 } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import type {
@@ -75,8 +71,8 @@ const ComputeBillingDimensions = ({
 )
 
 const VCPU_CHART_ATTRIBUTES: Attribute[] = [
-  { key: 'usedVcpuMinutes', name: 'CPU used', color: 'white' },
-  { key: 'idleVcpuMinutes', name: 'Reserved, idle', color: 'muted' },
+  { key: 'usedVcpuHours', name: 'CPU used', color: 'white' },
+  { key: 'idleVcpuHours', name: 'Reserved, idle', color: 'muted' },
 ]
 
 export interface ComputeServicesProps {
@@ -103,12 +99,12 @@ export const ComputeServices = ({
   const byProject = data?.byProject ?? []
   const bySize = aggregateUsageBySize(data?.instanceRows ?? [])
 
-  // The quota is vCPU-minutes, so it is measured against reserved vCPU rather than
-  // wall-clock runtime: a 2 vCPU instance consumes it twice as fast.
+  // The quota is vCPU-hours, so it is measured against reserved vCPU rather than wall-clock
+  // runtime: a 2 vCPU instance consumes it twice as fast.
   const quotaBurndown = buildComputeBurndown(
     points,
     (point) => point.reservedVcpuHours,
-    includedVcpuHours(limits),
+    limits.vcpuHours,
     COMPUTE_ALLOWANCE_WARNING_THRESHOLD
   )
 
@@ -118,16 +114,13 @@ export const ComputeServices = ({
   const totalGbHours = sumBy(points, (point) => point.gbHours)
   const totalRequests = sumBy(points, (point) => point.requests)
   const cpuUtilization = getCpuUtilization(totalUsedVcpuHours, totalReservedVcpuHours)
-  const concentration = getUsageConcentration(byProject.map((row) => row.reservedVcpuHours))
   const hasVcpuUsage = totalReservedVcpuHours > 0
 
-  // Minutes, not hours: these bars sum to the metered total, and a quota counted in minutes
-  // has to be readable against a chart counted in the same thing. In hours a day reads "0.98".
   const vcpuChartData: DataPoint[] = points.map((point) => ({
     period_start: point.timestamp,
     periodStartFormatted: dayjs(point.timestamp).format('DD MMM'),
-    usedVcpuMinutes: Math.round(point.usedVcpuHours * 60),
-    idleVcpuMinutes: Math.round(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours) * 60),
+    usedVcpuHours: Number(point.usedVcpuHours.toFixed(2)),
+    idleVcpuHours: Number(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours).toFixed(2)),
   }))
 
   return (
@@ -136,7 +129,7 @@ export const ComputeServices = ({
         section={{
           name: 'Compute',
           description:
-            'Usage across every compute in the organization. The included quota is counted in vCPU-minutes, so a larger instance consumes it faster than a smaller one running just as long. Suspended instances accrue nothing.\nUsage beyond the quota is priced per vCPU-hour and GB-hour. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
+            'Usage across every compute in the organization. The included quota is counted in vCPU-hours, so a larger instance consumes it faster than a smaller one running just as long. Suspended instances accrue nothing.\nUsage beyond the quota is priced per vCPU-hour and GB-hour. Compute is in alpha and these figures are estimates. Nothing here is billed yet.',
           links: [],
         }}
       >
@@ -151,7 +144,7 @@ export const ComputeServices = ({
                 <ComputeAllowanceSummary
                   name="Compute"
                   burndown={quotaBurndown}
-                  format={formatVcpuMinutes}
+                  format={formatVcpuHours}
                   limitsLabel={limitsLabel}
                   noLimitLabel={noLimitLabel}
                   isUsageBillingEnabled={subscription?.usage_billing_enabled ?? false}
@@ -162,13 +155,10 @@ export const ComputeServices = ({
             )}
 
             <div className="space-y-2">
-              <p className="text-sm">vCPU-minutes per day</p>
+              <p className="text-sm">vCPU-hours per day</p>
               <div>
-                <TotalRow
-                  label="Total reserved"
-                  value={formatVcpuMinutes(totalReservedVcpuHours)}
-                />
-                <TotalRow label="CPU used" value={formatVcpuMinutes(totalUsedVcpuHours)} />
+                <TotalRow label="Total reserved" value={formatVcpuHours(totalReservedVcpuHours)} />
+                <TotalRow label="CPU used" value={formatVcpuHours(totalUsedVcpuHours)} />
                 {cpuUtilization !== null && (
                   <TotalRow
                     label="Share of reserved that did work"
@@ -179,14 +169,12 @@ export const ComputeServices = ({
             </div>
             {hasVcpuUsage ? (
               <UsageBarChart
-                name="vCPU-minutes"
-                // The chart's unit union has no minutes member; 'absolute' is the plain
-                // number path, and the heading and series names carry the unit.
-                unit="absolute"
+                name="vCPU-hours"
+                unit="hours"
                 attributes={VCPU_CHART_ATTRIBUTES}
                 data={vcpuChartData}
-                yFormatter={(value) => ChartYFormatterCompactNumber(value, 'absolute')}
-                tooltipFormatter={(value) => ChartTooltipValueFormatter(value, 'absolute')}
+                yFormatter={(value) => ChartYFormatterCompactNumber(value, 'hours')}
+                tooltipFormatter={(value) => ChartTooltipValueFormatter(value, 'hours')}
               />
             ) : (
               <NoComputeUsage />
@@ -203,10 +191,6 @@ export const ComputeServices = ({
               <div>
                 <TotalRow label="Projects with usage" value={byProject.length.toLocaleString()} />
                 <TotalRow label="Total requests" value={formatComputeRequests(totalRequests)} />
-                <TotalRow
-                  label="Share from the largest project"
-                  value={formatPercentage(concentration)}
-                />
               </div>
             </div>
             {byProject.length > 0 ? <ComputeProjectTable rows={byProject} /> : <NoComputeUsage />}
@@ -352,7 +336,7 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
     <div className="divide-y border-b">
       <div className="grid grid-cols-12 gap-4 py-2 text-xs font-mono uppercase text-foreground-lighter">
         <span className="col-span-6">Project</span>
-        <span className="col-span-4 text-right">vCPU-min</span>
+        <span className="col-span-4 text-right">vCPU-hrs</span>
         <span className="col-span-2 text-right">CPU used</span>
       </div>
       {rows.map((row) => {
@@ -370,11 +354,11 @@ const ComputeProjectTable = ({ rows }: { rows: ComputeUsageByProject[] }) => {
             </div>
             <div className="col-span-4 flex flex-col items-end gap-1">
               <p className="text-sm tabular-nums text-foreground-light">
-                {formatVcpuMinutes(row.reservedVcpuHours)}
+                {formatVcpuHours(row.reservedVcpuHours)}
               </p>
               <div
                 className="flex items-center gap-2"
-                aria-label={`${formatPercentage(share)} of organization vCPU-minutes`}
+                aria-label={`${formatPercentage(share)} of organization vCPU-hours`}
               >
                 <span aria-hidden className="h-1 w-12 overflow-hidden rounded-full bg-surface-400">
                   <span

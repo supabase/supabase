@@ -62,9 +62,9 @@ describe('ComputeServices', () => {
 
     expect(await screen.findByText('Compute usage')).toBeInTheDocument()
     // Everything that sums to the metered total reads in the unit the quota is set in.
-    expect(await screen.findByText('vCPU-minutes per day')).toBeInTheDocument()
+    expect(await screen.findByText('vCPU-hours per day')).toBeInTheDocument()
     expect(await screen.findByText('Usage by project')).toBeInTheDocument()
-    expect(await screen.findByText('vCPU-min')).toBeInTheDocument()
+    expect(await screen.findByText('vCPU-hrs')).toBeInTheDocument()
 
     // Wall-clock runtime is a different dimension, so it keeps its own unit.
     expect(await screen.findByText('Running hours by size')).toBeInTheDocument()
@@ -75,8 +75,8 @@ describe('ComputeServices', () => {
 
     const quota = await summary('Compute')
     expect(quota.getByText('Included in Pro Plan')).toBeInTheDocument()
-    // The RFC includes 500 per cycle, read as vCPU-minutes, on free and paid alike.
-    expect(quota.getByText('500 vCPU-min')).toBeInTheDocument()
+    // The RFC's 500 minutes per cycle, read in vCPU-hours, on free and paid alike.
+    expect(quota.getByText('8.3 vCPU-hrs')).toBeInTheDocument()
     expect(quota.getByText('Used in period')).toBeInTheDocument()
     expect(quota.getByText('Overage in period')).toBeInTheDocument()
   })
@@ -96,7 +96,7 @@ describe('ComputeServices', () => {
     const quota = await summary('Compute')
     expect(quota.getByText('Exceeded limit')).toHaveClass('text-destructive')
     const overage = quota.getByText('Overage in period').parentElement
-    expect(within(overage!).queryByText('0 vCPU-min')).not.toBeInTheDocument()
+    expect(within(overage!).queryByText('0 vCPU-hrs')).not.toBeInTheDocument()
   })
 
   it('flags an exceeded quota as billable overage when usage billing is on', async () => {
@@ -149,7 +149,7 @@ describe('ComputeServices', () => {
     expect(await screen.findByText('Projects with usage')).toBeInTheDocument()
     expect(await screen.findAllByText(/1 compute · \d+ instances?/)).not.toHaveLength(0)
     await waitFor(() => {
-      expect(screen.getByText('Share from the largest project')).toBeInTheDocument()
+      expect(screen.getByText('Projects with usage')).toBeInTheDocument()
     })
   })
 

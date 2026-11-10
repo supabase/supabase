@@ -44,12 +44,12 @@ describe('ComputeQuotaMetric', () => {
     setComputeLimitsMode('plans')
   })
 
-  it('leads with vCPU-minutes against the included quota', async () => {
+  it('leads with vCPU-hours against the included quota', async () => {
     render('pro')
 
     expect(await screen.findByText('Compute')).toBeInTheDocument()
-    // The RFC includes 500 minutes per cycle, read as vCPU-minutes.
-    expect(await screen.findByText(/\/ 500 vCPU-min/)).toBeInTheDocument()
+    // The RFC's 500 minutes per cycle, held and read in vCPU-hours.
+    expect(await screen.findByText(/\/[\d.,]+ vCPU-hrs/)).toBeInTheDocument()
   })
 
   it('shows how many instances the usage came from, without a denominator', async () => {
@@ -77,16 +77,16 @@ describe('ComputeQuotaMetric', () => {
   it('drops the denominator outside the current billing cycle', async () => {
     render('pro', false)
 
-    expect(await screen.findByText(/^[\d,]+ vCPU-min$/)).toBeInTheDocument()
-    expect(screen.queryByText(/\/ 500 vCPU-min/)).not.toBeInTheDocument()
+    expect(await screen.findByText(/^[\d.,]+ vCPU-hrs$/)).toBeInTheDocument()
+    expect(screen.queryByText(/\/[\d.,]+ vCPU-hrs/)).not.toBeInTheDocument()
   })
 
   it('includes the same quota on every plan, per the RFC', async () => {
     const { unmount } = render('free')
-    expect(await screen.findByText(/\/ 500 vCPU-min/)).toBeInTheDocument()
+    expect(await screen.findByText(/\/[\d.,]+ vCPU-hrs/)).toBeInTheDocument()
     unmount()
 
     render('team')
-    expect(await screen.findByText(/\/ 500 vCPU-min/)).toBeInTheDocument()
+    expect(await screen.findByText(/\/[\d.,]+ vCPU-hrs/)).toBeInTheDocument()
   })
 })

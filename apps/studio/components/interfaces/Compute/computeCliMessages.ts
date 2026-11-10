@@ -1,4 +1,9 @@
-import { COMPUTE_CAPACITY_WARNING_SLOTS, getComputeCapacity } from './ComputeUsage.utils'
+import {
+  COMPUTE_CAPACITY_WARNING_SLOTS,
+  formatVcpuHours,
+  formatVcpuQuota,
+  getComputeCapacity,
+} from './ComputeUsage.utils'
 import { CLI_NAME } from '@/lib/constants/compute'
 
 /**
@@ -52,8 +57,8 @@ export const formatCliNotice = (value: ComputeCliNotice): string => value.lines.
  * ------------------------------------------------------------------ */
 
 export interface ComputeQuotaCliInput {
-  usedVcpuMinutes: number
-  includedVcpuMinutes: number
+  usedVcpuHours: number
+  includedVcpuHours: number
   planName: string
   organizationSlug: string
   /** When on, the quota is a hard stop rather than the start of overage billing. */
@@ -70,19 +75,19 @@ const billingUrl = (slug: string) => `https://supabase.com/dashboard/org/${slug}
  * threshold, which is the common case and should stay silent.
  */
 export const buildQuotaNotice = ({
-  usedVcpuMinutes,
-  includedVcpuMinutes,
+  usedVcpuHours,
+  includedVcpuHours,
   planName,
   organizationSlug,
   isSpendCapEnabled,
   warningThreshold = 0.8,
 }: ComputeQuotaCliInput): ComputeCliNotice | null => {
-  const remaining = includedVcpuMinutes - usedVcpuMinutes
+  const remaining = includedVcpuHours - usedVcpuHours
 
   if (remaining <= 0 && isSpendCapEnabled) {
     return notice('error', `Compute quota used in full for this organization.`, [
-      `  The spend cap is on, so instances stop at ${includedVcpuMinutes} vCPU-min rather than`,
-      `  billing the overage. Nothing will deploy until the quota resets.`,
+      `  The spend cap is on, so instances stop at ${formatVcpuHours(includedVcpuHours)} rather`,
+      `  than billing the overage. Nothing will deploy until the quota resets.`,
       '',
       `  Turn off the spend cap or change plan:`,
       `    ${billingUrl(organizationSlug)}`,
@@ -91,17 +96,17 @@ export const buildQuotaNotice = ({
 
   if (remaining <= 0) {
     return notice('warning', 'Compute past the included quota is billing overage.', [
-      `  ${usedVcpuMinutes} of ${includedVcpuMinutes} vCPU-min used on the ${planName}.`,
+      `  ${formatVcpuQuota(usedVcpuHours, includedVcpuHours)} used on the ${planName}.`,
       `  Instances keep running. Usage beyond the quota is billed at the Compute rate.`,
       '',
       `    ${usageUrl(organizationSlug)}`,
     ])
   }
 
-  if (usedVcpuMinutes / includedVcpuMinutes < warningThreshold) return null
+  if (usedVcpuHours / includedVcpuHours < warningThreshold) return null
 
-  return notice('warning', `${remaining} vCPU-min left in this billing cycle.`, [
-    `  ${usedVcpuMinutes} of ${includedVcpuMinutes} vCPU-min used on the ${planName}.`,
+  return notice('warning', `${formatVcpuHours(remaining)} left in this billing cycle.`, [
+    `  ${formatVcpuQuota(usedVcpuHours, includedVcpuHours)} used on the ${planName}.`,
     `  Run \`supabase ${CLI_NAME} usage\` for the breakdown by project.`,
   ])
 }
@@ -217,12 +222,12 @@ export const buildPlanGateNotice = ({
 export interface ComputeUsageReportInput {
   organizationName: string
   planName: string
-  usedVcpuMinutes: number
-  includedVcpuMinutes: number
+  usedVcpuHours: number
+  includedVcpuHours: number
   cycleEndsOn: string
   /** Formatted date the current rate reaches the quota, or `null` when it does not. */
   projectedExhaustionOn: string | null
-  projects: { name: string; vcpuMinutes: number; runningInstances: number }[]
+  projects: { name: string; vcpuHours: number; runningInstances: number }[]
   concurrentInstances: number | null
 }
 
@@ -239,14 +244,14 @@ const bar = (ratio: number, width = 24) => {
 export const buildUsageReport = ({
   organizationName,
   planName,
-  usedVcpuMinutes,
-  includedVcpuMinutes,
+  usedVcpuHours,
+  includedVcpuHours,
   cycleEndsOn,
   projectedExhaustionOn,
   projects,
   concurrentInstances,
 }: ComputeUsageReportInput): string[] => {
-  const ratio = usedVcpuMinutes / includedVcpuMinutes
+  const ratio = usedVcpuHours / includedVcpuHours
   const nameWidth = Math.max(...projects.map((project) => project.name.length), 7)
   const instanceCount = (running: number) =>
     concurrentInstances === null ? `${running}` : `${running} / ${concurrentInstances}`
@@ -254,17 +259,17 @@ export const buildUsageReport = ({
   return [
     `${organizationName} · ${planName} · cycle ends ${cycleEndsOn}`,
     '',
-    `  Compute   ${bar(ratio)}  ${usedVcpuMinutes} / ${includedVcpuMinutes} vCPU-min`,
+    `  Compute   ${bar(ratio)}  ${formatVcpuQuota(usedVcpuHours, includedVcpuHours)}`,
     ...(projectedExhaustionOn === null
       ? []
       : [`              projected to reach the quota on ${projectedExhaustionOn}`]),
     '',
-    `  ${'PROJECT'.padEnd(nameWidth)}   VCPU-MIN   SHARE   WORKERS`,
+    `  ${'PROJECT'.padEnd(nameWidth)}   VCPU-HRS   SHARE   INSTANCES`,
     ...projects.map((project) => {
-      const share = `${Math.round((project.vcpuMinutes / usedVcpuMinutes) * 100)}%`
+      const share = `${Math.round((project.vcpuHours / usedVcpuHours) * 100)}%`
       return [
         `  ${project.name.padEnd(nameWidth)}`,
-        `${String(project.vcpuMinutes).padStart(10)}`,
+        `${project.vcpuHours.toFixed(2).padStart(10)}`,
         `${share.padStart(7)}`,
         `${instanceCount(project.runningInstances).padStart(10)}`,
       ].join('')

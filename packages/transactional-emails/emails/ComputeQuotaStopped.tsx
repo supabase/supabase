@@ -4,7 +4,7 @@ import { Callout, ProjectUsageTable, UsageMeter } from '../components/UsageMeter
 import { theme } from '../theme'
 import {
   billingUrl,
-  formatMinutes,
+  formatHours,
   formatQuota,
   PREVIEW_QUOTA,
   usageUrl,
@@ -27,8 +27,8 @@ const ComputeQuotaStopped = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
-  usedVcpuMinutes,
+  includedVcpuHours,
+  usedVcpuHours,
   projects,
   stoppedInstances,
   resumesOn,
@@ -41,8 +41,8 @@ const ComputeQuotaStopped = ({
     <Section>
       <Heading>Compute instances have stopped</Heading>
       <Text muted>
-        {organizationName} used all {formatMinutes(includedVcpuMinutes)} included in the {planName}.
-        The spend cap is on, so Compute stops at the quota rather than billing the overage.
+        {organizationName} used all {formatHours(includedVcpuHours)} included in the {planName}. The
+        spend cap is on, so Compute stops at the quota rather than billing the overage.
       </Text>
 
       <Callout tone="destructive">
@@ -60,7 +60,7 @@ const ComputeQuotaStopped = ({
 
       <UsageMeter
         label="Compute"
-        value={formatQuota(usedVcpuMinutes, includedVcpuMinutes)}
+        value={formatQuota(usedVcpuHours, includedVcpuHours)}
         ratio={1}
         tone="destructive"
         caption="Quota used in full"
@@ -93,7 +93,7 @@ export const computeQuotaStopped: EmailTemplate<ComputeQuotaStoppedProps> = {
   Template: ComputeQuotaStopped,
   previewProps: {
     ...PREVIEW_QUOTA,
-    usedVcpuMinutes: 500,
+    usedVcpuHours: 500 / 60,
     stoppedInstances: 6,
     resumesOn: '[cycleEndDate]',
   },

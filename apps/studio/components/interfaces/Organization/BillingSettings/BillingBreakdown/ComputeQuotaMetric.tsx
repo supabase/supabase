@@ -4,8 +4,7 @@ import { cn } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { USAGE_APPROACHING_THRESHOLD } from './BillingBreakdown.constants'
-import { includedVcpuHours } from '@/components/interfaces/Compute/Compute.limits'
-import { sumBy } from '@/components/interfaces/Compute/ComputeUsage.utils'
+import { formatVcpuQuota, sumBy } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import { useComputeLimits } from '@/components/interfaces/Compute/useComputeLimits'
 import { useComputeOrgUsage } from '@/data/compute/use-compute-org-usage'
 import type { OrgSubscription } from '@/data/subscriptions/types'
@@ -34,8 +33,8 @@ export const ComputeQuotaMetric = ({
   })
 
   const { limits } = useComputeLimits(subscription?.plan)
-  // The quota is vCPU-minutes, measured against reserved vCPU so instance size counts.
-  const quotaHours = includedVcpuHours(limits)
+  // The quota is vCPU-hours, measured against reserved vCPU so instance size counts.
+  const quotaHours = limits.vcpuHours
 
   if (isPending) {
     return (
@@ -53,11 +52,10 @@ export const ComputeQuotaMetric = ({
   const isApproachingLimit = hasLimit && usageRatio >= USAGE_APPROACHING_THRESHOLD
   const isExceededLimit = relativeToSubscription && hasLimit && usageRatio >= 1
 
-  const usedVcpuMinutes = Math.round(vcpuHours * 60)
-  const usageLabel =
-    hasLimit && relativeToSubscription
-      ? `${usedVcpuMinutes.toLocaleString()} / ${Math.round(quotaHours * 60).toLocaleString()} vCPU-min`
-      : `${usedVcpuMinutes.toLocaleString()} vCPU-min`
+  const usageLabel = formatVcpuQuota(
+    vcpuHours,
+    hasLimit && relativeToSubscription ? quotaHours : null
+  )
 
   const percentageLabel =
     !hasLimit || vcpuHours === 0

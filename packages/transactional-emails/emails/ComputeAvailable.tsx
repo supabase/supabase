@@ -1,12 +1,12 @@
 import { EmailLayout } from '../components/Layout'
 import { Button, Heading, Hr, Mono, Section, Text } from '../components/Primitives'
-import { dashboardUrl, type EmailTemplate } from './shared'
+import { dashboardUrl, formatHours, type EmailTemplate } from './shared'
 
 interface ComputeAvailableProps {
   organizationName: string
   organizationSlug: string
   planName: string
-  includedVcpuMinutes: number
+  includedVcpuHours: number
   concurrentInstances: number
 }
 
@@ -22,11 +22,11 @@ const ComputeAvailable = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
+  includedVcpuHours,
   concurrentInstances,
 }: ComputeAvailableProps) => (
   <EmailLayout
-    preview={`${includedVcpuMinutes} vCPU-minutes a month and ${concurrentInstances} concurrent instances per project`}
+    preview={`${formatHours(includedVcpuHours)} a month and ${concurrentInstances} concurrent instances per project`}
     organizationName={organizationName}
   >
     <Section>
@@ -47,7 +47,7 @@ const ComputeAvailable = ({
           <tr>
             <td style={{ padding: '6px 0', fontSize: '14px' }}>Compute</td>
             <td align="right" style={{ padding: '6px 0', fontSize: '14px' }}>
-              {includedVcpuMinutes.toLocaleString('en-US')} vCPU-min a month
+              {formatHours(includedVcpuHours)} a month
             </td>
           </tr>
           <tr>
@@ -62,8 +62,8 @@ const ComputeAvailable = ({
       <Hr />
 
       <Text small muted>
-        A vCPU-minute is one minute of one vCPU. A instance at the base size uses one a minute; a
-        larger one uses more. Suspended instances use none.
+        A vCPU-hour is one hour of one vCPU. An instance at the base size uses one an hour; a larger
+        one uses more. Suspended instances use none.
       </Text>
 
       <Button href={dashboardUrl(`/org/${organizationSlug}/usage#compute-services`)}>
@@ -82,7 +82,7 @@ export const computeAvailable: EmailTemplate<ComputeAvailableProps> = {
     organizationName: '[orgName]',
     organizationSlug: '[orgSlug]',
     planName: '[planName]',
-    includedVcpuMinutes: 500,
+    includedVcpuHours: 500 / 60,
     concurrentInstances: 10,
   },
 }

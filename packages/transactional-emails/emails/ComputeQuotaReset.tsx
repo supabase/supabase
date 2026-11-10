@@ -1,14 +1,14 @@
 import { EmailLayout } from '../components/Layout'
 import { Button, Heading, Hr, Section, Text } from '../components/Primitives'
 import { Callout } from '../components/UsageMeter'
-import { billingUrl, formatMinutes, usageUrl, type EmailTemplate } from './shared'
+import { billingUrl, formatHours, usageUrl, type EmailTemplate } from './shared'
 
 interface ComputeQuotaResetProps {
   organizationName: string
   organizationSlug: string
   planName: string
-  includedVcpuMinutes: number
-  /** vCPU-minutes consumed in the cycle that just ended. */
+  includedVcpuHours: number
+  /** vCPU-hours consumed in the cycle that just ended. */
   previousCycleUsage: number
   resumedInstances: number
 }
@@ -24,15 +24,15 @@ const ComputeQuotaReset = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
+  includedVcpuHours,
   previousCycleUsage,
   resumedInstances,
 }: ComputeQuotaResetProps) => {
-  const overrun = previousCycleUsage - includedVcpuMinutes
+  const overrun = previousCycleUsage - includedVcpuHours
 
   return (
     <EmailLayout
-      preview={`${resumedInstances} instances are running again on a fresh ${includedVcpuMinutes} vCPU-minutes`}
+      preview={`${resumedInstances} instances are running again on a fresh ${formatHours(includedVcpuHours)}`}
       organizationName={organizationName}
       footerNote="Sent only when a new cycle restarts instances that had stopped."
     >
@@ -40,12 +40,12 @@ const ComputeQuotaReset = ({
         <Heading>Compute instances are running again</Heading>
         <Text muted>
           The new billing cycle started, so {organizationName} has its{' '}
-          {formatMinutes(includedVcpuMinutes)} back and {resumedInstances} instances have resumed.
+          {formatHours(includedVcpuHours)} back and {resumedInstances} instances have resumed.
         </Text>
 
         <Callout tone="warning">
-          Last cycle used {formatMinutes(previousCycleUsage)} — {formatMinutes(overrun)} more than
-          the {planName} includes. The same pattern will stop instances again before the cycle ends.
+          Last cycle used {formatHours(previousCycleUsage)} — {formatHours(overrun)} more than the{' '}
+          {planName} includes. The same pattern will stop instances again before the cycle ends.
         </Callout>
 
         <Button href={billingUrl(organizationSlug)}>Compare plans</Button>
@@ -74,8 +74,8 @@ export const computeQuotaReset: EmailTemplate<ComputeQuotaResetProps> = {
     organizationName: '[orgName]',
     organizationSlug: '[orgSlug]',
     planName: '[planName]',
-    includedVcpuMinutes: 500,
-    previousCycleUsage: 712,
+    includedVcpuHours: 500 / 60,
+    previousCycleUsage: 11.9,
     resumedInstances: 6,
   },
 }

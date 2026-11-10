@@ -9,7 +9,7 @@ import {
 } from './computeCliMessages'
 
 const QUOTA = {
-  includedVcpuMinutes: 500,
+  includedVcpuHours: 500 / 60,
   planName: 'Pro Plan',
   organizationSlug: 'northwind',
   isSpendCapEnabled: false,
@@ -17,21 +17,21 @@ const QUOTA = {
 
 describe('buildQuotaNotice', () => {
   it('says nothing below the threshold', () => {
-    expect(buildQuotaNotice({ ...QUOTA, usedVcpuMinutes: 120 })).toBeNull()
+    expect(buildQuotaNotice({ ...QUOTA, usedVcpuHours: 2 })).toBeNull()
   })
 
   it('warns without failing the command once past the threshold', () => {
-    const result = buildQuotaNotice({ ...QUOTA, usedVcpuMinutes: 432 })
+    const result = buildQuotaNotice({ ...QUOTA, usedVcpuHours: 7.2 })
 
     expect(result).not.toBeNull()
     expect(result?.severity).toBe('warning')
     expect(result?.exitCode).toBe(0)
     expect(result?.stream).toBe('stderr')
-    expect(formatCliNotice(result!)).toContain('68 vCPU-min left')
+    expect(formatCliNotice(result!)).toContain('1.1 vCPU-hrs left')
   })
 
   it('reports overage as a warning when the spend cap is off', () => {
-    const result = buildQuotaNotice({ ...QUOTA, usedVcpuMinutes: 548 })
+    const result = buildQuotaNotice({ ...QUOTA, usedVcpuHours: 9.1 })
 
     expect(result?.severity).toBe('warning')
     expect(result?.exitCode).toBe(0)
@@ -41,7 +41,7 @@ describe('buildQuotaNotice', () => {
   it('fails the command when the spend cap makes the quota a hard stop', () => {
     const result = buildQuotaNotice({
       ...QUOTA,
-      usedVcpuMinutes: 500,
+      usedVcpuHours: 500 / 60,
       isSpendCapEnabled: true,
     })
 
@@ -132,19 +132,19 @@ describe('buildUsageReport', () => {
   const report = buildUsageReport({
     organizationName: 'Northwind',
     planName: 'Pro Plan',
-    usedVcpuMinutes: 432,
-    includedVcpuMinutes: 500,
+    usedVcpuHours: 7.2,
+    includedVcpuHours: 500 / 60,
     cycleEndsOn: '1 December',
     projectedExhaustionOn: '22 November',
     concurrentInstances: 10,
     projects: [
-      { name: 'checkout-api', vcpuMinutes: 268, runningInstances: 4 },
-      { name: 'staging', vcpuMinutes: 20, runningInstances: 1 },
+      { name: 'checkout-api', vcpuHours: 4.47, runningInstances: 4 },
+      { name: 'staging', vcpuHours: 0.33, runningInstances: 1 },
     ],
   })
 
   it('leads with the quota and the projection', () => {
-    expect(report.join('\n')).toContain('432 / 500 vCPU-min')
+    expect(report.join('\n')).toContain('7.2/8.3 vCPU-hrs')
     expect(report.join('\n')).toContain('projected to reach the quota on 22 November')
   })
 
@@ -152,19 +152,19 @@ describe('buildUsageReport', () => {
     const steady = buildUsageReport({
       organizationName: 'Northwind',
       planName: 'Pro Plan',
-      usedVcpuMinutes: 120,
-      includedVcpuMinutes: 500,
+      usedVcpuHours: 2,
+      includedVcpuHours: 500 / 60,
       cycleEndsOn: '1 December',
       projectedExhaustionOn: null,
       concurrentInstances: 10,
-      projects: [{ name: 'checkout-api', vcpuMinutes: 120, runningInstances: 2 }],
+      projects: [{ name: 'checkout-api', vcpuHours: 2, runningInstances: 2 }],
     })
 
     expect(steady.join('\n')).not.toContain('projected')
   })
 
   it('aligns the project table on the longest name', () => {
-    const rows = report.filter((line) => line.includes('vcpu') || /\d+%/.test(line))
+    const rows = report.filter((line) => /\d+%/.test(line))
     const shareColumns = rows.map((line) => line.indexOf('%'))
 
     expect(new Set(shareColumns).size).toBe(1)

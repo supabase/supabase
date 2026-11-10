@@ -5,6 +5,7 @@ import {
   type ComputeLimits,
 } from '@/components/interfaces/Compute/Compute.limits'
 import { formatSize } from '@/components/interfaces/Compute/Compute.utils'
+import { formatVcpuHours } from '@/components/interfaces/Compute/ComputeUsage.utils'
 import type { OrgPlan } from '@/data/subscriptions/types'
 
 /**
@@ -20,9 +21,9 @@ import type { OrgPlan } from '@/data/subscriptions/types'
 const ALPHA_NOTE = 'Private alpha — available by invite'
 
 const formatQuota = (limits: ComputeLimits) =>
-  limits.vcpuMinutes === null
+  limits.vcpuHours === null
     ? 'Unmetered during the private alpha'
-    : `${limits.vcpuMinutes.toLocaleString()} vCPU-minutes of Compute`
+    : `${formatVcpuHours(limits.vcpuHours)} of Compute`
 
 const formatConcurrency = (limits: ComputeLimits) =>
   limits.concurrentInstances === 1
@@ -55,7 +56,7 @@ const computeFeaturesForPlan = (planId: OrgPlan['id']): (string | string[])[] =>
   if (limits === undefined) return []
 
   const quota =
-    limits.vcpuMinutes === null || planId === 'free'
+    limits.vcpuHours === null || planId === 'free'
       ? formatQuota(limits)
       : `${formatQuota(limits)}, then pay as you go`
 

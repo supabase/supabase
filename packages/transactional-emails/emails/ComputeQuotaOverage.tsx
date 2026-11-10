@@ -4,7 +4,7 @@ import { Callout, ProjectUsageTable, UsageMeter } from '../components/UsageMeter
 import { theme } from '../theme'
 import {
   billingUrl,
-  formatMinutes,
+  formatHours,
   formatQuota,
   PREVIEW_QUOTA,
   usageUrl,
@@ -28,8 +28,8 @@ const ComputeQuotaOverage = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
-  usedVcpuMinutes,
+  includedVcpuHours,
+  usedVcpuHours,
   cycleEndsOn,
   projects,
   overageSoFar,
@@ -43,15 +43,15 @@ const ComputeQuotaOverage = ({
     <Section>
       <Heading>Compute is now billing overage</Heading>
       <Text muted>
-        {organizationName} has used the {formatMinutes(includedVcpuMinutes)} included in the{' '}
-        {planName}. Instances keep running — Compute past the quota is billed at the overage rate.
+        {organizationName} has used the {formatHours(includedVcpuHours)} included in the {planName}.
+        Instances keep running — Compute past the quota is billed at the overage rate.
       </Text>
 
       <UsageMeter
         label="Compute"
-        value={formatQuota(usedVcpuMinutes, includedVcpuMinutes)}
+        value={formatQuota(usedVcpuHours, includedVcpuHours)}
         ratio={1}
-        caption={`${formatMinutes(usedVcpuMinutes - includedVcpuMinutes)} over the quota`}
+        caption={`${formatHours(usedVcpuHours - includedVcpuHours)} over the quota`}
       />
 
       <Hr />
@@ -88,7 +88,7 @@ export const computeQuotaOverage: EmailTemplate<ComputeQuotaOverageProps> = {
   Template: ComputeQuotaOverage,
   previewProps: {
     ...PREVIEW_QUOTA,
-    usedVcpuMinutes: 548,
+    usedVcpuHours: 9.1,
     // Left as slots rather than figures: the Compute rate is not settled, and a preview that
     // quotes one reads as a quote.
     overageSoFar: '[overageSoFar]',

@@ -147,48 +147,30 @@ export const aggregateUsageBySize = (
     .sort((a, b) => b.runningHours - a.runningHours)
 }
 
-/** Share of the total taken by the largest row, as a fraction. */
-export const getUsageConcentration = (values: number[]): number => {
-  const total = values.reduce((sum, value) => sum + value, 0)
-  if (total <= 0) return 0
-  return Math.max(...values) / total
-}
-
 /* ------------------------------------------------------------------ *
  * Formatting                                                          *
  * ------------------------------------------------------------------ */
 
-const round = (value: number) =>
-  value.toLocaleString(undefined, { maximumFractionDigits: value < 10 ? 1 : 0 })
+/**
+ * Compute reads in vCPU-hours everywhere, including below an hour, so the precision has to
+ * carry small values rather than rounding them to nothing: 0.04 is a real figure against an
+ * 8.33 allowance, and "0.0" is not.
+ */
+const round = (value: number) => {
+  const maximumFractionDigits = value < 1 ? 2 : value < 10 ? 1 : 0
+  return value.toLocaleString(undefined, { maximumFractionDigits })
+}
 
 export const formatComputeHours = (hours: number): string => `${round(hours)} hrs`
 
 /**
- * The included quota is quoted in vCPU-minutes, so usage reads in minutes until it is large
- * enough that hours are easier to scan.
- */
-export const formatVcpuMinutes = (vcpuHours: number): string => {
-  const minutes = vcpuHours * 60
-  return minutes < 10_000
-    ? `${Math.round(minutes).toLocaleString()} vCPU-min`
-    : formatVcpuHours(vcpuHours)
-}
-
-/**
- * Both sides of a quota comparison have to be in one unit, and the allowance is what picks it:
- * scaling each number on its own size is how "1,067 vCPU-hrs of 500 vCPU-min" happens, which
- * compares nothing. The unit is written once, after the pair.
+ * Both sides of a quota comparison have to read in one unit — scaling each number on its own
+ * size is how "1,067 vCPU-hrs of 500 vCPU-min" happens, which compares nothing. The unit is
+ * written once, after the pair.
  */
 export const formatVcpuQuota = (usedVcpuHours: number, includedVcpuHours: number | null) => {
-  const anchorHours = includedVcpuHours ?? usedVcpuHours
-  const isMinuteScale = anchorHours * 60 < 10_000
-
-  const value = (hours: number) =>
-    isMinuteScale ? Math.round(hours * 60).toLocaleString() : round(hours)
-  const unit = isMinuteScale ? 'vCPU-min' : 'vCPU-hrs'
-
-  if (includedVcpuHours === null) return `${value(usedVcpuHours)} ${unit}`
-  return `${value(usedVcpuHours)}/${value(includedVcpuHours)} ${unit}`
+  if (includedVcpuHours === null) return `${round(usedVcpuHours)} vCPU-hrs`
+  return `${round(usedVcpuHours)}/${round(includedVcpuHours)} vCPU-hrs`
 }
 
 /** Counts carry no unit, so the pair is all there is to say. */

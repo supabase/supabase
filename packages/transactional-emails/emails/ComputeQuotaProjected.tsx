@@ -2,7 +2,7 @@ import { EmailLayout } from '../components/Layout'
 import { Button, Heading, Hr, Mono, Section, Text } from '../components/Primitives'
 import { Callout, ProjectUsageTable, UsageMeter } from '../components/UsageMeter'
 import {
-  formatMinutes,
+  formatHours,
   formatQuota,
   PREVIEW_QUOTA,
   usageUrl,
@@ -13,14 +13,14 @@ import {
 interface ComputeQuotaProjectedProps extends ComputeQuotaProps {
   /** Formatted date the current burn rate reaches the quota. */
   projectedExhaustionOn: string
-  /** vCPU-minutes consumed per day over the trailing window. */
+  /** vCPU-hours consumed per day over the trailing window. */
   dailyBurnRate: number
   /** The project responsible for most of the acceleration. */
   leadingProject: string
 }
 
 /**
- * The quota is 500 vCPU-minutes — eight hours and twenty minutes of one instance. A threshold
+ * The quota is 8.33 vCPU-hours — eight hours and twenty minutes of one instance. A threshold
  * alert at 80% can arrive with less than two hours of headroom left, which is not a warning,
  * it is a receipt. This fires on the burn rate instead, so it can land before 80% does.
  */
@@ -28,8 +28,8 @@ const ComputeQuotaProjected = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
-  usedVcpuMinutes,
+  includedVcpuHours,
+  usedVcpuHours,
   cycleEndsOn,
   projects,
   projectedExhaustionOn,
@@ -44,15 +44,15 @@ const ComputeQuotaProjected = ({
     <Section>
       <Heading>Compute usage is on track to pass the quota</Heading>
       <Text muted>
-        {organizationName} is using about {formatMinutes(dailyBurnRate)} a day. At that rate the{' '}
-        {formatMinutes(includedVcpuMinutes)} included in the {planName} runs out on{' '}
+        {organizationName} is using about {formatHours(dailyBurnRate)} a day. At that rate the{' '}
+        {formatHours(includedVcpuHours)} included in the {planName} runs out on{' '}
         {projectedExhaustionOn} — the cycle ends on {cycleEndsOn}.
       </Text>
 
       <UsageMeter
         label="Compute"
-        value={formatQuota(usedVcpuMinutes, includedVcpuMinutes)}
-        ratio={usedVcpuMinutes / includedVcpuMinutes}
+        value={formatQuota(usedVcpuHours, includedVcpuHours)}
+        ratio={usedVcpuHours / includedVcpuHours}
         caption={`Projected to reach the quota on ${projectedExhaustionOn}`}
       />
 
@@ -84,15 +84,15 @@ export const computeQuotaProjected: EmailTemplate<ComputeQuotaProjectedProps> = 
   Template: ComputeQuotaProjected,
   previewProps: {
     ...PREVIEW_QUOTA,
-    usedVcpuMinutes: 290,
+    usedVcpuHours: 4.8,
     projectedExhaustionOn: '[projectedDate]',
-    dailyBurnRate: 38,
+    dailyBurnRate: 0.63,
     leadingProject: '[projectName1]',
     projects: [
-      { name: '[projectName1]', usage: '184 vCPU-min', share: 0.63 },
-      { name: '[projectName2]', usage: '72 vCPU-min', share: 0.25 },
-      { name: '[projectName3]', usage: '24 vCPU-min', share: 0.08 },
-      { name: '[projectName4]', usage: '10 vCPU-min', share: 0.04 },
+      { name: '[projectName1]', usage: '3.1 vCPU-hrs', share: 0.63 },
+      { name: '[projectName2]', usage: '1.2 vCPU-hrs', share: 0.25 },
+      { name: '[projectName3]', usage: '0.4 vCPU-hrs', share: 0.08 },
+      { name: '[projectName4]', usage: '0.17 vCPU-hrs', share: 0.04 },
     ],
   },
 }

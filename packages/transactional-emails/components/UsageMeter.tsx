@@ -12,7 +12,7 @@ const TONE_FILL: Record<MeterTone, string> = {
 
 interface UsageMeterProps {
   label: string
-  /** Formatted for a person: "412 of 500 vCPU-min". */
+  /** Formatted for a person: "7.2 of 8.33 vCPU-hrs". */
   value: string
   /** 0–1. Values above 1 clamp, because a bar wider than its track renders as overflow. */
   ratio: number

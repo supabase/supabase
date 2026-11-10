@@ -71,11 +71,11 @@ The projection has a 48-hour floor on its trailing window; without one it cries 
 Tuesday-afternoon spike.
 
 `compute-quota-projected` is deliberately allowed to land _before_ `compute-quota-warning`.
-The quota is 500 vCPU-minutes — eight hours and twenty minutes of a single instance — so a
+The quota is 8.33 vCPU-hours, eight hours and twenty minutes of a single instance, so a
 threshold crossed at 80% can leave under two hours of headroom. Rate is the signal; level is
 the receipt.
 
 ## What is still missing
 
-None of this can fire without a metering rollup that aggregates vCPU-minutes per org per
+None of this can fire without a metering rollup that aggregates vCPU-hours per org per
 cycle. The templates and their triggers are a design, not an implementation.

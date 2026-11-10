@@ -92,8 +92,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       included: null,
       isLoading: isPending,
       formatValue: formatVcpuQuota,
-      caption:
-        limits.vcpuMinutes === null ? noLimitLabel : 'Counted against the organization quota',
+      caption: limits.vcpuHours === null ? noLimitLabel : 'Counted against the organization quota',
     },
     {
       label: 'Concurrent instances',

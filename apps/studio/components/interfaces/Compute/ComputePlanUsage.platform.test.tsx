@@ -83,7 +83,7 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters the vCPU-minute quota and concurrent instances against the plan', async () => {
+  it('meters the vCPU-hour quota and concurrent instances against the plan', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: COMPUTE_PROFILE_CONTEXT,
@@ -98,9 +98,9 @@ describe('ComputePlanUsage', () => {
     // The quota belongs to the organization, so this project reports what it consumed and
     // points at the org usage page for the burn-down rather than claiming a share of it.
     const computeMeter = await meter('Compute')
-    expect(await computeMeter.findByText(/^[\d,]+ vCPU-min$/)).toBeInTheDocument()
+    expect(await computeMeter.findByText(/^[\d.,]+ vCPU-hrs$/)).toBeInTheDocument()
     expect(computeMeter.getByText('Counted against the organization quota')).toBeInTheDocument()
-    expect(computeMeter.queryByText(/\/500/)).not.toBeInTheDocument()
+    expect(computeMeter.queryByText(/\//)).not.toBeInTheDocument()
   })
 
   it('keeps runtime and CPU utilisation in the tooltip rather than under the bar', async () => {
@@ -110,7 +110,7 @@ describe('ComputePlanUsage', () => {
     })
 
     const computeMeter = await meter('Compute')
-    await computeMeter.findByText(/vCPU-min$/)
+    await computeMeter.findByText(/vCPU-hrs$/)
 
     // Only the pair and its status belong on the card; the rest lives behind the info icon.
     expect(computeMeter.queryByText(/CPU used/)).not.toBeInTheDocument()

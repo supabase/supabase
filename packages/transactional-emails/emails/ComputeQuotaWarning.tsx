@@ -4,7 +4,7 @@ import { ProjectUsageTable, UsageMeter } from '../components/UsageMeter'
 import { theme } from '../theme'
 import {
   billingUrl,
-  formatMinutes,
+  formatHours,
   formatQuota,
   PREVIEW_QUOTA,
   usageUrl,
@@ -16,33 +16,33 @@ const ComputeQuotaWarning = ({
   organizationName,
   organizationSlug,
   planName,
-  includedVcpuMinutes,
-  usedVcpuMinutes,
+  includedVcpuHours,
+  usedVcpuHours,
   cycleEndsOn,
   projects,
 }: ComputeQuotaProps) => {
-  const remaining = Math.max(includedVcpuMinutes - usedVcpuMinutes, 0)
+  const remaining = Math.max(includedVcpuHours - usedVcpuHours, 0)
 
   return (
     <EmailLayout
-      preview={`${formatMinutes(remaining)} left until ${cycleEndsOn}`}
+      preview={`${formatHours(remaining)} left until ${cycleEndsOn}`}
       organizationName={organizationName}
       footerNote="Sent once per billing cycle, the first time usage passes 80%."
     >
       <Section>
         <Heading>80% of the Compute quota is used</Heading>
         <Text muted>
-          {organizationName} has used {formatMinutes(usedVcpuMinutes)} of the{' '}
-          {formatMinutes(includedVcpuMinutes)} included in the {planName}. The cycle ends on{' '}
+          {organizationName} has used {formatHours(usedVcpuHours)} of the{' '}
+          {formatHours(includedVcpuHours)} included in the {planName}. The cycle ends on{' '}
           {cycleEndsOn}.
         </Text>
 
         <UsageMeter
           label="Compute"
-          value={formatQuota(usedVcpuMinutes, includedVcpuMinutes)}
-          ratio={usedVcpuMinutes / includedVcpuMinutes}
+          value={formatQuota(usedVcpuHours, includedVcpuHours)}
+          ratio={usedVcpuHours / includedVcpuHours}
           tone="warning"
-          caption={`${formatMinutes(remaining)} remaining`}
+          caption={`${formatHours(remaining)} remaining`}
         />
 
         <Hr />
@@ -72,7 +72,7 @@ const ComputeQuotaWarning = ({
 
 export const computeQuotaWarning: EmailTemplate<ComputeQuotaProps> = {
   id: 'compute-quota-warning',
-  trigger: 'Org-wide vCPU-minute usage crosses 80% of the included quota. Once per cycle.',
+  trigger: 'Org-wide vCPU-hour usage crosses 80% of the included quota. Once per cycle.',
   subject: ({ organizationName }) => `${organizationName} has used 80% of its Compute quota`,
   Template: ComputeQuotaWarning,
   previewProps: PREVIEW_QUOTA,

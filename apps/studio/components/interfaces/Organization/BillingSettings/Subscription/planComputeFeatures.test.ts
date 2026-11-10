@@ -3,14 +3,15 @@ import { describe, expect, it } from 'vitest'
 
 import { computeFeaturesFor, withComputeFeatures } from './planComputeFeatures'
 import { COMPUTE_PLAN_LIMITS } from '@/components/interfaces/Compute/Compute.limits'
+import { formatVcpuHours } from '@/components/interfaces/Compute/ComputeUsage.utils'
 
 const flatten = (features: (string | string[])[]) =>
   features.flatMap((feature) => (typeof feature === 'string' ? [feature] : feature)).join(' | ')
 
 describe('computeFeaturesFor', () => {
-  it('states the included quota, which the RFC sets at 500 on every plan', () => {
+  it('states the included quota, which the RFC sets the same on every plan', () => {
     for (const planId of ['free', 'pro', 'team', 'enterprise'] as const) {
-      expect(flatten(computeFeaturesFor(planId))).toContain('500 vCPU-minutes of Compute')
+      expect(flatten(computeFeaturesFor(planId))).toContain('8.3 vCPU-hrs of Compute')
     }
   })
 
@@ -60,7 +61,7 @@ describe('computeFeaturesFor', () => {
   it('tracks Compute.limits rather than restating it', () => {
     // Changing the gating must move the copy, or the two drift apart.
     expect(flatten(computeFeaturesFor('free'))).toContain(
-      `${COMPUTE_PLAN_LIMITS.free.vcpuMinutes} vCPU-minutes`
+      formatVcpuHours(COMPUTE_PLAN_LIMITS.free.vcpuHours!)
     )
   })
 
