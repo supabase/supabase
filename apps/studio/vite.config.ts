@@ -602,14 +602,6 @@ export default defineConfig(({ command, mode }) => {
     },
     resolve: {
       tsconfigPaths: true,
-      alias: [
-        // Blocking requires TanStack's native history API. Keep the original
-        // Next hook for the rollback runtime, which has no TanStack provider.
-        {
-          find: /^@\/hooks\/ui\/usePreventNavigationOnUnsavedChanges$/,
-          replacement: path.resolve(rootDir, 'compat/usePreventNavigationOnUnsavedChanges.ts'),
-        },
-      ],
     },
     ...(basePath && { base: basePath }),
     optimizeDeps: {
