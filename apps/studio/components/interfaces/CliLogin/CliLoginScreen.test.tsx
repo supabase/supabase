@@ -2,8 +2,8 @@ import { screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import { describe, expect, test, vi } from 'vitest'
 
+import { CliLoginScreen } from '@/components/interfaces/CliLogin/CliLoginScreen'
 import type { ProfileContextType } from '@/lib/profile'
-import { CliLoginScreen } from '@/pages/cli/login'
 import { customRender } from '@/tests/lib/custom-render'
 
 const { createCliLoginSessionMock } = vi.hoisted(() => ({
@@ -40,7 +40,6 @@ function renderScreen(props: Partial<Parameters<typeof CliLoginScreen>[0]> = {})
   const result = customRender(
     <CliLoginScreen
       isLoggedIn
-      routerReady
       sessionId="session-test"
       publicKey="public-key-test"
       tokenName="local-dev"
@@ -151,7 +150,6 @@ describe('CliLoginScreen', () => {
     rerender(
       <CliLoginScreen
         isLoggedIn
-        routerReady
         sessionId="session-test"
         publicKey="public-key-test"
         tokenName="local-dev"
