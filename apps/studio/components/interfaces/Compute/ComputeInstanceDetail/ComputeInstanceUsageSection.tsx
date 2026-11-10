@@ -131,14 +131,18 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+        {/*
+          Stacked rather than side by side. Edge Functions pairs these in two columns, but its
+          charts carry a single series over short intervals; these carry a month of daily
+          points, and two series on the CPU one, which a half-width column crushes.
+        */}
+        <div className="space-y-6">
           <UsageChartCard
             metrics={cpuMetrics}
             data={chartData}
             dataKey="reservedVcpuHours"
             dataKeys={['reservedVcpuHours', 'usedVcpuHours']}
             config={CPU_CHART_CONFIG}
-            unit="vCPU-hrs"
             isLoading={isPending}
             isError={isError}
             subject="CPU usage"
@@ -148,7 +152,6 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
             data={chartData}
             dataKey="gbHours"
             config={MEMORY_CHART_CONFIG}
-            unit="GB-hrs"
             isLoading={isPending}
             isError={isError}
             subject="memory usage"
@@ -165,7 +168,6 @@ interface UsageChartCardProps {
   dataKey: string
   dataKeys?: string[]
   config: ChartConfig
-  unit: string
   isLoading: boolean
   isError: boolean
   subject: string
@@ -177,7 +179,6 @@ const UsageChartCard = ({
   dataKey,
   dataKeys,
   config,
-  unit,
   isLoading,
   isError,
   subject,
@@ -207,8 +208,10 @@ const UsageChartCard = ({
             showYAxis
             config={config}
             YAxisProps={{
-              tickFormatter: (value: number) => `${metricValue(value)} ${unit}`,
-              width: 72,
+              // Bare numbers: the metric label above the chart already names the unit, and
+              // repeating it on every tick costs width the plot needs more.
+              tickFormatter: (value: number) => metricValue(value),
+              width: 40,
             }}
           />
         </div>
