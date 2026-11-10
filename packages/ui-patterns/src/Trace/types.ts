@@ -1,4 +1,4 @@
-import type { ReactNode } from 'react'
+import type { ComponentProps, ReactNode } from 'react'
 
 export type SpanStatus = 'ok' | 'error' | 'unset'
 
@@ -39,10 +39,17 @@ export interface TraceIndex {
   slowestId: string | null
 }
 
+export interface TimeTick {
+  ms: number
+  fraction: number
+  label: string
+}
+
 export interface TimeScale {
   window: TimeWindow
   width: number
   durationMs: number
+  ticks: readonly TimeTick[]
   toFraction: (ms: number) => number
   toX: (ms: number) => number
   toMs: (x: number) => number
@@ -52,4 +59,8 @@ export interface RootProps {
   trace: TraceData
   minRangeMs?: number
   children?: ReactNode
+}
+
+export interface WaterfallProps extends ComponentProps<'div'> {
+  treeWidth?: number
 }
