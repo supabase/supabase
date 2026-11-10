@@ -8,7 +8,8 @@ import type {
   PipelineConfig,
 } from './types'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 const isLocal =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' &&
@@ -29,9 +30,7 @@ export const checkReplicationFeatureFlagRetry = (
   error: StudioError
 ): boolean => {
   const isFeatureFlagRequiredError =
-    error instanceof StudioError &&
-    error.code === 503 &&
-    error.message.includes('feature flag is required')
+    isStudioError(error) && error.code === 503 && error.message.includes('feature flag is required')
 
   const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(error)
 

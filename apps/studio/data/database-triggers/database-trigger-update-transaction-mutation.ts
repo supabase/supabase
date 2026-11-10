@@ -35,6 +35,8 @@ export async function updateDatabaseTrigger({
   await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-update-transaction',
     sql,
     queryKey: ['trigger', 'update', originalTrigger.id],
     grant: unguarded.migrating,

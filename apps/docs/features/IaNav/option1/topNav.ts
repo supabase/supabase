@@ -109,7 +109,7 @@ export const GLOBAL_MENU_ITEMS: GlobalMenuItems = [
       menuItems: [
         [
           {
-            label: 'Projects, compute and scaling',
+            label: 'Projects, organizations and compute',
             icon: 'platform',
             href: '/guides/platform/performance',
             level: 'platform',

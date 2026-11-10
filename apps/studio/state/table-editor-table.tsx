@@ -14,14 +14,9 @@ import { Filter, SupaRow } from '@/components/grid/types'
 import { getInitialGridColumns } from '@/components/grid/utils/column'
 import { getGridColumns } from '@/components/grid/utils/gridColumns'
 import { Entity } from '@/data/table-editor/table-editor-types'
+import { isSensitiveComment } from '@/lib/sensitive-column-comment'
 
 const FALLBACK_TABLE_STATE = proxy({}) as TableEditorTableState
-
-// Helper to extract sensitive data marker from column comment
-const SENSITIVE_DATA_MARKER = '[SENSITIVE]'
-const isSensitiveDataColumn = (comment: string | null | undefined): boolean => {
-  return comment ? comment.includes(SENSITIVE_DATA_MARKER) : false
-}
 
 export const createTableEditorTableState = ({
   projectRef,
@@ -126,9 +121,7 @@ export const createTableEditorTableState = ({
     get sensitiveDataColumns() {
       // Single source of truth: columns marked sensitive = defaults minus user toggles (persistent only)
       const defaultSensitiveColumns = new Set(
-        state.table.columns
-          .filter((col) => isSensitiveDataColumn(col.comment))
-          .map((col) => col.name)
+        state.table.columns.filter((col) => isSensitiveComment(col.comment)).map((col) => col.name)
       )
       return new Set(
         Array.from(defaultSensitiveColumns).filter(

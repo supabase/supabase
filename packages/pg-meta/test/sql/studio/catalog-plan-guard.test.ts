@@ -11,15 +11,23 @@ import {
   getTableConstraintsSql,
   getTableDefinitionSql,
   getTableEditorSql,
+  getTableReferencingFunctionsSql,
+  getTableRelatedResourcesSql,
   getTablesPaginatedSql,
   getViewDefinitionSql,
+  TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT,
 } from '../../../src'
 import columnPrivileges from '../../../src/pg-meta-column-privileges'
 import tablePrivileges from '../../../src/pg-meta-table-privileges'
 import * as tables from '../../../src/pg-meta-tables'
 import * as types from '../../../src/pg-meta-types'
 import { assertPlanWithinBudget, explainAnalyze } from '../../db/plan-guard'
-import { buildStressCatalog, STRESS_TABLE_COUNT } from '../../db/stress-catalog'
+import {
+  buildStressCatalog,
+  buildStressFunctions,
+  buildStressTriggers,
+  STRESS_TABLE_COUNT,
+} from '../../db/stress-catalog'
 import { cleanupRoot, createTestDatabase } from '../../db/utils'
 
 /**
@@ -59,8 +67,22 @@ beforeAll(async () => {
   viewId = vId
 }, 120_000)
 
+// Function and trigger search get their own catalog: growing pg_proc/pg_depend/
+// pg_trigger in the shared one shifts the plans of unrelated queries above.
+let searchDb: Awaited<ReturnType<typeof createTestDatabase>> | undefined
+const getSearchDb = async () => {
+  if (!searchDb) {
+    searchDb = await createTestDatabase()
+    await buildStressCatalog(searchDb, STRESS_TABLE_COUNT)
+    await buildStressFunctions(searchDb)
+    await buildStressTriggers(searchDb)
+  }
+  return searchDb
+}
+
 afterAll(async () => {
   await db.cleanup()
+  await searchDb?.cleanup()
   await cleanupRoot()
 })
 
@@ -491,6 +513,16 @@ const SEARCH_ENTITIES_BUDGET = {
       reason:
         'policy name search: a leading-wildcard ILIKE cannot use the (polrelid, polname) index, so one filtered pass of pg_policy is unavoidable',
     },
+    pg_trigger: {
+      max: 1,
+      reason:
+        'trigger name search: a leading-wildcard ILIKE cannot use the (tgrelid, tgname) index, so one filtered pass of pg_trigger is unavoidable',
+    },
+    pg_proc: {
+      max: 1,
+      reason:
+        'function name search: a leading-wildcard ILIKE cannot use pg_proc_proname_args_nsp_index, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
+    },
   },
   maxExecutionTimeMs: 500,
 }
@@ -507,7 +539,95 @@ test('getSearchEntitiesSql: broad policy name search stays within budget', async
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)
 
+test('getSearchEntitiesSql: broad function name search stays within budget', async () => {
+  // `fn_1` matches a large share of both the user's functions and the (same-named)
+  // extension-owned ones, which must be excluded without scanning pg_depend
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'fn_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: broad trigger name search stays within budget', async () => {
+  // `trg_1` matches a large share of the user triggers, in a catalog where the
+  // foreign keys have added many internal triggers that must be skipped
+  const result = await explainAnalyze(await getSearchDb(), getSearchEntitiesSql({ query: 'trg_1' }))
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
+test('getSearchEntitiesSql: triggers found through a function stay within budget', async () => {
+  // Matches the `audit_row_fn` function; the triggers that run it (aud_*) only match
+  // through the function, which must share the one pg_trigger pass
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getSearchEntitiesSql({ query: 'audit_row_fn' })
+  )
+  assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
+}, 300_000)
+
 test('getSearchEntitiesSql: schema-qualified search stays within budget', async () => {
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)
+
+// Nothing here is matched by name: the table is given, so every lookup should be
+// an index probe. A seq scan over any of these means the query stopped being
+// scoped to the one table.
+const TABLE_RELATED_RESOURCES_BUDGET = {
+  allowedSeqScans: {},
+  maxExecutionTimeMs: 100,
+}
+
+test('getTableRelatedResourcesSql: policies and triggers stay index-scoped', async () => {
+  // t_0 is the hub table: many incoming foreign keys, so many internal triggers to skip
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableRelatedResourcesSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_RELATED_RESOURCES_BUDGET)
+}, 300_000)
+
+/** Rows returned by the first seq scan over `relation`, for checking a scan stopped early. */
+const seqScanRows = (node: unknown, relation: string): number | undefined => {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = seqScanRows(item, relation)
+      if (found !== undefined) return found
+    }
+  } else if (node !== null && typeof node === 'object') {
+    const obj = node as Record<string, unknown>
+    if (obj['Node Type'] === 'Seq Scan' && obj['Relation Name'] === relation) {
+      return obj['Actual Rows'] as number
+    }
+    for (const key of Object.keys(obj)) {
+      const found = seqScanRows(obj[key], relation)
+      if (found !== undefined) return found
+    }
+  }
+  return undefined
+}
+
+const TABLE_REFERENCING_FUNCTIONS_BUDGET = {
+  allowedSeqScans: {
+    pg_proc: {
+      max: 1,
+      reason:
+        'function source search: no index can answer a substring match on prosrc, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getTableReferencingFunctionsSql: source search stays within budget', async () => {
+  // Every stress function body mentions stress.t_0, so this matches all of pg_proc
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableReferencingFunctionsSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_REFERENCING_FUNCTIONS_BUDGET)
+
+  // The scan has to stop at the candidate cap. Ranking before the cap would
+  // make Postgres read every matching function body instead, which on a real
+  // catalog is the difference between milliseconds and about a second.
+  expect(seqScanRows(result.plan.Plan, 'pg_proc')).toBeLessThanOrEqual(
+    TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT
+  )
+}, 300_000)

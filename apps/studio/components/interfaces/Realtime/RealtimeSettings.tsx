@@ -419,10 +419,11 @@ export const RealtimeSettings = () => {
                                 title="No Realtime RLS policies found"
                                 description={
                                   <p className="prose max-w-full text-sm">
-                                    Private mode is {isSettingToPrivate ? 'being ' : ''}
-                                    enabled, but no RLS policies exist on the{' '}
-                                    <code>realtime.messages</code> table. No messages will be
-                                    received by users.
+                                    Private mode is{' '}
+                                    {isSettingToPrivate ? <span>{'being '}</span> : ''}
+                                    <span>enabled, but no RLS policies exist on the</span>{' '}
+                                    <code>realtime.messages</code>{' '}
+                                    <span>table. No messages will be received by users.</span>
                                   </p>
                                 }
                                 actions={

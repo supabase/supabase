@@ -33,6 +33,27 @@ const entitySearchResultSchema = z.object({
       table_id: z.number(),
     })
   ),
+  triggers: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
+      events: z.array(z.enum(['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'])),
+      schema: z.string(),
+      table: z.string(),
+      table_id: z.number(),
+      matched_function: z.string().nullable(),
+    })
+  ),
+  functions: z.array(
+    z.object({
+      id: z.number(),
+      schema: z.string(),
+      name: z.string(),
+      type: z.enum(['function', 'procedure']),
+      args: z.string(),
+    })
+  ),
 })
 
 async function getEntitySearch(
@@ -45,6 +66,8 @@ async function getEntitySearch(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-search',
       sql: getSearchEntitiesSql({ query }),
       queryKey: ['entity-search'],
       grant: unguarded.migrating,
@@ -58,6 +81,8 @@ async function getEntitySearch(
 export type EntitySearchData = Awaited<ReturnType<typeof getEntitySearch>>
 export type EntitySearchTable = EntitySearchData['tables'][number]
 export type EntitySearchPolicy = EntitySearchData['policies'][number]
+export type EntitySearchTrigger = EntitySearchData['triggers'][number]
+export type EntitySearchFunction = EntitySearchData['functions'][number]
 export type EntitySearchError = StudioError
 
 export const entitySearchQueryOptions = (

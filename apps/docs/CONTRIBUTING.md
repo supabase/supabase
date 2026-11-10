@@ -2,16 +2,9 @@
 
 Our docs help developers to get started and keep succeeding with Supabase. We welcome contributions from everyone.
 
-If you'd like to contribute, see our list of [recommended issues](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22). We also welcome you to open a PR or a new issue with your question.
+If you'd like to contribute, pick a [recommended issue](https://github.com/supabase/supabase/issues?q=is%3Aopen+is%3Aissue+label%3Adocumentation+label%3A%22help+wanted%22) or [open an issue](https://github.com/supabase/supabase/issues/new/choose) with your question or idea first. Link the issue in your pull request. GitHub automatically requests a review from the Docs team (`@supabase/docs`).
 
-How to write a docs page is covered by the [style guide](./style-guide/README.md). This file covers repo mechanics. If you write with an AI coding agent, these skills apply the style guide for you:
-
-- `/write-the-docs` to draft a new page.
-- `/edit-the-docs` to revise an existing page.
-- `/test-the-docs` to run the snippets you wrote.
-- `/review-the-docs` to check your work before you open a pull request.
-
-See [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring) for the full set, including the skills that help you frame a page and place it in the information architecture.
+How to write a docs page is covered by the [style guide](./style-guide/README.md). If you write with an agent, use our [AI agent skills for docs authoring](#ai-agent-skills-for-docs-authoring), including the skills that help you frame a page and place it in the information architecture. Be sure to give your changes human review.
 
 ## Style guide
 
@@ -163,10 +156,20 @@ Run `pnpm test:local lib/content-listings.test.ts` from apps/docs.
 **Manually add content listings:**
 
 1. Add or update a `ContentListingGroup` export in [`data/content-listings/[topic].data.ts`](data/content-listings/). The `id` field must be globally unique across all listing groups. For example, use `storage-get-started` rather than `get-started`. The ID is both the lookup key and the telemetry `listingId`.
-2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing.
+2. Place the component inline in guide MDX, for example `<ContentListings id="storage-get-started" />`. Use a partial only when the block is reused or gated with `$Show` at the partial level. For individual items that depend on a feature flag (for example `sdk:dart`), set `feature` on the item instead of wrapping the whole listing. The `feature` field removes only the listing item. The linked page stays live.
 3. Run `pnpm test:local lib/content-listings.test.ts` from `apps/docs`.
 
 Code snippets for manually adding content listings are available in [`.vscode/content-listing.code-snippets`](../../.vscode/content-listing.code-snippets). Use `cl-data` for a data export with a namespaced ID. Use `cl-inline` for an MDX component.
+
+## Feature flags and experiments
+
+Docs can hide or show content at build time with `enabled-features` flags. Use the `$Show` directive in MDX, or the `feature` field on a content listing item. To add or change a flag, see the [enabled-features README](../../packages/common/enabled-features/README.md).
+
+Docs also supports A/B tests behind PostHog feature flags. PostHog flags resolve in the browser, not at build time.
+
+Supabase staff: to run an experiment, contact the Docs PM or Docs Engineering. Read [Feature flag a docs change](https://app.notion.com/p/4105004b775f81bf810ddd5682284d23) (internal, staff only) first.
+
+Other contributors: if your change may need an A/B test, say so in your PR description or issue. The Docs team decides and sets up the flag. To preview a variant of a live experiment locally, add `?<flag>=<variant>` to the URL.
 
 ## Search
 

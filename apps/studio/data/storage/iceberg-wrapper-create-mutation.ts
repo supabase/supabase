@@ -43,10 +43,12 @@ export const useIcebergWrapperCreateMutation = () => {
     { projectRef: project?.ref },
     { variant: 'reveal' }
   )
-  const { data: apiKeysData, isError: isApiKeysError } = useQuery({
-    ...revealedApiKeysQueryOptions({ projectRef: project?.ref, grant: apiKeysGrant.grant }),
-    select: getKeys,
-  })
+  const { data: apiKeysData, isError: isApiKeysError } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
+  )
   const { secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'

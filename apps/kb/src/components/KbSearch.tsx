@@ -1,14 +1,16 @@
 import { useDocsSearchV2 } from 'common/hooks/useDocsSearchV2'
 import { useMountEffect } from 'common/hooks/useMountEffect'
 import {
+  getVisibleResults,
   SearchDialog,
   SearchPanel,
   useSearchShortcut,
   type SearchLabels,
 } from 'docs-search/components'
-import { useCallback, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 
 import { KB_SEARCH_MIN_CHARACTERS, KB_SEARCH_URL, reshapeKbResult } from '../lib/search'
+import { sendKbTelemetryEvent } from '../lib/telemetry'
 
 interface KbSearchDialogProps {
   isOpen: boolean
@@ -59,12 +61,36 @@ const KbSearchPanel = ({ onOpenChange }: Pick<KbSearchDialogProps, 'onOpenChange
     reshape: reshapeKbResult,
   })
 
+  useEffect(() => {
+    if (searchState.status !== 'results' && searchState.status !== 'noResults') return
+    const resultCount = searchState.status === 'results' ? searchState.results.length : 0
+    sendKbTelemetryEvent({
+      action: 'kb_search_submitted',
+      properties: {
+        queryLength: searchState.query.length,
+        resultCount,
+        hasResults: resultCount > 0,
+      },
+    })
+  }, [searchState])
+
   return (
     <SearchPanel
       searchState={searchState}
       labels={LABELS}
       minCharacters={KB_SEARCH_MIN_CHARACTERS}
       onQueryChange={(query) => (query ? handleDocsSearchDebounced(query) : resetSearch())}
+      onResultActivate={(result) => {
+        const results = getVisibleResults(searchState)
+        sendKbTelemetryEvent({
+          action: 'kb_search_result_clicked',
+          properties: {
+            resultPath: result.path,
+            resultPosition: results.findIndex(({ path }) => path === result.path) + 1,
+            resultCount: results.length,
+          },
+        })
+      }}
       onResultNavigate={(path) => window.location.assign(path)}
       onResultLinkNavigate={() => onOpenChange(false)}
     />

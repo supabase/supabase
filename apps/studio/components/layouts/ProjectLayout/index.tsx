@@ -119,6 +119,8 @@ export interface ProjectLayoutProps {
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
+  /** Starting width of the product menu in pixels, for menus that list more than links */
+  productMenuDefaultSize?: number
   productMenuClassName?: string
 }
 
@@ -135,7 +137,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       children,
       selectedTable,
       resizableSidebar = false,
-
+      productMenuDefaultSize = 256,
       productMenuClassName,
     },
     ref
@@ -156,7 +158,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_space_exhaustion ||
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+    // The free Micro upgrade is only included on paid plans
+    const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
+    const showUpgradeBanner = isPaidPlan && isNanoCompute && isComputeNearExhaustion
 
     const isExplorerEnabled = useFlag('explorer')
 
@@ -310,7 +314,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
                 panelRef={panelRef}
                 minSize="256px"
                 maxSize={resizableSidebar ? '512px' : '256px'}
-                defaultSize="256px"
+                defaultSize={`${productMenuDefaultSize}px`}
                 groupResizeBehavior="preserve-pixel-size"
                 id="panel-left"
               >

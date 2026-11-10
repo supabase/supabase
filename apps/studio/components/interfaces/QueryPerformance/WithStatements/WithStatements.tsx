@@ -120,7 +120,6 @@ export const WithStatements = ({
           postgresVersion: project?.dbVersion,
           databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
           sql: queryPerformanceQuery.resolvedSql,
-          errorMessage: errorMessage || undefined,
         })
       }
     }
@@ -135,7 +134,6 @@ export const WithStatements = ({
 
   useEffect(() => {
     if (hitRateError) {
-      const errorMessage = getErrorMessage(hitRateError)
       captureQueryPerformanceError(hitRateError, {
         projectRef: ref,
         databaseIdentifier: state.selectedDatabaseId,
@@ -143,14 +141,12 @@ export const WithStatements = ({
         queryType: 'hitRate',
         postgresVersion: project?.dbVersion,
         databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        errorMessage: errorMessage || undefined,
       })
     }
   }, [hitRateError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
 
   useEffect(() => {
     if (metricsError) {
-      const errorMessage = getErrorMessage(metricsError)
       captureQueryPerformanceError(metricsError, {
         projectRef: ref,
         databaseIdentifier: state.selectedDatabaseId,
@@ -158,7 +154,6 @@ export const WithStatements = ({
         queryType: 'metrics',
         postgresVersion: project?.dbVersion,
         databaseType: isPrimaryDatabase ? 'primary' : 'read-replica',
-        errorMessage: errorMessage || undefined,
       })
     }
   }, [metricsError, ref, state.selectedDatabaseId, project?.dbVersion, isPrimaryDatabase])
@@ -318,6 +313,8 @@ export const WithStatements = ({
             await executeSql({
               projectRef: project?.ref,
               connectionString,
+              sqlOrigin: 'studio',
+              queryName: 'pg-stat-statements-reset',
               sql: safeSql`SELECT pg_stat_statements_reset();`,
               grant: unguarded.migrating,
             })

@@ -16,7 +16,8 @@ import { useConnectionStringForReadOps } from '@/data/read-replicas/replicas-que
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { prefetchTableEditor } from '@/data/table-editor/table-editor-query'
 import { isMsSqlForeignTable } from '@/data/table-editor/table-editor-types'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 import { timeout } from '@/lib/helpers'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
@@ -70,14 +71,14 @@ const getPreferredOrderByColumns = (
 
 function getErrorCode(error: any): number | undefined {
   // Our custom StudioError's use 'code' instead of 'status'
-  if (error instanceof StudioError) {
+  if (isStudioError(error)) {
     return error.code
   }
   return error.status
 }
 
 function getRetryAfter(error: any): number | undefined {
-  if (error instanceof StudioError) {
+  if (isStudioError(error)) {
     return error.retryAfter
   }
 
@@ -257,7 +258,14 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-cursor',
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -289,7 +297,14 @@ export const fetchAllTableRows = async ({
 
       try {
         const { result } = await executeWithRetry(async () =>
-          executeSql({ projectRef, connectionString, sql: query, grant: unguarded.migrating })
+          executeSql({
+            projectRef,
+            connectionString,
+            sql: query,
+            sqlOrigin: 'studio',
+            queryName: 'table-rows-page',
+            grant: unguarded.migrating,
+          })
         )
         rows.push(...result)
         progressCallback?.(rows.length)
@@ -376,6 +391,8 @@ async function getTableRows(
       {
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'table-rows',
         sql,
         queryKey: ['table-rows', table?.id],
         isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),

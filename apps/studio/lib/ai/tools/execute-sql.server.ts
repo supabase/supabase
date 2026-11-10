@@ -24,7 +24,13 @@ export const createTool: ApprovalGatedToolFactory<typeof contract> = (ctx) => {
         ? { sql: approvedSql, isCappedInDatabase: false }
         : capReadQuery(approvedSql, DEFAULT_CELL_ROW_LIMIT + 1)
       const { result } = await executeSql(
-        { projectRef, connectionString, sql: limitedSql, grant: unguarded.migrating },
+        {
+          projectRef,
+          connectionString,
+          sql: limitedSql,
+          sqlOrigin: 'user',
+          grant: unguarded.migrating,
+        },
         abortSignal,
         authHeaders
       ).catch((error: unknown) => {

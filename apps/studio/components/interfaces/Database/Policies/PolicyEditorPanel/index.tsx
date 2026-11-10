@@ -219,6 +219,7 @@ export const PolicyEditorPanel = memo(function ({
       setError(undefined)
       executeMutation({
         sql,
+        sqlOrigin: 'user',
         projectRef: selectedProject?.ref,
         connectionString: selectedProject?.connectionString,
         handleError: (error) => {
@@ -265,6 +266,7 @@ export const PolicyEditorPanel = memo(function ({
         projectRef: selectedProject.ref,
         connectionString: selectedProject?.connectionString,
         originalPolicy: selectedPolicy,
+        sqlOrigin: 'user',
         // The Save click is the explicit user gesture that promotes editor content
         // to executable SQL.
         payload: {

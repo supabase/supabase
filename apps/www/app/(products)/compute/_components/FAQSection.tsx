@@ -28,7 +28,7 @@ const faqs = [
   {
     question: 'Can I attach a persistent disk?',
     answer:
-      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files — both reachable with near-zero intra-region latency and no data-transfer tax. Mountable persistent disks are on the roadmap.',
+      'Sandboxes and services are designed to scale to zero and restart on demand, so the local filesystem is fast scratch space, not durable storage. For state that needs to persist, use your Postgres database for structured data and Supabase Storage for files, both reachable with near-zero intra-region latency. Mountable persistent disks are on the roadmap.',
   },
   {
     question: 'How will pricing work?',

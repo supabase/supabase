@@ -5,6 +5,7 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { databaseKeys } from '@/data/database/keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -14,12 +15,14 @@ export type DatabaseFunctionCreateVariables = {
   projectRef: string
   connectionString?: string | null
   payload: PGFunctionCreate
+  sqlOrigin: SqlOrigin
 }
 
 export async function createDatabaseFunction({
   projectRef,
   connectionString,
   payload,
+  sqlOrigin,
 }: DatabaseFunctionCreateVariables) {
   const { sql, zod } = pgMeta.functions.create(payload)
 
@@ -27,6 +30,8 @@ export async function createDatabaseFunction({
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName: 'database-function-create',
     queryKey: ['functions', 'create'],
     grant: unguarded.migrating,
   })

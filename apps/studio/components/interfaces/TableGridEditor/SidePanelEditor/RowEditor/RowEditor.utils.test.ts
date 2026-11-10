@@ -1,12 +1,17 @@
-import { MAX_ARRAY_SIZE } from '@supabase/pg-meta/src/query/table-row-query'
+import type { PGTable } from '@supabase/pg-meta'
+import { MAX_ARRAY_SIZE, MAX_CHARACTERS } from '@supabase/pg-meta/src/query/table-row-query'
 import { describe, expect, it, vi } from 'vitest'
 
 import { RowField } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.types'
 import {
   convertByteaToHex,
+  generateReusedRowFields,
   generateRowObjectFromFields,
   generateUpdateRowPayload,
+  getPrimaryKeyMatch,
+  getTruncatedFieldNames,
   isValueTruncated,
+  mergeLargeValues,
   parseValue,
   validateFields,
 } from '@/components/interfaces/TableGridEditor/SidePanelEditor/RowEditor/RowEditor.utils'
@@ -253,6 +258,22 @@ describe('generateRowObjectFromFields', () => {
 })
 
 describe('isValueTruncated', () => {
+  describe('multibyte text', () => {
+    it('detects a value cut by characters that is shorter than MAX_CHARACTERS characters', () => {
+      // 5,000 three-byte characters is 15,000 bytes, so the query truncates it but `left()` keeps it whole
+      const original = '日'.repeat(5000)
+      expect(isValueTruncated(original + '...')).toBe(true)
+    })
+
+    it('does not flag a genuine multibyte value ending in an ellipsis', () => {
+      expect(isValueTruncated('日'.repeat(100) + '...')).toBe(false)
+    })
+
+    it('does not flag a short ASCII value ending in an ellipsis', () => {
+      expect(isValueTruncated('loading...')).toBe(false)
+    })
+  })
+
   it('should verify coordination with table-row-query.ts truncation patterns', () => {
     // Test the exact patterns that table-row-query.ts generates to ensure isValueTruncated stays in sync
 
@@ -797,5 +818,191 @@ describe('generateUpdateRowPayload', () => {
     ]
     const payload = generateUpdateRowPayload({ id: '1', price: '100', is_discounted: true }, fields)
     expect(payload).toEqual({ price: '90' })
+  })
+})
+
+describe('generateReusedRowFields', () => {
+  const makeField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'col',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: 'copied',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+
+  const reuse = (fields: RowField[]) =>
+    generateReusedRowFields({
+      fields,
+      blankFields: fields.map((field) => ({ ...field, value: undefined })),
+    })
+
+  it('keeps values of plain columns', () => {
+    const [field] = reuse([makeField({ name: 'title', value: 'hello' })])
+    expect(field.value).toBe('hello')
+  })
+
+  it('keeps values with a literal default', () => {
+    const [field] = reuse([makeField({ defaultValue: "'draft'::text", value: 'published' })])
+    expect(field.value).toBe('published')
+  })
+
+  it('keeps values with a literal default containing parentheses', () => {
+    const [field] = reuse([makeField({ defaultValue: "'a(b'::text", value: 'x' })])
+    expect(field.value).toBe('x')
+  })
+
+  it.each([
+    ['primary key', { isPrimaryKey: true }],
+    ['identity', { isIdentity: true }],
+    ['uuid default', { defaultValue: 'gen_random_uuid()' }],
+    ['sequence default', { defaultValue: "nextval('seq'::regclass)" }],
+    ['timestamp default', { defaultValue: 'now()' }],
+    ['CURRENT_TIMESTAMP default', { defaultValue: 'CURRENT_TIMESTAMP' }],
+    ['CURRENT_DATE default', { defaultValue: 'CURRENT_DATE' }],
+    ['CURRENT_USER default', { defaultValue: 'CURRENT_USER' }],
+  ])('clears %s columns', (_, overrides) => {
+    const [field] = reuse([makeField(overrides)])
+    expect(field.value).toBeUndefined()
+  })
+
+  it('clears truncated values', () => {
+    const [field] = reuse([
+      makeField({ format: 'jsonb', value: '{"a":"' + 'x'.repeat(20000) + '...' }),
+    ])
+    expect(field.value).toBeUndefined()
+  })
+
+  it('leaves a boolean with a function default unset so the database evaluates it', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'random() > 0.5', value: 'true' })],
+      blankFields: [makeField({ format: 'bool', value: 'random() > 0.5' })],
+    })
+    expect(field.value).toBeUndefined()
+  })
+
+  it('keeps a boolean with a literal default', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', defaultValue: 'true', value: 'false' })],
+      blankFields: [makeField({ format: 'bool', value: 'true' })],
+    })
+    expect(field.value).toBe('false')
+  })
+
+  it('uses the blank field value when clearing', () => {
+    const [field] = generateReusedRowFields({
+      fields: [makeField({ format: 'bool', isPrimaryKey: true, value: 'true' })],
+      blankFields: [makeField({ format: 'bool', value: 'null' })],
+    })
+    expect(field.value).toBe('null')
+  })
+})
+
+describe('large values when duplicating', () => {
+  const makeField = (overrides: Partial<RowField>): RowField => ({
+    id: '1',
+    name: 'col',
+    comment: '',
+    format: 'text',
+    enums: [],
+    value: 'copied',
+    defaultValue: null,
+    isNullable: true,
+    isIdentity: false,
+    isGenerated: false,
+    isPrimaryKey: false,
+    ...overrides,
+  })
+  const truncated = 'a'.repeat(MAX_CHARACTERS + 1) + '...'
+
+  describe('getTruncatedFieldNames', () => {
+    it('returns the fields whose values were truncated', () => {
+      const fields = [
+        makeField({ name: 'title', value: 'short' }),
+        makeField({ name: 'body', value: truncated }),
+        makeField({ name: 'meta', format: 'jsonb', value: truncated }),
+      ]
+      expect(getTruncatedFieldNames(fields)).toEqual(['body', 'meta'])
+    })
+
+    it.each([
+      ['primary key', { isPrimaryKey: true }],
+      ['identity', { isIdentity: true }],
+      ['function default', { defaultValue: 'gen_random_uuid()' }],
+      ['generated', { isGenerated: true }],
+    ])('skips %s fields, which are never copied', (_, overrides) => {
+      expect(getTruncatedFieldNames([makeField({ value: truncated, ...overrides })])).toEqual([])
+    })
+  })
+
+  describe('getPrimaryKeyMatch', () => {
+    const table = {
+      primary_keys: [{ name: 'org_id' }, { name: 'id' }],
+      columns: [
+        { name: 'org_id', format: 'int8' },
+        { name: 'id', format: 'bytea' },
+      ],
+    } as unknown as PGTable
+
+    it('matches on every primary key column', () => {
+      const match = getPrimaryKeyMatch({
+        row: { org_id: 7, id: { type: 'Buffer', data: [1, 2] }, other: 'x' },
+        table,
+      })
+      expect(match).toEqual({ org_id: 7, id: '\\x0102' })
+    })
+
+    it('returns undefined when the table has no primary key', () => {
+      const noPk = { primary_keys: [], columns: [] } as unknown as PGTable
+      expect(getPrimaryKeyMatch({ row: { id: 1 }, table: noPk })).toBeUndefined()
+    })
+
+    it('returns undefined when the row is missing a primary key value', () => {
+      expect(getPrimaryKeyMatch({ row: { org_id: 7 }, table })).toBeUndefined()
+    })
+  })
+
+  describe('mergeLargeValues', () => {
+    it('fills in fetched values and leaves other fields alone', () => {
+      const fields = [
+        makeField({ name: 'title', value: 'edited by the user' }),
+        makeField({ name: 'body', value: undefined }),
+      ]
+      const result = mergeLargeValues({ fields, values: { body: 'the full text' } })
+
+      expect(result.fields.map((f) => f.value)).toEqual(['edited by the user', 'the full text'])
+      expect(result.unavailable).toEqual([])
+    })
+
+    it('stringifies jsonb values the way row values are', () => {
+      const fields = [makeField({ name: 'meta', format: 'jsonb', value: undefined })]
+      const result = mergeLargeValues({ fields, values: { meta: { a: [1, 2] } } })
+
+      expect(result.fields[0].value).toBe('{"a":[1,2]}')
+    })
+
+    it('converts bytea values to hex', () => {
+      const fields = [makeField({ name: 'blob', format: 'bytea', value: undefined })]
+      const result = mergeLargeValues({
+        fields,
+        values: { blob: { type: 'Buffer', data: [255, 0] } },
+      })
+
+      expect(result.fields[0].value).toBe('\\xff00')
+    })
+
+    it('reports null values as unavailable and keeps the field unchanged', () => {
+      const fields = [makeField({ name: 'body', value: undefined })]
+      const result = mergeLargeValues({ fields, values: { body: null } })
+
+      expect(result.fields[0].value).toBeUndefined()
+      expect(result.unavailable).toEqual(['body'])
+    })
   })
 })

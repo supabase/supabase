@@ -6,11 +6,11 @@ import {
   type ErrorCodeService,
 } from 'shared-data'
 
-import { Service } from '@/data/graphql/graphql'
+import type { Service } from '@/data/graphql/graphql'
 
 const SERVICE_MAP: Partial<Record<Service, ErrorCodeService>> = {
-  [Service.Auth]: 'auth',
-  [Service.Realtime]: 'realtime',
+  AUTH: 'auth',
+  REALTIME: 'realtime',
 }
 
 export interface ErrorCodeInfo {
