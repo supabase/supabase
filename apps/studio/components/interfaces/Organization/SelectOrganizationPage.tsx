@@ -15,8 +15,15 @@ import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { withAuth } from '@/hooks/misc/withAuth'
 import { buildStudioPageTitle } from '@/lib/page-title'
 
-function SelectOrganization({ routeSlug }: { routeSlug?: string[] }) {
-  const { searchStr } = useLocation()
+function SelectOrganization() {
+  const { pathname, searchStr } = useLocation()
+  // `/org/_/billing` → ['billing']; the splat route nests under the `/org/_` route,
+  // which renders this page, so the trailing path is read from the location
+  const trailingSegments = pathname
+    .replace(/^\/org\/_\/?/, '')
+    .split('/')
+    .filter(Boolean)
+  const routeSlug = trailingSegments.length > 0 ? trailingSegments : undefined
   const { appTitle } = useCustomContent(['app:title'])
   const queryString = searchStr.replace(/^\?/, '')
 
