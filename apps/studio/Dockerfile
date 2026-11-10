@@ -51,8 +51,7 @@ CMD ["pnpm", "dev:studio"]
 
 # Compile TanStack Start (Vite + Nitro)
 FROM dev AS build
-# Images serve their own assets, and the pruned context has no upload script.
-RUN SKIP_ASSET_UPLOAD=1 NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build
 
 # Assemble the runtime tree at /srv. Nitro's node-server output is
 # self-contained (`.output/server` bundles the app with its traced
