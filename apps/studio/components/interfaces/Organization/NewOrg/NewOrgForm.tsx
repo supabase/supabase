@@ -4,6 +4,7 @@ import type { PaymentIntentResult, PaymentMethod, StripeElementsOptions } from '
 import { loadStripe } from '@stripe/stripe-js'
 import { useQueryClient } from '@tanstack/react-query'
 import { useDebounce } from '@uidotdev/usehooks'
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { groupBy } from 'lodash'
 import { HelpCircleIcon } from 'lucide-react'
 import { useTheme } from 'next-themes'
@@ -31,6 +32,9 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 import { z } from 'zod'
 
 import {
+  ORG_KIND_DEFAULT,
+  ORG_SIZE_DEFAULT,
+  ORG_SIZE_TYPES,
   OrganizationDetailsFields,
   organizationDetailsSchema,
   type OrgKind,
@@ -47,15 +51,9 @@ import {
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_OPTIONS,
-  ORG_KIND_DEFAULT,
-  ORG_SIZE_DEFAULT,
-  ORG_SIZE_TYPES,
   SURVEY_ORG_KIND_OPTIONS,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
-import {
-  getFollowUpStorageKey,
-  markFollowUpPending,
-} from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
+import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveySelect } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveySelect'
 import { useOnboardingSurveyVariant } from '@/components/interfaces/OnboardingSurvey/useOnboardingSurveyVariant'
 import { InlineLink } from '@/components/ui/InlineLink'
@@ -317,7 +315,9 @@ export const NewOrgForm = ({
         // A slow survey call can fail after the redirect to the new org, once the
         // follow-up card has already read (and cached) this key as empty
         queryClient.invalidateQueries({
-          queryKey: getLocalStorageQueryKey(getFollowUpStorageKey(profileId, slug)),
+          queryKey: getLocalStorageQueryKey(
+            LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, slug)
+          ),
         })
       }
 

@@ -1,8 +1,8 @@
+import { LOCAL_STORAGE_KEYS } from 'common'
 import { useCallback, useEffect, useState } from 'react'
 
 import {
   getFollowUpRemainingMs,
-  getFollowUpStorageKey,
   parseFollowUpState,
   type OnboardingSurveyFollowUpStatus,
 } from './OnboardingSurveyFollowUp.utils'
@@ -25,7 +25,9 @@ export function useOnboardingSurveyFollowUp() {
   const profileId = profile?.gotrue_id
   const orgSlug = organization?.slug
   const storageKey =
-    profileId && orgSlug ? getFollowUpStorageKey(profileId, orgSlug) : UNKNOWN_STORAGE_KEY
+    profileId && orgSlug
+      ? LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, orgSlug)
+      : UNKNOWN_STORAGE_KEY
 
   const [storedState, setStoredState] = useLocalStorageQuery<unknown>(storageKey, null)
   const followUpState = parseFollowUpState(storedState)

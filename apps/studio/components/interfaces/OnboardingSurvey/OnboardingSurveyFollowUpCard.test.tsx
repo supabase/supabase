@@ -1,11 +1,11 @@
 import { act, fireEvent, screen, waitFor } from '@testing-library/react'
 import { platformComponents as components } from 'api-types'
-import { safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { delay, HttpResponse } from 'msw'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.constants'
-import { getFollowUpStorageKey, markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
+import { markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
 import { OnboardingSurveyFollowUpCard } from './OnboardingSurveyFollowUpCard'
 import { BannerStack } from '@/components/ui/BannerStack/BannerStack'
 import { BannerStackProvider } from '@/components/ui/BannerStack/BannerStackProvider'
@@ -34,7 +34,7 @@ vi.mock(import('common'), async (importOriginal) => {
   }
 })
 
-const storageKey = getFollowUpStorageKey(PROFILE_ID, ORG_SLUG)
+const storageKey = LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(PROFILE_ID, ORG_SLUG)
 const readStoredState = () => JSON.parse(safeLocalStorage.getItem(storageKey) ?? 'null')
 
 const mockSurveyEndpoint = (status: 204 | 500) => {

@@ -31,13 +31,6 @@ export const BUILDING_OPTIONS: readonly OnboardingSurveyOption[] = [
   PREFER_NOT_TO_SAY_OPTION,
 ]
 
-export {
-  ORG_KIND_DEFAULT,
-  ORG_KIND_TYPES,
-  ORG_SIZE_DEFAULT,
-  ORG_SIZE_TYPES,
-} from '../Organization/NewOrg/OrganizationDetailsFields'
-
 // Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?".
 // UNDISCLOSED is the org kind's own Prefer not to say.
 export const SURVEY_ORG_KIND_OPTIONS: readonly OnboardingSurveyOption[] = (

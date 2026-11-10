@@ -1,11 +1,11 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { act, renderHook, waitFor } from '@testing-library/react'
-import { safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import type { PropsWithChildren } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.constants'
-import { getFollowUpStorageKey, markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
+import { markFollowUpPending } from './OnboardingSurveyFollowUp.utils'
 import { useOnboardingSurveyFollowUp } from './useOnboardingSurveyFollowUp'
 import { getLocalStorageQueryKey } from '@/hooks/misc/useLocalStorage'
 
@@ -28,8 +28,8 @@ const renderFollowUpHook = () => {
   return { queryClient, ...renderHook(() => useOnboardingSurveyFollowUp(), { wrapper }) }
 }
 
-const readStoredState = () =>
-  JSON.parse(safeLocalStorage.getItem(getFollowUpStorageKey(PROFILE_ID, ORG_SLUG)) ?? 'null')
+const storageKey = LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(PROFILE_ID, ORG_SLUG)
+const readStoredState = () => JSON.parse(safeLocalStorage.getItem(storageKey) ?? 'null')
 
 describe('useOnboardingSurveyFollowUp', () => {
   beforeEach(() => {
@@ -39,7 +39,7 @@ describe('useOnboardingSurveyFollowUp', () => {
 
   afterEach(() => {
     vi.useRealTimers()
-    safeLocalStorage.removeItem(getFollowUpStorageKey(PROFILE_ID, ORG_SLUG))
+    safeLocalStorage.removeItem(storageKey)
   })
 
   it('is not eligible when the creator answered on the form (no pending state)', async () => {
@@ -61,7 +61,7 @@ describe('useOnboardingSurveyFollowUp', () => {
     markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG })
     await act(async () => {
       await queryClient.invalidateQueries({
-        queryKey: getLocalStorageQueryKey(getFollowUpStorageKey(PROFILE_ID, ORG_SLUG)),
+        queryKey: getLocalStorageQueryKey(storageKey),
       })
     })
 

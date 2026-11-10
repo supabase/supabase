@@ -22,12 +22,8 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { z } from 'zod'
 
-import {
-  BUILDING_OPTIONS,
-  ORG_SIZE_DEFAULT,
-  ORG_SIZE_TYPES,
-  SURVEY_ORG_KIND_OPTIONS,
-} from './OnboardingSurvey.constants'
+import { ORG_SIZE_DEFAULT, ORG_SIZE_TYPES } from '../Organization/NewOrg/OrganizationDetailsFields'
+import { BUILDING_OPTIONS, SURVEY_ORG_KIND_OPTIONS } from './OnboardingSurvey.constants'
 import { OnboardingSurveySelect } from './OnboardingSurveySelect'
 import { FormSectionCollapse } from '@/components/ui/FormSectionCollapse'
 

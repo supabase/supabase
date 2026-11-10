@@ -15,10 +15,6 @@ const followUpStateSchema = z.object({
 export type OnboardingSurveyFollowUpState = z.infer<typeof followUpStateSchema>
 export type OnboardingSurveyFollowUpStatus = OnboardingSurveyFollowUpState['status']
 
-export function getFollowUpStorageKey(profileId: string, orgSlug: string) {
-  return LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, orgSlug)
-}
-
 export function parseFollowUpState(value: unknown): OnboardingSurveyFollowUpState | null {
   const result = followUpStateSchema.safeParse(value)
   return result.success ? result.data : null
@@ -48,7 +44,10 @@ export function markFollowUpPending({
     kind,
     size,
   }
-  safeLocalStorage.setItem(getFollowUpStorageKey(profileId, orgSlug), JSON.stringify(state))
+  safeLocalStorage.setItem(
+    LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, orgSlug),
+    JSON.stringify(state)
+  )
 }
 
 /** Milliseconds left to show the follow-up for an org created at `orgCreatedAt`. */

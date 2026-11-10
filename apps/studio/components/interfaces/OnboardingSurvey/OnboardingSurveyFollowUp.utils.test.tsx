@@ -1,10 +1,9 @@
-import { safeLocalStorage } from 'common'
+import { LOCAL_STORAGE_KEYS, safeLocalStorage } from 'common'
 import { afterEach, describe, expect, it } from 'vitest'
 
 import { ONBOARDING_SURVEY_FOLLOW_UP_WINDOW_MS } from './OnboardingSurvey.constants'
 import {
   getFollowUpRemainingMs,
-  getFollowUpStorageKey,
   isProjectCreationPath,
   markFollowUpPending,
   parseFollowUpState,
@@ -52,15 +51,17 @@ describe('parseFollowUpState', () => {
 })
 
 describe('markFollowUpPending', () => {
+  const storageKey = LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP('user-1', 'new-org')
+
   afterEach(() => {
-    safeLocalStorage.removeItem(getFollowUpStorageKey('user-1', 'new-org'))
+    safeLocalStorage.removeItem(storageKey)
   })
 
   it('stores a pending state keyed by user and org', () => {
     const now = new Date('2026-10-30T10:00:00.000Z')
     markFollowUpPending({ profileId: 'user-1', orgSlug: 'new-org', now })
 
-    const stored = safeLocalStorage.getItem(getFollowUpStorageKey('user-1', 'new-org'))
+    const stored = safeLocalStorage.getItem(storageKey)
     expect(JSON.parse(stored!)).toEqual({ status: 'pending', orgCreatedAt: now.toISOString() })
   })
 
@@ -74,7 +75,7 @@ describe('markFollowUpPending', () => {
       now,
     })
 
-    const stored = safeLocalStorage.getItem(getFollowUpStorageKey('user-1', 'new-org'))
+    const stored = safeLocalStorage.getItem(storageKey)
     expect(parseFollowUpState(JSON.parse(stored!))).toEqual({
       status: 'pending',
       orgCreatedAt: now.toISOString(),
