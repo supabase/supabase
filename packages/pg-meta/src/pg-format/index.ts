@@ -27,6 +27,23 @@ export interface PgFormatConfig {
 export type SafeSqlFragment = string & { readonly __safeSqlFragmentBrand: never }
 
 /**
+ * SQL that writes (DDL/DML). Needs a `write` grant to run through executeSql.
+ * Composing it via safeSql`...${w}...` or joinSqlFragments keeps the brand; only SQL written from
+ * scratch needs asWriteSql.
+ */
+export type WriteSqlFragment = SafeSqlFragment & { readonly __sqlIntent: 'write' }
+
+/** `WriteSqlFragment` if any input fragment writes, otherwise `SafeSqlFragment`. */
+type ComposedSql<F extends SafeSqlFragment> = [Extract<F, WriteSqlFragment>] extends [never]
+  ? SafeSqlFragment
+  : WriteSqlFragment
+
+/** Marks SQL as writing. Only for SQL that has already been built safely. */
+export function asWriteSql(sql: SafeSqlFragment): WriteSqlFragment {
+  return sql as WriteSqlFragment
+}
+
+/**
  * A branded string type representing SQL that may have been influenced by a
  * third party (URL params, AI output, external content). Safe to display;
  * must never be auto-executed or persisted as user-authored content.
@@ -356,14 +373,14 @@ export function format(fmt: SafeSqlFragment, ...arguments_: SafeSqlFragment[]): 
  * Only accepts SafeSqlFragment interpolations — plain strings are rejected at
  * compile time.
  */
-export function safeSql(
+export function safeSql<const F extends ReadonlyArray<SafeSqlFragment>>(
   strings: TemplateStringsArray,
-  ...interpolated: Array<SafeSqlFragment>
-): SafeSqlFragment {
+  ...interpolated: F
+): ComposedSql<F[number]> {
   return strings.reduce(
     (result, string, i) => result + string + (interpolated[i] ?? ''),
     ''
-  ) as SafeSqlFragment
+  ) as ComposedSql<F[number]>
 }
 
 /**
@@ -401,9 +418,9 @@ export function acceptUntrustedSql(sql: DisplayableSqlFragment): SafeSqlFragment
  * Joins an array of already-safe SQL fragments with a fixed structural
  * separator.
  */
-export function joinSqlFragments(
-  fragments: Array<SafeSqlFragment>,
+export function joinSqlFragments<const F extends ReadonlyArray<SafeSqlFragment>>(
+  fragments: F,
   separator: SqlFragmentSeparator
-): SafeSqlFragment {
-  return fragments.join(separator) as SafeSqlFragment
+): ComposedSql<F[number]> {
+  return fragments.join(separator) as ComposedSql<F[number]>
 }
