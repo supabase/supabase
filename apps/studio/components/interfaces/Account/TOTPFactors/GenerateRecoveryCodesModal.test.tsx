@@ -38,6 +38,7 @@ describe('GenerateRecoveryCodesModal', () => {
     customRender(
       <RecoveryCodesModal
         open
+        surface="account_security"
         onOpenChange={vi.fn()}
         mutation={{
           data: undefined,
@@ -118,7 +119,9 @@ describe('GenerateRecoveryCodesModal', () => {
     fireEvent.click(copyButton)
     await screen.findByRole('button', { name: 'Copied' })
     await waitFor(() => {
-      expect(telemetryRequests).toMatchObject([{ action: 'recovery_codes_copied' }])
+      expect(telemetryRequests).toMatchObject([
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+      ])
     })
     expect(await navigator.clipboard.readText()).toContain('WTO2-4T5X-BEUL-VJMI')
     fireEvent.click(
@@ -128,8 +131,11 @@ describe('GenerateRecoveryCodesModal', () => {
     expect(downloadClick).toHaveBeenCalledOnce()
     await waitFor(() => {
       expect(telemetryRequests).toMatchObject([
-        { action: 'recovery_codes_copied' },
-        { action: 'recovery_codes_download_clicked' },
+        { action: 'recovery_codes_copied', custom_properties: { surface: 'account_security' } },
+        {
+          action: 'recovery_codes_download_clicked',
+          custom_properties: { surface: 'account_security' },
+        },
       ])
     })
     expect(JSON.stringify(telemetryRequests)).not.toMatch(/wto2-?4t5x-?beul-?vjmi/i)
