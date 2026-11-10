@@ -34,32 +34,23 @@ export function useOnboardingSurveyFollowUp() {
   const pendingOrgCreatedAt =
     followUpState?.status === 'pending' ? followUpState.orgCreatedAt : undefined
 
-  // The window is time-based, so a timer (not render) decides when it closes.
-  const [activeOrgCreatedAt, setActiveOrgCreatedAt] = useState<string>()
+  // The window is time-based: it's checked against the clock on render, and a
+  // timer marks it expired (and re-renders) when it closes.
   const [expiredOrgCreatedAt, setExpiredOrgCreatedAt] = useState<string>()
+  const hasExpired =
+    !!pendingOrgCreatedAt &&
+    (expiredOrgCreatedAt === pendingOrgCreatedAt ||
+      getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now()) <= 0)
+  const isEligible = !!pendingOrgCreatedAt && !hasExpired
 
   useEffect(() => {
     if (!pendingOrgCreatedAt) return
-
-    const remainingMs = getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now())
-    if (remainingMs <= 0) {
-      setExpiredOrgCreatedAt(pendingOrgCreatedAt)
-      return
-    }
-
-    setActiveOrgCreatedAt(pendingOrgCreatedAt)
-    const timeout = setTimeout(() => {
-      setActiveOrgCreatedAt(undefined)
-      setExpiredOrgCreatedAt(pendingOrgCreatedAt)
-    }, remainingMs)
-    return () => {
-      clearTimeout(timeout)
-      setActiveOrgCreatedAt(undefined)
-    }
+    const timeout = setTimeout(
+      () => setExpiredOrgCreatedAt(pendingOrgCreatedAt),
+      getFollowUpRemainingMs(pendingOrgCreatedAt, Date.now())
+    )
+    return () => clearTimeout(timeout)
   }, [pendingOrgCreatedAt])
-
-  const isEligible = !!pendingOrgCreatedAt && activeOrgCreatedAt === pendingOrgCreatedAt
-  const hasExpired = !!pendingOrgCreatedAt && expiredOrgCreatedAt === pendingOrgCreatedAt
 
   const resolveFollowUp = useCallback(
     (status: Exclude<OnboardingSurveyFollowUpStatus, 'pending'>) => {
