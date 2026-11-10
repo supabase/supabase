@@ -92,7 +92,9 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       included: null,
       isLoading: isPending,
       formatValue: formatVcpuQuota,
-      caption: limits.vcpuHours === null ? noLimitLabel : 'Counted against the organization quota',
+      // Nothing to say in plans mode: the figure is the whole message. Alpha is different,
+      // because then there is no quota at all.
+      emptyLabel: limits.vcpuHours === null ? noLimitLabel : undefined,
     },
     {
       label: 'Concurrent instances',
@@ -101,6 +103,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       included: limits.concurrentInstances,
       isLoading: false,
       formatValue: formatCapacityQuota,
+      emptyLabel: noLimitLabel,
     },
   ]
 
@@ -140,7 +143,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       {!isCollapsed && (
         <div className="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0">
           {meters.map((meter) => (
-            <UsageMeter key={meter.label} {...meter} noLimitLabel={noLimitLabel} />
+            <UsageMeter key={meter.label} {...meter} />
           ))}
         </div>
       )}
@@ -189,8 +192,12 @@ interface MeterDefinition {
   isLoading: boolean
   /** Formats both sides as one string, so the pair cannot end up in two different units. */
   formatValue: (used: number, included: number | null) => string
-  /** Shown in place of a status line when there is no limit to be measured against. */
-  caption?: string
+  /**
+   * Shown when the meter has no limit. Opt-in per meter: "no fixed limit on this plan" is
+   * true of enterprise concurrency but false of the quota, which exists and is simply scoped
+   * to the organization rather than to this project.
+   */
+  emptyLabel?: string
 }
 
 const getBarClass = ({ isExceeded, isWarning }: { isExceeded: boolean; isWarning: boolean }) => {
@@ -273,7 +280,7 @@ const CompactUsageMeter = (meter: MeterDefinition) => {
   )
 }
 
-const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel: string }) => {
+const UsageMeter = (meter: MeterDefinition) => {
   const { label, description, isLoading } = meter
   const { hasLimit, isExceeded, isAtCapacity, isApproaching, headroom, barClass } =
     getMeterStatus(meter)
@@ -293,8 +300,8 @@ const UsageMeter = ({ noLimitLabel, ...meter }: MeterDefinition & { noLimitLabel
 
       {hasLimit && <MeterBar meter={meter} barClass={barClass} />}
 
-      {!hasLimit && !isLoading && (
-        <p className="text-xs text-foreground-lighter">{meter.caption ?? noLimitLabel}</p>
+      {!hasLimit && !isLoading && meter.emptyLabel && (
+        <p className="text-xs text-foreground-lighter">{meter.emptyLabel}</p>
       )}
       {isExceeded && <p className="text-xs text-destructive">{headroom ?? 'Over limit'}</p>}
       {isAtCapacity && <p className="text-xs text-warning">{headroom ?? 'At limit'}</p>}

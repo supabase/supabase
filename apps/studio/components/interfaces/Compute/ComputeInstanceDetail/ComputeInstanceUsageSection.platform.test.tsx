@@ -1,4 +1,4 @@
-import { screen, waitFor } from '@testing-library/react'
+import { screen, waitFor, within } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
 
 import type { ComputeInstance } from '../Compute.types'
@@ -30,6 +30,24 @@ describe('ComputeInstanceUsageSection', () => {
     expect(await screen.findByText('CPU used')).toBeInTheDocument()
     expect(await screen.findByText('GB-hours')).toBeInTheDocument()
     expect(await screen.findByText('Requests')).toBeInTheDocument()
+  })
+
+  it('splits usage into CPU and memory, with no instance-count chart', async () => {
+    customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
+
+    await screen.findByText('CPU used')
+    // The instance count is in the header and the list; a chart of it said nothing more.
+    expect(screen.queryByText('Instances')).not.toBeInTheDocument()
+  })
+
+  it('keeps the unit on the metric label rather than repeating it in the figure', async () => {
+    customRender(<ComputeInstanceUsageSection instance={INSTANCE} />)
+
+    const label = await screen.findByText('GB-hours')
+    const card = label.closest('div')?.parentElement
+    expect(card).not.toBeNull()
+    // "55 GB-hrs" under a label reading "GB-hours" says it twice.
+    expect(within(card!).queryByText(/GB-hrs/)).not.toBeInTheDocument()
   })
 
   it('states that figures are estimates while Compute is in alpha', async () => {

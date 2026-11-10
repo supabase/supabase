@@ -99,8 +99,9 @@ describe('ComputePlanUsage', () => {
     // points at the org usage page for the burn-down rather than claiming a share of it.
     const computeMeter = await meter('Compute')
     expect(await computeMeter.findByText(/^[\d.,]+ vCPU-hrs$/)).toBeInTheDocument()
-    expect(computeMeter.getByText('Counted against the organization quota')).toBeInTheDocument()
     expect(computeMeter.queryByText(/\//)).not.toBeInTheDocument()
+    // No "no fixed limit" line either: the quota exists, it is just scoped to the org.
+    expect(computeMeter.queryByText(/No fixed limit/)).not.toBeInTheDocument()
   })
 
   it('keeps runtime and CPU utilisation in the tooltip rather than under the bar', async () => {

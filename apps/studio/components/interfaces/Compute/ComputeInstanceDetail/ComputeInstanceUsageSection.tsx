@@ -1,19 +1,16 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import dayjs from 'dayjs'
-import { BarChart2Icon } from 'lucide-react'
-import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts'
-import { ChartContainer, ChartTooltip, ChartTooltipContent } from 'ui'
+import type { ReactNode } from 'react'
+import type { ChartConfig } from 'ui'
 import {
   Chart,
   ChartCard,
   ChartContent,
   ChartEmptyState,
   ChartHeader,
+  ChartLine,
   ChartLoadingState,
   ChartMetric,
-  ChartTitle,
-  type ChartConfig,
 } from 'ui-patterns/Chart'
 import {
   PageSection,
@@ -26,26 +23,32 @@ import {
 
 import type { ComputeInstance } from '../Compute.types'
 import {
-  formatComputeHours,
   formatComputeRequests,
-  formatGbHours,
   formatPercentage,
-  formatVcpuHours,
   getCpuUtilization,
   sumBy,
 } from '../ComputeUsage.utils'
 import { computeInstanceUsageQueryOptions } from '@/data/compute/compute-usage-query'
 
 const USAGE_WINDOW_DAYS = 30
+const DATE_TIME_FORMAT = 'MMM D, YYYY'
 
-const cpuConfig = {
-  usedVcpuHours: { label: 'CPU used' },
-  idleVcpuHours: { label: 'Reserved, idle' },
+/**
+ * Reserved sits behind used so the gap between the two lines reads as idle: vCPU that was
+ * held and billed without doing work. A stacked bar hid that in the total.
+ */
+const CPU_CHART_CONFIG = {
+  reservedVcpuHours: { label: 'Reserved', color: 'var(--foreground-muted)' },
+  usedVcpuHours: { label: 'CPU used', color: 'var(--primary-bright)' },
 } satisfies ChartConfig
 
-const instancesConfig = {
-  instances: { label: 'Instances' },
+const MEMORY_CHART_CONFIG = {
+  gbHours: { label: 'Memory', color: 'var(--primary-bright)' },
 } satisfies ChartConfig
+
+/** One decimal, or two below an hour, so sub-hour days do not all read as zero. */
+const metricValue = (value: number) =>
+  value.toLocaleString('en-US', { maximumFractionDigits: value < 1 ? 2 : 1 })
 
 interface ComputeInstanceUsageSectionProps {
   instance: ComputeInstance
@@ -65,7 +68,6 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
   )
 
   const points = data?.points ?? []
-  const isEmpty = !isPending && points.length === 0
 
   const totalRunningHours = sumBy(points, (point) => point.runningHours)
   const totalReservedVcpuHours = sumBy(points, (point) => point.reservedVcpuHours)
@@ -76,10 +78,46 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
 
   const chartData = points.map((point) => ({
     timestamp: point.timestamp,
-    usedVcpuHours: point.usedVcpuHours,
-    idleVcpuHours: Number(Math.max(0, point.reservedVcpuHours - point.usedVcpuHours).toFixed(2)),
-    instances: point.instances,
+    reservedVcpuHours: Number(point.reservedVcpuHours.toFixed(2)),
+    usedVcpuHours: Number(point.usedVcpuHours.toFixed(2)),
+    gbHours: Number(point.gbHours.toFixed(2)),
   }))
+
+  // Units live on the metric label and the axis, not repeated in the figure.
+  const cpuMetrics = (
+    <div className="flex flex-wrap gap-x-8 gap-y-4">
+      <ChartMetric
+        label="vCPU-hours"
+        value={metricValue(totalReservedVcpuHours)}
+        tooltip="Running hours multiplied by the vCPU each instance size reserves. This is what the quota counts."
+      />
+      <ChartMetric
+        label="CPU used"
+        value={cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
+        tooltip="Share of reserved vCPU that did work. The rest was idle, e.g. waiting on I/O."
+      />
+      <ChartMetric
+        label="Running hours"
+        value={metricValue(totalRunningHours)}
+        tooltip="Hours this compute's instances were running, busy or idle, rather than suspended."
+      />
+    </div>
+  )
+
+  const memoryMetrics = (
+    <div className="flex flex-wrap gap-x-8 gap-y-4">
+      <ChartMetric
+        label="GB-hours"
+        value={metricValue(totalGbHours)}
+        tooltip="Running hours multiplied by the memory each instance size reserves. Fixed at 2 GB per vCPU, so it tracks CPU rather than moving on its own."
+      />
+      <ChartMetric
+        label="Requests"
+        value={formatComputeRequests(totalRequests)}
+        tooltip="Requests handled across every instance of this compute."
+      />
+    </div>
+  )
 
   return (
     <PageSection>
@@ -93,172 +131,88 @@ export const ComputeInstanceUsageSection = ({ instance }: ComputeInstanceUsageSe
         </PageSectionSummary>
       </PageSectionMeta>
       <PageSectionContent>
-        <div className="space-y-4">
-          <Chart isLoading={isPending}>
-            <div className="grid grid-cols-2 divide-x divide-y rounded-md border border-default bg-surface-100 sm:grid-cols-3 lg:grid-cols-5 lg:divide-y-0">
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="Running hours"
-                  value={formatComputeHours(totalRunningHours)}
-                  tooltip="Hours this compute's instances were running, busy or idle, rather than suspended."
-                />
-              </div>
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="vCPU-hours"
-                  value={formatVcpuHours(totalReservedVcpuHours)}
-                  tooltip="Running hours multiplied by the vCPU each instance size reserves."
-                />
-              </div>
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="CPU used"
-                  value={cpuUtilization === null ? '—' : formatPercentage(cpuUtilization)}
-                  tooltip="Share of reserved vCPU that did work. The rest was idle, e.g. waiting on I/O."
-                />
-              </div>
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="GB-hours"
-                  value={formatGbHours(totalGbHours)}
-                  tooltip="Running hours multiplied by the memory each instance size reserves."
-                />
-              </div>
-              <div className="px-5 py-4">
-                <ChartMetric
-                  label="Requests"
-                  value={formatComputeRequests(totalRequests)}
-                  tooltip="Requests handled across every instance of this compute."
-                />
-              </div>
-            </div>
-          </Chart>
-
-          <div className="grid gap-4 lg:grid-cols-2">
-            <Chart isLoading={isPending} isErrored={isError}>
-              <ChartCard>
-                <ChartHeader align="start">
-                  <ChartTitle tooltip="vCPU-hours reserved each day, split into CPU used and idle.">
-                    vCPU-hours
-                  </ChartTitle>
-                </ChartHeader>
-                <ChartContent
-                  isEmpty={isEmpty}
-                  loadingState={<ChartLoadingState />}
-                  errorState={
-                    <ChartEmptyState
-                      icon={<BarChart2Icon size={16} />}
-                      title="Usage unavailable"
-                      description="Unable to load usage for this instance"
-                    />
-                  }
-                  emptyState={
-                    <ChartEmptyState
-                      icon={<BarChart2Icon size={16} />}
-                      title="No usage yet"
-                      description="Usage appears once the instance starts serving requests"
-                    />
-                  }
-                >
-                  <ChartContainer config={cpuConfig} className="h-44 w-full">
-                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                      <CartesianGrid
-                        vertical={false}
-                        strokeDasharray="3 3"
-                        className="stroke-border-stronger"
-                      />
-                      <XAxis
-                        dataKey="timestamp"
-                        tickLine={false}
-                        axisLine={false}
-                        minTickGap={32}
-                        tickFormatter={(value) => dayjs(value).format('DD MMM')}
-                        className="text-xs"
-                      />
-                      <YAxis tickLine={false} axisLine={false} width={40} className="text-xs" />
-                      <ChartTooltip
-                        content={
-                          <ChartTooltipContent
-                            labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
-                          />
-                        }
-                      />
-                      <Bar dataKey="usedVcpuHours" stackId="cpu" className="fill-foreground" />
-                      <Bar
-                        dataKey="idleVcpuHours"
-                        stackId="cpu"
-                        className="fill-foreground-muted"
-                        fillOpacity={0.4}
-                      />
-                    </BarChart>
-                  </ChartContainer>
-                </ChartContent>
-              </ChartCard>
-            </Chart>
-
-            <Chart isLoading={isPending} isErrored={isError}>
-              <ChartCard>
-                <ChartHeader align="start">
-                  <ChartTitle tooltip="Mean number of this compute's instances live each day.">
-                    Instances
-                  </ChartTitle>
-                </ChartHeader>
-                <ChartContent
-                  isEmpty={isEmpty}
-                  loadingState={<ChartLoadingState />}
-                  errorState={
-                    <ChartEmptyState
-                      icon={<BarChart2Icon size={16} />}
-                      title="Usage unavailable"
-                      description="Unable to load instance counts"
-                    />
-                  }
-                  emptyState={
-                    <ChartEmptyState
-                      icon={<BarChart2Icon size={16} />}
-                      title="No instances yet"
-                      description="Instance counts appear once the deployment is live"
-                    />
-                  }
-                >
-                  <ChartContainer config={instancesConfig} className="h-44 w-full">
-                    <BarChart data={chartData} margin={{ top: 8, right: 8, left: 0, bottom: 0 }}>
-                      <CartesianGrid
-                        vertical={false}
-                        strokeDasharray="3 3"
-                        className="stroke-border-stronger"
-                      />
-                      <XAxis
-                        dataKey="timestamp"
-                        tickLine={false}
-                        axisLine={false}
-                        minTickGap={32}
-                        tickFormatter={(value) => dayjs(value).format('DD MMM')}
-                        className="text-xs"
-                      />
-                      <YAxis
-                        tickLine={false}
-                        axisLine={false}
-                        width={40}
-                        className="text-xs"
-                        allowDecimals={false}
-                      />
-                      <ChartTooltip
-                        content={
-                          <ChartTooltipContent
-                            labelFormatter={(value) => dayjs(value).format('DD MMM YYYY')}
-                          />
-                        }
-                      />
-                      <Bar dataKey="instances" className="fill-foreground" />
-                    </BarChart>
-                  </ChartContainer>
-                </ChartContent>
-              </ChartCard>
-            </Chart>
-          </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-2">
+          <UsageChartCard
+            metrics={cpuMetrics}
+            data={chartData}
+            dataKey="reservedVcpuHours"
+            dataKeys={['reservedVcpuHours', 'usedVcpuHours']}
+            config={CPU_CHART_CONFIG}
+            unit="vCPU-hrs"
+            isLoading={isPending}
+            isError={isError}
+            subject="CPU usage"
+          />
+          <UsageChartCard
+            metrics={memoryMetrics}
+            data={chartData}
+            dataKey="gbHours"
+            config={MEMORY_CHART_CONFIG}
+            unit="GB-hrs"
+            isLoading={isPending}
+            isError={isError}
+            subject="memory usage"
+          />
         </div>
       </PageSectionContent>
     </PageSection>
   )
 }
+
+interface UsageChartCardProps {
+  metrics: ReactNode
+  data: { timestamp: string }[]
+  dataKey: string
+  dataKeys?: string[]
+  config: ChartConfig
+  unit: string
+  isLoading: boolean
+  isError: boolean
+  subject: string
+}
+
+const UsageChartCard = ({
+  metrics,
+  data,
+  dataKey,
+  dataKeys,
+  config,
+  unit,
+  isLoading,
+  isError,
+  subject,
+}: UsageChartCardProps) => (
+  <Chart isLoading={isLoading}>
+    <ChartCard>
+      <ChartHeader align="start">{metrics}</ChartHeader>
+      <ChartContent
+        isEmpty={isError || data.length === 0}
+        loadingState={<ChartLoadingState />}
+        emptyState={
+          <ChartEmptyState
+            title={isError ? `Unable to load ${subject}` : 'No data to show'}
+            description={
+              isError ? undefined : 'Usage appears once the instance starts serving requests'
+            }
+          />
+        }
+      >
+        <div className="h-40">
+          <ChartLine
+            data={data}
+            dataKey={dataKey}
+            dataKeys={dataKeys}
+            DateTimeFormat={DATE_TIME_FORMAT}
+            isFullHeight
+            showYAxis
+            config={config}
+            YAxisProps={{
+              tickFormatter: (value: number) => `${metricValue(value)} ${unit}`,
+              width: 72,
+            }}
+          />
+        </div>
+      </ChartContent>
+    </ChartCard>
+  </Chart>
+)
