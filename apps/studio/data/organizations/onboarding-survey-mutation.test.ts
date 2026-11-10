@@ -16,12 +16,10 @@ describe('buildOnboardingSurveyPayload', () => {
     expect(
       buildOnboardingSurveyPayload({
         slug: 'test-org',
-        heard_from: ' ai_tool ',
         building: ' a mobile game backend ',
       })
     ).toEqual({
       slug: 'test-org',
-      heard_from: 'ai_tool',
       building: 'a mobile game backend',
     })
   })
@@ -30,7 +28,7 @@ describe('buildOnboardingSurveyPayload', () => {
     expect(
       buildOnboardingSurveyPayload({
         slug: 'test-org',
-        heard_from: ' ',
+        kind: ' ',
         building: '',
       })
     ).toEqual({ slug: 'test-org' })
@@ -42,14 +40,12 @@ describe('buildOnboardingSurveyPayload', () => {
         slug: 'test-org',
         kind: '  STARTUP  ',
         size: '10',
-        heard_from: 'twitter',
         building: 'a saas',
       })
     ).toEqual({
       slug: 'test-org',
       kind: 'STARTUP',
       size: '10',
-      heard_from: 'twitter',
       building: 'a saas',
     })
   })
@@ -64,7 +60,6 @@ describe('submitOnboardingSurvey', () => {
       slug: 'acme',
       kind: 'COMPANY',
       size: '10',
-      heard_from: 'search_engine',
       building: 'a saas',
     })
 
@@ -73,7 +68,6 @@ describe('submitOnboardingSurvey', () => {
         slug: 'acme',
         kind: 'COMPANY',
         size: '10',
-        heard_from: 'search_engine',
         building: 'a saas',
       },
     })

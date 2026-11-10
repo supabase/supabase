@@ -11,7 +11,6 @@ export type OnboardingSurveyVariables = {
   slug: string
   kind?: string
   size?: string
-  heard_from?: string
   building?: string
 }
 
@@ -21,14 +20,12 @@ export function buildOnboardingSurveyPayload({
   slug,
   kind,
   size,
-  heard_from,
   building,
 }: OnboardingSurveyVariables): OnboardingSurveyBody {
   return {
     slug,
     kind: trim(kind),
     size: trim(size),
-    heard_from: trim(heard_from),
     building: trim(building),
   }
 }

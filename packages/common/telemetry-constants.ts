@@ -512,7 +512,7 @@ type OnboardingSurveySurface = 'org_form' | 'follow_up'
  */
 export interface OnboardingSurveyAnswerButtonClickedEvent {
   action: 'onboarding_survey_answer_button_clicked'
-  properties: { surface: OnboardingSurveySurface }
+  properties: { surface: 'follow_up' }
   groups: Partial<TelemetryGroups>
 }
 
