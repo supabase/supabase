@@ -109,14 +109,7 @@ export const RouteValidationWrapper = ({ children }: PropsWithChildren<{}>) => {
         setLastVisitedExplorerTab({ type: 'chat', id })
       }
     }
-  }, [
-    ref,
-    id,
-    routePattern,
-    setLastVisitedSnippet,
-    setLastVisitedTable,
-    setLastVisitedExplorerTab,
-  ])
+  }, [ref, id, routePattern, setLastVisitedSnippet, setLastVisitedTable, setLastVisitedExplorerTab])
 
   useEffect(() => {
     if (organization) {
