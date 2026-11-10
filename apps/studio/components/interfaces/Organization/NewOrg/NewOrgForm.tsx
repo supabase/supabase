@@ -294,79 +294,60 @@ export const NewOrgForm = ({
   const { mutateAsync: submitOnboardingSurvey } = useOnboardingSurveyMutation()
   const queryClient = useQueryClient()
 
-  const submitOrganizationSurvey = useCallback(
-    async (slug: string) => {
-      const submission = orgSubmission.current
-      if (!submission?.hasSurveyInOrgForm) return
+  const submitOrganizationSurvey = async (slug: string) => {
+    const submission = orgSubmission.current
+    if (!submission?.hasSurveyInOrgForm) return
 
-      const { building, kind } = submission.values
-      const size = kind === 'COMPANY' ? submission.values.size : undefined
-      // Kind and size always hold a value, so only count them as answered when changed
-      const hasKind = kind !== defaultValues.kind.toUpperCase()
-      const hasSize = size !== undefined && size !== defaultValues.size
-      const hasBuilding = building !== ''
-      const profileId = user.profile?.gotrue_id
+    const { building, kind } = submission.values
+    const size = kind === 'COMPANY' ? submission.values.size : undefined
+    // Kind and size always hold a value, so only count them as answered when changed
+    const hasKind = kind !== defaultValues.kind.toUpperCase()
+    const hasSize = size !== undefined && size !== defaultValues.size
+    const hasBuilding = building !== ''
+    const profileId = user.profile?.gotrue_id
 
-      const groupOverrides = { organization: slug }
+    const surveyProperties = { surface: 'org_form' as const, hasKind, hasBuilding }
+    const groupOverrides = { organization: slug }
 
-      const markSurveyFollowUpPending = () => {
-        if (!profileId) return
-        markFollowUpPending({ profileId, orgSlug: slug, kind, size })
-        // A slow survey call can fail after the redirect to the new org, once the
-        // follow-up card has already read (and cached) this key as empty
-        queryClient.invalidateQueries({
-          queryKey: getLocalStorageQueryKey(
-            LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, slug)
-          ),
-        })
-      }
+    const markSurveyFollowUpPending = () => {
+      if (!profileId) return
+      markFollowUpPending({ profileId, orgSlug: slug, kind, size })
+      // A slow survey call can fail after the redirect to the new org, once the
+      // follow-up card has already read (and cached) this key as empty
+      queryClient.invalidateQueries({
+        queryKey: getLocalStorageQueryKey(
+          LOCAL_STORAGE_KEYS.ONBOARDING_SURVEY_FOLLOW_UP(profileId, slug)
+        ),
+      })
+    }
 
-      // Nothing answered: send nothing yet so the creator's follow-up answers
-      // aren't dropped (the survey endpoint keeps one response per user and org).
-      // Kind/size ride along with the follow-up, since this is their only save path.
-      if (!hasKind && !hasSize && !hasBuilding) {
-        track(
-          'onboarding_survey_dismissed',
-          { surface: 'org_form', reason: 'org_form_blank' },
-          groupOverrides
-        )
-        markSurveyFollowUpPending()
-        return
-      }
-
+    // Nothing answered: send nothing yet so the creator's follow-up answers
+    // aren't dropped (the survey endpoint keeps one response per user and org).
+    // Kind/size ride along with the follow-up, since this is their only save path.
+    if (!hasKind && !hasSize && !hasBuilding) {
       track(
-        'onboarding_survey_submit_button_clicked',
-        { surface: 'org_form', hasKind, hasBuilding },
+        'onboarding_survey_dismissed',
+        { surface: 'org_form', reason: 'org_form_blank' },
         groupOverrides
       )
+      markSurveyFollowUpPending()
+      return
+    }
 
-      // Always persist kind/size: they're left out of the org creation payload
-      // when the survey is on the form, so this is their only save path.
-      try {
-        await submitOnboardingSurvey({
-          slug,
-          kind,
-          size,
-          building: building || undefined,
-        })
-      } catch {
-        track(
-          'onboarding_survey_submit_failed',
-          { surface: 'org_form', hasKind, hasBuilding },
-          groupOverrides
-        )
-        markSurveyFollowUpPending()
-      }
-    },
-    [
-      defaultValues.kind,
-      defaultValues.size,
-      queryClient,
-      submitOnboardingSurvey,
-      track,
-      user.profile?.gotrue_id,
-    ]
-  )
+    track('onboarding_survey_submit_button_clicked', surveyProperties, groupOverrides)
+
+    try {
+      await submitOnboardingSurvey({
+        slug,
+        kind,
+        size,
+        building: building || undefined,
+      })
+    } catch {
+      track('onboarding_survey_submit_failed', surveyProperties, groupOverrides)
+      markSurveyFollowUpPending()
+    }
+  }
 
   const { mutate: confirmPendingSubscriptionChange } = useConfirmPendingSubscriptionCreateMutation({
     onSuccess: async (data) => {
@@ -516,55 +497,49 @@ export const NewOrgForm = ({
     return onPaymentMethodReset()
   }
 
-  const orgKindField = (
-    <FormField
-      control={form.control}
-      name="kind"
-      render={({ field }) => (
-        <FormItemLayout label="Who is this org for?" layout="horizontal">
-          <FormControl>
-            <OnboardingSurveySelect
-              value={field.value}
-              onValueChange={field.onChange}
-              options={SURVEY_ORG_KIND_OPTIONS}
-            />
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
-  )
-
-  const orgSizeField = selectedOrgKind == 'COMPANY' && (
-    <FormField
-      control={form.control}
-      name="size"
-      render={({ field }) => (
-        <FormItemLayout label="How many people?" layout="horizontal">
-          <FormControl>
-            <Select value={field.value} onValueChange={field.onChange}>
-              <SelectTrigger className="w-full">
-                <SelectValue />
-              </SelectTrigger>
-
-              <SelectContent>
-                {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
-                  <SelectItem key={k} value={k}>
-                    {v}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </FormControl>
-        </FormItemLayout>
-      )}
-    />
-  )
-
   // Org type always has a value, so What are you building? shows right away.
   const onboardingSurveyFields = (
     <div className="flex flex-col gap-y-5">
-      {orgKindField}
-      {orgSizeField}
+      <FormField
+        control={form.control}
+        name="kind"
+        render={({ field }) => (
+          <FormItemLayout label="Who is this org for?" layout="horizontal">
+            <FormControl>
+              <OnboardingSurveySelect
+                value={field.value}
+                onValueChange={field.onChange}
+                options={SURVEY_ORG_KIND_OPTIONS}
+              />
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
+      {selectedOrgKind == 'COMPANY' && (
+        <FormField
+          control={form.control}
+          name="size"
+          render={({ field }) => (
+            <FormItemLayout label="How many people?" layout="horizontal">
+              <FormControl>
+                <Select value={field.value} onValueChange={field.onChange}>
+                  <SelectTrigger className="w-full">
+                    <SelectValue />
+                  </SelectTrigger>
+
+                  <SelectContent>
+                    {Object.entries(ORG_SIZE_TYPES).map(([k, v]) => (
+                      <SelectItem key={k} value={k}>
+                        {v}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      )}
       <FormField
         control={form.control}
         name="building"
