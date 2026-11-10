@@ -380,7 +380,7 @@ export const FileExplorerRow = ({
           ...(IS_PLATFORM
             ? [
                 {
-                  name: 'Purge CDN Cache',
+                  name: 'Purge CDN cache',
                   icon: <RefreshCwIcon size={12} className="text-foreground-light" />,
                   onClick: () => setShowPurgeCDNCacheModal(true),
                 },
