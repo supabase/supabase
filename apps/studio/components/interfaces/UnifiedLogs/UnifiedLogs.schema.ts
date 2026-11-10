@@ -113,5 +113,6 @@ export const querySearchParamsSchema = z.object({
   edge_auth: z.boolean().default(SEARCH_PARAMS_PARSER.edge_auth.defaultValue),
   edge_storage: z.boolean().default(SEARCH_PARAMS_PARSER.edge_storage.defaultValue),
   edge_postgrest: z.boolean().default(SEARCH_PARAMS_PARSER.edge_postgrest.defaultValue),
+  edge_metrics: z.boolean().default(SEARCH_PARAMS_PARSER.edge_metrics.defaultValue),
   user: z.string().optional(),
 })

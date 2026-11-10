@@ -36,7 +36,6 @@ export type FilterableField = {
   value: string
   type: string
   options?: Option[]
-  hiddenInFilterBar?: boolean
 }
 
 const filterOperatorSchema = z.object({
@@ -83,35 +82,33 @@ export const buildFilterProperties = ({
   timeRangeOptions?: CustomOptionObject
 }): FilterProperty[] => {
   return [
-    ...fields
-      .filter((field) => !field.hiddenInFilterBar)
-      .map((field): FilterProperty => {
-        if (field.type === 'timerange') {
-          return {
-            label: 'Time range',
-            name: field.value,
-            type: 'date',
-            options: timeRangeOptions,
-            formatValue: formatTimeRangeValue,
-            operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
-          }
-        }
-        // event_message only supports substring matching (it's free text); pathname
-        // supports both exact segment matching and substring matching.
-        const operators =
-          field.value === 'event_message'
-            ? PATTERN_OPERATORS
-            : field.value === 'pathname'
-              ? [...COMPARISON_OPERATORS, ...PATTERN_OPERATORS]
-              : COMPARISON_OPERATORS
+    ...fields.map((field): FilterProperty => {
+      if (field.type === 'timerange') {
         return {
-          label: field.label,
+          label: 'Time range',
           name: field.value,
-          type: 'string',
-          options: field.options ?? [],
-          operators,
+          type: 'date',
+          options: timeRangeOptions,
+          formatValue: formatTimeRangeValue,
+          operators: [{ label: 'Equals', value: '=', group: 'comparison' }],
         }
-      }),
+      }
+      // event_message only supports substring matching (it's free text); pathname
+      // supports both exact segment matching and substring matching.
+      const operators =
+        field.value === 'event_message'
+          ? PATTERN_OPERATORS
+          : field.value === 'pathname'
+            ? [...COMPARISON_OPERATORS, ...PATTERN_OPERATORS]
+            : COMPARISON_OPERATORS
+      return {
+        label: field.label,
+        name: field.value,
+        type: 'string',
+        options: field.options ?? [],
+        operators,
+      }
+    }),
     {
       label: 'User',
       name: USER_PROPERTY,

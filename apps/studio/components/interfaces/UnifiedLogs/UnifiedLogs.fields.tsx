@@ -1,25 +1,11 @@
 import { cn } from 'ui'
 
-import {
-  EXCLUDE_FILTER_FIELD,
-  LOG_EXCLUSION_RULES,
-  LOG_TYPES_LABELS,
-  METHODS,
-  STATUS_CODE_LABELS,
-} from './UnifiedLogs.constants'
+import { LOG_TYPES_LABELS, METHODS, STATUS_CODE_LABELS } from './UnifiedLogs.constants'
 import { ColumnSchema } from './UnifiedLogs.schema'
 import { getLevelLabel } from './UnifiedLogs.utils'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { DataTableFilterField, Option } from '@/components/ui/DataTable/DataTable.types'
 import { getLevelColor } from '@/components/ui/DataTable/DataTable.utils'
-
-const FacetOptionLabel = (props: Option) => (
-  <div className="flex items-center w-full justify-between gap-2">
-    <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
-      {props.label}
-    </span>
-  </div>
-)
 
 // instead of filterFields, maybe just 'fields' with a filterDisabled prop?
 // that way, we could have 'message' or 'headers' field with label and value as well as type!
@@ -40,28 +26,28 @@ export const filterFields = [
       label,
       value,
       options:
-        // [Joshen] Nested options are boolean toggles over a search param, or
-        // — via `exclusionFilter` — over a column filter.
+        // [Joshen] Nested options are treated as just boolean toggles atm for simplicity
         // Refer to DataTableFilterCheckbox for their logic
         value === 'edge'
           ? [
               { label: 'Auth', value: 'edge_auth' },
               { label: 'Storage', value: 'edge_storage' },
               { label: 'Postgrest', value: 'edge_postgrest' },
-              // Unchecked by default — the metrics endpoint is scraped once a
-              // minute and its successful responses carry no information.
-              // Failures on that path are never hidden.
-              ...Object.entries(LOG_EXCLUSION_RULES).map(([ruleId, rule]) => ({
-                label: rule.label,
-                value: ruleId,
-                exclusionFilter: { field: EXCLUDE_FILTER_FIELD, value: ruleId },
-              })),
+              { label: 'Metrics', value: 'edge_metrics' },
             ]
           : value === 'postgres'
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]
             : [],
     })),
-    component: FacetOptionLabel,
+    component: (props: Option) => {
+      return (
+        <div className="flex items-center w-full justify-between gap-2">
+          <span className="text-foreground/70 group-hover:text-accent-foreground text-xs">
+            {props.label}
+          </span>
+        </div>
+      )
+    },
   },
   {
     label: 'Level',
@@ -149,18 +135,6 @@ export const filterFields = [
     options: [],
     hasDynamicOptions: true,
     hasAsyncSearch: true,
-  },
-  {
-    // Renders nowhere: the toggle lives under API Gateway, alongside the other
-    // "hide a noisy subset of this source" options, and filters silently like
-    // they do. Declared here only so the `exclude` filter id is recognised as a
-    // builtin rather than mistaken for a log attribute.
-    label: 'Exclude',
-    value: EXCLUDE_FILTER_FIELD,
-    type: 'checkbox',
-    options: [],
-    hidden: true,
-    hiddenInFilterBar: true,
   },
   {
     label: 'Event message',

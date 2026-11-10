@@ -1,9 +1,9 @@
 import type { ColumnFiltersState, VisibilityState } from '@tanstack/react-table'
-import { LOCAL_STORAGE_KEYS, useDebounce } from 'common'
+import { useDebounce } from 'common'
 import { useQueryState } from 'nuqs'
-import { useCallback, useEffect, useMemo, useRef } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 
-import { DEFAULT_LOG_EXCLUSIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -25,32 +25,6 @@ export const useFilterSearchSync = ({
     debouncedApplyFilterSearch()
     return () => debouncedApplyFilterSearch.cancel()
   }, [columnFilters, debouncedApplyFilterSearch, enabled])
-}
-
-const haveSameExclusions = (a: readonly string[], b: readonly string[]) =>
-  a.length === b.length && a.every((value, index) => value === b[index])
-
-/**
- * Remembers which noise-reduction exclusions the user keeps on, per project.
- *
- * TODO(FE-4970): fold this into saved default filters once those land, so the
- * choice travels with the saved view instead of living in local storage.
- */
-export const useLogExclusionPreference = (projectRef?: string) => {
-  const [exclusions, setExclusions, { isLoading }] = useLocalStorageQuery<string[]>(
-    LOCAL_STORAGE_KEYS.UNIFIED_LOGS_EXCLUSIONS(projectRef ?? 'default'),
-    DEFAULT_LOG_EXCLUSIONS
-  )
-
-  // Bails on an unchanged set so callers can hand it the current filter state
-  // on every render without churning storage or re-rendering subscribers.
-  const persist = useCallback(
-    (next: string[]) =>
-      setExclusions((current) => (haveSameExclusions(current, next) ? current : next)),
-    [setExclusions]
-  )
-
-  return { exclusions, persist, isLoading }
 }
 
 const DEFAULT_COLUMN_VISIBILITY: VisibilityState = { uuid: false }

@@ -4,14 +4,11 @@ import { useState } from 'react'
 import { Checkbox, cn, Label, Skeleton } from 'ui'
 
 import type { DataTableCheckboxFilterField } from '../DataTable.types'
-import { findTableColumn, formatCompactNumber, setColumnFilterValue } from '../DataTable.utils'
+import { formatCompactNumber } from '../DataTable.utils'
 import { InputWithAddons } from '../primitives/InputWithAddons'
 import { useDataTable } from '../providers/DataTableProvider'
 import { DataTableFilterCheckboxLoader } from './DataTableFilterCheckboxLoader'
-import {
-  EXCLUDE_FILTER_FIELD,
-  SEARCH_PARAMS_PARSER,
-} from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
+import { SEARCH_PARAMS_PARSER } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.constants'
 import { isLogsFilterColumnValue } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.filters'
 
 export function DataTableFilterCheckbox<TData>({
@@ -24,6 +21,12 @@ export function DataTableFilterCheckbox<TData>({
   const [expandedOptions, setExpandedOptions] = useState<Set<string>>(new Set())
   const [searchParams, setSearchParams] = useQueryStates(SEARCH_PARAMS_PARSER)
 
+  // Nested options map 1:1 to a boolean search param via their `value`
+  // (e.g. `show_connection_logs`), so they can be read/written generically.
+  const getBooleanParam = (key: string) => Boolean(searchParams[key as keyof typeof searchParams])
+  const setBooleanParam = (key: string, val: boolean) =>
+    setSearchParams({ [key]: val } as Partial<typeof searchParams>)
+
   const toggleExpanded = (key: string) =>
     setExpandedOptions((prev) => {
       const next = new Set(prev)
@@ -33,28 +36,8 @@ export function DataTableFilterCheckbox<TData>({
     })
   const { table, columnFilters, isLoading, isLoadingCounts, getFacetedUniqueValues } =
     useDataTable()
-  // Nested options map 1:1 to a boolean search param via their `value`
-  // (e.g. `show_connection_logs`), so they can be read/written generically.
-  const getBooleanParam = (key: string) => Boolean(searchParams[key as keyof typeof searchParams])
-  const setBooleanParam = (key: string, val: boolean) =>
-    setSearchParams({ [key]: val } as Partial<typeof searchParams>)
 
-  // Nested options backed by a column filter read as "show these rows", so the
-  // filter value is present exactly while the box is unchecked.
-  const getFilterValues = (field: string) => {
-    const current = columnFilters.find((filter) => filter.id === field)?.value
-    return isLogsFilterColumnValue(current) ? current.values : []
-  }
-  const setExcluded = (
-    { field, value: ruleValue }: { field: string; value: string },
-    isExcluded: boolean
-  ) => {
-    const remaining = getFilterValues(field).filter((v) => v !== ruleValue)
-    const next = isExcluded ? [...remaining, ruleValue] : remaining
-    setColumnFilterValue(table, field, next.length ? { operator: '=', values: next } : undefined)
-  }
-
-  const column = findTableColumn(table, value)
+  const column = table.getColumn(value)
   // REMINDER: avoid using column?.getFilterValue()
   const filterValue = columnFilters.find((i) => i.id === value)?.value
   const facetedValue = getFacetedUniqueValues?.(table, value) || column?.getFacetedUniqueValues()
@@ -124,9 +107,7 @@ export function DataTableFilterCheckbox<TData>({
                       const newValues = checked
                         ? [...filters, option.value]
                         : filters.filter((value) => option.value !== value)
-                      setColumnFilterValue(
-                        table,
-                        value,
+                      column?.setFilterValue(
                         newValues.length ? { operator: '=', values: newValues } : undefined
                       )
                     }}
@@ -163,7 +144,7 @@ export function DataTableFilterCheckbox<TData>({
                         <Skeleton className="h-4 w-4" />
                       ) : facetedValue?.has(option.value) ? (
                         formatCompactNumber(facetedValue.get(option.value) || 0)
-                      ) : ['log_type', 'method', 'level', EXCLUDE_FILTER_FIELD].includes(value) ? (
+                      ) : ['log_type', 'method', 'level'].includes(value) ? (
                         '0'
                       ) : null}
                     </span>
@@ -172,10 +153,7 @@ export function DataTableFilterCheckbox<TData>({
                       type="button"
                       tabIndex={0}
                       onClick={() =>
-                        setColumnFilterValue(table, value, {
-                          operator: '=',
-                          values: [option.value],
-                        })
+                        column?.setFilterValue({ operator: '=', values: [option.value] })
                       }
                       className={cn(
                         'text-xs text-muted-foreground hover:text-foreground',
@@ -191,13 +169,7 @@ export function DataTableFilterCheckbox<TData>({
                 {hasNested && isExpanded && (
                   <div className="pb-1">
                     {option.options?.map((optionNested, nestedIndex) => {
-                      const exclusion = optionNested.exclusionFilter
-                      const nestedChecked = exclusion
-                        ? !getFilterValues(exclusion.field).includes(exclusion.value)
-                        : getBooleanParam(optionNested.value)
-                      const nestedCount = exclusion
-                        ? getFacetedUniqueValues?.(table, exclusion.field)?.get(exclusion.value)
-                        : undefined
+                      const nestedChecked = getBooleanParam(optionNested.value)
                       const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
 
                       return (
@@ -237,9 +209,7 @@ export function DataTableFilterCheckbox<TData>({
                               id={`${value}-${optionNested.value}`}
                               checked={nestedChecked}
                               onCheckedChange={(isChecked) =>
-                                exclusion
-                                  ? setExcluded(exclusion, !isChecked)
-                                  : setBooleanParam(optionNested.value, Boolean(isChecked))
+                                setBooleanParam(optionNested.value, Boolean(isChecked))
                               }
                             />
                             <Label
@@ -248,11 +218,6 @@ export function DataTableFilterCheckbox<TData>({
                             >
                               <span className="truncate text-xs">{optionNested.label}</span>
                             </Label>
-                            {nestedCount !== undefined && (
-                              <span className="shrink-0 font-mono text-xs text-foreground-lighter">
-                                {formatCompactNumber(nestedCount)}
-                              </span>
-                            )}
                           </div>
                         </div>
                       )

@@ -1,7 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import {
   ColumnFiltersState,
-  functionalUpdate,
   getCoreRowModel,
   getFacetedRowModel,
   getFilteredRowModel,
@@ -35,26 +34,16 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
-import {
-  DEFAULT_LOG_EXCLUSIONS,
-  EXCLUDE_FILTER_FIELD,
-  LOG_TYPES,
-  PIPELINE_LOG_LEVEL_LABELS,
-  SEARCH_PARAMS_PARSER,
-} from './UnifiedLogs.constants'
+import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
 import {
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
-  exclusionColumnFilters,
-  getExclusionValues,
   parseLogsFilterUrlParams,
-  withDefaultExclusions,
 } from './UnifiedLogs.filters'
 import {
   useFilterSearchSync,
   useLiveMode,
-  useLogExclusionPreference,
   useLogsTableColumns,
   useResetFocus,
 } from './UnifiedLogs.hooks'
@@ -114,9 +103,6 @@ export const CHART_CONFIG = {
 
 const PipelineLevelOption = (option: Option) => <span className="text-xs">{option.label}</span>
 
-/** Stable empty set for views that don't offer the Exclude filter. */
-const NO_EXCLUSIONS: string[] = []
-
 interface UnifiedLogsProps {
   scope?: UnifiedLogsScope
   hasFilterSideBar?: boolean
@@ -146,35 +132,16 @@ export const UnifiedLogs = ({
     flagsLoaded,
     computeEnabled,
   })
-  // Noise-reduction exclusions are on by default. They read as ordinary filters
-  // (`exclude:eq:<rule id>`), so the only thing that needs remembering is a user
-  // who turned one off — the URL carries the rest.
-  const isExcludeOffered = isOfferedFilter(EXCLUDE_FILTER_FIELD, offeredFilters)
-  const {
-    exclusions: preferredExclusions,
-    persist: persistExclusions,
-    isLoading: isLoadingExclusions,
-  } = useLogExclusionPreference(projectRef)
-  const defaultExclusions = isExcludeOffered ? preferredExclusions : NO_EXCLUSIONS
-
-  const visibleSearchFilters = withDefaultExclusions(
-    gateLogTypeFilters(
-      search.filter,
-      getLogTypeVisibility(
-        {
-          multigres: showMultigresLogs,
-          pipelines: canShowPipelinesLogs,
-          compute: computeAvailability.preserveComputeFilter,
-        },
-        scope
-      )
-    ),
-    defaultExclusions
-  )
-
-  const defaultExclusionFilters = useMemo(
-    () => exclusionColumnFilters(isExcludeOffered ? DEFAULT_LOG_EXCLUSIONS : NO_EXCLUSIONS),
-    [isExcludeOffered]
+  const visibleSearchFilters = gateLogTypeFilters(
+    search.filter,
+    getLogTypeVisibility(
+      {
+        multigres: showMultigresLogs,
+        pipelines: canShowPipelinesLogs,
+        compute: computeAvailability.preserveComputeFilter,
+      },
+      scope
+    )
   )
 
   const defaultColumnSorting = search.sort ? [search.sort] : []
@@ -228,15 +195,11 @@ export const UnifiedLogs = ({
 
   const searchParameters = useMemo(() => {
     const parameters = toQuerySearchParams(search, scope)
-    const gated = parameters.filter
-      ? gateLogTypeFilters(parameters.filter, queryLogTypeVisibility)
-      : parameters.filter
-    // Seeded here as well as into the column filters so the very first fetch
-    // already excludes — waiting for the debounced URL sync would flash the
-    // hidden rows and make the histogram and counts disagree with the list.
-    parameters.filter = withDefaultExclusions(gated, defaultExclusions) ?? undefined
+    if (parameters.filter) {
+      parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
+    }
     return parameters
-  }, [search, scope, queryLogTypeVisibility, defaultExclusions])
+  }, [search, scope, queryLogTypeVisibility])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
   const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
   const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
@@ -251,9 +214,7 @@ export const UnifiedLogs = ({
     setLocalFilterOrigin(null)
     setColumnFilters(buildDefaultColumnFilters({ ...search, filter: visibleSearchFilters }))
   })
-  // Re-seeds once the stored exclusion preference resolves, which can land after
-  // the first render.
-  useEffect(() => syncUrlFilters(), [urlFilterScope, isLoadingExclusions])
+  useEffect(() => syncUrlFilters(), [urlFilterScope])
 
   const { selection, selectRow, clearSelection } = useTableRowSelection({
     scope: JSON.stringify([projectRef, searchParameters]),
@@ -382,9 +343,6 @@ export const UnifiedLogs = ({
       rowSelection,
       columnOrder,
     },
-    // `resetColumnFilters()` (the sidebar's Reset button) restores this, which
-    // is what puts the default exclusions back on after a reset.
-    initialState: { columnFilters: defaultExclusionFilters },
     enableMultiRowSelection: true,
     columnResizeMode: 'onChange',
     filterFns: { inDateRange, arrSome },
@@ -394,12 +352,6 @@ export const UnifiedLogs = ({
     onColumnFiltersChange: (updater) => {
       setLocalFilterOrigin(urlFilterScope)
       setColumnFilters(updater)
-      // Persisted from here rather than from an effect over `columnFilters`, so
-      // only a deliberate change (a checkbox, a chip, Reset) is remembered —
-      // not the defaults being seeded in.
-      if (isExcludeOffered && !isLoadingExclusions) {
-        persistExclusions(getExclusionValues(functionalUpdate(updater, columnFilters)))
-      }
     },
     onSortingChange: setSorting,
     onColumnOrderChange: setColumnOrder,
@@ -495,8 +447,7 @@ export const UnifiedLogs = ({
   useFilterSearchSync({
     applyFilterSearch,
     columnFilters,
-    enabled:
-      computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs && !isLoadingExclusions,
+    enabled: computeAvailability.readyToSyncFilters && !isLoadingPipelinesLogs,
   })
 
   useEffect(() => {

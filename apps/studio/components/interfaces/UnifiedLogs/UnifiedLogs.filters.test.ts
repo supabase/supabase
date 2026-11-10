@@ -1,20 +1,17 @@
 import { describe, expect, it } from 'vitest'
 import { z } from 'zod'
 
-import { DEFAULT_LOG_EXCLUSIONS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
+import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
   addLogsColumnFilter,
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
-  exclusionColumnFilters,
-  getExclusionValues,
   groupLogsFiltersByColumn,
   logAttributeFilterId,
   logsFiltersToColumnFilters,
   logsFiltersToUrlParams,
   parseLogsFilterUrlParams,
-  withDefaultExclusions,
 } from './UnifiedLogs.filters'
 import { serializeUnifiedLogsSearchParams } from './UnifiedLogs.utils'
 
@@ -291,58 +288,6 @@ describe('addLogsColumnFilter', () => {
   it('stringifies numeric values so they match the column filter shape', () => {
     expect(addLogsColumnFilter([], { field: 'status', operator: '<>', value: 500 })).toEqual([
       { id: 'status', value: { operator: '<>', values: ['500'] } },
-    ])
-  })
-})
-
-describe('exclusion filters', () => {
-  it('defaults to hiding successful metrics scrapes', () => {
-    expect(DEFAULT_LOG_EXCLUSIONS).toEqual(['successful_metrics_scrapes'])
-  })
-
-  it('seeds the defaults into an empty filter param', () => {
-    expect(withDefaultExclusions(null, DEFAULT_LOG_EXCLUSIONS)).toEqual([
-      'exclude:eq:successful_metrics_scrapes',
-    ])
-  })
-
-  it('appends the defaults alongside existing filters', () => {
-    expect(withDefaultExclusions(['level:eq:error'], DEFAULT_LOG_EXCLUSIONS)).toEqual([
-      'level:eq:error',
-      'exclude:eq:successful_metrics_scrapes',
-    ])
-  })
-
-  it('leaves a filter param that already names the field alone', () => {
-    const filter = ['exclude:eq:successful_metrics_scrapes']
-    expect(withDefaultExclusions(filter, DEFAULT_LOG_EXCLUSIONS)).toBe(filter)
-  })
-
-  it('seeds nothing when the user has turned every exclusion off', () => {
-    expect(withDefaultExclusions(['level:eq:error'], [])).toEqual(['level:eq:error'])
-    expect(withDefaultExclusions(null, [])).toBeNull()
-  })
-
-  it('round-trips through the column filter shape', () => {
-    const columnFilters = exclusionColumnFilters(DEFAULT_LOG_EXCLUSIONS)
-    expect(columnFilters).toEqual([
-      { id: 'exclude', value: { operator: '=', values: ['successful_metrics_scrapes'] } },
-    ])
-    expect(getExclusionValues(columnFilters)).toEqual(['successful_metrics_scrapes'])
-  })
-
-  it('reads an empty set when no exclusion filter is applied', () => {
-    expect(exclusionColumnFilters([])).toEqual([])
-    expect(
-      getExclusionValues([{ id: 'level', value: { operator: '=', values: ['error'] } }])
-    ).toEqual([])
-  })
-
-  it('serializes to a URL param the parser reads back', () => {
-    const update = buildFilterSearchUpdate(exclusionColumnFilters(DEFAULT_LOG_EXCLUSIONS), [])
-    expect(update.filter).toEqual(['exclude:eq:successful_metrics_scrapes'])
-    expect(parseLogsFilterUrlParams(update.filter as string[])).toEqual([
-      { column: 'exclude', operator: '=', value: 'successful_metrics_scrapes' },
     ])
   })
 })

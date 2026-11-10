@@ -1,36 +1,7 @@
-import { FilterFn, Table } from '@tanstack/react-table'
+import { FilterFn } from '@tanstack/react-table'
 import { isAfter, isBefore, isSameDay } from 'date-fns'
 
 import { LEVELS } from './DataTable.constants'
-
-/**
- * The table column with this id, or undefined for a filter field that has no
- * column of its own. Unlike `table.getColumn()`, a miss is expected here and so
- * doesn't warn.
- */
-export function findTableColumn<TData>(table: Table<TData>, id: string) {
-  // Flat, not `getAllColumns()`: the latter only walks the top level, so it
-  // would miss a leaf under a grouped column def.
-  return table.getAllFlatColumns().find((column) => column.id === id)
-}
-
-/**
- * Writes a column filter by id, mirroring `column.setFilterValue()`. Unlike it,
- * this also works for filter fields with no matching table column — a field
- * that filters server-side without projecting a column of its own (e.g. the
- * unified logs `exclude` field).
- */
-export function setColumnFilterValue<TData>(table: Table<TData>, id: string, value: unknown) {
-  table.setColumnFilters((current) => {
-    // Mirrors TanStack's auto-remove: an undefined or empty value clears the
-    // filter rather than storing a no-op entry.
-    if (value === undefined || value === '') return current.filter((filter) => filter.id !== id)
-    if (current.some((filter) => filter.id === id)) {
-      return current.map((filter) => (filter.id === id ? { id, value } : filter))
-    }
-    return [...current, { id, value }]
-  })
-}
 
 export function formatCompactNumber(value: number) {
   if (value >= 100 && value < 1000) {

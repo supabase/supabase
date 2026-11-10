@@ -5,7 +5,6 @@ import { platformComponents as components } from 'api-types'
 import { FeatureFlagContext, LOCAL_STORAGE_KEYS } from 'common'
 import { mockAnimationsApi } from 'jsdom-testing-mocks'
 import { http, HttpResponse } from 'msw'
-import type { OnUrlUpdateFunction } from 'nuqs/adapters/testing'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { z } from 'zod'
 
@@ -755,47 +754,41 @@ describe('UnifiedLogs', () => {
       )
     )
   })
-  describe('successful metrics scrape exclusion', () => {
-    const EXCLUSIONS_KEY = LOCAL_STORAGE_KEYS.UNIFIED_LOGS_EXCLUSIONS('default')
+  describe('metrics request exclusion', () => {
     const METRICS_PATH = "'/customer/v1/privileged/metrics'"
-    const EXCLUDE_PARAM = 'exclude:eq:successful_metrics_scrapes'
 
-    afterEach(() => localStorage.removeItem(EXCLUSIONS_KEY))
-
-    /** Records every analytics query, and reports 12 hidden scrapes for the Exclude facet. */
     const mockAnalytics = (queries: string[]) =>
       addAPIMock({
         method: 'post',
         path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
         response: async ({ request }) => {
-          const { sql } = z.object({ sql: z.string() }).parse(await request.json())
-          queries.push(sql)
-          return HttpResponse.json<AnalyticsResponse>({
-            result: sql.includes('facet counts')
-              ? [{ facet: 'exclude', value: 'successful_metrics_scrapes', count: 12 }]
-              : [],
-          })
+          queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
+          return HttpResponse.json<AnalyticsResponse>({ result: [] })
         },
       })
 
-    const renderLogs = (onUrlUpdate?: OnUrlUpdateFunction) =>
+    const renderLogs = () =>
       customRender(
         <FeatureFlagContext.Provider
           value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
         >
           <UnifiedLogs />
         </FeatureFlagContext.Provider>,
-        { nuqs: { hasMemory: true, onUrlUpdate } }
+        { nuqs: { hasMemory: true } }
       )
 
-    /** The toggle lives under API Gateway, beside the other per-source noise options. */
-    const expandApiGateway = async (user: UserEvent) => {
-      const apiGateway = screen.getByRole('checkbox', { name: /API Gateway/ }).closest('div')
-      await user.click(within(apiGateway!).getByRole('button', { name: 'Expand' }))
-    }
-    const excludeCheckbox = () => screen.getByRole('checkbox', { name: /^Metrics/ })
-    const rowQueries = (queries: string[]) => queries.filter((sql) => sql.includes('row list'))
-    const lastRowQuery = (queries: string[]) => rowQueries(queries).at(-1)
+    /**
+     * The toggle sits under API Gateway, beside the other per-service options.
+     * Scoped to that group because the nested labels (Auth, Storage) collide
+     * with the top-level log type names.
+     */
+    const apiGatewayGroup = () =>
+      within(screen.getByRole('checkbox', { name: /API Gateway/ }).closest('div')!.parentElement!)
+    const expandApiGateway = async (user: UserEvent) =>
+      user.click(apiGatewayGroup().getByRole('button', { name: 'Expand' }))
+    const metricsCheckbox = () => apiGatewayGroup().getByRole('checkbox', { name: /^Metrics/ })
+    const lastRowQuery = (queries: string[]) =>
+      queries.filter((sql) => sql.includes('row list')).at(-1)
 
     it('hides them on a fresh load, across the list, chart and counts', async () => {
       const queries: string[] = []
@@ -808,11 +801,11 @@ describe('UnifiedLogs', () => {
           expect(queries.filter((q) => q.includes(kind)).at(-1)).toContain(METRICS_PATH)
         }
       })
-      // Only the successful scrapes go — every other status on that path stays.
+      // Only the successful ones go — every other status on that path stays.
       expect(lastRowQuery(queries)).toContain("IN ('200')")
     })
 
-    it('shows the toggle unchecked under API Gateway, with the hidden count', async () => {
+    it('starts unchecked under API Gateway, beside its siblings', async () => {
       const user = userEvent.setup()
       mockAnalytics([])
       renderLogs()
@@ -820,34 +813,24 @@ describe('UnifiedLogs', () => {
       expect(await screen.findByText('No results found')).toBeInTheDocument()
       await expandApiGateway(user)
 
-      expect(excludeCheckbox()).not.toBeChecked()
-      expect(await screen.findByText('12')).toBeInTheDocument()
+      expect(metricsCheckbox()).not.toBeChecked()
+      for (const sibling of ['Auth', 'Storage', 'Postgrest']) {
+        expect(
+          apiGatewayGroup().getByRole('checkbox', { name: new RegExp(`^${sibling}`) })
+        ).toBeChecked()
+      }
     })
 
-    it('filters silently, like the other per-source options', async () => {
-      const user = userEvent.setup()
+    it('filters silently, with no chip in the top filter bar', async () => {
       mockAnalytics([])
       renderLogs()
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
-      // No chip in the top filter bar, and not offered as a filterable property.
+      expect(screen.queryByTestId('filter-condition-edge_metrics')).not.toBeInTheDocument()
       expect(screen.queryByTestId('filter-condition-exclude')).not.toBeInTheDocument()
-      await user.click(screen.getByTestId('filter-bar-freeform-input'))
-      expect(screen.queryByRole('option', { name: /Exclude/ })).not.toBeInTheDocument()
     })
 
-    it('writes the exclusion to the URL so it travels with a shared link', async () => {
-      const onUrlUpdate = vi.fn()
-      mockAnalytics([])
-      renderLogs(onUrlUpdate)
-
-      expect(await screen.findByText('No results found')).toBeInTheDocument()
-      await waitFor(() => {
-        expect(onUrlUpdate.mock.lastCall?.[0]?.searchParams.get('filter')).toBe(EXCLUDE_PARAM)
-      })
-    })
-
-    it('shows the rows again when checked, and remembers that for the project', async () => {
+    it('shows them when checked, and keeps that in the URL', async () => {
       const user = userEvent.setup()
       const queries: string[] = []
       mockAnalytics(queries)
@@ -857,48 +840,30 @@ describe('UnifiedLogs', () => {
       await waitFor(() => expect(lastRowQuery(queries)).toContain(METRICS_PATH))
       await expandApiGateway(user)
 
-      await user.click(excludeCheckbox())
+      await user.click(metricsCheckbox())
 
-      expect(excludeCheckbox()).toBeChecked()
+      expect(metricsCheckbox()).toBeChecked()
       await waitFor(() => expect(lastRowQuery(queries)).not.toContain(METRICS_PATH))
-      await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
     }, 15_000)
 
-    it('stays shown after a reload once the user has opted in', async () => {
+    it('stays shown on a reload once the URL carries the choice', async () => {
       const user = userEvent.setup()
-      localStorage.setItem(EXCLUSIONS_KEY, '[]')
       const queries: string[] = []
       mockAnalytics(queries)
-      renderLogs()
+      customRender(
+        <FeatureFlagContext.Provider
+          value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
+        >
+          <UnifiedLogs />
+        </FeatureFlagContext.Provider>,
+        { nuqs: { hasMemory: true, searchParams: '?edge_metrics=true' } }
+      )
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
-      await waitFor(() => expect(rowQueries(queries).length).toBeGreaterThan(0))
+      await waitFor(() => expect(queries.some((q) => q.includes('row list'))).toBe(true))
       expect(lastRowQuery(queries)).not.toContain(METRICS_PATH)
       await expandApiGateway(user)
-      expect(excludeCheckbox()).toBeChecked()
+      expect(metricsCheckbox()).toBeChecked()
     })
-
-    it('hides them again when the sidebar filters are reset', async () => {
-      const user = userEvent.setup()
-      const onUrlUpdate = vi.fn()
-      mockAnalytics([])
-      renderLogs(onUrlUpdate)
-
-      expect(await screen.findByText('No results found')).toBeInTheDocument()
-      await expandApiGateway(user)
-      await user.click(excludeCheckbox())
-      await waitFor(() => expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('[]'))
-
-      // Reset stays reachable even though the exclusion was the only filter.
-      await user.click(screen.getByRole('button', { name: /Reset/ }))
-
-      expect(excludeCheckbox()).not.toBeChecked()
-      await waitFor(() => {
-        expect(onUrlUpdate.mock.lastCall?.[0]?.searchParams.get('filter')).toBe(EXCLUDE_PARAM)
-      })
-      await waitFor(() =>
-        expect(localStorage.getItem(EXCLUSIONS_KEY)).toBe('["successful_metrics_scrapes"]')
-      )
-    }, 15_000)
   })
 })
