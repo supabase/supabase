@@ -129,4 +129,28 @@ describe('useWebVitalsReporting', () => {
       '/project/abc/editor'
     )
   })
+
+  it('attributes metrics to the page the load started on when consent arrives after navigating', async () => {
+    const { render } = await setup()
+    await render({ apiUrl: API_URL, enabled: false })
+
+    // The user navigates around before accepting consent
+    window.history.pushState({}, '', '/org/acme')
+    await render({ apiUrl: API_URL, enabled: true })
+    await vi.waitFor(() => expect(registrationCount('LCP')).toBe(1))
+
+    observers.LCP.mock.calls[0][0]({
+      name: 'LCP',
+      value: 1800,
+      rating: 'good',
+      id: 'v6-7',
+      navigationType: 'navigate',
+    })
+
+    expect(sendTelemetryEvent).toHaveBeenCalledWith(
+      API_URL,
+      expect.objectContaining({ action: 'web_vital_evaluated' }),
+      '/project/abc/editor'
+    )
+  })
 })
