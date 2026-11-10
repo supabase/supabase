@@ -2,6 +2,7 @@ import {
   ROLE_IMPERSONATION_NO_RESULTS,
   ROLE_IMPERSONATION_SQL_LINE_COUNT,
   type SafeSqlFragment,
+  type WriteSqlFragment,
 } from '@supabase/pg-meta'
 import { DEFAULT_PLATFORM_APPLICATION_NAME } from '@supabase/pg-meta/src/constants'
 import { useMutation, useQueryClient, type QueryKey } from '@tanstack/react-query'
@@ -16,7 +17,7 @@ import { handleError as handleErrorFetchers, post, type Unguarded } from '@/data
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { MB } from '@/lib/constants'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantFor } from '@/lib/grants'
+import type { Grant, GrantForVariants } from '@/lib/grants'
 import { sqlEventParser } from '@/lib/sql-event-parser'
 import { useTrack } from '@/lib/telemetry/track'
 import { UseCustomMutationOptions } from '@/types'
@@ -61,11 +62,16 @@ type SqlSource =
   | { sqlOrigin: 'user'; queryName?: string }
   | { sqlOrigin: 'studio'; queryName: string }
 
-type ExecuteSqlVariables = SqlSource & {
+type PgMetaQuery = 'POST /platform/pg-meta/{ref}/query'
+export type PgMetaReadGrant = GrantForVariants<'post', '/platform/pg-meta/{ref}/query'>
+export type PgMetaWriteGrant = Grant<PgMetaQuery, 'write'>
+
+/** A plain `SafeSqlFragment` is read SQL. The optional brand lets it be assigned here. */
+type ReadSqlFragment = SafeSqlFragment & { readonly __sqlIntent?: 'read' }
+
+type BaseVariables = SqlSource & {
   projectRef?: string
-  grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'> | Unguarded
   connectionString?: string | null
-  sql: SafeSqlFragment
   queryKey?: QueryKey
   handleError?: (error: StudioError) => { result: any }
   isRoleImpersonationEnabled?: boolean
@@ -80,7 +86,19 @@ type ExecuteSqlVariables = SqlSource & {
   preflightCheck?: boolean
 }
 
-type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
+/** Read SQL runs with a read grant or a write grant. */
+type ReadSqlVariables = BaseVariables & {
+  sql: ReadSqlFragment
+  grant: PgMetaReadGrant | Unguarded
+}
+
+/** SQL marked with `asWriteSql` needs a `write` grant. */
+type WriteSqlVariables = BaseVariables & {
+  sql: WriteSqlFragment
+  grant: PgMetaWriteGrant | Unguarded
+}
+
+export type ExecuteSqlMutationVariables = (ReadSqlVariables | WriteSqlVariables) & {
   autoLimit?: number
   contextualInvalidation?: boolean
 }
@@ -90,6 +108,24 @@ type ExecuteSqlMutationVariables = ExecuteSqlVariables & {
  *
  * @throws {Error}
  */
+export async function executeSql<T = any>(
+  variables: WriteSqlVariables,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit,
+  fetcherOverride?: (options: {
+    query: string
+    headers?: HeadersInit
+  }) => Promise<{ data: T } | { error: Error }>
+): Promise<{ result: T }>
+export async function executeSql<T = any>(
+  variables: ReadSqlVariables,
+  signal?: AbortSignal,
+  headersInit?: HeadersInit,
+  fetcherOverride?: (options: {
+    query: string
+    headers?: HeadersInit
+  }) => Promise<{ data: T } | { error: Error }>
+): Promise<{ result: T }>
 export async function executeSql<T = any>(
   {
     projectRef,
@@ -103,7 +139,7 @@ export async function executeSql<T = any>(
     isRoleImpersonationEnabled = false,
     isStatementTimeoutDisabled = false,
     preflightCheck = false,
-  }: ExecuteSqlVariables,
+  }: ReadSqlVariables | WriteSqlVariables,
   signal?: AbortSignal,
   headersInit?: HeadersInit,
   fetcherOverride?: (options: {
@@ -258,7 +294,9 @@ export const useExecuteSqlMutation = ({
   const track = useTrack()
 
   return useMutation<ExecuteSqlData, QueryResponseError, ExecuteSqlMutationVariables>({
-    mutationFn: (args) => executeSql(args),
+    // args is ReadSqlVariables | WriteSqlVariables, already checked at mutate().
+    // TS can't match a union against separate overloads, so pick one; the runtime path is identical.
+    mutationFn: (args) => executeSql(args as ReadSqlVariables),
     async onSuccess(data, variables, context) {
       const { contextualInvalidation, sql, projectRef } = variables
 
