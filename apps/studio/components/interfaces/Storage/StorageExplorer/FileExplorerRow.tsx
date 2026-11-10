@@ -114,7 +114,7 @@ const RowActionsMenu = ({
         <span className="sr-only">{name} actions</span>
       </div>
     </DropdownMenuTrigger>
-    <DropdownMenuContent side="bottom" align="end">
+    <DropdownMenuContent side="bottom" align="end" className="w-40">
       {options.map((option) => {
         if ((option?.children ?? []).length > 0) {
           return (
