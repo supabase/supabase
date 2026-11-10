@@ -7,10 +7,10 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { computeQueryOptions } from '@/data/compute/compute-query'
 import { API_URL } from '@/lib/constants'
 import { PRODUCT_NAME } from '@/lib/constants/compute'
-import ComputePage from '@/pages/project/[ref]/compute/index'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/compute/index'
 import { addAPIMock, mswServer, type APIErrorBody } from '@/tests/lib/msw'
 import { routerMock } from '@/tests/lib/route-mock'
+import { renderRoute } from '@/tests/lib/route-render'
 
 type ListComputeInstancesResponse = components['schemas']['V2ListComputeInstancesResponse_Output']
 type ComputeInstanceDatum = ListComputeInstancesResponse['data'][number]
@@ -52,7 +52,11 @@ const renderComputePage = async () => {
     .fetchQuery(computeQueryOptions({ projectRef: PROJECT_REF }))
     .catch(() => undefined)
 
-  return customRender(<ComputePage dehydratedState={undefined} />, { queryClient })
+  return renderRoute(Route, {
+    routeId: '/project/$ref/compute/',
+    url: `/project/${PROJECT_REF}/compute`,
+    queryClient,
+  })
 }
 
 describe('/project/[ref]/compute', () => {

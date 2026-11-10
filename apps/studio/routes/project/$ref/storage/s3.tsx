@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import S3SettingsPage from '@/pages/project/[ref]/storage/s3'
+import { S3Connection } from '@/components/interfaces/Storage/StorageSettings/S3Connection'
 
 export const Route = createFileRoute('/project/$ref/storage/s3')({
-  component: StorageS3Route,
+  component: S3SettingsPage,
   staticData: {
     storageLayoutTitle: 'S3 Configuration',
     storageBucketsLayoutTitle: 'S3 Configuration',
@@ -11,6 +11,6 @@ export const Route = createFileRoute('/project/$ref/storage/s3')({
   },
 })
 
-function StorageS3Route() {
-  return <S3SettingsPage dehydratedState={undefined} />
+function S3SettingsPage() {
+  return <S3Connection />
 }

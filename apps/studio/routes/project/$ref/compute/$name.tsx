@@ -1,14 +1,14 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import ComputeInstanceDetailPage from '@/pages/project/[ref]/compute/[name]'
+import { ComputeInstanceDetail } from '@/components/interfaces/Compute/ComputeInstanceDetail/ComputeInstanceDetail'
 
 export const Route = createFileRoute('/project/$ref/compute/$name')({
-  component: ComputeInstanceDetailRoute,
+  component: ComputeInstanceDetailPage,
   staticData: {
     computeLayoutTitle: 'Instance',
   },
 })
 
-function ComputeInstanceDetailRoute() {
-  return <ComputeInstanceDetailPage dehydratedState={undefined} />
+function ComputeInstanceDetailPage() {
+  return <ComputeInstanceDetail />
 }
