@@ -43,7 +43,7 @@ export const PurgeCDNCacheDialog = ({
       }}
     >
       <AlertDialogContent
-        size="medium"
+        size={isFreePlan ? 'small' : 'medium'}
         onClick={(event) =>
           // Avoid triggering the overlay click
           event.stopPropagation()
@@ -61,10 +61,7 @@ export const PurgeCDNCacheDialog = ({
             {/* No Admonition (that has an alert role) here as we're already in an alertdialog */}
             <div className="space-y-4">
               {isFreePlan ? (
-                <>
-                  <p>CDN cache purge is not available on your plan.</p>
-                  <p>Upgrade your plan to purge the CDN cache.</p>
-                </>
+                <p>Purging the CDN cache requires the Pro plan or higher.</p>
               ) : (
                 <>
                   <p>
@@ -84,7 +81,7 @@ export const PurgeCDNCacheDialog = ({
         <AlertDialogFooter>
           <AlertDialogCancel disabled={isPurging}>Cancel</AlertDialogCancel>
           {isFreePlan ? (
-            <UpgradePlanButton source="upgrade" featureProposition="purge CDN cache" />
+            <UpgradePlanButton source="storagePurgeCDNCache" featureProposition="purge CDN cache" />
           ) : (
             <AlertDialogAction disabled={isPurging} onClick={onConfirm}>
               Purge CDN cache
