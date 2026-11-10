@@ -40,14 +40,13 @@ const SignInMfaPage: NextPageWithLayout = () => {
     auth
       .initialize()
       .then(async ({ error }) => {
-        if (error) {
-          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
-          // correct heading instead of "Two-factor authentication". The error is held in the
-          // shared auth context and surfaces via useAuthError() on /sign-in.
+        const token = await getAccessToken()
+
+        // A successful password retry can create a session after initialization cached an error.
+        // With no session, show the callback error on the sign-in page.
+        if (error && !token) {
           return router.replace({ pathname: '/sign-in', query: router.query })
         }
-
-        const token = await getAccessToken()
 
         if (token) {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
