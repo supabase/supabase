@@ -12,6 +12,7 @@ import {
   SEVERITY_DOT_CLASSES,
   SEVERITY_LABELS,
 } from './Issues.constants'
+import { IssuesLegacyRedirect } from './IssuesLegacyRedirect'
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useProjectIssues } from '@/data/issues/useProjectIssues'
@@ -36,6 +37,7 @@ export const IssuesOverview = () => {
 
   return (
     <div className="h-full overflow-y-auto bg-card">
+      <IssuesLegacyRedirect />
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10 px-6 pb-16 pt-10">
         <header className="flex items-start justify-between gap-4">
           <div className="flex flex-col gap-1">

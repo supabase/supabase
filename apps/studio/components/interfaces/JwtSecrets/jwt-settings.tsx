@@ -4,6 +4,7 @@ import {
   JwtSecretUpdateProgress,
   JwtSecretUpdateStatus,
 } from '@supabase/shared-types/out/events'
+import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import {
   AlertCircleIcon,
@@ -55,17 +56,19 @@ import {
   JWT_SECRET_UPDATE_ERROR_MESSAGES,
   JWT_SECRET_UPDATE_PROGRESS_MESSAGES,
 } from './jwt.constants'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import Panel from '@/components/ui/Panel'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
-import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { legacyAPIKeysStatusQueryOptions } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJwtSecretUpdateMutation } from '@/data/config/jwt-secret-update-mutation'
 import { useJwtSecretUpdatingStatusQuery } from '@/data/config/jwt-secret-updating-status-query'
 import { useProjectPostgrestConfigQuery } from '@/data/config/project-postgrest-config-query'
-import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { legacyJWTSigningKeyQueryOptions } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 const customJwtSecretFormSchema = z.object({
@@ -97,17 +100,31 @@ export const JWTSettings = () => {
   const { mutateAsync: updateJwt, isPending: isSubmittingJwtSecretUpdateRequest } =
     useJwtSecretUpdateMutation()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  const legacyKeyGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys/legacy', {
+    projectRef,
+  })
+  const legacyStatusGrant = useGrant('GET /v1/projects/{ref}/api-keys/legacy', { projectRef })
+  // A 404 means the legacy JWT secret hasn't been migrated yet (`legacyKey` is `null`); other
+  // errors are real failures.
+  const {
+    data: legacyKey,
+    error: legacyKeyError,
+    isPending,
+    isError: isLegacyKeyError,
+  } = useQuery(
+    legacyJWTSigningKeyQueryOptions(
+      { projectRef, grant: legacyKeyGrant.grant },
+      { enabled: IS_PLATFORM }
+    )
   )
-  const { data: legacyKey, isPending } = useLegacyJWTSigningKeyQuery(
-    { projectRef },
-    { enabled: IS_PLATFORM && canReadAPIKeys, retry: false }
+  const { data: legacyAPIKeysStatus } = useQuery(
+    legacyAPIKeysStatusQueryOptions({ projectRef, grant: legacyStatusGrant.grant })
   )
-  const { data: legacyAPIKeysStatus } = useLegacyAPIKeysStatusQuery(
-    { projectRef },
-    { enabled: IS_PLATFORM && canReadAPIKeys }
-  )
+  const isLegacyGrantDenied =
+    legacyKeyGrant.status === 'denied' || legacyStatusGrant.status === 'denied'
+  const legacyGrantError =
+    (legacyKeyGrant.status === 'error' ? legacyKeyGrant.error : undefined) ??
+    (legacyStatusGrant.status === 'error' ? legacyStatusGrant.error : undefined)
 
   const { Failed, Updated, Updating } = JwtSecretUpdateStatus
 
@@ -171,6 +188,25 @@ export const JWTSettings = () => {
               </div>
             ) : (
               <>
+                {isLegacyGrantDenied && (
+                  <Admonition
+                    type="default"
+                    title="Legacy JWT secret details are unavailable"
+                    description="You need additional permissions to view the legacy JWT secret and API key status."
+                  />
+                )}
+                {legacyGrantError && (
+                  <AlertError
+                    error={legacyGrantError}
+                    subject="Failed to check legacy JWT secret permissions"
+                  />
+                )}
+                {isLegacyKeyError && (
+                  <AlertError
+                    error={legacyKeyError}
+                    subject="Failed to retrieve legacy JWT secret status"
+                  />
+                )}
                 {legacyKey && legacyKey.status !== 'revoked' && (
                   <Admonition
                     type="warning"
@@ -245,7 +281,7 @@ export const JWTSettings = () => {
             )}
           </div>
 
-          {!isPending && !legacyKey && (
+          {!isPending && !isLegacyKeyError && !legacyKey && (
             <>
               {isUpdatingJwtSecret && (
                 <div className="flex items-center space-x-2">

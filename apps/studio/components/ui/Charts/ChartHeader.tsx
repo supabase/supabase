@@ -16,6 +16,13 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { formatDateTime, useFormatDateTime } from '@/lib/datetime'
 import { formatBytes, formatBytesMinMB } from '@/lib/helpers'
 
+export interface ChartHeaderStat {
+  label: string
+  value: number
+  /** Colors the dot next to the label */
+  tone: 'warning' | 'destructive'
+}
+
 export interface ChartHeaderProps {
   title?: string
   format?: string | ((value: unknown) => string)
@@ -54,6 +61,16 @@ export interface ChartHeaderProps {
   sql?: string
   titleTooltip?: string
   showNewBadge?: boolean
+  /**
+   * Extra stats shown on the right of the header. Receives all chart rows, or only the hovered
+   * row while a point is hovered.
+   */
+  getHeaderStats?: (rows: Record<string, unknown>[]) => ChartHeaderStat[]
+  /**
+   * Index of the point hovered on this chart. Used for `getHeaderStats` when hover isn't synced
+   * across charts, in which case the shared hover state doesn't reach the header.
+   */
+  focusedIndex?: number | null
 }
 
 export const ChartHeader = ({
@@ -88,6 +105,8 @@ export const ChartHeader = ({
   titleTooltip,
   showNewBadge,
   isMemoryChart,
+  getHeaderStats,
+  focusedIndex,
 }: ChartHeaderProps) => {
   const { ref } = useParams()
   const { hoveredIndex, isHovered } = useChartHoverState(syncId || 'default')
@@ -247,6 +266,11 @@ export const ChartHeader = ({
     </div>
   )
 
+  const syncedIndex = syncId && isHovered ? hoveredIndex : null
+  const statsIndex = syncedIndex ?? focusedIndex ?? null
+  const hoveredRow = statsIndex !== null ? data?.[statsIndex] : undefined
+  const headerStats = getHeaderStats?.(hoveredRow ? [hoveredRow] : (data ?? []))
+
   const highlighted = (
     <h4
       className={`text-foreground text-xl font-normal ${minimalHeader ? 'text-base' : 'text-2xl'}`}
@@ -291,6 +315,24 @@ export const ChartHeader = ({
         </div>
       </div>
       <div className="flex items-center gap-2">
+        {headerStats && headerStats.length > 0 && (
+          <div className="flex items-end gap-4 mr-2 text-foreground-light">
+            {headerStats.map((stat) => (
+              <div key={stat.label} className="flex flex-col items-end">
+                <div className="flex items-center gap-2">
+                  <div
+                    className={cn(
+                      'w-1.5 h-1.5 rounded-full',
+                      stat.tone === 'warning' ? 'bg-warning' : 'bg-destructive'
+                    )}
+                  />
+                  <span className="heading-meta">{stat.label}</span>
+                </div>
+                <span className="text-foreground text-base">{stat.value.toLocaleString()}</span>
+              </div>
+            ))}
+          </div>
+        )}
         {sql ? (
           <ButtonTooltip
             className="px-1.5"
