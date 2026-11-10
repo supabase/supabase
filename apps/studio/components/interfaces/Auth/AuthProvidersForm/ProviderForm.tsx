@@ -24,6 +24,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import { NO_REQUIRED_CHARACTERS } from '../Auth.constants'
 import { AuthAlert } from './AuthAlert'
 import type { Provider } from './AuthProvidersForm.types'
+import { unescapeNewlines } from './AuthProvidersForm.utils'
 import FormField from './FormField'
 import { Markdown } from '@/components/interfaces/Markdown'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
@@ -100,11 +101,18 @@ export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) 
             values[key] = !(config as any)[key]
           } else {
             const configValue = (config as any)[key]
-            values[key] = configValue
+            let value: string | boolean = configValue
               ? configValue
               : provider.properties[key].type === 'boolean'
                 ? false
                 : ''
+            // Stored multiline values (e.g. the SMS template) can contain literal
+            // `\n` escape sequences; convert them to real newlines so the textarea
+            // displays them correctly (required for WebOTP-compatible SMS templates).
+            if (provider.properties[key].type === 'multiline-string' && typeof value === 'string') {
+              value = unescapeNewlines(value)
+            }
+            values[key] = value
           }
         }
       })
