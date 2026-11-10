@@ -16,7 +16,7 @@ export type OnboardingSurveyVariables = {
 
 const trim = (v?: string) => v?.trim() || undefined
 
-export function buildOnboardingSurveyPayload({
+function buildOnboardingSurveyPayload({
   slug,
   kind,
   size,

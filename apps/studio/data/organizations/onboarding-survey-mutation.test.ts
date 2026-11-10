@@ -1,81 +1,53 @@
-import { describe, expect, it, vi } from 'vitest'
+import { platformComponents as components } from 'api-types'
+import { HttpResponse } from 'msw'
+import { describe, expect, it } from 'vitest'
 
-import { buildOnboardingSurveyPayload, submitOnboardingSurvey } from './onboarding-survey-mutation'
+import { submitOnboardingSurvey } from './onboarding-survey-mutation'
+import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
-const postMock = vi.fn()
+type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
 
-vi.mock('@/data/fetchers', () => ({
-  post: (...args: unknown[]) => postMock(...args),
-  handleError: (error: unknown) => {
-    throw error
-  },
-}))
-
-describe('buildOnboardingSurveyPayload', () => {
-  it('matches the onboarding survey API body shape', () => {
-    expect(
-      buildOnboardingSurveyPayload({
-        slug: 'test-org',
-        building: ' a mobile game backend ',
-      })
-    ).toEqual({
-      slug: 'test-org',
-      building: 'a mobile game backend',
-    })
+const mockSurveyEndpoint = (status: 204 | 500 = 204) => {
+  const requests: OnboardingSurveyBody[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/organizations/onboarding-survey',
+    response: async ({ request }) => {
+      requests.push((await request.json()) as OnboardingSurveyBody)
+      if (status === 500) {
+        return HttpResponse.json<APIErrorBody>({ message: 'Boom' }, { status: 500 })
+      }
+      return new HttpResponse(null, { status: 204 })
+    },
   })
-
-  it('omits empty optional values', () => {
-    expect(
-      buildOnboardingSurveyPayload({
-        slug: 'test-org',
-        kind: ' ',
-        building: '',
-      })
-    ).toEqual({ slug: 'test-org' })
-  })
-
-  it('includes kind and size when present', () => {
-    expect(
-      buildOnboardingSurveyPayload({
-        slug: 'test-org',
-        kind: '  STARTUP  ',
-        size: '10',
-        building: 'a saas',
-      })
-    ).toEqual({
-      slug: 'test-org',
-      kind: 'STARTUP',
-      size: '10',
-      building: 'a saas',
-    })
-  })
-})
+  return requests
+}
 
 describe('submitOnboardingSurvey', () => {
-  it('posts to the platform endpoint with the typed payload', async () => {
-    postMock.mockReset()
-    postMock.mockResolvedValue({ error: undefined })
+  it('leaves unanswered questions out of the request', async () => {
+    const requests = mockSurveyEndpoint()
 
-    await submitOnboardingSurvey({
-      slug: 'acme',
-      kind: 'COMPANY',
-      size: '10',
-      building: 'a saas',
-    })
+    await submitOnboardingSurvey({ slug: 'acme', kind: 'COMPANY', size: '10', building: '' })
+    await submitOnboardingSurvey({ slug: 'acme', kind: ' ', building: ' b2b_saas ' })
 
-    expect(postMock).toHaveBeenCalledWith('/platform/organizations/onboarding-survey', {
-      body: {
-        slug: 'acme',
-        kind: 'COMPANY',
-        size: '10',
-        building: 'a saas',
-      },
-    })
+    expect(requests).toEqual([
+      { slug: 'acme', kind: 'COMPANY', size: '10' },
+      { slug: 'acme', building: 'b2b_saas' },
+    ])
   })
 
-  it('throws when the slug is missing', async () => {
+  it('rejects when the request fails, so callers can keep the answers', async () => {
+    mockSurveyEndpoint(500)
+
+    await expect(submitOnboardingSurvey({ slug: 'acme', kind: 'COMPANY' })).rejects.toThrow('Boom')
+  })
+
+  it('sends nothing without an org slug', async () => {
+    const requests = mockSurveyEndpoint()
+
     await expect(submitOnboardingSurvey({ slug: '' })).rejects.toThrow(
       'Organization slug is required'
     )
+    expect(requests).toEqual([])
   })
 })
