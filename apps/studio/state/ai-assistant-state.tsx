@@ -330,6 +330,7 @@ function createChatInstance(
             chatId: options.id,
             chatName: chat?.name,
             supportMode: chat?.supportMetadata?.isSupportChat ?? false,
+            allowSupportAccess: chat?.supportMetadata?.allowSupportAccess ?? false,
             orgSlug: state.context.orgSlug,
             context: state.context,
             model: state.model,

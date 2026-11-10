@@ -27,6 +27,7 @@ import {
   isKnownAssistantModelId,
   type AssistantModelId,
 } from '@/lib/ai/model.utils'
+import { higherOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL } from '@/lib/ai/opt-in-level'
 import { getTools } from '@/lib/ai/tools'
 import { encodeNotebookToolError } from '@/lib/ai/tools/notebook-tool-error'
 import { apiWrapper } from '@/lib/api/apiWrapper'
@@ -73,6 +74,7 @@ const requestBodySchema = z.object({
   chatId: z.string().optional(),
   chatName: z.string().optional(),
   supportMode: z.boolean().optional(),
+  allowSupportAccess: z.boolean().optional(),
   orgSlug: z.string().optional(),
   model: z.string().optional(),
 })
@@ -104,6 +106,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
     chatName,
     model: rawRequestedModel,
     supportMode,
+    allowSupportAccess,
   } = data
 
   const requestedModel: AssistantModelId | undefined =
@@ -151,6 +154,11 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       return res.status(400).json({
         error: 'There was an error fetching your organization details',
       })
+    }
+
+    // Per-request override only: the org's stored opt-in level is never changed.
+    if (supportMode && allowSupportAccess && orgId !== undefined) {
+      aiOptInLevel = higherOptInLevel(aiOptInLevel, SUPPORT_ACCESS_OPT_IN_LEVEL)
     }
   }
 
