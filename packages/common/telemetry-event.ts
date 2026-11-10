@@ -19,7 +19,7 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'agent_setup_clicked',
   'view_as_markdown_clicked',
   // LCP, CLS and INP finalize as the page is hidden, so the request can race a tab close
-  'web_vital_reported',
+  'web_vital_evaluated',
 ])
 
 let featureFlagProperties: Record<string, unknown> = {}
