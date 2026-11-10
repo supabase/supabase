@@ -5166,6 +5166,7 @@ functions:
           }.launchIn(coroutineScope) // launch a new coroutine to collect the flow
 
           channel.subscribe(blockUntilSubscribed = true)
+          ```
       - id: listen-to-all-database-changes
         name: Listen to all database changes
         code: |
@@ -5315,7 +5316,7 @@ functions:
           // If you want more control, use the `postgresChangeFlow` method which works the same as the other examples
           val changeFlow = channel.postgresChangeFlow<PostgresAction.Delete>(schema = "public") {
               table = "users"
-              filter("id", FilterOperator.EQ, 1)
+              filter { eq("id", 1) }
           }
 
           // Collect the flow
