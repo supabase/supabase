@@ -3,11 +3,14 @@
   "extends": ["//"],
   "tasks": {
     // `eslint .` also runs the type-aware rules in eslint.type-checks.config.cjs, which is
-    // its own task so turbo can cache and parallelize it.
+    // its own task so turbo can cache and parallelize it. Both read the shared ESLint config,
+    // which lives in a workspace package that turbo doesn't hash for this task by default.
     "lint": {
       "dependsOn": ["lint:type-checks"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/eslint-config-supabase/**"],
     },
     "lint:type-checks": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/eslint-config-supabase/**"],
       "outputs": [],
     },
     "build": {
