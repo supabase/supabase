@@ -44,7 +44,7 @@ const guides = defineCollection({
 })
 
 // Fetched from the private supabase/troubleshooting repo by
-// scripts/federated-content/fetch-federated-content.ts (a prebuild step) —
+// scripts/federated-content/fetch-federated-content.ts (the `fetch:federated-content` turbo task) —
 // entirely generated, never hand-authored, see .gitignore. Rendered through
 // ArticleLayout by src/pages/troubleshooting/[...slug].astro.
 const troubleshooting = defineCollection({
