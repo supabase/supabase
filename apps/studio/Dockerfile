@@ -39,7 +39,8 @@ COPY --from=turbo /app/out/json ./
 COPY --from=turbo /app/out/pnpm-lock.yaml ./
 COPY ./patches/ ./patches
 
-# No need to clean cache because production uses standalone build
+# The production stage copies only the self-contained build output, so the
+# install cache never reaches the final image.
 RUN pnpm install --frozen-lockfile
 
 # dev contains dependencies and source code not compiled
@@ -51,8 +52,7 @@ CMD ["pnpm", "dev:studio"]
 
 # Compile TanStack Start (Vite + Nitro)
 FROM dev AS build
-# Images serve their own assets, and the pruned context has no upload script.
-RUN SKIP_ASSET_UPLOAD=1 NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build
+RUN NODE_OPTIONS=--max-old-space-size=4096 pnpm --filter studio run build
 
 # Assemble the runtime tree at /srv. Nitro's node-server output is
 # self-contained (`.output/server` bundles the app with its traced

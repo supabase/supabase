@@ -7,6 +7,7 @@ export const BANNER_ID = {
   FREE_MICRO_UPGRADE: 'free-micro-upgrade-banner',
   TERMS_OF_SERVICE_UPDATE: 'terms-of-service-update-banner',
   EXPLORER: 'explorer-banner',
+  ONBOARDING_SURVEY_FOLLOW_UP: 'onboarding-survey-follow-up-banner',
 } as const
 
 export type BannerId = (typeof BANNER_ID)[keyof typeof BANNER_ID]
