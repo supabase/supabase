@@ -18,7 +18,7 @@ import {
 import { CategoricalChartState } from 'recharts/types/chart/types'
 import { cn } from 'ui'
 
-import { ChartHeader } from './ChartHeader'
+import { ChartHeader, type ChartHeaderProps } from './ChartHeader'
 import { ChartHighlightAction, ChartHighlightActions } from './ChartHighlightActions'
 import {
   CHART_COLORS,
@@ -89,6 +89,7 @@ export interface ComposedChartProps<D = Datum> extends CommonChartProps<D> {
   sql?: string
   highlightActions?: ChartHighlightAction[]
   showNewBadge?: boolean
+  getHeaderStats?: ChartHeaderProps['getHeaderStats']
   normalizeVisibleStackToPercent?: boolean
 }
 
@@ -151,6 +152,7 @@ export function ComposedChart({
   highlightActions,
   titleTooltip,
   showNewBadge,
+  getHeaderStats,
   normalizeVisibleStackToPercent = false,
 }: ComposedChartProps) {
   const shouldDefaultToLineCharts = useFlag('defaultToLineCharts')
@@ -473,6 +475,8 @@ export function ComposedChart({
         hideHighlightedValue={hideHighlightedValue}
         title={title}
         showNewBadge={showNewBadge}
+        getHeaderStats={getHeaderStats}
+        focusedIndex={focusDataIndex}
         format={format}
         hideHighlightedLabel={hideHighlightedLabel}
         hideHighlightArea={hideHighlightArea}
