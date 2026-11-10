@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import GenericOrganizationPage from '@/pages/org/_/[[...routeSlug]]'
+import { SelectOrganizationPage } from '@/components/interfaces/Organization/SelectOrganizationPage'
 
 export const Route = createFileRoute('/org/_')({
   component: OrgWildcardIndexRoute,
@@ -19,5 +19,5 @@ export const Route = createFileRoute('/org/_')({
 // to `/`). The path-as-filename form keeps the last segment non-index,
 // so the bug branch is skipped.
 function OrgWildcardIndexRoute() {
-  return <GenericOrganizationPage />
+  return <SelectOrganizationPage />
 }

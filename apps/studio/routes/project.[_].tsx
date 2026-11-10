@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import GenericProjectPage from '@/pages/project/_/[[...routeSlug]]'
+import { SelectProjectPage } from '@/components/interfaces/Home/ProjectList/SelectProjectPage'
 
 export const Route = createFileRoute('/project/_')({
   component: ProjectWildcardIndexRoute,
@@ -11,5 +11,5 @@ export const Route = createFileRoute('/project/_')({
 // why this is named with the path-as-filename form rather than
 // `project/[_]/index.tsx`.
 function ProjectWildcardIndexRoute() {
-  return <GenericProjectPage />
+  return <SelectProjectPage />
 }

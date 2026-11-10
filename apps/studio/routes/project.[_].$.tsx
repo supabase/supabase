@@ -1,14 +1,12 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import GenericProjectPage from '@/pages/project/_/[[...routeSlug]]'
+import { SelectProjectPage } from '@/components/interfaces/Home/ProjectList/SelectProjectPage'
 
 export const Route = createFileRoute('/project/_/$')({
   component: ProjectWildcardSplatRoute,
 })
 
-// Matches `/project/_/...`. TanStack exposes the trailing path as the
-// `_splat` param; the underlying Next page normalises it back to the
-// `routeSlug: string[]` shape it originally consumed.
+// Matches `/project/_/...`; the trailing path arrives as the `_splat` param.
 //
 // Naming delta: `project.[_].$.tsx` (path-as-filename) rather than
 // `project/[_]/$.tsx` (nested directory) — see `org.[_].tsx` for the
@@ -16,5 +14,6 @@ export const Route = createFileRoute('/project/_/$')({
 // router-generator bug that strips the escaped `_` segment when the
 // last segment isn't escaped.
 function ProjectWildcardSplatRoute() {
-  return <GenericProjectPage />
+  const { _splat } = Route.useParams()
+  return <SelectProjectPage routeSlug={_splat ? _splat.split('/') : undefined} />
 }
