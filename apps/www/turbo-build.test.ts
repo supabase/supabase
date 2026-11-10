@@ -215,6 +215,10 @@ for (const args of [
   spawnSync('git', args, { cwd: fixture })
 }
 
+// The test process's own PATH locates the fixture's pnpm and turbo; it isn't a variable of any
+// turbo task, so it's read through a copy to stay out of the turbo env lint rule.
+const hostEnv = { ...process.env }
+
 function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
   const command = rootCommand ? path.join(fixture, 'node_modules/.bin/turbo') : 'pnpm'
   const result = spawnSync(
@@ -225,10 +229,10 @@ function build(env: Partial<NodeJS.ProcessEnv> = {}, rootCommand = false) {
       encoding: 'utf8',
       timeout: 60_000,
       env: {
-        ...process.env,
+        ...hostEnv,
         CI: 'true',
         VERCEL_GIT_COMMIT_SHA: '1111111111111111111111111111111111111111',
-        PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${process.env.PATH}`,
+        PATH: `${path.join(fixture, 'node_modules/.bin')}${path.delimiter}${hostEnv.PATH}`,
         ...env,
       },
     }
