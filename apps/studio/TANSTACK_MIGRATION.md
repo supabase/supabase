@@ -250,41 +250,41 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ### Project shell — `/logs/*`
 
-- [x] A `routes/project/$ref/logs/index.tsx` ← `pages/project/[ref]/logs/index.tsx` (sets `skipLogsLayout: true`; page handles its own ProjectLayout; DefaultLayout moved to page's `getLayout` so Next still wraps it)
-- [x] A `routes/project/$ref/logs/auth-logs.tsx` ← `pages/project/[ref]/logs/auth-logs.tsx`
-- [x] A `routes/project/$ref/logs/cron-logs.tsx` ← `pages/project/[ref]/logs/cron-logs.tsx`
-- [x] A `routes/project/$ref/logs/dedicated-pooler-logs.tsx` ← `pages/project/[ref]/logs/dedicated-pooler-logs.tsx`
-- [x] A `routes/project/$ref/logs/edge-functions-logs.tsx` ← `pages/project/[ref]/logs/edge-functions-logs.tsx`
-- [x] A `routes/project/$ref/logs/edge-logs.tsx` ← `pages/project/[ref]/logs/edge-logs.tsx`
-- [x] A `routes/project/$ref/logs/multigres-logs.tsx` ← `pages/project/[ref]/logs/multigres-logs.tsx`
-- [x] A `routes/project/$ref/logs/pg-upgrade-logs.tsx` ← `pages/project/[ref]/logs/pg-upgrade-logs.tsx`
-- [x] A `routes/project/$ref/logs/pgcron-logs.tsx` ← `pages/project/[ref]/logs/pgcron-logs.tsx`
-- [x] A `routes/project/$ref/logs/pooler-logs.tsx` ← `pages/project/[ref]/logs/pooler-logs.tsx`
-- [x] A `routes/project/$ref/logs/postgres-logs.tsx` ← `pages/project/[ref]/logs/postgres-logs.tsx`
-- [x] A `routes/project/$ref/logs/postgrest-logs.tsx` ← `pages/project/[ref]/logs/postgrest-logs.tsx`
-- [x] A `routes/project/$ref/logs/realtime-logs.tsx` ← `pages/project/[ref]/logs/realtime-logs.tsx`
-- [x] A `routes/project/$ref/logs/pipelines-logs.tsx` ← `pages/project/[ref]/logs/pipelines-logs.tsx`
-- [x] A `routes/project/$ref/logs/replication-logs.tsx` ← `pages/project/[ref]/logs/replication-logs.tsx`
-- [x] A `routes/project/$ref/logs/storage-logs.tsx` ← `pages/project/[ref]/logs/storage-logs.tsx`
-- [x] A `routes/project/$ref/logs/explorer/index.tsx` ← `pages/project/[ref]/logs/explorer/index.tsx`
-- [x] A `routes/project/$ref/logs/explorer/recent.tsx` ← `pages/project/[ref]/logs/explorer/recent.tsx`
-- [x] A `routes/project/$ref/logs/explorer/saved.tsx` ← `pages/project/[ref]/logs/explorer/saved.tsx`
-- [x] A `routes/project/$ref/logs/explorer/templates.tsx` ← `pages/project/[ref]/logs/explorer/templates.tsx`
+- [x] A→done `routes/project/$ref/logs/index.tsx` ← `pages/project/[ref]/logs/index.tsx` (sets `skipLogsLayout: true`; page handles its own ProjectLayout)
+- [x] A→done `routes/project/$ref/logs/auth-logs.tsx` ← `pages/project/[ref]/logs/auth-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/cron-logs.tsx` ← `pages/project/[ref]/logs/cron-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/dedicated-pooler-logs.tsx` ← `pages/project/[ref]/logs/dedicated-pooler-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/edge-functions-logs.tsx` ← `pages/project/[ref]/logs/edge-functions-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/edge-logs.tsx` ← `pages/project/[ref]/logs/edge-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/multigres-logs.tsx` ← `pages/project/[ref]/logs/multigres-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/pg-upgrade-logs.tsx` ← `pages/project/[ref]/logs/pg-upgrade-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/pgcron-logs.tsx` ← `pages/project/[ref]/logs/pgcron-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/pooler-logs.tsx` ← `pages/project/[ref]/logs/pooler-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/postgres-logs.tsx` ← `pages/project/[ref]/logs/postgres-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/postgrest-logs.tsx` ← `pages/project/[ref]/logs/postgrest-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/realtime-logs.tsx` ← `pages/project/[ref]/logs/realtime-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/pipelines-logs.tsx` ← `pages/project/[ref]/logs/pipelines-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/replication-logs.tsx` ← `pages/project/[ref]/logs/replication-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/storage-logs.tsx` ← `pages/project/[ref]/logs/storage-logs.tsx`
+- [x] A→done `routes/project/$ref/logs/explorer/index.tsx` ← `pages/project/[ref]/logs/explorer/index.tsx`
+- [x] A→done `routes/project/$ref/logs/explorer/recent.tsx` ← `pages/project/[ref]/logs/explorer/recent.tsx`
+- [x] A→done `routes/project/$ref/logs/explorer/saved.tsx` ← `pages/project/[ref]/logs/explorer/saved.tsx`
+- [x] A→done `routes/project/$ref/logs/explorer/templates.tsx` ← `pages/project/[ref]/logs/explorer/templates.tsx`
 
 ### Project shell — `/observability/*`
 
-- [x] A `routes/project/$ref/observability/index.tsx` ← `pages/project/[ref]/observability/index.tsx`
-- [x] A `routes/project/$ref/observability/$id.tsx` ← `pages/project/[ref]/observability/[id].tsx`
-- [x] A `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
-- [x] A `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
-- [x] A `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
-- [x] A `routes/project/$ref/observability/connections.tsx` ← `pages/project/[ref]/observability/connections.tsx`
-- [x] A `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
-- [x] A `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
-- [x] A `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
-- [x] A `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
-- [x] A `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
-- [x] A `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
+- [x] A→done `routes/project/$ref/observability/index.tsx` ← `pages/project/[ref]/observability/index.tsx`
+- [x] A→done `routes/project/$ref/observability/$id.tsx` ← `pages/project/[ref]/observability/[id].tsx`
+- [x] A→done `routes/project/$ref/observability/auth.tsx` ← `pages/project/[ref]/observability/auth.tsx`
+- [x] A→done `routes/project/$ref/observability/database.tsx` ← `pages/project/[ref]/observability/database.tsx`
+- [x] A→done `routes/project/$ref/observability/api-overview.tsx` ← `pages/project/[ref]/observability/api-overview.tsx`
+- [x] A→done `routes/project/$ref/observability/connections.tsx` ← `pages/project/[ref]/observability/connections.tsx`
+- [x] A→done `routes/project/$ref/observability/edge-functions.tsx` ← `pages/project/[ref]/observability/edge-functions.tsx`
+- [x] A→done `routes/project/$ref/observability/postgrest.tsx` ← `pages/project/[ref]/observability/postgrest.tsx`
+- [x] A→done `routes/project/$ref/observability/query-insights.tsx` ← `pages/project/[ref]/observability/query-insights.tsx`
+- [x] A→done `routes/project/$ref/observability/query-performance.tsx` ← `pages/project/[ref]/observability/query-performance.tsx`
+- [x] A→done `routes/project/$ref/observability/realtime.tsx` ← `pages/project/[ref]/observability/realtime.tsx`
+- [x] A→done `routes/project/$ref/observability/storage.tsx` ← `pages/project/[ref]/observability/storage.tsx`
 
 ### Project shell — `/issues/*`
 

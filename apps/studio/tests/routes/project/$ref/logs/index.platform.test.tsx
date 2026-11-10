@@ -2,10 +2,9 @@ import { act, screen, waitFor } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import LogPage from '@/pages/project/[ref]/logs/index'
-import { Route as TanStackLogsIndexRoute } from '@/routes/project/$ref/logs/index'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/project/$ref/logs/index'
 import { routerMock } from '@/tests/lib/route-mock'
+import { renderRoute } from '@/tests/lib/route-render'
 
 const { authState, unifiedLogsPreviewState } = vi.hoisted(() => ({
   authState: { current: { isLoading: false, session: null as object | null } },
@@ -42,7 +41,10 @@ vi.mock('@/components/interfaces/UnifiedLogs/UnifiedLogs', () => ({
   UnifiedLogs: () => <div>Unified logs view</div>,
 }))
 
-describe('/project/[ref]/logs', () => {
+const renderLogsIndex = () =>
+  renderRoute(Route, { routeId: '/project/$ref/logs/', url: '/project/default/logs' })
+
+describe('/project/$ref/logs', () => {
   beforeEach(() => {
     window.history.replaceState({}, '', '/project/default/logs')
     routerMock.setCurrentUrl('/project/default/logs')
@@ -55,7 +57,7 @@ describe('/project/[ref]/logs', () => {
   })
 
   it('redirects to sign-in with a return destination when there is no session', async () => {
-    customRender(<LogPage dehydratedState={undefined} />)
+    await renderLogsIndex()
 
     await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
     expect(routerMock.query.returnTo).toBe('/project/default/logs')
@@ -64,16 +66,7 @@ describe('/project/[ref]/logs', () => {
   it('redirects to sign-in while the unified logs preview is still loading', async () => {
     unifiedLogsPreviewState.current = { isEnabled: false, isLoading: true }
 
-    customRender(<LogPage dehydratedState={undefined} />)
-
-    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
-    expect(routerMock.query.returnTo).toBe('/project/default/logs')
-  })
-
-  it('redirects to sign-in from the TanStack route when there is no session', async () => {
-    const RouteComponent = TanStackLogsIndexRoute.options.component!
-
-    customRender(<RouteComponent />)
+    await renderLogsIndex()
 
     await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
     expect(routerMock.query.returnTo).toBe('/project/default/logs')
@@ -82,9 +75,20 @@ describe('/project/[ref]/logs', () => {
   it('renders the logs view when signed in', async () => {
     authState.current = { isLoading: false, session: { user: { id: 'user-id' } } }
 
-    customRender(<LogPage dehydratedState={undefined} />)
+    const { router } = await renderLogsIndex()
 
     expect(await screen.findByText('Unified logs view')).toBeInTheDocument()
-    expect(routerMock.pathname).toBe('/project/[ref]/logs')
+    expect(router.state.location.pathname).toBe('/project/default/logs')
+  })
+
+  it('redirects to the logs explorer when unified logs is disabled', async () => {
+    authState.current = { isLoading: false, session: { user: { id: 'user-id' } } }
+    unifiedLogsPreviewState.current = { isEnabled: false, isLoading: false }
+
+    const { router } = await renderLogsIndex()
+
+    await vi.waitFor(() =>
+      expect(router.state.location.pathname).toBe('/project/default/logs/explorer')
+    )
   })
 })
