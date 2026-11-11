@@ -2,6 +2,7 @@ import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { getEdgeFunctionTestUrl } from '@/lib/api/edgeFunctions'
+import { DEFAULT_SUPABASE_PUBLIC_URL } from '@/lib/constants/api'
 
 export default async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -27,7 +28,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse) {
       isPlatform: IS_PLATFORM,
       nimbusProjectsUrl: process.env.NIMBUS_PROD_PROJECTS_URL,
       supabaseUrl: process.env.SUPABASE_URL,
-      supabasePublicUrl: process.env.SUPABASE_PUBLIC_URL,
+      supabasePublicUrl: process.env.SUPABASE_PUBLIC_URL || DEFAULT_SUPABASE_PUBLIC_URL,
     })
 
     if (url === undefined) {

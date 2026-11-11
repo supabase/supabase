@@ -159,6 +159,24 @@ describe('/api/edge-functions/test', () => {
       expect(fetchMock.mock.calls[0][0]).toBe('http://kong:8000/functions/v1/test?name=a')
     })
 
+    it.each([
+      ['unset', undefined],
+      ['empty', ''],
+    ])(
+      'accepts the default public URL when SUPABASE_PUBLIC_URL is %s',
+      async (_name, publicUrl) => {
+        vi.stubEnv('SUPABASE_PUBLIC_URL', publicUrl)
+        const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+        vi.stubGlobal('fetch', fetchMock)
+        const { req, res } = createRequest('http://localhost:8000/functions/v1/test')
+
+        await handler(req, res)
+
+        expect(res._getStatusCode()).toBe(200)
+        expect(fetchMock.mock.calls[0][0]).toBe('http://kong:8000/functions/v1/test')
+      }
+    )
+
     it('rejects hosts other than the API gateway', async () => {
       const fetchMock = vi.fn()
       vi.stubGlobal('fetch', fetchMock)
