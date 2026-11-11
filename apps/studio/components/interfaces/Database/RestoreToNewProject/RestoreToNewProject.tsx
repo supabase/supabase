@@ -1,7 +1,15 @@
-import { Loader2Icon } from 'lucide-react'
+import { ChevronDownIcon, Loader2Icon } from 'lucide-react'
 import Link from 'next/link'
 import { useEffect, useState } from 'react'
-import { Alert, AlertDescription, AlertTitle, Button } from 'ui'
+import {
+  Alert,
+  AlertDescription,
+  AlertTitle,
+  Button,
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -288,14 +296,23 @@ export const RestoreToNewProject = () => {
         </Alert>
       ) : null}
       {previousClones?.length ? (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-sm font-medium">Previous restorations</h3>
-          <Panel className="flex flex-col divide-y divide-border">
-            {previousClones?.map((c) => (
-              <PreviousRestoreItem key={c.inserted_at} clone={c} />
-            ))}
-          </Panel>
-        </div>
+        <Collapsible className="flex flex-col gap-2">
+          <CollapsibleTrigger className="group flex w-full items-center justify-between text-left">
+            <h3 className="text-sm font-medium">Previous restorations ({previousClones.length})</h3>
+            <ChevronDownIcon
+              className="text-foreground-lighter transition-transform duration-200 group-data-[state=open]:rotate-180"
+              size={14}
+              strokeWidth={1.5}
+            />
+          </CollapsibleTrigger>
+          <CollapsibleContent>
+            <Panel className="flex flex-col divide-y divide-border">
+              {previousClones.map((c) => (
+                <PreviousRestoreItem key={c.inserted_at} clone={c} />
+              ))}
+            </Panel>
+          </CollapsibleContent>
+        </Collapsible>
       ) : null}
       {PITR_ENABLED ? (
         <>
