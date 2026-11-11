@@ -2,12 +2,16 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
-import { handleError, put, unguarded } from '@/data/fetchers'
+import { handleError, put } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
+
+export type ToggleLegacyAPIKeysGrant = GrantFor<'put', '/v1/projects/{ref}/api-keys/legacy'>
 
 export type ToggleLegacyAPIKeysVariables = {
   projectRef?: string
+  grant: ToggleLegacyAPIKeysGrant
   enabled: boolean
 }
 
@@ -19,7 +23,7 @@ export async function toggleLegacyAPIKeys(payload: ToggleLegacyAPIKeysVariables)
       path: { ref: payload.projectRef },
       query: { enabled: payload.enabled ? 'true' : 'false' },
     },
-    grant: unguarded.migrating,
+    grant: payload.grant,
   })
 
   if (error) handleError(error)
