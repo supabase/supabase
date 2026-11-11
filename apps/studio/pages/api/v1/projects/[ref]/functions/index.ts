@@ -24,9 +24,6 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 type EdgeFunctionsResponse = components['schemas']['FunctionResponse_Output']
 
 const handleGetAll = async (_req: NextApiRequest, res: NextApiResponse) => {
-  // Without a functions folder configured there is nothing to list
-  if (!process.env.EDGE_FUNCTIONS_MANAGEMENT_FOLDER) return res.status(200).json([])
-
   const store = getFunctionsArtifactStore()
 
   const functionsArtifacts = await store.getFunctions()

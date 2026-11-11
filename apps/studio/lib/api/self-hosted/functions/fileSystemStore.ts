@@ -6,7 +6,8 @@ import { pathToFileURL } from 'node:url'
 import { FunctionArtifact, FunctionFileEntry } from './types'
 
 export class FileSystemFunctionsArtifactStore {
-  constructor(private folderPath: string) {}
+  /** A store without a folder path has no functions. */
+  constructor(private folderPath: string | undefined) {}
 
   async getFunctions(): Promise<FunctionArtifact[]> {
     const dirEntries = await this.readFunctionsFolder()
@@ -31,7 +32,7 @@ export class FileSystemFunctionsArtifactStore {
   }
 
   async getFileEntriesBySlug(slug: string): Promise<Array<FunctionFileEntry>> {
-    if (slug === 'main') return []
+    if (!this.folderPath || slug === 'main') return []
 
     const functionFolderPath = path.resolve(this.folderPath, slug)
     if (!functionFolderPath.startsWith(path.resolve(this.folderPath) + path.sep)) return []
@@ -60,6 +61,8 @@ export class FileSystemFunctionsArtifactStore {
 
   /** Reads the functions folder. A folder that does not exist yet has no functions. */
   private async readFunctionsFolder(): Promise<Dirent[]> {
+    if (!this.folderPath) return []
+
     try {
       return await readdir(this.folderPath, { withFileTypes: true })
     } catch (error) {

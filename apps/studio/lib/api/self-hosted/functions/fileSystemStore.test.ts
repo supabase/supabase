@@ -30,6 +30,22 @@ describe('FileSystemFunctionsArtifactStore', () => {
     })
   })
 
+  describe('when no functions folder is configured', () => {
+    const store = new FileSystemFunctionsArtifactStore(undefined)
+
+    it('getFunctions returns an empty list', async () => {
+      await expect(store.getFunctions()).resolves.toEqual([])
+    })
+
+    it('getFunctionBySlug returns undefined', async () => {
+      await expect(store.getFunctionBySlug('hello')).resolves.toBeUndefined()
+    })
+
+    it('getFileEntriesBySlug returns an empty list', async () => {
+      await expect(store.getFileEntriesBySlug('hello')).resolves.toEqual([])
+    })
+  })
+
   it('rethrows errors other than a missing folder', async () => {
     const filePath = path.join(rootDir, 'not-a-folder')
     await writeFile(filePath, '')
