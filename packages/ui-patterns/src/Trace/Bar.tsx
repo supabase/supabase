@@ -48,7 +48,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
         className
       )}
       style={{
-        left: `${visibleStart * 100}%`,
+        left: `min(${visibleStart * 100}%, calc(100% - 2px))`,
         width: `${(visibleEnd - visibleStart) * 100}%`,
         ...style,
       }}
