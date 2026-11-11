@@ -111,7 +111,7 @@ export function StickyHeader({
         // Same for bottom
         'pb-8 -mb-3',
         'bg-linear-to-b from-background from-85% to-transparent to-100%',
-        // from lg the docs-layout-v2 header crumb names the section, so the heading stays in the flow
+        // from lg the option-1 header crumb names the section, so the heading stays in the flow
         'layout-v2:lg:static layout-v2:lg:bg-none layout-v2:lg:py-0 layout-v2:lg:mt-0.5 layout-v2:lg:mb-5',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',

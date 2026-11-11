@@ -1,4 +1,4 @@
-// legacy layout for docs-layout-v2 off. delete it with the flag
+// legacy layout for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 import Link from 'next/link'
 import { cn } from 'ui'
 import { FooterBottomRow } from '~/components/Navigation/Footer'

@@ -1,6 +1,6 @@
 'use client'
 
-// legacy layout for docs-layout-v2 off. delete it with the flag
+// legacy layout for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 import { AiTools } from '~/components/AiTools'
 import { Feedback } from '~/components/Feedback'
 import { isFeatureEnabled } from 'common'

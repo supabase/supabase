@@ -22,7 +22,7 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/docs-search/src/**/*.{tsx,ts}';
 
-@custom-variant layout-v2 (&:is([data-docs-layout='v2'] *));
+@custom-variant layout-v2 (&:is([data-ia-nav='option-1'] *));
 
 @theme inline {
   --font-sans:
@@ -112,7 +112,7 @@
   --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
 }
 
-:root[data-docs-layout='v2'] {
+:root[data-ia-nav='option-1'] {
   --header-height: 56px;
 }
 
@@ -122,8 +122,8 @@ html {
 }
 
 @media (min-width: 1024px) {
-  html[data-docs-layout='v2'],
-  html[data-docs-layout='v2'] body {
+  html[data-ia-nav='option-1'],
+  html[data-ia-nav='option-1'] body {
     overscroll-behavior-y: none;
   }
 }

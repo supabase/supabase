@@ -146,7 +146,6 @@ export const LOCAL_STORAGE_KEYS = {
   SAVED_PROJECT: 'docs.ui.user.selected.project',
   SAVED_BRANCH: 'docs.ui.user.selected.branch',
   IA_NAV_FLAG: 'docs-ia-mvp-v1',
-  DOCS_LAYOUT_FLAG: 'docs-layout-v2',
   DOCS_PAGE_ACTION: 'docs.ui.page-action',
 
   HIDE_PROMO_TOAST: 'supabase-hide-promo-toast-lw15-ticket',

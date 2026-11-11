@@ -148,7 +148,7 @@ const NavContainer = memo(function NavContainer({
   )
 })
 
-// legacy sidebar for docs-layout-v2 off. delete it with the flag
+// legacy sidebar for the docs-ia-mvp-v1 control variant. delete it when option-1 ships
 const LegacyNavContainer = memo(function LegacyNavContainer({
   children,
   toggleRef,
