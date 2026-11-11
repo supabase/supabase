@@ -111,6 +111,7 @@ export function Markers() {
         return (
           <div
             key={i}
+            aria-hidden
             data-trace-marker
             title={event.name}
             className="absolute top-1/2 size-[7px] -translate-x-1/2 -translate-y-1/2 rotate-45 border border-foreground bg-background"
