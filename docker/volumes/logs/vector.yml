@@ -138,6 +138,10 @@ transforms:
         if parsed.schema == "supabase.edge.logs.v1" &&
            (parsed.stream == "request" || parsed.stream == "runtime") &&
            is_object(parsed.metadata) && is_string(parsed.msg) {
+          event_timestamp, timestamp_err = parse_timestamp(parsed.timestamp, format: "%+")
+          if timestamp_err == null {
+            .timestamp = event_timestamp
+          }
           .function_log_stream = parsed.stream
           .event_message = parsed.msg
           .metadata.function_id = parsed.metadata.function_id
