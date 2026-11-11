@@ -1,14 +1,15 @@
 import { createFileRoute } from '@tanstack/react-router'
-import { IS_PLATFORM } from 'common'
+import { IS_PLATFORM, useParams } from 'common'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { JWTSecretKeysTable } from '@/components/interfaces/JwtSecrets/jwt-secret-keys-table'
 import JWTKeysLayout from '@/components/layouts/JWTKeys/JWTKeysLayout'
+import { AlertError } from '@/components/ui/AlertError'
 import { LocalSetupGuide } from '@/components/ui/LocalSetupGuide'
 import { NoPermission } from '@/components/ui/NoPermission'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useDeploymentMode } from '@/hooks/misc/useDeploymentMode'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const Route = createFileRoute('/project/$ref/settings/jwt/')({
   component: SettingsJwtIndexRoute,
@@ -28,9 +29,10 @@ function SettingsJwtIndexRoute() {
 
 function JWTSigningKeysPage() {
   const { isCli, isSelfHosted } = useDeploymentMode()
-  const { can: canReadAPIKeys, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
-  )
+  const { ref: projectRef } = useParams()
+  const signingKeysGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys', {
+    projectRef,
+  })
 
   if (!IS_PLATFORM) {
     return (
@@ -65,13 +67,17 @@ function JWTSigningKeysPage() {
 
   return (
     <>
-      {!isPermissionsLoaded ? (
-        <GenericSkeletonLoader />
-      ) : !canReadAPIKeys ? (
+      {signingKeysGrant.status === 'loading' && <GenericSkeletonLoader />}
+      {signingKeysGrant.status === 'denied' && (
         <NoPermission isFullPage resourceText="access your project's API keys" />
-      ) : (
-        <JWTSecretKeysTable />
       )}
+      {signingKeysGrant.status === 'error' && (
+        <AlertError
+          error={signingKeysGrant.error}
+          subject="Failed to check JWT signing keys permissions"
+        />
+      )}
+      {signingKeysGrant.status === 'granted' && <JWTSecretKeysTable />}
     </>
   )
 }
