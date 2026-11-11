@@ -95,6 +95,7 @@ export const EntityListItem = ({
   const isPreview = tabs.previewTabId === tabId
 
   const isActive = Number(id) === entity.id
+  const isChildPartition = entity.is_partition && entity.type !== ENTITY_TYPE.PARTITIONED_TABLE
   const canEdit = isActive && !isLocked
 
   const filters = useUrlTableFilters(entity.id)
@@ -223,7 +224,7 @@ export const EntityListItem = ({
             />
           </TooltipTrigger>
           <TooltipContent side="bottom">
-            {entity.is_partition ? 'Partition' : formatTooltipText(entity.type)}
+            {isChildPartition ? 'Partition' : formatTooltipText(entity.type)}
           </TooltipContent>
         </Tooltip>
         <div
@@ -363,11 +364,11 @@ export const EntityListItem = ({
                 </DropdownMenuItem>
               )}
 
-              {entity.type === ENTITY_TYPE.TABLE && (
+              {isTableLikeEntityListItem(entity) && (
                 <>
                   <DropdownMenuSeparator />
 
-                  {!entity.is_partition && (
+                  {entity.type === ENTITY_TYPE.TABLE && !entity.is_partition && (
                     <>
                       <DropdownMenuItem
                         key="edit-table"
@@ -393,6 +394,7 @@ export const EntityListItem = ({
                       </DropdownMenuItem>
                     </>
                   )}
+
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
@@ -442,38 +444,27 @@ export const EntityListItem = ({
                     </DropdownMenuSubContent>
                   </DropdownMenuSub>
 
+                  {entity.type === ENTITY_TYPE.PARTITIONED_TABLE && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        key="view-partitions"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          onViewPartitions?.(entity.id)
+                        }}
+                      >
+                        <CornerDownRightIcon size={12} className="shrink-0" />
+                        <span>View partitions</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
+
                   <DropdownMenuSeparator />
+
                   <DropdownMenuItem
                     key="delete-table"
-                    className="gap-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      snap.onDeleteTable()
-                    }}
-                  >
-                    <TrashIcon size={12} className="shrink-0" />
-                    <span>Delete table</span>
-                  </DropdownMenuItem>
-                </>
-              )}
-
-              {entity.type === ENTITY_TYPE.PARTITIONED_TABLE && (
-                <>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    key="view-partitions"
-                    className="gap-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      onViewPartitions?.(entity.id)
-                    }}
-                  >
-                    <CornerDownRightIcon size={12} className="shrink-0" />
-                    <span>View partitions</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    key="delete-partitioned-table"
                     className="gap-x-2"
                     onClick={(e) => {
                       e.stopPropagation()
