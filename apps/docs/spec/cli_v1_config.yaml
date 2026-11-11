@@ -894,10 +894,23 @@ parameters:
     type: 'bool'
     default: false
     description: |
-      If enabled, requires the user's current password to be provided when changing to a new password.
+      If enabled, a user whose session is more than 24 hours old must reauthenticate before changing their password. Call `reauthenticate()` to send the user a nonce, then pass the nonce with the password change.
+      To require the current password instead, use `auth.email.require_current_password`.
     links:
-      - name: 'Auth Server configuration'
-        link: 'https://supabase.com/docs/reference/auth'
+      - name: 'Require reauthentication when changing password'
+        link: 'https://supabase.com/docs/guides/auth/password-security#require-reauthentication-when-changing-password'
+
+  - id: 'auth.email.require_current_password'
+    title: 'auth.email.require_current_password'
+    tags: ['auth']
+    required: false
+    type: 'bool'
+    default: false
+    description: |
+      If enabled, a user must send their current password as `current_password` when changing their password. A password recovery flow skips this check.
+    links:
+      - name: 'Require current password when changing password'
+        link: 'https://supabase.com/docs/guides/auth/password-security#require-current-password-when-changing-password'
 
   - id: 'auth.email.max_frequency'
     title: 'auth.email.max_frequency'
