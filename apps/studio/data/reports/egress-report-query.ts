@@ -3,7 +3,6 @@ import { useContext, useEffect, useState } from 'react'
 
 import { PRESET_CONFIG } from '@/components/interfaces/Reports/Reports.constants'
 import { getLogsSql, queriesFactory } from '@/components/interfaces/Reports/Reports.utils'
-import type { LogsEndpointParams } from '@/components/interfaces/Settings/Logs/Logs.types'
 import { IS_PLATFORM } from '@/lib/constants'
 
 /**
@@ -33,14 +32,6 @@ export const useEgressReport = (projectRefOverride?: string) => {
   )
   const topPaths = queryHooks.egressTopPaths()
 
-  const handleRefresh = async () => {
-    if (!areQueriesReady) return
-    topPaths.runQuery()
-  }
-  const handleSetParams = (params: Partial<LogsEndpointParams>) => {
-    topPaths.setParams?.((prev: LogsEndpointParams) => ({ ...prev, ...params }))
-  }
-
   useEffect(() => {
     if (IS_PLATFORM && !hasLoadedFlags) return
     const nextUseOtel = IS_PLATFORM ? desiredUseOtel : false
@@ -55,10 +46,7 @@ export const useEgressReport = (projectRefOverride?: string) => {
 
   return {
     data: { topPaths: topPaths.logData },
-    params: { topPaths: topPaths.params },
     error: { topPaths: topPaths.error },
     isLoading: !areQueriesReady || topPaths.isLoading,
-    refresh: handleRefresh,
-    mergeParams: handleSetParams,
   }
 }

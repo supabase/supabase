@@ -3,23 +3,31 @@ import { parseAsString, useQueryStates } from 'nuqs'
 import { useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { z } from 'zod'
 
 import Table from '@/components/to-be-cleaned/Table'
+import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEgressReport } from '@/data/reports/egress-report-query'
 
-interface TopPathRow {
-  path: string
-  count: number
-}
+// Log rows arrive untyped (LogData[]); parse at the boundary instead of casting.
+// coerce handles the BigQuery integer count and the OTEL float count alike.
+const TopPathsSchema = z.array(
+  z.object({
+    status_code: z.coerce.number().optional(),
+    path: z.string(),
+    count: z.coerce.number(),
+  })
+)
 
 const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
   const { data, error, isLoading } = useEgressReport(projectRef)
-  const rows = (data.topPaths ?? []) as unknown as TopPathRow[]
+  const parsed = TopPathsSchema.safeParse(data.topPaths ?? [])
+  const rows = parsed.success ? parsed.data : []
 
   if (isLoading) {
     return (
-      <div className="space-y-2">
+      <div role="status" aria-label="Loading top API paths" className="space-y-2">
         <ShimmeringLoader />
         <ShimmeringLoader className="w-3/4" />
         <ShimmeringLoader className="w-1/2" />
@@ -27,37 +35,58 @@ const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
     )
   }
 
-  if (error) {
+  if (error.topPaths) {
+    const message =
+      typeof error.topPaths === 'string'
+        ? error.topPaths
+        : 'Could not load the top API paths right now.'
     return (
-      <p className="text-sm text-foreground-light">Could not load the top API paths right now.</p>
+      <AlertError
+        error={{ message }}
+        subject="Failed to load top API paths"
+        projectRef={projectRef}
+      />
     )
   }
 
   if (rows.length === 0) {
-    return <p className="text-sm text-foreground-light">No REST API requests in this period.</p>
+    return <p className="text-sm text-foreground-light">No REST API requests in the last hour.</p>
   }
 
-  const headerClasses = 'text-xs! py-2! font-bold bg-surface-200!'
+  // Sticky header stays visible while the body scrolls (~4 rows tall).
+  const headerClasses = 'text-xs! py-2! font-bold bg-surface-200! sticky top-0 z-10'
   const cellClasses = 'text-xs! py-2!'
 
   return (
-    <Table
-      containerClassName="overflow-x-auto"
-      head={
-        <>
-          <Table.th className={headerClasses}>Endpoint</Table.th>
-          <Table.th className={`${headerClasses} text-right`}>Requests</Table.th>
-        </>
-      }
-      body={rows.map((row) => (
-        <Table.tr key={row.path}>
-          <Table.td className={cellClasses}>
-            <span className="font-mono text-foreground-light">{row.path}</span>
-          </Table.td>
-          <Table.td className={`${cellClasses} text-right`}>{row.count.toLocaleString()}</Table.td>
-        </Table.tr>
-      ))}
-    />
+    <div className="space-y-2">
+      <p className="text-xs text-foreground-lighter">Based on the past hour of requests.</p>
+      <Table
+        className="table-fixed w-full"
+        containerClassName="max-h-44 overflow-y-auto"
+        head={
+          <>
+            <Table.th className={`${headerClasses} w-16`}>Status</Table.th>
+            <Table.th className={headerClasses}>Endpoint</Table.th>
+            <Table.th className={`${headerClasses} text-right w-28`}>Requests</Table.th>
+          </>
+        }
+        body={rows.map((row) => (
+          <Table.tr key={`${row.status_code ?? 'na'}-${row.path}`}>
+            <Table.td className={`${cellClasses} font-mono text-foreground-light`}>
+              {row.status_code || '—'}
+            </Table.td>
+            <Table.td className={cellClasses}>
+              <span className="block truncate font-mono text-foreground-light" title={row.path}>
+                {row.path}
+              </span>
+            </Table.td>
+            <Table.td className={`${cellClasses} text-right whitespace-nowrap`}>
+              {row.count.toLocaleString()}
+            </Table.td>
+          </Table.tr>
+        ))}
+      />
+    </div>
   )
 }
 
