@@ -35,11 +35,22 @@ export const GettingStartedStepper = () => {
       }
     >
       <GettingStartedStepperClient
-        localCommandsCode={<CodeBlock contents={LOCAL_COMMANDS} lang="bash" />}
+        localCommandsCode={
+          <CodeBlock
+            contents={LOCAL_COMMANDS}
+            lang="bash"
+            copyId="getting-started-local-commands"
+          />
+        }
         installCodes={Object.fromEntries(
           installCommands.map((command) => [
             command,
-            <CodeBlock key={command} contents={command} lang="bash" />,
+            <CodeBlock
+              key={command}
+              contents={command}
+              lang="bash"
+              copyId="getting-started-install"
+            />,
           ])
         )}
       />
