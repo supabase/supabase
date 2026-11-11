@@ -4576,6 +4576,30 @@ export interface AccountRecoveryReminderClosedEvent {
   groups: TelemetryGroups
 }
 
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -4584,6 +4608,8 @@ export type TelemetryEvent =
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
