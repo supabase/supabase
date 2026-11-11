@@ -1,4 +1,4 @@
-// Pre-build step: exports every src/content/**/*.{md,mdx} file as a plain
+// Build step (the `generate:markdown` turbo task): exports every src/content/**/*.{md,mdx} file as a plain
 // .md file under public/markdown/, for agents/tools that want the raw
 // content instead of the rendered page (same idea as apps/docs' guides
 // markdown export, recreated here at a much smaller scale — see

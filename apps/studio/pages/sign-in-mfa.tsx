@@ -39,15 +39,15 @@ const SignInMfaPage: NextPageWithLayout = () => {
   useEffect(() => {
     auth
       .initialize()
-      .then(async ({ error }) => {
-        if (error) {
-          // OAuth/SSO callback failed — bounce back to /sign-in so the error renders under the
-          // correct heading instead of "Two-factor authentication". The error is held in the
-          // shared auth context and surfaces via useAuthError() on /sign-in.
+      .then(async ({ error: callbackError }) => {
+        // A session that can't be refreshed counts as no session.
+        const token = await getAccessToken().catch(() => undefined)
+
+        // A successful password retry can create a session after initialization cached an error.
+        // With no session, show the callback error on the sign-in page.
+        if (callbackError && !token) {
           return router.replace({ pathname: '/sign-in', query: router.query })
         }
-
-        const token = await getAccessToken()
 
         if (token) {
           const { data, error } = await auth.mfa.getAuthenticatorAssuranceLevel()
@@ -61,8 +61,11 @@ const SignInMfaPage: NextPageWithLayout = () => {
           }
 
           if (data.currentLevel === data.nextLevel) {
-            onSignInTracked()
-            addLoginEvent({})
+            // After a failed callback, this session is an existing one, not a new sign-in.
+            if (!callbackError) {
+              onSignInTracked()
+              addLoginEvent({})
+            }
 
             await queryClient.resetQueries()
             router.push(getReturnToPath())

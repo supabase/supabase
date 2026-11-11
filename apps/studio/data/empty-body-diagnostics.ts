@@ -1,19 +1,7 @@
-import * as Sentry from '@sentry/nextjs'
-import { IS_PLATFORM } from 'common'
-
+import type { StudioSentryContext } from '@/lib/errors/report-studio-error'
 import { uuidv4 } from '@/lib/helpers'
 
-const PROBE_TIMEOUT_MS = 10_000
-
-const PARAM_AFTER_SEGMENT = new Map([
-  ['projects', '{ref}'],
-  ['organizations', '{slug}'],
-  ['branches', '{branch}'],
-])
-
-const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
-const NUMERIC_ID_PATTERN = /^\d+$/
-const LONG_ID_PATTERN = /^[A-Za-z0-9]{20,}$/
+const REFETCH_TIMEOUT_MS = 10_000
 
 const RESPONSE_HEADERS = [
   'content-type',
@@ -27,33 +15,11 @@ const RESPONSE_HEADERS = [
   'x-request-id',
 ]
 
-const reportedEndpoints = new Set<string>()
-
 let isRestoredFromBfcache = false
 if (typeof window !== 'undefined') {
   window.addEventListener('pageshow', (event) => {
     if (event.persisted) isRestoredFromBfcache = true
   })
-}
-
-export function templateEndpointPath(path: string): string {
-  const [pathname = ''] = path.split(/[?#]/)
-  const segments = pathname.split('/')
-  return segments
-    .map((segment, index) => {
-      if (segment.length === 0 || segment.startsWith('{')) return segment
-      const param = PARAM_AFTER_SEGMENT.get(segments[index - 1] ?? '')
-      if (param) return param
-      if (
-        UUID_PATTERN.test(segment) ||
-        NUMERIC_ID_PATTERN.test(segment) ||
-        LONG_ID_PATTERN.test(segment)
-      ) {
-        return '{id}'
-      }
-      return segment
-    })
-    .join('/')
 }
 
 function readHeaders(headers: Headers) {
@@ -63,6 +29,8 @@ function readHeaders(headers: Headers) {
 }
 
 function readBrowserContext() {
+  // The error context is also built when Studio fetches on the server
+  if (typeof document === 'undefined' || typeof navigator === 'undefined') return {}
   const navigation = performance.getEntriesByType?.('navigation')[0]
   return {
     visibility_state: document.visibilityState,
@@ -97,74 +65,110 @@ function readResourceTiming(url: string) {
   }
 }
 
-async function probe(request: Request) {
-  const headers = new Headers(request.headers)
-  const probeRequestId = uuidv4()
-  headers.set('X-Request-Id', probeRequestId)
+export type RefetchSummary = {
+  requestId: string
+  status?: number
+  bodyLength?: number
+  contentLength?: string | null
+  contentType?: string | null
+  error?: string
+}
+
+// DOMException (e.g. AbortError) is not an `Error` instance in every runtime
+function errorName(error: unknown) {
+  return typeof error === 'object' && error && 'name' in error ? String(error.name) : 'unknown'
+}
+
+/**
+ * Re-fetches a request bypassing the HTTP cache: the empty bodies we see on successful GETs
+ * look like a browser cache revalidation bug, and a no-store request skips that path.
+ * Uses plain fetch so the openapi-fetch middleware can't recurse. Never throws.
+ */
+export async function refetchWithoutCache(
+  request: Request
+): Promise<{ summary: RefetchSummary; response?: Response; body?: string }> {
+  const requestId = uuidv4()
+  // The caller awaits this, so bound it while still honoring the caller's own abort
   const controller = new AbortController()
-  const timeout = setTimeout(() => controller.abort(), PROBE_TIMEOUT_MS)
+  const abort = () => controller.abort()
+  if (request.signal.aborted) abort()
+  request.signal.addEventListener('abort', abort, { once: true })
+  const timeout = setTimeout(abort, REFETCH_TIMEOUT_MS)
 
   try {
-    // Plain fetch so the probe skips the openapi-fetch middleware (and can't recurse)
+    const headers = new Headers(request.headers)
+    headers.set('X-Request-Id', requestId)
     const response = await fetch(
       new Request(request, { cache: 'no-store', headers, signal: controller.signal })
     )
-    // Only the length: these endpoints can return API keys and secrets
-    const bodyLength = (await response.arrayBuffer()).byteLength
+    const buffer = await response.arrayBuffer()
     return {
-      probe_has_body: bodyLength > 0 ? 'true' : 'false',
-      probe_request_id: probeRequestId,
-      probe_status: response.status,
-      probe_body_length: bodyLength,
-      probe_content_length: response.headers.get('content-length'),
-      probe_content_type: response.headers.get('content-type'),
+      response,
+      body: new TextDecoder().decode(buffer),
+      summary: {
+        requestId,
+        status: response.status,
+        bodyLength: buffer.byteLength,
+        contentLength: response.headers.get('content-length'),
+        contentType: response.headers.get('content-type'),
+      },
     }
   } catch (error) {
     return {
-      probe_has_body: 'error',
-      probe_request_id: probeRequestId,
-      probe_error: error instanceof Error ? error.name : 'unknown',
+      summary: { requestId, error: errorName(error) },
     }
   } finally {
     clearTimeout(timeout)
+    request.signal.removeEventListener('abort', abort)
   }
 }
 
-export async function reportEmptyBodyResponse({
+function probeTags(refetch?: RefetchSummary): Record<string, string> {
+  if (!refetch) return {}
+  if (refetch.error) return { probe_has_body: 'error' }
+  return { probe_has_body: (refetch.bodyLength ?? 0) > 0 ? 'true' : 'false' }
+}
+
+function probeExtra(refetch?: RefetchSummary) {
+  if (!refetch) return {}
+  return {
+    probe_request_id: refetch.requestId,
+    probe_status: refetch.status,
+    probe_body_length: refetch.bodyLength,
+    probe_content_length: refetch.contentLength,
+    probe_content_type: refetch.contentType,
+    probe_error: refetch.error,
+  }
+}
+
+function buildContext(request: Request, response: Response) {
+  return {
+    method: request.method,
+    status: response.status,
+    response_type: response.type,
+    redirected: response.redirected,
+    request_id: request.headers.get('X-Request-Id'),
+    ...readHeaders(response.headers),
+    ...readBrowserContext(),
+    ...readResourceTiming(response.url || request.url),
+  }
+}
+
+/**
+ * Sentry context for the `MalformedResponse` error thrown when recovery fails: the original
+ * response, browser state and the refetch probe. Empty bodies that recover aren't reported.
+ */
+export function emptyBodyErrorContext({
   request,
   response,
-  schemaPath,
+  refetch,
 }: {
   request: Request
   response: Response
-  schemaPath: string
-}): Promise<void> {
-  try {
-    if (!IS_PLATFORM || request.method !== 'GET') return
-
-    const endpoint = templateEndpointPath(schemaPath)
-    if (reportedEndpoints.has(endpoint)) return
-    reportedEndpoints.add(endpoint)
-
-    const context = {
-      method: request.method,
-      status: response.status,
-      response_type: response.type,
-      redirected: response.redirected,
-      request_id: request.headers.get('X-Request-Id'),
-      ...readHeaders(response.headers),
-      ...readBrowserContext(),
-      ...readResourceTiming(response.url || request.url),
-    }
-    const { probe_has_body, ...probeContext } = await probe(request)
-
-    Sentry.captureMessage('Empty response body on successful API request', {
-      level: 'warning',
-      fingerprint: ['empty-body-response', endpoint],
-      tags: { endpoint, probe_has_body, empty_body_diagnostic: 'true' },
-      extra: { ...context, ...probeContext },
-    })
-  } catch (error) {
-    console.error('Failed to report empty response body', error)
+  refetch?: RefetchSummary
+}): StudioSentryContext {
+  return {
+    tags: { recovered_by: 'none', ...probeTags(refetch), empty_body_diagnostic: 'true' },
+    extra: { ...buildContext(request, response), ...probeExtra(refetch) },
   }
 }

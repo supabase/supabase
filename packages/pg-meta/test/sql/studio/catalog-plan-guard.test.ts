@@ -11,8 +11,11 @@ import {
   getTableConstraintsSql,
   getTableDefinitionSql,
   getTableEditorSql,
+  getTableReferencingFunctionsSql,
+  getTableRelatedResourcesSql,
   getTablesPaginatedSql,
   getViewDefinitionSql,
+  TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT,
 } from '../../../src'
 import columnPrivileges from '../../../src/pg-meta-column-privileges'
 import tablePrivileges from '../../../src/pg-meta-table-privileges'
@@ -564,3 +567,68 @@ test('getSearchEntitiesSql: schema-qualified search stays within budget', async 
   const result = await explainAnalyze(db, getSearchEntitiesSql({ query: 'stress.t_1' }))
   assertPlanWithinBudget(result, SEARCH_ENTITIES_BUDGET)
 }, 60_000)
+
+// Nothing here is matched by name: the table is given, so every lookup should be
+// an index probe. A seq scan over any of these means the query stopped being
+// scoped to the one table.
+const TABLE_RELATED_RESOURCES_BUDGET = {
+  allowedSeqScans: {},
+  maxExecutionTimeMs: 100,
+}
+
+test('getTableRelatedResourcesSql: policies, triggers and indexes stay index-scoped', async () => {
+  // t_0 is the hub table: many incoming foreign keys, so many internal triggers
+  // to skip, plus a primary key and unique constraint backing indexes of their own
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableRelatedResourcesSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_RELATED_RESOURCES_BUDGET)
+}, 300_000)
+
+/** Rows returned by the first seq scan over `relation`, for checking a scan stopped early. */
+const seqScanRows = (node: unknown, relation: string): number | undefined => {
+  if (Array.isArray(node)) {
+    for (const item of node) {
+      const found = seqScanRows(item, relation)
+      if (found !== undefined) return found
+    }
+  } else if (node !== null && typeof node === 'object') {
+    const obj = node as Record<string, unknown>
+    if (obj['Node Type'] === 'Seq Scan' && obj['Relation Name'] === relation) {
+      return obj['Actual Rows'] as number
+    }
+    for (const key of Object.keys(obj)) {
+      const found = seqScanRows(obj[key], relation)
+      if (found !== undefined) return found
+    }
+  }
+  return undefined
+}
+
+const TABLE_REFERENCING_FUNCTIONS_BUDGET = {
+  allowedSeqScans: {
+    pg_proc: {
+      max: 1,
+      reason:
+        'function source search: no index can answer a substring match on prosrc, so one filtered pass of pg_proc is unavoidable. pg_depend must NOT be scanned: extension functions are excluded through the pg_depend reference index.',
+    },
+  },
+  maxExecutionTimeMs: 500,
+}
+
+test('getTableReferencingFunctionsSql: source search stays within budget', async () => {
+  // Every stress function body mentions stress.t_0, so this matches all of pg_proc
+  const result = await explainAnalyze(
+    await getSearchDb(),
+    getTableReferencingFunctionsSql({ schema: 'stress', name: 't_0' })
+  )
+  assertPlanWithinBudget(result, TABLE_REFERENCING_FUNCTIONS_BUDGET)
+
+  // The scan has to stop at the candidate cap. Ranking before the cap would
+  // make Postgres read every matching function body instead, which on a real
+  // catalog is the difference between milliseconds and about a second.
+  expect(seqScanRows(result.plan.Plan, 'pg_proc')).toBeLessThanOrEqual(
+    TABLE_RELATED_FUNCTION_CANDIDATE_LIMIT
+  )
+}, 300_000)

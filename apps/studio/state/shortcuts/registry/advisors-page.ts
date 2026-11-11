@@ -1,13 +1,6 @@
 import { SHORTCUT_REFERENCE_GROUPS } from '../referenceGroups'
 import { RegistryDefinations } from '../types'
 
-/**
- * Shortcuts scoped to the Health, Security, and Performance Advisor pages — tab digit
- * shortcuts, refresh, and detail panel close. The tab digits mirror the
- * functions-detail-nav pattern (`ignoreInputs: true` so they don't fire from
- * inputs), and `Escape` follows the auth-users close-panel pattern with
- * `conflictBehavior: 'allow'` since other surfaces also use Escape.
- */
 export const ADVISORS_PAGE_SHORTCUT_IDS = {
   ADVISORS_TAB_ERRORS: 'advisors-page.tab-errors',
   ADVISORS_TAB_WARNINGS: 'advisors-page.tab-warnings',
@@ -46,7 +39,7 @@ export const advisorsPageRegistry: RegistryDefinations<AdvisorsPageShortcutId> =
   },
   [ADVISORS_PAGE_SHORTCUT_IDS.ADVISORS_REFRESH]: {
     id: ADVISORS_PAGE_SHORTCUT_IDS.ADVISORS_REFRESH,
-    label: 'Refresh advisor',
+    label: 'Rerun checks',
     sequence: ['Shift+R'],
     showInSettings: false,
     options: { ignoreInputs: true, registerInCommandMenu: true },
