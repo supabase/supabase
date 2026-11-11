@@ -9,11 +9,13 @@ type UseProjectIssuesOptions = {
   projectRef?: string
   enabled?: boolean
   includeHealth?: boolean
+  runHealthChecks?: boolean
 }
 export function useProjectIssues({
   projectRef,
   enabled = true,
   includeHealth = true,
+  runHealthChecks = true,
 }: UseProjectIssuesOptions) {
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const canRunHealth = includeHealth && isHealthAdvisorEnabled
@@ -21,7 +23,7 @@ export function useProjectIssues({
   const lintsQuery = useProjectLintsQuery({ projectRef }, { enabled })
   const healthQuery = useProjectHealthLintsQuery(
     { projectRef },
-    { enabled: enabled && canRunHealth }
+    { enabled: enabled && canRunHealth && runHealthChecks }
   )
   const signalsQuery = useAdvisorSignals({ projectRef, enabled })
 

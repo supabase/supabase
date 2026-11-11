@@ -38,6 +38,7 @@ import {
 
 import { Shortcut } from '../ui/Shortcut'
 import { Route } from '../ui/ui.types'
+import { SidebarIssueIndicator } from './SidebarIssueIndicator'
 import {
   generateProductRoutes,
   generateSettingsRoutes,
@@ -47,7 +48,6 @@ import {
 import { ProjectIndexPageLink } from '@/data/prefetchers/project.$ref'
 import { useHideSidebar } from '@/hooks/misc/useHideSidebar'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
-import { useLints } from '@/hooks/misc/useLints'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -248,34 +248,11 @@ export function SideBarNavLink({
   )
 }
 
-const ActiveDot = ({ hasErrors, hasWarnings }: { hasErrors: boolean; hasWarnings: boolean }) => {
-  const [sidebarBehaviour] = useLocalStorageQuery(
-    LOCAL_STORAGE_KEYS.SIDEBAR_BEHAVIOR,
-    DEFAULT_SIDEBAR_BEHAVIOR
-  )
-
-  // The nav icon only shifts right (pl-1.5 -> pl-2) when the sidebar is
-  // persistently open — not on hover-expand. Tie the dot to the same
-  // condition so it stays put while skimming the nav.
-  const isPersistentlyOpen = sidebarBehaviour === 'open'
-
-  return (
-    <div
-      className={cn(
-        'absolute pointer-events-none flex h-2 w-2 top-2 z-10 rounded-full',
-        isPersistentlyOpen ? 'left-[20px]' : 'left-[18px]',
-        hasErrors ? 'bg-destructive-600' : hasWarnings ? 'bg-warning-600' : 'bg-transparent'
-      )}
-    />
-  )
-}
-
 const ProjectLinks = () => {
   const router = useRouter()
   const track = useTrack()
   const { ref } = useParams()
   const { data: project, isPending: isProjectPending } = useSelectedProjectQuery()
-  const { securityLints, errorLints } = useLints()
 
   const activeRoute = router.pathname.split('/')[3]
 
@@ -367,12 +344,7 @@ const ProjectLinks = () => {
                 >
                   {route.icon}
                   <span>{route.label}</span>
-                  {!route.disabled && (
-                    <ActiveDot
-                      hasErrors={errorLints.length > 0}
-                      hasWarnings={securityLints.length > 0}
-                    />
-                  )}
+                  {!route.disabled && <SidebarIssueIndicator routeKey={route.key} />}
                 </SideBarNavLink>
               )
             } else {
