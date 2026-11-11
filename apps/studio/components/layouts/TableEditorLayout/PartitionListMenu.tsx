@@ -59,7 +59,6 @@ export const PartitionListMenu = ({
     {
       projectRef: project?.ref,
       connectionString: project?.connectionString,
-      schemas: [schema],
       search: searchText.trim() || undefined,
       sort: 'alphabetical',
       filterTypes: PARTITION_ENTITY_TYPES,
@@ -69,7 +68,10 @@ export const PartitionListMenu = ({
   )
 
   const partitions = useMemo(() => data?.pages.flatMap((page) => page.data.entities), [data?.pages])
-  const partitionNames = useMemo(() => partitions?.map((x) => x.name) ?? [], [partitions])
+  const partitionNames = useMemo(
+    () => partitions?.filter((x) => x.schema === schema).map((x) => x.name) ?? [],
+    [partitions, schema]
+  )
 
   const { data: apiAccessByTableName } = useTableApiAccessQuery(
     {

@@ -122,7 +122,7 @@ export const EntityListItem = ({
     'rls_disabled_in_public',
     ['ERROR'],
     lints,
-    selectedSchema
+    entity.schema
   ).hasLint
 
   const tableHasRlsEnabledNoPolicyLint: boolean = getEntityLintDetails(
@@ -130,7 +130,7 @@ export const EntityListItem = ({
     'rls_enabled_no_policy',
     ['ERROR', 'WARN', 'INFO'],
     lints,
-    selectedSchema
+    entity.schema
   ).hasLint
 
   const viewHasLints: boolean = getEntityLintDetails(
@@ -138,7 +138,7 @@ export const EntityListItem = ({
     'security_definer_view',
     ['ERROR', 'WARN'],
     lints,
-    selectedSchema
+    entity.schema
   ).hasLint
 
   const materializedViewHasLints: boolean = getEntityLintDetails(
@@ -146,7 +146,7 @@ export const EntityListItem = ({
     'materialized_view_in_api',
     ['ERROR', 'WARN'],
     lints,
-    selectedSchema
+    entity.schema
   ).hasLint
 
   const foreignTableHasLints: boolean = getEntityLintDetails(
@@ -154,10 +154,12 @@ export const EntityListItem = ({
     'foreign_table_in_api',
     ['ERROR', 'WARN'],
     lints,
-    selectedSchema
+    entity.schema
   ).hasLint
 
-  const apiAccessData = apiAccessMap?.[entity.name]
+  const isInSelectedSchema = entity.schema === selectedSchema
+  // The map is keyed by name within the selected schema, so it can't describe other schemas
+  const apiAccessData = isInSelectedSchema ? apiAccessMap?.[entity.name] : undefined
 
   const formatTooltipText = (entityType: string) => {
     const text =
@@ -236,6 +238,7 @@ export const EntityListItem = ({
               'text-sm transition truncate'
             )}
           >
+            {!isInSelectedSchema && <span className="text-foreground-muted">{entity.schema}.</span>}
             {entity.name}
           </span>
           <EntityTooltipTrigger
@@ -389,7 +392,7 @@ export const EntityListItem = ({
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
-                      href={`/project/${projectRef}/database/policies?schema=${encodeURIComponent(selectedSchema ?? '')}&search=${encodeURIComponent(String(entity.id))}`}
+                      href={`/project/${projectRef}/database/policies?schema=${encodeURIComponent(entity.schema)}&search=${encodeURIComponent(String(entity.id))}`}
                     >
                       <LockIcon size={12} className="shrink-0" />
                       <span>View policies</span>

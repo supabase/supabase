@@ -26,6 +26,9 @@ export const getEntityTypesSQL = ({
 
   const typeList = joinSqlFragments(filterTypes.map(literal), ', ')
   const schemaList = joinSqlFragments(schemas.map(literal), ', ')
+  // Partitions can live in any schema, so a parent's partitions aren't restricted to `schemas`
+  const schemaClause =
+    parentId !== undefined ? safeSql`` : safeSql`and nc.nspname in (${schemaList})`
   const searchClause = search ? safeSql`and c.relname ilike ${literal(`%${search}%`)}` : safeSql``
   const partitionClause = excludePartitions ? safeSql`and not c.relispartition` : safeSql``
 
@@ -67,7 +70,7 @@ export const getEntityTypesSQL = ({
           )
           or has_any_column_privilege(c.oid, 'SELECT, INSERT, UPDATE, REFERENCES')
         )
-        and nc.nspname in (${schemaList})
+        ${schemaClause}
         ${searchClause}
         ${partitionClause}
         ${parentClause}

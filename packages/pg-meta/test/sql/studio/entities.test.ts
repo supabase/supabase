@@ -166,3 +166,18 @@ withTestDatabase('getEntitiesByIdsSQL finds partitions and ignores unknown ids',
   )
   expect(rows).toEqual([expect.objectContaining({ name: 'view_parted_low', is_partition: true })])
 })
+
+withTestDatabase(
+  'lists partitions of a parent even when they live in another schema',
+  async (db) => {
+    await db.executeQuery(`
+    create schema tint;
+    create table public.cross_parted (id int, hue int not null) partition by range (hue);
+    create table tint.cross_child partition of public.cross_parted for values from (0) to (10);
+  `)
+
+    expect(
+      await listEntities(db, 'cross_', { parentId: await oidOf(db, 'public.cross_parted') })
+    ).toEqual(['cross_child r partition'])
+  }
+)
