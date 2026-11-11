@@ -54,12 +54,12 @@ export function startMemoryPressureLoop(): void {
       errorReported = false
     } catch (error) {
       if (error instanceof Deno.errors.NotFound || error instanceof Deno.errors.PermissionDenied) {
-        logInternal('main', 'warning', `Memory pressure monitor disabled: ${error}`, error)
+        logInternal('main', 'warning', 'Memory pressure monitor disabled', error)
         return
       }
       delay = RETRY_INTERVAL_MS
       if (!errorReported) {
-        logInternal('main', 'warning', `Memory pressure monitor failed; retrying: ${error}`, error)
+        logInternal('main', 'warning', 'Memory pressure monitor failed; retrying', error)
         errorReported = true
       }
     }
