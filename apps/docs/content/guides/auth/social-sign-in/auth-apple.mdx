@@ -621,7 +621,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     ## Using native sign in with Apple in Kotlin
 
-    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `gotrue.signInWith(Apple)`.
+    When using [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform/), you can use the [compose-auth](/docs/reference/kotlin/installing) plugin. On iOS it uses Native Apple Login automatically and on other platforms it uses `auth.signInWith(Apple)`.
 
     **Initialize the Supabase Client**
 
@@ -630,7 +630,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
     	supabaseUrl = "SUPABASE_URL",
     	supabaseKey = "SUPABASE_KEY"
     ) {
-    	install(GoTrue)
+    	install(Auth)
     	install(ComposeAuth) {
     		appleNativeLogin()
     	}
@@ -721,7 +721,7 @@ curl -X PATCH "https://api.supabase.com/v1/projects/$PROJECT_REF/config/auth" \
 
     ```kotlin
     dependencies {
-        implementation("io.github.jan-tennert.supabase:gotrue-kt:VERSION")
+        implementation("io.github.jan-tennert.supabase:auth-kt:VERSION")
         implementation("io.github.jan-tennert.supabase:compose-auth:VERSION")
     }
     ```
