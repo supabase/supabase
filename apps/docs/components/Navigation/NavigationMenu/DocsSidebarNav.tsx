@@ -33,7 +33,7 @@ import { useIaNavReady } from '~/features/IaNav/useIaNavReady'
 import { useNavItems } from '~/features/IaNav/useNavItems'
 
 interface DocsSidebarNavProviderProps extends PropsWithChildren {
-  menuId: MenuId
+  menuId?: MenuId
   additionalNavItems?: Record<string, Partial<NavMenuSection>[]>
 }
 
@@ -177,7 +177,7 @@ const useSidebarSections = () => {
 }
 
 const useDocsSidebarNavState = (
-  menuId: MenuId,
+  menuId: MenuId | undefined,
   additionalNavItems: DocsSidebarNavState['additionalNavItems']
 ): DocsSidebarNavState => {
   const pathname = useDocsPathname()
@@ -199,7 +199,7 @@ const useDocsSidebarNavState = (
   }
 
   // option-1 menu ids can share a tree, like realtime and api, so products match on the tree
-  const pageTree = navItems[menuId]
+  const pageTree = menuId ? navItems[menuId] : undefined
   const treeItems = pageTree
     ? sectionItems.filter((item) => item.level && navItems[item.level] === pageTree)
     : []

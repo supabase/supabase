@@ -5,7 +5,7 @@ import { getCrumbName, resolveBreadcrumbs, type BreadcrumbItem as Crumb } from '
 import Link from 'next/link'
 import { useDocsPathname } from '~/features/IaNav/IaNavRouteProvider'
 import { useNavItems } from '~/features/IaNav/useNavItems'
-import { Fragment } from 'react'
+import { Fragment, type Ref } from 'react'
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -19,6 +19,7 @@ import {
 import MenuIconPicker from './MenuIconPicker'
 
 interface HeaderBreadcrumbsProps {
+  headingSlotRef?: Ref<HTMLLIElement>
   className?: string
 }
 
@@ -28,7 +29,7 @@ interface BreadcrumbCrumbProps {
   hasIcon: boolean
 }
 
-export const HeaderBreadcrumbs = ({ className }: HeaderBreadcrumbsProps) => {
+export const HeaderBreadcrumbs = ({ headingSlotRef, className }: HeaderBreadcrumbsProps) => {
   const pathname = useDocsPathname()
   const crumbs = resolveBreadcrumbs(pathname, useNavItems())
 
@@ -59,6 +60,7 @@ export const HeaderBreadcrumbs = ({ className }: HeaderBreadcrumbsProps) => {
             ) : null}
           </Fragment>
         ))}
+        <li ref={headingSlotRef} className="flex shrink-0 items-center gap-2 empty:hidden" />
       </BreadcrumbList>
     </Breadcrumb>
   )

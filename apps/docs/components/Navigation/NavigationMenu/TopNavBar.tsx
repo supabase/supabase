@@ -16,12 +16,17 @@ import { HeadingReel } from 'ui-patterns/Toc/heading-reel'
 import { TopNavMenuToggle } from 'ui-patterns/TopNav/TopNavMenuToggle'
 
 import { getCustomContent } from '../../../lib/custom-content/getCustomContent'
-import { DocsSectionsMenu } from './DocsSectionsMenu'
+import { DOCS_SECTIONS_MENU_HEIGHT_STYLE, DocsSectionsMenu } from './DocsSectionsMenu'
 import { HeaderBreadcrumbs } from './HeaderBreadcrumbs'
 import { PageActionButtons } from './PageActionButtons'
 import useDropdownMenu from './useDropdownMenu'
 import { AskAiTrigger } from '@/features/SearchV2'
 import { SearchV2IconTrigger } from '@/features/SearchV2/SearchV2Trigger'
+
+interface DesktopTopNavBarProps {
+  headingSlotRef: Ref<HTMLLIElement>
+  updatedAtSlotRef: Ref<HTMLDivElement>
+}
 
 interface MobileTopNavBarProps {
   isMenuOpen?: boolean
@@ -39,7 +44,7 @@ const TopNavDropdown = dynamic(() => import('./TopNavDropdown'))
 
 const largeLogo = isFeatureEnabled('branding:large_logo')
 
-export const DesktopTopNavBar = () => {
+export const DesktopTopNavBar = ({ headingSlotRef, updatedAtSlotRef }: DesktopTopNavBarProps) => {
   const isLoggedIn = useIsLoggedIn()
   const isUserLoading = useIsUserLoading()
   const user = useUser()
@@ -51,7 +56,10 @@ export const DesktopTopNavBar = () => {
       className="relative w-full z-40 flex flex-col bg-default/75 backdrop-blur-sm backdrop-filter"
     >
       <div className="w-full flex h-(--header-height) border-b">
-        <div className="relative flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r">
+        <div
+          style={DOCS_SECTIONS_MENU_HEIGHT_STYLE}
+          className="docs-sections-cell relative flex w-(--docs-side-column-width) shrink-0 items-center gap-1.5 pl-5.75 pr-4 border-r"
+        >
           <a
             href="https://supabase.com"
             aria-label="Supabase.com"
@@ -62,12 +70,13 @@ export const DesktopTopNavBar = () => {
           <DocsSectionsMenu />
         </div>
         <div className="flex min-w-0 flex-1 items-center gap-4 pl-6 pr-3">
-          <HeaderBreadcrumbs />
-          <div className="ml-auto flex shrink-0 items-center gap-2">
+          <HeaderBreadcrumbs headingSlotRef={headingSlotRef} />
+          <div className="ml-auto flex shrink-0 items-center gap-3">
+            <div ref={updatedAtSlotRef} className="contents" />
             <PageActionButtons />
           </div>
         </div>
-        <div className="flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6">
+        <div className="flex w-(--docs-side-column-width) shrink-0 items-center justify-end gap-2 px-6 group-has-data-docs-right-rail/docs:border-l">
           <DevToolbarTrigger />
           <SearchV2IconTrigger />
           <AskAiTrigger />

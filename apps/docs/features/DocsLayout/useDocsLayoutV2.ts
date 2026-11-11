@@ -1,50 +1,17 @@
 'use client'
 
-import { useFeatureFlags } from 'common'
-import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
-import { safeLocalStorage, safeSessionStorage } from 'common/safe-storage'
-import { useEffect, useSyncExternalStore } from 'react'
+import { useIaNavVariant } from '~/features/IaNav/useIaNavVariant'
+import { useEffect } from 'react'
 
-import { DOCS_LAYOUT_FLAG } from './constants'
-
-const subscribeToNothing = () => () => {}
-
-// useSearchParamsShallow reads the url only on mount, so each render reads it again here
-const readOverride = () => {
-  const urlOverride = new URLSearchParams(window.location.search).get(DOCS_LAYOUT_FLAG)
-  // only true or false in the url is an override, so another value keeps the session override
-  return urlOverride === 'true' || urlOverride === 'false'
-    ? urlOverride
-    : safeSessionStorage.getItem(DOCS_LAYOUT_FLAG)
-}
-
+// the option-1 variant of the docs-ia-mvp-v1 flag turns on the new layout
 export const useDocsLayoutV2 = (): boolean => {
-  const { posthog, hasLoaded } = useFeatureFlags()
-  const override = useSyncExternalStore(subscribeToNothing, readOverride, () => null)
-  // the value from the last visit, so a returning reader skips the legacy layout while the flags load
-  const knownFlag = useSyncExternalStore(
-    subscribeToNothing,
-    () => safeLocalStorage.getItem(LOCAL_STORAGE_KEYS.DOCS_LAYOUT_FLAG),
-    () => null
-  )
+  const isLayoutV2 = useIaNavVariant() === 'option-1'
 
-  // a failed posthog request loads no flags at all, so the last value stays
-  const hasPosthogFlags = hasLoaded && Object.keys(posthog).length > 0
-  const isFlagOn = hasPosthogFlags ? posthog[DOCS_LAYOUT_FLAG] === true : knownFlag === 'true'
-  const isLayoutV2 = override ? override === 'true' : isFlagOn
-
-  // exception: the flags arrive through context, with no event to hook
+  // exception: the head script marks the page from the cached variant, so the loaded flag can change it
   useEffect(() => {
-    if (!hasPosthogFlags) return
-    safeLocalStorage.setItem(LOCAL_STORAGE_KEYS.DOCS_LAYOUT_FLAG, String(isFlagOn))
-  }, [hasPosthogFlags, isFlagOn])
-
-  // the html attribute drives the layout-v2 css variant, so server components can style both layouts
-  useEffect(() => {
-    if (override) safeSessionStorage.setItem(DOCS_LAYOUT_FLAG, override)
-    if (isLayoutV2) document.documentElement.dataset.docsLayout = 'v2'
-    else delete document.documentElement.dataset.docsLayout
-  }, [override, isLayoutV2])
+    if (isLayoutV2) document.documentElement.dataset.iaNav = 'option-1'
+    else delete document.documentElement.dataset.iaNav
+  }, [isLayoutV2])
 
   return isLayoutV2
 }
