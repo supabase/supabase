@@ -473,7 +473,6 @@ export const UnifiedLogs = ({
   const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
   const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
-  const hasActiveFilters = activeFilterCount > 0
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
   const currentDraft = useMemo(
     () => serializeView({ name: '', logSource, search }),
@@ -520,6 +519,11 @@ export const UnifiedLogs = ({
 
   const handleSaveCurrentView = () => {
     setIsSaveViewDialogOpen(true)
+  }
+
+  const handleClearActiveView = () => {
+    table.resetColumnFilters()
+    setActiveViewId(null)
   }
 
   const handleCreateView = (input: LogsViewDraft) => {
@@ -707,12 +711,10 @@ export const UnifiedLogs = ({
                         isError={isErrorSavedViews}
                         activeViewId={activeViewId}
                         isActiveViewModified={isActiveViewModified}
-                        hasActiveFilters={hasActiveFilters}
                         onApply={handleApplyView}
                         onRename={(id, name) => updateSavedView(id, { name })}
                         onDelete={deleteSavedView}
-                        onSaveCurrentView={handleSaveCurrentView}
-                        onUpdateActiveView={handleUpdateActiveView}
+                        onClearActiveView={handleClearActiveView}
                       />
                     )}
                     <DataTableViewOptions />

@@ -5,10 +5,10 @@ import {
   LayersIcon,
   Loader2Icon,
   Trash2Icon,
+  XIcon,
 } from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import {
-  Button,
   cn,
   DropdownMenu,
   DropdownMenuContent,
@@ -28,30 +28,47 @@ interface LogsViewsMenuProps {
   isError: boolean
   activeViewId: string | null
   isActiveViewModified: boolean
-  hasActiveFilters: boolean
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
-  onSaveCurrentView: () => void
-  onUpdateActiveView: () => void
+  onClearActiveView: () => void
 }
+
+// Plain icon triggers (not the full `Button` component, which has a fixed tiny
+// height) so these rows stay the same height as a text-only item like "Clear all
+// views" — `Button size="tiny"` would make every row taller than that.
+const RowIconAction = ({
+  icon,
+  label,
+  onClick,
+}: {
+  icon: React.ReactNode
+  label: string
+  onClick: (e: React.MouseEvent) => void
+}) => (
+  <button
+    type="button"
+    tabIndex={0}
+    aria-label={label}
+    onClick={onClick}
+    className="opacity-0 group-hover:opacity-100 p-0.5 rounded text-foreground-light hover:text-foreground hover:bg-overlay-hover"
+  >
+    {icon}
+  </button>
+)
 
 const LogsViewRow = ({
   view,
   isActive,
-  isModified,
   onApply,
   onRename,
   onRequestDelete,
-  onUpdateActive,
 }: {
   view: LogsView
   isActive: boolean
-  isModified: boolean
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => void
   onRequestDelete: (id: string) => void
-  onUpdateActive: () => void
 }) => {
   const [isEditingName, setIsEditingName] = useState(false)
   const [name, setName] = useState(view.name)
@@ -99,41 +116,19 @@ const LogsViewRow = ({
       <div className="flex items-center min-w-0">
         <LayersIcon size={14} className="mr-2 shrink-0 text-foreground-light" />
         <span className={cn('truncate', isActive && 'font-medium')}>{view.name}</span>
-        {isActive && isModified && (
-          <span className="ml-2 text-foreground-lighter text-xs shrink-0">(modified)</span>
-        )}
       </div>
-      <div className="flex items-center gap-2 shrink-0">
-        {isActive && isModified && (
-          <Button
-            variant="text"
-            size="tiny"
-            className="px-1.5"
-            onClick={(e) => {
-              e.stopPropagation()
-              onUpdateActive()
-            }}
-          >
-            Update
-          </Button>
-        )}
-        <Button
-          variant="text"
-          size="tiny"
-          className="opacity-0 group-hover:opacity-100 px-1"
-          icon={<EditIcon size={14} />}
-          aria-label={`Rename ${view.name}`}
+      <div className="flex items-center gap-1 shrink-0">
+        <RowIconAction
+          icon={<EditIcon size={12} />}
+          label={`Rename ${view.name}`}
           onClick={(e) => {
             e.stopPropagation()
             setIsEditingName(true)
           }}
         />
-        <Button
-          variant="text"
-          size="tiny"
-          className="opacity-0 group-hover:opacity-100 px-1"
-          icon={<Trash2Icon size={14} />}
-          aria-label={`Delete ${view.name}`}
+        <RowIconAction
+          icon={<Trash2Icon size={12} />}
+          label={`Delete ${view.name}`}
           onClick={(e) => {
             e.stopPropagation()
             onRequestDelete(view.id)
@@ -150,15 +145,14 @@ export const LogsViewsMenu = ({
   isError,
   activeViewId,
   isActiveViewModified,
-  hasActiveFilters,
   onApply,
   onRename,
   onDelete,
-  onSaveCurrentView,
-  onUpdateActiveView,
+  onClearActiveView,
 }: LogsViewsMenuProps) => {
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
   const isViewActive = activeViewId !== null
+  const isViewWarning = isViewActive && isActiveViewModified
 
   return (
     <>
@@ -166,8 +160,21 @@ export const LogsViewsMenu = ({
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
             size="tiny"
-            className={cn('w-[26px]', isViewActive && 'bg-brand-default/10')}
-            icon={<BookmarkIcon className={isViewActive ? 'text-brand-600' : 'text-foreground'} />}
+            className={cn(
+              'w-[26px]',
+              isViewWarning ? 'bg-warning/10' : isViewActive && 'bg-brand-default/10'
+            )}
+            icon={
+              <BookmarkIcon
+                className={
+                  isViewWarning
+                    ? 'text-warning-600'
+                    : isViewActive
+                      ? 'text-brand-600'
+                      : 'text-foreground'
+                }
+              />
+            }
             aria-label="Saved views"
             tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
           />
@@ -196,18 +203,17 @@ export const LogsViewsMenu = ({
                 key={view.id}
                 view={view}
                 isActive={view.id === activeViewId}
-                isModified={isActiveViewModified}
                 onApply={onApply}
                 onRename={onRename}
                 onRequestDelete={(id) => setDeleteTarget(views.find((v) => v.id === id) ?? null)}
-                onUpdateActive={onUpdateActiveView}
               />
             ))}
-          {hasActiveFilters && (
+          {isViewActive && (
             <>
               <DropdownMenuSeparator />
-              <DropdownMenuItem onSelect={onSaveCurrentView}>
-                Save current filters as view
+              <DropdownMenuItem onSelect={onClearActiveView}>
+                <XIcon size={14} className="mr-2" />
+                Clear all views
               </DropdownMenuItem>
             </>
           )}

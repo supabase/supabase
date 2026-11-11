@@ -30,12 +30,10 @@ const baseProps = {
   isError: false,
   activeViewId: null,
   isActiveViewModified: false,
-  hasActiveFilters: false,
   onApply: vi.fn(),
   onRename: vi.fn(),
   onDelete: vi.fn(),
-  onSaveCurrentView: vi.fn(),
-  onUpdateActiveView: vi.fn(),
+  onClearActiveView: vi.fn(),
 }
 
 const openMenu = async () => {
@@ -86,40 +84,16 @@ describe('LogsViewsMenu', () => {
     expect(row).toHaveClass('bg-foreground-lighter/10')
   })
 
-  it('shows a modified indicator and an Update action for the active view when modified', async () => {
-    const view = makeView()
-    const onUpdateActiveView = vi.fn()
-    customRender(
-      <LogsViewsMenu
-        {...baseProps}
-        views={[view]}
-        activeViewId={view.id}
-        isActiveViewModified
-        onUpdateActiveView={onUpdateActiveView}
-      />
-    )
-
-    await openMenu()
-
-    expect(await screen.findByText('(modified)')).toBeInTheDocument()
-    await userEvent.click(screen.getByRole('button', { name: 'Update' }))
-    expect(onUpdateActiveView).toHaveBeenCalledOnce()
-  })
-
-  it('does not show the modified indicator for an unmodified active view', async () => {
+  it('does not show a modified indicator or an Update action on the row anymore', async () => {
     const view = makeView()
     customRender(
-      <LogsViewsMenu
-        {...baseProps}
-        views={[view]}
-        activeViewId={view.id}
-        isActiveViewModified={false}
-      />
+      <LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} isActiveViewModified />
     )
 
     await openMenu()
 
     expect(screen.queryByText('(modified)')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Update' })).not.toBeInTheDocument()
   })
 
   it('shows the trigger in an active state when a view is active', async () => {
@@ -134,6 +108,21 @@ describe('LogsViewsMenu', () => {
     expect(screen.getByRole('button', { name: 'Saved views' })).not.toHaveClass(
       'bg-brand-default/10'
     )
+  })
+
+  it('shows the trigger in a warning state when the active view is modified', async () => {
+    customRender(
+      <LogsViewsMenu
+        {...baseProps}
+        views={[makeView()]}
+        activeViewId="view-1"
+        isActiveViewModified
+      />
+    )
+
+    const trigger = screen.getByRole('button', { name: 'Saved views' })
+    expect(trigger).toHaveClass('bg-warning/10')
+    expect(trigger).not.toHaveClass('bg-brand-default/10')
   })
 
   it('applies a view when its row is clicked', async () => {
@@ -174,21 +163,39 @@ describe('LogsViewsMenu', () => {
     expect(onDelete).toHaveBeenCalledWith('view-1')
   })
 
-  it('only shows "Save current filters as view" when there are active filters', async () => {
-    customRender(<LogsViewsMenu {...baseProps} hasActiveFilters={false} />)
+  it('only shows "Clear all views" when a view is active', async () => {
+    customRender(<LogsViewsMenu {...baseProps} activeViewId={null} />)
     await openMenu()
-    expect(screen.queryByText('Save current filters as view')).not.toBeInTheDocument()
+    expect(screen.queryByText('Clear all views')).not.toBeInTheDocument()
   })
 
-  it('calls onSaveCurrentView when the save item is clicked', async () => {
-    const onSaveCurrentView = vi.fn()
+  it('calls onClearActiveView when "Clear all views" is clicked', async () => {
+    const onClearActiveView = vi.fn()
+    const view = makeView()
     customRender(
-      <LogsViewsMenu {...baseProps} hasActiveFilters onSaveCurrentView={onSaveCurrentView} />
+      <LogsViewsMenu
+        {...baseProps}
+        views={[view]}
+        activeViewId={view.id}
+        onClearActiveView={onClearActiveView}
+      />
     )
 
     await openMenu()
-    await userEvent.click(await screen.findByText('Save current filters as view'))
+    await userEvent.click(await screen.findByText('Clear all views'))
 
-    expect(onSaveCurrentView).toHaveBeenCalledOnce()
+    expect(onClearActiveView).toHaveBeenCalledOnce()
+  })
+
+  it('"Clear all views" stays neutral regardless of modified state', async () => {
+    const view = makeView()
+    customRender(
+      <LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} isActiveViewModified />
+    )
+
+    await openMenu()
+
+    const item = (await screen.findByText('Clear all views')).closest('[role="menuitem"]')
+    expect(item).not.toHaveClass('text-warning-600')
   })
 })
