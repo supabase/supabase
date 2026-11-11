@@ -95,6 +95,7 @@ export const EntityListItem = ({
   const isPreview = tabs.previewTabId === tabId
 
   const isActive = Number(id) === entity.id
+  // A sub-partitioned child is still a parent, so it keeps the parent styling
   const isChildPartition = entity.is_partition && entity.type !== ENTITY_TYPE.PARTITIONED_TABLE
   const canEdit = isActive && !isLocked
 
@@ -217,11 +218,7 @@ export const EntityListItem = ({
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip disableHoverableContent={true}>
           <TooltipTrigger className="min-w-4">
-            <EntityTypeIcon
-              type={entity.type}
-              isPartition={entity.is_partition}
-              isActive={isActive}
-            />
+            <EntityTypeIcon type={entity.type} isPartition={isChildPartition} isActive={isActive} />
           </TooltipTrigger>
           <TooltipContent side="bottom">
             {isChildPartition ? 'Partition' : formatTooltipText(entity.type)}

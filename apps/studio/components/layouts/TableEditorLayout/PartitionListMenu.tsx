@@ -119,7 +119,9 @@ export const PartitionListMenu = ({
           variant="text"
           className="px-1"
           icon={<ArrowLeftIcon />}
-          aria-label="Back to all tables"
+          aria-label={
+            parentInfo?.parent_id != null ? 'Back to parent partitions' : 'Back to all tables'
+          }
           onClick={() => onBack(parentInfo?.parent_id ?? undefined)}
         />
         <span className="text-sm text-foreground-light truncate" title={parentInfo?.name}>

@@ -64,9 +64,7 @@ export const EntityTypeIcon = ({
   isPartition = false,
   className,
 }: EntityTypeIconProps) => {
-  // A sub-partitioned child is still a parent, so it keeps the parent styling
-  const isChildPartition = isPartition && entityType !== ENTITY_TYPE.PARTITIONED_TABLE
-  const type = isChildPartition ? ENTITY_TYPE.PARTITIONED_TABLE : entityType
+  const type = isPartition ? ENTITY_TYPE.PARTITIONED_TABLE : entityType
 
   if (type === 'sql' && sqlSource === 'logs') {
     return (
@@ -153,7 +151,9 @@ export const EntityTypeIcon = ({
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1100 bg-purple-500',
         type === ENTITY_TYPE.PARTITIONED_TABLE &&
-          `${isChildPartition ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500' : 'text-foreground bg-blue-700 dark:bg-blue-800'}`
+          (isPartition
+            ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500'
+            : 'text-foreground bg-blue-700 dark:bg-blue-800')
       )}
     >
       {Object.entries(ENTITY_TYPE)
