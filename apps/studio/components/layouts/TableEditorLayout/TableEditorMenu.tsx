@@ -129,20 +129,6 @@ export const TableEditorMenu = () => {
     enabled: !!project?.ref && isSelectedTableLike,
   })
 
-  // Sync the partition view to each newly selected table: a partition shows its parent's list,
-  // anything else shows the main list (unless it is the table whose partitions are open)
-  const syncedForIdRef = useRef<number | undefined>(undefined)
-  useEffect(() => {
-    const isSelectionResolved =
-      selectedTable !== undefined && (!isSelectedTableLike || selectedTableInfo !== undefined)
-    if (id === undefined || !isSelectionResolved || syncedForIdRef.current === id) return
-
-    syncedForIdRef.current = id
-    const parentId = selectedTableInfo?.parent_id
-    if (parentId != null) setPartitionParentId(parentId)
-    else if (id !== partitionParentId) setPartitionParentId(undefined)
-  }, [id, selectedTable, isSelectedTableLike, selectedTableInfo, partitionParentId])
-
   if (selectedTable?.schema && !selectedSchema) {
     setSelectedSchema(selectedTable.schema)
   }
@@ -196,6 +182,20 @@ export const TableEditorMenu = () => {
   const slideOffset = partitionParentId === undefined ? -LEVEL_OFFSET : LEVEL_OFFSET
 
   const hasFiltersApplied = visibleTypes.length !== 5
+
+  // Sync the partition view to each newly selected table: a partition shows its parent's list,
+  // anything else shows the main list (unless it is the table whose partitions are open)
+  const syncedForIdRef = useRef<number | undefined>(undefined)
+  useEffect(() => {
+    const isSelectionResolved =
+      selectedTable !== undefined && (!isSelectedTableLike || selectedTableInfo !== undefined)
+    if (id === undefined || !isSelectionResolved || syncedForIdRef.current === id) return
+
+    syncedForIdRef.current = id
+    const parentId = selectedTableInfo?.parent_id
+    if (parentId != null) setPartitionParentId(parentId)
+    else if (id !== partitionParentId) setPartitionParentId(undefined)
+  }, [id, selectedTable, isSelectedTableLike, selectedTableInfo, partitionParentId])
 
   useEffect(() => {
     // Clean up tabs + recent items for any tables that might have been removed outside of the dashboard session
