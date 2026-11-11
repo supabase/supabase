@@ -297,14 +297,16 @@ export const RestoreToNewProject = () => {
       ) : null}
       {previousClones?.length ? (
         <Collapsible className="flex flex-col gap-2">
-          <CollapsibleTrigger className="group flex w-full items-center justify-between text-left">
-            <h3 className="text-sm font-medium">Previous restorations ({previousClones.length})</h3>
-            <ChevronDownIcon
-              className="text-foreground-lighter transition-transform duration-200 group-data-[state=open]:rotate-180"
-              size={14}
-              strokeWidth={1.5}
-            />
-          </CollapsibleTrigger>
+          <h3 className="text-sm font-medium">
+            <CollapsibleTrigger className="group flex w-full items-center justify-between text-left">
+              Previous restorations ({previousClones.length})
+              <ChevronDownIcon
+                className="text-foreground-lighter transition-transform duration-200 group-data-[state=open]:rotate-180"
+                size={14}
+                strokeWidth={1.5}
+              />
+            </CollapsibleTrigger>
+          </h3>
           <CollapsibleContent>
             <Panel className="flex flex-col divide-y divide-border">
               {previousClones.map((c) => (
