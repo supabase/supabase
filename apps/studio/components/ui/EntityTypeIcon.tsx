@@ -51,15 +51,19 @@ interface EntityTypeIconProps {
   strokeWidth?: number
   isActive?: boolean
   sqlSource?: SqlSnippetSource
+  isPartition?: boolean
 }
 
 export const EntityTypeIcon = ({
-  type,
+  type: entityType,
   size = 15,
   strokeWidth = 1.5,
   isActive,
   sqlSource,
+  isPartition = false,
 }: EntityTypeIconProps) => {
+  const type = isPartition ? ENTITY_TYPE.PARTITIONED_TABLE : entityType
+
   if (type === 'sql' && sqlSource === 'logs') {
     return (
       <LogsSnippetIcon
@@ -143,7 +147,7 @@ export const EntityTypeIcon = ({
           'text-warning-600/80 dark:text-yellow-900 bg-yellow-500',
         type === ENTITY_TYPE.MATERIALIZED_VIEW && 'text-purple-1100 bg-purple-500',
         type === ENTITY_TYPE.PARTITIONED_TABLE &&
-          'text-foreground-light bg-surface-400 dark:bg-border-stronger'
+          `${isPartition ? 'text-blue-1100 bg-blue-500 dark:bg-blue-500' : 'text-foreground bg-blue-700 dark:bg-blue-800'}`
       )}
     >
       {Object.entries(ENTITY_TYPE)

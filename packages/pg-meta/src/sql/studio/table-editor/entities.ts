@@ -40,7 +40,10 @@ export const getEntityTypesSQL = ({
         end as "type_sort",
         obj_description(c.oid) as "comment",
         count(*) over() as "count",
-        c.relrowsecurity as "rls_enabled"
+        c.relrowsecurity as "rls_enabled",
+        -- A partition is an ordinary table in the catalog, so without this it is
+        -- indistinguishable from one the user created directly
+        c.relispartition as "is_partition"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
@@ -70,7 +73,8 @@ export const getEntityTypesSQL = ({
             'name', r.name,
             'type', r.type,
             'comment', r.comment,
-            'rls_enabled', r.rls_enabled
+            'rls_enabled', r.rls_enabled,
+            'is_partition', r.is_partition
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),
