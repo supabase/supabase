@@ -62,7 +62,7 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const scale = useWaterfallScale()
   const { span } = row
   const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
-  if (!isVisible) return null
+  if (!isVisible || scale.width === 0) return null
 
   const endMs = effectiveEndMs(span, nowMs)
   const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
