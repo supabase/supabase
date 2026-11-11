@@ -4,25 +4,20 @@ import type { PropsWithChildren } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useOnboardingSurveyVariant } from './useOnboardingSurveyVariant'
-import { createMockAuthContext, createMockSession } from '@/tests/lib/auth-helpers'
 import { CustomWrapper } from '@/tests/lib/custom-render'
 import { createMockProfileContext } from '@/tests/lib/profile-helpers'
-
-const SIGNED_IN_USER_ID = createMockSession().user.id
 
 const track = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => track }))
 
 type RenderOptions = {
-  isSignedIn?: boolean
-  /** null stands for flags that were fetched logged out */
-  flagsUserId?: string | null
+  hasFlagsForSignedInUser?: boolean
   isProfileLoaded?: boolean
 }
 
 const renderVariantHook = (
   flagValue: string | boolean | undefined,
-  { isSignedIn = true, flagsUserId = SIGNED_IN_USER_ID, isProfileLoaded = true }: RenderOptions = {}
+  { hasFlagsForSignedInUser = true, isProfileLoaded = true }: RenderOptions = {}
 ) => {
   const wrapper = ({ children }: PropsWithChildren) => (
     <FeatureFlagContext.Provider
@@ -31,11 +26,10 @@ const renderVariantHook = (
         // An empty store reads as "flags not loaded yet"
         posthog: flagValue === undefined ? {} : { onboardingSurveyPlacement: flagValue },
         hasLoaded: true,
-        userId: flagsUserId ?? undefined,
+        hasFlagsForSignedInUser,
       }}
     >
       <CustomWrapper
-        authContext={isSignedIn ? createMockAuthContext() : undefined}
         profileContext={createMockProfileContext({
           isLoading: !isProfileLoaded,
           isSuccess: isProfileLoaded,
@@ -79,12 +73,8 @@ describe('useOnboardingSurveyVariant', () => {
   })
 
   // Logged-out requests all get the same arm, so only a signed-in user's own flags count
-  it.each<[string, RenderOptions]>([
-    ['a logged-out visitor', { isSignedIn: false, flagsUserId: null, isProfileLoaded: false }],
-    ['flags fetched before sign-in', { flagsUserId: null }],
-    ['flags fetched for another user', { flagsUserId: 'another-user' }],
-  ])('returns no arm and records no exposure for %s', (_, options) => {
-    const { result } = renderVariantHook('org_form', options)
+  it('returns no arm and records no exposure for flags not fetched for the signed-in user', () => {
+    const { result } = renderVariantHook('org_form', { hasFlagsForSignedInUser: false })
 
     expect(result.current.variant).toBeUndefined()
     expect(track).not.toHaveBeenCalled()

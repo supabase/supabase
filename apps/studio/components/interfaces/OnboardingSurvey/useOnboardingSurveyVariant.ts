@@ -1,4 +1,4 @@
-import { useFeatureFlags, useUser } from 'common'
+import { useFeatureFlags } from 'common'
 import { useEffect, useRef } from 'react'
 
 import {
@@ -19,12 +19,9 @@ const EXPOSURE_EXPERIMENT_ID = 'onboarding_survey_placement'
  */
 export function useOnboardingSurveyVariant() {
   const flagValue = usePHFlag<string | false>(ONBOARDING_SURVEY_EXPERIMENT_ID)
-  const user = useUser()
-  const { userId: flagsUserId } = useFeatureFlags()
-  // Logged-out requests all get the same flag value, and it stays in the store after
-  // sign-in until the refetch lands.
-  const hasFlagsForUser = !!user?.id && flagsUserId === user.id
-  const variant = hasFlagsForUser && isOnboardingSurveyVariant(flagValue) ? flagValue : undefined
+  const { hasFlagsForSignedInUser } = useFeatureFlags()
+  const variant =
+    hasFlagsForSignedInUser && isOnboardingSurveyVariant(flagValue) ? flagValue : undefined
 
   const track = useTrack()
   const { isSuccess: isProfileLoaded } = useProfile()

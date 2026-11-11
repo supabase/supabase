@@ -8,7 +8,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import { NewOrgForm } from './NewOrgForm'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { createMockOrganizationResponse } from '@/tests/helpers'
-import { createMockAuthContext, createMockSession } from '@/tests/lib/auth-helpers'
 import { customRender } from '@/tests/lib/custom-render'
 import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 import { createMockProfile, createMockProfileContext } from '@/tests/lib/profile-helpers'
@@ -91,14 +90,13 @@ const renderForm = (flag: string | false | undefined) =>
         // An empty store reads as "flags not loaded yet"
         posthog: flag === undefined ? {} : { onboardingSurveyPlacement: flag },
         hasLoaded: true,
-        userId: createMockSession().user.id,
+        hasFlagsForSignedInUser: true,
       }}
     >
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
       <FollowUpStatus />
     </FeatureFlagContext.Provider>,
     {
-      authContext: createMockAuthContext(),
       profileContext: createMockProfileContext({
         profile: createMockProfile({ gotrue_id: PROFILE_ID }),
       }),
