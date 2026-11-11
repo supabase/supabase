@@ -49,6 +49,7 @@ if (target === 'dev') cleanTurbopackCache(studioRoot)
 const child = spawn('pnpm', ['run', script], {
   stdio: 'inherit',
   env: process.env,
+  shell: process.platform === 'win32',
 })
 
 const forwardSignal = (signal) => {
