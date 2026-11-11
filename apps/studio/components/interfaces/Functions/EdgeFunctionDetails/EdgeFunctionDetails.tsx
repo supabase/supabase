@@ -37,6 +37,7 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import CommandRender from '../CommandRender'
@@ -91,10 +92,15 @@ export const EdgeFunctionDetails = () => {
   )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const { data: selectedFunction, isPending: isFunctionPending } = useEdgeFunctionQuery({
+    projectRef,
+    slug: functionSlug,
+  })
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
-  const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const { data: endpoint, isPending: isEndpointPending } = useProjectApiUrl({ projectRef })
+  const functionUrl =
+    endpoint && selectedFunction ? `${endpoint}/functions/v1/${selectedFunction.slug}` : undefined
+  const isFunctionUrlLoading = !functionUrl && (isEndpointPending || isFunctionPending)
 
   const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -113,7 +119,7 @@ export const EdgeFunctionDetails = () => {
 
   const { managementCommands } = generateCLICommands({
     selectedFunction,
-    functionUrl,
+    functionUrl: functionUrl ?? '',
     anonKey: apiKey,
   })
 
@@ -274,7 +280,14 @@ export const EdgeFunctionDetails = () => {
                   fallback="Replace the placeholder with your own key."
                   className="px-6 pb-2"
                 />
+                {isFunctionUrlLoading && (
+                  <div className="px-6">
+                    <GenericSkeletonLoader />
+                  </div>
+                )}
                 {invocationTabs.map((tab) => {
+                  if (!functionUrl) return null
+
                   const code = tab.code({
                     showKey,
                     functionUrl,
