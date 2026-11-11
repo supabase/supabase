@@ -185,3 +185,64 @@ export function flattenTree(index: TraceIndex, collapsed: ReadonlySet<string>): 
 
   return rows
 }
+
+export const MAX_COLLAPSED_MARKS = 200
+
+export function effectiveEndMs(span: Pick<Span, 'startMs' | 'endMs'>, nowMs: number): number {
+  return span.endMs ?? Math.max(span.startMs, nowMs)
+}
+
+export function collapsedChildMidpoints(index: TraceIndex, id: string): number[] {
+  const children = index.childrenOf.get(id) ?? []
+  if (children.length > MAX_COLLAPSED_MARKS) return []
+  return children.map((childId) => {
+    const child = index.byId.get(childId)!
+    return (child.startMs + effectiveEndMs(child, index.nowMs)) / 2
+  })
+}
+
+export interface SpanBounds {
+  startFraction: number
+  endFraction: number
+  visibleStart: number
+  visibleEnd: number
+  isVisible: boolean
+}
+
+export function getSpanBounds(
+  span: Pick<Span, 'startMs' | 'endMs'>,
+  nowMs: number,
+  scale: TimeScale
+): SpanBounds {
+  const startFraction = scale.toFraction(span.startMs)
+  const endFraction = scale.toFraction(effectiveEndMs(span, nowMs))
+  const clamp = (fraction: number) => Math.min(Math.max(fraction, 0), 1)
+
+  return {
+    startFraction,
+    endFraction,
+    visibleStart: clamp(startFraction),
+    visibleEnd: clamp(endFraction),
+    isVisible: endFraction >= 0 && startFraction <= 1,
+  }
+}
+
+export type TimingPlacement = 'after' | 'before' | 'inside'
+
+export function getTimingPlacement({
+  startPx,
+  endPx,
+  laneWidth,
+  labelPx,
+  gapPx,
+}: {
+  startPx: number
+  endPx: number
+  laneWidth: number
+  labelPx: number
+  gapPx: number
+}): TimingPlacement {
+  if (endPx + gapPx + labelPx <= laneWidth) return 'after'
+  if (startPx - gapPx - labelPx >= 0) return 'before'
+  return 'inside'
+}
