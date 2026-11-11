@@ -367,28 +367,32 @@ export const EntityListItem = ({
                 <>
                   <DropdownMenuSeparator />
 
-                  <DropdownMenuItem
-                    key="edit-table"
-                    className="space-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      snap.onEditTable()
-                    }}
-                  >
-                    <EditIcon size={12} className="shrink-0" />
-                    <span>Edit table</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem
-                    key="duplicate-table"
-                    className="space-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      snap.onDuplicateTable()
-                    }}
-                  >
-                    <CopyIcon size={12} className="shrink-0" />
-                    <span>Duplicate table</span>
-                  </DropdownMenuItem>
+                  {!entity.is_partition && (
+                    <>
+                      <DropdownMenuItem
+                        key="edit-table"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          snap.onEditTable()
+                        }}
+                      >
+                        <EditIcon size={12} className="shrink-0" />
+                        <span>Edit table</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem
+                        key="duplicate-table"
+                        className="space-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          snap.onDuplicateTable()
+                        }}
+                      >
+                        <CopyIcon size={12} className="shrink-0" />
+                        <span>Duplicate table</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                   <DropdownMenuItem key="view-policies" className="space-x-2" asChild>
                     <Link
                       key="view-policies"
