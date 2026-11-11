@@ -26,18 +26,18 @@ export function useOnboardingSurveyVariant() {
   const { userId: flagsUserId } = useFeatureFlags()
   // Logged-out requests all get the same flag value, and it stays in the store after
   // sign-in until the refetch lands.
-  const areFlagsForUser = !!user?.id && flagsUserId === user.id
+  const hasFlagsForUser = !!user?.id && flagsUserId === user.id
 
   const hasTrackedExposure = useRef(false)
   useEffect(() => {
     if (hasTrackedExposure.current) return
-    if (!variant || !isProfileLoaded || !areFlagsForUser) return
+    if (!variant || !isProfileLoaded || !hasFlagsForUser) return
     hasTrackedExposure.current = true
     track('onboarding_survey_placement_experiment_exposed', {
       experiment_id: EXPOSURE_EXPERIMENT_ID,
       variant,
     })
-  }, [variant, isProfileLoaded, areFlagsForUser, track])
+  }, [variant, isProfileLoaded, hasFlagsForUser, track])
 
   return { variant }
 }

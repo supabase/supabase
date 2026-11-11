@@ -4,37 +4,26 @@ import type { PropsWithChildren } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useOnboardingSurveyVariant } from './useOnboardingSurveyVariant'
+import { createMockAuthContext, createMockSession } from '@/tests/lib/auth-helpers'
 import { CustomWrapper } from '@/tests/lib/custom-render'
+import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
-const USER_ID = 'user-1'
+const SIGNED_IN_USER_ID = createMockSession().user.id
 
-const mocks = vi.hoisted(() => ({
-  track: vi.fn(),
-  signedInUserId: undefined as string | undefined,
-}))
-
-vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => mocks.track }))
-vi.mock('common', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('common')>()),
-  useUser: () => (mocks.signedInUserId ? { id: mocks.signedInUserId } : null),
-}))
+const track = vi.hoisted(() => vi.fn())
+vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => track }))
 
 type RenderOptions = {
-  signedInUserId?: string
-  flagsUserId?: string
+  isSignedIn?: boolean
+  /** null stands for flags that were fetched logged out */
+  flagsUserId?: string | null
   isProfileLoaded?: boolean
 }
 
 const renderVariantHook = (
   flagValue: string | boolean | undefined,
-  { signedInUserId, flagsUserId, isProfileLoaded }: RenderOptions = {
-    signedInUserId: USER_ID,
-    flagsUserId: USER_ID,
-    isProfileLoaded: true,
-  }
+  { isSignedIn = true, flagsUserId = SIGNED_IN_USER_ID, isProfileLoaded = true }: RenderOptions = {}
 ) => {
-  mocks.signedInUserId = signedInUserId
-
   const wrapper = ({ children }: PropsWithChildren) => (
     <FeatureFlagContext.Provider
       value={{
@@ -42,17 +31,15 @@ const renderVariantHook = (
         // An empty store reads as "flags not loaded yet"
         posthog: flagValue === undefined ? {} : { onboardingSurveyPlacement: flagValue },
         hasLoaded: true,
-        userId: flagsUserId,
+        userId: flagsUserId ?? undefined,
       }}
     >
       <CustomWrapper
-        profileContext={{
-          profile: undefined,
-          error: null,
+        authContext={isSignedIn ? createMockAuthContext() : undefined}
+        profileContext={createMockProfileContext({
           isLoading: !isProfileLoaded,
-          isError: false,
-          isSuccess: !!isProfileLoaded,
-        }}
+          isSuccess: isProfileLoaded,
+        })}
       >
         {children}
       </CustomWrapper>
@@ -63,17 +50,17 @@ const renderVariantHook = (
 
 describe('useOnboardingSurveyVariant', () => {
   beforeEach(() => {
-    mocks.track.mockReset()
+    track.mockReset()
     localStorage.clear()
   })
 
-  it.each(['control', 'org_form'])('records exposure for the %s arm', (arm) => {
+  it.each(['control', 'org_form'])('records exposure once per mount for the %s arm', (arm) => {
     const { result, rerender } = renderVariantHook(arm)
     rerender()
 
     expect(result.current.variant).toBe(arm)
-    expect(mocks.track).toHaveBeenCalledTimes(1)
-    expect(mocks.track).toHaveBeenCalledWith('onboarding_survey_placement_experiment_exposed', {
+    expect(track).toHaveBeenCalledTimes(1)
+    expect(track).toHaveBeenCalledWith('onboarding_survey_placement_experiment_exposed', {
       experiment_id: 'onboarding_survey_placement',
       variant: arm,
     })
@@ -88,25 +75,19 @@ describe('useOnboardingSurveyVariant', () => {
     const { result } = renderVariantHook(flagValue)
 
     expect(result.current.variant).toBeUndefined()
-    expect(mocks.track).not.toHaveBeenCalled()
+    expect(track).not.toHaveBeenCalled()
   })
 
   // Logged-out requests all get the same arm, so only a signed-in user's own flags count
   it.each<[string, RenderOptions]>([
-    ['a logged-out visitor', { isProfileLoaded: false }],
-    ['a profile that has not loaded', { signedInUserId: USER_ID, flagsUserId: USER_ID }],
-    [
-      'flags fetched before sign-in',
-      { signedInUserId: USER_ID, flagsUserId: undefined, isProfileLoaded: true },
-    ],
-    [
-      'flags fetched for another user',
-      { signedInUserId: USER_ID, flagsUserId: 'user-2', isProfileLoaded: true },
-    ],
+    ['a logged-out visitor', { isSignedIn: false, flagsUserId: null, isProfileLoaded: false }],
+    ['a profile that has not loaded', { isProfileLoaded: false }],
+    ['flags fetched before sign-in', { flagsUserId: null }],
+    ['flags fetched for another user', { flagsUserId: 'another-user' }],
   ])('returns the arm but records no exposure for %s', (_, options) => {
     const { result } = renderVariantHook('org_form', options)
 
     expect(result.current.variant).toBe('org_form')
-    expect(mocks.track).not.toHaveBeenCalled()
+    expect(track).not.toHaveBeenCalled()
   })
 })

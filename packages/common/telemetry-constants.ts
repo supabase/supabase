@@ -566,9 +566,9 @@ export interface OnboardingSurveySubmitFailedEvent {
 }
 
 /**
- * Signed-in user was shown the new organization form while enrolled in the
- * onboardingSurveyPlacement experiment. Fires once per form view, after the profile
- * loads and the flags for that user have resolved.
+ * Signed-in user was shown the new organization form in either arm of the
+ * onboardingSurveyPlacement experiment. Fires once per mount of the form, after the
+ * profile loads and the flags for that user have resolved.
  *
  * @group Events
  * @source studio
