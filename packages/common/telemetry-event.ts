@@ -16,6 +16,8 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_result_clicked',
   'kb_search_closed',
   'agent_setup_clicked',
+  // LCP, CLS and INP finalize as the page is hidden, so the request can race a tab close
+  'web_vital_evaluated',
 ])
 
 // no auth imports here: apps without a dashboard session (kb) send events through this
