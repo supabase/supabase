@@ -35,29 +35,26 @@ When an AI agent finds that a Supabase documentation page is wrong, outdated, or
 
 ### Approve or request a report
 
-Supabase tells agents to ask for your approval before they send a report. The instruction is in a note at the top of each guide's Markdown version and in the Supabase MCP server. The MCP server and the Supabase CLI don't ask for approval themselves.
+Your agent might ask you to approve a report. If the report is useful, say yes. The agent sends the report with the Supabase MCP server or the Supabase CLI, and shows you a delete token.
 
-After the agent finishes your task, or when a problem blocks the task, it ends its reply with a feedback report and asks you one time whether to send it to Supabase.
+To ask for a report yourself, tell your agent, for example: "Report the problem you just found."
 
-If you say yes, the agent sends the report with the Supabase MCP server or the Supabase CLI. It then shows you a delete token, which you can use to delete the report. If neither tool is available or sending fails, the agent shows you the report so you can send it with `supabase feedback add` or `npx supabase@latest feedback add`.
+### Turn off reports
 
-To ask for a report yourself, tell your agent, for example: "Report the problem you found in the Auth guide to Supabase."
+The MCP server and the CLI don't ask for your approval themselves. To stop reports:
 
-### What a report contains
+- MCP server: Set the server's `features` parameter to the groups you use and leave out `feedback`, or turn on read-only mode. Read-only mode also hides the tool that deletes reports. For more information, see [MCP server configuration options](/docs/guides/ai-tools/mcp#configuration-options).
+- CLI: Tell your agent not to send reports. The MCP server settings don't stop an agent that has a shell.
 
-A report is plain text of 1,000 characters or fewer. It names the page, quotes the text that caused the problem, and says how the problem affected the task. Supabase tells agents to leave out secrets, credentials, personal data, code from your project, and database contents.
+### Delete a report
 
-Each report also records the following:
+Ask your agent to delete the report with its delete token. You can also run `supabase feedback delete <delete_token>` in the project directory where the agent sent the report, or add `--project-ref <ref>`. If the CLI was signed in when the agent sent the report, use the same account.
+
+### What a report records
+
+Besides the agent's text, each report records the following:
 
 - The tool and its version
 - From the MCP server, the MCP client name and version
 - From the CLI, whether an agent ran it, the agent name, your operating system, and your CPU architecture
 - When available, your Supabase user ID and project ref
-
-### Turn off or delete reports
-
-To stop reports through the MCP server, set the server's `features` parameter to the groups you use and leave out `feedback`, or turn on read-only mode. Read-only mode also hides the tool that deletes reports. For more information, see [MCP server configuration options](/docs/guides/ai-tools/mcp#configuration-options).
-
-These settings don't stop the CLI. An agent with a shell can still send a report with it. If you don't want reports, tell your agent.
-
-To delete a report, ask your agent to delete it with its delete token. You can also run `supabase feedback delete <delete_token>` in the project directory where the agent sent the report, or add `--project-ref <ref>`. If the CLI was signed in when the agent sent the report, use the same account.
