@@ -41,8 +41,7 @@ export const getEntityTypesSQL = ({
         obj_description(c.oid) as "comment",
         count(*) over() as "count",
         c.relrowsecurity as "rls_enabled",
-        -- A partition is an ordinary table in the catalog, so without this it is
-        -- indistinguishable from one the user created directly
+        -- Partitions are ordinary tables, so relkind alone can't single them out
         c.relispartition as "is_partition"
       from
         pg_namespace nc

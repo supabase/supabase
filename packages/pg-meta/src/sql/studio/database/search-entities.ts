@@ -151,21 +151,26 @@ export const getSearchEntitiesSql = ({
         c.relowner,
         c.relkind,
         c.relrowsecurity,
-        ${isSecurityInvokerView(safeSql`c.reloptions`)} as security_invoker,
+        c.reloptions,
         nc.nspname,
         case
           when lower(c.relname) = ${exactName} then 0
           when c.relname ilike ${prefixPattern} then 1
           else 2
         end as rank
-      from pg_class c
+      -- offset 0 is load-bearing: inlined, the wider relkind list estimates badly
+      -- enough that the planner runs the ILIKE ahead of it, over all of pg_class.
+      from (
+        select c.oid, c.relname, c.relowner, c.relkind, c.relrowsecurity, c.reloptions,
+               c.relnamespace
+        from pg_class c
+        -- Partition children would bury the parent the user actually searched for
+        where c.relkind in ('r', 'p', 'v', 'm', 'f')
+          and not c.relispartition
+        offset 0
+      ) c
       join pg_namespace nc on nc.oid = c.relnamespace
-      -- Every kind the table editor can open. Partitions are left out so a
-      -- partitioned table surfaces as the parent the user named, not as its
-      -- children; a foreign table used as a partition is skipped for the same reason.
-      where c.relkind in ('r', 'p', 'v', 'm', 'f')
-        and not c.relispartition
-        and nc.nspname not in (${excludedSchemas})
+      where nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
         and c.oid not in (select objid from extension_relations)
         and ${tableMatchFilter}
@@ -181,9 +186,9 @@ export const getSearchEntitiesSql = ({
         tc.relname as name,
         tc.relkind::text as type,
         tc.relrowsecurity as rls_enabled,
-        tc.security_invoker,
-        -- Only tables and partitioned tables can have policies, so the other
-        -- kinds skip the probe rather than counting a guaranteed zero
+        -- Past the cap on purpose: in the scan it runs for every name match
+        ${isSecurityInvokerView(safeSql`tc.reloptions`)} as security_invoker,
+        -- Only tables and partitioned tables can have policies
         case
           when tc.relkind in ('r', 'p')
             then (select count(*) from pg_policy pol where pol.polrelid = tc.oid)
@@ -398,9 +403,8 @@ export const getSearchEntitiesSql = ({
               'name', t.name,
               'type', t.type
             )
-            -- Kind-specific keys are omitted rather than zeroed, so a caller
-            -- can't read "RLS disabled" off a materialized view, which cannot
-            -- have RLS at all
+            -- Omitted rather than zeroed: a matview cannot have RLS at all, so
+            -- reporting it as disabled would imply a setting that exists
             || case
                  when t.type in ('r', 'p') then jsonb_build_object(
                    'rls_enabled', t.rls_enabled,
