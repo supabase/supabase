@@ -117,26 +117,31 @@ export const TableEditorMenu = () => {
     id,
   })
 
+  const isSelectedTableLike =
+    selectedTable?.entity_type === ENTITY_TYPE.TABLE ||
+    selectedTable?.entity_type === ENTITY_TYPE.PARTITIONED_TABLE
   const { data: selectedTableInfo } = useQuery({
     ...partitionInfoQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
       id,
     }),
-    enabled:
-      !!project?.ref &&
-      (selectedTable?.entity_type === ENTITY_TYPE.TABLE ||
-        selectedTable?.entity_type === ENTITY_TYPE.PARTITIONED_TABLE),
+    enabled: !!project?.ref && isSelectedTableLike,
   })
 
-  // Open the parent's partition list when a partition is selected, once per selection so "back" sticks
-  const autoOpenedForIdRef = useRef<number | undefined>(undefined)
+  // Sync the partition view to each newly selected table: a partition shows its parent's list,
+  // anything else shows the main list (unless it is the table whose partitions are open)
+  const syncedForIdRef = useRef<number | undefined>(undefined)
   useEffect(() => {
+    const isSelectionResolved =
+      selectedTable !== undefined && (!isSelectedTableLike || selectedTableInfo !== undefined)
+    if (id === undefined || !isSelectionResolved || syncedForIdRef.current === id) return
+
+    syncedForIdRef.current = id
     const parentId = selectedTableInfo?.parent_id
-    if (parentId == null || autoOpenedForIdRef.current === id) return
-    autoOpenedForIdRef.current = id
-    setPartitionParentId(parentId)
-  }, [id, selectedTableInfo?.parent_id, setPartitionParentId])
+    if (parentId != null) setPartitionParentId(parentId)
+    else if (id !== partitionParentId) setPartitionParentId(undefined)
+  }, [id, selectedTable, isSelectedTableLike, selectedTableInfo, partitionParentId])
 
   if (selectedTable?.schema && !selectedSchema) {
     setSelectedSchema(selectedTable.schema)

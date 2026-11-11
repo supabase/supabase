@@ -45,5 +45,5 @@ export const partitionCountQueryOptions = ({
   queryOptions<PartitionCountData, PartitionCountError>({
     queryKey: entityTypeKeys.partitionCount(projectRef, id),
     queryFn: ({ signal }) => getPartitionCount({ projectRef, connectionString, id }, signal),
-    enabled: typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    enabled: typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
   })

@@ -51,6 +51,6 @@ export const partitionInfoQueryOptions = ({
   queryOptions<PartitionInfoData, PartitionInfoError>({
     queryKey: entityTypeKeys.partitionInfo(projectRef, id),
     queryFn: ({ signal }) => getPartitionInfo({ projectRef, connectionString, id }, signal),
-    enabled: typeof projectRef !== 'undefined' && typeof id !== 'undefined',
+    enabled: typeof projectRef !== 'undefined' && typeof id !== 'undefined' && !isNaN(id),
     staleTime: 5 * 60 * 1000,
   })
