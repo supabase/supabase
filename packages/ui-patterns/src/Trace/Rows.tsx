@@ -2,10 +2,9 @@
 
 import { useVirtualizer } from '@tanstack/react-virtual'
 import { ChevronRight, Loader2 } from 'lucide-react'
-import { ScrollArea as ScrollAreaPrimitive } from 'radix-ui'
 import type { ComponentProps, KeyboardEvent } from 'react'
 import { createContext, use, useEffect, useMemo, useRef, useState } from 'react'
-import { Button, cn, ScrollBar, ScrollViewport } from 'ui'
+import { Button, cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import type { SpanContextValue } from './types'
@@ -23,11 +22,7 @@ function useSpan(): SpanContextValue {
   return value
 }
 
-export function Rows({
-  className,
-  children,
-  ...props
-}: ComponentProps<typeof ScrollAreaPrimitive.Root>) {
+export function Rows({ className, children, ...props }: ComponentProps<typeof ScrollRoot>) {
   const index = useTrace()
   const { selectedId, collapsed, select, setCollapsed } = useView()
   const rows = useMemo(() => flattenTree(index, collapsed), [index, collapsed])
@@ -108,11 +103,7 @@ export function Rows({
   }
 
   return (
-    <ScrollAreaPrimitive.Root
-      data-trace-rows
-      className={cn('relative min-h-0 flex-1 overflow-hidden', className)}
-      {...props}
-    >
+    <ScrollRoot data-trace-rows className={cn('relative min-h-0 flex-1', className)} {...props}>
       <ScrollViewport ref={viewportRef} className="h-full w-full">
         <div
           ref={treeRef}
@@ -154,7 +145,7 @@ export function Rows({
         </div>
       </ScrollViewport>
       <ScrollBar orientation="vertical" />
-    </ScrollAreaPrimitive.Root>
+    </ScrollRoot>
   )
 }
 
