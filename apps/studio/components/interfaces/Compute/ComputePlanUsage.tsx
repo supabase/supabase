@@ -26,7 +26,6 @@ import {
   type ComputeCapacity,
 } from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
-import { SparkBar } from '@/components/ui/SparkBar'
 import { computeProjectUsageQueryOptions } from '@/data/compute/compute-usage-query'
 import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
@@ -49,8 +48,9 @@ interface UsageMetric {
    */
   isLoading: boolean
   /**
-   * Set only on a metric bounded by the plan. Everything else here is a total with nothing to
-   * measure against, so it gets a figure and no bar — a bar implies a ceiling.
+   * Set only on a metric bounded by the plan. Nothing here draws a bar — the pair already
+   * names the limit, and the headroom line below carries the warning — so this exists to tone
+   * that line rather than to scale anything.
    */
   capacity?: ComputeCapacity
   /**
@@ -144,7 +144,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       description: 'Requests handled across every instance in this project.',
     },
     {
-      label: 'Concurrent instances',
+      label: 'Conc. instances',
       isLoading: false,
       value: formatCapacityQuota(declaredInstances, limits.concurrentInstances),
       description: `Instances that may run at once across every compute in this project. ${computeCount} deployed.`,
@@ -186,14 +186,8 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
         </div>
       </div>
 
-      {/*
-        Three across, two rows deep. Six in a single row left the wider labels wrapping and the
-        narrower ones not, so values sat at different heights across the strip; at three the
-        longest label here still fits on one line. The rows split along what they describe: the
-        CPU story first, then memory, throughput and the one limit.
-      */}
       {!isCollapsed && (
-        <div className="grid grid-cols-2 divide-x divide-y sm:grid-cols-3">
+        <div className="grid grid-cols-2 divide-x divide-y sm:grid-cols-3 lg:grid-cols-6 lg:divide-y-0">
           {metrics.map((metric) => (
             <UsageMetricCell key={metric.label} metric={metric} />
           ))}
@@ -232,14 +226,6 @@ const UsageTimeframeDropdown = ({
   </DropdownMenu>
 )
 
-const CAPACITY_BAR_CLASS: Record<ComputeCapacity['status'], string> = {
-  exceeded: 'bg-destructive',
-  full: 'bg-warning',
-  low: 'bg-warning',
-  available: 'bg-foreground-light',
-  unlimited: 'bg-foreground-light',
-}
-
 const CAPACITY_TEXT_CLASS: Record<ComputeCapacity['status'], string> = {
   exceeded: 'text-destructive',
   full: 'text-warning',
@@ -250,21 +236,10 @@ const CAPACITY_TEXT_CLASS: Record<ComputeCapacity['status'], string> = {
 
 const UsageMetricCell = ({ metric }: { metric: UsageMetric }) => {
   const { capacity } = metric
-  const hasLimit = capacity !== undefined && capacity.limit !== null && capacity.limit > 0
 
   return (
     <Chart isLoading={metric.isLoading} className="flex flex-col gap-2 px-5 py-4">
       <ChartMetric label={metric.label} value={metric.value} tooltip={metric.description} />
-
-      {hasLimit && (
-        <SparkBar
-          type="horizontal"
-          barClass={CAPACITY_BAR_CLASS[capacity.status]}
-          bgClass="bg-surface-400"
-          value={capacity.used}
-          max={capacity.limit ?? 1}
-        />
-      )}
 
       {metric.footnote && (
         <p

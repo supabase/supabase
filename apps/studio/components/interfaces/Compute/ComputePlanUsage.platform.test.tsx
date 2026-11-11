@@ -99,7 +99,7 @@ describe('ComputePlanUsage', () => {
       'Running hours',
       'GB-hours',
       'Requests',
-      'Concurrent instances',
+      'Conc. instances',
     ]) {
       expect(await screen.findByText(label)).toBeInTheDocument()
     }
@@ -115,16 +115,17 @@ describe('ComputePlanUsage', () => {
     await waitFor(() => expect(compute.queryByText(/vCPU-hrs/)).not.toBeInTheDocument())
   })
 
-  it('bars only the metric with a limit, since the rest are totals', async () => {
+  it('states limits as a pair rather than drawing a bar for them', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
-    await screen.findByText('Concurrent instances')
-    // A bar on a total implies a ceiling that does not exist.
-    const compute = await metric('vCPU-hours')
-    expect(compute.queryByRole('progressbar')).not.toBeInTheDocument()
+    // "1/10" says what a bar would, in a cell too narrow to spare the height for one.
+    expect(await screen.findByText('1/10')).toBeInTheDocument()
+
+    const capacity = await metric('Conc. instances')
+    expect(capacity.queryByRole('progressbar')).not.toBeInTheDocument()
   })
 
   it('shows the instance count immediately rather than behind the usage query', async () => {
@@ -164,7 +165,7 @@ describe('ComputePlanUsage', () => {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
-    const instanceMeter = await metric('Concurrent instances')
+    const instanceMeter = await metric('Conc. instances')
     expect(await instanceMeter.findByText('1/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('No room for more')).toBeInTheDocument()
     expect(instanceMeter.queryByText(/over the limit/)).not.toBeInTheDocument()
@@ -180,7 +181,7 @@ describe('ComputePlanUsage', () => {
       { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await metric('Concurrent instances')
+    const instanceMeter = await metric('Conc. instances')
     expect(await instanceMeter.findByText('2/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
@@ -241,7 +242,7 @@ describe('ComputePlanUsage in private alpha', () => {
       { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await metric('Concurrent instances')
+    const instanceMeter = await metric('Conc. instances')
     expect(instanceMeter.getByText('3/2')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
@@ -264,7 +265,7 @@ describe('ComputePlanUsage in private alpha', () => {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
-    expect(await screen.findByLabelText('Concurrent instances: 1/2')).toBeInTheDocument()
+    expect(await screen.findByLabelText('Conc. instances: 1/2')).toBeInTheDocument()
     expect(screen.queryByText('Compute', { selector: 'p' })).not.toBeInTheDocument()
   })
 })
