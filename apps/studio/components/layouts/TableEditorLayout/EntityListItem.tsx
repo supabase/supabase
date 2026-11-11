@@ -95,9 +95,9 @@ export const EntityListItem = ({
   const isPreview = tabs.previewTabId === tabId
 
   const isActive = Number(id) === entity.id
-  // A sub-partitioned child is still a parent, so it keeps the parent styling
   const isChildPartition = entity.is_partition && entity.type !== ENTITY_TYPE.PARTITIONED_TABLE
   const canEdit = isActive && !isLocked
+  const canViewPartitions = isActive && entity.type === ENTITY_TYPE.PARTITIONED_TABLE
 
   const filters = useUrlTableFilters(entity.id)
   const roleImpersonationState = useRoleImpersonationStateSnapshot()
@@ -250,7 +250,7 @@ export const EntityListItem = ({
           />
         </div>
 
-        {canEdit && (
+        {(canEdit || canViewPartitions) && (
           <DropdownMenu>
             <Tooltip>
               <TooltipTrigger asChild>
@@ -458,19 +458,22 @@ export const EntityListItem = ({
                     </>
                   )}
 
-                  <DropdownMenuSeparator />
-
-                  <DropdownMenuItem
-                    key="delete-table"
-                    className="gap-x-2"
-                    onClick={(e) => {
-                      e.stopPropagation()
-                      snap.onDeleteTable()
-                    }}
-                  >
-                    <TrashIcon size={12} className="shrink-0" />
-                    <span>Delete table</span>
-                  </DropdownMenuItem>
+                  {canEdit && (
+                    <>
+                      <DropdownMenuSeparator />
+                      <DropdownMenuItem
+                        key="delete-table"
+                        className="gap-x-2"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          snap.onDeleteTable()
+                        }}
+                      >
+                        <TrashIcon size={12} className="shrink-0" />
+                        <span>Delete table</span>
+                      </DropdownMenuItem>
+                    </>
+                  )}
                 </>
               )}
 

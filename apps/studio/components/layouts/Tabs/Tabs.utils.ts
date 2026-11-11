@@ -24,16 +24,28 @@ export function useTableEditorTabsCleanUp() {
       // pruning them. If it rejects, nothing is pruned.
       resolveEntities?: (ids: number[]) => Promise<Entity[]>
     }) => {
+      // Snapshot the candidates up front: tabs opened while the lookup below is pending
+      // haven't been checked against anything, so they must not be pruned
+      const recentItemsFilteredToSchemas: string[] = []
+      for (const schema of schemas) {
+        recentItemsFilteredToSchemas.push(
+          ...recentItemsRef.current.filter((x) => x.metadata?.schema === schema).map((x) => x.id)
+        )
+      }
+
+      const tabsFilteredToSchemas: string[] = []
+      for (const schema of schemas) {
+        tabsFilteredToSchemas.push(
+          ...openTabsRef.current.filter((tabId) => {
+            const tab = tabMapRef.current[tabId]
+            return tab?.metadata?.schema === schema
+          })
+        )
+      }
+
       const listedTabIds = new Set(listedEntities.map((x) => createTabId(x.type, { id: x.id })))
       const unlistedEntityIds = getUnlistedEntityIds({
-        tabIds: [
-          ...openTabsRef.current.filter((id) =>
-            schemas.includes(tabMapRef.current[id]?.metadata?.schema ?? '')
-          ),
-          ...recentItemsRef.current
-            .filter((x) => schemas.includes(x.metadata?.schema ?? ''))
-            .map((x) => x.id),
-        ],
+        tabIds: [...tabsFilteredToSchemas, ...recentItemsFilteredToSchemas],
         listedTabIds,
       })
       const resolvedEntities =
@@ -45,28 +57,11 @@ export function useTableEditorTabsCleanUp() {
       // Identity all entities by tab ID
       const entitiesById: string[] = entities.map((x: Entity) => createTabId(x.type, { id: x.id }))
 
-      const recentItemsFilteredToSchemas: string[] = []
-      for (const schema of schemas) {
-        recentItemsFilteredToSchemas.push(
-          ...recentItemsRef.current.filter((x) => x.metadata?.schema === schema).map((x) => x.id)
-        )
-      }
-
       const recentItemsToRemove = [
         ...recentItemsFilteredToSchemas.filter((entityId) => !entitiesById.includes(entityId)),
       ]
 
       tabs.removeRecentItems(recentItemsToRemove)
-
-      const tabsFilteredToSchemas: string[] = []
-      for (const schema of schemas) {
-        tabsFilteredToSchemas.push(
-          ...openTabsRef.current.filter((tabId) => {
-            const tab = tabMapRef.current[tabId]
-            return tab?.metadata?.schema === schema
-          })
-        )
-      }
 
       const tableEditorTabsToBeCleaned = [
         ...tabsFilteredToSchemas.filter(

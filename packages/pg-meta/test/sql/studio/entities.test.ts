@@ -115,6 +115,9 @@ withTestDatabase(
     create table public.rank_parted_low_a partition of public.rank_parted_low
       for values from (0) to (90);
     create table public.rank_parted_rest partition of public.rank_parted default;
+    create table public.rank_legacy_a (id int);
+    create table public.rank_legacy_b (id int);
+    create table public.rank_legacy_child () inherits (public.rank_legacy_a, public.rank_legacy_b);
   `)
     const parentId = await oidOf(db, 'public.rank_parted')
     const lowId = await oidOf(db, 'public.rank_parted_low')
@@ -133,6 +136,12 @@ withTestDatabase(
     )
     expect(parent).toEqual({ name: 'rank_parted', parent_id: null })
     expect(low).toEqual({ name: 'rank_parted_low', parent_id: parentId })
+
+    // Plain inheritance (even with several parents) isn't partitioning
+    const [legacy] = await db.executeQuery<{ name: string; parent_id: number | null }[]>(
+      getPartitionInfoSQL({ id: await oidOf(db, 'public.rank_legacy_child') })
+    )
+    expect(legacy).toEqual({ name: 'rank_legacy_child', parent_id: null })
   }
 )
 

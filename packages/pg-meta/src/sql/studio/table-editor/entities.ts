@@ -112,7 +112,10 @@ export const getPartitionInfoSQL = ({ id }: { id: number }): SafeSqlFragment => 
   return safeSql`
     select
       c.relname as "name",
-      (select i.inhparent::int8 from pg_inherits i where i.inhrelid = c.oid) as "parent_id"
+      -- pg_inherits also holds plain table inheritance, where a table can have several parents
+      case when c.relispartition then
+        (select i.inhparent::int8 from pg_inherits i where i.inhrelid = c.oid)
+      end as "parent_id"
     from pg_class c
     where c.oid = ${literal(id)}::oid;
   `

@@ -222,7 +222,12 @@ const DeleteConfirmationDialogs = ({
   const isPartitionedTableDialogOpen =
     snap.confirmationDialog?.type === 'table' &&
     selectedTable?.entity_type === ENTITY_TYPE.PARTITIONED_TABLE
-  const { data: partitionCount } = useQuery({
+  const {
+    data: partitionCount,
+    isError: isPartitionCountError,
+    isFetching: isFetchingPartitionCount,
+    refetch: refetchPartitionCount,
+  } = useQuery({
     ...partitionCountQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -230,6 +235,8 @@ const DeleteConfirmationDialogs = ({
     }),
     enabled: isPartitionedTableDialogOpen && !!project?.ref,
   })
+
+  const isAwaitingPartitionCount = isPartitionedTableDialogOpen && partitionCount === undefined
 
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
@@ -343,12 +350,31 @@ const DeleteConfirmationDialogs = ({
         }
         confirmLabel="Delete"
         confirmLabelLoading="Deleting"
+        disabled={isAwaitingPartitionCount}
         onCancel={() => {
           snap.closeConfirmationDialog()
         }}
         onConfirm={onConfirmDeleteTable}
       >
         <div data-testid="confirm-delete-table-modal" className="space-y-4">
+          {isAwaitingPartitionCount && isPartitionCountError && (
+            <Alert variant="warning">
+              <AlertTitle>Failed to check this table's partitions</AlertTitle>
+              <AlertDescription>
+                Deleting a partitioned table also deletes its partitions. Retry to see how many will
+                be deleted.
+              </AlertDescription>
+              <AlertDescription className="mt-4">
+                <Button
+                  size="tiny"
+                  loading={isFetchingPartitionCount}
+                  onClick={() => refetchPartitionCount()}
+                >
+                  Retry
+                </Button>
+              </AlertDescription>
+            </Alert>
+          )}
           {isPartitionedTableDialogOpen && partitionCount !== undefined && partitionCount > 0 && (
             <p className="text-sm text-foreground-light">
               This will also delete its {partitionCount} {pluralize(partitionCount, 'partition')}{' '}

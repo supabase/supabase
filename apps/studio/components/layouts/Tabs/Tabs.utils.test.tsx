@@ -166,6 +166,33 @@ describe('useTableEditorTabsCleanUp', () => {
     expect(store.openTabs).not.toContain('r-2')
   })
 
+  it('keeps tabs opened while the lookup is pending', async () => {
+    const store = createTabsState('default')
+    store.addTab(tableTab(1, 'plain'))
+    store.addTab(tableTab(2, 'child_partition'))
+
+    let finishLookup: () => void = () => {}
+    const lookup = new Promise<void>((resolve) => (finishLookup = resolve))
+
+    const cleanup = renderTableCleanup(store)
+    const cleanupPromise = cleanup({
+      schemas: ['public'],
+      entities: [tableEntity(1, 'plain')],
+      resolveEntities: async () => {
+        await lookup
+        return [tableEntity(2, 'child_partition')]
+      },
+    })
+
+    await act(async () => {
+      store.addTab(tableTab(3, 'opened_meanwhile'))
+    })
+    finishLookup()
+    await act(() => cleanupPromise)
+
+    expect(store.openTabs).toEqual(expect.arrayContaining(['r-1', 'r-2', 'r-3']))
+  })
+
   it('removes nothing when the lookup fails', async () => {
     const store = createTabsState('default')
     store.addTab(tableTab(2, 'child_partition'))
