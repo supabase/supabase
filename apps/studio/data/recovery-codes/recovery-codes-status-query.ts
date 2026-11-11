@@ -1,5 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
-import { useUser } from 'common'
+import { useSession, useUser } from 'common'
 
 import { recoveryCodeKeys } from './keys'
 import { handleError } from '@/data/fetchers'
@@ -27,11 +27,13 @@ export const useRecoveryCodesStatusQuery = <TData = RecoveryCodesStatusData>({
   ...options
 }: UseCustomQueryOptions<RecoveryCodesStatusData, RecoveryCodesError, TData> = {}) => {
   const userId = useUser()?.id
+  // auth.mfa.recoveryCodes.getStatus() needs a session, so skip it when signed out
+  const hasSession = useSession() !== null
   return useQuery<RecoveryCodesStatusData, RecoveryCodesError, TData>({
     queryKey: recoveryCodeKeys.status(userId),
     queryFn: () => getRecoveryCodesStatus(),
     staleTime: 1000 * 60 * 30,
-    enabled,
+    enabled: enabled && hasSession,
     ...options,
   })
 }

@@ -11,6 +11,11 @@ import { customRender, CustomWrapper } from '@/tests/lib/custom-render'
 const { push, replace } = vi.hoisted(() => ({ push: vi.fn(), replace: vi.fn() }))
 vi.mock('next/router', () => ({ useRouter: () => ({ push, replace }) }))
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => vi.fn() }))
+vi.mock('common', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('common')>()),
+  useParams: () => ({ ref: 'default' }),
+  useSession: () => ({ access_token: 'test-token' }),
+}))
 
 beforeEach(() => {
   vi.restoreAllMocks()

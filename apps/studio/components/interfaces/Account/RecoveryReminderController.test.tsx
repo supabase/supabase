@@ -26,6 +26,7 @@ vi.mock('common', async (importOriginal) => ({
     name === 'enableAccountRecoveryInterstitial' ? mock.rolloutEnabled : true,
   useFeatureFlags: () => ({ hasLoaded: mock.flagsLoaded }),
   useUser: () => (mock.userId ? { id: mock.userId } : null),
+  useSession: () => (mock.userId ? { user: { id: mock.userId } } : null),
   useAuth: () => ({
     session: mock.userId ? { user: { id: mock.userId } } : null,
     isLoading: mock.isAuthLoading,
