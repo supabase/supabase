@@ -59,6 +59,12 @@ export interface Comment {
   shortText?: string
   text?: string
   tags?: Array<{ tag: string; text: string }>
+  /**
+   * From a `@stability <value> [text]` block tag. `value` is one of
+   * `stable | beta | experimental | early-access`; `text` is optional,
+   * API-specific guidance (for example how to enable or request access).
+   */
+  stability?: { value: string; text: string }
   examples?: Array<{
     id: string
     name: string
@@ -276,6 +282,27 @@ export function normalizeComment(
         .replace(/>/g, '&gt;')
       const note = detail ? `**Deprecated.** ${detail}` : '**Deprecated.**'
       comment.text = comment.text ? `${note}\n\n${comment.text}` : note
+    }
+  }
+
+  // Surface @stability so SDK authors can flag APIs that are not generally
+  // available. The first word is the stability value and the rest is optional
+  // API-specific text for the banner. Angle brackets are escaped for the same
+  // MDX reason as @deprecated above.
+  if ('blockTags' in original && Array.isArray(original.blockTags)) {
+    const stabilityTag = original.blockTags.find((t) => t.tag === '@stability')
+    if (stabilityTag) {
+      const raw = stabilityTag.content
+        .map((p) => p.text)
+        .join('')
+        .trim()
+      const [value, ...rest] = raw.split(/\s+/)
+      if (value) {
+        comment.stability = {
+          value: value.toLowerCase(),
+          text: rest.join(' ').replace(/</g, '&lt;').replace(/>/g, '&gt;'),
+        }
+      }
     }
   }
 

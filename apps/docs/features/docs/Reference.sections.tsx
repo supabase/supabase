@@ -488,7 +488,23 @@ async function FunctionSection({
     types = await getTypeSpec(sdkId, version, fn['$ref'] as string)
   }
 
+  // Common banner for APIs that are available only to opted-in customers via early access programs.
+  // Each SDK adds API-specific guidance in its `@stability` doc text.
+  const stability = types?.comment?.stability
+  const stabilityBanner =
+    stability?.value === 'early-access'
+      ? [
+          '<Admonition type="note" title="Early access">',
+          "This feature is in early access and isn't available to all projects yet.",
+          stability.text,
+          '</Admonition>',
+        ]
+          .filter(Boolean)
+          .join('\n\n')
+      : undefined
+
   const fullDescription = [
+    stabilityBanner,
     types?.comment?.shortText,
     types?.comment?.text,
     'description' in fn && (fn.description as string),
