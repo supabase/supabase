@@ -28,6 +28,7 @@ export const useLogsViewsMock = (): UseLogsViewsResult => {
       ...input,
     }
     setViews((current) => [...current, view])
+    return view.id
   }
 
   const updateView = (

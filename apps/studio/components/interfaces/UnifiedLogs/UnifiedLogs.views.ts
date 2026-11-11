@@ -66,7 +66,7 @@ export interface UseLogsViewsResult {
   isLoading: boolean
   isError: boolean
   error: Error | null
-  createView: (input: LogsViewDraft) => void
+  createView: (input: LogsViewDraft) => string
   updateView: (
     id: string,
     input: Partial<Pick<LogsView, 'name' | 'filters' | 'viewOptions'>>

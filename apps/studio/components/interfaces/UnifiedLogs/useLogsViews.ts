@@ -12,7 +12,7 @@ const DISABLED_RESULT: UseLogsViewsResult = {
   isLoading: false,
   isError: false,
   error: null,
-  createView: noop,
+  createView: () => '',
   updateView: noop,
   deleteView: noop,
 }
