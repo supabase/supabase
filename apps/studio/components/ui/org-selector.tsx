@@ -7,6 +7,7 @@ import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ButtonTooltip } from './ButtonTooltip'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { groupByOrganization } from '@/data/organizations/free-project-limit-check.utils'
 import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import type { Organization } from '@/types'
 
@@ -29,6 +30,7 @@ const OrganizationCard = ({
     { enabled: isFreePlan }
   )
   const hasMembersExceedingFreeTierLimit = (membersExceededLimit || []).length > 0
+  const affectedOrganizations = groupByOrganization(membersExceededLimit ?? [])
   const freePlanWithExceedingLimits = isFreePlan && hasMembersExceedingFreeTierLimit
 
   return (
@@ -50,21 +52,30 @@ const OrganizationCard = ({
                 isSuccess && freePlanWithExceedingLimits ? (
                   <div className="space-y-3 w-96 p-2">
                     <p className="text-sm leading-normal">
-                      The following members have reached their maximum limits for the number of
-                      active free plan projects within organizations where they are an administrator
-                      or owner:
+                      Owners and administrators are limited in how many active Free Plan projects
+                      they can have across all organizations. Members over the limit:
                     </p>
-                    <ul className="pl-5 list-disc">
-                      {membersExceededLimit.map((member, idx: number) => (
-                        <li key={`member-${idx}`}>
-                          {`${member.username || member.primary_email} (Limit: ${member.free_project_limit} free projects)`}
+                    <ul className="space-y-2">
+                      {affectedOrganizations.map((affectedOrg) => (
+                        <li key={affectedOrg.slug}>
+                          <span className="text-foreground">{affectedOrg.name}</span>
+                          <ul className="pl-5 list-disc">
+                            {affectedOrg.projects.map((project) => (
+                              <li key={project.ref}>{project.name}</li>
+                            ))}
+                          </ul>
+                          <p className="text-xs text-foreground-lighter">
+                            Members:{' '}
+                            {affectedOrg.members
+                              .map((member) => `${member.label} (limit: ${member.limit})`)
+                              .join(', ')}
+                          </p>
                         </li>
                       ))}
                     </ul>
                     <p className="text-sm leading-normal">
-                      These members will need to either delete, pause, or upgrade one or more of
-                      these projects before you're able to create a free project within this
-                      organization.
+                      They will need to delete, pause, or upgrade one or more of these projects
+                      before you can create a free project within this organization.
                     </p>
                   </div>
                 ) : undefined,

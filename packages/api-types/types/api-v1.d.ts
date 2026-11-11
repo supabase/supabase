@@ -5480,7 +5480,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -6189,6 +6188,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -6491,6 +6499,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string
@@ -8592,6 +8602,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Branching or persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {
