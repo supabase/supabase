@@ -79,34 +79,37 @@ export function LogFieldRow<TData>({
       >
         {label}
       </span>{' '}
-      <span
-        className={cn(
-          'flex min-w-0 flex-[2] justify-end text-right text-sm leading-5',
-          canUseHoverActions && 'group-hover/field:opacity-0 group-focus-within/field:opacity-0'
-        )}
-      >
+      <span className="flex min-w-0 flex-[2] justify-end text-right text-sm leading-5">
         {children ?? value}
       </span>
       {canUseHoverActions && (
         <div
           className={cn(
-            'absolute inset-y-0 right-0 flex items-start gap-0.5 pr-4 pt-2 opacity-0',
+            'pointer-events-none absolute inset-y-0 right-0 flex items-stretch opacity-0',
             'focus-within:opacity-100 group-hover/field:opacity-100'
           )}
         >
-          {filterActions.map(({ operator, apply }) => (
+          <div
+            className={cn(
+              'relative flex items-start gap-0.5 bg-surface-100 pl-2 pr-4 pt-2',
+              'before:absolute before:inset-y-0 before:right-full before:w-8 before:bg-surface-100',
+              'before:[mask-image:linear-gradient(to_left,black,transparent)]'
+            )}
+          >
+            {filterActions.map(({ operator, apply }) => (
+              <LogFieldRowAction
+                key={operator}
+                icon={OPERATOR_ICONS[operator] ?? FilterIcon}
+                label={`Filter where ${label} ${LOGS_FILTER_OPERATOR_VERBS[operator]}`}
+                onSelect={apply}
+              />
+            ))}
             <LogFieldRowAction
-              key={operator}
-              icon={OPERATOR_ICONS[operator] ?? FilterIcon}
-              label={`Filter where ${label} ${LOGS_FILTER_OPERATOR_VERBS[operator]}`}
-              onSelect={apply}
+              icon={CopyIcon}
+              label={`Copy ${label}`}
+              onSelect={() => copyToClipboard(String(value))}
             />
-          ))}
-          <LogFieldRowAction
-            icon={CopyIcon}
-            label={`Copy ${label}`}
-            onSelect={() => copyToClipboard(String(value))}
-          />
+          </div>
         </div>
       )}
     </div>
@@ -154,7 +157,7 @@ function LogFieldRowAction({
           aria-label={label}
           onClick={handleClick}
           className={cn(
-            'focus-ring flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-sm',
+            'focus-ring pointer-events-auto flex h-5 w-5 shrink-0 cursor-pointer items-center justify-center rounded-sm',
             'text-foreground-lighter hover:bg-selection hover:text-foreground'
           )}
         >
