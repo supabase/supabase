@@ -4,6 +4,7 @@ import { useParams } from 'next/navigation'
 import { parseAsString, useQueryState } from 'nuqs'
 import { useRef } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
+import { toast } from 'sonner'
 import {
   Button,
   Dialog,
@@ -22,11 +23,10 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { getWriteGrantTooltip } from './APIKeys.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
-import { useGrant } from '@/lib/grants'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const FORM_ID = 'create-publishable-api-key'
@@ -70,7 +70,10 @@ export const CreatePublishableAPIKeyDialog = () => {
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
-    if (!createGrant.grant) return
+    if (!createGrant.grant) {
+      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      return
+    }
     createAPIKey(
       {
         projectRef,
@@ -102,7 +105,10 @@ export const CreatePublishableAPIKeyDialog = () => {
           onClick={openDialog}
           disabled={!canCreateAPIKeys}
           tooltip={{
-            content: { side: 'bottom', text: getWriteGrantTooltip(createGrant.status, 'create') },
+            content: {
+              side: 'bottom',
+              text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
+            },
           }}
         >
           New publishable key
