@@ -4,6 +4,8 @@ import { useState } from 'react'
 import { IS_PLATFORM } from '@/lib/constants'
 import { reportQueryError } from '@/lib/errors/report-studio-error'
 import { isStudioError } from '@/lib/errors/studio-errors'
+import { observeQueryClient } from '@/lib/telemetry/request-timing/query-cache-timing'
+import { requestTimingCollector } from '@/lib/telemetry/request-timing/request-timing-collector'
 
 // When running locally we don't need the internet
 // so we can pretend we're online all the time
@@ -101,8 +103,11 @@ export function getQueryClient() {
 
   // For SSG and SSR always create a new queryClient
   if (typeof window === 'undefined') return _queryClient
-  // Create the queryClient once in the client
-  if (!queryClient) queryClient = _queryClient
+  // Create the queryClient once in the client, and start timing its fetches and mutations
+  if (!queryClient) {
+    queryClient = _queryClient
+    observeQueryClient(_queryClient, requestTimingCollector)
+  }
 
   return queryClient
 }

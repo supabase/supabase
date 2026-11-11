@@ -7,6 +7,7 @@ import { useOrganizationsQuery } from '@/data/organizations/organizations-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { API_URL, IS_PLATFORM } from '@/lib/constants'
 import { IS_SESSION_REPLAY_ENABLED, SESSION_REPLAY_CONFIG } from '@/lib/session-replay'
+import { useRouteRequestTelemetry } from '@/lib/telemetry/request-timing/use-route-request-telemetry'
 
 export function Telemetry() {
   // Although this is "technically" breaking the rules of hooks
@@ -19,6 +20,8 @@ export function Telemetry() {
   const { data: organization } = useSelectedOrganizationQuery()
 
   const user = useUser()
+
+  useRouteRequestTelemetry({ apiUrl: API_URL })
 
   // Project ref from the URL params, mirroring the backend's `request.params.ref`
   const { ref: projectRef } = useParams()

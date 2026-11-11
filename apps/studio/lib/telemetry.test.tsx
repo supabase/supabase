@@ -35,6 +35,11 @@ vi.mock('@/hooks/misc/useSelectedOrganization', () => ({
   useSelectedOrganizationQuery: () => ({ data: undefined }),
 }))
 
+// Route request timing needs a router; it is covered by its own tests
+vi.mock('@/lib/telemetry/request-timing/use-route-request-telemetry', () => ({
+  useRouteRequestTelemetry: () => undefined,
+}))
+
 vi.mock('@sentry/nextjs', () => ({
   setUser: (...args: unknown[]) => mocks.setUser(...args),
   setTag: (...args: unknown[]) => mocks.setTag(...args),

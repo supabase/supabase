@@ -16,6 +16,8 @@ const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
   'kb_search_result_clicked',
   'kb_search_closed',
   'agent_setup_clicked',
+  // Sent as the tab is hidden, when the page may be unloading
+  'route_requests_evaluated',
 ])
 
 // no auth imports here: apps without a dashboard session (kb) send events through this

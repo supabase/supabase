@@ -4532,6 +4532,87 @@ export interface WarehouseDisabledEvent {
 }
 
 /**
+ * Network and React Query timing for one visit to a Studio route, as a single summary.
+ * A visit starts when the route is entered (or the page loads) and ends on the next
+ * navigation or when the tab is hidden. Only a sample of page loads report (see
+ * `sampleRate`); every route visit in a sampled page load does.
+ *
+ * Request figures come from the fetch layer and query/mutation figures from the React Query
+ * cache. They describe overlapping work, so never add them together.
+ *
+ * @group Events
+ * @source Studio request timing collector (fetch layer and React Query caches), after the user has accepted telemetry consent
+ * @page All Studio pages (platform only)
+ */
+export interface RouteRequestsEvaluatedEvent {
+  action: 'route_requests_evaluated'
+  properties: {
+    /** Route template, e.g. `/project/[ref]/editor`. Never contains a project ref or slug. */
+    routeTemplate: string
+    /** True for the first visit of a hard page load, when the React Query cache starts empty */
+    isInitialLoad: boolean
+    /** True when the visit started because the tab became visible again after being hidden */
+    resumedAfterHidden: boolean
+    /** Time from the start of the visit to its end, in milliseconds */
+    visitDurationMs: number
+    /** Fraction of page loads that report (e.g. 0.1). Divide counts by this to estimate totals. */
+    sampleRate: number
+
+    /** Network requests made through the Studio fetch layer during the visit */
+    requestCount: number
+    /** Requests that failed at the network level or returned HTTP 400 or above */
+    requestErrorCount: number
+    /** Sum of each request's time to response headers, in milliseconds */
+    requestSumMs: number
+    /** Time with at least one request in flight, in milliseconds */
+    requestBusyMs: number
+    /** Time from the first request starting to the last one finishing, in milliseconds */
+    requestSpanMs: number
+    /** Most requests in flight at the same time */
+    maxConcurrentRequests: number
+    /** Time with exactly one request in flight, in milliseconds. High values mean a waterfall. */
+    singleFlightMs: number
+    /** Per-endpoint totals, busiest first, capped */
+    endpoints: Array<{
+      /** Method and OpenAPI path template, e.g. `GET /platform/projects/{ref}` */
+      endpoint: string
+      count: number
+      errorCount: number
+      totalMs: number
+      maxMs: number
+    }>
+    /** Requests belonging to endpoints left out of `endpoints` by the cap */
+    otherEndpointRequestCount: number
+
+    /** React Query fetches that started during the visit (a retry chain counts once) */
+    queryFetchCount: number
+    /** Fetches that ended in an error after retries */
+    queryErrorCount: number
+    /** Fetches of a query that already had cached data */
+    queryBackgroundRefetchCount: number
+    /** Sum of query fetch durations including retry backoff, in milliseconds */
+    querySumMs: number
+    /** Per-label totals, busiest first, capped. Labels come from the query key's resource name. */
+    queries: Array<{
+      label: string
+      count: number
+      errorCount: number
+      totalMs: number
+      maxMs: number
+    }>
+    /** Fetches belonging to labels left out of `queries` by the cap */
+    otherQueryFetchCount: number
+
+    /** Mutations that settled during the visit */
+    mutationCount: number
+    /** Mutations that ended in an error */
+    mutationErrorCount: number
+    /** Sum of mutation durations, in milliseconds */
+    mutationSumMs: number
+  }
+}
+
+/**
  * Account recovery rollout exposure when the takeover opens.
  * @group Events
  * @source Automatic reminder controller
@@ -4861,3 +4942,4 @@ export type TelemetryEvent =
   | HeaderLocalVersionPopoverOpenedEvent
   | WarehouseEnabledEvent
   | WarehouseDisabledEvent
+  | RouteRequestsEvaluatedEvent
