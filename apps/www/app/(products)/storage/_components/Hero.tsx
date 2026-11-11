@@ -18,7 +18,7 @@ export function Hero() {
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <StartYourProjectButton />
+          <StartYourProjectButton variant="primary" buttonLocation="Product Page Hero - Storage" />
           <Button asChild size="medium">
             <a href="/docs/guides/storage">Documentation</a>
           </Button>

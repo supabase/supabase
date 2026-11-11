@@ -11,16 +11,6 @@ interface UseAdvisorPageShortcutsParams {
   isRefreshDisabled: boolean
 }
 
-/**
- * Registers shortcuts that apply across the Health, Security, and Performance
- * Advisor pages:
- *   - 1 / 2 / 3: switch to Errors / Warnings / Info tab
- *   - Shift+R: rerun the linter
- *   - Escape: close the lint detail panel (only when a lint is selected)
- *
- * The tab handlers mirror the URL update that `LintPageTabs` performs on click,
- * so the `preset` query stays in sync and the side panel closes.
- */
 export function useAdvisorPageShortcuts({
   setCurrentTab,
   refetch,
@@ -39,7 +29,10 @@ export function useAdvisorPageShortcuts({
   useShortcut(SHORTCUT_IDS.ADVISORS_TAB_WARNINGS, () => switchTab(LINTER_LEVELS.WARN))
   useShortcut(SHORTCUT_IDS.ADVISORS_TAB_INFO, () => switchTab(LINTER_LEVELS.INFO))
 
-  useShortcut(SHORTCUT_IDS.ADVISORS_REFRESH, refetch, { enabled: !isRefreshDisabled })
+  useShortcut(SHORTCUT_IDS.ADVISORS_REFRESH, refetch, {
+    enabled: !isRefreshDisabled,
+    label: 'Refresh advisor',
+  })
 
   useShortcut(
     SHORTCUT_IDS.ADVISORS_CLOSE_DETAIL,

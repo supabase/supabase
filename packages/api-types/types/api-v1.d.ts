@@ -1027,7 +1027,8 @@ export interface paths {
     delete?: never
     options?: never
     head?: never
-    patch?: never
+    /** Partially updates project's Postgres config */
+    patch: operations['v1-patch-postgres-config']
     trace?: never
   }
   '/v1/projects/{ref}/config/disk': {
@@ -3936,8 +3937,15 @@ export interface components {
     OAuthTokenResponse_Output: {
       access_token: string
       expires_in: number
+      /** @description Project refs the token is limited to. `null` means all projects. */
+      project_refs: string[] | null
       /** @description The `urn:ietf:params:oauth:grant-type:jwt-bearer` grant type issues access tokens only, no refresh token is returned and the token cannot be revoked via `/v1/oauth/revoke`. */
       refresh_token?: string
+      /**
+       * @description Space-delimited scopes granted to the token. Omitted when no scopes were granted.
+       * @example projects:read projects:write
+       */
+      scope?: string
       /** @enum {string} */
       token_type: 'Bearer'
     }
@@ -5472,7 +5480,6 @@ export interface components {
             status: string
           }
       result?: {
-        /** Format: date-time */
         timestamp: string
         total_auth_requests: number
         total_realtime_requests: number
@@ -6483,6 +6490,8 @@ export interface operations {
         code_challenge_method?: 'plain' | 'sha256' | 'S256'
         /** @description Organization slug */
         organization_slug?: string
+        /** @description Project ref */
+        project_ref?: string
         redirect_uri: string
         /** @description Resource indicator for MCP (Model Context Protocol) clients */
         resource?: string
@@ -9998,6 +10007,60 @@ export interface operations {
     }
   }
   'v1-update-postgres-config': {
+    parameters: {
+      query?: never
+      header?: never
+      path: {
+        /** @description Project ref */
+        ref: string
+      }
+      cookie?: never
+    }
+    requestBody: {
+      content: {
+        'application/json': components['schemas']['UpdatePostgresConfigBody']
+      }
+    }
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PostgresConfigResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Failed to update project's Postgres config */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
+  'v1-patch-postgres-config': {
     parameters: {
       query?: never
       header?: never

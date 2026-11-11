@@ -161,6 +161,7 @@ Hieu Pham
 Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
+Ilya Kobets
 Inian P
 Iryna Deans
 Isaac Dawson
@@ -275,7 +276,9 @@ Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
+Neil Brookes
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro

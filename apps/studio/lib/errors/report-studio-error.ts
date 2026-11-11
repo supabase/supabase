@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/nextjs'
 
 import { ERROR_ROUTING, SAMPLE_ALWAYS, SAMPLE_NEVER } from './error-routing'
 import { classifyError } from '@/data/error-classification'
-import type { StudioError } from '@/lib/errors/studio-errors'
+import { isNeverReportedError, type StudioError } from '@/lib/errors/studio-errors'
 
 export type StudioSentryContext = {
   tags?: Record<string, string | number | boolean>
@@ -13,13 +13,15 @@ export type StudioSentryContext = {
 /**
  * Sends the error to Sentry when its routing sample rate is above zero. The rate is attached as
  * the `sample_rate` tag; `beforeSend` applies it. Records the event id on the error.
- * `force` is for callers that explicitly asked for capture (`alwaysCapture`) and overrides routing.
+ * `force` is for callers that explicitly asked for capture (`alwaysCapture`) and overrides routing,
+ * except for errors that are never reported (`isNeverReportedError`).
  */
 export function reportStudioError(
   err: StudioError,
   context?: StudioSentryContext,
   { force = false }: { force?: boolean } = {}
 ) {
+  if (isNeverReportedError(err)) return
   const sampleRate = force ? SAMPLE_ALWAYS : ERROR_ROUTING[err._tag].sentrySampleRate
   if (sampleRate <= SAMPLE_NEVER) return
   if (err.errorEventId) return
@@ -34,6 +36,8 @@ export function reportStudioError(
       classified_by: err.classifiedBy,
       service: err.service,
       ...(err.endpoint && { endpoint: err.endpoint }),
+      ...(err.queryName && { query_name: err.queryName }),
+      ...(err.sqlState && { sql_state: err.sqlState }),
     },
     extra: { ...context?.extra, requestId: err.requestId, status: err.code },
   })
