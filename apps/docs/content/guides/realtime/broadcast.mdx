@@ -9,7 +9,7 @@ You can use Realtime Broadcast to send low-latency messages between users. Messa
 
 <Admonition type="note">
 
-Building chat or live cursors? The Supabase Library has Broadcast-based components you can install with a single command: [Realtime Chat](/library/docs/nextjs/realtime-chat) and [Realtime Cursor](/library/docs/nextjs/realtime-cursor).
+To see Broadcast in action, try the demo app at [multiplayer.dev](https://multiplayer.dev).
 
 </Admonition>
 
@@ -34,7 +34,7 @@ Regardless if it's public or private, the Realtime service connects to your data
 
 For Authorization, we insert a message and try to read it, and rollback the transaction to verify that the Row Level Security (RLS) policies set by the user are being respected by the user joining the channel, but this message isn't sent to the user. You can read more about it in [Authorization](/docs/guides/realtime/authorization).
 
-To see Broadcast in action, try the demo app at [multiplayer.dev](https://multiplayer.dev).
+
 
 ## Subscribe to messages
 
@@ -1333,3 +1333,7 @@ A few common use cases for Broadcast Replay include:
 - Loading the last events that happened during a sports event
 - Ensuring users always see the latest events after a page reload or network interruption
 - Highlighting the most recent sections that changed in a web page
+
+## Related resources
+
+- The Supabase Library has Broadcast-based components for web you can install with a single command: [Realtime Chat](/library/docs/nextjs/realtime-chat) and [Realtime Cursor](/library/docs/nextjs/realtime-cursor).
