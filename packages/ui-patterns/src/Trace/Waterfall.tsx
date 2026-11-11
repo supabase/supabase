@@ -57,7 +57,7 @@ export function Waterfall({
         ref={ref}
         data-trace-waterfall
         className={cn(
-          'flex min-h-0 flex-col overflow-hidden bg-surface-100 text-sm text-foreground',
+          'isolate flex min-h-0 flex-col overflow-hidden bg-surface-100 text-sm text-foreground',
           className
         )}
         style={
