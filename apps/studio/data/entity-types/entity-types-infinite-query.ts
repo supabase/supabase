@@ -18,6 +18,7 @@ export type EntityTypesVariables = {
   sort?: 'alphabetical' | 'grouped-alphabetical'
   filterTypes?: string[]
   excludePartitions?: boolean
+  parentId?: number
 }
 
 export interface Entity {
@@ -48,6 +49,7 @@ export async function getEntityTypes(
     sort = 'alphabetical',
     filterTypes = Object.values(ENTITY_TYPE),
     excludePartitions,
+    parentId,
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
@@ -56,6 +58,7 @@ export async function getEntityTypes(
     sort,
     filterTypes,
     excludePartitions,
+    parentId,
     search,
     limit,
     page,
@@ -90,6 +93,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     sort,
     filterTypes,
     excludePartitions,
+    parentId,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -110,6 +114,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
       limit,
       filterTypes,
       excludePartitions,
+      parentId,
     }),
     queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
@@ -123,6 +128,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
           sort,
           filterTypes,
           excludePartitions,
+          parentId,
         },
         signal
       ),

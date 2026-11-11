@@ -12,54 +12,102 @@ export function useTableEditorTabsCleanUp() {
   const recentItemsRef = useLatest(tabs.recentItems)
   const openTabsRef = useLatest(tabs.openTabs)
 
-  return useCallback(({ schemas, entities }: { schemas: string[]; entities: Entity[] }) => {
-    // Identity all entities by tab ID
-    const entitiesById: string[] = entities.map((x: Entity) => createTabId(x.type, { id: x.id }))
+  return useCallback(
+    async ({
+      schemas,
+      entities: listedEntities,
+      resolveEntities,
+    }: {
+      schemas: string[]
+      entities: Entity[]
+      // Confirms tabs missing from `entities` (e.g. hidden child partitions) still exist before
+      // pruning them. If it rejects, nothing is pruned.
+      resolveEntities?: (ids: number[]) => Promise<Entity[]>
+    }) => {
+      const listedTabIds = new Set(listedEntities.map((x) => createTabId(x.type, { id: x.id })))
+      const unlistedEntityIds = getUnlistedEntityIds({
+        tabIds: [
+          ...openTabsRef.current.filter((id) =>
+            schemas.includes(tabMapRef.current[id]?.metadata?.schema ?? '')
+          ),
+          ...recentItemsRef.current
+            .filter((x) => schemas.includes(x.metadata?.schema ?? ''))
+            .map((x) => x.id),
+        ],
+        listedTabIds,
+      })
+      const resolvedEntities =
+        resolveEntities && unlistedEntityIds.length > 0
+          ? await resolveEntities(unlistedEntityIds)
+          : []
+      const entities = [...listedEntities, ...resolvedEntities]
 
-    const recentItemsFilteredToSchemas: string[] = []
-    for (const schema of schemas) {
-      recentItemsFilteredToSchemas.push(
-        ...recentItemsRef.current.filter((x) => x.metadata?.schema === schema).map((x) => x.id)
-      )
-    }
+      // Identity all entities by tab ID
+      const entitiesById: string[] = entities.map((x: Entity) => createTabId(x.type, { id: x.id }))
 
-    const recentItemsToRemove = [
-      ...recentItemsFilteredToSchemas.filter((entityId) => !entitiesById.includes(entityId)),
-    ]
+      const recentItemsFilteredToSchemas: string[] = []
+      for (const schema of schemas) {
+        recentItemsFilteredToSchemas.push(
+          ...recentItemsRef.current.filter((x) => x.metadata?.schema === schema).map((x) => x.id)
+        )
+      }
 
-    tabs.removeRecentItems(recentItemsToRemove)
+      const recentItemsToRemove = [
+        ...recentItemsFilteredToSchemas.filter((entityId) => !entitiesById.includes(entityId)),
+      ]
 
-    const tabsFilteredToSchemas: string[] = []
-    for (const schema of schemas) {
-      tabsFilteredToSchemas.push(
-        ...openTabsRef.current.filter((tabId) => {
-          const tab = tabMapRef.current[tabId]
-          return tab?.metadata?.schema === schema
-        })
-      )
-    }
+      tabs.removeRecentItems(recentItemsToRemove)
 
-    const tableEditorTabsToBeCleaned = [
-      ...tabsFilteredToSchemas.filter(
-        (id) => !id.startsWith('sql') && !id.startsWith('schema') && !entitiesById.includes(id)
-      ),
-    ]
+      const tabsFilteredToSchemas: string[] = []
+      for (const schema of schemas) {
+        tabsFilteredToSchemas.push(
+          ...openTabsRef.current.filter((tabId) => {
+            const tab = tabMapRef.current[tabId]
+            return tab?.metadata?.schema === schema
+          })
+        )
+      }
 
-    // perform tabs cleanup
-    tabs.removeTabs(tableEditorTabsToBeCleaned)
+      const tableEditorTabsToBeCleaned = [
+        ...tabsFilteredToSchemas.filter(
+          (id) => !id.startsWith('sql') && !id.startsWith('schema') && !entitiesById.includes(id)
+        ),
+      ]
 
-    // [Joshen] Validate for opened tabs, if their label matches the entity's name - update label if not
-    // As the entity could've been renamed outside of the table editor
-    // e.g Using the SQL editor to rename the entity
-    const openTabs = openTabsRef.current
-      .map((id) => tabMapRef.current[id])
-      .filter((tab) => !!tab && editorEntityTypes['table']?.includes(tab.type))
+      // perform tabs cleanup
+      tabs.removeTabs(tableEditorTabsToBeCleaned)
 
-    openTabs.forEach((tab) => {
-      const entity = entities?.find((x) => tab.metadata?.tableId === x.id)
-      if (!!entity && entity.name !== tab.label) tabs.updateTab(tab.id, { label: entity.name })
-    })
-  }, [])
+      // [Joshen] Validate for opened tabs, if their label matches the entity's name - update label if not
+      // As the entity could've been renamed outside of the table editor
+      // e.g Using the SQL editor to rename the entity
+      const openTabs = openTabsRef.current
+        .map((id) => tabMapRef.current[id])
+        .filter((tab) => !!tab && editorEntityTypes['table']?.includes(tab.type))
+
+      openTabs.forEach((tab) => {
+        const entity = entities?.find((x) => tab.metadata?.tableId === x.id)
+        if (!!entity && entity.name !== tab.label) tabs.updateTab(tab.id, { label: entity.name })
+      })
+    },
+    []
+  )
+}
+
+const ENTITY_TAB_ID = /^[rvmfp]-(\d+)$/
+
+function getUnlistedEntityIds({
+  tabIds,
+  listedTabIds,
+}: {
+  tabIds: string[]
+  listedTabIds: Set<string>
+}) {
+  const ids = new Set<number>()
+  for (const tabId of tabIds) {
+    const match = ENTITY_TAB_ID.exec(tabId)
+    if (match && !listedTabIds.has(tabId)) ids.add(Number(match[1]))
+  }
+  return [...ids]
 }
 
 export function useSqlEditorTabsCleanup() {

@@ -1,6 +1,7 @@
 import { useParams } from 'common'
 import {
   CopyIcon,
+  CornerDownRightIcon,
   DownloadIcon,
   EditIcon,
   GlobeIcon,
@@ -66,6 +67,7 @@ export interface EntityListItemProps {
   style?: CSSProperties
   onExportCLI: () => void
   apiAccessMap?: TableApiAccessMap
+  onViewPartitions?: (id: number) => void
 }
 
 // [jordi] Used to determine the entity is a table and not a view or other unsupported entity type
@@ -82,6 +84,7 @@ export const EntityListItem = ({
   style,
   onExportCLI,
   apiAccessMap,
+  onViewPartitions,
 }: EntityListItemProps) => {
   const { data: project } = useSelectedProjectQuery()
   const snap = useTableEditorStateSnapshot()
@@ -449,6 +452,18 @@ export const EntityListItem = ({
 
               {entity.type === ENTITY_TYPE.PARTITIONED_TABLE && (
                 <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="view-partitions"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      onViewPartitions?.(entity.id)
+                    }}
+                  >
+                    <CornerDownRightIcon size={12} className="shrink-0" />
+                    <span>View partitions</span>
+                  </DropdownMenuItem>
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     key="delete-partitioned-table"

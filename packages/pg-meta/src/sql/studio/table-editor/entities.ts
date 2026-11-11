@@ -6,6 +6,7 @@ export const getEntityTypesSQL = ({
   sort,
   filterTypes,
   excludePartitions = false,
+  parentId,
   limit,
   page,
 }: {
@@ -13,8 +14,8 @@ export const getEntityTypesSQL = ({
   search?: string
   sort: 'alphabetical' | 'grouped-alphabetical'
   filterTypes: Array<string>
-  /** Hide child partitions so only top-level tables (incl. partitioned parents) are returned */
   excludePartitions?: boolean
+  parentId?: number
   limit: number
   page: number
 }): SafeSqlFragment => {
@@ -27,6 +28,11 @@ export const getEntityTypesSQL = ({
   const schemaList = joinSqlFragments(schemas.map(literal), ', ')
   const searchClause = search ? safeSql`and c.relname ilike ${literal(`%${search}%`)}` : safeSql``
   const partitionClause = excludePartitions ? safeSql`and not c.relispartition` : safeSql``
+
+  const parentClause =
+    parentId !== undefined
+      ? safeSql`and c.oid in (select inhrelid from pg_inherits where inhparent = ${literal(parentId)}::oid)`
+      : safeSql``
 
   return safeSql`
     with records as (
@@ -64,6 +70,7 @@ export const getEntityTypesSQL = ({
         and nc.nspname in (${schemaList})
         ${searchClause}
         ${partitionClause}
+        ${parentClause}
       order by ${innerOrderBy}
       limit ${literal(limit)}
       offset ${literal(page * limit)}
@@ -88,14 +95,41 @@ export const getEntityTypesSQL = ({
   `
 }
 
-/**
- * Counts every partition under a partitioned table, including nested sub-partitions.
- * `level > 0` skips the root row that pg_partition_tree returns for the table itself.
- */
+/** Counts nested partitions too; level 0 is the table itself */
 export const getPartitionCountSQL = ({ id }: { id: number }): SafeSqlFragment => {
   return safeSql`
     select count(*)::int as "count"
     from pg_partition_tree(${literal(id)}::oid::regclass)
     where level > 0;
+  `
+}
+
+/** Table name plus its parent partitioned table, if it is a partition */
+export const getPartitionInfoSQL = ({ id }: { id: number }): SafeSqlFragment => {
+  return safeSql`
+    select
+      c.relname as "name",
+      (select i.inhparent::int8 from pg_inherits i where i.inhrelid = c.oid) as "parent_id"
+    from pg_class c
+    where c.oid = ${literal(id)}::oid;
+  `
+}
+
+/** Finds entities by oid, including partitions that the entity list hides */
+export const getEntitiesByIdsSQL = ({ ids }: { ids: Array<number> }): SafeSqlFragment => {
+  const idList = joinSqlFragments(ids.map(literal), ', ')
+  return safeSql`
+    select
+      c.oid::int8 as "id",
+      nc.nspname as "schema",
+      c.relname as "name",
+      c.relkind as "type",
+      obj_description(c.oid) as "comment",
+      c.relrowsecurity as "rls_enabled",
+      c.relispartition as "is_partition"
+    from pg_class c
+    join pg_namespace nc on nc.oid = c.relnamespace
+    where c.oid in (${idList})
+      and c.relkind in ('r', 'v', 'm', 'f', 'p');
   `
 }
