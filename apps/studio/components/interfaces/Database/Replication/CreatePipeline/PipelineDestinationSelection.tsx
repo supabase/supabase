@@ -52,9 +52,7 @@ export const PipelineDestinationSelection = ({
               <span className="flex items-center gap-x-3.5">
                 {renderLogo?.(type)}
                 <span className="flex flex-col">
-                  <span className="flex items-center gap-x-2 font-medium text-foreground">
-                    {type}
-                  </span>
+                  <span className="font-medium text-foreground">{type}</span>
                   <span className="text-sm text-foreground-lighter text-balance">
                     {description}
                   </span>

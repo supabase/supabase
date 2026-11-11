@@ -110,15 +110,8 @@ export const DestinationTypeSelection = () => {
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
-  const STAGE_DESCRIPTIONS: Record<
-    NonNullable<DestinationTypeOption['stage']>,
-    (type: DestinationType) => string
-  > = {
-    'Public Alpha': (type) => `${type} support is in public alpha.`,
-  }
-
   const stageDescription = selectedOption?.stage
-    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
+    ? `${selectedOption.value} support is in public alpha.`
     : null
 
   const typeDescription =
