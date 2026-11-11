@@ -63,7 +63,6 @@ export default function TraceWaterfallDemo() {
               <Trace.Timing />
               <Trace.CollapsedChildren />
               <Trace.Markers />
-              <Trace.Slowest />
             </Trace.Lane>
           </Trace.Rows>
         </Trace.Waterfall>

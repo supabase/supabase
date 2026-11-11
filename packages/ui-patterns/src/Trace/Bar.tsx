@@ -1,7 +1,7 @@
 'use client'
 
 import type { ComponentProps } from 'react'
-import { Badge, cn } from 'ui'
+import { cn } from 'ui'
 
 import { Duration, useSpan } from './Rows'
 import { useTrace } from './Trace'
@@ -18,7 +18,6 @@ import { LIVE_GROWTH_TRANSITION, useWaterfallScale } from './Waterfall'
 const TIMING_GAP = 6
 const TIMING_CHAR_PX = 7.2
 const TIMING_CHIP_PX = 8
-const SLOWEST_PX = 65
 
 const STATUS_CLASS: Record<SpanStatus, string> = {
   ok: 'bg-brand',
@@ -58,7 +57,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
 
 export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const { row } = useSpan()
-  const { nowMs, slowestId } = useTrace()
+  const { nowMs } = useTrace()
   const scale = useWaterfallScale()
   const { span } = row
   const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
@@ -68,7 +67,6 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const startPx = visibleStart * scale.width
   const endPx = visibleEnd * scale.width
   const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
-  const reserved = span.id === slowestId ? SLOWEST_PX : 0
   const placement = getTimingPlacement({
     startPx,
     endPx,
@@ -81,7 +79,7 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const position = {
     after: { left: `calc(${visibleEnd * 100}% + ${TIMING_GAP}px)` },
     inside: {
-      right: `min(calc(${(1 - visibleEnd) * 100}% + ${4 + reserved}px), calc(100% - ${labelPx}px))`,
+      right: `min(calc(${(1 - visibleEnd) * 100}% + 4px), calc(100% - ${labelPx}px))`,
     },
     before: { right: `calc(${(1 - visibleStart) * 100}% + ${TIMING_GAP}px)` },
   }[placement]
@@ -126,29 +124,6 @@ export function Markers() {
         )
       })}
     </>
-  )
-}
-
-export function Slowest({ className, style, ...props }: ComponentProps<typeof Badge>) {
-  const { row } = useSpan()
-  const { nowMs, slowestId } = useTrace()
-  const scale = useWaterfallScale()
-  const { visibleEnd, isVisible } = getSpanBounds(row.span, nowMs, scale)
-  if (row.span.id !== slowestId || !isVisible) return null
-
-  return (
-    <Badge
-      variant="warning"
-      data-trace-slowest
-      className={cn(
-        'pointer-events-none absolute top-1/2 -translate-y-1/2 bg-background',
-        className
-      )}
-      style={{ right: `calc(${(1 - visibleEnd) * 100}% + 4px)`, ...style }}
-      {...props}
-    >
-      Slowest
-    </Badge>
   )
 }
 

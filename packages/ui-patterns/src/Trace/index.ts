@@ -1,4 +1,4 @@
-import { Bar, CollapsedChildren, Markers, Slowest, Timing } from './Bar'
+import { Bar, CollapsedChildren, Markers, Timing } from './Bar'
 import { Cell, Duration, Lane, Rows } from './Rows'
 import { Root } from './Trace'
 import { Cursor, Grid, Ruler, Waterfall } from './Waterfall'
@@ -15,7 +15,6 @@ export const Trace = {
   Duration,
   Bar,
   Markers,
-  Slowest,
   Timing,
   CollapsedChildren,
 }
