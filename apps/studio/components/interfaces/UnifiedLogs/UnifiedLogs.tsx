@@ -27,11 +27,13 @@ import {
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
+import { ActiveViewBadge } from './components/ActiveViewBadge'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
 import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
+import { LogsViewsMenu } from './components/LogsViewsMenu'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -61,6 +63,8 @@ import {
   isOfferedFilter,
   toQuerySearchParams,
 } from './UnifiedLogs.utils'
+import { applyView, isViewModified, serializeView, type LogsView } from './UnifiedLogs.views'
+import { LOGS_SAVED_VIEWS_FLAG, useLogsViews } from './useLogsViews'
 import { AlertError } from '@/components/ui/AlertError'
 import { LEVELS } from '@/components/ui/DataTable/DataTable.constants'
 import { Option } from '@/components/ui/DataTable/DataTable.types'
@@ -127,6 +131,15 @@ export const UnifiedLogs = ({
   const canShowPipelinesLogs = showPipelinesLogs || isLoadingPipelinesLogs
   const { hasLoaded: flagsLoaded } = useFeatureFlags()
   const computeEnabled = useFlag('compute')
+  const showSavedViews = useFlag(LOGS_SAVED_VIEWS_FLAG)
+  const {
+    views: savedViews,
+    isLoading: isLoadingSavedViews,
+    isError: isErrorSavedViews,
+    updateView: updateSavedView,
+    deleteView: deleteSavedView,
+  } = useLogsViews()
+  const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -431,6 +444,37 @@ export const UnifiedLogs = ({
     })
   }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
 
+  const filterableNames = useMemo(
+    () => new Set(filterFields.map((field) => field.value)),
+    [filterFields]
+  )
+  const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
+  const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
+  const hasActiveFilters = parseLogsFilterUrlParams(search.filter).length > 0
+
+  const handleApplyView = (view: LogsView) => {
+    const { params, dropped } = applyView(view, { filterableNames })
+    if (dropped.length > 0) {
+      console.warn(`Saved view "${view.name}" dropped unknown filters/options:`, dropped)
+    }
+    setSearch(params)
+    setActiveViewId(view.id)
+  }
+
+  const handleUpdateActiveView = () => {
+    if (!activeView) return
+    const { filters, viewOptions } = serializeView({
+      name: activeView.name,
+      logSource: activeView.logSource,
+      search,
+    })
+    updateSavedView(activeView.id, { filters, viewOptions })
+  }
+
+  const handleSaveCurrentView = () => {
+    // TODO(saved-views): open the save-view dialog once it exists; stub for now.
+  }
+
   const applyFilterSearch = () => {
     const offeredColumnFilters = columnFilters.filter(
       ({ id }) =>
@@ -576,7 +620,19 @@ export const UnifiedLogs = ({
                 )}
 
                 <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
-                  <LogsFilterBar offeredFilters={offeredFilters} />
+                  <LogsFilterBar
+                    offeredFilters={offeredFilters}
+                    activeViewBadge={
+                      showSavedViews ? (
+                        <ActiveViewBadge
+                          view={activeView}
+                          isModified={isActiveViewModified}
+                          onUpdate={handleUpdateActiveView}
+                          onClear={() => setActiveViewId(null)}
+                        />
+                      ) : undefined
+                    }
+                  />
                 </div>
 
                 {hasFilterSideBar && (
@@ -591,6 +647,19 @@ export const UnifiedLogs = ({
                     onRefresh={refetchAllData}
                     shortcutId={SHORTCUT_IDS.UNIFIED_LOGS_REFRESH}
                   />
+                  {showSavedViews && (
+                    <LogsViewsMenu
+                      views={savedViews}
+                      isLoading={isLoadingSavedViews}
+                      isError={isErrorSavedViews}
+                      activeViewId={activeViewId}
+                      hasActiveFilters={hasActiveFilters}
+                      onApply={handleApplyView}
+                      onRename={(id, name) => updateSavedView(id, { name })}
+                      onDelete={deleteSavedView}
+                      onSaveCurrentView={handleSaveCurrentView}
+                    />
+                  )}
                   <DataTableViewOptions />
                   <DownloadLogsButton searchParameters={searchParameters} />
                   {fetchPreviousPage ? (
