@@ -76,17 +76,12 @@ breadcrumb: 'Migrations'
 
 ### Before you begin
 
-<Accordion
-  type="default"
-  chevronAlign="right"
-  justified
-  size="medium"
-  className="text-foreground-light mt-8 mb-6"
->
-  <AccordionItem header="Install Postgres and psql" id="install-postgres">
-    <$Partial path="postgres_installation.mdx" />
-  </AccordionItem>
-</Accordion>
+<details>
+<summary>Install Postgres and psql</summary>
+
+  <$Partial path="postgres_installation.mdx" />
+
+</details>
 
 ### Restore backup using CLI
 
