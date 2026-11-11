@@ -17,14 +17,13 @@ import { Admonition } from 'ui-patterns/Admonition'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { APIKeyRow } from './APIKeyRow'
-import { getWriteGrantTooltip } from './APIKeys.utils'
 import { CreatePublishableAPIKeyDialog } from './CreatePublishableAPIKeyDialog'
 import { AlertError } from '@/components/ui/AlertError'
 import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useGrant } from '@/lib/grants'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
@@ -76,10 +75,7 @@ export const PublishableAPIKeys = () => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
     if (!deleteGrant.grant) {
-      toast.error(
-        getWriteGrantTooltip(deleteGrant.status, 'delete') ??
-          'Still checking permissions to delete API keys. Try again in a moment.'
-      )
+      toast.error(getWriteGrantToastMessage(deleteGrant.status, 'delete', 'API keys'))
       return
     }
     deleteAPIKey({ projectRef, id: apiKey.id, grant: deleteGrant.grant })

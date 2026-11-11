@@ -1,20 +1,22 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { FunctionSquareIcon, ShieldIcon, ZapIcon } from 'lucide-react'
+import { FunctionSquareIcon, ListTreeIcon, ShieldIcon, ZapIcon } from 'lucide-react'
 import type { ICommand } from 'ui-patterns/CommandMenu'
 import { useCommandMenuOpen, useCurrentPage, useRegisterCommands } from 'ui-patterns/CommandMenu'
 
 import {
   formatRelatedFunctionDetails,
+  formatRelatedIndexDetails,
   formatRelatedPolicyDetails,
   formatRelatedTriggerDetails,
 } from './TableRelatedResources.utils'
 import { COMMAND_MENU_SECTIONS } from '@/components/interfaces/App/CommandMenu/CommandMenu.utils'
 import {
   getFunctionEditorRoute,
+  getIndexEditorRoute,
   getPolicyEditorRoute,
   getTriggerEditorRoute,
-} from '@/components/interfaces/App/CommandMenu/DatabaseEntitySearch.utils'
+} from '@/components/interfaces/App/CommandMenu/DatabaseEntityRoutes.utils'
 import { orderCommandSectionsByPriority } from '@/components/interfaces/App/CommandMenu/ordering'
 import {
   tableReferencingFunctionsQueryOptions,
@@ -81,6 +83,7 @@ export function useTableRelatedResourcesCommands() {
   const projectRef = project?.ref ?? '_'
   const policies = canShowSection ? (data?.policies ?? []) : []
   const triggers = canShowSection ? (data?.triggers ?? []) : []
+  const indexes = canShowSection ? (data?.indexes ?? []) : []
   const functions = canShowSection ? (functionData?.functions ?? []) : []
 
   const commands: ICommand[] = [
@@ -97,6 +100,13 @@ export function useTableRelatedResourcesCommands() {
       icon: () => <ZapIcon />,
       badge: () => <Badge>{formatRelatedTriggerDetails(trigger)}</Badge>,
       route: getTriggerEditorRoute(projectRef, trigger),
+    })),
+    ...indexes.map((index) => ({
+      id: `related-index-${index.id}`,
+      name: index.name,
+      icon: () => <ListTreeIcon />,
+      badge: () => <Badge>{formatRelatedIndexDetails(index)}</Badge>,
+      route: getIndexEditorRoute(projectRef, index),
     })),
     ...functions.map((fn) => ({
       id: `related-function-${fn.id}`,
