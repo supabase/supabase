@@ -236,8 +236,7 @@ function umdAmdShortCircuit(): Plugin {
 // a function"). Deep imports (`lodash/isEqual`) fail harder: their plain-CJS
 // `require` throws "require is not defined". lodash-es is the same version as
 // real ESM, so both import styles just work. Client bundles are untouched —
-// resolution is gated on `options.ssr`, and the Next build doesn't read this
-// config.
+// resolution is gated on `options.ssr`.
 function ssrLodashEs(): Plugin {
   return {
     name: 'studio-ssr-lodash-es',
@@ -592,9 +591,8 @@ export default defineConfig(({ command, mode }) => {
     server: {
       port: 3000,
       watch: {
-        // Next's build output, left behind when switching from
-        // STUDIO_FRAMEWORK=next, includes a full node_modules copy under
-        // `.next/standalone`.
+        // A leftover `.next/` from the retired Next build includes a full
+        // node_modules copy under `.next/standalone`.
         ignored: ['**/.next/**'],
       },
     },
@@ -625,8 +623,8 @@ export default defineConfig(({ command, mode }) => {
         // because the dev pipeline shims `process`. Point the bare import
         // at a shim that re-exports `@sentry/react` (same 10.x version —
         // it's what `@sentry/nextjs` wraps on the client) plus explicit
-        // stand-ins for the Next-only APIs. Next build (`build:next`)
-        // doesn't read this config and keeps the real package.
+        // stand-ins for the Next-only APIs. App source still imports
+        // `@sentry/nextjs`.
         {
           find: /^@sentry\/nextjs$/,
           replacement: path.resolve(rootDir, 'compat/sentry-nextjs.ts'),
@@ -751,11 +749,10 @@ export default defineConfig(({ command, mode }) => {
       },
     },
     css: {
-      // Disable PostCSS auto-discovery. Studio's postcss.config.cjs is kept
-      // for the Next build (`build:next`) and uses `@tailwindcss/postcss`,
-      // but under Vite we let `@tailwindcss/vite` (added below) handle
-      // Tailwind v4 directives directly. Running both plugins on the same
-      // CSS would double-process Tailwind output.
+      // Disable PostCSS auto-discovery: studio's postcss.config.cjs uses
+      // `@tailwindcss/postcss`, but `@tailwindcss/vite` (added below)
+      // handles Tailwind v4 directives directly. Running both plugins on the
+      // same CSS would double-process Tailwind output.
       postcss: { plugins: [] },
     },
     ssr: {
