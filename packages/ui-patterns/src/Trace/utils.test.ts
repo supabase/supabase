@@ -9,6 +9,7 @@ import {
   flattenTree,
   formatDuration,
   formatMs,
+  getSpanBounds,
   getTimingPlacement,
   MAX_COLLAPSED_MARKS,
   niceTickStep,
@@ -193,6 +194,37 @@ describe('collapsedChildMidpoints', () => {
     const over = buildTraceIndex([span('root', 0, 1000), ...children(MAX_COLLAPSED_MARKS + 1)])
     expect(collapsedChildMidpoints(at, 'root')).toHaveLength(MAX_COLLAPSED_MARKS)
     expect(collapsedChildMidpoints(over, 'root')).toEqual([])
+  })
+})
+
+describe('getSpanBounds', () => {
+  const scale = createTimeScale([0, 100], 400)
+
+  it('returns the fractions of a span inside the window', () => {
+    expect(getSpanBounds(span('a', 25, 75), 0, scale)).toMatchObject({
+      visibleStart: 0.25,
+      visibleEnd: 0.75,
+      isVisible: true,
+    })
+  })
+
+  it('clamps a span that overflows either edge of the window', () => {
+    expect(getSpanBounds(span('a', -50, 150), 0, scale)).toMatchObject({
+      startFraction: -0.5,
+      endFraction: 1.5,
+      visibleStart: 0,
+      visibleEnd: 1,
+      isVisible: true,
+    })
+  })
+
+  it('reports a span outside the window as not visible', () => {
+    expect(getSpanBounds(span('a', 150, 200), 0, scale).isVisible).toBe(false)
+    expect(getSpanBounds(span('a', -100, -50), 0, scale).isVisible).toBe(false)
+  })
+
+  it('extends a running span to now', () => {
+    expect(getSpanBounds(span('a', 25, null), 50, scale).visibleEnd).toBe(0.5)
   })
 })
 

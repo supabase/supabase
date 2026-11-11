@@ -10,6 +10,7 @@ import {
   collapsedChildMidpoints,
   effectiveEndMs,
   formatDuration,
+  getSpanBounds,
   getTimingPlacement,
 } from './utils'
 import { useWaterfallScale } from './Waterfall'
@@ -30,8 +31,8 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
   const { nowMs } = useTrace()
   const scale = useWaterfallScale()
   const { span } = row
-  const left = scale.toFraction(span.startMs)
-  const width = scale.toFraction(effectiveEndMs(span, nowMs)) - left
+  const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
+  if (!isVisible) return null
 
   return (
     <div
@@ -46,7 +47,11 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
           'transition-[width] duration-300 ease-linear motion-reduce:transition-none',
         className
       )}
-      style={{ left: `${left * 100}%`, width: `${width * 100}%`, ...style }}
+      style={{
+        left: `${visibleStart * 100}%`,
+        width: `${(visibleEnd - visibleStart) * 100}%`,
+        ...style,
+      }}
       {...props}
     />
   )
@@ -57,13 +62,10 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   const { nowMs, slowestId } = useTrace()
   const scale = useWaterfallScale()
   const { span } = row
-  const endMs = effectiveEndMs(span, nowMs)
-  const startFraction = scale.toFraction(span.startMs)
-  const endFraction = scale.toFraction(endMs)
-  if (endFraction < 0 || startFraction > 1) return null
+  const { visibleStart, visibleEnd, isVisible } = getSpanBounds(span, nowMs, scale)
+  if (!isVisible) return null
 
-  const visibleStart = Math.max(startFraction, 0)
-  const visibleEnd = Math.min(endFraction, 1)
+  const endMs = effectiveEndMs(span, nowMs)
   const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
   const reserved = span.id === slowestId ? SLOWEST_PX : 0
   const placement = getTimingPlacement({
@@ -126,9 +128,8 @@ export function Slowest({ className, style, ...props }: ComponentProps<typeof Ba
   const { row } = useSpan()
   const { nowMs, slowestId } = useTrace()
   const scale = useWaterfallScale()
-  if (row.span.id !== slowestId) return null
-
-  const endFraction = scale.toFraction(effectiveEndMs(row.span, nowMs))
+  const { visibleEnd, isVisible } = getSpanBounds(row.span, nowMs, scale)
+  if (row.span.id !== slowestId || !isVisible) return null
 
   return (
     <Badge
@@ -138,7 +139,7 @@ export function Slowest({ className, style, ...props }: ComponentProps<typeof Ba
         'pointer-events-none absolute top-1/2 -translate-y-1/2 bg-background',
         className
       )}
-      style={{ right: `calc(${(1 - endFraction) * 100}% + 4px)`, ...style }}
+      style={{ right: `calc(${(1 - visibleEnd) * 100}% + 4px)`, ...style }}
       {...props}
     >
       Slowest

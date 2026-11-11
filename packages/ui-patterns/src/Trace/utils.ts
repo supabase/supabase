@@ -201,6 +201,32 @@ export function collapsedChildMidpoints(index: TraceIndex, id: string): number[]
   })
 }
 
+export interface SpanBounds {
+  startFraction: number
+  endFraction: number
+  visibleStart: number
+  visibleEnd: number
+  isVisible: boolean
+}
+
+export function getSpanBounds(
+  span: Pick<Span, 'startMs' | 'endMs'>,
+  nowMs: number,
+  scale: TimeScale
+): SpanBounds {
+  const startFraction = scale.toFraction(span.startMs)
+  const endFraction = scale.toFraction(effectiveEndMs(span, nowMs))
+  const clamp = (fraction: number) => Math.min(Math.max(fraction, 0), 1)
+
+  return {
+    startFraction,
+    endFraction,
+    visibleStart: clamp(startFraction),
+    visibleEnd: clamp(endFraction),
+    isVisible: endFraction >= 0 && startFraction <= 1,
+  }
+}
+
 export type TimingPlacement = 'after' | 'before' | 'inside'
 
 export function getTimingPlacement({
