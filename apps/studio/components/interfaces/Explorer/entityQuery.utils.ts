@@ -1,4 +1,9 @@
 import { ident, joinSqlFragments, safeSql, type SafeSqlFragment } from '@supabase/pg-meta'
+import { Query } from '@supabase/pg-meta/src/query'
+import {
+  formatPatternMatchFilterValue,
+  TEXT_TYPES,
+} from '@supabase/pg-meta/src/query/table-row-query'
 import { z } from 'zod'
 
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -60,6 +65,13 @@ const ENTITY_QUERY_DEFINITIONS: Record<string, EntityQueryDefinition> = {
 }
 
 /**
+ * The columns an entity shows when it narrows them, such as `auth.users` leaving out password
+ * hashes and tokens; undefined when it shows them all. Filters and sorts offer only these too.
+ */
+export const getEntityQueryColumns = (entity: Pick<QueryEntityBinding, 'schema' | 'name'>) =>
+  ENTITY_QUERY_DEFINITIONS[`${entity.schema}.${entity.name}`]?.columns
+
+/**
  * The query an entity opens with. Regenerated rather than stored, so it stays reproducible.
  * For a table with no definition it is exactly `select * from schema.name`.
  */
@@ -78,4 +90,89 @@ export const buildEntitySelectSql = (
     : safeSql``
 
   return safeSql`select ${columns} from ${ident(entity.schema)}.${ident(entity.name)}${orderBy}`
+}
+
+/**
+ * A table tab's filters and sorts, in the Table Editor's own shapes so its filter bar and sort
+ * popover work on them unchanged.
+ */
+export const tableViewSchema = z.object({
+  filters: z.array(
+    z.object({
+      column: z.union([z.string(), z.array(z.string())]),
+      operator: z.enum(['=', '<>', '>', '<', '>=', '<=', '~~', '~~*', '!~~', '!~~*', 'in', 'is']),
+      value: z.unknown(),
+    })
+  ),
+  sorts: z.array(
+    z.object({
+      table: z.string(),
+      column: z.string(),
+      ascending: z.boolean().optional(),
+      nullsFirst: z.boolean().optional(),
+    })
+  ),
+})
+
+export type TableView = z.infer<typeof tableViewSchema>
+
+export const EMPTY_TABLE_VIEW: TableView = { filters: [], sorts: [] }
+
+/**
+ * The query a table tab runs: what `buildEntitySelectSql` opens it with, narrowed by the Table
+ * Editor's filters and ordered by its sorts, built the way the Table Editor builds its own. It
+ * is a plain select of the table, so its rows stay editable in the shared results grid and
+ * opening it as a query hands over exactly what's on screen.
+ */
+export const buildTableViewSql = ({
+  entity,
+  tableView = EMPTY_TABLE_VIEW,
+  columnFormats = {},
+}: {
+  entity: Pick<QueryEntityBinding, 'schema' | 'name'>
+  tableView?: TableView
+  /** Column formats by name, so an empty filter value on a non-text column means null. */
+  columnFormats?: Record<string, string>
+}): SafeSqlFragment => {
+  const { filters, sorts } = tableView
+  if (filters.length === 0 && sorts.length === 0) return buildEntitySelectSql(entity)
+
+  const definition = ENTITY_QUERY_DEFINITIONS[`${entity.schema}.${entity.name}`] ?? {}
+  let query = new Query().from(entity.name, entity.schema).select(
+    definition.columns
+      ? joinSqlFragments(
+          definition.columns.map((column) => ident(column)),
+          ', '
+        )
+      : undefined
+  )
+
+  for (const filter of filters) {
+    const format = typeof filter.column === 'string' ? columnFormats[filter.column] : undefined
+    const isTextColumn = format === undefined || TEXT_TYPES.some((type) => type === format)
+    const value =
+      !isTextColumn && filter.value === ''
+        ? null
+        : formatPatternMatchFilterValue(filter.value, filter.operator)
+    query = query.filter(filter.column, filter.operator, value)
+  }
+
+  const orderBy =
+    sorts.length > 0
+      ? sorts
+      : definition.orderBy
+        ? [
+            {
+              table: entity.name,
+              column: definition.orderBy.column,
+              ascending: definition.orderBy.ascending,
+              nullsFirst: false,
+            },
+          ]
+        : []
+  for (const sort of orderBy) {
+    query = query.order(sort.table, sort.column, sort.ascending, sort.nullsFirst)
+  }
+
+  return query.toSql({ isCTE: false, isFinal: false })
 }

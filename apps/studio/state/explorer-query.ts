@@ -4,9 +4,10 @@ import { proxy, ref, snapshot, useSnapshot } from 'valtio'
 import { z } from 'zod'
 
 import {
-  buildEntitySelectSql,
   queryEntityBindingSchema,
+  tableViewSchema,
   type QueryEntityBinding,
+  type TableView,
 } from '@/components/interfaces/Explorer/entityQuery.utils'
 import { DEFAULT_CELL_ROW_LIMIT } from '@/components/interfaces/Explorer/QueryCell/QueryCell.utils'
 import { type QueryDisplay, type QueryResult } from '@/components/interfaces/Explorer/types'
@@ -48,6 +49,8 @@ export type DatabaseQueryDraft = ExplorerQueryDraftBase &
     rowLimit: number
     role?: ImpersonationRole
     entity?: QueryEntityBinding
+    /** A table tab's filters and sorts, kept with the draft so they survive switching tabs. */
+    tableView?: TableView
   }
 
 export type LogsQueryDraft = ExplorerQueryDraftBase &
@@ -75,6 +78,7 @@ type PersistedExplorerQueryDraft = {
   rowLimit?: number
   role?: ImpersonationRole
   entity?: QueryEntityBinding
+  tableView?: TableView
 } & QueryDisplay
 
 type PersistedExplorerQueryDrafts = Record<string, PersistedExplorerQueryDraft>
@@ -93,6 +97,7 @@ const persistedDraftSchema = z.object({
   rowLimit: z.unknown().optional(),
   role: z.unknown().optional(),
   entity: z.unknown().optional(),
+  tableView: tableViewSchema.optional().catch(undefined),
   view: z.unknown().optional(),
   chart: z.unknown().optional(),
 })
@@ -152,6 +157,8 @@ const toDraft = ({
     rowLimit: persisted.rowLimit ?? DEFAULT_CELL_ROW_LIMIT,
     role: persisted.role,
     entity: persisted.entity,
+    // Filters and sorts only mean something on a table's draft.
+    tableView: persisted.entity ? persisted.tableView : undefined,
   }
 }
 
@@ -196,6 +203,7 @@ const readPersistedDrafts = (storage: StorageLike, projectRef: string) => {
               view,
               chart,
               entity,
+              tableView: draft.data.tableView,
             },
           ],
         ]
@@ -223,19 +231,13 @@ const writePersistedDrafts = (
 }
 
 /**
- * Whether closing a draft would actually lose something. An entity-backed draft still sitting
- * on its generated `select *` is reproducible — reopening the table rebuilds it — so only a
- * draft the user has since edited (or an ad-hoc query with any content at all) is worth a
- * discard prompt.
+ * Whether closing a draft would actually lose something. A table's draft never is: its SQL is
+ * generated, and at most narrowed by a short prompt the user can ask again. Only an ad-hoc
+ * query with any content at all is worth a discard prompt.
  */
 export const hasDiscardableContent = (draft: ExplorerQueryDraft) => {
-  const sql = draft.uncheckedSql.trim()
-  if (sql.length === 0) return false
-
-  const entity = draft._tag === 'database' ? draft.entity : undefined
-  if (!entity) return true
-
-  return sql !== buildEntitySelectSql(entity).trim()
+  if (draft.uncheckedSql.trim().length === 0) return false
+  return draft._tag !== 'database' || draft.entity === undefined
 }
 
 export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage) => {
@@ -254,6 +256,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       rowLimit: draft._tag === 'database' ? draft.rowLimit : undefined,
       role: draft._tag === 'database' ? draft.role : undefined,
       entity: draft._tag === 'database' ? draft.entity : undefined,
+      tableView: draft._tag === 'database' ? draft.tableView : undefined,
       view: draft.view,
       chart: draft.chart,
     }
@@ -353,6 +356,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
       const currentRowLimit = draft._tag === 'database' ? draft.rowLimit : undefined
       const currentRole = draft._tag === 'database' ? draft.role : undefined
       const currentEntity = draft._tag === 'database' ? draft.entity : undefined
+      const currentTableView = draft._tag === 'database' ? draft.tableView : undefined
 
       state.drafts[id] = toDraft({
         id,
@@ -365,6 +369,7 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
           rowLimit: rowLimit ?? currentRowLimit,
           role: currentRole,
           entity: currentEntity,
+          tableView: currentTableView,
           view: draft.view,
           chart: draft.chart,
         },
@@ -388,6 +393,15 @@ export const createExplorerQueryState = (storage: StorageLike = safeLocalStorage
         const timeout = setTimeout(persist, EXPLORER_QUERY_PERSIST_DELAY)
         pendingPersistence.set(id, { timeout, persist })
       }
+    },
+
+    /** Sets a table tab's filters and sorts. Only a table's draft has them. */
+    setTableView: ({ id, tableView }: { id: string; tableView: TableView }) => {
+      const draft = state.drafts[id]
+      if (draft?._tag !== 'database' || !draft.entity) return
+
+      state.drafts[id] = { ...draft, tableView, updatedAt: Date.now() }
+      persistDraft(state.drafts[id])
     },
 
     flushPendingPersistence: ({ projectRef }: { projectRef?: string } = {}) => {

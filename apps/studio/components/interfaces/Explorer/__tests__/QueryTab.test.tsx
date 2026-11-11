@@ -3,6 +3,7 @@ import { act, screen, waitFor } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import type { platformComponents } from 'api-types'
 import { HttpResponse } from 'msw'
+import mockRouter from 'next-router-mock'
 import { useEffect, useRef, type ReactNode } from 'react'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -647,10 +648,48 @@ describe('QueryTab execution', () => {
   })
 })
 
+/**
+ * Mocks the pg-meta query endpoint for a table tab: resolving `public.users` to its entity, and
+ * recording every query the tab runs for rows. Other background metadata reads get no rows.
+ */
+const mockTableQueries = () => {
+  const executedQueries: string[] = []
+  addAPIMock({
+    method: 'post',
+    path: '/platform/pg-meta/:ref/query',
+    response: async ({ request }) => {
+      const key = new URL(request.url).searchParams.get('key') ?? ''
+      if (key.startsWith('entity-id')) return HttpResponse.json([{ id: 1 }])
+      if (key.startsWith('table-editor')) {
+        return HttpResponse.json([
+          {
+            entity: {
+              entity_type: ENTITY_TYPE.FOREIGN_TABLE,
+              id: 1,
+              schema: 'public',
+              name: 'users',
+              comment: null,
+              foreign_server_name: '',
+              foreign_data_wrapper_name: '',
+              foreign_data_wrapper_handler: '',
+              columns: [],
+            },
+          },
+        ])
+      }
+      if (key !== '') return HttpResponse.json([])
+      const { query } = (await request.json()) as { query: string }
+      executedQueries.push(query)
+      return HttpResponse.json([])
+    },
+  })
+  return executedQueries
+}
+
 describe('QueryTab auto-run', () => {
-  it('runs a table query on open without waiting for the user', async () => {
+  it('runs a table on open without waiting for the user', async () => {
     createEntityDraft()
-    const executions = mockExecutedQueries()
+    const executions = mockTableQueries()
 
     renderQueryTab()
 
@@ -658,30 +697,28 @@ describe('QueryTab auto-run', () => {
     expect(executions[0]).toContain('select * from public.users')
   })
 
-  it('runs only once, even as the editor re-renders', async () => {
+  it('runs only once, even as the tab re-renders', async () => {
     createEntityDraft()
-    const executions = mockExecutedQueries()
+    const executions = mockTableQueries()
 
     renderQueryTab()
 
     await waitFor(() => expect(executions).toHaveLength(1))
-    await userEvent.click(await screen.findByRole('button', { name: 'Show query' }))
+    await userEvent.click(await screen.findByRole('button', { name: /details$/ }))
 
     expect(executions).toHaveLength(1)
   })
 
-  it('waits for Run once the query is no longer the one it generated', async () => {
+  it('still shows the whole table when an older draft edited its SQL', async () => {
+    // Table tabs used to be editable queries, so a saved draft may hold edited SQL. A table
+    // tab always shows the table; editing SQL happens in a query opened from it.
     createEntityDraft('select id from public.users')
-    const executions = mockExecutedQueries()
+    const executions = mockTableQueries()
 
     renderQueryTab()
 
-    const runButton = await screen.findByRole('button', { name: 'Run' })
-    await waitFor(() => expect(runButton).toBeEnabled())
-    expect(executions).toHaveLength(0)
-
-    await userEvent.click(runButton)
     await waitFor(() => expect(executions).toHaveLength(1))
+    expect(executions[0]).toContain('select * from public.users')
   })
 
   it('leaves an ad-hoc query alone', async () => {
@@ -693,5 +730,110 @@ describe('QueryTab auto-run', () => {
     const runButton = await screen.findByRole('button', { name: 'Run' })
     await waitFor(() => expect(runButton).toBeEnabled())
     expect(executions).toHaveLength(0)
+  })
+})
+
+describe('QueryTab table tab', () => {
+  it("has the Table Editor's toolbar instead of a SQL editor, so a table reads as a table", async () => {
+    createEntityDraft()
+    mockTableQueries()
+
+    renderQueryTab()
+
+    expect(await screen.findByRole('button', { name: 'Refresh' })).toBeInTheDocument()
+    expect(screen.getByRole('button', { name: 'Open query' })).toBeInTheDocument()
+    // The tab already names the table, so the toolbar leads straight into the filter bar.
+    expect(screen.queryByText('public.users')).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Run' })).not.toBeInTheDocument()
+    expect(screen.queryByLabelText('SQL editor')).not.toBeInTheDocument()
+  })
+
+  it('runs the saved filters and sorts, so they outlast switching tabs', async () => {
+    createEntityDraft()
+    explorerQueryState.setTableView({
+      id: 'query-test',
+      tableView: {
+        filters: [{ column: 'email', operator: '=', value: 'ada@example.com' }],
+        sorts: [{ table: 'users', column: 'created_at', ascending: false }],
+      },
+    })
+    const executions = mockTableQueries()
+
+    renderQueryTab()
+
+    await waitFor(() => expect(executions).toHaveLength(1))
+    expect(executions[0]).toContain("email = 'ada@example.com'")
+    expect(executions[0]).toMatch(/order by .*created_at.* desc/i)
+  })
+
+  it("opens the table's SQL as a new query, keeping the table tab open", async () => {
+    createEntityDraft()
+    explorerQueryState.setTableView({
+      id: 'query-test',
+      tableView: {
+        filters: [{ column: 'email', operator: '=', value: 'ada@example.com' }],
+        sorts: [],
+      },
+    })
+    mockTableQueries()
+    const tabsState = createTabsState('default')
+    tabsState.addTab({
+      id: createTabId('query', { id: 'query-test' }),
+      type: 'query',
+      label: 'public.users',
+      metadata: { queryId: 'query-test' },
+      isPreview: true,
+    })
+
+    renderQueryTab(tabsState)
+
+    await userEvent.click(await screen.findByRole('button', { name: 'Open query' }))
+
+    await waitFor(() =>
+      expect(mockRouter.asPath).toMatch(/^\/project\/default\/explorer\/query\/(?!query-test)/)
+    )
+    const newId = mockRouter.asPath.split('/').pop() ?? ''
+    const newDraft = explorerQueryState.drafts[newId]
+    // What's on screen, filters included, as a plain query of the user's own.
+    expect(newDraft).toMatchObject({ _tag: 'database', pendingAutoRun: true })
+    expect(newDraft?.uncheckedSql).toContain("email = 'ada@example.com'")
+    expect(newDraft?._tag === 'database' && newDraft.entity).toBeFalsy()
+    // Opening a query must not replace the table's tab as a preview would be.
+    expect(tabsState.tabsMap[createTabId('query', { id: 'query-test' })]?.isPreview).toBe(false)
+  })
+
+  it('adds users through Auth on auth.users, as the Users page does, rather than inserting rows', async () => {
+    explorerQueryState.removeDraft({ id: 'query-test', projectRef: 'default' })
+    explorerQueryState.createDraft({
+      id: 'query-test',
+      projectRef: 'default',
+      sql: 'select 1',
+      source: { _tag: 'database' },
+      entity: { schema: 'auth', name: 'users', type: ENTITY_TYPE.TABLE },
+    })
+    const executions = mockTableQueries()
+
+    renderQueryTab()
+
+    expect(await screen.findByRole('button', { name: 'Add user' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Add row' })).not.toBeInTheDocument()
+    // Only the columns the Users page shows, so password hashes and tokens stay off screen.
+    await waitFor(() => expect(executions).toHaveLength(1))
+    expect(executions[0]).not.toContain('*')
+    expect(executions[0]).not.toContain('encrypted_password')
+  })
+
+  it('refreshes the rows on demand', async () => {
+    createEntityDraft()
+    const executions = mockTableQueries()
+
+    renderQueryTab()
+
+    await waitFor(() => expect(executions).toHaveLength(1))
+    const refresh = screen.getByRole('button', { name: 'Refresh' })
+    await waitFor(() => expect(refresh).toBeEnabled())
+    await userEvent.click(refresh)
+
+    await waitFor(() => expect(executions).toHaveLength(2))
   })
 })

@@ -4,7 +4,6 @@ import { toast } from 'sonner'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { useOpenEntityQuery } from '../hooks'
-import { AddRowButton } from './AddRowButton'
 import type { DatabaseObjectDetailsProps } from './DatabaseObjectDetails'
 import {
   formatPolicySummary,
@@ -43,7 +42,7 @@ import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 import { useTrack } from '@/lib/telemetry/track'
 
 /** What a table query sits on top of: its size, access rules, and the objects around it. */
-export const TableDetails = ({ relation, onRowAdded }: DatabaseObjectDetailsProps) => {
+export const TableDetails = ({ relation }: DatabaseObjectDetailsProps) => {
   const { data: project } = useSelectedProjectQuery()
   const projectRef = project?.ref
   const connectionString = project?.connectionString
@@ -72,11 +71,7 @@ export const TableDetails = ({ relation, onRowAdded }: DatabaseObjectDetailsProp
 
   return (
     <div className="flex flex-col">
-      <RelationDetailsHeader
-        relation={relation}
-        description={entity?.comment}
-        action={table && <AddRowButton relation={relation} onRowAdded={onRowAdded} />}
-      />
+      <RelationDetailsHeader relation={relation} description={entity?.comment} />
       {table && <TableProperties relation={relation} table={table} />}
       <TablePolicies
         relation={relation}

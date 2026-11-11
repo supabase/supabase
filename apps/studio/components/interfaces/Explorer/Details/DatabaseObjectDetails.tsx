@@ -10,8 +10,6 @@ import { useIsProtectedSchema } from '@/hooks/useProtectedSchemas'
 
 export type DatabaseObjectDetailsProps = {
   relation: QueryRelation
-  /** Receives a row added from the details, so a surface showing the table can show it too. */
-  onRowAdded?: (row: Record<string, unknown>) => void
 }
 
 type DetailsComponent = ComponentType<DatabaseObjectDetailsProps>

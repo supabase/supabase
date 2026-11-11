@@ -23,9 +23,11 @@ const configurationSchema = z.object({ createMore: z.boolean().optional() })
  */
 export const AddRowButton = ({
   relation,
+  className,
   onRowAdded,
 }: {
   relation: QueryRelation
+  className?: string
   /** Receives the row as it was stored, so a surface showing the table can show it too. */
   onRowAdded?: (row: Record<string, unknown>) => void
 }) => {
@@ -77,9 +79,10 @@ export const AddRowButton = ({
   return (
     <>
       <Button
-        variant="default"
+        variant="primary"
         size="tiny"
         icon={<PlusIcon size={14} />}
+        className={className}
         loading={isLoadingTable}
         onClick={handleOpen}
       >

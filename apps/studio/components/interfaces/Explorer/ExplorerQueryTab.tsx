@@ -20,7 +20,10 @@ import {
   KeyboardShortcut,
 } from 'ui'
 
+import { tableViewSchema } from './entityQuery.utils'
+import { ExplorerTableTab } from './ExplorerTableTab'
 import { ExplorerToolbarAction } from './ExplorerToolbar'
+import { useCreateQuery } from './hooks'
 import { QueryEditor, type ExplorerQueryModel, type QueryEditorHandle } from './QueryEditor'
 import { SaveQueryDropdown } from './SaveQueryDropdown'
 import { type QueryDisplay, type QueryResult } from './types'
@@ -45,6 +48,7 @@ export const ExplorerQueryTab = () => {
   )
 
   const queryEditorRef = useRef<QueryEditorHandle>(null)
+  const { createQuery } = useCreateQuery()
 
   const hotkeySequnece: Hotkey | undefined =
     SHORTCUT_DEFINITIONS[SHORTCUT_IDS.SQL_EDITOR_FORMAT].sequence[0]
@@ -73,13 +77,6 @@ export const ExplorerQueryTab = () => {
     if (!id || !ref) return
 
     explorerQueryState.restoreDraft({ id, projectRef: ref })
-
-    // A table is opened for its rows, so it lands on the results with the query tucked away;
-    // an ad-hoc query opens on the editor the user came to write in.
-    const restored = explorerQueryState.drafts[id]
-    const isEntityQuery = restored?._tag === 'database' && restored.entity !== undefined
-    setShowQuery(!isEntityQuery)
-
     setRestoredQueryKey(`${ref}:${id}`)
   }, [id, ref])
 
@@ -131,7 +128,6 @@ export const ExplorerQueryTab = () => {
           ...toQuerySourceBinding(draft),
           uncheckedSql: draft.uncheckedSql,
           rowLimit: draft.rowLimit,
-          entity: draft.entity,
         }
 
   const persistTab = () => tabs.makeTabPermanent(createTabId('query', { id }))
@@ -143,6 +139,64 @@ export const ExplorerQueryTab = () => {
     })
   }
 
+  // A table opens on its rows, with the Table Editor's toolbar. Its SQL is a starting point for
+  // a query of the user's own, in a tab of its own, so the table stays a table.
+  if (draft._tag === 'database' && draft.entity) {
+    return (
+      <ExplorerTableTab
+        id={id}
+        entity={{ ...draft.entity }}
+        // A plain copy of the stored view, which the snapshot hands out read-only.
+        tableView={draft.tableView ? tableViewSchema.parse(draft.tableView) : undefined}
+        rowLimit={draft.rowLimit}
+        result={result}
+        onResultChange={handleResultChange}
+        onOpenQuery={(sql) => {
+          // Kept open beside the new query rather than replaced as a preview tab.
+          persistTab()
+          createQuery({ sql, autoRun: true })
+        }}
+      />
+    )
+  }
+
+  const toolbarActions = (
+    <>
+      <SaveQueryDropdown
+        query={{ title: draft.name, sql: draft.uncheckedSql }}
+        source={toQuerySourceBinding(draft)}
+      />
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <ExplorerToolbarAction icon={<MoreVerticalIcon size={16} strokeWidth={2} />} />
+        </DropdownMenuTrigger>
+        <DropdownMenuContent className="w-48" align="end">
+          <DropdownMenuItem
+            className="justify-between"
+            onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
+          >
+            <div className="flex items-center gap-x-2">
+              <KeyboardIcon size={14} />
+              <span>Intellisense enabled</span>
+            </div>
+            {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            className="justify-between"
+            onClick={() => queryEditorRef.current?.prettify()}
+          >
+            <span className="flex items-center gap-x-2">
+              <AlignLeftIcon size={14} />
+              Prettify SQL
+            </span>
+            {formatKeys && <KeyboardShortcut keys={formatKeys} />}
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    </>
+  )
+
   return (
     <QueryEditor
       ref={queryEditorRef}
@@ -152,9 +206,6 @@ export const ExplorerQueryTab = () => {
       title={draft.name}
       query={query}
       result={result}
-      // A table is opened to see its rows, so it runs itself. The editor honors this only
-      // while the query is still the generated one — an edited query waits for Run.
-      autoRun
       display={display}
       showQuery={showQuery}
       onShowQueryChange={setShowQuery}
@@ -182,42 +233,7 @@ export const ExplorerQueryTab = () => {
         persistTab()
         explorerQueryState.setDisplay({ id, display })
       }}
-      toolbarActions={
-        <>
-          <SaveQueryDropdown
-            query={{ title: draft.name, sql: draft.uncheckedSql }}
-            source={toQuerySourceBinding(draft)}
-          />
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <ExplorerToolbarAction icon={<MoreVerticalIcon size={16} strokeWidth={2} />} />
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-48" align="end">
-              <DropdownMenuItem
-                className="justify-between"
-                onClick={() => setIsIntellisenseEnabled(!isIntellisenseEnabled)}
-              >
-                <div className="flex items-center gap-x-2">
-                  <KeyboardIcon size={14} />
-                  <span>Intellisense enabled</span>
-                </div>
-                {isIntellisenseEnabled && <CheckIcon className="text-primary" size={16} />}
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem
-                className="justify-between"
-                onClick={() => queryEditorRef.current?.prettify()}
-              >
-                <span className="flex items-center gap-x-2">
-                  <AlignLeftIcon size={14} />
-                  Prettify SQL
-                </span>
-                {formatKeys && <KeyboardShortcut keys={formatKeys} />}
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-        </>
-      }
+      toolbarActions={toolbarActions}
     />
   )
 }

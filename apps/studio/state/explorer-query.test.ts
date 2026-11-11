@@ -492,9 +492,38 @@ describe('hasDiscardableContent', () => {
     ).toBe(false)
   })
 
-  it('treats an edited entity draft as discardable', () => {
+  it('treats any table tab as reproducible, since reopening the table rebuilds it', () => {
     expect(
       hasDiscardableContent(draftWith({ sql: 'select id from public.users', withEntity: true }))
-    ).toBe(true)
+    ).toBe(false)
+  })
+})
+
+describe('setTableView', () => {
+  const entity = { schema: 'public', name: 'users', type: ENTITY_TYPE.TABLE }
+  const tableView = {
+    filters: [{ column: 'email', operator: '=' as const, value: 'ada@example.com' }],
+    sorts: [{ table: 'users', column: 'created_at', ascending: false }],
+  }
+
+  it("keeps a table tab's filters and sorts across a reload", () => {
+    const storage = createMemoryStorage()
+    const firstState = createExplorerQueryState(storage)
+    firstState.createDraft({ id: 'table-1', projectRef: 'project-a', entity })
+    firstState.setTableView({ id: 'table-1', tableView })
+
+    const secondState = createExplorerQueryState(storage)
+    secondState.restoreDraft({ id: 'table-1', projectRef: 'project-a' })
+
+    expect(secondState.drafts['table-1']).toMatchObject({ tableView })
+  })
+
+  it('leaves an ad-hoc query alone, since only a table has filters and sorts', () => {
+    const state = createExplorerQueryState(createMemoryStorage())
+    state.createDraft({ id: 'query-1', projectRef: 'project-a', sql: 'select 1' })
+
+    state.setTableView({ id: 'query-1', tableView })
+
+    expect(state.drafts['query-1']).toMatchObject({ tableView: undefined })
   })
 })

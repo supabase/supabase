@@ -4,7 +4,6 @@ import type { DatabaseObjectDetailsProps } from './DatabaseObjectDetails'
 import { DetailsProperties, DetailsProperty, DetailsSection } from './DetailsSection'
 import { RelationDetailsHeader } from './RelationDetailsHeader'
 import { TableTriggers } from './TableDetails'
-import { AddUserDropdown } from '@/components/interfaces/Auth/Users/AddUserDropdown'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useUsersCountQuery } from '@/data/auth/users-count-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
@@ -24,12 +23,7 @@ export const UsersTableDetails = ({ relation }: DatabaseObjectDetailsProps) => {
 
   return (
     <div className="flex flex-col">
-      <RelationDetailsHeader
-        relation={relation}
-        title="Users"
-        subtitle="Supabase Auth"
-        action={<AddUserDropdown />}
-      />
+      <RelationDetailsHeader relation={relation} title="Users" subtitle="Supabase Auth" />
       <DetailsSection title="Properties">
         <DetailsProperties>
           <DetailsProperty label="Users">
