@@ -1,15 +1,14 @@
 import { AuthError, AuthRetryableFetchError, type Session } from '@supabase/supabase-js'
-import { screen, waitFor } from '@testing-library/react'
+import { render, screen, waitFor } from '@testing-library/react'
 import { http, HttpResponse } from 'msw'
 import { Toaster } from 'sonner'
 import { beforeEach, describe, expect, test, vi } from 'vitest'
 
 import { BASE_PATH } from '@/lib/constants'
 import { auth } from '@/lib/gotrue'
-import SignInMfaPage from '@/pages/sign-in-mfa'
-import { customRender } from '@/tests/lib/custom-render'
+import { Route } from '@/routes/_auth/sign-in-mfa'
 import { addAPIMock, mswServer } from '@/tests/lib/msw'
-import { routerMock } from '@/tests/lib/route-mock'
+import { renderRoute } from '@/tests/lib/route-render'
 
 vi.mock('common', async (importOriginal) => {
   const actual = await importOriginal<typeof import('common')>()
@@ -31,9 +30,11 @@ const SESSION: Session = {
   },
 }
 
-function setUrl(url: string) {
-  window.history.replaceState(null, '', url)
-  routerMock.setCurrentUrl(url)
+const MFA_URL = '/sign-in-mfa?method=github&returnTo=%2Forg'
+
+function renderSignInMfa() {
+  window.history.replaceState(null, '', MFA_URL)
+  return renderRoute(Route, { routeId: '/_auth/sign-in-mfa', url: MFA_URL })
 }
 
 function mockAuth({
@@ -75,15 +76,14 @@ function mockAuditLogin() {
 describe('SignInMfaPage', () => {
   beforeEach(() => {
     vi.restoreAllMocks()
-    setUrl('/sign-in-mfa?method=github&returnTo=%2Forg')
   })
 
   test('returns to sign-in with the query when the callback failed and there is no session', async () => {
     mockAuth({ initializeError: CALLBACK_ERROR })
-    customRender(<SignInMfaPage dehydratedState={undefined} />)
+    const { router } = await renderSignInMfa()
 
-    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
-    expect(routerMock.query).toEqual({ method: 'github', returnTo: '/org' })
+    await waitFor(() => expect(router.state.location.pathname).toBe('/sign-in'))
+    expect(router.state.location.search).toEqual({ method: 'github', returnTo: '/org' })
   })
 
   test('shows the MFA form when a session exists despite an earlier callback error', async () => {
@@ -93,10 +93,10 @@ describe('SignInMfaPage', () => {
       )
     )
     mockAuth({ initializeError: CALLBACK_ERROR, session: SESSION })
-    customRender(<SignInMfaPage dehydratedState={undefined} />)
+    const { router } = await renderSignInMfa()
 
     expect(await screen.findByText('Two-factor authentication')).toBeInTheDocument()
-    expect(routerMock.pathname).toBe('/sign-in-mfa')
+    expect(router.state.location.pathname).toBe('/sign-in-mfa')
   })
 
   test('returns to sign-in quietly when the stored session cannot refresh', async () => {
@@ -105,41 +105,37 @@ describe('SignInMfaPage', () => {
       data: { session: null },
       error: new AuthRetryableFetchError('unavailable', 503),
     })
-    customRender(
-      <>
-        <SignInMfaPage dehydratedState={undefined} />
-        <Toaster />
-      </>
-    )
+    render(<Toaster />)
+    const { router } = await renderSignInMfa()
 
-    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
-    expect(routerMock.query).toEqual({ method: 'github', returnTo: '/org' })
+    await waitFor(() => expect(router.state.location.pathname).toBe('/sign-in'))
+    expect(router.state.location.search).toEqual({ method: 'github', returnTo: '/org' })
     expect(screen.queryByText(/Failed to initialize authentication/)).not.toBeInTheDocument()
   })
 
   test('returns to sign-in when there is no session', async () => {
     mockAuth({})
-    customRender(<SignInMfaPage dehydratedState={undefined} />)
+    const { router } = await renderSignInMfa()
 
-    await waitFor(() => expect(routerMock.pathname).toBe('/sign-in'))
-    expect(routerMock.query).toEqual({ method: 'github', returnTo: '/org' })
+    await waitFor(() => expect(router.state.location.pathname).toBe('/sign-in'))
+    expect(router.state.location.search).toEqual({ method: 'github', returnTo: '/org' })
   })
 
   test('records the sign-in and continues when the session is already at AAL2', async () => {
     const onAuditLogin = mockAuditLogin()
     mockAuth({ session: SESSION, currentLevel: 'aal2' })
-    customRender(<SignInMfaPage dehydratedState={undefined} />)
+    const { router } = await renderSignInMfa()
 
-    await waitFor(() => expect(routerMock.pathname).toBe('/org'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/org'))
     await waitFor(() => expect(onAuditLogin).toHaveBeenCalled())
   })
 
   test('continues without recording a sign-in when an AAL2 session outlived a failed callback', async () => {
     const onAuditLogin = mockAuditLogin()
     mockAuth({ initializeError: CALLBACK_ERROR, session: SESSION, currentLevel: 'aal2' })
-    customRender(<SignInMfaPage dehydratedState={undefined} />)
+    const { router } = await renderSignInMfa()
 
-    await waitFor(() => expect(routerMock.pathname).toBe('/org'))
+    await waitFor(() => expect(router.state.location.pathname).toBe('/org'))
     expect(onAuditLogin).not.toHaveBeenCalled()
   })
 })
