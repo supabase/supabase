@@ -121,6 +121,24 @@ export function commaSeparatedStringIntoArray(value: string): string[] {
     .filter(Boolean)
 }
 
+const BEARER_SCHEME = 'bearer'
+
+/**
+ * Extract the token from a `Bearer <token>` Authorization header (scheme is case-insensitive).
+ *
+ * Returns `null` for a missing, array-valued, non-Bearer or empty header. Parsed without a regex
+ * over the token so untrusted input can't trigger backtracking.
+ */
+export function getBearerToken(authorization: string | string[] | undefined | null) {
+  if (typeof authorization !== 'string') return null
+
+  const scheme = authorization.slice(0, BEARER_SCHEME.length)
+  const rest = authorization.slice(BEARER_SCHEME.length)
+  if (scheme.toLowerCase() !== BEARER_SCHEME || !/^\s/.test(rest)) return null
+
+  return rest.trim() || null
+}
+
 export class InternalServerError extends Error {
   constructor(
     message: string,
