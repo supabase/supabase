@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/react-query'
 import { getCoreRowModel, useReactTable } from '@tanstack/react-table'
-import { fireEvent, screen, waitFor } from '@testing-library/react'
+import { fireEvent, screen } from '@testing-library/react'
 import type { platformComponents } from 'api-types'
 import { FeatureFlagContext } from 'common'
 import { HttpResponse } from 'msw'
@@ -124,12 +124,12 @@ describe('log detail attributes', () => {
       renderDetail(tab)
       expect(await screen.findByText('Failed to retrieve log details')).toBeVisible()
       expect(screen.getByRole('alert')).toHaveTextContent('Attributes unavailable')
-      expect(screen.queryByText('Enriching log...')).not.toBeInTheDocument()
     }
   )
 
+  // The panel header shows progress instead, so the details don't jump when loading ends
   it.each(['overview', 'raw-json'] as const)(
-    'shows pending attributes before rendering scoped log details in the %s tab',
+    'adds scoped log attributes once they load, without a loading row, in the %s tab',
     async (tab) => {
       const response = Promise.withResolvers<AnalyticsResponse>()
       addAPIMock({
@@ -138,15 +138,15 @@ describe('log detail attributes', () => {
         response: async () => HttpResponse.json<AnalyticsResponse>(await response.promise),
       })
       renderDetail(tab)
-      expect(screen.getByRole('status')).toHaveTextContent('Enriching log...')
+      expect(screen.queryByRole('status')).not.toBeInTheDocument()
       expect(screen.queryByText('subscription-42')).not.toBeInTheDocument()
       response.resolve({
         result: [
           { source: 'realtime_logs', log_attributes: { subscription_id: 'subscription-42' } },
         ],
       })
-      await waitFor(() => expect(screen.queryByRole('status')).not.toBeInTheDocument())
-      if (tab === 'overview') fireEvent.click(screen.getByRole('button', { name: 'Details' }))
+      if (tab === 'overview')
+        fireEvent.click(await screen.findByRole('button', { name: 'Details' }))
       expect(await screen.findByText(/subscription-42/)).toBeVisible()
     }
   )

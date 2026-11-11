@@ -1,3 +1,9 @@
+export type TimelineItem<T> = { type: 'log'; log: T } | { type: 'more'; count: number }
+
+/**
+ * Folds a timeline to its first `collapsedCount` logs plus the active log, replacing each hidden
+ * run with a "more" item. A run of one log is shown as is, since a fold would save no space.
+ */
 export function foldTimelineSteps<T extends { id: string }>(
   logs: T[],
   {
@@ -5,20 +11,25 @@ export function foldTimelineSteps<T extends { id: string }>(
     isExpanded,
     collapsedCount,
   }: { activeLogId?: string; isExpanded: boolean; collapsedCount?: number }
-): { leadingLogs: T[]; activeLog?: T; hiddenBefore: number; hiddenAfter: number } {
-  if (isExpanded || collapsedCount === undefined || logs.length <= collapsedCount) {
-    return { leadingLogs: logs, hiddenBefore: 0, hiddenAfter: 0 }
+): TimelineItem<T>[] {
+  const visibleCount =
+    isExpanded || collapsedCount === undefined ? logs.length : Math.floor(collapsedCount)
+  const items: TimelineItem<T>[] = []
+  let hidden: T[] = []
+  const flushHidden = () => {
+    if (hidden.length === 1) items.push({ type: 'log', log: hidden[0] })
+    if (hidden.length > 1) items.push({ type: 'more', count: hidden.length })
+    hidden = []
   }
-  const visibleCount = Math.max(0, Math.floor(collapsedCount))
-  const leadingLogs = logs.slice(0, visibleCount)
-  const activeIndex = logs.findIndex((log) => log.id === activeLogId)
-  if (activeIndex < visibleCount || activeIndex === -1) {
-    return { leadingLogs, hiddenBefore: 0, hiddenAfter: logs.length - leadingLogs.length }
-  }
-  return {
-    leadingLogs,
-    activeLog: logs[activeIndex],
-    hiddenBefore: activeIndex - leadingLogs.length,
-    hiddenAfter: logs.length - activeIndex - 1,
-  }
+
+  logs.forEach((log, index) => {
+    if (index < visibleCount || log.id === activeLogId) {
+      flushHidden()
+      items.push({ type: 'log', log })
+    } else {
+      hidden.push(log)
+    }
+  })
+  flushHidden()
+  return items
 }

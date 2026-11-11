@@ -1,3 +1,4 @@
+import { Loader2Icon } from 'lucide-react'
 import { useState, type ReactNode } from 'react'
 import { Badge, cn } from 'ui'
 
@@ -31,61 +32,42 @@ export function LogTimeline({
   footer,
 }: LogTimelineProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { leadingLogs, activeLog, hiddenBefore, hiddenAfter } = foldTimelineSteps(logs, {
+  const items = foldTimelineSteps(logs, {
     activeLogId,
     isExpanded,
     collapsedCount: collapsedStepCount,
   })
-  const renderStep = (log: ColumnSchema, hasPrev: boolean, hasNext: boolean) => (
-    <TimelineStep
-      key={log.id}
-      log={log}
-      timeLabel={getTimeLabel(log)}
-      isActive={log.id === activeLogId}
-      hasPrev={hasPrev}
-      hasNext={hasNext}
-      href={getLogHref?.(log)}
-      onSelect={onSelectLog}
-    />
-  )
 
   return (
     <ol aria-label={ariaLabel} className="flex flex-col">
-      {leadingLogs.map((log, index) =>
-        renderStep(
-          log,
-          index > 0,
-          index < leadingLogs.length - 1 ||
-            hiddenBefore > 0 ||
-            !!activeLog ||
-            hiddenAfter > 0 ||
-            !!footer
+      {items.map((item, index) => {
+        const hasPrev = index > 0
+        const hasNext = index < items.length - 1 || !!footer
+        if (item.type === 'more') {
+          return (
+            <TimelineMoreStep
+              key={`more-${index}`}
+              hasPrev={hasPrev}
+              hasNext={hasNext}
+              onClick={() => setIsExpanded(true)}
+            >
+              +{item.count} more
+            </TimelineMoreStep>
+          )
+        }
+        return (
+          <TimelineStep
+            key={item.log.id}
+            log={item.log}
+            timeLabel={getTimeLabel(item.log)}
+            isActive={item.log.id === activeLogId}
+            hasPrev={hasPrev}
+            hasNext={hasNext}
+            href={getLogHref?.(item.log)}
+            onSelect={onSelectLog}
+          />
         )
-      )}
-      {hiddenBefore > 0 && (
-        <TimelineMoreStep
-          hasPrev={leadingLogs.length > 0}
-          hasNext
-          onClick={() => setIsExpanded(true)}
-        >
-          +{hiddenBefore} more
-        </TimelineMoreStep>
-      )}
-      {activeLog &&
-        renderStep(
-          activeLog,
-          leadingLogs.length > 0 || hiddenBefore > 0,
-          hiddenAfter > 0 || !!footer
-        )}
-      {hiddenAfter > 0 && (
-        <TimelineMoreStep
-          hasPrev={leadingLogs.length > 0 || !!activeLog}
-          hasNext={!!footer}
-          onClick={() => setIsExpanded(true)}
-        >
-          +{hiddenAfter} more
-        </TimelineMoreStep>
-      )}
+      })}
       {footer}
     </ol>
   )
@@ -223,14 +205,25 @@ function LogStepRow({ log, timeLabel }: { log: ColumnSchema; timeLabel: string }
 }
 
 /** One-line identity of a log: type icon, status, and its request or message. */
-export function LogStepSummary({ log }: { log: ColumnSchema }) {
+export function LogStepSummary({ log, isLoading }: { log: ColumnSchema; isLoading?: boolean }) {
   return (
     <div className="flex min-w-0 flex-1 items-center gap-2 text-base font-medium leading-6 text-foreground">
-      <LogTypeIcon
-        type={log.log_type}
-        label={getLogTypeLabel(log.log_type)}
-        className="shrink-0 text-foreground-lighter"
-      />
+      {isLoading ? (
+        // Matches the log type icon's size so the summary doesn't move when loading ends
+        <span className="inline-flex" role="img" aria-label="Loading log details">
+          <Loader2Icon
+            size={14}
+            strokeWidth={1.5}
+            className="shrink-0 animate-spin text-foreground-lighter"
+          />
+        </span>
+      ) : (
+        <LogTypeIcon
+          type={log.log_type}
+          label={getLogTypeLabel(log.log_type)}
+          className="shrink-0 text-foreground-lighter"
+        />
+      )}
       {!!log.status && (
         <>
           <Badge

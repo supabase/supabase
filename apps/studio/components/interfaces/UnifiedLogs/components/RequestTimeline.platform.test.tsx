@@ -132,12 +132,14 @@ function renderPanel(
     timezone,
     selectedLog,
     onSelectRow,
+    attributesReady,
   }: {
     scope?: UnifiedLogsScope
     flag?: boolean | null
     timezone?: string
     selectedLog?: ColumnSchema
     onSelectRow?: (id: string) => void
+    attributesReady?: Promise<void>
   } = {}
 ) {
   const queries: string[] = []
@@ -171,6 +173,7 @@ function renderPanel(
       const { sql } = requestSchema.parse(await request.json())
       queries.push(sql)
       if (sql.includes('SELECT source, log_attributes')) {
+        await attributesReady
         return HttpResponse.json<LogsResponse>({
           result: [
             {
@@ -250,13 +253,13 @@ describe('request timeline tab', () => {
     const { queryClient } = renderPanel(timelineRows, { timezone: 'Asia/Tokyo' })
     expect(await screen.findByText('01 Jan 2026 19:00:00')).toBeVisible()
     const items = stepsIn(await openTimeline(user))
-    expect(screen.getByText('01 Jan 2026 19:00:00')).toBeVisible()
-    expect(items[0]).toHaveTextContent('+0 ms')
+    expect(items[0]).toHaveTextContent('01 Jan 2026 19:00:00')
     expect(items[1]).toHaveTextContent('+45 ms')
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
-  it('lists logs sharing the request ID and opens one in the overview', async () => {
+  // Staying on the timeline lets the user step through the request one log at a time
+  it('lists logs sharing the request ID and opens one without leaving the timeline', async () => {
     const user = userEvent.setup()
     const { queries, queryClient } = renderPanel()
 
@@ -273,20 +276,44 @@ describe('request timeline tab', () => {
     ).toBe(true)
 
     await user.click(items[1])
-    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
     expect(screen.getByRole('status')).toHaveTextContent('POST /token')
+    const [gateway, auth] = stepsIn(screen.getByRole('list', { name: 'Related logs' }))
+    expect(auth).toHaveAttribute('aria-current', 'true')
+
+    await user.click(gateway)
+    expect(screen.getByRole('tab', { name: 'Timeline' })).toHaveAttribute('aria-selected', 'true')
+    expect(screen.getByRole('status')).toHaveTextContent('POST /auth/v1/token')
+    expect(gateway).toHaveAttribute('aria-current', 'true')
+
+    await user.click(auth)
+    await user.click(screen.getByRole('tab', { name: 'Overview' }))
     expect(screen.getByText('Authentication')).toBeVisible()
 
-    const [gateway, auth] = stepsIn(await openTimeline(user))
-    expect(auth).toHaveAttribute('aria-current', 'true')
-    await user.click(gateway)
-    expect(screen.getByRole('status')).toHaveTextContent('POST /auth/v1/token')
-
+    await user.click(stepsIn(await openTimeline(user))[0])
+    await user.click(screen.getByRole('tab', { name: 'Overview' }))
     expect(await screen.findByText('Request headers')).toBeVisible()
 
     expect(screen.queryByText('method')).not.toBeInTheDocument()
     await user.click(screen.getByRole('button', { name: 'Request' }))
     expect(screen.getByText('method')).toBeVisible()
+    await waitFor(() => expect(queryClient.isFetching()).toBe(0))
+  })
+
+  // A spinner the size of the icon replaces a loading row, so nothing shifts when loading ends
+  it('spins in place of the log type icon until the log details load', async () => {
+    const attributes = Promise.withResolvers<void>()
+    const { queryClient } = renderPanel(timelineRows, { attributesReady: attributes.promise })
+    const header = screen.getByRole('status')
+    expect(await within(header).findByRole('img', { name: 'Loading log details' })).toBeVisible()
+
+    attributes.resolve()
+    await waitFor(() =>
+      expect(
+        within(header).queryByRole('img', { name: 'Loading log details' })
+      ).not.toBeInTheDocument()
+    )
+    expect(within(header).getByRole('img')).toBeVisible()
     await waitFor(() => expect(queryClient.isFetching()).toBe(0))
   })
 
@@ -316,9 +343,12 @@ describe('request timeline tab', () => {
 
     expect(stepsIn(await openTimeline(user))).toHaveLength(3)
     await user.click(screen.getByRole('button', { name: '+6 more' }))
-    await user.click(stepsIn(await screen.findByRole('list', { name: 'Related logs' }))[6])
-    expect(screen.getByRole('tab', { name: 'Overview' })).toHaveAttribute('aria-selected', 'true')
+    const expandedList = await screen.findByRole('list', { name: 'Related logs' })
+    await user.click(stepsIn(expandedList)[6])
+    expect(stepsIn(expandedList)).toHaveLength(9)
+    expect(stepsIn(expandedList)[6]).toHaveAttribute('aria-current', 'true')
 
+    await user.click(screen.getByRole('tab', { name: 'Overview' }))
     const folded = stepsIn(await openTimeline(user))
     expect(folded).toHaveLength(4)
     expect(folded[3]).toHaveAttribute('aria-current', 'true')

@@ -1,61 +1,58 @@
 import { describe, expect, it } from 'vitest'
 
-import { foldTimelineSteps } from './LogTimeline.utils'
+import { foldTimelineSteps, type TimelineItem } from './LogTimeline.utils'
 
 const logs = 'abcdefghi'.split('').map((id) => ({ id }))
 
+/** Reads a fold the way the timeline shows it, e.g. `a b c +3 g +2`. */
+const describeFold = (items: TimelineItem<{ id: string }>[]) =>
+  items.map((item) => (item.type === 'log' ? item.log.id : `+${item.count}`)).join(' ')
+
+const fold = (activeLogId: string | undefined, collapsedCount?: number, isExpanded = false) =>
+  describeFold(foldTimelineSteps(logs, { activeLogId, isExpanded, collapsedCount }))
+
 describe('foldTimelineSteps', () => {
   it.each([
-    ['a', undefined, 0, 6],
-    ['c', undefined, 0, 6],
-    ['d', 'd', 0, 5],
-    ['g', 'g', 3, 2],
-    ['i', 'i', 5, 0],
-    ['missing', undefined, 0, 6],
-    [undefined, undefined, 0, 6],
+    ['a', 'a b c +6'],
+    ['c', 'a b c +6'],
+    ['d', 'a b c d +5'],
+    ['g', 'a b c +3 g +2'],
+    ['i', 'a b c +5 i'],
+    ['missing', 'a b c +6'],
+    [undefined, 'a b c +6'],
+  ])('keeps the open log %s in order between the hidden runs', (activeLogId, expected) => {
+    expect(fold(activeLogId, 3)).toBe(expected)
+  })
+
+  // A "+1 more" row takes the same space as the log it hides, so the log is shown instead
+  it.each([
+    ['e', 'a b c d e +4'],
+    ['h', 'a b c +4 h i'],
+  ])('shows a lone hidden log next to the open log %s', (activeLogId, expected) => {
+    expect(fold(activeLogId, 3)).toBe(expected)
+  })
+
+  it('shows a timeline one log longer than the fold in full', () => {
+    const items = foldTimelineSteps(logs.slice(0, 4), { isExpanded: false, collapsedCount: 3 })
+    expect(describeFold(items)).toBe('a b c d')
+  })
+
+  it.each([
+    { collapsedCount: 3, isExpanded: true },
+    { collapsedCount: undefined, isExpanded: false },
+    { collapsedCount: 9, isExpanded: false },
   ])(
-    'keeps %s in order between its hidden ranges',
-    (activeLogId, activeId, hiddenBefore, hiddenAfter) => {
-      const fold = foldTimelineSteps(logs, { activeLogId, isExpanded: false, collapsedCount: 3 })
-      expect(fold.leadingLogs).toEqual(logs.slice(0, 3))
-      expect(fold.activeLog?.id).toBe(activeId)
-      expect(fold.hiddenBefore).toBe(hiddenBefore)
-      expect(fold.hiddenAfter).toBe(hiddenAfter)
-      expect(fold.leadingLogs.length + (fold.activeLog ? 1 : 0) + hiddenBefore + hiddenAfter).toBe(
-        logs.length
-      )
+    'shows all logs when expanded, short, or not folding: %o',
+    ({ collapsedCount, isExpanded }) => {
+      expect(fold('g', collapsedCount, isExpanded)).toBe('a b c d e f g h i')
     }
   )
 
-  it.each([
-    { isExpanded: true, collapsedCount: 3 },
-    { isExpanded: false },
-    { isExpanded: false, collapsedCount: 9 },
-    { isExpanded: false, collapsedCount: 10 },
-  ])('shows all logs when expanded, short, or not folding: %o', (options) => {
-    expect(foldTimelineSteps(logs, { activeLogId: 'g', ...options })).toEqual({
-      leadingLogs: logs,
-      hiddenBefore: 0,
-      hiddenAfter: 0,
-    })
-  })
-
   it('handles an empty timeline', () => {
-    expect(foldTimelineSteps([], { isExpanded: false, collapsedCount: 3 })).toEqual({
-      leadingLogs: [],
-      hiddenBefore: 0,
-      hiddenAfter: 0,
-    })
+    expect(foldTimelineSteps([], { isExpanded: false, collapsedCount: 3 })).toEqual([])
   })
 
-  it.each([0, -1])('keeps the active log visible with a count of %s', (collapsedCount) => {
-    expect(
-      foldTimelineSteps(logs, { activeLogId: 'd', isExpanded: false, collapsedCount })
-    ).toEqual({
-      leadingLogs: [],
-      activeLog: logs[3],
-      hiddenBefore: 3,
-      hiddenAfter: 5,
-    })
+  it.each([0, -1])('keeps the open log visible with a count of %s', (collapsedCount) => {
+    expect(fold('d', collapsedCount)).toBe('+3 d +5')
   })
 })

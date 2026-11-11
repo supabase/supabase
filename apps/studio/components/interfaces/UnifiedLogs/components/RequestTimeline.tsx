@@ -2,10 +2,10 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ClockIcon, RouteIcon } from 'lucide-react'
 import { Skeleton } from 'ui'
-import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
+import { LogPanelEmptyState } from './LogPanelEmptyState'
 import { LogTimeline } from './LogTimeline'
 import { AlertError } from '@/components/ui/AlertError'
 import { DetailSectionHeader } from '@/components/ui/DataTable/DetailSectionHeader'
@@ -68,33 +68,30 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
 
   if (!data || data.logs.length === 0) {
     return (
-      <div className="flex min-h-full items-center justify-center p-4">
-        <EmptyStatePresentational
-          icon={RouteIcon}
-          title="No related logs"
-          description="Logs appear here when they share a request, trace, or function execution ID."
-          className="border-0 bg-transparent px-2 py-6"
-        />
-      </div>
+      <LogPanelEmptyState
+        icon={RouteIcon}
+        title="No related logs"
+        description="Logs appear here when they share a request, trace, or function execution ID."
+      />
     )
   }
 
-  const startMs = getRowTimestampMs(data.logs[0]) ?? 0
+  const [firstLog] = data.logs
+  const startMs = getRowTimestampMs(firstLog) ?? 0
 
   return (
     <div className="py-2">
-      <DetailSectionHeader
-        title="Request started"
-        icon={RouteIcon}
-        summary={formatDateTime(startMs)}
-      />
       <LogTimeline
         aria-label="Related logs"
         logs={data.logs}
         activeLogId={activeLog.id}
         onSelectLog={onSelectLog}
         collapsedStepCount={COLLAPSED_STEP_COUNT}
-        getTimeLabel={(log) => formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)}
+        getTimeLabel={(log) =>
+          log.id === firstLog.id
+            ? formatDateTime(startMs)
+            : formatOffset((getRowTimestampMs(log) ?? startMs) - startMs)
+        }
       />
     </div>
   )

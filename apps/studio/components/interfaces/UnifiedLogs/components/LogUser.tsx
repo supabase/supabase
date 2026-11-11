@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
+import { UserIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Skeleton } from 'ui'
 
@@ -7,6 +8,7 @@ import { ColumnSchema } from '../UnifiedLogs.schema'
 import type { QuerySearchParamsType } from '../UnifiedLogs.types'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
 import { LogFieldRow } from './LogFieldRow'
+import { LogPanelEmptyState } from './LogPanelEmptyState'
 import { resolveRequestUser } from './LogUser.utils'
 import { UserCard } from '@/components/interfaces/Auth/Users/UserCard'
 import { UserFields } from '@/components/interfaces/Auth/Users/UserFields'
@@ -60,14 +62,15 @@ export function LogUser({
 
   if (requestUser.kind === 'none') {
     return (
-      <div className="flex flex-col gap-1 p-4 text-sm">
-        <p className="text-foreground-light">No signed-in user</p>
-        <p className="text-foreground-lighter">
-          {requestUser.role
+      <LogPanelEmptyState
+        icon={UserIcon}
+        title="No signed-in user"
+        description={
+          requestUser.role
             ? `This request used the ${requestUser.role} role rather than a user's access token.`
-            : "Only API Gateway requests made with a user's access token, and Auth events, are linked to a user."}
-        </p>
-      </div>
+            : "Only API Gateway requests made with a user's access token, and Auth events, are linked to a user."
+        }
+      />
     )
   }
 
