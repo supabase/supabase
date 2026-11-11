@@ -5,19 +5,18 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { useOnboardingSurveyVariant } from './useOnboardingSurveyVariant'
 import { CustomWrapper } from '@/tests/lib/custom-render'
-import { createMockProfileContext } from '@/tests/lib/profile-helpers'
 
 const track = vi.hoisted(() => vi.fn())
 vi.mock('@/lib/telemetry/track', () => ({ useTrack: () => track }))
 
 type RenderOptions = {
   hasFlagsForSignedInUser?: boolean
-  isProfileLoaded?: boolean
+  isFormExposed?: boolean
 }
 
 const renderVariantHook = (
   flagValue: string | boolean | undefined,
-  { hasFlagsForSignedInUser = true, isProfileLoaded = true }: RenderOptions = {}
+  { hasFlagsForSignedInUser = true, isFormExposed = true }: RenderOptions = {}
 ) => {
   const wrapper = ({ children }: PropsWithChildren) => (
     <FeatureFlagContext.Provider
@@ -29,17 +28,10 @@ const renderVariantHook = (
         hasFlagsForSignedInUser,
       }}
     >
-      <CustomWrapper
-        profileContext={createMockProfileContext({
-          isLoading: !isProfileLoaded,
-          isSuccess: isProfileLoaded,
-        })}
-      >
-        {children}
-      </CustomWrapper>
+      <CustomWrapper>{children}</CustomWrapper>
     </FeatureFlagContext.Provider>
   )
-  return renderHook(() => useOnboardingSurveyVariant(), { wrapper })
+  return renderHook(() => useOnboardingSurveyVariant({ isFormExposed }), { wrapper })
 }
 
 describe('useOnboardingSurveyVariant', () => {
@@ -80,8 +72,8 @@ describe('useOnboardingSurveyVariant', () => {
     expect(track).not.toHaveBeenCalled()
   })
 
-  it('returns the arm but holds exposure until the profile loads', () => {
-    const { result } = renderVariantHook('org_form', { isProfileLoaded: false })
+  it('returns the arm but holds exposure until the form is exposed', () => {
+    const { result } = renderVariantHook('org_form', { isFormExposed: false })
 
     expect(result.current.variant).toBe('org_form')
     expect(track).not.toHaveBeenCalled()
