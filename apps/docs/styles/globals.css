@@ -20,6 +20,8 @@
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/docs-search/src/**/*.{tsx,ts}';
 
+@custom-variant layout-v2 (&:is([data-docs-layout='v2'] *));
+
 @theme inline {
   --font-sans:
     var(--font-inter), Inter, Helvetica Neue, Helvetica, ui-sans-serif, system-ui, sans-serif;
@@ -86,9 +88,20 @@
   --header-height: 50px;
 }
 
+:root[data-docs-layout='v2'] {
+  --header-height: 56px;
+}
+
 html {
   scroll-behavior: smooth;
   font-weight: 500;
+}
+
+@media (min-width: 1024px) {
+  html[data-docs-layout='v2'],
+  html[data-docs-layout='v2'] body {
+    overscroll-behavior-y: none;
+  }
 }
 
 html[data-theme*='dark'] {

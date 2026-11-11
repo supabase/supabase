@@ -10,6 +10,7 @@ import {
   useCloseMenuOnRouteChange,
 } from '~/components/Navigation/NavigationMenu/NavigationMenu.utils'
 import TopNavBar from '~/components/Navigation/NavigationMenu/TopNavBar'
+import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
 import { useDocsPathname, useNavItems } from '~/features/IaNav'
 import { DOCS_CONTENT_CONTAINER_ID } from '~/features/ui/helpers.constants'
 import { menuState, useMenuMobileOpen } from '~/hooks/useMenuState'
@@ -29,7 +30,10 @@ import {
 import { cn, ScrollBar, ScrollRoot, ScrollViewport } from 'ui'
 import { MobileNavLock } from 'ui-patterns/MobileNav/MobileNavLock'
 
-const Footer = dynamic(() => import('~/components/Navigation/Footer'))
+const Footer = dynamic(() => import('~/components/Navigation/Footer').then((mod) => mod.Footer))
+const LegacyFooter = dynamic(() =>
+  import('~/components/Navigation/Footer.legacy').then((mod) => mod.LegacyFooter)
+)
 const GlobalMenuDrawerSection = dynamic(() =>
   import('~/components/Navigation/NavigationMenu/GlobalMenuDrawer').then(
     (mod) => mod.GlobalMenuDrawerSection
@@ -134,6 +138,9 @@ interface SkeletonProps extends PropsWithChildren {
 }
 
 function TopNavSkeleton({ children }) {
+  // the root layout renders this on every page, so the hook sets the html attribute here
+  useDocsLayoutV2()
+
   return (
     <div className="flex flex-col h-full w-full">
       <div className="hidden lg:sticky w-full lg:flex top-0 left-0 right-0 z-50">
@@ -143,6 +150,8 @@ function TopNavSkeleton({ children }) {
     </div>
   )
 }
+
+const SkeletonFooter = () => (useDocsLayoutV2() ? <Footer className="mt-16" /> : <LegacyFooter />)
 
 function SidebarSkeleton({
   children,
@@ -213,7 +222,7 @@ function SidebarSkeleton({
           <MobileHeaderSlotsContext value={{ tocSlot, onTitleScroll: setScrolledTitle }}>
             {children}
           </MobileHeaderSlotsContext>
-          {!hideFooter && <Footer />}
+          {!hideFooter && <SkeletonFooter />}
         </div>
       </Container>
     </div>
