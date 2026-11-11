@@ -103,6 +103,7 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
   )
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
   const capacity = getComputeCapacity(declaredInstances, limits.concurrentInstances)
+  const reservedVcpuHours = usage?.reservedVcpuHours ?? 0
 
   const computeCount = `${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'}`
 
@@ -110,12 +111,18 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     {
       label: 'vCPU-hours',
       isLoading: isPending,
-      value: formatDecimal(usage?.reservedVcpuHours ?? 0),
-      footnote: limits.vcpuHours === null ? noLimitLabel : undefined,
+      // Paired with the allowance, because the figure alone carries no sense of scale. The
+      // denominator belongs to the organization, though, so the footnote says so: without it
+      // two projects could each read "5/8.3" and look fine while the organization is over.
+      value:
+        limits.vcpuHours === null
+          ? formatDecimal(reservedVcpuHours)
+          : `${formatDecimal(reservedVcpuHours)}/${formatDecimal(limits.vcpuHours)}`,
+      footnote: limits.vcpuHours === null ? noLimitLabel : 'Shared across the organization',
       description:
         limits.vcpuHours === null
           ? `Running hours multiplied by the vCPU each instance size reserves. ${noLimitLabel}.`
-          : 'Running hours multiplied by the vCPU each instance size reserves. This is what the organization quota counts, so a larger instance consumes it faster than a smaller one running just as long.',
+          : `Running hours multiplied by the vCPU each instance size reserves, so a larger instance consumes the quota faster than a smaller one running just as long. The ${formatDecimal(limits.vcpuHours)} vCPU-hrs is the organization's allowance, which every project in it draws from — see the organization usage page for the burn-down across all of them.`,
     },
     {
       label: 'Active CPU',
