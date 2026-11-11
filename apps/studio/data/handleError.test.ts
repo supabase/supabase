@@ -160,6 +160,23 @@ describe('handleError — error classification', () => {
       expect(err.errorEventId).toBe('event-123')
     })
 
+    it('never reports a response with an expected status, even with alwaysCapture', () => {
+      const err = throwAndCatch(
+        { message: 'forbidden', code: 403 },
+        { expectedStatuses: [403], alwaysCapture: true, reportImmediately: true }
+      )
+      expect(err).toBeInstanceOf(UnclassifiedApiError)
+      expect(captureException).not.toHaveBeenCalled()
+    })
+
+    it('still reports a status that is not listed as expected', () => {
+      throwAndCatch(
+        { message: 'boom', code: 500 },
+        { expectedStatuses: [403], alwaysCapture: true, reportImmediately: true }
+      )
+      expect(captureException).toHaveBeenCalledTimes(1)
+    })
+
     it('does not report routed-never tags unless alwaysCapture is set', () => {
       const abort = () => new DOMException('The operation was aborted.', 'AbortError')
       throwAndCatch(abort(), { reportImmediately: true })

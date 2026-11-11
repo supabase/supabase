@@ -44,6 +44,20 @@ describe('reporting errors from React Query', () => {
     )
   })
 
+  it('does not report a query that fails with an expected status', async () => {
+    await expect(
+      client.fetchQuery({
+        queryKey: ['expected'],
+        retry: false,
+        queryFn: async () => {
+          handleError({ message: 'not found', code: 404 }, { expectedStatuses: [404] })
+        },
+      })
+    ).rejects.toMatchObject({ _tag: 'UnclassifiedApiError', code: 404 })
+
+    expect(captureException).not.toHaveBeenCalled()
+  })
+
   it('reports a failed mutation once', async () => {
     const mutation = client.getMutationCache().build(client, {
       mutationFn: async () => {
