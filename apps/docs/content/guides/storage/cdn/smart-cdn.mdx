@@ -60,14 +60,16 @@ When you request a private asset through the authenticated endpoint (`/storage/v
 
 This means that:
 
-- If you change a user's access, for example by updating a [Row Level Security (RLS) policy](/docs/guides/database/postgres/row-level-security), [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is re-evaluated against your current access rules. The purge can take up to 60 seconds to propagate.
-- A CDN purge doesn't clear browser caches. A browser can reuse a cached asset without sending a request to Storage until its `cacheControl` TTL expires.
-- If a user signs out and a request reuses their old JWT, the user can still access files. Signing out ends the Auth session but doesn't invalidate access tokens that were already issued.
+- If you change a user's access, for example by updating a Row Level Security (RLS) policy, [purge the CDN cache](/docs/guides/storage/cdn/purge-cdn-cache) so the next request that reaches the server is re-evaluated against your current access rules.
+  - The purge can take up to 60 seconds to propagate.
+  - A CDN purge doesn't clear browser caches. A browser can reuse a cached asset without sending a request to Storage until its `cacheControl` TTL expires.
+- If a user signs out and a request reuses their old JWT, the user can still access files.
+  - Signing out ends the Auth session but doesn't invalidate access tokens that were already issued.
+  - To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions). Changes only affect newly issued JWTs. Existing tokens keep their original expiry. See the [recommended values](/docs/guides/auth/sessions#what-are-recommended-values-for-access-token-jwt-expiration) before choosing a duration.
 
-To shorten this window, lower the access token expiry in your project's [Sessions settings](/dashboard/project/_/auth/sessions). Changes only affect newly issued JWTs. Existing tokens keep their original expiry. See the [recommended values](/docs/guides/auth/sessions#what-are-recommended-values-for-access-token-jwt-expiration) before choosing a duration.
+To revoke access immediately, check the user's session and permissions in your own server code, for example with an [Edge Function](/docs/guides/functions).
 
-To revoke access immediately, check the user's session and permissions in your own server code, for example with an [Edge Function](/docs/guides/functions). Because your code handles authorization, you can call the Storage API with a secret API key (or the legacy `service_role` key) and still benefit from CDN caching between Storage and your server.
-
-To check for sign-out, first verify the JWT's signature and expiry with [`getClaims()`](/docs/reference/javascript/auth-getclaims). Don't trust its claims, look up its session, or evaluate permissions before it passes. Then verify that the `session_id` claim matches a row in `auth.sessions`. If no row exists, the user has signed out. See [how to ensure an access token can't be used after sign-out](/docs/guides/auth/sessions#how-to-ensure-an-access-token-jwt-cannot-be-used-after-a-user-signs-out).
+- Because your code handles authorization, you can call the Storage API with a secret API key (or the legacy `service_role` key) and still benefit from CDN caching between Storage and your server.
+- To check for sign-out, first verify the JWT's signature and expiry with [`getClaims()`](/docs/reference/javascript/auth-getclaims). Reject the request if verification fails. Only then verify that the `session_id` claim matches a row in `auth.sessions`. If no row exists, the user has signed out. See [how to ensure an access token can't be used after sign-out](/docs/guides/auth/sessions#how-to-ensure-an-access-token-jwt-cannot-be-used-after-a-user-signs-out).
 
 [Serving assets through the S3 API](/docs/guides/storage/s3/authentication) doesn't cache responses, but requests that use a session token still succeed after sign-out until the JWT expires.
