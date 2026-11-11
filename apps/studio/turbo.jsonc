@@ -2,6 +2,17 @@
   "$schema": "./../../node_modules/turbo/schema.json",
   "extends": ["//"],
   "tasks": {
+    // `eslint .` also runs the type-aware rules in eslint.type-checks.config.cjs, which is
+    // its own task so turbo can cache and parallelize it. Both read the shared ESLint config,
+    // which lives in a workspace package that turbo doesn't hash for this task by default.
+    "lint": {
+      "dependsOn": ["lint:type-checks"],
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/eslint-config-supabase/**"],
+    },
+    "lint:type-checks": {
+      "inputs": ["$TURBO_DEFAULT$", "$TURBO_ROOT$/packages/eslint-config-supabase/**"],
+      "outputs": [],
+    },
     "build": {
       "dependsOn": ["^build"],
       "env": [
@@ -93,9 +104,6 @@
         "AWS_BEDROCK_ROLE_ARN",
         "AWS_ACCESS_KEY_ID",
         "AWS_SECRET_ACCESS_KEY",
-        "FORCE_ASSET_CDN",
-        "ASSET_CDN_S3_ENDPOINT",
-        "SITE_NAME",
         "VERCEL_URL",
         "IS_BRAINTRUST_PUSH",
         "GITHUB_HEAD_REF",
@@ -116,9 +124,6 @@
         // Read by the Nitro server behind `pnpm start`. Declared so the turbo
         // env lint rule passes even though turbo doesn't drive `start`.
         "PORT",
-        // Gates the TanStack vs Next path in vercel.ts and
-        // scripts/dispatch.js (the dev/build/start dispatcher).
-        "STUDIO_FRAMEWORK",
         // Vite's built-in `import.meta.env.SSR` flag (used in ConnectStepsSection
         // to gate Vite-only `import.meta.glob`). Not a real process env var
         // but turbo's `no-undeclared-env-vars` lint flags any `env.SSR` access.
@@ -134,9 +139,6 @@
         "S3_PROTOCOL_ACCESS_KEY_SECRET",
       ],
       "outputs": [
-        ".next/**",
-        "!.next/cache/**",
-        "!.next/dev/**/*",
         // TanStack Start via Nitro: node server and Vercel Build Output.
         ".output/**",
         ".vercel/output/**",

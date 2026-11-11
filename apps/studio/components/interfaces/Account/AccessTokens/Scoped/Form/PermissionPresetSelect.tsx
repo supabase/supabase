@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Select, SelectContent, SelectItem, SelectTrigger } from 'ui'
 
-import type { PermissionSelection } from '../../AccessToken.permissions'
+import type { PermissionSelection, ResourceAccessMode } from '../../AccessToken.permissions'
 import {
   getActivePreset,
   PERMISSION_PRESETS,
@@ -10,15 +10,17 @@ import {
 
 interface PermissionPresetSelectProps {
   selection: PermissionSelection
+  resourceAccess: ResourceAccessMode
   onApplyPreset: (preset: PermissionPreset) => void
 }
 
 export const PermissionPresetSelect = ({
   selection,
+  resourceAccess,
   onApplyPreset,
 }: PermissionPresetSelectProps) => {
   const [announcement, setAnnouncement] = useState('')
-  const activePreset = getActivePreset(selection)
+  const activePreset = getActivePreset(selection, resourceAccess)
 
   const handleSelectPreset = (id: string) => {
     const preset = PERMISSION_PRESETS.find((candidate) => candidate.id === id)

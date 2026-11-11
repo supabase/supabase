@@ -1,9 +1,15 @@
 import { createMocks } from 'node-mocks-http'
-import { afterEach, describe, expect, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import handler from '../../../../pages/api/edge-functions/test'
 
-vi.mock('common', () => ({ IS_PLATFORM: true }))
+const mocks = vi.hoisted(() => ({ isPlatform: true }))
+
+vi.mock('common', () => ({
+  get IS_PLATFORM() {
+    return mocks.isPlatform
+  },
+}))
 
 const createRequest = (
   url = 'https://abcdefghijklmnopqrst.supabase.co/functions/v1/test',
@@ -21,7 +27,9 @@ const createRequest = (
 
 describe('/api/edge-functions/test', () => {
   afterEach(() => {
+    mocks.isPlatform = true
     vi.unstubAllGlobals()
+    vi.unstubAllEnvs()
   })
 
   it('preserves unsuccessful edge function responses', async () => {
@@ -114,10 +122,14 @@ describe('/api/edge-functions/test', () => {
     })
   })
 
-  it('rejects invalid URLs without making an upstream request', async () => {
+  it.each([
+    ['another host', 'https://example.com/functions/v1/test'],
+    ['userinfo', 'https://abcdefghijklmnopqrst.supabase.co@example.com/functions/v1/test'],
+    ['a path outside functions', 'https://abcdefghijklmnopqrst.supabase.co/rest/v1/test'],
+  ])('rejects %s without making an upstream request', async (_name, url) => {
     const fetchMock = vi.fn()
     vi.stubGlobal('fetch', fetchMock)
-    const { req, res } = createRequest('https://example.com/functions/v1/test')
+    const { req, res } = createRequest(url)
 
     await handler(req, res)
 
@@ -126,6 +138,54 @@ describe('/api/edge-functions/test', () => {
     expect(JSON.parse(res._getData())).toEqual({
       status: 400,
       error: { message: 'Provided URL is not a valid Supabase edge function URL' },
+    })
+  })
+
+  describe('self-hosted', () => {
+    beforeEach(() => {
+      mocks.isPlatform = false
+      vi.stubEnv('SUPABASE_URL', 'http://kong:8000')
+      vi.stubEnv('SUPABASE_PUBLIC_URL', 'http://localhost:8000')
+    })
+
+    it('calls the public edge function URL through the internal API gateway', async () => {
+      const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest('http://localhost:8000/functions/v1/test?name=a')
+
+      await handler(req, res)
+
+      expect(res._getStatusCode()).toBe(200)
+      expect(fetchMock.mock.calls[0][0]).toBe('http://kong:8000/functions/v1/test?name=a')
+    })
+
+    it.each([
+      ['unset', undefined],
+      ['empty', ''],
+    ])(
+      'accepts the default public URL when SUPABASE_PUBLIC_URL is %s',
+      async (_name, publicUrl) => {
+        vi.stubEnv('SUPABASE_PUBLIC_URL', publicUrl)
+        const fetchMock = vi.fn().mockResolvedValue(new Response(null))
+        vi.stubGlobal('fetch', fetchMock)
+        const { req, res } = createRequest('http://localhost:8000/functions/v1/test')
+
+        await handler(req, res)
+
+        expect(res._getStatusCode()).toBe(200)
+        expect(fetchMock.mock.calls[0][0]).toBe('http://kong:8000/functions/v1/test')
+      }
+    )
+
+    it('rejects hosts other than the API gateway', async () => {
+      const fetchMock = vi.fn()
+      vi.stubGlobal('fetch', fetchMock)
+      const { req, res } = createRequest('http://example.com/functions/v1/test')
+
+      await handler(req, res)
+
+      expect(fetchMock).not.toHaveBeenCalled()
+      expect(res._getStatusCode()).toBe(400)
     })
   })
 

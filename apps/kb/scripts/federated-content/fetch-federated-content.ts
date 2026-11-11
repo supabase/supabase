@@ -1,6 +1,6 @@
 // Fetches every troubleshooting article from the private supabase/troubleshooting
 // repo's `guides` folder into src/content/troubleshooting/ (gitignored,
-// regenerated on every prebuild — see content.config.ts's `troubleshooting`
+// regenerated on every build — see content.config.ts's `troubleshooting`
 // collection). No content processing: body text is written as fetched.
 import '../utils/dotenv.js'
 

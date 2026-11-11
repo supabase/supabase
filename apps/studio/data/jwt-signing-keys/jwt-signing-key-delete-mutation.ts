@@ -2,12 +2,19 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { jwtSigningKeysKeys } from './keys'
-import { del, handleError, unguarded } from '@/data/fetchers'
+import { del, handleError } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
+
+export type JWTSigningKeyDeleteGrant = GrantFor<
+  'delete',
+  '/v1/projects/{ref}/config/auth/signing-keys/{id}'
+>
 
 interface JWTSigningKeyDeleteVariables {
   projectRef?: string
+  grant: JWTSigningKeyDeleteGrant
   keyId: string
 }
 
@@ -18,7 +25,7 @@ export async function deleteJWTSigningKey(payload: JWTSigningKeyDeleteVariables)
     params: {
       path: { ref: payload.projectRef, id: payload.keyId },
     },
-    grant: unguarded.migrating,
+    grant: payload.grant,
   })
 
   if (error) handleError(error)

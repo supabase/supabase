@@ -175,6 +175,7 @@ export const RecoveryReminder = ({
     onTaskComplete?.('recovery_codes')
   }
   const flowProps = {
+    surface: 'recovery_interstitial' as const,
     showSecurityLink: true,
     onStart: () => {
       handleStart()

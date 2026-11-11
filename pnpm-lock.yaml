@@ -324,6 +324,9 @@ importers:
       config:
         specifier: workspace:*
         version: link:../../packages/config
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       mdast-util-toc:
         specifier: ^6.1.1
         version: 6.1.1
@@ -851,6 +854,9 @@ importers:
       lodash-es:
         specifier: ^4.18.1
         version: 4.18.1
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       tailwindcss:
         specifier: 'catalog:'
         version: 4.2.4
@@ -930,6 +936,9 @@ importers:
       eslint-config-supabase:
         specifier: workspace:*
         version: link:../../packages/eslint-config-supabase
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       mdast-util-toc:
         specifier: ^6.1.1
         version: 6.1.1
@@ -1237,9 +1246,6 @@ importers:
       fuse.js:
         specifier: ^7.4.0
         version: 7.4.0
-      generate-password-browser:
-        specifier: ^1.1.0
-        version: 1.1.0
       gqlmin:
         specifier: ^0.3.1
         version: 0.3.1
@@ -1315,9 +1321,6 @@ importers:
       radix-ui:
         specifier: 'catalog:'
         version: 1.4.3(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      randombytes:
-        specifier: ^2.1.0
-        version: 2.1.0
       react:
         specifier: 'catalog:'
         version: 19.2.6
@@ -1478,9 +1481,6 @@ importers:
       '@types/papaparse':
         specifier: ^5.3.1
         version: 5.3.9
-      '@types/randombytes':
-        specifier: ^2.0.3
-        version: 2.0.3
       '@types/react':
         specifier: 'catalog:'
         version: 19.2.14
@@ -1547,6 +1547,9 @@ importers:
       jsdom-testing-mocks:
         specifier: ^1.13.1
         version: 1.13.1
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       msw:
         specifier: ^2.3.0
         version: 2.11.3(@types/node@22.13.14)(typescript@6.0.2)
@@ -1773,6 +1776,9 @@ importers:
       lodash:
         specifier: ^4.18.1
         version: 4.18.1
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       mdast-util-from-markdown:
         specifier: ^1.3.1
         version: 1.3.1(supports-color@8.1.1)
@@ -2122,6 +2128,9 @@ importers:
       api-types:
         specifier: workspace:*
         version: link:../../packages/api-types
+      maybe-turbo:
+        specifier: workspace:*
+        version: link:../../packages/maybe-turbo
       postcss:
         specifier: ^8.5.18
         version: 8.5.28
@@ -2778,8 +2787,8 @@ importers:
   packages/shared-data:
     dependencies:
       '@supabase/shared-types':
-        specifier: 0.1.96
-        version: 0.1.96
+        specifier: 0.1.98
+        version: 0.1.98
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -8762,9 +8771,6 @@ packages:
     resolution: {integrity: sha512-4W4ISbreRygNXbhwqxeqyuRul8RPx+SF+Hp2IT8wctebQEHSVCULfKatiRiEhmasfoXvYm2AHV4XFsOxhoousA==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/shared-types@0.1.96':
-    resolution: {integrity: sha512-2qB7Cmtu/59VgDpSjFN11hQhmhKK0RXgmGuF8F4fKDFHiTWA5Tu3EhPpcU5/j7jKhEsgUPFLXiZaGxn9hNQk/g==}
-
   '@supabase/shared-types@0.1.98':
     resolution: {integrity: sha512-TU633VIMRpKDt69Vi9bjiVHTcyC3o1K3A7McIcEN/62Lb1OUK4aQg/zixuuX2qhHSDONfeafvrRmiHGzD7an1A==}
 
@@ -9569,9 +9575,6 @@ packages:
 
   '@types/prismjs@1.26.3':
     resolution: {integrity: sha512-A0D0aTXvjlqJ5ZILMz3rNfDBOx9hHxLZYv2by47Sm/pqW35zzjusrZTryatjN/Rf8Us2gZrJD+KeHbUSTux1Cw==}
-
-  '@types/randombytes@2.0.3':
-    resolution: {integrity: sha512-+NRgihTfuURllWCiIAhm1wsJqzsocnqXM77V/CalsdJIYSRGEHMnritxh+6EsBklshC+clo1KgnN14qgSGeQdw==}
 
   '@types/react-copy-to-clipboard@5.0.5':
     resolution: {integrity: sha512-en3JGqPA4RX4aUlo6q6uUbnqLp31Dhm2E/thiMvFTIvU+dUDG249jBG2MJ0rPMXE/MbKVrpmi/1r1G4QLhIHKQ==}
@@ -12829,9 +12832,6 @@ packages:
     engines: {node: '>=10'}
     deprecated: This package is no longer supported.
 
-  generate-password-browser@1.1.0:
-    resolution: {integrity: sha512-qsQve0rVbCqGqAfKgZwjxKUfI1d1nyd22dz+kE8gn1iw1LxGkR+Slsl79XXfm2wxuK27IkopTs5KXcOEQnhg0w==}
-
   generic-names@4.0.0:
     resolution: {integrity: sha512-ySFolZQfw9FoDb3ed9d80Cm9f0+r7qj+HJkWjeD9RBfpxEVTlVhol+gvaQB/78WbwYfbnNh8nWHHBSlg072y6A==}
 
@@ -15280,8 +15280,8 @@ packages:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  node-forge@1.4.2:
-    resolution: {integrity: sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==}
+  node-forge@1.4.3:
+    resolution: {integrity: sha512-P6wzfh6t70avmV8FrVEAd/36sOPJQ+hkaJVX1Laap9J/77m7M0eyozDvc8SwnDf4P7MP94gwbAAo0rg3YVXT+g==}
     engines: {node: '>= 6.13.0'}
 
   node-gyp-build-optional-packages@5.2.2:
@@ -16220,9 +16220,6 @@ packages:
   randomatic@3.1.1:
     resolution: {integrity: sha512-TuDE5KxZ0J461RVjrJZCJc+J+zCkTb1MbH9AQUq68sMhOMcy9jLcb3BrZKgp9q9Ncltdg4QVqWrH02W2EFFVYw==}
     engines: {node: '>= 0.10.0'}
-
-  randombytes@2.1.0:
-    resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
   range-parser@1.2.1:
     resolution: {integrity: sha512-Hrgsx+orqoygnmhFbKaHE6c296J+HTAQXoxEF6gNupROmmGJRoyzfG3ccAveqCBrwr/2yxQ5BVd/GTl5agOwSg==}
@@ -25584,8 +25581,6 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/shared-types@0.1.96': {}
-
   '@supabase/shared-types@0.1.98': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
@@ -26530,10 +26525,6 @@ snapshots:
       pg-types: 4.0.2
 
   '@types/prismjs@1.26.3': {}
-
-  '@types/randombytes@2.0.3':
-    dependencies:
-      '@types/node': 22.13.14
 
   '@types/react-copy-to-clipboard@5.0.5':
     dependencies:
@@ -30309,11 +30300,6 @@ snapshots:
       strip-ansi: 6.0.1
       wide-align: 1.1.5
 
-  generate-password-browser@1.1.0:
-    dependencies:
-      buffer: 6.0.3
-      randombytes: 2.1.0
-
   generic-names@4.0.0:
     dependencies:
       loader-utils: 3.3.1
@@ -31809,7 +31795,7 @@ snapshots:
       h3: 1.15.11
       http-shutdown: 1.2.2
       jiti: 2.7.0
-      node-forge: 1.4.2
+      node-forge: 1.4.3
       pathe: 2.0.3
       std-env: 4.3.0
       tinyclip: 0.1.15
@@ -33675,7 +33661,7 @@ snapshots:
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
 
-  node-forge@1.4.2: {}
+  node-forge@1.4.3: {}
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
@@ -34822,10 +34808,6 @@ snapshots:
       is-number: 4.0.0
       kind-of: 6.0.3
       math-random: 1.0.4
-
-  randombytes@2.1.0:
-    dependencies:
-      safe-buffer: 5.2.1
 
   range-parser@1.2.1: {}
 
