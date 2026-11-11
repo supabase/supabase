@@ -3,7 +3,9 @@ import { escapeIlikeLiteral } from '../../../helpers'
 import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
 import {
   EXTENSION_FUNCTIONS_CTE,
+  EXTENSION_RELATIONS_CTE,
   hasTableAccess,
+  isSecurityInvokerView,
   triggerActivation,
   triggerEvents,
 } from './catalog-helpers'
@@ -22,13 +24,22 @@ const CANDIDATE_LIMIT = 50
 // first (in the table's own order), then by their own name.
 const TABLE_RELATED_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
 
-export type SearchEntitiesTable = {
+type SearchEntitiesRelation = {
   id: number
   schema: string
   name: string
-  rls_enabled: boolean
-  policy_count: number
 }
+
+/**
+ * A matched relation, keyed by pg_class.relkind — every kind the table editor
+ * can open. Partitions are excluded, so 'p' is always a partition parent.
+ */
+export type SearchEntitiesTable = SearchEntitiesRelation &
+  (
+    | { type: 'r' | 'p'; rls_enabled: boolean; policy_count: number }
+    | { type: 'v'; security_invoker: boolean }
+    | { type: 'm' | 'f' }
+  )
 
 export type SearchEntitiesPolicy = {
   id: number
@@ -132,12 +143,15 @@ export const getSearchEntitiesSql = ({
   const policyExactName = literal(query.toLowerCase())
 
   return safeSql`
-    with table_candidates as materialized (
+    with ${EXTENSION_RELATIONS_CTE},
+    table_candidates as materialized (
       select
         c.oid,
         c.relname,
         c.relowner,
+        c.relkind,
         c.relrowsecurity,
+        ${isSecurityInvokerView(safeSql`c.reloptions`)} as security_invoker,
         nc.nspname,
         case
           when lower(c.relname) = ${exactName} then 0
@@ -146,10 +160,14 @@ export const getSearchEntitiesSql = ({
         end as rank
       from pg_class c
       join pg_namespace nc on nc.oid = c.relnamespace
-      where c.relkind in ('r', 'p')
+      -- Every kind the table editor can open. Partitions are left out so a
+      -- partitioned table surfaces as the parent the user named, not as its
+      -- children; a foreign table used as a partition is skipped for the same reason.
+      where c.relkind in ('r', 'p', 'v', 'm', 'f')
         and not c.relispartition
         and nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
+        and c.oid not in (select objid from extension_relations)
         and ${tableMatchFilter}
       order by rank, length(c.relname), c.relname
       limit ${literal(CANDIDATE_LIMIT)}
@@ -161,8 +179,16 @@ export const getSearchEntitiesSql = ({
         tc.oid::int8 as id,
         tc.nspname as schema,
         tc.relname as name,
+        tc.relkind::text as type,
         tc.relrowsecurity as rls_enabled,
-        (select count(*) from pg_policy pol where pol.polrelid = tc.oid)::int as policy_count,
+        tc.security_invoker,
+        -- Only tables and partitioned tables can have policies, so the other
+        -- kinds skip the probe rather than counting a guaranteed zero
+        case
+          when tc.relkind in ('r', 'p')
+            then (select count(*) from pg_policy pol where pol.polrelid = tc.oid)
+          else 0
+        end::int as policy_count,
         tc.rank
       from table_candidates tc
       where ${hasTableAccess(safeSql`tc.oid`, safeSql`tc.relowner`)}
@@ -370,9 +396,19 @@ export const getSearchEntitiesSql = ({
               'id', t.id,
               'schema', t.schema,
               'name', t.name,
-              'rls_enabled', t.rls_enabled,
-              'policy_count', t.policy_count
+              'type', t.type
             )
+            -- Kind-specific keys are omitted rather than zeroed, so a caller
+            -- can't read "RLS disabled" off a materialized view, which cannot
+            -- have RLS at all
+            || case
+                 when t.type in ('r', 'p') then jsonb_build_object(
+                   'rls_enabled', t.rls_enabled,
+                   'policy_count', t.policy_count
+                 )
+                 when t.type = 'v' then jsonb_build_object('security_invoker', t.security_invoker)
+                 else '{}'::jsonb
+               end
             order by t.rank, length(t.name), t.name
           )
           from matched_tables t
