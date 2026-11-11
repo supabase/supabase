@@ -65,19 +65,24 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
   if (!isVisible || scale.width === 0) return null
 
   const endMs = effectiveEndMs(span, nowMs)
+  const startPx = visibleStart * scale.width
+  const endPx = visibleEnd * scale.width
   const labelPx = formatDuration(endMs - span.startMs).length * TIMING_CHAR_PX + TIMING_CHIP_PX
   const reserved = span.id === slowestId ? SLOWEST_PX : 0
   const placement = getTimingPlacement({
-    startPx: visibleStart * scale.width,
-    endPx: visibleEnd * scale.width,
+    startPx,
+    endPx,
     laneWidth: scale.width,
     labelPx,
     gapPx: TIMING_GAP,
   })
+  const fitsInBar = labelPx <= endPx - startPx
 
   const position = {
     after: { left: `calc(${visibleEnd * 100}% + ${TIMING_GAP}px)` },
-    inside: { right: `calc(${(1 - visibleEnd) * 100}% + ${4 + reserved}px)` },
+    inside: {
+      right: `min(calc(${(1 - visibleEnd) * 100}% + ${4 + reserved}px), calc(100% - ${labelPx}px))`,
+    },
     before: { right: `calc(${(1 - visibleStart) * 100}% + ${TIMING_GAP}px)` },
   }[placement]
 
@@ -87,7 +92,8 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
       data-placement={placement}
       className={cn(
         'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
-        placement === 'inside' && '[&>span]:text-background',
+        placement === 'inside' && fitsInBar && '[&>span]:text-background',
+        placement === 'inside' && !fitsInBar && 'bg-background/90',
         LIVE_GROWTH_TRANSITION,
         className
       )}
