@@ -35,6 +35,7 @@ import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 // menu's relevance sort, so a better-matching policy, trigger or function doesn't
 // jump above the tables
 const ENTITY_SEARCH_RELEVANCE_GROUP = 'database-entity-search'
+const COMMAND_ITEM_ICON_CLASS = 'text-foreground-light group-aria-selected:text-foreground'
 
 /**
  * Searches the project's database entities by name as the user types in the
@@ -93,7 +94,7 @@ export function useDatabaseEntitySearchCommands() {
       forceMount: true,
       icon: () => (
         <span className="w-5 h-5 flex items-center justify-center shrink-0">
-          <EntityTypeIcon type={table.type} />
+          <EntityTypeIcon type={table.type} className={COMMAND_ITEM_ICON_CLASS} />
         </span>
       ),
       badge: details

@@ -52,6 +52,7 @@ interface EntityTypeIconProps {
   isActive?: boolean
   sqlSource?: SqlSnippetSource
   isPartition?: boolean
+  className?: string
 }
 
 export const EntityTypeIcon = ({
@@ -61,6 +62,7 @@ export const EntityTypeIcon = ({
   isActive,
   sqlSource,
   isPartition = false,
+  className,
 }: EntityTypeIconProps) => {
   const type = isPartition ? ENTITY_TYPE.PARTITIONED_TABLE : entityType
 
@@ -103,7 +105,8 @@ export const EntityTypeIcon = ({
         className={cn(
           'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-light',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
@@ -119,9 +122,10 @@ export const EntityTypeIcon = ({
         size={size}
         strokeWidth={strokeWidth}
         className={cn(
-          'text-foreground-muted group-hover:text-foreground-lighter',
+          'text-foreground-muted group-hover:text-foreground-lighter group-aria-selected:text-foreground',
           isActive && 'text-foreground-lighter',
-          'transition-colors'
+          'transition-colors',
+          className
         )}
       />
     )
