@@ -22,7 +22,12 @@ function useSpan(): SpanContextValue {
   return value
 }
 
-export function Rows({ className, children, ...props }: ComponentProps<typeof ScrollRoot>) {
+export function Rows({
+  className,
+  children,
+  'aria-label': ariaLabel = 'Spans',
+  ...props
+}: ComponentProps<typeof ScrollRoot>) {
   const index = useTrace()
   const { selectedId, collapsed, select, setCollapsed } = useView()
   const rows = useMemo(() => flattenTree(index, collapsed), [index, collapsed])
@@ -108,7 +113,7 @@ export function Rows({ className, children, ...props }: ComponentProps<typeof Sc
         <div
           ref={treeRef}
           role="tree"
-          aria-label="Spans"
+          aria-label={ariaLabel}
           className="relative w-full"
           style={{ height: virtualizer.getTotalSize() }}
           onKeyDown={handleKeyDown}
