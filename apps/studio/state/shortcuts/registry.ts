@@ -392,7 +392,7 @@ export const SHORTCUT_DEFINITIONS: Record<ShortcutId, ShortcutDefinition> = {
   },
   [SHORTCUT_IDS.NAV_ADVISORS]: {
     id: SHORTCUT_IDS.NAV_ADVISORS,
-    label: 'Go to Advisors',
+    label: 'Go to Issues',
     sequence: ['G', 'V'],
     showInSettings: false,
     referenceGroup: SHORTCUT_REFERENCE_GROUPS.NAVIGATION_GLOBAL,

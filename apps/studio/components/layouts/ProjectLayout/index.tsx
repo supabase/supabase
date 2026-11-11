@@ -189,7 +189,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-    const currentSectionKey = getSectionKeyFromPathname(pathname)
+    const isIssuesInboxEnabled = useFlag('issuesInbox')
+    const sectionKey = getSectionKeyFromPathname(pathname)
+    const currentSectionKey =
+      sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
     const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()

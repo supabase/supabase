@@ -7,7 +7,7 @@ import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 
-export type TableRelatedResourcesGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query'>
+export type TableRelatedResourcesGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 
 export type TableRelatedResourcesVariables = {
   projectRef?: string
