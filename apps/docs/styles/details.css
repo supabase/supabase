@@ -54,6 +54,15 @@
   transform: rotate(180deg);
 }
 
+/* Forced colors replaces background colors, which would hide the masked chevron.
+ * A system color is preserved, so use one. */
+@media (forced-colors: active) {
+  .prose
+    :where(details > summary):not(:where([class~='not-prose'], [class~='not-prose'] *))::after {
+    background-color: CanvasText;
+  }
+}
+
 .prose :where(details > summary + *):not(:where([class~='not-prose'], [class~='not-prose'] *)) {
   margin-top: 0;
 }
