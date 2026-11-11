@@ -281,7 +281,7 @@ export const EdgeFunctionDetails = () => {
                   className="px-6 pb-2"
                 />
                 {isFunctionUrlLoading && (
-                  <div className="px-6">
+                  <div className="mt-4 px-6">
                     <GenericSkeletonLoader />
                   </div>
                 )}
