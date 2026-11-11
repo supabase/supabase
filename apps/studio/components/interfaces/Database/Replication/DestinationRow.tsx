@@ -239,6 +239,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                   >
                     <RowMenu
                       destinationId={destinationId}
+                      destinationType={type}
                       pipeline={pipeline}
                       pipelineStatus={pipelineStatus?.status}
                       error={pipelineStatusError}
@@ -276,7 +277,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       />
 
       <UpdateVersionModal
-        visible={showUpdateVersionModal}
+        visible={type !== undefined && type !== 'Unknown' && showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />

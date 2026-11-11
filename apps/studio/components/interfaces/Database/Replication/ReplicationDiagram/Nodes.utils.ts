@@ -1,4 +1,6 @@
-export type ReplicationDestinationType = 'BigQuery' | 'DuckLake' | 'Snowflake' | 'ClickHouse'
+import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+
+export type ReplicationDestinationType = DestinationType | 'Unknown'
 
 export const getReplicationDestinationType = (
   config?: Record<string, unknown>
@@ -8,5 +10,5 @@ export const getReplicationDestinationType = (
   if ('ducklake' in config) return 'DuckLake'
   if ('snowflake' in config) return 'Snowflake'
   if ('clickhouse' in config) return 'ClickHouse'
-  return undefined
+  return 'Unknown'
 }

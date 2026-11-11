@@ -19,6 +19,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
+import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
 import { DestinationForm } from './DestinationForm'
@@ -26,6 +27,7 @@ import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
@@ -74,11 +76,18 @@ export const DestinationPanel = () => {
     type: existingDestinationType,
     destinationFetcher,
   } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
   const invalidExistingDestination = destinationFetcher.error?.code === 404
+  const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
   const showAccessRequest = !isAccessLoading && !enablePgReplicate
   const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
-  const showDestinationForm = !isAccessLoading && enablePgReplicate && !replicationNotEnabled
+  const isEditLoading = editMode && destinationFetcher.isPending
+  const canEditDestination =
+    !editMode || (existingDestinationType !== undefined && !isUnknownDestination)
+  const showDestinationForm =
+    !isAccessLoading && enablePgReplicate && !replicationNotEnabled && canEditDestination
 
   const existingDestination = editMode
     ? {
@@ -158,9 +167,23 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
-            {isAccessLoading && (
+            {(isAccessLoading || isEditLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
+              </SheetSection>
+            )}
+            {isUnknownDestination && (
+              <SheetSection>
+                <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {hasDestinationError && (
+              <SheetSection>
+                <AlertError
+                  error={destinationFetcher.error}
+                  subject="Failed to retrieve destination information"
+                  projectRef={projectRef}
+                />
               </SheetSection>
             )}
             {showAccessRequest && (
