@@ -111,14 +111,16 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     {
       label: 'vCPU-hours',
       isLoading: isPending,
-      // Paired with the allowance, because the figure alone carries no sense of scale. The
-      // denominator belongs to the organization, though, so the footnote says so: without it
-      // two projects could each read "5/8.3" and look fine while the organization is over.
-      value:
+      value: formatDecimal(reservedVcpuHours),
+      // A share of the quota rather than a pair against it. "13.2/8.3" claims the project has
+      // an 8.3 allowance, which it does not — the quota is the organization's, and two
+      // projects could each sit under it while the organization is over. A percentage states
+      // the same scale as a ratio, and naming the denominator in the same line keeps it from
+      // being read as this project's own limit.
+      footnote:
         limits.vcpuHours === null
-          ? formatDecimal(reservedVcpuHours)
-          : `${formatDecimal(reservedVcpuHours)}/${formatDecimal(limits.vcpuHours)}`,
-      footnote: limits.vcpuHours === null ? noLimitLabel : 'Shared across the organization',
+          ? noLimitLabel
+          : `${formatPercentage(reservedVcpuHours / limits.vcpuHours)} of the organization quota`,
       description:
         limits.vcpuHours === null
           ? `Running hours multiplied by the vCPU each instance size reserves. ${noLimitLabel}.`

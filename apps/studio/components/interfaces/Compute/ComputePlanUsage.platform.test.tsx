@@ -105,18 +105,18 @@ describe('ComputePlanUsage', () => {
     }
   })
 
-  it('pairs vCPU-hours with the allowance, and says whose allowance it is', async () => {
+  it('scales vCPU-hours as a share of the quota, not as a pair against it', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
     const compute = await metric('vCPU-hours')
-    // The figure alone has no scale, so it reads against the quota.
-    expect(await compute.findByText(/^[\d.,]+\/8\.3$/)).toBeInTheDocument()
-    // But the quota is the organization's: two projects could each sit under it while the
-    // organization is over, so the cell cannot imply a per-project allowance.
-    expect(compute.getByText('Shared across the organization')).toBeInTheDocument()
+
+    // "13.2/8.3" would claim the project holds an 8.3 allowance. The quota is the
+    // organization's, and two projects could each sit under it while the organization is over.
+    expect(compute.queryByText(/\//)).not.toBeInTheDocument()
+    expect(await compute.findByText(/^\d+% of the organization quota$/)).toBeInTheDocument()
   })
 
   it('carries no unit in the figures, since every label names one', async () => {
