@@ -38,7 +38,7 @@ export const PartitionListMenu = ({
   const { data: project } = useSelectedProjectQuery()
   const [searchText, setSearchText] = useState('')
 
-  const { data: parentInfo } = useQuery(
+  const { data: parentInfo, isPending: isParentInfoPending } = useQuery(
     partitionInfoQueryOptions({
       projectRef: project?.ref,
       connectionString: project?.connectionString,
@@ -119,6 +119,7 @@ export const PartitionListMenu = ({
           variant="text"
           className="px-1"
           icon={<ArrowLeftIcon />}
+          disabled={isParentInfoPending}
           aria-label={
             parentInfo?.parent_id != null ? 'Back to parent partitions' : 'Back to all tables'
           }
