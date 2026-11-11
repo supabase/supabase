@@ -133,8 +133,7 @@ export function Rows({
                   tabIndex={id === tabbableId ? 0 : -1}
                   data-trace-row
                   data-trace-row-id={id}
-                  data-state={isSelected ? 'selected' : undefined}
-                  className="absolute left-0 top-0 flex w-full cursor-pointer items-stretch divide-x divide-default outline-none hover:bg-foreground/5 focus-visible:bg-foreground/5 data-[state=selected]:bg-brand/10"
+                  className="focus-inset absolute left-0 top-0 flex w-full cursor-pointer items-stretch divide-x divide-border hover:bg-control aria-selected:bg-selection"
                   style={{ height: item.size, transform: `translateY(${item.start}px)` }}
                   onClick={() => {
                     select(id)
