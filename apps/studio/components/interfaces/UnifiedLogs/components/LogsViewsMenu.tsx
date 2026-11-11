@@ -2,8 +2,8 @@ import {
   AlertCircleIcon,
   BookmarkIcon,
   EditIcon,
+  LayersIcon,
   Loader2Icon,
-  SquareStackIcon,
   Trash2Icon,
 } from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
@@ -97,7 +97,7 @@ const LogsViewRow = ({
       onSelect={() => onApply(view)}
     >
       <div className="flex items-center min-w-0">
-        <SquareStackIcon size={14} className="mr-2 shrink-0 text-foreground-light" />
+        <LayersIcon size={14} className="mr-2 shrink-0 text-foreground-light" />
         <span className={cn('truncate', isActive && 'font-medium')}>{view.name}</span>
         {isActive && isModified && (
           <span className="ml-2 text-foreground-lighter text-xs shrink-0">(modified)</span>

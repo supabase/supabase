@@ -3,22 +3,23 @@ import { AnimatePresence, motion } from 'motion/react'
 import { createPortal } from 'react-dom'
 import { Button } from 'ui'
 
-interface SaveViewSuggestionBannerProps {
+interface ViewSuggestionBannerProps {
   visible: boolean
-  activeFilterCount: number
-  onSave: () => void
+  title: string
+  description: string
+  primaryLabel: string
+  onPrimary: () => void
   onDismiss: () => void
 }
 
-export const SaveViewSuggestionBanner = ({
+export const ViewSuggestionBanner = ({
   visible,
-  activeFilterCount,
-  onSave,
+  title,
+  description,
+  primaryLabel,
+  onPrimary,
   onDismiss,
-}: SaveViewSuggestionBannerProps) => {
-  const title = `You've configured ${activeFilterCount} filters!`
-  const description = 'Would you like to save them as a view?'
-
+}: ViewSuggestionBannerProps) => {
   const content = (
     <AnimatePresence>
       {visible && (
@@ -38,8 +39,8 @@ export const SaveViewSuggestionBanner = ({
                 </div>
               </div>
               <div className="flex items-center justify-end gap-1.5 shrink-0">
-                <Button size="tiny" variant="primary" onClick={onSave}>
-                  Save
+                <Button size="tiny" variant="primary" onClick={onPrimary}>
+                  {primaryLabel}
                 </Button>
                 <Button
                   size="tiny"

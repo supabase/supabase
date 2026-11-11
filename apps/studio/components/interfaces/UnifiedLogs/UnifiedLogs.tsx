@@ -16,6 +16,7 @@ import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } 
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
 import { useQueryStates } from 'nuqs'
 import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { toast } from 'sonner'
 import {
   Button,
   ChartConfig,
@@ -35,13 +36,13 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { LogsViewsMenu } from './components/LogsViewsMenu'
 import { SaveViewDialog } from './components/SaveViewDialog'
-import { SaveViewSuggestionBanner } from './components/SaveViewSuggestionBanner'
 import {
   getFilterCombinationKey,
   isFilterComboAlreadySaved,
   shouldShowSaveViewSuggestion,
 } from './components/SaveViewSuggestionBanner.utils'
 import { TooltipLabel } from './components/TooltipLabel'
+import { ViewSuggestionBanner } from './components/ViewSuggestionBanner'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import { filterFields as defaultFilterFields } from './UnifiedLogs.fields'
@@ -156,6 +157,7 @@ export const UnifiedLogs = ({
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState(false)
   const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
+  const [dismissedUpdateKey, setDismissedUpdateKey] = useState<string | null>(null)
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -486,6 +488,15 @@ export const UnifiedLogs = ({
     isDismissed: dismissedFilterKeys.has(filterCombinationKey),
     isAlreadySaved: isFilterComboAlreadySaved(currentDraft.filters, savedViews),
   })
+  // Keyed by view + filter combination so dismissing re-shows if the user modifies
+  // the view differently afterwards, and automatically "resets" once unmodified.
+  const updateSuggestionKey = activeView ? `${activeView.id}:${filterCombinationKey}` : null
+  const showUpdateViewSuggestion =
+    showSavedViews &&
+    !!activeView &&
+    isActiveViewModified &&
+    !isSaveViewDialogOpen &&
+    updateSuggestionKey !== dismissedUpdateKey
 
   const handleApplyView = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
@@ -504,6 +515,7 @@ export const UnifiedLogs = ({
       search,
     })
     updateSavedView(activeView.id, { filters, viewOptions })
+    toast.success('View updated')
   }
 
   const handleSaveCurrentView = () => {
@@ -514,10 +526,15 @@ export const UnifiedLogs = ({
     const id = createSavedView(input)
     setActiveViewId(id)
     setIsSaveViewDialogOpen(false)
+    toast.success('View saved')
   }
 
   const handleDismissSuggestion = () => {
     setDismissedFilterKeys((prev) => new Set(prev).add(filterCombinationKey))
+  }
+
+  const handleDismissUpdateSuggestion = () => {
+    setDismissedUpdateKey(updateSuggestionKey)
   }
 
   const applyFilterSearch = () => {
@@ -734,11 +751,21 @@ export const UnifiedLogs = ({
                   projectRef={projectRef}
                 />
               )}
-              <SaveViewSuggestionBanner
+              <ViewSuggestionBanner
                 visible={showSaveViewSuggestion}
-                activeFilterCount={activeFilterCount}
-                onSave={handleSaveCurrentView}
+                title={`You've configured ${activeFilterCount} filters!`}
+                description="Would you like to save them as a view?"
+                primaryLabel="Save"
+                onPrimary={handleSaveCurrentView}
                 onDismiss={handleDismissSuggestion}
+              />
+              <ViewSuggestionBanner
+                visible={showUpdateViewSuggestion}
+                title="You have modified your view"
+                description="Would you like to update?"
+                primaryLabel="Update"
+                onPrimary={handleUpdateActiveView}
+                onDismiss={handleDismissUpdateSuggestion}
               />
               <ResizablePanelGroup
                 key="main-logs"
