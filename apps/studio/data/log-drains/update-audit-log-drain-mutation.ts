@@ -5,7 +5,8 @@ import { AuditLogDrainConfig } from './create-audit-log-drain-mutation'
 import { logDrainsKeys } from './keys'
 import { LogDrainType } from '@/components/interfaces/LogDrains/LogDrains.constants'
 import { handleError, put } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuditLogDrainUpdateVariables = {
   slug: string
@@ -45,12 +46,12 @@ export const useUpdateAuditLogDrainMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuditLogDrainUpdateData, ResponseError, AuditLogDrainUpdateVariables>,
+  UseCustomMutationOptions<AuditLogDrainUpdateData, StudioError, AuditLogDrainUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuditLogDrainUpdateData, ResponseError, AuditLogDrainUpdateVariables>({
+  return useMutation<AuditLogDrainUpdateData, StudioError, AuditLogDrainUpdateVariables>({
     mutationFn: (vars) => updateAuditLogDrain(vars),
     async onSuccess(data, variables, context) {
       const { slug } = variables

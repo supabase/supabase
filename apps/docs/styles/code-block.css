@@ -16,9 +16,5 @@
 }
 
 .code-sample-source :is(.shiki, .code-sample-surface) {
-  mask:
-    linear-gradient(#000 0 0),
-    var(--source-notch-mask) right -2px bottom -2px / var(--source-notch-mask-width) 42px no-repeat;
-  mask-composite: exclude;
-  mask-clip: no-clip;
+  @apply notch-corner;
 }

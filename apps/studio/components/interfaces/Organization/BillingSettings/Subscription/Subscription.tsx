@@ -115,7 +115,7 @@ const Subscription = () => {
                 <div className="space-y-6 w-full">
                   <div className="flex justify-between items-center">
                     <p className="text-2xl text-primary leading-none">
-                      {currentPlan?.name ?? 'Unknown'} Plan
+                      {currentPlan?.name ?? <span>Unknown</span>} <span>Plan</span>
                     </p>
 
                     {canChangeTier && (
@@ -177,9 +177,11 @@ const Subscription = () => {
                         Projects may become unresponsive when this organization exceeds its{' '}
                         <Link href={`/org/${slug}/usage`}>included usage quota</Link>. To scale
                         seamlessly,{' '}
-                        {currentPlan?.id === 'free'
-                          ? 'upgrade to a paid plan.'
-                          : 'you can disable Spend Cap under the Cost Control settings.'}
+                        {currentPlan?.id === 'free' ? (
+                          <span>upgrade to a paid plan.</span>
+                        ) : (
+                          <span>you can disable Spend Cap under the Cost Control settings.</span>
+                        )}
                       </div>
                     </Admonition>
                   )}

@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationUpdateVariables = {
   slug: string
@@ -44,12 +45,12 @@ export const useOrganizationUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>,
+  UseCustomMutationOptions<OrganizationUpdateData, StudioError, OrganizationUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OrganizationUpdateData, ResponseError, OrganizationUpdateVariables>({
+  return useMutation<OrganizationUpdateData, StudioError, OrganizationUpdateVariables>({
     mutationFn: (vars) => updateOrganization(vars),
     async onSuccess(data, variables, context) {
       queryClient.setQueriesData(

@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { Card } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -15,19 +16,22 @@ import {
   ScaffoldSectionDescription,
   ScaffoldSectionTitle,
 } from '@/components/layouts/Scaffold'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useVaultSecretDecryptedValueQuery } from '@/data/vault/vault-secret-decrypted-value-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string }) => {
   const { data: project } = useSelectedProjectQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: project?.ref },
+    { variant: 'reveal' }
+  )
+  const canReadAPIKeys = apiKeysGrant.status === 'granted'
 
   const integration = INTEGRATIONS.find((i) => i.id === 'iceberg_wrapper' && i.type === 'wrapper')
   const wrapperMeta = (integration?.type === 'wrapper' && integration.meta) as WrapperMeta
@@ -46,9 +50,11 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
       { enabled: canReadAPIKeys }
     )
 
-  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useAPIKeys(
-    { projectRef: project?.ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  const { data: apiKeysData, isSuccess: isSuccessApiKeys } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
   )
 
   const isTokenValid = apiKeysData?.allSecretKeys.some((x) => x.api_key === decryptedToken)
@@ -77,6 +83,11 @@ export const SimpleConfigurationDetails = ({ bucketName }: { bucketName?: string
         />
       </ScaffoldHeader>
 
+      <ApiKeysAccessNote
+        className="mb-4"
+        grant={apiKeysGrant}
+        fallback="We can't check whether the catalog token is still valid."
+      />
       {isSuccessApiKeys && isSuccessVaultDecrypt && !isTokenValid && (
         <Admonition type="warning" title="Catalog token is no longer valid" className="mb-4">
           <p>

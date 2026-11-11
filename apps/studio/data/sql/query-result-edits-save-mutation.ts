@@ -1,4 +1,4 @@
-import { joinSqlFragments, safeSql } from '@supabase/pg-meta'
+import { asWriteSql, joinSqlFragments, safeSql } from '@supabase/pg-meta'
 import { Query, wrapWithTransaction } from '@supabase/pg-meta/src/query'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
@@ -7,18 +7,19 @@ import { z } from 'zod'
 import { executeSql } from './execute-sql-mutation'
 import { tableRowKeys } from '@/data/table-rows/keys'
 import { getCellEditUpdateStatements } from '@/data/table-rows/operation-queue-save-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 import { getEditedRows, type EditedRow, type PendingCellEdit } from '@/lib/query-result-editing'
 import { wrapWithRoleImpersonation, type RoleImpersonationState } from '@/lib/role-impersonation'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type QueryResultEditsSaveVariables = {
   projectRef: string
   connectionString?: string | null
   edits: readonly PendingCellEdit[]
   roleImpersonationState?: RoleImpersonationState
-  grant: GrantFor<'post', '/platform/pg-meta/{ref}/query'>
+  grant: GrantFor<'post', '/platform/pg-meta/{ref}/query', 'write'>
 }
 
 const rowsSchema = z.array(z.record(z.unknown()))
@@ -44,6 +45,8 @@ async function readBackRows(
     projectRef,
     connectionString,
     sql: wrapWithRoleImpersonation(sql, roleImpersonationState),
+    sqlOrigin: 'studio',
+    queryName: 'query-result-edits-read-back',
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['query-result-edits-read-back', table.id],
     grant,
@@ -70,12 +73,14 @@ async function saveQueryResultEdits(variables: QueryResultEditsSaveVariables) {
   if (edits.length === 0) return { savedRows: [], editedRows: [] }
 
   const statements = getCellEditUpdateStatements(edits)
-  const sql = wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`)
+  const sql = asWriteSql(wrapWithTransaction(safeSql`${joinSqlFragments(statements, ';\n')};`))
 
   await executeSql({
     projectRef,
     connectionString,
     sql: wrapWithRoleImpersonation(sql, roleImpersonationState),
+    sqlOrigin: 'studio',
+    queryName: 'query-result-edits-save',
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
     queryKey: ['query-result-edits-save'],
     grant,
@@ -100,12 +105,12 @@ export const useQueryResultEditsSaveMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<QueryResultEditsSaveData, ResponseError, QueryResultEditsSaveVariables>,
+  UseCustomMutationOptions<QueryResultEditsSaveData, StudioError, QueryResultEditsSaveVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<QueryResultEditsSaveData, ResponseError, QueryResultEditsSaveVariables>({
+  return useMutation<QueryResultEditsSaveData, StudioError, QueryResultEditsSaveVariables>({
     mutationFn: (variables) => saveQueryResultEdits(variables),
     async onSuccess(data, variables, context) {
       // The Table Editor may be showing the same rows.

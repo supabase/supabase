@@ -47,12 +47,12 @@ vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () =
     isLoading: options.previewLoading,
   }),
 }))
-vi.mock('./useIsETLPrivateAlpha', () => ({
-  useIsETLBigQueryPrivateAlpha: () => !options.legacy,
-  useIsETLIcebergPrivateAlpha: () => options.legacy,
-  useIsETLDucklakePrivateAlpha: () => false,
-  useIsETLSnowflakePrivateAlpha: () => false,
-  useIsETLClickHousePrivateAlpha: () => false,
+vi.mock('./useIsPipelinesEnabled', () => ({
+  useIsPipelinesBigQueryEnabled: () => !options.legacy,
+  useIsPipelinesIcebergEnabled: () => options.legacy,
+  useIsPipelinesDuckLakeEnabled: () => false,
+  useIsPipelinesSnowflakeEnabled: () => false,
+  useIsPipelinesClickHouseEnabled: () => false,
 }))
 vi.mock('@/hooks/misc/useCheckEntitlements', () => ({
   useCheckEntitlements: () => ({ hasAccess: options.hasAccess, isLoading: options.isLoading }),

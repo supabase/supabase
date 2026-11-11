@@ -18,6 +18,7 @@ import { spawn } from 'node:child_process'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
+import { cleanTurbopackCache } from './clean-turbopack-cache.mjs'
 import { readEnvFiles } from './lib/env.js'
 
 const target = process.argv[2]
@@ -35,6 +36,10 @@ const fileEnv = readEnvFiles(studioRoot, ['.env', '.env.local'])
 const studioFramework = process.env.STUDIO_FRAMEWORK ?? fileEnv.STUDIO_FRAMEWORK
 const framework = studioFramework === 'tanstack' ? 'tanstack' : 'next'
 const script = `${target}:${framework}`
+
+// Prune stale Turbopack dev cache before the dev server starts. This is a local side effect
+// rather than a build step, so it lives here instead of in a `predev` hook or a turbo task.
+if (target === 'dev') cleanTurbopackCache(studioRoot)
 
 // Use async `spawn` rather than `spawnSync` — long-running dev servers
 // (vite dev / next dev) wedge under `spawnSync` because Node holds the

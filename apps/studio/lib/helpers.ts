@@ -354,10 +354,15 @@ const formatSemver = (version: string) => {
   // e.g supabase-postgres-14.1.0.88
   // There's 4 segments instead so we can't use the semver package
   const segments = version.split('supabase-postgres-')
-  const semver = segments[segments.length - 1]
+  // e.g supabase-postgres-arm64-17.9.0.019 — any leading architecture token is dropped,
+  // since a version segment always starts with a digit
+  const semver = segments[segments.length - 1].replace(/^[a-z][a-z0-9_]*-/, '')
 
   // e.g supabase-postgres-14.1.0.99-vault-rc1
   const formattedSemver = semver.split('-')[0]
+
+  // Not a version (e.g. supabase-postgres-custom-123), so don't let it parse as a number
+  if (!/^\d+\.\d+/.test(formattedSemver)) return null
 
   return formattedSemver
 }
@@ -369,6 +374,7 @@ export const getSemanticVersion = (version: string) => {
   if (!version) return 0
 
   const formattedSemver = formatSemver(version)
+  if (!formattedSemver) return 0
   return Number(formattedSemver.split('.').join(''))
 }
 
@@ -376,6 +382,7 @@ export const getDatabaseMajorVersion = (version: string) => {
   if (!version) return 0
 
   const formattedSemver = formatSemver(version)
+  if (!formattedSemver) return 0
   return Number(formattedSemver.split('.')[0])
 }
 

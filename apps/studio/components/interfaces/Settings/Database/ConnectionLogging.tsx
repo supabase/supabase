@@ -66,7 +66,7 @@ export const ConnectionLogging = () => {
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = (payload) => {
     if (!projectRef) return
-    updatePostgresConfig({ projectRef, payload })
+    updatePostgresConfig({ projectRef, payload: { ...postgresConfig, ...payload } })
   }
 
   useEffect(() => {

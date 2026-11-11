@@ -54,9 +54,11 @@ export function useQueryResultEditing({
     'columns'
   )
   const hasWritePermission = canEditTables || canEditColumns
-  const { grant: queryGrant } = useGrant('POST /platform/pg-meta/{ref}/query', {
-    projectRef: project?.ref,
-  })
+  const { grant: queryGrant } = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
 
   const context = result?.editingContext
   const isPrimaryDatabase =

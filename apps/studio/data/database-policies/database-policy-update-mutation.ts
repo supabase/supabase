@@ -4,9 +4,11 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databasePoliciesKeys } from './keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabasePolicyUpdateVariables = {
   projectRef: string
@@ -23,6 +25,7 @@ export type DatabasePolicyUpdateVariables = {
     check?: SafeSqlFragment
     roles?: string[]
   }
+  sqlOrigin: SqlOrigin
 }
 
 export async function updateDatabasePolicy({
@@ -30,6 +33,7 @@ export async function updateDatabasePolicy({
   connectionString,
   originalPolicy,
   payload,
+  sqlOrigin,
 }: DatabasePolicyUpdateVariables) {
   let headers = new Headers()
   if (connectionString) headers.set('x-connection-encrypted', connectionString)
@@ -39,6 +43,8 @@ export async function updateDatabasePolicy({
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName: 'database-policy-update',
     queryKey: ['policy', 'update', originalPolicy.id],
     grant: unguarded.migrating,
   })
@@ -53,12 +59,12 @@ export const useDatabasePolicyUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>,
+  UseCustomMutationOptions<DatabasePolicyUpdateData, StudioError, DatabasePolicyUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabasePolicyUpdateData, ResponseError, DatabasePolicyUpdateVariables>({
+  return useMutation<DatabasePolicyUpdateData, StudioError, DatabasePolicyUpdateVariables>({
     mutationFn: (vars) => updateDatabasePolicy(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

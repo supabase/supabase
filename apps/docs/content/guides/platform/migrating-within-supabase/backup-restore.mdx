@@ -59,15 +59,15 @@ breadcrumb: 'Migrations'
        Run these commands after replacing ```[CONNECTION_STRING]``` with your connection string from the previous steps:
 
         ```bash
-        supabase db dump --db-url [CONNECTION_STRING] -f roles.sql --role-only
+        supabase db dump --remote=[CONNECTION_STRING] -f roles.sql --role-only
         ```
 
         ```bash
-        supabase db dump --db-url [CONNECTION_STRING] -f schema.sql
+        supabase db dump --remote=[CONNECTION_STRING] -f schema.sql
         ```
 
         ```bash
-        supabase db dump --db-url [CONNECTION_STRING] -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
+        supabase db dump --remote=[CONNECTION_STRING] -f data.sql --use-copy --data-only -x "storage.buckets_vectors" -x "storage.vector_indexes"
         ```
       </StepHikeCompact.Details>
     </StepHikeCompact.Step>
@@ -218,8 +218,8 @@ These steps cover a manual logical restore (`pg_dump` / `psql`) into a project y
 If you were using Supabase CLI for managing migrations on your old database and would like to preserve the migration history in your newly restored project, you need to insert the migration records separately using the following commands.
 
 ```bash
-supabase db dump --db-url "$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
-supabase db dump --db-url "$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
+supabase db dump --remote="$OLD_DB_URL" -f history_schema.sql --schema supabase_migrations
+supabase db dump --remote="$OLD_DB_URL" -f history_data.sql --use-copy --data-only --schema supabase_migrations
 psql \
   --single-transaction \
   --variable ON_ERROR_STOP=1 \
@@ -238,7 +238,7 @@ On `pg-delta`, a plain diff includes your customizations in the managed schemas:
 
 ```bash
 supabase link --project-ref "$OLD_PROJECT_REF"
-supabase db diff --linked > changes.sql
+supabase db diff --remote > changes.sql
 ```
 
 <$Partial path="managed_schemas_diff_capture.mdx" />
@@ -247,7 +247,7 @@ On the legacy `migra` engine, name the schemas explicitly:
 
 ```bash
 supabase link --project-ref "$OLD_PROJECT_REF"
-supabase db diff --linked --schema auth,storage > changes.sql
+supabase db diff --schema auth,storage --remote > changes.sql
 ```
 
 Recreate those objects on the new project from your own migration files or through the Dashboard.
@@ -324,7 +324,7 @@ DROP ROLE IF EXISTS cli_login_postgres;
   <StepHikeCompact.Step step={2}>
     <StepHikeCompact.Details title="List your edge functions" fullWidth>
       ```bash
-      supabase functions list --project-ref your_project_ref
+      supabase functions list --remote=your_project_ref
       ```
     </StepHikeCompact.Details>
   </StepHikeCompact.Step>
@@ -332,7 +332,7 @@ DROP ROLE IF EXISTS cli_login_postgres;
     <StepHikeCompact.Details title="Download your functions" fullWidth>
       You can download an individual function with the following command:
       ```bash
-      supabase functions download YOUR_FUNCTION_NAME --project-ref your_project_ref
+      supabase functions download YOUR_FUNCTION_NAME --remote=your_project_ref
       ```
       <Admonition type="note">
 
@@ -346,7 +346,7 @@ DROP ROLE IF EXISTS cli_login_postgres;
     <StepHikeCompact.Step step={4}>
     <StepHikeCompact.Details title="Deploy the functions" fullWidth>
       ```bash
-      supabase functions deploy --project-ref your_target_project_ref
+      supabase functions deploy --remote=your_target_project_ref
       ```
       This deploys all functions within the `supabase/functions` to the target project. You can confirm by checking your Edge Functions on [the project dashboard](/dashboard/project/_/functions)
 

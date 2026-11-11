@@ -240,6 +240,13 @@ limit ${limitLit}
     case 'pg_upgrade_logs':
       return safeSql`select id, ${LOG_TABLE_SQL[table]}.timestamp, event_message from ${LOG_TABLE_SQL[table]} ${joins} ${where} ${orderBy} limit ${analyticsLiteral(100)}`
 
+    case 'etl_replication_logs':
+      return safeSql`select id, t.timestamp, event_message from ${LOG_TABLE_SQL[table]} t
+  ${where}
+  ${orderBy}
+  limit ${limitLit}
+  `
+
     case 'pg_cron_logs': {
       const userClauses = buildWhereClauses(table, filters)
       const pgCronWhere =
@@ -314,7 +321,7 @@ export const LOG_TABLE_SQL: Record<LogsTableName, SafeLogSqlFragment> = {
   [LogsTableName.PGBOUNCER]: safeSql`pgbouncer_logs`,
   [LogsTableName.PG_UPGRADE]: safeSql`pg_upgrade_logs`,
   [LogsTableName.PG_CRON]: safeSql`pg_cron_logs`,
-  [LogsTableName.ETL]: safeSql`etl_replication_logs`,
+  [LogsTableName.PIPELINES]: safeSql`etl_replication_logs`,
   [LogsTableName.MULTIGRES]: safeSql`multigres_logs`,
 }
 
@@ -363,7 +370,9 @@ export const genCountQuery = (table: LogsTableName, filters: Filters): SafeLogSq
     where = basePgCronWhere
   }
   const joins = genCrossJoinUnnests(table)
-  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]} ${joins} ${where}`
+  // Pipelines filters read the row through the `t` alias.
+  const alias = table === LogsTableName.PIPELINES ? safeSql` t` : safeSql``
+  return safeSql`SELECT count(*) as count FROM ${LOG_TABLE_SQL[table]}${alias} ${joins} ${where}`
 }
 
 // Falls back to now for missing or unparseable params so an Invalid Date can't
@@ -914,7 +923,7 @@ const QUERY_TYPE_LABELS: Record<QueryType, string> = {
   pg_upgrade: 'Postgres upgrade',
   pg_cron: 'pg_cron',
   pgbouncer: 'PgBouncer',
-  etl: 'ETL',
+  pipelines: 'Pipelines',
   multigres: 'Multigres',
 }
 
@@ -932,7 +941,7 @@ const LOG_TABLE_TO_SERVICE_LABEL: Record<LogsTableName, string> = {
   pgbouncer_logs: 'PgBouncer',
   pg_upgrade_logs: 'Postgres upgrade',
   pg_cron_logs: 'pg_cron',
-  etl_replication_logs: 'ETL',
+  etl_replication_logs: 'Pipelines',
   multigres_logs: 'Multigres',
 }
 

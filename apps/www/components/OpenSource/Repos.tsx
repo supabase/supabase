@@ -48,6 +48,15 @@ const Tab = ({ isActive, label, icon, onClick }: TabProps) => (
   </button>
 )
 
+export type GitHubRepo = {
+  name: string
+  description: string | null
+  html_url: string
+  full_name: string
+  forks: number
+  stargazers_count: number
+}
+
 export interface RepoTab {
   label: string
   icon?: string
@@ -56,6 +65,7 @@ export interface RepoTab {
 
 interface Props {
   tabs: RepoTab[]
+  initialRepos: GitHubRepo[] | null
 }
 
 enum SWIPER_STATE {
@@ -64,13 +74,15 @@ enum SWIPER_STATE {
   END = 'END',
 }
 
-const Repos = ({ tabs }: Props) => {
-  const [repos, setRepos] = useState<any[] | null>(null)
+const Repos = ({ tabs, initialRepos }: Props) => {
+  const [repos, setRepos] = useState<any[] | null>(initialRepos)
   const [activeTab, setActiveTab] = useState(0)
   const [apiSwiper, setApiSwiper] = useState(undefined)
   const [swiperState, setSwiperState] = useState<SWIPER_STATE>(SWIPER_STATE.START)
 
   useEffect(() => {
+    if (initialRepos) return
+
     async function fetchOctoData() {
       const { Octokit } = await import('@octokit/core')
       const octokit = new Octokit()
@@ -84,7 +96,7 @@ const Repos = ({ tabs }: Props) => {
       setRepos(res.data)
     }
     fetchOctoData()
-  }, [])
+  }, [initialRepos])
 
   useEffect(() => {
     if (!apiSwiper) return
@@ -99,7 +111,7 @@ const Repos = ({ tabs }: Props) => {
   const activeTabRepos = repos
     ? repos
         ?.filter((repo) => tabs[activeTab].repos?.includes(repo.name))
-        ?.sort((a, b) => (a.stargazers_count < b.stargazers_count ? 1 : -1))
+        ?.sort((a, b) => b.stargazers_count - a.stargazers_count)
     : []
 
   return (

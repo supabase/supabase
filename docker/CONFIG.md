@@ -1198,6 +1198,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 | `EDGE_RUNTIME_TLS_KEY_PATH` | path | Both | Path to PEM-encoded private key (when TLS enabled). | Wired to `--key` flag |
 | `EDGE_RUNTIME_WORKER_POOL_SIZE` | integer (count) | | Tokio LocalPool size for the user worker pool. | Default: `available_parallelism()` in release |
 | `EXT_AI_CACHE_DIR` | path | | Directory used to cache ONNX model files downloaded by `Supabase.ai`. | Defaults to OS cache dir |
+| `FUNCTIONS_MEMORY_LIMIT` | string | Self-hosted | Total memory limit for the functions container, shared by all workers. | Default: `2g` (2 GiB). Accepts Docker Compose memory sizes, such as `512m` or `4g`. Used by Compose to set `mem_limit`; not passed to the runtime as an environment variable. |
 | `HTTP_PROXY` / `http_proxy` | URL | | HTTP outbound proxy for `fetch()` from user functions. | Read by `vendor/deno_fetch/proxy.rs` |
 | `HTTPS_PROXY` / `https_proxy` | URL | | HTTPS outbound proxy for `fetch()` and for the S3 filesystem backend. | Read by `vendor/deno_fetch/proxy.rs` and `crates/fs/impl/s3_fs.rs` |
 | `JSR_URL` | URL | | Override JSR (`jsr.io`) registry base URL. | Default: `https://jsr.io/` |

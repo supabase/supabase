@@ -5,6 +5,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { Header } from './Header'
 
+vi.hoisted(() => {
+  window.matchMedia = (() => ({
+    matches: false,
+    addEventListener: () => {},
+    removeEventListener: () => {},
+  })) as unknown as typeof window.matchMedia
+})
+
 // the same structure as Layout.astro: the header island and the toc share a sticky wrapper
 const mountPage = () => {
   document.body.innerHTML =

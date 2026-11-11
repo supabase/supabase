@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import type { User } from './users-infinite-query'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UserResetPasswordVariables = {
   projectRef: string
@@ -28,10 +29,10 @@ export const useUserResetPasswordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<UserResetPasswordData, ResponseError, UserResetPasswordVariables>,
+  UseCustomMutationOptions<UserResetPasswordData, StudioError, UserResetPasswordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<UserResetPasswordData, ResponseError, UserResetPasswordVariables>({
+  return useMutation<UserResetPasswordData, StudioError, UserResetPasswordVariables>({
     mutationFn: (vars) => resetPassword(vars),
     async onSuccess(data, variables, context) {
       // [Joshen] If we need to invalidate any queries

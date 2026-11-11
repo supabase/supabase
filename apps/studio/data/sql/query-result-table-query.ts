@@ -35,6 +35,8 @@ async function getQueryResultTable(
   const { result } = await executeSql(
     {
       ...args,
+      sqlOrigin: 'studio',
+      queryName: 'query-result-table',
       sql: wrapWithRoleImpersonation(
         safeSql`
       select n.nspname as schema, c.relname as name
@@ -83,6 +85,8 @@ async function getQueryResultRow(args: QueryResultRowVariables, signal?: AbortSi
   const { result } = await executeSql(
     {
       ...args,
+      sqlOrigin: 'studio',
+      queryName: 'query-result-row',
       sql: wrapWithRoleImpersonation(
         new Query()
           .from(args.table.name, args.table.schema)

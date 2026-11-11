@@ -8,6 +8,7 @@ import { Inter, Manrope, Source_Code_Pro } from 'next/font/google'
 
 import { Providers } from './Providers'
 import { Toaster } from './toaster'
+import { libraryUrl } from '@/lib/canonical'
 import { API_URL } from '@/lib/constants'
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
@@ -32,7 +33,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'article',
     authors: 'Supabase',
-    url: `${BASE_PATH}`,
+    url: libraryUrl(''),
     images: `${BASE_PATH}/img/supabase-og-image.png`,
     publishedTime: new Date().toISOString(),
     modifiedTime: new Date().toISOString(),

@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { databaseKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type DownloadableBackupVariables = {
   projectRef?: string
@@ -25,7 +26,7 @@ export async function getDownloadableBackup(
 }
 
 export type DownloadableBackupData = Awaited<ReturnType<typeof getDownloadableBackup>>
-export type DownloadableBackupError = ResponseError
+export type DownloadableBackupError = StudioError
 
 export const useDownloadableBackupQuery = <TData = DownloadableBackupData>(
   { projectRef }: DownloadableBackupVariables,

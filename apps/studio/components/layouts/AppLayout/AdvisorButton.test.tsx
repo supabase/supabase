@@ -1,16 +1,29 @@
+import { QueryClient } from '@tanstack/react-query'
+import { FeatureFlagContext } from 'common'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { AdvisorButton } from '@/components/layouts/AppLayout/AdvisorButton'
-import { render } from '@/tests/helpers'
+import { projectKeys } from '@/data/projects/keys'
+import { createMockProject } from '@/tests/helpers'
+import { customRender } from '@/tests/lib/custom-render'
+
+const render = (component: React.ReactElement) => {
+  const queryClient = new QueryClient({ defaultOptions: { queries: { staleTime: Infinity } } })
+  queryClient.setQueryData(projectKeys.detail('default'), createMockProject({ ref: 'default' }))
+  return customRender(
+    <FeatureFlagContext.Provider value={{ configcat: { issuesInbox: true }, posthog: {} }}>
+      {component}
+    </FeatureFlagContext.Provider>,
+    { queryClient }
+  )
+}
 
 const {
   mockUseProjectLintsQuery,
   mockUseNotificationsV2Query,
   mockUseAdvisorSignals,
   mockToggleSidebar,
-  mockIsPlatform,
 } = vi.hoisted(() => ({
-  mockIsPlatform: { value: true },
   mockUseProjectLintsQuery: vi.fn(),
   mockUseNotificationsV2Query: vi.fn(),
   mockUseAdvisorSignals: vi.fn(),
@@ -29,13 +42,6 @@ vi.mock('@/components/ui/AdvisorPanel/useAdvisorSignals', () => ({
   useAdvisorSignals: mockUseAdvisorSignals,
 }))
 
-vi.mock('@/lib/constants', async (importOriginal) => ({
-  ...(await importOriginal<typeof import('@/lib/constants')>()),
-  get IS_PLATFORM() {
-    return mockIsPlatform.value
-  },
-}))
-
 vi.mock('@/state/sidebar-manager-state', () => ({
   useSidebarManagerSnapshot: () => ({
     toggleSidebar: mockToggleSidebar,
@@ -45,7 +51,6 @@ vi.mock('@/state/sidebar-manager-state', () => ({
 
 describe('AdvisorButton', () => {
   beforeEach(() => {
-    mockIsPlatform.value = true
     mockUseProjectLintsQuery.mockReturnValue({ data: [], isPending: false, isError: false })
     mockUseNotificationsV2Query.mockReturnValue({
       data: { pages: [[]] },
@@ -161,7 +166,6 @@ describe('AdvisorButton', () => {
   })
 
   it('disables the notifications query on self-hosted so no request is made to the platform endpoint', () => {
-    mockIsPlatform.value = false
     render(<AdvisorButton projectRef="project-ref" />)
 
     expect(mockUseNotificationsV2Query).toHaveBeenCalledWith(

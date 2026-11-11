@@ -84,10 +84,10 @@ export function getUniqueLogRows<T extends { id: string }>(
 }
 
 export function getLogRowClassName(
-  row: Pick<ColumnSchema, 'level' | 'timestamp'>,
+  row: Pick<ColumnSchema, 'level' | 'date'>,
   liveTimestamp?: number
 ): string {
-  const isPast = Number(row.timestamp) <= (liveTimestamp || -1)
+  const isPast = row.date.getTime() <= (liveTimestamp || -1)
   return cn(getLevelRowClassName(row.level), isPast ? 'opacity-50' : 'opacity-100', 'h-[30px]')
 }
 
@@ -235,6 +235,7 @@ export function formatServiceTypeForDisplay(serviceType: string): string {
     supavisor: 'Supavisor',
     pgbouncer: 'PgBouncer',
     multigres: 'Multigres',
+    pipelines: 'Pipelines',
   }
 
   return specialCases[serviceType.toLowerCase()] || serviceType

@@ -2,7 +2,8 @@ import { useQuery } from '@tanstack/react-query'
 
 import { jitDbAccessKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type JitDbAccessMembersVariables = { projectRef?: string }
 
@@ -26,7 +27,7 @@ async function getJitDbAccessMembers(
 }
 
 export type JitDbAccessMembersData = Awaited<ReturnType<typeof getJitDbAccessMembers>>
-type JitDbAccessMembersError = ResponseError
+type JitDbAccessMembersError = StudioError
 
 export const useJitDbAccessMembersQuery = <TData = JitDbAccessMembersData>(
   { projectRef }: JitDbAccessMembersVariables,

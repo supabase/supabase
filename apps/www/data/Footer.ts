@@ -109,8 +109,8 @@ const footerData = [
         url: '/kb/topics/faqs',
       },
       {
-        text: 'Brand Assets',
-        url: '/brand-assets',
+        text: 'Brand Guidelines',
+        url: '/brand',
       },
       {
         text: 'Security & Compliance',
@@ -119,6 +119,10 @@ const footerData = [
       {
         text: 'Regions',
         url: '/regions',
+      },
+      {
+        text: 'dbarena',
+        url: 'https://dbarena.com',
       },
       {
         text: 'SOC2',

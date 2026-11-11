@@ -21,7 +21,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { useIsProjectActive, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import { type ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export const RestartServerButton = () => {
   const router = useRouter()
@@ -83,7 +83,7 @@ export const RestartServerButton = () => {
     restartProjectServices({ ref: projectRef, region: projectRegion, services: ['postgresql'] })
   }
 
-  const onRestartFailed = (error: ResponseError, type: string) => {
+  const onRestartFailed = (error: StudioError, type: string) => {
     toast.error(`Unable to restart ${type}: ${error.message}`)
     setServiceToRestart(undefined)
   }

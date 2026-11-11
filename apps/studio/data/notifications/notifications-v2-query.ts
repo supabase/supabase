@@ -3,7 +3,8 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { notificationKeys } from './keys'
 import type { components } from '@/data/api'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 const NOTIFICATIONS_PAGE_LIMIT = 10
 
@@ -60,7 +61,7 @@ export async function getNotifications(options: NotificationVariables, signal?: 
 }
 
 export type NotificationsData = Awaited<ReturnType<typeof getNotifications>>
-export type NotificationsError = ResponseError
+export type NotificationsError = StudioError
 
 export const useNotificationsV2Query = <TData = NotificationsData>(
   { status, filters, limit = NOTIFICATIONS_PAGE_LIMIT }: Omit<NotificationVariables, 'page'>,

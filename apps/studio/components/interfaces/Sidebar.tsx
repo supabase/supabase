@@ -229,11 +229,15 @@ export function SideBarNavLink({
     <SidebarMenuItem>
       {hasShortcut ? (
         <Shortcut
+          label={
+            route.shortcutId === SHORTCUT_IDS.NAV_ADVISORS || route.key === 'explorer'
+              ? `Go to ${route.label}`
+              : undefined
+          }
           id={route.shortcutId!}
           onTrigger={() => router.push(route.link!)}
           side="right"
           delayDuration={shortcutPopoverDelay}
-          label={route.key === 'explorer' ? 'Go to Explorer' : undefined}
         >
           {button}
         </Shortcut>
@@ -350,12 +354,15 @@ const ProjectLinks = () => {
       <SidebarGroup className="gap-0.5">
         <SidebarMenu>
           {otherRoutes.map((route) => {
-            if (route.key === 'advisors') {
+            if (route.key === 'issues' || route.key === 'advisors') {
               return (
                 <SideBarNavLink
                   key={route.key}
                   route={route}
-                  active={activeRoute === route.key}
+                  active={
+                    activeRoute === route.key ||
+                    (route.key === 'issues' && activeRoute === 'advisors')
+                  }
                   isLoading={isProjectPending}
                 >
                   {route.icon}

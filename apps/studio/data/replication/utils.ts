@@ -8,34 +8,33 @@ import type {
   PipelineConfig,
 } from './types'
 import { MAX_RETRY_FAILURE_COUNT } from '@/data/query-client'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 const isLocal =
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'prod' &&
   process.env.NEXT_PUBLIC_ENVIRONMENT !== 'staging'
 
-export const checkLocalETLNotSetUp = (error: ResponseError | null) => {
+export const checkLocalPipelinesNotSetUp = (error: StudioError | null) => {
   if (error === null) return false
 
-  const isETLAPINotRunning =
+  const isPipelinesApiNotRunning =
     error.code === undefined && error.message.includes('API error happened')
-  const isETLNotSetUp =
+  const isPipelinesNotSetUp =
     error.code === 503 && error.message.includes('replication API URL is not configured')
-  return isLocal && (isETLAPINotRunning || isETLNotSetUp)
+  return isLocal && (isPipelinesApiNotRunning || isPipelinesNotSetUp)
 }
 
 export const checkReplicationFeatureFlagRetry = (
   failureCount: number,
-  error: ResponseError
+  error: StudioError
 ): boolean => {
   const isFeatureFlagRequiredError =
-    error instanceof ResponseError &&
-    error.code === 503 &&
-    error.message.includes('feature flag is required')
+    isStudioError(error) && error.code === 503 && error.message.includes('feature flag is required')
 
-  const isLocalETLNotSetUp = checkLocalETLNotSetUp(error)
+  const isLocalPipelinesNotSetUp = checkLocalPipelinesNotSetUp(error)
 
-  if (isFeatureFlagRequiredError || isLocalETLNotSetUp) {
+  if (isFeatureFlagRequiredError || isLocalPipelinesNotSetUp) {
     return false
   }
 

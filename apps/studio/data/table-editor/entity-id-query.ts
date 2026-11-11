@@ -11,7 +11,7 @@ type EntityIdVariables = {
   connectionString?: string | null
   schema?: string
   name?: string
-  grant?: GrantFor<'post', '/platform/pg-meta/{ref}/query'>
+  grant?: GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 }
 
 const entityIdSchema = z.array(z.object({ id: z.number() }))
@@ -28,6 +28,8 @@ async function getEntityId(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'entity-id',
       sql: safeSql`select c.oid::int as id from pg_class c join pg_namespace n on n.oid = c.relnamespace where n.nspname = ${literal(schema)} and c.relname = ${literal(name)}`,
       queryKey: ['entity-id', schema, name],
       grant,

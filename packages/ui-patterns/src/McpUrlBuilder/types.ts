@@ -2,6 +2,8 @@ export interface McpFeatureGroup {
   id: string
   name: string
   description: string
+  /** Opt-in groups that the server also leaves off when `features` is omitted. */
+  defaultDisabled?: boolean
 }
 
 export type McpOnCopyCallback = 'url' | 'config' | 'command'

@@ -40,8 +40,7 @@ const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalPr
               <ul className="pl-5 text-sm list-disc text-foreground-light">
                 {(membersExceededLimit || []).map((member, idx: number) => (
                   <li key={`member-${idx}`}>
-                    {member.username || member.primary_email} (Limit: {member.free_project_limit}{' '}
-                    free projects)
+                    {`${member.username || member.primary_email} (Limit: ${member.free_project_limit} free projects)`}
                   </li>
                 ))}
               </ul>

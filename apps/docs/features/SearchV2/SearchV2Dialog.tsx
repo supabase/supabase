@@ -1,7 +1,9 @@
 'use client'
 
 import { useDocsSearchV2 } from 'common'
+import type { DocsSearchV2AskAiOpenedEvent } from 'common/telemetry-constants'
 import {
+  SearchActionItem,
   SearchDialog,
   SearchPanel,
   type SearchDialogProps,
@@ -11,12 +13,24 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import { useEffect } from 'react'
 
+import { AskAiIcon } from './AskAiIcon'
 import { SEARCH_V2_ENDPOINT, SEARCH_V2_MIN_CHARACTERS } from './constants'
+import type { SearchV2CloseReason } from './useSearchV2Dialog'
 import { useSendTelemetryEvent } from '@/lib/telemetry'
 
-type SearchV2DialogProps = Pick<SearchDialogProps, 'open' | 'onOpenChange'>
+interface SearchV2DialogProps extends Pick<SearchDialogProps, 'open'> {
+  onOpenChange: (open: boolean, closeReason?: SearchV2CloseReason) => void
+}
 
-type SearchV2PanelProps = Pick<SearchPanelProps, 'onResultNavigate' | 'onResultLinkNavigate'>
+interface SearchV2PanelProps extends Pick<
+  SearchPanelProps,
+  'onResultNavigate' | 'onResultLinkNavigate'
+> {
+  onAskAi?: (options: {
+    triggerType: DocsSearchV2AskAiOpenedEvent['properties']['triggerType']
+    question: string
+  }) => void
+}
 
 export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
   const router = useRouter()
@@ -26,15 +40,19 @@ export function SearchV2Dialog({ open, onOpenChange }: SearchV2DialogProps) {
       <SearchV2Panel
         onResultNavigate={(path) => {
           router.push(path)
-          onOpenChange(false)
+          onOpenChange(false, 'result_navigated')
         }}
-        onResultLinkNavigate={() => onOpenChange(false)}
+        onResultLinkNavigate={() => onOpenChange(false, 'result_navigated')}
       />
     </SearchDialog>
   )
 }
 
-function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2PanelProps) {
+export function SearchV2Panel({
+  onResultNavigate,
+  onResultLinkNavigate,
+  onAskAi,
+}: SearchV2PanelProps) {
   const sendTelemetryEvent = useSendTelemetryEvent()
   const { searchState, handleDocsSearchDebounced, resetSearch } = useDocsSearchV2({
     endpoint: SEARCH_V2_ENDPOINT,
@@ -69,6 +87,35 @@ function SearchV2Panel({ onResultNavigate, onResultLinkNavigate }: SearchV2Panel
       }
       onResultNavigate={(path) => onResultNavigate(path)}
       onResultLinkNavigate={() => onResultLinkNavigate?.()}
+      renderNoResults={
+        onAskAi
+          ? ({ query }) => (
+              <>
+                No results found for “{query}”.{' '}
+                <SearchActionItem
+                  icon={<AskAiIcon isThinking={false} className="size-3.5" />}
+                  onSelect={() => onAskAi({ triggerType: 'no_results_item', question: query })}
+                >
+                  Ask Supabase AI
+                </SearchActionItem>
+              </>
+            )
+          : undefined
+      }
+      renderFooterStart={
+        onAskAi
+          ? ({ query }) => (
+              <button
+                type="button"
+                tabIndex={0}
+                onClick={() => onAskAi({ triggerType: 'results_footer_button', question: query })}
+                className="relative -mx-2 cursor-pointer rounded-md px-2 py-1 text-foreground-light transition-colors duration-150 hover:bg-overlay-hover hover:text-foreground focus-ring"
+              >
+                Ask Supabase AI
+              </button>
+            )
+          : undefined
+      }
     />
   )
 }

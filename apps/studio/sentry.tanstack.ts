@@ -51,7 +51,25 @@ export function initSentryTanStackClient(router: AnyRouter) {
       // and beforeSend would drop them all. Leave it off until the Vite build
       // annotates frames (@sentry/vite-plugin moduleMetadata).
       includeThirdPartyErrorFilter: false,
-      extraIntegrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
+      extraIntegrations: [
+        Sentry.tanstackRouterBrowserTracingIntegration(router, {
+          // Skip the per-asset resource-timing spans. The Vite/Rolldown build
+          // ships ~250 separate immutable chunks on initial load, and the
+          // browser tracing integration turns EVERY one of them into a child
+          // span of the pageload transaction. Measured over 7 days in the
+          // supabase-app Sentry project, this build emitted ~3,500x the
+          // `resource.other` spans of the Next build on comparable pageload
+          // traffic, and `resource.*` was over half of all span volume in the
+          // project. That burned the span budget, tripped Sentry's spike
+          // protection, and made the pageload/throughput alerts fire (FE-4755).
+          //
+          // What this does NOT drop: `http.client` spans (the SDK excludes
+          // `fetch`/`xmlhttprequest` initiators from resource spans and
+          // instruments them separately), Web Vitals, navigation and pageload
+          // timings. We only lose the per-asset waterfall.
+          ignoreResourceSpans: ['resource.other', 'resource.link', 'resource.script'],
+        }),
+      ],
       // Without a release the SDK silently drops session envelopes
       // (`Client.sendSession` early-returns), so Release Health sends nothing
       // on this build. The Next build gets its release injected at build time

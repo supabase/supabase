@@ -1,3 +1,4 @@
+import { useParams } from 'common'
 import { parseAsString, parseAsStringEnum, useQueryState } from 'nuqs'
 import { useMemo, useRef } from 'react'
 import { Button, Card, ShadowScrollArea, Table, TableBody, TableHeader } from 'ui'
@@ -41,6 +42,7 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 const MARKETPLACE_VIEW_MODE_STORAGE_KEY = 'supabase.marketplace.viewMode'
 
 export const MarketplaceIndex = () => {
+  const { ref } = useParams()
   const [search, setSearch] = useQueryState(
     'search',
     parseAsString.withDefault('').withOptions({ clearOnDefault: true })
@@ -72,19 +74,23 @@ export const MarketplaceIndex = () => {
 
   const {
     data: availableIntegrations,
-    error,
+    error: availableIntegrationsError,
     isPending: isLoadingAvailable,
-    isError,
+    isError: isErrorAvailableIntegrations,
     isSuccess: isSuccessAvailable,
   } = useAvailableIntegrations()
 
   const {
     installedIntegrations,
+    error: installedError,
     isLoading: isLoadingInstalled,
+    isError: isErrorInstalled,
     isSuccess: isSuccessInstalled,
   } = useInstalledIntegrations()
 
   const installedIds = installedIntegrations.map((i) => i.id)
+  const error = availableIntegrationsError || installedError
+  const isError = isErrorAvailableIntegrations || isErrorInstalled
   const isLoading = isLoadingAvailable || isLoadingInstalled
   const isSuccess = isSuccessAvailable && isSuccessInstalled
 
@@ -244,7 +250,7 @@ export const MarketplaceIndex = () => {
         )}
 
         {isError && (
-          <AlertError subject="Failed to retrieve available integrations" error={error} />
+          <AlertError subject="Failed to retrieve integrations" projectRef={ref} error={error} />
         )}
 
         {isSuccess && (

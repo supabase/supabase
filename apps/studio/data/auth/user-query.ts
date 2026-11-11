@@ -6,7 +6,8 @@ import { User } from './users-infinite-query'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { UUID_REGEX } from '@/lib/constants'
-import { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomQueryOptions } from '@/types'
 
 type UserVariables = {
   projectRef?: string
@@ -24,7 +25,15 @@ export async function getUser(
   const sql = getUserSQL(userId)
 
   const { result } = await executeSql(
-    { projectRef, connectionString, sql, queryKey: [`user-${userId}`], grant: unguarded.migrating },
+    {
+      projectRef,
+      connectionString,
+      sql,
+      sqlOrigin: 'studio',
+      queryName: 'user',
+      queryKey: [`user-${userId}`],
+      grant: unguarded.migrating,
+    },
     signal
   )
 
@@ -33,7 +42,7 @@ export async function getUser(
 }
 
 export type UserData = Awaited<ReturnType<typeof getUser>>
-export type UserError = ResponseError
+export type UserError = StudioError
 
 export const useUserQuery = <TData = UserData>(
   { projectRef, connectionString, userId }: UserVariables,

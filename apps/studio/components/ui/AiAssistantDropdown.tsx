@@ -157,7 +157,7 @@ export function AiAssistantDropdown({
         <DropdownMenuContent align="end" className="w-44">
           <DropdownMenuItem onClick={handleCopyPrompt} className="gap-2">
             {showCopied ? <CheckIcon size={14} className="text-primary" /> : <CopyIcon size={14} />}
-            {showCopied ? 'Copied!' : copyLabel}
+            {showCopied ? <span>Copied!</span> : copyLabel}
           </DropdownMenuItem>
 
           {showExternalAI && (

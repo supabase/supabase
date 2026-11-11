@@ -63,6 +63,28 @@ export const fgaRefinements = {
   'POST /v1/branches/{branch_id_or_ref}/push': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/reset': branchVariants('write'),
   'POST /v1/branches/{branch_id_or_ref}/restore': branchVariants('write'),
+  'POST /platform/pg-meta/{ref}/query': {
+    base: [['database_read']],
+    variants: {
+      read: { requires: [['database_read']] },
+      write: { requires: [['database_write']] },
+    },
+    variantRequired: true,
+  },
+  'GET /v1/projects/{ref}/api-keys': {
+    base: [['api_gateway_keys_read'], ['api_gateway_keys_read', 'api_gateway_keys_secret_read']],
+    variants: {
+      reveal: { requires: [['api_gateway_keys_secret_read']] },
+    },
+    ownedQuery: { reveal: (variant) => (variant === 'reveal' ? 'true' : 'false') },
+  },
+  'GET /v1/projects/{ref}/api-keys/{id}': {
+    base: [['api_gateway_keys_read'], ['api_gateway_keys_read', 'api_gateway_keys_secret_read']],
+    variants: {
+      reveal: { requires: [['api_gateway_keys_secret_read']] },
+    },
+    ownedQuery: { reveal: (variant) => (variant === 'reveal' ? 'true' : 'false') },
+  },
 } as const satisfies FgaRefinementMap
 
 export type FgaRefinements = typeof fgaRefinements

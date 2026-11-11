@@ -6,7 +6,8 @@ import { toast } from 'sonner'
 import { databaseTriggerKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseTriggerUpdateVariables = {
   originalTrigger: {
@@ -31,6 +32,8 @@ export async function updateDatabaseTrigger({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'trigger-update',
     sql,
     queryKey: ['trigger', 'update', originalTrigger.id],
     grant: unguarded.migrating,
@@ -46,16 +49,12 @@ export const useDatabaseTriggerUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    DatabaseTriggerUpdateData,
-    ResponseError,
-    DatabaseTriggerUpdateVariables
-  >,
+  UseCustomMutationOptions<DatabaseTriggerUpdateData, StudioError, DatabaseTriggerUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseTriggerUpdateData, ResponseError, DatabaseTriggerUpdateVariables>({
+  return useMutation<DatabaseTriggerUpdateData, StudioError, DatabaseTriggerUpdateVariables>({
     mutationFn: (vars) => updateDatabaseTrigger(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

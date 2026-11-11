@@ -16,9 +16,9 @@ import {
 } from '@/lib/fga-refinements'
 import type { EndpointKey, Grant, VariantOf } from '@/lib/grants'
 
-type InitParam<Init, Checked> = undefined extends Init
-  ? [(Checked & { [key: string]: unknown })?]
-  : [Checked & { [key: string]: unknown }]
+type InitParam<Init> = undefined extends Init
+  ? [(Init & { [key: string]: unknown })?]
+  : [Init & { [key: string]: unknown }]
 
 declare const unguardedBrand: unique symbol
 
@@ -93,14 +93,9 @@ type CheckedUrl<Path, K extends string, Init> = [GrantProblem<K, GrantOf<Init>>]
 
 type MaybeOptional<T> = RequiredKeysOf<T> extends never ? T | undefined : T
 
-type CheckedInit<Init, Option> =
-  | (undefined extends Init ? (Option extends { grant: unknown } ? never : undefined) : never)
-  | ([Exclude<Init, undefined>] extends [Option]
-      ? Exclude<Init, undefined>
-      : Omit<Exclude<Init, undefined>, 'grant'> & Option)
-
-type ParseAsContext<Init> = { parseAs?: (NonNullable<Init> & { parseAs?: unknown })['parseAs'] }
-
+// Grants are checked only on `url` (via `CheckedUrl`). Checking them on `init` too means inferring
+// `Init` through conditional and `Omit` types at every call site, which roughly doubled type
+// instantiations and made a cold `tsc` run over 10x slower.
 export type GuardedClientMethod<
   Paths extends {},
   M extends HttpMethod,
@@ -115,10 +110,7 @@ export type GuardedClientMethod<
   >,
 >(
   url: CheckedUrl<Path, EndpointKey<M, NoInfer<Path> & string>, NoInfer<Init>>,
-  ...init: InitParam<
-    Init,
-    CheckedInit<Init, GrantOption<EndpointKey<M, NoInfer<Path> & string>>> & ParseAsContext<Init>
-  >
+  ...init: InitParam<Init>
 ) => Promise<FetchResponse<FilterKeys<Paths[Path], M>, Init, Media>>
 
 type AnyRefinement = FgaRefinement<FgaGuardedEndpoint>

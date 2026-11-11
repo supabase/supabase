@@ -24,12 +24,12 @@ import { useReplicationPipelineReplicationStatusQuery } from '@/data/replication
 import { useReplicationPipelineStatusQuery } from '@/data/replication/pipeline-status-query'
 import { useReplicationPipelineVersionQuery } from '@/data/replication/pipeline-version-query'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { createNavigationHandler } from '@/lib/navigation'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import { type ResponseError } from '@/types'
 
 interface DestinationRowProps {
   destinationId: number
@@ -125,7 +125,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
       setShowDeleteDestinationForm(false)
       toast.success(`Deleted pipeline "${destinationName}"`)
     } catch (error) {
-      toast.error(`Failed to delete pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to delete pipeline: ${(error as StudioError).message}`)
     } finally {
       setIsDeleting(false)
     }
@@ -186,7 +186,7 @@ export const DestinationRow = ({ destinationId }: DestinationRowProps) => {
                       <>
                         <span aria-hidden>&middot;</span>
                         <span className="text-destructive">
-                          {errorCount} table error{errorCount === 1 ? '' : 's'}
+                          {errorCount} table error{errorCount === 1 ? '' : <span>s</span>}
                         </span>
                       </>
                     )}

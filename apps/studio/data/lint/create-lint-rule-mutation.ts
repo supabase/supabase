@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { lintKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type ExceptionPayload = components['schemas']['CreateNotificationExceptionsBody']['exceptions'][0]
 
@@ -32,11 +33,11 @@ export const useLintRuleCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<LintRuleCreateData, ResponseError, LintRuleCreateVariables>,
+  UseCustomMutationOptions<LintRuleCreateData, StudioError, LintRuleCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
-  return useMutation<LintRuleCreateData, ResponseError, LintRuleCreateVariables>({
+  return useMutation<LintRuleCreateData, StudioError, LintRuleCreateVariables>({
     mutationFn: (vars) => createLintRule(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

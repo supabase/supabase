@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { jitDbAccessKeys } from './keys'
 import { handleError, put, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type JitDbAccessUpdateVariables = {
   projectRef: string
@@ -30,12 +31,12 @@ export const useJitDbAccessUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<JitDbAccessUpdateData, ResponseError, JitDbAccessUpdateVariables>,
+  UseCustomMutationOptions<JitDbAccessUpdateData, StudioError, JitDbAccessUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<JitDbAccessUpdateData, ResponseError, JitDbAccessUpdateVariables>({
+  return useMutation<JitDbAccessUpdateData, StudioError, JitDbAccessUpdateVariables>({
     mutationFn: (vars) => updateJitDbAccess(vars),
 
     async onSuccess(data, variables, context) {

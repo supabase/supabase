@@ -5,7 +5,8 @@ import { toast } from 'sonner'
 import { organizationKeys } from './keys'
 import { handleError, patch } from '@/data/fetchers'
 import { organizationKeys as organizationKeysV1 } from '@/data/organizations/keys'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OrganizationMemberAssignRoleVariables = {
   slug: string
@@ -43,7 +44,7 @@ export const useOrganizationMemberAssignRoleMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     OrganizationMemberAssignData,
-    ResponseError,
+    StudioError,
     OrganizationMemberAssignRoleVariables
   >,
   'mutationFn'
@@ -52,7 +53,7 @@ export const useOrganizationMemberAssignRoleMutation = ({
 
   return useMutation<
     OrganizationMemberAssignData,
-    ResponseError,
+    StudioError,
     OrganizationMemberAssignRoleVariables
   >({
     mutationFn: (vars) => assignOrganizationMemberRole(vars),

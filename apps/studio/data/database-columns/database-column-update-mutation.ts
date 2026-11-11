@@ -6,7 +6,8 @@ import { toast } from 'sonner'
 import { CreateColumnBody } from './database-column-create-mutation'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type UpdateColumnBody = Partial<
   Omit<CreateColumnBody, 'schema' | 'table' | 'isPrimaryKey'>
@@ -54,6 +55,8 @@ export async function updateDatabaseColumn({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'column-update',
     sql,
     queryKey: ['column', 'update', originalColumn.id],
     grant: unguarded.migrating,
@@ -69,10 +72,10 @@ export const useDatabaseColumnUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>,
+  UseCustomMutationOptions<DatabaseColumnUpdateData, StudioError, DatabaseColumnUpdateVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<DatabaseColumnUpdateData, ResponseError, DatabaseColumnUpdateVariables>({
+  return useMutation<DatabaseColumnUpdateData, StudioError, DatabaseColumnUpdateVariables>({
     mutationFn: (vars) => updateDatabaseColumn(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

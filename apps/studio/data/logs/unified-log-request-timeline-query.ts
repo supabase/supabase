@@ -16,7 +16,7 @@ import {
   type RequestCorrelationIds,
 } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const TIMELINE_WINDOW_MS = 7 * 60 * 1000
 
@@ -26,11 +26,13 @@ const timelineRowSchema = unifiedLogsQueryRowSchema.extend({ source: z.string() 
 
 export type UnifiedLogRequestTimelineVariables = UnifiedLogAttributesVariables
 
-export type UnifiedLogRequestTimelineError = ResponseError
+export type UnifiedLogRequestTimelineError = StudioError
 
 const hasNewIds = (next: RequestCorrelationIds, prev: RequestCorrelationIds) =>
   next.requestIds.some((id) => !prev.requestIds.includes(id)) ||
-  next.executionIds.some((id) => !prev.executionIds.includes(id))
+  next.executionIds.some((id) => !prev.executionIds.includes(id)) ||
+  next.nativeRequestIds.some((id) => !prev.nativeRequestIds.includes(id)) ||
+  next.traceIds.some((id) => !prev.traceIds.includes(id))
 
 async function getUnifiedLogRequestTimeline(
   { projectRef, logId, source, logTimestampMs }: UnifiedLogRequestTimelineVariables,
@@ -56,7 +58,7 @@ async function getUnifiedLogRequestTimeline(
   let rows: z.infer<typeof timelineRowSchema>[] = []
 
   for (let lookup = 0; lookup < MAX_LOOKUPS; lookup++) {
-    if (ids.requestIds.length === 0 && ids.executionIds.length === 0) break
+    if (Object.values(ids).every((values) => values.length === 0)) break
 
     const result = await runOtelLogsSql({
       projectRef,
@@ -73,6 +75,8 @@ async function getUnifiedLogRequestTimeline(
     ids = {
       requestIds: [...new Set([...ids.requestIds, ...found.requestIds])],
       executionIds: [...new Set([...ids.executionIds, ...found.executionIds])],
+      nativeRequestIds: [...new Set([...ids.nativeRequestIds, ...found.nativeRequestIds])],
+      traceIds: [...new Set([...ids.traceIds, ...found.traceIds])],
     }
   }
 

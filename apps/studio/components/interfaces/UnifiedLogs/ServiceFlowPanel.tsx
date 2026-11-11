@@ -49,8 +49,9 @@ export function ServiceFlowPanel({
   const selectedRow = selectedRows[0]
   const activeLog =
     (openedLog && openedLog.fromId === selectedRow?.id ? openedLog.log : undefined) ?? selectedRow
-  const showTimeline = isRequestTimelineEnabled && selectedRow?.log_type !== 'compute'
-  const showUser = selectedRow?.log_type !== 'compute'
+  const isProcessLog = selectedRow?.log_type === 'compute' || selectedRow?.log_type === 'pipelines'
+  const showTimeline = isRequestTimelineEnabled && !isProcessLog
+  const showUser = !isProcessLog
   const tabs = [
     'overview',
     'raw-json',

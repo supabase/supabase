@@ -1,7 +1,7 @@
 'use client'
 
 import Link from 'next/link'
-import { type CSSProperties, type PropsWithChildren, type ReactNode } from 'react'
+import { type PropsWithChildren, type ReactNode } from 'react'
 import {
   cn,
   DropdownMenu,
@@ -11,7 +11,8 @@ import {
   IconGitHubSolid,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
-import { getNotchFocusRing, getNotchMask, getNotchOutline } from 'ui-patterns/Notch'
+import { getNotchFocusRing, getNotchStyle } from 'ui-patterns/Notch'
+import { NotchOutline } from 'ui-patterns/Notch/NotchOutline'
 
 interface CodeSampleWrapperProps {
   source: string | URL | (string | URL)[]
@@ -31,7 +32,7 @@ interface SourceFrameProps {
 }
 
 export const SOURCE_FOOTER_CLASSES = cn(
-  'not-prose absolute right-0 bottom-0 z-1 flex h-8 w-(--source-notch-width) items-center gap-2 px-3 whitespace-nowrap',
+  'not-prose absolute right-0 bottom-0 z-1 flex h-8 w-(--notch-width) items-center gap-2 px-3 whitespace-nowrap',
   'text-xs text-foreground-lighter no-underline transition-colors hover:text-foreground',
   'focus-inset rounded-md'
 )
@@ -127,37 +128,21 @@ export function SourceFrame({
   footer,
   notchWidth = DEFAULT_NOTCH_WIDTH,
 }: PropsWithChildren<SourceFrameProps>) {
-  const outline = getNotchOutline(notchWidth)
-  const notchStyle = {
-    '--source-notch-width': `${notchWidth}px`,
-    '--source-notch-mask': getNotchMask(notchWidth),
-    '--source-notch-mask-width': `${notchWidth + 10}px`,
-  } as CSSProperties
-
   return (
     <div
-      style={notchStyle}
+      style={getNotchStyle(notchWidth)}
       className="group/source code-sample-source shiki-wrapper relative w-full [&_.shiki]:pb-8 [&_.shiki]:shadow-none!"
     >
       <div className="codeblock-drop-shadow relative has-[.code-scroll:focus-visible]:z-1">
         {children}
       </div>
-      <svg
-        aria-hidden
-        width={notchWidth + 8}
-        height="40"
-        viewBox={`0 0 ${notchWidth + 8} 40`}
-        fill="none"
-        className="pointer-events-none absolute right-0 bottom-0 z-1 overflow-visible"
-      >
-        <path d={outline} className="stroke-background-200" />
-        <path d={outline} className="stroke-border" />
+      <NotchOutline width={notchWidth} surfaceClassName="stroke-background-200" className="z-1">
         <path
           d={getNotchFocusRing(notchWidth)}
           strokeWidth={2}
           className="hidden stroke-ring group-has-[.code-scroll:focus-visible]/source:inline"
         />
-      </svg>
+      </NotchOutline>
       {footer}
     </div>
   )

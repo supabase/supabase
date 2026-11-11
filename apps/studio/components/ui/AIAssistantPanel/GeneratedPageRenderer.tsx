@@ -1,5 +1,11 @@
 import { useParams } from 'common'
-import { ChevronRight, LayoutDashboard, Maximize2, RotateCw, Square } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  LayoutDashboardIcon,
+  Maximize2Icon,
+  RotateCwIcon,
+  SquareIcon,
+} from 'lucide-react'
 import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { Button, cn, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
@@ -115,7 +121,7 @@ function QueryPreviewList({
   return (
     <Collapsible open={isOpen} onOpenChange={setIsOpen}>
       <CollapsibleTrigger className="flex w-full items-center gap-2 px-3 py-2 text-left text-xs text-foreground-light hover:text-foreground">
-        <ChevronRight
+        <ChevronRightIcon
           size={14}
           strokeWidth={1.5}
           className={cn('transition-transform', isOpen && 'rotate-90')}
@@ -232,7 +238,7 @@ export const GeneratedPageRenderer = ({
     >
       <ExplorerToolbar aria-label="Generated page toolbar">
         <ExplorerToolbarIcon>
-          <LayoutDashboard size={16} strokeWidth={1.5} />
+          <LayoutDashboardIcon size={16} strokeWidth={1.5} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{page.title}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -241,7 +247,7 @@ export const GeneratedPageRenderer = ({
               <Button
                 size="tiny"
                 variant="text"
-                icon={<RotateCw size={14} strokeWidth={1.5} />}
+                icon={<RotateCwIcon size={14} strokeWidth={1.5} />}
                 onClick={runtime.reload}
               >
                 Reload
@@ -249,7 +255,7 @@ export const GeneratedPageRenderer = ({
               <Button
                 size="tiny"
                 variant="text"
-                icon={<Square size={14} strokeWidth={1.5} />}
+                icon={<SquareIcon size={14} strokeWidth={1.5} />}
                 onClick={runtime.stop}
               >
                 Stop
@@ -257,7 +263,7 @@ export const GeneratedPageRenderer = ({
               <Button
                 size="tiny"
                 variant="text"
-                icon={<Maximize2 size={14} strokeWidth={1.5} />}
+                icon={<Maximize2Icon size={14} strokeWidth={1.5} />}
                 onClick={handleExpand}
               >
                 Expand

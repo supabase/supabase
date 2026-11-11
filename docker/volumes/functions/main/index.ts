@@ -1,6 +1,15 @@
 import * as jose from 'jsr:@panva/jose@6'
+import { startMemoryPressureLoop } from './memory-pressure.ts'
 
 console.log('main function started')
+startMemoryPressureLoop()
+
+addEventListener('unhandledrejection', (ev) => {
+  // Without preventDefault(), a floating rejection destroys the main worker and the process exits.
+  // Sync throws inside timer callbacks are still fatal; wrap them in try/catch.
+  ev.preventDefault()
+  console.error('unhandled promise rejection in main worker', ev.reason)
+})
 
 const MAX_WORKER_RETRIES = 3
 
@@ -35,17 +44,35 @@ export enum RequestErrors {
   InvalidResponseStatusCode = 'INVALID_RESPONSE_STATUS_CODE',
 }
 
+// Errors from this router stay readable from browsers, as on the platform.
+// Function responses keep the function's own CORS headers.
+const ERROR_CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+  'Access-Control-Expose-Headers': 'sb-error-code',
+}
+
 function getFunctionErrorResponse({ code, message, status }: FunctionFailure): Response {
   return Response.json(
     { code, message },
     {
       status,
       headers: {
+        ...ERROR_CORS_HEADERS,
         'sb-error-code': code,
-        'Access-Control-Expose-Headers': 'sb-error-code',
       },
     }
   )
+}
+
+function onError(e: unknown): Response {
+  const ref = crypto.randomUUID()
+  console.error(`unhandled error in request handler (ref: ${ref})`, e)
+  return getFunctionErrorResponse({
+    code: RequestErrors.BootError,
+    message: `Internal Server Error (ref: ${ref})`,
+    status: 503,
+  })
 }
 
 function handleWorkerResponse(response: Response): Response {
@@ -191,8 +218,8 @@ function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
     {
       status: 401,
       headers: {
+        ...ERROR_CORS_HEADERS,
         'sb-error-code': code,
-        'Access-Control-Expose-Headers': 'sb-error-code',
       },
     }
   )
@@ -258,7 +285,7 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
     }
   }
 
-  if (!jwtAlgorithm) {
+  if (typeof jwtAlgorithm !== 'string' || !jwtAlgorithm) {
     return {
       code: RequestErrors.InvalidTokenFormat,
       message: 'Invalid JWT format',
@@ -281,23 +308,15 @@ async function isValidHybridJWT(jwt: string): Promise<AuthFailure | null> {
   }
 }
 
-Deno.serve(async (req: Request) => {
+Deno.serve({ onError }, async (req: Request) => {
   if (req.method !== 'OPTIONS' && VERIFY_JWT) {
-    try {
-      const token = getAuthToken(req)
-      if (typeof token !== 'string') {
-        return getAuthErrorResponse(token)
-      }
-      const authFailure = await isValidHybridJWT(token)
-      if (authFailure) {
-        return getAuthErrorResponse(authFailure)
-      }
-    } catch (e) {
-      console.error(e)
-      return getAuthErrorResponse({
-        code: RequestErrors.InvalidTokenFormat,
-        message: 'Invalid JWT format',
-      })
+    const token = getAuthToken(req)
+    if (typeof token !== 'string') {
+      return getAuthErrorResponse(token)
+    }
+    const authFailure = await isValidHybridJWT(token)
+    if (authFailure) {
+      return getAuthErrorResponse(authFailure)
     }
   }
 
@@ -342,7 +361,7 @@ Deno.serve(async (req: Request) => {
     })
   }
 
-  const memoryLimitMb = 150
+  const memoryLimitMb = 256
   // Keep the wall clock above the 150s request idle timeout configured in Compose.
   const workerTimeoutMs = 400_000
   const requestAbsentTimeoutMs = 60_000

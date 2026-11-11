@@ -37,19 +37,19 @@ npx supabase init
 Generate types for your project to produce the `database.types.ts` file:
 
 ```bash
-npx supabase gen types typescript --project-id "$PROJECT_REF" --schema public > database.types.ts
+npx supabase gen types typescript --remote="$PROJECT_REF" --schema public > database.types.ts
 ```
 
 or in case of local development:
 
 ```bash
-npx supabase gen types typescript --local > database.types.ts
+npx supabase gen types typescript > database.types.ts
 ```
 
 or in case of a self-hosted instance (see [Accessing Postgres](/docs/guides/self-hosting/accessing-postgres#connect-through-supavisor) for more information):
 
 ```bash
-npx supabase gen types typescript --db-url postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain-or-ip]:5432/postgres --schema public > database.types.ts
+npx supabase gen types typescript --remote=postgres://postgres.[POOLER_TENANT_ID]:[POSTGRES_PASSWORD]@[your-domain-or-ip]:5432/postgres --schema public > database.types.ts
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
@@ -308,7 +308,7 @@ One way to keep your type definitions in sync with your database is to set up a 
 Add the following script to your `package.json` to run it using `npm run update-types`
 
 ```json
-"update-types": "npx supabase gen types --lang=typescript --project-id \"$PROJECT_REF\" > database.types.ts"
+"update-types": "npx supabase gen types --lang=typescript --remote=\"$PROJECT_REF\" > database.types.ts"
 ```
 
 Create a file `.github/workflows/update-types.yml` with the following snippet to define the action along with the environment variables. This script will commit new type changes to your repo every night.

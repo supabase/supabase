@@ -125,15 +125,18 @@ export const CostControl = () => {
                         } plan`}
                         description={
                           <>
-                            {currentPlan?.name || ''} plan requires you to have spend cap off at all
-                            times. Your projects will never become unresponsive. Only when your{' '}
+                            {currentPlan?.name || ''}{' '}
+                            <span>
+                              plan requires you to have spend cap off at all times. Your projects
+                              will never become unresponsive. Only when your
+                            </span>{' '}
                             <Link
                               href={`/org/${slug}/usage`}
                               className="text-green-900 transition hover:text-green-1000"
                             >
                               included usage
                             </Link>{' '}
-                            is exceeded will you be charged for any additional usage.
+                            <span>is exceeded will you be charged for any additional usage.</span>
                           </>
                         }
                       />
@@ -166,7 +169,8 @@ export const CostControl = () => {
                     </div>
                     <div>
                       <p className="mb-1">
-                        Spend cap is {isUsageBillingEnabled ? 'disabled' : 'enabled'}
+                        Spend cap is{' '}
+                        {isUsageBillingEnabled ? <span>disabled</span> : <span>enabled</span>}
                       </p>
                       <p className="text-sm text-foreground-light">
                         {isUsageBillingEnabled ? (

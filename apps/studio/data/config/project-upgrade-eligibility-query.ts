@@ -6,7 +6,8 @@ import { configKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { useProjectDetailQuery } from '@/data/projects/project-detail-query'
 import { PROJECT_STATUS } from '@/lib/constants/infrastructure'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectUpgradeTargetVersion = { postgres_version: string; release_channel: string }
 export type ProjectUpgradeEligibilityVariables = { projectRef?: string }
@@ -40,7 +41,7 @@ export async function getProjectUpgradeEligibility(
 }
 
 export type ProjectUpgradeEligibilityData = Awaited<ReturnType<typeof getProjectUpgradeEligibility>>
-export type ProjectUpgradeEligibilityError = ResponseError
+export type ProjectUpgradeEligibilityError = StudioError
 
 export const useProjectUpgradeEligibilityQuery = <TData = ProjectUpgradeEligibilityData>(
   { projectRef }: ProjectUpgradeEligibilityVariables,

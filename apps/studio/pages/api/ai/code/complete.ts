@@ -51,7 +51,14 @@ async function fetchSchemas(
   if (!includeSchema) return { schemas: [], error: false }
   try {
     const { result } = await executeSql<Schemas>(
-      { projectRef, connectionString, sql: pgMetaSchemasList.sql, grant: unguarded.migrating },
+      {
+        projectRef,
+        connectionString,
+        sql: pgMetaSchemasList.sql,
+        sqlOrigin: 'studio',
+        queryName: 'ai-code-complete-schemas',
+        grant: unguarded.migrating,
+      },
       undefined,
       headers,
       IS_PLATFORM ? undefined : executeQuery
@@ -72,6 +79,8 @@ async function fetchSchemaDDL(
       {
         projectRef,
         connectionString,
+        sqlOrigin: 'studio',
+        queryName: 'ai-code-complete-schema-ddl',
         sql: getEntityDefinitionsSql({ schemas }),
         grant: unguarded.migrating,
       },

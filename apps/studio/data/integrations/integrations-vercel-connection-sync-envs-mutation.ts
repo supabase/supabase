@@ -2,7 +2,8 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type IntegrationsVercelConnectionSyncEnvsVariables = {
   connectionId: string
@@ -35,14 +36,14 @@ export const useIntegrationsVercelConnectionSyncEnvsMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     IntegrationsVercelConnectionSyncEnvsData,
-    ResponseError,
+    StudioError,
     IntegrationsVercelConnectionSyncEnvsVariables
   >,
   'mutationFn'
 > = {}) => {
   return useMutation<
     IntegrationsVercelConnectionSyncEnvsData,
-    ResponseError,
+    StudioError,
     IntegrationsVercelConnectionSyncEnvsVariables
   >({
     mutationFn: (vars) => syncEnvsIntegrationsVercelConnection(vars),

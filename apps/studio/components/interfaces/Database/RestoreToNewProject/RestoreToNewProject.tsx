@@ -273,8 +273,11 @@ export const RestoreToNewProject = () => {
           <AlertTitle>Restoration in progress</AlertTitle>
           <AlertDescription>
             <p>
-              The new project {(restoringClone?.target_project as any)?.name || ''} is currently
-              being created. You'll be able to restore again once the project is ready.
+              The new project {(restoringClone?.target_project as any)?.name || ''}{' '}
+              <span>
+                is currently being created. You'll be able to restore again once the project is
+                ready.
+              </span>
             </p>
             <Button asChild className="mt-2">
               <Link href={`/project/${restoringClone?.target_project?.ref ?? '_'}`}>

@@ -20,8 +20,7 @@ This quickstart uses Prisma migrations against your Postgres database. Use a **d
 
 Open the project [**Connect** panel](/dashboard/project/_?showConnect=true&connectTab=direct). This quickstart uses two connection strings. The [**Transaction pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=transaction) string is for application queries, and the [**Direct connection**](/dashboard/project/_?showConnect=true&connectTab=direct) string is for running migrations with Prisma. If your network doesn't support IPv6 and you don't have the [IPv4 add-on](/docs/guides/platform/ipv4-address), use the [**Session pooler**](/dashboard/project/_?showConnect=true&connectTab=direct&method=session) string for migrations instead.
 
-Copy the Transaction pooler connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` stops Prisma from generating prepared statements, which the shared pooler doesn't support in transaction mode. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment.
-
+Copy the Transaction pooler connection string and append `?pgbouncer=true&connection_limit=1`. `pgbouncer=true` stops Prisma from generating [prepared statements](/kb/troubleshooting/disabling-prepared-statements-qL8lEL), which the shared pooler doesn't support in transaction mode. The `connection_limit=1` parameter is only required if you are using Prisma from a serverless environment.
 You will need both connection strings to set up environment variables in Step 5.
 
 <Admonition type="note">

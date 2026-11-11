@@ -2,9 +2,13 @@ import { assertType, describe, expect, it, vi } from 'vitest'
 
 import { client, get, patch, post } from './fetchers'
 import { assertGrant, GrantAssertionError, guardMethod, unguarded } from './guarded-fetch'
+import type { Grant } from '@/lib/grants'
 import { testGrant } from '@/tests/lib/test-grant'
 
 const BRANCHES = 'GET /v1/projects/{ref}/branches'
+const API_KEYS = 'GET /v1/projects/{ref}/api-keys'
+const API_KEY = 'GET /v1/projects/{ref}/api-keys/{id}'
+const PG_META_QUERY = 'POST /platform/pg-meta/{ref}/query'
 const params = { path: { ref: 'proj' } }
 
 type Result<F extends () => unknown> = Awaited<ReturnType<F>>
@@ -118,6 +122,129 @@ describe('guarded fetch types', () => {
   })
 })
 
+describe('guarded fetch types for an endpoint with an owned query param', () => {
+  it('match the raw client with a plain or reveal grant', () => {
+    const r = () => client.GET('/v1/projects/{ref}/api-keys', { params })
+
+    const plain = () => get('/v1/projects/{ref}/api-keys', { params, grant: testGrant(API_KEYS) })
+    assertType<Equals<Result<typeof plain>, Result<typeof r>>>(true)
+
+    const reveal = () =>
+      get('/v1/projects/{ref}/api-keys', {
+        params,
+        grant: testGrant(API_KEYS, { variant: 'reveal' }),
+      })
+    assertType<Equals<Result<typeof reveal>, Result<typeof r>>>(true)
+  })
+
+  it('reject the owned query param', () => {
+    const query = { reveal: 'true' } as const
+    const plainWithReveal = {
+      params: { path: params.path, query },
+      grant: testGrant(API_KEYS),
+    }
+    // @ts-expect-error `reveal` is set from the grant, not by the caller (plain grant)
+    void (() => get('/v1/projects/{ref}/api-keys', plainWithReveal))
+
+    const revealGrantWithReveal = {
+      params: { path: params.path, query },
+      grant: testGrant(API_KEYS, { variant: 'reveal' }),
+    }
+    // @ts-expect-error `reveal` is set from the grant, not by the caller (reveal grant)
+    void (() => get('/v1/projects/{ref}/api-keys', revealGrantWithReveal))
+  })
+
+  it('reject a variant the endpoint does not have', () => {
+    void (() => get('/v1/projects/{ref}/branches', { params, grant: testGrant(BRANCHES) }))
+    // @ts-expect-error the endpoint has no `reveal` variant
+    void (() => testGrant(BRANCHES, { variant: 'reveal' }))
+    const revealGrant = testGrant(API_KEYS, { variant: 'reveal' })
+    const wrongEndpoint = { params, grant: revealGrant }
+    // @ts-expect-error a reveal grant for api-keys isn't a grant for branches
+    void (() => get('/v1/projects/{ref}/branches', wrongEndpoint))
+  })
+
+  it('match the raw client for a single key with a plain or reveal grant', () => {
+    const keyParams = { path: { ref: 'proj', id: 'key' } }
+    const r = () => client.GET('/v1/projects/{ref}/api-keys/{id}', { params: keyParams })
+
+    const plain = () =>
+      get('/v1/projects/{ref}/api-keys/{id}', { params: keyParams, grant: testGrant(API_KEY) })
+    assertType<Equals<Result<typeof plain>, Result<typeof r>>>(true)
+
+    const reveal = () =>
+      get('/v1/projects/{ref}/api-keys/{id}', {
+        params: keyParams,
+        grant: testGrant(API_KEY, { variant: 'reveal' }),
+      })
+    assertType<Equals<Result<typeof reveal>, Result<typeof r>>>(true)
+  })
+
+  it('reject the owned query param and a list grant for a single key', () => {
+    const path = { ref: 'proj', id: 'key' }
+    const withReveal = {
+      params: { path, query: { reveal: 'true' } as const },
+      grant: testGrant(API_KEY, { variant: 'reveal' }),
+    }
+    // @ts-expect-error `reveal` is set from the grant, not by the caller
+    void (() => get('/v1/projects/{ref}/api-keys/{id}', withReveal))
+
+    const listGrant = { params: { path }, grant: testGrant(API_KEYS, { variant: 'reveal' }) }
+    // @ts-expect-error a reveal grant for api-keys isn't a grant for api-keys/{id}
+    void (() => get('/v1/projects/{ref}/api-keys/{id}', listGrant))
+  })
+
+  it('treat grants with different variants as distinct types', () => {
+    type Plain = Grant<typeof API_KEYS>
+    type Reveal = Grant<typeof API_KEYS, 'reveal'>
+    assertType<Equals<Reveal extends Plain ? true : false, false>>(true)
+    assertType<Equals<Plain extends Reveal ? true : false, false>>(true)
+  })
+})
+
+describe('guarded fetch types for an endpoint with a required read/write variant', () => {
+  const queryInit = {
+    params: { path: { ref: 'proj' }, header: { 'x-connection-encrypted': '' } },
+    body: { query: 'select 1' },
+  }
+
+  it('match the raw client with a read grant and a write grant', () => {
+    const r = () => client.POST('/platform/pg-meta/{ref}/query', queryInit)
+
+    const read = () =>
+      post('/platform/pg-meta/{ref}/query', {
+        ...queryInit,
+        grant: testGrant(PG_META_QUERY, { variant: 'read' }),
+      })
+    assertType<Equals<Result<typeof read>, Result<typeof r>>>(true)
+
+    const write = () =>
+      post('/platform/pg-meta/{ref}/query', {
+        ...queryInit,
+        grant: testGrant(PG_META_QUERY, { variant: 'write' }),
+      })
+    assertType<Equals<Result<typeof write>, Result<typeof r>>>(true)
+  })
+
+  it('reject a plain grant and a variant the endpoint does not have', () => {
+    const plain = { ...queryInit, grant: testGrant(PG_META_QUERY) }
+    // @ts-expect-error plain grant where a variant is required
+    void (() => post('/platform/pg-meta/{ref}/query', plain))
+    // @ts-expect-error the endpoint has no `reveal` variant
+    void (() => testGrant(PG_META_QUERY, { variant: 'reveal' }))
+  })
+
+  it('treat read and write grants as distinct types', () => {
+    type Plain = Grant<typeof PG_META_QUERY>
+    type Read = Grant<typeof PG_META_QUERY, 'read'>
+    type Write = Grant<typeof PG_META_QUERY, 'write'>
+    assertType<Equals<Read extends Write ? true : false, false>>(true)
+    assertType<Equals<Write extends Read ? true : false, false>>(true)
+    assertType<Equals<Plain extends Read ? true : false, false>>(true)
+    assertType<Equals<Plain extends Write ? true : false, false>>(true)
+  })
+})
+
 describe('guardMethod', () => {
   it('strips the grant before calling the raw method', async () => {
     const raw = vi.fn().mockResolvedValue({})
@@ -126,6 +253,36 @@ describe('guardMethod', () => {
     await guarded('/v1/projects/{ref}/branches', { params, grant: testGrant(BRANCHES) })
 
     expect(raw).toHaveBeenCalledWith('/v1/projects/{ref}/branches', { params })
+  })
+
+  it.each([
+    { name: 'a reveal grant', grant: testGrant(API_KEYS, { variant: 'reveal' }), reveal: 'true' },
+    { name: 'a plain grant', grant: testGrant(API_KEYS), reveal: 'false' },
+    { name: 'unguarded', grant: unguarded.byDesign('test'), reveal: 'false' },
+  ])('sets reveal=$reveal for $name', async ({ grant, reveal }) => {
+    const raw = vi.fn().mockResolvedValue({})
+    const guarded = guardMethod('get', raw)
+
+    await guarded('/v1/projects/{ref}/api-keys', { params, grant })
+
+    expect(raw).toHaveBeenCalledWith('/v1/projects/{ref}/api-keys', {
+      params: { path: params.path, query: { reveal } },
+    })
+  })
+
+  it.each([
+    { name: 'a reveal grant', grant: testGrant(API_KEY, { variant: 'reveal' }), reveal: 'true' },
+    { name: 'a plain grant', grant: testGrant(API_KEY), reveal: 'false' },
+  ])('sets reveal=$reveal on a single key for $name', async ({ grant, reveal }) => {
+    const raw = vi.fn().mockResolvedValue({})
+    const guarded = guardMethod('get', raw)
+    const keyParams = { path: { ref: 'proj', id: 'key' } }
+
+    await guarded('/v1/projects/{ref}/api-keys/{id}', { params: keyParams, grant })
+
+    expect(raw).toHaveBeenCalledWith('/v1/projects/{ref}/api-keys/{id}', {
+      params: { path: keyParams.path, query: { reveal } },
+    })
   })
 
   it('throws in development when the grant is missing', () => {
@@ -176,6 +333,12 @@ describe('assertGrant', () => {
     expect(check(BRANCHES, grant)).not.toThrow()
   })
 
+  it('rejects a grant with an unknown variant', () => {
+    const grant = testGrant(API_KEYS, { variant: 'nope' as never })
+    expect(check(API_KEYS, grant)).toThrow("unknown variant 'nope'")
+    expect(check(API_KEYS, testGrant(API_KEYS, { variant: 'reveal' }))).not.toThrow()
+  })
+
   it('accepts a grant without a project ref for any project', () => {
     expect(check(BRANCHES, testGrant(BRANCHES))).not.toThrow()
   })
@@ -207,6 +370,18 @@ describe('assertGrant', () => {
     )
     expect(
       check(endpoint, testGrant(endpoint, { variant: 'production' }), create({ with_data: true }))
+    ).not.toThrow()
+  })
+
+  it('requires a variant on an endpoint with a required variant', () => {
+    expect(check(PG_META_QUERY, testGrant(PG_META_QUERY), { params })).toThrow(
+      'grant needs a variant'
+    )
+    expect(
+      check(PG_META_QUERY, testGrant(PG_META_QUERY, { variant: 'read' }), { params })
+    ).not.toThrow()
+    expect(
+      check(PG_META_QUERY, testGrant(PG_META_QUERY, { variant: 'write' }), { params })
     ).not.toThrow()
   })
 

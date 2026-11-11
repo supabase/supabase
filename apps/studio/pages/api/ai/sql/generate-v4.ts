@@ -205,6 +205,8 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
         {
           projectRef,
           connectionString,
+          sqlOrigin: 'studio',
+          queryName: 'ai-sql-generate-schemas',
           sql: pgMetaSchemasList.sql,
           grant: unguarded.migrating,
         },
@@ -238,7 +240,6 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       planId,
       isHighComplianceProject,
       includesLogsSnippets,
-      isExplorerEnabled: explorerEnabled,
       requestedModel,
       effectiveModel,
       systemProviderOptions,

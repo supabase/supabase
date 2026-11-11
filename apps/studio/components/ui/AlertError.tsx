@@ -100,12 +100,12 @@ export const AlertError = ({
         <>
           {error?.message && (
             <p>
-              {showErrorPrefix && 'Error: '}
-              {formattedErrorMessage}
+              {`${showErrorPrefix ? 'Error: ' : ''}${formattedErrorMessage}`}
               {isSupportFallbackInline && (
                 <>
                   {/[.!?]$/.test(formattedErrorMessage ?? '') ? ' ' : '. '}
-                  If the issue persists, {renderSupportLink('contact support')}.
+                  <span>If the issue persists,</span> {renderSupportLink('contact support')}
+                  <span>.</span>
                 </>
               )}
             </p>

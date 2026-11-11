@@ -12,7 +12,7 @@ export type QueryRelationsVariables = {
   projectRef?: string
   connectionString?: string | null
   sql?: string
-  grant?: GrantFor<'post', '/platform/pg-meta/{ref}/query'>
+  grant?: GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 }
 
 const queryRelationSchema = z.object({
@@ -52,6 +52,8 @@ async function getQueryRelations(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'query-relations',
       sql: safeSql`
         select distinct on (c.oid) c.oid::int as id, n.nspname as schema, c.relname as name, c.relkind as type, r.position::int as position
         from unnest(array[${joinSqlFragments(names, ', ')}]::text[]) with ordinality as r(name, position)

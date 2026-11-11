@@ -2,9 +2,11 @@ import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { AIFilterRequestPayload, FilterGroup } from 'ui-patterns/FilterBar'
 
+import { classifyResponseError } from '@/data/error-classification'
 import { constructHeaders, fetchHandler } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { UseCustomMutationOptions } from '@/types'
 
 export type SqlFilterGenerateResponse = FilterGroup
 
@@ -28,7 +30,7 @@ export async function generateSqlFilters({
       const errorBody = await response.json()
       errorMessage = errorBody?.error || errorBody?.message || errorMessage
     } catch {}
-    throw new ResponseError(errorMessage, response.status)
+    throw classifyResponseError({ message: errorMessage, code: response.status })
   }
 
   return (await response.json()) as SqlFilterGenerateResponse
@@ -41,10 +43,10 @@ export const useSqlFilterGenerateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<SqlFilterGenerateData, ResponseError, AIFilterRequestPayload>,
+  UseCustomMutationOptions<SqlFilterGenerateData, StudioError, AIFilterRequestPayload>,
   'mutationFn'
 > = {}) => {
-  return useMutation<SqlFilterGenerateData, ResponseError, AIFilterRequestPayload>({
+  return useMutation<SqlFilterGenerateData, StudioError, AIFilterRequestPayload>({
     mutationFn: (vars) => generateSqlFilters(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

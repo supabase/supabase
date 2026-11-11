@@ -19,7 +19,11 @@ export const QueryDetailsPanel = ({
   sql?: string
 }) => {
   const { data: project } = useSelectedProjectQuery()
-  const queryGrant = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
+  const queryGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
   const {
     data: relations,
     isPending,

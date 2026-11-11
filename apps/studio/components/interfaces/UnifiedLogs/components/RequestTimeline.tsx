@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { ClockIcon, RouteIcon } from 'lucide-react'
 import { Skeleton } from 'ui'
+import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
 
 import { ColumnSchema } from '../UnifiedLogs.schema'
 import { getLogTypeSource, getRowTimestampMs } from '../UnifiedLogs.utils'
@@ -35,7 +36,7 @@ export function LogTimestampHeader({ log }: { log: ColumnSchema }) {
 export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimelineProps) {
   const { ref: projectRef } = useParams()
   const formatDateTime = useFormatDateTime()
-  const { data, error, isPending, isError, isSuccess } = useQuery(
+  const { data, error, isLoading, isError } = useQuery(
     unifiedLogRequestTimelineQueryOptions({
       projectRef,
       logId: row.id,
@@ -44,7 +45,7 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
     })
   )
 
-  if (isPending) {
+  if (isLoading) {
     return (
       <div className="flex flex-col gap-3 p-4" aria-label="Loading related logs">
         {[0, 1, 2].map((i) => (
@@ -65,14 +66,15 @@ export function RequestTimeline({ row, activeLog, onSelectLog }: RequestTimeline
     )
   }
 
-  if (isSuccess && data.logs.length === 0) {
+  if (!data || data.logs.length === 0) {
     return (
-      <div className="flex flex-col gap-1 p-4 text-sm">
-        <p className="text-foreground-light">No related logs</p>
-        <p className="text-foreground-lighter">
-          Only API Gateway, Auth, Storage, and Edge Function logs carry a request ID that links
-          them.
-        </p>
+      <div className="flex min-h-full items-center justify-center p-4">
+        <EmptyStatePresentational
+          icon={RouteIcon}
+          title="No related logs"
+          description="Logs appear here when they share a request, trace, or function execution ID."
+          className="border-0 bg-transparent px-2 py-6"
+        />
       </div>
     )
   }

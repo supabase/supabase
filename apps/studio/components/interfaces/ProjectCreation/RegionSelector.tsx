@@ -242,7 +242,8 @@ export const RegionSelector = ({
                   restrictHighAvailabilityRegion ? (
                     <div className="text-warning">
                       High Availability projects are currently limited to{' '}
-                      {regionOptions[0]?.name ?? highAvailabilityRegionCode}.
+                      {regionOptions[0]?.name ?? highAvailabilityRegionCode}
+                      <span>.</span>
                     </div>
                   ) : showNonProdFields ? (
                     <div className="text-warning">

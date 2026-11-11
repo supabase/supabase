@@ -12,7 +12,7 @@ import { useLocalStorageQuery } from '@/hooks/misc/useLocalStorage'
 import { getAiOptInLevel, type AiOptInLevel } from '@/hooks/misc/useOrgOptedIntoAi'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { OPT_IN_TAGS } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 // Shared schema definition
 export const AIOptInSchema = z.object({
@@ -93,7 +93,7 @@ export const useAIOptInForm = (onSuccessCallback?: (level: AiOptInLevel) => void
           setUpdatedOptInSinceMCP(true)
           onSuccessCallback?.(values.aiOptInLevel)
         },
-        onError: (error: ResponseError) => {
+        onError: (error: StudioError) => {
           toast.error(`Failed to update settings: ${error.message}`)
         },
       }

@@ -6,15 +6,18 @@ import { z } from 'zod'
 
 import type { SavedDatabaseFunction } from './database-functions-query'
 import { databaseKeys } from '@/data/database/keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type DatabaseFunctionUpdateVariables = {
   projectRef: string
   connectionString?: string | null
   func: SavedDatabaseFunction
   payload: PGFunctionUpdate
+  sqlOrigin: SqlOrigin
 }
 
 export async function updateDatabaseFunction({
@@ -22,6 +25,7 @@ export async function updateDatabaseFunction({
   connectionString,
   func,
   payload,
+  sqlOrigin,
 }: DatabaseFunctionUpdateVariables) {
   const { sql, zod } = pgMeta.functions.update(func, payload)
 
@@ -29,6 +33,8 @@ export async function updateDatabaseFunction({
     projectRef,
     connectionString,
     sql,
+    sqlOrigin,
+    queryName: 'database-function-update',
     queryKey: ['functions', 'update', func.id.toString()],
     grant: unguarded.migrating,
   })
@@ -45,14 +51,14 @@ export const useDatabaseFunctionUpdateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     DatabaseFunctionUpdateData,
-    ResponseError,
+    StudioError,
     DatabaseFunctionUpdateVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<DatabaseFunctionUpdateData, ResponseError, DatabaseFunctionUpdateVariables>({
+  return useMutation<DatabaseFunctionUpdateData, StudioError, DatabaseFunctionUpdateVariables>({
     mutationFn: (vars) => updateDatabaseFunction(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -3,7 +3,8 @@ import { InfiniteData, useInfiniteQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthApprovals, USE_MOCKS } from './mocks'
 import type { ListOAuthApprovalsResponse } from './types'
-import type { ResponseError, UseCustomInfiniteQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomInfiniteQueryOptions } from '@/types'
 
 export type OAuthApprovalsVariables = {
   slug?: string
@@ -23,7 +24,7 @@ export async function getOAuthApprovals({
 }
 
 export type OAuthApprovalsData = Awaited<ReturnType<typeof getOAuthApprovals>>
-export type OAuthApprovalsError = ResponseError
+export type OAuthApprovalsError = StudioError
 
 export const useOAuthApprovalsQuery = <TData = OAuthApprovalsData>(
   { slug, cursor }: OAuthApprovalsVariables,

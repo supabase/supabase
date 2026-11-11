@@ -77,9 +77,11 @@ const RemoveRestrictionModal = ({
               <p>
                 The IPv4 address <code>{selectedRestriction}</code> will be removed from your list
                 of network restrictions
-                {isRemovingOnlyRestriction
-                  ? '.'
-                  : ", and no longer have access to your project's database."}
+                {isRemovingOnlyRestriction ? (
+                  <span>.</span>
+                ) : (
+                  <span>, and no longer have access to your project's database.</span>
+                )}
               </p>
               {isRemovingOnlyRestriction && (
                 <Admonition

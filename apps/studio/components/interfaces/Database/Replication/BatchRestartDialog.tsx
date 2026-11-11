@@ -49,8 +49,7 @@ export const BatchRestartDialog = ({
   onResetStart,
   onResetComplete,
 }: BatchRestartDialogProps) => {
-  const { ref: projectRef, pipelineId: _pipelineId } = useParams()
-  const pipelineId = Number(_pipelineId)
+  const { ref: projectRef, pipelineId } = useParams()
   const { runWithRequestStatus } = usePipelineRequestStatus()
   const restartRequestStatus = getRestartRequestStatus(pipelineStatusName)
   const affectedTables = useMemo(() => {
@@ -78,6 +77,7 @@ export const BatchRestartDialog = ({
 
   const handleReset = async () => {
     if (!projectRef) return toast.error('Project ref is required')
+    if (!pipelineId) return
     onResetStart?.(affectedTableIds)
     try {
       await runWithRequestStatus(pipelineId, restartRequestStatus, () =>

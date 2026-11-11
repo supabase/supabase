@@ -729,6 +729,11 @@ export const examples: Registry = [
     files: ['example/keyboard-shortcut-inline.tsx'],
   },
   {
+    name: 'keyboard-shortcut-keycaps',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-keycaps.tsx'],
+  },
+  {
     name: 'label-demo',
     type: 'components:example',
     registryDependencies: ['label'],
@@ -1954,5 +1959,10 @@ export const examples: Registry = [
     name: 'status-code-demo',
     type: 'components:example',
     files: ['example/status-code-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-demo.tsx'],
   },
 ]

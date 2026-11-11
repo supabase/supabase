@@ -126,6 +126,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -140,6 +141,7 @@ export const CreateFunction = ({
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
+          sqlOrigin: 'user',
         },
         {
           onSuccess: () => {
@@ -459,7 +461,7 @@ export const CreateFunction = ({
               disabled={isCreating || isUpdating}
               loading={isCreating || isUpdating}
             >
-              {isEditing ? 'Save' : 'Create'} function
+              {isEditing ? <span>Save</span> : <span>Create</span>} <span>function</span>
             </Button>
           </SheetFooter>
         </div>

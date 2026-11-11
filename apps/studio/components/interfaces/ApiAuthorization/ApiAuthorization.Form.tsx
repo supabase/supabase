@@ -30,7 +30,8 @@ import {
   InterstitialLayout,
 } from '@/components/layouts/InterstitialLayout'
 import type { ApiAuthorizationResponse } from '@/data/api-authorization/api-authorization-query'
-import type { Organization, ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { Organization } from '@/types'
 
 type OrganizationsState_Loading = {
   _tag: 'loading'
@@ -38,7 +39,7 @@ type OrganizationsState_Loading = {
 
 type OrganizationsState_Error = {
   _tag: 'error'
-  error: ResponseError | null
+  error: StudioError | null
 }
 
 type OrganizationsState_Empty = {
@@ -186,7 +187,7 @@ function OrganizationsLoader(): ReactNode {
 }
 
 interface OrganizationsErrorNoticeProps {
-  error: ResponseError | null
+  error: StudioError | null
 }
 
 function OrganizationsErrorNotice({ error }: OrganizationsErrorNoticeProps): ReactNode {

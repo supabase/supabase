@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 type CaptureMessageOptions = {
   context: string
@@ -31,19 +32,19 @@ const WHITELIST_ERRORS = [
 /**
  * Captures a critical error to Sentry, filtering out whitelisted errors.
  *
- * @param error - The error object (ResponseError, Error, or any object with a message property)
+ * @param error - The error object (StudioError, Error, or any object with a message property)
  * @param context - The context/action that failed (e.g., 'reset password', 'sign up', 'create project')
  *   Attached as the `context` tag on the Sentry event.
  */
 export function captureCriticalError(
-  error: ResponseError | Error | { message: string },
+  error: StudioError | Error | { message: string },
   context: string
 ): void {
   if (!error.message) {
     return
   }
 
-  if (error instanceof ResponseError) {
+  if (isStudioError(error)) {
     handleResponseError(error, context)
     return
   }
@@ -55,11 +56,11 @@ export function captureCriticalError(
   handleUnknownAPIResponseError(error, context)
 }
 
-function handleResponseError(error: ResponseError, context: string) {
-  const { code, message, requestPathname } = error
-  if (!requestPathname || !code) {
+function handleResponseError(error: StudioError, context: string) {
+  const { code, message, endpoint } = error
+  if (!endpoint || !code) {
     captureMessage({
-      message: `Response Error (no code or requestPathname) w/ message: ${error.message}`,
+      message: `Response Error (no code or endpoint) w/ message: ${error.message}`,
       context,
     })
     return
@@ -69,7 +70,7 @@ function handleResponseError(error: ResponseError, context: string) {
     // Only capture 5XX errors as critical errors
     captureMessage({
       context,
-      message: `requestPathname ${requestPathname} w/ message: ${message}`,
+      message: `endpoint ${endpoint} w/ message: ${message}`,
     })
     return
   }

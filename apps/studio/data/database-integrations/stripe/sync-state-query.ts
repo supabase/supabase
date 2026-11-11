@@ -5,7 +5,7 @@ import { z } from 'zod'
 import { stripeSyncKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type DbConnection = {
   projectRef: string
@@ -23,7 +23,7 @@ const StripeSyncStateSchema = z
 export type StripeSyncState = z.infer<typeof StripeSyncStateSchema>
 
 export type StripeSyncStateData = z.infer<typeof StripeSyncStateSchema>
-export type StripeSyncStateError = ResponseError
+export type StripeSyncStateError = StudioError
 
 export async function getStripeSyncState(
   { projectRef, connectionString }: DbConnection,
@@ -33,6 +33,8 @@ export async function getStripeSyncState(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'stripe-sync-state',
       sql: safeSql`
        SELECT started_at, closed_at, status FROM stripe.sync_runs WHERE status != 'pending' ORDER BY started_at DESC LIMIT 1;
       `,

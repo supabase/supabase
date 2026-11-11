@@ -48,9 +48,9 @@ const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
   [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
   [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
   [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
-  [PricingMetric.ETL_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.ETL_COPY_BACKFILL_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.ETL_REPLICATED_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+  [PricingMetric.PIPELINES_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+  [PricingMetric.PIPELINES_COPY_BACKFILL_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+  [PricingMetric.PIPELINES_REPLICATED_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
 }
 
 export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
@@ -266,7 +266,8 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                                           {usageMetric && (
                                             <span>
                                               ({formatUsage(usageMetric, breakdown)}
-                                              {!!unit ? ` ${unit}` : ''})
+                                              {!!unit ? <span>{` ${unit}`}</span> : ''}
+                                              <span>)</span>
                                             </span>
                                           )}
                                         </li>
@@ -352,8 +353,9 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                             <div className="flex items-center justify-between gap-4 text-xs">
                               <span>
                                 Tax
-                                {upcomingInvoice.tax?.tax_rate_percentage != null &&
-                                  ` (${upcomingInvoice.tax.tax_rate_percentage}%)`}
+                                {upcomingInvoice.tax?.tax_rate_percentage != null && (
+                                  <span>{` (${upcomingInvoice.tax.tax_rate_percentage}%)`}</span>
+                                )}
                               </span>
                               <span translate="no">
                                 {formatCurrency(upcomingInvoice.tax!.tax_amount)}
@@ -390,9 +392,11 @@ export const UpcomingInvoice = ({ slug }: UpcomingInvoiceProps) => {
                       className="pt-2! pb-0! px-0 text-foreground-light text-xs text-right"
                       colSpan={2}
                     >
-                      Your {organization?.plan?.name && `${organization.plan.name} `}Plan fee for
-                      this period has already been paid. This invoice will only reflect usage
-                      charges.
+                      Your {organization?.plan?.name && <span>{`${organization.plan.name} `}</span>}
+                      <span>
+                        Plan fee for this period has already been paid. This invoice will only
+                        reflect usage charges.
+                      </span>
                     </TableCell>
                   </TableRow>
                 )}

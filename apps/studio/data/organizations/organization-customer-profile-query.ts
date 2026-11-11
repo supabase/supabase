@@ -4,7 +4,8 @@ import { IS_PLATFORM } from 'common'
 import { organizationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OrganizationCustomerProfileVariables = {
   slug?: string
@@ -32,7 +33,7 @@ export async function getOrganizationCustomerProfile(
 export type OrganizationCustomerProfileData = Awaited<
   ReturnType<typeof getOrganizationCustomerProfile>
 >
-export type OrganizationCustomerProfileError = ResponseError
+export type OrganizationCustomerProfileError = StudioError
 
 export const useOrganizationCustomerProfileQuery = <TData = OrganizationCustomerProfileData>(
   { slug }: OrganizationCustomerProfileVariables,

@@ -3,7 +3,8 @@ import { queryOptions, useQuery } from '@tanstack/react-query'
 import { REPLICATION_METADATA_FRESHNESS_MS } from './constants'
 import { replicationKeys } from './keys'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type ReplicationTableColumnsParams = { projectRef?: string; sourceId?: number; tableId?: number }
 
@@ -32,7 +33,7 @@ async function fetchReplicationTableColumns(
 export type ReplicationTableColumnsData = Awaited<ReturnType<typeof fetchReplicationTableColumns>>
 
 type ReplicationTableColumnsQueryOptions<TData> = Omit<
-  UseCustomQueryOptions<ReplicationTableColumnsData, ResponseError, TData>,
+  UseCustomQueryOptions<ReplicationTableColumnsData, StudioError, TData>,
   'enabled'
 > & { enabled?: boolean }
 
@@ -40,7 +41,7 @@ export const replicationTableColumnsQueryOptions = <TData = ReplicationTableColu
   { projectRef, sourceId, tableId }: ReplicationTableColumnsParams,
   { enabled = true, ...options }: ReplicationTableColumnsQueryOptions<TData> = {}
 ) =>
-  queryOptions<ReplicationTableColumnsData, ResponseError, TData>({
+  queryOptions<ReplicationTableColumnsData, StudioError, TData>({
     queryKey: replicationKeys.tableColumns(projectRef, sourceId, tableId),
     queryFn: ({ signal }) =>
       fetchReplicationTableColumns({ projectRef, sourceId, tableId }, signal),

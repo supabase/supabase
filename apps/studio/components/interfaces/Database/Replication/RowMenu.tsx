@@ -33,17 +33,17 @@ import { Pipeline } from '@/data/replication/pipelines-query'
 import { useRestartPipelineMutation } from '@/data/replication/restart-pipeline-mutation'
 import { useStartPipelineMutation } from '@/data/replication/start-pipeline-mutation'
 import { useStopPipelineMutation } from '@/data/replication/stop-pipeline-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
   usePipelineRequestStatus,
 } from '@/state/replication-pipeline-request-status'
-import type { ResponseError } from '@/types'
 
 interface RowMenuProps {
   destinationId: number
   pipeline: Pipeline | undefined
   pipelineStatus?: ReplicationPipelineStatusData['status']
-  error: ResponseError | null
+  error: StudioError | null
   isLoading: boolean
   isError: boolean
   hasUpdate?: boolean
@@ -108,7 +108,7 @@ export const RowMenu = ({
         startPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to start pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to start pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -121,7 +121,7 @@ export const RowMenu = ({
         stopPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to stop pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to stop pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -134,7 +134,7 @@ export const RowMenu = ({
         restartPipeline({ projectRef, pipelineId: pipeline.id })
       )
     } catch (error) {
-      toast.error(`Failed to restart pipeline: ${(error as ResponseError).message}`)
+      toast.error(`Failed to restart pipeline: ${(error as StudioError).message}`)
     }
   }
 
@@ -150,7 +150,8 @@ export const RowMenu = ({
             </span>
           </TooltipTrigger>
           <TooltipContent side="bottom" className="max-w-xs">
-            Couldn't load status{error?.message ? `: ${error.message}` : '.'}
+            Couldn't load status
+            {error?.message ? <span>{`: ${error.message}`}</span> : <span>.</span>}
           </TooltipContent>
         </Tooltip>
       )}

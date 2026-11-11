@@ -6,7 +6,8 @@ import { remapSqlContentField, remapWireSnippet } from './content-remap'
 import { contentKeys } from './keys'
 import type { SnippetWithContent } from './sql-folders-query'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type GetUserContentByIdResponse = Omit<
   components['schemas']['GetUserContentByIdResponse_Output'],
@@ -34,7 +35,7 @@ export async function getContentById(
 }
 
 export type ContentIdData = Awaited<ReturnType<typeof getContentById>>
-export type ContentIdError = ResponseError
+export type ContentIdError = StudioError
 
 // SQL-editor-specific fetch: the editor only ever loads SQL snippets, so the
 // content body is typed as SQL content and the result is a SnippetWithContent

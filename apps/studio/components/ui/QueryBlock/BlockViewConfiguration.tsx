@@ -76,7 +76,7 @@ export const BlockViewConfiguration = ({
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, xKey: value })}
               >
                 <SelectTrigger className="text-left">
-                  X Axis {chartConfig?.xKey && `- ${chartConfig.xKey}`}
+                  X Axis {chartConfig?.xKey && <span>{`- ${chartConfig.xKey}`}</span>}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -95,7 +95,7 @@ export const BlockViewConfiguration = ({
                 onValueChange={(value) => updateChartConfig({ ...chartConfig, yKey: value })}
               >
                 <SelectTrigger className="text-left">
-                  Y Axis {chartConfig?.yKey && `- ${chartConfig.yKey}`}
+                  Y Axis {chartConfig?.yKey && <span>{`- ${chartConfig.yKey}`}</span>}
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>

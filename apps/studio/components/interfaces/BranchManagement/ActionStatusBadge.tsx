@@ -80,7 +80,8 @@ export const ActionStatusBadge = ({ name, status }: ActionStatusBadgeProps) => {
       {(isUnhealthy || isWaiting) && (
         <StatusIcon variant={isUnhealthy ? 'destructive' : 'default'} hideBackground />
       )}
-      {NAME_TO_LABEL[name]}: {STATUS_TO_LABEL[status]}
+      {NAME_TO_LABEL[name]}
+      <span>:</span> {STATUS_TO_LABEL[status]}
     </Badge>
   )
 }

@@ -53,6 +53,7 @@ export type FilterOperatorObject = {
 export type FilterOperator = string | FilterOperatorObject
 
 export type FilterProperty = {
+  propertyGroupLabel?: string
   label: string
   name: string
   type: 'string' | 'number' | 'date' | 'boolean'
@@ -94,6 +95,7 @@ export type FilterBarAction = {
 }
 
 export type MenuItem = {
+  propertyGroupLabel?: string
   value: string
   label: string
   count?: number

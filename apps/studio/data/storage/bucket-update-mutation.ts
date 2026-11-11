@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketUpdateVariables = {
   projectRef: string
@@ -62,12 +63,12 @@ export const useBucketUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BucketUpdateData, ResponseError, BucketUpdateVariables>,
+  UseCustomMutationOptions<BucketUpdateData, StudioError, BucketUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketUpdateData, ResponseError, BucketUpdateVariables>({
+  return useMutation<BucketUpdateData, StudioError, BucketUpdateVariables>({
     mutationFn: async (vars) => {
       const result = await updateBucket(vars)
       if (result.error) {

@@ -23,6 +23,7 @@ import {
 } from 'ui'
 
 import {
+  DISK_SPACE_EXHAUSTION_DESCRIPTION,
   isResourceWarningMessageKey,
   RESOURCE_WARNING_MESSAGES,
   type ResourceWarningMessageKey,
@@ -170,9 +171,21 @@ export const ResourceExhaustionWarningBanner = () => {
     )
   )
 
+  const isFreePlan = organization?.plan?.id === 'free'
+  const diskSpaceDescription = (() => {
+    if (organization === undefined) return warningContent?.description
+    return isFreePlan
+      ? DISK_SPACE_EXHAUSTION_DESCRIPTION.free
+      : DISK_SPACE_EXHAUSTION_DESCRIPTION.paid
+  })()
+  const singleWarningDescription =
+    activeWarnings[0] === 'disk_space_exhaustion'
+      ? diskSpaceDescription
+      : warningContent?.description
+
   const description = applyDiskIoBaseline(
     applyResourceList(
-      activeWarnings.length > 1 ? multipleWarningDescription : warningContent?.description,
+      activeWarnings.length > 1 ? multipleWarningDescription : singleWarningDescription,
       activeWarnings
     )
   )
@@ -181,8 +194,6 @@ export const ResourceExhaustionWarningBanner = () => {
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.metric
-
-  const isFreePlan = organization?.plan?.id === 'free'
 
   // True for a single compute warning, or when all active warnings are compute-related
   const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)

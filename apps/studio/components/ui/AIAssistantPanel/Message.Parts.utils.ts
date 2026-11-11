@@ -79,6 +79,11 @@ const TOOL_LABELS: Record<string, ToolLabels> = {
   get_active_incidents: { running: 'Checking Supabase status', done: 'Checked Supabase status' },
   list_policies: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
   list_tables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
+  list_functions: {
+    running: 'Listing database functions',
+    done: 'Listed database functions',
+    detail: inSchemas,
+  },
   list_extensions: { running: 'Listing extensions', done: 'Listed extensions' },
   list_edge_functions: { running: 'Listing Edge Functions', done: 'Listed Edge Functions' },
   list_branches: { running: 'Listing branches', done: 'Listed branches' },
@@ -88,7 +93,7 @@ const TOOL_LABELS: Record<string, ToolLabels> = {
   list_databases: { running: 'Listing databases', done: 'Listed databases' },
   list_notebooks: { running: 'Listing notebooks', done: 'Listed notebooks' },
   get_notebook: { running: 'Reading notebook', done: 'Read notebook' },
-  // Self-hosted fallbacks
+  // Removed self-hosted fallback tools, kept for their calls in saved chats
   getSchemaTables: { running: 'Listing tables', done: 'Listed tables', detail: inSchemas },
   getRlsKnowledge: { running: 'Checking policies', done: 'Checked policies', detail: inSchemas },
   getFunctions: {

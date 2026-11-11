@@ -1,16 +1,18 @@
 import { QueryObserver, queryOptions, useQuery, type QueryClient } from '@tanstack/react-query'
-import { components } from 'api-types'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { replicationPollingOptions } from './polling'
 import { get, handleError } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
-type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: number }
+type ReplicationPipelinesStatusParams = { projectRef?: string; pipelineId?: string }
 
 const PIPELINE_STOP_TIMEOUT_MS = 30_000
-export type ReplicationPipelineStatusResponse =
-  components['schemas']['PipelineStatusResponse_Output']
+export type ReplicationPipelineStatusResponse = Awaited<
+  ReturnType<typeof fetchReplicationPipelineStatus>
+>
 export type ReplicationPipelineStatus = ReplicationPipelineStatusResponse['status']['name']
 
 async function fetchReplicationPipelineStatus(
@@ -28,7 +30,7 @@ async function fetchReplicationPipelineStatus(
     handleError(error)
   }
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 export type ReplicationPipelineStatusData = Awaited<
@@ -43,7 +45,7 @@ export const replicationPipelineStatusQueryOptions = <TData = ReplicationPipelin
   projectRef,
   pipelineId,
 }: ReplicationPipelinesStatusParams) =>
-  queryOptions<ReplicationPipelineStatusData, ResponseError, TData>({
+  queryOptions<ReplicationPipelineStatusData, StudioError, TData>({
     queryKey: replicationKeys.pipelinesStatus(projectRef, pipelineId),
     queryFn: ({ signal }) => fetchReplicationPipelineStatus({ projectRef, pipelineId }, signal),
     ...replicationPollingOptions,
@@ -81,9 +83,9 @@ export function waitForPipelineStopped(
 
 export const useReplicationPipelineStatusQuery = <TData = ReplicationPipelineStatusData>(
   variables: ReplicationPipelinesStatusParams,
-  options: UseCustomQueryOptions<ReplicationPipelineStatusData, ResponseError, TData> = {}
+  options: UseCustomQueryOptions<ReplicationPipelineStatusData, StudioError, TData> = {}
 ) =>
-  useQuery<ReplicationPipelineStatusData, ResponseError, TData>({
+  useQuery<ReplicationPipelineStatusData, StudioError, TData>({
     ...replicationPipelineStatusQueryOptions<TData>(variables),
     ...options,
     enabled:

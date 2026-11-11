@@ -26,6 +26,11 @@ export function CommandListItem({
     <div
       ref={setRef}
       role="option"
+      aria-label={
+        item.propertyGroupLabel
+          ? `${item.propertyGroupLabel}: ${getActionItemLabel(item)}`
+          : undefined
+      }
       aria-disabled={item.disabled}
       onClick={() => {
         if (!item.disabled) onSelect(item)

@@ -39,7 +39,7 @@ describe('trackFeatureFlag', () => {
     const result = await trackFeatureFlag({ foo: 'bar' } as any)
 
     expect(fetchers.post).toHaveBeenCalledWith('/platform/telemetry/feature-flags/track', {
-      body: { foo: 'bar' },
+      body: { foo: 'bar', platform: 'studio' },
     })
     expect(result).toBe('success')
   })
@@ -51,6 +51,9 @@ describe('trackFeatureFlag', () => {
 
     await trackFeatureFlag({ foo: 'bar' } as any)
 
-    expect(fetchers.handleError).toHaveBeenCalledWith({ message: 'fail' })
+    expect(fetchers.handleError).toHaveBeenCalledWith(
+      { message: 'fail' },
+      { reportImmediately: true }
+    )
   })
 })

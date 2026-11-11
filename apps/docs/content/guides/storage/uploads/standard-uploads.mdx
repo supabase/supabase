@@ -344,3 +344,118 @@ curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/{bucket_n
 
 When two or more clients upload a file to the same path, the first client to complete the upload will succeed and the other clients will receive a `400 Asset Already Exists` error.
 If you provide the `x-upsert` header the last client to complete the upload will succeed instead.
+
+## Presigned uploads
+
+Standard uploads also support using signed upload tokens to create time-limited URLs that you can share with your users. Create the signed URL by invoking the `createSignedUploadUrl` method on the SDK, then pass the returned token to `uploadToSignedUrl` to complete the upload.
+
+<Tabs
+  scrollable
+  size="small"
+  type="underlined"
+  defaultActiveId="javascript"
+  queryGroup="language"
+>
+<TabPanel id="javascript" label="JavaScript">
+
+```typescript
+// Create a signed upload URL
+const { data } = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path')
+
+// Upload to the signed URL
+const { error } = await supabase.storage
+  .from('bucket_name')
+  .uploadToSignedUrl('file_path', data.token, file)
+```
+
+</TabPanel>
+<$Show if="sdk:dart">
+<TabPanel id="dart" label="Dart">
+
+```dart
+// Create a signed upload URL
+final response = await supabase.storage.from('bucket_name').createSignedUploadUrl('file_path');
+
+// Upload to the signed URL
+await supabase.storage.from('bucket_name').uploadToSignedUrl('file_path', response.token, file);
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:swift">
+<TabPanel id="swift" label="Swift">
+
+```swift
+// Create a signed upload URL
+let signedUrl = try await supabase.storage.from("bucket_name").createSignedUploadURL(path: "file_path")
+
+// Upload to the signed URL
+try await supabase.storage.from("bucket_name")
+  .uploadToSignedURL(path: "file_path", token: signedUrl.token, data: file)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:kotlin">
+<TabPanel id="kotlin" label="Kotlin">
+
+```kotlin
+// Create a signed upload URL
+val signedUrl = supabase.storage.from("bucket_name").createSignedUploadUrl("file_path")
+
+// Upload to the signed URL
+supabase.storage.from("bucket_name").uploadToSignedUrl("file_path", signedUrl.token, bytes)
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:python">
+<TabPanel id="python" label="Python">
+
+```python
+# Create a signed upload URL
+response = supabase.storage.from_('bucket_name').create_signed_upload_url('file_path')
+
+# Upload to the signed URL
+with open('local_file_path', 'rb') as f:
+    supabase.storage.from_('bucket_name').upload_to_signed_url(
+        path='file_path',
+        token=response.token,
+        file=f,
+    )
+```
+
+</TabPanel>
+</$Show>
+<$Show if="sdk:csharp">
+<TabPanel id="csharp" label="C#">
+
+```c#
+// Create a signed upload URL
+var signedUrl = await supabase.Storage.From("bucket_name").CreateUploadSignedUrl("file_path");
+
+// Upload to the signed URL
+await supabase.Storage.From("bucket_name").UploadToSignedUrl("local_file_path", signedUrl);
+```
+
+</TabPanel>
+</$Show>
+<TabPanel id="curl" label="cURL">
+
+```bash
+# Create a signed upload URL
+curl -X POST "https://{your_project_ref}.supabase.co/storage/v1/object/upload/sign/{bucket_name}/{file_path}" \
+  -H "apikey: {your_anon_key}" \
+  -H "Authorization: Bearer {your_jwt_token}"
+
+# Upload to the signed URL, using the token returned above
+curl -X PUT "https://{your_project_ref}.supabase.co/storage/v1/object/upload/sign/{bucket_name}/{file_path}?token={token}" \
+  --data-binary "@/local/path/to/your/file.ext"
+```
+
+</TabPanel>
+</Tabs>
+
+### Revoke signed URLs
+
+You can't revoke individual signed URLs. To revoke all signed URLs, rotate your project's URL signing key, and then revoke the previous key. For more information, see [URL Signing Keys](/docs/guides/storage/security/signing-keys).

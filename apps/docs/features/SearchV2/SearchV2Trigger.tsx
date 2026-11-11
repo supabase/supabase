@@ -1,29 +1,20 @@
 'use client'
 
-import { SearchTrigger, useSearchShortcut, type SearchTriggerProps } from 'docs-search/components'
-import { useCallback } from 'react'
+import { SearchTrigger, type SearchTriggerProps } from 'docs-search/components'
 
-import { SearchV2Dialog } from './SearchV2Dialog'
-import { useSearchV2Dialog } from './useSearchV2Dialog'
+import { useSearchV2 } from './SearchV2Provider'
 
 type SearchV2TriggerProps = Pick<SearchTriggerProps, 'className' | 'placeholder'>
 
 export function SearchV2Trigger({ className, placeholder }: SearchV2TriggerProps) {
-  const { open, openDialog, handleOpenChange } = useSearchV2Dialog()
-
-  const handleShortcut = useCallback(() => openDialog('keyboard_shortcut'), [openDialog])
-
-  useSearchShortcut(handleShortcut)
+  const { isSearchOpen, showSearch } = useSearchV2()
 
   return (
-    <>
-      <SearchTrigger
-        className={className}
-        placeholder={placeholder}
-        expanded={open}
-        onClick={() => openDialog('search_input')}
-      />
-      <SearchV2Dialog open={open} onOpenChange={handleOpenChange} />
-    </>
+    <SearchTrigger
+      className={className}
+      placeholder={placeholder}
+      expanded={isSearchOpen}
+      onClick={() => showSearch('search_input')}
+    />
   )
 }

@@ -1,5 +1,5 @@
 import { useParams } from 'common'
-import { LayoutDashboard, RotateCw, Square } from 'lucide-react'
+import { LayoutDashboardIcon, RotateCwIcon, SquareIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -44,7 +44,7 @@ export const ExplorerGeneratedPageTab = () => {
   if (!entry) {
     return (
       <div className="flex h-full flex-col items-center justify-center gap-3 bg-surface-100">
-        <LayoutDashboard className="text-foreground-muted" size={24} />
+        <LayoutDashboardIcon className="text-foreground-muted" size={24} />
         <div className="text-center">
           <p className="text-sm font-medium">This page is no longer available</p>
           <p className="text-sm text-foreground-lighter">
@@ -61,7 +61,7 @@ export const ExplorerGeneratedPageTab = () => {
     <ExplorerQueryViewport>
       <ExplorerToolbar aria-label="Generated page toolbar">
         <ExplorerToolbarIcon>
-          <LayoutDashboard size={16} strokeWidth={2} />
+          <LayoutDashboardIcon size={16} strokeWidth={2} />
         </ExplorerToolbarIcon>
         <ExplorerToolbarTitle>{entry.page.title}</ExplorerToolbarTitle>
         <ExplorerToolbarActions>
@@ -71,13 +71,13 @@ export const ExplorerGeneratedPageTab = () => {
           <ExplorerToolbarAction
             aria-label="Reload page"
             tooltip="Reload page"
-            icon={<RotateCw size={16} strokeWidth={2} />}
+            icon={<RotateCwIcon size={16} strokeWidth={2} />}
             onClick={runtime.reload}
           />
           <ExplorerToolbarAction
             aria-label="Stop page"
             tooltip="Stop page"
-            icon={<Square size={16} strokeWidth={2} />}
+            icon={<SquareIcon size={16} strokeWidth={2} />}
             onClick={runtime.stop}
           />
         </ExplorerToolbarActions>

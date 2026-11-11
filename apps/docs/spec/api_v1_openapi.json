@@ -9596,6 +9596,20 @@
             "description": "If `null`, the value is automatically configured to 10.",
             "nullable": true
           },
+          "db_pool_max_lifetime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600,
+            "description": "If `null`, the value is automatically configured to 1800.",
+            "nullable": true
+          },
+          "db_pool_max_idletime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "If `null`, the value is automatically configured to 30.",
+            "nullable": true
+          },
           "jwt_secret": { "type": "string" }
         },
         "required": [
@@ -9603,7 +9617,9 @@
           "max_rows",
           "db_extra_search_path",
           "db_pool",
-          "db_pool_acquisition_timeout"
+          "db_pool_acquisition_timeout",
+          "db_pool_max_lifetime",
+          "db_pool_max_idletime"
         ]
       },
       "V1UpdatePostgrestConfigBody": {
@@ -9613,7 +9629,9 @@
           "db_schema": { "type": "string" },
           "max_rows": { "type": "integer", "minimum": 0, "maximum": 1000000 },
           "db_pool": { "type": "integer", "minimum": 0, "maximum": 1000 },
-          "db_pool_acquisition_timeout": { "type": "integer", "minimum": 0, "maximum": 60 }
+          "db_pool_acquisition_timeout": { "type": "integer", "minimum": 0, "maximum": 60 },
+          "db_pool_max_lifetime": { "type": "integer", "minimum": 0, "maximum": 3600 },
+          "db_pool_max_idletime": { "type": "integer", "minimum": 0, "maximum": 60 }
         },
         "example": { "db_schema": "public,storage", "db_pool": 20, "max_rows": 1000 }
       },
@@ -9640,6 +9658,20 @@
             "maximum": 9007199254740991,
             "description": "If `null`, the value is automatically configured to 10.",
             "nullable": true
+          },
+          "db_pool_max_lifetime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 3600,
+            "description": "If `null`, the value is automatically configured to 1800.",
+            "nullable": true
+          },
+          "db_pool_max_idletime": {
+            "type": "integer",
+            "minimum": 0,
+            "maximum": 60,
+            "description": "If `null`, the value is automatically configured to 30.",
+            "nullable": true
           }
         },
         "required": [
@@ -9647,7 +9679,9 @@
           "max_rows",
           "db_extra_search_path",
           "db_pool",
-          "db_pool_acquisition_timeout"
+          "db_pool_acquisition_timeout",
+          "db_pool_max_lifetime",
+          "db_pool_max_idletime"
         ]
       },
       "V1ProjectRefResponse_Output": {
@@ -11779,6 +11813,7 @@
                     "log_edge_function_error_rate_high",
                     "realtime_authorization_timeouts",
                     "realtime_postgres_changes_spike",
+                    "realtime_concurrent_users_near_limit",
                     "project_not_active",
                     "advisor_check_unavailable"
                   ]

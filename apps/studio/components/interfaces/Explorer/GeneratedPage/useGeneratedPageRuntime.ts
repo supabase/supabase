@@ -1,5 +1,5 @@
 import { acceptUntrustedSql, untrustedSql } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useEffect, useRef, useState } from 'react'
 
 import {
@@ -23,7 +23,7 @@ import {
   type ApprovedGeneratedPageQueries,
 } from './generated-page.utils'
 import { resolveLogTimeRange } from '@/components/interfaces/QuerySources/LogTimeRange.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
 import { isValidConnString, unguarded } from '@/data/fetchers'
 import { executeLogsSql } from '@/data/logs/execute-logs-sql-mutation'
@@ -31,10 +31,10 @@ import { acceptUntrustedLogsSql, untrustedLogSql } from '@/data/logs/safe-analyt
 import { QUERY_SOURCE_REGISTRY } from '@/data/query-sources/query-source-registry'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import { applyAutoLimit } from '@/data/sql/utils'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useLatest } from '@/hooks/misc/useLatest'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import type { RenderPageInput } from '@/lib/ai/tools/generated-page-schema'
+import { useGrant } from '@/lib/grants'
 
 export type GeneratedPageRun = { id: number; document: string }
 
@@ -68,14 +68,12 @@ export function useGeneratedPageRuntime({
   const projectRef = project?.ref
   const connectionString = project?.connectionString
 
-  const { can: canReadApiKeys, isLoading: isLoadingPermission } = useAsyncCheckPermissions(
-    PermissionAction.READ,
-    'service_api_keys'
-  )
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const canReadApiKeys = apiKeysGrant.status === 'granted'
+  const isLoadingPermission = apiKeysGrant.status === 'loading'
   const { data: apiUrl, isPending: isLoadingApiUrl } = useProjectApiUrl({ projectRef })
-  const { data: apiKeys, isLoading: isLoadingApiKeys } = useAPIKeys(
-    { projectRef },
-    { enabled: canReadApiKeys }
+  const { data: apiKeys, isLoading: isLoadingApiKeys } = useQuery(
+    apiKeysQueryOptions({ projectRef, grant: apiKeysGrant.grant }, { select: getKeys })
   )
   const clientKey = selectPublicClientKey(apiKeys)
 
@@ -177,6 +175,8 @@ export function useGeneratedPageRuntime({
           projectRef,
           connectionString,
           sql: limited.sql,
+          // The page's queries are written by the Assistant
+          sqlOrigin: 'user',
           preflightCheck: true,
           grant: unguarded.migrating,
         })

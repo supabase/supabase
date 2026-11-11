@@ -40,6 +40,7 @@ const STATUS_LABELS: Record<ProjectStatus, string> = {
   PAUSING: 'Pausing',
   PAUSE_FAILED: 'Pause failed',
   RESIZING: 'Resizing',
+  PROMOTING: 'Promoting',
 }
 
 const STATUS_OPTIONS = Object.values(PROJECT_STATUS)

@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { oauthAppsKeys } from './keys'
 import { USE_MOCKS } from './mocks'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type OAuthAppRevokeVariables = {
   slug: string
@@ -25,12 +26,12 @@ export const useOAuthAppRevokeMutation = ({
   onSuccess,
   ...options
 }: Omit<
-  UseCustomMutationOptions<OAuthAppRevokeData, ResponseError, OAuthAppRevokeVariables>,
+  UseCustomMutationOptions<OAuthAppRevokeData, StudioError, OAuthAppRevokeVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<OAuthAppRevokeData, ResponseError, OAuthAppRevokeVariables>({
+  return useMutation<OAuthAppRevokeData, StudioError, OAuthAppRevokeVariables>({
     mutationFn: (vars) => revokeOAuthApp(vars),
     async onSuccess(data, variables, context) {
       // Revoking an app deletes every row for (app_id, organization_id), both kinds — the

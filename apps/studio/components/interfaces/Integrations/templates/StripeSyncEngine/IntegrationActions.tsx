@@ -73,25 +73,13 @@ export const IntegrationInstalledActions = ({
 
 export const IntegrationNotInstalledActions = ({
   className,
-  installing,
-  canInstall,
   isUninstallRequested,
-  hideInstallCTA = false,
   handleUninstall,
-  setShouldShowInstallSheet,
 }: {
   className?: string
-  installing: boolean
-  canInstall: boolean
   isUninstallRequested: boolean
-  hideInstallCTA?: boolean
   handleUninstall: () => void
-  setShouldShowInstallSheet: (value: boolean) => void
 }) => {
-  const { can: canManageSecrets } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.EDGE_FUNCTIONS_SECRETS_WRITE
-  )
-
   const {
     schemaComment: { status: installationStatus },
   } = useStripeSyncStatus()
@@ -99,25 +87,6 @@ export const IntegrationNotInstalledActions = ({
 
   return (
     <div className={cn('flex gap-x-2 justify-end', className)}>
-      {!hideInstallCTA && (
-        <ButtonTooltip
-          variant="primary"
-          onClick={() => setShouldShowInstallSheet(true)}
-          disabled={!canInstall || !canManageSecrets}
-          loading={installing}
-          tooltip={{
-            content: {
-              text: !canInstall
-                ? 'Your database already uses a schema named "stripe"'
-                : !canManageSecrets
-                  ? 'You need additional permissions to install the Stripe Sync Engine.'
-                  : undefined,
-            },
-          }}
-        >
-          {installError ? 'Retry installation' : 'Install integration'}
-        </ButtonTooltip>
-      )}
       {installError && (
         <Button loading={isUninstallRequested} onClick={handleUninstall}>
           Uninstall

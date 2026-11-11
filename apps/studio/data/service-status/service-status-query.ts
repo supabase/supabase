@@ -3,7 +3,8 @@ import { components } from 'api-types'
 
 import { serviceStatusKeys } from './keys'
 import { get, handleError, unguarded } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type ProjectServiceStatusVariables = {
   projectRef?: string
@@ -39,7 +40,7 @@ export async function getProjectServiceStatus(
 }
 
 export type ProjectServiceStatusData = Awaited<ReturnType<typeof getProjectServiceStatus>>
-export type ProjectServiceStatusError = ResponseError
+export type ProjectServiceStatusError = StudioError
 
 export const useProjectServiceStatusQuery = <TData = ProjectServiceStatusData>(
   { projectRef }: ProjectServiceStatusVariables,

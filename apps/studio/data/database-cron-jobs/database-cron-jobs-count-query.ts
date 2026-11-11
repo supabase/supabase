@@ -4,7 +4,8 @@ import { useQuery } from '@tanstack/react-query'
 import { databaseCronJobsKeys } from './keys'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 type DatabaseCronJobsCountVariables = {
   projectRef?: string
@@ -22,6 +23,8 @@ export async function getDatabaseCronJobsCount({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'cron-jobs-count',
     sql: cronJobCountSql,
     queryKey: ['cron-jobs-count'],
     grant: unguarded.migrating,
@@ -30,7 +33,7 @@ export async function getDatabaseCronJobsCount({
 }
 
 export type DatabaseCronJobData = number
-export type DatabaseCronJobError = ResponseError
+export type DatabaseCronJobError = StudioError
 
 export const useCronJobsCountQuery = <TData = DatabaseCronJobData>(
   { projectRef, connectionString }: DatabaseCronJobsCountVariables,

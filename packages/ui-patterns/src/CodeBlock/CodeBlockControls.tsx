@@ -69,8 +69,14 @@ export function CodeCopyButton({
   )
 }
 
-export function CodeBlockControls({ content }: { content: string }) {
-  const [isWrapped, setIsWrapped] = useState(false)
+export function CodeBlockControls({
+  content,
+  defaultWrapped = false,
+}: {
+  content: string
+  defaultWrapped?: boolean
+}) {
+  const [isWrapped, setIsWrapped] = useState(defaultWrapped)
   // Empty until the first toggle, so nothing is announced on mount
   const [wrapStatus, setWrapStatus] = useState('')
 

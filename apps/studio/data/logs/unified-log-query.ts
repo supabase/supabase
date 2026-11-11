@@ -8,14 +8,14 @@ import { mapUnifiedLogRow, parseUnifiedLogsQueryRows } from './unified-logs.util
 import { getUnifiedLogsQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { QuerySearchParamsType } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.types'
 import { handleError } from '@/data/fetchers'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type UnifiedLogVariables = {
   projectRef?: string
   id?: string
   search: QuerySearchParamsType
 }
-export type UnifiedLogError = ResponseError
+export type UnifiedLogError = StudioError
 
 async function getUnifiedLog(
   { projectRef, id, search }: UnifiedLogVariables,

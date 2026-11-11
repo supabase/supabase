@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 
 import { storageKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type NamespaceTableFields = components['schemas']['CreateNamespaceTableBody']['fields']
 
@@ -46,7 +47,7 @@ export const useIcebergNamespaceTableCreateMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     IcebergNamespaceTableCreateData,
-    ResponseError,
+    StudioError,
     CreateIcebergNamespaceTableVariables
   >,
   'mutationFn'
@@ -55,7 +56,7 @@ export const useIcebergNamespaceTableCreateMutation = ({
 
   return useMutation<
     IcebergNamespaceTableCreateData,
-    ResponseError,
+    StudioError,
     CreateIcebergNamespaceTableVariables
   >({
     mutationFn: (vars) => createIcebergNamespaceTable({ ...vars }),

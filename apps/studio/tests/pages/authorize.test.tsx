@@ -9,7 +9,7 @@ vi.mock('@/hooks/misc/withAuth', () => ({
   withAuth: (Component: React.ComponentType) => Component,
 }))
 
-const flags = vi.hoisted(() => ({ scopedGrants: false }))
+const flags = vi.hoisted(() => ({ consent: false }))
 const params = vi.hoisted(() => ({ current: {} as Record<string, string | undefined> }))
 
 vi.mock('common', async (importOriginal) => {
@@ -17,7 +17,7 @@ vi.mock('common', async (importOriginal) => {
   return {
     ...actual,
     useParams: () => params.current,
-    useFlag: () => flags.scopedGrants,
+    useFlag: (key: string) => key === 'enableScopedOAuthConsent' && flags.consent,
   }
 })
 
@@ -55,7 +55,7 @@ const DEFAULT_PROFILE_CONTEXT: ProfileContextType = {
 
 describe('APIAuthorizationPage', () => {
   afterEach(() => {
-    flags.scopedGrants = false
+    flags.consent = false
     params.current = {}
   })
 
@@ -66,7 +66,7 @@ describe('APIAuthorizationPage', () => {
     expect(screen.getByText('Loading...')).toBeInTheDocument()
   })
 
-  test('renders the legacy component when the OauthAppScopedGrants flag is off', () => {
+  test('renders the legacy component when the enableScopedOAuthConsent flag is off', () => {
     useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 
     customRender(<APIAuthorizationPage dehydratedState={{}} />, {
@@ -78,7 +78,7 @@ describe('APIAuthorizationPage', () => {
   })
 
   test('preselects projects from repeated project_ref params', async () => {
-    flags.scopedGrants = true
+    flags.consent = true
     useRouterMock.mockReturnValue({
       isReady: true,
       push: routerPushMock,
@@ -94,7 +94,7 @@ describe('APIAuthorizationPage', () => {
   })
 
   test('normalises a single project_ref param to a one-item preselection', async () => {
-    flags.scopedGrants = true
+    flags.consent = true
     useRouterMock.mockReturnValue({
       isReady: true,
       push: routerPushMock,
@@ -110,7 +110,7 @@ describe('APIAuthorizationPage', () => {
   })
 
   test('org_bound_all renders without a picker and covers every project', async () => {
-    flags.scopedGrants = true
+    flags.consent = true
     params.current = { mock_scenario: 'org_bound_all' }
     useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 
@@ -124,7 +124,7 @@ describe('APIAuthorizationPage', () => {
   })
 
   test('user_bound_all renders without a picker and covers every project', async () => {
-    flags.scopedGrants = true
+    flags.consent = true
     params.current = { mock_scenario: 'user_bound_all' }
     useRouterMock.mockReturnValue({ isReady: true, push: routerPushMock, query: {} })
 

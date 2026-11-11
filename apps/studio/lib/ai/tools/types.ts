@@ -53,6 +53,13 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   minOptInLevel: AiOptInLevel | null
   needsApproval: boolean
   /**
+   * Rules for using the tool that its description doesn't cover. Omit it when the description
+   * is enough. The chat system prompt includes it only for requests where the tool is available,
+   * so it may name only tools that are available whenever this one is. Keep it static: the
+   * system prompt is cached, so nothing here may depend on a single request.
+   */
+  promptGuidance?: string
+  /**
    * What the model may see of the output. Required, so a contract can't forget to decide.
    * Applied to the current turn and again on history replay, so it must be safe to run on
    * its own result. Return the output unchanged only if all of it is safe at every level.
@@ -65,13 +72,20 @@ export type ToolContract<TInput = unknown, TOutput = unknown> = {
   outputOnInvalid?: JSONValue
 }
 
+/** A tool that no longer exists, kept so its outputs in saved chats replay safely. */
+export type LegacyToolContract<TOutput = unknown> = Pick<
+  ToolContract<unknown, TOutput>,
+  'name' | 'outputSchema' | 'toModelOutput' | 'outputOnInvalid'
+>
+
 /**
  * A tool the remote MCP server implements. The server owns the description, input schema,
- * execution and output; Studio decides only who may run it and whether it needs approval.
+ * execution and output; Studio decides who may run it, whether it needs approval, and how the
+ * system prompt tells the model to use it.
  */
 export type RemoteToolContract = Pick<
   ToolContract,
-  'name' | 'availability' | 'minOptInLevel' | 'needsApproval'
+  'name' | 'availability' | 'minOptInLevel' | 'needsApproval' | 'promptGuidance'
 >
 
 export type ToolContractInput<C extends ToolContract> = z.infer<C['inputSchema']>

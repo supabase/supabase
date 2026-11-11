@@ -151,7 +151,7 @@ const mockSetupMutation = () => {
     path: '/platform/warehouse/:ref/setup',
     response: async ({ request }) => {
       requests.push((await request.json()) as WarehouseSetupBody)
-      return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: 1, tables: [] })
+      return HttpResponse.json<WarehouseSetupResponse>({ pipeline_id: '1', tables: [] })
     },
   })
   return requests

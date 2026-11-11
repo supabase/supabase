@@ -1,5 +1,18 @@
 const LIBRARY_URL = process.env.NEXT_PUBLIC_LIBRARY_URL ?? process.env.NEXT_PUBLIC_UI_LIBRARY_URL
 
+const zoneRewrites = (basePath, url) => [
+  // vercel keeps the segment prefetch header on .segments paths. the zone then adds the suffix again
+  {
+    source: `${basePath}/:path(.*)\\.segments/:segment(.*)\\.segment\\.rsc`,
+    destination: `${url}/:path`,
+  },
+  { source: `${basePath}\\.segments/:segment(.*)\\.segment\\.rsc`, destination: `${url}` },
+  // a zone serves its root as index.rsc
+  { source: `${basePath}\\.rsc`, destination: `${url}` },
+  { source: basePath, destination: `${url}` },
+  { source: `${basePath}/:path*`, destination: `${url}/:path*` },
+]
+
 const rewrites = [
   {
     source: '/:path*',
@@ -15,30 +28,15 @@ const rewrites = [
   },
   ...(process.env.NEXT_PUBLIC_VERCEL_ENV === 'production'
     ? [
-        { source: '/docs', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}` },
         {
           source: '/docs/',
           destination: `${process.env.NEXT_PUBLIC_DOCS_URL}`,
         },
-        { source: '/docs/:path*', destination: `${process.env.NEXT_PUBLIC_DOCS_URL}/:path*` },
+        ...zoneRewrites('/docs', process.env.NEXT_PUBLIC_DOCS_URL),
       ]
     : []),
-  {
-    source: '/library',
-    destination: `${LIBRARY_URL}`,
-  },
-  {
-    source: '/library/:path*',
-    destination: `${LIBRARY_URL}/:path*`,
-  },
-  {
-    source: '/design-system',
-    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}`,
-  },
-  {
-    source: '/design-system/:path*',
-    destination: `${process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL}/:path*`,
-  },
+  ...zoneRewrites('/library', LIBRARY_URL),
+  ...zoneRewrites('/design-system', process.env.NEXT_PUBLIC_DESIGN_SYSTEM_URL),
   {
     source: '/kb',
     destination: `${process.env.NEXT_PUBLIC_KB_URL}`,

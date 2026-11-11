@@ -182,9 +182,14 @@ export const ImportForeignSchemaDialog = ({
             <DialogSection className="flex flex-col gap-y-4">
               <p className="text-sm">
                 Namespace “<strong>{namespace}</strong>”{' '}
-                {circumstance === 'fresh'
-                  ? 'must be linked to a new schema before tables can be paired.'
-                  : 'clashes with an existing database schema. Create a new schema to use as the destination for this data.'}
+                {circumstance === 'fresh' ? (
+                  <span>must be linked to a new schema before tables can be paired.</span>
+                ) : (
+                  <span>
+                    clashes with an existing database schema. Create a new schema to use as the
+                    destination for this data.
+                  </span>
+                )}
               </p>
               <Separator />
               <FormField

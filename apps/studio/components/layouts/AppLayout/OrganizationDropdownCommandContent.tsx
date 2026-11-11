@@ -47,7 +47,6 @@ export function OrganizationDropdownCommandContent({
           routePathname={routePathname}
           hasRouteSlug={hasRouteSlug}
           onClose={onClose}
-          compactPadding={!embedded}
         />
       ))}
     </>
@@ -57,7 +56,7 @@ export function OrganizationDropdownCommandContent({
     return (
       <Command className={cn(className, 'flex flex-col flex-1 min-h-0 overflow-hidden')}>
         <div className="flex items-center gap-2 shrink-0 border-b p-2">
-          <Button variant="text" block size="small" asChild>
+          <Button variant="outline" block size="small" asChild>
             <Link
               href="/organizations"
               className="text-xs text-foreground-light hover:text-foreground"

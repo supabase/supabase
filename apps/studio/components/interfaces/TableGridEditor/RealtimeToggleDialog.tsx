@@ -85,16 +85,18 @@ export const RealtimeToggleDialog = ({
       <DialogContent size="small" aria-describedby={undefined}>
         <DialogHeader>
           <DialogTitle>
-            {isRealtimeEnabled ? 'Disable' : 'Enable'} realtime for {table.name}
+            {isRealtimeEnabled ? <span>Disable</span> : <span>Enable</span>}{' '}
+            <span>realtime for</span> {table.name}
           </DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
         <DialogSection>
           <div className="space-y-2">
             <p className="text-sm">
-              Once realtime has been {isRealtimeEnabled ? 'disabled' : 'enabled'}, the table will{' '}
-              {isRealtimeEnabled ? 'no longer ' : ''}broadcast any changes to authorized
-              subscribers.
+              Once realtime has been{' '}
+              {isRealtimeEnabled ? <span>disabled</span> : <span>enabled</span>}
+              <span>, the table will</span> {isRealtimeEnabled ? <span>{'no longer '}</span> : ''}
+              <span>broadcast any changes to authorized subscribers.</span>
             </p>
             {!isRealtimeEnabled && (
               <p className="text-sm">
@@ -112,7 +114,7 @@ export const RealtimeToggleDialog = ({
             Cancel
           </Button>
           <Button variant="primary" loading={isTogglingRealtime} onClick={toggleRealtime}>
-            {isRealtimeEnabled ? 'Disable' : 'Enable'} realtime
+            {isRealtimeEnabled ? <span>Disable</span> : <span>Enable</span>} <span>realtime</span>
           </Button>
         </DialogFooter>
       </DialogContent>

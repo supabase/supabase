@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { oauthAppsKeys } from './keys'
 import { getMockOAuthOrgAppDetails, USE_MOCKS } from './mocks'
 import type { OAuthOrgAppDetails } from './types'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type OAuthOrgAppDetailsVariables = {
   slug?: string
@@ -24,7 +25,7 @@ export async function getOAuthOrgAppDetails({
 }
 
 export type OAuthOrgAppDetailsData = Awaited<ReturnType<typeof getOAuthOrgAppDetails>>
-export type OAuthOrgAppDetailsError = ResponseError
+export type OAuthOrgAppDetailsError = StudioError
 
 export const useOAuthOrgAppDetailsQuery = <TData = OAuthOrgAppDetailsData>(
   { slug, appId }: OAuthOrgAppDetailsVariables,

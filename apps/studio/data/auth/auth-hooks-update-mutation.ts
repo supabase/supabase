@@ -5,7 +5,8 @@ import { configKeys } from '../config/keys'
 import { authKeys } from './keys'
 import type { components } from '@/data/api'
 import { handleError, patch } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type AuthHooksUpdateVariables = {
   projectRef: string
@@ -29,12 +30,12 @@ export const useAuthHooksUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>,
+  UseCustomMutationOptions<AuthHooksUpdateData, StudioError, AuthHooksUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<AuthHooksUpdateData, ResponseError, AuthHooksUpdateVariables>({
+  return useMutation<AuthHooksUpdateData, StudioError, AuthHooksUpdateVariables>({
     mutationFn: (vars) => updateAuthHooks(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -62,7 +62,7 @@ Register your domain with Supabase to prove that you own it. You need to downloa
 In the CLI, run [`domains create`](/docs/reference/cli/supabase-domains-create) to register the domain and Supabase and get your verification records:
 
 ```bash
-supabase domains create --project-ref abcdefghijklmnopqrst --custom-hostname api.example.com
+supabase domains create --remote=abcdefghijklmnopqrst --custom-hostname api.example.com
 ```
 
 A single TXT records is returned. For example:
@@ -87,7 +87,7 @@ Make sure you've configured all required DNS settings:
 Use the [`domains reverify`](/docs/reference/cli/supabase-domains-reverify) command to begin the verification process of your domain. You may need to run this command a few times because DNS records take a while to propagate.
 
 ```bash
-supabase domains reverify --project-ref abcdefghijklmnopqrst
+supabase domains reverify --remote=abcdefghijklmnopqrst
 ```
 
 In the background, Supabase will check your DNS records and issue an SSL certificate. Supabase uses multiple Certificate Authorities (including Let's Encrypt, Google Trust Services and SSL.com) to ensure high availability. The specific issuer is chosen based on availability and this process can take up to 30 minutes.
@@ -120,7 +120,7 @@ To prevent issues for your users, follow these steps:
 Once you've done the necessary preparations to activate the new domain for your project, you can activate it using the [`domains activate`](/docs/reference/cli/supabase-domains-activate) CLI command.
 
 ```bash
-supabase domains activate --project-ref abcdefghijklmnopqrst
+supabase domains activate --remote=abcdefghijklmnopqrst
 ```
 
 When this step completes, Supabase will serve the requests from your new domain. The Supabase project domain **continues to work** and serve requests so you do not need to rush to change client code URLs.
@@ -145,7 +145,7 @@ Removing a custom domain may cause some issues when using Supabase Auth with OAu
 To remove an activated custom domain you can use the [`domains delete`](/docs/reference/cli/supabase-domains-delete) CLI command.
 
 ```bash
-supabase domains delete --project-ref abcdefghijklmnopqrst
+supabase domains delete --remote=abcdefghijklmnopqrst
 ```
 
 ## Vanity subdomains
@@ -170,7 +170,7 @@ Assume your Supabase project's domain is `abcdefghijklmnopqrst.supabase.co` and 
 Use the [`vanity-subdomains check-availability`](/docs/reference/cli/supabase-vanity-subdomains-check-availability) command of the CLI to check if your desired subdomain is available for use:
 
 ```bash
-supabase vanity-subdomains check-availability --project-ref abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
+supabase vanity-subdomains check-availability --remote=abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
 ```
 
 ### Prepare to activate the subdomain
@@ -202,7 +202,7 @@ Once you've chosen an available subdomain and have done all the necessary prepar
 Use the [`vanity-subdomains activate`](/docs/reference/cli/supabase-vanity-subdomains-activate) command to activate and claim your subdomain:
 
 ```bash
-supabase vanity-subdomains activate --project-ref abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
+supabase vanity-subdomains activate --remote=abcdefghijklmnopqrst --desired-subdomain my-example-brand --experimental
 ```
 
 If you wish to use the new domain in client code, you can set it up like so:
@@ -223,7 +223,7 @@ Removing a subdomain may cause some issues when using Supabase Auth with OAuth o
 Use the [`vanity-subdomains delete`](/docs/reference/cli/supabase-vanity-subdomains-delete) command of the CLI to remove the subdomain `my-example-brand.supabase.co` from your project.
 
 ```bash
-supabase vanity-subdomains delete --project-ref abcdefghijklmnopqrst --experimental
+supabase vanity-subdomains delete --remote=abcdefghijklmnopqrst --experimental
 ```
 
 <$Show if="billing:all">

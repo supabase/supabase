@@ -7,7 +7,7 @@ import { UNIFIED_LOGS_QUERY_OPTIONS } from './unified-logs-infinite-query'
 import { getLogAttributesQuery } from '@/components/interfaces/UnifiedLogs/UnifiedLogs.queries'
 import { handleError } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const LOG_WINDOW_MS = 60 * 1000
 
@@ -23,7 +23,7 @@ export type UnifiedLogAttributesVariables = {
   logTimestampMs?: number | null
 }
 
-export type UnifiedLogAttributesError = ResponseError
+export type UnifiedLogAttributesError = StudioError
 
 export const getLogTimeWindow = (timestampMs: number, windowMs: number) => ({
   iso_timestamp_start: new Date(timestampMs - windowMs).toISOString(),

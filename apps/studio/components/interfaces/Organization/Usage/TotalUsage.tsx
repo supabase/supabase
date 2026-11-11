@@ -36,9 +36,9 @@ const METRICS_TO_HIDE_WITH_NO_USAGE: PricingMetric[] = [
   PricingMetric.DISK_THROUGHPUT_GP3,
   PricingMetric.LOG_STORAGE,
   PricingMetric.ACTIVE_COMPUTE_HOURS,
-  PricingMetric.ETL_PIPELINE,
-  PricingMetric.ETL_REPLICATED_DATA,
-  PricingMetric.ETL_COPY_BACKFILL_DATA,
+  PricingMetric.PIPELINES_PIPELINE,
+  PricingMetric.PIPELINES_REPLICATED_DATA,
+  PricingMetric.PIPELINES_COPY_BACKFILL_DATA,
 ]
 
 export const TotalUsage = ({
@@ -101,18 +101,7 @@ export const TotalUsage = ({
         return metricUsage && metricUsage.usage > 0
       })
 
-    const PINNED_METRICS = [PricingMetric.LOG_INGESTION, PricingMetric.LOG_QUERYING]
-
     return breakdownMetrics.slice().sort((a, b) => {
-      const pinnedIndexA = PINNED_METRICS.indexOf(a.key as PricingMetric)
-      const pinnedIndexB = PINNED_METRICS.indexOf(b.key as PricingMetric)
-
-      if (pinnedIndexA !== -1 || pinnedIndexB !== -1) {
-        if (pinnedIndexA === -1) return 1
-        if (pinnedIndexB === -1) return -1
-        return pinnedIndexA - pinnedIndexB
-      }
-
       const usageMetaA = usage.usages.find((x) => x.metric === a.key)
       const usageRatioA =
         typeof usageMetaA !== 'number'

@@ -70,7 +70,11 @@ type ExplorerTableTabProps = {
  */
 export const ExplorerTableTab = (props: ExplorerTableTabProps) => {
   const { data: project } = useSelectedProjectQuery()
-  const { grant } = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
+  const { grant } = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
   const { data: entityId, isPending: isResolvingId } = useQuery(
     entityIdQueryOptions({
       projectRef: project?.ref,
@@ -190,7 +194,11 @@ const ExplorerTableView = ({
     hasSidebar: true,
   })
 
-  const queryGrant = useGrant('POST /platform/pg-meta/{ref}/query', { projectRef: project?.ref })
+  const queryGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
 
   /** Runs the table's query: Studio builds it from the table and the toolbar, so no gesture is needed. */
   const runTableQuery = async () => {
@@ -205,6 +213,8 @@ const ExplorerTableView = ({
       projectRef: project.ref,
       connectionString: project.connectionString,
       sql: limitedSql.sql,
+      sqlOrigin: 'studio',
+      queryName: 'explorer-table-rows',
       autoLimit: limitedSql.appendAutoLimit ? rowLimit : undefined,
       contextualInvalidation: true,
       isStatementTimeoutDisabled: true,
@@ -250,6 +260,8 @@ const ExplorerTableView = ({
         projectRef: project.ref,
         connectionString: project.connectionString,
         sql: safeSql`${tableSql} limit ${literal(rowLimit)} offset ${literal(current.rows.length)}`,
+        sqlOrigin: 'studio',
+        queryName: 'explorer-table-rows-page',
         grant: queryGrant.grant,
       })
       const rows = z.array(z.record(z.unknown())).parse(page)

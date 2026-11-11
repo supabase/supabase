@@ -67,6 +67,21 @@
   }
 }
 
+@utility raised-svg-surface {
+  & stop:first-child {
+    stop-color: hsl(var(--colors-white) / 0.015);
+  }
+  & stop:last-child {
+    stop-color: hsl(var(--colors-black) / 0.01);
+  }
+  & feDropShadow {
+    flood-color: hsl(var(--colors-black) / var(--button-shadow-opacity));
+  }
+  & [data-raised-edge] {
+    stroke: hsl(var(--button-edge-color) / calc(0.1 * var(--button-edge-strength)));
+  }
+}
+
 /*
  * Soft shimmer gradient used by LoadingLine.
  */

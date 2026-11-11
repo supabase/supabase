@@ -13,6 +13,14 @@ describe('getUserInitials', () => {
     expect(getUserInitials(user({ raw_user_meta_data: { name: 'ada' } }))).toBe('A')
   })
 
+  it.each([
+    [{ raw_user_meta_data: { name: '😀' } }, '😀'],
+    [{ raw_user_meta_data: { name: '😀 Ada 🚀' } }, '😀🚀'],
+    [{ email: '😀@example.com' }, '😀'],
+  ])('preserves complete Unicode code points in %j', (overrides, expected) => {
+    expect(getUserInitials(user(overrides))).toBe(expected)
+  })
+
   it('falls back to the first letter of the email', () => {
     expect(getUserInitials(user({ email: 'grace@example.com' }))).toBe('G')
   })
@@ -29,6 +37,12 @@ describe('getUserInitials', () => {
 })
 
 describe('getUserPrimaryLabel', () => {
+  it('falls back to email when the display name contains only whitespace', () => {
+    expect(
+      getUserPrimaryLabel(user({ email: 'ada@example.com', raw_user_meta_data: { name: '  ' } }))
+    ).toBe('ada@example.com')
+  })
+
   it('prefers the display name, then email, then phone', () => {
     expect(
       getUserPrimaryLabel(user({ email: 'ada@example.com', raw_user_meta_data: { name: 'Ada' } }))

@@ -3,7 +3,8 @@ import { keepPreviousData, useQuery } from '@tanstack/react-query'
 import { organizationKeys } from './keys'
 import type { CustomerAddress, CustomerTaxId } from './types'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type CreditTopUpPreviewVariables = {
   slug?: string
@@ -42,9 +43,9 @@ export const useCreditTopUpPreview = <TData = CreditTopUpPreviewData>(
   {
     enabled = true,
     ...options
-  }: UseCustomQueryOptions<CreditTopUpPreviewData, ResponseError, TData> = {}
+  }: UseCustomQueryOptions<CreditTopUpPreviewData, StudioError, TData> = {}
 ) =>
-  useQuery<CreditTopUpPreviewData, ResponseError, TData>({
+  useQuery<CreditTopUpPreviewData, StudioError, TData>({
     queryKey: organizationKeys.creditTopUpPreview(slug, {
       amount,
       address: address as Record<string, unknown> | undefined,

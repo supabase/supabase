@@ -55,7 +55,7 @@ You change all of the Postgres settings below through [Custom Postgres Configura
 Consider these options first. They are responsible for most log volume on most projects.
 
 - **[`log_statement`](/docs/guides/database/postgres/postgres-log-config#logstatement)** — set to `none` if you don't manually read through raw query logs to debug your application, for example if your team relies on an AI coding assistant, an APM tool, or the Query Performance dashboard instead. Keep `all` on if you routinely read query text in the Logs Explorer to debug issues, or you have a compliance requirement to retain a full statement audit trail; `mod` is a lighter-volume option if you only need a record of data changes.
-- **[`log_min_duration_statement`](/docs/guides/database/postgres/postgres-log-config#logmindurationstatement)** — raise the threshold (for example, from a few milliseconds to 1-2 seconds) if you only care about queries that are slow enough to notice. Keep it low only while you're actively in a performance-tuning phase, and raise it back up once that investigation is done.
+- **[`log_min_duration_statement`](/docs/guides/observability/log-slow-queries#log-slow-queries)** — raise the threshold (for example, from a few milliseconds to 1-2 seconds) if you only care about queries that are slow enough to notice. Keep it low only while you're actively in a performance-tuning phase, and raise it back up once that investigation is done.
 - **[pgAudit](/docs/guides/database/extensions/pgaudit)**, if enabled — this extension can be very verbose independently of `log_statement`. Turn off a broad `pgaudit.log` or `pgaudit.role` configuration if you don't need a dedicated audit trail beyond what `log_statement` already gives you.
 
 <Admonition type="danger" title="Statement logs can expose sensitive data">
@@ -73,8 +73,7 @@ Enabling `log_statement=all`, or setting `log_min_duration_statement` to a low o
 
 ### Check this if your logs seem unusually large for no clear reason
 
-**[`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages)** controls the verbosity of Postgres's own internal logging, separate from query activity. The default is `warning`. If this was turned up to a debug level while troubleshooting a specific issue and never turned back down, it can produce a large, ongoing volume of internal messages that aren't useful for day-to-day monitoring — check the current value and reset it if you don't recognize turning it up yourself.
-
+**[`log_min_messages`](/docs/guides/database/postgres/postgres-log-config#logminmessages)** controls the verbosity of [Postgres's own internal logging](/kb/troubleshooting/understanding-postgresql-logging-levels-and-how-they-impact-your-project-KXiJRm), separate from query activity. The default is `warning`. If this was turned up to a debug level while troubleshooting a specific issue and never turned back down, it can produce a large, ongoing volume of internal messages that aren't useful for day-to-day monitoring — check the current value and reset it if you don't recognize turning it up yourself.
 Custom RPC functions and stored procedures are also worth reviewing. A PL/pgSQL function that calls `RAISE NOTICE` or `RAISE LOG` produces log output every time it runs, independent of any of the settings above — if a frequently-called function logs on every invocation, it can account for a large, otherwise-unexplained share of your volume.
 
 ### Settings you can generally leave alone

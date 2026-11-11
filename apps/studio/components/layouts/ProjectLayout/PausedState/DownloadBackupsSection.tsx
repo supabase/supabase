@@ -83,17 +83,8 @@ export const DownloadBackupsSection = () => {
     const toastId = toast.loading('Fetching database backup')
 
     downloadBackup(
-      {
-        ref,
-        backup: {
-          id: latestBackup,
-        },
-      },
-      {
-        onSuccess: () => {
-          toast.success('Downloading database backup', { id: toastId })
-        },
-      }
+      { ref, backupId: latestBackup },
+      { onSuccess: () => toast.success('Downloading database backup', { id: toastId }) }
     )
   }
 

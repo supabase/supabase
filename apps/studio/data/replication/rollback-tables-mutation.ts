@@ -3,23 +3,23 @@ import type { components } from 'api-types'
 import { toast } from 'sonner'
 
 import { replicationKeys } from './keys'
+import { pipelineIdSchema } from './pipeline-id'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type RollbackTablesTarget = components['schemas']['RollbackTablesBody']['target']
 
 type RollbackTablesParams = {
   projectRef: string
-  pipelineId: number
+  pipelineId: string
   target: RollbackTablesTarget
 }
-
-type RollbackTablesResponse = components['schemas']['RollbackTablesResponse_Output']
 
 async function rollbackTables(
   { projectRef, pipelineId, target }: RollbackTablesParams,
   signal?: AbortSignal
-): Promise<RollbackTablesResponse> {
+) {
   if (!projectRef) throw new Error('Project reference is required')
   if (!pipelineId) throw new Error('Pipeline ID is required')
 
@@ -34,7 +34,7 @@ async function rollbackTables(
   )
   if (error) handleError(error)
 
-  return data
+  return { ...data, pipeline_id: pipelineIdSchema.parse(data.pipeline_id) }
 }
 
 type RollbackTablesData = Awaited<ReturnType<typeof rollbackTables>>
@@ -44,12 +44,12 @@ export const useRollbackTablesMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<RollbackTablesData, ResponseError, RollbackTablesParams>,
+  UseCustomMutationOptions<RollbackTablesData, StudioError, RollbackTablesParams>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<RollbackTablesData, ResponseError, RollbackTablesParams>({
+  return useMutation<RollbackTablesData, StudioError, RollbackTablesParams>({
     mutationFn: (vars) => rollbackTables(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, pipelineId } = variables

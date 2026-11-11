@@ -8,7 +8,7 @@ import { getLogRowClassName } from '../UnifiedLogs.utils'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './Columns'
 import { LogsTable } from './LogsTable'
 import { DataTableProvider } from '@/components/ui/DataTable/providers/DataTableProvider'
-import type { ResponseError } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 const getRowClassName = (row: Row<ColumnSchema>) => getLogRowClassName(row.original)
 const noopFetchNextPage = async () => {}
@@ -18,7 +18,7 @@ interface EmbeddedLogsTableProps {
   rows: ColumnSchema[]
   isLoading: boolean
   isFetching?: boolean
-  error?: ResponseError | null
+  error?: StudioError | null
   isError?: boolean
   onRowClick?: (logId: string) => void
   footer?: ReactNode

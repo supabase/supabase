@@ -25,8 +25,8 @@ export const DESCRIPTIONS: Record<string, string> = {
   catalog_uri: '',
 }
 
-// [Joshen] For context we've decided to decouple ETL from Analytics Buckets for now
-// So this flag just hides all ETL-related user flows in Analytics Buckets
+// [Joshen] For context we've decided to decouple Pipelines from Analytics Buckets for now
+// So this flag just hides all Pipelines-related user flows in Analytics Buckets
 // Depending on future decision if we intend to keep it that way, then we might be able
-// to clean up + deprecate the remaining ETL-related UI within Analytics Buckets
+// to clean up + deprecate the remaining Pipelines-related UI within Analytics Buckets
 export const HIDE_REPLICATION_USER_FLOW = true

@@ -1,9 +1,10 @@
 'use client'
 
+import { FaqAnswer } from '~/components/FaqAnswer'
 import pricingFaq from '~/data/PricingFAQ.json'
 import React from 'react'
 import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from 'ui'
+import { Accordion, AccordionItem, AccordionTrigger } from 'ui'
 
 const PricingFAQs = () => {
   return (
@@ -19,11 +20,11 @@ const PricingFAQs = () => {
                     <AccordionTrigger>
                       <span className="text-foreground">{faq.question}</span>
                     </AccordionTrigger>
-                    <AccordionContent>
+                    <FaqAnswer>
                       <div className="prose text-foreground-lighter">
                         <ReactMarkdown>{faq.answer}</ReactMarkdown>
                       </div>
-                    </AccordionContent>
+                    </FaqAnswer>
                   </AccordionItem>
                 </div>
               )

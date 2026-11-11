@@ -4,7 +4,8 @@ import { toast } from 'sonner'
 import { pollUntilBucketEmpty } from './bucket-util'
 import { storageKeys } from './keys'
 import { del, handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 type BucketDeleteVariables = {
   projectRef: string
@@ -37,12 +38,12 @@ export const useBucketDeleteMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<BucketDeleteData, ResponseError, BucketDeleteVariables>,
+  UseCustomMutationOptions<BucketDeleteData, StudioError, BucketDeleteVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<BucketDeleteData, ResponseError, BucketDeleteVariables>({
+  return useMutation<BucketDeleteData, StudioError, BucketDeleteVariables>({
     mutationFn: (vars) => deleteBucket(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, id } = variables

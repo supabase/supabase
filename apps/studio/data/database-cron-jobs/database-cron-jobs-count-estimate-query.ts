@@ -22,6 +22,8 @@ export async function getCronJobsCountEstimate({
   const { result } = await executeSql<Array<{ live_tuple_estimate: number }>>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-cron-jobs-count-estimate',
     sql: cronJobsCountEstimateSql,
     queryKey: cronJobsCountEstimateKey(projectRef),
     grant: unguarded.migrating,

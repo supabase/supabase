@@ -45,7 +45,7 @@ If you're using an existing Supabase project, you might have made schema changes
 Run the following command to pull these changes before making local schema changes from the CLI:
 
 ```sql
-supabase db pull
+supabase db pull --remote
 ```
 
 This command creates a new migration in `supabase/migrations/<timestamp>_remote_schema.sql` which reflects the schema changes you have made previously.
@@ -206,7 +206,7 @@ jobs:
 
       - name: Verify generated types are checked in
         run: |
-          supabase gen types typescript --local > types.gen.ts
+          supabase gen types typescript > types.gen.ts
           if ! git diff --ignore-space-at-eol --exit-code --quiet types.gen.ts; then
             echo "Detected uncommitted changes after build. See status below:"
             git diff
@@ -245,7 +245,7 @@ jobs:
           version: latest
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - run: supabase db push --yes --remote
 ```
 
 </TabPanel>
@@ -277,7 +277,7 @@ jobs:
           version: latest
 
       - run: supabase link --project-ref $SUPABASE_PROJECT_ID
-      - run: supabase db push
+      - run: supabase db push --yes --remote
 ```
 
 </TabPanel>
@@ -336,13 +336,13 @@ The GitHub Actions runner will deploy your existing migrations to the staging pr
 Alternatively, you can also apply migrations through your local CLI to a linked remote database.
 
 ```sql
-supabase db push
+supabase db push --remote
 ```
 
 Once pushed, check that the migration version is up to date for both local and remote databases.
 
 ```sql
-supabase migration list
+supabase migration list --remote
 ```
 
 ### Permission denied on `db pull`
