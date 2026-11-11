@@ -36,9 +36,9 @@ describe('HeadingLinksIsland', () => {
     root = createRoot(document.getElementById('island')!)
     act(() => root?.render(<HeadingLinksIsland />))
 
-    const headingIds = [
-      ...document.querySelectorAll('button[aria-label="Copy link to section"]'),
-    ].map((button) => button.parentElement?.id)
+    const headingIds = [...document.querySelectorAll('a[aria-label="Copy link to section"]')].map(
+      (link) => link.parentElement?.id
+    )
     expect(headingIds).toEqual(['setup', 'install', 'verify'])
   })
 })

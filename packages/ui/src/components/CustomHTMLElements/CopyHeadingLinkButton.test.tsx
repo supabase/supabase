@@ -14,7 +14,7 @@ const renderButton = () =>
   )
 
 const clickButton = () =>
-  fireEvent.click(screen.getByRole('button', { name: 'Copy link to section' }))
+  fireEvent.click(screen.getByRole('link', { name: 'Copy link to section' }))
 
 const copySectionLink = () => {
   renderButton()
@@ -41,6 +41,15 @@ describe('CopyHeadingLinkButton', () => {
     )
   })
 
+  it('links to the section, so a click also moves to it', () => {
+    renderButton()
+
+    expect(screen.getByRole('link', { name: 'Copy link to section' })).toHaveAttribute(
+      'href',
+      '#usage'
+    )
+  })
+
   it('announces the copy to screen readers only after a click', async () => {
     renderButton()
     expect(screen.getByRole('status')).toHaveTextContent('')
@@ -59,5 +68,15 @@ describe('CopyHeadingLinkButton', () => {
     await act(() => vi.advanceTimersByTimeAsync(2000))
 
     expect(screen.getByRole('status')).toHaveTextContent('')
+  })
+
+  it('restarts the two second wait when the link is copied again', async () => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] })
+    copySectionLink()
+    await act(() => vi.advanceTimersByTimeAsync(1000))
+    clickButton()
+    await act(() => vi.advanceTimersByTimeAsync(1500))
+
+    expect(screen.getByRole('status')).toHaveTextContent('Link copied')
   })
 })
