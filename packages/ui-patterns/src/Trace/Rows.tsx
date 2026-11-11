@@ -203,6 +203,7 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
           <span className="sr-only">Running</span>
         </>
       )}
+      {row.span.status === 'error' && <span className="sr-only">Error</span>}
     </div>
   )
 }
