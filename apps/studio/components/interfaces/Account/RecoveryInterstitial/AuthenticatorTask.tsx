@@ -47,6 +47,7 @@ export const AuthenticatorTask = ({
       </RecoveryTaskRow>
       <AddNewFactorModal
         visible={isOpen}
+        recoveryCodesSurface="recovery_interstitial"
         onClose={handleClose}
         onComplete={handleComplete}
         onRecoveryCodesSaved={onRecoveryCodesSaved}
