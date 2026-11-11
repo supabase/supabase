@@ -42,7 +42,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
       className={cn(
         'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm',
         STATUS_CLASS[span.status],
-        isSelected && 'ring-1 ring-foreground',
+        'data-[state=selected]:ring-1 data-[state=selected]:ring-inset data-[state=selected]:ring-foreground',
         span.endMs === null &&
           'transition-[width] duration-300 ease-linear motion-reduce:transition-none',
         className
