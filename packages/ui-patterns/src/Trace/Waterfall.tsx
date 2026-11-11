@@ -8,8 +8,8 @@ import { useTrace } from './Trace'
 import type { TimeScale, WaterfallProps } from './types'
 import { createTimeScale } from './utils'
 
-const LIVE_GROWTH_TRANSITION =
-  'transition-[left] duration-300 ease-linear motion-reduce:transition-none'
+export const LIVE_GROWTH_TRANSITION =
+  'transition-[left,right,width] duration-300 ease-linear motion-reduce:transition-none'
 
 const WaterfallContext = createContext<TimeScale | null>(null)
 

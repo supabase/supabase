@@ -13,7 +13,7 @@ import {
   getSpanBounds,
   getTimingPlacement,
 } from './utils'
-import { useWaterfallScale } from './Waterfall'
+import { LIVE_GROWTH_TRANSITION, useWaterfallScale } from './Waterfall'
 
 const TIMING_GAP = 6
 const TIMING_CHAR_PX = 7.2
@@ -43,8 +43,7 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
         'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm',
         STATUS_CLASS[span.status],
         'data-[state=selected]:ring-1 data-[state=selected]:ring-inset data-[state=selected]:ring-foreground',
-        span.endMs === null &&
-          'transition-[width] duration-300 ease-linear motion-reduce:transition-none',
+        LIVE_GROWTH_TRANSITION,
         className
       )}
       style={{
@@ -89,8 +88,7 @@ export function Timing({ className, style, ...props }: ComponentProps<'div'>) {
       className={cn(
         'pointer-events-none absolute top-1/2 -translate-y-1/2 whitespace-nowrap rounded-sm px-1',
         placement === 'inside' && '[&>span]:text-background',
-        placement === 'after' &&
-          'transition-[left] duration-300 ease-linear motion-reduce:transition-none',
+        LIVE_GROWTH_TRANSITION,
         className
       )}
       style={{ ...position, ...style }}
