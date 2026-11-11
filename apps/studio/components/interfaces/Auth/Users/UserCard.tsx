@@ -11,6 +11,8 @@ interface UserCardProps {
   variant?: 'default' | 'outline'
   href?: string
   linkLabel?: string
+  /** Before the avatar, such as a way back to where the card was opened from. */
+  leading?: ReactNode
   actions?: ReactNode
   className?: string
 }
@@ -20,6 +22,7 @@ export function UserCard({
   variant = 'default',
   href,
   linkLabel,
+  leading,
   actions,
   className,
 }: UserCardProps) {
@@ -47,6 +50,7 @@ export function UserCard({
           )}
         />
       )}
+      {leading && <div className="relative -mr-1 flex shrink-0 items-center">{leading}</div>}
       <Avatar className="h-7 w-7 shrink-0">
         <AvatarImage src={getAvatarUrl(user)} alt="" />
         <AvatarFallback className="bg-surface-300 text-xs text-foreground-light">

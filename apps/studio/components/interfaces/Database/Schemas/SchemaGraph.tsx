@@ -450,17 +450,21 @@ export const SchemaGraph = ({
       >
         <Background
           gap={16}
-          className="*:stroke-foreground-muted opacity-25"
+          // Only the dots: the background's full-size rect would otherwise outline the canvas.
+          className="[&>pattern]:stroke-foreground-muted opacity-25"
           variant={BackgroundVariant.Dots}
           color={'inherit'}
         />
-        <MiniMap
-          pannable
-          zoomable
-          nodeColor={miniMapNodeColor}
-          maskColor={miniMapMaskColor}
-          className="border rounded-md shadow-xs mb-11!"
-        />
+        {/* Explorer's visualizer, the one with a details sidebar, goes without the minimap. */}
+        {!details && (
+          <MiniMap
+            pannable
+            zoomable
+            nodeColor={miniMapNodeColor}
+            maskColor={miniMapMaskColor}
+            className="border rounded-md shadow-xs mb-11!"
+          />
+        )}
         <SchemaGraphLegend />
         {hasNextPage && (
           <Panel position="bottom-center" className="mb-11!">

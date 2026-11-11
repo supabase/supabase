@@ -12,6 +12,10 @@ export type RowDetailsProps = {
   rowIdentifiers: Record<string, unknown>
   /** For details that can delete their row, to take it out of the result too. */
   onRowDeleted?: () => void
+  /** For details shown in place of their table's, to go back to the table. */
+  onBack?: () => void
+  /** Present when the row can be edited, to open the full row form. */
+  onEdit?: () => void
 }
 
 /**

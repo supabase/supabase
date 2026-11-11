@@ -4,6 +4,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { GenericRowDetails } from './GenericRowDetails'
 import type { RowDetailsProps } from './RowDetails'
+import { RowDetailsBackButton } from './RowDetailsBackButton'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { UserCard } from '@/components/interfaces/Auth/Users/UserCard'
 import { UserLogs } from '@/components/interfaces/Auth/Users/UserLogs'
@@ -55,7 +56,15 @@ export const UserRowDetails = (props: RowDetailsProps) => {
         if (value === 'overview' || value === 'raw' || value === 'logs') setView(value)
       }}
     >
-      <UserCard user={user} className="pb-3" />
+      <UserCard
+        user={user}
+        className="pb-3"
+        leading={
+          props.onBack && (
+            <RowDetailsBackButton relationName={props.relation.name} onClick={props.onBack} />
+          )
+        }
+      />
       <TabsList className="shrink-0 gap-x-4 px-4">
         <TabsTrigger value="overview">Overview</TabsTrigger>
         {showLogs && !showRecentLogs && <TabsTrigger value="logs">Logs</TabsTrigger>}

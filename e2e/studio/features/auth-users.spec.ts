@@ -112,9 +112,7 @@ test('should show web3 users as enabled when the matching web3 provider is enabl
 
   await page.goto(toUrl(`/project/${ref}/auth/users?show=${userId}`))
 
-  const providerRow = page
-    .getByRole('link', { name: 'Configure web3 provider' })
-    .locator("xpath=ancestor::div[contains(@class, 'bg-surface-100')][1]")
+  const providerRow = page.getByRole('link', { name: 'Configure web3 provider' })
 
   await expect(providerRow).toContainText('Enabled')
   await expect(providerRow).not.toContainText('Disabled')

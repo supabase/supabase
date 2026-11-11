@@ -1,18 +1,10 @@
 import { useParams } from 'common'
 import dayjs from 'dayjs'
-import {
-  BanIcon,
-  CheckIcon,
-  CopyIcon,
-  MailIcon,
-  ShieldOffIcon,
-  TrashIcon,
-  XIcon,
-} from 'lucide-react'
+import { CheckIcon, ChevronRightIcon, CopyIcon, XIcon } from 'lucide-react'
 import Link from 'next/link'
 import { ComponentProps, ReactNode, useEffect, useState } from 'react'
 import { toast } from 'sonner'
-import { Button, cn, Separator } from 'ui'
+import { Badge, Button, Card, cn, Separator } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 
@@ -20,7 +12,6 @@ import { PROVIDERS_SCHEMAS } from '../AuthProvidersFormValidation'
 import { BanUserModal } from './BanUserModal'
 import { DeleteUserModal } from './DeleteUserModal'
 import { UserFields } from './UserFields'
-import { PANEL_PADDING } from './Users.constants'
 import { providerIconMap } from './Users.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import CopyButton from '@/components/ui/CopyButton'
@@ -171,6 +162,14 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     })
   }
 
+  const sentDescription = formattedExpiry ? `Sent, valid for ${formattedExpiry}` : 'Sent'
+  let magicLinkDescription = isVerified
+    ? 'Email a passwordless sign-in link'
+    : 'Email a link to confirm their address'
+  if (successAction === 'send_magic_link') {
+    magicLinkDescription = isVerified ? sentDescription : 'Sent'
+  }
+
   useEffect(() => {
     if (successAction !== undefined) {
       const timer = setTimeout(() => setSuccessAction(undefined), 5000)
@@ -191,200 +190,166 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
 
         <UserFields user={user} className="pt-3" />
 
-        <Separator />
+        {providers.length > 0 && (
+          <UserSection title="Providers">
+            {providers.map((provider) => {
+              const providerMeta = PROVIDERS_SCHEMAS.find(
+                (x) =>
+                  ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
+              )
+              const enabledProperty =
+                provider.name.toLowerCase() === 'web3'
+                  ? (
+                      {
+                        solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
+                        ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
+                      } as const
+                    )[
+                      (
+                        (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
+                          ?.chain ?? ''
+                      ).toLowerCase() as 'solana' | 'ethereum'
+                    ]
+                  : Object.keys(providerMeta?.properties ?? {}).find((x) =>
+                      x.toLowerCase().endsWith('_enabled')
+                    )
+              const providerName =
+                provider.name === 'email'
+                  ? provider.name.toLowerCase()
+                  : (providerMeta?.title ?? provider.name)
+              const isActive = data?.[enabledProperty as keyof typeof data] ?? false
 
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
-          <p>Provider Information</p>
-          <p className="text-sm text-foreground-light">The user has the following providers</p>
-        </div>
-
-        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
-          {providers.map((provider) => {
-            const providerMeta = PROVIDERS_SCHEMAS.find(
-              (x) =>
-                ('key' in x && x.key === provider.name) || x.title.toLowerCase() === provider.name
-            )
-            const enabledProperty =
-              provider.name.toLowerCase() === 'web3'
-                ? (
-                    {
-                      solana: 'EXTERNAL_WEB3_SOLANA_ENABLED',
-                      ethereum: 'EXTERNAL_WEB3_ETHEREUM_ENABLED',
-                    } as const
-                  )[
-                    (
-                      (user.raw_user_meta_data?.custom_claims as { chain?: string } | undefined)
-                        ?.chain ?? ''
-                    ).toLowerCase() as 'solana' | 'ethereum'
-                  ]
-                : Object.keys(providerMeta?.properties ?? {}).find((x) =>
-                    x.toLowerCase().endsWith('_enabled')
-                  )
-            const providerName =
-              provider.name === 'email'
-                ? provider.name.toLowerCase()
-                : (providerMeta?.title ?? provider.name)
-            const isActive = data?.[enabledProperty as keyof typeof data] ?? false
-
-            return (
-              <div key={provider.name} className={cn(CONTAINER_CLASS, 'items-start justify-start')}>
-                {provider.icon && (
-                  <img
-                    width={16}
-                    src={provider.icon}
-                    alt={`${provider.name} auth icon`}
-                    className={cn('mt-1.5', provider.name === 'github' ? 'dark:invert' : '')}
-                  />
-                )}
-                <div className="grow mt-0.5">
-                  <p className="capitalize">{providerName}</p>
-                  <p className="text-xs text-foreground-light">
-                    Signed in with a {providerName} account via{' '}
-                    {providerName === 'SAML' ? 'SSO' : 'OAuth'}
-                  </p>
-                  {authenticationSignInProviders && (
-                    <Button asChild className="mt-2">
-                      <Link
-                        href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
-                      >
-                        Configure {providerName} provider
-                      </Link>
-                    </Button>
+              const content = (
+                <>
+                  {provider.icon ? (
+                    <img
+                      width={16}
+                      height={16}
+                      src={provider.icon}
+                      alt=""
+                      className={cn('shrink-0', provider.name === 'github' && 'dark:invert')}
+                    />
+                  ) : (
+                    <span className="h-4 w-4 shrink-0" aria-hidden />
                   )}
-                </div>
-                {isActive ? (
-                  <div className="flex items-center gap-1 rounded-full border border-brand-400 bg-brand-200 py-1 px-1 text-xs text-primary">
-                    <span className="rounded-full bg-brand-default p-0.5 text-xs text-brand-200">
-                      <CheckIcon strokeWidth={2} size={12} />
-                    </span>
-                    <span className="px-1">Enabled</span>
-                  </div>
-                ) : (
-                  <div className="rounded-md border border-strong bg-surface-100 py-1 px-3 text-xs text-foreground-lighter">
-                    Disabled
-                  </div>
-                )}
-              </div>
-            )
-          })}
-        </div>
+                  <span className="min-w-0 flex-1 truncate capitalize">{providerName}</span>
+                  <Badge variant={isActive ? 'success' : 'default'}>
+                    {isActive ? 'Enabled' : 'Disabled'}
+                  </Badge>
+                </>
+              )
 
-        <Separator />
+              if (!authenticationSignInProviders) {
+                return (
+                  <div key={provider.name} className={USER_SECTION_ROW_CLASS}>
+                    {content}
+                  </div>
+                )
+              }
 
-        <div className={cn('flex flex-col -space-y-1', PANEL_PADDING)}>
-          {isEmailAuth && (
-            <>
-              <RowAction
-                title="Reset password"
-                description="Send a password recovery email to the user"
+              return (
+                <Link
+                  key={provider.name}
+                  href={`/project/${projectRef}/auth/providers?provider=${provider.name === 'SAML' ? 'SAML 2.0' : provider.name}`}
+                  aria-label={`Configure ${providerName} provider`}
+                  className={cn(USER_SECTION_ROW_CLASS, 'transition-colors hover:bg-surface-200')}
+                >
+                  {content}
+                  <ChevronRightIcon
+                    size={14}
+                    strokeWidth={1.5}
+                    aria-hidden
+                    className="-mr-1 shrink-0 text-foreground-lighter"
+                  />
+                </Link>
+              )
+            })}
+          </UserSection>
+        )}
+
+        {(isEmailAuth || isPhoneAuth) && (
+          <UserSection title="Sign-in help">
+            {isEmailAuth && (
+              <UserActionRow
+                title="Password recovery"
+                description={
+                  successAction === 'send_recovery'
+                    ? sentDescription
+                    : 'Email a link to reset their password'
+                }
+                isSent={successAction === 'send_recovery'}
                 button={{
-                  icon: <MailIcon />,
-                  text: 'Send password recovery',
+                  text: 'Send link',
                   isLoading: isResettingPassword,
-                  disabled: !canSendRecovery,
+                  canPerform: canSendRecovery,
+                  permissionAction: 'send password recovery',
                   onClick: () => {
                     if (projectRef) resetPassword({ projectRef, user })
                   },
                 }}
-                success={
-                  successAction === 'send_recovery'
-                    ? {
-                        title: 'Password recovery sent',
-                        description: `The link in the email is valid for ${formattedExpiry}`,
-                      }
-                    : undefined
-                }
               />
-              <RowAction
-                title={isVerified ? 'Send magic link' : 'Send confirmation email'}
-                description={
-                  isVerified
-                    ? 'Send a passwordless magic link to the user'
-                    : 'Send a confirmation email to the user'
-                }
+            )}
+            {isEmailAuth && (
+              <UserActionRow
+                title={isVerified ? 'Magic link' : 'Confirmation email'}
+                description={magicLinkDescription}
+                isSent={successAction === 'send_magic_link'}
                 button={{
-                  icon: <MailIcon />,
-                  text: isVerified ? 'Send magic link' : 'Send confirmation email',
+                  text: isVerified ? 'Send link' : 'Send email',
                   isLoading: isSendingMagicLink,
-                  disabled: !canSendMagicLink,
+                  canPerform: canSendMagicLink,
+                  permissionAction: isVerified ? 'send a magic link' : 'send a confirmation email',
                   onClick: () => {
                     if (projectRef) sendMagicLink({ projectRef, user })
                   },
                 }}
-                success={
-                  successAction === 'send_magic_link'
-                    ? {
-                        title: isVerified ? 'Magic link sent' : 'Confirmation email sent',
-                        description: isVerified
-                          ? `The link in the email is valid for ${formattedExpiry}`
-                          : 'The confirmation email has been sent to the user',
-                      }
-                    : undefined
-                }
               />
-            </>
-          )}
-          {isPhoneAuth && (
-            <RowAction
-              title="Send OTP"
-              description="Passwordless login via phone for the user"
-              button={{
-                icon: <MailIcon />,
-                text: 'Send OTP',
-                isLoading: isSendingOTP,
-                disabled: !canSendOtp,
-                onClick: () => {
-                  if (projectRef) sendOTP({ projectRef, user })
-                },
-              }}
-              success={
-                successAction === 'send_otp'
-                  ? {
-                      title: 'OTP sent',
-                      description: `The link in the OTP SMS is valid for ${formattedExpiry}`,
-                    }
-                  : undefined
-              }
-            />
-          )}
-        </div>
+            )}
+            {isPhoneAuth && (
+              <UserActionRow
+                title="One-time password"
+                description={
+                  successAction === 'send_otp'
+                    ? sentDescription
+                    : 'Text a passwordless sign-in code'
+                }
+                isSent={successAction === 'send_otp'}
+                button={{
+                  text: 'Send code',
+                  isLoading: isSendingOTP,
+                  canPerform: canSendOtp,
+                  permissionAction: 'send a one-time password',
+                  onClick: () => {
+                    if (projectRef) sendOTP({ projectRef, user })
+                  },
+                }}
+              />
+            )}
+          </UserSection>
+        )}
 
-        <Separator />
-
-        <div className={cn('flex flex-col', PANEL_PADDING)}>
-          <p>Danger zone</p>
-          <p className="text-sm text-foreground-light">
-            Be wary of the following features as they cannot be undone.
-          </p>
-        </div>
-
-        <div className={cn('flex flex-col -space-y-1 pt-0!', PANEL_PADDING)}>
-          <RowAction
-            title="Remove MFA factors"
-            description="Removes all MFA factors associated with the user"
+        <UserSection title="Danger zone">
+          <UserActionRow
+            title="MFA factors"
+            description="Remove every factor, dropping the user to AAL1"
             button={{
-              icon: <ShieldOffIcon />,
-              text: 'Remove MFA factors',
-              disabled: !canRemoveMFAFactors,
+              text: 'Remove',
+              canPerform: canRemoveMFAFactors,
+              permissionAction: 'remove MFA factors',
               onClick: () => setIsDeleteFactorsModalOpen(true),
             }}
-            className="!bg border-destructive-400"
           />
-          <RowAction
-            title={
-              isBanned
-                ? `User is banned until ${dayjs(user.banned_until).format(DATE_FORMAT)}`
-                : 'Ban user'
-            }
+          <UserActionRow
+            title={isBanned ? 'Banned' : 'Ban user'}
             description={
               isBanned
-                ? 'User has no access to the project until after this date'
-                : 'Revoke access to the project for a set duration'
+                ? `No access until ${dayjs(user.banned_until).format(DATE_FORMAT)}`
+                : 'Block access for a set duration'
             }
             button={{
-              icon: <BanIcon />,
-              text: isBanned ? 'Unban user' : 'Ban user',
-              disabled: !canUpdateUser,
+              text: isBanned ? 'Unban' : 'Ban',
+              canPerform: canUpdateUser,
+              permissionAction: isBanned ? 'unban users' : 'ban users',
               onClick: () => {
                 if (isBanned) {
                   setIsUnbanModalOpen(true)
@@ -393,21 +358,19 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
                 }
               },
             }}
-            className="!bg border-destructive-400"
           />
-          <RowAction
+          <UserActionRow
             title="Delete user"
-            description="User will no longer have access to the project"
+            description="Permanently remove the user and their access"
             button={{
-              icon: <TrashIcon />,
+              text: 'Delete',
               variant: 'danger',
-              text: 'Delete user',
-              disabled: !canRemoveUser,
+              canPerform: canRemoveUser,
+              permissionAction: 'delete users',
               onClick: () => setIsDeleteModalOpen(true),
             }}
-            className="!bg border-destructive-400"
           />
-        </div>
+        </UserSection>
       </div>
 
       <DeleteUserModal
@@ -461,6 +424,64 @@ export const UserOverview = ({ user, onDeleteSuccess }: UserOverviewProps) => {
     </>
   )
 }
+
+const USER_SECTION_ROW_CLASS =
+  'flex min-h-11 items-center gap-x-3 px-3 py-2 text-sm text-foreground'
+
+/** A titled card of rows, each separated by a rule, like the providers list in Auth. */
+const UserSection = ({ title, children }: { title: string; children: ReactNode }) => (
+  <section className="flex flex-col gap-y-2 border-t px-4 py-4">
+    <h3 className="heading-default text-foreground">{title}</h3>
+    <Card className="divide-y overflow-hidden">{children}</Card>
+  </section>
+)
+
+/** One action on the user: what it does on the left, the button that does it on the right. */
+const UserActionRow = ({
+  title,
+  description,
+  isSent = false,
+  button,
+}: {
+  title: string
+  description: string
+  isSent?: boolean
+  button: {
+    text: string
+    variant?: ComponentProps<typeof Button>['variant']
+    isLoading?: boolean
+    canPerform: boolean
+    /** Finishes "You need additional permissions to …" when the button is disabled. */
+    permissionAction: string
+    onClick: () => void
+  }
+}) => (
+  <div className={USER_SECTION_ROW_CLASS}>
+    <div className="min-w-0 flex-1">
+      <p className="truncate">{title}</p>
+      <p className="text-foreground-lighter">{description}</p>
+    </div>
+    <ButtonTooltip
+      size="tiny"
+      variant={button.variant ?? 'default'}
+      className="shrink-0"
+      icon={isSent ? <CheckIcon className="text-brand" /> : undefined}
+      loading={button.isLoading ?? false}
+      disabled={!button.canPerform}
+      onClick={button.onClick}
+      tooltip={{
+        content: {
+          side: 'bottom',
+          text: button.canPerform
+            ? undefined
+            : `You need additional permissions to ${button.permissionAction}`,
+        },
+      }}
+    >
+      {button.text}
+    </ButtonTooltip>
+  </div>
+)
 
 export const RowData = ({ property, value }: { property: string; value?: string | boolean }) => {
   return (
