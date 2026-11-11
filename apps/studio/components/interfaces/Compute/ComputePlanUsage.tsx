@@ -6,25 +6,24 @@ import { useState } from 'react'
 import {
   Button,
   Card,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuRadioGroup,
   DropdownMenuRadioItem,
   DropdownMenuTrigger,
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
 } from 'ui'
-import { InfoTooltip } from 'ui-patterns/info-tooltip'
+import { Chart, ChartMetric } from 'ui-patterns/Chart'
 
 import type { ComputeInstance } from './Compute.types'
 import {
   formatCapacityQuota,
-  formatComputeHours,
+  formatComputeRequests,
+  formatDecimal,
   formatPercentage,
-  formatVcpuQuota,
   getComputeCapacity,
   getCpuUtilization,
+  type ComputeCapacity,
 } from './ComputeUsage.utils'
 import { useComputeLimits } from './useComputeLimits'
 import { SparkBar } from '@/components/ui/SparkBar'
@@ -40,11 +39,43 @@ const USAGE_TIMEFRAMES = [
 
 type UsageTimeframe = (typeof USAGE_TIMEFRAMES)[number]
 
+interface UsageMetric {
+  label: string
+  value: string
+  description: string
+  /**
+   * Per metric, not per card. The instance count comes from props and is known immediately;
+   * putting it behind the usage query's skeleton would hide a figure that is already there.
+   */
+  isLoading: boolean
+  /**
+   * Set only on a metric bounded by the plan. Everything else here is a total with nothing to
+   * measure against, so it gets a figure and no bar — a bar implies a ceiling.
+   */
+  capacity?: ComputeCapacity
+  /**
+   * A line under the figure. Carries the headroom where there is a limit, and otherwise says
+   * so: on a plan with no cap, or during the alpha where the quota is not metered at all,
+   * the absence of a bar is not by itself an answer.
+   */
+  footnote?: string
+}
+
 interface ComputePlanUsageProps {
   projectRef: string
   instances: ComputeInstance[]
 }
 
+/**
+ * The same five figures each deployment's overview reports, summed across the project, plus
+ * the one limit that is scoped to a project.
+ *
+ * A lone "13 vCPU-hrs" says almost nothing: it is runtime multiplied by instance size, so
+ * without the runtime and the size beside it there is no way to tell a long-running small
+ * instance from a brief large one, and no way to tell how much of it did work. The family
+ * answers that, and reading the same five labels here and on a deployment page means moving
+ * between the two is one model at two scopes rather than two.
+ */
 export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProps) => {
   const { data: organization } = useSelectedOrganizationQuery()
   const { limits, noLimitLabel } = useComputeLimits(organization?.plan)
@@ -71,39 +102,54 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
     0
   )
   const cpuUtilization = getCpuUtilization(usage?.usedVcpuHours ?? 0, usage?.reservedVcpuHours ?? 0)
-  const runtime = formatComputeHours(usage?.runningHours ?? 0)
+  const capacity = getComputeCapacity(declaredInstances, limits.concurrentInstances)
 
-  // Only the headline figure and its status earn a place on the card. Runtime, CPU utilisation
-  // and the compute count are context for someone already reading the number, so they sit in
-  // the tooltip rather than stacking three lines under every bar.
-  const meters: MeterDefinition[] = [
+  const computeCount = `${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'}`
+
+  const metrics: UsageMetric[] = [
     {
-      label: 'Compute',
-      description: [
-        'vCPU reserved while instances run in this project. Suspended instances accrue nothing.',
-        cpuUtilization === null
-          ? `${runtime} runtime this period.`
-          : `${runtime} runtime this period, ${formatPercentage(cpuUtilization)} of it spent on CPU.`,
-      ].join(' '),
-      used: usage?.reservedVcpuHours ?? 0,
-      // The quota belongs to the organization, so a project cannot be "over" it and a bar
-      // measuring one project against all of it would be a lie. This reports what this project
-      // consumed; the org usage page owns the burn-down.
-      included: null,
+      label: 'vCPU-hours',
       isLoading: isPending,
-      formatValue: formatVcpuQuota,
-      // Nothing to say in plans mode: the figure is the whole message. Alpha is different,
-      // because then there is no quota at all.
-      emptyLabel: limits.vcpuHours === null ? noLimitLabel : undefined,
+      value: formatDecimal(usage?.reservedVcpuHours ?? 0),
+      footnote: limits.vcpuHours === null ? noLimitLabel : undefined,
+      description:
+        limits.vcpuHours === null
+          ? `Running hours multiplied by the vCPU each instance size reserves. ${noLimitLabel}.`
+          : 'Running hours multiplied by the vCPU each instance size reserves. This is what the organization quota counts, so a larger instance consumes it faster than a smaller one running just as long.',
+    },
+    {
+      label: 'Active CPU',
+      isLoading: isPending,
+      value: cpuUtilization === null ? '—' : formatPercentage(cpuUtilization),
+      description:
+        'Share of reserved vCPU that did work. The rest was reserved and idle, e.g. waiting on I/O.',
+    },
+    {
+      label: 'Running hours',
+      isLoading: isPending,
+      value: formatDecimal(usage?.runningHours ?? 0),
+      description: `Hours instances were running, busy or idle, rather than suspended. Across ${computeCount}.`,
+    },
+    {
+      label: 'GB-hours',
+      isLoading: isPending,
+      value: formatDecimal(usage?.gbHours ?? 0),
+      description:
+        'Memory reserved over time. Pinned at 2 GB per vCPU on every size, so it tracks vCPU-hours exactly — it is here because overage prices it as its own dimension, not because it can move on its own.',
+    },
+    {
+      label: 'Requests',
+      isLoading: isPending,
+      value: formatComputeRequests(usage?.requests ?? 0),
+      description: 'Requests handled across every instance in this project.',
     },
     {
       label: 'Concurrent instances',
-      description: `Instances that may run at once across every compute in this project. ${instances.length.toLocaleString()} ${instances.length === 1 ? 'compute' : 'computes'} deployed.`,
-      used: declaredInstances,
-      included: limits.concurrentInstances,
       isLoading: false,
-      formatValue: formatCapacityQuota,
-      emptyLabel: noLimitLabel,
+      value: formatCapacityQuota(declaredInstances, limits.concurrentInstances),
+      description: `Instances that may run at once across every compute in this project. ${computeCount} deployed.`,
+      capacity,
+      footnote: capacity.status === 'unlimited' ? noLimitLabel : (capacity.label ?? undefined),
     },
   ]
 
@@ -114,8 +160,8 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
           <h3 className="text-sm text-foreground">Usage</h3>
           {isCollapsed && (
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5">
-              {meters.map((meter) => (
-                <CompactUsageMeter key={meter.label} {...meter} />
+              {metrics.map((metric) => (
+                <CompactMetric key={metric.label} metric={metric} />
               ))}
             </div>
           )}
@@ -141,9 +187,9 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
       </div>
 
       {!isCollapsed && (
-        <div className="grid grid-cols-1 divide-y sm:grid-cols-2 sm:divide-x sm:divide-y-0">
-          {meters.map((meter) => (
-            <UsageMeter key={meter.label} {...meter} />
+        <div className="grid grid-cols-2 divide-x divide-y sm:grid-cols-3 lg:grid-cols-6 lg:divide-y-0">
+          {metrics.map((metric) => (
+            <UsageMetricCell key={metric.label} metric={metric} />
           ))}
         </div>
       )}
@@ -180,135 +226,59 @@ const UsageTimeframeDropdown = ({
   </DropdownMenu>
 )
 
-interface MeterDefinition {
-  label: string
-  description: string
-  used: number
-  /**
-   * `null` reports the figure on its own, with no bar. Both meters here are project-scoped,
-   * but only concurrency has a limit at that scope — the quota belongs to the organization.
-   */
-  included: number | null
-  isLoading: boolean
-  /** Formats both sides as one string, so the pair cannot end up in two different units. */
-  formatValue: (used: number, included: number | null) => string
-  /**
-   * Shown when the meter has no limit. Opt-in per meter: "no fixed limit on this plan" is
-   * true of enterprise concurrency but false of the quota, which exists and is simply scoped
-   * to the organization rather than to this project.
-   */
-  emptyLabel?: string
+const CAPACITY_BAR_CLASS: Record<ComputeCapacity['status'], string> = {
+  exceeded: 'bg-destructive',
+  full: 'bg-warning',
+  low: 'bg-warning',
+  available: 'bg-foreground-light',
+  unlimited: 'bg-foreground-light',
 }
 
-const getBarClass = ({ isExceeded, isWarning }: { isExceeded: boolean; isWarning: boolean }) => {
-  if (isExceeded) return 'bg-destructive'
-  if (isWarning) return 'bg-warning'
-  return 'bg-foreground-light'
+const CAPACITY_TEXT_CLASS: Record<ComputeCapacity['status'], string> = {
+  exceeded: 'text-destructive',
+  full: 'text-warning',
+  low: 'text-warning',
+  available: 'text-foreground-lighter',
+  unlimited: 'text-foreground-lighter',
 }
 
-/**
- * Every limit on this card is capacity, so it is judged on slots left rather than percentage
- * used: "8 of 10" and "40 of 50" are the same ratio but only one is about to block a deploy.
- */
-const getMeterStatus = ({ used, included }: MeterDefinition) => {
-  const hasLimit = included !== null && included > 0
-  if (!hasLimit) {
-    return {
-      hasLimit,
-      isExceeded: false,
-      isAtCapacity: false,
-      isApproaching: false,
-      headroom: null,
-      barClass: getBarClass({ isExceeded: false, isWarning: false }),
-    }
-  }
-
-  const { status, label } = getComputeCapacity(used, included)
-  const isExceeded = status === 'exceeded'
-  const isAtCapacity = status === 'full'
-  const isApproaching = status === 'low'
-
-  return {
-    hasLimit,
-    isExceeded,
-    isAtCapacity,
-    isApproaching,
-    headroom: label,
-    barClass: getBarClass({ isExceeded, isWarning: isApproaching || isAtCapacity }),
-  }
-}
-
-const formatMeterValue = ({ used, included, formatValue }: MeterDefinition, hasLimit: boolean) =>
-  formatValue(used, hasLimit ? included : null)
-
-/** Only rendered for a meter that has a limit, so `included` is non-null by construction. */
-const MeterBar = ({ meter, barClass }: { meter: MeterDefinition; barClass: string }) => {
-  const canFill = !meter.isLoading && meter.included !== null
+const UsageMetricCell = ({ metric }: { metric: UsageMetric }) => {
+  const { capacity } = metric
+  const hasLimit = capacity !== undefined && capacity.limit !== null && capacity.limit > 0
 
   return (
-    <SparkBar
-      type="horizontal"
-      barClass={barClass}
-      bgClass="bg-surface-400"
-      value={canFill ? meter.used : 0}
-      max={canFill && meter.included !== null ? meter.included : 1}
-    />
-  )
-}
+    <Chart isLoading={metric.isLoading} className="flex flex-col gap-2 px-5 py-4">
+      <ChartMetric label={metric.label} value={metric.value} tooltip={metric.description} />
 
-const CompactUsageMeter = (meter: MeterDefinition) => {
-  const { hasLimit, headroom, barClass } = getMeterStatus(meter)
-  const value = meter.isLoading ? undefined : formatMeterValue(meter, hasLimit)
-  const caption = [value, headroom].filter(Boolean).join(' · ')
+      {hasLimit && (
+        <SparkBar
+          type="horizontal"
+          barClass={CAPACITY_BAR_CLASS[capacity.status]}
+          bgClass="bg-surface-400"
+          value={capacity.used}
+          max={capacity.limit ?? 1}
+        />
+      )}
 
-  return (
-    <Tooltip>
-      <TooltipTrigger asChild>
-        <div
-          className="flex items-center gap-x-2 cursor-default"
-          aria-label={`${meter.label}: ${value}`}
+      {metric.footnote && (
+        <p
+          className={cn(
+            'text-xs',
+            capacity ? CAPACITY_TEXT_CLASS[capacity.status] : 'text-foreground-lighter'
+          )}
         >
-          <span className="text-xs text-foreground-light">{meter.label}</span>
-          <div className="w-12">{hasLimit && <MeterBar meter={meter} barClass={barClass} />}</div>
-        </div>
-      </TooltipTrigger>
-      <TooltipContent side="bottom" className="max-w-64">
-        <p>{meter.description}</p>
-        {value && <p className="mt-1 tabular-nums text-foreground-light">{caption}</p>}
-      </TooltipContent>
-    </Tooltip>
-  )
-}
-
-const UsageMeter = (meter: MeterDefinition) => {
-  const { label, description, isLoading } = meter
-  const { hasLimit, isExceeded, isAtCapacity, isApproaching, headroom, barClass } =
-    getMeterStatus(meter)
-
-  return (
-    <div className="flex flex-col gap-2 px-5 py-4">
-      <div className="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-0.5">
-        <div className="flex items-center gap-x-1.5">
-          <p className="text-sm text-foreground">{label}</p>
-          <InfoTooltip side="top">{description}</InfoTooltip>
-        </div>
-        <p className="text-sm tabular-nums text-foreground-light">
-          {isLoading && '—'}
-          {!isLoading && formatMeterValue(meter, hasLimit)}
+          {metric.footnote}
         </p>
-      </div>
-
-      {hasLimit && <MeterBar meter={meter} barClass={barClass} />}
-
-      {!hasLimit && !isLoading && meter.emptyLabel && (
-        <p className="text-xs text-foreground-lighter">{meter.emptyLabel}</p>
       )}
-      {isExceeded && <p className="text-xs text-destructive">{headroom ?? 'Over limit'}</p>}
-      {isAtCapacity && <p className="text-xs text-warning">{headroom ?? 'At limit'}</p>}
-      {isApproaching && <p className="text-xs text-warning">{headroom ?? 'Approaching limit'}</p>}
-      {!isExceeded && !isAtCapacity && !isApproaching && headroom !== null && (
-        <p className="text-xs text-foreground-lighter">{headroom}</p>
-      )}
-    </div>
+    </Chart>
   )
 }
+
+const CompactMetric = ({ metric }: { metric: UsageMetric }) => (
+  <div className="flex items-baseline gap-x-1.5" aria-label={`${metric.label}: ${metric.value}`}>
+    <span className="text-xs text-foreground-light">{metric.label}</span>
+    <span className="text-xs tabular-nums text-foreground">
+      {metric.isLoading ? '—' : metric.value}
+    </span>
+  </div>
+)

@@ -23,12 +23,12 @@ vi.mock('common', async (importOriginal) => ({
   useIsLoggedIn: () => true,
 }))
 
-/** Each meter is a block headed by its label; scope assertions to the one under test. */
-const meter = async (label: string) => {
+/** Each metric is a cell headed by its label; scope assertions to the one under test. */
+const metric = async (label: string) => {
   const heading = await screen.findByText(label)
-  const block = heading.closest('div')?.parentElement?.parentElement
-  if (block === null || block === undefined) throw new Error(`No meter block for ${label}`)
-  return within(block)
+  const cell = heading.closest('div')?.parentElement?.parentElement
+  if (cell === null || cell === undefined) throw new Error(`No metric cell for ${label}`)
+  return within(cell)
 }
 
 const instance = (overrides: Partial<ComputeInstance> = {}): ComputeInstance => ({
@@ -83,39 +83,60 @@ afterEach(() => {
 describe('ComputePlanUsage', () => {
   beforeEach(() => setComputeLimitsMode('plans'))
 
-  it('meters the vCPU-hour quota and concurrent instances against the plan', async () => {
+  it('aggregates the same figures a deployment overview reports, across the project', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
     expect(await screen.findByText('Usage')).toBeInTheDocument()
-    expect(await screen.findByText('Compute')).toBeInTheDocument()
-    expect(await screen.findByText('Concurrent instances')).toBeInTheDocument()
-    // GB-hours tracks vCPU at a fixed ratio, so it is not a separate meter.
-    expect(screen.queryByText('GB-hours')).not.toBeInTheDocument()
-    expect(screen.queryByText('Deployments')).not.toBeInTheDocument()
-    // The quota belongs to the organization, so this project reports what it consumed and
-    // points at the org usage page for the burn-down rather than claiming a share of it.
-    const computeMeter = await meter('Compute')
-    expect(await computeMeter.findByText(/^[\d.,]+ vCPU-hrs$/)).toBeInTheDocument()
-    expect(computeMeter.queryByText(/\//)).not.toBeInTheDocument()
-    // No "no fixed limit" line either: the quota exists, it is just scoped to the org.
-    expect(computeMeter.queryByText(/No fixed limit/)).not.toBeInTheDocument()
+
+    // A lone vCPU-hours figure cannot distinguish a long small instance from a brief large
+    // one, so the family that explains it travels with it.
+    for (const label of [
+      'vCPU-hours',
+      'Active CPU',
+      'Running hours',
+      'GB-hours',
+      'Requests',
+      'Concurrent instances',
+    ]) {
+      expect(await screen.findByText(label)).toBeInTheDocument()
+    }
   })
 
-  it('keeps runtime and CPU utilisation in the tooltip rather than under the bar', async () => {
+  it('carries no unit in the figures, since every label names one', async () => {
     mockOrganizationOnPlan('pro', 'Pro')
     customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
-    const computeMeter = await meter('Compute')
-    await computeMeter.findByText(/vCPU-hrs$/)
+    const compute = await metric('vCPU-hours')
+    await waitFor(() => expect(compute.queryByText(/vCPU-hrs/)).not.toBeInTheDocument())
+  })
 
-    // Only the pair and its status belong on the card; the rest lives behind the info icon.
-    expect(computeMeter.queryByText(/Active CPU/)).not.toBeInTheDocument()
-    expect(computeMeter.queryByText(/runtime/)).not.toBeInTheDocument()
+  it('bars only the metric with a limit, since the rest are totals', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(<ComputePlanUsage projectRef="default" instances={[instance()]} />, {
+      profileContext: COMPUTE_PROFILE_CONTEXT,
+    })
+
+    await screen.findByText('Concurrent instances')
+    // A bar on a total implies a ceiling that does not exist.
+    const compute = await metric('vCPU-hours')
+    expect(compute.queryByRole('progressbar')).not.toBeInTheDocument()
+  })
+
+  it('shows the instance count immediately rather than behind the usage query', async () => {
+    mockOrganizationOnPlan('pro', 'Pro')
+    customRender(
+      <ComputePlanUsage projectRef="default" instances={[instance({ declaredInstances: 3 })]} />,
+      { profileContext: COMPUTE_PROFILE_CONTEXT }
+    )
+
+    // It comes from props, so a shared loading state across the card would hide a figure
+    // that is already known.
+    expect(await screen.findByText('3/10')).toBeInTheDocument()
   })
 
   it('sums instances across computes and names how many computes run them', async () => {
@@ -143,7 +164,7 @@ describe('ComputePlanUsage', () => {
       profileContext: COMPUTE_PROFILE_CONTEXT,
     })
 
-    const instanceMeter = await meter('Concurrent instances')
+    const instanceMeter = await metric('Concurrent instances')
     expect(await instanceMeter.findByText('1/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('No room for more')).toBeInTheDocument()
     expect(instanceMeter.queryByText(/over the limit/)).not.toBeInTheDocument()
@@ -159,7 +180,7 @@ describe('ComputePlanUsage', () => {
       { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await meter('Concurrent instances')
+    const instanceMeter = await metric('Concurrent instances')
     expect(await instanceMeter.findByText('2/1')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
@@ -220,7 +241,7 @@ describe('ComputePlanUsage in private alpha', () => {
       { profileContext: COMPUTE_PROFILE_CONTEXT }
     )
 
-    const instanceMeter = await meter('Concurrent instances')
+    const instanceMeter = await metric('Concurrent instances')
     expect(instanceMeter.getByText('3/2')).toBeInTheDocument()
     expect(instanceMeter.getByText('1 over the limit')).toBeInTheDocument()
   })
