@@ -150,6 +150,8 @@ pages linking into reference docs or server-side auth guides.
   `ai/python`, `deployment/terraform`, `deployment/ci`
 - Reference docs under `/docs/reference`
 - Non-docs routes such as `/dashboard` and `/ui`, which the link checker skips
+- Guides that the nav disables, listed in `NAV_DISABLED_PAGES` in
+  `utils/resolve-docs-scope.ts`, because their HTML page returns 404
 
 ### Limits
 

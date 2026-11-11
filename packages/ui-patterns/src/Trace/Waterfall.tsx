@@ -8,14 +8,14 @@ import { useTrace } from './Trace'
 import type { TimeScale, WaterfallProps } from './types'
 import { createTimeScale } from './utils'
 
-const LIVE_GROWTH_TRANSITION =
-  'transition-[left] duration-300 ease-linear motion-reduce:transition-none'
+export const LIVE_GROWTH_TRANSITION =
+  'transition-[left,right,width] duration-300 ease-linear motion-reduce:transition-none'
 
 const WaterfallContext = createContext<TimeScale | null>(null)
 
-function useWaterfallScale(): TimeScale {
+export function useWaterfallScale(): TimeScale {
   const value = use(WaterfallContext)
-  if (!value) throw new Error('Trace.Ruler and Trace.Grid must be rendered inside Trace.Waterfall')
+  if (!value) throw new Error('Trace parts must be rendered inside Trace.Waterfall')
   return value
 }
 
@@ -57,7 +57,7 @@ export function Waterfall({
         ref={ref}
         data-trace-waterfall
         className={cn(
-          'flex min-h-0 flex-col overflow-hidden bg-surface-100 text-sm text-foreground',
+          'isolate flex min-h-0 flex-col overflow-hidden bg-surface-100 text-sm text-foreground',
           className
         )}
         style={
@@ -155,7 +155,7 @@ export function Cursor({ className, ...props }: ComponentProps<'div'>) {
   if (!isLive || fraction < 0 || fraction > 1) return null
 
   return (
-    <div data-trace-cursor-anchor className="relative z-0 h-0 shrink-0">
+    <div data-trace-cursor-anchor className="relative z-10 h-0 shrink-0">
       <div
         aria-hidden
         data-trace-cursor-track

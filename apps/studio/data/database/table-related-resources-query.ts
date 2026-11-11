@@ -7,7 +7,7 @@ import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { GrantFor } from '@/lib/grants'
 
-export type TableRelatedResourcesGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query'>
+export type TableRelatedResourcesGrant = GrantFor<'post', '/platform/pg-meta/{ref}/query', 'read'>
 
 export type TableRelatedResourcesVariables = {
   projectRef?: string
@@ -33,6 +33,16 @@ const tableRelatedResourcesSchema = z.object({
       activation: z.enum(['BEFORE', 'AFTER', 'INSTEAD OF']),
       events: z.array(z.enum(['INSERT', 'UPDATE', 'DELETE', 'TRUNCATE'])),
       schema: z.string(),
+    })
+  ),
+  indexes: z.array(
+    z.object({
+      id: z.number(),
+      name: z.string(),
+      schema: z.string(),
+      columns: z.array(z.string()),
+      is_primary: z.boolean(),
+      is_unique: z.boolean(),
     })
   ),
 })
@@ -98,6 +108,7 @@ export type TableRelatedResourcesData = Awaited<ReturnType<typeof getTableRelate
 export type TableReferencingFunctionsData = Awaited<ReturnType<typeof getTableReferencingFunctions>>
 export type TableRelatedPolicy = TableRelatedResourcesData['policies'][number]
 export type TableRelatedTrigger = TableRelatedResourcesData['triggers'][number]
+export type TableRelatedIndex = TableRelatedResourcesData['indexes'][number]
 export type TableRelatedFunction = TableReferencingFunctionsData['functions'][number]
 export type TableRelatedResourcesError = StudioError
 

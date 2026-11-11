@@ -1,3 +1,4 @@
+import type { RecoveryCodesSurface } from 'common/telemetry-constants'
 import { ComponentProps, useState } from 'react'
 import { Button } from 'ui'
 
@@ -11,6 +12,7 @@ export interface GenerateRecoveryCodesModalProps extends Pick<
   label?: string
   onComplete?: () => void
   onStart?: () => void
+  surface?: RecoveryCodesSurface
   showSecurityLink?: boolean
 }
 
@@ -20,6 +22,7 @@ export const useGenerateRecoveryCodesModal = ({
   size,
   onComplete,
   onStart,
+  surface = 'account_security',
   showSecurityLink,
 }: GenerateRecoveryCodesModalProps = {}) => {
   const mutation = useRecoveryCodesGenerateMutation()
@@ -40,6 +43,7 @@ export const useGenerateRecoveryCodesModal = ({
       <RecoveryCodesModal
         open={isOpen}
         mutation={mutation}
+        surface={surface}
         showSecurityLink={showSecurityLink}
         onOpenChange={(open) => {
           setIsOpen(open)
