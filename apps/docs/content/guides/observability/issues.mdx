@@ -1,0 +1,20 @@
+---
+id: 'issues'
+title: 'Issues'
+description: 'Health, security, and performance issues you or an agent can check for in a project.'
+---
+
+Issues flag health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. Issues were previously called Advisors.
+
+You or an agent can check for issues from:
+
+- Studio: [Health issues](/dashboard/project/_/issues?category=health), [Security issues](/dashboard/project/_/issues?category=security), and [Performance issues](/dashboard/project/_/issues?category=performance)
+- MCP: `get_issues`, which replaces the deprecated `get_advisors`
+- CLI: `supabase issues`, which replaces the deprecated [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
+- Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
+
+Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
+
+## Available checks
+
+<DatabaseAdvisorsIndex />

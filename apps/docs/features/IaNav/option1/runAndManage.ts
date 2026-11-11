@@ -344,9 +344,9 @@ export const runAndManage: NavMenuConstant = {
         },
         { name: 'Reports', url: '/guides/observability/reports' },
         {
-          name: 'Advisors and health checks',
+          name: 'Issues and health checks',
           items: [
-            { name: 'Advisors', url: '/guides/observability/advisors' },
+            { name: 'Issues', url: '/guides/observability/issues' },
             { name: 'Detection checks', url: '/guides/observability/detecting' },
           ],
         },

@@ -14,7 +14,7 @@ BEFORE QUERYING
 2. Confirm project and database instance from the scheduled task configuration.
    Use project-scoped Supabase MCP with project_ref and read_only=true.
    Use query_logs for ClickHouse, execute_sql for read-only Postgres diagnostics,
-   and get_advisors for the specified category. Follow each tool's input schema.
+   and get_issues for the specified category. Follow each tool's input schema.
    Supply explicit UTC log windows, no longer than 24 hours per request.
 3. Load operator threshold overrides, prior snapshots, reset markers, configured
    limits, and prior alert state from the authorized harness state. If unavailable,
@@ -338,7 +338,7 @@ statement that writes.
    example with jq, so credentials in a response never reach your context.
 3. Check each item with read-only access:
    - Database: use the Supabase MCP server scoped to the project, with
-     read_only=true. Run get_advisors for security findings. Get db_schema
+     read_only=true. Run get_issues for security issues. Get db_schema
      from the project's PostgREST config in the Management API, and use
      execute_sql to list tables without RLS in each of those schemas. If you
      can't read db_schema, check public and report the rest as can't check.

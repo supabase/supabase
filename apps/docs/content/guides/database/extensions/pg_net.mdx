@@ -35,7 +35,7 @@ It eliminates the need for servers to continuously poll for database changes and
 ```sql
 -- Example: enable the "pg_net" extension.
 create extension pg_net with schema "extensions";
--- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts. Registering it in the extensions schema avoids exposing it in public and satisfies the Security Advisor check.
+-- Note: The extension creates its own schema/namespace named "net" to avoid naming conflicts. Registering it in the extensions schema avoids exposing it in public, which security checks flag.
 
 -- Example: disable the "pg_net" extension
 drop extension if exists pg_net;
@@ -448,7 +448,7 @@ This doesn't expose request data to unauthenticated or client-side users, for tw
 
 ## Troubleshooting
 
-The Security Advisor might report that `pg_net` is installed in the `public` schema. Postgres defines the extension as non-relocatable, so `alter extension pg_net set schema extensions` can't move it. Instead, drop the extension and create it in the `extensions` schema:
+A security issue might report that `pg_net` is installed in the `public` schema. Postgres defines the extension as non-relocatable, so `alter extension pg_net set schema extensions` can't move it. Instead, drop the extension and create it in the `extensions` schema:
 
 <Admonition type="danger">
 

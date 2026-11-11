@@ -150,7 +150,7 @@ export async function fetchCliLibReferenceSource() {
 export async function fetchLintWarningsGuideSources() {
   return new LintWarningsGuideLoader(
     'guide',
-    '/guides/observability/advisors',
+    '/guides/observability/issues',
     'supabase',
     'splinter',
     'main',
