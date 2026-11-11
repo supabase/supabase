@@ -71,6 +71,7 @@ export const TableEditorMenu = () => {
       search: searchText.trim() || undefined,
       sort,
       filterTypes: visibleTypes,
+      excludePartitions: true,
     },
     {
       enabled: visibleTypes.length > 0,

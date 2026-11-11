@@ -211,9 +211,15 @@ export const EntityListItem = ({
         {isActive && <div className="absolute left-0 h-full w-0.5 bg-foreground" />}
         <Tooltip disableHoverableContent={true}>
           <TooltipTrigger className="min-w-4">
-            <EntityTypeIcon type={entity.type} isActive={isActive} />
+            <EntityTypeIcon
+              type={entity.type}
+              isPartition={entity.is_partition}
+              isActive={isActive}
+            />
           </TooltipTrigger>
-          <TooltipContent side="bottom">{formatTooltipText(entity.type)}</TooltipContent>
+          <TooltipContent side="bottom">
+            {entity.is_partition ? 'Partition' : formatTooltipText(entity.type)}
+          </TooltipContent>
         </Tooltip>
         <div
           className={cn(
@@ -429,6 +435,23 @@ export const EntityListItem = ({
                   <DropdownMenuSeparator />
                   <DropdownMenuItem
                     key="delete-table"
+                    className="gap-x-2"
+                    onClick={(e) => {
+                      e.stopPropagation()
+                      snap.onDeleteTable()
+                    }}
+                  >
+                    <TrashIcon size={12} className="shrink-0" />
+                    <span>Delete table</span>
+                  </DropdownMenuItem>
+                </>
+              )}
+
+              {entity.type === ENTITY_TYPE.PARTITIONED_TABLE && (
+                <>
+                  <DropdownMenuSeparator />
+                  <DropdownMenuItem
+                    key="delete-partitioned-table"
                     className="gap-x-2"
                     onClick={(e) => {
                       e.stopPropagation()

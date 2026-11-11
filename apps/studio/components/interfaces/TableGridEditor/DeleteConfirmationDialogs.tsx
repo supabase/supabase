@@ -1,3 +1,4 @@
+import { useQuery } from '@tanstack/react-query'
 import { ExternalLinkIcon } from 'lucide-react'
 import Link from 'next/link'
 import { toast } from 'sonner'
@@ -7,6 +8,8 @@ import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { useTableFilter } from '@/components/grid/hooks/useTableFilter'
 import type { SupaRow } from '@/components/grid/types'
 import { useDatabaseColumnDeleteMutation } from '@/data/database-columns/database-column-delete-mutation'
+import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
+import { partitionCountQueryOptions } from '@/data/entity-types/partition-count-query'
 import { useMaterializedViewDeleteMutation } from '@/data/materialized-views/materialized-view-delete-mutation'
 import { Entity } from '@/data/table-editor/table-editor-types'
 import { useTableRowDeleteAllMutation } from '@/data/table-rows/table-row-delete-all-mutation'
@@ -15,6 +18,7 @@ import { useTableRowTruncateMutation } from '@/data/table-rows/table-row-truncat
 import { useTableDeleteMutation } from '@/data/tables/table-delete-mutation'
 import { useViewDeleteMutation } from '@/data/views/view-delete-mutation'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { pluralize } from '@/lib/helpers'
 import { useGetImpersonatedRoleState } from '@/state/role-impersonation-state'
 import { useTableEditorStateSnapshot } from '@/state/table-editor'
 
@@ -215,6 +219,18 @@ const DeleteConfirmationDialogs = ({
     })
   }
 
+  const isPartitionedTableDialogOpen =
+    snap.confirmationDialog?.type === 'table' &&
+    selectedTable?.entity_type === ENTITY_TYPE.PARTITIONED_TABLE
+  const { data: partitionCount } = useQuery({
+    ...partitionCountQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      id: selectedTable?.id,
+    }),
+    enabled: isPartitionedTableDialogOpen && !!project?.ref,
+  })
+
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
 
   const onConfirmDeleteRow = async () => {
@@ -333,6 +349,12 @@ const DeleteConfirmationDialogs = ({
         onConfirm={onConfirmDeleteTable}
       >
         <div data-testid="confirm-delete-table-modal" className="space-y-4">
+          {isPartitionedTableDialogOpen && partitionCount !== undefined && partitionCount > 0 && (
+            <p className="text-sm text-foreground-light">
+              This will also delete its {partitionCount} {pluralize(partitionCount, 'partition')}{' '}
+              and all of their data.
+            </p>
+          )}
           <p className="text-sm text-foreground-light">
             Are you sure you want to delete the selected table? This action cannot be undone.
           </p>

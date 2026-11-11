@@ -5,6 +5,7 @@ export const getEntityTypesSQL = ({
   search,
   sort,
   filterTypes,
+  excludePartitions = false,
   limit,
   page,
 }: {
@@ -12,6 +13,8 @@ export const getEntityTypesSQL = ({
   search?: string
   sort: 'alphabetical' | 'grouped-alphabetical'
   filterTypes: Array<string>
+  /** Hide child partitions so only top-level tables (incl. partitioned parents) are returned */
+  excludePartitions?: boolean
   limit: number
   page: number
 }): SafeSqlFragment => {
@@ -23,6 +26,7 @@ export const getEntityTypesSQL = ({
   const typeList = joinSqlFragments(filterTypes.map(literal), ', ')
   const schemaList = joinSqlFragments(schemas.map(literal), ', ')
   const searchClause = search ? safeSql`and c.relname ilike ${literal(`%${search}%`)}` : safeSql``
+  const partitionClause = excludePartitions ? safeSql`and not c.relispartition` : safeSql``
 
   return safeSql`
     with records as (
@@ -40,7 +44,9 @@ export const getEntityTypesSQL = ({
         end as "type_sort",
         obj_description(c.oid) as "comment",
         count(*) over() as "count",
-        c.relrowsecurity as "rls_enabled"
+        c.relrowsecurity as "rls_enabled",
+        -- Partitions are ordinary tables, so relkind alone can't single them out
+        c.relispartition as "is_partition"
       from
         pg_namespace nc
         join pg_class c on nc.oid = c.relnamespace
@@ -57,6 +63,7 @@ export const getEntityTypesSQL = ({
         )
         and nc.nspname in (${schemaList})
         ${searchClause}
+        ${partitionClause}
       order by ${innerOrderBy}
       limit ${literal(limit)}
       offset ${literal(page * limit)}
@@ -70,12 +77,25 @@ export const getEntityTypesSQL = ({
             'name', r.name,
             'type', r.type,
             'comment', r.comment,
-            'rls_enabled', r.rls_enabled
+            'rls_enabled', r.rls_enabled,
+            'is_partition', r.is_partition
           )
           order by ${outerOrderBy}
         ), '[]'::jsonb),
         'count', coalesce(min(r.count), 0)
       ) "data"
     from records r;
+  `
+}
+
+/**
+ * Counts every partition under a partitioned table, including nested sub-partitions.
+ * `level > 0` skips the root row that pg_partition_tree returns for the table itself.
+ */
+export const getPartitionCountSQL = ({ id }: { id: number }): SafeSqlFragment => {
+  return safeSql`
+    select count(*)::int as "count"
+    from pg_partition_tree(${literal(id)}::oid::regclass)
+    where level > 0;
   `
 }

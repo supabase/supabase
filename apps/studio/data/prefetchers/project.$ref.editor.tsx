@@ -37,6 +37,7 @@ export function usePrefetchEditorIndexPage() {
       connectionString: project?.connectionString,
       sort: entityTypesSort,
       filterTypes: Object.values(ENTITY_TYPE),
+      excludePartitions: true,
     }).catch(() => {
       // eat prefetching errors as they are not critical
     })

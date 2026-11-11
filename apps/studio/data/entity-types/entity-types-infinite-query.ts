@@ -17,6 +17,7 @@ export type EntityTypesVariables = {
   page?: number
   sort?: 'alphabetical' | 'grouped-alphabetical'
   filterTypes?: string[]
+  excludePartitions?: boolean
 }
 
 export interface Entity {
@@ -26,6 +27,7 @@ export interface Entity {
   type: ENTITY_TYPE
   comment: string | null
   rls_enabled: boolean
+  is_partition: boolean
 }
 
 export type EntityTypesResponse = {
@@ -45,10 +47,19 @@ export async function getEntityTypes(
     page = 0,
     sort = 'alphabetical',
     filterTypes = Object.values(ENTITY_TYPE),
+    excludePartitions,
   }: EntityTypesVariables,
   signal?: AbortSignal
 ) {
-  const sql = getEntityTypesSQL({ schemas, sort, filterTypes, search, limit, page })
+  const sql = getEntityTypesSQL({
+    schemas,
+    sort,
+    filterTypes,
+    excludePartitions,
+    search,
+    limit,
+    page,
+  })
 
   const { result } = await executeSql(
     {
@@ -78,6 +89,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
     limit = 100,
     sort,
     filterTypes,
+    excludePartitions,
   }: Omit<EntityTypesVariables, 'page'>,
   {
     enabled = true,
@@ -91,7 +103,14 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
   > = {}
 ) => {
   return useInfiniteQuery({
-    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryKey: entityTypeKeys.list(projectRef, {
+      schemas,
+      search,
+      sort,
+      limit,
+      filterTypes,
+      excludePartitions,
+    }),
     queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
         {
@@ -103,6 +122,7 @@ export const useEntityTypesQuery = <TData = EntityTypesData>(
           page: pageParam,
           sort,
           filterTypes,
+          excludePartitions,
         },
         signal
       ),
@@ -133,10 +153,18 @@ export function prefetchEntityTypes(
     limit = 100,
     sort,
     filterTypes,
+    excludePartitions,
   }: Omit<EntityTypesVariables, 'page'>
 ) {
   return client.prefetchInfiniteQuery({
-    queryKey: entityTypeKeys.list(projectRef, { schemas, search, sort, limit, filterTypes }),
+    queryKey: entityTypeKeys.list(projectRef, {
+      schemas,
+      search,
+      sort,
+      limit,
+      filterTypes,
+      excludePartitions,
+    }),
     initialPageParam: 0,
     queryFn: ({ signal, pageParam }) =>
       getEntityTypes(
@@ -149,6 +177,7 @@ export function prefetchEntityTypes(
           page: pageParam,
           sort,
           filterTypes,
+          excludePartitions,
         },
         signal
       ),
