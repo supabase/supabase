@@ -186,8 +186,14 @@ export const ComputePlanUsage = ({ projectRef, instances }: ComputePlanUsageProp
         </div>
       </div>
 
+      {/*
+        Three across, two rows deep. Six in a single row left the wider labels wrapping and the
+        narrower ones not, so values sat at different heights across the strip; at three the
+        longest label here still fits on one line. The rows split along what they describe: the
+        CPU story first, then memory, throughput and the one limit.
+      */}
       {!isCollapsed && (
-        <div className="grid grid-cols-2 divide-x divide-y sm:grid-cols-3 lg:grid-cols-6 lg:divide-y-0">
+        <div className="grid grid-cols-2 divide-x divide-y sm:grid-cols-3">
           {metrics.map((metric) => (
             <UsageMetricCell key={metric.label} metric={metric} />
           ))}
