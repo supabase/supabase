@@ -1274,6 +1274,34 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
+ * User opened the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchOpenedEvent {
+  action: 'kb_search_opened'
+  properties: {
+    /** The trigger that opened the dialog: Cmd+K or Ctrl+K, or a search button on the page. */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User closed the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchClosedEvent {
+  action: 'kb_search_closed'
+  properties: {
+    /** Why the dialog closed: the user dismissed it or opened a result. */
+    closeReason: 'dismissed' | 'result_navigated'
+  }
+}
+
+/**
  * A knowledge base search returned, with or without results. The query text is left out
  * because it can contain personal data; only its length is sent.
  *
@@ -3493,7 +3521,7 @@ type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ * @page /dashboard/project/{ref}/issues or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -3528,7 +3556,7 @@ export interface AdvisorDetailOpenedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/issues/{id} (issue detail)
  */
 export interface AdvisorAssistantButtonClickedEvent {
   action: 'advisor_assistant_button_clicked'
@@ -4400,7 +4428,7 @@ export interface HeaderFeedbackDropdownOpenedEvent {
 }
 
 /**
- * User clicked the Advisor Center toggle button in the page header.
+ * User clicked the Issues panel toggle button in the page header (formerly the Advisor Center).
  *
  * @group Events
  * @source studio
@@ -4548,6 +4576,30 @@ export interface AccountRecoveryReminderClosedEvent {
   groups: TelemetryGroups
 }
 
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -4556,6 +4608,8 @@ export type TelemetryEvent =
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4629,6 +4683,8 @@ export type TelemetryEvent =
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
+  | KbSearchOpenedEvent
+  | KbSearchClosedEvent
   | KbSearchSubmittedEvent
   | KbSearchResultClickedEvent
   | DocsSearchV2ClosedEvent

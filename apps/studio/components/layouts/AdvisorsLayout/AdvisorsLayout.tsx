@@ -11,7 +11,7 @@ export interface AdvisorsLayoutProps {
   title?: string
 }
 
-const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) => {
+const AdvisorsLayoutContent = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) => {
   const router = useRouter()
   const page = router.pathname.split('/')[4]
   const menu = useGenerateAdvisorsMenu()
@@ -28,4 +28,4 @@ const AdvisorsLayout = ({ children }: PropsWithChildren<AdvisorsLayoutProps>) =>
   )
 }
 
-export default withAuth(AdvisorsLayout)
+export const AdvisorsLayout = withAuth(AdvisorsLayoutContent)

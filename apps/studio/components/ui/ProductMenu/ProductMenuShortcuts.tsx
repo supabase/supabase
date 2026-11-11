@@ -32,7 +32,9 @@ const ProductMenuShortcut = ({ item }: { item: ProductMenuShortcutItem }) => {
     router.push(url)
   }, [router, url])
 
-  useShortcut(shortcutId, navigate)
+  useShortcut(shortcutId, navigate, {
+    label: shortcutId.startsWith('nav.advisors-') ? `Go to ${item.name}` : undefined,
+  })
 
   return null
 }

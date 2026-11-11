@@ -4,6 +4,8 @@ import { waitUntil } from '@vercel/functions'
 import { NextApiRequest, NextApiResponse } from 'next'
 import { z } from 'zod'
 
+import { getBearerToken } from '@/lib/api/apiHelpers'
+
 const InstallBodySchema = z.object({
   projectRef: z.string().min(1),
   stripeSecretKey: z.string().min(1),
@@ -19,13 +21,6 @@ async function isStripeSyncEnabled() {
   // The ConfigClient doesn't seem to work properly so we'll just gate access from the frontend
   // for now
   return true
-}
-
-function getBearerToken(req: NextApiRequest) {
-  const authHeader = req.headers.authorization
-  if (!authHeader || Array.isArray(authHeader)) return null
-  const match = authHeader.match(/^Bearer\s+(.+)$/i)
-  return match?.[1]?.trim() ?? null
 }
 
 export const config = {
@@ -52,7 +47,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
 }
 
 async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
+  const supabaseToken = getBearerToken(req.headers.authorization)
   if (!supabaseToken) {
     return res
       .status(401)
@@ -86,7 +81,7 @@ async function handleDeleteStripeSyncInstall(req: NextApiRequest, res: NextApiRe
 }
 
 async function handleSetupStripeSyncInstall(req: NextApiRequest, res: NextApiResponse) {
-  const supabaseToken = getBearerToken(req)
+  const supabaseToken = getBearerToken(req.headers.authorization)
   if (!supabaseToken) {
     return res
       .status(401)
