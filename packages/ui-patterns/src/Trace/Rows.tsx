@@ -167,14 +167,14 @@ export function Cell({ className, style, ...props }: ComponentProps<'div'>) {
       style={{ paddingLeft: row.depth * INDENT + 4, ...style }}
       {...props}
     >
-      <span className="flex size-[18px] shrink-0 items-center justify-center">
+      <span className="flex size-4.5 shrink-0 items-center justify-center">
         {row.hasChildren && (
           <Button
             variant="text"
             size="tiny"
             tabIndex={-1}
             aria-label={row.isExpanded ? 'Collapse' : 'Expand'}
-            className="size-[18px] p-0"
+            className="size-4.5 p-0"
             icon={
               <ChevronRight
                 className={cn(
