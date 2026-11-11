@@ -81,11 +81,17 @@ describe('useOnboardingSurveyVariant', () => {
   // Logged-out requests all get the same arm, so only a signed-in user's own flags count
   it.each<[string, RenderOptions]>([
     ['a logged-out visitor', { isSignedIn: false, flagsUserId: null, isProfileLoaded: false }],
-    ['a profile that has not loaded', { isProfileLoaded: false }],
     ['flags fetched before sign-in', { flagsUserId: null }],
     ['flags fetched for another user', { flagsUserId: 'another-user' }],
-  ])('returns the arm but records no exposure for %s', (_, options) => {
+  ])('returns no arm and records no exposure for %s', (_, options) => {
     const { result } = renderVariantHook('org_form', options)
+
+    expect(result.current.variant).toBeUndefined()
+    expect(track).not.toHaveBeenCalled()
+  })
+
+  it('returns the arm but holds exposure until the profile loads', () => {
+    const { result } = renderVariantHook('org_form', { isProfileLoaded: false })
 
     expect(result.current.variant).toBe('org_form')
     expect(track).not.toHaveBeenCalled()
