@@ -1,13 +1,12 @@
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import type { ReactNode } from 'react'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import JWTSigningKeysPage from '@/pages/project/[ref]/settings/jwt/index'
-import { customRender as render } from '@/tests/lib/custom-render'
-import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
 
-const { mockIsPlatform, mockUseDeploymentMode } = vi.hoisted(() => ({
+const { mockIsPlatform, mockUseAsyncCheckPermissions, mockUseDeploymentMode } = vi.hoisted(() => ({
   mockIsPlatform: { value: true },
+  mockUseAsyncCheckPermissions: vi.fn(),
   mockUseDeploymentMode: vi.fn(),
 }))
 
@@ -18,10 +17,13 @@ vi.mock('common', async () => {
     get IS_PLATFORM() {
       return mockIsPlatform.value
     },
-    useIsLoggedIn: () => true,
-    useParams: () => ({ ref: 'default' }),
   }
 })
+
+vi.mock('@/hooks/misc/useCheckPermissionsV2', () => ({
+  useAsyncCheckPermissionsV2: mockUseAsyncCheckPermissions,
+  FGA_PERMISSIONS: { PROJECT: { AUTH_SIGNING_KEYS_READ: 'auth_signing_keys_read' } },
+}))
 
 vi.mock('@/hooks/misc/useDeploymentMode', () => ({
   useDeploymentMode: mockUseDeploymentMode,
@@ -53,7 +55,7 @@ vi.mock('@/components/ui/LocalSetupGuide', () => ({
 describe('/project/[ref]/settings/jwt', () => {
   beforeEach(() => {
     mockIsPlatform.value = true
-    mockProjectGrantContext({ ref: 'default' })
+    mockUseAsyncCheckPermissions.mockReturnValue({ can: true, isSuccess: true })
     mockUseDeploymentMode.mockReturnValue({
       isPlatform: true,
       isCli: false,
@@ -61,10 +63,10 @@ describe('/project/[ref]/settings/jwt', () => {
     })
   })
 
-  it('renders the JWT signing keys table on platform', async () => {
+  it('renders the JWT signing keys table on platform', () => {
     render(<JWTSigningKeysPage dehydratedState={{}} />)
 
-    expect(await screen.findByText('JWTSecretKeysTable')).toBeInTheDocument()
+    expect(screen.getByText('JWTSecretKeysTable')).toBeInTheDocument()
     expect(screen.queryByText('LocalSetupGuide')).not.toBeInTheDocument()
   })
 

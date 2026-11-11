@@ -84,7 +84,7 @@ const TestSection = ({ type }: { type: DestinationType }) => {
 }
 
 describe('PipelineDataSection', () => {
-  it.each<DestinationType>(['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse'])(
+  it.each<DestinationType>(['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse', 'Analytics Bucket'])(
     'groups %s publication, initial sync and replication settings without connection fields',
     async (type) => {
       mockPublicationRequests(false)

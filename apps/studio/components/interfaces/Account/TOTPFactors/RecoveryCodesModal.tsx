@@ -1,6 +1,5 @@
 import { AuthError, AuthMFARecoveryCodesGenerateResponseData } from '@supabase/auth-js'
 import { UseMutationResult, useQueryClient } from '@tanstack/react-query'
-import type { RecoveryCodesSurface } from 'common/telemetry-constants'
 import { CheckIcon, CopyIcon, DownloadIcon } from 'lucide-react'
 import { ComponentProps, useEffect, useMemo, useState } from 'react'
 import {
@@ -24,13 +23,11 @@ import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { recoveryCodeKeys } from '@/data/recovery-codes/keys'
-import { useTrack } from '@/lib/telemetry/track'
 
 interface RecoveryCodesModalProps<T>
   extends
     Omit<ComponentProps<typeof Dialog>, 'onOpenChange'>,
     Required<Pick<ComponentProps<typeof Dialog>, 'onOpenChange'>> {
-  surface: RecoveryCodesSurface
   showSecurityLink?: boolean
   mutation: Pick<
     UseMutationResult<AuthMFARecoveryCodesGenerateResponseData, AuthError, T>,
@@ -41,12 +38,10 @@ interface RecoveryCodesModalProps<T>
 export const RecoveryCodesModal = <T = unknown,>({
   onOpenChange,
   mutation,
-  surface,
   showSecurityLink = false,
   ...props
 }: RecoveryCodesModalProps<T>) => {
   const queryClient = useQueryClient()
-  const track = useTrack()
   const [copied, setCopied] = useState(false)
   const [copiedToClipboard, setCopiedToClipboard] = useState(false)
 
@@ -76,7 +71,6 @@ export const RecoveryCodesModal = <T = unknown,>({
     a.click()
     document.body.removeChild(a)
     window.URL.revokeObjectURL(url)
-    track('recovery_codes_download_clicked', { surface })
   }
 
   useEffect(() => {
@@ -161,10 +155,7 @@ export const RecoveryCodesModal = <T = unknown,>({
                     onClick={() =>
                       copyToClipboard(
                         codes.map((code) => formatRecoveryCode(code)).join('\n') ?? '',
-                        () => {
-                          setCopiedToClipboard(true)
-                          track('recovery_codes_copied', { surface })
-                        }
+                        () => setCopiedToClipboard(true)
                       )
                     }
                   >

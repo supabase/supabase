@@ -1,9 +1,10 @@
 import { useParams } from 'common'
 import { Trash2Icon } from 'lucide-react'
 
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useGrant } from '@/lib/grants'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
@@ -27,7 +28,7 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
       tooltip={{
         content: {
           side: 'left',
-          text: getWriteGrantTooltip(deleteGrant.status, 'delete', 'API keys'),
+          text: getWriteGrantTooltip(deleteGrant.status, 'delete'),
         },
       }}
     >

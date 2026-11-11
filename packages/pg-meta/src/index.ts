@@ -42,14 +42,8 @@ export {
   untrustedSql,
   acceptUntrustedSql,
   joinSqlFragments,
-  asWriteSql,
 } from './pg-format'
-export type {
-  WriteSqlFragment,
-  SafeSqlFragment,
-  UntrustedSqlFragment,
-  DisplayableSqlFragment,
-} from './pg-format'
+export type { SafeSqlFragment, UntrustedSqlFragment, DisplayableSqlFragment } from './pg-format'
 
 export type { PGTable, PGTablePrimaryKey, PGTableRelationship } from './pg-meta-tables'
 export type { PGColumn } from './pg-meta-columns'

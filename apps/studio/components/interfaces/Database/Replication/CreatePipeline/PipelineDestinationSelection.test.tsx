@@ -57,6 +57,20 @@ describe('PipelineDestinationSelection', () => {
     expect(onChange).not.toHaveBeenCalled()
   })
 
+  it('gives Analytics Bucket an accessible label without whitespace in its ID', () => {
+    render(
+      <PipelineDestinationSelection
+        availableDestinations={['Analytics Bucket']}
+        value="Analytics Bucket"
+        onChange={vi.fn()}
+      />
+    )
+    const radio = screen.getByRole('radio', { name: /Analytics Bucket/ })
+    expect(radio.id).not.toMatch(/\s/)
+    expect(radio).toHaveAccessibleName(/Analytics Bucket/)
+    expect(radio).toBeChecked()
+  })
+
   it('handles no available destinations without selecting one', () => {
     const onChange = vi.fn()
     render(

@@ -2,7 +2,18 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
-import { Button, DialogFooter, DialogSection, Form, FormControl, FormField, Input } from 'ui'
+import {
+  Button,
+  cn,
+  DialogFooter,
+  DialogSection,
+  Form,
+  FormControl,
+  FormField,
+  Input,
+  SheetFooter,
+  SheetSection,
+} from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import z from 'zod'
@@ -100,10 +111,14 @@ const formId = 'create-analytics-storage-bucket-form'
 export type CreateAnalyticsBucketForm = z.infer<typeof FormSchema>
 
 interface CreateAnalyticsBucketFormProps {
+  type?: 'dialog' | 'sheet'
   onOpenChange: (value: boolean) => void
 }
 
-export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucketFormProps) => {
+export const CreateAnalyticsBucketForm = ({
+  type = 'dialog',
+  onOpenChange,
+}: CreateAnalyticsBucketFormProps) => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { extension: wrappersExtension, state: wrappersExtensionState } =
@@ -175,9 +190,12 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
     }
   }
 
+  const Section = type === 'dialog' ? DialogSection : SheetSection
+  const Footer = type === 'dialog' ? DialogFooter : SheetFooter
+
   return (
     <>
-      <DialogSection className="flex flex-col p-0! grow">
+      <Section className="flex flex-col p-0! grow">
         <Form {...form}>
           <form id={formId} onSubmit={form.handleSubmit(onSubmit)}>
             <FormField
@@ -217,7 +235,7 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
             {wrappersExtensionNeedsUpgrading ? (
               <Admonition
                 type="warning"
-                className="border-x-0 rounded-none border-b-0"
+                className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
                 title="Wrappers extension must be updated for Iceberg Wrapper support"
               >
                 <p className="prose max-w-full text-sm leading-normal!">
@@ -231,7 +249,10 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
                 </p>
               </Admonition>
             ) : (
-              <Admonition type="default" className="border-x-0 rounded-none border-b-0">
+              <Admonition
+                type="default"
+                className={cn('border-x-0 rounded-none', type === 'dialog' && 'border-b-0')}
+              >
                 <p className="leading-normal!">
                   Supabase will install the{' '}
                   {wrappersExtensionState !== 'installed' ? (
@@ -249,9 +270,9 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
             )}
           </form>
         </Form>
-      </DialogSection>
+      </Section>
 
-      <DialogFooter>
+      <Footer>
         <Button disabled={isCreating} onClick={() => onOpenChange(false)}>
           Cancel
         </Button>
@@ -264,7 +285,7 @@ export const CreateAnalyticsBucketForm = ({ onOpenChange }: CreateAnalyticsBucke
         >
           Create bucket
         </Button>
-      </DialogFooter>
+      </Footer>
     </>
   )
 }

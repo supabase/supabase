@@ -3,19 +3,12 @@ import { toast } from 'sonner'
 
 import { JWTAlgorithm } from './jwt-signing-keys-query'
 import { jwtSigningKeysKeys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
-
-export type JWTSigningKeyCreateGrant = GrantFor<
-  'post',
-  '/v1/projects/{ref}/config/auth/signing-keys'
->
 
 interface JWTSigningKeyCreateVariables {
   projectRef?: string
-  grant: JWTSigningKeyCreateGrant
   algorithm: JWTAlgorithm
   status: 'in_use' | 'standby'
   private_jwk: any
@@ -33,7 +26,7 @@ export async function createJWTSigningKey(payload: JWTSigningKeyCreateVariables)
       status: payload.status,
       ...(payload.private_jwk ? { private_jwk: payload.private_jwk } : null),
     },
-    grant: payload.grant,
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)

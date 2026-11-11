@@ -40,9 +40,6 @@ interface ResourceAccessStepProps {
   control: Control<TokenFormValues>
   setValue: UseFormSetValue<TokenFormValues>
 
-  /** Switches the form between the Project and Organization resource scopes. */
-  onResourceAccessChange: (mode: Exclude<ResourceAccessMode, 'account'>) => void
-
   /** Switches the form into legacy (account-wide) token mode. */
   onSelectLegacyToken: () => void
 }
@@ -69,7 +66,6 @@ const CARD_OPTIONS: {
 export const ResourceAccessStep = ({
   control,
   setValue,
-  onResourceAccessChange,
   onSelectLegacyToken,
 }: ResourceAccessStepProps) => {
   const { data: organizations = [] } = useOrganizationsQuery()
@@ -154,7 +150,8 @@ export const ResourceAccessStep = ({
                 value={resourceAccess}
                 onValueChange={(value) => {
                   field.onChange(value)
-                  onResourceAccessChange(value as Exclude<ResourceAccessMode, 'account'>)
+                  // Reset dependent selections when switching modes.
+                  setValue('projectRefs', [])
                 }}
               >
                 {CARD_OPTIONS.map((option) => (

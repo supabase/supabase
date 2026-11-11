@@ -1,7 +1,6 @@
 import {
   PageSection,
   PageSectionContent,
-  PageSectionDescription,
   PageSectionMeta,
   PageSectionSummary,
   PageSectionTitle,
@@ -46,10 +45,7 @@ export const GeneralSettings = () => {
         <PageSection>
           <PageSectionMeta>
             <PageSectionSummary>
-              <PageSectionTitle>Delete organization</PageSectionTitle>
-              <PageSectionDescription>
-                Permanently remove your organization and its projects.
-              </PageSectionDescription>
+              <PageSectionTitle>Danger zone</PageSectionTitle>
             </PageSectionSummary>
           </PageSectionMeta>
           <PageSectionContent>

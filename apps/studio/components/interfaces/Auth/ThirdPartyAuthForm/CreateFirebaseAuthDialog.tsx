@@ -21,9 +21,7 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateFirebaseAuthIntegrationProps {
   visible: boolean
@@ -52,9 +50,6 @@ export const CreateFirebaseAuthIntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
-  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
-    projectRef,
-  })
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Firebase Auth integration.`)
@@ -84,15 +79,8 @@ export const CreateFirebaseAuthIntegrationDialog = ({
   }, [visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    if (!createGrant.grant) {
-      toast.error(
-        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
-      )
-      return
-    }
     createAuthIntegration({
       projectRef: projectRef!,
-      grant: createGrant.grant,
       oidcIssuerUrl: `https://securetoken.google.com/${values.firebaseProjectId}`,
     })
   }
@@ -166,25 +154,15 @@ export const CreateFirebaseAuthIntegrationDialog = ({
           <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <ButtonTooltip
+          <Button
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending || !createGrant.grant}
+            disabled={isPending}
             loading={isPending}
-            tooltip={{
-              content: {
-                side: 'top',
-                text: getWriteGrantTooltip(
-                  createGrant.status,
-                  'add',
-                  'third-party auth integrations'
-                ),
-              },
-            }}
           >
             {isCreating ? 'Create connection' : 'Update connection'}
-          </ButtonTooltip>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

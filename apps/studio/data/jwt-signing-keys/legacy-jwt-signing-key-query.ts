@@ -1,60 +1,44 @@
-import { jwtSigningKeysKeys } from './keys'
-import { get, handleError } from '@/data/fetchers'
-import { grantedQueryOptions, type GrantedQueryCallerOptions } from '@/data/granted-query-options'
-import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantFor } from '@/lib/grants'
+import { useQuery } from '@tanstack/react-query'
 
-export type LegacyJWTSigningKeyGrant = GrantFor<
-  'get',
-  '/v1/projects/{ref}/config/auth/signing-keys/legacy'
->
+import { jwtSigningKeysKeys } from './keys'
+import { get, handleError, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 interface LegacyJWTSigningKeyVariables {
   projectRef?: string
-  grant?: LegacyJWTSigningKeyGrant
 }
 
-/**
- * A 404 means the legacy JWT secret hasn't been imported as a signing key yet, which is a normal
- * state, so it resolves to `null`. Any other failure throws.
- */
 async function getLegacyJWTSigningKey(
-  { projectRef, grant }: { projectRef: string; grant: LegacyJWTSigningKeyGrant },
+  { projectRef }: LegacyJWTSigningKeyVariables,
   signal?: AbortSignal
 ) {
+  if (!projectRef) throw new Error('projectRef is required')
+
   const { data, error } = await get(`/v1/projects/{ref}/config/auth/signing-keys/legacy`, {
     params: { path: { ref: projectRef } },
     signal,
-    grant,
+    grant: unguarded.migrating,
   })
 
   if (error) {
-    if ((error as { code?: number }).code === 404) return null
     handleError(error)
   }
 
-  return data ?? null
+  return data
 }
 
 export type LegacyJWTSigningKeyData = Awaited<ReturnType<typeof getLegacyJWTSigningKey>>
-export type LegacyJWTSigningKeyError = StudioError
 
-export const legacyJWTSigningKeyQueryOptions = <TData = LegacyJWTSigningKeyData>(
-  { projectRef, grant }: LegacyJWTSigningKeyVariables,
-  options?: GrantedQueryCallerOptions<
-    LegacyJWTSigningKeyData,
-    LegacyJWTSigningKeyError,
-    TData,
-    ReturnType<typeof jwtSigningKeysKeys.legacy>
-  >
+export const useLegacyJWTSigningKeyQuery = <TData = LegacyJWTSigningKeyData>(
+  { projectRef }: LegacyJWTSigningKeyVariables,
+  { enabled, ...options }: UseCustomQueryOptions<LegacyJWTSigningKeyData, StudioError, TData> = {}
 ) =>
-  grantedQueryOptions(
-    {
-      queryKey: jwtSigningKeysKeys.legacy(projectRef),
-      queryFn:
-        projectRef && grant
-          ? ({ signal }) => getLegacyJWTSigningKey({ projectRef, grant }, signal)
-          : undefined,
-    },
-    { retry: false, refetchOnWindowFocus: false, ...options }
-  )
+  useQuery<LegacyJWTSigningKeyData, StudioError, TData>({
+    queryKey: jwtSigningKeysKeys.legacy(projectRef),
+    queryFn: ({ signal }) => getLegacyJWTSigningKey({ projectRef }, signal),
+    enabled: enabled && !!projectRef,
+    retry: false,
+    refetchOnWindowFocus: false,
+    ...options,
+  })

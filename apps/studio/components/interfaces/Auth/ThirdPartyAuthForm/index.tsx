@@ -32,35 +32,25 @@ import {
 import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { InlineLink } from '@/components/ui/InlineLink'
-import { NoPermission } from '@/components/ui/NoPermission'
 import { useDeleteThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-delete-mutation'
 import {
   ThirdPartyAuthIntegration,
   thirdPartyAuthIntegrationsQueryOptions,
 } from '@/data/third-party-auth/integrations-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { DOCS_URL } from '@/lib/constants'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
 
 export const ThirdPartyAuthForm = () => {
   const { ref: projectRef } = useParams()
-  const integrationsGrant = useGrant('GET /v1/projects/{ref}/config/auth/third-party-auth', {
-    projectRef,
-  })
-  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}', {
-    projectRef,
-  })
   const {
     data: integrationsData,
-    isPending: isLoadingIntegrations,
+    isPending: isLoading,
     isError,
     isSuccess,
     error,
-  } = useQuery(
-    thirdPartyAuthIntegrationsQueryOptions({ projectRef, grant: integrationsGrant.grant })
-  )
-  const isLoading = integrationsGrant.status === 'loading' || isLoadingIntegrations
+  } = useQuery(thirdPartyAuthIntegrationsQueryOptions({ projectRef }))
   const integrations = integrationsData || []
 
   const [selectedIntegration, setSelectedIntegration] = useState<INTEGRATION_TYPES>()
@@ -73,20 +63,9 @@ export const ThirdPartyAuthForm = () => {
   })
 
   const { mutateAsync: deleteIntegration } = useDeleteThirdPartyAuthIntegrationMutation()
-  const canUpdateConfig = deleteGrant.status === 'granted'
-
-  if (integrationsGrant.status === 'denied') {
-    return <NoPermission resourceText="view auth provider settings" />
-  }
-
-  if (integrationsGrant.status === 'error') {
-    return (
-      <AlertError
-        error={integrationsGrant.error}
-        subject="Failed to check auth provider settings permissions"
-      />
-    )
-  }
+  const { can: canUpdateConfig } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_CONFIG_WRITE
+  )
 
   if (isError) {
     return (
@@ -152,11 +131,6 @@ export const ThirdPartyAuthForm = () => {
                     key={integration.id}
                     integration={integration}
                     canUpdateConfig={canUpdateConfig}
-                    deleteTooltip={getWriteGrantTooltip(
-                      deleteGrant.status,
-                      'delete',
-                      'third-party auth integrations'
-                    )}
                     onDelete={() => {
                       setSelectedIntegrationForDeletion(integration)
                     }}
@@ -211,15 +185,7 @@ export const ThirdPartyAuthForm = () => {
           confirmLabelLoading="Deleting"
           onCancel={() => setSelectedIntegrationForDeletion(undefined)}
           onConfirm={async () => {
-            if (!selectedIntegrationForDeletion) return
-            if (!deleteGrant.grant) {
-              toast.error(
-                getWriteGrantToastMessage(
-                  deleteGrant.status,
-                  'delete',
-                  'third-party auth integrations'
-                )
-              )
+            if (!selectedIntegrationForDeletion) {
               return
             }
             const type = getIntegrationType(selectedIntegrationForDeletion)
@@ -227,7 +193,6 @@ export const ThirdPartyAuthForm = () => {
               await deleteIntegration({
                 projectRef: projectRef!,
                 tpaId: selectedIntegrationForDeletion.id,
-                grant: deleteGrant.grant,
               })
               toast.success(`Successfully deleted ${getIntegrationTypeLabel(type)}.`)
               setSelectedIntegrationForDeletion(undefined)

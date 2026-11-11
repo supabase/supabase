@@ -20,9 +20,7 @@ import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
 import { isValidOidcIssuerUrl } from './ThirdPartyAuthForm.utils'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateCustomOidcIntegrationDialogProps {
   visible: boolean
@@ -47,9 +45,6 @@ export const CreateCustomOidcIntegrationDialog = ({
   onClose,
 }: CreateCustomOidcIntegrationDialogProps) => {
   const { ref: projectRef } = useParams()
-  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
-    projectRef,
-  })
 
   const form = useForm<FormValues>({
     resolver: zodResolver(FormSchema),
@@ -69,17 +64,7 @@ export const CreateCustomOidcIntegrationDialog = ({
   })
 
   const onSubmit: SubmitHandler<FormValues> = (values) => {
-    if (!createGrant.grant) {
-      toast.error(
-        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
-      )
-      return
-    }
-    createAuthIntegration({
-      projectRef: projectRef!,
-      grant: createGrant.grant,
-      oidcIssuerUrl: values.issuerUrl,
-    })
+    createAuthIntegration({ projectRef: projectRef!, oidcIssuerUrl: values.issuerUrl })
   }
 
   return (
@@ -121,25 +106,15 @@ export const CreateCustomOidcIntegrationDialog = ({
           <Button disabled={isPending} onClick={handleClose}>
             Cancel
           </Button>
-          <ButtonTooltip
+          <Button
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending || !createGrant.grant}
+            disabled={isPending}
             loading={isPending}
-            tooltip={{
-              content: {
-                side: 'top',
-                text: getWriteGrantTooltip(
-                  createGrant.status,
-                  'add',
-                  'third-party auth integrations'
-                ),
-              },
-            }}
           >
             Add provider
-          </ButtonTooltip>
+          </Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

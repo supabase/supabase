@@ -27,10 +27,11 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const NAME_SCHEMA = z
@@ -75,10 +76,7 @@ export const CreateSecretAPIKeyDialog = () => {
   const { mutate: createAPIKey, isPending: isCreatingAPIKey } = useAPIKeyCreateMutation()
 
   const onSubmit: SubmitHandler<z.infer<typeof SCHEMA>> = async (values) => {
-    if (!createGrant.grant) {
-      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
-      return
-    }
+    if (!createGrant.grant) return
     createAPIKey(
       {
         projectRef,
@@ -113,10 +111,7 @@ export const CreateSecretAPIKeyDialog = () => {
             onClick={openDialog}
             disabled={!canCreateAPIKeys}
             tooltip={{
-              content: {
-                side: 'bottom',
-                text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
-              },
+              content: { side: 'bottom', text: getWriteGrantTooltip(createGrant.status, 'create') },
             }}
           >
             New secret key

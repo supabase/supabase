@@ -27,6 +27,10 @@ export const useIsPipelinesBigQueryEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableBigQueryPrivateAlpha')
 }
 
+export const useIsPipelinesIcebergEnabled = () => {
+  return useIsCurrentOrgInFlagList('etlEnableIcebergPrivateAlpha')
+}
+
 export const useIsPipelinesDuckLakeEnabled = () => {
   return useIsCurrentOrgInFlagList('etlEnableDucklakePrivateAlpha')
 }
@@ -42,6 +46,7 @@ export const useIsPipelinesClickHouseEnabled = () => {
 export const useIsPipelinesEnabled = () => {
   const destinationAccess = [
     useIsPipelinesBigQueryEnabled(),
+    useIsPipelinesIcebergEnabled(),
     useIsPipelinesDuckLakeEnabled(),
     useIsPipelinesSnowflakeEnabled(),
     useIsPipelinesClickHouseEnabled(),

@@ -2,19 +2,12 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { keys } from './keys'
-import { handleError, post } from '@/data/fetchers'
+import { handleError, post, unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
-
-export type CreateThirdPartyAuthGrant = GrantFor<
-  'post',
-  '/v1/projects/{ref}/config/auth/third-party-auth'
->
 
 export type CreateThirdPartyAuthVariables = {
   projectRef: string
-  grant: CreateThirdPartyAuthGrant
   customJwks?: Record<string, never>
   jwksUrl?: string
   oidcIssuerUrl?: string
@@ -22,7 +15,6 @@ export type CreateThirdPartyAuthVariables = {
 
 export async function createThirdPartyIntegration({
   projectRef,
-  grant,
   customJwks,
   jwksUrl,
   oidcIssuerUrl,
@@ -38,7 +30,7 @@ export async function createThirdPartyIntegration({
       jwks_url: jwksUrl,
       oidc_issuer_url: oidcIssuerUrl,
     },
-    grant,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
 

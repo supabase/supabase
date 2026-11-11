@@ -15,7 +15,7 @@ import { DuckLakeFields } from '../DestinationPanel/DestinationForm/DuckLake/Fie
 import { NewPublicationPanel } from '../DestinationPanel/DestinationForm/NewPublicationPanel'
 import { SnowflakeFields } from '../DestinationPanel/DestinationForm/Snowflake/Fields'
 import { DESTINATION_DOCS_PATHS } from '../DestinationPanel/DestinationPanel.constants'
-import type { DestinationType } from '../DestinationPanel/DestinationPanel.types'
+import type { FlowDestination } from '../DestinationPanel/DestinationPanel.types'
 import { PipelineConnectionSection } from './PipelineConnectionSection'
 import { PIPELINE_CREATION_STEPS as steps } from './PipelineCreationFlow.constants'
 import { PipelineCreationHeader } from './PipelineCreationHeader'
@@ -39,7 +39,7 @@ import { SteppedFlow, SteppedFlowHeader } from '@/components/ui/SteppedFlow/Step
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { DOCS_URL } from '@/lib/constants'
 
-const getDocsUrl = (step: string, destination: DestinationType) => {
+const getDocsUrl = (step: string, destination: FlowDestination) => {
   if (step === 'connection') return `${DOCS_URL}${DESTINATION_DOCS_PATHS[destination]}`
   if (step === 'data')
     return `${DOCS_URL}/guides/database/replication/pipelines#choosing-which-tables-to-copy`
@@ -54,17 +54,17 @@ export const PipelineCreationFlow = ({
   availableDestinations,
   onClose,
 }: {
-  availableDestinations: DestinationType[]
+  availableDestinations: FlowDestination[]
   onClose: () => void
 }) => {
   const router = useRouter()
   const [step, setStep] = useQueryState('step', stepParser)
   const hasInitializedStepRef = useRef(false)
 
-  const [type, setType] = useState<DestinationType>(availableDestinations[0] ?? 'BigQuery')
+  const [type, setType] = useState<FlowDestination>(availableDestinations[0] ?? 'BigQuery')
   const [isPublicationPanelVisible, setIsPublicationPanelVisible] = useState(false)
   const form = useForm<DestinationPanelSchemaType>({
-    defaultValues: generateDefaultValues({ editMode: false }),
+    defaultValues: generateDefaultValues({ catalogToken: '', editMode: false }),
     shouldUnregister: false,
   })
   const initialTypeRef = useRef(type)

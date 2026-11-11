@@ -17,6 +17,7 @@ import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesIcebergEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '../useIsPipelinesEnabled'
 import { DestinationType } from './DestinationPanel.types'
@@ -26,7 +27,7 @@ interface DestinationTypeOption {
   value: DestinationType
   label: string
   description: string
-  stage: 'Public Alpha' | null
+  stage: 'Public Alpha' | 'Deprecated' | null
   enabled: boolean
 }
 
@@ -38,6 +39,7 @@ interface DestinationTypeGroup {
 export const DestinationTypeSelection = () => {
   const { isEnabled: isCreationPreviewEnabled } = usePipelineCreationPreview()
   const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
   const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
   const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
   const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
@@ -46,6 +48,7 @@ export const DestinationTypeSelection = () => {
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
+      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -101,6 +104,18 @@ export const DestinationTypeSelection = () => {
         },
       ],
     },
+    {
+      label: 'Deprecated',
+      options: [
+        {
+          value: 'Analytics Bucket',
+          label: 'Analytics Bucket',
+          description: 'Replicate changes to Supabase Storage as Apache Iceberg tables',
+          stage: 'Deprecated',
+          enabled: isOptionVisible('Analytics Bucket', isIcebergEnabled),
+        },
+      ],
+    },
   ]
 
   const visibleGroups = groups
@@ -110,8 +125,16 @@ export const DestinationTypeSelection = () => {
 
   const selectedOption = options.find((option) => option.value === destinationType)
 
+  const STAGE_DESCRIPTIONS: Record<
+    NonNullable<DestinationTypeOption['stage']>,
+    (type: DestinationType) => string
+  > = {
+    'Public Alpha': (type) => `${type} support is in public alpha.`,
+    Deprecated: (type) => `${type} is deprecated.`,
+  }
+
   const stageDescription = selectedOption?.stage
-    ? `${selectedOption.value} support is in public alpha.`
+    ? STAGE_DESCRIPTIONS[selectedOption.stage](selectedOption.value)
     : null
 
   const typeDescription =

@@ -1,12 +1,13 @@
 import { toast } from 'sonner'
 
+import { getWriteGrantTooltip } from '@/components/interfaces/APIKeys/APIKeys.utils'
 import { defaultDisabledSmtpFormValues } from '@/components/interfaces/Auth/SmtpForm/SmtpForm.constants'
 import { type ConnectedResource } from '@/components/interfaces/Integrations/Landing/Landing.utils'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { useAuthConfigUpdateMutation } from '@/data/auth/auth-config-update-mutation'
 import { useAuthorizedAppRevokeMutation } from '@/data/oauth/authorized-app-revoke-mutation'
 import { useSecretsDeleteMutation } from '@/data/secrets/secrets-delete-mutation'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useGrant } from '@/lib/grants'
 
 /**
  * Combines the four mutations used to remove a connected resource (OAuth app, secret API key,
@@ -43,7 +44,7 @@ export const useConnectedResourceMutations = ({
       case 'api_key':
         if (!projectRef) throw new Error('Project is required')
         if (!apiKeyDeleteGrant.grant) {
-          const message = getWriteGrantToastMessage(apiKeyDeleteGrant.status, 'delete', 'API keys')
+          const message = 'You need additional permissions to delete API keys'
           toast.error(message)
           throw new Error(message)
         }
@@ -65,7 +66,7 @@ export const useConnectedResourceMutations = ({
   const getRemoveDisabledReason = (resource: ConnectedResource) => {
     if (resource.kind !== 'api_key' || apiKeyDeleteGrant.status === 'granted') return undefined
     return (
-      getWriteGrantTooltip(apiKeyDeleteGrant.status, 'delete', 'API keys') ??
+      getWriteGrantTooltip(apiKeyDeleteGrant.status, 'delete') ??
       'Checking permissions to delete API keys'
     )
   }

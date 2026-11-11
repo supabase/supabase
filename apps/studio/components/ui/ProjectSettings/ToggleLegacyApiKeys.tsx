@@ -1,4 +1,3 @@
-import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { useState } from 'react'
 import { toast } from 'sonner'
@@ -14,21 +13,14 @@ import {
 } from 'ui'
 
 import Panel from '../Panel'
-import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
-import { NoPermission } from '@/components/ui/NoPermission'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useToggleLegacyAPIKeysMutation } from '@/data/api-keys/legacy-api-key-toggle-mutation'
-import { legacyAPIKeysStatusQueryOptions } from '@/data/api-keys/legacy-api-keys-status-query'
-import { legacyJWTSigningKeyQueryOptions } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
 import { useAuthorizedAppsQuery } from '@/data/oauth/authorized-apps-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import {
-  getWriteGrantToastMessage,
-  getWriteGrantTooltip,
-  useGrant,
-  type GrantResult,
-} from '@/lib/grants'
 
 export const ToggleLegacyApiKeysPanel = () => {
   const { ref: projectRef } = useParams()
@@ -37,21 +29,19 @@ export const ToggleLegacyApiKeysPanel = () => {
   const [isConfirmOpen, setIsConfirmOpen] = useState(false)
   const [isAppsWarningOpen, setIsAppsWarningOpen] = useState(false)
 
-  const statusGrant = useGrant('GET /v1/projects/{ref}/api-keys/legacy', { projectRef })
-  const legacyJWTSecretGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys/legacy', {
-    projectRef,
-  })
-  const toggleGrant = useGrant('PUT /v1/projects/{ref}/api-keys/legacy', { projectRef })
-  const canUpdateAPIKeys = toggleGrant.status === 'granted'
-
-  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } = useQuery(
-    legacyAPIKeysStatusQueryOptions({ projectRef, grant: statusGrant.grant })
+  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
+  )
+  const { can: canUpdateAPIKeys, isSuccess: isPermissionsSuccess } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_WRITE
   )
 
-  // Only used to explain why re-enabling is blocked, so it doesn't gate the panel. A 404 resolves
-  // to `null` (not migrated); a real error leaves it undefined and the toggle stays usable.
-  const { data: legacyJWTSecret } = useQuery(
-    legacyJWTSigningKeyQueryOptions({ projectRef, grant: legacyJWTSecretGrant.grant })
+  const { data: legacyAPIKeysStatusData, isSuccess: isLegacyAPIKeysStatusSuccess } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
+
+  const { data: legacyJWTSecret } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
   )
 
   const { data: authorizedApps = [], isError: isAuthorizedAppsError } = useAuthorizedAppsQuery({
@@ -93,26 +83,7 @@ export const ToggleLegacyApiKeysPanel = () => {
         ),
       }
 
-  if (statusGrant.status === 'denied') {
-    return (
-      <section>
-        <NoPermission resourceText="view legacy API keys settings" />
-      </section>
-    )
-  }
-
-  if (statusGrant.status === 'error') {
-    return (
-      <section>
-        <AlertError
-          error={statusGrant.error}
-          subject="Failed to check legacy API keys permissions"
-        />
-      </section>
-    )
-  }
-
-  if (!isLegacyAPIKeysStatusSuccess) {
+  if (!(isLegacyAPIKeysStatusSuccess && isPermissionsSuccess)) {
     return null
   }
 
@@ -145,15 +116,11 @@ export const ToggleLegacyApiKeysPanel = () => {
                 tooltip={{
                   content: {
                     side: 'bottom',
-                    text:
-                      getWriteGrantTooltip(
-                        toggleGrant.status,
-                        'enable or disable',
-                        'JWT-based API keys'
-                      ) ??
-                      (!isLegacyKeysEnabled && legacyJWTSecret?.status === 'revoked'
+                    text: !canUpdateAPIKeys
+                      ? 'You need additional permissions to enable or disable JWT-based API keys'
+                      : !isLegacyKeysEnabled && legacyJWTSecret?.status === 'revoked'
                         ? 'The legacy JWT secret is revoked. Re-enabling is not possible until it is at least moved to previously used.'
-                        : undefined),
+                        : undefined,
                   },
                 }}
               >
@@ -170,7 +137,6 @@ export const ToggleLegacyApiKeysPanel = () => {
         visible={isConfirmOpen}
         onClose={() => setIsConfirmOpen(false)}
         legacyAPIKeysStatusData={legacyAPIKeysStatusData}
-        toggleGrant={toggleGrant}
       />
 
       <AlertDialog open={isAppsWarningOpen} onOpenChange={(value) => setIsAppsWarningOpen(value)}>
@@ -195,12 +161,10 @@ const ToggleApiKeysModal = ({
   visible,
   onClose,
   legacyAPIKeysStatusData,
-  toggleGrant,
 }: {
   visible: boolean
   onClose: () => void
   legacyAPIKeysStatusData: { enabled: boolean }
-  toggleGrant: GrantResult<'PUT /v1/projects/{ref}/api-keys/legacy'>
 }) => {
   const { ref: projectRef } = useParams()
   const { enabled: isLegacyKeysEnabled } = legacyAPIKeysStatusData || {}
@@ -209,16 +173,10 @@ const ToggleApiKeysModal = ({
     useToggleLegacyAPIKeysMutation()
 
   const onToggleLegacyAPIKeysEnabled = () => {
-    if (!toggleGrant.grant) {
-      toast.error(
-        getWriteGrantToastMessage(toggleGrant.status, 'enable or disable', 'JWT-based API keys')
-      )
-      return
-    }
     const enabled = !legacyAPIKeysStatusData?.enabled
 
     toggleLegacyAPIKey(
-      { projectRef, grant: toggleGrant.grant, enabled },
+      { projectRef, enabled },
       {
         onSuccess: () => {
           toast.success(

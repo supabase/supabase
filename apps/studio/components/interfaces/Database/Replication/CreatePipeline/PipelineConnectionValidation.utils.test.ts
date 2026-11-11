@@ -7,7 +7,7 @@ import {
 } from './PipelineConnectionValidation.utils'
 
 const validData = {
-  ...generateDefaultValues({ editMode: false }),
+  ...generateDefaultValues({ catalogToken: '', editMode: false }),
   name: 'Warehouse',
   projectId: 'project',
   datasetId: 'dataset',

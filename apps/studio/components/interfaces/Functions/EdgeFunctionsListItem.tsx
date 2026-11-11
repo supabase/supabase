@@ -29,9 +29,8 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
 
   const showLastHourStats = useFlag('edgeFunctionsRequestMetrics')
 
-  const { data: endpoint, isPending: isEndpointPending } = useProjectApiUrl({ projectRef: ref })
-  const functionUrl = endpoint ? `${endpoint}/functions/v1/${item.slug}` : undefined
-  const isFunctionUrlLoading = !functionUrl && isEndpointPending
+  const { data: endpoint } = useProjectApiUrl({ projectRef: ref })
+  const functionUrl = `${endpoint}/functions/v1/${item.slug}`
 
   const handleNavigation = createNavigationHandler(
     `/project/${ref}/functions/${item.slug}${IS_PLATFORM ? '' : `/code`}`,
@@ -70,41 +69,35 @@ export const EdgeFunctionsListItem = ({ function: item }: EdgeFunctionsListItemP
       </TableCell>
       <TableCell>
         <div className="text-xs text-foreground-light flex gap-2 items-center truncate">
-          {isFunctionUrlLoading && <ShimmeringLoader className="w-48 py-2" />}
-          {functionUrl && (
-            <>
-              <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
-                {functionUrl}
-              </p>
-              <button
-                type="button"
-                tabIndex={0}
-                aria-label="Copy function URL"
-                className="text-foreground-lighter hover:text-foreground transition"
-                onClick={(event: MouseEvent<HTMLButtonElement>) => {
-                  function onCopy(value: string) {
-                    setIsCopied(true)
-                    copyToClipboard(value)
-                    setTimeout(() => setIsCopied(false), 3000)
-                  }
-                  event.stopPropagation()
-                  onCopy(functionUrl)
-                }}
-              >
-                {isCopied ? (
-                  <div className="text-primary">
-                    <CheckIcon size={14} strokeWidth={3} />
-                  </div>
-                ) : (
-                  <div className="relative">
-                    <div className="block">
-                      <CopyIcon size={14} strokeWidth={1.5} />
-                    </div>
-                  </div>
-                )}
-              </button>
-            </>
-          )}
+          <p title={functionUrl} className="font-mono truncate hidden md:inline max-w-120">
+            {functionUrl}
+          </p>
+          <button
+            type="button"
+            tabIndex={0}
+            className="text-foreground-lighter hover:text-foreground transition"
+            onClick={(event: MouseEvent<HTMLButtonElement>) => {
+              function onCopy(value: string) {
+                setIsCopied(true)
+                copyToClipboard(value)
+                setTimeout(() => setIsCopied(false), 3000)
+              }
+              event.stopPropagation()
+              onCopy(functionUrl)
+            }}
+          >
+            {isCopied ? (
+              <div className="text-primary">
+                <CheckIcon size={14} strokeWidth={3} />
+              </div>
+            ) : (
+              <div className="relative">
+                <div className="block">
+                  <CopyIcon size={14} strokeWidth={1.5} />
+                </div>
+              </div>
+            )}
+          </button>
         </div>
       </TableCell>
       <TableCell className="hidden 2xl:table-cell whitespace-nowrap">

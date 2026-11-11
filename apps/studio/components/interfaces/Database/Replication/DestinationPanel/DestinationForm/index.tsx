@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -19,10 +20,13 @@ import {
   useIsPipelinesBigQueryEnabled,
   useIsPipelinesClickHouseEnabled,
   useIsPipelinesDuckLakeEnabled,
+  useIsPipelinesIcebergEnabled,
   useIsPipelinesSnowflakeEnabled,
 } from '../../useIsPipelinesEnabled'
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
 import { AdvancedSettings } from './AdvancedSettings'
+import { getAnalyticsBucketValidationIssues } from './AnalyticsBucket/AnalyticsBucket.utils'
+import { AnalyticsBucketFields } from './AnalyticsBucket/Fields'
 import {
   BIGQUERY_SERVICE_ACCOUNT_JSON_MESSAGE,
   getBigQueryValidationIssues,
@@ -57,13 +61,18 @@ import { useDestinationForm } from './useDestinationForm'
 import { ValidationFailuresSection } from './ValidationFailuresSection'
 import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { AlertError } from '@/components/ui/AlertError'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
+import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 const formId = 'destination-editor'
 
@@ -100,12 +109,15 @@ export const DestinationForm = ({
     selectedType === 'DuckLake' && (!isProjectSuccess || isOrioleDb !== false)
 
   const isBigQueryEnabled = useIsPipelinesBigQueryEnabled()
+  const isIcebergEnabled = useIsPipelinesIcebergEnabled()
   const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
   const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
   const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
+
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
   const [publicationPanelVisible, setPublicationPanelVisible] = useState(false)
+  const [newBucketSheetVisible, setNewBucketSheetVisible] = useState(false)
   const [pendingFormValues, setPendingFormValues] = useState<z.infer<typeof FormSchema> | null>(
     null
   )
@@ -120,11 +132,19 @@ export const DestinationForm = ({
   const availableDestinations = useMemo(() => {
     const destinations = []
     if (isBigQueryEnabled) destinations.push({ value: 'BigQuery', label: 'BigQuery' })
+    if (isIcebergEnabled)
+      destinations.push({ value: 'Analytics Bucket', label: 'Analytics Bucket' })
     if (isDuckLakeEnabled) destinations.push({ value: 'DuckLake', label: 'DuckLake' })
     if (isSnowflakeEnabled) destinations.push({ value: 'Snowflake', label: 'Snowflake' })
     if (isClickHouseEnabled) destinations.push({ value: 'ClickHouse', label: 'ClickHouse' })
     return destinations
-  }, [isBigQueryEnabled, isDuckLakeEnabled, isSnowflakeEnabled, isClickHouseEnabled])
+  }, [
+    isBigQueryEnabled,
+    isDuckLakeEnabled,
+    isIcebergEnabled,
+    isSnowflakeEnabled,
+    isClickHouseEnabled,
+  ])
   const hasNoAvailableDestinations = availableDestinations.length === 0
 
   const sourceId = useReplicationSourceId({ projectRef })
@@ -152,6 +172,26 @@ export const DestinationForm = ({
   const isErrorExistingConfig = editMode && (isErrorDestination || isErrorPipeline)
   const isExistingConfigReady = !editMode || (isSuccessDestination && isSuccessPipeline)
 
+  // Revealed API keys are only ever consumed as the default catalog token for
+  // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
+  // destination types.
+  const shouldPrefillCatalogToken = selectedType === 'Analytics Bucket' && !editMode
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef },
+    { variant: 'reveal' }
+  )
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys, enabled: shouldPrefillCatalogToken }
+    )
+  )
+  const { serviceKey } = apiKeysData ?? {}
+  const catalogToken = serviceKey?.api_key ?? ''
+
+  const { data: projectSettings } = useProjectSettingsV2Query({ projectRef })
+
   const {
     isValidating,
     validateConfiguration,
@@ -168,9 +208,11 @@ export const DestinationForm = ({
       generateDefaultValues({
         destinationData,
         pipelineData,
+        catalogToken,
+        region: projectSettings?.region,
         editMode,
       }),
-    [destinationData, pipelineData, editMode]
+    [destinationData, pipelineData, catalogToken, projectSettings, editMode]
   )
   const form = useForm<z.infer<typeof FormSchema>>({
     mode: 'onSubmit',
@@ -197,6 +239,13 @@ export const DestinationForm = ({
           getBigQueryValidationIssues(data, {
             secretsOptional: editMode,
             validateJson: false,
+          }).forEach(({ path, message }) => {
+            addRequiredFieldError(path, message)
+          })
+        } else if (selectedType === 'Analytics Bucket') {
+          getAnalyticsBucketValidationIssues(data, {
+            secretsOptional: editMode,
+            storedS3AccessKeyId: editMode ? defaultValues.s3AccessKeyId : undefined,
           }).forEach(({ path, message }) => {
             addRequiredFieldError(path, message)
           })
@@ -446,6 +495,22 @@ export const DestinationForm = ({
       {selectedType === 'BigQuery' && isBigQueryEnabled && (
         <BigQueryFields form={form} editMode={editMode} />
       )}
+      {selectedType === 'Analytics Bucket' && isIcebergEnabled && (
+        <>
+          {shouldPrefillCatalogToken && (
+            <ApiKeysAccessNote
+              className="px-5 pt-5"
+              grant={apiKeysGrant}
+              fallback="Enter the catalog token manually."
+            />
+          )}
+          <AnalyticsBucketFields
+            form={form}
+            editMode={editMode}
+            onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+          />
+        </>
+      )}
       {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>
           <p role="status" className="px-5 pt-5 text-sm text-foreground-light empty:sr-only">
@@ -638,6 +703,11 @@ export const DestinationForm = ({
           }
           setPublicationPanelVisible(false)
         }}
+      />
+
+      <CreateAnalyticsBucketSheet
+        open={newBucketSheetVisible}
+        onOpenChange={setNewBucketSheetVisible}
       />
 
       <ValidationWarningsDialog

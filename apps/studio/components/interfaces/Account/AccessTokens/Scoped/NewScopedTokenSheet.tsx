@@ -10,7 +10,7 @@ import {
   SheetTrigger,
 } from 'ui'
 
-import { sanitizeSelection, selectionToScopes } from '../AccessToken.permissions'
+import { selectionToScopes } from '../AccessToken.permissions'
 import { ExperimentalTokenDropdown } from '../Classic/ExperimentalTokenDropdown'
 import { NewScopedTokenForm, type NewScopedTokenFormHandle } from './Form/NewScopedTokenForm'
 import { getExpiryDate, type TokenFormValues } from './Form/NewScopedTokenForm.utils'
@@ -77,9 +77,7 @@ export const NewScopedTokenSheet = ({ onCreateExperimentalToken }: NewScopedToke
       return
     }
 
-    const permissions = selectionToScopes(
-      sanitizeSelection(values.permissions, values.resourceAccess)
-    )
+    const permissions = selectionToScopes(values.permissions)
     if (permissions.length === 0) return
 
     const payload: ScopedAccessTokenCreateVariables = {

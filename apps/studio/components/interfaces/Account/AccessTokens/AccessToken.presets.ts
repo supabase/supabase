@@ -1,11 +1,9 @@
 import {
   getCatalogEntry,
-  getEntryModes,
-  getVisibleEntries,
+  PERMISSION_CATALOG,
   type PermissionCatalogEntry,
   type PermissionMode,
   type PermissionSelection,
-  type ResourceAccessMode,
 } from './AccessToken.permissions'
 
 /**
@@ -82,25 +80,15 @@ export const PERMISSION_PRESETS: PermissionPreset[] = [
 export const getPreset = (id: PermissionPresetId): PermissionPreset | undefined =>
   PERMISSION_PRESETS.find((preset) => preset.id === id)
 
-export const resolvePresetMode = (
-  preset: PermissionPreset,
-  entry: PermissionCatalogEntry,
-  resourceAccess: ResourceAccessMode
-): PermissionMode => {
-  const mode = preset.resolve(entry)
-  return getEntryModes(entry, resourceAccess).includes(mode) ? mode : 'none'
-}
-
 /** Applies a preset over `entries`, leaving any selection outside that subset untouched. */
 export const applyPreset = (
   preset: PermissionPreset,
   selection: PermissionSelection,
-  resourceAccess: ResourceAccessMode,
-  entries: PermissionCatalogEntry[] = getVisibleEntries(resourceAccess)
+  entries: PermissionCatalogEntry[] = PERMISSION_CATALOG
 ): PermissionSelection => {
   const next = { ...selection }
   for (const entry of entries) {
-    next[entry.key] = resolvePresetMode(preset, entry, resourceAccess)
+    next[entry.key] = preset.resolve(entry)
   }
   return next
 }
@@ -111,18 +99,13 @@ export const applyPreset = (
  */
 export const getActivePresetId = (
   selection: PermissionSelection,
-  resourceAccess: ResourceAccessMode,
-  entries: PermissionCatalogEntry[] = getVisibleEntries(resourceAccess)
-): PermissionPresetId | null => getActivePreset(selection, resourceAccess, entries)?.id ?? null
+  entries: PermissionCatalogEntry[] = PERMISSION_CATALOG
+): PermissionPresetId | null => getActivePreset(selection, entries)?.id ?? null
 
 export const getActivePreset = (
   selection: PermissionSelection,
-  resourceAccess: ResourceAccessMode,
-  entries: PermissionCatalogEntry[] = getVisibleEntries(resourceAccess)
+  entries: PermissionCatalogEntry[] = PERMISSION_CATALOG
 ): PermissionPreset | undefined =>
   PERMISSION_PRESETS.find((preset) =>
-    entries.every(
-      (entry) =>
-        (selection[entry.key] ?? 'none') === resolvePresetMode(preset, entry, resourceAccess)
-    )
+    entries.every((entry) => (selection[entry.key] ?? 'none') === preset.resolve(entry))
   )

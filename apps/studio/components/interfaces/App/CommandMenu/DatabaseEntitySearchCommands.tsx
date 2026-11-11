@@ -11,17 +11,15 @@ import {
 
 import { COMMAND_MENU_SECTIONS } from './CommandMenu.utils'
 import {
-  getFunctionEditorRoute,
-  getPolicyEditorRoute,
-  getTableEditorRoute,
-  getTriggerEditorRoute,
-} from './DatabaseEntityRoutes.utils'
-import {
   ENTITY_SEARCH_DEBOUNCE_MS,
   formatFunctionSearchDetails,
   formatTableSearchDetails,
   formatTriggerSearchDetails,
   getEntitySearchQuery,
+  getFunctionEditorRoute,
+  getPolicyEditorRoute,
+  getTableEditorRoute,
+  getTriggerEditorRoute,
   matchesEntitySearch,
   matchesTableRelatedSearch,
   matchesTriggerSearch,

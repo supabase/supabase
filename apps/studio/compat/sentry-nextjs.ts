@@ -9,8 +9,9 @@
  * table editor route). The Vite dev server shims `process`, so the crash
  * only surfaces in the production/test build.
  *
- * vite.config.ts aliases `@sentry/nextjs` to this module; app source keeps
- * importing `@sentry/nextjs`.
+ * vite.config.ts aliases `@sentry/nextjs` to this module for the TanStack
+ * build only — app source keeps importing `@sentry/nextjs`, and the Next
+ * build (`build:next`) is untouched.
  *
  * `@sentry/nextjs` re-exports `@sentry/react` (same version, 10.x) and adds
  * Next-specific helpers on top. Everything Studio uses at runtime —

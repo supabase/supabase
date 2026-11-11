@@ -8,6 +8,7 @@ import { PIPELINE_NAME_FIELD_COPY } from './DestinationFormFieldCopy'
 
 const PIPELINE_NAME_PLACEHOLDERS: Record<DestinationType, string> = {
   BigQuery: 'Analytics Pipeline',
+  'Analytics Bucket': 'Iceberg Pipeline',
   DuckLake: 'Lakehouse Pipeline',
   Snowflake: 'Data Warehouse Pipeline',
   ClickHouse: 'Live Analytics Pipeline',

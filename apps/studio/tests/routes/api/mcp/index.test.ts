@@ -12,12 +12,12 @@ const NOTEBOOK_TOOLS = [
   'delete_notebook',
 ]
 
-function postMcp(method: string, params: Record<string, unknown> = {}, search = '') {
+async function mcpRequest(method: string, params: Record<string, unknown> = {}) {
   const handlers = Route.options.server?.handlers as {
     POST: (ctx: { request: Request }) => Promise<Response>
   }
-  return handlers.POST({
-    request: new Request(`http://localhost/api/mcp${search}`, {
+  const response = await handlers.POST({
+    request: new Request('http://localhost/api/mcp', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -26,23 +26,19 @@ function postMcp(method: string, params: Record<string, unknown> = {}, search = 
       body: JSON.stringify({ jsonrpc: '2.0', id: 1, method, params }),
     }),
   })
-}
-
-async function mcpRequest(method: string, params: Record<string, unknown> = {}) {
-  const response = await postMcp(method, params)
   return response.json()
 }
 
-beforeEach(() => {
-  // `search_docs` loads the docs GraphQL schema while listing tools.
-  mswServer.use(
-    http.get('https://supabase.com/docs/api/graphql', () =>
-      HttpResponse.json({ data: { schema: 'type Query { ping: String }' } })
-    )
-  )
-})
-
 describe('self-hosted /api/mcp notebooks', () => {
+  beforeEach(() => {
+    // `search_docs` loads the docs GraphQL schema while listing tools.
+    mswServer.use(
+      http.get('https://supabase.com/docs/api/graphql', () =>
+        HttpResponse.json({ data: { schema: 'type Query { ping: String }' } })
+      )
+    )
+  })
+
   it('does not list notebook tools', async () => {
     const { result } = await mcpRequest('tools/list')
     const names: string[] = result.tools.map((tool: { name: string }) => tool.name)
@@ -56,20 +52,5 @@ describe('self-hosted /api/mcp notebooks', () => {
 
     expect(body.result?.isError ?? true).toBe(true)
     expect(JSON.stringify(body)).toMatch(/not found|unknown tool/i)
-  })
-})
-
-describe('/api/mcp query validation', () => {
-  it('accepts supported feature groups', async () => {
-    const response = await postMcp('tools/list', {}, '?features=docs,database,feedback')
-
-    expect(response.status).toBe(200)
-  })
-
-  it.each(['notebooks', 'invalid,unknown'])('rejects the %s feature groups', async (features) => {
-    const response = await postMcp('tools/list', {}, `?features=${features}`)
-
-    expect(response.status).toBe(400)
-    expect(await response.json()).toHaveProperty('error.features')
   })
 })

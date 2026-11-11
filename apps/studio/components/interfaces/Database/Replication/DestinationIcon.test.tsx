@@ -4,7 +4,13 @@ import { describe, expect, test } from 'vitest'
 import { DestinationIcon } from './DestinationIcon'
 import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
 
-const DESTINATION_TYPES: DestinationType[] = ['BigQuery', 'DuckLake', 'Snowflake', 'ClickHouse']
+const DESTINATION_TYPES: DestinationType[] = [
+  'BigQuery',
+  'Analytics Bucket',
+  'DuckLake',
+  'Snowflake',
+  'ClickHouse',
+]
 
 describe('DestinationIcon', () => {
   test.each(DESTINATION_TYPES)('renders %s at the canonical stroke width', (type) => {

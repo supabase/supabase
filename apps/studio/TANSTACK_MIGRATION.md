@@ -2,23 +2,31 @@
 
 Temporary tracking doc. Delete once migration is done.
 
-**Runtime model — TanStack Start only**
+**Runtime model — Next.js and TanStack Start run side-by-side**
 
-FE-3106 retired the Next build (`build:next` / `dev:next`, `scripts/dispatch.js`,
-the `STUDIO_FRAMEWORK` switch and the Next E2E shard). `pnpm dev`/`build`/`start`
-run the Vite/TanStack build only, so nothing serves `pages/...` any more.
+Throughout this migration both runtimes coexist in the same workspace:
 
-- `pages/...` files are plain modules: Path A routes still re-export them until
-  the cleanup pass moves each body into its route file and deletes the page.
-- The FE-3106 cleanup PRs delete `pages/...` area by area; deleting a page is
-  safe once its route no longer imports it.
-- The Next compat shims (`apps/studio/compat/next/`) stay while components
-  outside `routes/...` still import `next/*`.
+- The Next.js pages router (`pages/...`) and the TanStack route tree
+  (`routes/...`) ship **at the same time**. The Vite/TanStack build is
+  what we run today; the Next build (`build:next` / `dev:next` scripts
+  in `apps/studio/package.json`) stays alive as a fallback so we can
+  bisect regressions and ship either runtime if needed.
+- **Do not delete any `apps/studio/pages/...` file during the per-route
+  migration.** Path A pages re-export their `pages/` default export, so
+  the Next file is load-bearing for both runtimes. Removing it breaks
+  the Next build and breaks the TanStack route too.
+- Body-moves and `pages/...` deletion happen **only in the final
+  cleanup pass**, after every route is represented in `routes/...` and
+  we're ready to retire the Next runtime entirely. That's a separate,
+  deliberate phase — not something to fold into individual route PRs.
+- Same rule for the Next compat shims (`apps/studio/compat/next/`):
+  they stay until the cleanup pass, regardless of how many routes have
+  moved.
 
 **PR guardrail — mirror page edits into their route**
 
-While a route still re-exports its page, a change to the `pages/...` file can
-leave its `routes/...` wrapper stale. A CodeRabbit `path_instructions`
+Because both runtimes ship at once, any change to a `pages/...` file can
+leave its `routes/...` mirror stale. A CodeRabbit `path_instructions`
 rule (`.coderabbit.yaml`, scoped to `apps/studio/pages/**`) posts a
 review reminder on every PR that touches a page, prompting the author to
 check whether the corresponding route needs the same change. It's a
@@ -45,10 +53,10 @@ Once every page is represented in `routes/`, we do a second pass to properly mov
 
 Other rules:
 
-- New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for code that still imports `next/*`.
+- New code uses native TanStack APIs directly (no `next/router`, no `next/link`). The Next compat shim stays in place for pages we re-export.
 - `withAuth()` HOC → TanStack `beforeLoad` on the containing route/layout. Apply this at shared-layout level where possible.
-- Body moves and `pages/...` deletions happen in the FE-3106 cleanup PRs; mark each entry `[x] A→done` as its page is deleted.
-- Not migrated via this list: `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
+- **Never** delete a `pages/...` file mid-migration — both runtimes need to keep working. Body-moves and Next-file deletions are reserved for the cleanup pass at the very end, after every entry in this checklist is `[x]`. See "Runtime model" above.
+- Not migrated via this list: `pages/api/**` (Next API routes — separate migration), `_app.tsx`, `_document.tsx`, `_error`, `pages/org/_/[[...routeSlug]].tsx`, `pages/project/_/[[...routeSlug]].tsx` (catch-alls — revisit at the end).
 
 **Legend**
 
@@ -379,12 +387,13 @@ These are the layout-only TanStack files. Most hold a single product layout comp
 
 ## API routes
 
-**Strategy — shim.** Each `routes/api/...` file holds its handler
-(moved from `pages/api/...`, which is deleted, FE-3106), wraps it with
-`toWebHandler` from `compat/next/api.ts`, and registers it via
-`createFileRoute(...).server.handlers`. `apiWrapper` and
-`apiAuthenticate` run inside the shim, seeing a NextApiRequest-shaped
-`req` and a proxy `res`.
+**Strategy — shim + re-export.** `compat/next/api.ts` exposes
+`toWebHandler(nextHandler)` that adapts a `(req, res) => …` Next.js handler
+into a TanStack Start Web-fetch handler. Each `routes/api/...` file imports
+the default export from `pages/api/...`, wraps with `toWebHandler`, and
+registers via `createFileRoute(...).server.handlers`. `apiWrapper` and
+`apiAuthenticate` stay untouched — they run inside the shim, seeing a
+NextApiRequest-shaped `req` and a proxy `res`.
 
 **Path conventions** — `pages/api/foo/[bar]/baz.ts` → `routes/api/foo/$bar/baz.ts`;
 `pages/api/foo/[[...slug]].ts` → `routes/api/foo/$.ts`.
@@ -423,7 +432,8 @@ Web-natively from scratch:
 - `routes/api/mcp/index.ts` — uses MCP SDK's
   `WebStandardStreamableHTTPServerTransport` (`handleRequest(request)`
   returns a `Response` directly).
-- `routes/api/ai/docs.ts` is Web-Response native — no shim involved.
+- `pages/api/ai/docs.ts` was already edge-runtime / Web-Response native
+  — direct re-export, no shim involved.
 
 Tracking below is coarse — each bullet is a `pages/api/**` subtree. Check off
 once every file in the subtree has a `routes/api/**` counterpart. Expand into

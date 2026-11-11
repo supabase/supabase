@@ -2,7 +2,7 @@
  * Everything the model needs to know about the ClickHouse-backed Supabase `logs`
  * table, in one place. Both ClickHouse completion flows — the inline "edit this
  * query" path and the whole-query BigQuery rewrite — are assembled from these,
- * server-side in `routes/api/ai/code/complete.ts`, so there is exactly one
+ * server-side in `pages/api/ai/code/complete.ts`, so there is exactly one
  * description of the schema to keep current.
  */
 

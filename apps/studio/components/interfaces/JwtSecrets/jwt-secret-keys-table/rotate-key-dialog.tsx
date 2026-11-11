@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
+  Button,
   Checkbox,
   cn,
   DialogDescription,
@@ -21,7 +22,6 @@ import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 export function RotateKeyDialog({
   projectRef,
@@ -37,10 +37,6 @@ export function RotateKeyDialog({
   const [isStandbyUnderstood, setStandbyUnderstood] = useState(false)
   const [isPreviouslyUsedUnderstood, setPreviouslyUsedUnderstood] = useState(false)
   const [isEdgeFunctionsVerifyJWTUnderstood, setEdgeFunctionsVerifyJWTUnderstood] = useState(false)
-
-  const updateGrant = useGrant('PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}', {
-    projectRef,
-  })
 
   const { data: edgeFunctions, isPending: isLoadingEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef,
@@ -278,37 +274,19 @@ export function RotateKeyDialog({
         )}
       </DialogSection>
       <DialogFooter>
-        <ButtonTooltip
+        <Button
           variant="primary"
-          onClick={() => {
-            if (!updateGrant.grant) {
-              toast.error(getWriteGrantToastMessage(updateGrant.status, 'rotate', 'signing keys'))
-              return
-            }
-            mutate({
-              projectRef,
-              grant: updateGrant.grant,
-              keyId: standbyKey.id,
-              status: 'in_use',
-            })
-          }}
+          onClick={() => mutate({ projectRef, keyId: standbyKey.id, status: 'in_use' })}
           disabled={
-            !updateGrant.grant ||
             isLoadingEdgeFunctions ||
             !isPreviouslyUsedUnderstood ||
             !isStandbyUnderstood ||
             (!!verifyJWTEdgeFunctions.length && !isEdgeFunctionsVerifyJWTUnderstood)
           }
           loading={isPendingMutation}
-          tooltip={{
-            content: {
-              side: 'top',
-              text: getWriteGrantTooltip(updateGrant.status, 'rotate', 'signing keys'),
-            },
-          }}
         >
           Rotate signing key
-        </ButtonTooltip>
+        </Button>
       </DialogFooter>
     </>
   )

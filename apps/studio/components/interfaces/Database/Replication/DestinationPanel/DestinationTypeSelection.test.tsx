@@ -22,12 +22,14 @@ vi.mock('@/components/interfaces/App/FeaturePreview/FeaturePreviewContext', () =
 }))
 
 const mockBigQueryEnabled = vi.fn()
+const mockIcebergEnabled = vi.fn()
 const mockDucklakeEnabled = vi.fn()
 const mockSnowflakeEnabled = vi.fn()
 const mockClickHouseEnabled = vi.fn()
 
 vi.mock('../useIsPipelinesEnabled', () => ({
   useIsPipelinesBigQueryEnabled: () => mockBigQueryEnabled(),
+  useIsPipelinesIcebergEnabled: () => mockIcebergEnabled(),
   useIsPipelinesDuckLakeEnabled: () => mockDucklakeEnabled(),
   useIsPipelinesSnowflakeEnabled: () => mockSnowflakeEnabled(),
   useIsPipelinesClickHouseEnabled: () => mockClickHouseEnabled(),
@@ -57,6 +59,7 @@ describe('DestinationTypeSelection', () => {
     window.localStorage.clear()
     mockCreationPreview.mockReturnValue(false)
     mockBigQueryEnabled.mockReturnValue(false)
+    mockIcebergEnabled.mockReturnValue(false)
     mockDucklakeEnabled.mockReturnValue(false)
     mockSnowflakeEnabled.mockReturnValue(false)
     mockClickHouseEnabled.mockReturnValue(false)
@@ -67,10 +70,19 @@ describe('DestinationTypeSelection', () => {
     mockCreationPreview.mockReturnValue(true)
     mockBigQueryEnabled.mockReturnValue(true)
     mockDucklakeEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
     customRender(<DestinationTypeSelection />)
     expect(await screen.findByRole('radiogroup', { name: 'Destination type' })).toBeInTheDocument()
     expect(screen.queryByRole('combobox')).not.toBeInTheDocument()
-    expect(screen.queryByRole('radio', { name: /Analytics Bucket/ })).not.toBeInTheDocument()
+    expect(screen.getByRole('radio', { name: /Analytics Bucket/ })).toBeInTheDocument()
+    expect(screen.getByText('DEPRECATED')).toBeInTheDocument()
+    fireEvent.click(screen.getByRole('radio', { name: /Analytics Bucket/ }))
+    expect(await screen.findByRole('radio', { name: /Analytics Bucket/ })).toBeChecked()
+    expect(
+      screen.getByText(
+        'Destination type cannot be changed after creation. Analytics Bucket is deprecated.'
+      )
+    ).toBeInTheDocument()
     fireEvent.click(screen.getByRole('radio', { name: /DuckLake/ }))
     expect(await screen.findByRole('radio', { name: /DuckLake/ })).toBeChecked()
   })
@@ -83,6 +95,7 @@ describe('DestinationTypeSelection', () => {
 
   test('groups destinations by release stage', async () => {
     mockBigQueryEnabled.mockReturnValue(true)
+    mockIcebergEnabled.mockReturnValue(true)
     mockDucklakeEnabled.mockReturnValue(true)
     mockSnowflakeEnabled.mockReturnValue(true)
     mockClickHouseEnabled.mockReturnValue(true)
@@ -93,11 +106,11 @@ describe('DestinationTypeSelection', () => {
 
     const publicAlphaGroup = await screen.findByRole('group', { name: 'Public Alpha' })
     expect(screen.queryByText('Early Access')).not.toBeInTheDocument()
-    expect(screen.queryByText('Deprecated')).not.toBeInTheDocument()
+    expect(screen.getByText('Deprecated')).toBeInTheDocument()
     for (const destination of ['BigQuery', 'ClickHouse', 'DuckLake', 'Snowflake']) {
       expect(within(publicAlphaGroup).getByText(destination)).toBeInTheDocument()
     }
-    expect(screen.queryByText('Analytics Bucket')).not.toBeInTheDocument()
+    expect(screen.getByText('Analytics Bucket')).toBeInTheDocument()
   })
 
   test('hides destinations behind disabled feature flags', async () => {

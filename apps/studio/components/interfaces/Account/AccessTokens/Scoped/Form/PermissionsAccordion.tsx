@@ -6,11 +6,9 @@ import { FormLayout } from 'ui-patterns/form/Layout/FormLayout'
 
 import {
   countConfiguredInCategory,
-  getEntryModes,
-  getVisibleCategories,
+  PERMISSION_CATALOG_BY_CATEGORY,
   type PermissionMode,
   type PermissionSelection,
-  type ResourceAccessMode,
 } from '../../AccessToken.permissions'
 import { getActivePreset, type PermissionPreset } from '../../AccessToken.presets'
 import type { TokenAccessEvaluation } from '../../AccessToken.roles'
@@ -21,7 +19,6 @@ import { PermissionRow } from './PermissionRow'
 interface PermissionsAccordionProps {
   control: Control<TokenFormValues>
   selection: PermissionSelection
-  resourceAccess: ResourceAccessMode
   onChange: (key: string, mode: PermissionMode) => void
   onApplyPreset: (preset: PermissionPreset) => void
   access?: TokenAccessEvaluation
@@ -30,14 +27,12 @@ interface PermissionsAccordionProps {
 export const PermissionsAccordion = ({
   control,
   selection,
-  resourceAccess,
   onChange,
   onApplyPreset,
   access,
 }: PermissionsAccordionProps) => {
   const [openCategories, setOpenCategories] = useState<string[]>([])
-  const categories = getVisibleCategories(resourceAccess)
-  const activePreset = getActivePreset(selection, resourceAccess)
+  const activePreset = getActivePreset(selection)
   // Derived, so editing any row back off the preset clears the warning with it.
   const riskyPreset = activePreset?.isRisky === true ? activePreset : undefined
 
@@ -53,11 +48,7 @@ export const PermissionsAccordion = ({
           </p>
         }
       >
-        <PermissionPresetSelect
-          selection={selection}
-          resourceAccess={resourceAccess}
-          onApplyPreset={onApplyPreset}
-        />
+        <PermissionPresetSelect selection={selection} onApplyPreset={onApplyPreset} />
       </FormLayout>
 
       {riskyPreset !== undefined && (
@@ -71,16 +62,16 @@ export const PermissionsAccordion = ({
       )}
 
       <Accordion type="multiple" value={openCategories} onValueChange={setOpenCategories}>
-        {categories.map((category, index) => {
-          const configuredCount = countConfiguredInCategory(selection, category.key, resourceAccess)
+        {PERMISSION_CATALOG_BY_CATEGORY.map((category, index) => {
+          const configuredCount = countConfiguredInCategory(selection, category.key)
           return (
             <AccordionItem
               key={category.key}
               value={category.key}
               className={cn('border', {
-                'border-b-0': index < categories.length - 1,
+                'border-b-0': index < PERMISSION_CATALOG_BY_CATEGORY.length - 1,
                 'rounded-t-md': index === 0,
-                'rounded-b-md': index === categories.length - 1,
+                'rounded-b-md': index === PERMISSION_CATALOG_BY_CATEGORY.length - 1,
               })}
             >
               <AccordionTrigger className="bg-surface-300 first:rounded-t last:rounded-b px-4 py-3 hover:no-underline transition">
@@ -104,7 +95,6 @@ export const PermissionsAccordion = ({
                         control={control}
                         entry={entry}
                         mode={selection[entry.key] ?? 'none'}
-                        modes={getEntryModes(entry, resourceAccess)}
                         onChange={(mode) => onChange(entry.key, mode)}
                         entryAccess={access?.entries[entry.key]}
                       />

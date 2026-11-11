@@ -2,12 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   countConfigured,
-  countConfiguredInCategory,
   getCatalogEntry,
-  getEntryModes,
-  getVisibleCategories,
-  getVisibleEntries,
-  sanitizeSelection,
   scopesToSelection,
   selectionToScopes,
   type PermissionSelection,
@@ -151,16 +146,7 @@ describe('selectionToScopes', () => {
 
 describe('countConfigured', () => {
   it('counts only non-none modes', () => {
-    expect(
-      countConfigured(
-        {
-          'project:database': 'read',
-          'project:storage': 'none',
-          'organization:members': 'readwrite',
-        },
-        'organization'
-      )
-    ).toBe(2)
+    expect(countConfigured({ a: 'read', b: 'none', c: 'readwrite' })).toBe(2)
   })
 })
 
@@ -321,175 +307,5 @@ describe('getEnabledEndpointsForCapability', () => {
         })
       )
     ).toEqual(['PUT /api/upgrade'])
-  })
-})
-
-const PROJECT_SCOPE_HIDDEN_KEYS = [
-  'user:organizations',
-  'organization:audit_logs',
-  'organization:billing',
-  'organization:config',
-  'organization:members',
-  'organization:projects',
-  'organization:platform_webhooks',
-  'project:auth_hooks',
-  'project:auth_users',
-  'project:operations',
-  'project:snippets',
-]
-
-const keysOf = (resourceAccess: 'project' | 'organization' | 'account') =>
-  getVisibleEntries(resourceAccess).map((entry) => entry.key)
-
-describe('project-scope visibility', () => {
-  it('names eleven real catalog entries as hidden', () => {
-    expect(PROJECT_SCOPE_HIDDEN_KEYS).toHaveLength(11)
-    for (const key of PROJECT_SCOPE_HIDDEN_KEYS) {
-      expect(getCatalogEntry(key), key).toBeDefined()
-    }
-  })
-
-  it('hides exactly those entries on project scope', () => {
-    expect(keysOf('project')).toEqual(
-      keysOf('organization').filter((key) => !PROJECT_SCOPE_HIDDEN_KEYS.includes(key))
-    )
-  })
-
-  it('keeps every entry on organization and account scope', () => {
-    for (const key of PROJECT_SCOPE_HIDDEN_KEYS) {
-      expect(keysOf('organization')).toContain(key)
-      expect(keysOf('account')).toContain(key)
-    }
-  })
-
-  it('keeps the account-wide rows and the rest of the project category on project scope', () => {
-    expect(keysOf('project')).toContain('user:projects')
-    expect(keysOf('project')).toContain('user:snippets')
-    expect(keysOf('project')).toContain('organization:admin')
-    expect(keysOf('project')).toContain('project:admin')
-  })
-
-  it('drops a category once every one of its rows is hidden', () => {
-    const categories = getVisibleCategories('project')
-    expect(categories.every((category) => category.entries.length > 0)).toBe(true)
-    expect(categories.map((category) => category.key)).toEqual(
-      getVisibleCategories('organization').map((category) => category.key)
-    )
-  })
-})
-
-describe('getEntryModes', () => {
-  const organizationAdmin = getCatalogEntry('organization:admin')!
-  const projectAdmin = getCatalogEntry('project:admin')!
-  const advisors = getCatalogEntry('project:advisors')!
-
-  it('drops Read from Organization Settings on project scope only', () => {
-    expect(getEntryModes(organizationAdmin, 'project')).toEqual(['none', 'readwrite'])
-    expect(getEntryModes(organizationAdmin, 'organization')).toEqual(['none', 'read', 'readwrite'])
-    expect(getEntryModes(organizationAdmin, 'account')).toEqual(['none', 'read', 'readwrite'])
-  })
-
-  it('leaves every other entry unrestricted', () => {
-    expect(getEntryModes(projectAdmin, 'project')).toEqual(['none', 'read', 'readwrite'])
-    expect(getEntryModes(advisors, 'project')).toEqual(['none', 'read'])
-  })
-})
-
-describe('sanitizeSelection', () => {
-  const configured: PermissionSelection = {
-    'organization:members': 'readwrite',
-    'organization:billing': 'read',
-    'project:snippets': 'readwrite',
-    'project:auth_users': 'read',
-    'user:organizations': 'read',
-    'organization:admin': 'read',
-    'project:admin': 'readwrite',
-  }
-
-  it('resets hidden rows and Organization Settings Read to none on project scope', () => {
-    expect(sanitizeSelection(configured, 'project')).toEqual({
-      'organization:members': 'none',
-      'organization:billing': 'none',
-      'project:snippets': 'none',
-      'project:auth_users': 'none',
-      'user:organizations': 'none',
-      'organization:admin': 'none',
-      'project:admin': 'readwrite',
-    })
-  })
-
-  it('keeps Organization Settings Read-write on project scope', () => {
-    expect(sanitizeSelection({ 'organization:admin': 'readwrite' }, 'project')).toEqual({
-      'organization:admin': 'readwrite',
-    })
-  })
-
-  it('leaves an organization-scoped selection untouched', () => {
-    expect(sanitizeSelection(configured, 'organization')).toEqual(configured)
-  })
-
-  it('drops modes for keys that are not in the catalog', () => {
-    expect(sanitizeSelection({ 'project:gone': 'read' }, 'organization')).toEqual({
-      'project:gone': 'none',
-    })
-  })
-})
-
-describe('configured counters on project scope', () => {
-  const selection: PermissionSelection = {
-    'project:admin': 'read',
-    'project:snippets': 'readwrite',
-    'organization:members': 'readwrite',
-  }
-
-  it('skips hidden rows', () => {
-    expect(countConfigured(selection, 'project')).toBe(1)
-    expect(countConfigured(selection, 'organization')).toBe(3)
-  })
-
-  it('skips hidden rows per category', () => {
-    expect(countConfiguredInCategory(selection, 'project', 'project')).toBe(1)
-    expect(countConfiguredInCategory(selection, 'project', 'organization')).toBe(2)
-    expect(countConfiguredInCategory(selection, 'account', 'project')).toBe(0)
-    expect(countConfiguredInCategory(selection, 'account', 'organization')).toBe(1)
-  })
-})
-
-describe('project-scoped payload', () => {
-  const hiddenScopes = PROJECT_SCOPE_HIDDEN_KEYS.flatMap((key) => {
-    const entry = getCatalogEntry(key)!
-    return [...entry.readScopes, ...entry.writeScopes]
-  })
-
-  it('grants no hidden scope, whatever the selection held', () => {
-    const everything: PermissionSelection = Object.fromEntries(
-      getVisibleEntries('organization').map((entry) => [entry.key, 'readwrite' as const])
-    )
-    const scopes = selectionToScopes(sanitizeSelection(everything, 'project'))
-
-    for (const scope of hiddenScopes) {
-      expect(scopes, scope).not.toContain(scope)
-    }
-    expect(scopes).toContain('project_admin_write')
-  })
-
-  it('grants no organization settings scope when the selection only held Read', () => {
-    const allRead: PermissionSelection = Object.fromEntries(
-      getVisibleEntries('organization').map((entry) => [entry.key, 'read' as const])
-    )
-    const scopes = selectionToScopes(sanitizeSelection(allRead, 'project'))
-
-    for (const scope of hiddenScopes) {
-      expect(scopes, scope).not.toContain(scope)
-    }
-    expect(scopes).not.toContain('organization_admin_read')
-    expect(scopes).toContain('project_admin_read')
-  })
-
-  it('still grants Organization Settings read-write, which carries its read scope', () => {
-    const scopes = selectionToScopes(
-      sanitizeSelection({ 'organization:admin': 'readwrite' }, 'project')
-    )
-    expect(scopes.sort()).toEqual(['organization_admin_read', 'organization_admin_write'])
   })
 })

@@ -1,11 +1,9 @@
-import { screen } from '@testing-library/react'
+import { render, screen } from '@testing-library/react'
 import { Dialog, DialogContent } from 'ui'
 import { describe, expect, it, vi } from 'vitest'
 
 import { CreateKeyDialog } from './create-key-dialog'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
-import { customRender as render } from '@/tests/lib/custom-render'
-import { mockProjectGrantContext } from '@/tests/lib/project-grant-mocks'
 
 const { mockShortcut } = vi.hoisted(() => ({
   mockShortcut: vi.fn(({ children }: any) => <div data-testid="shortcut">{children}</div>),
@@ -15,10 +13,9 @@ vi.mock('@/components/ui/Shortcut', () => ({
   Shortcut: mockShortcut,
 }))
 
-vi.mock('common', async () => {
-  const actual = await vi.importActual<Record<string, unknown>>('common')
-  return { ...actual, useIsLoggedIn: () => true, useParams: () => ({ ref: 'project-ref' }) }
-})
+vi.mock('@/data/jwt-signing-keys/jwt-signing-key-create-mutation', () => ({
+  useJWTSigningKeyCreateMutation: () => ({ mutate: vi.fn(), isPending: false }),
+}))
 
 vi.mock('sonner', () => ({
   toast: {
@@ -28,9 +25,7 @@ vi.mock('sonner', () => ({
 }))
 
 describe('CreateKeyDialog', () => {
-  it('wraps the create standby key button with the submit shortcut', async () => {
-    mockProjectGrantContext({ ref: 'project-ref' })
-
+  it('wraps the create standby key button with the submit shortcut', () => {
     render(
       <Dialog open>
         <DialogContent>
@@ -38,8 +33,6 @@ describe('CreateKeyDialog', () => {
         </DialogContent>
       </Dialog>
     )
-
-    await screen.findByRole('button', { name: 'Create standby key' })
 
     expect(mockShortcut).toHaveBeenCalledWith(
       expect.objectContaining({

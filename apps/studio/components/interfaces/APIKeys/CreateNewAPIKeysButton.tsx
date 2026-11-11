@@ -14,9 +14,10 @@ import {
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { getWriteGrantTooltip } from './APIKeys.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useAPIKeyCreateMutation } from '@/data/api-keys/api-key-create-mutation'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
+import { useGrant } from '@/lib/grants'
 
 export const CreateNewAPIKeysButton = () => {
   const { ref: projectRef } = useParams()
@@ -31,7 +32,10 @@ export const CreateNewAPIKeysButton = () => {
   const handleCreateNewApiKeys = async () => {
     if (!projectRef) return
     if (!createGrant.grant) {
-      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'API keys'))
+      toast.error(
+        getWriteGrantTooltip(createGrant.status, 'create') ??
+          'Still checking permissions to create API keys. Try again in a moment.'
+      )
       return
     }
 
@@ -81,10 +85,7 @@ export const CreateNewAPIKeysButton = () => {
         onClick={() => setCreateKeysDialogOpen(true)}
         disabled={createGrant.status !== 'granted'}
         tooltip={{
-          content: {
-            side: 'bottom',
-            text: getWriteGrantTooltip(createGrant.status, 'create', 'API keys'),
-          },
+          content: { side: 'bottom', text: getWriteGrantTooltip(createGrant.status, 'create') },
         }}
       >
         Create new API keys

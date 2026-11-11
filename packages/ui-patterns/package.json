@@ -799,10 +799,6 @@
       "import": "./src/TopNav/TopNavMenuToggle.tsx",
       "types": "./src/TopNav/TopNavMenuToggle.tsx"
     },
-    "./Trace/Rows": {
-      "import": "./src/Trace/Rows.tsx",
-      "types": "./src/Trace/Rows.tsx"
-    },
     "./Trace/Trace": {
       "import": "./src/Trace/Trace.tsx",
       "types": "./src/Trace/Trace.tsx"
@@ -882,7 +878,6 @@
     "@supabase/sql-to-rest": "^0.1.6",
     "@supabase/supabase-js": "catalog:",
     "@tanstack/react-table": "catalog:",
-    "@tanstack/react-virtual": "^3.13.24",
     "class-variance-authority": "^0.7.1",
     "cmdk": "^1.1.1",
     "common": "workspace:*",

@@ -2,11 +2,10 @@ import { safeSql } from '@supabase/pg-meta'
 import { pipeUIMessageStreamToResponse, streamText, UIMessage } from 'ai'
 import { expect, test, vi } from 'vitest'
 
+import generateV4 from '../../pages/api/ai/sql/generate-v4'
 import { ASSISTANT_TIMEOUT_MS } from '@/lib/ai/assistant-timeout'
 import { getTools } from '@/lib/ai/tools'
 import { sanitizeMessagePart } from '@/lib/ai/tools/tool-sanitizer'
-import { Route } from '@/routes/api/ai/sql/generate-v4'
-import { getRouteHandler } from '@/tests/lib/server-route'
 
 vi.mock('@/lib/ai/tools/tool-sanitizer', () => ({
   sanitizeMessagePart: vi.fn((part) => part),
@@ -63,15 +62,13 @@ vi.mock('ai', async () => {
   }
 })
 
-function createRequest() {
-  const clientConnection = new AbortController()
-  const request = new Request('http://localhost/api/ai/sql/generate-v4', {
+function createMocks() {
+  const mockReq = {
     method: 'POST',
     headers: {
-      Authorization: 'Bearer test-token',
-      'Content-Type': 'application/json',
+      authorization: 'Bearer test-token',
     },
-    body: JSON.stringify({
+    body: {
       messages: [
         {
           id: 'test-msg-id',
@@ -91,24 +88,27 @@ function createRequest() {
       connectionString: 'test-connection',
       orgSlug: 'test-org',
       supportMode: true,
-    }),
-    signal: clientConnection.signal,
-  })
-
-  return {
-    disconnectClient: () => clientConnection.abort(),
-    callGenerateV4: () => getRouteHandler(Route, 'POST')({ request }),
+    },
+    on: vi.fn(),
   }
+
+  const mockRes = {
+    status: vi.fn(() => mockRes),
+    json: vi.fn(() => mockRes),
+    setHeader: vi.fn(() => mockRes),
+    on: vi.fn(),
+  }
+
+  return { mockRes, callGenerateV4: () => generateV4(mockReq as any, mockRes as any) }
 }
 
 test('generateV4 calls the tool sanitizer', async () => {
-  // Keep the stream open so only the client disconnect can release the request.
-  vi.mocked(pipeUIMessageStreamToResponse).mockImplementationOnce(() => new Promise(() => {}))
-  const { disconnectClient, callGenerateV4 } = createRequest()
+  const { mockRes, callGenerateV4 } = createMocks()
 
-  const response = await callGenerateV4()
+  await callGenerateV4()
   expect(pipeUIMessageStreamToResponse).toHaveBeenCalledOnce()
-  expect(response.status).toBe(200)
+  await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
+  expect(mockRes.status).not.toHaveBeenCalledWith(500)
 
   expect(sanitizeMessagePart).toHaveBeenCalled()
   expect(getTools).toHaveBeenCalledWith(
@@ -116,11 +116,9 @@ test('generateV4 calls the tool sanitizer', async () => {
       supportMode: true,
     })
   )
-  // A client disconnect must tear down the remote MCP connection opened in getTools
-  const { signal } = vi.mocked(getTools).mock.calls[0][0]
-  expect(signal?.aborted).toBe(false)
-  disconnectClient()
-  expect(signal?.aborted).toBe(true)
+  // The response 'close' event must be wired up so the remote MCP connection
+  // opened in getTools is torn down when the stream finishes or the client drops
+  expect(mockRes.on).toHaveBeenCalledWith('close', expect.any(Function))
 })
 
 test('generateV4 streams a tool result that continues the previous assistant message', async () => {
@@ -146,7 +144,7 @@ test('generateV4 streams a tool result that continues the previous assistant mes
         }),
       }) as unknown as ReturnType<typeof streamText>
   )
-  const { callGenerateV4 } = createRequest()
+  const { callGenerateV4 } = createMocks()
 
   await callGenerateV4()
   const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value
@@ -171,7 +169,7 @@ test('generateV4 flags a response the deadline stopped and releases the request'
         }),
       }) as unknown as ReturnType<typeof streamText>
   )
-  const { callGenerateV4 } = createRequest()
+  const { callGenerateV4 } = createMocks()
 
   await callGenerateV4()
   const chunks = await vi.mocked(pipeUIMessageStreamToResponse).mock.results[0].value

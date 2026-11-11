@@ -1,5 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQuery } from '@tanstack/react-query'
 import { IS_PLATFORM, useFlag, useParams } from 'common'
 import { AlertCircleIcon, RotateCwIcon, TimerIcon } from 'lucide-react'
 import { AnimatePresence } from 'motion/react'
@@ -13,6 +11,7 @@ import {
   AlertDialogFooter,
   AlertDialogHeader,
   AlertDialogTitle,
+  Button,
   Card,
   CardContent,
   Dialog,
@@ -36,39 +35,25 @@ import { CreateKeyDialog } from './create-key-dialog'
 import { KeyDetailsDialog } from './key-details-dialog'
 import { RotateKeyDialog } from './rotate-key-dialog'
 import { SigningKeyRow } from './signing-key-row'
-import { AlertError } from '@/components/ui/AlertError'
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import {
   getJWTSigningKeyLastUsedAt,
   useApiKeysLastUsedQuery,
 } from '@/data/analytics/api-keys-last-used-query'
-import { legacyAPIKeysStatusQueryOptions } from '@/data/api-keys/legacy-api-keys-status-query'
+import { useLegacyAPIKeysStatusQuery } from '@/data/api-keys/legacy-api-keys-status-query'
 import { useJWTSigningKeyDeleteMutation } from '@/data/jwt-signing-keys/jwt-signing-key-delete-mutation'
 import { useJWTSigningKeyUpdateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-update-mutation'
 import {
   JWTSigningKey,
-  jwtSigningKeysQueryOptions,
+  useJWTSigningKeysQuery,
 } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 import { useLegacyJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-create-mutation'
-import { legacyJWTSigningKeyQueryOptions } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { useLegacyJWTSigningKeyQuery } from '@/data/jwt-signing-keys/legacy-jwt-signing-key-query'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 type DialogType = 'legacy' | 'create' | 'rotate' | 'key-details' | 'revoke' | 'delete'
-
-type LegacyRevokeBlockedReason = 'denied' | 'error' | 'enabled'
-
-const LEGACY_REVOKE_BLOCKED_DESCRIPTION = {
-  denied:
-    "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled. You don't have permission to check or change that setting.",
-  error:
-    "You can't revoke the legacy JWT secret until JWT-based legacy API keys are disabled, and we couldn't check their status. Try again later.",
-  enabled:
-    "It's not possible to revoke the legacy JWT secret unless you have already disabled JWT-based legacy API keys. This is because revoking the JWT secret invalidates the JWT-based legacy API keys.",
-} satisfies Record<LegacyRevokeBlockedReason, string>
 
 const JWTSecretKeysTableHeader = ({
   showLastRotatedAt = false,
@@ -104,27 +89,8 @@ export const JWTSecretKeysTable = () => {
   const [shownDialog, setShownDialog] = useState<DialogType>()
   const showApiKeysLastUsed = useFlag('showApiKeysLastUsed')
 
-  const signingKeysGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys', {
-    projectRef,
-  })
-  const legacyKeyGrant = useGrant('GET /v1/projects/{ref}/config/auth/signing-keys/legacy', {
-    projectRef,
-  })
-  const legacyStatusGrant = useGrant('GET /v1/projects/{ref}/api-keys/legacy', { projectRef })
-  const migrateGrant = useGrant('POST /v1/projects/{ref}/config/auth/signing-keys/legacy', {
-    projectRef,
-  })
-  const updateGrant = useGrant('PATCH /v1/projects/{ref}/config/auth/signing-keys/{id}', {
-    projectRef,
-  })
-  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/config/auth/signing-keys/{id}', {
-    projectRef,
-  })
-
-  // The last-used analytics endpoint still uses legacy permissions (analytics:Read on logflare), not FGA
-  const { can: canReadLastUsed } = useAsyncCheckPermissions(
-    PermissionAction.ANALYTICS_READ,
-    'logflare'
+  const { can: canReadAPIKeys, isLoading: isLoadingCanReadAPIKeys } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.AUTH_SIGNING_KEYS_READ
   )
   const now = useRef(new Date()).current
   const {
@@ -137,33 +103,18 @@ export const JWTSecretKeysTable = () => {
       isoTimestampStart: new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString(),
       isoTimestampEnd: now.toISOString(),
     },
-    { enabled: canReadLastUsed && showApiKeysLastUsed }
+    { enabled: canReadAPIKeys && showApiKeysLastUsed }
   )
-  const {
-    data: signingKeys,
-    error: signingKeysError,
-    isPending: isLoadingSigningKeys,
-    isError: isSigningKeysError,
-  } = useQuery(jwtSigningKeysQueryOptions({ projectRef, grant: signingKeysGrant.grant }))
-  // A 404 means the legacy JWT secret hasn't been migrated yet (`legacyKey` is `null`); other
-  // errors are real failures.
-  const {
-    data: legacyKey,
-    error: legacyKeyError,
-    isPending: isLoadingLegacyKey,
-    isError: isLegacyKeyError,
-  } = useQuery(legacyJWTSigningKeyQueryOptions({ projectRef, grant: legacyKeyGrant.grant }))
-  // Only the legacy revoke dialogs use this status, so it never gates the table. It stays unknown
-  // when its grant is denied or the request fails, and the dialogs fail closed in that case.
-  const { data: legacyAPIKeysStatus, isError: isLegacyAPIKeysStatusError } = useQuery(
-    legacyAPIKeysStatusQueryOptions({ projectRef, grant: legacyStatusGrant.grant })
+  const { data: signingKeys, isPending: isLoadingSigningKeys } = useJWTSigningKeysQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
   )
-
-  // The legacy key is needed too: without it the table would show the "Migrate JWT secret" panel
-  const readGrants = [signingKeysGrant, legacyKeyGrant]
-  const isReadDenied = readGrants.some((grant) => grant.status === 'denied')
-  const isReadGrantLoading = readGrants.some((grant) => grant.status === 'loading')
-  const readGrantError = readGrants.find((grant) => grant.status === 'error')
+  const { data: legacyKey, isPending: isLoadingLegacyKey } = useLegacyJWTSigningKeyQuery(
+    { projectRef },
+    { enabled: canReadAPIKeys }
+  )
+  const { data: legacyAPIKeysStatus, isPending: isLoadingLegacyAPIKeysStatus } =
+    useLegacyAPIKeysStatusQuery({ projectRef }, { enabled: canReadAPIKeys })
 
   const { mutate: migrateJWTSecret, isPending: isMigrating } = useLegacyJWTSigningKeyCreateMutation(
     {
@@ -192,18 +143,7 @@ export const JWTSecretKeysTable = () => {
 
   const isPendingMutation = isUpdatingJWTSigningKey || isDeletingJWTSigningKey || isMigrating
   const isLoading =
-    isProjectLoading || isReadGrantLoading || isLoadingSigningKeys || isLoadingLegacyKey
-
-  const isLegacyAPIKeysKnownDisabled = legacyAPIKeysStatus?.enabled === false
-  const isLegacyAPIKeysStatusUnknown = legacyAPIKeysStatus === undefined
-  const isRevokingLegacyKey = legacyKey?.id !== undefined && legacyKey.id === selectedKey?.id
-  const canConfirmRevoke = !isRevokingLegacyKey || isLegacyAPIKeysKnownDisabled
-  const legacyRevokeBlockedReason: LegacyRevokeBlockedReason =
-    isLegacyAPIKeysStatusUnknown && legacyStatusGrant.status === 'denied'
-      ? 'denied'
-      : isLegacyAPIKeysStatusUnknown && isLegacyAPIKeysStatusError
-        ? 'error'
-        : 'enabled'
+    isProjectLoading || isLoadingSigningKeys || isLoadingLegacyKey || isLoadingLegacyAPIKeysStatus
 
   const sortedKeys = useMemo(() => {
     if (!signingKeys || !Array.isArray(signingKeys.keys)) return []
@@ -240,61 +180,36 @@ export const JWTSecretKeysTable = () => {
   }
 
   const handlePreviouslyUsedKey = async (keyId: string) => {
-    if (!updateGrant.grant) {
-      toast.error(getWriteGrantToastMessage(updateGrant.status, 'update', 'signing keys'))
-      return
-    }
     setSelectedKeyToUpdate(keyId)
     updateJWTSigningKey(
-      { projectRef, grant: updateGrant.grant, keyId, status: 'previously_used' },
+      { projectRef, keyId, status: 'previously_used' },
       { onSuccess: () => toast.success('Successfully moved key to previously used') }
     )
   }
 
   const handleStandbyKey = (keyId: string) => {
-    if (!updateGrant.grant) {
-      toast.error(getWriteGrantToastMessage(updateGrant.status, 'update', 'signing keys'))
-      return
-    }
     setSelectedKeyToUpdate(keyId)
     updateJWTSigningKey(
-      { projectRef: projectRef!, grant: updateGrant.grant, keyId, status: 'standby' },
+      { projectRef: projectRef!, keyId, status: 'standby' },
       { onSuccess: () => toast.success('Successfully moved key to standby') }
     )
   }
 
   const handleRevokeKey = (keyId: string) => {
-    if (!updateGrant.grant) {
-      toast.error(getWriteGrantToastMessage(updateGrant.status, 'revoke', 'signing keys'))
-      return
-    }
     updateJWTSigningKey(
-      { projectRef: projectRef!, grant: updateGrant.grant, keyId, status: 'revoked' },
+      { projectRef: projectRef!, keyId, status: 'revoked' },
       { onSuccess: () => toast.success('Successfully revoked key') }
     )
   }
 
   const handleDeleteKey = (keyId: string) => {
-    if (!deleteGrant.grant) {
-      toast.error(getWriteGrantToastMessage(deleteGrant.status, 'delete', 'signing keys'))
-      return
-    }
     deleteJWTSigningKey(
-      { projectRef: projectRef!, grant: deleteGrant.grant, keyId },
+      { projectRef: projectRef!, keyId },
       { onSuccess: () => toast.success('Successfully deleted key') }
     )
   }
 
-  if (readGrantError?.status === 'error') {
-    return (
-      <AlertError
-        error={readGrantError.error}
-        subject="Failed to check JWT signing keys permissions"
-      />
-    )
-  }
-
-  if (isReadDenied) {
+  if (!canReadAPIKeys && !isLoadingCanReadAPIKeys) {
     return (
       <div className="bg-surface-100 rounded-md border shadow-xs">
         <div className="flex items-center py-8 px-8 space-x-2">
@@ -312,20 +227,10 @@ export const JWTSecretKeysTable = () => {
     return <GenericSkeletonLoader />
   }
 
-  if (isSigningKeysError) {
-    return <AlertError error={signingKeysError} subject="Failed to retrieve JWT signing keys" />
-  }
-
-  if (isLegacyKeyError) {
-    return (
-      <AlertError error={legacyKeyError} subject="Failed to retrieve legacy JWT secret status" />
-    )
-  }
-
   return (
     <>
       <div className="-space-y-px">
-        {legacyKey ? (
+        {!canReadAPIKeys ? null : legacyKey ? (
           <>
             {standbyKey ? (
               <ActionPanel
@@ -372,8 +277,6 @@ export const JWTSecretKeysTable = () => {
                         setSelectedKey={setSelectedKey}
                         setShownDialog={setShownDialog}
                         handleStandbyKey={handleStandbyKey}
-                        updateGrantStatus={updateGrant.status}
-                        deleteGrantStatus={deleteGrant.status}
                         handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                         legacyKey={legacyKey}
                         standbyKey={standbyKey}
@@ -393,8 +296,6 @@ export const JWTSecretKeysTable = () => {
                         setSelectedKey={setSelectedKey}
                         setShownDialog={setShownDialog}
                         handleStandbyKey={handleStandbyKey}
-                        updateGrantStatus={updateGrant.status}
-                        deleteGrantStatus={deleteGrant.status}
                         handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                         lastUsedAt={getLastUsedAt(standbyKey.id)}
                         isLoadingLastUsed={isLoadingLastUsed}
@@ -434,8 +335,6 @@ export const JWTSecretKeysTable = () => {
                             setSelectedKey={setSelectedKey}
                             setShownDialog={setShownDialog}
                             handleStandbyKey={handleStandbyKey}
-                            updateGrantStatus={updateGrant.status}
-                            deleteGrantStatus={deleteGrant.status}
                             handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                             lastUsedAt={getLastUsedAt(key.id)}
                             isLoadingLastUsed={isLoadingLastUsed}
@@ -484,8 +383,6 @@ export const JWTSecretKeysTable = () => {
                         setSelectedKey={setSelectedKey}
                         setShownDialog={setShownDialog}
                         handleStandbyKey={handleStandbyKey}
-                        updateGrantStatus={updateGrant.status}
-                        deleteGrantStatus={deleteGrant.status}
                         handlePreviouslyUsedKey={handlePreviouslyUsedKey}
                         legacyKey={legacyKey}
                         standbyKey={standbyKey}
@@ -517,28 +414,13 @@ export const JWTSecretKeysTable = () => {
             <p>This change does not cause any downtime on your project.</p>
           </DialogSection>
           <DialogFooter>
-            <ButtonTooltip
+            <Button
               variant="primary"
               loading={isMigrating}
-              disabled={!migrateGrant.grant}
-              tooltip={{
-                content: {
-                  side: 'top',
-                  text: getWriteGrantTooltip(migrateGrant.status, 'migrate', 'the JWT secret'),
-                },
-              }}
-              onClick={() => {
-                if (!migrateGrant.grant) {
-                  toast.error(
-                    getWriteGrantToastMessage(migrateGrant.status, 'migrate', 'the JWT secret')
-                  )
-                  return
-                }
-                migrateJWTSecret({ projectRef: projectRef!, grant: migrateGrant.grant })
-              }}
+              onClick={() => migrateJWTSecret({ projectRef: projectRef! })}
             >
               Migrate JWT secret
-            </ButtonTooltip>
+            </Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>
@@ -574,40 +456,47 @@ export const JWTSecretKeysTable = () => {
         </Dialog>
       )}
 
-      {selectedKey && selectedKey.status === 'previously_used' && canConfirmRevoke && (
-        <TextConfirmModal
-          visible={shownDialog === 'revoke'}
-          loading={isPendingMutation}
-          onConfirm={() => handleRevokeKey(selectedKey.id)}
-          onCancel={resetDialog}
-          title={`Revoke ${selectedKey.id}`}
-          confirmString={selectedKey.id}
-          confirmLabel="Yes, revoke this signing key"
-          confirmPlaceholder="Type the ID of the key to confirm"
-          variant="destructive"
-          alert={{
-            title: 'This key will no longer be trusted!',
-            description:
-              'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
-          }}
-        />
-      )}
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        (legacyKey?.id !== selectedKey.id || !(legacyAPIKeysStatus?.enabled ?? false)) && (
+          <TextConfirmModal
+            visible={shownDialog === 'revoke'}
+            loading={isPendingMutation}
+            onConfirm={() => handleRevokeKey(selectedKey.id)}
+            onCancel={resetDialog}
+            title={`Revoke ${selectedKey.id}`}
+            confirmString={selectedKey.id}
+            confirmLabel="Yes, revoke this signing key"
+            confirmPlaceholder="Type the ID of the key to confirm"
+            variant="destructive"
+            alert={{
+              title: 'This key will no longer be trusted!',
+              description:
+                'By revoking a signing key, all applications trusting it will no longer do so. If there are JWTs (access tokens) that are valid at the time of revocation, they will no longer be trusted, causing users with such JWTs to be signed out.',
+            }}
+          />
+        )}
 
-      {selectedKey && selectedKey.status === 'previously_used' && !canConfirmRevoke && (
-        <AlertDialog open={shownDialog === 'revoke'} onOpenChange={() => resetDialog()}>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
-            </AlertDialogHeader>
-            <AlertDialogDescription>
-              {LEGACY_REVOKE_BLOCKED_DESCRIPTION[legacyRevokeBlockedReason]}
-            </AlertDialogDescription>
-            <AlertDialogFooter>
-              <AlertDialogCancel>OK</AlertDialogCancel>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      )}
+      {selectedKey &&
+        selectedKey.status === 'previously_used' &&
+        legacyKey?.id === selectedKey.id &&
+        (legacyAPIKeysStatus?.enabled ?? true) && (
+          <AlertDialog open={shownDialog === 'revoke'} onOpenChange={() => resetDialog()}>
+            <AlertDialogContent>
+              <AlertDialogHeader>
+                <AlertDialogTitle>Disable JWT-based legacy API keys first</AlertDialogTitle>
+              </AlertDialogHeader>
+              <AlertDialogDescription>
+                It's not possible to revoke the legacy JWT secret unless you have already disabled
+                JWT-based legacy API keys. This is because revoking the JWT secret invalidates the
+                JWT-based legacy API keys.
+              </AlertDialogDescription>
+              <AlertDialogFooter>
+                <AlertDialogCancel>OK</AlertDialogCancel>
+              </AlertDialogFooter>
+            </AlertDialogContent>
+          </AlertDialog>
+        )}
 
       {selectedKey && selectedKey.status === 'revoked' && (
         <TextConfirmModal

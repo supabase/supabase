@@ -25,9 +25,9 @@ async function enrollFactor() {
     },
     error: null,
   })
-  await userEvent.type(screen.getByRole('textbox', { name: 'Authenticator name' }), 'Backup')
-  fireEvent.click(screen.getByRole('button', { name: 'Generate QR code' }))
-  await screen.findByText('Verify authenticator app: Backup')
+  await userEvent.type(screen.getByRole('textbox', { name: 'Authenticator app name' }), 'Backup')
+  fireEvent.click(screen.getByRole('button', { name: 'Generate QR' }))
+  await screen.findByText('Verify new factor Backup')
 }
 
 async function verifyFactor() {
@@ -81,16 +81,6 @@ async function confirmRegeneration() {
 }
 
 describe('RecoveryReminder', () => {
-  beforeEach(() => {
-    vi.mocked(useFlag).mockReturnValue(false)
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
-    })
-  })
-
   test('dismisses an untouched reminder only after the resolved check finishes', async () => {
     const onDismiss = vi.fn()
     const { rerender } = customRender(<RecoveryReminder gap="missing" onDismiss={onDismiss} />)
@@ -110,6 +100,7 @@ describe('RecoveryReminder', () => {
     expect(container).toBeEmptyDOMElement()
   })
 
+  beforeEach(() => vi.mocked(useFlag).mockReturnValue(false))
   test('shimmers until a resolved check dismisses the untouched reminder', async () => {
     const onDismiss = vi.fn()
     const { rerender } = customRender(
@@ -257,6 +248,12 @@ describe('RecoveryReminder', () => {
   })
 
   test('returns to the reminder on error and allows retry', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
     vi.spyOn(auth.mfa.recoveryCodes, 'generate')
       .mockResolvedValueOnce({ data: null, error: new AuthError('generation failed') })
       .mockResolvedValue(response)
@@ -294,6 +291,12 @@ describe('RecoveryReminder', () => {
   })
 
   test('does not claim the account is safe when recovery checks fail', () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/projects/:ref',
+      response: () =>
+        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
+    })
     customRender(<RecoveryReminder gap={null} onDismiss={vi.fn()} isError />)
     expect(screen.queryByText('You’re all set')).not.toBeInTheDocument()
     expect(

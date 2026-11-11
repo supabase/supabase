@@ -5,7 +5,7 @@ import { getDataValidationIssues } from './PipelineDataValidation.utils'
 import type { ReplicationPublicationData } from '@/data/replication/publication-query'
 
 const data = {
-  ...generateDefaultValues({ editMode: false }),
+  ...generateDefaultValues({ catalogToken: '', editMode: false }),
   publicationName: 'analytics',
 }
 const publication: ReplicationPublicationData = {

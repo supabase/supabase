@@ -10,6 +10,7 @@
     "build": "turbo run build",
     "build:studio": "turbo run build --filter=studio",
     "build:studio:docker": "docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --no-cache",
+    "build:studio:docker:tanstack": "docker build . -f apps/studio/Dockerfile --target production -t supabase-studio:local-tanstack --build-arg NEXT_PUBLIC_STUDIO_AUTH_MODE=supabase --build-arg STUDIO_FRAMEWORK=tanstack --no-cache",
     "build:design-system": "turbo run build --filter=design-system",
     "build:docs": "turbo run build --filter=docs",
     "build:kb": "turbo run build --filter=kb",

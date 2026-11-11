@@ -1,13 +1,11 @@
 import { AuthError } from '@supabase/auth-js'
 import { fireEvent, screen, waitFor, within } from '@testing-library/react'
-import { HttpResponse } from 'msw'
-import { beforeEach, describe, expect, test, vi } from 'vitest'
+import { describe, expect, test, vi } from 'vitest'
 
 import { formatRecoveryCode } from './RecoveryCodesModal.utils'
 import { RegenerateRecoveryCodesModal } from './RegenerateRecoveryCodesModal'
 import { auth } from '@/lib/gotrue'
 import { customRender } from '@/tests/lib/custom-render'
-import { addAPIMock, type APIErrorBody } from '@/tests/lib/msw'
 
 const { mockCopyToClipboard } = vi.hoisted(() => ({
   mockCopyToClipboard: vi.fn((_value: string, callback: () => void) => {
@@ -41,15 +39,6 @@ const confirmRegenerate = async () => {
 }
 
 describe('RegenerateRecoveryCodesModal', () => {
-  beforeEach(() => {
-    addAPIMock({
-      method: 'get',
-      path: '/platform/projects/:ref',
-      response: () =>
-        HttpResponse.json<APIErrorBody>({ message: 'Project not selected' }, { status: 404 }),
-    })
-  })
-
   test('canceling confirmation does not replace recovery codes', async () => {
     const regenerate = vi.spyOn(auth.mfa.recoveryCodes, 'regenerate')
     customRender(<RegenerateRecoveryCodesModal />)

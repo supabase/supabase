@@ -1,24 +1,10 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { useFlag } from 'common'
-import type { RecoveryCodesSurface } from 'common/telemetry-constants'
 import { useEffect, useState } from 'react'
 import { useForm, type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
-import {
-  Button,
-  Dialog,
-  DialogContent,
-  DialogFooter,
-  DialogHeader,
-  DialogSection,
-  DialogSectionSeparator,
-  DialogTitle,
-  Form,
-  FormControl,
-  FormField,
-  Input,
-} from 'ui'
+import { Form, FormControl, FormField, Input } from 'ui'
 import { Input as PasswordInput } from 'ui-patterns/DataInputs/Input'
 import ConfirmationModal from 'ui-patterns/Dialogs/ConfirmationModal'
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
@@ -30,7 +16,6 @@ import InformationBox from '@/components/ui/InformationBox'
 import { organizationKeys } from '@/data/organizations/keys'
 import { useMfaChallengeAndVerifyMutation } from '@/data/profile/mfa-challenge-and-verify-mutation'
 import { useMfaEnrollMutation } from '@/data/profile/mfa-enroll-mutation'
-import { getMfaListFactors } from '@/data/profile/mfa-list-factors-query'
 import { useMfaUnenrollMutation } from '@/data/profile/mfa-unenroll-mutation'
 import { useRecoveryCodesGenerateMutation } from '@/data/recovery-codes/recovery-codes-generate-mutation'
 import { useRecoveryCodesStatusQuery } from '@/data/recovery-codes/recovery-codes-status-query'
@@ -40,7 +25,6 @@ type TOTP = { qr_code: string; secret: string; uri: string }
 
 interface AddNewFactorModalProps {
   visible: boolean
-  recoveryCodesSurface?: RecoveryCodesSurface
   onClose: () => void
   onComplete?: () => void
   onRecoveryCodesSaved?: () => void
@@ -48,7 +32,6 @@ interface AddNewFactorModalProps {
 
 export const AddNewFactorModal = ({
   visible,
-  recoveryCodesSurface = 'mfa_setup',
   onClose,
   onComplete,
   onRecoveryCodesSaved,
@@ -62,50 +45,28 @@ export const AddNewFactorModal = ({
 
   const recoveryCodesGenerateMutation = useRecoveryCodesGenerateMutation({
     onSettled: () => {
-      handleClose()
+      onClose()
       setIsRecoveryCodesModalOpen(true)
     },
   })
 
   const [isRecoveryCodesModalOpen, setIsRecoveryCodesModalOpen] = useState<boolean>(false)
 
-  const [isBackupOfferOpen, setIsBackupOfferOpen] = useState(false)
-  const [isBackupSetupOpen, setIsBackupSetupOpen] = useState(false)
-  const isSetupVisible = visible || isBackupSetupOpen
-
-  const handleClose = () => {
-    setIsBackupSetupOpen(false)
-    onClose()
-  }
-
-  const handleRecoveryCodesSaved = async () => {
-    onRecoveryCodesSaved?.()
-    try {
-      const factors = await getMfaListFactors()
-      const verifiedAuthenticators = factors.all.filter(
-        (factor) => factor.status === 'verified' && factor.factor_type !== 'recovery_code'
-      )
-      if (verifiedAuthenticators.length === 1) setIsBackupOfferOpen(true)
-    } catch {
-      // The optional offer must not interrupt completed enrollment if this check fails.
-    }
-  }
-
   useEffect(() => {
-    if (!isSetupVisible) reset()
-  }, [reset, isSetupVisible])
+    if (!visible) reset()
+  }, [reset, visible])
 
   return (
     <>
       <FirstStep
-        visible={isSetupVisible && !Boolean(data)}
+        visible={visible && !Boolean(data)}
         isEnrolling={isEnrolling || (enableAuthRecoveryCodes && isRecoveryCodesStatusPending)}
         enroll={enroll}
         reset={reset}
-        onClose={handleClose}
+        onClose={onClose}
       />
       <SecondStep
-        visible={isSetupVisible && Boolean(data)}
+        visible={visible && Boolean(data)}
         factorName={data?.friendly_name ?? ''}
         factor={data as Extract<typeof data, { type: 'totp' }>}
         isLoading={
@@ -113,7 +74,7 @@ export const AddNewFactorModal = ({
           (enableAuthRecoveryCodes &&
             (isRecoveryCodesStatusPending || recoveryCodesGenerateMutation.isPending))
         }
-        onClose={handleClose}
+        onClose={onClose}
         onComplete={async () => {
           onComplete?.()
           if (enableAuthRecoveryCodes) {
@@ -125,50 +86,18 @@ export const AddNewFactorModal = ({
               return
             }
           }
-          handleClose()
+          onClose()
         }}
       />
-
       <RecoveryCodesModal
         open={isRecoveryCodesModalOpen}
-        surface={recoveryCodesSurface}
         onOpenChange={(open) => {
           setIsRecoveryCodesModalOpen(open)
           // A successful close is allowed only after the save acknowledgement.
-          if (!open && recoveryCodesGenerateMutation.isSuccess) void handleRecoveryCodesSaved()
+          if (!open && recoveryCodesGenerateMutation.isSuccess) onRecoveryCodesSaved?.()
         }}
         mutation={recoveryCodesGenerateMutation}
       />
-
-      <Dialog open={isBackupOfferOpen} onOpenChange={setIsBackupOfferOpen}>
-        <DialogContent size="small" aria-describedby={undefined}>
-          <DialogHeader>
-            <DialogTitle>Add another MFA method?</DialogTitle>
-          </DialogHeader>
-          <DialogSectionSeparator />
-          <DialogSection>
-            <p className="text-sm text-foreground-light">
-              Your recovery codes are saved. Set up another authenticator app on a different device
-              as a backup if you lose access to your main device.
-            </p>
-          </DialogSection>
-          <DialogFooter>
-            <Button variant="default" onClick={() => setIsBackupOfferOpen(false)}>
-              Not now
-            </Button>
-            <Button
-              variant="primary"
-              onClick={() => {
-                setIsBackupOfferOpen(false)
-                reset()
-                setIsBackupSetupOpen(true)
-              }}
-            >
-              Add another method
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </>
   )
 }
@@ -209,9 +138,9 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
     <ConfirmationModal
       size="medium"
       visible={visible}
-      title="Set up MFA"
-      confirmLabel="Generate QR code"
-      confirmLabelLoading="Generating QR code"
+      title="Add a new authenticator app as a factor"
+      confirmLabel="Generate QR"
+      confirmLabelLoading="Generating QR"
       loading={isEnrolling}
       onCancel={onClose}
       onConfirm={form.handleSubmit(onSubmit)}
@@ -229,8 +158,8 @@ const FirstStep = ({ visible, isEnrolling, enroll, onClose }: FirstStepProps) =>
             render={({ field }) => (
               <FormItemLayout
                 name="name"
-                label="Authenticator name"
-                description="Use this name to identify the MFA method in settings and during sign-in."
+                label="Authenticator app name"
+                description="Used to identify the app in your account settings and during sign-in."
               >
                 <FormControl>
                   <Input placeholder="e.g.: Google Authenticator" autoFocus {...field} />
@@ -284,7 +213,7 @@ const SecondStep = ({
   const { mutate: unenroll } = useMfaUnenrollMutation({ onSuccess: () => onClose() })
   const { mutate: challengeAndVerify, isPending: isVerifying } = useMfaChallengeAndVerifyMutation({
     onError: (error) => {
-      toast.error(`Failed to add MFA method: ${error?.message}`)
+      toast.error(`Failed to add a second factor authentication:  ${error?.message}`)
     },
     onSuccess: async (_data, variables) => {
       setVerifiedFactorId(variables.factorId)
@@ -293,13 +222,13 @@ const SecondStep = ({
           queryKey: organizationKeys.members(lastVisitedOrganization),
         })
       }
-      toast.success('MFA method added')
+      toast.success(`Successfully added a second factor authentication`)
       onComplete()
     },
   })
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
-    if (!factor) return toast.error('Unable to load this MFA method. Close setup and try again.')
+    if (!factor) return toast.error('Factor required')
     challengeAndVerify({ factorId: factor.id, code: values.code })
   }
 
@@ -311,14 +240,14 @@ const SecondStep = ({
       setFactor(outerFactor)
       form.reset({ code: '' })
     }
-  }, [outerFactor, factor?.id, form])
+  }, [outerFactor])
 
   return (
     <ConfirmationModal
       size="medium"
       visible={visible}
       className="py-5"
-      title={`Verify authenticator app: ${factorName}`}
+      title={`Verify new factor ${factorName}`}
       confirmLabel="Confirm"
       confirmLabelLoading="Confirming"
       loading={isVerifying || isLoading || hasCompletedChallenge}
@@ -331,8 +260,8 @@ const SecondStep = ({
       onConfirm={form.handleSubmit(onSubmit)}
     >
       <p className="text-sm">
-        Scan this QR code with an authenticator app, then enter the code from the app to finish
-        setup.
+        Use an authenticator app to scan the following QR code, and provide the code from the app to
+        complete the enrolment.
       </p>
 
       {!factor && (

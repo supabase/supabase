@@ -42,37 +42,6 @@ export type GrantResult<E extends FgaGuardedEndpoint, V extends VariantOf<E> = n
   | { status: 'denied'; grant?: never }
   | { status: 'error'; error: StudioError; grant?: never }
 
-/**
- * Tooltip text for a write action that is disabled by its grant, e.g.
- * `getWriteGrantTooltip(grant.status, 'create', 'signing keys')`. Returns undefined while the grant
- * is loading or granted.
- */
-export function getWriteGrantTooltip(
-  status: GrantResult<FgaGuardedEndpoint, never>['status'],
-  action: string,
-  resource: string
-) {
-  if (status === 'denied') return `You need additional permissions to ${action} ${resource}`
-  if (status === 'error') return `Failed to check permissions to ${action} ${resource}`
-  return undefined
-}
-
-/**
- * Toast text for a write action that did nothing because its grant is missing, e.g.
- * `toast.error(getWriteGrantToastMessage(grant.status, 'create', 'signing keys'))`. Unlike the
- * tooltip, it always returns a message, including while permissions are still loading.
- */
-export function getWriteGrantToastMessage(
-  status: Exclude<GrantResult<FgaGuardedEndpoint, never>['status'], 'granted'>,
-  action: string,
-  resource: string
-) {
-  return (
-    getWriteGrantTooltip(status, action, resource) ??
-    `Still checking permissions to ${action} ${resource}. Try again in a moment.`
-  )
-}
-
 export type GrantScope = {
   organizationSlug?: string
   projectRef?: string | null

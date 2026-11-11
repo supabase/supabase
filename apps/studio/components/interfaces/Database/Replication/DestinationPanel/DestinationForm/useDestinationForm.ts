@@ -4,7 +4,7 @@ import { toast } from 'sonner'
 import * as z from 'zod'
 
 import { type DestinationType, type ExistingDestination } from '../DestinationPanel.types'
-import { DEFAULT_MAX_FILL_MS } from './DestinationForm.constants'
+import { CREATE_NEW_NAMESPACE, DEFAULT_MAX_FILL_MS } from './DestinationForm.constants'
 import { DestinationPanelFormSchema as FormSchema } from './DestinationForm.schema'
 import {
   buildBatchConfig,
@@ -20,6 +20,8 @@ import { type BatchConfig } from '@/data/replication/types'
 import { useUpdateDestinationPipelineMutation } from '@/data/replication/update-destination-pipeline-mutation'
 import type { ValidationFailure } from '@/data/replication/validate-destination-mutation'
 import { useValidatePipelineMutation } from '@/data/replication/validate-pipeline-mutation'
+import { useIcebergNamespaceCreateMutation } from '@/data/storage/iceberg-namespace-create-mutation'
+import { useS3AccessKeyCreateMutation } from '@/data/storage/s3-access-key-create-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import {
   PipelineStatusRequestStatus,
@@ -49,6 +51,12 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   const { mutateAsync: validatePipeline, isPending: isValidatingPipeline } =
     useValidatePipelineMutation()
 
+  const { mutateAsync: createS3AccessKey, isPending: isCreatingS3AccessKey } =
+    useS3AccessKeyCreateMutation()
+
+  const { mutateAsync: createNamespace, isPending: isCreatingNamespace } =
+    useIcebergNamespaceCreateMutation()
+
   const { mutateAsync: createDestinationPipeline, isPending: creatingDestinationPipeline } =
     useCreateDestinationPipelineMutation({
       onError: () => {},
@@ -66,7 +74,28 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
   const isValidating = isValidatingDestination || isValidatingPipeline
 
   const isSaving =
-    creatingDestinationPipeline || updatingDestinationPipeline || startingPipeline || isValidating
+    creatingDestinationPipeline ||
+    updatingDestinationPipeline ||
+    startingPipeline ||
+    isCreatingS3AccessKey ||
+    isCreatingNamespace ||
+    isValidating
+
+  // Helper function to handle namespace creation if needed
+  const resolveNamespace = async (data: z.infer<typeof FormSchema>) => {
+    if (data.namespace === CREATE_NEW_NAMESPACE) {
+      if (!data.newNamespaceName) throw new Error('New namespace name is required.')
+
+      await createNamespace({
+        projectRef,
+        warehouse: data.warehouseName!,
+        namespace: data.newNamespaceName,
+      })
+
+      return data.newNamespaceName
+    }
+    return data.namespace
+  }
 
   const resetValidation = useCallback(() => {
     setHasRunValidation(false)
@@ -181,10 +210,12 @@ export const useDestinationForm = ({ selectedType }: { selectedType: Destination
     const editMode = !!existingDestination
 
     try {
-      const destinationConfig = buildDestinationConfig({
+      const destinationConfig = await buildDestinationConfig({
         projectRef,
         selectedType,
         data,
+        createS3AccessKey,
+        resolveNamespace,
       })
 
       if (!destinationConfig) throw new Error('Destination configuration is missing.')

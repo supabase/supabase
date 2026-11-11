@@ -130,26 +130,28 @@ export const DeleteOrganizationButton = () => {
 
   return (
     <>
-      <ButtonTooltip
-        variant="danger"
-        disabled={!canDeleteOrganization || !orgSlug}
-        loading={!orgSlug}
-        onClick={() => {
-          setCheckedProjects({})
-          setAcknowledgedAll(false)
-          setIsOpen(true)
-        }}
-        tooltip={{
-          content: {
-            side: 'bottom',
-            text: !canDeleteOrganization
-              ? 'You need additional permissions to delete this organization'
-              : undefined,
-          },
-        }}
-      >
-        Delete organization
-      </ButtonTooltip>
+      <div className="mt-2">
+        <ButtonTooltip
+          variant="danger"
+          disabled={!canDeleteOrganization || !orgSlug}
+          loading={!orgSlug}
+          onClick={() => {
+            setCheckedProjects({})
+            setAcknowledgedAll(false)
+            setIsOpen(true)
+          }}
+          tooltip={{
+            content: {
+              side: 'bottom',
+              text: !canDeleteOrganization
+                ? 'You need additional permissions to delete this organization'
+                : undefined,
+            },
+          }}
+        >
+          Delete organization
+        </ButtonTooltip>
+      </div>
 
       <TextConfirmModal
         visible={isOpen}

@@ -3,6 +3,7 @@ import { useMemo, useState } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
+  Button,
   Checkbox,
   DialogFooter,
   DialogHeader,
@@ -18,12 +19,10 @@ import {
   Textarea,
 } from 'ui'
 
-import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { Shortcut } from '@/components/ui/Shortcut'
 import { useJWTSigningKeyCreateMutation } from '@/data/jwt-signing-keys/jwt-signing-key-create-mutation'
 import { JWTAlgorithm } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
 import { stringToBase64URL } from '@/lib/base64url'
-import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 
 const RSA_JWK_REQUIRED_PROPERTIES = ['kty', 'n', 'e', 'p', 'q', 'd', 'dq', 'dp', 'qi']
@@ -36,8 +35,6 @@ export const CreateKeyDialog = ({
   projectRef: string
   onClose: () => void
 }) => {
-  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/signing-keys', { projectRef })
-  const createTooltip = getWriteGrantTooltip(createGrant.status, 'create', 'signing keys')
   const [newKeyAlgorithm, setNewKeyAlgorithm] = useState<JWTAlgorithm>('ES256')
   const [isBYOK, setBYOK] = useState(false)
   const [privateKey, setPrivateKey] = useState('')
@@ -130,13 +127,8 @@ export const CreateKeyDialog = ({
   })
 
   const handleAddNewStandbyKey = async () => {
-    if (!createGrant.grant) {
-      toast.error(getWriteGrantToastMessage(createGrant.status, 'create', 'signing keys'))
-      return
-    }
     mutate({
       projectRef: projectRef!,
-      grant: createGrant.grant,
       algorithm: newKeyAlgorithm,
       status: 'standby',
       private_jwk: isBYOK
@@ -245,29 +237,20 @@ export const CreateKeyDialog = ({
           onTrigger={handleAddNewStandbyKey}
           options={{
             enabled:
-              !!createGrant.grant &&
-              !isPendingMutation &&
-              !privateKeyMessage &&
-              (!isBYOK || privateKey.trim().length > 0),
+              !isPendingMutation && !privateKeyMessage && (!isBYOK || privateKey.trim().length > 0),
           }}
           side="top"
-          // Hide the shortcut hint while blocked so the permission tooltip shows instead
-          tooltipOpen={createTooltip ? false : undefined}
         >
-          <ButtonTooltip
+          <Button
             variant="primary"
             onClick={() => handleAddNewStandbyKey()}
             disabled={
-              !createGrant.grant ||
-              isPendingMutation ||
-              !!privateKeyMessage ||
-              (isBYOK && privateKey.trim().length === 0)
+              isPendingMutation || !!privateKeyMessage || (isBYOK && privateKey.trim().length === 0)
             }
             loading={isPendingMutation}
-            tooltip={{ content: { side: 'top', text: createTooltip } }}
           >
             Create standby key
-          </ButtonTooltip>
+          </Button>
         </Shortcut>
       </DialogFooter>
     </>

@@ -1,4 +1,4 @@
-import { components, type FgaGuardedEndpoint } from 'api-types'
+import { components } from 'api-types'
 import dayjs from 'dayjs'
 import {
   CircleArrowDownIcon,
@@ -29,7 +29,6 @@ import { CopyableKey } from './copyable-key'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { JWTSigningKey } from '@/data/jwt-signing-keys/jwt-signing-keys-query'
-import { getWriteGrantTooltip, type GrantResult } from '@/lib/grants'
 
 interface SigningKeyRowProps {
   signingKey: components['schemas']['SigningKeyResponse_Output']
@@ -37,8 +36,6 @@ interface SigningKeyRowProps {
   setShownDialog: (dialog?: 'key-details' | 'revoke' | 'delete') => void
   handlePreviouslyUsedKey: (keyId: string) => void
   handleStandbyKey: (keyId: string) => void
-  updateGrantStatus: GrantResult<FgaGuardedEndpoint>['status']
-  deleteGrantStatus: GrantResult<FgaGuardedEndpoint>['status']
   legacyKey?: JWTSigningKey | null
   standbyKey?: JWTSigningKey | null
   isLoading?: boolean
@@ -107,8 +104,6 @@ export const SigningKeyRow = ({
   setShownDialog,
   handlePreviouslyUsedKey,
   handleStandbyKey,
-  updateGrantStatus,
-  deleteGrantStatus,
   legacyKey,
   standbyKey,
   isLoading = false,
@@ -204,33 +199,26 @@ export const SigningKeyRow = ({
             )}
 
             {signingKey.status === 'standby' && (
-              <DropdownMenuItemTooltip
+              <DropdownMenuItem
                 className="gap-x-2"
-                disabled={updateGrantStatus !== 'granted'}
                 onSelect={() => handlePreviouslyUsedKey(signingKey.id)}
-                tooltip={{
-                  content: {
-                    side: 'left',
-                    text: getWriteGrantTooltip(updateGrantStatus, 'update', 'signing keys'),
-                  },
-                }}
               >
                 <CircleArrowDownIcon size={14} />
                 Move to previously used
-              </DropdownMenuItemTooltip>
+              </DropdownMenuItem>
             )}
             {signingKey.status === 'previously_used' && (
               <>
                 <DropdownMenuItemTooltip
+                  disabled={!!standbyKey}
                   className="gap-x-2"
-                  disabled={updateGrantStatus !== 'granted' || !!standbyKey}
                   onSelect={() => handleStandbyKey(signingKey.id)}
                   tooltip={{
                     content: {
                       side: 'left',
-                      text:
-                        getWriteGrantTooltip(updateGrantStatus, 'update', 'signing keys') ??
-                        (standbyKey ? 'You may only have one standby key at a time' : undefined),
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
                     },
                   }}
                 >
@@ -238,37 +226,30 @@ export const SigningKeyRow = ({
                   Move to standby key
                 </DropdownMenuItemTooltip>
 
-                <DropdownMenuItemTooltip
+                <DropdownMenuItem
                   className="gap-x-2"
-                  disabled={updateGrantStatus !== 'granted'}
                   onSelect={() => {
                     setSelectedKey(signingKey)
                     setShownDialog('revoke')
                   }}
-                  tooltip={{
-                    content: {
-                      side: 'left',
-                      text: getWriteGrantTooltip(updateGrantStatus, 'revoke', 'signing keys'),
-                    },
-                  }}
                 >
                   <ShieldOffIcon size={14} />
                   Revoke key
-                </DropdownMenuItemTooltip>
+                </DropdownMenuItem>
               </>
             )}
             {signingKey.status === 'revoked' && (
               <>
                 <DropdownMenuItemTooltip
                   className="gap-x-2"
-                  disabled={updateGrantStatus !== 'granted' || !!standbyKey}
+                  disabled={!!standbyKey}
                   onSelect={() => handleStandbyKey(signingKey.id)}
                   tooltip={{
                     content: {
                       side: 'left',
-                      text:
-                        getWriteGrantTooltip(updateGrantStatus, 'update', 'signing keys') ??
-                        (standbyKey ? 'You may only have one standby key at a time' : undefined),
+                      text: !!standbyKey
+                        ? 'You may only have one standby key at a time'
+                        : undefined,
                     },
                   }}
                 >
@@ -276,23 +257,17 @@ export const SigningKeyRow = ({
                   Move to standby key
                 </DropdownMenuItemTooltip>
 
-                <DropdownMenuItemTooltip
+                <DropdownMenuItem
                   onSelect={() => {
                     setSelectedKey(signingKey)
                     setShownDialog('delete')
                   }}
                   className="gap-x-2"
-                  disabled={deleteGrantStatus !== 'granted' || legacyKey?.id === signingKey.id}
-                  tooltip={{
-                    content: {
-                      side: 'left',
-                      text: getWriteGrantTooltip(deleteGrantStatus, 'delete', 'signing keys'),
-                    },
-                  }}
+                  disabled={legacyKey?.id === signingKey.id}
                 >
                   <Trash2Icon size={14} />
                   Delete permanently
-                </DropdownMenuItemTooltip>
+                </DropdownMenuItem>
               </>
             )}
           </DropdownMenuContent>

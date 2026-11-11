@@ -2,25 +2,17 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { keys } from './keys'
-import { del, handleError } from '@/data/fetchers'
+import { del, handleError, unguarded } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
-import type { GrantFor } from '@/lib/grants'
 import type { UseCustomMutationOptions } from '@/types'
-
-export type DeleteThirdPartyAuthIntegrationGrant = GrantFor<
-  'delete',
-  '/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}'
->
 
 export type DeleteThirdPartyAuthIntegrationVariables = {
   projectRef: string
-  grant: DeleteThirdPartyAuthIntegrationGrant
   tpaId: string
 }
 
 export async function deleteThirdPartyIntegration({
   projectRef,
-  grant,
   tpaId,
 }: DeleteThirdPartyAuthIntegrationVariables) {
   const { data, error } = await del('/v1/projects/{ref}/config/auth/third-party-auth/{tpa_id}', {
@@ -30,7 +22,7 @@ export async function deleteThirdPartyIntegration({
         tpa_id: tpaId,
       },
     },
-    grant,
+    grant: unguarded.migrating,
   })
   if (error) handleError(error)
   return data

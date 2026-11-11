@@ -21,7 +21,7 @@ export const CreateAnalyticsBucketModal = ({
           <DialogTitle>Create {config.singularName} bucket</DialogTitle>
         </DialogHeader>
         <DialogSectionSeparator />
-        <CreateAnalyticsBucketForm onOpenChange={onOpenChange} />
+        <CreateAnalyticsBucketForm type="dialog" onOpenChange={onOpenChange} />
       </DialogContent>
     </Dialog>
   )

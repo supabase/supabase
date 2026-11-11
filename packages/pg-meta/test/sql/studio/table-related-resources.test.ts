@@ -152,54 +152,6 @@ withTestDatabase('returns empty results for a table that is not there', async (d
     create policy "posts are public" on public.blog_posts for select using (true);
   `)
 
-  expect(await related(db, 'blog_posts', 'other_schema')).toEqual({
-    policies: [],
-    triggers: [],
-    indexes: [],
-  })
+  expect(await related(db, 'blog_posts', 'other_schema')).toEqual({ policies: [], triggers: [] })
   expect(await referencingFunctions(db, 'blog_posts', 'other_schema')).toEqual([])
-})
-
-withTestDatabase('returns the indexes of the table, with the columns they cover', async (db) => {
-  await db.executeQuery(`
-    create table public.blog_posts (
-      id int primary key,
-      slug text unique,
-      author_id int,
-      created_at timestamptz,
-      body text
-    );
-    create table public.comments (id int primary key);
-
-    create index idx_posts_created_author on public.blog_posts (created_at, author_id);
-    create index idx_posts_lower_slug on public.blog_posts (lower(slug));
-  `)
-
-  const { indexes } = await related(db, 'blog_posts')
-
-  expect(indexes).toEqual([
-    // The primary key and unique constraint each bring an index of their own
-    expect.objectContaining({
-      name: 'blog_posts_pkey',
-      columns: ['id'],
-      is_primary: true,
-      is_unique: true,
-    }),
-    expect.objectContaining({
-      name: 'blog_posts_slug_key',
-      columns: ['slug'],
-      is_primary: false,
-      is_unique: true,
-    }),
-    // Declared (created_at, author_id), the reverse of the table's column
-    // order, so this fails if the columns come back in attnum order
-    expect.objectContaining({
-      name: 'idx_posts_created_author',
-      columns: ['created_at', 'author_id'],
-      is_primary: false,
-      is_unique: false,
-    }),
-    // An expression has no column to name
-    expect.objectContaining({ name: 'idx_posts_lower_slug', columns: ['(expression)'] }),
-  ])
 })
