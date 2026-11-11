@@ -60,6 +60,8 @@ export type FeatureFlagContextType = {
   configcat: { [key: string]: boolean | number | string | null }
   posthog: CallFeatureFlagsResponse
   hasLoaded?: boolean
+  /** The user the flags were fetched for. Undefined when they were fetched logged out. */
+  userId?: string
   /**
    * True while ConfigCat flags are being re-evaluated after `getConfigCatFlags` changed,
    * e.g. because its custom attributes changed. Until then, `configcat` holds values
@@ -170,6 +172,7 @@ export const FeatureFlagProvider = ({
         configcat: {},
         posthog: {},
         configCatFetcher: getConfigCatFlags,
+        userId: user?.id,
       }
 
       // Run both async operations in parallel — allSettled so a failure in one doesn't block the other
