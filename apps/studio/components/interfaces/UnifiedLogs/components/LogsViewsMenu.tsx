@@ -1,8 +1,15 @@
-import { AlertCircleIcon, BookmarkIcon, EditIcon, Loader2Icon, Trash2Icon } from 'lucide-react'
+import {
+  AlertCircleIcon,
+  BookmarkIcon,
+  EditIcon,
+  Loader2Icon,
+  SquareStackIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import { KeyboardEvent, useState } from 'react'
 import {
-  Badge,
   Button,
+  cn,
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -12,7 +19,7 @@ import {
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
-import { countActiveFilters, type LogsView } from '../UnifiedLogs.views'
+import { type LogsView } from '../UnifiedLogs.views'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 
 interface LogsViewsMenuProps {
@@ -20,25 +27,31 @@ interface LogsViewsMenuProps {
   isLoading: boolean
   isError: boolean
   activeViewId: string | null
+  isActiveViewModified: boolean
   hasActiveFilters: boolean
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
   onSaveCurrentView: () => void
+  onUpdateActiveView: () => void
 }
 
 const LogsViewRow = ({
   view,
   isActive,
+  isModified,
   onApply,
   onRename,
   onRequestDelete,
+  onUpdateActive,
 }: {
   view: LogsView
   isActive: boolean
+  isModified: boolean
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => void
   onRequestDelete: (id: string) => void
+  onUpdateActive: () => void
 }) => {
   const [isEditingName, setIsEditingName] = useState(false)
   const [name, setName] = useState(view.name)
@@ -79,10 +92,31 @@ const LogsViewRow = ({
   }
 
   return (
-    <DropdownMenuItem className="group justify-between gap-2" onSelect={() => onApply(view)}>
-      <span className={isActive ? 'font-medium truncate' : 'truncate'}>{view.name}</span>
-      <div className="flex items-center gap-1 shrink-0">
-        <Badge>{countActiveFilters(view)}</Badge>
+    <DropdownMenuItem
+      className={cn('group justify-between gap-2', isActive && 'bg-foreground-lighter/10')}
+      onSelect={() => onApply(view)}
+    >
+      <div className="flex items-center min-w-0">
+        <SquareStackIcon size={14} className="mr-2 shrink-0 text-foreground-light" />
+        <span className={cn('truncate', isActive && 'font-medium')}>{view.name}</span>
+        {isActive && isModified && (
+          <span className="ml-2 text-foreground-lighter text-xs shrink-0">(modified)</span>
+        )}
+      </div>
+      <div className="flex items-center gap-2 shrink-0">
+        {isActive && isModified && (
+          <Button
+            variant="text"
+            size="tiny"
+            className="px-1.5"
+            onClick={(e) => {
+              e.stopPropagation()
+              onUpdateActive()
+            }}
+          >
+            Update
+          </Button>
+        )}
         <Button
           variant="text"
           size="tiny"
@@ -115,13 +149,16 @@ export const LogsViewsMenu = ({
   isLoading,
   isError,
   activeViewId,
+  isActiveViewModified,
   hasActiveFilters,
   onApply,
   onRename,
   onDelete,
   onSaveCurrentView,
+  onUpdateActiveView,
 }: LogsViewsMenuProps) => {
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
+  const isViewActive = activeViewId !== null
 
   return (
     <>
@@ -129,8 +166,8 @@ export const LogsViewsMenu = ({
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
             size="tiny"
-            className="w-[26px]"
-            icon={<BookmarkIcon className="text-foreground" />}
+            className={cn('w-[26px]', isViewActive && 'bg-brand-default/10')}
+            icon={<BookmarkIcon className={isViewActive ? 'text-brand-600' : 'text-foreground'} />}
             aria-label="Saved views"
             tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
           />
@@ -142,8 +179,8 @@ export const LogsViewsMenu = ({
             </DropdownMenuItem>
           )}
           {!isLoading && isError && (
-            <DropdownMenuItem disabled className="gap-2 text-foreground-light">
-              <AlertCircleIcon size={14} />
+            <DropdownMenuItem disabled className="text-foreground-light">
+              <AlertCircleIcon size={14} className="mr-2" />
               Failed to load views
             </DropdownMenuItem>
           )}
@@ -159,9 +196,11 @@ export const LogsViewsMenu = ({
                 key={view.id}
                 view={view}
                 isActive={view.id === activeViewId}
+                isModified={isActiveViewModified}
                 onApply={onApply}
                 onRename={onRename}
                 onRequestDelete={(id) => setDeleteTarget(views.find((v) => v.id === id) ?? null)}
+                onUpdateActive={onUpdateActiveView}
               />
             ))}
           {hasActiveFilters && (

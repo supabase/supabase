@@ -27,7 +27,6 @@ import {
 } from 'ui'
 
 import { RefreshButton } from '../../ui/DataTable/RefreshButton'
-import { ActiveViewBadge } from './components/ActiveViewBadge'
 import { generateDynamicColumns, UNIFIED_LOGS_COLUMNS } from './components/Columns'
 import { DownloadLogsButton } from './components/DownloadLogsButton'
 import { LogsFilterBar } from './components/LogsFilterBar'
@@ -36,6 +35,12 @@ import { LogsListPanel } from './components/LogsListPanel'
 import { LogsTable } from './components/LogsTable'
 import { LogsViewsMenu } from './components/LogsViewsMenu'
 import { SaveViewDialog } from './components/SaveViewDialog'
+import { SaveViewSuggestionBanner } from './components/SaveViewSuggestionBanner'
+import {
+  getFilterCombinationKey,
+  isFilterComboAlreadySaved,
+  shouldShowSaveViewSuggestion,
+} from './components/SaveViewSuggestionBanner.utils'
 import { TooltipLabel } from './components/TooltipLabel'
 import { ServiceFlowPanel } from './ServiceFlowPanel'
 import { LOG_TYPES, PIPELINE_LOG_LEVEL_LABELS, SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
@@ -150,6 +155,7 @@ export const UnifiedLogs = ({
   } = useLogsViews()
   const [activeViewId, setActiveViewId] = useState<string | null>(null)
   const [isSaveViewDialogOpen, setIsSaveViewDialogOpen] = useState(false)
+  const [dismissedFilterKeys, setDismissedFilterKeys] = useState<Set<string>>(new Set())
   const computeAvailability = getComputeLogsAvailability({
     isPlatform: IS_PLATFORM,
     flagsLoaded,
@@ -464,12 +470,22 @@ export const UnifiedLogs = ({
   )
   const activeView = savedViews.find((view) => view.id === activeViewId) ?? null
   const isActiveViewModified = activeView ? isViewModified(activeView, search) : false
-  const hasActiveFilters = parseLogsFilterUrlParams(search.filter).length > 0
+  const activeFilterCount = parseLogsFilterUrlParams(search.filter).length
+  const hasActiveFilters = activeFilterCount > 0
   const logSource = getLogAttributeSources(searchParameters)[0] ?? 'edge_logs'
   const currentDraft = useMemo(
     () => serializeView({ name: '', logSource, search }),
     [logSource, search]
   )
+  const filterCombinationKey = getFilterCombinationKey(search.filter)
+  const showSaveViewSuggestion = shouldShowSaveViewSuggestion({
+    isEnabled: showSavedViews,
+    activeFilterCount,
+    hasActiveView: !!activeView,
+    isDialogOpen: isSaveViewDialogOpen,
+    isDismissed: dismissedFilterKeys.has(filterCombinationKey),
+    isAlreadySaved: isFilterComboAlreadySaved(currentDraft.filters, savedViews),
+  })
 
   const handleApplyView = (view: LogsView) => {
     const { params, dropped } = applyView(view, { filterableNames })
@@ -498,6 +514,10 @@ export const UnifiedLogs = ({
     const id = createSavedView(input)
     setActiveViewId(id)
     setIsSaveViewDialogOpen(false)
+  }
+
+  const handleDismissSuggestion = () => {
+    setDismissedFilterKeys((prev) => new Set(prev).add(filterCombinationKey))
   }
 
   const applyFilterSearch = () => {
@@ -648,19 +668,7 @@ export const UnifiedLogs = ({
                   )}
 
                   <div className="order-first w-full min-w-0 sm:order-0 sm:w-auto sm:flex-1 py-2">
-                    <LogsFilterBar
-                      offeredFilters={offeredFilters}
-                      activeViewBadge={
-                        showSavedViews ? (
-                          <ActiveViewBadge
-                            view={activeView}
-                            isModified={isActiveViewModified}
-                            onUpdate={handleUpdateActiveView}
-                            onClear={() => setActiveViewId(null)}
-                          />
-                        ) : undefined
-                      }
-                    />
+                    <LogsFilterBar offeredFilters={offeredFilters} />
                   </div>
 
                   {hasFilterSideBar && (
@@ -681,11 +689,13 @@ export const UnifiedLogs = ({
                         isLoading={isLoadingSavedViews}
                         isError={isErrorSavedViews}
                         activeViewId={activeViewId}
+                        isActiveViewModified={isActiveViewModified}
                         hasActiveFilters={hasActiveFilters}
                         onApply={handleApplyView}
                         onRename={(id, name) => updateSavedView(id, { name })}
                         onDelete={deleteSavedView}
                         onSaveCurrentView={handleSaveCurrentView}
+                        onUpdateActiveView={handleUpdateActiveView}
                       />
                     )}
                     <DataTableViewOptions />
@@ -724,6 +734,12 @@ export const UnifiedLogs = ({
                   projectRef={projectRef}
                 />
               )}
+              <SaveViewSuggestionBanner
+                visible={showSaveViewSuggestion}
+                activeFilterCount={activeFilterCount}
+                onSave={handleSaveCurrentView}
+                onDismiss={handleDismissSuggestion}
+              />
               <ResizablePanelGroup
                 key="main-logs"
                 className="flex-1 border-t"

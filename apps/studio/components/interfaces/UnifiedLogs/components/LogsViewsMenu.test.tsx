@@ -29,11 +29,13 @@ const baseProps = {
   isLoading: false,
   isError: false,
   activeViewId: null,
+  isActiveViewModified: false,
   hasActiveFilters: false,
   onApply: vi.fn(),
   onRename: vi.fn(),
   onDelete: vi.fn(),
   onSaveCurrentView: vi.fn(),
+  onUpdateActiveView: vi.fn(),
 }
 
 const openMenu = async () => {
@@ -65,14 +67,73 @@ describe('LogsViewsMenu', () => {
     expect(await screen.findByText('Failed to load views')).toBeInTheDocument()
   })
 
-  it('lists views with their active filter count', async () => {
+  it('lists views by name', async () => {
     const view = makeView()
     customRender(<LogsViewsMenu {...baseProps} views={[view]} />)
 
     await openMenu()
 
     expect(await screen.findByText('Errors only')).toBeInTheDocument()
-    expect(screen.getByText('1')).toBeInTheDocument()
+  })
+
+  it('highlights the active view in the list', async () => {
+    const view = makeView()
+    customRender(<LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} />)
+
+    await openMenu()
+
+    const row = (await screen.findByText('Errors only')).closest('[role="menuitem"]')
+    expect(row).toHaveClass('bg-foreground-lighter/10')
+  })
+
+  it('shows a modified indicator and an Update action for the active view when modified', async () => {
+    const view = makeView()
+    const onUpdateActiveView = vi.fn()
+    customRender(
+      <LogsViewsMenu
+        {...baseProps}
+        views={[view]}
+        activeViewId={view.id}
+        isActiveViewModified
+        onUpdateActiveView={onUpdateActiveView}
+      />
+    )
+
+    await openMenu()
+
+    expect(await screen.findByText('(modified)')).toBeInTheDocument()
+    await userEvent.click(screen.getByRole('button', { name: 'Update' }))
+    expect(onUpdateActiveView).toHaveBeenCalledOnce()
+  })
+
+  it('does not show the modified indicator for an unmodified active view', async () => {
+    const view = makeView()
+    customRender(
+      <LogsViewsMenu
+        {...baseProps}
+        views={[view]}
+        activeViewId={view.id}
+        isActiveViewModified={false}
+      />
+    )
+
+    await openMenu()
+
+    expect(screen.queryByText('(modified)')).not.toBeInTheDocument()
+  })
+
+  it('shows the trigger in an active state when a view is active', async () => {
+    customRender(<LogsViewsMenu {...baseProps} views={[makeView()]} activeViewId="view-1" />)
+
+    expect(screen.getByRole('button', { name: 'Saved views' })).toHaveClass('bg-brand-default/10')
+  })
+
+  it('does not show the trigger as active when no view is active', async () => {
+    customRender(<LogsViewsMenu {...baseProps} views={[makeView()]} />)
+
+    expect(screen.getByRole('button', { name: 'Saved views' })).not.toHaveClass(
+      'bg-brand-default/10'
+    )
   })
 
   it('applies a view when its row is clicked', async () => {

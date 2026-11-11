@@ -2,7 +2,7 @@ import { useQueries } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { LoaderCircleIcon, SearchIcon } from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
-import { ReactNode, useEffect, useEffectEvent, useRef, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import {
   FilterBar,
   FilterCondition,
@@ -51,10 +51,9 @@ const TimeRangeOption = ({ onChange }: CustomOptionProps) => (
 
 interface LogsFilterBarProps {
   offeredFilters?: readonly string[]
-  activeViewBadge?: ReactNode
 }
 
-export const LogsFilterBar = ({ offeredFilters, activeViewBadge }: LogsFilterBarProps) => {
+export const LogsFilterBar = ({ offeredFilters }: LogsFilterBarProps) => {
   const { ref: projectRef } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { table, filterFields, columnFilters, isFetching, searchParameters } = useDataTable<
@@ -203,19 +202,15 @@ export const LogsFilterBar = ({ offeredFilters, activeViewBadge }: LogsFilterBar
   }, [columnFilters, user])
 
   return (
-    <div
-      onFocusCapture={() => setHasFocusedFilterBar(true)}
-      className="flex items-center gap-2 min-w-0"
-    >
+    <div onFocusCapture={() => setHasFocusedFilterBar(true)}>
       <span role="status" aria-live="polite" aria-atomic="true" className="sr-only">
         {attributeDiscoveryStatus}
       </span>
-      {activeViewBadge}
       <FilterBar
         ref={filterBarRef}
         variant="pill"
         freeformDefaultProperty="event_message"
-        className="flex-1 min-w-0 bg-transparent border-0 [&>div>div>div>input]:!text-xs"
+        className="bg-transparent border-0 [&>div>div>div>input]:!text-xs"
         filterProperties={filterPropertiesWithAvailability}
         freeformText={freeformText}
         filters={filters}
