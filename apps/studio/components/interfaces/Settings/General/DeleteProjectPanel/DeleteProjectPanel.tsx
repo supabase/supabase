@@ -1,4 +1,4 @@
-import { Alert, AlertDescription, AlertTitle, CriticalIcon } from 'ui'
+import { Admonition } from 'ui-patterns/Admonition'
 import {
   PageSection,
   PageSectionContent,
@@ -20,8 +20,8 @@ export const DeleteProjectPanel = () => {
 
   const title =
     selectedOrganization?.managed_by === 'vercel-marketplace'
-      ? 'Deleting this project will also remove your database and uninstall the resource on Vercel.'
-      : 'Deleting this project will also remove your database.'
+      ? 'Deleting this project will also remove your database and uninstall the resource on Vercel'
+      : 'Deleting this project will also remove your database'
   const description =
     selectedOrganization?.managed_by === 'vercel-marketplace'
       ? 'Make sure you have made a backup if you want to keep your data, and that no Vercel project is connected to this resource.'
@@ -33,20 +33,19 @@ export const DeleteProjectPanel = () => {
         <PageSectionSummary>
           <PageSectionTitle>Delete project</PageSectionTitle>
           <PageSectionDescription>
-            Permanently remove your project and its database
+            Permanently remove your project and its database.
           </PageSectionDescription>
         </PageSectionSummary>
       </PageSectionMeta>
 
       <PageSectionContent>
-        <Alert variant="destructive">
-          <CriticalIcon />
-          <AlertTitle>{title}</AlertTitle>
-          <AlertDescription>{description}</AlertDescription>
-          <div className="mt-2">
-            <DeleteProjectButton />
-          </div>
-        </Alert>
+        <Admonition
+          type="danger"
+          title={title}
+          description={description}
+          actions={<DeleteProjectButton />}
+          layout="responsive"
+        />
       </PageSectionContent>
     </PageSection>
   )

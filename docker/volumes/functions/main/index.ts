@@ -44,14 +44,22 @@ export enum RequestErrors {
   InvalidResponseStatusCode = 'INVALID_RESPONSE_STATUS_CODE',
 }
 
+// Errors from this router stay readable from browsers, as on the platform.
+// Function responses keep the function's own CORS headers.
+const ERROR_CORS_HEADERS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey',
+  'Access-Control-Expose-Headers': 'sb-error-code',
+}
+
 function getFunctionErrorResponse({ code, message, status }: FunctionFailure): Response {
   return Response.json(
     { code, message },
     {
       status,
       headers: {
+        ...ERROR_CORS_HEADERS,
         'sb-error-code': code,
-        'Access-Control-Expose-Headers': 'sb-error-code',
       },
     }
   )
@@ -210,8 +218,8 @@ function getAuthErrorResponse({ code, message = 'Invalid JWT' }: AuthFailure) {
     {
       status: 401,
       headers: {
+        ...ERROR_CORS_HEADERS,
         'sb-error-code': code,
-        'Access-Control-Expose-Headers': 'sb-error-code',
       },
     }
   )

@@ -30,10 +30,12 @@ function getUserFields(user: User): { label: string; value: string }[] {
 export function UserFields({
   user,
   onFilterByUser,
+  actionsMode = 'menu',
   className,
 }: {
   user: User
   onFilterByUser?: () => void
+  actionsMode?: 'hover' | 'menu'
   className?: string
 }) {
   return (
@@ -46,6 +48,8 @@ export function UserFields({
           filterFields={[]}
           disabled={!value}
           onAddFilter={label === 'User ID' ? onFilterByUser : undefined}
+          filterOperators={['=']}
+          actionsMode={actionsMode}
         >
           {value ? (
             <span className="min-w-0 truncate text-right font-mono text-xs leading-5">{value}</span>

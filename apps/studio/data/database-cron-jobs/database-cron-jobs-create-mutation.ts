@@ -3,6 +3,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { databaseCronJobsKeys } from './keys'
+import type { SqlOrigin } from '@/data/error-classification'
 import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
 import type { StudioError } from '@/lib/errors/studio-errors'
@@ -12,6 +13,7 @@ export type DatabaseCronJobCreateVariables = {
   projectRef: string
   connectionString?: string | null
   query: SafeSqlFragment
+  sqlOrigin: SqlOrigin
   searchTerm?: string
   identifier?: string | number
 }
@@ -20,11 +22,14 @@ export async function createDatabaseCronJob({
   projectRef,
   connectionString,
   query,
+  sqlOrigin,
 }: DatabaseCronJobCreateVariables) {
   const { result } = await executeSql({
     projectRef,
     connectionString,
     sql: query,
+    sqlOrigin,
+    queryName: 'database-cron-job-create',
     queryKey: databaseCronJobsKeys.create(),
     grant: unguarded.migrating,
   })

@@ -1,3 +1,5 @@
+import { useQuery } from '@tanstack/react-query'
+
 import { useS3AccessKeyCreateMutation } from './s3-access-key-create-mutation'
 import { WRAPPERS } from '@/components/interfaces/Integrations/Wrappers/Wrappers.constants'
 import {
@@ -8,28 +10,57 @@ import {
   getCatalogURI,
   getConnectionURL,
 } from '@/components/interfaces/Storage/StorageSettings/StorageSettings.utils'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { FDWCreateVariables, useFDWCreateMutation } from '@/data/fdw/fdw-create-mutation'
 import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
+
+type ApiKeyState = 'ready' | 'loading' | 'error' | 'missing'
+
+function getApiKeyState({
+  hasApiKey,
+  isError,
+  hasData,
+}: {
+  hasApiKey: boolean
+  isError: boolean
+  hasData: boolean
+}): ApiKeyState {
+  if (hasApiKey) return 'ready'
+  if (isError) return 'error'
+  if (hasData) return 'missing'
+  return 'loading'
+}
 
 export const useIcebergWrapperCreateMutation = () => {
   const { data: project } = useSelectedProjectQuery()
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2(
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ
+  // The wrapper's catalog token is a secret API key, so it needs the `reveal` grant
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: project?.ref },
+    { variant: 'reveal' }
   )
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef: project?.ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  const { data: apiKeysData, isError: isApiKeysError } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef: project?.ref, grant: apiKeysGrant.grant },
+      { select: getKeys }
+    )
   )
   const { secretKey, serviceKey } = apiKeysData ?? {}
   const { data: settings } = useProjectSettingsV2Query({ projectRef: project?.ref })
   const protocol = settings?.app_config?.protocol ?? 'https'
   const endpoint = settings?.app_config?.storage_endpoint || settings?.app_config?.endpoint
 
-  const apiKey = secretKey?.api_key ?? serviceKey?.api_key ?? 'SUPABASE_CLIENT_API_KEY'
+  const apiKey = secretKey?.api_key ?? serviceKey?.api_key
+  // Only meaningful once the grant is `granted`; before that the grant itself explains why
+  const apiKeyState = getApiKeyState({
+    hasApiKey: Boolean(apiKey),
+    isError: isApiKeysError,
+    hasData: Boolean(apiKeysData),
+  })
 
   const wrapperMeta = WRAPPERS.find((wrapper) => wrapper.name === 'iceberg_wrapper')
 
@@ -43,6 +74,20 @@ export const useIcebergWrapperCreateMutation = () => {
   const { mutateAsync: createFDW, isPending: isCreatingFDW } = useFDWCreateMutation()
 
   const mutateAsync = async ({ bucketName }: { bucketName: string }) => {
+    // Without the keys the wrapper would be saved with a placeholder token that never works
+    if (apiKeysGrant.status !== 'granted') {
+      throw new Error(
+        'You need additional permissions to view API keys, which are needed to create an Iceberg wrapper.'
+      )
+    }
+
+    // Never fall back to a placeholder token: the wrapper would be created but never work
+    if (!apiKey) {
+      throw new Error(
+        'Unable to load a secret API key, which is needed to create an Iceberg wrapper.'
+      )
+    }
+
     const createS3KeyData = await createS3AccessKey({
       projectRef: project?.ref,
       description: getAnalyticsBucketS3KeyName(bucketName),
@@ -74,5 +119,11 @@ export const useIcebergWrapperCreateMutation = () => {
     mutateAsync,
     isPending: isCreatingFDW || isCreatingS3AccessKey,
     hasPermission: canCreateCredentials,
+    /** Callers should block creation and explain when this isn't `granted`. */
+    apiKeysGrant,
+    /** True once the grant is `granted` and a usable secret key has been revealed. */
+    isApiKeyReady: apiKeysGrant.status === 'granted' && apiKeyState === 'ready',
+    /** Progress of revealing the key, for callers that explain why creation is blocked. */
+    apiKeyState,
   }
 }

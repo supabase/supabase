@@ -2,8 +2,9 @@ import { useQuery } from '@tanstack/react-query'
 import { z } from 'zod'
 
 import { scopedAccessTokenKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { BASE_PATH } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 /**
  * Cross-reference between OpenFGA permission scopes, Management API endpoints, and MCP tools.
@@ -228,12 +229,11 @@ export async function getGetScopedTokenPermissionsForScope(signal?: AbortSignal)
       if (Number.isFinite(parsed) && parsed > 0) retryAfter = parsed
     }
 
-    throw new StudioError(
-      `Failed to fetch scoped access token permissions: ${response.statusText}`,
-      response.status,
-      undefined,
-      retryAfter
-    )
+    throw classifyResponseError({
+      message: `Failed to fetch scoped access token permissions: ${response.statusText}`,
+      code: response.status,
+      retryAfter,
+    })
   }
 
   const payload: unknown = await response.json()

@@ -1,6 +1,7 @@
 import * as Sentry from '@sentry/nextjs'
 
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import { isStudioError } from '@/lib/errors/studio-errors'
 
 type CaptureMessageOptions = {
   context: string
@@ -43,7 +44,7 @@ export function captureCriticalError(
     return
   }
 
-  if (error instanceof StudioError) {
+  if (isStudioError(error)) {
     handleResponseError(error, context)
     return
   }
@@ -56,10 +57,10 @@ export function captureCriticalError(
 }
 
 function handleResponseError(error: StudioError, context: string) {
-  const { code, message, requestPathname } = error
-  if (!requestPathname || !code) {
+  const { code, message, endpoint } = error
+  if (!endpoint || !code) {
     captureMessage({
-      message: `Response Error (no code or requestPathname) w/ message: ${error.message}`,
+      message: `Response Error (no code or endpoint) w/ message: ${error.message}`,
       context,
     })
     return
@@ -69,7 +70,7 @@ function handleResponseError(error: StudioError, context: string) {
     // Only capture 5XX errors as critical errors
     captureMessage({
       context,
-      message: `requestPathname ${requestPathname} w/ message: ${message}`,
+      message: `endpoint ${endpoint} w/ message: ${message}`,
     })
     return
   }

@@ -24,6 +24,8 @@ export async function getViews(
     {
       projectRef,
       connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'views',
       sql,
       queryKey: ['views', schemas].filter(Boolean),
       grant: unguarded.migrating,

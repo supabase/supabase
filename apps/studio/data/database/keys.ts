@@ -5,6 +5,16 @@ export const databaseKeys = {
   keywords: (projectRef: string | undefined) => ['projects', projectRef, 'keywords'] as const,
   entitySearch: (projectRef: string | undefined, query: string) =>
     ['projects', projectRef, 'entity-search', query] as const,
+  tableRelatedResources: (
+    projectRef: string | undefined,
+    schema: string | undefined,
+    table: string | undefined
+  ) => ['projects', projectRef, 'table-related-resources', schema, table] as const,
+  tableReferencingFunctions: (
+    projectRef: string | undefined,
+    schema: string | undefined,
+    table: string | undefined
+  ) => ['projects', projectRef, 'table-referencing-functions', schema, table] as const,
   migrations: (projectRef: string | undefined) => ['projects', projectRef, 'migrations'] as const,
   tableColumns: (
     projectRef: string | undefined,

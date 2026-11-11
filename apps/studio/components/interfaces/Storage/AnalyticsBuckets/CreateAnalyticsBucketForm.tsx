@@ -25,6 +25,7 @@ import {
   validBucketNameRegex,
 } from './CreateAnalyticsBucketForm.utils'
 import { getServiceVersionsPath } from '@/components/interfaces/Settings/General/ServiceVersions/ServiceVersions.utils'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useDatabaseExtensionEnableMutation } from '@/data/database-extensions/database-extension-enable-mutation'
 import { useAnalyticsBucketCreateMutation } from '@/data/storage/analytics-bucket-create-mutation'
@@ -134,8 +135,13 @@ export const CreateAnalyticsBucketForm = ({
       onError: () => {},
     })
 
-  const { mutateAsync: createIcebergWrapper, isPending: isCreatingIcebergWrapper } =
-    useIcebergWrapperCreateMutation()
+  const {
+    mutateAsync: createIcebergWrapper,
+    isPending: isCreatingIcebergWrapper,
+    apiKeysGrant,
+    apiKeyState,
+    isApiKeyReady,
+  } = useIcebergWrapperCreateMutation()
 
   const { mutateAsync: enableExtension, isPending: isEnablingExtension } =
     useDatabaseExtensionEnableMutation()
@@ -151,6 +157,7 @@ export const CreateAnalyticsBucketForm = ({
     if (!ref) return console.error('Project ref is required')
     if (!project) return console.error('Project details is required')
     if (!wrappersExtension) return console.error('Unable to find wrappers extension')
+    if (!isApiKeyReady) return
 
     const hasExistingBucket = buckets.some((x) => x.name === values.name)
     if (hasExistingBucket) return toast.error('Bucket name already exists')
@@ -218,6 +225,13 @@ export const CreateAnalyticsBucketForm = ({
               )}
             />
 
+            <ApiKeysAccessNote
+              className="px-5 pb-5"
+              grant={apiKeysGrant}
+              keyState={apiKeyState}
+              fallback="They're needed to set up the Iceberg Wrapper, so you can't create an Analytics bucket."
+            />
+
             {wrappersExtensionNeedsUpgrading ? (
               <Admonition
                 type="warning"
@@ -241,12 +255,16 @@ export const CreateAnalyticsBucketForm = ({
               >
                 <p className="leading-normal!">
                   Supabase will install the{' '}
-                  {wrappersExtensionState !== 'installed' ? 'Wrappers extension and ' : ''}
-                  Iceberg Wrapper integration on your behalf.{' '}
+                  {wrappersExtensionState !== 'installed' ? (
+                    <span>{'Wrappers extension and '}</span>
+                  ) : (
+                    ''
+                  )}
+                  <span>Iceberg Wrapper integration on your behalf.</span>{' '}
                   <InlineLink href={`${DOCS_URL}/guides/database/extensions/wrappers/iceberg`}>
                     Learn more
                   </InlineLink>
-                  .
+                  <span>.</span>
                 </p>
               </Admonition>
             )}
@@ -263,7 +281,7 @@ export const CreateAnalyticsBucketForm = ({
           form={formId}
           type="submit"
           loading={isCreating}
-          disabled={wrappersExtensionNeedsUpgrading || isCreating}
+          disabled={wrappersExtensionNeedsUpgrading || isCreating || !isApiKeyReady}
         >
           Create bucket
         </Button>

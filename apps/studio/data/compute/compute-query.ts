@@ -2,9 +2,10 @@ import { queryOptions } from '@tanstack/react-query'
 
 import { computeRefetchInterval, parseComputeInstance } from './compute.utils'
 import { computeKeys } from './keys'
+import { classifyResponseError } from '@/data/error-classification'
 import { get, handleError, unguarded } from '@/data/fetchers'
 import { IS_PLATFORM } from '@/lib/constants'
-import { StudioError } from '@/lib/errors/studio-errors'
+import type { StudioError } from '@/lib/errors/studio-errors'
 
 export type ComputeVariables = { projectRef?: string }
 export type ComputeError = StudioError
@@ -19,7 +20,7 @@ async function getComputeInstances({ projectRef }: ComputeVariables, signal?: Ab
   })
 
   if (response.status === 404) {
-    throw new StudioError('Compute is not available for this project', 404)
+    throw classifyResponseError({ message: 'Compute is not available for this project', code: 404 })
   }
   if (error) return handleError(error)
   return data.data.map((instance) => parseComputeInstance(instance))

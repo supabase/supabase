@@ -24,7 +24,7 @@ import {
 } from 'ui'
 
 import type { EventTrigger } from './EventTriggerList.utils'
-import { SUPABASE_ROLES } from '@/components/interfaces/Database/Roles/Roles.constants'
+import { isSupabaseRole } from '@/components/interfaces/Database/Roles/Roles.utils'
 import { getDatabaseFunctionsHref } from '@/components/interfaces/Database/Triggers/TriggersList/TriggerList.utils'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { TableRowNoResults } from '@/components/ui/TableRowNoResults'
@@ -39,8 +39,6 @@ interface EventTriggerListProps {
   onDuplicateTrigger: (trigger: EventTrigger) => void
   onDeleteTrigger: (trigger: EventTrigger) => void
 }
-
-const SYSTEM_OWNERS = new Set<string>(SUPABASE_ROLES)
 
 export const EventTriggerList = ({
   filterString,
@@ -80,7 +78,7 @@ export const EventTriggerList = ({
   return (
     <>
       {orderedTriggers.map((trigger) => {
-        const isSystemTrigger = trigger.owner ? SYSTEM_OWNERS.has(trigger.owner) : false
+        const isSystemTrigger = trigger.owner ? isSupabaseRole(trigger.owner) : false
         const canEditTrigger = !isSystemTrigger && canEdit
         const disabledReason = !canEdit
           ? 'You need additional permissions to update event triggers'

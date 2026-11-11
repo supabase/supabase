@@ -1,4 +1,5 @@
 import { zodResolver } from '@hookform/resolvers/zod'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { Loader2Icon } from 'lucide-react'
 import { AnimatePresence, motion } from 'motion/react'
@@ -62,15 +63,16 @@ import { ValidationWarningsDialog } from './ValidationWarningsDialog'
 import { usePipelineCreationPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { CreateAnalyticsBucketSheet } from '@/components/interfaces/Storage/AnalyticsBuckets/CreateAnalyticsBucketSheet'
 import { AlertError } from '@/components/ui/AlertError'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useProjectSettingsV2Query } from '@/data/config/project-settings-v2-query'
 import { useReplicationDestinationByIdQuery } from '@/data/replication/destination-by-id-query'
 import { useReplicationPipelineByIdQuery } from '@/data/replication/pipeline-by-id-query'
 import { useReplicationPublicationNamesQuery } from '@/data/replication/publication-names-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
 import { useReplicationSourceId } from '@/data/replication/sources-query'
-import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useIsOrioleDb, useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
+import { useGrant } from '@/lib/grants'
 
 const formId = 'destination-editor'
 
@@ -111,11 +113,6 @@ export const DestinationForm = ({
   const isDuckLakeEnabled = useIsPipelinesDuckLakeEnabled()
   const isSnowflakeEnabled = useIsPipelinesSnowflakeEnabled()
   const isClickHouseEnabled = useIsPipelinesClickHouseEnabled()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissionsV2([
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_READ,
-    // api keys reveal = true will require this perms
-    FGA_PERMISSIONS.PROJECT.API_GATEWAY_KEYS_SECRET_READ,
-  ])
 
   const [showValidationWarningsDialog, setShowValidationWarningsDialog] = useState(false)
   const [showCostDialog, setShowCostDialog] = useState(false)
@@ -178,9 +175,17 @@ export const DestinationForm = ({
   // Revealed API keys are only ever consumed as the default catalog token for
   // Analytics Bucket (Iceberg) destinations, so don't fetch them for other
   // destination types.
-  const { data: apiKeysData } = useAPIKeys(
-    { projectRef, reveal: true },
-    { enabled: canReadAPIKeys && selectedType === 'Analytics Bucket' && !editMode }
+  const shouldPrefillCatalogToken = selectedType === 'Analytics Bucket' && !editMode
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef },
+    { variant: 'reveal' }
+  )
+  const { data: apiKeysData } = useQuery(
+    revealedApiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      { select: getKeys, enabled: shouldPrefillCatalogToken }
+    )
   )
   const { serviceKey } = apiKeysData ?? {}
   const catalogToken = serviceKey?.api_key ?? ''
@@ -491,11 +496,20 @@ export const DestinationForm = ({
         <BigQueryFields form={form} editMode={editMode} />
       )}
       {selectedType === 'Analytics Bucket' && isIcebergEnabled && (
-        <AnalyticsBucketFields
-          form={form}
-          editMode={editMode}
-          onSelectNewBucket={() => setNewBucketSheetVisible(true)}
-        />
+        <>
+          {shouldPrefillCatalogToken && (
+            <ApiKeysAccessNote
+              className="px-5 pt-5"
+              grant={apiKeysGrant}
+              fallback="Enter the catalog token manually."
+            />
+          )}
+          <AnalyticsBucketFields
+            form={form}
+            editMode={editMode}
+            onSelectNewBucket={() => setNewBucketSheetVisible(true)}
+          />
+        </>
       )}
       {selectedType === 'DuckLake' && isDuckLakeEnabled && (
         <>

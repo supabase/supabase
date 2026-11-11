@@ -1,8 +1,9 @@
 import { FIRST_REFERRER_COOKIE_NAME } from 'common/first-referrer-cookie'
+import { unstable_doesMiddlewareMatch } from 'next/experimental/testing/server'
 import { NextRequest } from 'next/server'
 import { describe, expect, it, vi } from 'vitest'
 
-import { proxy } from './proxy'
+import { config, proxy } from './proxy'
 
 // content.generated.ts is produced by scripts/generateMdContent.mjs at
 // content:build time and gitignored, so it isn't on disk in CI before tests
@@ -396,5 +397,28 @@ describe('www proxy', () => {
 
       expect(res.headers.get('x-middleware-rewrite')).toBeNull()
     })
+  })
+})
+
+describe('www proxy matcher', () => {
+  const matches = (url: string) => unstable_doesMiddlewareMatch({ config, url })
+
+  it.each([
+    '/dashboard/_vercel/immutable/initial/nitro/index-abc123.js',
+    '/dashboard/_serverFn/abc123',
+    '/dashboard/api/get-deployment-commit',
+  ])('skips non-document Studio traffic: %s', (url) => {
+    expect(matches(url)).toBe(false)
+  })
+
+  it.each([
+    '/dashboard',
+    '/dashboard/sign-up',
+    '/dashboard/project/abc',
+    '/dashboard/apikeys',
+    '/dashboard-preview',
+    '/pricing',
+  ])('runs on documents: %s', (url) => {
+    expect(matches(url)).toBe(true)
   })
 })
