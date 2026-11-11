@@ -14,7 +14,7 @@
       "outputs": [],
     },
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^build", "typecheck"],
       "env": [
         "ANALYZE",
         "CI",
