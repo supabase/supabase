@@ -1,7 +1,7 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { keyword } from '@supabase/pg-meta'
 import type { PGTrigger, PGTriggerCreate } from '@supabase/pg-meta'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { parseAsBoolean, parseAsString, useQueryState } from 'nuqs'
 import { useEffect, useRef, useState } from 'react'
@@ -17,13 +17,14 @@ import { useInstallRequiredExtensions } from '@/components/interfaces/Integratio
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
 import { useDatabaseTriggerCreateMutation } from '@/data/database-triggers/database-trigger-create-mutation'
 import { useDatabaseTriggerUpdateMutation } from '@/data/database-triggers/database-trigger-update-transaction-mutation'
-import { useDatabaseHooksQuery } from '@/data/database-triggers/database-triggers-query'
+import { databaseHooksQueryOptions } from '@/data/database-triggers/database-triggers-query'
 import { useHooksEnableMutation } from '@/data/database/hooks-enable-mutation'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { tableEditorQueryOptions } from '@/data/table-editor/table-editor-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 export type HTTPArgument = { id: string; name: string; value: string }
@@ -93,10 +94,24 @@ export const EditHookPanel = () => {
     isSchemasLoaded && !schemas.some((schema) => schema.name === 'supabase_functions')
   const isExtensionDataLoading = isExtensionsLoading || !isSchemasLoaded
 
-  const { data: hooks = [], isSuccess } = useDatabaseHooksQuery({
-    projectRef: project?.ref,
-    connectionString: project?.connectionString,
-  })
+  const readGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'read' }
+  )
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
+
+  const { data: hooks = [], isSuccess } = useQuery(
+    databaseHooksQueryOptions({
+      projectRef: project?.ref,
+      connectionString: project?.connectionString,
+      grant: readGrant.grant,
+    })
+  )
 
   const [showCreateHookForm, setShowCreateHookForm] = useQueryState(
     'new',
@@ -208,6 +223,17 @@ export const EditHookPanel = () => {
       return console.error('Project ref is required')
     }
 
+    if (!writeGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(
+          writeGrant.status,
+          selectedHook === undefined ? 'create' : 'update',
+          'webhooks'
+        )
+      )
+      return
+    }
+
     if (isExtensionDataLoading) return
 
     try {
@@ -295,12 +321,14 @@ export const EditHookPanel = () => {
 
       if (selectedHook === undefined) {
         createDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           payload,
         })
       } else {
         updateDatabaseTrigger({
+          grant: writeGrant.grant,
           projectRef: project?.ref,
           connectionString: project?.connectionString,
           originalTrigger: selectedHook,

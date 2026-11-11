@@ -43,6 +43,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 
 const formId = 'create-trigger'
 
@@ -91,6 +92,11 @@ export const TriggerSheet = ({
 }: TriggerSheetProps) => {
   const { data: project } = useSelectedProjectQuery()
   const { selectedSchema } = useQuerySchemaState()
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
 
   const [showFunctionSelector, setShowFunctionSelector] = useState(false)
 
@@ -148,10 +154,17 @@ export const TriggerSheet = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
     if (!project) return console.error('Project is required')
+    if (!writeGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(writeGrant.status, isEditing ? 'update' : 'create', 'triggers')
+      )
+      return
+    }
     const { tableId, ...payload } = values
 
     if (isEditing) {
       updateDatabaseTrigger({
+        grant: writeGrant.grant,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         originalTrigger: selectedTrigger,
@@ -159,6 +172,7 @@ export const TriggerSheet = ({
       })
     } else {
       createDatabaseTrigger({
+        grant: writeGrant.grant,
         projectRef: project?.ref,
         connectionString: project?.connectionString,
         payload,

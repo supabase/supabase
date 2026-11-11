@@ -52,6 +52,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -101,6 +102,11 @@ export const CreateFunction = ({
     onClose,
   })
 
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
   const { mutate: createDatabaseFunction, isPending: isCreating } =
     useDatabaseFunctionCreateMutation()
   const { mutate: updateDatabaseFunction, isPending: isUpdating } =
@@ -108,6 +114,11 @@ export const CreateFunction = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
+    if (!writeGrant.grant) {
+      return toast.error(
+        getWriteGrantToastMessage(writeGrant.status, isEditing ? 'update' : 'create', 'functions')
+      )
+    }
     // Submit click is the explicit user gesture that promotes form-entered SQL fragments
     // (`args` items, `return_type`, and each `config_params` value) to executable.
     const payload = {
@@ -123,6 +134,7 @@ export const CreateFunction = ({
       updateDatabaseFunction(
         {
           func,
+          grant: writeGrant.grant,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
@@ -138,6 +150,7 @@ export const CreateFunction = ({
     } else {
       createDatabaseFunction(
         {
+          grant: writeGrant.grant,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
