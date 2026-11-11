@@ -47,11 +47,11 @@ import { IS_PLATFORM } from '@/lib/constants'
 
 function HoursOrNeverText({ value }: { value: number }) {
   if (value === 0) {
-    return 'never'
+    return <span>never</span>
   } else if (value === 1) {
-    return 'hour'
+    return <span>hour</span>
   } else {
-    return 'hours'
+    return <span>hours</span>
   }
 }
 

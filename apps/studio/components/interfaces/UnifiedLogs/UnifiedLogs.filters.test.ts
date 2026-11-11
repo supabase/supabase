@@ -3,6 +3,7 @@ import { z } from 'zod'
 
 import { SEARCH_PARAMS_PARSER } from './UnifiedLogs.constants'
 import {
+  addLogsColumnFilter,
   buildDefaultColumnFilters,
   buildFilterSearchUpdate,
   columnFiltersToLogsFilters,
@@ -237,4 +238,56 @@ it('ignores malformed attribute encodings without losing valid neighboring or le
     { column: 'event_message', operator: '~~*', value: '100% ready:now' },
     { column: 'attribute.span_id', operator: '<>', value: 'span:1' },
   ])
+})
+
+describe('addLogsColumnFilter', () => {
+  const pathname = { field: 'pathname', operator: '=', value: '/rest/v1/todos' } as const
+
+  it('adds a filter for a column that has none', () => {
+    expect(addLogsColumnFilter([], pathname)).toEqual([
+      { id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } },
+    ])
+  })
+
+  it('keeps values with special characters intact', () => {
+    const value = `/rest/v1/todos?name=eq."O'Brien"&x=a:b`
+    expect(addLogsColumnFilter([], { ...pathname, value })).toEqual([
+      { id: 'pathname', value: { operator: '=', values: [value] } },
+    ])
+  })
+
+  it('collects a second value under the same operator, in place', () => {
+    const current = [
+      { id: 'method', value: { operator: '=', values: ['GET'] } },
+      { id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } },
+    ]
+    expect(addLogsColumnFilter(current, { field: 'method', operator: '=', value: 'POST' })).toEqual(
+      [{ id: 'method', value: { operator: '=', values: ['GET', 'POST'] } }, current[1]]
+    )
+  })
+
+  it('leaves an already applied filter untouched rather than duplicating it', () => {
+    const current = [{ id: 'pathname', value: { operator: '=', values: ['/rest/v1/todos'] } }]
+    expect(addLogsColumnFilter(current, pathname)).toEqual(current)
+  })
+
+  it('replaces the values when the operator changes, since a column holds one operator', () => {
+    const current = [{ id: 'pathname', value: { operator: '=', values: ['/health'] } }]
+    expect(addLogsColumnFilter(current, { ...pathname, operator: '<>' })).toEqual([
+      { id: 'pathname', value: { operator: '<>', values: ['/rest/v1/todos'] } },
+    ])
+  })
+
+  it('replaces an unwrapped legacy value (bare string[]) with the wrapped shape', () => {
+    const current = [{ id: 'log_type', value: ['postgres'] }]
+    expect(
+      addLogsColumnFilter(current, { field: 'log_type', operator: '=', value: 'auth' })
+    ).toEqual([{ id: 'log_type', value: { operator: '=', values: ['auth'] } }])
+  })
+
+  it('stringifies numeric values so they match the column filter shape', () => {
+    expect(addLogsColumnFilter([], { field: 'status', operator: '<>', value: 500 })).toEqual([
+      { id: 'status', value: { operator: '<>', values: ['500'] } },
+    ])
+  })
 })

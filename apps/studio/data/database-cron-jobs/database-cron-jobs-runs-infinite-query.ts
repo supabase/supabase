@@ -53,6 +53,8 @@ export async function getDatabaseCronJobRuns({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'database-cron-jobs-runs-infinite',
     sql: query,
     grant: unguarded.migrating,
   })

@@ -161,7 +161,7 @@ export const CronJobScheduleSection = ({ form, supportsSeconds }: CronJobSchedul
               </div>
               <div className="bg-surface-100 p-4 rounded-sm grid gap-y-4 border">
                 <h4 className="text-sm text-foreground">
-                  Schedule {timezone ? `(${timezone})` : ''}
+                  Schedule {timezone ? <span>{`(${timezone})`}</span> : ''}
                 </h4>
                 <span
                   className={cn(

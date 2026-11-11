@@ -31,7 +31,7 @@ export function ColumnOverlayItem({ column }: ColumnOverlayItemProps) {
 
         <span className="sb-grid-column-header__inner__format">
           {columnFormat}
-          {columnFormat === 'bytea' ? ` (hex)` : ''}
+          {columnFormat === 'bytea' ? <span>{` (hex)`}</span> : ''}
         </span>
         {column.isEncrypted && <LockIcon size={14} strokeWidth={2} />}
         {hasIndexSuggestion && (

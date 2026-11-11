@@ -349,7 +349,7 @@ export function useQueryInsightsTableColumns({
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-xs font-mono text-foreground truncate">
-                  {row.queryType ?? '–'}
+                  {row.queryType ?? <span>–</span>}
                   {getTableName(row.query) && (
                     <>
                       {' '}

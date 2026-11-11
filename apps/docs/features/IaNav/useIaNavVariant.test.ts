@@ -5,6 +5,7 @@ import { LOCAL_STORAGE_KEYS } from 'common/constants/local-storage'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { IA_NAV_FLAG } from './constants'
+import { IaNavRouteProvider } from './IaNavRouteProvider'
 import { useIaNavVariant } from './useIaNavVariant'
 
 vi.mock('common', () => ({
@@ -12,6 +13,10 @@ vi.mock('common', () => ({
   posthogClient: { captureExperimentExposure: vi.fn() },
   useFeatureFlags: vi.fn(),
   useSearchParamsShallow: vi.fn(),
+}))
+
+vi.mock('next/navigation', () => ({
+  useSelectedLayoutSegments: vi.fn(() => ['ia', 'option-1', 'guides', 'auth']),
 }))
 
 const captureExposure = vi.mocked(posthogClient.captureExperimentExposure)
@@ -127,5 +132,27 @@ describe('useIaNavVariant', () => {
 
     expect(result.current).toBe('control')
     expect(localStorage.getItem(LOCAL_STORAGE_KEYS.IA_NAV_FLAG)).toBe('false')
+  })
+})
+
+describe('useIaNavVariant on the option-1 route', () => {
+  beforeEach(() => {
+    captureExposure.mockClear()
+  })
+
+  it('returns option-1 before the URL is read and records no exposure', () => {
+    vi.mocked(useFeatureFlags).mockReturnValue({
+      posthog: { [IA_NAV_FLAG]: 'control' },
+      hasLoaded: true,
+    } as unknown as ReturnType<typeof useFeatureFlags>)
+    vi.mocked(useSearchParamsShallow).mockReturnValue(
+      new URLSearchParams() as unknown as ReturnType<typeof useSearchParamsShallow>
+    )
+    window.history.replaceState(null, '', '/')
+
+    const { result } = renderHook(() => useIaNavVariant(), { wrapper: IaNavRouteProvider })
+
+    expect(result.current).toBe('option-1')
+    expect(captureExposure).not.toHaveBeenCalled()
   })
 })

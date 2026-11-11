@@ -502,6 +502,69 @@ export interface ProjectCreationSimpleVersionConfirmModalOpenedEvent {
   groups: Omit<TelemetryGroups, 'project'>
 }
 
+type OnboardingSurveySurface = 'org_form' | 'follow_up'
+
+/**
+ * User clicked Answer on the onboarding survey follow-up card.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyAnswerButtonClickedEvent {
+  action: 'onboarding_survey_answer_button_clicked'
+  properties: { surface: 'follow_up' }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User clicked Submit. Fires before the backend mutation; pair with
+ * OnboardingSurveySubmitFailedEvent for failure rate. The platform's own
+ * `onboarding_survey_submitted` event tracks actual completions.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitButtonClickedEvent {
+  action: 'onboarding_survey_submit_button_clicked'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * User dismissed the onboarding survey.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveyDismissedEvent {
+  action: 'onboarding_survey_dismissed'
+  properties: {
+    surface: OnboardingSurveySurface
+    reason: 'org_form_blank' | 'follow_up_skip' | 'follow_up_closed' | 'follow_up_expired'
+  }
+  groups: Partial<TelemetryGroups>
+}
+
+/**
+ * Onboarding survey submit failed.
+ *
+ * @group Events
+ * @source studio
+ */
+export interface OnboardingSurveySubmitFailedEvent {
+  action: 'onboarding_survey_submit_failed'
+  properties: {
+    surface: OnboardingSurveySurface
+    hasKind: boolean
+    hasBuilding: boolean
+  }
+  groups: Partial<TelemetryGroups>
+}
+
 /**
  * Project creation form was rendered and shown to the user. Passive impression that
  * anchors the project-creation funnel (exposed -> completed). Fires once per form view,
@@ -1023,6 +1086,7 @@ export type MarkdownAffordancePageType =
   | 'pricing'
   | 'changelog'
   | 'guide'
+  | 'kb'
   | 'ask_ai_answer'
 
 /**
@@ -1031,7 +1095,7 @@ export type MarkdownAffordancePageType =
  * Fires on success only; failed fetch/clipboard writes are not counted.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface CopyAsMarkdownClickedEvent {
   action: 'copy_as_markdown_clicked'
@@ -1047,7 +1111,7 @@ export interface CopyAsMarkdownClickedEvent {
  * User clicked the sidebar link to set up an AI coding agent with Supabase.
  *
  * @group Events
- * @source docs
+ * @source docs, kb
  */
 export interface AgentSetupClickedEvent {
   action: 'agent_setup_clicked'
@@ -1073,7 +1137,7 @@ export interface PreferredSourceClickedEvent {
  * User clicked "Ask..." to open a new window to consult an agent about the current page.
  *
  * @group Events
- * @source www, docs
+ * @source www, docs, kb
  */
 export interface AskAiClickedEvent {
   action: 'ask_ai_clicked'
@@ -1210,6 +1274,71 @@ export interface DocsSearchV2ResultClickedEvent {
 }
 
 /**
+ * User opened the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchOpenedEvent {
+  action: 'kb_search_opened'
+  properties: {
+    /** The trigger that opened the dialog: Cmd+K or Ctrl+K, or a search button on the page. */
+    triggerType: 'keyboard_shortcut' | 'search_input'
+  }
+}
+
+/**
+ * User closed the knowledge base search dialog.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchClosedEvent {
+  action: 'kb_search_closed'
+  properties: {
+    /** Why the dialog closed: the user dismissed it or opened a result. */
+    closeReason: 'dismissed' | 'result_navigated'
+  }
+}
+
+/**
+ * A knowledge base search returned, with or without results. The query text is left out
+ * because it can contain personal data; only its length is sent.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchSubmittedEvent {
+  action: 'kb_search_submitted'
+  properties: {
+    /** Length of the trimmed search term. */
+    queryLength: number
+    /** Number of results the search returned. */
+    resultCount: number
+    /** Whether the search returned at least one result. */
+    hasResults: boolean
+  }
+}
+
+/**
+ * User activated a knowledge base search result, by clicking it or selecting it via keyboard.
+ *
+ * @group Events
+ * @source kb
+ */
+export interface KbSearchResultClickedEvent {
+  action: 'kb_search_result_clicked'
+  properties: {
+    /** The path of the result that was activated. */
+    resultPath: string
+    /** 1-based position of the result in the list. */
+    resultPosition: number
+    /** Number of results showing when the result was activated. */
+    resultCount: number
+  }
+}
+
+/**
  * User closed the Search V2 dialog.
  *
  * @group Events
@@ -1243,7 +1372,8 @@ export interface DocsSearchV2AskAiOpenedEvent {
 }
 
 /**
- * User's question was sent to Ask AI in the Search V2 dialog.
+ * User's question was sent to Ask AI in the Search V2 dialog. The question text is left out
+ * because it can contain personal data; only its length is sent.
  *
  * @group Events
  * @source docs
@@ -1252,11 +1382,7 @@ export interface DocsSearchV2AskAiQuestionSubmittedEvent {
   action: 'docs_search_v2_ask_ai_question_submitted'
   properties: {
     /**
-     * The question sent to Ask AI, cut to its first 300 characters.
-     */
-    question: string
-    /**
-     * The length of the full question, in characters.
+     * The length of the question, in characters.
      */
     questionLength: number
     /**
@@ -3125,6 +3251,11 @@ export interface CommandMenuCommandClickedEvent {
     command_value?: string
     command_type: 'action' | 'route'
     /**
+     * Heading of the section the command was listed under, e.g. `Related resources`.
+     * Absent when the command was not listed under one, as on a command menu sub-page.
+     */
+    command_section?: string
+    /**
      * The search query that was active when the command was clicked
      */
     search_query?: string
@@ -3390,7 +3521,7 @@ type AdvisorLevel = 'ERROR' | 'WARN' | 'INFO'
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref}/advisors/security or home page or advisor panel sidebar
+ * @page /dashboard/project/{ref}/issues or home page or advisor panel sidebar
  */
 export interface AdvisorDetailOpenedEvent {
   action: 'advisor_detail_opened'
@@ -3425,7 +3556,7 @@ export interface AdvisorDetailOpenedEvent {
  *
  * @group Events
  * @source studio
- * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/advisors/security or /dashboard/project/{ref}/advisors/performance (lint detail panel)
+ * @page /dashboard/project/{ref} (homepage), /dashboard/project/{ref}/issues/{id} (issue detail)
  */
 export interface AdvisorAssistantButtonClickedEvent {
   action: 'advisor_assistant_button_clicked'
@@ -4297,7 +4428,7 @@ export interface HeaderFeedbackDropdownOpenedEvent {
 }
 
 /**
- * User clicked the Advisor Center toggle button in the page header.
+ * User clicked the Issues panel toggle button in the page header (formerly the Advisor Center).
  *
  * @group Events
  * @source studio
@@ -4445,6 +4576,30 @@ export interface AccountRecoveryReminderClosedEvent {
   groups: TelemetryGroups
 }
 
+export type RecoveryCodesSurface = 'account_security' | 'mfa_setup' | 'recovery_interstitial'
+
+/**
+ * @group Events
+ * @source User successfully copies codes from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesCopiedEvent {
+  action: 'recovery_codes_copied'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
+/**
+ * @group Events
+ * @source User starts a download from the Save your recovery codes dialog
+ * @page /account/security, /organizations, /org/*, /project/*, /new, /new/*
+ */
+export interface RecoveryCodesDownloadClickedEvent {
+  action: 'recovery_codes_download_clicked'
+  properties: { surface: RecoveryCodesSurface }
+  groups: TelemetryGroups
+}
+
 /**
  * @hidden
  */
@@ -4453,6 +4608,8 @@ export type TelemetryEvent =
   | AccountRecoveryActionClickedEvent
   | AccountRecoveryTaskCompletedEvent
   | AccountRecoveryReminderClosedEvent
+  | RecoveryCodesCopiedEvent
+  | RecoveryCodesDownloadClickedEvent
   | ExplorerQuerySubmittedEvent
   | ExplorerQueryCompletedEvent
   | ExplorerQueryFailedEvent
@@ -4481,6 +4638,10 @@ export type TelemetryEvent =
   | ProjectCreationGithubConnectClickedEvent
   | ProjectCreationSimpleVersionSubmittedEvent
   | ProjectCreationSimpleVersionConfirmModalOpenedEvent
+  | OnboardingSurveyAnswerButtonClickedEvent
+  | OnboardingSurveySubmitButtonClickedEvent
+  | OnboardingSurveyDismissedEvent
+  | OnboardingSurveySubmitFailedEvent
   | ProjectCreationFormExposedEvent
   | FreeTierGeneralRegionExperimentExposedEvent
   | FreeTierGeneralRegionUpgradeClickedEvent
@@ -4522,6 +4683,10 @@ export type TelemetryEvent =
   | DocsSearchV2OpenedEvent
   | DocsSearchV2SearchSubmittedEvent
   | DocsSearchV2ResultClickedEvent
+  | KbSearchOpenedEvent
+  | KbSearchClosedEvent
+  | KbSearchSubmittedEvent
+  | KbSearchResultClickedEvent
   | DocsSearchV2ClosedEvent
   | DocsSearchV2AskAiOpenedEvent
   | DocsSearchV2AskAiQuestionSubmittedEvent

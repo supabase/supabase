@@ -76,7 +76,12 @@ export const ProductMenuItem = ({
       )
 
       return shortcutId ? (
-        <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
+        <ShortcutTooltip
+          label={shortcutId.startsWith('nav.advisors-') ? `Go to ${name}` : undefined}
+          shortcutId={shortcutId}
+          side="right"
+          delayDuration={1000}
+        >
           {externalLink}
         </ShortcutTooltip>
       ) : (
@@ -91,7 +96,12 @@ export const ProductMenuItem = ({
     )
 
     return shortcutId ? (
-      <ShortcutTooltip shortcutId={shortcutId} side="right" delayDuration={1000}>
+      <ShortcutTooltip
+        label={shortcutId.startsWith('nav.advisors-') ? `Go to ${name}` : undefined}
+        shortcutId={shortcutId}
+        side="right"
+        delayDuration={1000}
+      >
         {link}
       </ShortcutTooltip>
     ) : (

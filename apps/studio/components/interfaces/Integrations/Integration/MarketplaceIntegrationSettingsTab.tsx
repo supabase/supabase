@@ -39,7 +39,7 @@ export const MarketplaceIntegrationSettingsTab = () => {
   const [appToRevoke, setAppToRevoke] = useState<AuthorizedApp | undefined>()
   const [apiKeyToDelete, setApiKeyToDelete] = useState<ApiKeyResource | undefined>()
 
-  const { removeResource, isRemoving } = useConnectedResourceMutations({
+  const { removeResource, getRemoveDisabledReason, isRemoving } = useConnectedResourceMutations({
     projectRef: ref,
     orgSlug: organization?.slug,
     onSuccess: () => toast.success('Successfully removed the connected resource'),
@@ -167,7 +167,12 @@ export const MarketplaceIntegrationSettingsTab = () => {
                   />
                 )}
                 {groups.map((group) => (
-                  <ResourceGroupSection key={group.kind} group={group} onRemove={onSelectRemove} />
+                  <ResourceGroupSection
+                    key={group.kind}
+                    group={group}
+                    onRemove={onSelectRemove}
+                    getRemoveDisabledReason={getRemoveDisabledReason}
+                  />
                 ))}
               </>
             )}

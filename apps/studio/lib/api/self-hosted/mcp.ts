@@ -1,6 +1,7 @@
 import {
   createFeedbackOperations,
   type FeedbackOperationsOptions,
+  type SupabasePlatform,
 } from '@supabase/mcp-server-supabase'
 import {
   ApiKey,
@@ -205,5 +206,22 @@ export function getFeedbackOperations({
   return {
     submit: ({ projectId: _projectId, ...input }) => feedback.submit(input),
     delete: ({ projectId: _projectId, ...input }) => feedback.delete(input),
+  }
+}
+
+export type GetSelfHostedPlatformOptions = {
+  headers?: HeadersInit
+}
+
+// Self-hosted Studio has no notebooks. Without `notebooks` the MCP server registers no notebook tools.
+// https://github.com/supabase/mcp/blob/8af504280d5689537c481924f8a11222ae0ceaeb/packages/mcp-server-supabase/src/server.ts#L374
+export function getSelfHostedPlatform({
+  headers,
+}: GetSelfHostedPlatformOptions): Omit<SupabasePlatform, 'notebooks'> {
+  return {
+    database: getDatabaseOperations({ headers }),
+    development: getDevelopmentOperations({ headers }),
+    debugging: getDebuggingOperations({ headers }),
+    feedback: getFeedbackOperations(),
   }
 }

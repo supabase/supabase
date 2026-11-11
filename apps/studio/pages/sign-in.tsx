@@ -10,6 +10,7 @@ import { AuthenticationLayout } from '@/components/layouts/AuthenticationLayout'
 import { SignInLayout } from '@/components/layouts/SignInLayout/SignInLayout'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { useEnabledIdentityProviders } from '@/hooks/misc/useEnabledIdentityProviders'
+import { useHydratedQuery } from '@/hooks/misc/useHydratedQuery'
 import { useInboundBranding } from '@/hooks/misc/useInboundBranding'
 import { useIsFeatureEnabled } from '@/hooks/misc/useIsFeatureEnabled'
 import { IS_PLATFORM } from '@/lib/constants'
@@ -18,6 +19,7 @@ import type { NextPageWithLayout } from '@/types'
 
 const SignInPage: NextPageWithLayout = () => {
   const router = useRouter()
+  const query = useHydratedQuery()
   const [showOtherOptions, setShowOtherOptions] = useState(false)
 
   const {
@@ -97,7 +99,7 @@ const SignInPage: NextPageWithLayout = () => {
           <Link
             href={{
               pathname: '/sign-up',
-              query: { ...router.query, returnTo: getSignUpReturnTo(router.query.returnTo) },
+              query: { ...query, returnTo: getSignUpReturnTo(query.returnTo) },
             }}
             className="underline transition text-foreground hover:text-foreground-light"
           >
