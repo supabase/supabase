@@ -22,7 +22,6 @@ import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { AlertError } from '@/components/ui/AlertError'
-import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
@@ -129,7 +128,7 @@ export const WarehouseMetricsReport = () => {
     }
 
     if (pageState.status === 'not_provisioned' || pageState.status === 'disabled') {
-      return <WarehouseMetricsEmptyState projectRef={ref} status={pageState.status} />
+      return <WarehouseMetricsEmptyState projectRef={ref} />
     }
 
     if (pageState.status === 'all_failed') {
@@ -144,20 +143,6 @@ export const WarehouseMetricsReport = () => {
 
     return (
       <>
-        <div className="space-y-2 text-sm text-foreground-light">
-          <p>
-            Project-wide Warehouse workload metrics, collected every minute. For replication health,
-            see the{' '}
-            <InlineLink href={`/project/${ref}/integrations/warehouse/overview`}>
-              Warehouse integration overview
-            </InlineLink>
-            .
-          </p>
-          <p>
-            Compare the same workload before and after a layout change. Choosing partitioning or
-            sorting rules also needs query and table details.
-          </p>
-        </div>
         {range.isClamped && (
           <p className="text-sm text-foreground-light">
             This range was adjusted to the last 30 days of available metrics.
