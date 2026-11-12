@@ -1,5 +1,10 @@
 import assert from 'node:assert/strict'
+import { execFileSync, spawnSync } from 'node:child_process'
+import fs from 'node:fs'
+import os from 'node:os'
+import path from 'node:path'
 import { test } from 'node:test'
+import { fileURLToPath } from 'node:url'
 
 import { isInScope, tagMarkdown, tagUrl } from './tag-readme-links.mjs'
 
@@ -225,4 +230,86 @@ test('only the intended files are in scope', () => {
   ]) {
     assert.ok(!isInScope(file), file)
   }
+})
+
+// End-to-end: run the real CLI inside a throwaway git repository.
+const SCRIPT = fileURLToPath(new URL('./tag-readme-links.mjs', import.meta.url))
+const LINK = '[Dashboard](https://supabase.com/dashboard)'
+
+function withTempRepo(run) {
+  const root = fs.mkdtempSync(path.join(os.tmpdir(), 'tag-readme-links-'))
+  try {
+    execFileSync('git', ['init', '-q'], { cwd: root })
+    const write = (file, content) => {
+      fs.mkdirSync(path.dirname(path.join(root, file)), { recursive: true })
+      fs.writeFileSync(path.join(root, file), content)
+    }
+    const read = (file) => fs.readFileSync(path.join(root, file), 'utf8')
+    const git = (...args) => execFileSync('git', args, { cwd: root })
+    const cli = (...args) =>
+      spawnSync(process.execPath, [SCRIPT, ...args], { cwd: root, encoding: 'utf8' })
+    return run({ root, write, read, git, cli })
+  } finally {
+    fs.rmSync(root, { recursive: true, force: true })
+  }
+}
+
+const tagged = (file) =>
+  `[Dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=${file})`
+
+test('CLI: tags a link, then refreshes it after the file is moved with git mv', () => {
+  withTempRepo(({ write, read, git, cli }) => {
+    write('examples/a/README.md', `${LINK}\n`)
+    git('add', '.')
+
+    assert.equal(cli().status, 0)
+    assert.equal(read('examples/a/README.md'), `${tagged('examples/a/README.md')}\n`)
+
+    git('mv', 'examples/a', 'examples/b')
+    const stale = cli('--check')
+    assert.equal(stale.status, 1, 'a moved file should be reported as out of date')
+    assert.match(stale.stderr, /examples\/b\/README\.md/)
+
+    assert.equal(cli().status, 0)
+    assert.equal(read('examples/b/README.md'), `${tagged('examples/b/README.md')}\n`)
+    assert.equal(cli('--check').status, 0, 'a second run should find nothing to do')
+  })
+})
+
+test('CLI: refreshes a link after a plain rename that has not been staged', () => {
+  withTempRepo(({ root, write, read, git, cli }) => {
+    write('examples/a/README.md', `${LINK}\n`)
+    git('add', '.')
+    assert.equal(cli().status, 0)
+
+    // Rename on disk only: the index still lists the old path and the new one is untracked.
+    fs.renameSync(path.join(root, 'examples/a'), path.join(root, 'examples/b'))
+
+    const result = cli()
+    assert.equal(result.status, 0, result.stderr)
+    assert.equal(read('examples/b/README.md'), `${tagged('examples/b/README.md')}\n`)
+  })
+})
+
+test('CLI: a deleted file does not break the run', () => {
+  withTempRepo(({ root, write, git, cli }) => {
+    write('README.md', `${LINK}\n`)
+    write('examples/a/README.md', `${LINK}\n`)
+    git('add', '.')
+    fs.rmSync(path.join(root, 'examples/a'), { recursive: true })
+
+    const result = cli('--check')
+    assert.equal(result.status, 1, 'the remaining untagged README should still be reported')
+    assert.doesNotMatch(result.stderr, /ENOENT/)
+  })
+})
+
+test('CLI: files ignored by git are left alone', () => {
+  withTempRepo(({ write, read, cli }) => {
+    write('.gitignore', 'examples/ignored/\n')
+    write('examples/ignored/README.md', `${LINK}\n`)
+
+    assert.equal(cli().status, 0)
+    assert.equal(read('examples/ignored/README.md'), `${LINK}\n`)
+  })
 })

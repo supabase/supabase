@@ -23,7 +23,7 @@
  *   node scripts/tag-readme-links.mjs                 # rewrite files in place
  *   node scripts/tag-readme-links.mjs --check         # exit 1 if any file would change (writes nothing)
  *   node scripts/tag-readme-links.mjs --repo <name>   # override utm_source (default: supabase)
- *   node scripts/tag-readme-links.mjs <file>...       # limit to specific tracked files
+ *   node scripts/tag-readme-links.mjs <file>...       # limit to specific files
  *
  * To cover more files, add a pattern to INCLUDE_PATTERNS.
  */
@@ -216,14 +216,24 @@ function repoRoot() {
   return execFileSync('git', ['rev-parse', '--show-toplevel'], { encoding: 'utf8' }).trim()
 }
 
-function listTrackedFiles(root) {
-  return execFileSync('git', ['ls-files', '-z'], {
-    cwd: root,
-    encoding: 'utf8',
-    maxBuffer: 64 * 1024 * 1024,
-  })
+/**
+ * Files git knows about (tracked, or untracked but not ignored) that exist on disk. Including untracked
+ * files and skipping missing ones means the script behaves the same whether a file was moved with
+ * `git mv`, or just renamed and not staged yet.
+ */
+export function listCandidateFiles(root) {
+  const listed = execFileSync(
+    'git',
+    ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+    {
+      cwd: root,
+      encoding: 'utf8',
+      maxBuffer: 64 * 1024 * 1024,
+    }
+  )
     .split('\0')
     .filter(Boolean)
+  return [...new Set(listed)].filter((file) => fs.existsSync(path.join(root, file)))
 }
 
 function parseArgs(argv) {
@@ -258,12 +268,12 @@ function main() {
   }
 
   const root = repoRoot()
-  const tracked = new Set(listTrackedFiles(root))
+  const candidates = new Set(listCandidateFiles(root))
   const requested = options.files.map((file) =>
     path.relative(root, path.resolve(file)).split(path.sep).join('/')
   )
-  const files = (options.files.length > 0 ? requested : [...tracked]).filter(
-    (file) => tracked.has(file) && isInScope(file)
+  const files = (options.files.length > 0 ? requested : [...candidates]).filter(
+    (file) => candidates.has(file) && isInScope(file)
   )
 
   const totals = { added: 0, refreshed: 0 }
