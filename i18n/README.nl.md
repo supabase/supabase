@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.nl.md) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
+[Supabase](https://supabase.com) is een open source Firebase alternatief. We bouwen de functies van Firebase met behulp van enterprise-grade open source tools.
 
-- [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.nl.md)
-- [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.nl.md)
+- [x]Gehoste Postgres Database. [Docs](https://supabase.com/docs/guides/database)
+- [x] Authenticatie en Autorisatie. [Docs](https://supabase.com/docs/guides/auth)
 - [x] Automatisch gegenereerde API's.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.nl.md#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.nl.md#graphql-api-overview)
-  - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.nl.md#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Realtime abonnementen. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Functies.
-  - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.nl.md)
-  - [x] Randfuncties. [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.nl.md)
-- [x] Bestandsopslag. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.nl.md)
+  - [x] Database functies. [Docs](https://supabase.com/docs/guides/database/functions)
+  - [x] Randfuncties. [Docs](https://supabase.com/docs/guides/functions)
+- [x] Bestandsopslag. [Docs](https://supabase.com/docs/guides/storage)
 - [x] Dashboard
 
 [Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Documentatie
 
-Voor volledige documentatie, bezoek [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.nl.md)
+Voor volledige documentatie, bezoek [supabase.com/docs](https://supabase.com/docs)
 
 Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Om te zien hoe u kunt bijdragen, bezoek [Aan de slag](../DEVELOPERS.md)
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Het beste voor: hulp bij het bouwen, discussie over database best practices.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Het beste voor: bugs en fouten die u tegenkomt bij het gebruik van Supabase.
-- [Ondersteuning per e-mail](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.nl.md#business-support). Meest geschikt voor: problemen met uw database of infrastructuur.
+- [Ondersteuning per e-mail](https://supabase.com/docs/support#business-support). Meest geschikt voor: problemen met uw database of infrastructuur.
 - [Discord](https://discord.supabase.com). Het beste voor: het delen van uw applicaties en omgang met de gemeenschap.
 
 ## Status
 
 - [Alpha: We testen Supabase met een gesloten groep klanten
-- [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.nl.md). Maar doe het rustig aan, er zijn een paar kinken
+- [x] Publieke Alpha: Iedereen kan zich aanmelden op [supabase.com/dashboard](https://supabase.com/dashboard). Maar doe het rustig aan, er zijn een paar kinken
 - [Publieke Beta: Stabiel genoeg voor de meeste niet-bedrijfsmatige toepassingen
-- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.nl.md#feature-status)]
+- [Publiek: General Availability [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
 
 We zijn momenteel in Openbare Beta. Bekijk "releases" van deze repo om op de hoogte te blijven van belangrijke updates.
 
@@ -55,8 +55,8 @@ Supabase is een combinatie van open source tools. We bouwen de functies van Fire
 
 **Architectuur**
 
-Supabase is een [gehost platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.nl.md). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
-U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.nl.md) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.nl.md).
+Supabase is een [gehost platform](https://supabase.com/dashboard). U kunt zich aanmelden en Supabase gebruiken zonder iets te installeren.
+U kunt ook [zelf hosten](https://supabase.com/docs/guides/hosting/overview) en [lokaal ontwikkelen](https://supabase.com/docs/guides/local-development).
 
 ![architectuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

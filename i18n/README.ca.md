@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.ca.md) és una alternativa de codi obert a Firebase. Estem construint les funcionalitats de Firebase usant eines de codi obert de nivell empresarial.
+[Supabase](https://supabase.com) és una alternativa de codi obert a Firebase. Estem construint les funcionalitats de Firebase usant eines de codi obert de nivell empresarial.
 
 - [x] Allotjament de base de dades Postgres
 - [x] Subscripcions en temps real
@@ -21,19 +21,19 @@
 
 ## Documentació
 
-Per a veure la documentació completa, visita [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.ca.md).
+Per a veure la documentació completa, visita [supabase.com/docs](https://supabase.com/docs).
 
 ## Comunitat i suport
 
 - [Fòrum de la comunitat](https://github.com/supabase/supabase/discussions). Millor per a: ajuda construint, discussions sobre les millors pràctiques de base de dades.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Millor per a: errors que et pots trobar utilitzant Supabase.
-- [Suport per correu electrònic](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.ca.md#business-*support). Millor per a: problemes amb la base de dades o infraestructura.
+- [Suport per correu electrònic](https://supabase.com/docs/support#business-*support). Millor per a: problemes amb la base de dades o infraestructura.
 - [Discord](https://discord.supabase.com). Millor per a: compartir les teves aplicacions i passar l’estona amb la comunitat.
 
 ## Estat
 
 - [x] Alfa: Estem provant Supabase amb un cercle tancat de clients.
-- [x] Alfa pública: Qualsevol pot registrar-se a [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.ca.md). Però sigues flexible amb nosaltres; encara poden existir obstacles.
+- [x] Alfa pública: Qualsevol pot registrar-se a [supabase.com/dashboard](https://supabase.com/dashboard). Però sigues flexible amb nosaltres; encara poden existir obstacles.
 - [x] Beta pública: Prou estable per a la majoria dels casos no empresarials.
 - [ ] Públic: Llest per a producció.
 
@@ -49,7 +49,7 @@ Supabase és una combinació d’eines de codi obert. Estem construint les funci
 
 **Arquitectura actual**
 
-Supabase és una [plataforma allotjada](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.ca.md). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.ca.md) i [desenvolupar localment](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.ca.md).
+Supabase és una [plataforma allotjada](https://supabase.com/dashboard). Et pots registrar i començar a utilitzar Supabase sense instal·lar res. També podeu tenir una [_host_ pròpia](https://supabase.com/docs/guides/hosting/overview) i [desenvolupar localment](https://supabase.com/docs/guides/local-development).
 
 ![Arquitectura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

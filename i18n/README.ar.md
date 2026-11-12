@@ -9,19 +9,19 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.ar.md)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
+[Supabase](https://supabase.com)هو بديل مفتوح المصدر لـ(Firebase). نحن نبني ميزات (Firebase) باستخدام أدوات مفتوحة المصدر عالية الجودة تستخدمها الشركات.
 
-- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.ar.md)
-- [x] [الشرح](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.ar.md) المصادقة والترخيص
+- [x] قاعدة بيانات (Postgres) مستضافة. [الشرح](https://supabase.com/docs/guides/database)
+- [x] [الشرح](https://supabase.com/docs/guides/auth) المصادقة والترخيص
 - [x] واجهات برمجة التطبيقات التي يتم إنشاؤها تلقائيا.
-  - [x] REST. [الشرح](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.ar.md)
-  - [x] GraphQL. [الشرح](https://supabase.com/docs/guides/graphql?utm_source=supabase&utm_content=i18n/README.ar.md)
-  - [x] اشتراكات الوقت الفعلي (Realtime subscriptions). [الشرح](https://supabase.com/docs/guides/realtime?utm_source=supabase&utm_content=i18n/README.ar.md)
+  - [x] REST. [الشرح](https://supabase.com/docs/guides/api)
+  - [x] GraphQL. [الشرح](https://supabase.com/docs/guides/graphql)
+  - [x] اشتراكات الوقت الفعلي (Realtime subscriptions). [الشرح](https://supabase.com/docs/guides/realtime)
 - [x] الدوال.
-  - [x] دوال قاعدة البيانات (Database Functions). [الشرح](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.ar.md)
-  - [x] Edge Functions [الشرح](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.ar.md)
-- [x] [الشرح](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.ar.md) التخزين.
-- [x] ذكاء اصطناعي + مجموعة أدوات المتجهات/التضمينات (AI + Vector/Embeddings Toolkit). [الشرح](https://supabase.com/docs/guides/ai?utm_source=supabase&utm_content=i18n/README.ar.md)
+  - [x] دوال قاعدة البيانات (Database Functions). [الشرح](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge Functions [الشرح](https://supabase.com/docs/guides/functions)
+- [x] [الشرح](https://supabase.com/docs/guides/storage) التخزين.
+- [x] ذكاء اصطناعي + مجموعة أدوات المتجهات/التضمينات (AI + Vector/Embeddings Toolkit). [الشرح](https://supabase.com/docs/guides/ai)
 - [x] لوحة الإدارة.
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -32,7 +32,7 @@
 
 ## الشرح
 
-للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.ar.md).
+للحصول على الشرح الكامل، قم بزيارة [supabase.com/docs](https://supabase.com/docs).
 
 لمعرفه كيفية دعم المشروع قم بزيارة [Getting Started](./DEVELOPERS.md).
 
@@ -40,7 +40,7 @@
 
 - [منتدى المجتمع](https://github.com/supabase/supabase/discussions). الأفضل لـ: المساعدة في البناء، والنقاش حول أفضل ممارسات قاعدة البيانات.
 - [مشاكل GitHub](https://github.com/supabase/supabase/issues). الأفضل لـ: المشاكل والأخطاء التي تواجهها عند استخدامك لـ(Supabase).
-- [دعم البريد الإلكتروني](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.ar.md#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
+- [دعم البريد الإلكتروني](https://supabase.com/docs/support#business-support). الأفضل لـ: مشاكل مع قاعدة بياناتك أو البنية التحتية.
 - [ديسكورد](https://discord.supabase.com/). الأفضل لـ: مشاركة التطبيقات الخاصه بك وقضاء بعض الوقت مع المجتمع.
 
 ## كيف يعمل (Supabase)؟
@@ -49,7 +49,7 @@ Supabase عبارة عن مجموعة من الأدوات مفتوحة المص�
 
 **الهيكلة الحالية**
 
-(supabase) هي [منصة مستضافة](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.ar.md), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.ar.md) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.ar.md).
+(supabase) هي [منصة مستضافة](https://supabase.com/dashboard), يمكنك التسجيل والبدأ باستخدامها دون الحاجة لتثبيت أي شئ. يمكنك أيضا [استضافتها ذاتيا](https://supabase.com/docs/guides/hosting/overview) و [تطويرها داخليا](https://supabase.com/docs/guides/local-development).
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

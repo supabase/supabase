@@ -208,8 +208,8 @@ test('tagUrl reports why a URL was left alone', () => {
   )
 })
 
-test('stops a bare URL at full-width punctuation in translated text', () => {
-  const file = 'i18n/README.ja.md'
+test('stops a bare URL at full-width punctuation in non-English text', () => {
+  const file = 'examples/ja/README.md'
   const tagUrlFor = (path) => `https://supabase.com${path}?utm_source=supabase&utm_content=${file}`
   assert.equal(
     tagMarkdown('詳細は https://supabase.com/docs）を参照。', { filePath: file }).text,
@@ -219,7 +219,7 @@ test('stops a bare URL at full-width punctuation in translated text', () => {
     tagMarkdown('ドキュメント：https://supabase.com/docs。', { filePath: file }).text,
     `ドキュメント：[https://supabase.com/docs](${tagUrlFor('/docs')})。`
   )
-  // Link syntax in translated text is unaffected.
+  // Link syntax in non-English text is unaffected.
   assert.equal(
     tagMarkdown('[ドキュメント](https://supabase.com/docs)を参照', { filePath: file }).text,
     `[ドキュメント](${tagUrlFor('/docs')})を参照`
@@ -242,12 +242,12 @@ test('only the intended files are in scope', () => {
     'docker/CONFIG.md',
     'apps/studio/README.md',
     'packages/ui/README.md',
-    'i18n/README.ja.md',
   ]) {
     assert.ok(isInScope(file), file)
   }
   for (const file of [
     'AGENTS.md',
+    'i18n/README.ja.md',
     'docker/CHANGELOG.md',
     'docker/.env.example',
     'apps/studio/components/README.md',

@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.th.md) คือโปรเจกต์โอเพนซอร์สทางเลือกของ Firebase. เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร
+[Supabase](https://supabase.com) คือโปรเจกต์โอเพนซอร์สทางเลือกของ Firebase. เราพัฒนาฟีเจอร์ที่เทียบเท่ากับ Firebase ด้วยเครื่องมือโอเพนซอร์สระดับองค์กร
 
 - [x] โฮสต์ฐานข้อมูล Postgres (Postgres Database)
 - [x] การสมัครสมาชิกแบบ Realtime
@@ -21,18 +21,18 @@
 
 ## เอกสารข้อมูล
 
-เข้าไปที่ [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.th.md) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
+เข้าไปที่ [supabase.com/docs](https://supabase.com/docs) สำหรับเอกสารข้อมูล (Documentation) ฉบับเต็ม
 
 ## ชุมชนและการสนับสนุน
 
 - [ฟอรั่มชุมชน](https://github.com/supabase/supabase/discussions). สำหรับ: ความช่วยเหลือในการใช้งาน Supabase หรือการพูดคุยแลกเปลี่ยนข้อมูลเกี่ยวกับ Databases Best Practices
 - [GitHub Issues](https://github.com/supabase/supabase/issues). สำหรับ: Bugs และ Erros ที่พบในการใช้งาน Supabase
-- [การช่วยเหลือทางอีเมล](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.th.md#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
+- [การช่วยเหลือทางอีเมล](https://supabase.com/docs/support#business-support). สำหรับ: ปัญหาที่พบสำหรับ Database หรือ Infrastructure ของคุณ
 
 ## Status
 
 - [x] Alpha: เรากำลังทดสอบ Supabase ในวงผู้ใช้ที่จำกัด
-- [x] Public Alpha: ทุกคนสามารถลงชื่อเข้าใช้ได้ที่ [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.th.md) แต่อย่าพึ่งไว้ใจมากนะ ระบบยังไม่สมบูรณ์
+- [x] Public Alpha: ทุกคนสามารถลงชื่อเข้าใช้ได้ที่ [supabase.com/dashboard](https://supabase.com/dashboard) แต่อย่าพึ่งไว้ใจมากนะ ระบบยังไม่สมบูรณ์
 - [x] Public Beta: เสถียรมากพอสำหรับการใช้งานแบบทั่วไป (ไม่ใช่องค์กร)
 - [ ] Public: พร้อมสำหรับการใช้งาน
 
@@ -48,7 +48,7 @@ Supabase สร้างขึ้นมาจากการรวมกัน�
 
 **สถาปัตยกรรม**
 
-Supabase เป็น [hosted platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.th.md). คุณสามารถลงทะเบียนและเริ่มใช้งาน Supabase ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
+Supabase เป็น [hosted platform](https://supabase.com/dashboard). คุณสามารถลงทะเบียนและเริ่มใช้งาน Supabase ได้เลยโดยไม่ต้องติดตั้งอะไรเพิ่มเติม นอกเหนือไปจากนั้นเรากำลังพัฒนาระบบเพื่อการพัฒนาเว็บบน local (local development experience) ที่เป็นจุดมุ่งหมายของเราในตอนนี้ รวมถึงความมั่นคงของระบบ
 
 ![สถาปัตยกรรม](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

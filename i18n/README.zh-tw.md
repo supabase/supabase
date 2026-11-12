@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.zh-tw.md)是一個開源的 Firebase 替代品。我們正在使用企業級的開源工具構建 Firebase 的功能。
+[Supabase](https://supabase.com)是一個開源的 Firebase 替代品。我們正在使用企業級的開源工具構建 Firebase 的功能。
 
-- [x] 托管的 Postgres 資料庫。[文檔](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
-- [x] 認證和授權。[文檔](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
+- [x] 托管的 Postgres 資料庫。[文檔](https://supabase.com/docs/guides/database)
+- [x] 認證和授權。[文檔](https://supabase.com/docs/guides/auth)
 - [x] 自動生成的 API。
-  - [x] REST.[文檔](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.zh-tw.md#rest-api-overview)
-  - [x] GraphQL。[文件](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.zh-tw.md#graphql-api-overview)
-  - [x] 實時訂閱。[文檔](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.zh-tw.md#realtime-api-overview)
+  - [x] REST.[文檔](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL。[文件](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] 實時訂閱。[文檔](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] 函數。
-  - [x] 資料庫函數。[文件](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
-  - [x] 邊缘功能 [文檔](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
-- [x] 文件存儲。[文件](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
+  - [x] 資料庫函數。[文件](https://supabase.com/docs/guides/database/functions)
+  - [x] 邊缘功能 [文檔](https://supabase.com/docs/guides/functions)
+- [x] 文件存儲。[文件](https://supabase.com/docs/guides/storage)
 - [x] 儀表板
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## 文檔
 
-有關完整的文檔，請訪問[supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.zh-tw.md)
+有關完整的文檔，請訪問[supabase.com/docs](https://supabase.com/docs)
 
 要了解如何貢獻，請訪問[入門](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@
 
 - [社群論壇](https://github.com/supabase/supabase/discussions)。最適合：幫助構建，討論資料庫的數佳實踐。
 - [GitHub 問题](https://github.com/supabase/supabase/issues)。最適合：你在使用 Supabase 时遇到的 bug 和错误。
-- [電子郵件支持](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.zh-tw.md#business-support)。最適合：你的資料庫或數據基礎設施的問題。
+- [電子郵件支持](https://supabase.com/docs/support#business-support)。最適合：你的資料庫或數據基礎設施的問題。
 - [Discord](https://discord.supabase.com)。最適合：分享你的應用程式並與社群一起玩耍。
 
 ## 狀態
 
 - [x] Alpha：我們正在與一组封閉的客户測試 Supabase。
-- [x] 公開 Alpha：任何人都可以在[supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.zh-tw.md)上註冊。但請對我們寬容一些，有一些小問題。
+- [x] 公開 Alpha：任何人都可以在[supabase.com/dashboard](https://supabase.com/dashboard)上註冊。但請對我們寬容一些，有一些小問題。
 - [x] 公開測試版：足夠穩定，適合大多數非企業使用的情况。
-- [ ] 公開：普遍可用 [狀態](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.zh-tw.md#feature-status)
+- [ ] 公開：普遍可用 [狀態](https://supabase.com/docs/guides/getting-started/features#feature-status)
 
 我們目前正處於公開測試階段。請關注此軟體的 "發布"，以獲得重大更新的通知。
 
@@ -55,8 +55,8 @@ Supabase 是一個開源工具的组合。我們正在使用企業級的開源�
 
 **架構**
 
-Supabase 是一個[托管平台](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.zh-tw.md)。你可以註冊並開始使用 Supabase，無需安裝任何東西。
-你也可以[自行托管](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.zh-tw.md)和[本地開發](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.zh-tw.md)。
+Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註冊並開始使用 Supabase，無需安裝任何東西。
+你也可以[自行托管](https://supabase.com/docs/guides/hosting/overview)和[本地開發](https://supabase.com/docs/guides/local-development)。
 
 ![架構](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

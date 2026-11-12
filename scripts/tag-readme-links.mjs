@@ -1,8 +1,8 @@
 #!/usr/bin/env node
 /**
  * Tags supabase.com links in this repo's GitHub-facing markdown (see INCLUDE_PATTERNS: the root
- * README, CONTRIBUTING and DEVELOPERS files, example READMEs, the self-hosting guides, each app and
- * package README, and the translated READMEs) with:
+ * README, CONTRIBUTING and DEVELOPERS files, example READMEs, the self-hosting guides, and the
+ * README at the top of each app and package) with:
  *
  *   utm_source=<repo>            which repository the link lives in
  *   utm_content=<file path>      which file in that repository the link lives in
@@ -20,7 +20,7 @@
  *     is the URL itself, only the href is tagged.
  *   - URLs with placeholders (`<ref>`, `[ref]`, `{ref}`, `$VAR`) are skipped.
  *   - A URL ends at the first non-ASCII character, so it stops at full-width punctuation (`。`, `）`) in
- *     translated text. One that runs straight into letters, like `https://supabase.com/docs查看`, is skipped.
+ *     non-English text. One that runs straight into letters, like `https://supabase.com/docs查看`, is skipped.
  *
  * Usage:
  *   node scripts/tag-readme-links.mjs                 # rewrite files in place
@@ -44,8 +44,8 @@ export const INCLUDE_PATTERNS = [
   /^docker\/(?:README|CONFIG)\.md$/i,
   // The README at the top of each app and package. Nested READMEs are developer notes, not entry points.
   /^(?:apps|packages)\/[^/]+\/README\.md$/i,
-  // Translations of the root README.
-  /^i18n\/[^/]+\.md$/i,
+  // `i18n/` (translations of the root README) is deliberately not listed: community-maintained and
+  // not worth the review noise.
   // `examples/prompts` holds prompt files that people copy into AI tools, not pages people click through.
   /^examples\/(?!prompts\/)(?:.+\/)?README\.md$/i,
 ]

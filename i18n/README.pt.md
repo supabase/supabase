@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.pt.md) é uma alternativa de código aberto ao Firebase. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
+[Supabase](https://supabase.com) é uma alternativa de código aberto ao Firebase. Estamos reproduzindo as funcionalidades do Firebase usando ferramentas de código aberto de nível empresarial.
 
 - [x] Base de dados Postgres hospedada
 - [x] Subscrições em tempo real
@@ -21,18 +21,18 @@
 
 ## Documentação
 
-Para ver a documentação completa, visite [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.pt.md)
+Para ver a documentação completa, visite [supabase.com/docs](https://supabase.com/docs)
 
 ## Comunidade & Suporte
 
 - [Fórum da comunidade](https://github.com/supabase/supabase/discussions). Indicado para: ajuda no desenvolvimento, discussão sobre as melhores práticas de base de dados.
 - [Problemas do GitHub](https://github.com/supabase/supabase/issues). Indicado para: bugs e erros que tu encontrares ao usar o Supabase.
-- [Suporte por e-mail](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.pt.md#business-support). Indicado para: problemas com a tua base de dados ou infraestrutura.
+- [Suporte por e-mail](https://supabase.com/docs/support#business-support). Indicado para: problemas com a tua base de dados ou infraestrutura.
 
 ## Status
 
 - [x] Alpha: estamos a testar o Supabase com um grupo fechado de clientes
-- [x] Alpha Público: Qualquer pessoa pode se inscrever em [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.pt.md). Mas vai com calma, ainda existem alguns problemas.
+- [x] Alpha Público: Qualquer pessoa pode se inscrever em [supabase.com/dashboard](https://supabase.com/dashboard). Mas vai com calma, ainda existem alguns problemas.
 - [x] Beta público: estável o suficiente para a maioria dos casos de uso não empresarial
 - [ ] Público: pronto para produção
 
@@ -48,7 +48,7 @@ Supabase é uma combinação de ferramentas de código aberto. Estamos a constru
 
 **Arquitetura atual**
 
-Supabase é uma [plataforma hospedada](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.pt.md). Podes-te inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos a criar a experiência de desenvolvimento local - esse é nosso foco atual, juntamente com a estabilidade da plataforma.
+Supabase é uma [plataforma hospedada](https://supabase.com/dashboard). Podes-te inscrever e começar a usar o Supabase sem instalar nada. Ainda estamos a criar a experiência de desenvolvimento local - esse é nosso foco atual, juntamente com a estabilidade da plataforma.
 
 ![Arquitetura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

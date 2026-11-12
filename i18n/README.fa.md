@@ -9,7 +9,7 @@
 
 # Supabase
 
-‫[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.fa.md) یک جایگزین اپن‌سورس برای Firebase است. ما در حال ساخت امکانات Firebase با استفاده ابزارهای اپن‌سورس و کلاس تجاری هستیم.
+‫[Supabase](https://supabase.com) یک جایگزین اپن‌سورس برای Firebase است. ما در حال ساخت امکانات Firebase با استفاده ابزارهای اپن‌سورس و کلاس تجاری هستیم.
 
 - [x] ‫دیتابیس Postgres میزبانی‌شده
 - [x] اتصال و ارتباط بلادرنگ
@@ -23,18 +23,18 @@
 
 ## مستندات
 
-برای مستندات کامل به‫ [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.fa.md) مراجعه کنید.
+برای مستندات کامل به‫ [supabase.com/docs](https://supabase.com/docs) مراجعه کنید.
 
 ## جامعه و پشتیبانی
 
 - ‫[Community Forum](https://github.com/supabase/supabase/discussions). گزینه مناسب برای راهنمایی گرفتن در مورد توسعه و روش مناسب استفاده از دیتابیس می‌باشد.
 - ‫[GitHub Issues](https://github.com/supabase/supabase/issues). گزینه مناسب برای خطاها و باگ‌هایی که در استفاده از Supabase برمی‌خوردید.
-- ‫[Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.fa.md#business-support). بهترین گزینه برای مشکلات مرتبط با دیتابیس و زیرساخت است.
+- ‫[Email Support](https://supabase.com/docs/support#business-support). بهترین گزینه برای مشکلات مرتبط با دیتابیس و زیرساخت است.
 
 ## وضعیت
 
 - [x] ‫آلفا: در حال تست Supabase با گروه محدود از کاربران هستیم.
-- [x] ‫آلفای عمومی: همه می‌تواند برای استفاده از طریق [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.fa.md) ثبت‌نام کنند. اما سخت نگیرید، ممکن است مشکلات معدودی وجود داشته باشد.
+- [x] ‫آلفای عمومی: همه می‌تواند برای استفاده از طریق [supabase.com/dashboard](https://supabase.com/dashboard) ثبت‌نام کنند. اما سخت نگیرید، ممکن است مشکلات معدودی وجود داشته باشد.
 - [x] بتای عمومی: قابل اتکا برای اکثر استفاده‌های غیر-تجاری می‌باشد.
 - [ ] عمومی: آماده برای استفاده تجاری.
 
@@ -50,7 +50,7 @@
 
 **معماری فعلی**
 
-‫Supabase یک [پلتفرم میزبانی‌شده](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.fa.md) است. شما می‌توانید بدون نصب چیزی، ثبت‌نام و شروع به استفاده از Supabase کنید. ما هنوز در حال ساختن تجربه‌ی توسعه local هستیم - این تمرکز اصلی فعلی ما علاوه بر اتکاپذیری است.
+‫Supabase یک [پلتفرم میزبانی‌شده](https://supabase.com/dashboard) است. شما می‌توانید بدون نصب چیزی، ثبت‌نام و شروع به استفاده از Supabase کنید. ما هنوز در حال ساختن تجربه‌ی توسعه local هستیم - این تمرکز اصلی فعلی ما علاوه بر اتکاپذیری است.
 
 ![معماری](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

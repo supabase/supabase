@@ -7,18 +7,18 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.hr.md) je open source alternativa Firebaseu. Izgrađujemo funkcionalnosti Firebasea koristeći enterprise-grade open source alate.
+[Supabase](https://supabase.com) je open source alternativa Firebaseu. Izgrađujemo funkcionalnosti Firebasea koristeći enterprise-grade open source alate.
 
-- [x] Hostana Postgres baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.hr.md)
-- [x] Autentifikacija i autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.hr.md)
+- [x] Hostana Postgres baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database)
+- [x] Autentifikacija i autorizacija. [Dokumentacija](https://supabase.com/docs/guides/auth)
 - [x] Automatski generirani API-ji.
-  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hr.md#rest-api-overview)
-  - [x] GraphQL. [Dokumentacija](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hr.md#graphql-api-overview)
-  - [x] Pretplate u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hr.md#realtime-api-overview)
+  - [x] REST. [Dokumentacija](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Dokumentacija](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Pretplate u realnom vremenu. [Dokumentacija](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Funkcije.
-  - [x] Funkcije baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.hr.md)
-  - [x] Edge funkcije [Dokumentacija](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.hr.md)
-- [x] Pohranjivanje datoteka. [Dokumentacija](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.hr.md)
+  - [x] Funkcije baza podataka. [Dokumentacija](https://supabase.com/docs/guides/database/functions)
+  - [x] Edge funkcije [Dokumentacija](https://supabase.com/docs/guides/functions)
+- [x] Pohranjivanje datoteka. [Dokumentacija](https://supabase.com/docs/guides/storage)
 - [x] Panel
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -29,7 +29,7 @@ Pratite "izdanja" ovog repozitorija da bi bili obaviješteni o većim ažuriranj
 
 ## Dokumentacija
 
-Za cjelovitu dokumentaciju, posjetite [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.hr.md)
+Za cjelovitu dokumentaciju, posjetite [supabase.com/docs](https://supabase.com/docs)
 
 Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.md)
 
@@ -37,7 +37,7 @@ Za informacije kako doprinijeti razvoju, posjetite [Početak rada](./DEVELOPERS.
 
 - [Forum zajednice](https://github.com/supabase/supabase/discussions). Najbolje služi za: pomoć pri izgradnji, diskusiji o najboljoj praksi oko baza podataka.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Najbolje služi za: bugove i greške na koje ste naišli koristeći Supabase.
-- [Email potpora](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.hr.md#business-support). Najbolje služi za: probleme oko vaše baze podataka ili oko infrastrukture.
+- [Email potpora](https://supabase.com/docs/support#business-support). Najbolje služi za: probleme oko vaše baze podataka ili oko infrastrukture.
 - [Discord](https://discord.supabase.com). Najbolje služi za: pokazati vaše aplikacije i druženje sa ostatkom zajednice.
 
 ## Kako funkcionira
@@ -46,8 +46,8 @@ Supabase je kombinacija alata otvorenog koda. Izgrađujemo funkcionalnosti Fireb
 
 **Arhitektura**
 
-Supabase je [hostana platforma](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.hr.md). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
-Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.hr.md) i [razvijati lokalno](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.hr.md).
+Supabase je [hostana platforma](https://supabase.com/dashboard). Možete se registrirati i odmah počet koristiti Supabase bez ikakvih instalacija.
+Također možete ju [samostalno hostati](https://supabase.com/docs/guides/hosting/overview) i [razvijati lokalno](https://supabase.com/docs/guides/local-development).
 
 ![Arhitektura](https://raw.githubusercontent.com/supabase/supabase/master/apps/docs/public/img/supabase-architecture.svg)
 

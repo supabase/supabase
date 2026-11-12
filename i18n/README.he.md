@@ -9,7 +9,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.he.md) Supabase הוא חלופה בקוד פתוח של Firebase. אנו מפתחים את התכונות של Firebase באמצעות כלי קוד פתוח ברמת גימור ארגונית.
+[Supabase](https://supabase.com) Supabase הוא חלופה בקוד פתוח של Firebase. אנו מפתחים את התכונות של Firebase באמצעות כלי קוד פתוח ברמת גימור ארגונית.
 
 - [x] מאגר נתונים מסוג פוסטגרס (Postgres)
 - [x] מנויים בזמן אמת
@@ -23,18 +23,18 @@
 
 ## תיעוד
 
-לתיעוד המלא, בקר\י ב[supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.he.md)
+לתיעוד המלא, בקר\י ב[supabase.com/docs](https://supabase.com/docs)
 
 ## קהילה & תמיכה
 
 - [פורום הקהילה](https://github.com/supabase/supabase/discussions). נועד עבור: עזרה בבנייה, דיון אודות שיטות עבודה מומלצות מול מאגר הנתונים.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). נועד עבור: דיווח על באגים ושגיאות בזמן שימוש בSupabase
-- [אימייל תמיכה](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.he.md#business-support). נועד עבור: תקלות במסד הנתונים או בתשתית שלך.
+- [אימייל תמיכה](https://supabase.com/docs/support#business-support). נועד עבור: תקלות במסד הנתונים או בתשתית שלך.
 
 ## סטטוס
 
 - [x] אלפא: בוחנים את המערכת מול מאגר סגור של לקוחות
-- [x] אלפא פומבית: כל אחד יכול להרשם ב[supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.he.md). אבל תהיו עדינים, יהיו בעיות.
+- [x] אלפא פומבית: כל אחד יכול להרשם ב[supabase.com/dashboard](https://supabase.com/dashboard). אבל תהיו עדינים, יהיו בעיות.
 - [x] בטא פומבית: יציב מספיק לרוב הלקוחות הלא-ארגוניים.
 - [ ] יציב: מתאים לשימוש הכלל.
 
@@ -50,7 +50,7 @@ Supabase הוא שילוב של כלי קוד פתוח. אנו בונים את �
 
 **ארכיטקטורה נוכחית**
 
-Supabase היא [תשתית ענן](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.he.md)
+Supabase היא [תשתית ענן](https://supabase.com/dashboard)
 . את\ה יכול\ה להירשם ולהתחיל להשתמש ב- Supabase מבלי להתקין שום דבר. אנו עדיין עובדים על לייצר את חוויית הפיתוח המקומית - בזה אנחנו מתמקדים, יחד עם יציבות המערכת.
 
 ![Architecture](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)

@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.ms.md) adalah sumber terbuka alternatif kepada Firebase. Kami sedang membina ciri-ciri Firebase menggunakan alat sumber terbuka kelas perusahaan.
+[Supabase](https://supabase.com) adalah sumber terbuka alternatif kepada Firebase. Kami sedang membina ciri-ciri Firebase menggunakan alat sumber terbuka kelas perusahaan.
 
 - [x] Hosting Pangkalan Data untuk Postgres
 - [x] Langganan Waktu Nyata (Realtime)
@@ -21,18 +21,18 @@
 
 ## Dokumentasi
 
-Untuk dokumentasi lengkap, layari [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.ms.md)
+Untuk dokumentasi lengkap, layari [supabase.com/docs](https://supabase.com/docs)
 
 ## Komuniti & Sokongan
 
 - [Forum Komuniti](https://github.com/supabase/supabase/discussions). Terbaik untuk: membantu pembinaan and perbincangan mengenai cara terbaik pangkalan data.
 - [Isu GitHub](https://github.com/supabase/supabase/issues). Terbaik untuk: pepijat dan ralat yang anda hadapi menggunakan Supabase.
-- [Sokongan E-mel](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.ms.md#business-support). Terbaik untuk: masalah dengan pangkalan data atau infrastruktur.
+- [Sokongan E-mel](https://supabase.com/docs/support#business-support). Terbaik untuk: masalah dengan pangkalan data atau infrastruktur.
 
 ## Status
 
 - [x] Alpha: Kami menguji Supabase dengan sejumlah pelanggan secara tertutup
-- [x] Public Alpha: Sesiapa sahaja boleh mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.ms.md). Tetapi, mohon bersabar kerana mungkin ada masalah
+- [x] Public Alpha: Sesiapa sahaja boleh mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tetapi, mohon bersabar kerana mungkin ada masalah
 - [x] Public Beta: Cukup stabil untuk kebanyakan kes penggunaan bukan perusahaan
 - [ ] Public: Bersedia untuk pengeluaran
 
@@ -48,8 +48,8 @@ Supabase adalah gabungan alat sumber terbuka. Kami membina ciri Firebase menggun
 
 **Seni bina semasa**
 
-Supabase ialah [platform yang dihoskan](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.ms.md). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
-Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.ms.md) dan [lokal](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.ms.md).
+Supabase ialah [platform yang dihoskan](https://supabase.com/dashboard). Anda boleh mendaftar dan mula menggunakan Supabase tanpa memasang apa-apa.
+Anda juga boleh [host sendiri](https://supabase.com/docs/guides/hosting/overview) dan [lokal](https://supabase.com/docs/guides/local-development).
 
 ![Seni bina](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

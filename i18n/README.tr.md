@@ -7,26 +7,26 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.tr.md) açık kaynaklı bir Firebase alternatifidir. Kurumsal düzeyde açık kaynak araçları kullanarak Firebase'in özelliklerini geliştiriyoruz.
+[Supabase](https://supabase.com) açık kaynaklı bir Firebase alternatifidir. Kurumsal düzeyde açık kaynak araçları kullanarak Firebase'in özelliklerini geliştiriyoruz.
 
-- [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.tr.md)
-- [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.tr.md)
+- [x] Barındırılan Postgres Veritabanı. [Dokümanlar](https://supabase.com/docs/guides/database)
+- [x] Kimlik Doğrulama ve Yetkilendirme. [Dokümanlar](https://supabase.com/docs/guides/auth)
 - [x] Otomatik oluşturulan API'ler.
-  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.tr.md#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.tr.md#graphql-api-overview)
-  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.tr.md#realtime-api-overview)
+  - [x] REST. [Dokümanlar](https://supabase.com/docs/guides/api#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] Gerçek zamanlı abonelikler. [Dokümanlar](https://supabase.com/docs/guides/api#realtime-api-overview)
 - [x] Fonksiyonlar.
-  - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.tr.md)
-  - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.tr.md)
-- [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.tr.md)
-- [x] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai?utm_source=supabase&utm_content=i18n/README.tr.md)
+  - [x] Veritabanı Fonksiyonları. [Dokümanlar](https://supabase.com/docs/guides/database/functions)
+  - [x] Kenar İşlevleri [Dokümanlar](https://supabase.com/docs/guides/functions)
+- [x] Dosya Depolama. [Docs](https://supabase.com/docs/guides/storage)
+- [x] AI + Vektör / Gömme Araçları. [Dokümanlar](https://supabase.com/docs/guides/ai)
 - [x] Gösterge Tablosu
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokümantasyon
 
-Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.tr.md) adresini ziyaret edin
+Belgelerin tamamı için [supabase.com/docs](https://supabase.com/docs) adresini ziyaret edin
 
 Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) adresini ziyaret edin
 
@@ -34,7 +34,7 @@ Nasıl Katkıda bulunacağınızı görmek için [Başlarken](../DEVELOPERS.md) 
 
 - [Topluluk Forumu](https://github.com/supabase/supabase/discussions). Şunlar için en iyisi: oluşturma konusunda yardım, veritabanı en iyi uygulamaları hakkında tartışma.
 - [GitHub Sorunları](https://github.com/supabase/supabase/issues). Supabase'i kullanırken karşılaştığınız hatalar ve hatalar için en iyisi.
-- [E-posta Desteği](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.tr.md#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
+- [E-posta Desteği](https://supabase.com/docs/support#business-support). Veritabanınız veya altyapınızla ilgili sorunlar için en iyisi.
 - [Discord](https://discord.supabase.com). Uygulamalarınızı paylaşmak ve toplulukla takılmak için en iyisi.
 
 ## Nasıl çalışır
@@ -43,8 +43,8 @@ Supabase açık kaynak araçlarının bir birleşimidir. Firebase'in özellikler
 
 **Mimari**
 
-Supabase [barındırılan bir platformdur](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.tr.md). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
-Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.tr.md) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.tr.md).
+Supabase [barındırılan bir platformdur](https://supabase.com/dashboard). Supabase'e kaydolabilir ve hiçbir şey yüklemeden kullanmaya başlayabilirsiniz.
+Ayrıca [self-host](https://supabase.com/docs/guides/hosting/overview) ve [yerel olarak geliştirebilirsiniz](https://supabase.com/docs/guides/local-development).
 
 ![Mimarlık](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

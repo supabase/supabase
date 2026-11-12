@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.nb-no.md) er et open source-alternativ til Firebase. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-klare open source-verktøy.
+[Supabase](https://supabase.com) er et open source-alternativ til Firebase. Vi bygger funksjonaliteten til Firebase ved hjelp av enterprise-klare open source-verktøy.
 
 - [x] Hostet Postgres-database
 - [x] Sanntidsabonnementer
@@ -21,18 +21,18 @@
 
 ## Dokumentasjon
 
-Besøk [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.nb-no.md) for full dokumentasjon.
+Besøk [supabase.com/docs](https://supabase.com/docs) for full dokumentasjon.
 
 ## Community & support
 
 - [Community-forum](https://github.com/supabase/supabase/discussions). Egnet for: hjelp med utvikling, best practices-diskusjoner.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Egnet for: bugs og feil du opplever med Supabase.
-- [Support på e-post](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.nb-no.md#business-support). Egnet for: problemer med databasen din eller infrastruktur.
+- [Support på e-post](https://supabase.com/docs/support#business-support). Egnet for: problemer med databasen din eller infrastruktur.
 
 ## Status
 
 - [x] Alpha: Vi tester Supabase med en lukket gruppe kunder
-- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.nb-no.md). Merk at enkelte feil og quirks kan forekomme.
+- [x] Offentlig Alpha: Hvem som helst kan registrere seg på [supabase.com/dashboard](https://supabase.com/dashboard). Merk at enkelte feil og quirks kan forekomme.
 - [x] Offentlig Beta: Stabilt nok for de fleste ikke-enterprise-bruksområder
 - [ ] Offentlig: Produksjonsklar
 
@@ -48,7 +48,7 @@ Supabase er en samling av open source-verktøy. Vi bygger funksjonaliteten til F
 
 **Nåværende arkitektur**
 
-Supabase er en [hostet plattform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.nb-no.md). Du kan registrere deg og begynne å bruke Supabase uten å installere noe. Vi holder fortsatt på å bygge verktøy for lokalt bruk – dette er nå vårt kjernefokus, i tillegg til plattformstabilitet.
+Supabase er en [hostet plattform](https://supabase.com/dashboard). Du kan registrere deg og begynne å bruke Supabase uten å installere noe. Vi holder fortsatt på å bygge verktøy for lokalt bruk – dette er nå vårt kjernefokus, i tillegg til plattformstabilitet.
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
