@@ -50,6 +50,7 @@ import { DocsButton } from '@/components/ui/DocsButton'
 import { FeaturePreviewBadge } from '@/components/ui/FeaturePreviewBadge'
 import { InlineLink, InlineLinkClassName } from '@/components/ui/InlineLink'
 import { useDatabaseRolesQuery } from '@/data/database-roles/database-roles-query'
+import { useJitDbAccessInviteDeleteMutation } from '@/data/jit-db-access/jit-db-access-invite-delete-mutation'
 import { useJitDbAccessMembersQuery } from '@/data/jit-db-access/jit-db-access-members-query'
 import { useJitDbAccessQuery } from '@/data/jit-db-access/jit-db-access-query'
 import { useJitDbAccessRevokeMutation } from '@/data/jit-db-access/jit-db-access-revoke-mutation'
@@ -61,6 +62,7 @@ import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useChe
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 export const JitDbAccessConfiguration = () => {
   const { ref } = useParams()
@@ -151,7 +153,22 @@ export const JitDbAccessConfiguration = () => {
       onError: () => {},
     })
 
-  const isMutating = isUpdatingJitDbAccess || isRevokingAccess
+  const deleteInvitationGrant = useGrant(
+    'DELETE /v1/projects/{ref}/database/jit/invite/{invite_id}',
+    {
+      projectRef: ref,
+    }
+  )
+  const { mutateAsync: deleteInvitation, isPending: isDeletingInvitation } =
+    useJitDbAccessInviteDeleteMutation({
+      onSuccess: () => {
+        toast.success('Successfully deleted invitation')
+        setSelectedUserToDelete(null)
+      },
+      onError: () => {},
+    })
+
+  const isMutating = isUpdatingJitDbAccess || isRevokingAccess || isDeletingInvitation
   const disableRuleActions = isMutating || isLoadingDatabaseRoles || isLoadingOrganizationMembers
   const isRulesLoading = isLoadingJitMembers || isLoadingProjectMembers
 
@@ -291,7 +308,19 @@ export const JitDbAccessConfiguration = () => {
       if (!ref) throw new Error('Project ref is required')
       if (!selectedUserToDelete) throw new Error('User is required')
 
-      await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+      if (selectedUserToDelete.inviteState) {
+        if (!selectedUserToDelete.inviteId) throw new Error('Invitation ID is required')
+        if (deleteInvitationGrant.status !== 'granted') {
+          throw new Error('You need additional permissions to delete invitations')
+        }
+        await deleteInvitation({
+          grant: deleteInvitationGrant.grant,
+          projectRef: ref,
+          inviteId: selectedUserToDelete.inviteId,
+        })
+      } else {
+        await revokeUserAccess({ projectRef: ref, userId: selectedUserToDelete.memberId })
+      }
     } catch (error) {
       setDeleteRuleError(getErrorMessage(error))
       throw error
@@ -496,7 +525,6 @@ export const JitDbAccessConfiguration = () => {
                 isLoading={isRulesLoading}
                 canUpdate={!!canUpdateJitDbAccess}
                 disableActions={disableRuleActions}
-                allProjectMembersHaveRules={availableMembersForAdd.length === 0}
                 onAddRule={openAddRuleSheet}
                 onEditRule={openEditRuleSheet}
                 onDeleteRule={openDeleteDialog}
@@ -514,7 +542,7 @@ export const JitDbAccessConfiguration = () => {
 
       <JitDbAccessDeleteDialog
         user={selectedUserToDelete}
-        isDeleting={isRevokingAccess}
+        isDeleting={isRevokingAccess || isDeletingInvitation}
         error={deleteRuleError}
         onClose={() => {
           setDeleteRuleError(null)
