@@ -107,7 +107,7 @@ export class LintWarningsGuideSource extends BaseSource {
     this.checksum = createHash('sha256').update(this.lint.content).digest('base64')
 
     this.meta = {
-      title: `Database issue check: Lint ${this.lint.path}`,
+      title: `Database Advisor: Lint ${this.lint.path}`,
     }
 
     this.sections = [
@@ -122,6 +122,6 @@ export class LintWarningsGuideSource extends BaseSource {
   extractIndexedContent(): string {
     const sections = this.sections ?? []
     const sectionText = sections.map(({ content }) => content).join('\n\n')
-    return `# Database issue check: Lint ${this.lint.path}\n\nThis is a database lint rule for Supabase, targeting the lint ID ${this.lint.path}. Lint rules help enforce performance and security best practices for your Supabase database.\n\n${sectionText}`
+    return `# Database Advisor: Lint ${this.lint.path}\n\nThis is a database lint rule for Supabase, targeting the lint ID ${this.lint.path}. Lint rules help enforce performance and security best practices for your Supabase database.\n\n${sectionText}`
   }
 }

@@ -961,12 +961,12 @@
   },
   {
     "source": "/docs/guides/database/database-advisors",
-    "destination": "/docs/guides/observability/issues",
+    "destination": "/docs/guides/observability/advisors",
     "permanent": true
   },
   {
     "source": "/docs/guides/database/database-linter",
-    "destination": "/docs/guides/observability/issues",
+    "destination": "/docs/guides/observability/advisors",
     "permanent": true
   },
   {
@@ -1632,11 +1632,6 @@
   {
     "source": "/docs/guides/observability/access-data",
     "destination": "/docs/guides/observability",
-    "permanent": true
-  },
-  {
-    "source": "/docs/guides/observability/advisors",
-    "destination": "/docs/guides/observability/issues",
     "permanent": true
   },
   {

@@ -44,6 +44,12 @@ export const telemetryAccessWhat: ContentListingGroup = {
         'Pull health, security, and performance issues from Studio, MCP, the CLI, or the API.',
     },
     {
+      title: 'Advisors',
+      href: '/guides/observability/advisors',
+      description:
+        'Run health, security, and performance checks from Studio, MCP, the CLI, or the API.',
+    },
+    {
       title: 'Reports',
       href: '/guides/observability/reports',
       description: 'Studio dashboards for API, Auth, Storage, Realtime, and database signals.',

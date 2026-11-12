@@ -4,13 +4,13 @@ title: 'Issues'
 description: 'Health, security, and performance issues you or an agent can check for in a project.'
 ---
 
-Issues flag health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. Issues were previously called Advisors.
+Issues flag health, security, and performance problems in your project, such as elevated error rates, misconfigured RLS policies, or missing indexes. Each issue comes from a deterministic check that ships with the platform. You can use Issues alongside [Advisors](/docs/guides/observability/advisors), which is planned for deprecation in a future release.
 
 You or an agent can check for issues from:
 
 - Studio: [Health issues](/dashboard/project/_/issues?category=health), [Security issues](/dashboard/project/_/issues?category=security), and [Performance issues](/dashboard/project/_/issues?category=performance)
-- MCP: `get_issues`, which replaces the deprecated `get_advisors`
-- CLI: [`supabase issues`](/docs/reference/cli/supabase-issues), which replaces the deprecated [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors)
+- MCP: `get_issues`
+- CLI: [`supabase issues`](/docs/reference/cli/supabase-issues)
 - Management API: [security](/docs/reference/api/v1-get-security-advisors), [performance](/docs/reference/api/v1-get-performance-advisors), and [health](/docs/reference/api/v2-run-project-advisors) checks
 
 Some issues may be intentional, so check them against your intended schema and access model before you change anything. Health issues can take a while to clear after a fix, since the check measures error rates over a period of time.
@@ -36,7 +36,7 @@ Text output summarizes each issue and its affected-resource count, followed by c
 
 `--fail-on` accepts `none`, `info`, `warning`, or `critical`, and defaults to `none`. It exits with status 1 when a displayed issue meets the threshold. Severity filtering happens first. An unavailable remote check also exits with status 1, even with `--fail-on none`.
 
-The deprecated `supabase db advisors` command retains its existing flags, defaults, output, and exit behavior.
+The [`supabase db advisors`](/docs/reference/cli/supabase-db-advisors) command is planned for deprecation in a future release. It retains its existing flags, defaults, output, and exit behavior.
 
 ## Check issues with MCP
 
@@ -52,7 +52,7 @@ Use `get_issues` with your project scope. For example, these tool arguments requ
 
 `type` accepts `all`, `security`, `performance`, or `health`, and defaults to `all`. `severity` accepts `info`, `warning`, or `critical`, and defaults to `info`. A project-scoped MCP connection supplies `project_id` automatically.
 
-The deprecated `get_advisors` tool remains available for existing callers.
+The `get_advisors` tool is planned for deprecation in a future release. It remains available for existing callers.
 
 ## Interpret results
 

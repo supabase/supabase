@@ -428,6 +428,7 @@
   "local-development/testing/pgtap-extended",
   "observability",
   "observability/advanced-log-filtering",
+  "observability/advisors",
   "observability/automate-with-agents",
   "observability/automate-with-agents/health",
   "observability/automate-with-agents/performance",
