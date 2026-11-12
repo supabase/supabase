@@ -203,6 +203,31 @@ describe('OnboardingSurveyFollowUpCard', () => {
     expect(requests).toHaveLength(1)
   })
 
+  it('sends can_code in the same request as the other answers', async () => {
+    markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'COMPANY', size: '10' })
+    const requests = mockSurveyEndpoint(204)
+
+    renderCard()
+    fireEvent.click(await screen.findByRole('button', { name: 'Answer' }))
+    const dialog = await screen.findByRole('dialog')
+    await chooseOption(dialog, 0, 'Agency')
+    await chooseOption(dialog, 1, 'Other')
+    await chooseOption(dialog, 2, 'No')
+    fireEvent.click(within(dialog).getByRole('button', { name: 'Send answers' }))
+
+    await waitFor(() =>
+      expect(requests).toEqual([
+        { slug: ORG_SLUG, kind: 'AGENCY', building: 'other', can_code: 'no' },
+      ])
+    )
+    expect(track).toHaveBeenCalledWith('onboarding_survey_submit_button_clicked', {
+      surface: 'follow_up',
+      hasKind: true,
+      hasBuilding: true,
+      hasCanCode: true,
+    })
+  })
+
   it('asks for a company size and sends it', async () => {
     markFollowUpPending({ profileId: PROFILE_ID, orgSlug: ORG_SLUG, kind: 'PERSONAL' })
     const requests = mockSurveyEndpoint(204)
@@ -236,6 +261,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
       surface: 'follow_up',
       hasKind: true,
       hasBuilding: false,
+      hasCanCode: false,
     })
   })
 
@@ -252,6 +278,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
         surface: 'follow_up',
         hasKind: true,
         hasBuilding: false,
+        hasCanCode: false,
       })
     )
     await waitFor(() => expect(readStoredState()).toEqual(pendingState))
