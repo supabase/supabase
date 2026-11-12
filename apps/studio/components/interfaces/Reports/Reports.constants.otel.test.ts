@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { generateOtelWhereSafe, PRESET_CONFIG } from './Reports.constants'
+import { generateOtelWhereSafe, PRESET_CONFIG, STORAGE_ROUTE_PATTERN } from './Reports.constants'
 import { Presets, type ReportFilterItem } from './Reports.types'
 
 function getOtelSql(preset: Presets, queryName: string, filters: ReportFilterItem[] = []): string {
@@ -128,5 +128,26 @@ describe('Report OTEL queries', () => {
       "log_attributes['response.headers.cf_cache_status'] in ('MISS', 'NONE/UNKNOWN', 'EXPIRED', 'BYPASS', 'DYNAMIC')"
     )
     expect(missesSql).toContain('limit 12')
+  })
+})
+
+describe('STORAGE_ROUTE_PATTERN', () => {
+  // Mirrors the SQL: matched paths become `<prefix>/*`, others stay as-is.
+  const toRoute = (path: string) => {
+    const match = path.match(new RegExp(STORAGE_ROUTE_PATTERN))
+    return match ? `${match[1]}/*` : path
+  }
+
+  it.each([
+    ['/storage/v1/s3/bucket/a/b.mp4', '/storage/v1/s3/*'],
+    ['/storage/v1/object/public/bucket/a.png', '/storage/v1/object/public/*'],
+    ['/storage/v1/object/sign/bucket/a.png', '/storage/v1/object/sign/*'],
+    ['/storage/v1/object/upload/sign/bucket/a.png', '/storage/v1/object/upload/sign/*'],
+    ['/storage/v1/object/bucket/a.png', '/storage/v1/object/*'],
+    ['/storage/v1/render/image/public/bucket/a.png', '/storage/v1/render/image/public/*'],
+    ['/storage/v1/bucket', '/storage/v1/bucket'],
+    ['/rest/v1/rpc/my_fn', '/rest/v1/rpc/my_fn'],
+  ])('groups %s as %s', (path, expected) => {
+    expect(toRoute(path)).toBe(expected)
   })
 })
