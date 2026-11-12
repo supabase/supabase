@@ -20,6 +20,8 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import { useEnsurePipelineRegionSource } from '../CreatePipeline/useEnsurePipelineRegionSource'
 import { EnablePipelinesCallout } from '../EnablePipelinesCallout'
 import { PipelineStatusName } from '../Replication.constants'
+import { canModifyDestination } from '../ReplicationDiagram/Nodes.utils'
+import { UnknownDestinationNotice } from '../UnknownDestinationNotice'
 import { useDestinationInformation } from '../useDestinationInformation'
 import { useIsPipelinesEnabled } from '../useIsPipelinesEnabled'
 import { usePreferredPipelineClusterId } from '../usePreferredPipelineClusterId'
@@ -28,6 +30,7 @@ import { DESTINATION_DOCS_PATHS } from './DestinationPanel.constants'
 import { DestinationType } from './DestinationPanel.types'
 import { DestinationTypeSelection } from './DestinationTypeSelection'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useReplicationDestinationsQuery } from '@/data/replication/destinations-query'
 import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
@@ -49,7 +52,6 @@ export const DestinationPanel = () => {
     'destinationType',
     parseAsStringEnum<DestinationType>([
       'BigQuery',
-      'Analytics Bucket',
       'DuckLake',
       'Snowflake',
       'ClickHouse',
@@ -78,11 +80,17 @@ export const DestinationPanel = () => {
     type: existingDestinationType,
     destinationFetcher,
   } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const isUnknownDestination = editMode && existingDestinationType === 'Unknown'
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
   const invalidExistingDestination = destinationFetcher.error?.code === 404
+  const hasDestinationError = editMode && destinationFetcher.isError && !invalidExistingDestination
   const showAccessRequest = !isAccessLoading && !enablePgReplicate
   const showEnablement = !isAccessLoading && enablePgReplicate && replicationNotEnabled
-  const showDestinationForm = !isAccessLoading && enablePgReplicate && !replicationNotEnabled
+  const isEditLoading = editMode && destinationFetcher.isPending
+  const canEditDestination = !editMode || canModifyDestination(existingDestinationType)
+  const showDestinationForm =
+    !isAccessLoading && enablePgReplicate && !replicationNotEnabled && canEditDestination
 
   const existingDestination = editMode
     ? {
@@ -138,10 +146,7 @@ export const DestinationPanel = () => {
     onClose,
   })
 
-  const destinationDocsPath =
-    destinationType && destinationType !== 'Analytics Bucket'
-      ? DESTINATION_DOCS_PATHS[destinationType]
-      : undefined
+  const destinationDocsPath = destinationType ? DESTINATION_DOCS_PATHS[destinationType] : undefined
   const docsUrl = `${DOCS_URL}${
     destinationDocsPath ?? '/guides/database/replication/pipelines#step-3-configure-a-destination'
   }`
@@ -195,9 +200,23 @@ export const DestinationPanel = () => {
               />
             </SheetHeader>
 
-            {isAccessLoading && (
+            {(isAccessLoading || isEditLoading) && (
               <SheetSection>
                 <GenericSkeletonLoader />
+              </SheetSection>
+            )}
+            {isUnknownDestination && (
+              <SheetSection>
+                <UnknownDestinationNotice />
+              </SheetSection>
+            )}
+            {hasDestinationError && (
+              <SheetSection>
+                <AlertError
+                  error={destinationFetcher.error}
+                  subject="Failed to retrieve destination information"
+                  projectRef={projectRef}
+                />
               </SheetSection>
             )}
             {showAccessRequest && (

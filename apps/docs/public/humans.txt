@@ -51,6 +51,7 @@ Beng Eu
 Benjamin Coenen
 Benoit Ammermann
 Beth Long
+Bob Van Landuyt
 Bobbie Soedirgo
 Brad Deam
 Brad Gyger
@@ -161,6 +162,7 @@ Hieu Pham
 Hunter Luckow
 Ignacio Dobronich
 Illia Basalaiev
+Ilya Kobets
 Inian P
 Iryna Deans
 Isaac Dawson
@@ -196,6 +198,7 @@ Joel Martin
 Johan Bergström
 John Pena
 Jon M
+Jonathan Eng
 Jonathan Smock
 Jonny Summers-Muir
 Jordan McQueen
@@ -232,7 +235,6 @@ Laurence Isla
 Leandro Pereira
 Leigh Anne Applewhite
 Lenny Urbanowski
-Leonardo Santiago
 Levon Galstyan
 Liam Cloud Hogan
 Lindsay Moss
@@ -275,7 +277,9 @@ Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
+Neil Brookes
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro
@@ -288,6 +292,7 @@ Oli R
 Pamela Chia
 Patricia Szasz
 Patrick Crane
+Patrick Knight
 Paul Bauer
 Paul Copplestone
 Paul Ibeabuchi
@@ -315,6 +320,7 @@ Robert Vojta
 Rodrigo Esteves
 Rodrigo Mansueli
 Román Cuellar
+Roman Gruhn
 Roman Hernandez
 Ronan Lehane
 Rory Hunter

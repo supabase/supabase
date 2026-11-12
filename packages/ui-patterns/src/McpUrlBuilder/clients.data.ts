@@ -64,6 +64,12 @@ export const FEATURE_GROUPS_PLATFORM: McpFeatureGroup[] = [
     id: 'storage',
     name: 'Storage',
     description: 'Manage files and storage buckets',
+    defaultDisabled: true,
+  },
+  {
+    id: 'notebooks',
+    name: 'Notebooks',
+    description: 'Create, run, and manage project notebooks',
   },
 ]
 

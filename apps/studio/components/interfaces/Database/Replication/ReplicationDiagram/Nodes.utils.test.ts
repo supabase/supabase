@@ -5,7 +5,6 @@ import { getReplicationDestinationType } from './Nodes.utils'
 describe('getReplicationDestinationType', () => {
   it.each([
     ['big_query', 'BigQuery'],
-    ['iceberg', 'Analytics Bucket'],
     ['ducklake', 'DuckLake'],
     ['snowflake', 'Snowflake'],
     ['clickhouse', 'ClickHouse'],
@@ -13,8 +12,12 @@ describe('getReplicationDestinationType', () => {
     expect(getReplicationDestinationType({ [key]: {} })).toBe(expected)
   })
 
-  it('returns undefined for unknown or missing configs', () => {
-    expect(getReplicationDestinationType({})).toBeUndefined()
+  it('renders unrecognized configurations anonymously', () => {
+    expect(getReplicationDestinationType({ iceberg: {} })).toBe('Unknown')
+    expect(getReplicationDestinationType({})).toBe('Unknown')
+  })
+
+  it('returns undefined while the configuration is missing', () => {
     expect(getReplicationDestinationType(undefined)).toBeUndefined()
   })
 })

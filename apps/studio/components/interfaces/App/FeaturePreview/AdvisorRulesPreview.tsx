@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import Image from 'next/image'
 
 import { useIsAdvisorRulesEnabled } from './FeaturePreviewContext'
@@ -7,14 +7,19 @@ import { BASE_PATH } from '@/lib/constants'
 
 export const AdvisorRulesPreview = () => {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const isAdvisorRulesEnabled = useIsAdvisorRulesEnabled()
+  const overviewHref = isIssuesInboxEnabled
+    ? `/project/${ref}/issues?category=security`
+    : `/project/${ref}/advisors/security`
+  const href = isAdvisorRulesEnabled ? `/project/${ref}/advisors/rules/security` : overviewHref
 
   return (
     <div>
       <p className="text-sm text-foreground-light mb-4">
-        Disable specific Advisor categories or rules to prevent them from showing up in Advisor
-        reports or email notifications. This could be useful for rules that might not be applicable
-        to your project.
+        {isIssuesInboxEnabled
+          ? 'Turn off specific checks or categories to stop them showing up in Issues or email notifications. This could be useful for checks that might not apply to your project.'
+          : 'Disable specific Advisor categories or rules to prevent them from showing up in Advisor reports or email notifications. This could be useful for rules that might not be applicable to your project.'}
       </p>
       <Image
         src={`${BASE_PATH}/img/previews/advisor-rule-preview.png`}
@@ -28,14 +33,8 @@ export const AdvisorRulesPreview = () => {
         <ul className="list-disc pl-6 text-sm text-foreground-light space-y-1">
           <li>
             Allow you to disable advisor rules for your project from the{' '}
-            <InlineLink
-              href={
-                isAdvisorRulesEnabled
-                  ? `/project/${ref}/advisors/rules/security`
-                  : `/project/${ref}/advisors/security`
-              }
-            >
-              Advisors section.
+            <InlineLink href={href}>
+              {isIssuesInboxEnabled ? 'Issues section.' : 'Advisors section.'}
             </InlineLink>
           </li>
         </ul>

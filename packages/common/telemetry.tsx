@@ -25,8 +25,9 @@ import {
   type SessionRecordingOptions,
 } from './posthog-client'
 import { TelemetryEvent } from './telemetry-constants'
+import { buildTelemetryEventRequest } from './telemetry-event'
 import { clearFirstTouchData, getFirstTouchData } from './telemetry-first-touch-store'
-import { getSharedTelemetryData } from './telemetry-utils'
+import { setTelemetryPlatform, type TelemetryPlatform } from './telemetry-utils'
 
 export { handlePageLeaveTelemetry }
 
@@ -67,6 +68,7 @@ export const TelemetryTagManager = () => {
 
 export const PageTelemetry = ({
   API_URL,
+  platform,
   hasAcceptedConsent,
   enabled = true,
   organizationSlug,
@@ -74,6 +76,7 @@ export const PageTelemetry = ({
   sessionReplay,
 }: {
   API_URL: string
+  platform: TelemetryPlatform
   hasAcceptedConsent: boolean
   enabled?: boolean
   organizationSlug?: string
@@ -81,6 +84,8 @@ export const PageTelemetry = ({
   /** Masking policy for session replay. Omit to disable recording. */
   sessionReplay?: SessionRecordingOptions
 }) => {
+  setTelemetryPlatform(platform)
+
   const router = useRouter()
 
   const pagesPathname = router?.pathname
@@ -130,6 +135,7 @@ export const PageTelemetry = ({
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
+  const lastSentPagesUrlRef = useRef<string | null>(null)
   const previousAppPathnameRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -165,6 +171,7 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
+        lastSentPagesUrlRef.current = window.location.pathname + window.location.search
       }
     }
   }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
@@ -174,6 +181,11 @@ export const PageTelemetry = ({
 
     function handleRouteChange() {
       if (!hasSentInitialPageTelemetryRef.current) return
+      // routeChangeComplete can fire when only the hash changes, and `$current_url` drops the hash,
+      // so that pageview would be an exact repeat.
+      const url = window.location.pathname + window.location.search
+      if (url === lastSentPagesUrlRef.current) return
+      lastSentPagesUrlRef.current = url
       sendPageTelemetry()
     }
 
@@ -233,38 +245,12 @@ export const PageTelemetry = ({
   return null
 }
 
-type EventBody = components['schemas']['TelemetryEventBodyV2']
-
-const KEEPALIVE_ACTIONS = new Set<TelemetryEvent['action']>([
-  'sign_in_submitted',
-  'sign_in_button_clicked',
-  'start_project_button_clicked',
-  'www_pricing_plan_cta_clicked',
-  'example_link_clicked',
-])
-
 const EXAMPLE_LINK_PATTERN =
   /^https:\/\/github\.com\/supabase\/supabase\/(?:tree|blob)\/[^/]+\/examples\/([^?#]+)/
 
 export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathname?: string) {
-  const consent = hasConsented()
-  if (!consent) return
-
-  const body: EventBody = {
-    ...getSharedTelemetryData(pathname),
-    action: event.action,
-    custom_properties: 'properties' in event ? event.properties : {},
-    groups: 'groups' in event ? { ...event.groups } : {},
-  }
-
-  if (event.action.startsWith('explorer_')) body.page_title = 'Explorer'
-
-  if (body.groups?.project === 'Unknown') {
-    delete body.groups.project
-    if (body.groups?.organization === 'Unknown') {
-      delete body.groups
-    }
-  }
+  const request = buildTelemetryEventRequest(API_URL, event, pathname)
+  if (!request) return
 
   // keepalive lets the request survive a navigation that starts right after
   // the event (the OAuth redirect after sign_in_submitted, a plain-link click
@@ -272,9 +258,9 @@ export function sendTelemetryEvent(API_URL: string, event: TelemetryEvent, pathn
   // page-wide, so it stays scoped to those events. Callers like useTrack
   // fire-and-forget, so rejections are handled here rather than surfacing
   // as unhandled promise rejections.
-  return post(`${ensurePlatformSuffix(API_URL)}/telemetry/event`, body, {
+  return post(request.url, request.body, {
     headers: { Version: '2' },
-    keepalive: KEEPALIVE_ACTIONS.has(event.action),
+    keepalive: request.keepalive,
   }).catch((error) => {
     console.error('Problem sending telemetry event:', error)
   })

@@ -1,9 +1,8 @@
-import { useTheme } from 'next-themes'
-import Image from 'next/legacy/image'
 import Link from 'next/link'
-import { PropsWithChildren, useEffect, useState } from 'react'
+import { PropsWithChildren } from 'react'
 import { cn } from 'ui'
 
+import { DisabledUntilHydrated } from '@/components/ui/DisabledUntilHydrated'
 import { useCustomContent } from '@/hooks/custom-content/useCustomContent'
 import { BASE_PATH } from '@/lib/constants'
 
@@ -23,13 +22,8 @@ export const ForgotPasswordLayout = ({
   className,
   children,
 }: PropsWithChildren<ForgotPasswordLayoutProps>) => {
-  const { resolvedTheme } = useTheme()
   const { dashboardAuthLogoLinkUrl } = useCustomContent(['dashboard_auth:logo_link_url'])
   const marketingSiteUrl = dashboardAuthLogoLinkUrl ?? 'https://supabase.com'
-
-  // Addresses hydration issue with `resolvedTheme` as its undefined during SSR and the first (hydrating) client render
-  const [mounted, setMounted] = useState(false)
-  useEffect(() => setMounted(true), [])
 
   return (
     <div
@@ -43,15 +37,15 @@ export const ForgotPasswordLayout = ({
           <div className="flex shrink-0 grow items-center lg:grow-0">
             <div className="flex w-full items-center justify-between md:w-auto">
               <Link href={logoLinkToMarketingSite ? marketingSiteUrl : '/organizations'}>
-                <Image
-                  src={
-                    mounted && resolvedTheme?.includes('dark')
-                      ? `${BASE_PATH}/img/supabase-dark.svg`
-                      : `${BASE_PATH}/img/supabase-light.svg`
-                  }
+                <img
+                  src={`${BASE_PATH}/img/supabase-light.svg`}
                   alt=""
-                  height={24}
-                  width={120}
+                  className="h-[24px] dark:hidden"
+                />
+                <img
+                  src={`${BASE_PATH}/img/supabase-dark.svg`}
+                  alt=""
+                  className="hidden h-[24px] dark:block"
                 />
               </Link>
             </div>
@@ -68,7 +62,7 @@ export const ForgotPasswordLayout = ({
             </div>
           )}
 
-          {children}
+          <DisabledUntilHydrated>{children}</DisabledUntilHydrated>
         </main>
       </div>
     </div>

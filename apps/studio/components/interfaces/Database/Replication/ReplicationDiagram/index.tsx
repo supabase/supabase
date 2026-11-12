@@ -13,6 +13,7 @@ import {
 } from '@/data/replication/destinations-query'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import { timeout } from '@/lib/helpers'
+import { ReplicationClusterProvider } from '@/state/replication-cluster'
 
 import '@xyflow/react/dist/style.css'
 
@@ -21,9 +22,11 @@ import { checkLocalPipelinesNotSetUp } from '@/data/replication/utils'
 
 export const ReplicationDiagram = () => {
   return (
-    <ReactFlowProvider>
-      <ReplicationDiagramContent />
-    </ReactFlowProvider>
+    <ReplicationClusterProvider clusterId={undefined}>
+      <ReactFlowProvider>
+        <ReplicationDiagramContent />
+      </ReactFlowProvider>
+    </ReplicationClusterProvider>
   )
 }
 

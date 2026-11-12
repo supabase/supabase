@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from 'ui'
 import { PageBreadcrumbs, PageBreadcrumbsActions } from 'ui-patterns/PageBreadcrumbs'
+import { PageContainer } from 'ui-patterns/PageContainer'
 import {
   PageHeader,
   PageHeaderAside,
@@ -37,7 +38,7 @@ import {
   PageHeaderSummary,
   PageHeaderTitle,
 } from 'ui-patterns/PageHeader'
-import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
+import { GenericSkeletonLoader, ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { DeleteDestination } from './DeleteDestination'
 import { DestinationLogo } from './DestinationLogo'
@@ -52,9 +53,14 @@ import {
 import { PipelineId } from './PipelineId'
 import { PipelineStatePill } from './PipelineStatePill'
 import { PipelineStatusName } from './Replication.constants'
-import { getReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
+import {
+  canModifyDestination,
+  getReplicationDestinationType,
+} from './ReplicationDiagram/Nodes.utils'
+import { UnknownDestinationNotice } from './UnknownDestinationNotice'
 import { UpdateVersionModal } from './UpdateVersionModal'
 import { useUnifiedLogsPreview } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
+import { AlertError } from '@/components/ui/AlertError'
 import { DocsButton } from '@/components/ui/DocsButton'
 import {
   getReplicationRegionLabel,
@@ -120,12 +126,14 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     projectRef,
     pipelineId: pipeline?.id,
   })
-  const { data: destination, isPending: isDestinationLoading } = useReplicationDestinationByIdQuery(
-    {
-      projectRef,
-      destinationId: pipeline?.destination_id,
-    }
-  )
+  const {
+    data: destination,
+    error: destinationError,
+    isPending: isDestinationLoading,
+  } = useReplicationDestinationByIdQuery({
+    projectRef,
+    destinationId: pipeline?.destination_id,
+  })
 
   const { mutateAsync: startPipeline, isPending: isStartingPipeline } = useStartPipelineMutation({
     onError: () => {},
@@ -141,20 +149,26 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
   const statusName = getStatusName(pipelineStatusData?.status)
   const displayState = getPipelineDisplayState(requestStatus, statusName)
-  const destinationType = getReplicationDestinationType(
-    destination?.config as Record<string, unknown> | undefined
-  )
+  const destinationType = getReplicationDestinationType(destination?.config)
+  const isUnknownDestination = destinationType === 'Unknown'
+  const canModify = canModifyDestination(destinationType)
   const isPipelineIdentityLoading =
     isPipelineLoading || (pipeline !== undefined && isDestinationLoading)
-  const hasUpdate = Boolean(versionData?.new_version)
+  const hasUpdate = canModify && Boolean(versionData?.new_version)
   const isTransitioning = requestStatus !== PipelineStatusRequestStatus.None
+  const isRunningOrFailed =
+    statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
 
   // What the primary button offers for each state it can act on. Anything not listed here (a
   // pipeline mid-transition, or one in an unknown state) has no action, so the button falls back
   // to the display state's own label and renders no icon.
-  const lifecycle = LIFECYCLE_BY_STATUS[statusName as PipelineStatusName]
+  const lifecycle =
+    isUnknownDestination && isRunningOrFailed
+      ? LIFECYCLE_BY_STATUS[PipelineStatusName.STARTED]
+      : LIFECYCLE_BY_STATUS[statusName as PipelineStatusName]
   const isActionable = lifecycle !== undefined
   const primaryAction: LifecycleAction | undefined = lifecycle?.action
+  const canShowLifecycleAction = canModify || primaryAction === 'stop'
   const lifecycleLabel = isTransitioning
     ? displayState.label
     : (lifecycle?.label ?? displayState.label)
@@ -164,16 +178,16 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
 
   // The overflow menu carries the lifecycle actions the primary button isn't already offering,
   // so the detail page has the same reach as the row menu on the list without repeating itself.
-  const isRunningOrFailed =
-    statusName === PipelineStatusName.STARTED || statusName === PipelineStatusName.FAILED
   const canUseMenuActions =
     isRunningOrFailed && !isTransitioning && !isPipelineStatusError && !!pipeline
-  const canRestart = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'restart'
+  const canRestart =
+    canModify && canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'restart'
   const canStop = canUseMenuActions && !isPipelineRequestPending && primaryAction !== 'stop'
 
   const onLifecycleAction = async (action?: LifecycleAction) => {
     const resolvedAction = action ?? primaryAction
     if (!projectRef || !pipeline || resolvedAction === undefined) return
+    if (!canModify && resolvedAction !== 'stop') return
 
     try {
       if (resolvedAction === 'start') {
@@ -200,7 +214,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
     try {
       setIsDeleting(true)
       if (statusName !== PipelineStatusName.STOPPED) {
-        await stopPipeline({ projectRef, pipelineId: pipeline.id })
+        await stopPipeline({ projectRef, pipelineId: pipeline.id, waitUntilStopped: true })
       }
       await deleteDestinationPipeline({
         projectRef,
@@ -331,30 +345,34 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                     Update available
                   </Button>
                 )}
-                <Button
-                  variant={
-                    !hasUpdate && statusName === PipelineStatusName.STOPPED ? 'primary' : 'default'
-                  }
-                  icon={lifecycleIcon}
-                  onClick={() => onLifecycleAction()}
-                  loading={
-                    displayState.type === 'loading' ||
-                    isTransitioning ||
-                    isStartingPipeline ||
-                    isStoppingPipeline ||
-                    isRestartingPipeline
-                  }
-                  disabled={
-                    Boolean(pipelineError) ||
-                    isPipelineStatusError ||
-                    !pipeline ||
-                    isTransitioning ||
-                    isPipelineRequestPending ||
-                    !isActionable
-                  }
-                >
-                  {lifecycleLabel}
-                </Button>
+                {canShowLifecycleAction && (
+                  <Button
+                    variant={
+                      !hasUpdate && statusName === PipelineStatusName.STOPPED
+                        ? 'primary'
+                        : 'default'
+                    }
+                    icon={lifecycleIcon}
+                    onClick={() => onLifecycleAction()}
+                    loading={
+                      displayState.type === 'loading' ||
+                      isTransitioning ||
+                      isStartingPipeline ||
+                      isStoppingPipeline ||
+                      isRestartingPipeline
+                    }
+                    disabled={
+                      Boolean(pipelineError) ||
+                      isPipelineStatusError ||
+                      !pipeline ||
+                      isTransitioning ||
+                      isPipelineRequestPending ||
+                      !isActionable
+                    }
+                  >
+                    {lifecycleLabel}
+                  </Button>
+                )}
                 <DropdownMenu>
                   <DropdownMenuTrigger asChild>
                     <Button
@@ -385,16 +403,18 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
                       </DropdownMenuItem>
                     )}
                     {(canRestart || canStop) && <DropdownMenuSeparator />}
-                    <DropdownMenuItem
-                      className="gap-x-2"
-                      disabled={pipeline === undefined}
-                      onClick={() => {
-                        if (pipeline !== undefined) setEdit(pipeline.destination_id)
-                      }}
-                    >
-                      <EditIcon size={14} />
-                      <span>Edit pipeline</span>
-                    </DropdownMenuItem>
+                    {canModify && (
+                      <DropdownMenuItem
+                        className="gap-x-2"
+                        disabled={pipeline === undefined}
+                        onClick={() => {
+                          if (pipeline !== undefined) setEdit(pipeline.destination_id)
+                        }}
+                      >
+                        <EditIcon size={14} />
+                        <span>Edit pipeline</span>
+                      </DropdownMenuItem>
+                    )}
                     <DropdownMenuItem
                       className="gap-x-2"
                       disabled={pipeline === undefined}
@@ -411,7 +431,29 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
         </PageHeader>
       </div>
 
-      {children}
+      {isPipelineIdentityLoading && !pipelineError && (
+        <PageContainer size="large">
+          <GenericSkeletonLoader />
+        </PageContainer>
+      )}
+
+      {isUnknownDestination && (
+        <PageContainer size="large">
+          <UnknownDestinationNotice />
+        </PageContainer>
+      )}
+
+      {destinationError && (
+        <PageContainer size="large">
+          <AlertError
+            error={destinationError}
+            subject="Failed to retrieve destination information"
+            projectRef={projectRef}
+          />
+        </PageContainer>
+      )}
+
+      {!isUnknownDestination && (canModify || pipelineError) && children}
 
       <DestinationPanel />
 
@@ -424,7 +466,7 @@ export const ReplicationPipelineLayout = ({ children }: PropsWithChildren) => {
       />
 
       <UpdateVersionModal
-        visible={showUpdateVersionModal}
+        visible={canModify && showUpdateVersionModal}
         pipeline={pipeline}
         onClose={() => setShowUpdateVersionModal(false)}
       />

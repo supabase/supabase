@@ -23,11 +23,12 @@ import { FormHeader } from '@/components/ui/Forms/FormHeader'
 import { NoPermission } from '@/components/ui/NoPermission'
 import { useAPIKeyDeleteMutation } from '@/data/api-keys/api-key-delete-mutation'
 import { apiKeysQueryOptions, type APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useGrant } from '@/lib/grants'
+import { getWriteGrantToastMessage, useGrant } from '@/lib/grants'
 
 export const PublishableAPIKeys = () => {
   const { ref: projectRef } = useParams()
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
 
   const {
     data: apiKeysData = [],
@@ -73,7 +74,11 @@ export const PublishableAPIKeys = () => {
   const onDeleteAPIKey = (apiKey: Extract<APIKeysData[number], { type: 'publishable' }>) => {
     if (!projectRef) return console.error('Project ref is required')
     if (!apiKey.id) return console.error('API key ID is required')
-    deleteAPIKey({ projectRef, id: apiKey.id })
+    if (!deleteGrant.grant) {
+      toast.error(getWriteGrantToastMessage(deleteGrant.status, 'delete', 'API keys'))
+      return
+    }
+    deleteAPIKey({ projectRef, id: apiKey.id, grant: deleteGrant.grant })
   }
 
   useEffect(() => {

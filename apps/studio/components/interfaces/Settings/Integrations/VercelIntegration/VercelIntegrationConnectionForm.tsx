@@ -303,7 +303,7 @@ const VercelIntegrationConnectionForm = ({
                       ] as const
                     ).map(([label, value], index) => (
                       <span key={value}>
-                        {index > 0 && ', '}
+                        {index > 0 && <span>{', '}</span>}
                         <button
                           type="button"
                           tabIndex={disabled ? -1 : 0}
@@ -368,8 +368,8 @@ const VercelIntegrationConnectionForm = ({
           <p>
             This syncs your production credentials to the{' '}
             <span className="text-foreground">{selectedNonProdTargets.join(' and ')}</span>{' '}
-            environment{selectedNonProdTargets.length > 1 ? 's' : ''} of your connected Vercel
-            project.
+            environment{selectedNonProdTargets.length > 1 ? <span>s</span> : ''}{' '}
+            <span>of your connected Vercel project.</span>
           </p>
           {isBranchingEnabled ? (
             <p>

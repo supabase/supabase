@@ -135,7 +135,8 @@ export const RedirectUrls = () => {
                 <div className="flex flex-col gap-y-2">
                   <p className="mb-2 text-sm text-foreground-light">
                     Are you sure you want to remove the following {selectedUrls.length} URL
-                    {selectedUrls.length > 1 ? 's' : ''}?
+                    {selectedUrls.length > 1 ? <span>s</span> : ''}
+                    <span>?</span>
                   </p>
                   <ScrollArea className={cn(selectedUrls.length > 4 ? 'h-[250px]' : '')}>
                     <div className="flex flex-col -space-y-1">

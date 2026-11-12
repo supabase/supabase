@@ -6,18 +6,12 @@ import { createFileRoute } from '@tanstack/react-router'
 import { getFunctionsArtifactStore } from '@/lib/api/self-hosted/functions'
 import { uuidv4 } from '@/lib/helpers'
 
-// Twin of `pages/api/v1/projects/[ref]/functions/[slug]/body.ts`. Web-
-// streams rewrite — the pages-router version flushed multipart parts
-// directly via Node's `res.write` + `pipeline(createReadStream, res)`,
-// which the buffering `toWebHandler` shim can't represent. Returns a
-// `Response` whose body is a `ReadableStream` built from an async
-// generator (`Readable.from(...).toWeb()`), so file reads honour
-// consumer backpressure and stop on client disconnect rather than
-// buffering every file eagerly.
+// The multipart body is a `ReadableStream` built from an async generator
+// (`Readable.from(...).toWeb()`), so file reads honour consumer backpressure
+// and stop on client disconnect rather than buffering every file eagerly.
 //
-// `getFunctionsArtifactStore` already asserts self-hosted mode, so no
-// auth wrapper is needed (matches the pages-router `apiWrapper`'s
-// effective no-op when `IS_PLATFORM` is false).
+// `getFunctionsArtifactStore` already asserts self-hosted mode, so no auth
+// wrapper is needed.
 
 const GET = async ({ params }: { params: { ref?: string; slug?: string } }) => {
   // Mirrors `apiWrapper`'s global catch (lib/api/apiWrapper.ts): capture to

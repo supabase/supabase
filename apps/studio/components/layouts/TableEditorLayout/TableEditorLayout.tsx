@@ -2,6 +2,7 @@ import { LOCAL_STORAGE_KEYS, useParams } from 'common'
 import { PropsWithChildren, useEffect } from 'react'
 
 import { ProjectLayoutWithAuth } from '../ProjectLayout'
+import { useTableRelatedResourcesCommands } from './TableRelatedResources.Commands'
 import { SaveQueueActionBar } from '@/components/grid/components/footer/operations/SaveQueueActionBar'
 import { useIsQueueOperationsEnabled } from '@/components/interfaces/Account/Preferences/useDashboardSettings'
 import { BannerTableEditorQueueOperations } from '@/components/ui/BannerStack/Banners/BannerTableEditorQueueOperations'
@@ -25,6 +26,8 @@ export const TableEditorLayout = ({ children }: PropsWithChildren<{}>) => {
   )
 
   const { can: canWriteTables } = useAsyncCheckPermissionsV2(FGA_PERMISSIONS.PROJECT.DATABASE_WRITE)
+
+  useTableRelatedResourcesCommands()
 
   useEffect(() => {
     if (!isPermissionsLoaded) return

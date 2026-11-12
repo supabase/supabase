@@ -260,7 +260,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                             </span>{' '}
                           </>
                         )}
-                        rows
+                        <span>rows</span>
                       </p>
                     </>
                   ) : (
@@ -278,7 +278,7 @@ export function DataTableInfinite<TData, TValue, TMeta>({
                             </span>{' '}
                           </>
                         )}
-                        rows)
+                        <span>rows)</span>
                       </p>
                     )
                   )}

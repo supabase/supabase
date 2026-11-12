@@ -11,6 +11,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
   Table,
   TableBody,
   TableHead,
@@ -350,11 +351,10 @@ export const ReplicationPipelineStatus = () => {
                         )
                       }
                     />
-                    <div className="flex items-center">
+                    <SplitButtonGroup className="items-center">
                       <Button
                         size="tiny"
                         variant="default"
-                        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
                         icon={<RotateCcwIcon />}
                         disabled={isPipelineBusy || showDisabledState || isPipelineError}
                         loading={isPipelineBusy}
@@ -371,7 +371,7 @@ export const ReplicationPipelineStatus = () => {
                             variant="default"
                             aria-label="More reset options"
                             icon={<ChevronDownIcon />}
-                            className="shrink-0 rounded-l-none px-1 py-1.25 -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                            className="shrink-0 px-1 py-1.25"
                             disabled={showDisabledState || isPipelineError}
                           />
                         </DropdownMenuTrigger>
@@ -394,7 +394,7 @@ export const ReplicationPipelineStatus = () => {
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
-                    </div>
+                    </SplitButtonGroup>
                   </div>
 
                   <Card>

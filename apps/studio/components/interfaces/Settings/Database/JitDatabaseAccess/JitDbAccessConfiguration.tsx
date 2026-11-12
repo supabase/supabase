@@ -531,8 +531,8 @@ export const JitDbAccessConfiguration = () => {
               <div className="text-sm">
                 <p>
                   Enabling temporary access will allow {activeRuleCount} pre-configured member
-                  {activeRuleCount === 1 ? '' : 's'} to request temporary database access
-                  immediately.
+                  {activeRuleCount === 1 ? '' : <span>s</span>}{' '}
+                  <span>to request temporary database access immediately.</span>
                 </p>
               </div>
             </AlertDialogDescription>

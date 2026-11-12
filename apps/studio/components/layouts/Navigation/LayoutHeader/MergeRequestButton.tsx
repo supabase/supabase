@@ -21,10 +21,12 @@ export const MergeRequestButton = () => {
   const projectRef = projectDetails?.parent_project_ref || ref
 
   const branchesGrant = useGrant('GET /v1/projects/{ref}/branches', { projectRef })
-  const { data: branches } = useQuery({
-    ...branchesQueryOptions({ projectRef, grant: branchesGrant.grant }),
-    enabled: Boolean(projectDetails),
-  })
+  const { data: branches } = useQuery(
+    branchesQueryOptions(
+      { projectRef, grant: branchesGrant.grant },
+      { enabled: Boolean(projectDetails) }
+    )
+  )
 
   const { mutate: updateBranch, isPending: isUpdating } = useBranchUpdateMutation({
     onError: () => {
