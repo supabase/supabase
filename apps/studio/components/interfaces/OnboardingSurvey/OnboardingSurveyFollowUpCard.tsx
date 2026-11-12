@@ -83,7 +83,7 @@ export function OnboardingSurveyFollowUpCard() {
     addBanner({
       id: BANNER_ID.ONBOARDING_SURVEY_FOLLOW_UP,
       isDismissed: false,
-      priority: 1,
+      priority: 4,
       content: (
         <BannerCard onDismiss={() => skipFollowUp('follow_up_skip')}>
           <div className="flex flex-col gap-y-4">
