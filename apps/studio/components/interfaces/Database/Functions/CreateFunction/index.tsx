@@ -43,6 +43,7 @@ import { CreateFunctionHeader } from './CreateFunctionHeader'
 import { FunctionEditor } from './FunctionEditor'
 import { POSTGRES_DATA_TYPES } from '@/components/interfaces/TableGridEditor/SidePanelEditor/SidePanelEditor.constants'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { SchemaSelector } from '@/components/ui/SchemaSelector'
 import { useDatabaseExtensionsQuery } from '@/data/database-extensions/database-extensions-query'
 import { useDatabaseFunctionCreateMutation } from '@/data/database-functions/database-functions-create-mutation'
@@ -52,6 +53,7 @@ import { useQuerySchemaState } from '@/hooks/misc/useSchemaQueryState'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useProtectedSchemas } from '@/hooks/useProtectedSchemas'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 const FORM_ID = 'create-function-sidepanel'
 
@@ -101,6 +103,11 @@ export const CreateFunction = ({
     onClose,
   })
 
+  const writeGrant = useGrant(
+    'POST /platform/pg-meta/{ref}/query',
+    { projectRef: project?.ref },
+    { variant: 'write' }
+  )
   const { mutate: createDatabaseFunction, isPending: isCreating } =
     useDatabaseFunctionCreateMutation()
   const { mutate: updateDatabaseFunction, isPending: isUpdating } =
@@ -108,6 +115,11 @@ export const CreateFunction = ({
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (data) => {
     if (!project) return console.error('Project is required')
+    if (!writeGrant.grant) {
+      return toast.error(
+        getWriteGrantToastMessage(writeGrant.status, isEditing ? 'update' : 'create', 'functions')
+      )
+    }
     // Submit click is the explicit user gesture that promotes form-entered SQL fragments
     // (`args` items, `return_type`, and each `config_params` value) to executable.
     const payload = {
@@ -123,6 +135,7 @@ export const CreateFunction = ({
       updateDatabaseFunction(
         {
           func,
+          grant: writeGrant.grant,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
@@ -138,6 +151,7 @@ export const CreateFunction = ({
     } else {
       createDatabaseFunction(
         {
+          grant: writeGrant.grant,
           projectRef: project.ref,
           connectionString: project.connectionString,
           payload,
@@ -192,277 +206,298 @@ export const CreateFunction = ({
               className="grow overflow-auto"
               onSubmit={form.handleSubmit(onSubmit)}
             >
-              <SheetSection className={cn(focusedEditor ? 'hidden' : '', 'flex flex-col gap-y-4')}>
-                <FormField
-                  control={form.control}
-                  name="schema"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Schema"
-                      description={
-                        <>
-                          Tables made in the table editor will be in <code>public</code>
-                        </>
-                      }
-                      layout="horizontal"
-                    >
-                      <FormControl>
-                        <SchemaSelector
-                          selectedSchemaName={field.value}
-                          excludedSchemas={protectedSchemas?.map((s) => s.name)}
-                          size="small"
-                          onSelectSchema={(name) => field.onChange(name)}
-                        />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="name"
-                  render={({ field }) => (
-                    <FormItemLayout
-                      label="Name of function"
-                      description="Name will also be used for the function name in postgres"
-                      layout="horizontal"
-                    >
-                      <FormControl>
-                        <Input {...field} placeholder="Name of function" />
-                      </FormControl>
-                    </FormItemLayout>
-                  )}
-                />
-              </SheetSection>
-
-              <Separator className={focusedEditor ? 'hidden' : ''} />
-
-              <SheetSection className={focusedEditor ? 'hidden' : 'flex flex-col gap-y-4'}>
-                <FormField
-                  control={form.control}
-                  name="type"
-                  render={({ field }) => (
-                    <FormItemLayout label="Type" layout="horizontal">
-                      <Select
-                        disabled={isEditing}
-                        onValueChange={field.onChange}
-                        defaultValue={field.value}
-                      >
-                        <SelectTrigger className="col-span-8">
-                          {field.value === 'function' ? 'Function' : 'Stored procedure'}
-                        </SelectTrigger>
-                        <SelectContent align="end">
-                          <SelectItem value="function">
-                            <p>Function</p>
-                            <p className="text-foreground-lighter">
-                              For query logic, triggers, and RPC calls
-                            </p>
-                          </SelectItem>
-                          <SelectItem value="procedure">
-                            <p>Stored procedure</p>
-                            <p className="text-foreground-lighter">
-                              For batch or multi-step tasks that manages transactions
-                            </p>
-                          </SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </FormItemLayout>
-                  )}
-                />
-                {type === 'function' && (
+              <fieldset disabled={!writeGrant.grant} className="contents">
+                <SheetSection
+                  className={cn(focusedEditor ? 'hidden' : '', 'flex flex-col gap-y-4')}
+                >
                   <FormField
                     control={form.control}
-                    name="return_type"
+                    name="schema"
                     render={({ field }) => (
-                      <FormItemLayout label="Return type" layout="horizontal">
-                        {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                      <FormItemLayout
+                        label="Schema"
+                        description={
+                          <>
+                            Tables made in the table editor will be in <code>public</code>
+                          </>
+                        }
+                        layout="horizontal"
+                      >
+                        <FormControl>
+                          <SchemaSelector
+                            selectedSchemaName={field.value}
+                            excludedSchemas={protectedSchemas?.map((s) => s.name)}
+                            size="small"
+                            onSelectSchema={(name) => field.onChange(name)}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    render={({ field }) => (
+                      <FormItemLayout
+                        label="Name of function"
+                        description="Name will also be used for the function name in postgres"
+                        layout="horizontal"
+                      >
+                        <FormControl>
+                          <Input {...field} placeholder="Name of function" />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </SheetSection>
+
+                <Separator className={focusedEditor ? 'hidden' : ''} />
+
+                <SheetSection className={focusedEditor ? 'hidden' : 'flex flex-col gap-y-4'}>
+                  <FormField
+                    control={form.control}
+                    name="type"
+                    render={({ field }) => (
+                      <FormItemLayout label="Type" layout="horizontal">
                         <Select
                           disabled={isEditing}
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <SelectTrigger className="col-span-8">
-                            <SelectValue />
+                            {field.value === 'function' ? 'Function' : 'Stored procedure'}
                           </SelectTrigger>
-                          <SelectContent>
-                            <ScrollArea className="h-52">
-                              {['void', 'record', 'trigger', 'integer', ...POSTGRES_DATA_TYPES].map(
-                                (option) => (
-                                  <SelectItem value={option} key={option}>
-                                    {option}
-                                  </SelectItem>
-                                )
-                              )}
-                            </ScrollArea>
+                          <SelectContent align="end">
+                            <SelectItem value="function">
+                              <p>Function</p>
+                              <p className="text-foreground-lighter">
+                                For query logic, triggers, and RPC calls
+                              </p>
+                            </SelectItem>
+                            <SelectItem value="procedure">
+                              <p>Stored procedure</p>
+                              <p className="text-foreground-lighter">
+                                For batch or multi-step tasks that manages transactions
+                              </p>
+                            </SelectItem>
                           </SelectContent>
                         </Select>
                       </FormItemLayout>
                     )}
                   />
-                )}
-              </SheetSection>
-
-              <Separator className={focusedEditor ? 'hidden' : ''} />
-
-              <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                <FormFieldArgs readonly={isEditing} />
-              </SheetSection>
-
-              <Separator className={focusedEditor ? 'hidden' : ''} />
-
-              <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
-                <FormField
-                  control={form.control}
-                  name="definition"
-                  render={({ field }) => (
-                    <FormItem className="space-y-4 flex flex-col h-full">
-                      <div className="px-content">
-                        <FormLabel className="text-base text-foreground">Definition</FormLabel>
-                        <FormDescription className="text-sm text-foreground-light">
-                          <p>
-                            The language below should be written in <code>{language}</code>.
-                          </p>
-                          {!isEditing && <p>Change the language in the Advanced Settings below.</p>}
-                        </FormDescription>
-                      </div>
-                      <div
-                        className={cn(
-                          'border border-default flex',
-                          focusedEditor ? 'grow ' : 'h-72'
-                        )}
-                      >
-                        <FunctionEditor
-                          field={field}
-                          language={language}
-                          focused={focusedEditor}
-                          setFocused={setFocusedEditor}
-                        />
-                      </div>
-
-                      <FormMessage className="px-content" />
-                    </FormItem>
+                  {type === 'function' && (
+                    <FormField
+                      control={form.control}
+                      name="return_type"
+                      render={({ field }) => (
+                        <FormItemLayout label="Return type" layout="horizontal">
+                          {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                          <Select
+                            disabled={isEditing}
+                            onValueChange={field.onChange}
+                            defaultValue={field.value}
+                          >
+                            <SelectTrigger className="col-span-8">
+                              <SelectValue />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <ScrollArea className="h-52">
+                                {[
+                                  'void',
+                                  'record',
+                                  'trigger',
+                                  'integer',
+                                  ...POSTGRES_DATA_TYPES,
+                                ].map((option) => (
+                                  <SelectItem value={option} key={option}>
+                                    {option}
+                                  </SelectItem>
+                                ))}
+                              </ScrollArea>
+                            </SelectContent>
+                          </Select>
+                        </FormItemLayout>
+                      )}
+                    />
                   )}
-                />
-              </SheetSection>
-              <Separator className={focusedEditor ? 'hidden' : ''} />
-              {isEditing ? null : (
-                <>
-                  <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                    <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
-                      <FormItem className="flex flex-row items-center justify-between">
-                        <div className="space-y-0.5">
-                          <FormLabel className="text-sm">Show advanced settings</FormLabel>
-                          <FormDescription className="text-foreground-lighter">
-                            These are settings that might be familiar for Postgres developers
+                </SheetSection>
+
+                <Separator className={focusedEditor ? 'hidden' : ''} />
+
+                <SheetSection className={focusedEditor ? 'hidden' : ''}>
+                  <FormFieldArgs readonly={isEditing} />
+                </SheetSection>
+
+                <Separator className={focusedEditor ? 'hidden' : ''} />
+
+                <SheetSection className={`${focusedEditor ? 'h-full' : ''} px-0!`}>
+                  <FormField
+                    control={form.control}
+                    name="definition"
+                    render={({ field }) => (
+                      <FormItem className="space-y-4 flex flex-col h-full">
+                        <div className="px-content">
+                          <FormLabel className="text-base text-foreground">Definition</FormLabel>
+                          <FormDescription className="text-sm text-foreground-light">
+                            <p>
+                              The language below should be written in <code>{language}</code>.
+                            </p>
+                            {!isEditing && (
+                              <p>Change the language in the Advanced Settings below.</p>
+                            )}
                           </FormDescription>
                         </div>
-                        <FormControl>
-                          <Switch
-                            checked={advancedSettingsShown}
-                            onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
+                        <div
+                          className={cn(
+                            'border border-default flex',
+                            focusedEditor ? 'grow ' : 'h-72'
+                          )}
+                        >
+                          <FunctionEditor
+                            field={field}
+                            language={language}
+                            focused={focusedEditor}
+                            setFocused={setFocusedEditor}
+                            isReadOnly={!writeGrant.grant}
                           />
-                        </FormControl>
+                        </div>
+
+                        <FormMessage className="px-content" />
                       </FormItem>
-                    </div>
-                  </SheetSection>
-                  {advancedSettingsShown && (
-                    <>
-                      <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
-                        <FormFieldLanguage />
-                        {type === 'function' && (
+                    )}
+                  />
+                </SheetSection>
+                <Separator className={focusedEditor ? 'hidden' : ''} />
+                {isEditing ? null : (
+                  <>
+                    <SheetSection className={focusedEditor ? 'hidden' : ''}>
+                      <div className="space-y-8 rounded-sm bg-studio py-4 px-6 border border-overlay">
+                        <FormItem className="flex flex-row items-center justify-between">
+                          <div className="space-y-0.5">
+                            <FormLabel className="text-sm">Show advanced settings</FormLabel>
+                            <FormDescription className="text-foreground-lighter">
+                              These are settings that might be familiar for Postgres developers
+                            </FormDescription>
+                          </div>
+                          <FormControl>
+                            <Switch
+                              checked={advancedSettingsShown}
+                              onCheckedChange={(checked) => setAdvancedSettingsShown(checked)}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      </div>
+                    </SheetSection>
+                    {advancedSettingsShown && (
+                      <>
+                        <SheetSection className={focusedEditor ? 'hidden' : 'space-y-2 pt-0'}>
+                          <FormFieldLanguage />
+                          {type === 'function' && (
+                            <FormField
+                              control={form.control}
+                              name="behavior"
+                              render={({ field }) => (
+                                <FormItemLayout label="Behavior" layout="horizontal">
+                                  {/* Form selects don't need form controls, otherwise the CSS gets weird */}
+                                  <Select defaultValue={field.value} onValueChange={field.onChange}>
+                                    <SelectTrigger className="col-span-8">
+                                      <SelectValue />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="IMMUTABLE" key="IMMUTABLE">
+                                        immutable
+                                      </SelectItem>
+                                      <SelectItem value="STABLE" key="STABLE">
+                                        stable
+                                      </SelectItem>
+                                      <SelectItem value="VOLATILE" key="VOLATILE">
+                                        volatile
+                                      </SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                </FormItemLayout>
+                              )}
+                            />
+                          )}
+                        </SheetSection>
+                        <Separator className={focusedEditor ? 'hidden' : ''} />
+                        <SheetSection className={focusedEditor ? 'hidden' : ''}>
+                          <CreateFunctionConfigParamsSection />
+                        </SheetSection>
+                        <Separator className={focusedEditor ? 'hidden' : ''} />
+                        <SheetSection className={focusedEditor ? 'hidden' : ''}>
+                          <h5 className="text-base text-foreground mb-4">Type of Security</h5>
                           <FormField
                             control={form.control}
-                            name="behavior"
+                            name="security_definer"
                             render={({ field }) => (
-                              <FormItemLayout label="Behavior" layout="horizontal">
-                                {/* Form selects don't need form controls, otherwise the CSS gets weird */}
-                                <Select defaultValue={field.value} onValueChange={field.onChange}>
-                                  <SelectTrigger className="col-span-8">
-                                    <SelectValue />
-                                  </SelectTrigger>
-                                  <SelectContent>
-                                    <SelectItem value="IMMUTABLE" key="IMMUTABLE">
-                                      immutable
-                                    </SelectItem>
-                                    <SelectItem value="STABLE" key="STABLE">
-                                      stable
-                                    </SelectItem>
-                                    <SelectItem value="VOLATILE" key="VOLATILE">
-                                      volatile
-                                    </SelectItem>
-                                  </SelectContent>
-                                </Select>
-                              </FormItemLayout>
+                              <FormItem>
+                                <FormControl className="col-span-8">
+                                  <RadioGroupStacked
+                                    onValueChange={(value) =>
+                                      field.onChange(value == 'SECURITY_DEFINER')
+                                    }
+                                    value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
+                                  >
+                                    <RadioGroupStackedItem
+                                      value="SECURITY_INVOKER"
+                                      id="SECURITY_INVOKER"
+                                      label="SECURITY INVOKER"
+                                      description={
+                                        <>
+                                          Function is to be executed with the privileges of the user
+                                          that <span className="text-foreground">calls it</span>.
+                                        </>
+                                      }
+                                    />
+                                    <RadioGroupStackedItem
+                                      value="SECURITY_DEFINER"
+                                      id="SECURITY_DEFINER"
+                                      label="SECURITY DEFINER"
+                                      description={
+                                        <>
+                                          Function is to be executed with the privileges of the user
+                                          that <span className="text-foreground">created it</span>.
+                                        </>
+                                      }
+                                    />
+                                  </RadioGroupStacked>
+                                </FormControl>
+                                <FormMessage />
+                              </FormItem>
                             )}
                           />
-                        )}
-                      </SheetSection>
-                      <Separator className={focusedEditor ? 'hidden' : ''} />
-                      <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <CreateFunctionConfigParamsSection />
-                      </SheetSection>
-                      <Separator className={focusedEditor ? 'hidden' : ''} />
-                      <SheetSection className={focusedEditor ? 'hidden' : ''}>
-                        <h5 className="text-base text-foreground mb-4">Type of Security</h5>
-                        <FormField
-                          control={form.control}
-                          name="security_definer"
-                          render={({ field }) => (
-                            <FormItem>
-                              <FormControl className="col-span-8">
-                                <RadioGroupStacked
-                                  onValueChange={(value) =>
-                                    field.onChange(value == 'SECURITY_DEFINER')
-                                  }
-                                  value={field.value ? 'SECURITY_DEFINER' : 'SECURITY_INVOKER'}
-                                >
-                                  <RadioGroupStackedItem
-                                    value="SECURITY_INVOKER"
-                                    id="SECURITY_INVOKER"
-                                    label="SECURITY INVOKER"
-                                    description={
-                                      <>
-                                        Function is to be executed with the privileges of the user
-                                        that <span className="text-foreground">calls it</span>.
-                                      </>
-                                    }
-                                  />
-                                  <RadioGroupStackedItem
-                                    value="SECURITY_DEFINER"
-                                    id="SECURITY_DEFINER"
-                                    label="SECURITY DEFINER"
-                                    description={
-                                      <>
-                                        Function is to be executed with the privileges of the user
-                                        that <span className="text-foreground">created it</span>.
-                                      </>
-                                    }
-                                  />
-                                </RadioGroupStacked>
-                              </FormControl>
-                              <FormMessage />
-                            </FormItem>
-                          )}
-                        />
-                      </SheetSection>
-                    </>
-                  )}
-                </>
-              )}
+                        </SheetSection>
+                      </>
+                    )}
+                  </>
+                )}
+              </fieldset>
             </form>
           </Form>
           <SheetFooter>
             <Button disabled={isCreating || isUpdating} onClick={confirmOnClose}>
               Cancel
             </Button>
-            <Button
+            <ButtonTooltip
               variant="primary"
               form={FORM_ID}
               type="submit"
-              disabled={isCreating || isUpdating}
+              disabled={isCreating || isUpdating || !writeGrant.grant}
               loading={isCreating || isUpdating}
+              tooltip={{
+                content: {
+                  side: 'top',
+                  text: getWriteGrantTooltip(
+                    writeGrant.status,
+                    isEditing ? 'update' : 'create',
+                    'functions'
+                  ),
+                },
+              }}
             >
               {isEditing ? <span>Save</span> : <span>Create</span>} <span>function</span>
-            </Button>
+            </ButtonTooltip>
           </SheetFooter>
         </div>
         <DiscardChangesConfirmationDialog {...modalProps} />
