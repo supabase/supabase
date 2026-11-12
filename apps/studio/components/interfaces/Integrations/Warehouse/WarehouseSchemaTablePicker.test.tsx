@@ -158,6 +158,21 @@ const mockSetupMutation = () => {
 }
 
 describe('WarehouseSchemaTablePicker', () => {
+  test('explains that tables are loading before offering a selection', async () => {
+    addAPIMock({ method: 'get', path: '/platform/projects/:ref', response: PROJECT })
+    addAPIMock({
+      method: 'post',
+      path: '/platform/pg-meta/:ref/query',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseSchemaTablePicker onSubmit={() => {}} isSubmitting={false} />)
+
+    expect(await screen.findByText('Loading tables...')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Tables' })).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+  })
+
   test('starts empty and supports selecting every table in a schema', async () => {
     mockPickerQueries({ isEditing: false })
     const requests = mockSetupMutation()

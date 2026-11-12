@@ -31,13 +31,13 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { ConnectSheetStep } from '../../ConnectSheet/ConnectSheetStep'
 import { EnvRow } from '../../ConnectSheet/content/server/common/EnvRow'
 import { CopyPromptButton } from '../../ConnectSheet/CopyPromptAdmonition'
 import { useConnectSheetParams } from '../../ConnectSheet/useConnectSheetParams'
 import type { WarehouseCatalogCredentials } from './Warehouse.utils'
+import { WarehouseLoadingState } from './WarehouseLoadingState'
 import { AlertError } from '@/components/ui/AlertError'
 import CopyButton from '@/components/ui/CopyButton'
 import { useUpdateWarehouseCatalogMutation } from '@/data/warehouse/warehouse-catalog-mutation'
@@ -379,7 +379,7 @@ export const WarehouseConnectionCard = ({ variant = 'default' }: WarehouseConnec
         <>
           {isCatalogPending && (
             <CardContent>
-              <GenericSkeletonLoader />
+              <WarehouseLoadingState label="Loading DuckDB catalog access..." />
             </CardContent>
           )}
           {isCatalogError && (

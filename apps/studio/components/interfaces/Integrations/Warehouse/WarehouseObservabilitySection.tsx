@@ -12,8 +12,8 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
+import { WarehouseLoadingState } from './WarehouseLoadingState'
 import {
   getWarehouseSummaryNotice,
   getWarehouseSummaryRange,
@@ -82,7 +82,7 @@ export const WarehouseObservabilitySection = () => {
   }
 
   const renderSummary = () => {
-    if (isPending) return <GenericSkeletonLoader />
+    if (isPending) return <WarehouseLoadingState label="Loading workload metrics..." />
     if (isError) {
       return (
         <AlertError

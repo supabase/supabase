@@ -11,7 +11,6 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
-import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import {
   buildSchemasWithTables,
@@ -24,6 +23,7 @@ import {
   type WarehouseSetupTable,
   type WarehouseSetupTarget,
 } from './Warehouse.utils'
+import { WarehouseLoadingState } from './WarehouseLoadingState'
 import { AlertError } from '@/components/ui/AlertError'
 import { useSchemasQuery } from '@/data/database/schemas-query'
 import { useReplicationPublicationQuery } from '@/data/replication/publication-query'
@@ -161,7 +161,7 @@ export const WarehouseSchemaTablePicker = ({
         <PageSectionContent>
           <Card>
             <CardContent>
-              <GenericSkeletonLoader />
+              <WarehouseLoadingState label="Loading tables..." />
             </CardContent>
           </Card>
         </PageSectionContent>

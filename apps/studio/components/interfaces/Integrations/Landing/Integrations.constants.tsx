@@ -17,6 +17,7 @@ import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
 import { UpgradeDatabaseAlert } from '../Queues/UpgradeDatabaseAlert'
 import { getStripeSyncSchemaComment } from '../templates/StripeSyncEngine/useStripeSyncStatus'
+import { WarehouseLoadingState } from '../Warehouse/WarehouseLoadingState'
 import { WRAPPERS } from '../Wrappers/Wrappers.constants'
 import { WrapperMeta } from '../Wrappers/Wrappers.types'
 import { stripeSyncKeys } from '@/data/database-integrations/stripe/keys'
@@ -449,7 +450,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
               (mod) => mod.WarehouseOverviewTab
             ),
           {
-            loading: Loading,
+            loading: WarehouseLoadingState,
           }
         )
       }

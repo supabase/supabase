@@ -111,6 +111,20 @@ const DuckLakeForm = () => {
 }
 
 describe('OrioleDB catalog restrictions', () => {
+  test('explains that Warehouse is loading before showing setup controls', async () => {
+    mockProject(false)
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/setup-status',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseSetupPanel />)
+
+    expect(await screen.findByText('Loading Warehouse...')).toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: 'Enable Warehouse' })).not.toBeInTheDocument()
+  })
+
   test.each(['not_started', 'disabled', 'error'] as const)(
     'blocks Warehouse setup using the current OrioleDB project when %s',
     async (status) => {

@@ -42,6 +42,24 @@ const mockMetrics = (body: WarehouseMetricsResponse) =>
   })
 
 describe('Warehouse workload summary', () => {
+  test('keeps the workload section and metrics link available while observations load', async () => {
+    addAPIMock({
+      method: 'get',
+      path: '/platform/warehouse/:ref/metrics',
+      response: () => new Promise<never>(() => {}),
+    })
+
+    customRender(<WarehouseObservabilitySection />)
+
+    expect(await screen.findByText('Loading workload metrics...')).toBeInTheDocument()
+    expect(screen.getByRole('heading', { name: 'Workload' })).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'View metrics' })).toHaveAttribute(
+      'href',
+      '/project/default/observability/warehouse'
+    )
+    expect(screen.queryByText('Unavailable')).not.toBeInTheDocument()
+  })
+
   test('shows observed workload, latency, errors and capacity with the metrics link', async () => {
     mockMetrics(response())
     customRender(<WarehouseObservabilitySection />)
