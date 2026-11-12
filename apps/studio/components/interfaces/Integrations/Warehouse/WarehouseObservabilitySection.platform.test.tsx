@@ -79,7 +79,7 @@ describe('Warehouse workload summary', () => {
 
     customRender(<WarehouseObservabilitySection />)
 
-    expect(await screen.findByText('Loading workload metrics...')).toBeInTheDocument()
+    expect(await screen.findByLabelText('Loading workload metrics')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Workload' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'View metrics' })).toHaveAttribute(
       'href',
