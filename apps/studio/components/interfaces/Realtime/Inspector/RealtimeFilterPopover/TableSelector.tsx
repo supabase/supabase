@@ -71,7 +71,7 @@ const TableSelector = ({
   const searchTables = debounce(setSearchInput)
 
   const entities = (data?.pages[0].data.entities ? [...data?.pages[0].data.entities] : []).sort(
-    (a, b) => (a.name > b.name ? 0 : -1)
+    (a, b) => a.name.localeCompare(b.name)
   )
 
   return (
