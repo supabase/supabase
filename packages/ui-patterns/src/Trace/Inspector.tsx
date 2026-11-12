@@ -1,13 +1,13 @@
 'use client'
 
 import { useMemo } from 'react'
-import { Badge, Popover, PopoverAnchor, PopoverContent } from 'ui'
+import { Badge, Popover, PopoverAnchor, PopoverContent, type BadgeProps } from 'ui'
 
 import { useTrace, useView } from './Trace'
 import type { SpanStatus } from './types'
 import { effectiveEndMs, formatAttributeValue, formatDuration } from './utils'
 
-const STATUS_BADGE: Record<SpanStatus, 'success' | 'destructive' | 'default'> = {
+const STATUS_BADGE: Record<SpanStatus, BadgeProps['variant']> = {
   ok: 'success',
   error: 'destructive',
   unset: 'default',
