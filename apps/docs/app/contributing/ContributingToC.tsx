@@ -25,7 +25,7 @@ export function ContributingToc({ className }: { className?: string }) {
     const tocItems = headings
       .filter((heading) => !!heading.id && heading.textContent)
       .map((heading) => ({
-        label: heading.textContent!.substring(0, heading.textContent!.length - 1), // Remove ending `#`
+        label: heading.textContent!,
         anchor: heading.id,
       }))
     setTocItems(tocItems)

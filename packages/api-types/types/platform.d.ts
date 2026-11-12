@@ -9269,19 +9269,12 @@ export interface components {
       integration: {
         name: string
       }
-      metadata: components['schemas']['GetOrganizationIntegrationResponseJsonValue']
+      metadata: components['schemas']['JsonValue']
       organization: {
         slug: string
       }
       updated_at: string
     }
-    /** @description Any JSON-serializable value */
-    GetOrganizationIntegrationResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetOrganizationIntegrationResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetOrganizationIntegrationResponseJsonValue']
-        }
     GetPlatformAppInstallationResponse_Output: {
       /** Format: uuid */
       app_id: string
@@ -9645,7 +9638,7 @@ export interface components {
               | 'auth_mfa_web_authn_default'
               | 'log_drain_default'
               | 'etl_pipeline_default'
-            meta?: components['schemas']['GetSubscriptionResponseJsonValue']
+            meta?: components['schemas']['JsonValue']
             name: string
             price: number
             price_description: string
@@ -9660,13 +9653,6 @@ export interface components {
       }[]
       usage_billing_enabled: boolean
     }
-    /** @description Any JSON-serializable value */
-    GetSubscriptionResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetSubscriptionResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetSubscriptionResponseJsonValue']
-        }
     GetUserContentByIdResponse_Output: {
       content?: {
         [key: string]: unknown
@@ -9754,19 +9740,12 @@ export interface components {
       integration: {
         name: string
       }
-      metadata: components['schemas']['GetUserOrganizationIntegrationResponseJsonValue']
+      metadata: components['schemas']['JsonValue']
       organization: {
         slug: string
       }
       updated_at: string
     }
-    /** @description Any JSON-serializable value */
-    GetUserOrganizationIntegrationResponseJsonValue:
-      | ((string | number | boolean) | null)
-      | components['schemas']['GetUserOrganizationIntegrationResponseJsonValue'][]
-      | {
-          [key: string]: components['schemas']['GetUserOrganizationIntegrationResponseJsonValue']
-        }
     GetVercelProjectsResponse_Output: {
       pagination: {
         count: number
@@ -10122,6 +10101,13 @@ export interface components {
       /** Format: uri */
       receipt_pdf: string
     }
+    /** @description Any JSON-serializable value */
+    JsonValue:
+      | ((string | number | boolean) | null)
+      | components['schemas']['JsonValue'][]
+      | {
+          [key: string]: components['schemas']['JsonValue']
+        }
     /** @description Any JSON-serializable value */
     JsonValue_Output:
       | ((string | number | boolean) | null)
@@ -30123,6 +30109,7 @@ export interface operations {
           | 'disk_bytes_read'
           | 'disk_bytes_written'
           | 'pg_database_size'
+          | 'orioledb_undo_size'
           | 'disk_fs_size'
           | 'disk_fs_avail'
           | 'disk_fs_used'
@@ -30184,6 +30171,7 @@ export interface operations {
               | 'disk_bytes_read'
               | 'disk_bytes_written'
               | 'pg_database_size'
+              | 'orioledb_undo_size'
               | 'disk_fs_size'
               | 'disk_fs_avail'
               | 'disk_fs_used'

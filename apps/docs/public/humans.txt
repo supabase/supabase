@@ -51,6 +51,7 @@ Beng Eu
 Benjamin Coenen
 Benoit Ammermann
 Beth Long
+Bob Van Landuyt
 Bobbie Soedirgo
 Brad Deam
 Brad Gyger
@@ -166,6 +167,7 @@ Inian P
 Iryna Deans
 Isaac Dawson
 Ivan Vasilov
+Jagpreet Singh
 Jamie Boyd
 Jake Ng
 Jared Patterson
@@ -276,7 +278,9 @@ Mrinal Paliwal
 Mykhailo Mischa Lieibenson
 Nara Kasbergen Kwon
 Natalie Roberge
+Neil Brookes
 Nick B
+Nick Clark
 Nick Littman
 Nick Nowlan
 Nicola Ferraro

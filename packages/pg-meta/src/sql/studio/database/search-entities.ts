@@ -1,6 +1,14 @@
 import { DEFAULT_SYSTEM_SCHEMAS } from '../../../constants'
 import { escapeIlikeLiteral } from '../../../helpers'
 import { joinSqlFragments, literal, safeSql, type SafeSqlFragment } from '../../../pg-format'
+import {
+  EXTENSION_FUNCTIONS_CTE,
+  EXTENSION_RELATIONS_CTE,
+  hasTableAccess,
+  isSecurityInvokerView,
+  triggerActivation,
+  triggerEvents,
+} from './catalog-helpers'
 
 // Postgres identifiers are capped at 63 bytes, so a longer search string can
 // never match a name. Callers should skip the request entirely in that case.
@@ -11,39 +19,27 @@ export const SEARCH_ENTITIES_MAX_QUERY_LENGTH = 63
 // role can't access doesn't starve the result set.
 const CANDIDATE_LIMIT = 50
 
-// Mirrors what the table list endpoints expose: the role owns the table or has
-// some privilege on it (or one of its columns). Triggers are listed through
-// information_schema.triggers, which does not count SELECT.
-const hasTableAccess = (
-  oid: SafeSqlFragment,
-  owner: SafeSqlFragment,
-  { includeSelect = true }: { includeSelect?: boolean } = {}
-) => {
-  const tablePrivileges = includeSelect
-    ? safeSql`'SELECT, INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
-    : safeSql`'INSERT, UPDATE, DELETE, TRUNCATE, REFERENCES, TRIGGER'`
-  const columnPrivileges = includeSelect
-    ? safeSql`'SELECT, INSERT, UPDATE, REFERENCES'`
-    : safeSql`'INSERT, UPDATE, REFERENCES'`
-  return safeSql`(
-  pg_has_role(${owner}, 'USAGE')
-  or has_table_privilege(${oid}, ${tablePrivileges})
-  or has_any_column_privilege(${oid}, ${columnPrivileges})
-)`
-}
-
 // For things that hang off a table (policies, triggers). Name matches rank by
 // their own name. Ones pulled in through a matched table group by that table
 // first (in the table's own order), then by their own name.
 const TABLE_RELATED_ORDER = safeSql`source, rank, table_sort_length, table_sort_name, length(name), name, table_name`
 
-export type SearchEntitiesTable = {
+type SearchEntitiesRelation = {
   id: number
   schema: string
   name: string
-  rls_enabled: boolean
-  policy_count: number
 }
+
+/**
+ * A matched relation, keyed by pg_class.relkind — every kind the table editor
+ * can open. Partitions are excluded, so 'p' is always a partition parent.
+ */
+export type SearchEntitiesTable = SearchEntitiesRelation &
+  (
+    | { type: 'r' | 'p'; rls_enabled: boolean; policy_count: number }
+    | { type: 'v'; security_invoker: boolean }
+    | { type: 'm' | 'f' }
+  )
 
 export type SearchEntitiesPolicy = {
   id: number
@@ -147,24 +143,36 @@ export const getSearchEntitiesSql = ({
   const policyExactName = literal(query.toLowerCase())
 
   return safeSql`
-    with table_candidates as materialized (
+    with ${EXTENSION_RELATIONS_CTE},
+    table_candidates as materialized (
       select
         c.oid,
         c.relname,
         c.relowner,
+        c.relkind,
         c.relrowsecurity,
+        c.reloptions,
         nc.nspname,
         case
           when lower(c.relname) = ${exactName} then 0
           when c.relname ilike ${prefixPattern} then 1
           else 2
         end as rank
-      from pg_class c
+      -- offset 0 is load-bearing: inlined, the wider relkind list estimates badly
+      -- enough that the planner runs the ILIKE ahead of it, over all of pg_class.
+      from (
+        select c.oid, c.relname, c.relowner, c.relkind, c.relrowsecurity, c.reloptions,
+               c.relnamespace
+        from pg_class c
+        -- Partition children would bury the parent the user actually searched for
+        where c.relkind in ('r', 'p', 'v', 'm', 'f')
+          and not c.relispartition
+        offset 0
+      ) c
       join pg_namespace nc on nc.oid = c.relnamespace
-      where c.relkind in ('r', 'p')
-        and not c.relispartition
-        and nc.nspname not in (${excludedSchemas})
+      where nc.nspname not in (${excludedSchemas})
         and not pg_is_other_temp_schema(nc.oid)
+        and c.oid not in (select objid from extension_relations)
         and ${tableMatchFilter}
       order by rank, length(c.relname), c.relname
       limit ${literal(CANDIDATE_LIMIT)}
@@ -176,8 +184,16 @@ export const getSearchEntitiesSql = ({
         tc.oid::int8 as id,
         tc.nspname as schema,
         tc.relname as name,
+        tc.relkind::text as type,
         tc.relrowsecurity as rls_enabled,
-        (select count(*) from pg_policy pol where pol.polrelid = tc.oid)::int as policy_count,
+        -- Past the cap on purpose: in the scan it runs for every name match
+        ${isSecurityInvokerView(safeSql`tc.reloptions`)} as security_invoker,
+        -- Only tables and partitioned tables can have policies
+        case
+          when tc.relkind in ('r', 'p')
+            then (select count(*) from pg_policy pol where pol.polrelid = tc.oid)
+          else 0
+        end::int as policy_count,
         tc.rank
       from table_candidates tc
       where ${hasTableAccess(safeSql`tc.oid`, safeSql`tc.relowner`)}
@@ -261,16 +277,7 @@ export const getSearchEntitiesSql = ({
       order by ${TABLE_RELATED_ORDER}
       limit ${literal(limit)}
     ),
-    -- Built once from the pg_depend reference index (cost follows extension members,
-    -- not matches). A per-row not exists probe is slower and can seq scan pg_depend.
-    extension_functions as materialized (
-      select d.objid
-      from pg_depend d
-      where d.refclassid = 'pg_extension'::regclass
-        and d.refobjid in (select e.oid from pg_extension e)
-        and d.classid = 'pg_proc'::regclass
-        and d.deptype = 'e'
-    ),
+    ${EXTENSION_FUNCTIONS_CTE},
     function_candidates as materialized (
       select
         p.oid,
@@ -394,9 +401,18 @@ export const getSearchEntitiesSql = ({
               'id', t.id,
               'schema', t.schema,
               'name', t.name,
-              'rls_enabled', t.rls_enabled,
-              'policy_count', t.policy_count
+              'type', t.type
             )
+            -- Omitted rather than zeroed: a matview cannot have RLS at all, so
+            -- reporting it as disabled would imply a setting that exists
+            || case
+                 when t.type in ('r', 'p') then jsonb_build_object(
+                   'rls_enabled', t.rls_enabled,
+                   'policy_count', t.policy_count
+                 )
+                 when t.type = 'v' then jsonb_build_object('security_invoker', t.security_invoker)
+                 else '{}'::jsonb
+               end
             order by t.rank, length(t.name), t.name
           )
           from matched_tables t
@@ -448,22 +464,8 @@ export const getSearchEntitiesSql = ({
             jsonb_build_object(
               'id', t.id,
               'name', t.name,
-              'activation', case
-                when (t.tgtype & 2) <> 0 then 'BEFORE'
-                when (t.tgtype & 64) <> 0 then 'INSTEAD OF'
-                else 'AFTER'
-              end,
-              'events', to_jsonb(
-                array_remove(
-                  array[
-                    case when (t.tgtype & 4) <> 0 then 'INSERT' end,
-                    case when (t.tgtype & 16) <> 0 then 'UPDATE' end,
-                    case when (t.tgtype & 8) <> 0 then 'DELETE' end,
-                    case when (t.tgtype & 32) <> 0 then 'TRUNCATE' end
-                  ],
-                  null
-                )
-              ),
+              'activation', ${triggerActivation(safeSql`t.tgtype`)},
+              'events', ${triggerEvents(safeSql`t.tgtype`)},
               'schema', t.schema,
               'table', t.table_name,
               'table_id', t.table_id,

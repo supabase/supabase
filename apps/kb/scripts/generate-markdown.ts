@@ -1,4 +1,4 @@
-// Pre-build step: exports every src/content/**/*.{md,mdx} file as a plain
+// Build step (the `generate:markdown` turbo task): exports every src/content/**/*.{md,mdx} file as a plain
 // .md file under public/markdown/, for agents/tools that want the raw
 // content instead of the rendered page (same idea as apps/docs' guides
 // markdown export, recreated here at a much smaller scale — see
@@ -18,6 +18,7 @@ import { addBaseUrlPrefix, stripHeadingCustomIds } from './helpers.ts'
 
 const SCRIPT_DIR = path.dirname(fileURLToPath(import.meta.url))
 const CONTENT_DIR = path.join(SCRIPT_DIR, '..', 'src', 'content')
+const COMMUNITY_GUIDES_PATH = path.join(SCRIPT_DIR, '..', 'src', 'data', 'community-guides.json')
 const OUTPUT_DIR = path.join(SCRIPT_DIR, '..', 'public', 'markdown')
 
 // Used to turn root-relative links into full URLs so the exported file still
@@ -236,6 +237,19 @@ async function main() {
       }
     })
   )
+
+  // community guides have no markdown file of their own, so they link off-site
+  const communityGuides: { title: string; url: string; topics?: string[] }[] = JSON.parse(
+    await readFile(COMMUNITY_GUIDES_PATH, 'utf-8')
+  )
+  for (const { title, url, topics = [] } of communityGuides) {
+    for (const { name } of TOPICS) {
+      if (
+        isInTopic({ collection: 'communityGuides', topics: ['Community', ...topics], topic: name })
+      )
+        guidesByTopic.get(name)!.push({ title, url })
+    }
+  }
 
   const topicEntries: Entry[] = TOPICS.map((topic) => ({
     title: topic.name,

@@ -92,6 +92,24 @@ describe('buildTelemetryEventRequest', () => {
     expect(unset?.body.custom_properties).toStrictEqual(event.properties)
     expect(set?.body.custom_properties).toStrictEqual({ ...event.properties, platform: 'kb' })
   })
+
+  it('builds the same endpoint whether the API URL has a trailing slash or /platform', () => {
+    const event = {
+      action: 'kb_search_submitted',
+      properties: { queryLength: 3, resultCount: 1, hasResults: true },
+    } as const
+    for (const apiUrl of [
+      'https://api.example.com/',
+      'https://api.example.com/platform',
+      'https://api.example.com/platform/',
+      'https://api.example.com//',
+      'https://api.example.com/platform//',
+    ]) {
+      expect(buildTelemetryEventRequest(apiUrl, event)?.url).toBe(
+        'https://api.example.com/platform/telemetry/event'
+      )
+    }
+  })
 })
 
 describe('sendTelemetryEvent', () => {

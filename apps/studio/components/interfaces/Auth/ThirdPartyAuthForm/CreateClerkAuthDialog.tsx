@@ -20,8 +20,10 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { InlineLink } from '@/components/ui/InlineLink'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateClerkAuthIntegrationProps {
   visible: boolean
@@ -58,6 +60,9 @@ export const CreateClerkAuthIntegrationDialog = ({
   onClose,
 }: CreateClerkAuthIntegrationProps) => {
   const { ref: projectRef } = useParams()
+  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Clerk integration.`)
@@ -87,8 +92,15 @@ export const CreateClerkAuthIntegrationDialog = ({
   }, [visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
+      )
+      return
+    }
     createAuthIntegration({
       projectRef: projectRef!,
+      grant: createGrant.grant,
       oidcIssuerUrl: values.domain,
     })
   }
@@ -139,15 +151,25 @@ export const CreateClerkAuthIntegrationDialog = ({
           <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button
+          <ButtonTooltip
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !createGrant.grant}
             loading={isPending}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: getWriteGrantTooltip(
+                  createGrant.status,
+                  'add',
+                  'third-party auth integrations'
+                ),
+              },
+            }}
           >
             Create connection
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>

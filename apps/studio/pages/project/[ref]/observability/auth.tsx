@@ -364,7 +364,7 @@ const AuthUsage = () => {
               ))}
             </div>
           </div>
-          <div>
+          <div id="auth-api-gateway">
             <div className="mb-4 space-y-4">
               <ReportSectionHeader
                 id="auth-api-gateway"
