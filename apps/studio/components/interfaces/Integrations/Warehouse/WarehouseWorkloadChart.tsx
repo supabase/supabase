@@ -1,6 +1,6 @@
 import dayjs from 'dayjs'
 import { InfoIcon } from 'lucide-react'
-import { Card, CardContent, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
+import { Card, CardContent, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 import { ChartLine } from 'ui-patterns/Chart'
 
 import type {
@@ -16,6 +16,7 @@ interface WarehouseWorkloadChartProps {
   metric?: WarehouseSummaryValue
   value?: string
   unit: 'ms' | '/s'
+  isPreview?: boolean
 }
 
 export const WarehouseWorkloadChart = ({
@@ -25,6 +26,7 @@ export const WarehouseWorkloadChart = ({
   metric,
   value,
   unit,
+  isPreview = false,
 }: WarehouseWorkloadChartProps) => {
   const notice = metric && getWarehouseSummaryNotice(metric)
   const hasValues = points.some((point) => point.value !== undefined)
@@ -34,16 +36,25 @@ export const WarehouseWorkloadChart = ({
       <CardContent className="space-y-3 p-4">
         <div className="flex items-center justify-between gap-2">
           <h3 className="text-sm text-foreground-light">{title}</h3>
-          <Tooltip>
-            <TooltipTrigger aria-label={`About ${title.toLowerCase()}`}>
-              <InfoIcon size={14} className="text-foreground-lighter" />
-            </TooltipTrigger>
-            <TooltipContent className="max-w-72">{description}</TooltipContent>
-          </Tooltip>
+          {!isPreview && (
+            <Tooltip>
+              <TooltipTrigger aria-label={`About ${title.toLowerCase()}`}>
+                <InfoIcon size={14} className="text-foreground-lighter" />
+              </TooltipTrigger>
+              <TooltipContent className="max-w-72">{description}</TooltipContent>
+            </Tooltip>
+          )}
         </div>
-        <p className="text-xl tabular-nums">{value ?? 'Unavailable'}</p>
+        {isPreview && (
+          <div aria-hidden="true" className="h-7 w-20 rounded bg-surface-200 opacity-40" />
+        )}
+        {!isPreview && <p className="text-xl tabular-nums">{value ?? 'Unavailable'}</p>}
         {hasValues && (
-          <div>
+          <div
+            inert={isPreview || undefined}
+            aria-hidden={isPreview || undefined}
+            className={cn(isPreview && 'pointer-events-none opacity-40 grayscale')}
+          >
             <ChartLine
               className="h-36"
               isFullHeight
@@ -51,7 +62,7 @@ export const WarehouseWorkloadChart = ({
               dataKey="value"
               config={{ value: { label: title, color: 'var(--chart-1)' } }}
               color="var(--chart-1)"
-              showXAxis
+              showXAxis={!isPreview}
               showYAxis={false}
               showHighlightArea={false}
               tooltipDetails={(_, __, pointValue) => `${pointValue}${unit === 'ms' ? ' ms' : '/s'}`}
@@ -63,7 +74,7 @@ export const WarehouseWorkloadChart = ({
             {notice ?? 'Waiting for query measurements'}
           </div>
         )}
-        {metric?.timestamp !== null && metric?.timestamp !== undefined && (
+        {!isPreview && metric?.timestamp !== null && metric?.timestamp !== undefined && (
           <p className="text-xs text-foreground-lighter">
             Interval ending {dayjs.unix(metric.timestamp).format('HH:mm')}
           </p>

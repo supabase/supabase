@@ -59,20 +59,12 @@ const SummaryMetric = ({
   )
 }
 
-const WorkloadSection = ({
-  children,
-  isExample = false,
-}: {
-  children: ReactNode
-  isExample?: boolean
-}) => (
+const WorkloadSection = ({ children }: { children: ReactNode }) => (
   <PageSection className="pt-5!">
     <PageSectionMeta>
       <PageSectionSummary>
         <PageSectionTitle>Workload</PageSectionTitle>
-        <PageSectionDescription>
-          {isExample ? 'Query performance appears after setup.' : 'Query performance and capacity.'}
-        </PageSectionDescription>
+        <PageSectionDescription>Query performance and capacity.</PageSectionDescription>
       </PageSectionSummary>
     </PageSectionMeta>
     <PageSectionContent className="space-y-4">{children}</PageSectionContent>
@@ -80,32 +72,42 @@ const WorkloadSection = ({
 )
 
 const WarehouseWorkloadPreview = () => {
+  const points = (values: number[]) =>
+    values.map((value, index) => ({
+      timestamp: new Date(Date.UTC(2026, 0, 1, 0, index * 5)).toISOString(),
+      value,
+    }))
+
   return (
-    <WorkloadSection isExample>
-      <div className="grid gap-4 sm:grid-cols-2">
-        {['Query duration', 'Query rate'].map((title) => (
-          <Card key={title}>
-            <CardContent className="space-y-3 p-4">
-              <h3 className="text-sm text-foreground-light">{title}</h3>
-              <svg
-                aria-hidden="true"
-                viewBox="0 0 300 100"
-                preserveAspectRatio="none"
-                className="h-36 w-full text-foreground-muted opacity-30"
-                fill="none"
-              >
-                <path d="M0 25H300M0 50H300M0 75H300" stroke="currentColor" strokeOpacity="0.3" />
-                <path
-                  d="M0 80C25 80 25 60 50 65S75 85 100 55S125 65 150 45S175 60 200 30S225 45 250 25S275 35 300 15"
-                  stroke="currentColor"
-                  strokeWidth="2"
-                  vectorEffect="non-scaling-stroke"
-                />
-              </svg>
-            </CardContent>
-          </Card>
-        ))}
+    <WorkloadSection>
+      <div className="grid gap-4 sm:grid-cols-2" role="group" aria-label="Workload preview">
+        <WarehouseWorkloadChart
+          title="Query duration"
+          unit="ms"
+          description=""
+          points={points([820, 800, 810, 720, 740, 680, 590, 610, 540, 470, 490, 420])}
+          isPreview
+        />
+        <WarehouseWorkloadChart
+          title="Query rate"
+          unit="/s"
+          description=""
+          points={points([4, 5, 4, 5, 6, 5, 5, 7, 6, 5, 6, 6])}
+          isPreview
+        />
       </div>
+      <Card>
+        <CardContent>
+          <dl className="grid gap-4 opacity-40 grayscale sm:grid-cols-2">
+            {['Query errors', 'Worker slots in use'].map((label) => (
+              <div key={label} className="space-y-2">
+                <dt className="text-sm text-foreground-light">{label}</dt>
+                <dd aria-label="Not yet measured" className="h-7 w-20 rounded bg-surface-200" />
+              </div>
+            ))}
+          </dl>
+        </CardContent>
+      </Card>
     </WorkloadSection>
   )
 }

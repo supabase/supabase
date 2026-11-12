@@ -266,19 +266,19 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Tables, Status and workload silhouettes before setup', async () => {
+  test('shows Tables, Status and full workload previews before setup', async () => {
     mockSetupStatus({ setup_status: 'not_started' })
     customRender(<WarehouseOverviewTab />)
-    expect(await screen.findByText('Query performance appears after setup.')).toBeInTheDocument()
+    expect(await screen.findByRole('group', { name: 'Workload preview' })).toBeInTheDocument()
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
       .filter((heading) => ['Tables', 'Status', 'Workload'].includes(heading ?? ''))
     expect(headings).toEqual(['Tables', 'Status', 'Workload'])
+    expect(screen.getByRole('img', { name: 'Replication status preview' })).toBeInTheDocument()
     expect(
-      screen.getByText('Replication status appears here after you set up Warehouse.')
-    ).toBeInTheDocument()
-    expect(screen.queryByText('Live')).not.toBeInTheDocument()
+      screen.queryByText('Replication status appears here after you set up Warehouse.')
+    ).not.toBeInTheDocument()
   })
 
   test('shows Tables, Status, Workload, Connect, then Disable once setup is complete', async () => {

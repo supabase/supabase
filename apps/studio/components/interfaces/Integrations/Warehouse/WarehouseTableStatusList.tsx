@@ -170,11 +170,28 @@ export const WarehouseStatusPreview = () => (
       </PageSectionSummary>
     </PageSectionMeta>
     <PageSectionContent>
-      <Card>
-        <CardContent className="py-8 text-sm text-foreground-light">
-          Replication status appears here after you set up Warehouse.
-        </CardContent>
-      </Card>
+      <div role="img" aria-label="Replication status preview">
+        <div inert aria-hidden="true" className="pointer-events-none opacity-40 grayscale">
+          <WarehouseTableStatusList
+            tables={[
+              {
+                schema: 'public',
+                name: 'orders',
+                copy_name: 'public.orders',
+                state: 'live',
+                lag_ms: 0,
+              },
+              {
+                schema: 'public',
+                name: 'customers',
+                copy_name: 'public.customers',
+                state: 'live',
+                lag_ms: 0,
+              },
+            ]}
+          />
+        </div>
+      </div>
     </PageSectionContent>
   </PageSection>
 )

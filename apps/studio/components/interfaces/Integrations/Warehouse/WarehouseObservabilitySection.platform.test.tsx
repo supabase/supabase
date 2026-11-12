@@ -42,10 +42,13 @@ const mockMetrics = (body: WarehouseMetricsResponse) =>
   })
 
 describe('Warehouse workload summary', () => {
-  test('shows chart silhouettes before setup without measurements or controls', () => {
+  test('previews the full workload layout before setup without measurements or controls', () => {
     customRender(<WarehouseObservabilitySection mode="example" />)
     expect(screen.queryByText('Example data')).not.toBeInTheDocument()
-    expect(screen.getByText('Query performance appears after setup.')).toBeInTheDocument()
+    expect(screen.queryByText('Query performance appears after setup.')).not.toBeInTheDocument()
+    expect(screen.getByRole('group', { name: 'Workload preview' })).toBeInTheDocument()
+    expect(screen.getByText('Query errors')).toBeInTheDocument()
+    expect(screen.getByText('Worker slots in use')).toBeInTheDocument()
     expect(screen.getByRole('heading', { name: 'Query duration' })).toBeInTheDocument()
     expect(screen.queryByRole('button')).not.toBeInTheDocument()
     expect(screen.queryByText(/Interval ending| ms|\/s/)).not.toBeInTheDocument()
