@@ -1,10 +1,10 @@
 import { UpcomingInvoiceResponse } from '@/data/invoices/org-invoice-upcoming-query'
 
-export type UpcomingInvoice = NonNullable<UpcomingInvoiceResponse['upcomingInvoice']>
+export type UpcomingInvoiceData = NonNullable<UpcomingInvoiceResponse['upcomingInvoice']>
 export type UpcomingInvoiceUsageLineItem =
-  UpcomingInvoice['currentCosts']['usage']['lineItems'][number]
+  UpcomingInvoiceData['currentCosts']['usage']['lineItems'][number]
 export type UpcomingInvoiceFixedFeeLineItem =
-  UpcomingInvoice['currentCosts']['fixedFees']['lineItems'][number]
+  UpcomingInvoiceData['currentCosts']['fixedFees']['lineItems'][number]
 export type UpcomingInvoiceUsageUnit = Extract<
   UpcomingInvoiceUsageLineItem,
   { schema: 'compute' }

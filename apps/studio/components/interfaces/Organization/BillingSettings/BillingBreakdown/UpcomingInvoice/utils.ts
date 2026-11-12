@@ -1,8 +1,7 @@
 import { UpcomingInvoiceUsageUnit } from './types'
-import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
-import { DOCS_URL } from '@/lib/constants'
+import { pluralize } from '@/lib/helpers'
 
-export const USAGE_UNIT_LABELS: Record<
+const USAGE_UNIT_LABELS: Record<
   Exclude<UpcomingInvoiceUsageUnit, 'byte'>,
   { singular: string; plural: string } | null
 > = {
@@ -14,10 +13,10 @@ export const USAGE_UNIT_LABELS: Record<
   count: null, // no label for count
 }
 
-export const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
+const BYTE_UNITS = ['B', 'KB', 'MB', 'GB', 'TB', 'PB']
 
 // Above this, full numbers get hard to scan (e.g. IOPS-hours), so switch to 2.2M-style notation
-export const COMPACT_NOTATION_THRESHOLD = 1_000_000
+const COMPACT_NOTATION_THRESHOLD = 1_000_000
 
 export function formatNumber(value: number) {
   // Avoid very low usage displaying as "0"
@@ -44,38 +43,5 @@ export function formatUsageWithUnit(usage: number, unit: UpcomingInvoiceUsageUni
   const label = USAGE_UNIT_LABELS[unit]
   if (!label) return formattedUsage
 
-  return `${formattedUsage} ${usage === 1 ? label.singular : label.plural}`
-}
-
-export const usageBillingDocsLink: { [K in PricingMetric]?: string } = {
-  [PricingMetric.MONTHLY_ACTIVE_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users`,
-  [PricingMetric.MONTHLY_ACTIVE_SSO_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-sso`,
-  [PricingMetric.MONTHLY_ACTIVE_THIRD_PARTY_USERS]: `${DOCS_URL}/guides/platform/manage-your-usage/monthly-active-users-third-party`,
-  [PricingMetric.AUTH_MFA_PHONE]: `${DOCS_URL}/guides/platform/manage-your-usage/advanced-mfa-phone`,
-
-  [PricingMetric.EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
-  [PricingMetric.CACHED_EGRESS]: `${DOCS_URL}/guides/platform/manage-your-usage/egress`,
-
-  [PricingMetric.FUNCTION_INVOCATIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/edge-function-invocations`,
-
-  [PricingMetric.STORAGE_SIZE]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-size`,
-  [PricingMetric.STORAGE_IMAGES_TRANSFORMED]: `${DOCS_URL}/guides/platform/manage-your-usage/storage-image-transformations`,
-
-  [PricingMetric.REALTIME_MESSAGE_COUNT]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-messages`,
-  [PricingMetric.REALTIME_PEAK_CONNECTIONS]: `${DOCS_URL}/guides/platform/manage-your-usage/realtime-peak-connections`,
-
-  [PricingMetric.CUSTOM_DOMAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/custom-domains`,
-  [PricingMetric.IPV4]: `${DOCS_URL}/guides/platform/manage-your-usage/ipv4`,
-  [PricingMetric.PITR_7]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.PITR_14]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.PITR_28]: `${DOCS_URL}/guides/platform/manage-your-usage/point-in-time-recovery`,
-  [PricingMetric.DISK_SIZE_GB_HOURS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
-  [PricingMetric.DISK_SIZE_GB_HOURS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-size`,
-  [PricingMetric.DISK_IOPS_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
-  [PricingMetric.DISK_IOPS_IO2]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-iops`,
-  [PricingMetric.DISK_THROUGHPUT_GP3]: `${DOCS_URL}/guides/platform/manage-your-usage/disk-throughput`,
-  [PricingMetric.LOG_DRAIN]: `${DOCS_URL}/guides/platform/manage-your-usage/log-drains`,
-  [PricingMetric.PIPELINES_PIPELINE]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.PIPELINES_COPY_BACKFILL_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
-  [PricingMetric.PIPELINES_REPLICATED_DATA]: `${DOCS_URL}/guides/platform/manage-your-usage/pipelines`,
+  return `${formattedUsage} ${pluralize(usage, label.singular, label.plural)}`
 }

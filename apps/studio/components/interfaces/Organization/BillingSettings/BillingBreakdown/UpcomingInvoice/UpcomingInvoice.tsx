@@ -6,9 +6,9 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import {
-  UpcomingInvoice,
+import type {
   UpcomingInvoiceAnyLineItem,
+  UpcomingInvoiceData,
   UpcomingInvoiceProjectBreakdown,
   UpcomingInvoiceUsageUnit,
 } from './types'
@@ -479,7 +479,7 @@ function InvoiceLineItemAmount({
 function PrepaidCreditsTooltip({
   prepaidCredits,
 }: {
-  prepaidCredits: UpcomingInvoice['prepaidCredits']
+  prepaidCredits: UpcomingInvoiceData['prepaidCredits']
 }) {
   return (
     <>
@@ -511,7 +511,7 @@ function PrepaidCreditsTooltip({
 function PrepaidCreditsForecast({
   prepaidCredits,
 }: {
-  prepaidCredits: Extract<UpcomingInvoice['prepaidCredits'], { kind: 'with_forecast' }>
+  prepaidCredits: Extract<UpcomingInvoiceData['prepaidCredits'], { kind: 'with_forecast' }>
 }) {
   const hasProjectedWithdrawal = prepaidCredits.projectedWithdrawnInRemainingCycle > 0
 
@@ -527,7 +527,7 @@ function PrepaidCreditsForecast({
 function getMinimumFeeTooltip({
   expectedAtEndOfCycle,
   floorPrice,
-}: UpcomingInvoice['minimum_fee']) {
+}: UpcomingInvoiceData['minimum_fee']) {
   if (floorPrice === null) {
     return "If your costs for the billing cycle are below the minimum fee, you're charged the difference."
   }
