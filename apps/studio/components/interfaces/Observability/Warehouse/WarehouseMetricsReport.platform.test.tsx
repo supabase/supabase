@@ -80,7 +80,7 @@ describe('WarehouseMetricsReport', () => {
     customRender(<WarehouseMetricsReport />)
 
     expect(await screen.findByText("Supabase Warehouse isn't enabled")).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Go to Warehouse settings' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
     )
@@ -92,6 +92,10 @@ describe('WarehouseMetricsReport', () => {
     customRender(<WarehouseMetricsReport />)
 
     expect(await screen.findByText('Supabase Warehouse is disabled')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
   })
 
   test('shows an error for the failing section while the other sections still render', async () => {

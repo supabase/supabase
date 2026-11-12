@@ -11,12 +11,13 @@ interface WarehouseMetricsEmptyStateProps {
 const COPY = {
   not_provisioned: {
     title: "Supabase Warehouse isn't enabled",
-    description: 'Enable Supabase Warehouse to see query, latency, and capacity metrics here.',
+    description:
+      'Run analytical queries on a replicated copy of your data, then monitor query latency, failures, and capacity here.',
   },
   disabled: {
     title: 'Supabase Warehouse is disabled',
     description:
-      'Enable Supabase Warehouse again to see query, latency, and capacity metrics here.',
+      'Set up Supabase Warehouse again to query a replicated copy of your data and monitor its latency, failures, and capacity here.',
   },
 } as const
 
@@ -35,7 +36,7 @@ export const WarehouseMetricsEmptyState = ({
     >
       <Button asChild variant="default">
         <Link href={`/project/${projectRef}/integrations/warehouse/overview`}>
-          Go to Warehouse settings
+          Set up Warehouse
         </Link>
       </Button>
     </EmptyStatePresentational>

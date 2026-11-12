@@ -60,7 +60,7 @@ describe('WarehouseTab', () => {
     customRender(<WarehouseTab />)
 
     expect(await screen.findByText('Warehouse is not set up')).toBeInTheDocument()
-    expect(screen.getByRole('link', { name: 'Choose tables' })).toHaveAttribute(
+    expect(screen.getByRole('link', { name: 'Set up Warehouse' })).toHaveAttribute(
       'href',
       '/project/default/integrations/warehouse/overview'
     )
