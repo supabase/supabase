@@ -6,7 +6,12 @@ import { Accordion, AccordionContent, AccordionItem, AccordionTrigger, cn } from
 import { InfoTooltip } from 'ui-patterns/info-tooltip'
 import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
-import { AnyLineItem, ProjectBreakdown, UpcomingInvoiceV2Dto, UsageUnit } from './types'
+import {
+  UpcomingInvoice,
+  UpcomingInvoiceAnyLineItem,
+  UpcomingInvoiceProjectBreakdown,
+  UpcomingInvoiceUsageUnit,
+} from './types'
 import { formatUsageWithUnit } from './utils'
 import { AlertError } from '@/components/ui/AlertError'
 import { useOrgUpcomingInvoiceQuery } from '@/data/invoices/org-invoice-upcoming-query'
@@ -253,7 +258,7 @@ function InvoiceSection({
   )
 }
 
-function InvoiceLineItemList({ lineItems }: { lineItems: AnyLineItem[] }) {
+function InvoiceLineItemList({ lineItems }: { lineItems: UpcomingInvoiceAnyLineItem[] }) {
   return (
     <Accordion type="multiple">
       {lineItems.map((item, index) => {
@@ -269,7 +274,7 @@ function InvoiceLineItemRow({
   accordionItemValue,
   item,
 }: {
-  item: AnyLineItem
+  item: UpcomingInvoiceAnyLineItem
   accordionItemValue: string
 }) {
   if (item.line_item_kind === 'fixed-fee') {
@@ -343,8 +348,8 @@ function InvoiceProjectBreakdownRow({
   project,
   usageUnit,
 }: {
-  project: ProjectBreakdown
-  usageUnit?: UsageUnit
+  project: UpcomingInvoiceProjectBreakdown
+  usageUnit?: UpcomingInvoiceUsageUnit
 }) {
   const amountBeforeDiscount = +project.variants
     .reduce((sum, variant) => sum + variant.pre_tax_amount_before_discount, 0)
@@ -474,7 +479,7 @@ function InvoiceLineItemAmount({
 function PrepaidCreditsTooltip({
   prepaidCredits,
 }: {
-  prepaidCredits: UpcomingInvoiceV2Dto['prepaidCredits']
+  prepaidCredits: UpcomingInvoice['prepaidCredits']
 }) {
   return (
     <>
@@ -506,7 +511,7 @@ function PrepaidCreditsTooltip({
 function PrepaidCreditsForecast({
   prepaidCredits,
 }: {
-  prepaidCredits: Extract<UpcomingInvoiceV2Dto['prepaidCredits'], { kind: 'with_forecast' }>
+  prepaidCredits: Extract<UpcomingInvoice['prepaidCredits'], { kind: 'with_forecast' }>
 }) {
   const hasProjectedWithdrawal = prepaidCredits.projectedWithdrawnInRemainingCycle > 0
 
@@ -522,7 +527,7 @@ function PrepaidCreditsForecast({
 function getMinimumFeeTooltip({
   expectedAtEndOfCycle,
   floorPrice,
-}: UpcomingInvoiceV2Dto['minimum_fee']) {
+}: UpcomingInvoice['minimum_fee']) {
   if (floorPrice === null) {
     return "If your costs for the billing cycle are below the minimum fee, you're charged the difference."
   }

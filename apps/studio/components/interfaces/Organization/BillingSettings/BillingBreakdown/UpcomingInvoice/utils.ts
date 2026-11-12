@@ -1,9 +1,9 @@
-import { UsageUnit } from './types'
+import { UpcomingInvoiceUsageUnit } from './types'
 import { PricingMetric } from '@/data/analytics/org-daily-stats-query'
 import { DOCS_URL } from '@/lib/constants'
 
 export const USAGE_UNIT_LABELS: Record<
-  Exclude<UsageUnit, 'byte'>,
+  Exclude<UpcomingInvoiceUsageUnit, 'byte'>,
   { singular: string; plural: string } | null
 > = {
   gigabyte: { singular: 'GB', plural: 'GB' },
@@ -37,7 +37,7 @@ export function formatDecimalBytes(bytes: number) {
   return `${formatNumber(bytes / 1000 ** Math.max(exponent, 0))} ${BYTE_UNITS[Math.max(exponent, 0)]}`
 }
 
-export function formatUsageWithUnit(usage: number, unit: UsageUnit) {
+export function formatUsageWithUnit(usage: number, unit: UpcomingInvoiceUsageUnit) {
   if (unit === 'byte') return formatDecimalBytes(usage)
 
   const formattedUsage = formatNumber(usage)
