@@ -450,7 +450,7 @@ const SUPABASE_INTEGRATIONS: Array<IntegrationDefinition> = [
               (mod) => mod.WarehouseOverviewTab
             ),
           {
-            loading: WarehouseLoadingState,
+            loading: () => <WarehouseLoadingState />,
           }
         )
       }
