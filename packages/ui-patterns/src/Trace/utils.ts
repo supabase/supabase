@@ -256,7 +256,6 @@ export function getTimingPlacement({
 const MIN_WINDOW_FRACTION = 0.01
 export const MINIMAP_COLUMNS = 120
 
-const STATUS_RANK: Record<SpanStatus, number> = { unset: 1, ok: 2, error: 3 }
 const RANKED_STATUS: SpanStatus[] = ['unset', 'ok', 'error']
 
 const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max)
@@ -315,7 +314,7 @@ export function computeMinimapRects(
     const spanEnd = effectiveEndMs(span, index.nowMs)
     const to = clamp(Math.ceil(((spanEnd - start) / duration) * columns) - 1, from, columns - 1)
     for (let column = from; column <= to; column++) {
-      lane[column] = Math.max(lane[column], STATUS_RANK[span.status])
+      lane[column] = Math.max(lane[column], RANKED_STATUS.indexOf(span.status) + 1)
     }
   }
 
