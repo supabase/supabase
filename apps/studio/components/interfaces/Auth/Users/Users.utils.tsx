@@ -104,8 +104,8 @@ const providers = {
     { twilio: 'twilio-icon' },
     { messagebird: 'messagebird-icon' },
     { textlocal: 'messagebird-icon' },
-    { vonage: 'messagebird-icon' },
-    { twilioverify: 'twilio-verify-icon' },
+    { vonage: 'vonage-icon' },
+    { twilioverify: 'twilio-icon' },
   ],
 }
 
