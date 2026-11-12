@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { databaseErrorSchema, PgMetaDatabaseError } from './types'
+import { createPgMetaDatabaseError, databaseErrorSchema, PgMetaDatabaseError } from './types'
 
 describe('api/self-hosted/types', () => {
   describe('databaseErrorSchema', () => {
@@ -105,6 +105,51 @@ describe('api/self-hosted/types', () => {
 
       expect(error400.statusCode).toBe(400)
       expect(error500.statusCode).toBe(500)
+    })
+  })
+
+  describe('createPgMetaDatabaseError', () => {
+    it('preserves a standard database error response', () => {
+      const error = createPgMetaDatabaseError(
+        {
+          message: 'Syntax error',
+          code: '42601',
+          formattedError: 'ERROR: syntax error',
+        },
+        400
+      )
+
+      expect(error.message).toBe('Syntax error')
+      expect(error.code).toBe('42601')
+      expect(error.statusCode).toBe(400)
+      expect(error.formattedError).toBe('ERROR: syntax error')
+    })
+
+    it.each([
+      'failed to get upstream connection details',
+      'failed to process upstream connection details',
+    ])('suggests checking the crypto keys for "%s"', (message) => {
+      const error = createPgMetaDatabaseError({ error: message }, 500)
+
+      expect(error.message).toBe(
+        "Failed to connect to postgres-meta. Studio's PG_META_CRYPTO_KEY may not match postgres-meta's CRYPTO_KEY."
+      )
+      expect(error.code).toBe('UNKNOWN_ERROR')
+      expect(error.formattedError).toBe(error.message)
+    })
+
+    it('preserves an unexpected error message', () => {
+      const error = createPgMetaDatabaseError({ error: 'Service unavailable' }, 503)
+
+      expect(error.message).toBe('Service unavailable')
+      expect(error.statusCode).toBe(503)
+    })
+
+    it('handles a response without an error message', () => {
+      const error = createPgMetaDatabaseError(null, 500)
+
+      expect(error.message).toBe('An unexpected postgres-meta error occurred')
+      expect(error.code).toBe('UNKNOWN_ERROR')
     })
   })
 })
