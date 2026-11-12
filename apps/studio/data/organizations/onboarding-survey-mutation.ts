@@ -5,13 +5,17 @@ import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
-export type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody']
+// The platform accepts `can_code`; api-types gains it at the next regeneration from the prod spec
+export type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody'] & {
+  can_code?: string
+}
 
 export type OnboardingSurveyVariables = {
   slug: string
   kind?: string
   size?: string
   building?: string
+  can_code?: string
 }
 
 const trim = (v?: string) => v?.trim() || undefined
@@ -21,12 +25,14 @@ function buildOnboardingSurveyPayload({
   kind,
   size,
   building,
+  can_code,
 }: OnboardingSurveyVariables): OnboardingSurveyBody {
   return {
     slug,
     kind: trim(kind),
     size: trim(size),
     building: trim(building),
+    can_code: trim(can_code),
   }
 }
 

@@ -31,6 +31,11 @@ export const BUILDING_OPTIONS: readonly OnboardingSurveyOption[] = [
   PREFER_NOT_TO_SAY_OPTION,
 ]
 
+export const CAN_CODE_OPTIONS: readonly OnboardingSurveyOption[] = [
+  { value: 'no', label: 'No' },
+  { value: 'yes', label: 'Yes' },
+]
+
 // Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?".
 // UNDISCLOSED is the org kind's own Prefer not to say.
 export const SURVEY_ORG_KIND_OPTIONS: readonly OnboardingSurveyOption[] = (
