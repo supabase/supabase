@@ -1,0 +1,172 @@
+---
+title: 'Use Supabase with Unity'
+subtitle: 'Learn how to create a Supabase project, add some sample data to your database, and query the data from a Unity app.'
+breadcrumb: 'Framework Quickstarts'
+---
+
+<AiPrompt id="unity" />
+
+<$Partial path="quickstart_db_setup.mdx" />
+
+## 3. Create a Unity project
+
+In Unity Hub, click **New project**. This guide uses Unity 6.3 and was tested in the editor and in a Windows build. It does not cover Web builds, because Unity Web does not support `System.Net.Http`, which the SDK uses.
+
+## 4. Set up AI tooling (optional)
+
+<$Partial path="quickstart_ai_tooling.mdx" />
+
+## 5. Install the Supabase client library
+
+Unity cannot install NuGet packages, so install [NuGetForUnity](https://github.com/GlitchEnzo/NuGetForUnity) first. This needs Git on your machine. In **Window > Package Management > Package Manager**, open the **+** menu, select **Install package from git URL**, and paste this URL:
+
+```text
+https://github.com/GlitchEnzo/NuGetForUnity.git?path=/src/NuGetForUnity
+```
+
+Then open **NuGet > Manage NuGet Packages** and install [`Supabase`](https://www.nuget.org/packages/Supabase).
+
+## 6. Initialize the Supabase client
+
+Add a `SupabaseManager.cs` script and attach it to an empty GameObject. It creates one client for the whole app. Replace the two placeholders with your project URL and publishable key. You can get both from the helper below, or [from the project **Connect** panel](/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=dotnet&using=unity):
+
+<Button variant="primary" asChild>
+  <a href="/dashboard/project/_?showConnect=true&connectTab=frameworks&framework=dotnet&using=unity">
+    Open Connect panel
+  </a>
+</Button>
+
+```csharp name=Assets/SupabaseManager.cs
+using System.Threading.Tasks;
+using Supabase;
+using UnityEngine;
+
+public class SupabaseManager : MonoBehaviour
+{
+    public static SupabaseManager Instance { get; private set; }
+    public Client Supabase { get; private set; }
+
+    // Await this before you use the client.
+    public Task InitializationTask { get; private set; }
+
+    private const string Url = "YOUR_SUPABASE_URL";
+    private const string Key = "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+    private void Awake()
+    {
+        if (Instance != null)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+        Instance = this;
+        DontDestroyOnLoad(gameObject);
+        InitializationTask = InitializeAsync();
+    }
+
+    private async Task InitializeAsync()
+    {
+        Supabase = new Client(Url, Key);
+        await Supabase.InitializeAsync();
+    }
+}
+```
+
+<$Partial path="api_settings.mdx" variables={{ "framework": "dotnet", "tab": "frameworks" }} />
+
+<Admonition type="note">
+
+Unity does not load `.env` files, so this guide puts the project URL and publishable key in the script. The publishable key is safe to ship in your app. Row Level Security and database privileges control access to your data.
+
+</Admonition>
+
+## 7. Create a data model for instruments
+
+Create an `Instrument.cs` file. The attributes link the class to the `instruments` table and its columns.
+
+```csharp name=Assets/Instrument.cs
+using Supabase.Postgrest.Attributes;
+using Supabase.Postgrest.Models;
+
+[Table("instruments")]
+public class Instrument : BaseModel
+{
+    [PrimaryKey("id")]
+    public long Id { get; set; }
+
+    [Column("name")]
+    public string Name { get; set; } = string.Empty;
+}
+```
+
+## 8. Query data from the app
+
+Create an `InstrumentList.cs` script and attach it to a GameObject in the same scene. It logs each instrument name.
+
+```csharp name=Assets/InstrumentList.cs
+using System;
+using System.Threading.Tasks;
+using UnityEngine;
+
+public class InstrumentList : MonoBehaviour
+{
+    // Unity does not await Start(), so this only starts the load.
+    private void Start()
+    {
+        _ = LoadInstrumentsAsync();
+    }
+
+    private async Task LoadInstrumentsAsync()
+    {
+        try
+        {
+            var manager = SupabaseManager.Instance;
+            await manager.InitializationTask;
+            var response = await manager.Supabase.From<Instrument>().Get();
+            foreach (var instrument in response.Models)
+            {
+                Debug.Log(instrument.Name);
+            }
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Error loading instruments: {e.Message}");
+        }
+    }
+}
+```
+
+## 9. Start the app
+
+Click **Play** in the editor. Open **Window > General > Console**. It shows `violin`, `viola`, and `cello`.
+
+<$Partial path="quickstart_going_to_production.mdx" />
+
+### IL2CPP code stripping
+
+With a **Managed Stripping Level** above **Minimal**, IL2CPP removes code that the SDK needs. The query then returns empty names, and other calls fail. Add this `Assets/link.xml` to keep the SDK and your models:
+
+```xml name=Assets/link.xml
+<linker>
+  <assembly fullname="Supabase" preserve="all" />
+  <assembly fullname="Supabase.Core" preserve="all" />
+  <assembly fullname="Supabase.Functions" preserve="all" />
+  <assembly fullname="Supabase.Gotrue" preserve="all" />
+  <assembly fullname="Supabase.Postgrest" preserve="all" />
+  <assembly fullname="Supabase.Realtime" preserve="all" />
+  <assembly fullname="Supabase.Storage" preserve="all" />
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="Instrument" preserve="all" />
+  </assembly>
+</linker>
+```
+
+Add a `type` line for each model class. If your scripts are in an assembly definition, use its name instead of `Assembly-CSharp`.
+
+## Next steps
+
+- Set up [Auth](/docs/guides/auth) for your app
+- Explore the [C# reference](/docs/reference/csharp/introduction)
+- [Insert more data](/docs/guides/database/import-data) into your database
+- Upload and serve static files using [Storage](/docs/guides/storage)
