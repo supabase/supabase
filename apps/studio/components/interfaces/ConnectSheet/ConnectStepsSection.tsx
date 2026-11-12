@@ -226,6 +226,11 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
   const stepsContainerRef = useRef<HTMLDivElement | null>(null)
   const deploymentMode = useDeploymentMode()
   const isHighAvailability = useIsHighAvailability()
+  const capabilities = useProjectCapabilities()
+  // Fall back to the pre-capabilities `isHighAvailability` check (rather than
+  // a fixed default) so behavior for already-correct HA projects doesn't
+  // regress while the backend capabilities field is still rolling out.
+  const hasConnectionPooling = capabilities?.hasConnectionPooling ?? !isHighAvailability
   const connectionStringPooler = useConnectionStringPooler(deploymentMode)
 
   const { projectAddonsDedicatedIpv4Address } = useIsFeatureEnabled([
@@ -249,7 +254,7 @@ export function ConnectStepsSection({ steps, state, projectKeys }: ConnectStepsS
     connectionMethod: state.connectionMethod,
     useSharedPooler: state.useSharedPooler,
     hasIpv4Addon: !!ipv4Addon,
-    isHighAvailability,
+    hasConnectionPooling,
   })
   const showSessionPoolerNotice = shouldShowSessionPoolerNotice({
     isPlatform: deploymentMode.isPlatform,

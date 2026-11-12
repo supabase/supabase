@@ -8,11 +8,13 @@ const {
   mockUseDatabaseSelectorStateSnapshot,
   mockUseDatabaseSettingsStateSnapshot,
   mockUseHighAvailability,
+  mockUseProjectCapabilities,
   mockUseSupavisorConfigurationQuery,
 } = vi.hoisted(() => ({
   mockUseDatabaseSelectorStateSnapshot: vi.fn(),
   mockUseDatabaseSettingsStateSnapshot: vi.fn(),
   mockUseHighAvailability: vi.fn(),
+  mockUseProjectCapabilities: vi.fn(),
   mockUseSupavisorConfigurationQuery: vi.fn(),
 }))
 
@@ -23,6 +25,10 @@ vi.mock('common', async (importOriginal) => ({
 
 vi.mock('@/hooks/misc/useHighAvailability', () => ({
   useHighAvailability: mockUseHighAvailability,
+}))
+
+vi.mock('@/hooks/misc/useSelectedProject', () => ({
+  useProjectCapabilities: mockUseProjectCapabilities,
 }))
 
 vi.mock('@/data/database/supavisor-configuration-query', () => ({
@@ -52,6 +58,7 @@ describe('PoolingModesModal', () => {
     })
     mockUseDatabaseSelectorStateSnapshot.mockReturnValue({ selectedDatabaseId: 'ha-project' })
     mockUseSupavisorConfigurationQuery.mockReturnValue({ data: undefined })
+    mockUseProjectCapabilities.mockReturnValue(undefined)
   })
 
   it('renders nothing and skips the supavisor query for High Availability projects', () => {
@@ -78,5 +85,18 @@ describe('PoolingModesModal', () => {
 
     expect(screen.getByText('Which pooling mode should I use?')).toBeInTheDocument()
     expectEveryQueryCall(mockUseSupavisorConfigurationQuery, true)
+  })
+
+  it('renders nothing and skips the supavisor query for Multigres Lite projects', () => {
+    mockUseHighAvailability.mockReturnValue({ isHighAvailability: false, isPending: false })
+    mockUseProjectCapabilities.mockReturnValue({
+      hasConnectionPooling: false,
+      requiresDirectTlsNegotiation: true,
+    })
+
+    const { container } = customRender(<PoolingModesModal />)
+
+    expect(container).toBeEmptyDOMElement()
+    expectEveryQueryCall(mockUseSupavisorConfigurationQuery, false)
   })
 })
