@@ -10,6 +10,12 @@ import config from './config'
 import { ERROR_CODE_DOCS_URLS, ERROR_CODES, HTTP_ERROR_CODES } from './error-codes'
 import type { ErrorCodeDefinition, ErrorCodeService } from './error-codes'
 import extensions from './extensions.json'
+import {
+  getInstanceDiskLimits,
+  hasBurstableDiskIO,
+  INSTANCE_DISK_LIMITS,
+} from './instance-disk-limits'
+import type { InstanceDiskLimits } from './instance-disk-limits'
 import logConstants from './log-constants'
 import { plans, PricingInformation } from './plans'
 import { pricing } from './pricing'
@@ -32,6 +38,9 @@ export {
   ERROR_CODES,
   HTTP_ERROR_CODES,
   extensions,
+  getInstanceDiskLimits,
+  hasBurstableDiskIO,
+  INSTANCE_DISK_LIMITS,
   logConstants,
   plans,
   pricing,
@@ -46,6 +55,7 @@ export type {
   CloudProvider,
   ErrorCodeDefinition,
   ErrorCodeService,
+  InstanceDiskLimits,
   PricingInformation,
   Region,
 }

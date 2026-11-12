@@ -5,6 +5,7 @@ import { fileURLToPath } from 'node:url'
 import {
   GUIDE_LIST_COMPONENT,
   GUIDE_LIST_COMPONENT_PAGES,
+  resolveAllDocsPages,
   resolveDocsScope,
 } from './resolve-docs-scope.ts'
 
@@ -28,4 +29,23 @@ test('ignores unrelated docs component changes', async () => {
 
   assert.deepEqual(result.pages, [])
   assert.equal(result.skip, true)
+})
+
+test('skips a guide that the navigation disables', async () => {
+  const result = await resolveDocsScope({
+    changedFiles: [
+      'apps/docs/content/guides/ai-tools/agent-feedback.mdx',
+      'apps/docs/content/guides/ai-tools/mcp.mdx',
+    ],
+    repoRoot,
+  })
+
+  assert.deepEqual(result.pages, ['/docs/guides/ai-tools/mcp'])
+})
+
+test('excludes a guide that the navigation disables from the full run', async () => {
+  const pages = await resolveAllDocsPages(repoRoot)
+
+  assert.ok(pages.includes('/docs/guides/ai-tools/mcp'))
+  assert.ok(!pages.includes('/docs/guides/ai-tools/agent-feedback'))
 })

@@ -4,6 +4,8 @@ import { expect, it } from 'vitest'
 import { z } from 'zod'
 
 import { hideToolErrorsFromModel } from './generate-assistant-response.utils'
+import { toModelExecuteSqlOutput } from './tools/execute-sql-output'
+import { contract as runNotebookContract } from './tools/run-notebook'
 
 type DoStream = Extract<
   NonNullable<ConstructorParameters<typeof MockLanguageModelV4>[0]>['doStream'],
@@ -62,6 +64,8 @@ it('hides rows and errors from the model and Braintrust', async () => {
         role: 'assistant',
         content: [
           toolCall('rows', null),
+          { type: 'tool-call', toolCallId: 'notebook', toolName: 'run_notebook', input: {} },
+          { type: 'tool-approval-request', approvalId: 'approve-notebook', toolCallId: 'notebook' },
           { type: 'tool-approval-request', approvalId: 'approve-rows', toolCallId: 'rows' },
           toolCall('error-0', 0),
           { type: 'tool-approval-request', approvalId: 'approve-error-0', toolCallId: 'error-0' },
@@ -73,6 +77,7 @@ it('hides rows and errors from the model and Braintrust', async () => {
         role: 'tool',
         content: [
           { type: 'tool-approval-response', approvalId: 'approve-rows', approved: true },
+          { type: 'tool-approval-response', approvalId: 'approve-notebook', approved: true },
           { type: 'tool-approval-response', approvalId: 'approve-error-0', approved: true },
           { type: 'tool-approval-response', approvalId: 'approve-error-1', approved: true },
         ],
@@ -85,12 +90,38 @@ it('hides rows and errors from the model and Braintrust', async () => {
         needsApproval: true,
         execute: async ({ failure }) => {
           if (failure === null) {
-            return { rows: [{ title: 'Buy milk' }], totalRows: 1, optInLevel: 'schema' }
+            return { rows: [{ title: 'Buy milk' }], totalRows: 1, optInLevel: 'schema' as const }
           }
           hideSpanErrorFromTrace()
           throw queryErrors[failure]
         },
-        toModelOutput: () => ({ type: 'text', value: 'rows hidden' }),
+        toModelOutput: ({ output }) => ({
+          type: 'json',
+          value: toModelExecuteSqlOutput(output, 'schema'),
+        }),
+      }),
+      run_notebook: ai.tool({
+        inputSchema: z.object({}),
+        needsApproval: true,
+        execute: async () => ({
+          id: 'nb',
+          name: 'Notebook',
+          updated_at: '2026-10-21',
+          optInLevel: 'schema' as const,
+          cells: [
+            {
+              cell_id: 'a',
+              title: 'Results',
+              source: 'database' as const,
+              status: 'success' as const,
+              rows: [{ title: 'Notebook secret' }],
+            },
+          ],
+        }),
+        toModelOutput: ({ output }) => ({
+          type: 'json',
+          value: runNotebookContract.toModelOutput(output, 'schema'),
+        }),
       }),
     },
   })
@@ -105,7 +136,7 @@ it('hides rows and errors from the model and Braintrust', async () => {
   expect(prompts).toHaveLength(1)
   const promptsJson = JSON.stringify(prompts)
   const uploadsJson = JSON.stringify(await uploads.drain())
-  for (const secret of ['Buy milk', 'Walk dog', 'Feed cat']) {
+  for (const secret of ['Buy milk', 'Notebook secret', 'Walk dog', 'Feed cat']) {
     expect(promptsJson).not.toContain(secret)
     expect(uploadsJson).not.toContain(secret)
   }
