@@ -23,6 +23,9 @@ functions:
       The Supabase client is your entrypoint to the rest of the Supabase functionality
       and is the easiest way to interact with everything we offer within the Supabase ecosystem.
 
+    notes: |
+      - Clients created from the same `ClientOptions` object share its session storage. When a user signs in on one of them, the clients created after it use that user's session.
+      - On a server that handles several users, create a new `ClientOptions` for each client, and set `persist_session` and `auto_refresh_token` to `False`.
     params:
       - name: supabase_url
         isOptional: false
@@ -56,7 +59,7 @@ functions:
           - name: storage
             isOptional: true
             type: SyncSupportedStorage
-            description: A storage provider. Used to store the signed-in session.
+            description: A storage provider. Used to store the signed-in session. Defaults to an in-memory storage, shared by every client created from the same `ClientOptions`.
           - name: realtime
             isOptional: true
             type: string
@@ -105,6 +108,29 @@ functions:
                   schema="public",
               )
           )
+          ```
+      - id: server-side-client
+        name: Server-side client
+        code: |
+          ```python
+          import os
+          from supabase import create_client, Client
+          from supabase.client import ClientOptions
+
+          url: str = os.environ.get("SUPABASE_URL")
+          key: str = os.environ.get("SUPABASE_KEY")
+
+          def get_client() -> Client:
+              # A new ClientOptions for each client: clients created from
+              # the same ClientOptions share the signed-in session.
+              return create_client(
+                  url,
+                  key,
+                  options=ClientOptions(
+                      persist_session=False,
+                      auto_refresh_token=False,
+                  ),
+              )
           ```
 
   - id: auth-api
