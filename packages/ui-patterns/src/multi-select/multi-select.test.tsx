@@ -1,6 +1,6 @@
-import { fireEvent, render, screen } from '@testing-library/react'
-import { useState } from 'react'
-import { describe, expect, it } from 'vitest'
+import { fireEvent, render, screen, waitFor } from '@testing-library/react'
+import { ComponentProps, useState } from 'react'
+import { describe, expect, it, vi } from 'vitest'
 
 import {
   MultiSelector,
@@ -20,11 +20,11 @@ class ResizeObserver {
 
 global.ResizeObserver = ResizeObserver
 
-function MultiSelectDemo() {
+function MultiSelectDemo(props: Partial<ComponentProps<typeof MultiSelector>>) {
   const [selectedValues, setSelectedValues] = useState<string[]>([])
 
   return (
-    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
+    <MultiSelector values={selectedValues} onValuesChange={setSelectedValues} {...props}>
       <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit="wrap" />
       <MultiSelectorContent>
         <MultiSelectorInput placeholder="Search fruits" showResetIcon />
@@ -269,5 +269,45 @@ describe('multi-select', () => {
     const disabledItem = screen.getByText('Mango')
     fireEvent.click(disabledItem)
     expect(trigger).not.toHaveTextContent('Mango') // Mango should not be selectable
+  })
+
+  function ControlledSearchMultiSelectDemo() {
+    const [selectedValues, setSelectedValues] = useState<string[]>([])
+
+    return (
+      <MultiSelector values={selectedValues} onValuesChange={setSelectedValues}>
+        <MultiSelectorTrigger className="w-72" label="Select fruits" badgeLimit="wrap" />
+        <MultiSelectorContent>
+          <MultiSelectorInput placeholder="Search fruits" showResetIcon />
+          <MultiSelectorList>
+            <MultiSelectorItem value="Apple">Apple</MultiSelectorItem>
+            <MultiSelectorItem value="Banana">Banana</MultiSelectorItem>
+            <MultiSelectorItem value="Cherry">Cherry</MultiSelectorItem>
+            <MultiSelectorItem value="Date">Date</MultiSelectorItem>
+            <MultiSelectorItem value="Elderberrie">Elderberrie</MultiSelectorItem>
+            <MultiSelectorItem value="Fig">Fig</MultiSelectorItem>
+            <MultiSelectorItem value="Grape">Grape</MultiSelectorItem>
+            <MultiSelectorItem value="Kiwi">Kiwi</MultiSelectorItem>
+            <MultiSelectorItem value="Mango" disabled>
+              Mango
+            </MultiSelectorItem>
+            <MultiSelectorItem value="Strawberry">Strawberry</MultiSelectorItem>
+          </MultiSelectorList>
+        </MultiSelectorContent>
+      </MultiSelector>
+    )
+  }
+
+  it('supports consumers filtering', async () => {
+    const onSearchChange = vi.fn()
+    render(<MultiSelectDemo onSearchChange={onSearchChange} />)
+
+    const trigger = screen.getByRole('combobox')
+    fireEvent.click(trigger) // Open the dropdown
+
+    const searchInput = screen.getByPlaceholderText('Search fruits')
+    fireEvent.change(searchInput, { target: { value: 'Ap' } }) // Search for "Ap"
+
+    await waitFor(() => expect(onSearchChange).toHaveBeenCalledWith('Ap'))
   })
 })
