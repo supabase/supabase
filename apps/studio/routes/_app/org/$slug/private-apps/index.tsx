@@ -41,7 +41,7 @@ function OrgPrivateApps() {
   return (
     <OrganizationSettingsLayout>
       <PrivateAppsProvider>
-        <PrivateAppsPage />
+        <PrivateAppsContent />
       </PrivateAppsProvider>
     </OrganizationSettingsLayout>
   )
@@ -108,8 +108,4 @@ function PrivateAppsContent() {
       />
     </>
   )
-}
-
-function PrivateAppsPage() {
-  return <PrivateAppsContent />
 }
