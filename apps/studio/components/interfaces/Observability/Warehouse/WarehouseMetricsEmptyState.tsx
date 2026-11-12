@@ -1,4 +1,4 @@
-import { DatabaseZapIcon } from 'lucide-react'
+import { WarehouseIcon } from 'lucide-react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { EmptyStatePresentational } from 'ui-patterns/EmptyStatePresentational'
@@ -29,7 +29,7 @@ export const WarehouseMetricsEmptyState = ({
 
   return (
     <EmptyStatePresentational
-      icon={DatabaseZapIcon}
+      icon={WarehouseIcon}
       title={title}
       description={description}
       className="my-16"
