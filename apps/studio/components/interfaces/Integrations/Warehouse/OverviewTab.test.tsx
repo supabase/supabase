@@ -266,7 +266,7 @@ describe('WarehouseOverviewTab', () => {
     expect(screen.queryByText('Picker error: Initial setup failed')).not.toBeInTheDocument()
   })
 
-  test('shows Status, Tables, Connect, then Disable once setup is complete', async () => {
+  test('shows Status, Workload, Tables, Connect, then Disable once setup is complete', async () => {
     mockSetupStatus({
       setup_status: 'complete',
       tables: [
@@ -292,7 +292,7 @@ describe('WarehouseOverviewTab', () => {
     customRender(<WarehouseOverviewTab />)
 
     // findByRole throws on duplicates, so this also guards the section titles staying distinct.
-    for (const name of ['Status', 'Tables', 'Connect', 'Disable']) {
+    for (const name of ['Status', 'Workload', 'Tables', 'Connect', 'Disable']) {
       expect(await screen.findByRole('heading', { name })).toBeInTheDocument()
     }
     expect(screen.getByText('Replicated tables picker')).toBeInTheDocument()
@@ -307,9 +307,11 @@ describe('WarehouseOverviewTab', () => {
     const headings = screen
       .getAllByRole('heading')
       .map((heading) => heading.textContent)
-      .filter((heading) => ['Status', 'Tables', 'Connect', 'Disable'].includes(heading ?? ''))
+      .filter((heading) =>
+        ['Status', 'Workload', 'Tables', 'Connect', 'Disable'].includes(heading ?? '')
+      )
 
-    expect(headings).toEqual(['Status', 'Tables', 'Connect', 'Disable'])
+    expect(headings).toEqual(['Status', 'Workload', 'Tables', 'Connect', 'Disable'])
   })
 
   test('tracks initial setup as enablement', async () => {

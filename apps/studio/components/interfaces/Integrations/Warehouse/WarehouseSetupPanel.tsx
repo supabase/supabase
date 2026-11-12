@@ -285,6 +285,7 @@ const WarehouseSetupPanelContent = ({
   return (
     <>
       <WarehouseReplicatedTablesSection tables={data.tables} />
+      <WarehouseObservabilitySection />
       <WarehouseSchemaTablePicker
         isEditing
         onSubmit={handleSetup}
@@ -292,7 +293,6 @@ const WarehouseSetupPanelContent = ({
         error={setupMutation.error}
       />
       <WarehouseConnectSection />
-      <WarehouseObservabilitySection />
       <WarehouseDisableCard />
     </>
   )
