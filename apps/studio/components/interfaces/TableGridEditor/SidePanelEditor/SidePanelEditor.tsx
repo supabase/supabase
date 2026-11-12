@@ -42,6 +42,7 @@ import { databasePoliciesKeys } from '@/data/database-policies/keys'
 import { useDatabasePublicationCreateMutation } from '@/data/database-publications/database-publications-create-mutation'
 import { useDatabasePublicationsQuery } from '@/data/database-publications/database-publications-query'
 import { useDatabasePublicationUpdateMutation } from '@/data/database-publications/database-publications-update-mutation'
+import { getTablesForPublicationToggle } from '@/data/database-publications/database-publications.utils'
 import type { Constraint } from '@/data/database/constraints-query'
 import type { ForeignKeyConstraint } from '@/data/database/foreign-key-constraints-query'
 import { ENTITY_TYPE } from '@/data/entity-types/entity-type-constants'
@@ -52,7 +53,7 @@ import { tableRowKeys } from '@/data/table-rows/keys'
 import { tableKeys } from '@/data/tables/keys'
 import { invalidateTableMetadata } from '@/data/tables/table-metadata-invalidation'
 import { RetrieveTableResult } from '@/data/tables/table-retrieve-query'
-import { getTables } from '@/data/tables/tables-query'
+import { useGetTables } from '@/data/tables/tables-query'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { useUrlState } from '@/hooks/ui/useUrlState'
@@ -189,6 +190,10 @@ export const SidePanelEditor = ({
   const track = useTrack()
   const queryClient = useQueryClient()
   const { data: project } = useSelectedProjectQuery()
+  const getTables = useGetTables({
+    projectRef: project?.ref,
+    connectionString: project?.connectionString,
+  })
   const isQueueOperationsEnabled = useIsQueueOperationsEnabled()
   const { updateRow, addRow, isEditPending } = useTableRowOperations()
   const getImpersonatedRoleState = useGetImpersonatedRoleState()
@@ -485,54 +490,17 @@ export const SidePanelEditor = ({
         })
         return
       }
-      if (realtimePublication.tables === null) {
-        // UI doesn't have support for toggling realtime for ALL tables
-        // Switch it to individual tables via an array of strings
-        // Refer to PublicationStore for more information about this
-        const publicTables = await queryClient.fetchQuery({
-          queryKey: tableKeys.list(project.ref, 'public', { includeColumns }),
-          queryFn: ({ signal }) =>
-            getTables(
-              {
-                projectRef: project.ref,
-                connectionString: project.connectionString,
-                schema: 'public',
-              },
-              signal
-            ),
-        })
-        // TODO: support tables in non-public schemas
-        const realtimeTables = enabled
-          ? publicTables.map((t) => `${t.schema}.${t.name}`)
-          : publicTables.filter((t) => t.id !== table.id).map((t) => `${t.schema}.${t.name}`)
-        await updatePublication({
-          id: realtimePublication.id,
-          projectRef: project.ref,
-          connectionString: project.connectionString,
-          tables: realtimeTables,
-        })
-
-        track(enabled ? 'table_realtime_enabled' : 'table_realtime_disabled', {
-          method: 'ui',
-          schema_name: table.schema,
-          table_name: table.name,
-        })
-        return
-      }
-      const isAlreadyEnabled = realtimePublication.tables.some((x) => x.id == table.id)
-      const realtimeTables =
-        isAlreadyEnabled && !enabled
-          ? // Toggle realtime off
-            realtimePublication.tables
-              .filter((t) => t.id !== table.id)
-              .map((t) => `${t.schema}.${t.name}`)
-          : !isAlreadyEnabled && enabled
-            ? // Toggle realtime on
-              realtimePublication.tables
-                .map((t) => `${t.schema}.${t.name}`)
-                .concat([`${table.schema}.${table.name}`])
-            : null
-      if (realtimeTables === null) return
+      const allTables =
+        realtimePublication.tables === null && !enabled
+          ? await getTables(undefined, includeColumns)
+          : undefined
+      const realtimeTables = getTablesForPublicationToggle({
+        publication: realtimePublication,
+        table,
+        enabled,
+        allTables,
+      })
+      if (realtimeTables === undefined) return
       await updatePublication({
         id: realtimePublication.id,
         projectRef: project.ref,
