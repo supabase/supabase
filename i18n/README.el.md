@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) είναι μια εναλλακτική λύση της Firebase ανοιχτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας εργαλεία ανοιχτού κώδικα επιχειρηματικού επιπέδου.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.el.md) είναι μια εναλλακτική λύση της Firebase ανοιχτού κώδικα. Χτίζουμε τα χαρακτηριστικά της Firebase χρησιμοποιώντας εργαλεία ανοιχτού κώδικα επιχειρηματικού επιπέδου.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.el.md)
+- [x] Αυθεντικοποίηση και εξουσιοδότηση. [Έγγραφα](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.el.md)
 - [x] Αυτόματα παραγόμενα APIs.
-  - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Έγγραφα](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.el.md#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.el.md#graphql-api-overview)
+  - [x] Συνδρομές σε πραγματικό χρόνο. [Έγγραφα](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.el.md#realtime-api-overview)
 - [x] Συναρτήσεις.
-  - [x] Συναρτήσεις βάσης δεδομένων. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Αποθήκευση αρχείων. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Συναρτήσεις βάσης δεδομένων. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.el.md)
+  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.el.md)
+- [x] Αποθήκευση αρχείων. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.el.md)
 - [x] Ταμπλό
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Τεκμηρίωση
 
-Για πλήρη τεκμηρίωση, επισκεφθείτε τη διεύθυνση [supabase.com/docs](https://supabase.com/docs)
+Για πλήρη τεκμηρίωση, επισκεφθείτε τη διεύθυνση [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.el.md)
 
 Για να δείτε πώς μπορείτε να συνεισφέρετε, επισκεφθείτε το [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Το καλύτερο για: βοήθεια με την κατασκευή, συζήτηση σχετικά με τις βέλτιστες πρακτικές της βάσης δεδομένων.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Το καλύτερο για: σφάλματα και λάθη που αντιμετωπίζετε χρησιμοποιώντας την Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Το καλύτερο για: προβλήματα με τη βάση δεδομένων ή την υποδομή σας.
+- [Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.el.md#business-support). Το καλύτερο για: προβλήματα με τη βάση δεδομένων ή την υποδομή σας.
 - [Discord](https://discord.supabase.com). Το καλύτερο για: να μοιράζεστε τις εφαρμογές σας και να κάνετε παρέα με την κοινότητα.
 
 ## Κατάσταση
 
 - [x] Alpha: Δοκιμάζουμε το Supabase με ένα κλειστό σύνολο πελατών
-- [x] Δημόσια Alpha: [supabase.com/dashboard](https://supabase.com/dashboard). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
+- [x] Δημόσια Alpha: [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.el.md). Αλλά να είστε προσεκτικοί μαζί μας, υπάρχουν μερικές ατέλειες
 - [x] Δημόσια Beta: Αρκετά σταθερό για τις περισσότερες περιπτώσεις μη επιχειρηματικής χρήσης
-- [ ] Δημόσια: [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Δημόσια: [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.el.md#feature-status)]
 
 Βρισκόμαστε επί του παρόντος σε Public Beta. Παρακολουθήστε τις "κυκλοφορίες" αυτού του repo για να ειδοποιηθείτε για σημαντικές ενημερώσεις.
 
@@ -55,8 +55,8 @@
 
 **Αρχιτεκτονική**
 
-Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
-Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development).
+Η Supabase είναι μια [φιλοξενούμενη πλατφόρμα](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.el.md). Μπορείτε να εγγραφείτε και να αρχίσετε να χρησιμοποιείτε το Supabase χωρίς να εγκαταστήσετε τίποτα.
+Μπορείτε επίσης να κάνετε [αυτο-ξενάγηση](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.el.md) και [ανάπτυξη τοπικά](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.el.md).
 
 ![Αρχιτεκτονική](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

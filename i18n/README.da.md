@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) er et Open Source Firebase-alternativ. Vi opbygger Firebase-funktionerne ved hjælp af open source-værktøjer i virksomhedskvalitet.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.da.md) er et Open Source Firebase-alternativ. Vi opbygger Firebase-funktionerne ved hjælp af open source-værktøjer i virksomhedskvalitet.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Autentifikation og autorisering. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.da.md)
+- [x] Autentifikation og autorisering. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.da.md)
 - [x] Automatisk genererede API'er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.da.md#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.da.md#graphql-api-overview)
+  - [x] Realtidsabonnementer. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.da.md#realtime-api-overview)
 - [x] Funktioner.
-  - [x] Databasefunktioner. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
-- [x] Filopbevaring. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Databasefunktioner. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.da.md)
+  - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.da.md)
+- [x] Filopbevaring. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.da.md)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentation
 
-Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs)
+Du kan finde den fulde dokumentation på [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.da.md)
 
 For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ For at se, hvordan man bidrager, besøg [Getting Started](../DEVELOPERS.md)
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Bedst til: hjælp med at bygge, diskussion om bedste praksis for databaser.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bedst til: fejl og fejl, du støder på ved brug af Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Bedst til: problemer med din database eller infrastruktur.
+- [Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.da.md#business-support). Bedst til: problemer med din database eller infrastruktur.
 - [Discord](https://discord.supabase.com). Bedst til: deling af dine applikationer og hygge med fællesskabet.
 
 ## Status
 
 - [x] Alpha: Vi tester Supabase med et lukket sæt af kunder
-- [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard). Men vær forsigtig med os, der er et par knuder
+- [x] Offentlig Alpha: Alle kan tilmelde sig på [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.da.md). Men vær forsigtig med os, der er et par knuder
 - [x] Public Beta: Stabil nok til de fleste ikke-virksomhedsrelaterede brugssager
-- [ ] Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Public: Generel tilgængelighed [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.da.md#feature-status)]
 
 Vi er i øjeblikket i Public Beta. Hold øje med "releases" i denne repo for at få besked om større opdateringer.
 
@@ -55,8 +55,8 @@ Supabase er en kombination af open source-værktøjer. Vi opbygger funktionerne 
 
 **Arkitektur**
 
-Supabase er en [hosted platform](https://supabase.com/dashboard). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
-Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview) og [udvikle lokalt](https://supabase.com/docs/guides/local-development).
+Supabase er en [hosted platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.da.md). Du kan tilmelde dig og begynde at bruge Supabase uden at installere noget.
+Du kan også [selv hoste](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.da.md) og [udvikle lokalt](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.da.md).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

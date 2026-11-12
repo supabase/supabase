@@ -7,7 +7,7 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) është projekt publik (open-source) si alternativë e Firebase. Ne jemi duke ndërtuar funksionet e Firebase duke përdorur mjete nga produktet publike të shkallës së ndërmarrjes.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.sq.md) është projekt publik (open-source) si alternativë e Firebase. Ne jemi duke ndërtuar funksionet e Firebase duke përdorur mjete nga produktet publike të shkallës së ndërmarrjes.
 
 - [x] Hosted Postgres Database
 - [x] Abonime në kohë reale
@@ -21,18 +21,18 @@
 
 ## Dokumentimi
 
-Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/docs)
+Për dokumentimin e plotë, vizitoni [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.sq.md)
 
 ## Komuniteti dhe Mbështetja
 
 - [Forumi i Komunitetit](https://github.com/supabase/supabase/discussions). Me e mirë për: ndihmë për ndërtime, diskutime për databasat dhe praktikat më të mira.
 - [GitHub Problemet](https://github.com/supabase/supabase/issues). Me e mirë për: të meta dhe gabime që ju përmballeni duke përdorur Supabase
-- [Mbështetje nëpërmjet Adresës Elektronike](https://supabase.com/docs/support#business-support). Më e mirë për: problemet me infrastrukturën e databases tuaj.
+- [Mbështetje nëpërmjet Adresës Elektronike](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.sq.md#business-support). Më e mirë për: problemet me infrastrukturën e databases tuaj.
 
 ## Statusi
 
 - [x] Alfa: Ne po testojmë Supabase me një grup të mbyllur klientësh
-- [x] Publike Alpha: Gjithkush mund të regjistrohet në [supabase.com/dashboard](https://supabase.com/dashboard). Por shkoni lehtë për ne, ka disa ngërçe
+- [x] Publike Alpha: Gjithkush mund të regjistrohet në [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.sq.md). Por shkoni lehtë për ne, ka disa ngërçe
 - [x] Publike Beta: Mjaft e qëndrueshme për shumicën e rasteve të përdorimit për jo ndërmarrjet
 - [ ] Publike: Gati për Prodhim / Publikim
 
@@ -48,7 +48,7 @@ Supabase është një kombinim i mjeteve që janë projekte të hapura (open sou
 
 **Arkitektura Aktuale**
 
-Supabase është një [platform hostimi](https://supabase.com/dashboard). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
+Supabase është një [platform hostimi](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.sq.md). Ti mundesh të regjistrohesh dhe të fillosh ta përdorish Supabase duke mos instaluar asgjë. Poashtu ne jemi duke punuar për ta ndërtuar eksperiencën për zhvillim lokal, por kjo nuk është fokusi ynë kryesorë dhe thelbësor, së bashku me stabilitetin e platformës.
 
 ![Arkitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

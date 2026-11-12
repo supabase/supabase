@@ -208,6 +208,29 @@ test('tagUrl reports why a URL was left alone', () => {
   )
 })
 
+test('stops a bare URL at full-width punctuation in translated text', () => {
+  const file = 'i18n/README.ja.md'
+  const tagUrlFor = (path) => `https://supabase.com${path}?utm_source=supabase&utm_content=${file}`
+  assert.equal(
+    tagMarkdown('詳細は https://supabase.com/docs）を参照。', { filePath: file }).text,
+    `詳細は [https://supabase.com/docs](${tagUrlFor('/docs')})）を参照。`
+  )
+  assert.equal(
+    tagMarkdown('ドキュメント：https://supabase.com/docs。', { filePath: file }).text,
+    `ドキュメント：[https://supabase.com/docs](${tagUrlFor('/docs')})。`
+  )
+  // Link syntax in translated text is unaffected.
+  assert.equal(
+    tagMarkdown('[ドキュメント](https://supabase.com/docs)を参照', { filePath: file }).text,
+    `[ドキュメント](${tagUrlFor('/docs')})を参照`
+  )
+})
+
+test('skips a URL that runs straight into letters, where its end is ambiguous', () => {
+  const input = '详见https://supabase.com/docs查看更多'
+  assert.equal(tag(input).text, input)
+})
+
 test('only the intended files are in scope', () => {
   for (const file of [
     'README.md',
@@ -215,14 +238,21 @@ test('only the intended files are in scope', () => {
     'DEVELOPERS.md',
     'examples/auth/hono/README.md',
     'examples/README.MD',
+    'docker/README.md',
+    'docker/CONFIG.md',
+    'apps/studio/README.md',
+    'packages/ui/README.md',
+    'i18n/README.ja.md',
   ]) {
     assert.ok(isInScope(file), file)
   }
   for (const file of [
     'AGENTS.md',
-    'i18n/README.ja.md',
-    'apps/studio/README.md',
-    'packages/ui/README.md',
+    'docker/CHANGELOG.md',
+    'docker/.env.example',
+    'apps/studio/components/README.md',
+    'apps/docs/spec/README.md',
+    'e2e/docs/README.md',
     'examples/prompts/README.md',
     'examples/prompts/use-realtime.md',
     'examples/auth/hono/src/client.tsx',

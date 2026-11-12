@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) on avatud lähtekoodiga Firebase'i alternatiiv. Me ehitame Firebase'i funktsioonid, kasutades ettevõtlusklassi avatud lähtekoodiga tööriistu.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.et.md) on avatud lähtekoodiga Firebase'i alternatiiv. Me ehitame Firebase'i funktsioonid, kasutades ettevõtlusklassi avatud lähtekoodiga tööriistu.
 
-- [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database)
-- [x] Autentimine ja autoriseerimine. [Dokumendid](https://supabase.com/docs/guides/auth)
+- [x] Hostitud Postgres andmebaas. [Dokumendid](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.et.md)
+- [x] Autentimine ja autoriseerimine. [Dokumendid](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.et.md)
 - [x] Automaatselt genereeritud APId.
-  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumendid](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.et.md#rest-api-overview)
+  - [x] GraphQL. [Dokumendid](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.et.md#graphql-api-overview)
+  - [x] Reaalajas toimivad tellimused. [Dokumendid](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.et.md#realtime-api-overview)
 - [x] Funktsioonid.
-  - [x] Andmebaasi funktsioonid. [Dokumendid](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Faili salvestamine. [Dokumendid](https://supabase.com/docs/guides/storage)
+  - [x] Andmebaasi funktsioonid. [Dokumendid](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.et.md)
+  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.et.md)
+- [x] Faili salvestamine. [Dokumendid](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.et.md)
 - [x] Armatuurlaud
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentatsioon
 
-Täieliku dokumentatsiooni saamiseks külastage [supabase.com/docs](https://supabase.com/docs)
+Täieliku dokumentatsiooni saamiseks külastage [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.et.md)
 
 Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Et näha, kuidas panustada, külastage [Getting Started](../DEVELOPERS.md)
 
 - [Ühenduse foorum](https://github.com/supabase/supabase/discussions). Parim: abi ehitamisel, arutelu andmebaasi parimate tavade üle.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Parim lahendus: vead ja vead, millega Supabase'i kasutades kokku puutute.
-- [E-posti tugi](https://supabase.com/docs/support#business-support). Parim lahendus: probleemid andmebaasi või infrastruktuuriga.
+- [E-posti tugi](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.et.md#business-support). Parim lahendus: probleemid andmebaasi või infrastruktuuriga.
 - [Discord](https://discord.supabase.com). Parim: oma rakenduste jagamiseks ja kogukonnaga suhtlemiseks.
 
 ## Staatus
 
 - [x] Alpha: Me testime Supabase'i suletud kliendikogumiga
-- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [supabase.com/dashboard](https://supabase.com/dashboard). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
+- [x] Avalik Alpha: Igaüks saab registreeruda aadressil [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.et.md). Kuid olge meiega ettevaatlikud, seal on mõned veidrused
 - [x] Avalik beeta: Piisavalt stabiilne enamiku mitte-ettevõtluskasutuse jaoks
-- [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Avalik: Üldine kättesaadavus [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.et.md#feature-status)]
 
 Oleme praegu Public Beta versioonis. Jälgige selle repo "releases", et saada teateid suuremate uuenduste kohta.
 
@@ -55,8 +55,8 @@ Supabase on avatud lähtekoodiga tööriistade kombinatsioon. Me ehitame Firebas
 
 **Arhitektuur**
 
-Supabase on [hostitud platvorm](https://supabase.com/dashboard). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
-Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development).
+Supabase on [hostitud platvorm](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.et.md). Võite registreeruda ja alustada Supabase'i kasutamist ilma midagi installimata.
+Võite ka [ise hostida](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.et.md) ja [arendada lokaalselt](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.et.md).
 
 ![Arhitektuur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

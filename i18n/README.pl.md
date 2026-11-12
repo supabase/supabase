@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) to alternatywa dla Firebase o otwartym kodzie źródłowym. Tworzymy funkcje Firebase przy użyciu narzędzi open source klasy korporacyjnej.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.pl.md) to alternatywa dla Firebase o otwartym kodzie źródłowym. Tworzymy funkcje Firebase przy użyciu narzędzi open source klasy korporacyjnej.
 
-- [x] hostowana baza danych Postgres [x]. [Dokumenty](https://supabase.com/docs/guides/database)
-- [x] uwierzytelnianie i autoryzacja [x]. [Dokumenty](https://supabase.com/docs/guides/auth)
+- [x] hostowana baza danych Postgres [x]. [Dokumenty](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.pl.md)
+- [x] uwierzytelnianie i autoryzacja [x]. [Dokumenty](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.pl.md)
 - [x] Automatycznie generowane interfejsy API.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.pl.md#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.pl.md#graphql-api-overview)
+  - [x] Subskrypcje w czasie rzeczywistym. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.pl.md#realtime-api-overview)
 - [x] Funkcje.
-  - [x] Funkcje bazy danych. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Funkcje brzegowe [Docs](https://supabase.com/docs/guides/functions)
-- przechowywanie plików [x]. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Funkcje bazy danych. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.pl.md)
+  - [x] Funkcje brzegowe [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.pl.md)
+- przechowywanie plików [x]. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.pl.md)
 - [Pulpit nawigacyjny
 
 ![Pulpit nawigacyjny Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentacja
 
-Pełna dokumentacja znajduje się na stronie [supabase.com/docs](https://supabase.com/docs)
+Pełna dokumentacja znajduje się na stronie [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.pl.md)
 
 Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Aby zobaczyć, jak wnieść swój wkład, odwiedź [Getting Started](../DEVELOPE
 
 - [Forum społeczności](https://github.com/supabase/supabase/discussions). Najlepsze do: pomocy w budowaniu, dyskusji o najlepszych praktykach dotyczących baz danych.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Najlepszy do: błędów i błędów napotkanych podczas korzystania z Supabase.
-- [Email Support](https://supabase.com/docs/support#business-support). Najlepsze w przypadku: problemów z bazą danych lub infrastrukturą.
+- [Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.pl.md#business-support). Najlepsze w przypadku: problemów z bazą danych lub infrastrukturą.
 - [Discord](https://discord.supabase.com). Najlepszy do: dzielenia się aplikacjami i spędzania czasu ze społecznością.
 
 ## Status
 
 - [x] Alpha: Testujemy Supabase z zamkniętą grupą klientów
-- [x] Publiczna wersja alfa: Każdy może zarejestrować się na stronie [supabase.com/dashboard](https://supabase.com/dashboard). Ale spokojnie, jest kilka niedociągnięć
+- [x] Publiczna wersja alfa: Każdy może zarejestrować się na stronie [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.pl.md). Ale spokojnie, jest kilka niedociągnięć
 - [x] Publiczna beta: Wystarczająco stabilna dla większości przypadków użycia innych niż korporacyjne
-- [] Public: Ogólna dostępność [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [] Public: Ogólna dostępność [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.pl.md#feature-status)]
 
 Obecnie jesteśmy w Publicznej Becie. Obserwuj "wydania" tego repozytorium, aby otrzymywać powiadomienia o ważniejszych aktualizacjach.
 
@@ -55,8 +55,8 @@ Supabase to połączenie narzędzi open source. Tworzymy funkcje Firebase przy u
 
 **Architektura**
 
-Supabase jest [platformą hostowaną](https://supabase.com/dashboard). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
-Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview) i [rozwijać lokalnie](https://supabase.com/docs/guides/local-development).
+Supabase jest [platformą hostowaną](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.pl.md). Możesz zarejestrować się i zacząć korzystać z Supabase bez instalowania czegokolwiek.
+Możesz także [self-host](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.pl.md) i [rozwijać lokalnie](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.pl.md).
 
 ![Architektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) একটি ওপেন সোর্স ফায়ারবেস বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স সরঞ্জাম ব্যবহার করে ফায়ারবেসের বৈশিষ্ট্যগুলি তৈরি করছি।
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.bn.md) একটি ওপেন সোর্স ফায়ারবেস বিকল্প। আমরা এন্টারপ্রাইজ-গ্রেড ওপেন সোর্স সরঞ্জাম ব্যবহার করে ফায়ারবেসের বৈশিষ্ট্যগুলি তৈরি করছি।
 
-- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database)
-- [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth)
+- [x] হোস্ট করা পোস্টগ্রেস ডাটাবেস. [ডক্স](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.bn.md)
+- [x] অথেনটিকেশন এবং অথরাইজড . [ডক্স](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.bn.md)
 - [x] স্বয়ংক্রিয়ভাবে তৈরি এপিআই.
-  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api#realtime-api-overview)
-  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] রেস্ট. [ডক্স](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.bn.md#rest-api-overview)
+  - [x] রিয়েলটাইম সাবস্ক্রিপশন. [ডক্স](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.bn.md#realtime-api-overview)
+  - [x] গ্রাফকিউএল (বেটা). [ডক্স](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.bn.md#graphql-api-overview)
 - [x] ফাংশনস.
-  - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions)
-  - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions)
-- [x] ফাইল স্টোরেজ. [ডক্স](https://supabase.com/docs/guides/storage)
+  - [x] ডাটাবেস ফাংশনস. [ডক্স](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.bn.md)
+  - [x] এজ ফাংশনস. [ডক্স](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.bn.md)
+- [x] ফাইল স্টোরেজ. [ডক্স](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.bn.md)
 - [x] ড্যাশবোর্ড
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## ডকুমেন্টেশন
 
-সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs)
+সম্পূর্ণ ডকুমেন্টেশনের জন্য, দেখুন [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.bn.md)
 
 কিভাবে কন্ট্রিবিউট করতে হয় তা দেখতে, পরিদর্শন করুন [Getting Started](../DEVELOPERS.md)
 
@@ -33,13 +33,13 @@
 
 - [কমিউনিটি ফোরাম](https://github.com/supabase/supabase/discussions)। সর্বোত্তম: তৈরি করতে সহায়তা, ডাটাবেস সেরা অনুশীলন সম্পর্কে আলোচনা।
 - [গিটহাব ইস্যু](https://github.com/supabase/supabase/issues)। সর্বোত্তম: সুপাবেস ব্যবহার করতে আপনি যে বাগ এবং ত্রুটির সম্মুখীন হন।
-- [ইমেইল সাপোর্ট](https://supabase.com/docs/support#business-support)। সর্বোত্তম: আপনার ডাটাবেস বা অবকাঠামো নিয়ে সমস্যা।
+- [ইমেইল সাপোর্ট](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.bn.md#business-support)। সর্বোত্তম: আপনার ডাটাবেস বা অবকাঠামো নিয়ে সমস্যা।
 - [ডিসকোর্ড](https://discord.supabase.com)। সর্বোত্তম: আপনার অ্যাপ্লিকেশনগুলি শেয়ার করা এবং কমিউনিটির সাথে দেখা সাক্ষাৎ করা৷
 
 ## স্ট্যাটাস
 
 - [x] আলফা: আমরা কাছের গ্রাহকদের সাথে Supabase পরীক্ষা করছি
-- [x] পাবলিক আলফা: যে কেউ [supabase.com/dashboard](https://supabase.com/dashboard) এ সাইন আপ করতে পারেন। কিন্তু আমাদের উপর সহজ যান, কয়েক kinks আছে
+- [x] পাবলিক আলফা: যে কেউ [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.bn.md) এ সাইন আপ করতে পারেন। কিন্তু আমাদের উপর সহজ যান, কয়েক kinks আছে
 - [x] পাবলিক বেটা: বেশিরভাগ নন-এন্টারপ্রাইজ ব্যবহারের ক্ষেত্রে যথেষ্ট স্থিতিশীল
 - [ ] পাবলিক: প্রোডাকশন রেডি
 
@@ -55,8 +55,8 @@ Supabase হল ওপেন সোর্স টুলের সংমিশ্�
 
 **স্থাপত্য**
 
-সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://supabase.com/dashboard)। আপনি সাইন আপ করে এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
-এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development) করতে পারেন।
+সুপাবেস হল একটি [হোস্ট করা প্ল্যাটফর্ম](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.bn.md)। আপনি সাইন আপ করে এবং কিছু ইনস্টল না করে সুপাবেস ব্যবহার শুরু করতে পারেন।
+এছাড়াও আপনি [স্ব-হোস্ট](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.bn.md) এবং [ডেভেলপ লোকালি](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.bn.md) করতে পারেন।
 
 ![আর্কিটেকচার](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.id.md) adalah alternatif Firebase open source. Kami membangun fitur-fitur Firebase menggunakan alat bantu open source tingkat perusahaan.
 
-- [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database)
-- [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth)
+- [x] Basis Data Postgres yang dihosting. [Dokumen](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.id.md)
+- [x] Otentikasi dan Otorisasi. [Dokumen](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.id.md)
 - [x] API yang dibuat secara otomatis.
-  - [x] REST. [Dokumen](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Dokumen](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Langganan realtime. [Dokumen](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumen](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.id.md#rest-api-overview)
+  - [x] GraphQL. [Dokumen](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.id.md#graphql-api-overview)
+  - [x] Langganan realtime. [Dokumen](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.id.md#realtime-api-overview)
 - [x] Fungsi-fungsi.
-  - [x] Fungsi-fungsi Basis Data. [Dokumen](https://supabase.com/docs/guides/database/functions)
-  - [x] Fungsi Tepi [Dokumen](https://supabase.com/docs/guides/functions)
-- [x] Penyimpanan File. [Dokumen](https://supabase.com/docs/guides/storage)
+  - [x] Fungsi-fungsi Basis Data. [Dokumen](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.id.md)
+  - [x] Fungsi Tepi [Dokumen](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.id.md)
+- [x] Penyimpanan File. [Dokumen](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.id.md)
 - [x] Dasbor
 
 ![Dasbor Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentasi
 
-Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs)
+Untuk dokumentasi lengkap, kunjungi [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.id.md)
 
 Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Untuk melihat bagaimana cara berkontribusi, kunjungi [Memulai](../DEVELOPERS.md)
 
 - [Forum Komunitas](https://github.com/supabase/supabase/discussions). Paling baik untuk: bantuan dalam membangun, diskusi tentang praktik terbaik basis data.
 - [Masalah GitHub](https://github.com/supabase/supabase/issues). Paling baik untuk: bug dan kesalahan yang Anda temui saat menggunakan Supabase.
-- [Dukungan Email](https://supabase.com/docs/support#business-support). Terbaik untuk: masalah dengan basis data atau infrastruktur Anda.
+- [Dukungan Email](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.id.md#business-support). Terbaik untuk: masalah dengan basis data atau infrastruktur Anda.
 - [Discord](https://discord.supabase.com). Terbaik untuk: berbagi aplikasi Anda dan bergaul dengan komunitas.
 
 ## Status
 
 - [x] Alpha: Kami sedang menguji Supabase dengan sekumpulan pelanggan tertutup
-- [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
+- [x] Alpha Publik: Siapa pun dapat mendaftar di [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.id.md). Tapi jangan khawatir, ada beberapa hal yang perlu diperhatikan
 - [x] Public Beta: Cukup stabil untuk sebagian besar kasus penggunaan non-perusahaan
-- [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [Publik: Ketersediaan Umum [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.id.md#feature-status)]
 
 Saat ini kami berada dalam versi Beta Publik. Tonton "rilis" repo ini untuk mendapatkan pemberitahuan tentang pembaruan utama.
 
@@ -55,8 +55,8 @@ Supabase adalah kombinasi dari alat sumber terbuka. Kami membangun fitur-fitur F
 
 **Arsitektur**
 
-Supabase adalah [platform yang di-host](https://supabase.com/dashboard). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
-Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development).
+Supabase adalah [platform yang di-host](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.id.md). Anda bisa mendaftar dan mulai menggunakan Supabase tanpa menginstal apa pun.
+Anda juga bisa [menghosting sendiri](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.id.md) dan [mengembangkan secara lokal](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.id.md).
 
 ![Arsitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

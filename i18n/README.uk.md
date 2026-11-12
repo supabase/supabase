@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) - це альтернатива Firebase з відкритим вихідним кодом. Ми створюємо можливості Firebase, використовуючи інструменти з відкритим вихідним кодом корпоративного рівня.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.uk.md) - це альтернатива Firebase з відкритим вихідним кодом. Ми створюємо можливості Firebase, використовуючи інструменти з відкритим вихідним кодом корпоративного рівня.
 
-- [x] Розміщена база даних Postgres. [Документи](https://supabase.com/docs/guides/database)
-- [x] Аутентифікація та авторизація. [Документи](https://supabase.com/docs/guides/auth)
+- [x] Розміщена база даних Postgres. [Документи](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.uk.md)
+- [x] Аутентифікація та авторизація. [Документи](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.uk.md)
 - [x] Автоматично згенеровані API.
-  - [x] REST. [Документи](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Підписки в режимі реального часу. [Документи](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Документи](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.uk.md#rest-api-overview)
+  - [x] GraphQL. [Документи](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.uk.md#graphql-api-overview)
+  - [x] Підписки в режимі реального часу. [Документи](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.uk.md#realtime-api-overview)
 - [x] Функції.
-  - [x] Функції бази даних. [Документи](https://supabase.com/docs/guides/database/functions)
-  - [x] Граничні функції [Документи](https://supabase.com/docs/guides/functions)
-- [x] Зберігання файлів. [Документи](https://supabase.com/docs/guides/storage)
+  - [x] Функції бази даних. [Документи](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.uk.md)
+  - [x] Граничні функції [Документи](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.uk.md)
+- [x] Зберігання файлів. [Документи](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.uk.md)
 - [x] Інформаційна панель
 
 [Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Документація
 
-Для отримання повної документації відвідайте [supabase.com/docs](https://supabase.com/docs)
+Для отримання повної документації відвідайте [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.uk.md)
 
 Щоб дізнатися, як зробити внесок, відвідайте [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@
 
 - [Форум спільноти](https://github.com/supabase/supabase/discussions). Найкраще для: допомоги у створенні, обговорення найкращих практик роботи з базами даних.
 - [Проблеми GitHub](https://github.com/supabase/supabase/issues). Найкраще для: помилок і помилок, з якими ви зіткнулися при використанні Supabase.
-- [Підтримка електронною поштою](https://supabase.com/docs/support#business-support). Найкраще для: проблем з вашою базою даних або інфраструктурою.
+- [Підтримка електронною поштою](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.uk.md#business-support). Найкраще для: проблем з вашою базою даних або інфраструктурою.
 - [Discord](https://discord.supabase.com). Найкраще для: обміну вашими додатками та спілкування зі спільнотою.
 
 ## Статус
 
 - [x] Альфа: Ми тестуємо Supabase із закритим набором клієнтів
-- [x] Публічна альфа-версія: Будь-хто може зареєструватися на [supabase.com/dashboard](https://supabase.com/dashboard). Але будьте обережні з нами, є кілька нюансів
+- [x] Публічна альфа-версія: Будь-хто може зареєструватися на [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.uk.md). Але будьте обережні з нами, є кілька нюансів
 - [x] Публічна бета-версія: Достатньо стабільна для більшості непідприємницьких випадків використання
-- [ ] Загальнодоступна: Загальна доступність [[статус](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Загальнодоступна: Загальна доступність [[статус](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.uk.md#feature-status)]
 
 Наразі ми перебуваємо на стадії публічної бета-версії. Слідкуйте за "релізами" цього репозиторію, щоб отримувати сповіщення про основні оновлення.
 
@@ -55,8 +55,8 @@ Supabase - це комбінація інструментів з відкрит�
 
 **Архітектура**
 
-Supabase - це [хостингова платформа](https://supabase.com/dashboard). Ви можете зареєструватися і почати використовувати Supabase без встановлення.
-Ви також можете [самостійно хостити](https://supabase.com/docs/guides/hosting/overview) і [розробляти локально](https://supabase.com/docs/guides/local-development).
+Supabase - це [хостингова платформа](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.uk.md). Ви можете зареєструватися і почати використовувати Supabase без встановлення.
+Ви також можете [самостійно хостити](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.uk.md) і [розробляти локально](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.uk.md).
 
 ![Архітектура](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

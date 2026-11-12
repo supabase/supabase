@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) on avoimen lähdekoodin Firebase-vaihtoehto. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin työkaluja.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.fi.md) on avoimen lähdekoodin Firebase-vaihtoehto. Rakennamme Firebasen ominaisuuksia käyttäen yritystason avoimen lähdekoodin työkaluja.
 
-- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database)
-- [x] Tunnistus ja valtuutus. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres Database. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.fi.md)
+- [x] Tunnistus ja valtuutus. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.fi.md)
 - [x] Automaattisesti luodut API:t.
-  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Asiakirjat](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.fi.md#rest-api-overview)
+  - [x] GraphQL. [Asiakirjat](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.fi.md#graphql-api-overview)
+  - [x] Reaaliaikaiset tilaukset. [Asiakirjat](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.fi.md#realtime-api-overview)
 - [x] Funktiot.
-  - [x] Tietokantafunktiot. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions)
-- [x] Tiedostojen tallennus. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Tietokantafunktiot. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.fi.md)
+  - [x] Reunatoiminnot [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.fi.md)
+- [x] Tiedostojen tallennus. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.fi.md)
 - [x] Kojelauta
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentaatio
 
-Täydellinen dokumentaatio löytyy osoitteesta [supabase.com/docs](https://supabase.com/docs)
+Täydellinen dokumentaatio löytyy osoitteesta [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.fi.md)
 
 Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Jos haluat nähdä, miten osallistuminen tapahtuu, käy osoitteessa [Getting Sta
 
 - [Yhteisön foorumi](https://github.com/supabase/supabase/discussions). Sopii parhaiten: Apua rakentamiseen, keskustelua tietokannan parhaista käytännöistä.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Sopii parhaiten: Supabasea käytettäessä kohdatut viat ja virheet.
-- [Sähköpostituki](https://supabase.com/docs/support#business-support). Sopii parhaiten: Tietokantaan tai infrastruktuuriin liittyvät ongelmat.
+- [Sähköpostituki](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.fi.md#business-support). Sopii parhaiten: Tietokantaan tai infrastruktuuriin liittyvät ongelmat.
 - [Discord](https://discord.supabase.com). Sopii parhaiten: Sovellusten jakamiseen ja yhteisön kanssa hengailuun.
 
 ## Status
 
 - [x] Alpha: Testaamme Supabasea suljetulla asiakasjoukolla
-- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [supabase.com/dashboard](https://supabase.com/dashboard). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
+- [x] Julkinen Alpha: Kuka tahansa voi rekisteröityä osoitteessa [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.fi.md). Mutta olkaa varovaisia, sillä on vielä muutamia ongelmia
 - [x] Julkinen beta: Tarpeeksi vakaa useimpiin ei-yrityskäyttötapauksiin
-- [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Julkinen: Yleinen saatavuus [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.fi.md#feature-status)]
 
 Olemme tällä hetkellä Public Betassa. Seuraa tämän repon "releases" -osiota saadaksesi ilmoituksen tärkeimmistä päivityksistä.
 
@@ -55,8 +55,8 @@ Supabase on yhdistelmä avoimen lähdekoodin työkaluja. Rakennamme Firebasen om
 
 **Arkkitehtuuri**
 
-Supabase on [hosted platform](https://supabase.com/dashboard). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
-Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview) ja [kehittää paikallisesti](https://supabase.com/docs/guides/local-development).
+Supabase on [hosted platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.fi.md). Voit rekisteröityä ja aloittaa Supabasen käytön asentamatta mitään.
+Voit myös [itse isännöidä](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.fi.md) ja [kehittää paikallisesti](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.fi.md).
 
 ![Arkkitehtuuri](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

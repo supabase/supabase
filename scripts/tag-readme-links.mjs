@@ -1,7 +1,8 @@
 #!/usr/bin/env node
 /**
- * Tags supabase.com links in this repo's GitHub-facing markdown (the root README,
- * CONTRIBUTING and DEVELOPERS files, and every example's README) with:
+ * Tags supabase.com links in this repo's GitHub-facing markdown (see INCLUDE_PATTERNS: the root
+ * README, CONTRIBUTING and DEVELOPERS files, example READMEs, the self-hosting guides, each app and
+ * package README, and the translated READMEs) with:
  *
  *   utm_source=<repo>            which repository the link lives in
  *   utm_content=<file path>      which file in that repository the link lives in
@@ -18,6 +19,8 @@
  *   - A bare URL is wrapped as `[url](url?utm_...)` so the visible text stays clean. When a link's text
  *     is the URL itself, only the href is tagged.
  *   - URLs with placeholders (`<ref>`, `[ref]`, `{ref}`, `$VAR`) are skipped.
+ *   - A URL ends at the first non-ASCII character, so it stops at full-width punctuation (`。`, `）`) in
+ *     translated text. One that runs straight into letters, like `https://supabase.com/docs查看`, is skipped.
  *
  * Usage:
  *   node scripts/tag-readme-links.mjs                 # rewrite files in place
@@ -37,6 +40,12 @@ export const DEFAULT_REPO = 'supabase'
 /** Tracked files (repo-relative, forward slashes) that are rendered on GitHub and link out to supabase.com. */
 export const INCLUDE_PATTERNS = [
   /^(?:README|CONTRIBUTING|DEVELOPERS)\.md$/i,
+  // Self-hosting guides.
+  /^docker\/(?:README|CONFIG)\.md$/i,
+  // The README at the top of each app and package. Nested READMEs are developer notes, not entry points.
+  /^(?:apps|packages)\/[^/]+\/README\.md$/i,
+  // Translations of the root README.
+  /^i18n\/[^/]+\.md$/i,
   // `examples/prompts` holds prompt files that people copy into AI tools, not pages people click through.
   /^examples\/(?!prompts\/)(?:.+\/)?README\.md$/i,
 ]
@@ -49,7 +58,7 @@ export function isInScope(filePath) {
 // (`web.archive.org/web/https://supabase.com`); the lookahead rejects `supabase.com.evil` but allows a
 // sentence-ending period.
 const URL_PATTERN =
-  /(?<![\w./@-])https?:\/\/(?:www\.)?supabase\.com(?![\w-]|\.\w)(?:[/?#][^\s<>"'`)\]]*)?/g
+  /(?<![\w./@-])https?:\/\/(?:www\.)?supabase\.com(?![\w-]|\.\w)(?:[/?#][^\s<>"'`)\]\u0080-\uFFFF]*)?/g
 
 const TRAILING_PUNCTUATION = /[.,;:!?*]+$/
 
@@ -146,7 +155,8 @@ function tagSegment(segment, context, stats) {
     const nextChar = segment[start + match[0].length]
     if (start < cursor) continue
 
-    if (/[[{}$]/.test(url) || nextChar === '<' || nextChar === '{') {
+    const runsIntoText = nextChar !== undefined && /[\p{L}\p{N}]/u.test(nextChar)
+    if (/[[{}$]/.test(url) || nextChar === '<' || nextChar === '{' || runsIntoText) {
       stats.skipped++
       continue
     }

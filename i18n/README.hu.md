@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit vállalati szintű nyílt forráskódú eszközökkel építjük ki.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.hu.md) egy nyílt forráskódú Firebase alternatíva. A Firebase funkcióit vállalati szintű nyílt forráskódú eszközökkel építjük ki.
 
-- [x] Hosted Postgres adatbázis. [Docs](https://supabase.com/docs/guides/database)
-- [x] Hitelesítés és engedélyezés. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres adatbázis. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.hu.md)
+- [x] Hitelesítés és engedélyezés. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.hu.md)
 - [x] Automatikusan generált API-k.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Valós idejű előfizetések. [Docs](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hu.md#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hu.md#graphql-api-overview)
+  - [x] Valós idejű előfizetések. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.hu.md#realtime-api-overview)
 - [x] Funkciók.
-  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions)
-- [x] Fájlok tárolása. [Docs](https://supabase.com/docs/guides/storage)
+  - [x] Database Functions. [Docs](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.hu.md)
+  - [x] Edge Functions [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.hu.md)
+- [x] Fájlok tárolása. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.hu.md)
 - [x] Dashboard
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentáció
 
-A teljes dokumentációért látogasson el [supabase.com/docs](https://supabase.com/docs)
+A teljes dokumentációért látogasson el [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.hu.md)
 
 A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](../DEVELOPERS.md) oldalra
 
@@ -33,15 +33,15 @@ A Contribute-hoz való hozzájáruláshoz látogasson el a [Getting Started](../
 
 - [Közösségi fórum](https://github.com/supabase/supabase/discussions). Legjobb: segítség az építéshez, az adatbázis legjobb gyakorlatainak megvitatása.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Legjobb: hibák és hibák, amelyekkel a Supabase használatával találkozol.
-- [Email Support](https://supabase.com/docs/support#business-support). Legjobb: az adatbázisoddal vagy az infrastruktúrával kapcsolatos problémákra.
+- [Email Support](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.hu.md#business-support). Legjobb: az adatbázisoddal vagy az infrastruktúrával kapcsolatos problémákra.
 - [Discord](https://discord.supabase.com). A legjobb: az alkalmazások megosztására és a közösséggel való együttlétre.
 
 ## Állapot
 
 - [x] Alpha: A Supabase-t egy zárt ügyfélkörrel teszteljük
-- [x] Nyilvános alfa: Bárki regisztrálhat az [supabase.com/dashboard](https://supabase.com/dashboard) oldalon. De legyetek óvatosak velünk, van még néhány hiba
+- [x] Nyilvános alfa: Bárki regisztrálhat az [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.hu.md) oldalon. De legyetek óvatosak velünk, van még néhány hiba
 - [x] Nyilvános béta: Elég stabil a legtöbb nem vállalati felhasználási esethez
-- [ ] Nyilvános: Általános elérhetőség [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Nyilvános: Általános elérhetőség [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.hu.md#feature-status)]
 
 Jelenleg nyilvános béta verzióban vagyunk. Figyelje a "releases" ezen repo-t, hogy értesítést kapjon a fontosabb frissítésekről.
 
@@ -55,8 +55,8 @@ A Supabase nyílt forráskódú eszközök kombinációja. A Firebase funkcióit
 
 **Architektúra**
 
-A Supabase egy [hosztolt platform](https://supabase.com/dashboard). Regisztrálhat és elkezdheti használni a Supabase-t anélkül, hogy bármit telepítene.
-Önállóan is [hosztolhat](https://supabase.com/docs/guides/hosting/overview) és [fejleszthet helyben](https://supabase.com/docs/guides/local-development).
+A Supabase egy [hosztolt platform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.hu.md). Regisztrálhat és elkezdheti használni a Supabase-t anélkül, hogy bármit telepítene.
+Önállóan is [hosztolhat](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.hu.md) és [fejleszthet helyben](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.hu.md).
 
 ![Architektúra](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

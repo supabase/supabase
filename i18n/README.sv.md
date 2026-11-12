@@ -5,19 +5,19 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) är ett alternativ till Firebase med öppen källkod. Vi bygger upp funktionerna från Firebase med hjälp av öppen källkod-verktyg i företagsklass.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.sv.md) är ett alternativ till Firebase med öppen källkod. Vi bygger upp funktionerna från Firebase med hjälp av öppen källkod-verktyg i företagsklass.
 
-- [x] Hosted Postgres-databas. [Docs](https://supabase.com/docs/guides/database)
-- [x] Autentisering och auktorisering. [Docs](https://supabase.com/docs/guides/auth)
+- [x] Hosted Postgres-databas. [Docs](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.sv.md)
+- [x] Autentisering och auktorisering. [Docs](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.sv.md)
 - [x] Automatiskt genererade API:er.
-  - [x] REST. [Docs](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Prenumerationer i realtid. [Dokument](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sv.md#rest-api-overview)
+  - [x] GraphQL. [Docs](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sv.md#graphql-api-overview)
+  - [x] Prenumerationer i realtid. [Dokument](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sv.md#realtime-api-overview)
 - [x] Funktioner.
-  - [x] Databasfunktioner. [Dokument](https://supabase.com/docs/guides/database/functions)
-  - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions)
-- [x] Lagring av filer. [Docs](https://supabase.com/docs/guides/storage)
-- [x] AI + Vektor/Inbäddningsverktyg. [Docs](https://supabase.com/docs/guides/ai)
+  - [x] Databasfunktioner. [Dokument](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.sv.md)
+  - [x] Edge-funktioner [Docs](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.sv.md)
+- [x] Lagring av filer. [Docs](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.sv.md)
+- [x] AI + Vektor/Inbäddningsverktyg. [Docs](https://supabase.com/docs/guides/ai?utm_source=supabase&utm_content=i18n/README.sv.md)
 - [x] Kontrollpanel
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
@@ -28,7 +28,7 @@ Bevaka "releases" i denna repo för att få information om större uppdateringar
 
 ## Dokumentation
 
-Fullständig dokumentation finns på [supabase.com/docs](https://supabase.com/docs)
+Fullständig dokumentation finns på [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.sv.md)
 
 För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 
@@ -36,7 +36,7 @@ För att se hur man bidrar, besök [Getting Started](../DEVELOPERS.md)
 
 - [Community Forum](https://github.com/supabase/supabase/discussions). Bäst för: hjälp med att bygga, diskussion om bästa praxis för databaser.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Bäst för: buggar och fel som du stöter på när du använder Supabase.
-- [E-postsupport](https://supabase.com/docs/support#business-support). Bäst för: problem med din databas eller infrastruktur.
+- [E-postsupport](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.sv.md#business-support). Bäst för: problem med din databas eller infrastruktur.
 - [Discord](https://discord.supabase.com). Bäst för: att dela med dig av dina applikationer och umgås med gemenskapen.
 
 ## Hur det fungerar
@@ -45,8 +45,8 @@ Supabase är en kombination av verktyg med öppen källkod. Vi bygger funktioner
 
 **Arkitektur**
 
-Supabase är en [värdplattform](https://supabase.com/dashboard). Du kan registrera dig och börja använda Supabase utan att installera något.
-Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview) och [utveckla lokalt](https://supabase.com/docs/guides/local-development).
+Supabase är en [värdplattform](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.sv.md). Du kan registrera dig och börja använda Supabase utan att installera något.
+Du kan också [självhosta](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.sv.md) och [utveckla lokalt](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.sv.md).
 
 ![Arkitektur](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

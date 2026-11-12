@@ -11,7 +11,7 @@ This is the official Docker Compose setup for self-hosted Supabase. It provides 
 
 ## Getting Started
 
-Follow the detailed setup guide in our documentation: [Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)
+Follow the detailed setup guide in our documentation: [Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker?utm_source=supabase&utm_content=docker/README.md)
 
 The guide covers:
 - Prerequisites (Git and Docker)
@@ -40,12 +40,12 @@ This Docker Compose configuration includes the following services:
 
 ## Documentation
 
-- **[Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker)** - Setup and configuration guides
+- **[Self-Hosting with Docker](https://supabase.com/docs/guides/self-hosting/docker?utm_source=supabase&utm_content=docker/README.md)** - Setup and configuration guides
 - **[CHANGELOG.md](./CHANGELOG.md)** - Track recent updates and changes to services
 - **[versions.md](./versions.md)** - Complete history of Docker image versions for rollback reference
 - **[Ask DeepWiki / Supabase](https://deepwiki.com/supabase/supabase/3-self-hosted-deployment)** - DeepWiki-generated description of self-hosted configuration
 - **[CONFIG.md](./CONFIG.md)** - Configuration reference for all environment variables
-- **[Update your deployment](https://supabase.com/docs/guides/self-hosting/updating)** - Update an existing deployment with `update.sh`
+- **[Update your deployment](https://supabase.com/docs/guides/self-hosting/updating?utm_source=supabase&utm_content=docker/README.md)** - Update an existing deployment with `update.sh`
 
 ## Updates
 
@@ -57,7 +57,7 @@ sh update.sh
 sh run.sh pull && sh run.sh recreate
 ```
 
-See the **[update guide](https://supabase.com/docs/guides/self-hosting/updating)** for conflicts,
+See the **[update guide](https://supabase.com/docs/guides/self-hosting/updating?utm_source=supabase&utm_content=docker/README.md)** for conflicts,
 breaking changes, pinning a release, and older installs without `.supabase-version`.
 
 ## Community & Support
@@ -65,7 +65,7 @@ breaking changes, pinning a release, and older installs without `.supabase-versi
 For troubleshooting common issues, see:
 - [GitHub Discussions](https://github.com/orgs/supabase/discussions?discussions_q=is%3Aopen+label%3Aself-hosted) - Questions, feature requests, and workarounds
 - [GitHub Issues](https://github.com/supabase/supabase/issues?q=is%3Aissue%20state%3Aopen%20label%3Aself-hosted) - Known issues
-- [Documentation](https://supabase.com/docs/guides/self-hosting) - Setup and configuration guides
+- [Documentation](https://supabase.com/docs/guides/self-hosting?utm_source=supabase&utm_content=docker/README.md) - Setup and configuration guides
 
 Self-hosted Supabase is community-supported. Get help and connect with other users:
 
@@ -83,13 +83,13 @@ Share your self-hosting experience:
 ⚠️ **The default configuration is not secure for production use.**
 
 Before deploying to production, you must:
-- [Update](https://supabase.com/docs/guides/self-hosting/docker#configuring-and-securing-supabase) all default passwords and secrets in the `.env` file
+- [Update](https://supabase.com/docs/guides/self-hosting/docker?utm_source=supabase&utm_content=docker/README.md#configuring-and-securing-supabase) all default passwords and secrets in the `.env` file
 - Review and update CORS settings
-- Set up a [secure proxy](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https) in front of your self-hosted Supabase
+- Set up a [secure proxy](https://supabase.com/docs/guides/self-hosting/self-hosted-proxy-https?utm_source=supabase&utm_content=docker/README.md) in front of your self-hosted Supabase
 - Review and adjust network security configuration (ACLs, etc.)
 - Set up proper backup procedures
 
-See the [main installation guide](https://supabase.com/docs/guides/self-hosting/docker) and the how-tos in the documentation.
+See the [main installation guide](https://supabase.com/docs/guides/self-hosting/docker?utm_source=supabase&utm_content=docker/README.md) and the how-tos in the documentation.
 
 ## License
 

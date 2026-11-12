@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) je odprtokodna alternativa Firebase. Funkcije Firebase gradimo z odprtokodnimi orodji za podjetja.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.sl.md) je odprtokodna alternativa Firebase. Funkcije Firebase gradimo z odprtokodnimi orodji za podjetja.
 
-- [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database)
-- [x] Avtentikacija in avtorizacija. [Dokumenti](https://supabase.com/docs/guides/auth)
+- [x] Gostovana podatkovna baza Postgres. [Dokumenti](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.sl.md)
+- [x] Avtentikacija in avtorizacija. [Dokumenti](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.sl.md)
 - [x] Samodejno generirani API-ji.
-  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api#graphql-api-overview)
-  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/api#realtime-api-overview)
+  - [x] REST. [Dokumenti](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sl.md#rest-api-overview)
+  - [x] GraphQL. [Dokumenti](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sl.md#graphql-api-overview)
+  - [x] Naročnine v realnem času. [Dokumenti](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.sl.md#realtime-api-overview)
 - [x] Funkcije.
-  - [x] Funkcije podatkovne zbirke. [Dokumenti](https://supabase.com/docs/guides/database/functions)
-  - [x] Funkcije robov [Dokumenti](https://supabase.com/docs/guides/functions)
-- [x] Shranjevanje datotek. [Dokumenti](https://supabase.com/docs/guides/storage)
+  - [x] Funkcije podatkovne zbirke. [Dokumenti](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.sl.md)
+  - [x] Funkcije robov [Dokumenti](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.sl.md)
+- [x] Shranjevanje datotek. [Dokumenti](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.sl.md)
 - [x] Nadzorna plošča
 
 ![Supabase Dashboard](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Dokumentacija
 
-Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/docs)
+Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.sl.md)
 
 Če si želite ogledati, kako prispevati, obiščite [Getting Started](../DEVELOPERS.md)
 
@@ -33,15 +33,15 @@ Za celotno dokumentacijo obiščite [supabase.com/docs](https://supabase.com/doc
 
 - [Forum skupnosti](https://github.com/supabase/supabase/discussions). Najprimernejši za: pomoč pri gradnji, razpravo o najboljših praksah zbirke podatkov.
 - [GitHub Issues](https://github.com/supabase/supabase/issues). Najprimernejši za: hrošče in napake, na katere naletite pri uporabi zbirke Supabase.
-- [E-poštna podpora](https://supabase.com/docs/support#business-support). Najboljše za: težave s podatkovno zbirko ali infrastrukturo.
+- [E-poštna podpora](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.sl.md#business-support). Najboljše za: težave s podatkovno zbirko ali infrastrukturo.
 - [Discord](https://discord.supabase.com). Najboljši za: izmenjavo aplikacij in druženje s skupnostjo.
 
 ## Status
 
 - [x] Alfa: Testiramo bazo Supabase z zaprtim naborom strank
-- [x] Javna alfa: [supabase.com/dashboard](https://supabase.com/dashboard). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
+- [x] Javna alfa: [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.sl.md). Vendar nas ne obremenjujte, saj je še nekaj pomanjkljivosti
 - [x] Javna beta različica: Dovolj stabilna za večino primerov uporabe, ki niso povezani s podjetji
-- [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features#feature-status)]
+- [ ] Javna: Splošna razpoložljivost [[status](https://supabase.com/docs/guides/getting-started/features?utm_source=supabase&utm_content=i18n/README.sl.md#feature-status)]
 
 Trenutno smo v javni beta različici. Spremljajte "releases" tega repozitorija, da boste obveščeni o večjih posodobitvah.
 
@@ -55,8 +55,8 @@ Supabaza je kombinacija odprtokodnih orodij. Funkcije Firebase gradimo z odprtok
 
 **Arhitektura**
 
-Supabase je [gostovana platforma](https://supabase.com/dashboard). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
-Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview) in [razvijate lokalno](https://supabase.com/docs/guides/local-development).
+Supabase je [gostovana platforma](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.sl.md). Prijavite se lahko in začnete uporabljati bazo Supabase, ne da bi kar koli namestili.
+Lahko tudi [gostujete sami](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.sl.md) in [razvijate lokalno](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.sl.md).
 
 ![Arhitektura](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 

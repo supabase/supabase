@@ -7,25 +7,25 @@
 
 # Supabase
 
-[Supabase](https://supabase.com) là một giải pháp mã nguồn mở thay thế cho Firebase. Chúng tôi đang sử dụng các công cụ mã nguồn mở đạt chuẩn doanh nghiệp để xây dựng các chức năng mà Firebase cung cấp.
+[Supabase](https://supabase.com/?utm_source=supabase&utm_content=i18n/README.vi-vn.md) là một giải pháp mã nguồn mở thay thế cho Firebase. Chúng tôi đang sử dụng các công cụ mã nguồn mở đạt chuẩn doanh nghiệp để xây dựng các chức năng mà Firebase cung cấp.
 
-- [x] Cơ sở dữ liệu Postgres tự quản lý. [Tài liệu](https://supabase.com/docs/guides/database)
-- [x] Xác thực và uỷ quyền. [Tài liệu](https://supabase.com/docs/guides/auth)
+- [x] Cơ sở dữ liệu Postgres tự quản lý. [Tài liệu](https://supabase.com/docs/guides/database?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
+- [x] Xác thực và uỷ quyền. [Tài liệu](https://supabase.com/docs/guides/auth?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
 - [x] APIs tự động khởi tạo.
-  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/api#rest-api-overview)
-  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/api#realtime-api-overview)
-  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/api#graphql-api-overview)
+  - [x] REST. [Tài liệu](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.vi-vn.md#rest-api-overview)
+  - [x] Lắng nghe thay đổi thời gian thực. [Tài liệu](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.vi-vn.md#realtime-api-overview)
+  - [x] GraphQL (Thử nghiệm). [Tài liệu](https://supabase.com/docs/guides/api?utm_source=supabase&utm_content=i18n/README.vi-vn.md#graphql-api-overview)
 - [x] Chức năng hàm.
-  - [x] Hàm dành cho cơ sở dữ liệu (Database functions). [Tài liệu](https://supabase.com/docs/guides/database/functions)
-  - [x] Hàm được phân phối trên toàn cầu (Edge Functions). [Tài liệu](https://supabase.com/docs/guides/functions)
-- [x] Kho lưu trữ. [Tài liệu](https://supabase.com/docs/guides/storage)
+  - [x] Hàm dành cho cơ sở dữ liệu (Database functions). [Tài liệu](https://supabase.com/docs/guides/database/functions?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
+  - [x] Hàm được phân phối trên toàn cầu (Edge Functions). [Tài liệu](https://supabase.com/docs/guides/functions?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
+- [x] Kho lưu trữ. [Tài liệu](https://supabase.com/docs/guides/storage?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
 - [x] Bảng điều khiển
 
 ![Bảng điều khiển của Supabase](https://raw.githubusercontent.com/supabase/supabase/master/apps/www/public/images/github/supabase-dashboard.png)
 
 ## Tài liệu tham khảo
 
-Để có tài liệu đầy đủ, hãy truy cập [supabase.com/docs](https://supabase.com/docs)
+Để có tài liệu đầy đủ, hãy truy cập [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=i18n/README.vi-vn.md)
 
 Để biết cách Đóng góp, hãy truy cập [Bắt đầu](../DEVELOPERS.md)
 
@@ -33,13 +33,13 @@
 
 - [Diễn đàn cộng đồng](https://github.com/supabase/supabase/discussions). Tốt nhất cho: hỗ trợ xây dựng và thảo luận về các phương pháp tối ưu nhất dành cho cơ sở dữ liệu.
 - [Các vấn đề trên GitHub](https://github.com/supabase/supabase/issues). Tốt nhất cho: các lỗi và "bugs" mà bạn gặp phải khi sử dụng Supabase.
-- [Hỗ trợ qua email](https://supabase.com/docs/support#business-support). Tốt nhất cho: các vấn đề với cơ sở dữ liệu hoặc cơ sở hạ tầng của bạn.
+- [Hỗ trợ qua email](https://supabase.com/docs/support?utm_source=supabase&utm_content=i18n/README.vi-vn.md#business-support). Tốt nhất cho: các vấn đề với cơ sở dữ liệu hoặc cơ sở hạ tầng của bạn.
 - [Discord](https://discord.supabase.com). Tốt nhất cho: chia sẻ ứng dụng của bạn và dành thời gian với cộng đồng.
 
 ## Trạng thái
 
 - [x] Alpha: Chúng tôi đang thử nghiệm Supabase với một nhóm người dùng kín
-- [x] Public Alpha: Bất kỳ ai cũng có thể đăng ký tại [supabase.com/dashboard](https://supabase.com/dashboard). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài lỗi nhỏ.
+- [x] Public Alpha: Bất kỳ ai cũng có thể đăng ký tại [supabase.com/dashboard](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.vi-vn.md). Nhưng hãy bình tĩnh với chúng tôi, sẽ có một vài lỗi nhỏ.
 - [x] Public Beta: Đủ ổn định cho hầu hết các trường hợp sử dụng không dành cho môi trường doanh nghiệp (production)
 - [ ] Public: Sẵn sàng cho môi trường doanh nghiệp (production)
 
@@ -55,8 +55,8 @@ Supabase là sự kết hợp của các công cụ mã nguồn mở. Các tính
 
 **Kiến trúc**
 
-Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://supabase.com/dashboard). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
-Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting/overview) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development).
+Supabase là một [nền tảng lưu trữ cơ sở dữ liệu](https://supabase.com/dashboard?utm_source=supabase&utm_content=i18n/README.vi-vn.md). Bạn có thể đăng ký và bắt đầu sử dụng Supabase mà không cần cài đặt bất kỳ thứ gì.
+Bạn cũng có thể [tự quản lý](https://supabase.com/docs/guides/hosting/overview?utm_source=supabase&utm_content=i18n/README.vi-vn.md) và [phát triển cục bộ](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=i18n/README.vi-vn.md).
 
 ![Kiến trúc](https://github.com/supabase/supabase/blob/master/apps/docs/public/img/supabase-architecture.svg)
 
