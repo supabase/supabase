@@ -98,7 +98,7 @@ export const WarehouseMetricsChart = ({
           titleTooltip={chart.tooltip}
           chartStyle="line"
           hideChartType
-          showTotal={model.highlight === 'total'}
+          showTotal={false}
           showLegend={model.attributes.length >= 2}
           showTooltip
           showMaxValue={model.attributes.some((attribute) => attribute.isMaxValue)}

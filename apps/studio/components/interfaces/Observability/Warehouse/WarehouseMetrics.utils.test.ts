@@ -264,14 +264,26 @@ describe('buildWarehouseChartModel highlight', () => {
     expect(model.latestValue).toBe(7)
   })
 
-  test('is total without a latest value for a single rate metric split by labels', () => {
+  test('hides the headline for a single rate metric split by labels', () => {
     const response = withSeries('rpc_rate', [
       makeSeries({ method: 'A' }, [1, 2]),
       makeSeries({ method: 'B' }, [3, 4]),
     ])
     const model = buildWarehouseChartModel(response, labeledChart)
-    expect(model.highlight).toBe('total')
+    expect(model.highlight).toBe('none')
     expect(model.latestValue).toBeUndefined()
+  })
+
+  test('hides the headline when labeled count series have missing values', () => {
+    const chart: WarehouseChartDef = { ...labeledChart, format: '' }
+    const response = withSeries('rpc_rate', [
+      makeSeries({ method: 'A' }, [1, null]),
+      makeSeries({ method: 'B' }, [3, null]),
+    ])
+    const model = buildWarehouseChartModel(response, chart)
+    expect(model.highlight).toBe('none')
+    expect(model.latestValue).toBeUndefined()
+    expect(model.rows[1]).toMatchObject({ s0: null, s1: null })
   })
 
   test('is none for a duration chart split by labels', () => {
@@ -358,7 +370,7 @@ describe('buildWarehouseChartModel highlight', () => {
     const model = buildWarehouseChartModel(response, labeledChart, 1)
     expect(model.shownSeries).toBe(1)
     expect(model.totalSeries).toBe(2)
-    expect(model.highlight).toBe('total')
+    expect(model.highlight).toBe('none')
     expect(model.latestValue).toBeUndefined()
   })
 
@@ -378,9 +390,9 @@ describe('buildWarehouseChartModel highlight', () => {
       'execution-time': 'primary',
       'worker-slots': 'primary',
       'rejected-requests': 'primary',
-      'worker-starts': 'total',
+      'worker-starts': 'none',
       'worker-start-time': 'none',
-      'requests-by-method': 'total',
+      'requests-by-method': 'none',
       'request-duration': 'none',
     })
   })

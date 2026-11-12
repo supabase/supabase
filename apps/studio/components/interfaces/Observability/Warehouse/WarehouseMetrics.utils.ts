@@ -26,10 +26,9 @@ export type WarehouseChartAvailability =
 /**
  * What the headline number above a chart shows:
  * - `primary`: the latest value of the primary series (the primary metric has at most one series).
- * - `total`: the sum across series, computed by ComposedChart (a single rate or count metric split by labels).
  * - `none`: no headline, because any one slice (or a sum of slices) would be misleading.
  */
-export type WarehouseChartHighlight = 'primary' | 'total' | 'none'
+export type WarehouseChartHighlight = 'primary' | 'none'
 
 export interface WarehouseChartModel {
   rows: WarehouseChartRow[]
@@ -171,12 +170,7 @@ export const buildWarehouseChartModel = (
   const primarySeriesCount = others.filter(
     (candidate) => candidate.metric === chart.primaryMetric
   ).length
-  const isSummableFormat = chart.format === '/s' || chart.format === ''
-  const isSingleMetric = chart.series.length === 1
-
-  let highlight: WarehouseChartHighlight = 'none'
-  if (primarySeriesCount <= 1) highlight = 'primary'
-  else if (isSingleMetric && isSummableFormat) highlight = 'total'
+  const highlight: WarehouseChartHighlight = primarySeriesCount <= 1 ? 'primary' : 'none'
 
   const latestValue =
     highlight === 'primary'
