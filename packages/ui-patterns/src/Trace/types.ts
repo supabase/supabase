@@ -76,8 +76,12 @@ export interface VisibleRow {
 export interface ViewContextValue {
   selectedId: string | null
   collapsed: ReadonlySet<string>
+  window: TimeWindow
+  isZoomed: boolean
   select: (id: string | null) => void
   setCollapsed: (id: string, collapsed: boolean) => void
+  setWindow: (start: number, end: number) => void
+  resetWindow: () => void
 }
 
 export interface SpanContextValue {
