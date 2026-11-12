@@ -118,15 +118,8 @@ Within a single migration generated on the [`pg-delta`](/docs/guides/local-devel
 If you can't connect to a preview branch:
 
 1. **Check credentials**: Ensure you're using the correct branch-specific credentials
-2. **Auto-pause**: The branch might be paused. It will resume on the first request
+2. **Paused branch**: If someone paused the branch, it doesn't accept connections. Select **Restore branch** on the Branches page in the Supabase Dashboard, or run `supabase branches unpause <branch-name>`, then wait for the branch to come back up
 3. **Network restrictions**: Check if network restrictions are blocking access
-
-### Connection timeouts
-
-Preview branches auto-pause after inactivity. First connections after pause may timeout:
-
-1. **Retry**: The branch will wake up after the first request
-2. **Persistent branches**: Convert frequently-used branches to persistent
 
 ## Configuration problems
 
@@ -162,9 +155,8 @@ Branch creation might be slow due to:
 
 Preview branches may have different performance characteristics:
 
-1. **Cold starts**: First queries after auto-pause are slower
-2. **Resource limits**: Preview branches have different resource allocations
-3. **Indexing**: Ensure proper indexes exist in your migrations
+1. **Resource limits**: Preview branches have different resource allocations
+2. **Indexing**: Ensure proper indexes exist in your migrations
 
 ## Data issues
 
