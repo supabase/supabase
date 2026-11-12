@@ -87,3 +87,31 @@ test('role update and remove SQL has analyzable EXECUTEs', () => {
   expect(expectAnalyzableExecutes(pgMeta.roles.update({ id: 1 }, { canLogin: false }).sql)).toBe(1)
   expect(expectAnalyzableExecutes(pgMeta.roles.remove({ id: 1 }, { ifExists: true }).sql)).toBe(1)
 })
+
+test('table update SQL has analyzable EXECUTEs', () => {
+  // A name that contains a dollar-quote delimiter and a quote: neither may end
+  // up in the generated SQL text, because it is embedded in a `DO $$ … $$` block.
+  const old = { id: 1, schema: 'public', name: `a table with $$ and it's quoted` }
+
+  // Drop the primary key, and add one back.
+  expect(expectAnalyzableExecutes(pgMeta.tables.update(old, { primary_keys: [] }).sql)).toBe(1)
+  expect(
+    expectAnalyzableExecutes(pgMeta.tables.update(old, { primary_keys: [{ name: 'id' }] }).sql)
+  ).toBe(1)
+})
+
+test('column update SQL has analyzable EXECUTEs', () => {
+  const old = {
+    name: `a column with $$ and it's quoted`,
+    schema: 'public',
+    table: `a table with $$ and it's quoted`,
+    table_id: 1,
+    ordinal_position: 1,
+    is_identity: false,
+    is_unique: true,
+  }
+
+  // Drop the unique constraint, and drop an existing check constraint.
+  expect(expectAnalyzableExecutes(pgMeta.columns.update(old, { is_unique: false }).sql)).toBe(1)
+  expect(expectAnalyzableExecutes(pgMeta.columns.update(old, { check: null }).sql)).toBe(1)
+})
