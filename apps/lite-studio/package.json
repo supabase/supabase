@@ -2,9 +2,6 @@
   "name": "lite-studio",
   "private": true,
   "type": "module",
-  "engines": {
-    "node": "24.x"
-  },
   "scripts": {
     "build": "react-router build",
     "dev": "react-router dev",
