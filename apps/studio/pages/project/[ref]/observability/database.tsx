@@ -316,7 +316,7 @@ const DatabaseUsage = () => {
               />
             </ShortcutTooltip>
             <ReportSettings chartId="database-charts" />
-            <div className="flex items-center gap-3">
+            <div className="contents">
               <LogsDatePicker
                 onSubmit={handleDatePickerChange}
                 value={datePickerValue}
@@ -333,7 +333,7 @@ const DatabaseUsage = () => {
                 source="databaseReportDateRange"
               />
               {selectedDateRange && (
-                <div className="flex items-center gap-x-2 text-xs">
+                <div className="order-last flex w-full flex-wrap items-center gap-x-2 text-xs xl:order-none xl:w-auto">
                   <p className="text-foreground-light">
                     {dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}
                   </p>
