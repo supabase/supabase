@@ -845,7 +845,44 @@ describe('Pipelines logs', () => {
 describe('metrics request exclusion (FE-4969)', () => {
   const METRICS_PATH = `'/customer/v1/privileged/metrics'`
   const whereOf = (sql: string) => sql.split(/\bWHERE\b/)[1] ?? ''
-  const shown = createUnifiedLogsSearch({ ...baseSearch, edge_metrics: true })
+  const shown = createUnifiedLogsSearch({ ...baseSearch, show_privileged_metrics_requests: true })
+
+  it.each([
+    [
+      'ClickHouse',
+      getUnifiedLogsQuery,
+      getLogsChartQuery,
+      getLogsCountQuery,
+      "source != 'edge_logs'",
+    ],
+    [
+      'BigQuery',
+      getUnifiedLogsQueryBQ,
+      getLogsChartQueryBQ,
+      getLogsCountQueryBQ,
+      "log_type = 'edge'",
+    ],
+  ])(
+    'keeps %s rows, chart, facets and metrics counts consistent',
+    (_, rows, chart, counts, source) => {
+      for (const build of [rows, chart, counts]) {
+        const sql = build(withFilters('method:eq:GET'))
+        expect(sql).toContain(METRICS_PATH)
+        expect(sql).toMatch(/NOT [Cc][Oo][Aa][Ll][Ee][Ss][Cc][Ee]\(\(/)
+        expect(sql).toContain(source)
+        expect(sql).toContain("IN ('200')")
+        expect(sql).toContain("IN ('GET')")
+      }
+      expect(rows(shown)).not.toContain(METRICS_PATH)
+      expect(chart(shown)).not.toContain(METRICS_PATH)
+      const metricsBranch = counts(withFilters('method:eq:GET'))
+        .split("'show_privileged_metrics_requests'")
+        .at(-1)!
+      expect(metricsBranch).toContain(METRICS_PATH)
+      expect(metricsBranch).toContain("IN ('GET')")
+      expect(metricsBranch).not.toMatch(/NOT [Cc][Oo][Aa][Ll][Ee][Ss][Cc][Ee]/)
+    }
+  )
 
   it('hides only the successful scrapes by default', () => {
     const where = whereOf(getUnifiedLogsQuery(baseSearch))

@@ -39,6 +39,8 @@ mockAnimationsApi()
 describe('UnifiedLogs', () => {
   afterEach(() => {
     vi.useRealTimers()
+    localStorage.removeItem('unified-logs-show-privileged-metrics-requests-default')
+    localStorage.removeItem('unified-logs-show-privileged-metrics-requests-other')
     localStorage.removeItem(LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK)
     localStorage.removeItem(`${LOCAL_STORAGE_KEYS.UNIFIED_LOGS_DOCK}-edge-function`)
   })
@@ -228,7 +230,9 @@ describe('UnifiedLogs', () => {
 
     expect(await screen.findByText('No results found', {}, { timeout: 5_000 })).toBeInTheDocument()
     expect(screen.getAllByText('Postgres').length).toBeGreaterThan(0)
-    expect(screen.queryByText('Pipelines')).not.toBeInTheDocument()
+    await waitFor(() => expect(screen.queryByText('Pipelines')).not.toBeInTheDocument(), {
+      timeout: 5_000,
+    })
     expect(screen.queryByRole('button', { name: 'Pipeline ID' })).not.toBeInTheDocument()
   }, 15_000)
 
@@ -757,31 +761,34 @@ describe('UnifiedLogs', () => {
   describe('metrics request exclusion', () => {
     const METRICS_PATH = "'/customer/v1/privileged/metrics'"
 
-    const mockAnalytics = (queries: string[]) =>
+    const mockAnalytics = (queries: string[], metricsCount = 0) =>
       addAPIMock({
         method: 'post',
         path: '/platform/projects/:ref/analytics/endpoints/logs.all.otel',
         response: async ({ request }) => {
-          queries.push(z.object({ sql: z.string() }).parse(await request.json()).sql)
-          return HttpResponse.json<AnalyticsResponse>({ result: [] })
+          const sql = z.object({ sql: z.string() }).parse(await request.json()).sql
+          queries.push(sql)
+          return HttpResponse.json<AnalyticsResponse>({
+            result: sql.includes('facet counts')
+              ? [
+                  { facet: 'show_privileged_metrics_requests', value: 'all', count: metricsCount },
+                  { facet: 'log_type', value: 'edge', count: 0 },
+                ]
+              : [],
+          })
         },
       })
 
-    const renderLogs = () =>
+    const renderLogs = (searchParams = '') =>
       customRender(
         <FeatureFlagContext.Provider
           value={{ configcat: { otelUnifiedLogs: true }, posthog: {}, hasLoaded: true }}
         >
           <UnifiedLogs />
         </FeatureFlagContext.Provider>,
-        { nuqs: { hasMemory: true } }
+        { nuqs: { hasMemory: true, searchParams } }
       )
 
-    /**
-     * The toggle sits under API Gateway, beside the other per-service options.
-     * Scoped to that group because the nested labels (Auth, Storage) collide
-     * with the top-level log type names.
-     */
     const apiGatewayGroup = () =>
       within(screen.getByRole('checkbox', { name: /API Gateway/ }).closest('div')!.parentElement!)
     const expandApiGateway = async (user: UserEvent) =>
@@ -826,7 +833,9 @@ describe('UnifiedLogs', () => {
       renderLogs()
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
-      expect(screen.queryByTestId('filter-condition-edge_metrics')).not.toBeInTheDocument()
+      expect(
+        screen.queryByTestId('filter-condition-show_privileged_metrics_requests')
+      ).not.toBeInTheDocument()
       expect(screen.queryByTestId('filter-condition-exclude')).not.toBeInTheDocument()
     })
 
@@ -846,6 +855,92 @@ describe('UnifiedLogs', () => {
       await waitFor(() => expect(lastRowQuery(queries)).not.toContain(METRICS_PATH))
     }, 15_000)
 
+    it('resets when Metrics is the only changed filter and keeps the default on return', async () => {
+      const user = userEvent.setup()
+      const queries: string[] = []
+      mockAnalytics(queries)
+      const firstVisit = renderLogs()
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+      await user.click(metricsCheckbox())
+      expect(metricsCheckbox()).toBeChecked()
+      await user.click(screen.getByRole('button', { name: 'Reset' }))
+      await waitFor(() => expect(metricsCheckbox()).not.toBeChecked())
+      firstVisit.unmount()
+      renderLogs()
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+      expect(metricsCheckbox()).not.toBeChecked()
+      await waitFor(() => expect(lastRowQuery(queries)).toContain(METRICS_PATH))
+    }, 15_000)
+
+    it('restores the project choice when returning without URL state', async () => {
+      const user = userEvent.setup()
+      mockAnalytics([])
+      const firstVisit = renderLogs()
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+      await user.click(metricsCheckbox())
+      await user.click(screen.getByRole('checkbox', { name: /API Gateway/ }))
+      firstVisit.unmount()
+      renderLogs()
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+      await waitFor(() => expect(metricsCheckbox()).toBeChecked())
+    }, 15_000)
+
+    it.each([false, true])(
+      'honors explicit URL %s over the saved opposite choice',
+      async (urlValue) => {
+        const user = userEvent.setup()
+        localStorage.setItem(
+          'unified-logs-show-privileged-metrics-requests-default',
+          JSON.stringify(!urlValue)
+        )
+        mockAnalytics([])
+        renderLogs(`?show_privileged_metrics_requests=${urlValue}`)
+        expect(await screen.findByText('No results found')).toBeInTheDocument()
+        await expandApiGateway(user)
+        await waitFor(() =>
+          expect(metricsCheckbox()).toHaveAttribute('aria-checked', String(urlValue))
+        )
+        await user.click(screen.getByRole('checkbox', { name: /API Gateway/ }))
+        expect(localStorage.getItem('unified-logs-show-privileged-metrics-requests-default')).toBe(
+          JSON.stringify(!urlValue)
+        )
+        await user.click(screen.getByRole('button', { name: 'Reset' }))
+        await waitFor(() => expect(metricsCheckbox()).not.toBeChecked())
+        expect(localStorage.getItem('unified-logs-show-privileged-metrics-requests-default')).toBe(
+          'false'
+        )
+      }
+    )
+
+    it.each(['true', '"true"', '{invalid'])(
+      'does not borrow another project choice or accept invalid saved values: %s',
+      async (savedValue) => {
+        const user = userEvent.setup()
+        localStorage.setItem('unified-logs-show-privileged-metrics-requests-other', 'true')
+        if (savedValue !== 'true')
+          localStorage.setItem('unified-logs-show-privileged-metrics-requests-default', savedValue)
+        mockAnalytics([])
+        renderLogs()
+        expect(await screen.findByText('No results found')).toBeInTheDocument()
+        await expandApiGateway(user)
+        expect(metricsCheckbox()).not.toBeChecked()
+      }
+    )
+
+    it('shows the successful metrics count while the exclusion is enabled', async () => {
+      const user = userEvent.setup()
+      mockAnalytics([], 37)
+      renderLogs()
+      expect(await screen.findByText('No results found')).toBeInTheDocument()
+      await expandApiGateway(user)
+      expect(metricsCheckbox()).not.toBeChecked()
+      expect(apiGatewayGroup().getByText('37')).toBeInTheDocument()
+    })
+
     it('stays shown on a reload once the URL carries the choice', async () => {
       const user = userEvent.setup()
       const queries: string[] = []
@@ -856,7 +951,7 @@ describe('UnifiedLogs', () => {
         >
           <UnifiedLogs />
         </FeatureFlagContext.Provider>,
-        { nuqs: { hasMemory: true, searchParams: '?edge_metrics=true' } }
+        { nuqs: { hasMemory: true, searchParams: '?show_privileged_metrics_requests=true' } }
       )
 
       expect(await screen.findByText('No results found')).toBeInTheDocument()
