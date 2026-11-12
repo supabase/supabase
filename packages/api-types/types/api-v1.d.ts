@@ -6188,6 +6188,15 @@ export interface operations {
         }
         content?: never
       }
+      /** @description Persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
+      }
       /** @description Forbidden action */
       403: {
         headers: {
@@ -8593,6 +8602,15 @@ export interface operations {
           [name: string]: unknown
         }
         content?: never
+      }
+      /** @description Branching or persistent branches are not available on the organization plan */
+      402: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['PlanGateErrorBody']
+        }
       }
       /** @description Forbidden action */
       403: {

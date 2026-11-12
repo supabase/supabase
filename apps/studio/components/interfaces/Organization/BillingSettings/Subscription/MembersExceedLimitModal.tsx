@@ -8,7 +8,11 @@ import {
   AlertDialogTitle,
 } from 'ui'
 
+import { AffectedOrganizationsList } from '@/components/ui/AffectedOrganizationsList'
+import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import { useFreeProjectLimitCheckQuery } from '@/data/organizations/free-project-limit-check-query'
+import { groupByOrganization } from '@/data/organizations/free-project-limit-check.utils'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 
 export interface MembersExceedLimitModalProps {
@@ -23,31 +27,26 @@ const MembersExceedLimitModal = ({ visible, onClose }: MembersExceedLimitModalPr
     { slug },
     { enabled: visible }
   )
+  const { data: orgMembers } = useOrganizationMembersQuery({ slug }, { enabled: visible })
+  const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
+  const organizations = groupByOrganization(membersExceededLimit ?? [])
 
   return (
     <AlertDialog open={visible} onOpenChange={onClose}>
       <AlertDialogContent size="medium">
         <AlertDialogHeader>
-          <AlertDialogTitle>
-            Your organization has members who have exceeded their free project limits
-          </AlertDialogTitle>
+          <AlertDialogTitle>Exceeding number of active Free Projects</AlertDialogTitle>
           <AlertDialogDescription>
             <div className="flex flex-col space-y-2">
               <p className="text-sm text-foreground-light">
-                The following members have reached their maximum limits for the number of active
-                free plan projects within organizations where they are an administrator or owner:
+                Owners and administrators are limited in how many active Free Plan projects they can
+                have across all organizations. These members are over the limit:
               </p>
-              <ul className="pl-5 text-sm list-disc text-foreground-light">
-                {(membersExceededLimit || []).map((member, idx: number) => (
-                  <li key={`member-${idx}`}>
-                    {`${member.username || member.primary_email} (Limit: ${member.free_project_limit} free projects)`}
-                  </li>
-                ))}
-              </ul>
-              <p className="text-sm text-foreground-light">
-                These members will need to either delete, pause, or upgrade one or more of these
-                projects before you're able to downgrade this project.
-              </p>
+              <AffectedOrganizationsList organizations={organizations} />
+              <FreeProjectLimitActions
+                goal="downgrade to the Free Plan"
+                hasMultipleMembers={hasMultipleMembers}
+              />
             </div>
           </AlertDialogDescription>
         </AlertDialogHeader>

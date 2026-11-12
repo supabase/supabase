@@ -446,7 +446,18 @@ describe('project creation wizard', () => {
       mockWizardEndpoints({
         organizations: [mockOrg({ plan: { id: 'free', name: 'Free' } })],
         freeProjectLimitMembers: [
-          { free_project_limit: 2, primary_email: 'member@example.com', username: 'member-1' },
+          {
+            free_project_limit: 2,
+            primary_email: 'member@example.com',
+            username: 'member-1',
+            free_plan_organizations: [
+              {
+                slug: 'other-org',
+                organization_name: 'Other Org',
+                projects: [{ ref: 'abc', name: 'Active Project' }],
+              },
+            ],
+          },
         ],
       })
       addAPIMock({ method: 'get', path: '/platform/organizations/:slug/members', response: [] })
@@ -463,10 +474,12 @@ describe('project creation wizard', () => {
 
       await renderWizard()
 
-      await screen.findByText(
-        'The organization has members who have exceeded their free project limits'
+      await screen.findByText('Exceeding number of active Free Projects')
+      expect(screen.getByRole('link', { name: 'Other Org' })).toHaveAttribute(
+        'href',
+        '/org/other-org'
       )
-      expect(screen.getByText(/member-1 \(Limit: 2 free projects\)/)).toBeInTheDocument()
+      expect(screen.getByRole('link', { name: 'Active Project' })).toBeInTheDocument()
       expect(screen.queryByPlaceholderText('Project name')).not.toBeInTheDocument()
     })
 

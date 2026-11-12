@@ -693,7 +693,7 @@ export interface paths {
     }
     /**
      * Gets the Supabase config of a connected GitHub repository
-     * @description Reads `supabase/config.toml` from the workdir of the connected repository and returns it as JSON.
+     * @description Reads the Supabase config from the workdir of the connected repository and returns it as JSON. The file is `supabase/config.json` or `supabase/config.jsonc` if present, otherwise `supabase/config.toml`. Having both `config.json` and `config.jsonc` is rejected as ambiguous.
      */
     get: operations['GitHubConnectionsController_getGitHubConnectionConfig']
     put?: never
@@ -1835,6 +1835,28 @@ export interface paths {
     patch?: never
     trace?: never
   }
+  '/platform/organizations/{slug}/oauth/approvals': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List approved oauth apps for an organization
+     * @description Returns a cursor-paginated list of OAuth apps approved by the organization or its members.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of approvals returned per page.
+     */
+    get: operations['OAuthApprovalsController_listApprovals']
+    put?: never
+    post?: never
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
   '/platform/organizations/{slug}/oauth/apps': {
     parameters: {
       query?: never
@@ -2510,6 +2532,28 @@ export interface paths {
     put?: never
     /** Logged into account */
     post: operations['ProfileController_auditAccountLogin']
+    delete?: never
+    options?: never
+    head?: never
+    patch?: never
+    trace?: never
+  }
+  '/platform/profile/oauth/grants': {
+    parameters: {
+      query?: never
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    /**
+     * List the user's OAuth grants
+     * @description Returns a cursor-paginated list of the OAuth apps the user has granted access to on their own behalf.
+     *
+     *     Use `page[after]` and `page[before]` to navigate pages and `page[size]` to control the number of grants returned per page.
+     */
+    get: operations['OAuthGrantsController_listGrants']
+    put?: never
+    post?: never
     delete?: never
     options?: never
     head?: never
@@ -6209,47 +6253,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -6305,6 +6308,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -6457,6 +6465,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -7483,47 +7496,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -7579,6 +7551,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -7731,6 +7708,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -8517,57 +8499,6 @@ export interface components {
             }
           }
         | {
-            iceberg:
-              | {
-                  supabase: {
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description Project ref
-                     * @example abcdefghijklmnopqrst
-                     */
-                    project_ref: string
-                    /**
-                     * @description S3 region
-                     * @example ap-southeast-1
-                     */
-                    s3_region: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-              | {
-                  rest: {
-                    /**
-                     * @description Iceberg REST catalog URI
-                     * @example https://catalog.example.com
-                     */
-                    catalog_uri: string
-                    /**
-                     * @description Namespace
-                     * @example my-namespace
-                     */
-                    namespace?: string | null
-                    /**
-                     * @description S3-compatible storage endpoint
-                     * @example https://s3.example.com
-                     */
-                    s3_endpoint: string
-                    /**
-                     * @description Warehouse name
-                     * @example my-warehouse
-                     */
-                    warehouse_name: string
-                  }
-                }
-          }
-        | {
             ducklake: {
               /**
                * @description Persisted DuckLake data path
@@ -8604,6 +8535,7 @@ export interface components {
                * @example false
                */
               s3_use_ssl?: boolean | null
+              table_namespace?: string | null
               table_sorting?: {
                 tables: {
                   schema: string
@@ -8813,57 +8745,6 @@ export interface components {
               }
             }
           | {
-              iceberg:
-                | {
-                    supabase: {
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description Project ref
-                       * @example abcdefghijklmnopqrst
-                       */
-                      project_ref: string
-                      /**
-                       * @description S3 region
-                       * @example ap-southeast-1
-                       */
-                      s3_region: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-                | {
-                    rest: {
-                      /**
-                       * @description Iceberg REST catalog URI
-                       * @example https://catalog.example.com
-                       */
-                      catalog_uri: string
-                      /**
-                       * @description Namespace
-                       * @example my-namespace
-                       */
-                      namespace?: string | null
-                      /**
-                       * @description S3-compatible storage endpoint
-                       * @example https://s3.example.com
-                       */
-                      s3_endpoint: string
-                      /**
-                       * @description Warehouse name
-                       * @example my-warehouse
-                       */
-                      warehouse_name: string
-                    }
-                  }
-            }
-          | {
               ducklake: {
                 /**
                  * @description Persisted DuckLake data path
@@ -8900,6 +8781,7 @@ export interface components {
                  * @example false
                  */
                 s3_use_ssl?: boolean | null
+                table_namespace?: string | null
                 table_sorting?: {
                   tables: {
                     schema: string
@@ -9122,7 +9004,7 @@ export interface components {
       }[]
     }
     GetGitHubConnectionConfigResponse_Output: {
-      /** @description JSON representation of the parsed `supabase/config.toml`. Its shape is owned by the Supabase CLI and is passed through as-is. */
+      /** @description JSON representation of the parsed `supabase/config.toml`, `supabase/config.json` or `supabase/config.jsonc`. Its shape is owned by the Supabase CLI and is passed through as-is. */
       config: {
         [key: string]: unknown
       }
@@ -10378,6 +10260,91 @@ export interface components {
         oauth_app_id: string
       }[]
     }
+    ListOAuthApprovalsResponse_Output: {
+      data: {
+        attributes: {
+          /** @description Metadata about the approved OAuth app */
+          app: {
+            /** @description OAuth app publisher name, or null for dynamically registered apps */
+            created_by: string | null
+            /** @description URL for rendering the app icon */
+            icon: string | null
+            /** @description OAuth app name */
+            name: string
+          }
+          /** @description Timestamp of the most recent approval of this app, at the org or member level */
+          last_approved_at: string
+          /** @description Information about the organization-bound grant for this app, or null if only member-bound */
+          org_grant: {
+            /** @description Timestamp of the org-level approval */
+            approved_at: string
+            /** @description Scopes approved at the org level */
+            approved_scopes: (
+              | 'analytics:read'
+              | 'analytics:write'
+              | 'analytics_config:read'
+              | 'analytics_config:write'
+              | 'auth:read'
+              | 'auth:write'
+              | 'database:read'
+              | 'database:write'
+              | 'domains:read'
+              | 'domains:write'
+              | 'edge_functions:read'
+              | 'edge_functions:write'
+              | 'environment:read'
+              | 'environment:write'
+              | 'organizations:read'
+              | 'organizations:write'
+              | 'projects:read'
+              | 'projects:write'
+              | 'rest:read'
+              | 'rest:write'
+              | 'secrets:read'
+              | 'secrets:write'
+              | 'storage:read'
+              | 'storage:write'
+            )[]
+            /** @description Org-level grant ID */
+            grant_id: string
+          } | null
+          /** @enum {string} */
+          target: 'organization' | 'members' | 'organization_and_members'
+        }
+        /**
+         * Format: uuid
+         * @description OAuth app ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_app'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/organizations/my-org/oauth/approvals?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     ListPlatformAppInstallationsResponse_Output: {
       installations: {
         /** Format: uuid */
@@ -10475,6 +10442,87 @@ export interface components {
         name: string
       }[]
     }
+    ListUserOAuthGrantsResponse_Output: {
+      data: {
+        attributes: {
+          app: {
+            created_by: string | null
+            icon: string | null
+            id: string
+            name: string
+          }
+          approved_at: string
+          approved_scopes: (
+            | 'analytics:read'
+            | 'analytics:write'
+            | 'analytics_config:read'
+            | 'analytics_config:write'
+            | 'auth:read'
+            | 'auth:write'
+            | 'database:read'
+            | 'database:write'
+            | 'domains:read'
+            | 'domains:write'
+            | 'edge_functions:read'
+            | 'edge_functions:write'
+            | 'environment:read'
+            | 'environment:write'
+            | 'organizations:read'
+            | 'organizations:write'
+            | 'projects:read'
+            | 'projects:write'
+            | 'rest:read'
+            | 'rest:write'
+            | 'secrets:read'
+            | 'secrets:write'
+            | 'storage:read'
+            | 'storage:write'
+          )[]
+          organization: {
+            name: string
+            slug: string
+          }
+          projects:
+            | {
+                name: string
+                ref: string
+              }[]
+            | null
+        }
+        /**
+         * Format: uuid
+         * @description Grant ID
+         */
+        id: string
+        /**
+         * @description Resource type.
+         * @enum {string}
+         */
+        type: 'oauth_grant'
+      }[]
+      links: {
+        /**
+         * @description URL path to the first page if available.
+         * @example /platform/profile/oauth/grants?page[size]=10
+         */
+        first?: string | null
+        /**
+         * @description URL path to the last page if available.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[after]=019adf7d-4513-71ba-b264-21900edb4295
+         */
+        last?: string | null
+        /**
+         * @description URL path to the next page.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[after]=019adf7d-4513-7062-b292-78b86cc470a4
+         */
+        next: string | null
+        /**
+         * @description URL path to the previous page.
+         * @example /platform/profile/oauth/grants?page[size]=10&page[before]=019adf7d-4513-74c5-bb9a-f1bc0f7a95d7
+         */
+        prev: string | null
+      }
+    }
     LoadBalancerDetailResponse_Output: {
       databases: {
         identifier: string
@@ -10503,6 +10551,14 @@ export interface components {
       username: string
     }
     MemberWithFreeProjectLimit_Output: {
+      free_plan_organizations: {
+        organization_name: string
+        projects: {
+          name: string
+          ref: string | null
+        }[]
+        slug: string | null
+      }[]
       free_project_limit: number
       primary_email: string
       username: string
@@ -14573,47 +14629,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -14667,6 +14682,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean | null
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -14817,6 +14837,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -15741,47 +15766,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token?: string | null
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref?: string | null
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id?: string | null
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region?: string | null
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key?: string | null
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name?: string | null
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -15835,6 +15819,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean | null
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -15985,6 +15974,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -16631,47 +16625,6 @@ export interface components {
             }
           }
         | {
-            iceberg: {
-              supabase: {
-                /**
-                 * @description Catalog token
-                 * @example A jwt secret
-                 */
-                catalog_token: string
-                /**
-                 * @description Namespace
-                 * @example my-namespace
-                 */
-                namespace?: string | null
-                /**
-                 * @description Project ref
-                 * @example abcdefghijklmnopqrst
-                 */
-                project_ref: string
-                /**
-                 * @description S3 access key ID
-                 * @example 53383b1d0cdb16a3afa63152656aa3cc
-                 */
-                s3_access_key_id: string
-                /**
-                 * @description S3 region
-                 * @example ap-southeast-1
-                 */
-                s3_region: string
-                /**
-                 * @description S3 secret access key
-                 * @example 25a0c5e69d847088a3e6ffb901adf4d19bbf74a400dec2ee49f46401039b3258
-                 */
-                s3_secret_access_key: string
-                /**
-                 * @description Warehouse name
-                 * @example my-warehouse
-                 */
-                warehouse_name: string
-              }
-            }
-          }
-        | {
             ducklake:
               | {
                   /**
@@ -16727,6 +16680,11 @@ export interface components {
                    * @example false
                    */
                   s3_use_ssl?: boolean
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -16879,6 +16837,11 @@ export interface components {
                         /** @enum {string} */
                         type: 'supabase_storage'
                       }
+                  /**
+                   * @description Immutable source namespace above replicated schemas. Omit to preserve the legacy flat layout.
+                   * @example abcjuqabhgwjjutfvtpa
+                   */
+                  table_namespace?: string | null
                   table_sorting?: {
                     tables?: {
                       schema: string
@@ -17282,6 +17245,11 @@ export interface components {
          * @example [YOUR_S3_SECRET_ACCESS_KEY]
          */
         s3_secret_access_key: string
+        /**
+         * @description Source project namespace above replicated schemas in the DuckLake catalog. Omitted for existing flat-layout destinations.
+         * @example abcjuqabhgwjjutfvtpa
+         */
+        table_namespace?: string
       }
       /** @description Whether external catalog access is enabled */
       enabled: boolean
@@ -17440,8 +17408,8 @@ export interface components {
       /** @description Tables with Warehouse copies */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -17565,8 +17533,8 @@ export interface components {
       /** @description Warehouse linked tables and replication-derived sync state */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -17638,8 +17606,8 @@ export interface components {
       /** @description Tables with Warehouse copies */
       tables: {
         /**
-         * @description DuckLake schema-qualified table name
-         * @example public.orders
+         * @description DuckLake table path with individually quoted identifiers, including the configured project namespace when present
+         * @example "abcjuqabhgwjjutfvtpa"."public"."orders"
          */
         copy_name: string
         /**
@@ -19793,7 +19761,7 @@ export interface operations {
         }
         content?: never
       }
-      /** @description The config file could not be parsed as TOML */
+      /** @description The config file could not be parsed as TOML or JSON, or both `config.json` and `config.jsonc` exist */
       422: {
         headers: {
           [name: string]: unknown
@@ -23889,6 +23857,63 @@ export interface operations {
       }
     }
   }
+  OAuthApprovalsController_listApprovals: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. Nulls sort last in ascending order and first in descending order. Defaults to `name`. */
+        sort?:
+          | 'name'
+          | '-name'
+          | 'created_by'
+          | '-created_by'
+          | 'last_approved_at'
+          | '-last_approved_at'
+      }
+      header?: never
+      path: {
+        /** @description Organization slug */
+        slug: string
+      }
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListOAuthApprovalsResponse_Output']
+        }
+      }
+      /** @description Unauthorized */
+      401: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Forbidden action */
+      403: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+      /** @description Rate limit exceeded */
+      429: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   OAuthAppsController_listOAuthApps: {
     parameters: {
       query: {
@@ -26444,6 +26469,46 @@ export interface operations {
       }
     }
   }
+  OAuthGrantsController_listGrants: {
+    parameters: {
+      query?: {
+        page?: {
+          after?: string
+          before?: string
+          size?: number
+        }
+        /** @description Sort field, prefixed with `-` for descending order. Defaults to `app_name`. */
+        sort?:
+          | 'app_name'
+          | '-app_name'
+          | 'organization_name'
+          | '-organization_name'
+          | 'approved_at'
+          | '-approved_at'
+      }
+      header?: never
+      path?: never
+      cookie?: never
+    }
+    requestBody?: never
+    responses: {
+      200: {
+        headers: {
+          [name: string]: unknown
+        }
+        content: {
+          'application/json': components['schemas']['ListUserOAuthGrantsResponse_Output']
+        }
+      }
+      /** @description Failed to get user's OAuth grants */
+      500: {
+        headers: {
+          [name: string]: unknown
+        }
+        content?: never
+      }
+    }
+  }
   PermissionsController_getPermissions: {
     parameters: {
       query?: never
@@ -26606,6 +26671,8 @@ export interface operations {
         limit?: number
         /** @description Number of projects to skip */
         offset?: number
+        /** @description A comma-separated list of project refs to filter by. Accepts up to 100 refs. Refs of projects that do not exist or are not accessible are omitted from the response. */
+        refs?: string
         /** @description Search projects by name */
         search?: string
         /** @description Sort order for projects */
@@ -36815,7 +36882,7 @@ export interface operations {
   WarehouseController_deleteWarehouse: {
     parameters: {
       query?: {
-        /** @description Permanently delete the managed DuckLake catalog schema and Storage bucket. Defaults to false. */
+        /** @description Permanently delete the managed DuckLake catalog schema and dedicated Storage bucket. Legacy shared buckets and their objects are retained. Defaults to false. */
         delete_data?: 'true' | 'false'
       }
       header?: never

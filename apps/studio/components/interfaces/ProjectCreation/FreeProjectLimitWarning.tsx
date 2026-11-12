@@ -1,41 +1,47 @@
+import { useParams } from 'common'
 import { Admonition } from 'ui-patterns/Admonition'
 
+import { AffectedOrganizationsList } from '@/components/ui/AffectedOrganizationsList'
+import { FreeProjectLimitActions } from '@/components/ui/FreeProjectLimitActions'
 import Panel from '@/components/ui/Panel'
 import { UpgradePlanButton } from '@/components/ui/UpgradePlanButton'
 import type { MemberWithFreeProjectLimit } from '@/data/organizations/free-project-limit-check-query'
+import { groupByOrganization } from '@/data/organizations/free-project-limit-check.utils'
+import { useOrganizationMembersQuery } from '@/data/organizations/organization-members-query'
 
 interface FreeProjectLimitWarningProps {
   membersExceededLimit: MemberWithFreeProjectLimit[]
 }
 
 export const FreeProjectLimitWarning = ({ membersExceededLimit }: FreeProjectLimitWarningProps) => {
+  const { slug } = useParams()
+  const { data: orgMembers } = useOrganizationMembersQuery({ slug })
+  const hasMultipleMembers = (orgMembers ?? []).filter((member) => !member.invited_id).length > 1
+  const organizations = groupByOrganization(membersExceededLimit)
+
   return (
     <Panel.Content>
       <Admonition
         type="default"
-        title="The organization has members who have exceeded their free project limits"
+        title="Exceeding number of active Free Projects"
         description={
           <div className="space-y-3">
             <p className="text-sm leading-normal">
-              The following members have reached their maximum limits for the number of active free
-              plan projects within organizations where they are an administrator or owner:
+              Owners and administrators are limited in how many active Free Plan projects they can
+              have across all organizations. These members are over the limit:
             </p>
-            <ul className="pl-5 list-disc">
-              {membersExceededLimit.map((member, idx: number) => (
-                <li key={`member-${idx}`}>
-                  {`${member.username || member.primary_email} (Limit: ${member.free_project_limit} free projects)`}
-                </li>
-              ))}
-            </ul>
-            <p className="text-sm leading-normal">
-              These members will need to either delete, pause, or upgrade one or more of these
-              projects before you're able to create a free project within this organization.
-            </p>
-
-            <UpgradePlanButton
-              source="freeProjectLimitWarning"
-              featureProposition="create more projects"
+            <AffectedOrganizationsList organizations={organizations} />
+            <FreeProjectLimitActions
+              goal="create a free project in this organization"
+              hasMultipleMembers={hasMultipleMembers}
             />
+
+            <div className="mt-4">
+              <UpgradePlanButton
+                source="freeProjectLimitWarning"
+                featureProposition="create more projects"
+              />
+            </div>
           </div>
         }
       />
