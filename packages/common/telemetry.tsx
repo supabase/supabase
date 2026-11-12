@@ -181,9 +181,8 @@ export const PageTelemetry = ({
 
     function handleRouteChange() {
       if (!hasSentInitialPageTelemetryRef.current) return
-      // Studio's TanStack compat shim also fires routeChangeComplete for hash-only changes and for
-      // third-party history.replaceState calls that keep the path and query. `$current_url` drops
-      // the hash, so those would be exact repeats. Path or query (filter) changes still count.
+      // routeChangeComplete can fire when only the hash changes, and `$current_url` drops the hash,
+      // so that pageview would be an exact repeat.
       const url = window.location.pathname + window.location.search
       if (url === lastSentPagesUrlRef.current) return
       lastSentPagesUrlRef.current = url
