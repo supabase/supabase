@@ -9,21 +9,23 @@ import Table from '@/components/to-be-cleaned/Table'
 import { AlertError } from '@/components/ui/AlertError'
 import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useEgressReport } from '@/data/reports/egress-report-query'
+import { formatBytes } from '@/lib/helpers'
 
 // Log rows arrive untyped (LogData[]); parse at the boundary instead of casting.
-// coerce handles the BigQuery integer count and the OTEL float count alike.
+// coerce handles BigQuery integers and OTEL floats alike.
 const TopPathsSchema = z.array(
   z.object({
-    status_code: z.coerce.number().optional(),
     path: z.string(),
     count: z.coerce.number(),
+    egress_bytes: z.coerce.number(),
   })
 )
 
 const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
-  const { data, error, isLoading } = useEgressReport(projectRef)
-  const parsed = TopPathsSchema.safeParse(data.topPaths ?? [])
-  const rows = parsed.success ? parsed.data : []
+  const { logData, error, isLoading } = useEgressReport(projectRef)
+  const parsed = TopPathsSchema.safeParse(logData)
+  // The query also limits to 5; cap here too so the panel never grows past 5 rows.
+  const rows = parsed.success ? parsed.data.slice(0, 5) : []
 
   if (isLoading) {
     return (
@@ -35,11 +37,9 @@ const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
     )
   }
 
-  if (error.topPaths) {
+  if (error) {
     const message =
-      typeof error.topPaths === 'string'
-        ? error.topPaths
-        : 'Could not load the top API paths right now.'
+      typeof error === 'string' ? error : 'Could not load the top API paths right now.'
     return (
       <AlertError
         error={{ message }}
@@ -50,35 +50,36 @@ const EgressTopPaths = ({ projectRef }: { projectRef: string }) => {
   }
 
   if (rows.length === 0) {
-    return <p className="text-sm text-foreground-light">No REST API requests in the last hour.</p>
+    return <p className="text-sm text-foreground-light">No API requests in the past 24 hours.</p>
   }
 
-  // Sticky header stays visible while the body scrolls (~4 rows tall).
-  const headerClasses = 'text-xs! py-2! font-bold bg-surface-200! sticky top-0 z-10'
+  const headerClasses = 'text-xs! py-2! font-bold'
   const cellClasses = 'text-xs! py-2!'
 
   return (
     <div className="space-y-2">
-      <p className="text-xs text-foreground-lighter">Based on the past hour of requests.</p>
+      <p className="text-xs text-foreground-lighter">
+        Top 5 paths by response size in the last 24 hours. This is an estimate and can differ from
+        billed egress.
+      </p>
       <Table
         className="table-fixed w-full"
-        containerClassName="max-h-44 overflow-y-auto"
         head={
           <>
-            <Table.th className={`${headerClasses} w-16`}>Status</Table.th>
             <Table.th className={headerClasses}>Endpoint</Table.th>
+            <Table.th className={`${headerClasses} text-right w-28`}>Egress</Table.th>
             <Table.th className={`${headerClasses} text-right w-28`}>Requests</Table.th>
           </>
         }
         body={rows.map((row) => (
-          <Table.tr key={`${row.status_code ?? 'na'}-${row.path}`}>
-            <Table.td className={`${cellClasses} font-mono text-foreground-light`}>
-              {row.status_code || '—'}
-            </Table.td>
+          <Table.tr key={row.path}>
             <Table.td className={cellClasses}>
               <span className="block truncate font-mono text-foreground-light" title={row.path}>
                 {row.path}
               </span>
+            </Table.td>
+            <Table.td className={`${cellClasses} text-right whitespace-nowrap`}>
+              {formatBytes(row.egress_bytes)}
             </Table.td>
             <Table.td className={`${cellClasses} text-right whitespace-nowrap`}>
               {row.count.toLocaleString()}
