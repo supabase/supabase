@@ -1531,11 +1531,11 @@ export function createStorageExplorerState({
               state.abortUploadCallbacks[toastId] = []
             }
             state.abortUploadCallbacks[toastId].push(() => {
-              try {
-                upload.abort(true)
-              } catch (error) {
-                // Ignore error
-              }
+              // abort() returns a promise that rejects if the server fails to terminate the
+              // upload, so the rejection has to be handled here rather than with try/catch
+              upload.abort(true).catch(() => {
+                // Ignore error, the upload has already been stopped on the client
+              })
               reject(new Error('Upload aborted by user'))
             })
 
