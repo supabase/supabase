@@ -171,7 +171,7 @@ export const WarehouseStatusPreview = () => (
     </PageSectionMeta>
     <PageSectionContent>
       <div role="img" aria-label="Replication status preview">
-        <div inert aria-hidden="true" className="pointer-events-none opacity-40 grayscale">
+        <div inert aria-hidden="true" className="pointer-events-none grayscale">
           <Card>
             <CardContent className="p-0">
               <Table>
@@ -186,13 +186,15 @@ export const WarehouseStatusPreview = () => (
                   {['w-28', 'w-36'].map((width) => (
                     <TableRow key={width}>
                       <TableCell>
-                        <div className={`h-4 rounded bg-surface-300 ${width}`} />
+                        <div className={`h-4 rounded bg-foreground-muted/40 ${width}`} />
                       </TableCell>
                       <TableCell>
-                        <div className="h-4 w-20 rounded bg-surface-300" />
+                        <div className="h-4 w-20 rounded bg-foreground-muted/40" />
                       </TableCell>
                       <TableCell>
-                        <div className="h-4 w-12 rounded bg-surface-300" />
+                        <StateDot variant="default" className="opacity-60">
+                          <span className="block h-4 w-12 rounded bg-foreground-muted/60" />
+                        </StateDot>
                       </TableCell>
                     </TableRow>
                   ))}
