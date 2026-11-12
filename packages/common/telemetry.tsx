@@ -135,7 +135,7 @@ export const PageTelemetry = ({
   }, [API_URL, enabled, hasAcceptedConsent, slug, ref])
 
   const hasSentInitialPageTelemetryRef = useRef(false)
-  const lastSentPagesPathnameRef = useRef<string | null>(null)
+  const lastSentPagesUrlRef = useRef<string | null>(null)
   const previousAppPathnameRef = useRef<string | null>(null)
 
   useEffect(() => {
@@ -171,7 +171,7 @@ export const PageTelemetry = ({
       } finally {
         clearFirstTouchData()
         hasSentInitialPageTelemetryRef.current = true
-        lastSentPagesPathnameRef.current = window.location.pathname
+        lastSentPagesUrlRef.current = window.location.pathname + window.location.search
       }
     }
   }, [router?.isReady, enabled, hasAcceptedConsent, slug, ref])
@@ -181,12 +181,12 @@ export const PageTelemetry = ({
 
     function handleRouteChange() {
       if (!hasSentInitialPageTelemetryRef.current) return
-      // routeChangeComplete also fires for query-only changes, and Studio's TanStack compat
-      // shim fires it for hash changes and third-party history.replaceState calls too.
-      // Match the app-router branch below: one pageview per path change.
-      const { pathname } = window.location
-      if (pathname === lastSentPagesPathnameRef.current) return
-      lastSentPagesPathnameRef.current = pathname
+      // Studio's TanStack compat shim also fires routeChangeComplete for hash-only changes and for
+      // third-party history.replaceState calls that keep the path and query. `$current_url` drops
+      // the hash, so those would be exact repeats. Path or query (filter) changes still count.
+      const url = window.location.pathname + window.location.search
+      if (url === lastSentPagesUrlRef.current) return
+      lastSentPagesUrlRef.current = url
       sendPageTelemetry()
     }
 
