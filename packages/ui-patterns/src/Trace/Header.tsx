@@ -35,14 +35,9 @@ export function Status() {
   const variant = isLive ? 'success' : root?.status === 'error' ? 'destructive' : 'default'
 
   return (
-    <>
-      <Badge variant={variant} data-trace-status>
-        {label}
-      </Badge>
-      <span role="status" aria-live="polite" className="sr-only">
-        {label}
-      </span>
-    </>
+    <Badge variant={variant} role="status" aria-live="polite" data-trace-status>
+      {label}
+    </Badge>
   )
 }
 
