@@ -1,0 +1,61 @@
+---
+title: Surfaces
+description: Product views that render both in Studio and inside AI assistants through MCP Apps.
+---
+
+Surfaces are complete product views, such as a query editor, a logs viewer or a project home, that more than one host renders. Studio renders them natively. Claude, ChatGPT and other [MCP Apps](https://github.com/modelcontextprotocol/ext-apps) hosts render them inside a conversation, using the build in `apps/mcp-apps`.
+
+They live in the `surfaces` package and are imported by subpath, for example `surfaces/query` or `surfaces/logs`.
+
+## How surfaces differ from fragments
+
+A fragment is a building block. A surface is a whole view with its own states and actions, built from `ui` and `ui-patterns` with the same semantic tokens, so it adopts each host's theme.
+
+Because the host is different every time, a surface never loads data or talks to a host itself:
+
+- **Data comes in as props.** Reads arrive as a `Loadable<T>`: `idle` when the host can't provide the data, `loading`, `success` or `error`. Each view handles all four.
+- **Actions go out as callbacks.** Saving a row, refreshing logs or asking the agent are callbacks. When a host can't do something, it omits the callback and the view hides or disables the action.
+- **Hosts supply what differs.** For example, the query editor takes the SQL editor as a prop, so Studio can pass Monaco while MCP Apps pass CodeMirror.
+
+Data shapes such as `Project`, `Table` and `ChartConfig` are contracts owned by the Supabase MCP server and exported from `@supabase/mcp-server-supabase/apps`. Every host reads and writes the same shapes.
+
+## Where each surface is used
+
+| Surface                          | Studio                           | MCP Apps                          |
+| -------------------------------- | -------------------------------- | --------------------------------- |
+| [Project List](project-list)     | Not yet                          | Project browser                   |
+| [Explorer](explorer)             | Not yet                          | Project workspace, explorer panel |
+| [Issues List](issues-list)       | Not yet                          | Project home, issues panel        |
+| [Notebooks List](notebooks-list) | Not yet                          | Project home, notebooks panel     |
+| [Query Editor](query-editor)     | Explorer query and notebook tabs | SQL panel, workspace tabs         |
+| [Query Results](query-results)   | Explorer results and charts      | Inline query blocks, SQL panel    |
+| [Logs](logs)                     | Not yet                          | Logs panel, workspace tab         |
+| [Row Editor](row-editor)         | Not yet                          | Row panel, table editing          |
+| [Project Home](project-home)     | Not yet                          | Project workspace, home panel     |
+
+## Agent actions
+
+Surfaces never talk to an agent directly, and they don't write prompts. Each host has different tools and conventions, so the host owns everything agent-specific:
+
+- **Asking the agent.** A view calls `onAsk` with a structured `AgentRequest`, such as `{ type: 'project-check', project, check: 'security' }`. The host turns it into a message for its agent. MCP Apps phrase it for the MCP server's tools; Studio would phrase it for its Assistant.
+- **Sharing context.** A view calls `selectionSharing.attach` and `detach` with a bounded, labeled attachment, such as selected logs. The host decides where it goes: model context in an MCP Apps host, or the Assistant's context in Studio.
+- **Letting the agent drive a view.** Tools like `open_query` or `set_query_draft` are registered by the host and call into the host's own screens, not into surfaces. Surfaces provide only the state rules they share, such as `QueryDraftState`, which rejects an agent edit when the user changed the query after the agent last read it.
+
+Omit these callbacks in a host without an agent, and the views hide or disable the actions.
+
+## Building blocks
+
+Surfaces build their UI from the same components as the rest of Studio, never their own copies:
+
+- A failed read is a warning [Admonition](../fragments/admonition) titled "Failed to …", with the error underneath and Retry as an action, matching Studio's `AlertError`. A failed action, such as saving a row, uses a destructive Admonition.
+- A whole view with nothing to show uses [Empty State Presentational](../fragments/empty-state-presentational). Results areas use the same one-line message as Studio's Explorer, such as "Success. No rows returned".
+- Project status is a [Badge](../components/badge) with the same labels as Studio's project list.
+- Dialogs use [Dialog](../components/dialog), and confirmations use [Confirmation Modal](../fragments/confirmation-modal).
+
+`surfaces/common` holds only the shared types (`Loadable`, `AskAgent`, `SelectionSharing`) and small helpers, so there's nothing to keep in sync with the design system.
+
+## Rules
+
+- No data hooks, routers, stores or host SDKs inside a surface. The screen that renders a surface decides how to load data and act on callbacks.
+- Hiding an action is not authorization. The server enforces scope, read-only mode and write policy on every call.
+- Hosts forbid `eval` and may block external assets, so keep dependencies small and avoid runtime code generation.

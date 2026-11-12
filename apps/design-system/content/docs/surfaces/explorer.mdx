@@ -1,0 +1,36 @@
+---
+title: Explorer
+description: Browse a database's tables and write SQL, with one editor for whatever is selected.
+---
+
+<ComponentPreview name="surfaces-explorer" peekCode wide padded={false} />
+
+## Usage
+
+`Explorer` has two columns. The sidebar has the schema, a search and the schema's tables, with **Run SQL** at the bottom. The editor on the right shows what is selected: a table's rows, or the SQL draft. The host loads schemas and tables, runs queries with `onRunQuery` and saves rows with `onSaveRow`. Omit `onSaveRow` to make results read-only.
+
+There are no tabs. Hosts such as ChatGPT and Claude already have their own tabs and panels, so each panel shows one Explorer. For one query's results, open a single [Query Editor](query-editor) instead.
+
+It follows Studio's Explorer:
+
+- **A table shows its rows**, with paging, row editing and Refresh. It has no SQL editor and no result settings. Open query copies its SQL into the SQL draft, asking first if the draft has edits.
+- **SQL lives in one draft** that stays open while you browse tables. It never runs until the user clicks Run, including SQL an agent wrote.
+- **Tables and SQL share one results area:** the [results grid](query-results), row editing and the footer. Charts are for SQL. Editing is offered only when the results come from a single table with a primary key.
+
+## Driving the Explorer
+
+The `ref` handle lets a host, or an agent acting through it, show a table, draft SQL, and reach the editor:
+
+```tsx
+const explorer = useRef<ExplorerHandle>(null)
+
+explorer.current?.openTable({ schema: 'public', name: 'companies' })
+explorer.current?.openQuery({ title: 'Slow queries', sql })
+explorer.current?.editor(EXPLORER_QUERY_ID)?.update(nextSql, revision)
+```
+
+None of these run custom SQL. `openQuery` is rejected if the user has edited the draft, so their work is never replaced. An edit passes the revision it read, so it's rejected if the user changed the query since. `onStateChange` reports what is showing, without rows, for hosts that share the view with an agent.
+
+## In MCP Apps
+
+An agent opens the Explorer with `open_explorer_panel` when the user wants to browse their data, optionally starting at a table. When the user asks for specific results, the agent opens a single query with `open_sql_panel` or `show_query_block` instead.

@@ -9,6 +9,7 @@
 @source '../content/**/*.mdx';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/surfaces/src/**/*.{tsx,ts,js}';
 
 @theme inline {
   --font-sans:

@@ -1965,4 +1965,79 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/trace-waterfall-demo.tsx'],
   },
+  {
+    name: 'surfaces-query-editor',
+    type: 'components:example',
+    files: ['example/surfaces-query-editor.tsx'],
+  },
+  {
+    name: 'surfaces-query-editor-viewport',
+    type: 'components:example',
+    files: ['example/surfaces-query-editor-viewport.tsx'],
+  },
+  {
+    name: 'surfaces-explorer-toolbar',
+    type: 'components:example',
+    files: ['example/surfaces-explorer-toolbar.tsx'],
+  },
+  {
+    name: 'surfaces-results-grid',
+    type: 'components:example',
+    files: ['example/surfaces-results-grid.tsx'],
+  },
+  {
+    name: 'surfaces-result-chart',
+    type: 'components:example',
+    files: ['example/surfaces-result-chart.tsx'],
+  },
+  {
+    name: 'surfaces-result-chart-line',
+    type: 'components:example',
+    files: ['example/surfaces-result-chart-line.tsx'],
+  },
+  {
+    name: 'surfaces-result-chart-empty',
+    type: 'components:example',
+    files: ['example/surfaces-result-chart-empty.tsx'],
+  },
+  {
+    name: 'surfaces-logs-view',
+    type: 'components:example',
+    files: ['example/surfaces-logs-view.tsx'],
+  },
+  {
+    name: 'surfaces-row-editor',
+    type: 'components:example',
+    files: ['example/surfaces-row-editor.tsx'],
+  },
+  {
+    name: 'surfaces-project-home',
+    type: 'components:example',
+    files: ['example/surfaces-project-home.tsx'],
+  },
+  {
+    name: 'surfaces-project-home-states',
+    type: 'components:example',
+    files: ['example/surfaces-project-home-states.tsx'],
+  },
+  {
+    name: 'surfaces-project-list',
+    type: 'components:example',
+    files: ['example/surfaces-project-list.tsx'],
+  },
+  {
+    name: 'surfaces-explorer',
+    type: 'components:example',
+    files: ['example/surfaces-explorer.tsx'],
+  },
+  {
+    name: 'surfaces-issues-list',
+    type: 'components:example',
+    files: ['example/surfaces-issues-list.tsx'],
+  },
+  {
+    name: 'surfaces-notebooks-list',
+    type: 'components:example',
+    files: ['example/surfaces-notebooks-list.tsx'],
+  },
 ]

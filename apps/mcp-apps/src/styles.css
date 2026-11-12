@@ -1,0 +1,38 @@
+@import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
+
+@source './**/*.{ts,tsx}';
+@source './../../../packages/surfaces/src/**/*.{ts,tsx}';
+@source './../../../packages/ui/src/**/*.{tsx,ts,js}';
+@source './../../../packages/ui-patterns/src/Chart/**/*.{tsx,ts,js}';
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+/* Inline surfaces size to their content; hosts resize the frame from it. */
+html[data-surface='inline'],
+html[data-surface='inline'] body,
+html[data-surface='inline'] #root {
+  height: auto;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before,
+  ::backdrop,
+  ::file-selector-button {
+    border-color: var(--border, currentColor);
+  }
+}

@@ -1,0 +1,16 @@
+---
+title: Logs
+description: A project's recent logs with filters, a detail panel and selection the agent can read.
+---
+
+<ComponentPreview name="surfaces-logs-view" peekCode wide padded={false} />
+
+## Usage
+
+`LogsView` renders the logs a host loaded for the current `settings`: time window, source and level. When the settings change, the host loads logs again and passes the new `logs` state. Search filters the loaded logs on the client.
+
+- `selectionSharing` lets a user share selected logs with the agent as context without sending a message. Omit it when the host can't do this.
+- `onAsk` receives an `investigate-logs` request with the selection attached. The host writes the prompt. Omit it when the host has no agent.
+- `agentName` names the agent in actions, for example "Send to Claude". The detail panel also has Copy, which copies the selected logs as JSON.
+
+Log contents are user data. Hosts must treat them as untrusted, and the view labels shared selections that way.

@@ -1,0 +1,20 @@
+---
+title: Project Home
+description: A project's overview with traffic, advisor findings and actions for the agent.
+---
+
+<ComponentPreview name="surfaces-project-home" peekCode wide padded={false} />
+
+## Usage
+
+`ProjectHome` shows a project's identity, the last 24 hours of API traffic, its open issues and user count, and advisor findings. Issues count each failing check once, like Studio's Issues page. The activity chart follows the [chart pattern](../ui-patterns/charts): what it covers is in the title's tooltip, and zero traffic shows as an empty state rather than a flat line. The host passes the overview as a `Loadable`. Pass `onAsk` to let users send checks and finding reviews to the agent. It receives a `project-check` or `review-finding` request, and the host writes the prompt. Without it, those actions are disabled with a note.
+
+## Composition
+
+Home is made of sections that each work on their own: the header, the stats, the activity chart, [Issues List](issues-list), [Notebooks List](notebooks-list) and `ProjectChecks`. Pass `notebooks` to show the notebooks section; omit it when the connection has none. An agent can open the whole Home beside the conversation with `open_project_home_panel`, or a section alone with `open_issues_panel` or `open_notebooks_panel`.
+
+## States
+
+Each section of the overview can fail on its own. A section that failed reads as unavailable, never as zero or healthy. When the connection has no overview at all, pass `{ status: 'idle' }`.
+
+<ComponentPreview name="surfaces-project-home-states" wide padded={false} />

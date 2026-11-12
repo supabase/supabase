@@ -1,0 +1,53 @@
+{
+  "name": "mcp-apps",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Supabase surfaces packaged as MCP Apps: one self-contained HTML document per surface, served by the Supabase MCP server.",
+  "type": "module",
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "dev": "vite --port 5174",
+    "build": "node scripts/build.mjs",
+    "build:watch": "node scripts/build.mjs --watch",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit",
+    "clean": "rimraf dist .turbo tsconfig.tsbuildinfo",
+    "dev:host": "vite --config host/vite.config.ts",
+    "dev:e2e": "node scripts/dev-e2e.mjs"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/ext-apps": "1.7.5",
+    "@openai/mcp-extensions": "0.1.0",
+    "@supabase/mcp-server-supabase": "link:../../../mcp-surfaces/packages/mcp-server-supabase",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "surfaces": "workspace:*",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@ai-sdk/amazon-bedrock": "5.0.55",
+    "@ai-sdk/anthropic": "4.0.38",
+    "@ai-sdk/openai": "4.0.41",
+    "@aws-sdk/credential-providers": "3.1041.0",
+    "@modelcontextprotocol/sdk": "^1.29.0",
+    "@tailwindcss/vite": "4.2.4",
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "ai": "7.0.59",
+    "config": "workspace:*",
+    "jsdom": "^28.1.0",
+    "tailwindcss": "catalog:",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  }
+}
