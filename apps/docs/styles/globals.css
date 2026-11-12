@@ -5,9 +5,11 @@
 @import 'ui-patterns/Notch/notch.css';
 @import './code-block.css';
 @import './reference.css';
+@import './sidebar.css';
 @import './ask-ai.css';
 @import './curved-scroll-area.css';
 @import 'docs-search/styles.css';
+@import './header.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
@@ -19,6 +21,8 @@
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
 @source './../../../packages/docs-search/src/**/*.{tsx,ts}';
+
+@custom-variant layout-v2 (&:is([data-ia-nav='option-1'] *));
 
 @theme inline {
   --font-sans:
@@ -41,6 +45,27 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+  --container-docs-content: 731px;
+}
+
+@utility docs-active-bar {
+  &[aria-current]::before {
+    @apply absolute -left-3.25 top-1/2 h-[1em] w-px -translate-y-1/2 bg-brand;
+    content: '';
+  }
+}
+
+@utility docs-rail-sublist {
+  @apply mt-1 ml-px border-l pl-3;
+}
+
+@utility docs-rail-link {
+  @apply relative block py-1 text-sm text-foreground-lighter wrap-anywhere;
+  @apply transition-colors duration-150 hover:text-foreground-light focus-ring;
+  @apply focus-visible:text-foreground-light;
+  &[aria-current] {
+    @apply text-foreground;
+  }
 }
 
 @layer utilities {
@@ -84,11 +109,23 @@
 :root {
   --sidebar-width: 300px;
   --header-height: 50px;
+  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
+}
+
+:root[data-ia-nav='option-1'] {
+  --header-height: 56px;
 }
 
 html {
   scroll-behavior: smooth;
   font-weight: 500;
+}
+
+@media (min-width: 1024px) {
+  html[data-ia-nav='option-1'],
+  html[data-ia-nav='option-1'] body {
+    overscroll-behavior-y: none;
+  }
 }
 
 html[data-theme*='dark'] {

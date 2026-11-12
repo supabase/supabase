@@ -14,8 +14,12 @@ const Layout = ({
   NavigationMenu?: ReactNode
 }>) => {
   return (
-    <SidebarSkeleton NavigationMenu={NavigationMenu} additionalNavItems={additionalNavItems}>
-      <LayoutMainContent className="pb-0">{children}</LayoutMainContent>
+    <SidebarSkeleton
+      NavigationMenu={NavigationMenu}
+      additionalNavItems={additionalNavItems}
+      hasRightRail
+    >
+      <LayoutMainContent className="pb-0 layout-v2:lg:px-20">{children}</LayoutMainContent>
     </SidebarSkeleton>
   )
 }

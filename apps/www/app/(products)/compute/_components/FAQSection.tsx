@@ -1,8 +1,4 @@
-'use client'
-
-import { FaqAnswer } from '~/components/FaqAnswer'
-import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionItem, AccordionTrigger } from 'ui'
+import { FaqList } from '~/components/FaqList'
 
 const faqs = [
   {
@@ -48,22 +44,7 @@ export function FAQSection() {
       <div className="sm:py-18 mx-auto px-6 py-16 md:py-24 lg:px-16 lg:py-24 xl:px-20">
         <h2 className="h3 text-center">Frequently asked questions</h2>
         <div className="my-16">
-          <Accordion type="multiple" className="text-foreground-light">
-            {faqs.map((faq, i) => (
-              <div className="border-b py-2" key={i}>
-                <AccordionItem value={`faq--${i.toString()}`} className="border-none">
-                  <AccordionTrigger>
-                    <span className="text-foreground text-left">{faq.question}</span>
-                  </AccordionTrigger>
-                  <FaqAnswer>
-                    <div className="prose text-foreground-lighter">
-                      <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                    </div>
-                  </FaqAnswer>
-                </AccordionItem>
-              </div>
-            ))}
-          </Accordion>
+          <FaqList items={faqs} />
         </div>
       </div>
     </div>

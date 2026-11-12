@@ -3,7 +3,8 @@ import { IS_PLATFORM } from 'common'
 import { NextApiRequest, NextApiResponse } from 'next'
 
 import { toWebHandler } from '@/compat/next/api'
-import { isValidEdgeFunctionURL } from '@/lib/api/edgeFunctions'
+import { getEdgeFunctionTestUrl } from '@/lib/api/edgeFunctions'
+import { DEFAULT_SUPABASE_PUBLIC_URL } from '@/lib/constants/api'
 
 async function handler(req: NextApiRequest, res: NextApiResponse) {
   const { method } = req
@@ -25,13 +26,14 @@ async function handler(req: NextApiRequest, res: NextApiResponse) {
 async function handlePost(req: NextApiRequest, res: NextApiResponse) {
   try {
     const { url: requestUrl, method, body: requestBody, headers: customHeaders } = req.body
-    const url = IS_PLATFORM
-      ? requestUrl
-      : requestUrl.replace(process.env.SUPABASE_PUBLIC_URL, process.env.SUPABASE_URL)
+    const url = getEdgeFunctionTestUrl(requestUrl, {
+      isPlatform: IS_PLATFORM,
+      nimbusProjectsUrl: process.env.NIMBUS_PROD_PROJECTS_URL,
+      supabaseUrl: process.env.SUPABASE_URL,
+      supabasePublicUrl: process.env.SUPABASE_PUBLIC_URL || DEFAULT_SUPABASE_PUBLIC_URL,
+    })
 
-    const validEdgeFnUrl = isValidEdgeFunctionURL(url, IS_PLATFORM)
-
-    if (!validEdgeFnUrl) {
+    if (url === undefined) {
       return res.status(400).json({
         status: 400,
         error: { message: 'Provided URL is not a valid Supabase edge function URL' },

@@ -11,7 +11,11 @@ import {
   useWatch,
 } from 'ui'
 
-import type { PermissionCatalogEntry, PermissionMode } from '../../AccessToken.permissions'
+import {
+  PERMISSION_MODE_LABEL,
+  type PermissionCatalogEntry,
+  type PermissionMode,
+} from '../../AccessToken.permissions'
 import type { EntryAccess } from '../../AccessToken.roles'
 import { ExceedsRoleBadge } from '../ExceedsRoleBadge'
 import { TokenFormValues } from './NewScopedTokenForm.utils'
@@ -21,6 +25,7 @@ interface PermissionRowProps {
   control: Control<TokenFormValues>
   entry: PermissionCatalogEntry
   mode: PermissionMode
+  modes: PermissionMode[]
   onChange: (mode: PermissionMode) => void
   entryAccess?: EntryAccess
 }
@@ -29,6 +34,7 @@ export const PermissionRow = ({
   control,
   entry,
   mode,
+  modes,
   onChange,
   entryAccess,
 }: PermissionRowProps) => {
@@ -117,9 +123,11 @@ export const PermissionRow = ({
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="none">None</SelectItem>
-            <SelectItem value="read">Read</SelectItem>
-            {entry.writable && <SelectItem value="readwrite">Read-write</SelectItem>}
+            {modes.map((value) => (
+              <SelectItem key={value} value={value}>
+                {PERMISSION_MODE_LABEL[value]}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </div>
