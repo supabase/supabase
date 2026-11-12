@@ -340,7 +340,7 @@ $$;`
         ? safeSql`
   ALTER TABLE ${ident(old.schema)}.${ident(old.table)} ADD CONSTRAINT ${ident(`${old.table}_${old.name}_check`)} CHECK (${check});
 
-  SELECT conkey into v_conkey FROM pg_constraint WHERE conname = ${literal(`${old.table}_${old.name}_check`)};
+  SELECT conkey into v_conkey FROM pg_constraint WHERE conrelid = ${literal(old.table_id)} AND conname = ${literal(`${old.table}_${old.name}_check`)};
 
   ASSERT v_conkey IS NOT NULL, 'error creating column constraint: check condition must refer to this column';
   ASSERT cardinality(v_conkey) = 1, 'error creating column constraint: check condition cannot refer to multiple columns';
