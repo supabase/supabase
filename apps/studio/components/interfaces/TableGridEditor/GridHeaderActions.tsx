@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import { Realtime } from 'icons'
 import {
   BookOpenTextIcon,
@@ -69,6 +69,7 @@ export interface GridHeaderActionsProps {
 }
 export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProps) => {
   const { ref } = useParams()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   const track = useTrack()
   const appSnap = useAppStateSnapshot()
   const snap = useTableEditorTableStateSnapshot()
@@ -334,7 +335,11 @@ export const GridHeaderActions = ({ table, isRefetching }: GridHeaderActionsProp
                     <Button asChild>
                       <Link
                         target="_blank"
-                        href={`/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`}
+                        href={
+                          isIssuesInboxEnabled
+                            ? `/project/${ref}/issues/${matchingMaterializedViewLint?.name}`
+                            : `/project/${ref}/advisors/security?preset=${matchingMaterializedViewLint?.level}&id=${matchingMaterializedViewLint?.cache_key}`
+                        }
                       >
                         Learn more
                       </Link>

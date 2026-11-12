@@ -60,6 +60,8 @@ export const useSetIntrospection = ({
     mutate({
       projectRef: project.ref,
       connectionString: project.connectionString,
+      sqlOrigin: 'studio',
+      queryName: 'graphql-introspection-set',
       sql,
       grant: unguarded.migrating,
     })

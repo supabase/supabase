@@ -1,6 +1,7 @@
 'use client'
 
 import { useState, type ReactNode } from 'react'
+import { cn } from 'ui'
 
 export interface HeadingReelProps {
   // a new id rolls the new children in
@@ -8,6 +9,7 @@ export interface HeadingReelProps {
   // a higher index than the last one rolls up, a lower one rolls down
   index: number
   children: ReactNode
+  className?: string
 }
 
 interface HeadingRoll {
@@ -18,7 +20,7 @@ interface HeadingRoll {
   direction: 'forward' | 'backward'
 }
 
-export const HeadingReel = ({ id, index, children }: HeadingReelProps) => {
+export const HeadingReel = ({ id, index, children, className }: HeadingReelProps) => {
   const [roll, setRoll] = useState<HeadingRoll>({
     activeId: id,
     activeContent: children,
@@ -38,7 +40,12 @@ export const HeadingReel = ({ id, index, children }: HeadingReelProps) => {
   }
 
   return (
-    <span className="toc-heading-reel relative block h-5 min-w-0 [clip-path:inset(0_-100vw)]">
+    <span
+      className={cn(
+        'toc-heading-reel relative block h-5 min-w-0 [clip-path:inset(0_-100vw)]',
+        className
+      )}
+    >
       {roll.previous ? (
         <span
           key={roll.previous.id}

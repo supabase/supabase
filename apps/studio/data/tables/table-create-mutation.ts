@@ -28,6 +28,8 @@ export async function createTable({ projectRef, connectionString, payload }: Tab
   const { result } = await executeSql<void>({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-create',
     sql,
     queryKey: ['table', 'create'],
     grant: unguarded.migrating,

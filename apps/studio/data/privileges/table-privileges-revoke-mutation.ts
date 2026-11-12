@@ -30,6 +30,8 @@ export async function revokeTablePrivileges({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-privileges-revoke',
     sql,
     queryKey: ['table-privileges', 'revoke'],
     grant: unguarded.migrating,

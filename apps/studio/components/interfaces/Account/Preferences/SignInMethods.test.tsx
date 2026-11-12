@@ -173,12 +173,14 @@ describe('SignInMethods', () => {
     expect(screen.queryByText('Email')).not.toBeInTheDocument()
   })
 
-  it('does not offer to add a password to SSO users', async () => {
-    mockGetUser([ssoIdentity])
+  it('shows a single email for managed SSO sign-in without offering password setup', async () => {
+    mockGetUser([{ ...ssoIdentity, identity_data: { user_name: EMAIL } }])
 
     renderSignInMethods()
 
     expect(await screen.findByText('SSO')).toBeInTheDocument()
+    expect(screen.getByText(EMAIL, { exact: true })).toBeInTheDocument()
+    expect(screen.queryByText(`${EMAIL} · ${EMAIL}`)).not.toBeInTheDocument()
     expect(screen.getByText('Your organization manages how you sign in.')).toBeInTheDocument()
     expect(screen.queryByRole('button', { name: 'Add password' })).not.toBeInTheDocument()
   })
