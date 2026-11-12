@@ -2,6 +2,8 @@
 
 import 'server-only'
 
+import { requireEnvironmentVariables } from './required-env'
+
 interface CustomerioProfile {
   email: string
   firstName?: string
@@ -60,6 +62,10 @@ export class CustomerioTrackClient {
     private siteId: string,
     private apiKey: string
   ) {
+    requireEnvironmentVariables({
+      CUSTOMERIO_SITE_ID: siteId,
+      CUSTOMERIO_API_KEY: apiKey,
+    })
     this.auth = btoa(`${siteId}:${apiKey}`)
   }
 
@@ -131,9 +137,7 @@ export class CustomerioAppClient {
   private auth: string
 
   constructor(private apiKey: string) {
-    if (!apiKey || apiKey.trim() === '') {
-      throw new Error('Customer.io App API key is required')
-    }
+    requireEnvironmentVariables({ CUSTOMERIO_APP_API_KEY: apiKey })
     this.auth = apiKey.trim()
   }
 
