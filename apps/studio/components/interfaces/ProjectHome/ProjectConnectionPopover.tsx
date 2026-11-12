@@ -9,7 +9,7 @@ import {
   TerminalIcon,
 } from 'lucide-react'
 import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef , useState } from 'react'
 import {
   Button,
   cn,
@@ -62,6 +62,8 @@ interface ProjectConnectionPopoverProps {
 export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopoverProps) => {
   const [open, setOpen] = useState(false)
   const [copiedItem, setCopiedItem] = useState<string | null>(null)
+  const copyTimeoutRef = useRef<ReturnType<typeof setTimeout>>()
+
   const [, setShowConnect] = useQueryState('showConnect', parseAsBoolean.withDefault(false))
 
   const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
@@ -188,8 +190,10 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
   useEffect(() => {
     if (!open) {
       setCopiedItem(null)
+      clearTimeout(copyTimeoutRef.current)
     }
   }, [open])
+  useEffect(() => () => clearTimeout(copyTimeoutRef.current), [])
 
   return (
     <div className="mt-3 flex items-center gap-3">
@@ -229,6 +233,8 @@ export const ProjectConnectionPopover = ({ projectRef }: ProjectConnectionPopove
                     event.preventDefault()
                     if (item.disabled) return
 
+                    clearTimeout(copyTimeoutRef.current)
+                    copyTimeoutRef.current = setTimeout(() => setCopiedItem(null), 2000)
                     copyToClipboard(item.value)
                     setCopiedItem(item.label)
                   }}
