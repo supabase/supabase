@@ -32,8 +32,8 @@ export const BUILDING_OPTIONS: readonly OnboardingSurveyOption[] = [
 ]
 
 export const CAN_CODE_OPTIONS: readonly OnboardingSurveyOption[] = [
-  { value: 'no', label: 'No' },
   { value: 'yes', label: 'Yes' },
+  { value: 'no', label: 'No' },
 ]
 
 // Same values as ORG_KIND_TYPES, worded as answers to "Who is this org for?".

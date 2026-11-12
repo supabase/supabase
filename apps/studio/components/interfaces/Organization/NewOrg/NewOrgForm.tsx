@@ -242,7 +242,6 @@ export const NewOrgForm = ({
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
   const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
   const selectedOrgKind = useWatch({ control: form.control, name: 'kind' })
-  const selectedBuilding = useWatch({ control: form.control, name: 'building' })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -569,23 +568,21 @@ export const NewOrgForm = ({
           </FormItemLayout>
         )}
       />
-      {selectedBuilding !== '' && (
-        <FormField
-          control={form.control}
-          name="can_code"
-          render={({ field }) => (
-            <FormItemLayout label="Do you know how to code?" layout="horizontal">
-              <FormControl>
-                <OnboardingSurveySelect
-                  value={field.value}
-                  onValueChange={field.onChange}
-                  options={CAN_CODE_OPTIONS}
-                />
-              </FormControl>
-            </FormItemLayout>
-          )}
-        />
-      )}
+      <FormField
+        control={form.control}
+        name="can_code"
+        render={({ field }) => (
+          <FormItemLayout label="Do you know how to code?" layout="horizontal">
+            <FormControl>
+              <OnboardingSurveySelect
+                value={field.value}
+                onValueChange={field.onChange}
+                options={CAN_CODE_OPTIONS}
+              />
+            </FormControl>
+          </FormItemLayout>
+        )}
+      />
     </div>
   )
 

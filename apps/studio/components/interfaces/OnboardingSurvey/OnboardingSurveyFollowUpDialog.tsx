@@ -68,11 +68,11 @@ export function OnboardingSurveyFollowUpDialog({
     defaultValues,
   })
 
-  const [kind, building] = useWatch({
+  const [kind, building, canCode] = useWatch({
     control: form.control,
-    name: ['kind', 'building'],
+    name: ['kind', 'building', 'can_code'],
   })
-  const hasAnswer = kind !== '' || building !== ''
+  const hasAnswer = kind !== '' || building !== '' || canCode !== ''
 
   return (
     <Dialog open={open} onOpenChange={(isOpen) => !isOpen && onClose()}>
@@ -88,7 +88,7 @@ export function OnboardingSurveyFollowUpDialog({
                 All questions are optional. Your answers help us improve Supabase.
               </p>
 
-              {/* Each question appears once the one before it is answered */}
+              {/* Size and What are you building? appear once Who is this org for? is answered */}
               <div>
                 <FormField
                   control={form.control}
@@ -161,29 +161,23 @@ export function OnboardingSurveyFollowUpDialog({
                   )}
                 </AnimatePresence>
 
-                <AnimatePresence initial={false}>
-                  {kind !== '' && building !== '' && (
-                    <FormSectionCollapse>
-                      <div className="pt-5">
-                        <FormField
-                          control={form.control}
-                          name="can_code"
-                          render={({ field }) => (
-                            <FormItemLayout label="Do you know how to code?" layout="vertical">
-                              <FormControl>
-                                <OnboardingSurveySelect
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                  options={CAN_CODE_OPTIONS}
-                                />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
-                    </FormSectionCollapse>
-                  )}
-                </AnimatePresence>
+                <div className="pt-5">
+                  <FormField
+                    control={form.control}
+                    name="can_code"
+                    render={({ field }) => (
+                      <FormItemLayout label="Do you know how to code?" layout="vertical">
+                        <FormControl>
+                          <OnboardingSurveySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            options={CAN_CODE_OPTIONS}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </div>
               </div>
             </DialogSection>
           </form>
