@@ -210,7 +210,7 @@ describe('OnboardingSurveyFollowUpCard', () => {
     renderCard()
     fireEvent.click(await screen.findByRole('button', { name: 'Answer' }))
     const dialog = await screen.findByRole('dialog')
-    await chooseOption(dialog, 1, 'Yes')
+    await chooseOption(dialog, 2, 'Yes')
     await chooseOption(dialog, 0, 'Agency')
     await chooseOption(dialog, 1, 'Other')
     fireEvent.click(within(dialog).getByRole('button', { name: 'Send answers' }))

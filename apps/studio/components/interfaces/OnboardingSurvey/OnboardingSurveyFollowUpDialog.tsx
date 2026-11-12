@@ -88,7 +88,6 @@ export function OnboardingSurveyFollowUpDialog({
                 All questions are optional. Your answers help us improve Supabase.
               </p>
 
-              {/* Size and What are you building? appear once Who is this org for? is answered */}
               <div>
                 <FormField
                   control={form.control}
@@ -137,29 +136,23 @@ export function OnboardingSurveyFollowUpDialog({
                   )}
                 </AnimatePresence>
 
-                <AnimatePresence initial={false}>
-                  {kind !== '' && (
-                    <FormSectionCollapse>
-                      <div className="pt-5">
-                        <FormField
-                          control={form.control}
-                          name="building"
-                          render={({ field }) => (
-                            <FormItemLayout label="What are you building?" layout="vertical">
-                              <FormControl>
-                                <OnboardingSurveySelect
-                                  value={field.value}
-                                  onValueChange={field.onChange}
-                                  options={BUILDING_OPTIONS}
-                                />
-                              </FormControl>
-                            </FormItemLayout>
-                          )}
-                        />
-                      </div>
-                    </FormSectionCollapse>
-                  )}
-                </AnimatePresence>
+                <div className="pt-5">
+                  <FormField
+                    control={form.control}
+                    name="building"
+                    render={({ field }) => (
+                      <FormItemLayout label="What are you building?" layout="vertical">
+                        <FormControl>
+                          <OnboardingSurveySelect
+                            value={field.value}
+                            onValueChange={field.onChange}
+                            options={BUILDING_OPTIONS}
+                          />
+                        </FormControl>
+                      </FormItemLayout>
+                    )}
+                  />
+                </div>
 
                 <div className="pt-5">
                   <FormField
