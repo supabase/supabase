@@ -2,8 +2,14 @@ export const oauthAppsKeys = {
   authorizeRequest: (id: string | undefined) => ['oauth-apps', 'authorize', id] as const,
   authorizeOrganizations: (id: string | undefined) =>
     ['oauth-apps', 'authorize', id, 'organizations'] as const,
-  authorizeOrganizationProjects: (id: string | undefined, slug: string | undefined) =>
-    ['oauth-apps', 'authorize', id, 'organizations', slug, 'projects'] as const,
+  authorizeOrganizationProjects: (
+    slug: string | undefined | null,
+    params?: {
+      sort?: 'name_asc' | 'name_desc' | 'created_asc' | 'created_desc'
+      search?: string
+      statuses?: string[]
+    }
+  ) => ['oauth-apps', 'authorize', 'organizations', slug, 'projects', params] as const,
   orgAppDetails: (slug: string | undefined, appId: string | undefined) =>
     ['oauth-apps', 'organizations', slug, 'apps', appId, 'grant'] as const,
   preflightValidation: (slug: string | undefined, appId: string | undefined) =>
