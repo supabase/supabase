@@ -10,7 +10,7 @@ const pgConfigZod = z.object({
   group: z.string(),
   subgroup: z.string(),
   unit: z.string().nullable(),
-  short_desc: z.string(),
+  short_desc: z.string().nullable(),
   extra_desc: z.string().nullable(),
   context: z.string(),
   vartype: z.string(),
