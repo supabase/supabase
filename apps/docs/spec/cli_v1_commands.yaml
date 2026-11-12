@@ -776,6 +776,8 @@ commands:
     description: |
 
 
+      Deprecated: use `supabase issues`. Existing flags, defaults, output, and exit behavior remain supported. A deprecation notice is written to stderr.
+
       Inspects the database for common security and performance issues such as missing RLS policies, unindexed foreign keys, exposed auth.users, and more.
 
       Inspects the local database by default. Pass `--remote` for the linked project, or `--remote=<ref|branch|url>` for another project, a branch of the linked project, or a database URL. The command prints a `Target:` line on stderr naming the database it resolved, and never asks for confirmation.
@@ -4948,3 +4950,81 @@ commands:
     usage: supabase whoami [flags]
     subcommands: []
     flags: []
+  - id: supabase-issues
+    title: supabase issues
+    summary: Checks security, performance, and health issues
+    description: |
+
+
+      Checks a project for security, performance, and health issues. Findings are grouped by check, with every affected resource and its evidence preserved. Severities are `info`, `warning`, and `critical`, corresponding to the underlying INFO, WARN, and ERROR findings.
+
+      The default `--type all --severity info` displays every issue. Use `--fail-on warning` to exit with status 1 when a displayed issue is warning or critical. The severity filter applies before the exit threshold.
+
+      Inspects the local database by default. Use `--remote` for the linked project, or `--remote=<ref|branch|url>` for another target. Security and performance checks use a transaction that is always rolled back for local databases and direct database URLs. Health checks require a remote project: `--type health` rejects local and direct database targets, while `--type all` reports health coverage as unavailable for those targets.
+
+      By default, the command prints a table with severity, category, issue title, and the number of affected resources, followed by check coverage. Long titles wrap to fit the terminal. Narrow terminals show stacked fields when the table cannot fit. Unavailable checks include their reason and an incomplete-results warning. An empty result means no issues match the selected severity; it does not establish that the project is healthy.
+
+      Structured output contains `issues` and `checks`. Each issue includes its stable check ID, severity, category, documentation URL, and affected resources. Coverage reports each requested category as complete or unavailable. A remote check that cannot run is reported as unavailable and exits with status 1; it is never reported as a clean check.
+
+      `supabase db advisors` is deprecated. Its existing flags, defaults, output, and exit behavior remain supported.
+
+      Use `--output-format json` or `--output-format stream-json` for structured output. The legacy `-o` / `--output` flag is not supported by this command. Check IDs identify check types within a project; they are not persistent incident IDs.
+    tags:
+      - management-api
+      - local-dev
+    links: []
+    usage: supabase issues [flags]
+    subcommands: []
+    flags:
+      - id: fail-on
+        name: --fail-on <[ none | info | warning | critical ]>
+        description: Minimum displayed issue severity to exit with non-zero status.
+        default_value: none
+        accepted_values:
+          - id: none
+            name: none
+            type: '[ none | info | warning | critical ]'
+          - id: info
+            name: info
+            type: '[ none | info | warning | critical ]'
+          - id: warning
+            name: warning
+            type: '[ none | info | warning | critical ]'
+          - id: critical
+            name: critical
+            type: '[ none | info | warning | critical ]'
+      - id: remote
+        name: --remote[=<ref|branch|url>]
+        description: 'Target a remote database: the linked project, or --remote=<ref|branch|url>.'
+        default_value: 'false'
+      - id: severity
+        name: --severity <[ info | warning | critical ]>
+        description: 'Minimum issue severity to display: info, warning, critical.'
+        default_value: info
+        accepted_values:
+          - id: info
+            name: info
+            type: '[ info | warning | critical ]'
+          - id: warning
+            name: warning
+            type: '[ info | warning | critical ]'
+          - id: critical
+            name: critical
+            type: '[ info | warning | critical ]'
+      - id: type
+        name: --type <[ all | security | performance | health ]>
+        description: 'Type of issues to check: all, security, performance, health.'
+        default_value: all
+        accepted_values:
+          - id: all
+            name: all
+            type: '[ all | security | performance | health ]'
+          - id: security
+            name: security
+            type: '[ all | security | performance | health ]'
+          - id: performance
+            name: performance
+            type: '[ all | security | performance | health ]'
+          - id: health
+            name: health
+            type: '[ all | security | performance | health ]'

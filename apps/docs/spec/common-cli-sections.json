@@ -186,6 +186,12 @@
         "type": "cli-command"
       },
       {
+        "id": "supabase-issues",
+        "title": "Check security, performance, and health issues",
+        "slug": "supabase-issues",
+        "type": "cli-command"
+      },
+      {
         "id": "supabase-db-advisors",
         "title": "Check database for security and performance issues",
         "slug": "supabase-db-advisors",
