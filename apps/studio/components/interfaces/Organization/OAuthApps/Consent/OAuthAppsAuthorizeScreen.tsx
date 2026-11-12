@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 import { TimestampInfo } from 'ui-patterns/TimestampInfo'
@@ -10,6 +10,7 @@ import { MAX_SELECTED_PROJECTS, ProjectMultiSelect } from './ProjectMultiSelect'
 import { ScopeGroupCard } from './ScopeGroupCard'
 import { ScopeGroupCardWithDiff } from './ScopeGroupCardWithDiff'
 import { useMemberOrganization } from './useMemberOrganization'
+import { useProjectsByRefQuery } from './useProjectsByRefQuery'
 import { ApiAuthorizationLoadingScreen } from '@/components/interfaces/ApiAuthorization/ApiAuthorization.Loading'
 import {
   DestinationLogo,
@@ -87,16 +88,36 @@ export const OAuthAppsAuthorizeScreen = ({
     projectRef,
     request,
   })
+  const [search, setSearch] = useState('')
 
-  const { data: projects } = useOAuthAppsAuthorizeOrganizationProjectsQuery(
-    {
-      id: authId,
-      slug: memberOrg || '',
-    },
-    {
-      enabled: !isPendingMemberOrg && !!memberOrg,
-    }
+  // TODO: replace with useOrgProjectsInfiniteQuery
+  const {
+    data: projectsData,
+    isPending: isPendingProjects,
+    isFetching: isFetchingProjects,
+    isFetchingNextPage: isFetchingNextPageProjects,
+    hasNextPage: hasNextPageProjects,
+    fetchNextPage: fetchNextPageProjects,
+  } = useOAuthAppsAuthorizeOrganizationProjectsQuery({
+    slug: memberOrg,
+    search,
+  })
+
+  const projects = useMemo(
+    () => projectsData?.pages.flatMap((page) => page.projects),
+    [projectsData]
   )
+
+  const handleLoadMoreProjects = () => {
+    if (
+      !isPendingProjects &&
+      !isFetchingProjects &&
+      !isFetchingNextPageProjects &&
+      hasNextPageProjects
+    ) {
+      fetchNextPageProjects()
+    }
+  }
 
   const {
     data: appDetails,
@@ -121,6 +142,7 @@ export const OAuthAppsAuthorizeScreen = ({
 
     const grant = appDetails.existing_grant
     const hasAllProjectsGrant = grant !== null && grant.project_refs.length === 0
+
     if (hasAllProjectsGrant && isProjectScopingModeEnabled) {
       setAllProjectsSelected(true)
       return
@@ -133,6 +155,8 @@ export const OAuthAppsAuthorizeScreen = ({
     })
     if (refs.length > 0) setSelectedProjectRefs(refs.slice(0, MAX_SELECTED_PROJECTS))
   }, [appDetails, projects, memberOrg, isProjectScopingModeEnabled, projectRef])
+
+  const { data: selectedProjects } = useProjectsByRefQuery(selectedProjectRefs)
 
   const preflightQuery = useOAuthAppsPreflightValidationQuery(
     {
@@ -163,7 +187,7 @@ export const OAuthAppsAuthorizeScreen = ({
   const isSubmitting = approveMutation.isPending
   const hasProjects = (projects?.length ?? 0) > 0
 
-  const isBlockedOnProjects = isProjectScopingModeEnabled && !hasProjects
+  const isBlockedOnProjects = isProjectScopingModeEnabled && !isPendingProjects && !hasProjects
   const canProceed = !isBlockedOnProjects
 
   const grantedProjects = (projects ?? []).filter((project) =>
@@ -357,8 +381,6 @@ export const OAuthAppsAuthorizeScreen = ({
           {canProceed && isProjectScopingModeEnabled && (
             <div className="flex flex-col gap-2">
               <ProjectMultiSelect
-                projects={projects ?? []}
-                selectedRefs={selectedProjectRefs}
                 onChange={setSelectedProjectRefs}
                 maxSelected={MAX_SELECTED_PROJECTS}
                 error={
@@ -368,6 +390,10 @@ export const OAuthAppsAuthorizeScreen = ({
                 unavailableRefs={getFailedProjects(roleFailure).map((project) => project.ref)}
                 allProjectsSelected={allProjectsSelected}
                 onAllProjectsChange={setAllProjectsSelected}
+                onSearchChange={setSearch}
+                projects={projects ?? []}
+                selectedProjects={selectedProjects ?? []}
+                onLoadMore={handleLoadMoreProjects}
               />
             </div>
           )}
@@ -437,7 +463,7 @@ export const OAuthAppsAuthorizeScreen = ({
             <>
               <p>
                 {grantKind === 'member_bound' && (
-                  <span>{'No admin approval is needed if your role permits this access. '}</span>
+                  <span>No admin approval is needed if your role permits this access. </span>
                 )}
                 <span>This authorization will appear in Authorized apps.</span>
               </p>
