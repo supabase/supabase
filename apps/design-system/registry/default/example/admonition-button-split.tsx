@@ -5,6 +5,7 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
@@ -16,11 +17,8 @@ export default function AdmonitionButtonSplitDemo() {
       title="Set up custom SMTP to edit templates"
       description="Emails will be sent using the default templates. Set up custom SMTP to edit their subject and body."
       actions={
-        <div className="flex w-full @lg:w-auto">
-          <Button
-            type="button"
-            className="flex-1 rounded-r-none px-3 @lg:flex-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-          >
+        <SplitButtonGroup className="w-full @lg:w-auto">
+          <Button type="button" className="flex-1 px-3 @lg:flex-none">
             Set up SMTP
           </Button>
           <DropdownMenu>
@@ -28,7 +26,7 @@ export default function AdmonitionButtonSplitDemo() {
               <Button
                 type="button"
                 aria-label="More email template editing options"
-                className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+                className="shrink-0 px-1 py-1.25"
                 icon={<ChevronDown />}
               />
             </DropdownMenuTrigger>
@@ -51,7 +49,7 @@ export default function AdmonitionButtonSplitDemo() {
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
-        </div>
+        </SplitButtonGroup>
       }
     />
   )

@@ -1965,4 +1965,9 @@ export const examples: Registry = [
     type: 'components:example',
     files: ['example/trace-waterfall-demo.tsx'],
   },
+  {
+    name: 'trace-waterfall-live-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-live-demo.tsx'],
+  },
 ]
