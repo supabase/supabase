@@ -128,14 +128,21 @@ When secondary actions are related but distinct (not alternatives to the primary
 
 <ComponentPreview name="button-split-dropdown" peekCode />
 
-Ensure the middle border is shared rather than doubled-up. Do not use `border-l-0` on the chevron button as that drops the divider on hover/focus. Instead:
+For the default variant, wrap the button and its chevron trigger in `SplitButtonGroup`. To name the group for screen readers, pass an `aria-label` to it.
 
-- Primary action: `rounded-r-none` and `hover:z-10` so its border stacks above the chevron on hover.
-- Chevron trigger: `rounded-l-none`, `shrink-0`, `px-[4px] py-[5px]`, and `-ml-px` to overlap the adjacent border by one pixel.
-- Both: `focus-visible:z-10` so the focus ring stacks above the neighbour, and `focus-visible:rounded-r-sm` / `focus-visible:rounded-l-sm` so the squared-off edge is slightly rounded while the ring is shown.
-- Chevron trigger only: `aria-label` describing the menu (the icon is decorative).
+Give the chevron trigger `shrink-0` and `px-1 py-1.25`. The chevron icon is decorative, so also give the trigger an `aria-label` that names the menu.
 
-Inside [Admonition](../fragments/admonition#split-button-with-dropdown) actions when `layout="responsive"`: also use `flex w-full @lg:w-auto` with `flex-1 @lg:flex-none` on the primary action.
+The `primary`, `danger`, and `warning` variants have an opaque fill, so they use per-button classes in place of `SplitButtonGroup`. Add `rounded-r-none hover:z-10` to the primary action and `rounded-l-none -ml-px` to the chevron trigger.
+
+In [Admonition](../fragments/admonition#split-button-with-dropdown) actions with `layout="responsive"`, add `w-full @lg:w-auto` to `SplitButtonGroup` and `flex-1 @lg:flex-none` to the primary action.
+
+`SplitButtonGroup` renders a `role="group"` wrapper with the `raised-control-group` utility, which changes the default-variant buttons in these ways:
+
+- It squares the inner corners and rounds them slightly while the focus ring shows.
+- It overlaps the buttons by one pixel, and only one button paints that shared column. Under the translucent dark fill, a plain `-ml-px` overlap stacks both edges and makes the divider look heavier.
+- It lets the hovered button paint the shared column, so the divider matches that button's edge color. At rest, the chevron trigger paints it.
+- It lifts the focused button above its neighbor.
+- It keeps the primary action from shrinking on press.
 
 ## Default fill and floating buttons
 

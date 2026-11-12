@@ -102,7 +102,6 @@ export const MarketplaceDetail = () => {
       <IntegrationDetailTabShortcuts tabs={tabs} />
       <MarketplaceDetailBreadrumbs
         title={integration.name}
-        isInstalled={isInstalled}
         actions={
           <>
             {isInstalled && integrationStatus?.partner_links?.dashboard && (
