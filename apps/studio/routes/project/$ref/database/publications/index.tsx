@@ -14,7 +14,7 @@ export const Route = createFileRoute('/project/$ref/database/publications/')({
   },
 })
 
-const DatabasePublicationsContent = () => {
+function DatabasePublications() {
   const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
     FGA_PERMISSIONS.PROJECT.DATABASE_READ
   )
@@ -32,8 +32,4 @@ const DatabasePublicationsContent = () => {
       </PageContainer>
     </PageLayout>
   )
-}
-
-function DatabasePublications() {
-  return <DatabasePublicationsContent />
 }

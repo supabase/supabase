@@ -18,7 +18,7 @@ export const Route = createFileRoute('/project/$ref/database/publications/$id')(
   },
 })
 
-const DatabasePublicationsContent = () => {
+function DatabasePublications() {
   const { ref, id } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { can: canViewPublications, isSuccess: isPermissionsLoaded } = useAsyncCheckPermissionsV2(
@@ -55,8 +55,4 @@ const DatabasePublicationsContent = () => {
       </PageContainer>
     </PageLayout>
   )
-}
-
-function DatabasePublications() {
-  return <DatabasePublicationsContent />
 }
