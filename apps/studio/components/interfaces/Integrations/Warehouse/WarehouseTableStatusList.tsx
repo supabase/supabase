@@ -172,24 +172,34 @@ export const WarehouseStatusPreview = () => (
     <PageSectionContent>
       <div role="img" aria-label="Replication status preview">
         <div inert aria-hidden="true" className="pointer-events-none opacity-40 grayscale">
-          <WarehouseTableStatusList
-            tables={[
-              {
-                schema: 'public',
-                name: 'orders',
-                copy_name: 'public.orders',
-                state: 'live',
-                lag_ms: 0,
-              },
-              {
-                schema: 'public',
-                name: 'customers',
-                copy_name: 'public.customers',
-                state: 'live',
-                lag_ms: 0,
-              },
-            ]}
-          />
+          <Card>
+            <CardContent className="p-0">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Table</TableHead>
+                    <TableHead className="w-48">Lag</TableHead>
+                    <TableHead className="w-36">Status</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {['w-28', 'w-36'].map((width) => (
+                    <TableRow key={width}>
+                      <TableCell>
+                        <div className={`h-4 rounded bg-surface-300 ${width}`} />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-20 rounded bg-surface-300" />
+                      </TableCell>
+                      <TableCell>
+                        <div className="h-4 w-12 rounded bg-surface-300" />
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </PageSectionContent>
