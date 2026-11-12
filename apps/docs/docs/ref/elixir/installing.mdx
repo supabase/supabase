@@ -1,0 +1,46 @@
+---
+id: installing
+title: 'Installing'
+slug: installing
+custom_edit_url: https://github.com/supabase/supabase/edit/master/apps/docs/spec/supabase_elixir_v0.yml
+---
+
+### Install from Hex
+
+<RefSubLayout.EducationRow>
+  <RefSubLayout.Details>
+
+    You can install Supabase packages from [hex.pm](https://hex.pm/packages/supabase_potion).
+
+    Add the packages you need to your `mix.exs` dependencies.
+
+  </RefSubLayout.Details>
+
+  <RefSubLayout.Examples>
+
+    <Tabs
+      size="small"
+      type="underlined"
+      defaultActiveId="elixir"
+      queryGroup="language"
+    >
+      <TabPanel id="elixir" label="mix.exs">
+
+        ```elixir mix.exs
+        defp deps do
+          [
+            {:supabase_potion, "~> 0.5"},
+            {:supabase_postgrest, "~> 1.2"},
+            {:supabase_auth, "~> 0.10"},
+            {:supabase_storage, "~> 0.5"},
+            {:supabase_realtime, "~> 0.4"},
+            {:supabase_functions, "~> 0.1"}
+          ]
+        end
+        ```
+
+      </TabPanel>
+    </Tabs>
+
+  </RefSubLayout.Examples>
+</RefSubLayout.EducationRow>
