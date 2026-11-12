@@ -318,10 +318,24 @@ const GuideList = ({ guides, activeTopic, onTopicClear }: GuideListProps) => {
               )}
             >
               <span className="min-w-0 flex-1 text-sm font-medium tracking-body text-foreground">
-                {guide.title}
                 {externalHost ? (
-                  <span className="ml-3 text-xs font-normal text-foreground-lighter transition-colors group-hover:text-foreground-light">
-                    {externalHost}
+                  <span className="mr-3">
+                    <img
+                      // google serves a favicon for any host, so contributors do not upload a logo
+                      src={`https://www.google.com/s2/favicons?domain=${externalHost}&sz=32`}
+                      alt=""
+                      width={16}
+                      height={16}
+                      loading="lazy"
+                      referrerPolicy="no-referrer"
+                      className="mr-2 inline size-4 rounded-sm align-text-bottom"
+                    />
+                    {guide.author ?? externalHost}
+                  </span>
+                ) : null}
+                <span className={cn(externalHost && 'text-foreground-light')}>{guide.title}</span>
+                {externalHost ? (
+                  <span className="ml-1 text-foreground-lighter transition-colors group-hover:text-foreground-light">
                     <ArrowUpRight
                       aria-hidden
                       strokeWidth={2.5}

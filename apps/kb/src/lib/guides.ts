@@ -10,6 +10,7 @@ export interface GuideSummary {
   topics: Topic[]
   href: string
   date?: string
+  author?: string
 }
 
 export interface FeaturedItem extends GuideSummary {
@@ -73,6 +74,7 @@ export const toCommunityGuideSummary = (
   description: entry.data.description ?? '',
   topics: entry.data.topics.filter((topic): topic is Topic => isKnownTopic(topic)),
   href: entry.data.url,
+  author: entry.data.author,
   date: entry.data.lastEdited ? formatDisplayDate(entry.data.lastEdited) : undefined,
 })
 

@@ -95,6 +95,7 @@ const communityGuides = defineCollection({
       description: z.string().optional(),
       // Where the guide lives, usually off-site, since there is no body to render here
       url: z.url(),
+      author: z.string().optional(),
       topics: z.array(z.string()).default([]),
       // JSON has no date type, so `lastEdited` arrives as an ISO string
       lastEdited: z.coerce
