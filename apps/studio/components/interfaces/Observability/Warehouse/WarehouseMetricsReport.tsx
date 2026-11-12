@@ -17,11 +17,13 @@ import {
 } from './WarehouseMetrics.utils'
 import { WarehouseMetricsEmptyState } from './WarehouseMetricsEmptyState'
 import { WarehouseMetricsSection } from './WarehouseMetricsSection'
+import { OBSERVABILITY_DOCS_HREFS } from '@/components/interfaces/Observability/Observability.constants'
 import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
 import { AlertError } from '@/components/ui/AlertError'
+import { DocsButton } from '@/components/ui/DocsButton'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
@@ -195,6 +197,11 @@ export const WarehouseMetricsReport = () => {
               <ArrowRightIcon size={12} />
               <p>{dayjs(selectedDateRange.period_end.date).format('MMM D, h:mma')}</p>
             </div>
+            <DocsButton
+              className="ml-auto"
+              href={OBSERVABILITY_DOCS_HREFS.warehouse}
+              topic="Warehouse reports"
+            />
           </div>
         }
       >

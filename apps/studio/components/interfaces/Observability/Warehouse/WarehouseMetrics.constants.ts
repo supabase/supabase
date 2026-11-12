@@ -14,6 +14,7 @@ export interface WarehouseChartDef {
   title: string
   tooltip: string
   format: WarehouseChartFormat
+  isFullWidth?: boolean
   series: readonly WarehouseChartSeriesDef[]
   /** The metric whose latest value is highlighted above the chart. */
   primaryMetric: WarehouseMetricName
@@ -35,7 +36,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'queries',
     title: 'Queries',
-    description: 'Compare workload and failures with latency and capacity over the same period.',
+    description: 'Query volume and outcomes.',
     charts: [
       {
         id: 'query-rate',
@@ -57,6 +58,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       },
       {
         id: 'failed-queries',
+        isFullWidth: true,
         title: 'Failed queries',
         tooltip:
           "Failures per second. Timeouts are already included in errors, so don't add the lines together. Canceled queries are counted separately.",
@@ -73,11 +75,11 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'latency',
     title: 'Latency',
-    description:
-      'Compare query duration with worker waits to investigate time spent waiting for capacity.',
+    description: 'Query duration and worker waits.',
     charts: [
       {
         id: 'query-duration',
+        isFullWidth: true,
         title: 'Query duration',
         tooltip:
           'Time until a query succeeds, fails, or is canceled, including worker waits and result streaming.',
@@ -116,11 +118,11 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'capacity',
     title: 'Capacity',
-    description:
-      'Compare occupied slots and rejected requests with worker waits to investigate capacity pressure.',
+    description: 'Worker slots and rejected requests.',
     charts: [
       {
         id: 'worker-slots',
+        isFullWidth: true,
         title: 'Worker slots',
         tooltip:
           'Worker capacity grants in use or pending connection, compared with the slot limit. Grants are not SQL query counts.',
@@ -135,6 +137,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       },
       {
         id: 'rejected-requests',
+        isFullWidth: true,
         title: 'Rejected requests',
         tooltip: 'Requests per second turned away before they could run, split by reason.',
         format: '/s',
@@ -146,8 +149,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'workers',
     title: 'Workers and requests',
-    description:
-      'Compare warm and cold worker starts with latency, and request statuses with query failures.',
+    description: 'Worker starts and request performance.',
     charts: [
       {
         id: 'worker-starts',
@@ -170,6 +172,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       },
       {
         id: 'requests-by-method',
+        isFullWidth: true,
         title: 'Requests by method',
         tooltip: 'Requests per second, split by method and status. Not a count of SQL statements.',
         format: '/s',
@@ -178,6 +181,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       },
       {
         id: 'request-duration',
+        isFullWidth: true,
         title: 'Request duration',
         tooltip: 'How long requests take to complete, split by method and status.',
         format: 'ms',

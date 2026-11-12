@@ -90,6 +90,9 @@ describe('WarehouseMetricsReport', () => {
     expect(await screen.findByText('Query rate')).toBeInTheDocument()
     expect(await screen.findByText('Worker slots')).toBeInTheDocument()
     expect(await screen.findByText('Request duration')).toBeInTheDocument()
+    expect(
+      screen.getByRole('link', { name: 'Warehouse reports documentation (opens in new tab)' })
+    ).toHaveAttribute('href', expect.stringContaining('/guides/observability/reports#warehouse'))
   })
 
   test('shows the empty state with a link to the integration when Warehouse is not provisioned', async () => {
@@ -204,7 +207,7 @@ describe('WarehouseMetricsReport', () => {
     customRender(<WarehouseMetricsReport />)
 
     // The override applies to every chart in the Queries section
-    expect(await screen.findAllByText('No data in this time range')).toHaveLength(3)
+    expect(await screen.findAllByText('No data to show')).toHaveLength(3)
     expect(await screen.findByText('Query rate')).toBeInTheDocument()
   })
 

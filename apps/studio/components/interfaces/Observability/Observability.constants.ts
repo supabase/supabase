@@ -11,5 +11,6 @@ export const OBSERVABILITY_DOCS_HREFS = {
   edgeFunctions: `${DOCS_URL}/guides/telemetry/reports#edge-functions`,
   storage: `${DOCS_URL}/guides/telemetry/reports#storage`,
   realtime: `${DOCS_URL}/guides/realtime/reports`,
+  warehouse: `${DOCS_URL}/guides/observability/reports#warehouse`,
   customReport: `${DOCS_URL}/guides/telemetry/reports#using-reports`,
 } as const
