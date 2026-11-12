@@ -148,7 +148,8 @@ The two special message types have a well defined binary format where the first 
 - **Ref**: Variable length string
 - **Topic**: Variable length string
 - **User Event**: Variable length string
-- **Metadata**: Variable length JSON string
+- **Metadata**: Variable length JSON string. Optional keys:
+  - `persist`: Stores the broadcast for [replay](#phx_join). Use `true` to keep it for 72 hours, or `{"ttl": <seconds>}` with a value from 1 to 259200. This option works only on private channels and only in binary frames. Text-frame broadcasts don't support it.
 - **User Payload**: Variable length payload data
 
 #### User Broadcast
@@ -403,6 +404,29 @@ user-event                // User Event
 ```
 
 The payload encoding is a hint for the client to know if the payload should be treated as JSON or not.
+
+The following frame sends the same broadcast with `persist` metadata. The metadata `{"persist":{"ttl":3600}}` is 24 bytes, so the Metadata Size is `0x18`:
+
+```
+0x03                      // Type
+0x02                      // Join Ref Size
+0x01                      // Ref Size
+0x12                      // Topic Size
+0x0A                      // User Event Size
+0x18                      // Metadata Size
+0x01                      // Payload Encoding (1 = JSON)
+10                        // Actual Join Ref
+1                         // Actual Ref
+realtime:chat-room        // Topic
+user-event                // User Event
+{"persist":{"ttl":3600}}  // Metadata
+{                         // User Event Payload
+  "content": "Hello, World!",
+  "createdAt": "2025-11-17T21:14:14Z",
+  "id": "9b823349-71c0-465b-9a83-a63aa2a9ae6d",
+  "username": "VCSHLD556nQD-B-vUTJJ3"
+}
+```
 
 #### presence
 
@@ -939,15 +963,25 @@ The `ids` array on incoming `postgres_changes` payloads must match the subscript
 
 ### Broadcast errors
 
-Broadcast errors only affect **private channels**. When `config.broadcast.ack` is `false` (the default), all push failures — including size violations and RLS write denials — are silently dropped. RLS denials are always silent regardless of `ack`.
-
-When `ack` is `true`, the server replies on error with `response.error` (an atom string), not `response.reason`:
+When `config.broadcast.ack` is `false` (the default), the server drops a failed push without a reply. When `ack` is `true`, it replies with the error in `response.error` (an atom string), not `response.reason`:
 
 ```json
 { "status": "error", "response": { "error": "payload_size_exceeded" } }
 ```
 
-Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers.
+On public channels, the only error is `payload_size_exceeded`. Private channels can also return authorization errors, such as `unauthorized` when no RLS policy allows the sender to write, and the persistence errors below.
+
+Note that the JS client (`send()`) resolves to the string `'error'` and does not expose the specific `error` atom to callers. The exception is a `send()` with `persist`: it resolves to the `error` code, such as `persistence_unauthorized`.
+
+When `ack` is `true`, a persistence failure replies with one of the following codes in `response.error`:
+
+| Error code                 | Description                                                            |
+| -------------------------- | ---------------------------------------------------------------------- |
+| `persistence_unauthorized` | Delivered but not stored: RLS doesn't allow the sender to persist      |
+| `persistence_failed`       | Delivered but not stored: writing to `realtime.messages` failed        |
+| `persistence_invalid_ttl`  | Not delivered or stored: the `persist` value or its `ttl` is not valid |
+
+To allow persistence, create an `insert` policy on `realtime.messages` where `realtime.messages.extension` is `persistence`. See [Realtime Authorization](/docs/guides/realtime/authorization) for how these policies work.
 
 ### Presence errors
 
