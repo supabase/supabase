@@ -76,7 +76,7 @@ describe('Linter.utils lintInfoMap pitr_archiving_stale entry', () => {
     expect(info!.category).toBe('security')
     // metadata is unused by this entry's link(), and every field on Lint['metadata'] is optional, so {} needs no cast
     expect(info!.link({ projectRef, metadata: {} })).toBe('/project/abc/database/backups/pitr')
-    expect(info!.docsLink).toContain('/guides/platform/backups#point-in-time-recovery')
+    expect(info!.docsLink).toContain('/guides/platform/backups#troubleshooting-stale-wal-archiving')
   })
 })
 
