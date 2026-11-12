@@ -5,7 +5,7 @@ import { handleError, post } from '@/data/fetchers'
 import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
-// The platform accepts `can_code`; api-types gains it at the next regeneration from the prod spec
+// `can_code` is missing from api-types until they are regenerated from the production spec
 export type OnboardingSurveyBody = components['schemas']['OnboardingSurveyBody'] & {
   can_code?: string
 }
