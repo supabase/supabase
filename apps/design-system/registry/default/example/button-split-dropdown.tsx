@@ -6,23 +6,19 @@ import {
   DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
+  SplitButtonGroup,
 } from 'ui'
 
 export default function ButtonSplitDropdownDemo() {
   return (
-    <div className="flex w-fit">
-      <Button
-        type="button"
-        className="rounded-r-none hover:z-10 focus-visible:z-10 focus-visible:rounded-r-sm"
-      >
-        Primary action
-      </Button>
+    <SplitButtonGroup className="w-fit">
+      <Button type="button">Primary action</Button>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
             type="button"
             aria-label="More actions"
-            className="shrink-0 rounded-l-none px-[4px] py-[5px] -ml-px focus-visible:z-10 focus-visible:rounded-l-sm"
+            className="shrink-0 px-1 py-1.25"
             icon={<ChevronDown />}
           />
         </DropdownMenuTrigger>
@@ -34,6 +30,6 @@ export default function ButtonSplitDropdownDemo() {
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>
-    </div>
+    </SplitButtonGroup>
   )
 }
