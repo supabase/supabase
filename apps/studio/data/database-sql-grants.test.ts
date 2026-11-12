@@ -83,7 +83,6 @@ describe('database function mutations', () => {
     await createDatabaseFunction({
       projectRef,
       grant: writeGrant,
-      sqlOrigin: 'studio',
       payload: {
         name: 'fn',
         definition: safeSql`select 1`,
@@ -101,7 +100,6 @@ describe('database function mutations', () => {
       projectRef,
       grant: writeGrant,
       func,
-      sqlOrigin: 'studio',
       payload: { name: 'fn2' },
     })
     await deleteDatabaseFunction({ projectRef, grant: writeGrant, func })
