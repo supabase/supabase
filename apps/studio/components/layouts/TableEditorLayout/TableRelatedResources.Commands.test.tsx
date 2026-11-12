@@ -42,6 +42,40 @@ const RELATED_RESOURCES: TableRelatedResourcesData = {
       schema: 'public',
     },
   ],
+  indexes: [
+    {
+      id: 501,
+      name: 'blog_posts_pkey',
+      schema: 'public',
+      columns: ['id'],
+      is_primary: true,
+      is_unique: true,
+    },
+    {
+      id: 502,
+      name: 'blog_posts_slug_key',
+      schema: 'public',
+      columns: ['slug'],
+      is_primary: false,
+      is_unique: true,
+    },
+    {
+      id: 503,
+      name: 'idx_posts_author_created',
+      schema: 'public',
+      columns: ['author_id', 'created_at'],
+      is_primary: false,
+      is_unique: false,
+    },
+    {
+      id: 504,
+      name: 'idx_posts_wide',
+      schema: 'public',
+      columns: ['a', 'b', 'c', 'd'],
+      is_primary: false,
+      is_unique: false,
+    },
+  ],
 }
 
 const REFERENCING_FUNCTIONS: TableReferencingFunctionsData = {
@@ -202,6 +236,16 @@ describe('useTableRelatedResourcesCommands', () => {
     // The triggers index route only redirects and drops the query string
     expect(section).toHaveTextContent(
       '/project/default/database/triggers/data?schema=public&edit=401'
+    )
+
+    expect(section).toHaveTextContent('blog_posts_pkey')
+    expect(section).toHaveTextContent('Primary key • On id')
+    expect(section).toHaveTextContent('Unique • On slug')
+    expect(section).toHaveTextContent('Index • On author_id, created_at')
+    // Past three columns, naming them all would outgrow the row
+    expect(section).toHaveTextContent('Index • On 4 columns')
+    expect(section).toHaveTextContent(
+      '/project/default/database/indexes?schema=public&edit=blog_posts_pkey'
     )
 
     expect(section).toHaveTextContent('public.count_blog_posts')

@@ -175,7 +175,9 @@ export const NewOrgForm = ({
     },
   })
 
-  const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant()
+  const { variant: onboardingSurveyVariant } = useOnboardingSurveyVariant({
+    isFormExposed: user.isSuccess,
+  })
   const showOnboardingSurveyInOrgForm = onboardingSurveyVariant === 'org_form'
   // What was submitted and whether the survey was on the form, fixed at submit:
   // the survey step runs after creation (much later after a card confirmation),

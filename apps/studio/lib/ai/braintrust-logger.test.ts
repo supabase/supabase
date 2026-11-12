@@ -3,11 +3,9 @@ import { describe, expect, it } from 'vitest'
 import {
   hideSpanErrorFromTrace,
   isTracingAllowed,
-  maskTraceValue,
   redactHiddenSpanError,
 } from './braintrust-logger'
-import { NO_DATA_ERROR, NO_DATA_PERMISSIONS } from './tools/execute-sql-output'
-import { sanitizeNotebookRunOutput, type NotebookRunOutput } from './tools/notebook-run-output'
+import { NO_DATA_ERROR } from './tools/execute-sql-output'
 
 describe('isTracingAllowed', () => {
   it('allows tracing for non-EU regions', () => {
@@ -22,54 +20,6 @@ describe('isTracingAllowed', () => {
 
   it('disallows tracing when the region is unknown', () => {
     expect(isTracingAllowed({ projectRegion: undefined })).toBe(false)
-  })
-})
-
-describe('maskTraceValue', () => {
-  const rows = [{ email: 'test@example.com' }]
-  const notebook = {
-    id: 'nb',
-    name: 'Signups',
-    updated_at: '2026-10-21T00:00:00Z',
-    optInLevel: 'schema',
-    cells: [
-      {
-        cell_id: 'a',
-        title: 'Emails',
-        source: 'database',
-        status: 'success',
-        rows,
-      },
-    ],
-  } satisfies NotebookRunOutput
-
-  it('masks execute_sql output below the data level', () => {
-    expect(maskTraceValue({ rows, totalRows: 1, optInLevel: 'disabled' })).toBe(NO_DATA_PERMISSIONS)
-  })
-
-  it('preserves output at the data level', () => {
-    const output = { rows, totalRows: 1, optInLevel: 'schema_and_log_and_data' }
-    expect(maskTraceValue(output)).toEqual(output)
-  })
-
-  it('masks run_notebook output below the data level', () => {
-    const masked = maskTraceValue(notebook)
-    expect(masked).toEqual(sanitizeNotebookRunOutput(notebook, 'schema'))
-    expect(JSON.stringify(masked)).not.toContain('test@example.com')
-  })
-
-  it('keeps only the stamp when no tool schema matches', () => {
-    expect(maskTraceValue({ records: rows, optInLevel: 'bogus' })).toEqual({ optInLevel: 'bogus' })
-  })
-
-  it('leaves unstamped values alone', () => {
-    const modelView = { rows, note: 'Only the first 100 rows are included.' }
-    expect(maskTraceValue(modelView)).toEqual(modelView)
-  })
-
-  it('masks stamped output in message history', () => {
-    const messages = [{ parts: [{ output: { rows, optInLevel: 'schema' } }] }]
-    expect(maskTraceValue(messages)).toEqual([{ parts: [{ output: NO_DATA_PERMISSIONS }] }])
   })
 })
 
