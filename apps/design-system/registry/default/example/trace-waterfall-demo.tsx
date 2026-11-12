@@ -5,7 +5,8 @@ function span(
   parentId: string | null,
   name: string,
   startMs: number,
-  endMs: number | null
+  endMs: number | null,
+  extra: Partial<Pick<Span, 'status' | 'events'>> = {}
 ): Span {
   return {
     id,
@@ -17,14 +18,23 @@ function span(
     status: 'ok',
     attributes: {},
     events: [],
+    ...extra,
   }
 }
 
 const finished: TraceData = {
   spans: [
     span('root', null, 'POST /checkout', 0, 480),
-    span('auth', 'root', 'auth.verify', 8, 62),
+    span('auth', 'root', 'auth.verify', 8, 140, {
+      events: [
+        { timeMs: 30, name: 'jwt.decoded' },
+        { timeMs: 95, name: 'cache.miss' },
+      ],
+    }),
     span('db', 'root', 'db.query', 70, 410),
+    span('plan', 'db', 'db.plan', 72, 90),
+    span('exec', 'db', 'db.execute', 95, 400),
+    span('cache', 'root', 'cache.set', 420, 470, { status: 'error' }),
   ],
 }
 
@@ -33,6 +43,7 @@ const live: TraceData = {
   spans: [
     span('root', null, 'GET /export', 0, 1240),
     span('db', 'root', 'db.query', 100, 900),
+    span('fetch', 'db', 'db.fetch', 120, 880),
     span('stream', 'root', 'stream.write', 1000, null),
   ],
 }
@@ -40,21 +51,37 @@ const live: TraceData = {
 export default function TraceWaterfallDemo() {
   return (
     <div className="flex w-full flex-col gap-8">
-      <Trace.Root trace={finished}>
-        <Trace.Waterfall treeWidth={120}>
+      <Trace.Root trace={finished} defaultCollapsed={new Set(['db'])}>
+        <Trace.Waterfall treeWidth={220} className="h-56">
           <Trace.Ruler />
           <Trace.Grid />
           <Trace.Cursor />
-          <div className="h-24" />
+          <Trace.Rows>
+            <Trace.Cell />
+            <Trace.Lane>
+              <Trace.Bar />
+              <Trace.Timing />
+              <Trace.CollapsedChildren />
+              <Trace.Markers />
+            </Trace.Lane>
+          </Trace.Rows>
         </Trace.Waterfall>
       </Trace.Root>
 
       <Trace.Root trace={live} minRangeMs={3000}>
-        <Trace.Waterfall treeWidth={120}>
+        <Trace.Waterfall treeWidth={220} className="h-40">
           <Trace.Ruler />
           <Trace.Grid />
           <Trace.Cursor />
-          <div className="h-24" />
+          <Trace.Rows>
+            <Trace.Cell />
+            <Trace.Lane>
+              <Trace.Bar />
+              <Trace.Timing />
+              <Trace.CollapsedChildren />
+              <Trace.Markers />
+            </Trace.Lane>
+          </Trace.Rows>
         </Trace.Waterfall>
       </Trace.Root>
     </div>
