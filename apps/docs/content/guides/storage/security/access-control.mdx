@@ -1,102 +1,108 @@
 ---
 id: 'storage-access-control'
-title: 'Storage Access Control'
-description: 'Learn how to restrict Supabase file uploads.'
+title: 'Restrict Storage uploads'
+description: 'Write Row Level Security policies on storage.objects to control who can upload, list, read, and overwrite files in your Supabase Storage buckets.'
 sidebar_label: 'Uploads'
 tocVideo: '4ERX__Y908k'
 ---
+
+Control who can upload, list, read, and overwrite files in Supabase Storage by writing Row Level Security (RLS) policies on the `storage.objects` table. When you finish, only the people and folders you allow can reach your files.
+
+## Overview
 
 Supabase Storage is designed to work perfectly with Postgres [Row Level Security](/docs/guides/database/postgres/row-level-security) (RLS).
 
 You can use RLS to create [Security Access Policies](https://www.postgresql.org/docs/current/sql-createpolicy.html) that are incredibly powerful and flexible, allowing you to restrict access based on your business needs.
 
-## Access policies
-
 By default Storage does not allow any uploads to buckets without RLS policies. You selectively allow certain operations by creating RLS policies on the `storage.objects` table.
 
-You can find the documentation for the storage schema [here](/docs/guides/storage/schema/design) , and to simplify the process of crafting your policies, you can use these [helper functions](/docs/guides/storage/schema/helper-functions) .
+To learn how Storage organizes buckets and objects, see the [storage schema](/docs/guides/storage/schema/design). To simplify crafting your policies, use the [helper functions](/docs/guides/storage/schema/helper-functions).
 
-If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()` documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
+## Procedure
 
-<Admonition type="note">
+### Choose the operations to allow
 
-The RLS policies required for different operations are documented [here](/docs/reference/javascript/file-buckets-createbucket)
+1. Decide which operations your policies must allow. The RLS policies required for each operation are documented in the [`createBucket` reference](/docs/reference/javascript/file-buckets-createbucket).
 
-</Admonition>
+2. For [uploading](/docs/reference/javascript/file-buckets-upload) objects, grant `INSERT` on the `storage.objects` table. This is the only policy uploading requires.
 
-For example, the only RLS policy required for [uploading](/docs/reference/javascript/file-buckets-upload) objects is to grant the `INSERT` permission to the `storage.objects` table.
+3. To allow overwriting files with the `upsert` option, also grant `SELECT` and `UPDATE`.
 
-To allow overwriting files using the `upsert` functionality you will need to additionally grant `SELECT` and `UPDATE` permissions.
+4. If you need different `SELECT` policies for different Storage actions, such as listing objects versus reading authenticated objects, use the operation-aware helpers `storage.allow_only_operation()` and `storage.allow_any_operation()`. They are documented in [Storage Helper Functions](/docs/guides/storage/schema/helper-functions).
 
-## Policy examples
+### Restrict uploads
 
-An easy way to get started would be to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, `DELETE` operations and restrict the policies to meet your security requirements. For example, one can start with the following `INSERT` policy:
+An easy way to get started is to create RLS policies for `SELECT`, `INSERT`, `UPDATE`, and `DELETE`, then restrict each one to meet your security requirements.
 
-```sql
-create policy "policy_name"
-ON storage.objects
-for insert with check (
-  true
-);
-```
+1. Start with an `INSERT` policy that allows everything:
 
-and modify it to only allow authenticated users to upload assets to a specific bucket by changing it to:
+   ```sql
+   create policy "policy_name"
+   ON storage.objects
+   for insert with check (
+     true
+   );
+   ```
 
-```sql
-create policy "policy_name"
-on storage.objects for insert to authenticated with check (
-    -- restrict bucket
-    bucket_id = 'my_bucket_id'
-);
-```
+2. Restrict it to authenticated users uploading to one bucket:
 
-This example demonstrates how you would allow authenticated users to upload files to a folder called `private` inside `my_bucket_id`:
+   ```sql
+   create policy "policy_name"
+   on storage.objects for insert to authenticated with check (
+       -- restrict bucket
+       bucket_id = 'my_bucket_id'
+   );
+   ```
 
-```sql
-create policy "Allow authenticated uploads"
-on storage.objects
-for insert
-to authenticated
-with check (
-  bucket_id = 'my_bucket_id' and
-  (storage.foldername(name))[1] = 'private'
-);
-```
+3. To allow authenticated users to upload files to a folder called `private` inside `my_bucket_id`, restrict it further:
 
-This example demonstrates how you would allow authenticated users to upload files to a folder called with their `users.id` inside `my_bucket_id`:
+   ```sql
+   create policy "Allow authenticated uploads"
+   on storage.objects
+   for insert
+   to authenticated
+   with check (
+     bucket_id = 'my_bucket_id' and
+     (storage.foldername(name))[1] = 'private'
+   );
+   ```
 
-```sql
-create policy "Allow authenticated uploads"
-on storage.objects
-for insert
-to authenticated
-with check (
-  bucket_id = 'my_bucket_id' and
-  (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
-);
-```
+4. To allow authenticated users to upload files to a folder named with their `users.id` inside `my_bucket_id`, match the folder to the user:
 
-Allow a user to access a file that was previously uploaded by the same user:
+   ```sql
+   create policy "Allow authenticated uploads"
+   on storage.objects
+   for insert
+   to authenticated
+   with check (
+     bucket_id = 'my_bucket_id' and
+     (storage.foldername(name))[1] = (select auth.jwt()->>'sub')
+   );
+   ```
 
-```sql
-create policy "Individual user Access"
-on storage.objects for select
-to authenticated
-using ( (select auth.jwt()->>'sub') = owner_id );
-```
+### Allow reads
 
-Allow anyone to access objects in the `avatars` bucket via publishable key. The `allow_any_operation()` filter is critical here as without it users would be able to list the bucket contents.
+1. To allow a user to access a file that the same user previously uploaded, match the file's owner:
 
-<Admonition type="note">
+   ```sql
+   create policy "Individual user Access"
+   on storage.objects for select
+   to authenticated
+   using ( (select auth.jwt()->>'sub') = owner_id );
+   ```
 
-This is not needed for public buckets, as they are already publicly accessible
+2. To allow anyone to access objects in the `avatars` bucket with a publishable key, use `allow_any_operation()`. The filter is critical here, because without it users would be able to list the bucket contents:
 
-</Admonition>
+   ```sql
+   create policy "Avatar images are publicly accessible." on storage.objects
+     for select using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
+   ```
 
-```sql
-create policy "Avatar images are publicly accessible." on storage.objects
-  for select using (bucket_id = 'avatars' and storage.allow_any_operation(array['object.get_authenticated_info', 'object.get_authenticated']));
-```
+   <Admonition type="note">
+
+   This is not needed for public buckets, as they are already publicly accessible
+
+   </Admonition>
 
 ---
 
@@ -104,8 +110,23 @@ create policy "Avatar images are publicly accessible." on storage.objects
 
 <YouTube id="4ERX__Y908k" title="Storage access control policy examples" />
 
-## Bypassing access controls
+## Verify
+
+1. Sign in as a user and upload a file to the folder your policy allows. The upload succeeds.
+2. Sign in as a different user and upload a file to the first user's folder. The policy rejects the request.
+
+## Policy examples
+
+The policy examples are in [Restrict uploads](#restrict-uploads) and [Allow reads](#allow-reads).
+
+## Bypass access controls
 
 If you exclusively use Storage from trusted clients, such as your own servers, and need to bypass the RLS policies, you can use the `service key` in the `Authorization` header. Service keys entirely bypass RLS policies, granting you unrestricted access to all Storage APIs.
 
 Remember you should not share the service key publicly.
+
+## Next steps
+
+- [Storage helper functions](/docs/guides/storage/schema/helper-functions): the operation-aware filters used above.
+- [Storage schema](/docs/guides/storage/schema/design): the tables your policies apply to.
+- [Row Level Security](/docs/guides/database/postgres/row-level-security): the policy model Storage builds on.
