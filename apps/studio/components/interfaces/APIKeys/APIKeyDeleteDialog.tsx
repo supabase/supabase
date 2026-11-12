@@ -1,9 +1,9 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { Trash2 } from 'lucide-react'
+import { useParams } from 'common'
+import { Trash2Icon } from 'lucide-react'
 
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import type { APIKeysData } from '@/data/api-keys/api-keys-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface APIKeyDeleteDialogProps {
   apiKey: Extract<APIKeysData[number], { type: 'secret' | 'publishable' }>
@@ -11,10 +11,9 @@ interface APIKeyDeleteDialogProps {
 }
 
 export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialogProps) => {
-  const { can: canDeleteAPIKeys } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    '*'
-  )
+  const { ref: projectRef } = useParams()
+  const deleteGrant = useGrant('DELETE /v1/projects/{ref}/api-keys/{id}', { projectRef })
+  const canDeleteAPIKeys = deleteGrant.status === 'granted'
 
   return (
     <DropdownMenuItemTooltip
@@ -28,13 +27,11 @@ export const APIKeyDeleteDialog = ({ apiKey, setKeyToDelete }: APIKeyDeleteDialo
       tooltip={{
         content: {
           side: 'left',
-          text: !canDeleteAPIKeys
-            ? 'You need additional permissions to delete API keys'
-            : undefined,
+          text: getWriteGrantTooltip(deleteGrant.status, 'delete', 'API keys'),
         },
       }}
     >
-      <Trash2 size={14} /> Delete API key
+      <Trash2Icon size={14} /> Delete API key
     </DropdownMenuItemTooltip>
   )
 }

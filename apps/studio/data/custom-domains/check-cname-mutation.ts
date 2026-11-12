@@ -3,7 +3,8 @@ import { toast } from 'sonner'
 
 import { fetchHandler, handleError } from '@/data/fetchers'
 import { BASE_PATH } from '@/lib/constants'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type CheckCNAMERecordVariables = {
   domain: string
@@ -47,10 +48,10 @@ export const useCheckCNAMERecordMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>,
+  UseCustomMutationOptions<CheckCNAMERecordData, StudioError, CheckCNAMERecordVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<CheckCNAMERecordData, ResponseError, CheckCNAMERecordVariables>({
+  return useMutation<CheckCNAMERecordData, StudioError, CheckCNAMERecordVariables>({
     mutationFn: (vars) => checkCNAMERecord(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

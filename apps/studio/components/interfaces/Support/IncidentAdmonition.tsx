@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ExternalLink } from 'lucide-react'
+import { ExternalLinkIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Link from 'next/link'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
@@ -34,7 +34,7 @@ export function IncidentAdmonition({
             title={title}
             description={description}
             actions={
-              <Button asChild icon={<ExternalLink strokeWidth={1.5} />}>
+              <Button asChild icon={<ExternalLinkIcon strokeWidth={1.5} />}>
                 <Link href={statusPageUrl} target="_blank" rel="noreferrer">
                   Status page
                 </Link>

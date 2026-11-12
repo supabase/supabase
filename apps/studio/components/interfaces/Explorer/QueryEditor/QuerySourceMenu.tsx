@@ -1,5 +1,5 @@
 import { useFlag, useParams } from 'common'
-import { Check, ChevronDown } from 'lucide-react'
+import { CheckIcon, ChevronDownIcon } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -79,7 +79,7 @@ export const QuerySourceMenu = ({
             disabled={disabled}
             aria-label={`Query source: ${QUERY_SOURCE_LABELS[source._tag]}`}
             icon={<QuerySourceIcon source={source._tag} />}
-            iconRight={<ChevronDown size={16} strokeWidth={2} />}
+            iconRight={<ChevronDownIcon size={16} strokeWidth={2} />}
           >
             {QUERY_SOURCE_LABELS[source._tag]}
           </ExplorerToolbarAction>
@@ -100,7 +100,7 @@ export const QuerySourceMenu = ({
                 <QuerySourceIcon source={candidate._tag} className="text-foreground-light" />
                 {QUERY_SOURCE_LABELS[candidate._tag]}
               </span>
-              {source._tag === candidate._tag && <Check size={14} />}
+              {source._tag === candidate._tag && <CheckIcon size={14} />}
             </DropdownMenuItem>
           ))}
 

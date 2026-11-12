@@ -1,7 +1,5 @@
-// TanStack Start server entry; Nitro bundles it into the server for every
-// target. Sentry's init must run before the route tree evaluates, so the
-// instrument module is imported first; `wrapFetchWithSentry` then captures
-// request-scoped errors, including ones swallowed into a 500 downstream.
+// wrapFetchWithSentry only adds a span, trace meta tags, and a flush. errors
+// are captured in start.ts, because only the sentry middleware sees handler throws.
 import './instrument.server.mjs'
 
 import { wrapFetchWithSentry } from '@sentry/tanstackstart-react'

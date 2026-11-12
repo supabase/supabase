@@ -1,5 +1,5 @@
 import type { Dayjs } from 'dayjs'
-import { CheckIcon, Globe } from 'lucide-react'
+import { CheckIcon, GlobeIcon } from 'lucide-react'
 import { useId, useState } from 'react'
 import {
   cn,
@@ -44,7 +44,7 @@ export const TimezoneSelection = ({
             size="small"
           >
             <span className="flex min-w-0 items-center gap-2">
-              <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+              <GlobeIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
               <span className="truncate">{getTimezoneLabel(selectedTimezone, date)}</span>
             </span>
           </ComboboxTrigger>

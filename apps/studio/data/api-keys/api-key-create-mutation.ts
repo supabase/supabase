@@ -3,10 +3,15 @@ import { toast } from 'sonner'
 
 import { apiKeysKeys } from './keys'
 import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { GrantFor } from '@/lib/grants'
+import type { UseCustomMutationOptions } from '@/types'
+
+export type APIKeyCreateGrant = GrantFor<'post', '/v1/projects/{ref}/api-keys'>
 
 export type APIKeyCreateVariables = {
   projectRef?: string
+  grant: APIKeyCreateGrant
   name: string
   description?: string
 } & ({ type: 'publishable' } | { type: 'secret' })
@@ -35,6 +40,7 @@ export async function createAPIKey(payload: APIKeyCreateVariables) {
       name: payload.name,
       description: payload.description || null,
     },
+    grant: payload.grant,
   })
 
   if (error) handleError(error)
@@ -48,12 +54,12 @@ export const useAPIKeyCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<APIKeyCreateData, ResponseError, APIKeyCreateVariables>,
+  UseCustomMutationOptions<APIKeyCreateData, StudioError, APIKeyCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<APIKeyCreateData, ResponseError, APIKeyCreateVariables>({
+  return useMutation<APIKeyCreateData, StudioError, APIKeyCreateVariables>({
     mutationFn: (vars) => createAPIKey(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

@@ -1,5 +1,12 @@
 import { FilesBucket as FilesBucketIcon } from 'icons'
-import { File, Film, FolderOpen, Image as ImageIcon, LoaderCircle, Music } from 'lucide-react'
+import {
+  FileIcon,
+  FilmIcon,
+  FolderOpenIcon,
+  ImageIcon,
+  LoaderCircleIcon,
+  MusicIcon,
+} from 'lucide-react'
 
 import { STORAGE_ROW_STATUS, STORAGE_ROW_TYPES, STORAGE_VIEWS } from './Storage.constants'
 
@@ -22,7 +29,7 @@ export const StorageRowIcon = ({
 }: StorageRowIconProps) => {
   if (view === STORAGE_VIEWS.LIST && status === STORAGE_ROW_STATUS.LOADING) {
     return (
-      <LoaderCircle
+      <LoaderCircleIcon
         size={14}
         strokeWidth={ICON_STROKE_WIDTH}
         className="animate-spin text-foreground-lighter"
@@ -32,7 +39,11 @@ export const StorageRowIcon = ({
 
   if (fileType === STORAGE_ROW_TYPES.FOLDER) {
     return isOpened ? (
-      <FolderOpen size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+      <FolderOpenIcon
+        size={16}
+        strokeWidth={ICON_STROKE_WIDTH}
+        className="text-foreground-lighter"
+      />
     ) : (
       <FilesBucketIcon
         size={16}
@@ -49,12 +60,16 @@ export const StorageRowIcon = ({
   }
 
   if (mimeType?.includes('audio')) {
-    return <Music size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+    return (
+      <MusicIcon size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+    )
   }
 
   if (mimeType?.includes('video')) {
-    return <Film size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+    return (
+      <FilmIcon size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+    )
   }
 
-  return <File size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
+  return <FileIcon size={16} strokeWidth={ICON_STROKE_WIDTH} className="text-foreground-lighter" />
 }

@@ -12,7 +12,7 @@ date: '2025-12-05'
 toc_depth: 2
 ---
 
-Today we're releasing Broadcast Replay for Realtime - a powerful new feature that enables private channels to access messages that were sent earlier, ensuring your users never miss critical updates.
+Today we're releasing Broadcast Replay for [Realtime](/features/realtime-broadcast-replay) - a powerful new feature that enables private channels to access messages that were sent earlier, ensuring your users never miss critical updates.
 
 ## The Challenge: Missing Important Messages in Real-time Applications
 
@@ -36,7 +36,7 @@ The replay configuration accepts two parameters:
 - **`since`** (required): Unix timestamp in milliseconds specifying the earliest point from which messages should be retrieved;
 - **`limit`** (optional): Number of messages to return (1-25, useful for preventing information overload).
 
-You can see Broadcast Replay in action at [https://multiplayer.dev](https://multiplayer.dev/), where the chat box demonstrates how users can access historical messages when joining or reconnecting to a conversation.
+You can see Broadcast Replay in action at [https://multiplayer.dev](https://multiplayer.dev/), where the chat box demonstrates how users can access historical messages when joining or reconnecting to a conversation. To build the chat UI itself, start from the [Realtime Chat component](https://supabase.com/library/docs/nextjs/realtime-chat) in the Supabase UI Library.
 
 ## Real-World Use Cases
 

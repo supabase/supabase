@@ -1,6 +1,6 @@
 import { useDebounce } from '@uidotdev/usehooks'
 import { useParams } from 'common'
-import { ArrowDownNarrowWide, Search } from 'lucide-react'
+import { ArrowDownNarrowWideIcon, SearchIcon } from 'lucide-react'
 import { useCallback, useMemo, useState } from 'react'
 import {
   Button,
@@ -114,12 +114,17 @@ export const BucketsPicker = ({
                     placeholder="Search for a bucket"
                     value={filterString}
                     onChange={(e) => setFilterString(e.target.value)}
-                    icon={<Search />}
+                    icon={<SearchIcon />}
                   />
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <Button icon={<ArrowDownNarrowWide />}>
-                        Sorted by {sortBucket === 'alphabetical' ? 'name' : 'created at'}
+                      <Button icon={<ArrowDownNarrowWideIcon />}>
+                        Sorted by{' '}
+                        {sortBucket === 'alphabetical' ? (
+                          <span>name</span>
+                        ) : (
+                          <span>created at</span>
+                        )}
                       </Button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start" className="w-40">

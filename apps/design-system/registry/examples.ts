@@ -68,6 +68,16 @@ export const examples: Registry = [
     files: ['example/alert-demo.tsx'],
   },
   {
+    name: 'code-block-demo',
+    type: 'components:example',
+    files: ['example/code-block-demo.tsx'],
+  },
+  {
+    name: 'code-block-plain',
+    type: 'components:example',
+    files: ['example/code-block-plain.tsx'],
+  },
+  {
     name: 'collapsible-card-section-demo',
     type: 'components:example',
     registryDependencies: ['collapsible-card-section'],
@@ -717,6 +727,11 @@ export const examples: Registry = [
     type: 'components:example',
     registryDependencies: ['button'],
     files: ['example/keyboard-shortcut-inline.tsx'],
+  },
+  {
+    name: 'keyboard-shortcut-keycaps',
+    type: 'components:example',
+    files: ['example/keyboard-shortcut-keycaps.tsx'],
   },
   {
     name: 'label-demo',
@@ -1554,6 +1569,21 @@ export const examples: Registry = [
     files: ['example/inner-side-menu-with-search.tsx'],
   },
   {
+    name: 'ai-tools-demo',
+    type: 'components:example',
+    files: ['example/ai-tools-demo.tsx'],
+  },
+  {
+    name: 'ai-tools-minimal',
+    type: 'components:example',
+    files: ['example/ai-tools-minimal.tsx'],
+  },
+  {
+    name: 'ai-tools-horizontal',
+    type: 'components:example',
+    files: ['example/ai-tools-horizontal.tsx'],
+  },
+  {
     name: 'toc-demo',
     type: 'components:example',
     files: ['example/toc-demo.tsx'],
@@ -1929,5 +1959,10 @@ export const examples: Registry = [
     name: 'status-code-demo',
     type: 'components:example',
     files: ['example/status-code-demo.tsx'],
+  },
+  {
+    name: 'trace-waterfall-demo',
+    type: 'components:example',
+    files: ['example/trace-waterfall-demo.tsx'],
   },
 ]

@@ -1,15 +1,20 @@
 'use client'
 
 import { Feedback } from '~/components/Feedback'
+import { LegacyGuidesSidebar } from '~/components/GuidesSidebar.legacy'
+import { useDocsLayoutV2 } from '~/features/DocsLayout/useDocsLayoutV2'
+import { HeadingSlotCrumb } from '~/layouts/HeadingSlot'
+import { RightRailPortal } from '~/layouts/RightRail'
 import { useSendTelemetryEvent } from '~/lib/telemetry'
-import { askAiUrls, isFeatureEnabled, useCopyMarkdownFromUrl } from 'common'
-import { Chatgpt, Claude } from 'icons'
-import { Check, Copy, Sparkles } from 'lucide-react'
-import Link from 'next/link'
+import { isFeatureEnabled } from 'common'
+import { PREFERRED_SOURCE_URL } from 'common/markdown-affordance'
+import { Google } from 'icons'
 import { usePathname } from 'next/navigation'
-import { cn } from 'ui'
+import { cn, IconGitHubSolid } from 'ui'
 import { ExpandableVideo } from 'ui-patterns/ExpandableVideo'
-import { Toc, TOCItems, TOCScrollArea } from 'ui-patterns/Toc'
+import { TocPrimitive, TOCScrollArea } from 'ui-patterns/Toc'
+import type { TOCItemType } from 'ui-patterns/Toc/server/get-toc'
+import { toTocTree } from 'ui-patterns/Toc/toc'
 
 import { useTocAnchors } from '../features/docs/GuidesMdx.state'
 
@@ -20,139 +25,132 @@ interface TOCHeader {
   level: number
 }
 
-function AiTools({ className }: { className?: string }) {
-  const path = usePathname()
-  const sendTelemetryEvent = useSendTelemetryEvent()
-  const { copied, copyMarkdown } = useCopyMarkdownFromUrl()
-  const urls = askAiUrls(`https://supabase.com/docs${path}`)
-
-  function handleAgentSetupClick() {
-    sendTelemetryEvent({ action: 'agent_setup_clicked' })
-  }
-
-  async function handleCopy() {
-    const ok = await copyMarkdown(`/docs${path}.md`, {
-      fallback: () => document.getElementById('sb-docs-guide-main-article')?.innerHTML ?? '',
-    })
-    if (ok) {
-      sendTelemetryEvent({ action: 'copy_as_markdown_clicked', properties: { pageType: 'guide' } })
-    }
-  }
-
-  return (
-    <section className={cn(className)} aria-labelledby="ai-tools-title">
-      <h3
-        id="ai-tools-title"
-        className="block font-mono uppercase text-xs text-foreground-light mb-3"
-      >
-        AI Tools
-      </h3>
-      <div className="flex flex-col gap-2">
-        <Link
-          href="/guides/ai-tools"
-          onClick={handleAgentSetupClick}
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Sparkles size={14} strokeWidth={1.5} />
-          Connect your AI agent
-        </Link>
-        <button
-          tabIndex={0}
-          onClick={handleCopy}
-          className="flex cursor-pointer items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground text-left transition-colors"
-        >
-          {copied ? (
-            <Check size={14} strokeWidth={1.5} className="text-primary" aria-hidden />
-          ) : (
-            <Copy size={14} strokeWidth={1.5} aria-hidden />
-          )}
-          {copied ? 'Copied!' : 'Copy as Markdown'}
-        </button>
-        <span className="sr-only" role="status">
-          {copied ? 'Copied to clipboard' : ''}
-        </span>
-        <a
-          href={urls.chatgpt}
-          target="_blank"
-          onClick={() =>
-            sendTelemetryEvent({
-              action: 'ask_ai_clicked',
-              properties: { agent: 'chatgpt', pageType: 'guide' },
-            })
-          }
-          rel="noreferrer noopener"
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Chatgpt size={14} aria-hidden />
-          Ask ChatGPT
-        </a>
-        <a
-          href={urls.claude}
-          target="_blank"
-          onClick={() =>
-            sendTelemetryEvent({
-              action: 'ask_ai_clicked',
-              properties: { agent: 'claude', pageType: 'guide' },
-            })
-          }
-          rel="noreferrer noopener"
-          className="flex items-center gap-1.5 text-xs text-foreground-lighter hover:text-foreground transition-colors"
-        >
-          <Claude size={14} aria-hidden />
-          Ask Claude
-        </a>
-      </div>
-    </section>
-  )
-}
-
-const GuidesSidebar = ({
-  className,
-  video,
-  videoTitle,
-  hideToc,
-}: {
-  className?: string
+interface GuidesRightRailProps {
   video?: string
   videoTitle?: string
   hideToc?: boolean
-}) => {
+  editHref?: string
+}
+
+interface GuidesSidebarProps extends GuidesRightRailProps {
+  className?: string
+}
+
+interface GuideTocProps {
+  toc: TOCItemType[]
+  activeUrl: string | undefined
+}
+
+interface GuideTocLinkProps {
+  item: TOCItemType
+  isActive: boolean
+  hasActiveBar?: boolean
+  className?: string
+}
+
+const GuidesSidebar = ({ className, ...props }: GuidesSidebarProps) =>
+  useDocsLayoutV2() ? (
+    <GuidesRightRail {...props} />
+  ) : (
+    <LegacyGuidesSidebar className={className} {...props} />
+  )
+
+const GuidesRightRail = ({ video, videoTitle, hideToc, editHref }: GuidesRightRailProps) => {
   const pathname = usePathname()
+  const sendTelemetryEvent = useSendTelemetryEvent()
   const { toc } = useTocAnchors()
+  const activeIndex = Math.max(TocPrimitive.useTopActiveIndex(toc), 0)
   const showFeedback = isFeatureEnabled('feedback:docs')
   const tocVideoPreview = `https://img.youtube.com/vi/${video}/0.jpg`
 
+  const handlePreferredSourceClick = () =>
+    sendTelemetryEvent({ action: 'preferred_source_clicked', properties: { pageType: 'guide' } })
+
   return (
-    <div className={cn('thin-scrollbar overflow-y-auto h-fit', 'px-px', className)}>
-      <div className="w-full relative border-l flex flex-col gap-6 lg:gap-8 px-2 h-fit">
-        {video && (
-          <div className="relative pl-5">
-            <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
-          </div>
-        )}
-        {showFeedback && (
-          <div className="pl-5">
-            <Feedback key={pathname} />
-          </div>
-        )}
-        <div className="pl-5">
-          <AiTools key={pathname} />
-        </div>
-        {!hideToc && toc.length !== 0 && (
-          <Toc className="-ml-[calc(0.25rem+6px)]">
-            <h3 className="inline-flex items-center gap-1.5 font-mono text-xs uppercase text-foreground pl-[calc(1.5rem+6px)]">
-              On this page
-            </h3>
-            <TOCScrollArea>
-              <TOCItems items={toc} />
-            </TOCScrollArea>
-          </Toc>
+    <RightRailPortal>
+      <div className="flex min-h-0 flex-1 flex-col gap-8 px-6 pt-6">
+        {video ? (
+          <ExpandableVideo imgUrl={tocVideoPreview} videoId={video} videoTitle={videoTitle} />
+        ) : null}
+        {hideToc || toc.length === 0 ? null : (
+          <GuideToc toc={toc} activeUrl={toc[activeIndex]?.url} />
         )}
       </div>
-    </div>
+      <footer className="shrink-0 border-t py-3 pl-6 pr-4">
+        <ul className="flex flex-col">
+          {showFeedback ? (
+            <li className="-ml-2 flex h-8 items-center">
+              <Feedback key={pathname} variant="rail" className="w-full" />
+            </li>
+          ) : null}
+          <li>
+            <a
+              href={PREFERRED_SOURCE_URL}
+              target="_blank"
+              rel="noreferrer noopener"
+              onClick={handlePreferredSourceClick}
+              className="-ml-2 flex h-8 items-center gap-2 rounded-md py-2 pr-2 pl-1.5 text-sm text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground focus-ring focus-visible:bg-surface-200 focus-visible:text-foreground"
+            >
+              <Google aria-hidden className="size-4 text-foreground-lighter" />
+              Prefer on Google
+            </a>
+          </li>
+          {editHref ? (
+            <li>
+              <a
+                href={editHref}
+                target="_blank"
+                rel="noreferrer noopener edit"
+                className="-ml-2 flex h-8 items-center gap-2 rounded-md py-2 pr-2 pl-1.5 text-sm text-foreground-light transition-colors hover:bg-surface-200 hover:text-foreground focus-ring focus-visible:bg-surface-200 focus-visible:text-foreground"
+              >
+                <IconGitHubSolid aria-hidden className="size-4 text-foreground-lighter" />
+                Edit this page
+              </a>
+            </li>
+          ) : null}
+        </ul>
+      </footer>
+      <HeadingSlotCrumb key={pathname} heading={toc[activeIndex]} index={activeIndex} />
+    </RightRailPortal>
   )
 }
 
-export default GuidesSidebar
+const GuideToc = ({ toc, activeUrl }: GuideTocProps) => (
+  <nav aria-label="On this page" className="flex min-h-0 flex-1 flex-col">
+    <TOCScrollArea className="-me-4 pe-4">
+      <ul className="flex flex-col gap-1 pb-6">
+        {toTocTree(toc).map(({ item, children }) => (
+          <li key={item.url} className={cn(children.length > 0 && 'pt-2 first:pt-0')}>
+            <GuideTocLink
+              item={item}
+              isActive={item.url === activeUrl}
+              className={children.length > 0 ? 'font-medium text-foreground-light' : undefined}
+            />
+            {children.length > 0 ? (
+              <ul className="docs-rail-sublist">
+                {children.map((child) => (
+                  <li key={child.url}>
+                    <GuideTocLink item={child} isActive={child.url === activeUrl} hasActiveBar />
+                  </li>
+                ))}
+              </ul>
+            ) : null}
+          </li>
+        ))}
+      </ul>
+    </TOCScrollArea>
+  </nav>
+)
+
+const GuideTocLink = ({ item, isActive, hasActiveBar = false, className }: GuideTocLinkProps) => (
+  <TocPrimitive.TOCItem
+    href={item.url}
+    aria-current={isActive ? 'location' : undefined}
+    className={cn('docs-rail-link', hasActiveBar && 'docs-active-bar', className)}
+  >
+    {item.title}
+  </TocPrimitive.TOCItem>
+)
+
 export { GuidesSidebar }
 export type { TOCHeader }

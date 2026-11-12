@@ -3,11 +3,13 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { tableRowKeys } from './keys'
+import { unguarded } from '@/data/fetchers'
 import { executeSql } from '@/data/sql/execute-sql-mutation'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { RoleImpersonationState, wrapWithRoleImpersonation } from '@/lib/role-impersonation'
 import { useTrack } from '@/lib/telemetry/track'
 import { isRoleImpersonationEnabled } from '@/state/role-impersonation-state'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type TableRowCreateVariables = {
   projectRef: string
@@ -48,8 +50,11 @@ export async function createTableRow({
   const { result } = await executeSql({
     projectRef,
     connectionString,
+    sqlOrigin: 'studio',
+    queryName: 'table-row-create',
     sql,
     isRoleImpersonationEnabled: isRoleImpersonationEnabled(roleImpersonationState?.role),
+    grant: unguarded.migrating,
   })
 
   return result
@@ -62,13 +67,13 @@ export const useTableRowCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<TableRowCreateData, ResponseError, TableRowCreateVariables>,
+  UseCustomMutationOptions<TableRowCreateData, StudioError, TableRowCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
   const track = useTrack()
 
-  return useMutation<TableRowCreateData, ResponseError, TableRowCreateVariables>({
+  return useMutation<TableRowCreateData, StudioError, TableRowCreateVariables>({
     mutationFn: (vars) => createTableRow(vars),
     async onSuccess(data, variables, context) {
       const { projectRef, table } = variables

@@ -1,5 +1,5 @@
 import type { PGTrigger } from '@supabase/pg-meta'
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
 import Image from 'next/legacy/image'
 import { useEffect } from 'react'
@@ -33,12 +33,12 @@ import {
   FormSectionContent,
   FormSectionLabel,
 } from '@/components/ui/Forms/FormSection'
-import { getKeys, useAPIKeysQuery } from '@/data/api-keys/api-keys-query'
+import { getKeys, revealedApiKeysQueryOptions } from '@/data/api-keys/api-keys-query'
 import { useEdgeFunctionsQuery } from '@/data/edge-functions/edge-functions-query'
 import { useTableNamesQuery } from '@/data/tables/table-names-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { buildDatabaseEdgeFunctionUrl, isEdgeFunctionUrl } from '@/lib/api/edgeFunctions'
+import { useGrant } from '@/lib/grants'
 import { uuidv4 } from '@/lib/helpers'
 
 export interface FormContentsProps {
@@ -52,10 +52,14 @@ export const FormContents = ({ form, selectedHook }: FormContentsProps) => {
 
   const restUrl = project?.restUrl
 
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: keys = [] } = useAPIKeysQuery(
-    { projectRef: ref, reveal: true },
-    { enabled: canReadAPIKeys }
+  // Denied access is surfaced next to the headers (`HTTPHeaders`), so the form stays usable here
+  const apiKeysGrant = useGrant(
+    'GET /v1/projects/{ref}/api-keys',
+    { projectRef: ref },
+    { variant: 'reveal' }
+  )
+  const { data: keys = [] } = useQuery(
+    revealedApiKeysQueryOptions({ projectRef: ref, grant: apiKeysGrant.grant })
   )
   const { data: functions = [], isSuccess: isSuccessEdgeFunctions } = useEdgeFunctionsQuery({
     projectRef: ref,

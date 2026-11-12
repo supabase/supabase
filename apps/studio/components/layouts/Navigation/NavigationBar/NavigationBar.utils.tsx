@@ -1,4 +1,4 @@
-import { useParams } from 'common'
+import { useFlag, useParams } from 'common'
 import {
   Auth,
   Compute,
@@ -9,7 +9,14 @@ import {
   Storage,
   TableEditor,
 } from 'icons'
-import { Blocks, Lightbulb, List, Settings, Telescope } from 'lucide-react'
+import {
+  BlocksIcon,
+  CircleAlertIcon,
+  LightbulbIcon,
+  ListIcon,
+  SettingsIcon,
+  TelescopeIcon,
+} from 'lucide-react'
 
 import {
   useIsExplorerEnabled,
@@ -42,6 +49,8 @@ interface ProductFeatures {
 }
 
 interface OtherFeatures {
+  isHealthAdvisorEnabled?: boolean
+  issuesInbox?: boolean
   isPlatform?: boolean
   unifiedLogs?: boolean
   showReports?: boolean
@@ -204,17 +213,26 @@ export const generateOtherRoutes = (
 ): Route[] => {
   const { isProjectActive, isProjectBuilding, buildingUrl } = getRouteContext(ref, project)
 
+  const isIssuesInboxEnabled = features?.issuesInbox ?? false
+  const legacyCategory = features?.isHealthAdvisorEnabled ? 'health' : 'security'
+  const advisorDestination = isIssuesInboxEnabled
+    ? `/project/${ref}/issues`
+    : `/project/${ref}/advisors/${legacyCategory}`
   const unifiedLogsEnabled = features?.unifiedLogs ?? false
   const reportsEnabled = features?.showReports ?? true
   const logsEnabled = features?.showLogs ?? true
 
   return [
     {
-      key: 'advisors',
-      label: 'Advisors',
+      key: isIssuesInboxEnabled ? 'issues' : 'advisors',
+      label: isIssuesInboxEnabled ? 'Issues' : 'Advisors',
       disabled: !isProjectActive,
-      icon: <Lightbulb size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
-      link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/advisors/security`),
+      icon: isIssuesInboxEnabled ? (
+        <CircleAlertIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+      ) : (
+        <LightbulbIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />
+      ),
+      link: ref && (isProjectBuilding ? buildingUrl : advisorDestination),
       shortcutId: SHORTCUT_IDS.NAV_ADVISORS,
     },
     ...(reportsEnabled
@@ -223,7 +241,7 @@ export const generateOtherRoutes = (
             key: 'observability',
             label: 'Observability',
             disabled: !isProjectActive,
-            icon: <Telescope size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <TelescopeIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link:
               ref &&
               (isProjectBuilding
@@ -241,7 +259,7 @@ export const generateOtherRoutes = (
             key: 'logs',
             label: 'Logs',
             disabled: false,
-            icon: <List size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+            icon: <ListIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
             link:
               ref &&
               (unifiedLogsEnabled ? `/project/${ref}/logs` : `/project/${ref}/logs/explorer`),
@@ -253,7 +271,7 @@ export const generateOtherRoutes = (
       key: 'integrations',
       label: 'Integrations',
       disabled: !isProjectActive,
-      icon: <Blocks size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <BlocksIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && (isProjectBuilding ? buildingUrl : `/project/${ref}/integrations`),
       shortcutId: SHORTCUT_IDS.NAV_INTEGRATIONS,
     },
@@ -265,10 +283,14 @@ export const useGenerateOtherRoutes = (): Route[] => {
   const { ref } = useParams()
   const { data: project } = useSelectedProjectQuery()
   const { isEnabled: unifiedLogsEnabled } = useUnifiedLogsPreview()
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   const reportsEnabled = useIsFeatureEnabled('reports:all')
   const logsEnabled = useIsFeatureEnabled('logs:all')
 
   return generateOtherRoutes(ref, project, {
+    issuesInbox: isIssuesInboxEnabled,
+    isHealthAdvisorEnabled,
     unifiedLogs: unifiedLogsEnabled,
     showReports: reportsEnabled,
     showLogs: logsEnabled,
@@ -280,7 +302,7 @@ export const generateSettingsRoutes = (ref?: string): Route[] => {
     {
       key: 'settings',
       label: 'Project Settings',
-      icon: <Settings size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
+      icon: <SettingsIcon size={ICON_SIZE} strokeWidth={ICON_STROKE_WIDTH} />,
       link: ref && `/project/${ref}/settings/general`,
       disabled: false,
       shortcutId: SHORTCUT_IDS.NAV_SETTINGS,

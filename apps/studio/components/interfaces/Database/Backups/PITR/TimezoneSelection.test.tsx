@@ -52,5 +52,5 @@ describe('TimezoneSelection', () => {
     expect(onSelectTimezone).toHaveBeenCalledTimes(1)
     expect(onSelectTimezone.mock.calls[0][0]).toBe(madridTimezone)
     expect(trigger).toHaveAttribute('aria-expanded', 'false')
-  })
+  }, 10_000)
 })

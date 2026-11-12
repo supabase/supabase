@@ -1,7 +1,10 @@
 import { Metadata } from 'next'
+
 import WrappedClient from './WrappedClient'
+import { canonicalAlternates } from '@/lib/canonical'
 
 export const metadata: Metadata = {
+  alternates: canonicalAlternates('/wrapped'),
   title: 'Supabase Wrapped 2025',
   description:
     'In 2025, developers around the world shipped faster, scaled further, and built things we never imagined. Here is what you accomplished on Supabase.',

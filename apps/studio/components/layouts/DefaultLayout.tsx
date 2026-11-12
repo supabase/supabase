@@ -17,11 +17,12 @@ import {
 import { ProjectContextProvider } from './ProjectLayout/ProjectContext'
 import { AppBannerWrapper } from '@/components/interfaces/App/AppBannerWrapper'
 import { GitHubConfigDriftBanner } from '@/components/interfaces/App/GitHubConfigDriftBanner'
+import { OnboardingSurveyFollowUpCard } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUpCard'
 import { Sidebar } from '@/components/interfaces/Sidebar'
-import { useSyncScopedIntrospection } from '@/data/scoped-introspection'
 import { useLastVisitedOrganization } from '@/hooks/misc/useLastVisitedOrganization'
 import { useCheckLatestDeploy } from '@/hooks/use-check-latest-deploy'
 import { IS_PLATFORM } from '@/lib/constants'
+import { getPathSegment } from '@/lib/pathname.utils'
 import { useAppStateSnapshot } from '@/state/app-state'
 import { useSidebarManagerSnapshot } from '@/state/sidebar-manager-state'
 
@@ -45,7 +46,6 @@ export const DefaultLayout = ({
   headerTitle,
   hideMobileMenu,
 }: PropsWithChildren<DefaultLayoutProps>) => {
-  useSyncScopedIntrospection()
   useCheckLatestDeploy()
 
   const { ref } = useParams()
@@ -144,7 +144,10 @@ export const DefaultLayout = ({
             </div>
 
             <BannerStack />
-            <StudioMobileSheetNav />
+            {IS_PLATFORM && <OnboardingSurveyFollowUpCard />}
+            <StudioMobileSheetNav
+              shouldCloseOnQueryChange={getPathSegment(router.pathname, 3) !== 'issues'}
+            />
           </MobileSheetProvider>
         </ProjectContextProvider>
       </LayoutSidebarProvider>

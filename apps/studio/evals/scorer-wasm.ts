@@ -3,8 +3,8 @@ import { parse } from 'libpg-query'
 
 import { AssistantEvalScorer } from './scorer'
 import { getParsedToolSpans } from './trace-utils'
-import { createNotebookInputSchema } from '@/components/ui/AIAssistantPanel/Message.utils'
-import { executeSqlInputSchema } from '@/lib/ai/tools/studio-tools'
+import { contract as createNotebookContract } from '@/lib/ai/tools/create-notebook'
+import { contract as executeSqlContract } from '@/lib/ai/tools/execute-sql'
 import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-identifier-quoting'
 
 /**
@@ -14,10 +14,10 @@ import { extractIdentifiers, isQuotedInSql, needsQuoting } from '@/lib/sql-ident
  */
 async function getSqlQueries(trace: Trace): Promise<string[]> {
   const executeSqlSpans = await getParsedToolSpans(trace, 'execute_sql', {
-    inputSchema: executeSqlInputSchema,
+    inputSchema: executeSqlContract.inputSchema,
   })
   const createNotebookSpans = await getParsedToolSpans(trace, 'create_notebook', {
-    inputSchema: createNotebookInputSchema,
+    inputSchema: createNotebookContract.inputSchema,
   })
 
   const notebookCellSql = createNotebookSpans.flatMap((s) =>

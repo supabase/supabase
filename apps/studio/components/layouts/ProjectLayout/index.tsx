@@ -1,6 +1,6 @@
 import { LOCAL_STORAGE_KEYS, mergeRefs, useFlag, useParams } from 'common'
-import { AnimatePresence, motion } from 'framer-motion'
 import { XIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Head from 'next/head'
 import { useRouter } from 'next/router'
 import {
@@ -119,6 +119,8 @@ export interface ProjectLayoutProps {
   // Deprecated: use browserTitle.entity instead. Kept for backwards compatibility.
   selectedTable?: string
   resizableSidebar?: boolean
+  /** Starting width of the product menu in pixels, for menus that list more than links */
+  productMenuDefaultSize?: number
   productMenuClassName?: string
 }
 
@@ -135,7 +137,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       children,
       selectedTable,
       resizableSidebar = false,
-
+      productMenuDefaultSize = 256,
       productMenuClassName,
     },
     ref
@@ -156,7 +158,9 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
       !!projectResourceWarnings?.disk_space_exhaustion ||
       !!projectResourceWarnings?.disk_io_exhaustion
     const isNanoCompute = selectedProject?.infra_compute_size === 'nano'
-    const showUpgradeBanner = isNanoCompute && isComputeNearExhaustion
+    // The free Micro upgrade is only included on paid plans
+    const isPaidPlan = !!selectedOrganization?.plan?.id && selectedOrganization.plan.id !== 'free'
+    const showUpgradeBanner = isPaidPlan && isNanoCompute && isComputeNearExhaustion
 
     const isExplorerEnabled = useFlag('explorer')
 
@@ -185,7 +189,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
     } = useMobileSheet()
 
     const pathname = getPathnameWithoutQuery(router.asPath, router.pathname)
-    const currentSectionKey = getSectionKeyFromPathname(pathname)
+    const isIssuesInboxEnabled = useFlag('issuesInbox')
+    const sectionKey = getSectionKeyFromPathname(pathname)
+    const currentSectionKey =
+      sectionKey === 'advisors' && isIssuesInboxEnabled ? 'issues' : sectionKey
 
     const mainScrollContainer = useMainScrollContainer()
     const setMainScrollContainer = useSetMainScrollContainer()
@@ -220,6 +227,7 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
 
     const ignorePausedState =
       router.pathname === '/project/[ref]' ||
+      router.pathname.includes('/project/[ref]/branches') ||
       router.pathname.includes('/project/[ref]/settings') ||
       router.pathname.includes('/project/[ref]/functions') ||
       router.pathname.includes('/project/[ref]/logs')
@@ -307,9 +315,10 @@ export const ProjectLayout = forwardRef<HTMLDivElement, PropsWithChildren<Projec
             {productMenu && sideBarIsOpen && (
               <ResizablePanel
                 panelRef={panelRef}
-                minSize={256}
-                maxSize={resizableSidebar ? 512 : 256}
-                defaultSize={256}
+                minSize="256px"
+                maxSize={resizableSidebar ? '512px' : '256px'}
+                defaultSize={`${productMenuDefaultSize}px`}
+                groupResizeBehavior="preserve-pixel-size"
                 id="panel-left"
               >
                 <AnimatePresence initial={false}>

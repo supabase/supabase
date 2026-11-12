@@ -1,5 +1,4 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { ArrowUp, ChevronDown, FileText } from 'lucide-react'
+import { ArrowUpIcon, ChevronDownIcon, FileTextIcon } from 'lucide-react'
 import {
   Button,
   cn,
@@ -10,7 +9,7 @@ import {
 } from 'ui'
 
 import { ShortcutBadge } from '@/components/ui/ShortcutBadge'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useTrack } from '@/lib/telemetry/track'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
 import { useShortcut } from '@/state/shortcuts/useShortcut'
@@ -22,9 +21,8 @@ export const InsertButton = () => {
 
   const snap = useTableEditorTableStateSnapshot()
   const tableEditorSnap = useTableEditorStateSnapshot()
-  const { can: canCreateColumns } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'columns'
+  const { can: canCreateColumns } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   const onAddRow =
@@ -56,7 +54,7 @@ export const InsertButton = () => {
           data-testid="table-editor-insert-new-row"
           variant="primary"
           size="tiny"
-          icon={<ChevronDown strokeWidth={1.5} />}
+          icon={<ChevronDownIcon strokeWidth={1.5} />}
         >
           Insert
         </Button>
@@ -120,8 +118,8 @@ export const InsertButton = () => {
                   }}
                 >
                   <div className="relative shrink-0 w-4">
-                    <FileText size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
-                    <ArrowUp
+                    <FileTextIcon size={18} strokeWidth={1.5} className="translate-x-[-2px]" />
+                    <ArrowUpIcon
                       className={cn(
                         'transition duration-200 absolute bottom-0 right-0 translate-y-1 opacity-0 bg-brand-400 rounded-full',
                         'group-data-highlighted:translate-y-0 group-data-highlighted:text-primary group-data-highlighted:opacity-100'

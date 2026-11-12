@@ -9,9 +9,7 @@ const DynamicCodeBlock = dynamic(() =>
   import('../CodeBlock').then((m) => ({ default: m.CodeBlock }))
 )
 
-export const InlineCode = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
-  <code className={cn('text-code-inline', className)} {...props} />
-)
+export const InlineCode = (props: HTMLAttributes<HTMLElement>) => <code {...props} />
 
 export const Blockquote = ({ className, ...props }: HTMLAttributes<HTMLElement>) => (
   <blockquote
@@ -60,7 +58,8 @@ export const DefaultPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement
 export const CodeBlockPre = ({ children, ...props }: HTMLAttributes<HTMLPreElement>) => {
   // Find the code element inside pre
   const codeElement = React.Children.toArray(children).find(
-    (child) => isValidElement(child) && child.type === 'code'
+    // react-markdown passes the mapped Code component, not a plain code element
+    (child) => isValidElement(child) && (child.type === 'code' || child.type === Code)
   )
 
   if (!isValidElement(codeElement)) {

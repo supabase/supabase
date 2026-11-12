@@ -7,12 +7,11 @@ import fs from 'fs'
 import { globby } from 'globby'
 import matter from 'gray-matter'
 import prettier from 'prettier'
+import { checkGuidePageEnabled } from '~/features/docs/NavigationPageStatus.utils'
 
-import { generateCLIPages } from './files/cli'
 import { generateReferencePages } from './files/reference-lib'
 
 async function generate() {
-  const cliPages = generateCLIPages()
   const referencePages = await generateReferencePages()
 
   const contentFiles = await globby(['content/guides/**/!(_)*.mdx'])
@@ -30,21 +29,11 @@ async function generate() {
     })
   )
 
-  const troubleshootingFiles = await globby(['content/troubleshooting/**/!(_)*.mdx'])
-  const troubleshootingPages = await Promise.all(
-    troubleshootingFiles.map(async (filePath) => {
-      return {
-        link: filePath.replace(/^content/, 'guides').replace(/\.mdx$/, ''),
-        priority: 1,
-      }
-    })
-  )
-
-  const allPages = (contentPages as Array<{ link: string; priority: number }>).concat(
-    troubleshootingPages,
-    referencePages,
-    cliPages
-  )
+  const allPages = (contentPages as Array<{ link: string; priority: number }>)
+    .filter(({ link }) => checkGuidePageEnabled(`/${link}`))
+    .concat(referencePages)
+  // Keep the output order stable across builds
+  allPages.sort((a, b) => (a.link < b.link ? -1 : a.link > b.link ? 1 : 0))
 
   const sitemap = `
     <?xml version="1.0" encoding="UTF-8"?>
@@ -75,7 +64,6 @@ async function generate() {
     `Total of ${allPages.length} pages in sitemap, located at /apps/docs/${sitemapFilePath}`
   )
 
-  // eslint-disable-next-line no-sync
   fs.writeFileSync(sitemapFilePath, formatted)
 }
 

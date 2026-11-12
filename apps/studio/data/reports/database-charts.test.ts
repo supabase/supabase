@@ -1,7 +1,11 @@
+import { INSTANCE_DISK_LIMITS } from 'shared-data'
 import { describe, expect, it } from 'vitest'
 
 import { getReportAttributesV2, shouldShowDiskIOBurstBalanceChart } from './database-charts'
+import { getThresholdZoneChart } from '@/components/ui/Charts/ComposedChartThresholdZones.utils'
 import { RESOURCE_WARNING_MESSAGES } from '@/components/ui/ResourceExhaustionWarningBanner/ResourceExhaustionWarningBanner.constants'
+import { mapResponseToAnalyticsData } from '@/data/analytics/infra-monitoring-queries'
+import type { InfraMonitoringMultiData } from '@/data/analytics/infra-monitoring-query'
 import { Project } from '@/data/projects/project-detail-query'
 
 const PROJECT: Project = {
@@ -101,50 +105,96 @@ describe('getReportAttributesV2 shared pooler chart', () => {
   })
 })
 
+// Visibility permutations are covered by shouldShowDiskIOBurstBalanceChart below.
+describe('getReportAttributesV2 disk throughput reference line', () => {
+  const getMaxThroughputLine = (diskLimits?: (typeof INSTANCE_DISK_LIMITS)[string]) => {
+    const chart = getReportAttributesV2(
+      ENTITLED_FEATURES,
+      buildProject(),
+      {
+        attributes: { type: 'gp3', throughput_mbps: 1000, iops: 3000, size_gb: 100 },
+      } as Parameters<typeof getReportAttributesV2>[2],
+      undefined,
+      undefined,
+      false,
+      false,
+      false,
+      true,
+      diskLimits
+    ).find((chart) => chart.id === 'disk-throughput')
+    const line = (chart?.attributes ?? []).find(
+      (attribute) => typeof attribute === 'object' && attribute.attribute === 'disk_throughput_max'
+    )
+    return typeof line === 'object' ? line : undefined
+  }
+
+  it('caps the reference line at the compute limit when provisioned above it', () => {
+    // 1000 MB/s provisioned, but an m6g.large sustains at most 594 MB/s
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6g.large'])
+    expect(line?.value).toBe(594 * 1024 * 1024)
+  })
+
+  it('keeps the provisioned value when the compute limit is higher', () => {
+    const line = getMaxThroughputLine(INSTANCE_DISK_LIMITS['m6i.large'])
+    expect(line?.value).toBe(1000 * 1024 * 1024)
+  })
+})
+
 describe('getReportAttributesV2 disk-io-burst-balance chart', () => {
   it('shows the chart for burstable non high availability projects', () => {
     expect(getBurstBalanceChart(buildProject())?.hide).toBe(false)
   })
 
-  it('hides the chart for high availability projects', () => {
-    expect(getBurstBalanceChart(buildProject({ high_availability: true }))?.hide).toBe(true)
-  })
-
   it('hides the chart when the feature flag is off', () => {
     expect(getBurstBalanceChart(buildProject(), false)?.hide).toBe(true)
-  })
-
-  it('hides the chart for non burstable compute sizes', () => {
-    expect(getBurstBalanceChart(buildProject({ infra_compute_size: '16xlarge' }))?.hide).toBe(true)
   })
 })
 
 describe('shouldShowDiskIOBurstBalanceChart', () => {
   it('shows the chart for burstable non high availability projects when the flag is on', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), true)).toBe(true)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), true, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(true)
   })
 
   it('hides the chart when the flag is off', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(buildProject(), false)).toBe(false)
+    expect(
+      shouldShowDiskIOBurstBalanceChart(buildProject(), false, INSTANCE_DISK_LIMITS['t4g.micro'])
+    ).toBe(false)
   })
 
-  it('hides the chart for non burstable compute sizes', () => {
+  it('hides the chart for configurations whose baseline equals the maximum', () => {
     expect(
-      shouldShowDiskIOBurstBalanceChart(buildProject({ infra_compute_size: '4xlarge' }), true)
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6g.4xlarge']
+      )
     ).toBe(false)
+  })
+
+  it('shows the chart for 4XL configurations that do burst', () => {
+    expect(
+      shouldShowDiskIOBurstBalanceChart(
+        buildProject({ infra_compute_size: '4xlarge' }),
+        true,
+        INSTANCE_DISK_LIMITS['m6i.4xlarge']
+      )
+    ).toBe(true)
   })
 
   it('hides the chart for high availability projects', () => {
     expect(
       shouldShowDiskIOBurstBalanceChart(
         buildProject({ high_availability: true, infra_compute_size: 'large' }),
-        true
+        true,
+        INSTANCE_DISK_LIMITS['m6g.large']
       )
     ).toBe(false)
   })
 
   it('hides the chart when the project is unknown', () => {
-    expect(shouldShowDiskIOBurstBalanceChart(undefined, true)).toBe(false)
+    expect(shouldShowDiskIOBurstBalanceChart(undefined, true, undefined)).toBe(false)
   })
 })
 
@@ -160,5 +210,105 @@ describe('resource warning metrics chart IDs', () => {
       .filter((chartId) => !visibleChartIds.has(chartId))
 
     expect(missingChartIds).toEqual([])
+  })
+})
+
+describe('getReportAttributesV2 memory commitment chart', () => {
+  it.each(['multi', 'single'] as const)(
+    'prevents missing capacity from turning normal commitment into a Severe warning in 2m %s responses',
+    (format) => {
+      const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+        (chart) => chart.id === 'memory-commitment'
+      )
+      if (!chart) throw new Error('Expected the memory commitment chart')
+
+      const GIB = 1024 ** 3
+      const samples = [
+        { period_start: '2024-01-02T03:00:00Z', ram_commit_limit: String(5 * GIB) },
+        { period_start: '2024-01-02T03:01:00Z', ram_commit_limit: undefined },
+        { period_start: '2024-01-02T03:02:00Z', ram_commit_limit: String(5 * GIB) },
+        { period_start: '2024-01-02T03:03:00Z', ram_commit_limit: String(5 * GIB) },
+      ].map((sample) => ({ ...sample, ram_commit_used: String(4 * GIB) }))
+      const metadata = { format: 'bytes', total: 0, totalAverage: 0, yAxisLimit: 9 * GIB }
+      const attributes = ['ram_commit_used', 'ram_commit_limit'] as const
+      const mapped = attributes.map((attribute) => {
+        const response: InfraMonitoringMultiData =
+          format === 'multi'
+            ? {
+                _originalInterval: '2m',
+                data: samples.map(({ period_start, ...values }) => ({ period_start, values })),
+                series: { [attribute]: metadata },
+              }
+            : { ...metadata, _originalInterval: '2m', data: samples }
+        return mapResponseToAnalyticsData(
+          response,
+          [attribute],
+          undefined,
+          chart.thresholdZoneAttribute
+        )[attribute].data
+      })
+      const data = mapped[0].map((point, index) => ({ ...point, ...mapped[1][index] }))
+      const guidance = getThresholdZoneChart(
+        data,
+        chart.thresholdZones,
+        chart.thresholdZoneAttribute
+      )
+
+      expect(guidance.selectedZone).toBeUndefined()
+      expect(data[0].ram_commit_limit).toBeUndefined()
+      expect(data.map((point) => point.ram_commit_used)).toEqual([4 * GIB, 4 * GIB])
+      expect(data[1].ram_commit_limit).toBe(5 * GIB)
+    }
+  )
+
+  it.each([true, false])(
+    'controls risk guidance without hiding the commitment chart when risk zones are %s',
+    (showMemoryCommitmentRiskZones) => {
+      const chart = getReportAttributesV2(
+        ENTITLED_FEATURES,
+        buildProject(),
+        undefined,
+        undefined,
+        undefined,
+        false,
+        false,
+        true,
+        showMemoryCommitmentRiskZones
+      ).find((chart) => chart.id === 'memory-commitment')
+      if (!chart) throw new Error('Expected the memory commitment chart')
+
+      const GIB = 1024 ** 3
+      const guidance = getThresholdZoneChart(
+        [{ ram_commit_limit: 5 * GIB, ram_commit_used: 8.5 * GIB }],
+        chart.thresholdZones,
+        chart.thresholdZoneAttribute
+      )
+
+      expect(chart.hide).toBe(false)
+      expect(guidance.selectedZone?.badgeLabel).toBe(
+        showMemoryCommitmentRiskZones ? 'Severe' : undefined
+      )
+      expect(guidance.zones.map((zone) => zone.label)).toEqual(
+        showMemoryCommitmentRiskZones ? ['Severe', 'Full commitment capacity'] : []
+      )
+    }
+  )
+
+  it('keeps capacity tied to compute size so overcommitment cannot raise the reference', () => {
+    const chart = getReportAttributesV2(ENTITLED_FEATURES, buildProject()).find(
+      (chart) => chart.id === 'memory-commitment'
+    )
+    const capacity = chart?.thresholdZones?.find((zone) => zone.isAlwaysVisible)
+    const GIB = 1024 ** 3
+
+    expect(
+      capacity?.getRanges([
+        { ram_commit_limit: 5 * GIB, ram_commit_used: 12 * GIB },
+        { ram_commit_limit: 2 * GIB, ram_commit_used: 6 * GIB },
+      ])
+    ).toEqual([
+      [9 * GIB, 9 * GIB],
+      [3 * GIB, 3 * GIB],
+    ])
   })
 })

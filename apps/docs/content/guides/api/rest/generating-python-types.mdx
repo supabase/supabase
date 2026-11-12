@@ -32,13 +32,13 @@ npx supabase init
 Generate types for your project to produce the `database_types.py` file:
 
 ```bash
-npx supabase gen types --lang=python --project-id "$PROJECT_REF" --schema public > database.types.py
+npx supabase gen types --lang=python --remote="$PROJECT_REF" --schema public > database.types.py
 ```
 
 or in case of local development:
 
 ```bash
-npx supabase gen types --lang=python --local > database_types.py
+npx supabase gen types --lang=python > database_types.py
 ```
 
 These types are generated from your database schema. Given a table `public.movies`, the generated types will look like:
@@ -99,7 +99,7 @@ One way to keep your type definitions in sync with your database is to set up a 
 Add the following script to your `package.json` to run it using `npm run update-types`
 
 ```json
-"update-types": "npx supabase gen types --lang=python --project-id \"$PROJECT_REF\" > database_types.py"
+"update-types": "npx supabase gen types --lang=python --remote=\"$PROJECT_REF\" > database_types.py"
 ```
 
 Create a file `.github/workflows/update-types.yml` with the following snippet to define the action along with the environment variables. This script will commit new type changes to your repo every night.

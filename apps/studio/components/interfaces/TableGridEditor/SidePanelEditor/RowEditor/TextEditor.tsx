@@ -125,7 +125,8 @@ export const TextEditor = ({
       header={
         <div className="flex items-center justify-between">
           <p>
-            {readOnly ? 'Viewing' : 'Editing'} value of: <code>{column}</code>
+            {readOnly ? <span>Viewing</span> : <span>Editing</span>} <span>value of:</span>{' '}
+            <code>{column}</code>
           </p>
           {(!isTruncated || (isTruncated && isSuccess)) && (
             <TwoOptionToggle

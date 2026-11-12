@@ -5,8 +5,13 @@ import { toast } from 'sonner'
 
 import type { ExtendedSupportCategories } from '@/components/interfaces/Support/Support.constants'
 import { NO_ORG_MARKER, NO_PROJECT_MARKER } from '@/components/interfaces/Support/SupportForm.utils'
-import { handleError, post } from '@/data/fetchers'
-import { ResponseError } from '@/types'
+import {
+  classifyResponseError,
+  parseRateLimitResetSeconds,
+  parseRetryAfterSeconds,
+} from '@/data/error-classification'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import type { UseCustomMutationOptions } from '@/types'
 
 export type sendSupportTicketVariables = {
@@ -72,21 +77,21 @@ export async function sendSupportTicket({
       dashboardStudioVersion,
       threadRef,
     },
+    grant: unguarded.migrating,
   })
 
   if (error) {
     const httpResponse: unknown = response
     if (httpResponse instanceof Response && httpResponse.status === 429) {
-      const resetHeader =
-        httpResponse.headers.get('Retry-After') ?? httpResponse.headers.get('X-RateLimit-Reset')
-      const parsedReset = resetHeader ? parseInt(resetHeader, 10) : NaN
-      const waitSeconds = Number.isFinite(parsedReset) ? parsedReset : RATE_LIMIT_FALLBACK_SECONDS
-      throw new ResponseError(
-        `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
-        429,
-        undefined,
-        waitSeconds
-      )
+      const waitSeconds =
+        parseRetryAfterSeconds(httpResponse.headers.get('Retry-After')) ??
+        parseRateLimitResetSeconds(httpResponse.headers.get('X-RateLimit-Reset')) ??
+        RATE_LIMIT_FALLBACK_SECONDS
+      throw classifyResponseError({
+        message: `You have submitted too many support requests. Please try again in ${waitSeconds} second${waitSeconds === 1 ? '' : 's'}.`,
+        code: 429,
+        retryAfter: waitSeconds,
+      })
     }
 
     handleError(error, {
@@ -108,10 +113,10 @@ export const useSendSupportTicketMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<sendSupportTicketData, ResponseError, sendSupportTicketVariables>,
+  UseCustomMutationOptions<sendSupportTicketData, StudioError, sendSupportTicketVariables>,
   'mutationFn'
 > = {}) => {
-  return useMutation<sendSupportTicketData, ResponseError, sendSupportTicketVariables>({
+  return useMutation<sendSupportTicketData, StudioError, sendSupportTicketVariables>({
     mutationFn: (vars) => sendSupportTicket(vars),
     async onSuccess(data, variables, context) {
       await onSuccess?.(data, variables, context)

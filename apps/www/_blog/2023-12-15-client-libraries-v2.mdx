@@ -35,7 +35,7 @@ Check out the [docs](https://supabase.com/docs/reference/python/introduction), a
 
 <Admonition type="note" title="Python library for vectors and embeddings">
 
-Don’t forget that we also have Vecs, a Python client for managing and querying vector stores in Postgres with the pgvector extension. [Get started](https://supabase.com/docs/guides/ai/python/api)!
+Don’t forget that we also have Vecs, a Python client for managing and querying vector stores in Postgres with the [pgvector](https://supabase.com/docs/guides/database/extensions/pgvector) extension. [Get started](https://supabase.com/docs/guides/ai/python/api)!
 
 </Admonition>
 
@@ -79,7 +79,7 @@ We’ve made several updates for Typescript support in `supabase-js`:
 The core theme of Flutter v2 has been stability and better DX. Shout-out to [Vinzent](https://github.com/Vinzent03), a community maintainer who has done the majority of the work. Some notable improvements:
 
 - **Type safety for queries:** The return type of a query will automatically be set to `List` of `Map` depending on return type ( `single()` or `maybeSingle()` )
-- **Type safety for Realtime:** Realtime broadcast and presence get their own methods to make it more easily accessible.
+- **Type safety for [Realtime](https://supabase.com/docs/guides/realtime):** Realtime broadcast and presence get their own methods to make it more easily accessible.
 - **Performance:**
   - Initialization time has been reduced by lazily refreshing the session in the background.
   - Lighter package size. We have removed some dependencies

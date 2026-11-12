@@ -46,3 +46,35 @@ export function constrainDateToRange(current: dayjs.Dayjs, lower: dayjs.Dayjs, u
   }
   return current
 }
+
+export function getRestoreDate(unix: number, timezone: string) {
+  const instant = dayjs.unix(unix).utc()
+  const offset = new Intl.DateTimeFormat('en-US', {
+    timeZone: timezone,
+    timeZoneName: 'longOffset',
+  })
+    .formatToParts(instant.toDate())
+    .find((part) => part.type === 'timeZoneName')?.value
+  const match = offset?.match(/^GMT([+-])(\d{2}):(\d{2})$/)
+  if (!match) return instant
+
+  const minutes = Number(match[2]) * 60 + Number(match[3])
+  return instant.utcOffset(match[1] === '-' ? -minutes : minutes)
+}
+
+export function updateRestoreDate(
+  current: dayjs.Dayjs,
+  date: string,
+  time: Time,
+  timezone: string
+) {
+  const wallTime = dayjs.utc(date).hour(time.h).minute(time.m).second(time.s)
+  const candidate = getRestoreDate(
+    wallTime.subtract(current.utcOffset(), 'minute').unix(),
+    timezone
+  )
+  const format = 'YYYY-MM-DD HH:mm:ss'
+  if (candidate.format(format) === wallTime.format(format)) return candidate
+
+  return getRestoreDate(dayjs.tz(wallTime.format(format), timezone).unix(), timezone)
+}

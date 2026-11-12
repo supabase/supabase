@@ -1,4 +1,10 @@
-import { ChevronRight, CircleX, Minus, MoreVertical, StopCircle } from 'lucide-react'
+import {
+  ChevronRightIcon,
+  CircleXIcon,
+  MinusIcon,
+  MoreVerticalIcon,
+  StopCircleIcon,
+} from 'lucide-react'
 import { parseAsString, useQueryState } from 'nuqs'
 import { Fragment, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
@@ -238,7 +244,7 @@ export const ActivityRow = ({
                 variant="outline"
                 className="px-1 mr-3"
                 onClick={onExpand}
-                icon={<ChevronRight className={cn('transition', expanded && 'rotate-90')} />}
+                icon={<ChevronRightIcon className={cn('transition', expanded && 'rotate-90')} />}
               />
             )}
 
@@ -331,7 +337,7 @@ export const ActivityRow = ({
             {durationSeconds !== null ? (
               formatDuration(durationSeconds * 1000, 0)
             ) : (
-              <Minus size={12} className="text-foreground-lighter" />
+              <MinusIcon size={12} className="text-foreground-lighter" />
             )}
           </p>
         </TableCell>
@@ -343,7 +349,7 @@ export const ActivityRow = ({
 
               return (
                 <Fragment key={pid}>
-                  {index > 0 && ', '}
+                  {index > 0 && <span>{', '}</span>}
 
                   <HoverCard openDelay={150} closeDelay={100}>
                     <HoverCardTrigger
@@ -354,7 +360,8 @@ export const ActivityRow = ({
                     </HoverCardTrigger>
                     <HoverCardContent className="bg-alternative w-96 max-h-64 overflow-y-auto p-3 text-xs">
                       <p>
-                        Blocked via {blockChain.length} hop{blockChain.length > 1 ? 's' : ''}
+                        Blocked via {blockChain.length} hop
+                        {blockChain.length > 1 ? <span>s</span> : ''}
                       </p>
 
                       <div className="flex flex-col mt-2 gap-y-1.5">
@@ -426,7 +433,7 @@ export const ActivityRow = ({
               )
             })
           ) : (
-            <Minus size={12} className="text-foreground-lighter" />
+            <MinusIcon size={12} className="text-foreground-lighter" />
           )}
         </TableCell>
 
@@ -437,7 +444,7 @@ export const ActivityRow = ({
                 aria-label="More actions"
                 variant="text"
                 className="px-1"
-                icon={<MoreVertical />}
+                icon={<MoreVerticalIcon />}
               />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-44">
@@ -457,7 +464,7 @@ export const ActivityRow = ({
                   },
                 }}
               >
-                <CircleX size={12} />
+                <CircleXIcon size={12} />
                 <span>Cancel query</span>
               </DropdownMenuItemTooltip>
 
@@ -474,7 +481,7 @@ export const ActivityRow = ({
                   },
                 }}
               >
-                <StopCircle size={12} />
+                <StopCircleIcon size={12} />
                 <span>Terminate session</span>
               </DropdownMenuItemTooltip>
             </DropdownMenuContent>

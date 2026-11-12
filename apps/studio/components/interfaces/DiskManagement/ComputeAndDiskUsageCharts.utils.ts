@@ -6,7 +6,7 @@ export type ComputeUsageChartDatum = {
   timestamp: string
   maxCpuUsage: number
   ramUsage: number
-  diskIoConsumption: number
+  diskIoBalance?: number
 }
 
 export type DiskUsageChartDatum = {
@@ -73,12 +73,19 @@ export const buildUsageChartData = (
     return { computeChartData: [], diskChartData: [] }
   }
 
-  const computeChartData = usageData.data.map((point) => ({
-    timestamp: point.period_start,
-    maxCpuUsage: clampPercentage(toNumber(point.values.max_cpu_usage)),
-    ramUsage: clampPercentage(toNumber(point.values.ram_usage)),
-    diskIoConsumption: clampPercentage(toNumber(point.values.disk_io_consumption)),
-  }))
+  const computeChartData = usageData.data.map((point) => {
+    const datum: ComputeUsageChartDatum = {
+      timestamp: point.period_start,
+      maxCpuUsage: clampPercentage(toNumber(point.values.max_cpu_usage)),
+      ramUsage: clampPercentage(toNumber(point.values.ram_usage)),
+    }
+    const balance = point.values.disk_io_budget
+    const parsedBalance = balance?.trim() ? Number(balance) : undefined
+    if (parsedBalance !== undefined && Number.isFinite(parsedBalance)) {
+      datum.diskIoBalance = clampPercentage(parsedBalance)
+    }
+    return datum
+  })
 
   const diskChartData = usageData.data.flatMap((point) => {
     const databaseBytes = toNumber(point.values.pg_database_size)
@@ -109,12 +116,16 @@ export const getComputeUsageSummary = (
 ) => {
   const peakCpuUsage = getPeakChartValue(data, 'maxCpuUsage')
   const peakMemoryUsage = getPeakChartValue(data, 'ramUsage')
-  const peakDiskIoUsage = getPeakChartValue(data, 'diskIoConsumption')
+  const balances = data.flatMap(({ diskIoBalance }) =>
+    diskIoBalance === undefined ? [] : [diskIoBalance]
+  )
+  const minDiskIoBalance = balances.length > 0 ? Math.min(...balances) : undefined
+  const peakDiskIoConsumption = minDiskIoBalance === undefined ? undefined : 100 - minDiskIoBalance
 
   const supportedPeaks = [
     peakCpuUsage,
     peakMemoryUsage,
-    ...(includeDiskIo ? [peakDiskIoUsage] : []),
+    ...(includeDiskIo ? [peakDiskIoConsumption] : []),
   ]
   const peaks = supportedPeaks.filter((value): value is number => value !== undefined)
   const peakComputeUsage = peaks.length > 0 ? Math.max(...peaks) : undefined
@@ -122,7 +133,8 @@ export const getComputeUsageSummary = (
   return {
     peakCpuUsage,
     peakMemoryUsage,
-    peakDiskIoUsage,
+    minDiskIoBalance,
+    diskIoStatus: getUsageMetricStatus(peakDiskIoConsumption),
     peakComputeUsage,
     status: getWorstUsageMetricStatus(...supportedPeaks),
   }

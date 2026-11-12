@@ -77,14 +77,20 @@ module.exports = defineConfig([
     },
     rules: {
       'shadcn/no-unknown-classes': ['warn', { allow: ['not-prose'] }],
-      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout'] }],
+      // a transition-[...] list names css properties, not a design value, so no token can replace it
+      'shadcn/no-arbitrary-values': ['warn', { allow: ['layout', 'transition'] }],
       'shadcn/no-raw-colors': 'warn',
     },
   },
   tanstackQuery.configs['flat/recommended'],
   {
     rules: {
-      '@tanstack/query/exhaustive-deps': 'warn',
+      // Grants (FGA permission tokens) and connection strings don't change the returned data,
+      // so keeping them out of query keys avoids splitting the cache.
+      '@tanstack/query/exhaustive-deps': [
+        'warn',
+        { allowlist: { variables: ['grant', 'connectionString'] } },
+      ],
     },
   },
   typescriptConfig,

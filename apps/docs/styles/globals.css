@@ -1,8 +1,15 @@
 @import 'config/tailwind.config.css';
+@import 'config/inline-code.css';
+@import 'ui-patterns/CodeBlock/code-block.css';
+@import 'ui-patterns/Toc/toc-menu.css';
+@import 'ui-patterns/Notch/notch.css';
 @import './code-block.css';
 @import './reference.css';
-@import './loading-beam.css';
-@import './scroll-fade.css';
+@import './sidebar.css';
+@import './ask-ai.css';
+@import './curved-scroll-area.css';
+@import 'docs-search/styles.css';
+@import './header.css';
 
 @source '../app/**/*.{ts,tsx,mdx}';
 @source '../components/**/*.tsx';
@@ -13,6 +20,9 @@
 @source '../pages/**/*.{tsx,mdx}';
 @source './../../../packages/ui/src/**/*.{tsx,ts,js}';
 @source './../../../packages/ui-patterns/src/**/*.{tsx,ts,js}';
+@source './../../../packages/docs-search/src/**/*.{tsx,ts}';
+
+@custom-variant layout-v2 (&:is([data-ia-nav='option-1'] *));
 
 @theme inline {
   --font-sans:
@@ -35,6 +45,27 @@
   --text-8xl: 5.875rem;
   --text-9xl: 7.875rem;
   --font-weight-normal: 450;
+  --container-docs-content: 731px;
+}
+
+@utility docs-active-bar {
+  &[aria-current]::before {
+    @apply absolute -left-3.25 top-1/2 h-[1em] w-px -translate-y-1/2 bg-brand;
+    content: '';
+  }
+}
+
+@utility docs-rail-sublist {
+  @apply mt-1 ml-px border-l pl-3;
+}
+
+@utility docs-rail-link {
+  @apply relative block py-1 text-sm text-foreground-lighter wrap-anywhere;
+  @apply transition-colors duration-150 hover:text-foreground-light focus-ring;
+  @apply focus-visible:text-foreground-light;
+  &[aria-current] {
+    @apply text-foreground;
+  }
 }
 
 @layer utilities {
@@ -78,11 +109,23 @@
 :root {
   --sidebar-width: 300px;
   --header-height: 50px;
+  --docs-side-column-width: clamp(15rem, 20vw, 17.5rem);
+}
+
+:root[data-ia-nav='option-1'] {
+  --header-height: 56px;
 }
 
 html {
   scroll-behavior: smooth;
   font-weight: 500;
+}
+
+@media (min-width: 1024px) {
+  html[data-ia-nav='option-1'],
+  html[data-ia-nav='option-1'] body {
+    overscroll-behavior-y: none;
+  }
 }
 
 html[data-theme*='dark'] {
@@ -148,7 +191,7 @@ h6:not(.font-mono),
   white-space: pre-line;
 }
 
-.prose :where(p, a, code, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
+.prose :where(p, a, pre):not(:where([class~='not-prose'], [class~='not-prose'] *)),
 .prose :where(ol > li):not(:where([class~='not-prose'], [class~='not-prose'] *))::marker {
   font-weight: inherit;
 }
@@ -163,8 +206,8 @@ h6:not(.font-mono),
   @apply font-heading font-semibold;
 }
 
-/* Alert set its own type scale to prevent drift in docs */
-.prose
+/* Alert set its own type scale to prevent drift in docs. prose-sm keeps its own smaller scale */
+.prose:not(:where(.prose-sm))
   :where(p, li, a, figcaption):not(:where([class~='not-prose'], [class~='not-prose'] *)):not(
     :where(h1, h2, h3, h4, h5, h6, .h1, .h2, .h3, .h4, .h5, .h6) *
   ):not(:where([data-slot='alert'] *)) {
@@ -217,13 +260,6 @@ pre[class*='language-'] {
   font-family: var(--font-mono);
   & h5 {
     font-weight: 200;
-  }
-}
-
-.method-list-item-validation {
-  code {
-    @apply text-xs bg-control rounded-sm;
-    padding: 1px 6px;
   }
 }
 
@@ -284,20 +320,11 @@ pre[class*='language-'] {
   }
 }
 
-/* format <code> inside <p> */
 h2 code,
 h3 code,
 h4 code {
   word-break: keep-all !important;
   white-space: nowrap !important;
-  padding: 0.1rem 0.35rem !important;
-
-  &:before {
-    display: none;
-  }
-  &::after {
-    display: none;
-  }
 }
 
 article p strong {
@@ -307,15 +334,6 @@ article p strong {
 /* fix box shadow when <code> is inside <a> */
 a:has(code) {
   box-shadow: none !important;
-}
-
-/* fix code line wrapping */
-/* need to set this to happen from medium onwards, otherwise the would cause horizontal scroll */
-article p code {
-  &::before,
-  &::after {
-    display: none !important;
-  }
 }
 
 .short-inline-codeblock {
@@ -367,27 +385,6 @@ article p code {
 
 th code {
   @apply text-nowrap;
-}
-
-/*
- * First column (e.g. variable names): wrap at word boundaries, not mid-token.
- */
-.prose :where(td:first-child) code {
-  @apply break-words whitespace-normal;
-}
-
-/*
- * Other columns: prevents very long code lines (checksums, URLs, etc.) from
- * breaking table widths.
- */
-.prose :where(td:not(:first-child)) code {
-  @apply break-all;
-}
-
-.prose table td:first-child,
-.prose table th:first-child {
-  min-width: 12rem;
-  width: 30%;
 }
 
 /* Zoomable image */

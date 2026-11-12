@@ -1,6 +1,6 @@
 ---
 title: 'Creating a Supabase client for SSR'
-subtitle: 'Configure your Supabase client to use cookies'
+description: 'Configure your Supabase client to use cookies'
 ---
 
 Learn how to configure your Supabase client to use cookies. Your app can then render on the server with the user already signed in.
@@ -838,8 +838,8 @@ exports.createClient = (context) => {
         return parseCookieHeader(context.req.headers.cookie ?? '')
       },
       setAll(cookiesToSet, headers) {
-        cookiesToSet.forEach(({ name, value }) =>
-          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value))
+        cookiesToSet.forEach(({ name, value, options }) =>
+          context.res.appendHeader('Set-Cookie', serializeCookieHeader(name, value, options))
         )
         Object.entries(headers).forEach(([key, value]) => context.res.setHeader(key, value))
       },
@@ -1015,5 +1015,5 @@ See the [advanced Auth server-side rendering guide](/docs/guides/auth/server-sid
 ## Next steps
 
 - Implement [Authentication using Email and Password](/docs/guides/auth/passwords)
-- Implement [Authentication using OAuth](/docs/guides/auth/social-login)
+- Implement [Authentication using OAuth](/docs/guides/auth/social-sign-in)
 - [Learn more about SSR](/docs/guides/auth/server-side/advanced-guide)

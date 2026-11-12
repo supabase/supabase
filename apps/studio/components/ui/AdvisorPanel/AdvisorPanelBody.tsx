@@ -1,5 +1,5 @@
 import { useFlag } from 'common'
-import { AlertTriangle, ChevronRight, Inbox } from 'lucide-react'
+import { AlertTriangleIcon, ChevronRightIcon, InboxIcon } from 'lucide-react'
 import { Badge, Button, cn } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 
@@ -18,16 +18,18 @@ import type { Notification } from '@/data/notifications/notifications-v2-query'
 import type { AdvisorCategory, AdvisorSeverity } from '@/state/advisor-state'
 
 const NoProjectNotice = () => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
+  const itemLabel = isIssuesInboxEnabled ? 'issues' : 'advisories'
   const isHealthAdvisorEnabled = useFlag('healthAdvisor')
   return (
     <div className="absolute top-28 px-6 flex flex-col items-center justify-center w-full gap-y-2">
-      <Inbox className="text-foreground-muted" strokeWidth={1} />
+      <InboxIcon className="text-foreground-muted" strokeWidth={1} />
       <div className="text-center">
         <p className="heading-default">Project required</p>
         <p className="text-foreground-light text-sm">
           {isHealthAdvisorEnabled
-            ? 'Select a project to view its security, performance and health advisories'
-            : 'Select a project to view its security and performance advisories'}
+            ? `Select a project to view its security, performance and health ${itemLabel}`
+            : `Select a project to view its security and performance ${itemLabel}`}
         </p>
       </div>
     </div>
@@ -63,6 +65,7 @@ export const AdvisorPanelBody = ({
   hasProjectRef = true,
   projectNameByRef,
 }: AdvisorPanelBodyProps) => {
+  const isIssuesInboxEnabled = useFlag('issuesInbox')
   // Notifications are the only items that exist without a project, so the notice replaces
   // the list whenever the user has narrowed to categories that need one.
   const needsProject =
@@ -82,9 +85,11 @@ export const AdvisorPanelBody = ({
   if (isError) {
     return (
       <div className="h-full mx-4 flex flex-col items-center justify-center gap-y-2">
-        <AlertTriangle className="text-destructive" />
+        <AlertTriangleIcon className="text-destructive" />
         <div className="flex flex-col items-center justify-center">
-          <h4 className="text-base font-normal text-foreground-light">Error loading advisories</h4>
+          <h4 className="text-base font-normal text-foreground-light">
+            {isIssuesInboxEnabled ? 'Error loading issues' : 'Error loading advisories'}
+          </h4>
           <p className="text-sm text-foreground-lighter">Please try again later.</p>
         </div>
       </div>
@@ -155,7 +160,7 @@ export const AdvisorPanelBody = ({
                         {severityLabels[item.severity]}
                       </Badge>
                     )}
-                    <ChevronRight
+                    <ChevronRightIcon
                       size={16}
                       strokeWidth={1.5}
                       className="shrink-0 text-foreground-lighter"
@@ -170,7 +175,7 @@ export const AdvisorPanelBody = ({
       {severityFilters.length > 0 && hiddenItemsCount > 0 && (
         <div className="px-4 py-3">
           <Button variant="text" className="w-full" onClick={onShowHiddenItems}>
-            Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? 's' : ''}
+            Show {hiddenItemsCount} more issue{hiddenItemsCount !== 1 ? <span>s</span> : ''}
           </Button>
         </div>
       )}

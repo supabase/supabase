@@ -1,4 +1,4 @@
-import { CheckIcon, Globe } from 'lucide-react'
+import { CheckIcon, GlobeIcon } from 'lucide-react'
 import { useId, useMemo, useState } from 'react'
 import {
   Card,
@@ -94,7 +94,7 @@ export const TimezoneSettings = () => {
                     size="small"
                   >
                     <span className="flex min-w-0 items-center gap-2">
-                      <Globe aria-hidden="true" className="h-4 w-4 shrink-0" />
+                      <GlobeIcon aria-hidden="true" className="h-4 w-4 shrink-0" />
                       <span className="truncate">
                         {isAutoDetected ? `Auto detect (${timezone})` : triggerLabel}
                       </span>

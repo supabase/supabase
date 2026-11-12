@@ -2,8 +2,8 @@
 
 import { createClient } from '@supabase/supabase-js'
 import CodeBlock from '~/components/CodeBlock/CodeBlock'
-import { motion } from 'framer-motion'
 import { ChevronsUpDown } from 'lucide-react'
+import { motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import {
   Button,

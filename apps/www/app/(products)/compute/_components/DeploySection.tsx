@@ -1,7 +1,7 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useInView, useReducedMotion } from 'framer-motion'
+import { AnimatePresence, motion, useInView, useReducedMotion } from 'motion/react'
 import Link from 'next/link'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'

@@ -1,8 +1,14 @@
 import { useParams } from 'common'
-import { AlertTriangle, BookOpen, ChartLine, ChevronDown, Sparkles, Wrench } from 'lucide-react'
+import {
+  AlertTriangleIcon,
+  BookOpenIcon,
+  ChartLineIcon,
+  ChevronDownIcon,
+  SparklesIcon,
+  WrenchIcon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { COMPUTE_DISK } from 'shared-data'
 import {
   Alert,
   AlertDescription,
@@ -16,6 +22,7 @@ import {
 } from 'ui'
 
 import {
+  DISK_SPACE_EXHAUSTION_DESCRIPTION,
   isResourceWarningMessageKey,
   RESOURCE_WARNING_MESSAGES,
   type ResourceWarningMessageKey,
@@ -29,11 +36,10 @@ import {
   isComputeUpgradeWarning,
   type TroubleshootItem,
 } from './ResourceExhaustionWarningBanner.utils'
-import { mapComputeSizeNameToAddonVariantId } from '@/components/interfaces/DiskManagement/DiskManagement.utils'
 import { SIDEBAR_KEYS } from '@/components/layouts/ProjectLayout/LayoutSidebar/LayoutSidebarProvider'
 import { useResourceWarningsQuery } from '@/data/usage/resource-warnings-query'
+import { useProjectDiskLimits } from '@/hooks/misc/useProjectDiskLimits'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
-import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useShowDiskIOBurstBalanceChart } from '@/hooks/misc/useShowDiskIOBurstBalanceChart'
 import { useTrack } from '@/lib/telemetry/track'
 import { useAiAssistantStateSnapshot } from '@/state/ai-assistant-state'
@@ -62,7 +68,7 @@ const TroubleshootMenuItem = ({
   if (item.kind === 'ai') {
     return (
       <DropdownMenuItem className="flex items-center gap-x-2 cursor-pointer" onClick={onAskAI}>
-        <Sparkles size={14} />
+        <SparklesIcon size={14} />
         {item.menuLabel}
       </DropdownMenuItem>
     )
@@ -71,7 +77,7 @@ const TroubleshootMenuItem = ({
     return (
       <DropdownMenuItem asChild onClick={() => onTroubleshootClick(item)}>
         <Link href={item.href} className="flex items-center gap-x-2 cursor-pointer">
-          <ChartLine size={14} />
+          <ChartLineIcon size={14} />
           {item.menuLabel}
         </Link>
       </DropdownMenuItem>
@@ -85,7 +91,7 @@ const TroubleshootMenuItem = ({
         rel="noreferrer"
         className="flex items-center gap-x-2 cursor-pointer"
       >
-        <BookOpen size={14} />
+        <BookOpenIcon size={14} />
         {item.menuLabel}
       </a>
     </DropdownMenuItem>
@@ -96,12 +102,11 @@ export const ResourceExhaustionWarningBanner = () => {
   const { ref } = useParams()
   const router = useRouter()
   const { data: organization, isLoading: isOrgLoading } = useSelectedOrganizationQuery()
-  const { data: project } = useSelectedProjectQuery()
-  const diskIoBaselineLabel = (() => {
-    const variant = mapComputeSizeNameToAddonVariantId(project?.infra_compute_size)
-    const baseline = COMPUTE_DISK[variant]?.baselineThroughputMBps
-    return typeof baseline === 'number' ? `${baseline} MB/s` : 'its baseline'
-  })()
+  const { limits: diskLimits } = useProjectDiskLimits()
+  const diskIoBaselineLabel =
+    typeof diskLimits?.baselineThroughputMBps === 'number'
+      ? `${diskLimits.baselineThroughputMBps} MB/s`
+      : 'its baseline'
   const applyDiskIoBaseline = (text?: string) =>
     text ? text.replace(/\{baseline\}/g, diskIoBaselineLabel) : text
   const { openSidebar } = useSidebarManagerSnapshot()
@@ -163,9 +168,21 @@ export const ResourceExhaustionWarningBanner = () => {
     )
   )
 
+  const isFreePlan = organization?.plan?.id === 'free'
+  const diskSpaceDescription = (() => {
+    if (organization === undefined) return warningContent?.description
+    return isFreePlan
+      ? DISK_SPACE_EXHAUSTION_DESCRIPTION.free
+      : DISK_SPACE_EXHAUSTION_DESCRIPTION.paid
+  })()
+  const singleWarningDescription =
+    activeWarnings[0] === 'disk_space_exhaustion'
+      ? diskSpaceDescription
+      : warningContent?.description
+
   const description = applyDiskIoBaseline(
     applyResourceList(
-      activeWarnings.length > 1 ? multipleWarningDescription : warningContent?.description,
+      activeWarnings.length > 1 ? multipleWarningDescription : singleWarningDescription,
       activeWarnings
     )
   )
@@ -174,8 +191,6 @@ export const ResourceExhaustionWarningBanner = () => {
     activeWarnings.length > 1
       ? RESOURCE_WARNING_MESSAGES.multiple_resource_warnings.metric
       : RESOURCE_WARNING_MESSAGES[activeWarnings[0]]?.metric
-
-  const isFreePlan = organization?.plan?.id === 'free'
 
   // True for a single compute warning, or when all active warnings are compute-related
   const isComputeUpgradeMetric = isComputeUpgradeWarning(metric, activeWarnings)
@@ -273,7 +288,7 @@ export const ResourceExhaustionWarningBanner = () => {
         'border-0 border-r-0 rounded-none [&>svg]:left-6 px-6 [&>svg]:w-[26px] [&>svg]:h-[26px]'
       )}
     >
-      <AlertTriangle />
+      <AlertTriangleIcon />
       <div className="">
         <AlertTitle>{title}</AlertTitle>
         <AlertDescription>{description}</AlertDescription>
@@ -282,7 +297,7 @@ export const ResourceExhaustionWarningBanner = () => {
         {troubleshootItems.length >= 2 && (
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button icon={<Wrench size={14} />} iconRight={<ChevronDown size={14} />}>
+              <Button icon={<WrenchIcon size={14} />} iconRight={<ChevronDownIcon size={14} />}>
                 Troubleshoot
               </Button>
             </DropdownMenuTrigger>
@@ -301,7 +316,7 @@ export const ResourceExhaustionWarningBanner = () => {
         {soleTroubleshootItem?.kind === 'metrics' && (
           <Button
             asChild
-            icon={<ChartLine size={14} />}
+            icon={<ChartLineIcon size={14} />}
             onClick={() => handleTroubleshootClick(soleTroubleshootItem)}
           >
             <Link href={soleTroubleshootItem.href}>{soleTroubleshootItem.buttonLabel}</Link>
@@ -310,7 +325,7 @@ export const ResourceExhaustionWarningBanner = () => {
         {soleTroubleshootItem?.kind === 'docs' && (
           <Button
             asChild
-            icon={<BookOpen size={14} />}
+            icon={<BookOpenIcon size={14} />}
             onClick={() => handleTroubleshootClick(soleTroubleshootItem)}
           >
             <a href={soleTroubleshootItem.href} target="_blank" rel="noreferrer">

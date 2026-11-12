@@ -1,6 +1,6 @@
 import { Monaco, OnMount } from '@monaco-editor/react'
-import { AnimatePresence, motion } from 'framer-motion'
 import type { editor as monacoEditor } from 'monaco-editor'
+import { AnimatePresence, motion } from 'motion/react'
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { toast } from 'sonner'
 import { KeyboardShortcut } from 'ui'

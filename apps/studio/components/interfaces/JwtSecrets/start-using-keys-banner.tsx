@@ -1,4 +1,4 @@
-import { Import } from 'lucide-react'
+import { ImportIcon } from 'lucide-react'
 import { Button } from 'ui'
 
 import { FeatureBanner } from '@/components/ui/FeatureBanner'
@@ -19,7 +19,7 @@ export const StartUsingJwtSigningKeysBanner = ({
           new JWT signing keys, migrate your project's secret to the new set up.
         </p>
         <div className="mt-4">
-          <Button variant="primary" icon={<Import />} onClick={onClick} loading={isLoading}>
+          <Button variant="primary" icon={<ImportIcon />} onClick={onClick} loading={isLoading}>
             Migrate JWT secret
           </Button>
         </div>

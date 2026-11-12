@@ -1,9 +1,16 @@
 import { useParams } from 'common'
-import { ChevronDown, FolderOpen, Settings, Shield, Trash2 } from 'lucide-react'
+import {
+  ChevronDownIcon,
+  FolderOpenIcon,
+  RefreshCwIcon,
+  SettingsIcon,
+  ShieldIcon,
+  Trash2Icon,
+} from 'lucide-react'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { parseAsBoolean, useQueryState } from 'nuqs'
-import { useEffect } from 'react'
+import { parseAsStringLiteral, useQueryState } from 'nuqs'
+import { useEffect, useRef } from 'react'
 import { toast } from 'sonner'
 import {
   Badge,
@@ -30,6 +37,7 @@ import { DeleteBucketModal } from '@/components/interfaces/Storage/FilesBuckets/
 import { EditBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EditBucketModal'
 import { EmptyBucketModal } from '@/components/interfaces/Storage/FilesBuckets/EmptyBucketModal'
 import { PublicBucketWarning } from '@/components/interfaces/Storage/FilesBuckets/PublicBucketWarning'
+import { PurgeBucketCDNCacheModal } from '@/components/interfaces/Storage/FilesBuckets/PurgeBucketCDNCacheModal'
 import { useSelectedBucket } from '@/components/interfaces/Storage/FilesBuckets/useSelectedBucket'
 import { PUBLIC_BUCKET_TOOLTIP } from '@/components/interfaces/Storage/Storage.constants'
 import StorageBucketsError from '@/components/interfaces/Storage/StorageBucketsError'
@@ -37,6 +45,7 @@ import { StorageExplorer } from '@/components/interfaces/Storage/StorageExplorer
 import { useBucketPolicyCount } from '@/components/interfaces/Storage/useBucketPolicyCount'
 import { DefaultLayout } from '@/components/layouts/DefaultLayout'
 import StorageLayout from '@/components/layouts/StorageLayout/StorageLayout'
+import { IS_PLATFORM } from '@/lib/constants'
 import { StorageExplorerStateContextProvider } from '@/state/storage-explorer'
 import type { NextPageWithLayout } from '@/types'
 
@@ -45,18 +54,27 @@ const BucketPage: NextPageWithLayout = () => {
   const { bucketId, ref } = useParams()
   const { data: bucket, error, isSuccess, isError } = useSelectedBucket()
 
-  const [showEditModal, setShowEditModal] = useQueryState(
-    'edit',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
+  const [modalDisplayed, setModalDisplayed] = useQueryState(
+    'action',
+    parseAsStringLiteral(['edit', 'empty', 'delete', 'purgeCDNCache']).withOptions({
+      history: 'push',
+      clearOnDefault: true,
+    })
   )
-  const [showEmptyModal, setShowEmptyModal] = useQueryState(
-    'empty',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
-  const [showDeleteModal, setShowDeleteModal] = useQueryState(
-    'delete',
-    parseAsBoolean.withDefault(false).withOptions({ history: 'push', clearOnDefault: true })
-  )
+
+  const menuTriggerRef = useRef<HTMLButtonElement | null>(null)
+
+  function restoreActionsButtonFocus() {
+    if (menuTriggerRef.current == null) return
+    menuTriggerRef.current.focus()
+  }
+
+  function closeModal() {
+    setModalDisplayed(null)
+    setTimeout(() => {
+      restoreActionsButtonFocus()
+    })
+  }
 
   const { getPolicyCount } = useBucketPolicyCount()
   const policyCount = bucket ? getPolicyCount(bucket.id) : 0
@@ -84,7 +102,7 @@ const BucketPage: NextPageWithLayout = () => {
                 asChild
                 variant="outline"
                 size="tiny"
-                icon={<Shield size={14} />}
+                icon={<ShieldIcon size={14} />}
                 iconRight={
                   policyCount > 0 ? (
                     <span className="w-4 h-4 bg-surface-200 text-foreground-light text-xs rounded-full flex items-center justify-center font-medium">
@@ -101,31 +119,36 @@ const BucketPage: NextPageWithLayout = () => {
               </Button>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <Button variant="outline" size="tiny" iconRight={<ChevronDown size={14} />}>
+                  <Button
+                    ref={menuTriggerRef}
+                    variant="outline"
+                    size="tiny"
+                    iconRight={<ChevronDownIcon size={14} />}
+                  >
                     Edit bucket
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setShowEditModal(true)}
-                  >
-                    <Settings size={12} />
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('edit')}>
+                    <SettingsIcon size={12} />
                     <p>Bucket settings</p>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setShowEmptyModal(true)}
-                  >
-                    <FolderOpen size={12} />
+                  {IS_PLATFORM && (
+                    <DropdownMenuItem
+                      className="gap-x-2"
+                      onClick={() => setModalDisplayed('purgeCDNCache')}
+                    >
+                      <RefreshCwIcon size={12} />
+                      <p>Purge CDN cache</p>
+                    </DropdownMenuItem>
+                  )}
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('empty')}>
+                    <FolderOpenIcon size={12} />
                     <p>Empty bucket</p>
                   </DropdownMenuItem>
-                  <DropdownMenuItem
-                    className="flex items-center space-x-2"
-                    onClick={() => setShowDeleteModal(true)}
-                  >
-                    <Trash2 size={12} />
+                  <DropdownMenuItem className="gap-x-2" onClick={() => setModalDisplayed('delete')}>
+                    <Trash2Icon size={12} />
                     <p>Delete bucket</p>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
@@ -179,20 +202,27 @@ const BucketPage: NextPageWithLayout = () => {
       {bucket && (
         <>
           <EditBucketModal
-            visible={showEditModal}
+            visible={modalDisplayed === 'edit'}
             bucket={bucket}
-            onClose={() => setShowEditModal(false)}
+            onClose={() => closeModal()}
           />
           <EmptyBucketModal
-            visible={showEmptyModal}
+            visible={modalDisplayed === 'empty'}
             bucket={bucket}
-            onClose={() => setShowEmptyModal(false)}
+            onClose={() => closeModal()}
           />
           <DeleteBucketModal
-            visible={showDeleteModal}
+            visible={modalDisplayed === 'delete'}
             bucket={bucket}
-            onClose={() => setShowDeleteModal(false)}
+            onClose={() => closeModal()}
           />
+          {IS_PLATFORM && (
+            <PurgeBucketCDNCacheModal
+              visible={modalDisplayed === 'purgeCDNCache'}
+              bucket={bucket}
+              onClose={() => closeModal()}
+            />
+          )}
         </>
       )}
     </StorageExplorerStateContextProvider>

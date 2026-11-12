@@ -1,6 +1,6 @@
-import { Check } from 'lucide-react'
+import { CheckIcon } from 'lucide-react'
 import Image from 'next/image'
-import { Badge, Button } from 'ui'
+import { Badge } from 'ui'
 
 import { AWS_IDP_REGIONS } from './AwsRegionSelector'
 import {
@@ -9,12 +9,15 @@ import {
   getIntegrationTypeLabel,
   INTEGRATION_TYPES,
 } from './ThirdPartyAuthForm.utils'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { ThirdPartyAuthIntegration } from '@/data/third-party-auth/integrations-query'
 import { DOCS_URL } from '@/lib/constants'
 
 interface IntegrationCardProps {
   integration: ThirdPartyAuthIntegration
   canUpdateConfig: boolean
+  /** Explains why deleting is disabled, if it is. */
+  deleteTooltip?: string
   onDelete: () => void
 }
 
@@ -98,7 +101,19 @@ export const getIntegrationTypeDescription = (type: INTEGRATION_TYPES) => {
 
     case 'custom':
     default:
-      return 'Custom'
+      return (
+        <>
+          Allow users to use Supabase with any OpenID Connect (OIDC) provider. You can read more in
+          the{' '}
+          <a
+            className="hover:decoration-primary underline hover:text-foreground transition"
+            href={`${DOCS_URL}/guides/auth/third-party/overview`}
+          >
+            documentation
+          </a>
+          .
+        </>
+      )
   }
 }
 
@@ -170,20 +185,22 @@ export const IntegrationTypeContent = ({
 
     case 'custom':
     default:
-      return <>Custom</>
+      return (
+        <div className="text-sm flex flex-row gap-x-4">
+          <span className="text-foreground-light w-36">Issuer URL</span>
+          <span className="text-foreground break-all">{integration?.oidc_issuer_url ?? ''}</span>
+        </div>
+      )
   }
 }
 
 export const IntegrationCard = ({
   integration,
   canUpdateConfig,
+  deleteTooltip,
   onDelete,
 }: IntegrationCardProps) => {
-  let type = getIntegrationType(integration)
-
-  if (type === 'custom') {
-    return null
-  }
+  const type = getIntegrationType(integration)
 
   return (
     <>
@@ -201,16 +218,21 @@ export const IntegrationCard = ({
           <div>
             {/* TODO: this should be a configure integration where it would show the sheet and the user can disable or delete the integration
               but there's no "edit integration" endpoing for now. */}
-            <Button variant="danger" disabled={!canUpdateConfig} onClick={() => onDelete()}>
+            <ButtonTooltip
+              variant="danger"
+              disabled={!canUpdateConfig}
+              onClick={() => onDelete()}
+              tooltip={{ content: { side: 'bottom', text: deleteTooltip } }}
+            >
               Delete integration
-            </Button>
+            </ButtonTooltip>
           </div>
         </div>
         <div className="shrink-0">
           {true ? (
             <Badge className="space-x-1" variant="success">
               <div className="h-3.5 w-3.5 bg-brand-default rounded-full flex justify-center items-center">
-                <Check className="h-2 w-2 text-background-overlay" strokeWidth={6} />
+                <CheckIcon className="h-2 w-2 text-background-overlay" strokeWidth={6} />
               </div>
               <span>Enabled</span>
             </Badge>

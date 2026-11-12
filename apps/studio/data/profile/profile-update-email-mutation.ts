@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { profileKeys } from './keys'
 import { handleError, put } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
 import { auth } from '@/lib/gotrue'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type EmailUpdateVariables = {
   email: string
@@ -27,12 +28,12 @@ export const useEmailUpdateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<EmailUpdateData, ResponseError, EmailUpdateVariables>,
+  UseCustomMutationOptions<EmailUpdateData, StudioError, EmailUpdateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<EmailUpdateData, ResponseError, EmailUpdateVariables>({
+  return useMutation<EmailUpdateData, StudioError, EmailUpdateVariables>({
     mutationFn: (vars) => updateEmail(vars),
     async onSuccess(data, variables, context) {
       await Promise.all([

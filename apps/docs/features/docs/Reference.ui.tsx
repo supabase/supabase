@@ -83,15 +83,23 @@ export const RefSubLayout = {
   Examples,
 }
 
+export type HeadingTag = 'h1' | 'h2'
+
 interface StickyHeaderProps {
   title?: React.ReactNode | string
   monoFont?: boolean
   className?: string
+  tag?: HeadingTag
 }
 
-export function StickyHeader({ title, monoFont = false, className }: StickyHeaderProps) {
+export function StickyHeader({
+  title,
+  monoFont = false,
+  className,
+  tag: Tag = 'h2',
+}: StickyHeaderProps) {
   return (
-    <h2
+    <Tag
       tabIndex={-1} // For programmatic focus on auto-scroll to section
       className={cn(
         'sticky top-0 z-1',
@@ -103,6 +111,8 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
         // Same for bottom
         'pb-8 -mb-3',
         'bg-linear-to-b from-background from-85% to-transparent to-100%',
+        // from lg the option-1 header crumb names the section, so the heading stays in the flow
+        'layout-v2:lg:static layout-v2:lg:bg-none layout-v2:lg:py-0 layout-v2:lg:mt-0.5 layout-v2:lg:mb-5',
         'text-2xl font-medium text-foreground',
         'scroll-mt-[calc(var(--header-height)+1rem)]',
         'focus:outline-hidden',
@@ -111,7 +121,7 @@ export function StickyHeader({ title, monoFont = false, className }: StickyHeade
       )}
     >
       {title}
-    </h2>
+    </Tag>
   )
 }
 
@@ -427,7 +437,16 @@ function ApiOperationRequestBodyDetailsInternal({
     schema.type === 'number' ||
     schema.type === 'integer'
   ) {
-    return <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+    return (
+      <>
+        <span className="font-mono text-sm font-medium text-foreground">{schema.type}</span>
+        {schema.description && (
+          <div className="prose wrap-break-word text-sm">
+            <MDXRemoteBase source={schema.description} customPreprocess={normalizeMarkdown} />
+          </div>
+        )}
+      </>
+    )
   } else if (schema.type === 'array') {
     const itemTypeDisplay = getTypeDisplayFromSchema(schema.items)
     const displayName = itemTypeDisplay?.displayName ?? 'unknown'

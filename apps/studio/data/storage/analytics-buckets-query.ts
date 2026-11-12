@@ -6,7 +6,8 @@ import { useIsAnalyticsBucketsEnabled } from '@/data/config/project-storage-conf
 import { get, handleError } from '@/data/fetchers'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { PROJECT_STATUS } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export type AnalyticsBucketsVariables = { projectRef?: string }
 export type AnalyticsBucket = components['schemas']['StorageAnalyticsBucketResponse_Output']
@@ -28,7 +29,7 @@ export async function getAnalyticsBuckets(
 }
 
 export type AnalyticsBucketsData = Awaited<ReturnType<typeof getAnalyticsBuckets>>
-export type AnalyticsBucketsError = ResponseError
+export type AnalyticsBucketsError = StudioError
 
 export const useAnalyticsBucketsQuery = <TData = AnalyticsBucketsData>(
   { projectRef }: AnalyticsBucketsVariables,

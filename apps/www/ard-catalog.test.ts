@@ -61,7 +61,7 @@ function docsGuideSource(pathname: string): string | null {
     'docs',
     'content',
     'guides',
-    `${pathname.slice(prefix.length)}.mdx`
+    `${pathname.slice(prefix.length).replace(/\.md$/, '')}.mdx`
   )
 }
 

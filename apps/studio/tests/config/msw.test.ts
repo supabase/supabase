@@ -11,9 +11,5 @@ test('MSW works as expected', async () => {
 })
 
 test('MSW errors on missing endpoints', async () => {
-  expect(async () => {
-    const res = await fetch(`${API_URL}/endpoint-that-doesnt-exist`)
-    const json = await res.json()
-    expect(json).toEqual({ message: '🚫 MSW missed' })
-  })
+  await expect(fetch(`${API_URL}/endpoint-that-doesnt-exist`)).rejects.toThrow()
 })

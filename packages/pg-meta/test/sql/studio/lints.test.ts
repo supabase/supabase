@@ -15,9 +15,9 @@ describe('enrichLintsQuery', () => {
     expect(result).not.toContain('pgrst.db_schemas')
   })
 
-  it('should NOT include SET LOCAL pgrst.db_schemas when exposedSchemas is empty string', () => {
+  it("should set pgrst.db_schemas to '' when exposedSchemas is empty string (Data API off)", () => {
     const result = enrichLintsQuery(dummyQuery, '')
-    expect(result).not.toContain('pgrst.db_schemas')
+    expect(result).toContain("set local pgrst.db_schemas = '';")
   })
 
   it('should always include the query', () => {

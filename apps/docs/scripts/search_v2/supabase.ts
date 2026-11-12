@@ -1,7 +1,7 @@
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
 
-export const TABLE_NAME = 'docs_sections'
-export const SEARCH_FUNCTION = 'search_docs'
+export const TABLE_NAME = 'docs_search_v2'
+export const SEARCH_FUNCTION = 'docs_search_v2'
 
 function requireEnv(name: string): string {
   const value = process.env[name]
@@ -11,12 +11,12 @@ function requireEnv(name: string): string {
   return value
 }
 
-/** Server-side client built from SEARCH_V2_SUPABASE_PROJECT_ID + SEARCH_V2_SUPABASE_SECRET_KEY in .env.local. */
+/** Server-side client built from NEXT_PUBLIC_SUPABASE_URL + SUPABASE_SECRET_KEY in .env.local. */
 export function createSupabaseClient(): SupabaseClient {
-  const projectId = requireEnv('SEARCH_V2_SUPABASE_PROJECT_ID')
-  const secretKey = requireEnv('SEARCH_V2_SUPABASE_SECRET_KEY')
+  const url = requireEnv('NEXT_PUBLIC_SUPABASE_URL')
+  const secretKey = requireEnv('SUPABASE_SECRET_KEY')
 
-  return createClient(`https://${projectId}.supabase.co`, secretKey, {
+  return createClient(url, secretKey, {
     auth: { autoRefreshToken: false, persistSession: false, detectSessionInUrl: false },
   })
 }

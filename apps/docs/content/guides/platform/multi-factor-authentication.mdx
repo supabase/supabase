@@ -18,17 +18,11 @@ Currently, Supabase supports adding a unique time-based one-time password (TOTP)
 
 ## Enable MFA
 
-You can enable MFA for your user account under your [Supabase account settings](/dashboard/account/security). Enabling MFA will result in all other user sessions to be automatically logged out and forced to sign in again with MFA.
-
-<Admonition type="note">
-
-Supabase does not return recovery codes. Instead, we recommend that you register a backup TOTP factor to use in an event that you lose access to your primary TOTP factor. Make sure you use a different device and app, or store the secret in a secure location different than your primary one.
-
-</Admonition>
+You can enable MFA for your user account under your [Supabase account settings](/dashboard/account/security). Enabling MFA will result in all other [user sessions](/docs/guides/auth/sessions) to be automatically logged out and forced to sign in again with MFA.
 
 <Admonition type="caution">
 
-For security reasons, we will not be able to restore access to your account if you lose all your two-factor authentication credentials. Do register a backup factor if necessary.
+For security reasons, we will not be able to restore access to your account if you lose all your two-factor authentication credentials. We recommend you register a backup factor.
 
 </Admonition>
 
@@ -38,9 +32,33 @@ Once you've enabled MFA for your Supabase user account, you will be prompted to 
 
 If you are an organization owner and on the Pro, Team or Enterprise plan, you can enforce that all organization members [must have MFA enabled](/docs/guides/platform/mfa/org-mfa-enforcement).
 
+## Recovery codes
+
+Recovery codes let you complete the MFA step if you lose access to your authenticator app. You get 10 codes, and each code works once. Store them somewhere safe, such as a password manager.
+
+When you enable MFA, the Supabase dashboard generates your recovery codes and shows them once. Copy or download them before you close the dialog.
+
+### Sign in with a recovery code
+
+If you can't use your authenticator app, sign in with a recovery code:
+
+1. Sign in with your usual method.
+2. On the two-factor authentication screen, under **Unable to sign in?**, click **Authenticate using a recovery code**.
+3. Enter one of your recovery codes.
+
+After 5 incorrect codes, sign-in with a recovery code is locked for 15 minutes.
+
+If you lost your authenticator app, go to **Account → Security → Multi-factor authentication**. Select **Add MFA method** and verify the new authenticator. Then select **Remove MFA method** for the lost authenticator. Removing your last MFA method disables MFA and deletes your recovery codes.”```
+
+Optional change just for clarity.
+
+### Generate or regenerate recovery codes
+
+Your account security settings show how many recovery codes you have left. If your account has MFA but no recovery codes, click **Generate recovery codes**. To replace your codes with a new set, click **Regenerate**. Your previous codes stop working immediately.
+
 ## Disable MFA
 
-You can disable MFA for your user account under your [Supabase account settings](/dashboard/account/security). On subsequent sign-in attempts, you will not be prompted to enter an MFA code.
+You can disable MFA for your user account under your [Supabase account settings](/dashboard/account/security). On subsequent sign-in attempts, you will not be prompted to enter an MFA code. Disabling MFA also deletes your recovery codes.
 
 <Admonition type="caution">
 

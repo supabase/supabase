@@ -1,18 +1,20 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
+import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { ExternalLink, Maximize2, Minimize2, Terminal } from 'lucide-react'
+import { ExternalLinkIcon, Maximize2Icon, Minimize2Icon, TerminalIcon } from 'lucide-react'
 import { useRouter } from 'next/router'
 import { ComponentPropsWithoutRef, ElementRef, forwardRef, useState } from 'react'
 import { Button, Collapsible, CollapsibleContent, CollapsibleTrigger } from 'ui'
+import { ShimmeringLoader } from 'ui-patterns/ShimmeringLoader'
 
 import type { Commands } from './Functions.types'
 import CommandRender from '@/components/interfaces/Functions/CommandRender'
+import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { DocsButton } from '@/components/ui/DocsButton'
 import { useAccessTokensQuery } from '@/data/access-tokens/access-tokens-query'
-import { useAPIKeys } from '@/data/api-keys/api-keys-query'
+import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { DOCS_URL } from '@/lib/constants'
+import { useGrant } from '@/lib/grants'
 
 interface TerminalInstructionsProps extends ComponentPropsWithoutRef<typeof Collapsible> {
   closable?: boolean
@@ -28,12 +30,21 @@ export const TerminalInstructions = forwardRef<
   const [showInstructions, setShowInstructions] = useState(!closable)
 
   const { data: tokens } = useAccessTokensQuery()
-  const { can: canReadAPIKeys } = useAsyncCheckPermissions(PermissionAction.SECRETS_READ, '*')
-  const { data: apiKeyData } = useAPIKeys({ projectRef }, { enabled: canReadAPIKeys })
+  const apiKeysGrant = useGrant('GET /v1/projects/{ref}/api-keys', { projectRef })
+  const { data: apiKeyData } = useQuery(
+    apiKeysQueryOptions(
+      { projectRef, grant: apiKeysGrant.grant },
+      {
+        // A skipped query still returns cached data, so ignore it unless the grant is granted
+        select: (data) => getKeys(apiKeysGrant.status === 'granted' ? data : []),
+      }
+    )
+  )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
-  const functionsEndpoint = `${endpoint}/functions/v1`
+  const { data: endpoint, isPending: isEndpointPending } = useProjectApiUrl({ projectRef })
+  const functionsEndpoint = endpoint ? `${endpoint}/functions/v1` : undefined
+  const isFunctionsEndpointLoading = !functionsEndpoint && isEndpointPending
 
   const apiKey = publishableKey?.api_key ?? anonKey?.api_key ?? '[YOUR ANON KEY]'
 
@@ -63,7 +74,9 @@ export const TerminalInstructions = forwardRef<
       },
       comment: 'Deploy your function',
     },
-    {
+  ]
+  if (functionsEndpoint) {
+    commands.push({
       command: `curl -L -X POST '${functionsEndpoint}/hello-world' -H 'Authorization: Bearer ${apiKey}'${anonKey?.type === 'publishable' ? ` -H 'apikey: ${apiKey}'` : ''} --data '{"name":"Functions"}'`,
       description: 'Invokes the hello-world function',
       jsx: () => {
@@ -77,8 +90,8 @@ export const TerminalInstructions = forwardRef<
         )
       },
       comment: 'Invoke your function',
-    },
-  ]
+    })
+  }
 
   return (
     <Collapsible
@@ -91,22 +104,30 @@ export const TerminalInstructions = forwardRef<
       <CollapsibleTrigger className="flex w-full justify-between" disabled={!closable}>
         <div className="flex items-center gap-x-3">
           <div className="flex items-center justify-center w-8 h-8 p-2 border rounded-sm bg-alternative">
-            <Terminal strokeWidth={2} />
+            <TerminalIcon strokeWidth={2} />
           </div>
           <h4>Create your first Edge Function via the CLI</h4>
         </div>
         {closable && (
           <div className="cursor-pointer" onClick={() => setShowInstructions(!showInstructions)}>
             {showInstructions ? (
-              <Minimize2 size={16} strokeWidth={1.5} />
+              <Minimize2Icon size={16} strokeWidth={1.5} />
             ) : (
-              <Maximize2 size={16} strokeWidth={1.5} />
+              <Maximize2Icon size={16} strokeWidth={1.5} />
             )}
           </div>
         )}
       </CollapsibleTrigger>
       <CollapsibleContent className="w-full transition-all data-closed:animate-collapsible-up data-open:animate-collapsible-down">
-        <CommandRender commands={commands} className="my-4" />
+        <div className="my-4 space-y-4">
+          <CommandRender commands={commands} />
+          {isFunctionsEndpointLoading && <ShimmeringLoader className="w-3/4" />}
+        </div>
+        <ApiKeysAccessNote
+          grant={apiKeysGrant}
+          fallback="Replace the placeholder with your own key."
+          className="mb-4"
+        />
         {tokens && tokens.length === 0 ? (
           <div className="py-4 space-y-3 border-t">
             <div>
@@ -127,7 +148,7 @@ export const TerminalInstructions = forwardRef<
             </div>
             <div className="flex gap-2">
               <DocsButton href={`${DOCS_URL}/guides/functions`} />
-              <Button asChild icon={<ExternalLink />}>
+              <Button asChild icon={<ExternalLinkIcon />}>
                 <a
                   target="_blank"
                   rel="noreferrer"

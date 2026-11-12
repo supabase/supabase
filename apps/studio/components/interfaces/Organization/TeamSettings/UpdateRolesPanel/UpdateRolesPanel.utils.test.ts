@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { deriveRoleChangeActions } from './UpdateRolesPanel.utils'
+import { deriveRoleChangeActions, hasRoleConfigurationChanges } from './UpdateRolesPanel.utils'
 
 // [Joshen] This is specifically testing the project scope changes
 describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
@@ -434,5 +434,30 @@ describe('UpdateRolesPanel.utils.ts:deriveRoleChangeActions', () => {
       { roleId: 31, refs: ['ref_4', 'ref_6', 'ref_8'] },
       { roleId: 32, refs: ['ref_3', 'ref_5'] },
     ])
+  })
+})
+
+describe('UpdateRolesPanel.utils.ts:hasRoleConfigurationChanges', () => {
+  const original = [
+    { ref: 'a', name: 'A', roleId: 10, baseRoleId: 3 },
+    { ref: 'b', name: 'B', roleId: 11, baseRoleId: 3 },
+  ]
+
+  test('returns false for the same projects in a different order', () => {
+    expect(hasRoleConfigurationChanges(original, [original[1], original[0]])).toBe(false)
+  })
+
+  test('ignores baseRoleId when the role is unchanged', () => {
+    const reAdded = [original[0], { ref: 'b', name: 'B', roleId: 11 }]
+    expect(hasRoleConfigurationChanges(original, reAdded)).toBe(false)
+  })
+
+  test('returns true when a project is added, removed or its role changes', () => {
+    const roleChanged = [original[0], { ...original[1], roleId: 12 }]
+    expect(hasRoleConfigurationChanges(original, [original[0]])).toBe(true)
+    expect(
+      hasRoleConfigurationChanges(original, [...original, { ref: 'c', name: 'C', roleId: 3 }])
+    ).toBe(true)
+    expect(hasRoleConfigurationChanges(original, roleChanged)).toBe(true)
   })
 })

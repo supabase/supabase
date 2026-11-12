@@ -8,7 +8,8 @@ import type {
   UpsertWebhookEndpointInput,
   WebhookEndpoint,
 } from '@/components/interfaces/Platform/Webhooks/PlatformWebhooks.types'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type WebhookEndpointCreateVariables = {
   scope: WebhookScopeParams
@@ -28,10 +29,7 @@ async function createEndpoint({
   })
   if (!result?.data) throw new Error('Endpoint was created but no data was returned')
 
-  // The server never stores `name` (see PlatformWebhooks.types.ts) — carry through
-  // what the user typed so it's visible for this session, even though it won't
-  // survive a refetch or page reload.
-  return { ...toWebhookEndpoint(result.data), name: input.name }
+  return toWebhookEndpoint(result.data)
 }
 
 type WebhookEndpointCreateData = Awaited<ReturnType<typeof createEndpoint>>
@@ -41,16 +39,12 @@ export const useWebhookEndpointCreateMutation = ({
   onError,
   ...options
 }: Omit<
-  UseCustomMutationOptions<
-    WebhookEndpointCreateData,
-    ResponseError,
-    WebhookEndpointCreateVariables
-  >,
+  UseCustomMutationOptions<WebhookEndpointCreateData, StudioError, WebhookEndpointCreateVariables>,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<WebhookEndpointCreateData, ResponseError, WebhookEndpointCreateVariables>({
+  return useMutation<WebhookEndpointCreateData, StudioError, WebhookEndpointCreateVariables>({
     mutationFn: createEndpoint,
     async onSuccess(data, variables, context) {
       await queryClient.invalidateQueries({

@@ -46,8 +46,8 @@ export const useIsAwsNimbusCloudProvider = () => {
   return isAwsNimbus
 }
 
-export const useIsOrioleDb = () => {
-  const { data: project } = useSelectedProjectQuery()
+export const useIsOrioleDb = ({ enabled = true } = {}) => {
+  const { data: project } = useSelectedProjectQuery({ enabled })
   const isOrioleDb = project?.dbVersion?.endsWith('orioledb')
   return isOrioleDb
 }

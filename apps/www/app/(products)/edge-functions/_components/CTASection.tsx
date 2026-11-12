@@ -1,7 +1,7 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion, useInView } from 'framer-motion'
+import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useEffect, useRef, useState } from 'react'
 import { Button } from 'ui'
 
@@ -85,7 +85,10 @@ export function CTASection() {
         <TerminalAnimation />
 
         <div className="flex items-center gap-2">
-          <StartYourProjectButton />
+          <StartYourProjectButton
+            variant="primary"
+            buttonLocation="Product Page CTA - Edge Functions"
+          />
           <Button asChild size="medium">
             <a href="/docs/guides/functions/quickstart">Quickstart guide</a>
           </Button>

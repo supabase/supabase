@@ -1,5 +1,6 @@
 import type { AuthMFAListFactorsResponse, Factor } from '@supabase/supabase-js'
 import { useQuery } from '@tanstack/react-query'
+import { useUser } from 'common'
 
 import { profileKeys } from './keys'
 import { auth } from '@/lib/gotrue'
@@ -20,10 +21,12 @@ export const useMfaListFactorsQuery = <TData = CustomMFAListFactorsData>({
   enabled = true,
   ...options
 }: UseCustomQueryOptions<CustomMFAListFactorsData, CustomMFAListFactorsError, TData> = {}) => {
+  const userId = useUser()?.id
   return useQuery<CustomMFAListFactorsData, CustomMFAListFactorsError, TData>({
-    queryKey: profileKeys.mfaFactors(),
+    queryKey: profileKeys.mfaFactors(userId),
     queryFn: () => getMfaListFactors(),
     staleTime: 1000 * 60 * 30,
+    enabled,
     ...options,
   })
 }

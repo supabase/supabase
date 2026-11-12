@@ -1,6 +1,6 @@
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useParams } from 'common'
-import { Trash } from 'lucide-react'
+import { TrashIcon } from 'lucide-react'
 import { useEffect } from 'react'
 import { SubmitHandler, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
@@ -21,7 +21,9 @@ import {
 import { FormItemLayout } from 'ui-patterns/form/FormItemLayout/FormItemLayout'
 import * as z from 'zod'
 
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { useCreateThirdPartyAuthIntegrationMutation } from '@/data/third-party-auth/integration-create-mutation'
+import { getWriteGrantToastMessage, getWriteGrantTooltip, useGrant } from '@/lib/grants'
 
 interface CreateAuth0IntegrationProps {
   visible: boolean
@@ -50,6 +52,9 @@ export const CreateAuth0IntegrationDialog = ({
   const isCreating = true
 
   const { ref: projectRef } = useParams()
+  const createGrant = useGrant('POST /v1/projects/{ref}/config/auth/third-party-auth', {
+    projectRef,
+  })
   const { mutate: createAuthIntegration, isPending } = useCreateThirdPartyAuthIntegrationMutation({
     onSuccess: () => {
       toast.success(`Successfully created a new Auth0 Auth integration.`)
@@ -80,8 +85,15 @@ export const CreateAuth0IntegrationDialog = ({
   }, [visible])
 
   const onSubmit: SubmitHandler<z.infer<typeof FormSchema>> = async (values) => {
+    if (!createGrant.grant) {
+      toast.error(
+        getWriteGrantToastMessage(createGrant.status, 'add', 'third-party auth integrations')
+      )
+      return
+    }
     createAuthIntegration({
       projectRef: projectRef!,
+      grant: createGrant.grant,
       oidcIssuerUrl: `https://${values.auth0DomainName}.auth0.com`,
     })
   }
@@ -158,7 +170,7 @@ export const CreateAuth0IntegrationDialog = ({
         <DialogFooter>
           {!isCreating && (
             <div className="flex-1">
-              <Button variant="danger" onClick={() => onDelete()} icon={<Trash />}>
+              <Button variant="danger" onClick={() => onDelete()} icon={<TrashIcon />}>
                 Remove connection
               </Button>
             </div>
@@ -167,15 +179,25 @@ export const CreateAuth0IntegrationDialog = ({
           <Button disabled={isPending} onClick={() => onClose()}>
             Cancel
           </Button>
-          <Button
+          <ButtonTooltip
             variant="primary"
             form={FORM_ID}
             type="submit"
-            disabled={isPending}
+            disabled={isPending || !createGrant.grant}
             loading={isPending}
+            tooltip={{
+              content: {
+                side: 'top',
+                text: getWriteGrantTooltip(
+                  createGrant.status,
+                  'add',
+                  'third-party auth integrations'
+                ),
+              },
+            }}
           >
             {isCreating ? 'Create connection' : 'Update connection'}
-          </Button>
+          </ButtonTooltip>
         </DialogFooter>
       </DialogContent>
     </Dialog>

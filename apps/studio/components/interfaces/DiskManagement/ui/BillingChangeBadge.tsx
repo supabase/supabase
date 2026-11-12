@@ -1,5 +1,5 @@
-import { AnimatePresence, motion } from 'framer-motion'
-import { ChevronRight } from 'lucide-react'
+import { ChevronRightIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import { Badge, cn, Tooltip, TooltipContent, TooltipTrigger } from 'ui'
 
 import { formatCurrency } from '@/lib/helpers'
@@ -44,7 +44,7 @@ export const BillingChangeBadge = ({
                   <span className="text-xs font-mono text-foreground-muted" translate="no">
                     {formatCurrency(beforePrice)}
                   </span>
-                  <ChevronRight size={12} strokeWidth={2} className="text-foreground-muted" />
+                  <ChevronRightIcon size={12} strokeWidth={2} className="text-foreground-muted" />
                   <motion.span
                     key={afterPrice} // This key will change whenever any form value changes
                     className={cn(

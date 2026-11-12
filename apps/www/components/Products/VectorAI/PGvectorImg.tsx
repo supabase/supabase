@@ -1,5 +1,5 @@
 import { DEFAULT_EASE } from '~/lib/animations'
-import { domAnimation, LazyMotion, m } from 'framer-motion'
+import { domAnimation, LazyMotion, m } from 'motion/react'
 import { useTheme } from 'next-themes'
 import React, { useEffect, useRef } from 'react'
 

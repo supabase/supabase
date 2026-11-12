@@ -1,4 +1,3 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
 import { useParams } from 'common'
 import { parseAsBoolean, useQueryState } from 'nuqs'
 import { useCallback, useState } from 'react'
@@ -10,11 +9,9 @@ import { CreateWrapperSheet } from './CreateWrapperSheet'
 import { WRAPPERS } from './Wrappers.constants'
 import { wrapperMetaComparator } from './Wrappers.utils'
 import { WrapperTable } from './WrapperTable'
-import { useIsMarketplaceEnabled } from '@/components/interfaces/App/FeaturePreview/FeaturePreviewContext'
 import { DiscardChangesConfirmationDialog } from '@/components/ui-patterns/Dialogs/DiscardChangesConfirmationDialog'
-import { DocsButton } from '@/components/ui/DocsButton'
 import { useFDWsQuery } from '@/data/fdw/fdws-query'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
+import { FGA_PERMISSIONS, useAsyncCheckPermissionsV2 } from '@/hooks/misc/useCheckPermissionsV2'
 import { useSelectedProjectQuery } from '@/hooks/misc/useSelectedProject'
 import { useConfirmOnClose } from '@/hooks/ui/useConfirmOnClose'
 import { SHORTCUT_IDS } from '@/state/shortcuts/registry'
@@ -23,16 +20,14 @@ import { useShortcut } from '@/state/shortcuts/useShortcut'
 export const WrappersTab = () => {
   const { id } = useParams()
   const { data: project } = useSelectedProjectQuery()
-  const isMarketplaceEnabled = useIsMarketplaceEnabled()
 
   const [isCreating, setIsCreating] = useQueryState(
     'new',
     parseAsBoolean.withDefault(false).withOptions({ clearOnDefault: true })
   )
 
-  const { can: canCreateWrapper } = useAsyncCheckPermissions(
-    PermissionAction.TENANT_SQL_ADMIN_WRITE,
-    'wrappers'
+  const { can: canCreateWrapper } = useAsyncCheckPermissionsV2(
+    FGA_PERMISSIONS.PROJECT.DATABASE_WRITE
   )
 
   useShortcut(SHORTCUT_IDS.LIST_PAGE_NEW_ITEM, () => setIsCreating(true), {
@@ -85,12 +80,6 @@ export const WrappersTab = () => {
         </div>
       ) : (
         <>
-          {!isMarketplaceEnabled && (
-            <div className="max-w-5xl flex items-center gap-x-2 justify-end mb-4">
-              <DocsButton href={wrapperMeta.docsUrl} />
-              <AddWrapperButton variant="primary" />
-            </div>
-          )}
           <WrapperTable />
         </>
       )}

@@ -1,21 +1,21 @@
-import { AnalyticsBucket, BigQuery, ClickHouse, Database } from 'icons'
-import { Snowflake } from 'lucide-react'
+import { BigQuery, ClickHouse, Database } from 'icons'
+import { CircleHelpIcon, SnowflakeIcon } from 'lucide-react'
 import type { ComponentType, SVGProps } from 'react'
 
-import type { DestinationType } from './DestinationPanel/DestinationPanel.types'
+import type { ReplicationDestinationType } from './ReplicationDiagram/Nodes.utils'
 
 type DestinationIconComponent = ComponentType<SVGProps<SVGSVGElement> & { size?: string | number }>
 
-const destinationIconByType: Record<DestinationType, DestinationIconComponent> = {
+const destinationIconByType: Record<ReplicationDestinationType, DestinationIconComponent> = {
   BigQuery,
-  'Analytics Bucket': AnalyticsBucket,
   DuckLake: Database,
-  Snowflake,
+  Snowflake: SnowflakeIcon,
   ClickHouse,
+  Unknown: CircleHelpIcon,
 }
 
 interface DestinationIconProps extends Omit<SVGProps<SVGSVGElement>, 'strokeWidth'> {
-  type: DestinationType
+  type: ReplicationDestinationType
   size?: string | number
 }
 

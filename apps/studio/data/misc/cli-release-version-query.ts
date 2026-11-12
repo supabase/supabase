@@ -3,7 +3,8 @@ import { useQuery } from '@tanstack/react-query'
 import { miscKeys } from './keys'
 import { fetchHandler } from '@/data/fetchers'
 import { BASE_PATH, IS_PLATFORM } from '@/lib/constants'
-import type { ResponseError, UseCustomQueryOptions } from '@/types'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomQueryOptions } from '@/types'
 
 export async function getCLIReleaseVersion() {
   try {
@@ -17,7 +18,7 @@ export async function getCLIReleaseVersion() {
 }
 
 export type CLIReleaseVersionData = Awaited<ReturnType<typeof getCLIReleaseVersion>>
-export type CLIReleaseVersionError = ResponseError
+export type CLIReleaseVersionError = StudioError
 
 export const useCLIReleaseVersionQuery = <TData = CLIReleaseVersionData>({
   enabled = true,

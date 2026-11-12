@@ -1,6 +1,6 @@
 import { useQuery } from '@tanstack/react-query'
 import { useParams } from 'common'
-import { RefreshCw, Search } from 'lucide-react'
+import { RefreshCwIcon, SearchIcon } from 'lucide-react'
 import { useState } from 'react'
 import { Button, InputGroup, InputGroupAddon, InputGroupInput } from 'ui'
 import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
@@ -85,11 +85,11 @@ export const ComputeInstanceLogsTab = ({ instanceName, stream }: ComputeInstance
               onChange={(event) => setMessage(event.target.value)}
             />
             <InputGroupAddon>
-              <Search />
+              <SearchIcon />
             </InputGroupAddon>
           </InputGroup>
         </div>
-        <Button icon={<RefreshCw />} loading={isFetching} onClick={() => refetch()}>
+        <Button icon={<RefreshCwIcon />} loading={isFetching} onClick={() => refetch()}>
           Refresh
         </Button>
       </div>

@@ -3,8 +3,9 @@ import { toast } from 'sonner'
 
 import { networkRestrictionKeys } from './keys'
 import { configKeys } from '@/data/config/keys'
-import { handleError, post } from '@/data/fetchers'
-import type { ResponseError, UseCustomMutationOptions } from '@/types'
+import { handleError, post, unguarded } from '@/data/fetchers'
+import type { StudioError } from '@/lib/errors/studio-errors'
+import type { UseCustomMutationOptions } from '@/types'
 
 export type NetworkRestrictionsApplyVariables = {
   projectRef: string
@@ -22,6 +23,7 @@ export async function applyNetworkRestrictions({
   const { data, error } = await post('/v1/projects/{ref}/network-restrictions/apply', {
     params: { path: { ref: projectRef } },
     body: { dbAllowedCidrs, dbAllowedCidrsV6 },
+    grant: unguarded.migrating,
   })
 
   if (error) handleError(error)
@@ -37,18 +39,14 @@ export const useNetworkRestrictionsApplyMutation = ({
 }: Omit<
   UseCustomMutationOptions<
     NetworkRestrictionsApplyData,
-    ResponseError,
+    StudioError,
     NetworkRestrictionsApplyVariables
   >,
   'mutationFn'
 > = {}) => {
   const queryClient = useQueryClient()
 
-  return useMutation<
-    NetworkRestrictionsApplyData,
-    ResponseError,
-    NetworkRestrictionsApplyVariables
-  >({
+  return useMutation<NetworkRestrictionsApplyData, StudioError, NetworkRestrictionsApplyVariables>({
     mutationFn: (vars) => applyNetworkRestrictions(vars),
     async onSuccess(data, variables, context) {
       const { projectRef } = variables

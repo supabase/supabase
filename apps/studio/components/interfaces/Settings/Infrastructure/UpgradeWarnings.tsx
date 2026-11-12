@@ -46,6 +46,8 @@ const getValidationErrorTitle = (error: ProjectUpgradeEligibilityValidationError
       return `${error.schema_name}.${error.obj_name}`
     case 'active_replication_slot':
       return error.slot_name
+    case 'table_using_reg_type':
+      return `${error.schema_name}.${error.table_name}`
     case 'project_hibernating':
       return 'Project is hibernating'
     case 'x86_architecture':
@@ -71,6 +73,8 @@ const getValidationErrorDescription = (error: ProjectUpgradeEligibilityValidatio
       return `Move the ${error.obj_type} to your own schema`
     case 'active_replication_slot':
       return 'Drop the active replication slot'
+    case 'table_using_reg_type':
+      return `Change the type of column ${error.column_name}, which uses the unsupported type ${error.type_name}`
     case 'project_hibernating':
       return 'The project is currently hibernating and will wake on next supported request'
     case 'x86_architecture':
@@ -92,6 +96,7 @@ const ValidationErrorItem = ({ error }: { error: ProjectUpgradeEligibilityValida
         return `/project/${projectRef}/database/extensions?filter=${encode(error.extension_name)}`
       case 'indexes_referencing_ll_to_earth':
         return `/project/${projectRef}/database/indexes?schema=${encode(error.schema_name)}&search=${encode(error.index_name)}`
+      case 'table_using_reg_type':
       case 'unlogged_table_with_persistent_sequence':
         return `/project/${projectRef}/database/tables?schema=${encode(error.schema_name)}&search=${encode(error.table_name)}`
       case 'user_defined_objects_in_internal_schemas':
@@ -156,6 +161,8 @@ export const ValidationErrorsWarning = ({
   )
 }
 
+// The API can return warning types this bundle doesn't know about yet, regardless of the
+// generated types, so each helper below needs a default case.
 const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
   switch (warning.type) {
     case 'pg_graphql_introspection_change':
@@ -166,6 +173,8 @@ const getWarningTitle = (warning: ProjectUpgradeEligibilityWarning): string => {
       return 'Custom operators may need attention after this upgrade'
     case 'btree_gist_nan_reindex':
       return 'btree_gist indexes on float columns must be reindexed after this upgrade'
+    default:
+      return 'Review the upgrade notes before upgrading'
   }
 }
 
@@ -179,6 +188,8 @@ const getWarningDescription = (warning: ProjectUpgradeEligibilityWarning): strin
       return 'After upgrading, recreating an operator that references a non-built-in selectivity estimator (for example during a restore or branch) requires superuser and may fail. Most projects are not affected.'
     case 'btree_gist_nan_reindex':
       return 'After upgrading, btree_gist indexes on float columns can return wrong results for rows containing NaN until they are rebuilt. If those columns may contain NaN values, run `REINDEX INDEX CONCURRENTLY` on the affected indexes — this runs online with no downtime.'
+    default:
+      return 'This upgrade may affect your project.'
   }
 }
 
@@ -192,6 +203,8 @@ const getWarningLink = (warning: ProjectUpgradeEligibilityWarning): string => {
       return `${DOCS_URL}/guides/platform/upgrading#custom-operator-selectivity-estimators`
     case 'btree_gist_nan_reindex':
       return `${DOCS_URL}/guides/platform/upgrading#btree_gist-indexes-on-float-columns-require-reindexing-after-upgrade`
+    default:
+      return `${DOCS_URL}/guides/platform/upgrading#specific-upgrade-notes`
   }
 }
 

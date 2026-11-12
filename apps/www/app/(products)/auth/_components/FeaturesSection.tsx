@@ -1,8 +1,8 @@
 'use client'
 
 import SectionContainerWithCn from '~/components/Layouts/SectionContainerWithCn'
-import { AnimatePresence, motion } from 'framer-motion'
 import { Link as LinkIcon } from 'lucide-react'
+import { AnimatePresence, motion } from 'motion/react'
 import Image from 'next/image'
 import { useEffect, useRef, useState } from 'react'
 import { cn } from 'ui'
@@ -31,13 +31,24 @@ const FEATURES = [
   {
     title: 'All the social providers',
     description:
-      'Add social logins with one click. Google, Facebook, GitHub, Azure (Microsoft), GitLab, Twitter, Discord, and many more.',
+      'Add social sign-in with one click. Google, Facebook, GitHub, Azure (Microsoft), GitLab, Twitter, Discord, and many more.',
     visual: ProvidersSkeleton,
   },
   {
     title: 'Fully integrated',
-    description:
-      'Auth without any external services. Built-in authentication, authorization, and user management.',
+    description: (
+      <>
+        Auth without any external services. Built-in authentication, authorization, and user
+        management. Use{' '}
+        <a
+          href="/library?category=Authentication"
+          className="text-foreground underline underline-offset-2 hover:text-foreground-light"
+        >
+          prebuilt UI components
+        </a>
+        .
+      </>
+    ),
     visual: IntegratedSkeleton,
   },
   {
@@ -113,7 +124,7 @@ function ProvidersSkeleton() {
     <div
       ref={containerRef}
       role="img"
-      aria-label="A grid of social login provider icons — Google, GitHub, Apple, Discord, and more — with one highlighted at a time"
+      aria-label="A grid of social sign-in provider icons — Google, GitHub, Apple, Discord, and more — with one highlighted at a time"
       className="flex items-center justify-center w-full h-full relative overflow-hidden pointer-events-none select-none"
       style={{
         maskImage: 'radial-gradient(ellipse 70% 70% at 50% 50%, black 30%, transparent 75%)',
@@ -571,7 +582,7 @@ export function FeaturesSection() {
           <span className="text-foreground">for user authentication</span>
         </h3>
         <p className="text-foreground-lighter text-sm lg:text-base">
-          Social logins, email/password, magic links, phone auth, and more — with enterprise-grade
+          Social sign-in, email/password, magic links, phone auth, and more — with enterprise-grade
           security built on Postgres&apos; Row Level Security.
         </p>
       </div>

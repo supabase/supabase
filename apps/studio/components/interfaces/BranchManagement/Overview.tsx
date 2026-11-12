@@ -1,17 +1,16 @@
-import { PermissionAction } from '@supabase/shared-types/out/constants'
-import { useQueryClient } from '@tanstack/react-query'
+import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { useParams } from 'common'
 import { partition } from 'lodash'
 import {
-  Clock,
-  ExternalLink,
-  Infinity,
-  MoreVertical,
-  Pencil,
-  Redo,
-  RefreshCw,
-  Shield,
-  Trash2,
+  ClockIcon,
+  ExternalLinkIcon,
+  InfinityIcon,
+  MoreVerticalIcon,
+  PencilIcon,
+  RedoIcon,
+  RefreshCwIcon,
+  ShieldIcon,
+  Trash2Icon,
 } from 'lucide-react'
 import Link from 'next/link'
 import { useState } from 'react'
@@ -26,21 +25,23 @@ import {
 } from 'ui'
 import { ConfirmationModal } from 'ui-patterns/Dialogs/ConfirmationModal'
 
+import { BranchingEmptyState } from './BranchingEmptyState'
 import { BranchLoader, BranchManagementSection, BranchRow, BranchRowLoader } from './BranchPanels'
 import { EditBranchModal } from './EditBranchModal'
 import { PreviewBranchesEmptyState } from './EmptyStates'
 import { SwitchToPreviewModal } from './SwitchToPreviewModal'
+import { ButtonTooltip } from '@/components/ui/ButtonTooltip'
 import { DropdownMenuItemTooltip } from '@/components/ui/DropdownMenuItemTooltip'
 import { TextConfirmModal } from '@/components/ui/TextConfirmModalWrapper'
 import { useBranchPushMutation } from '@/data/branches/branch-push-mutation'
-import { useBranchQuery } from '@/data/branches/branch-query'
+import { branchQueryOptions } from '@/data/branches/branch-query'
 import { useBranchResetMutation } from '@/data/branches/branch-reset-mutation'
 import { useBranchRestoreMutation } from '@/data/branches/branch-restore-mutation'
 import { useBranchUpdateMutation } from '@/data/branches/branch-update-mutation'
 import type { Branch } from '@/data/branches/branches-query'
 import { branchKeys } from '@/data/branches/keys'
+import { useBranchGrant } from '@/hooks/branches/useBranchGrant'
 import { useCheckEntitlements } from '@/hooks/misc/useCheckEntitlements'
-import { useAsyncCheckPermissions } from '@/hooks/misc/useCheckPermissions'
 import { useSelectedOrganizationQuery } from '@/hooks/misc/useSelectedOrganization'
 import { IS_PLATFORM } from '@/lib/constants'
 
@@ -81,6 +82,8 @@ export const Overview = ({
   const { hasAccess: hasAccessToPersistentBranching, isLoading: isLoadingEntitlement } =
     useCheckEntitlements('branching_persistent')
 
+  const showEmptyState = isSuccess && previewBranches.length === 0
+
   return (
     <>
       <BranchManagementSection header="Production branch">
@@ -91,7 +94,7 @@ export const Overview = ({
             isGithubConnected={isGithubConnected}
             label={
               <div className="flex items-center gap-x-2">
-                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                <ShieldIcon size={14} strokeWidth={1.5} className="text-warning" />
                 {mainBranch.name}
               </div>
             }
@@ -103,7 +106,7 @@ export const Overview = ({
           <div className="w-full flex items-center justify-between px-4 py-2.5 hover:bg-surface-100">
             <Link href={`/project/${projectRef}`} className="text-foreground block w-full">
               <div className="flex items-center gap-x-3">
-                <Shield size={14} strokeWidth={1.5} className="text-warning" />
+                <ShieldIcon size={14} strokeWidth={1.5} className="text-warning" />
                 main
               </div>
             </Link>
@@ -111,118 +114,125 @@ export const Overview = ({
         )}
       </BranchManagementSection>
 
-      {/* Persistent Branches Section */}
-      <BranchManagementSection header="Persistent branches">
-        {(isLoading || isLoadingEntitlement) && <BranchLoader />}
-        {isSuccess &&
-          !isLoadingEntitlement &&
-          !hasAccessToPersistentBranching &&
-          IS_PLATFORM &&
-          persistentBranches.length === 0 && (
-            <div className="px-6 py-10 flex items-center justify-between">
-              <div className="flex flex-col gap-0.5">
-                <p className="text-sm">Upgrade to unlock persistent branches</p>
-                <p className="text-sm text-foreground-lighter text-balance">
-                  Persistent branches are long-lived, cannot be reset, and are ideal for staging
-                  environments.
-                </p>
-              </div>
-              <Button variant="primary" asChild>
-                <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
-                  Upgrade
-                </Link>
-              </Button>
-            </div>
-          )}
-        {isSuccess &&
-          !isLoadingEntitlement &&
-          hasAccessToPersistentBranching &&
-          persistentBranches.length === 0 && (
-            <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
-              <p>No persistent branches</p>
-              <p className="text-foreground-lighter text-center text-balance">
-                Persistent branches are long-lived, cannot be reset, and are ideal for staging
-                environments.
-              </p>
-            </div>
-          )}
-        {isSuccess &&
-          !isLoadingEntitlement &&
-          persistentBranches.map((branch) => {
-            return (
-              <BranchRow
-                isGithubConnected={isGithubConnected}
-                key={branch.id}
-                repo={repo}
-                branch={branch}
-                rowActions={
-                  <PreviewBranchActions
-                    branch={branch}
+      {showEmptyState ? (
+        <BranchingEmptyState isGithubConnected={isGithubConnected} />
+      ) : (
+        <>
+          {/* Persistent Branches Section */}
+          <BranchManagementSection header="Persistent branches">
+            {(isLoading || isLoadingEntitlement) && <BranchLoader />}
+            {isSuccess &&
+              !isLoadingEntitlement &&
+              !hasAccessToPersistentBranching &&
+              IS_PLATFORM &&
+              persistentBranches.length === 0 && (
+                <div className="px-6 py-10 flex items-center justify-between">
+                  <div className="flex flex-col gap-0.5">
+                    <p className="text-sm">Upgrade to unlock persistent branches</p>
+                    <p className="text-sm text-foreground-lighter text-balance">
+                      Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                      environments.
+                    </p>
+                  </div>
+                  <Button variant="primary" asChild>
+                    <Link href={`/org/${selectedOrg?.slug}/billing?panel=subscriptionPlan`}>
+                      Upgrade
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            {isSuccess &&
+              !isLoadingEntitlement &&
+              hasAccessToPersistentBranching &&
+              persistentBranches.length === 0 && (
+                <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
+                  <p>No persistent branches</p>
+                  <p className="text-foreground-lighter text-center text-balance">
+                    Persistent branches are long-lived, cannot be reset, and are ideal for staging
+                    environments.
+                  </p>
+                </div>
+              )}
+            {isSuccess &&
+              !isLoadingEntitlement &&
+              persistentBranches.map((branch) => {
+                return (
+                  <BranchRow
+                    isGithubConnected={isGithubConnected}
+                    key={branch.id}
                     repo={repo}
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
-                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    branch={branch}
+                    rowActions={
+                      <PreviewBranchActions
+                        branch={branch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    }
                   />
-                }
-              />
-            )
-          })}
-      </BranchManagementSection>
+                )
+              })}
+          </BranchManagementSection>
 
-      {/* Ephemeral/Preview Branches Section */}
-      <BranchManagementSection header="Preview branches">
-        {isLoading && <BranchLoader />}
-        {isSuccess && ephemeralBranches.length === 0 && (
-          <PreviewBranchesEmptyState onSelectCreateBranch={onSelectCreateBranch} />
-        )}
-        {isSuccess &&
-          ephemeralBranches.map((branch) => {
-            return (
-              <BranchRow
-                isGithubConnected={isGithubConnected}
-                key={branch.id}
-                repo={repo}
-                branch={branch}
-                rowActions={
-                  <PreviewBranchActions
-                    branch={branch}
+          {/* Ephemeral/Preview Branches Section */}
+          <BranchManagementSection header="Preview branches">
+            {isLoading && <BranchLoader />}
+            {isSuccess && ephemeralBranches.length === 0 && (
+              <PreviewBranchesEmptyState onSelectCreateBranch={onSelectCreateBranch} />
+            )}
+            {isSuccess &&
+              ephemeralBranches.map((branch) => {
+                return (
+                  <BranchRow
+                    isGithubConnected={isGithubConnected}
+                    key={branch.id}
                     repo={repo}
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
-                    generateCreatePullRequestURL={generateCreatePullRequestURL}
-                  />
-                }
-              />
-            )
-          })}
-      </BranchManagementSection>
-      {/* Scheduled for deletion branches section */}
-      <BranchManagementSection header="Scheduled for deletion branches">
-        {isLoading && <BranchLoader />}
-        {isSuccess && scheduledForDeletionBranches.length === 0 && (
-          <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
-            <p className="text-foreground-lighter">No branches scheduled for deletion</p>
-          </div>
-        )}
-        {isSuccess &&
-          scheduledForDeletionBranches.map((branch) => {
-            return (
-              <BranchRow
-                isGithubConnected={isGithubConnected}
-                key={branch.id}
-                repo={repo}
-                branch={branch}
-                rowActions={
-                  <PreviewBranchActions
                     branch={branch}
-                    repo={repo}
-                    // If a scheduled for deletion branch is deleted, we force the deletion
-                    onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
-                    generateCreatePullRequestURL={generateCreatePullRequestURL}
+                    rowActions={
+                      <PreviewBranchActions
+                        branch={branch}
+                        repo={repo}
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    }
                   />
-                }
-              />
-            )
-          })}
-      </BranchManagementSection>
+                )
+              })}
+          </BranchManagementSection>
+
+          {/* Scheduled for deletion branches section */}
+          <BranchManagementSection header="Scheduled for deletion branches">
+            {isLoading && <BranchLoader />}
+            {isSuccess && scheduledForDeletionBranches.length === 0 && (
+              <div className="flex items-center flex-col gap-0.5 justify-center w-full py-10">
+                <p className="text-foreground-lighter">No branches scheduled for deletion</p>
+              </div>
+            )}
+            {isSuccess &&
+              scheduledForDeletionBranches.map((branch) => {
+                return (
+                  <BranchRow
+                    isGithubConnected={isGithubConnected}
+                    key={branch.id}
+                    repo={repo}
+                    branch={branch}
+                    rowActions={
+                      <PreviewBranchActions
+                        branch={branch}
+                        repo={repo}
+                        // If a scheduled for deletion branch is deleted, we force the deletion
+                        onSelectDeleteBranch={() => onSelectDeleteBranch(branch)}
+                        generateCreatePullRequestURL={generateCreatePullRequestURL}
+                      />
+                    }
+                  />
+                )
+              })}
+          </BranchManagementSection>
+        </>
+      )}
     </>
   )
 }
@@ -241,18 +251,37 @@ const PreviewBranchActions = ({
   const queryClient = useQueryClient()
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canDeleteBranches } = useAsyncCheckPermissions(
-    PermissionAction.DELETE,
-    'preview_branches'
-  )
-  const { can: canUpdateBranches } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'preview_branches'
-  )
-  // If user can update branches, they can restore branches
-  const canRestoreBranches = canUpdateBranches
+  const branchGrant = useBranchGrant('GET /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const resetBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/reset', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const restoreBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/restore', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const deleteBranchGrant = useBranchGrant('DELETE /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const canUpdateBranches = updateBranchGrant.status === 'granted'
+  const canPushBranches = pushBranchGrant.status === 'granted'
+  const canResetBranches = resetBranchGrant.status === 'granted'
+  const canRestoreBranches = restoreBranchGrant.status === 'granted'
+  const canDeleteBranches = deleteBranchGrant.status === 'granted'
 
-  const { data } = useBranchQuery({ projectRef, branchRef })
+  const { data } = useQuery(branchQueryOptions({ projectRef, branchRef, grant: branchGrant.grant }))
   const isBranchActiveHealthy = data?.status === 'ACTIVE_HEALTHY'
   const isPersistentBranch = branch.persistent
 
@@ -301,19 +330,47 @@ const PreviewBranchActions = ({
   })
 
   const onRetriggerBranch = () => {
-    branchPushMutate({ branchRef, projectRef })
+    if (pushBranchGrant.status !== 'granted') return
+    branchPushMutate({ grant: pushBranchGrant.grant, branchRef, projectRef })
   }
 
   const onRestoreBranch = () => {
-    restoreBranch({ branchRef, projectRef })
+    if (restoreBranchGrant.status !== 'granted') return
+    restoreBranch({ grant: restoreBranchGrant.grant, branchRef, projectRef })
   }
 
   const onConfirmReset = () => {
-    resetBranch({ branchRef, projectRef })
+    if (resetBranchGrant.status !== 'granted') return
+    resetBranch({ grant: resetBranchGrant.grant, branchRef, projectRef })
   }
 
   const onTogglePersistent = () => {
-    updateBranch({ branchRef, projectRef, persistent: !branch.persistent })
+    if (updateBranchGrant.status !== 'granted') return
+    updateBranch({
+      grant: updateBranchGrant.grant,
+      branchRef,
+      projectRef,
+      persistent: !branch.persistent,
+    })
+  }
+
+  const getResetDisabledReason = () => {
+    if (!canResetBranches) return 'You need additional permissions to reset branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before resetting.'
+    }
+    return undefined
+  }
+
+  const getModeSwitchDisabledReason = () => {
+    if (!canUpdateBranches) return 'You need additional permissions to edit branches'
+    if (!isBranchActiveHealthy) {
+      return 'Branch is still initializing. Please wait for it to become healthy before switching.'
+    }
+    if (!branch.persistent && !hasAccessToPersistentBranching) {
+      return 'Upgrade your plan to access persistent branches'
+    }
+    return undefined
   }
 
   const onDeleteBranch = (e: Event | React.MouseEvent<HTMLDivElement>) => {
@@ -332,7 +389,7 @@ const PreviewBranchActions = ({
           <Button
             variant="text"
             aria-label="More branch actions"
-            icon={<MoreVertical />}
+            icon={<MoreVerticalIcon />}
             className="px-1"
             onClick={(e) => e.stopPropagation()}
           />
@@ -360,14 +417,14 @@ const PreviewBranchActions = ({
               },
             }}
           >
-            <Pencil size={14} /> Edit branch
+            <PencilIcon size={14} /> Edit branch
           </DropdownMenuItemTooltip>
 
           {!branch.deletion_scheduled_at && (
             <>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={!canUpdateBranches || isRetriggering}
+                disabled={!canPushBranches || isRetriggering}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmRetriggersModal(true)
@@ -379,17 +436,18 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !canUpdateBranches
+                    text: !canPushBranches
                       ? `You need additional permissions to ${branch.git_branch ? 'resync' : 'rebase'} branches`
                       : undefined,
                   },
                 }}
               >
-                <Redo size={14} /> {branch.git_branch ? 'Resync branch' : 'Rebase branch'}
+                <RedoIcon size={14} />{' '}
+                {branch.git_branch ? <span>Resync branch</span> : <span>Rebase branch</span>}
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
-                disabled={isResetting || !isBranchActiveHealthy}
+                disabled={!canResetBranches || isResetting || !isBranchActiveHealthy}
                 onSelect={(e) => {
                   e.stopPropagation()
                   setShowConfirmResetModal(true)
@@ -401,18 +459,18 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before resetting.'
-                      : undefined,
+                    text: getResetDisabledReason(),
                   },
                 }}
               >
-                <RefreshCw size={14} /> Reset branch
+                <RefreshCwIcon size={14} /> Reset branch
               </DropdownMenuItemTooltip>
               <DropdownMenuItemTooltip
                 className="gap-x-2"
                 disabled={
-                  !isBranchActiveHealthy || (!branch.persistent && !hasAccessToPersistentBranching)
+                  !canUpdateBranches ||
+                  !isBranchActiveHealthy ||
+                  (!branch.persistent && !hasAccessToPersistentBranching)
                 }
                 onSelect={(e) => {
                   e.stopPropagation()
@@ -425,21 +483,17 @@ const PreviewBranchActions = ({
                 tooltip={{
                   content: {
                     side: 'left',
-                    text: !isBranchActiveHealthy
-                      ? 'Branch is still initializing. Please wait for it to become healthy before switching.'
-                      : !branch.persistent && !hasAccessToPersistentBranching
-                        ? 'Upgrade your plan to access persistent branches'
-                        : undefined,
+                    text: getModeSwitchDisabledReason(),
                   },
                 }}
               >
                 {branch.persistent ? (
                   <>
-                    <Clock size={14} /> Switch to preview
+                    <ClockIcon size={14} /> Switch to preview
                   </>
                 ) : (
                   <>
-                    <Infinity size={14} className="scale-110" /> Switch to persistent
+                    <InfinityIcon size={14} className="scale-110" /> Switch to persistent
                   </>
                 )}
               </DropdownMenuItemTooltip>
@@ -455,7 +509,7 @@ const PreviewBranchActions = ({
                 href={generateCreatePullRequestURL(branch.git_branch)}
                 onClick={(e) => e.stopPropagation()}
               >
-                <ExternalLink size={14} /> Create pull request
+                <ExternalLinkIcon size={14} /> Create pull request
               </a>
             </DropdownMenuItem>
           )}
@@ -482,7 +536,7 @@ const PreviewBranchActions = ({
                 },
               }}
             >
-              <Clock size={14} /> Restore branch
+              <ClockIcon size={14} /> Restore branch
             </DropdownMenuItemTooltip>
           )}
 
@@ -502,7 +556,7 @@ const PreviewBranchActions = ({
               },
             }}
           >
-            <Trash2 size={14} /> Delete branch
+            <Trash2Icon size={14} /> Delete branch
           </DropdownMenuItemTooltip>
         </DropdownMenuContent>
       </DropdownMenu>
@@ -533,7 +587,8 @@ const PreviewBranchActions = ({
       >
         <p className="text-sm text-foreground-light">
           Are you sure you want to switch the branch "{branch.name}" to{' '}
-          {branch.persistent ? 'preview' : 'persistent'}?
+          {branch.persistent ? <span>preview</span> : <span>persistent</span>}
+          <span>?</span>
         </p>
       </ConfirmationModal>
 
@@ -572,10 +627,16 @@ const PreviewBranchActions = ({
 const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) => {
   const { project_ref: branchRef, parent_project_ref: projectRef } = branch
 
-  const { can: canUpdateBranches } = useAsyncCheckPermissions(
-    PermissionAction.UPDATE,
-    'preview_branches'
-  )
+  const updateBranchGrant = useBranchGrant('PATCH /v1/branches/{branch_id_or_ref}', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const pushBranchGrant = useBranchGrant('POST /v1/branches/{branch_id_or_ref}/push', {
+    projectRef,
+    isDefault: branch.is_default,
+  })
+  const canUpdateBranches = updateBranchGrant.status === 'granted'
+  const canPushBranches = pushBranchGrant.status === 'granted'
   const { mutate: branchPushMutate, isPending: isRetriggering } = useBranchPushMutation({
     onSuccess() {
       toast.success('Success! Please allow a few minutes for the branch to update.')
@@ -589,22 +650,29 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
   const [showConfirmRetriggersModal, setShowConfirmRetriggersModal] = useState(false)
 
   const onRetriggerBranch = () => {
-    branchPushMutate({ branchRef, projectRef })
+    if (pushBranchGrant.status !== 'granted') return
+    branchPushMutate({ grant: pushBranchGrant.grant, branchRef, projectRef })
   }
 
   return (
     <>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
-          <Button variant="text" icon={<MoreVertical />} className="px-1" />
+          <ButtonTooltip
+            variant="text"
+            icon={<MoreVerticalIcon />}
+            className="px-1"
+            tooltip={{ content: { side: 'bottom', text: 'More options' } }}
+          />
         </DropdownMenuTrigger>
         <DropdownMenuContent className="w-56" side="bottom" align="end">
           {repo ? (
-            <Link passHref href={`/project/${projectRef}/settings/integrations`}>
-              <DropdownMenuItem asChild className="gap-x-2">
-                <a>Change production branch</a>
-              </DropdownMenuItem>
-            </Link>
+            <DropdownMenuItem asChild className="gap-x-2">
+              <Link href={`/project/${projectRef}/settings/integrations`}>
+                <PencilIcon size={14} />
+                Change production branch
+              </Link>
+            </DropdownMenuItem>
           ) : (
             <DropdownMenuItem
               className="gap-x-2"
@@ -612,13 +680,13 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               onSelect={() => setShowEditBranchModal(true)}
               onClick={() => setShowEditBranchModal(true)}
             >
-              <Pencil size={14} /> Edit Branch
+              <PencilIcon size={14} /> Edit Branch
             </DropdownMenuItem>
           )}
           {branch.git_branch ? (
             <DropdownMenuItemTooltip
               className="gap-x-2"
-              disabled={!canUpdateBranches || isRetriggering}
+              disabled={!canPushBranches || isRetriggering}
               onSelect={(e) => {
                 e.stopPropagation()
                 setShowConfirmRetriggersModal(true)
@@ -630,13 +698,13 @@ const MainBranchActions = ({ branch, repo }: { branch: Branch; repo: string }) =
               tooltip={{
                 content: {
                   side: 'left',
-                  text: !canUpdateBranches
+                  text: !canPushBranches
                     ? `You need additional permissions to resync branches`
                     : undefined,
                 },
               }}
             >
-              <Redo size={14} /> Resync branch
+              <RefreshCwIcon size={14} /> Resync branch
             </DropdownMenuItemTooltip>
           ) : null}
         </DropdownMenuContent>
