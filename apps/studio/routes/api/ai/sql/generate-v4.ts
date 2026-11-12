@@ -223,6 +223,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       projectRegion,
       chatId,
       chatName,
+      // A defined orgId means getAIDetails confirmed the project belongs to the organization.
       allowTracing: IS_TRACING_ENABLED && orgId !== undefined,
       supportMode,
       userId,

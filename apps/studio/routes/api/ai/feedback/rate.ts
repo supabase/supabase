@@ -126,7 +126,7 @@ Instructions:
 `,
     })
 
-    // Log feedback to Braintrust if tracing is enabled and span ID is available
+    // A defined orgId means getAIDetails confirmed the project belongs to the organization.
     if (IS_TRACING_ENABLED && orgId !== undefined && spanId) {
       try {
         const logger = currentLogger()
