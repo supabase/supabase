@@ -68,10 +68,6 @@ export const Route = createFileRoute('/project/$ref/auth/templates/$templateId')
 })
 
 function TemplatePage() {
-  return <RedirectToTemplates />
-}
-
-const RedirectToTemplates = () => {
   const { templateId, ref } = Route.useParams()
   const { ref: projectRef } = useParams()
 
