@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest'
 
 import {
   formatFunctionSearchDetails,
+  formatTableSearchDetails,
   formatTriggerSearchDetails,
   matchesTableRelatedSearch,
   matchesTriggerSearch,
@@ -20,6 +21,23 @@ describe('matchesTableRelatedSearch', () => {
 
   it('does not match unrelated searches', () => {
     expect(matchesTableRelatedSearch(policy, 'colors')).toBe(false)
+  })
+})
+
+describe('formatTableSearchDetails', () => {
+  const base = { id: 1, schema: 'public', name: 'blog_posts' }
+
+  it.each([
+    [{ ...base, type: 'r', rls_enabled: true, policy_count: 4 }, '4 policies • RLS enabled'],
+    [{ ...base, type: 'r', rls_enabled: false, policy_count: 1 }, '1 policy • RLS disabled'],
+    [{ ...base, type: 'p', rls_enabled: true, policy_count: 0 }, '0 policies • RLS enabled'],
+    [{ ...base, type: 'v', security_invoker: true }, 'Security invoker'],
+    [{ ...base, type: 'v', security_invoker: false }, 'Security definer'],
+    // Neither RLS nor security_invoker applies, and the icon already carries the kind
+    [{ ...base, type: 'm' }, ''],
+    [{ ...base, type: 'f' }, ''],
+  ] as const)('formats %j', (table, expected) => {
+    expect(formatTableSearchDetails(table)).toBe(expected)
   })
 })
 
