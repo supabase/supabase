@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest'
 
-import { passwordNeedsPercentEncoding, passwordStrength } from './password-strength'
+import {
+  passwordHasUnsupportedCharacters,
+  passwordNeedsPercentEncoding,
+  passwordStrength,
+} from './password-strength'
 
 describe('passwordNeedsPercentEncoding', () => {
   it('returns false for passwords that are safe to use in a connection string', () => {
@@ -23,6 +27,23 @@ describe('passwordNeedsPercentEncoding', () => {
   })
 })
 
+describe('passwordHasUnsupportedCharacters', () => {
+  it('returns false for passwords containing only printable ASCII characters', () => {
+    expect(passwordHasUnsupportedCharacters('')).toBe(false)
+    expect(passwordHasUnsupportedCharacters('Str0ngPassword123')).toBe(false)
+    expect(passwordHasUnsupportedCharacters('with-safe_chars.~!@#$%^&*()')).toBe(false)
+    expect(passwordHasUnsupportedCharacters('with a plain space')).toBe(false)
+  })
+
+  it('returns true for passwords containing extended ASCII or non-ASCII characters', () => {
+    expect(passwordHasUnsupportedCharacters('Str0ngPassword123èFÖÆ')).toBe(true)
+    expect(passwordHasUnsupportedCharacters('pässwörd')).toBe(true)
+    expect(passwordHasUnsupportedCharacters('password\u00A0')).toBe(true)
+    expect(passwordHasUnsupportedCharacters('password\u00AD')).toBe(true)
+    expect(passwordHasUnsupportedCharacters('password🔥')).toBe(true)
+  })
+})
+
 describe('passwordStrength', () => {
   it('returns empty values for message, warning and strength for empty input', async () => {
     const result = await passwordStrength('')
@@ -34,6 +55,13 @@ describe('passwordStrength', () => {
     const result = await passwordStrength(longPassword)
     expect(result.message).toMatch(/maximum length/i)
     expect(result.warning).toMatch(/less than 100 characters/i)
+    expect(result.strength).toBe(0)
+  })
+
+  it('rejects passwords containing unsupported extended ASCII characters', async () => {
+    const result = await passwordStrength('Str0ngPassword123èFÖÆ')
+    expect(result.message).toMatch(/unsupported characters/i)
+    expect(result.warning).toMatch(/only contain letters, numbers, and standard symbols/i)
     expect(result.strength).toBe(0)
   })
 
