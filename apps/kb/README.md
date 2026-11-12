@@ -8,7 +8,7 @@ There are 3 buckets of content that live within the repo itself:
 
 - **Guides**: Walkthroughs, migrations, comparison content, etc. Lives in `src/content/guides/**.mdx`.
 - **FAQs**: Short, specific questions with direct answers. Lives in `src/content/faqs/**/**.mdx`.
-- **Community resources**: Community-produced guides or tutorials on other websites. Lives at `src/data/community-guides.
+- **Community resources**: Community-produced guides or tutorials on other websites. Lives at `src/data/community-guides.json`.
 
 Additionally, the KB has **troubleshooting** topics (`src/content/troubleshooting/`), but this content lives in a private repo. See `AGENTS.md` for how it works and what's intentionally left out for now.
 
@@ -23,12 +23,11 @@ Additionally, stick to plain GitHub-Flavored Markdown:
 - For callouts, use GitHub's native alert syntax (`> [!NOTE]`, `> [!TIP]`, `> [!IMPORTANT]`, `> [!WARNING]`,
   `> [!CAUTION]`) — the build renders these into the `Admonition` component for you
   (`src/lib/mdx/rehype-admonitions.ts`). Don't import or use `Admonition` directly in content.
-- Frontmatter requires `title`, `description`, and `topics` (values must match `TOPIC_NAMES` in
-  `src/lib/topics.ts`); `pinned` and `github_url` are optional. See `src/content.config.ts` for the full schema.
+- Frontmatter requires `title`, but see `src/content.config.ts` for the full schema.
 
 ## Development
 
-Requires Node >= 22.12 and pnpm. Install dependencies from the repository root with `pnpm install`, then start the dev server at [http://localhost:3008](http://localhost:3008):
+Requires Node >=22.23.4 and pnpm. Install dependencies from the repository root with `pnpm install`, then start the dev server at [http://localhost:3008](http://localhost:3008):
 
 ```sh
 # From the root directory of the repository
@@ -38,9 +37,9 @@ pnpm dev:kb
 pnpm dev
 ```
 
-Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. Copy `.env.example` to `.env`, then set `GH_TOKEN` (for example `export GH_TOKEN=$(gh auth token)`) and run `pnpm fetch:federated-content`. Guides, FAQs, and community guides work without any extra setup.
+Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. Copy `.env.example` to `.env.local`, then set `GH_TOKEN` (for example `GH_TOKEN=$(gh auth token)`) and run `pnpm fetch:federated-content`. Guides, FAQs, and community guides work without any extra setup.
 
-To check a production build locally:
+To check a production build locally, you need the same private repo access and `GH_TOKEN` described above. The build runs `fetch:federated-content` first, so it fails without credentials:
 
 ```sh
 # From the root directory of the repository
