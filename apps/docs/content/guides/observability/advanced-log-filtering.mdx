@@ -163,6 +163,60 @@ order by timestamp;
 
 See [Client-side tracing](/docs/guides/observability/client-side-tracing) for how to attach trace context from Supabase client SDKs.
 
+## Follow a user's activity [#follow-user-activity]
+
+### Track a user across services [#track-user-across-services]
+
+To trace what a specific user did, find their recent auth events by user ID, then use the `request_id` from those events to find the other service logs that belong to the same request.
+
+```sql
+-- step 1: find the user's recent auth events
+select timestamp,
+  log_attributes['user_id'] as user_id,
+  log_attributes['request_id'] as request_id,
+  event_message
+from logs
+where source = 'auth_logs'
+  and log_attributes['user_id'] = 'xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx'
+order by timestamp desc
+limit 20;
+```
+
+```sql
+-- step 2: use a request_id from step 1 to find all related logs
+select timestamp, source, event_message
+from logs
+where log_attributes['request_id'] = '<request_id from step 1>'
+order by timestamp;
+```
+
+The user ID appears in [Auth](/dashboard/project/_/auth/users) and in your application's user table.
+
+### Investigate an Edge Function invocation [#investigate-edge-function]
+
+`function_edge_logs` records the HTTP request and response for each invocation. `function_logs` records the console output from inside the function. Both share an `execution_id` that lets you view them together.
+
+```sql
+-- find a failing invocation
+select timestamp,
+  log_attributes['execution_id'] as execution_id,
+  log_attributes['response.status_code'] as status,
+  log_attributes['request.path'] as path
+from logs
+where source = 'function_edge_logs'
+  and toInt32OrZero(log_attributes['response.status_code']) >= 500
+order by timestamp desc
+limit 20;
+```
+
+```sql
+-- fetch the HTTP layer and console output for one invocation
+select timestamp, source, event_message
+from logs
+where log_attributes['execution_id'] = '<execution_id from above>'
+order by timestamp;
+```
+
 ## Query limits [#limit-and-result-row-limitations]
 
 Use an explicit `limit` and narrow time range. The logs query surface rejects `select *` and `count(*)`; list columns and use `count()`. A result limit bounds returned rows, not the time range scanned.
