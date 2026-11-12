@@ -69,9 +69,10 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
       </div>
       <div className="absolute inset-0 z-20 w-full h-full flex items-center justify-center">
         <span
+          aria-hidden="true"
           className={cn(
-            'w-full h-px border border-b border-dashed transition-all opacity-90 border-strong',
-            hasSpendCap && 'opacity-100 border-warning'
+            'h-0.5 w-full transition-shadow',
+            hasSpendCap ? 'groove-primary' : 'groove-page'
           )}
         />
       </div>
@@ -95,9 +96,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                   <motion.span
                     custom={index}
                     variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded-sm h-0 transform transition-all'
-                    )}
+                    className={cn('w-full bg-surface-200 border-stronger border-2 rounded-sm h-0')}
                   />
                 </div>
               ))}
@@ -121,9 +120,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                   <motion.span
                     custom={index}
                     variants={barVariant}
-                    className={cn(
-                      'w-full bg-surface-200 border-stronger border-2 rounded-sm h-0 transform transition-all'
-                    )}
+                    className={cn('w-full bg-surface-200 border-stronger border-2 rounded-sm h-0')}
                   />
                 </div>
               ))}
@@ -139,7 +136,7 @@ const CostControlAnimation: FC<Props> = ({ className }) => {
                         custom={index}
                         variants={barVariant}
                         className={cn(
-                          'relative w-full bg-warning-400 border-warning border-2 rounded-sm h-0 transform transition-all'
+                          'relative w-full bg-warning-400 border-warning border-2 rounded-sm h-0'
                         )}
                       >
                         {bar.y > 50 && (
