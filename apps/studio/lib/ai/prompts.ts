@@ -84,7 +84,8 @@ CREATE POLICY "Active subscribers" ON premium_content FOR SELECT TO authenticate
 
 ## Advanced Patterns: Security Definer & Custom Claims
 - Use \`SECURITY DEFINER\` helper functions for complex JOIN checks (e.g., returning tenant_id for the user).
-- Always revoke \`EXECUTE\` on helper functions from \`anon\` and \`authenticated\` roles.
+- Put \`SECURITY DEFINER\` helpers in a non-exposed schema, set \`search_path = ''\`, and schema-qualify every referenced object.
+- Revoke \`EXECUTE\` from \`PUBLIC\`, then grant it only to the roles that need the helper. Revoking only from \`anon\` and \`authenticated\` is ineffective while \`PUBLIC\` retains the default grant.
 - Implement flexible RBAC using custom DB tables/functions via JWT claims or cross-table relationships.
 
 ## Best Practices
@@ -109,20 +110,33 @@ CREATE POLICY "Active subscribers" ON premium_content FOR SELECT TO authenticate
 ## Minimal Working Example: Multi-Tenant
 \`\`\`sql
 -- Enable RLS
-ALTER TABLE customers ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.customers ENABLE ROW LEVEL SECURITY;
 
 -- Secure helper function
-CREATE OR REPLACE FUNCTION get_user_tenant() RETURNS uuid LANGUAGE sql SECURITY DEFINER STABLE AS $$
-  SELECT tenant_id FROM user_profiles WHERE auth_user_id = auth.uid();
+CREATE SCHEMA IF NOT EXISTS private;
+REVOKE ALL ON SCHEMA private FROM PUBLIC;
+GRANT USAGE ON SCHEMA private TO authenticated;
+
+CREATE OR REPLACE FUNCTION private.get_user_tenant()
+RETURNS uuid
+LANGUAGE sql
+SECURITY DEFINER
+SET search_path = ''
+STABLE
+AS $$
+  SELECT tenant_id
+  FROM public.user_profiles
+  WHERE auth_user_id = (SELECT auth.uid());
 $$;
-REVOKE EXECUTE ON FUNCTION get_user_tenant() FROM anon, authenticated;
+REVOKE EXECUTE ON FUNCTION private.get_user_tenant() FROM PUBLIC;
+GRANT EXECUTE ON FUNCTION private.get_user_tenant() TO authenticated;
 
 -- Policies
-CREATE POLICY "Tenant read" ON customers FOR SELECT TO authenticated USING (tenant_id = get_user_tenant());
-CREATE POLICY "Tenant write" ON customers FOR INSERT TO authenticated WITH CHECK (tenant_id = get_user_tenant());
+CREATE POLICY "Tenant read" ON public.customers FOR SELECT TO authenticated USING (tenant_id = private.get_user_tenant());
+CREATE POLICY "Tenant write" ON public.customers FOR INSERT TO authenticated WITH CHECK (tenant_id = private.get_user_tenant());
 
 -- Helpful index
-CREATE INDEX idx_customers_tenant ON customers(tenant_id);
+CREATE INDEX idx_customers_tenant ON public.customers(tenant_id);
 \`\`\`
 
 ## Exposing a Table to the Data API
