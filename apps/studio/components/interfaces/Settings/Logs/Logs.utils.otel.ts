@@ -27,8 +27,8 @@ const PG_ERROR: SafeLogSqlFragment = safeSql`${attr('parsed.error_severity')} IN
 const PG_WARNING: SafeLogSqlFragment = safeSql`${attr('parsed.error_severity')} = 'WARNING'`
 const FN_ERROR: SafeLogSqlFragment = safeSql`${attr('level')} IN ('error', 'fatal')`
 const FN_WARNING: SafeLogSqlFragment = safeSql`${attr('level')} = 'warning'`
-const MULTIGRES_ERROR: SafeLogSqlFragment = safeSql`JSONExtractString(event_message, 'level') IN ('ERROR', 'FATAL', 'PANIC')`
-const MULTIGRES_WARNING: SafeLogSqlFragment = safeSql`JSONExtractString(event_message, 'level') IN ('WARN', 'WARNING')`
+const MULTIGRES_ERROR: SafeLogSqlFragment = safeSql`${attr('level')} IN ('ERROR', 'FATAL', 'PANIC')`
+const MULTIGRES_WARNING: SafeLogSqlFragment = safeSql`${attr('level')} IN ('WARN', 'WARNING')`
 const AUTH_ERROR: SafeLogSqlFragment = safeSql`${attr('level')} IN ('error', 'fatal') OR ${statusAsInt('status')} >= 500`
 const AUTH_WARNING: SafeLogSqlFragment = safeSql`${attr('level')} = 'warning' OR ${statusAsInt('status')} BETWEEN 400 AND 499`
 const AUTH_INFO: SafeLogSqlFragment = safeSql`NOT (${AUTH_ERROR}) AND NOT (${AUTH_WARNING})`
@@ -201,6 +201,7 @@ const OTEL_SOURCES: Record<LogsTableName, OtelSourceDescriptor> = {
   },
   [LogsTableName.MULTIGRES]: {
     source: 'multigres_logs',
+    columns: [col('level', safeSql`level`)],
     error: MULTIGRES_ERROR,
     warning: MULTIGRES_WARNING,
   },
