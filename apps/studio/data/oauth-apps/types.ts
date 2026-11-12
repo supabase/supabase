@@ -11,7 +11,7 @@ export type OAuthAppsAuthorizeLiveFields = Pick<
 
 export type OAuthScope = NonNullable<LiveAuthorizeRequest['scopes']>[number]
 
-export function isWriteScope(scope: OAuthScope): boolean {
+export function isWriteScope(scope: string): boolean {
   return scope.endsWith(':write')
 }
 
@@ -19,10 +19,9 @@ export type OAuthGrantKind = 'organization_bound' | 'member_bound'
 
 export type OAuthAppsAuthorizeRequest = OAuthAppsAuthorizeLiveFields & {
   app_id: string
-  app_name: string
   grant_kind: OAuthGrantKind
   project_scoping_mode: boolean
-  scopes: OAuthScope[]
+  scopes?: string[]
 }
 
 export type OAuthOrganizationRole = {
@@ -38,8 +37,9 @@ export type OAuthAppsAuthorizeOrganizationProject = {
 }
 
 export type OAuthExistingGrant = {
-  approved_scopes: OAuthScope[] | null
-  project_refs: string[]
+  grant_id: string
+  approved_scopes: string[] | null
+  project_refs: string[] | null
   approved_at: string
 }
 
@@ -57,7 +57,7 @@ export function getPreselectedProjectRefs({
   liveProjects: OAuthAppsAuthorizeOrganizationProject[]
 }): string[] {
   const liveRefs = new Set(liveProjects.map((project) => project.ref))
-  const candidates = existingGrant?.project_refs.length
+  const candidates = existingGrant?.project_refs?.length
     ? existingGrant.project_refs
     : projectRef
       ? [projectRef]
@@ -86,14 +86,14 @@ export type OAuthScopeValidationResult =
   | {
       scope_target: 'all_projects'
       role: OAuthValidationRole
-      failed_scopes: OAuthScope[]
+      failed_scopes: string[]
     }
   | {
       scope_target: 'projects'
       failures: Array<{
         ref: string
         role: OAuthValidationRole
-        failed_scopes: OAuthScope[]
+        failed_scopes: string[]
       }>
     }
 
@@ -109,15 +109,7 @@ export type OAuthAppsAuthorizeRoleValidationFailure = {
   validation: OAuthScopeValidationResult
 }
 
-export type OAuthAppsAuthorizeApproveResult =
-  | OAuthAppsAuthorizeRedirect
-  | OAuthAppsAuthorizeRoleValidationFailure
-
-export function isRoleValidationFailure(
-  result: OAuthAppsAuthorizeApproveResult
-): result is OAuthAppsAuthorizeRoleValidationFailure {
-  return 'error_code' in result && result.error_code === 'role_validation_failed'
-}
+export type OAuthAppsAuthorizeApproveResult = OAuthAppsAuthorizeRedirect
 
 export function getFailedProjects(
   failure: OAuthAppsAuthorizeRoleValidationFailure | null | undefined
@@ -128,36 +120,46 @@ export function getFailedProjects(
 
 export type OAuthAppsAuthorizePreflightSuccess = { status: 'success' }
 
-export type OAuthAppsAuthorizePreflightResult =
-  | OAuthAppsAuthorizePreflightSuccess
-  | OAuthAppsAuthorizeRoleValidationFailure
-
-export function isPreflightValidationFailure(
-  result: OAuthAppsAuthorizePreflightResult
-): result is OAuthAppsAuthorizeRoleValidationFailure {
-  return 'error_code' in result && result.error_code === 'role_validation_failed'
+export type OAuthAppsAuthorizePreflightResult = {
+  existing_grant: {
+    approved_at: string
+    approved_scopes: string[] | null
+    grant_id: string
+    project_refs: string[] | null
+  } | null
+  validation_failure: {
+    failed_scopes: string[]
+    role: {
+      name: 'owner' | 'administrator' | 'developer' | 'read-only' | 'no-access'
+    }
+    scope_target: 'all_projects'
+  } | null
 }
 
 export type OAuthApprovalTarget = 'organization' | 'members' | 'organization_and_members'
 
 export type OAuthApprovalItem = {
-  app: {
-    id: string
-    name: string
-    created_by: string
-    icon: string | null
+  id: string
+  type: 'oauth_app'
+  attributes: {
+    app: {
+      name: string
+      created_by: string | null
+      icon: string | null
+    }
+    last_approved_at: string
+    target: OAuthApprovalTarget
+    org_grant: {
+      grant_id: string
+      approved_scopes: string[]
+      approved_at: string
+    } | null
   }
-  grant_target: OAuthApprovalTarget
-  org_grant: {
-    grant_id: string
-    approved_scopes: string[]
-    approved_at: string
-  } | null
 }
 
 export type ListOAuthApprovalsResponse = {
   data: OAuthApprovalItem[]
-  pagination: { next_cursor: string | null }
+  links: { next: string | null }
 }
 
 export type OAuthGrantProject = {
