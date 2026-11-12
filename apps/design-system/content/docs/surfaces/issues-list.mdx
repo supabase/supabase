@@ -1,0 +1,16 @@
+---
+title: Issues List
+description: A project's open issues from its security and performance advisors, each of which can be sent to the agent.
+---
+
+<ComponentPreview name="surfaces-issues-list" peekCode wide />
+
+## Usage
+
+`IssuesList` shows a project's security and performance advisor findings, one row per failing check. Each row has Review, which sends a `review-finding` request through `onAsk` so the host can ask its agent to investigate. The list confirms a send beside its heading and shows a failed send below it.
+
+It works on its own or inside another view. [Project Home](project-home) renders it as its Issues section, and an agent can open it alone beside the conversation with `open_issues_panel`.
+
+- `issues` is the host's read of the advisors as a `Loadable`. Pass `{ status: 'idle' }` when the connection has none.
+- A category that failed to load reads as unavailable, never as "no issues".
+- `onRefresh` adds Refresh. Omit `onAsk` when the host can't send to chat; Review is then disabled.

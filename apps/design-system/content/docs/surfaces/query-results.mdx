@@ -1,0 +1,24 @@
+---
+title: Query Results
+description: The results grid and chart used by query editors and inline query blocks.
+---
+
+<ComponentPreview name="surfaces-results-grid" peekCode wide />
+
+## Results grid
+
+`QueryResultsGrid` is a compact grid for reading results. Pass `table` metadata from a table read to mark primary keys and column types. With `canEdit`, each row gets an edit action that calls `onEditRow`. Editing itself happens in the [Row Editor](row-editor).
+
+## Chart
+
+`QueryResultChart` draws a bar or line chart from a `ChartConfig`: an X column and up to three Y series. Pass `title` so assistive technology can name the chart.
+
+<ComponentPreview name="surfaces-result-chart" peekCode wide />
+
+A `timestamp` X column gets date formatting in ticks and tooltips.
+
+<ComponentPreview name="surfaces-result-chart-line" wide />
+
+With no rows or no configured columns, the chart shows a one-line message instead, like the rest of the results area.
+
+<ComponentPreview name="surfaces-result-chart-empty" />

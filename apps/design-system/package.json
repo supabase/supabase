@@ -44,6 +44,7 @@
     "remark-code-import": "^1.2.0",
     "remark-gfm": "^4.0.0",
     "sonner": "^2.0.8",
+    "surfaces": "workspace:*",
     "ts-morph": "^22.0.0",
     "ui": "workspace:*",
     "ui-patterns": "workspace:*",

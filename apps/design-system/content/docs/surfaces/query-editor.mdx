@@ -1,0 +1,33 @@
+---
+title: Query Editor
+description: The query editor's toolbar, editor and results layout, shared by Studio's Explorer and MCP Apps.
+---
+
+<ComponentPreview name="surfaces-query-editor" peekCode wide />
+
+## Usage
+
+`QueryEditorFrame` provides the chrome and layout only. It holds no query state and runs nothing. The consumer passes the SQL editor, the results and the footer, and owns execution, sources and saving.
+
+```tsx
+import { CodeMirrorSqlEditor } from 'surfaces/codemirror'
+import { QueryEditorFrame, QueryResultFooter } from 'surfaces/explorer'
+import { QueryResultsGrid } from 'surfaces/query'
+```
+
+- `editor` is a render function, so Studio can pass Monaco and MCP Apps can pass CodeMirror.
+- Pass `display` and `onDisplayChange` to show result settings, which switch between a table and a chart.
+- Omit `run` to hide the run button, for example while an approval controls the run.
+- Pass `onTitleChange` to make the title editable.
+
+## Viewport
+
+Use `variant="viewport"` when the editor fills a tab's content area. The query and results become a resizable split, so the parent must have a bounded height and `min-h-0`.
+
+<ComponentPreview name="surfaces-query-editor-viewport" wide />
+
+## Toolbar
+
+The toolbar parts are exported separately for views that need the same toolbar without the editor, such as notebook cells and chats. Give icon-only actions an `aria-label` as well as a tooltip.
+
+<ComponentPreview name="surfaces-explorer-toolbar" peekCode />

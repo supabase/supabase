@@ -1,0 +1,14 @@
+{
+  "extends": "tsconfig/react-library.json",
+  "compilerOptions": {
+    "noEmit": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "types": ["vite/client", "node"],
+    "lib": ["dom", "dom.iterable", "es2023"],
+    "target": "es2022",
+    "allowImportingTsExtensions": true
+  },
+  "include": ["src", "scripts", "vite.config.ts", "vitest.setup.ts", "vitest.config.ts", "host"]
+}

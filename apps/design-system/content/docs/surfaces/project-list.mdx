@@ -1,0 +1,15 @@
+---
+title: Project List
+description: The projects a connection can see, with search, status and project checks for the agent.
+---
+
+<ComponentPreview name="surfaces-project-list" peekCode wide padded={false} />
+
+## Usage
+
+`ProjectList` renders the projects and organizations a host loaded. Search filters them on the client by name, reference, organization or region. Each row shows the project's status with the same labels as Studio's project list.
+
+- `onOpenProject` opens a project. The host decides what opening means, such as showing its [Explorer](explorer).
+- `onCreate` and `onOpenResource` add Create and Open… when the connection's `capabilities` allow them. Open… is for scoped tokens that can't list the whole account.
+- `onAsk` adds a checks menu to each row. It receives a `project-check` request, and the host writes the prompt. Without it, the checks show as unavailable.
+- `error` shows a failed load or action above the list. Pass `onRetry` with it to offer Retry.

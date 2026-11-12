@@ -1,0 +1,14 @@
+---
+title: Row Editor
+description: A form for editing or inserting a table row, built from the table's column metadata.
+---
+
+<ComponentPreview name="surfaces-row-editor" peekCode wide />
+
+## Usage
+
+`RowEditorForm` builds its fields from `table.columns`. Generated and non-editable columns are read only. Enums render as selects, and nullable columns can be set to `NULL`.
+
+On save, the form calls `onSave` with a `RowChange`. Updates include the values they replace, so the host can reject an edit when the row changed in the meantime. `onSave` resolves with the row as stored.
+
+`RowEditor` wraps the same form in a sheet. Use `RowEditorForm` directly when the form fills a panel, as it does in the MCP Apps row panel.

@@ -1,0 +1,16 @@
+---
+title: Notebooks List
+description: A project's saved notebooks, each of which the agent can run and summarize.
+---
+
+<ComponentPreview name="surfaces-notebooks-list" peekCode wide />
+
+## Usage
+
+`NotebooksList` shows a project's saved notebooks, favorites first. Run sends a `run-notebook` request through `onAsk` with the notebook's id and name. The view never runs SQL itself: the host asks its agent to run the notebook and summarize the results, so the summary lands in the conversation.
+
+It works on its own or inside another view. [Project Home](project-home) renders it below Issues, and an agent can open it alone beside the conversation with `open_notebooks_panel`.
+
+- `notebooks` is the host's read of the notebooks as a `Loadable`. Pass `{ status: 'idle' }` when the connection has none.
+- `onRefresh` adds Refresh. Omit `onAsk` when the host can't send to chat; Run is then disabled.
+- Notebook names and descriptions are user content. Hosts pass them to the agent as data, not instructions.

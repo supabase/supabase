@@ -265,6 +265,22 @@ export const docsConfig: DocsConfig = {
       ],
     },
     {
+      title: 'Surfaces',
+      sortOrder: 'alphabetical',
+      items: [
+        { title: 'Introduction', href: '/docs/surfaces/introduction', items: [], priority: true },
+        { title: 'Explorer', href: '/docs/surfaces/explorer', items: [] },
+        { title: 'Issues List', href: '/docs/surfaces/issues-list', items: [] },
+        { title: 'Logs', href: '/docs/surfaces/logs', items: [] },
+        { title: 'Notebooks List', href: '/docs/surfaces/notebooks-list', items: [] },
+        { title: 'Project List', href: '/docs/surfaces/project-list', items: [] },
+        { title: 'Project Home', href: '/docs/surfaces/project-home', items: [] },
+        { title: 'Query Editor', href: '/docs/surfaces/query-editor', items: [] },
+        { title: 'Query Results', href: '/docs/surfaces/query-results', items: [] },
+        { title: 'Row Editor', href: '/docs/surfaces/row-editor', items: [] },
+      ],
+    },
+    {
       title: 'Atom Components',
       sortOrder: 'alphabetical',
       items: [

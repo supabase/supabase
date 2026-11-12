@@ -1,0 +1,52 @@
+{
+  "name": "surfaces",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Supabase product surfaces that render in Studio and in MCP Apps hosts. Views take data as props and report actions through callbacks; they never fetch or call a host themselves.",
+  "license": "MIT",
+  "sideEffects": false,
+  "exports": {
+    "./common": "./src/common/index.ts",
+    "./query": "./src/query/index.ts",
+    "./row": "./src/row/index.ts",
+    "./logs": "./src/logs/index.ts",
+    "./project": "./src/project/index.ts",
+    "./codemirror": "./src/editor/codemirror-sql-editor.tsx",
+    "./explorer": "./src/explorer/index.ts",
+    "./test-utils": "./src/test-utils.tsx"
+  },
+  "scripts": {
+    "preinstall": "npx only-allow pnpm",
+    "clean": "rimraf .turbo tsconfig.tsbuildinfo",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@codemirror/commands": "6.8.0",
+    "@codemirror/lang-sql": "6.8.0",
+    "@codemirror/language": "6.11.0",
+    "@codemirror/state": "6.5.2",
+    "@codemirror/view": "6.36.5",
+    "@lezer/highlight": "^1.2.1",
+    "@supabase/mcp-server-supabase": "link:../../../mcp-surfaces/packages/mcp-server-supabase",
+    "lucide-react": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "recharts": "catalog:",
+    "ui": "workspace:*",
+    "ui-patterns": "workspace:*",
+    "zod": "catalog:"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "^7.0.1",
+    "@testing-library/react": "^16.3.3",
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@typescript/native": "catalog:",
+    "jsdom": "^28.1.0",
+    "tsconfig": "workspace:*",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}

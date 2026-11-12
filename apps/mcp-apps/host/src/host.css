@@ -1,0 +1,26 @@
+@import 'config/tailwind.config.css';
+
+@source './**/*.{ts,tsx}';
+@source './../../../../packages/ui/src/**/*.{tsx,ts,js}';
+
+html,
+body,
+#root {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+@layer base {
+  *,
+  ::after,
+  ::before {
+    border-color: var(--border, currentColor);
+  }
+}
