@@ -37,7 +37,7 @@ pnpm dev:kb
 pnpm dev
 ```
 
-Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. Copy `.env.example` to `.env.local`, then set `GH_TOKEN` (for example `GH_TOKEN=$(gh auth token)`) and run `pnpm fetch:federated-content`. Guides, FAQs, and community guides work without any extra setup.
+Troubleshooting content is fetched from a private repo, so it's only available locally if you have access and credentials set. Copy `.env.example` to `.env.local`, then set `GH_TOKEN` to a literal token value (`.env.local` does not run shell commands). Alternatively, run `export GH_TOKEN=$(gh auth token)` in your shell before `pnpm fetch:federated-content`. Guides, FAQs, and community guides work without any extra setup.
 
 To check a production build locally, you need the same private repo access and `GH_TOKEN` described above. The build runs `fetch:federated-content` first, so it fails without credentials:
 
