@@ -25,7 +25,7 @@ cd my-chat
 cp .env.example .env
 ```
 
-This community template uses Next.js 13, AI SDK 2, and Supabase Auth Helpers. Review its [dependency versions](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/package.json) and plan upgrades before deployment. For a new authentication foundation using `@supabase/ssr`, start with the [Next.js starter](/library/docs/starters/nextjs-starter).
+This community template uses Next.js 13, AI SDK 2, and Supabase Auth Helpers, which have been replaced by `@supabase/ssr` (see the [migration guide](https://supabase.com/docs/guides/auth/server-side/migrating-to-ssr-from-auth-helpers)). Review its [dependency versions](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/package.json) and plan upgrades before deployment. For a new authentication foundation using `@supabase/ssr`, start with the [Next.js starter](/library/docs/starters/nextjs-starter).
 
 ## Start Supabase
 
@@ -35,7 +35,7 @@ Install [Docker](https://docs.docker.com/get-started/get-docker/) and the [Supab
 supabase start
 ```
 
-The template includes database migrations for chat history. Use the project URL and `anon` key printed by the CLI in `.env`:
+The template includes [database migrations](https://supabase.com/docs/guides/local-development/database-migrations) for chat history. Use the project URL and `anon` key printed by the CLI in `.env`:
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=your-local-api-url
@@ -44,7 +44,7 @@ OPENAI_API_KEY=your-model-provider-api-key
 NEXT_PUBLIC_AUTH_GITHUB=false
 ```
 
-The variable names match the template's [environment example](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/.env.example). Keep `OPENAI_API_KEY` on the server. To add GitHub sign-in, follow the template's [OAuth setup](https://github.com/supabase-community/vercel-ai-chatbot#set-up-github-oauth) and fill in its provider settings.
+The variable names match the template's [environment example](https://github.com/supabase-community/vercel-ai-chatbot/blob/main/.env.example). Keep `OPENAI_API_KEY` on the server. To add GitHub sign-in, follow the template's [OAuth setup](https://github.com/supabase-community/vercel-ai-chatbot#set-up-github-oauth) and fill in its provider settings. Supabase's [GitHub login guide](https://supabase.com/docs/guides/auth/social-sign-in/auth-github) covers the provider side.
 
 ## Choose a model
 
@@ -61,3 +61,8 @@ Open [the app](http://localhost:3000), sign up, and send a message. Use the loca
 ## Deploy the app
 
 Follow the template's [deployment guide](https://github.com/supabase-community/vercel-ai-chatbot#deploy-your-own) to connect a hosted Supabase project, apply its migrations, and set the production Auth Site URL and server environment variables.
+
+## Learn more
+
+- [AI & Vectors](https://supabase.com/docs/guides/ai) covers embeddings and semantic search if you want to search past conversations.
+- [Row Level Security](https://supabase.com/docs/guides/database/postgres/row-level-security) explains how to scope chat history to each user.

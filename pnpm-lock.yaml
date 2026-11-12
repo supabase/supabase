@@ -1199,8 +1199,8 @@ importers:
         specifier: ^2.1.0
         version: 2.1.0
       braintrust:
-        specifier: ^3.37.2
-        version: 3.37.2(@aws-sdk/credential-provider-web-identity@3.972.38)(@types/react@19.2.14)(supports-color@8.1.1)(zod@3.25.76)
+        specifier: ^3.40.0
+        version: 3.43.0(@aws-sdk/credential-provider-web-identity@3.972.38)(@types/react@19.2.14)(supports-color@8.1.1)(zod@3.25.76)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -2769,8 +2769,8 @@ importers:
   packages/shared-data:
     dependencies:
       '@supabase/shared-types':
-        specifier: 0.1.96
-        version: 0.1.96
+        specifier: 0.1.98
+        version: 0.1.98
       zod:
         specifier: 'catalog:'
         version: 3.25.76
@@ -2931,6 +2931,9 @@ importers:
       '@tanstack/react-table':
         specifier: 'catalog:'
         version: 8.21.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/react-virtual':
+        specifier: ^3.13.24
+        version: 3.14.3(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -8750,9 +8753,6 @@ packages:
     resolution: {integrity: sha512-4W4ISbreRygNXbhwqxeqyuRul8RPx+SF+Hp2IT8wctebQEHSVCULfKatiRiEhmasfoXvYm2AHV4XFsOxhoousA==}
     engines: {node: '>=22.0.0'}
 
-  '@supabase/shared-types@0.1.96':
-    resolution: {integrity: sha512-2qB7Cmtu/59VgDpSjFN11hQhmhKK0RXgmGuF8F4fKDFHiTWA5Tu3EhPpcU5/j7jKhEsgUPFLXiZaGxn9hNQk/g==}
-
   '@supabase/shared-types@0.1.98':
     resolution: {integrity: sha512-TU633VIMRpKDt69Vi9bjiVHTcyC3o1K3A7McIcEN/62Lb1OUK4aQg/zixuuX2qhHSDONfeafvrRmiHGzD7an1A==}
 
@@ -10709,8 +10709,8 @@ packages:
     resolution: {integrity: sha512-yQbXgO/OSZVD2IsiLlro+7Hf6Q18EJrKSEsdoMzKePKXct3gvD8oLcOQdIzGupr5Fj+EDe8gO/lxc1BzfMpxvA==}
     engines: {node: '>=8'}
 
-  braintrust@3.37.2:
-    resolution: {integrity: sha512-iHbtwSBJ/5Q7yWE86L3xJZlGPkr0ZwqQbu4xELzXBRMcIbiOHBkyA+MDrY/QbW/50JLVaiJXWn+eP2DiWNr7+Q==}
+  braintrust@3.43.0:
+    resolution: {integrity: sha512-aB8sUOAYuiYRlrr7AY7eaVxbYqm1UARTNHKnmY/jyc6SJsQLYg3+McHLXPvwZcF0XgYkbiyDh9zN/DV0iEgBwQ==}
     hasBin: true
     peerDependencies:
       '@types/react': '>=18'
@@ -15249,8 +15249,8 @@ packages:
     resolution: {integrity: sha512-dRB78srN/l6gqWulah9SrxeYnxeddIG30+GOqK/9OlLVyLg3HPnr6SqOWTWOXKRwC2eGYCkZ59NNuSgvSrpgOA==}
     engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
 
-  node-forge@1.4.2:
-    resolution: {integrity: sha512-rRtAR5XLJ8gCKd9du4qrKAsgCG1ObGP4gLeNJMa4vYSeq4bmBMOJk5IHkrviBV0q7uoAJlVd8HEQYQSVUb4FGQ==}
+  node-forge@1.4.3:
+    resolution: {integrity: sha512-P6wzfh6t70avmV8FrVEAd/36sOPJQ+hkaJVX1Laap9J/77m7M0eyozDvc8SwnDf4P7MP94gwbAAo0rg3YVXT+g==}
     engines: {node: '>= 6.13.0'}
 
   node-gyp-build-optional-packages@5.2.2:
@@ -25495,8 +25495,6 @@ snapshots:
       '@supabase/phoenix': 0.4.5
       tslib: 2.8.1
 
-  '@supabase/shared-types@0.1.96': {}
-
   '@supabase/shared-types@0.1.98': {}
 
   '@supabase/sql-to-rest@0.1.6(encoding@0.1.13)(supports-color@8.1.1)':
@@ -27858,7 +27856,7 @@ snapshots:
     dependencies:
       fill-range: 7.1.1
 
-  braintrust@3.37.2(@aws-sdk/credential-provider-web-identity@3.972.38)(@types/react@19.2.14)(supports-color@8.1.1)(zod@3.25.76):
+  braintrust@3.43.0(@aws-sdk/credential-provider-web-identity@3.972.38)(@types/react@19.2.14)(supports-color@8.1.1)(zod@3.25.76):
     dependencies:
       '@next/env': 14.2.35
       '@vercel/functions': 1.6.0(@aws-sdk/credential-provider-web-identity@3.972.38)
@@ -31705,7 +31703,7 @@ snapshots:
       h3: 1.15.11
       http-shutdown: 1.2.2
       jiti: 2.7.0
-      node-forge: 1.4.2
+      node-forge: 1.4.3
       pathe: 2.0.3
       std-env: 4.3.0
       tinyclip: 0.1.15
@@ -33565,7 +33563,7 @@ snapshots:
       fetch-blob: 3.2.0
       formdata-polyfill: 4.0.10
 
-  node-forge@1.4.2: {}
+  node-forge@1.4.3: {}
 
   node-gyp-build-optional-packages@5.2.2:
     dependencies:
