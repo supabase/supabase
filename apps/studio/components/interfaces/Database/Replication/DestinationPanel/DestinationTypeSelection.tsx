@@ -62,7 +62,8 @@ export const DestinationTypeSelection = () => {
   const editMode = edit !== null
 
   const { type: existingDestinationType } = useDestinationInformation({ id: edit })
-  const destinationType = existingDestinationType ?? urlDestinationType
+  const destinationType =
+    existingDestinationType === 'Unknown' ? null : (existingDestinationType ?? urlDestinationType)
 
   const isOptionVisible = (value: DestinationType, hasAccess: boolean) =>
     editMode ? destinationType === value : hasAccess

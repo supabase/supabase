@@ -25,6 +25,8 @@ export interface IsoRing {
   z: number
   radius: number
   isDashed?: boolean
+  scale?: [number, number]
+  arc?: [number, number]
 }
 
 interface ProjectedShape extends ProjectedBox {
