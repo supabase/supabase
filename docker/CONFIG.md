@@ -4,7 +4,7 @@ Last updated: 2026-05-23
 
 This document is the aggregated reference for environment variables relevant to a self-hosted Supabase deployment. It aims to be comprehensive for the self-hosted use case rather than literally exhaustive - variables that only apply on the hosted platform are typically omitted or marked as such. For the complete set a given service can read, refer to its [upstream repositories](#upstream-repositories) below.
 
-The default self-hosted setup already includes explicit values for all required variables, and the remaining configuration inherits sensible defaults from the services themselves. Otherwise, it serves as a reference for advanced customization or educational purposes. For more guidance on the essential keys and secrets, see [Configuring secrets](https://supabase.com/docs/guides/self-hosting/docker#configuring-secrets) in the self-hosting guide.
+The default self-hosted setup already includes explicit values for all required variables, and the remaining configuration inherits sensible defaults from the services themselves. Otherwise, it serves as a reference for advanced customization or educational purposes. For more guidance on the essential keys and secrets, see [Configuring secrets](https://supabase.com/docs/guides/self-hosting/docker?utm_source=supabase&utm_content=docker/CONFIG.md#configuring-secrets) in the self-hosting guide.
 
 > **A note on accuracy.** This reference is compiled from each service's source code and upstream docs as a self-hosting overview - it is **not** maintained by the individual product teams and shouldn't be treated as canonical. Within each row:
 >
@@ -34,7 +34,7 @@ Each table has five columns:
 |---|---|
 | **Variable** | Exact env var name as the service's code reads it. Names are case-sensitive. |
 | **Type** | Closed vocabulary: `string`, `integer`, `number`, `boolean`, `JSON`, `enum`, `URL`, `path`, `JWT`, `JWKS`. Numeric forms carry a unit hint where one applies - e.g. `integer (seconds)`, `integer (ms)`, `integer (bytes)`, `integer (MB)`, `integer (count)`, `number (ratio)`. String forms with a semantic hint: `string (duration)` (Go `time.Duration` strings like `10s`, `5m`, distinct from `integer (seconds)`), `string (regex)`, `string (CSV)`. |
-| **Set by (CLI, Self-hosted)** | `Both` if the variable is set inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
+| **Set by (CLI, Self-hosted)** | `Both` if the variable is set inside the corresponding container when you run `supabase start` (see the [Local development & CLI](https://supabase.com/docs/guides/local-development?utm_source=supabase&utm_content=docker/CONFIG.md)) *and* in `docker/docker-compose.yml` / `docker/.env.example`. `Self-hosted` if only in the self-hosted compose/.env (including inside commented-out lines). `CLI` if only in the CLI runtime env. Blank if neither - the variable is documented because the service's code reads it, but no Supabase-side config pre-wires it. |
 | **Description** | What the variable controls. |
 | **Notes** | Default value, requirement, deprecation, alias, or scope. |
 
@@ -1381,7 +1381,7 @@ The fields below are repeated for each provider. Substitute `<PROVIDER>` with on
 
 | Variable | Type | Set by | Description | Notes |
 |---|---|---|---|---|
-| `JWT_SECRET` | string | Both | HS256 secret used by GoTrue, PostgREST, and other services to sign and verify JWTs. Not exposed to SQL; store it in [Vault](https://supabase.com/docs/guides/database/vault) if a database function needs it. | Required. Sourced from `JWT_SECRET` in `.env.example` |
+| `JWT_SECRET` | string | Both | HS256 secret used by GoTrue, PostgREST, and other services to sign and verify JWTs. Not exposed to SQL; store it in [Vault](https://supabase.com/docs/guides/database/vault?utm_source=supabase&utm_content=docker/CONFIG.md) if a database function needs it. | Required. Sourced from `JWT_SECRET` in `.env.example` |
 | `JWT_EXP` | integer (seconds) | Both | Default JWT expiry (seconds) stored as `app.settings.jwt_exp` on the `postgres` database. Read by `volumes/db/jwt.sql`. | Sourced from `JWT_EXPIRY` in `.env.example` |
 
 ---

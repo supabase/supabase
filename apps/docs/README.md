@@ -1,6 +1,6 @@
 # Supabase Docs
 
-This directory contains the Next.js app for [supabase.com/docs](https://supabase.com/docs).
+This directory contains the Next.js app for [supabase.com/docs](https://supabase.com/docs?utm_source=supabase&utm_content=apps/docs/README.md).
 
 Guides live in `content/` as MDX. Reference pages are generated from the specs in `spec/`: OpenAPI, SDKSpec, ConfigSpec, and CLISpec. Some sections come from other repositories.
 

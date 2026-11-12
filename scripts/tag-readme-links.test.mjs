@@ -215,14 +215,21 @@ test('only the intended files are in scope', () => {
     'DEVELOPERS.md',
     'examples/auth/hono/README.md',
     'examples/README.MD',
+    'docker/README.md',
+    'docker/CONFIG.md',
+    'apps/studio/README.md',
+    'packages/ui/README.md',
   ]) {
     assert.ok(isInScope(file), file)
   }
   for (const file of [
     'AGENTS.md',
     'i18n/README.ja.md',
-    'apps/studio/README.md',
-    'packages/ui/README.md',
+    'docker/CHANGELOG.md',
+    'docker/.env.example',
+    'apps/studio/components/README.md',
+    'apps/docs/spec/README.md',
+    'e2e/docs/README.md',
     'examples/prompts/README.md',
     'examples/prompts/use-realtime.md',
     'examples/auth/hono/src/client.tsx',
