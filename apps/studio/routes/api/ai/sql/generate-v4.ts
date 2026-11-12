@@ -119,6 +119,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
   let orgId: number | undefined
   let orgSlug: string | undefined
   let planId: string | undefined
+  let projectRegion: string | undefined
 
   if (!IS_PLATFORM) {
     aiOptInLevel = 'schema'
@@ -134,6 +135,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       orgId = aiDetails.orgId
       orgSlug = aiDetails.orgSlug
       planId = aiDetails.planId
+      projectRegion = aiDetails.projectRegion
       isHighComplianceProject = aiDetails.isHighComplianceProject
     } catch (error) {
       return res.status(400).json({
@@ -218,6 +220,7 @@ async function handlePost(req: NextApiRequest, res: NextApiResponse, claims?: Jw
       aiOptInLevel,
       getSchemas: aiOptInLevel !== 'disabled' ? getSchemas : undefined,
       projectRef,
+      projectRegion,
       chatId,
       chatName,
       allowTracing: IS_TRACING_ENABLED && orgId !== undefined,

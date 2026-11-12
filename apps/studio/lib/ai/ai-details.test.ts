@@ -73,6 +73,7 @@ describe('getAIDetails', () => {
       orgId: 1,
       orgSlug: ORG_SLUG,
       planId: 'pro',
+      projectRegion: 'us-east-1',
       isHighComplianceProject: false,
     })
   })
@@ -93,6 +94,7 @@ describe('getAIDetails', () => {
       })
 
       expect(result.orgId).toBe(1)
+      expect(result.projectRegion).toBe(region)
     }
   )
 
@@ -197,6 +199,7 @@ describe('getAIDetails', () => {
       })
 
       expect(result.orgId).toBeUndefined()
+      expect(result.projectRegion).toBeUndefined()
       expect(result.aiOptInLevel).toBe('disabled')
       expect(result.hasAccessToAdvanceModel).toBe(false)
       expect(result.orgSlug).toBeUndefined()

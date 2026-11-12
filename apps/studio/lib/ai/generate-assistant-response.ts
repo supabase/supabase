@@ -32,6 +32,7 @@ export async function generateAssistantResponse({
   aiOptInLevel = 'schema',
   getSchemas,
   projectRef,
+  projectRegion,
   chatId,
   chatName,
   allowTracing,
@@ -56,6 +57,7 @@ export async function generateAssistantResponse({
   aiOptInLevel?: AiOptInLevel
   getSchemas?: () => Promise<string>
   projectRef?: string
+  projectRegion?: string
   chatId?: string
   chatName?: string
   allowTracing?: boolean
@@ -175,6 +177,7 @@ export async function generateAssistantResponse({
       input: { prompt: lastUserText ?? '' } satisfies AssistantEvalInput,
       metadata: {
         projectRef,
+        projectRegion,
         chatId,
         chatName,
         aiOptInLevel,

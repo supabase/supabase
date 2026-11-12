@@ -10,6 +10,7 @@ export type AIDetails = {
   orgId: number | undefined
   orgSlug: string | undefined
   planId: string | undefined
+  projectRegion: string | undefined
   /** "High Compliance" in the dashboard, `is_sensitive` in the platform API. */
   isHighComplianceProject: boolean | undefined
 }
@@ -51,6 +52,7 @@ export const getAIDetails = async ({
       orgId: undefined,
       orgSlug: undefined,
       planId: undefined,
+      projectRegion: undefined,
       isHighComplianceProject: undefined,
     }
   }
@@ -61,6 +63,7 @@ export const getAIDetails = async ({
     orgId: selectedOrg.id,
     orgSlug: selectedOrg.slug,
     planId: selectedOrg.plan.id,
+    projectRegion: project?.region,
     isHighComplianceProject,
   }
 }
