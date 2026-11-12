@@ -1,6 +1,8 @@
 import { describe, expect, it } from 'vitest'
 
 import { passwordNeedsPercentEncoding, passwordStrength } from './password-strength'
+import { DEFAULT_MINIMUM_PASSWORD_STRENGTH } from '@/lib/constants'
+import { generateStrongPassword } from '@/lib/project'
 
 describe('passwordNeedsPercentEncoding', () => {
   it('returns false for passwords that are safe to use in a connection string', () => {
@@ -43,6 +45,11 @@ describe('passwordStrength', () => {
     expect(result.message).toContain('This password is strong')
     expect(result.warning).toBe('')
     expect(result.strength).toBe(4)
+  })
+
+  it('scores a generated password as strong enough to create a project', async () => {
+    const result = await passwordStrength(generateStrongPassword())
+    expect(result.strength).toBeGreaterThanOrEqual(DEFAULT_MINIMUM_PASSWORD_STRENGTH)
   })
 
   it('returns weak score, suggestion, and warning for weak password', async () => {
