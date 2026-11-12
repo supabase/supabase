@@ -37,11 +37,13 @@ import {
   PageSectionSummary,
   PageSectionTitle,
 } from 'ui-patterns/PageSection'
+import { GenericSkeletonLoader } from 'ui-patterns/ShimmeringLoader'
 import z from 'zod'
 
 import CommandRender from '../CommandRender'
 import { INVOCATION_TABS } from './EdgeFunctionDetails.constants'
 import { generateCLICommands } from './EdgeFunctionDetails.utils'
+import { AlertError } from '@/components/ui/AlertError'
 import { ApiKeysAccessNote } from '@/components/ui/ApiKeysAccessNote'
 import { apiKeysQueryOptions, getKeys } from '@/data/api-keys/api-keys-query'
 import { useProjectApiUrl } from '@/data/config/project-endpoint-query'
@@ -91,10 +93,22 @@ export const EdgeFunctionDetails = () => {
   )
   const { anonKey, publishableKey } = apiKeyData ?? {}
 
-  const { data: selectedFunction } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
+  const {
+    data: selectedFunction,
+    error: functionError,
+    isPending: isFunctionPending,
+  } = useEdgeFunctionQuery({ projectRef, slug: functionSlug })
 
-  const { data: endpoint } = useProjectApiUrl({ projectRef })
-  const functionUrl = `${endpoint}/functions/v1/${selectedFunction?.slug}`
+  const {
+    data: endpoint,
+    error: endpointError,
+    isPending: isEndpointPending,
+  } = useProjectApiUrl({ projectRef })
+  const functionUrl =
+    endpoint && selectedFunction ? `${endpoint}/functions/v1/${selectedFunction.slug}` : undefined
+  const isFunctionUrlLoading = !functionUrl && (isEndpointPending || isFunctionPending)
+  const functionUrlError =
+    !functionUrl && !isFunctionUrlLoading ? (endpointError ?? functionError) : null
 
   const { mutate: updateEdgeFunction, isPending: isUpdating } = useEdgeFunctionUpdateMutation()
   const { mutate: deleteEdgeFunction, isPending: isDeleting } = useEdgeFunctionDeleteMutation({
@@ -113,7 +127,7 @@ export const EdgeFunctionDetails = () => {
 
   const { managementCommands } = generateCLICommands({
     selectedFunction,
-    functionUrl,
+    functionUrl: functionUrl ?? '',
     anonKey: apiKey,
   })
 
@@ -274,7 +288,23 @@ export const EdgeFunctionDetails = () => {
                   fallback="Replace the placeholder with your own key."
                   className="px-6 pb-2"
                 />
+                {isFunctionUrlLoading && (
+                  <div className="mt-4 px-6">
+                    <GenericSkeletonLoader />
+                  </div>
+                )}
+                {functionUrlError && (
+                  <div className="mt-4 px-6">
+                    <AlertError
+                      error={functionUrlError}
+                      subject="Failed to retrieve function URL"
+                      projectRef={projectRef}
+                    />
+                  </div>
+                )}
                 {invocationTabs.map((tab) => {
+                  if (!functionUrl) return null
+
                   const code = tab.code({
                     showKey,
                     functionUrl,

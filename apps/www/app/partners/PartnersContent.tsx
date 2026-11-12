@@ -3,11 +3,10 @@
 import { ArrowRight, Check } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import ReactMarkdown from 'react-markdown'
-import { Accordion, AccordionItem, AccordionTrigger, Button } from 'ui'
+import { Button } from 'ui'
 
 import BackgroundPattern from '../../components/Partners/BackgroundPattern'
-import { FaqAnswer } from '@/components/FaqAnswer'
+import { FaqList } from '@/components/FaqList'
 import DefaultLayout from '@/components/Layouts/Default'
 import SectionContainer from '@/components/Layouts/SectionContainer'
 import SectionHeading from '@/components/Layouts/SectionHeading'
@@ -21,29 +20,6 @@ type FeaturedPartner = { slug: string; title: string; logo: string }
 
 interface Props {
   featuredPartners: FeaturedPartner[]
-}
-
-const FaqList = ({ items }: { items: { question: string; answer: string }[] }) => {
-  return (
-    <Accordion type="multiple" className="text-foreground-light">
-      {items.map((faq, i) => {
-        return (
-          <div className="border-b py-2" key={i}>
-            <AccordionItem value={`faq--${i.toString()}`} className="border-none">
-              <AccordionTrigger>
-                <span className="text-foreground">{faq.question}</span>
-              </AccordionTrigger>
-              <FaqAnswer>
-                <div className="prose text-foreground-lighter">
-                  <ReactMarkdown>{faq.answer}</ReactMarkdown>
-                </div>
-              </FaqAnswer>
-            </AccordionItem>
-          </div>
-        )
-      })}
-    </Accordion>
-  )
 }
 
 export default function PartnersContent({ featuredPartners }: Props) {
