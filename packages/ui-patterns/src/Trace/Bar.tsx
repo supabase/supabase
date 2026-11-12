@@ -5,25 +5,19 @@ import { cn } from 'ui'
 
 import { Duration, useSpan } from './Rows'
 import { useTrace, useView } from './Trace'
-import type { SpanStatus } from './types'
 import {
   collapsedChildMidpoints,
   effectiveEndMs,
   formatDuration,
   getSpanBounds,
   getTimingPlacement,
+  STATUS_TEXT,
 } from './utils'
 import { LIVE_GROWTH_TRANSITION, useWaterfallScale } from './Waterfall'
 
 const TIMING_GAP = 6
 const TIMING_CHAR_PX = 7.2
 const TIMING_CHIP_PX = 8
-
-const STATUS_CLASS: Record<SpanStatus, string> = {
-  ok: 'bg-brand',
-  error: 'bg-destructive',
-  unset: 'bg-foreground-muted',
-}
 
 export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
   const { row, isSelected } = useSpan()
@@ -40,8 +34,8 @@ export function Bar({ className, style, ...props }: ComponentProps<'div'>) {
       data-status={span.status}
       data-state={isSelected ? 'selected' : undefined}
       className={cn(
-        'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm',
-        STATUS_CLASS[span.status],
+        'absolute top-1/2 h-[50%] min-w-0.5 -translate-y-1/2 rounded-sm bg-current',
+        STATUS_TEXT[span.status],
         'data-[state=selected]:ring-1 data-[state=selected]:ring-inset data-[state=selected]:ring-foreground',
         !isZoomed && LIVE_GROWTH_TRANSITION,
         className

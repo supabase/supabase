@@ -193,6 +193,12 @@ export function flattenTree(index: TraceIndex, collapsed: ReadonlySet<string>): 
   return rows
 }
 
+export const STATUS_TEXT: Record<SpanStatus, string> = {
+  ok: 'text-brand',
+  error: 'text-destructive',
+  unset: 'text-foreground-muted',
+}
+
 export const MAX_COLLAPSED_MARKS = 200
 
 export function effectiveEndMs(span: Pick<Span, 'startMs' | 'endMs'>, nowMs: number): number {

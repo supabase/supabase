@@ -5,20 +5,16 @@ import { useMemo, useRef } from 'react'
 import { cn } from 'ui'
 
 import { useTrace, useView } from './Trace'
-import type { SpanStatus, TimeWindow } from './types'
+import type { TimeWindow } from './types'
 import {
   clampWindow,
   computeMinimapRects,
   formatDuration,
   MINIMAP_COLUMNS,
   resizeWindow,
+  STATUS_TEXT,
 } from './utils'
 
-const STATUS_FILL: Record<SpanStatus, string> = {
-  ok: 'fill-brand',
-  error: 'fill-destructive',
-  unset: 'fill-foreground-muted',
-}
 const HEIGHT = 47
 const MIN_LANE = 2
 const BAR_PX = 4
@@ -131,7 +127,7 @@ export function Minimap({ className, ...props }: ComponentProps<'div'>) {
             y={offsetY + lane * lanePitch + laneGap / 2}
             width={width}
             height={lanePitch - laneGap}
-            className={cn('opacity-70', STATUS_FILL[status])}
+            className={cn('fill-current opacity-70', STATUS_TEXT[status])}
           />
         ))}
       </svg>
