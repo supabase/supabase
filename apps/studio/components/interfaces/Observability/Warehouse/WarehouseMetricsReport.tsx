@@ -6,7 +6,11 @@ import { useState } from 'react'
 import { Button } from 'ui'
 import { Admonition } from 'ui-patterns/Admonition'
 
-import { getSectionAttributes, WAREHOUSE_METRICS_SECTIONS } from './WarehouseMetrics.constants'
+import {
+  getSectionAttributes,
+  WAREHOUSE_METRICS_MAX_RANGE_DAYS,
+  WAREHOUSE_METRICS_SECTIONS,
+} from './WarehouseMetrics.constants'
 import {
   getWarehouseMetricsPageState,
   resolveWarehouseMetricsRange,
@@ -17,8 +21,8 @@ import ReportHeader from '@/components/interfaces/Reports/ReportHeader'
 import { REPORT_DATERANGE_HELPER_LABELS } from '@/components/interfaces/Reports/Reports.constants'
 import ReportStickyNav from '@/components/interfaces/Reports/ReportStickyNav'
 import { LogsDatePicker } from '@/components/interfaces/Settings/Logs/Logs.DatePickers'
-import UpgradePrompt from '@/components/interfaces/Settings/Logs/UpgradePrompt'
 import { AlertError } from '@/components/ui/AlertError'
+import { InlineLink } from '@/components/ui/InlineLink'
 import { ShortcutTooltip } from '@/components/ui/ShortcutTooltip'
 import { warehouseKeys } from '@/data/warehouse/keys'
 import { warehouseMetricsQueryOptions } from '@/data/warehouse/warehouse-metrics-query'
@@ -40,10 +44,10 @@ export const WarehouseMetricsReport = () => {
     updateDateRange,
     datePickerValue,
     datePickerHelpers,
-    showUpgradePrompt,
-    setShowUpgradePrompt,
     handleDatePickerChange,
-  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES)
+  } = useReportDateRange(REPORT_DATERANGE_HELPER_LABELS.LAST_60_MINUTES, {
+    retentionDays: WAREHOUSE_METRICS_MAX_RANGE_DAYS,
+  })
 
   // Out-of-range bounds are rewritten and in-range ones pass through unchanged,
   // so the query keys stay stable across renders.
@@ -140,6 +144,20 @@ export const WarehouseMetricsReport = () => {
 
     return (
       <>
+        <div className="space-y-2 text-sm text-foreground-light">
+          <p>
+            Project-wide Warehouse workload metrics, collected every minute. For replication health,
+            see the{' '}
+            <InlineLink href={`/project/${ref}/integrations/warehouse/overview`}>
+              Warehouse integration overview
+            </InlineLink>
+            .
+          </p>
+          <p>
+            Compare the same workload before and after a layout change. Choosing partitioning or
+            sorting rules also needs query and table details.
+          </p>
+        </div>
         {range.isClamped && (
           <p className="text-sm text-foreground-light">
             This range was adjusted to the last 30 days of available metrics.
@@ -182,16 +200,10 @@ export const WarehouseMetricsReport = () => {
               onSubmit={handleDatePickerChange}
               value={datePickerValue}
               helpers={datePickerHelpers}
+              retentionDays={WAREHOUSE_METRICS_MAX_RANGE_DAYS}
               open={showDatePicker}
               onOpenChange={setShowDatePicker}
               shortcutId={SHORTCUT_IDS.OBSERVABILITY_TOGGLE_DATE_PICKER}
-            />
-            <UpgradePrompt
-              show={showUpgradePrompt}
-              setShowUpgradePrompt={setShowUpgradePrompt}
-              title="Report date range"
-              description="Report data can be stored for a maximum of 3 months depending on the plan that your project is on."
-              source="warehouseReportDateRange"
             />
             <div className="flex items-center gap-x-2 text-xs text-foreground-light">
               <p>{dayjs(selectedDateRange.period_start.date).format('MMM D, h:mma')}</p>

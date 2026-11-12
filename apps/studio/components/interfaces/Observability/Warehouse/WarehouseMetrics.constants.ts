@@ -35,7 +35,7 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'queries',
     title: 'Queries',
-    description: 'How much work you send to Supabase Warehouse, and how much of it fails.',
+    description: 'Compare workload and failures with latency and capacity over the same period.',
     charts: [
       {
         id: 'query-rate',
@@ -49,7 +49,8 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       {
         id: 'queries-in-progress',
         title: 'Queries in progress',
-        tooltip: 'Queries running at the same time. Rising values mean concurrency is increasing.',
+        tooltip:
+          'Queries awaiting completion, including time waiting for a worker and streaming results.',
         format: '',
         primaryMetric: 'query_in_flight',
         series: [{ metric: 'query_in_flight', label: 'In progress' }],
@@ -72,12 +73,14 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'latency',
     title: 'Latency',
-    description: 'How long queries take, and how long they wait for a worker.',
+    description:
+      'Compare query duration with worker waits to investigate time spent waiting for capacity.',
     charts: [
       {
         id: 'query-duration',
         title: 'Query duration',
-        tooltip: 'Time from when a query starts until it succeeds, fails, or is canceled.',
+        tooltip:
+          'Time until a query succeeds, fails, or is canceled, including worker waits and result streaming.',
         format: 'ms',
         primaryMetric: 'query_duration_p95',
         series: [
@@ -90,7 +93,8 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       {
         id: 'worker-wait',
         title: 'Time waiting for a worker',
-        tooltip: 'How long queries wait for a worker to become available before they can run.',
+        tooltip:
+          'Time spent acquiring a worker, measured per attempt including retries, rather than per query.',
         format: 'ms',
         primaryMetric: 'assignment_wait_p95',
         series: [
@@ -100,9 +104,9 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
       },
       {
         id: 'execution-time',
-        title: 'Execution time',
+        title: 'Successful query duration',
         tooltip:
-          'Average time spent running successful queries, including streaming results back to the client.',
+          'Average successful query duration on a worker, including result streaming and client backpressure.',
         format: 'ms',
         primaryMetric: 'duckdb_duration_mean',
         series: [{ metric: 'duckdb_duration_mean', label: 'Average' }],
@@ -112,20 +116,21 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'capacity',
     title: 'Capacity',
-    description: 'How many worker slots you use, and whether requests are turned away.',
+    description:
+      'Compare occupied slots and rejected requests with worker waits to investigate capacity pressure.',
     charts: [
       {
         id: 'worker-slots',
         title: 'Worker slots',
         tooltip:
-          'Worker slots available to your Warehouse and how many are in use. Slots in use include running queries and those waiting to connect.',
+          'Worker capacity grants in use or pending connection, compared with the slot limit. Grants are not SQL query counts.',
         format: '',
         primaryMetric: 'worker_admission_occupied',
         series: [
           { metric: 'worker_admission_limit', label: 'Limit', isLimit: true },
           { metric: 'worker_admission_occupied', label: 'In use' },
-          { metric: 'worker_admission_active', label: 'Running' },
-          { metric: 'worker_admission_pending', label: 'Waiting to connect' },
+          { metric: 'worker_admission_active', label: 'Active grants' },
+          { metric: 'worker_admission_pending', label: 'Pending grants' },
         ],
       },
       {
@@ -141,7 +146,8 @@ export const WAREHOUSE_METRICS_SECTIONS: readonly WarehouseSectionDef[] = [
   {
     id: 'workers',
     title: 'Workers and requests',
-    description: 'How often workers start, and how requests to Supabase Warehouse perform.',
+    description:
+      'Compare warm and cold worker starts with latency, and request statuses with query failures.',
     charts: [
       {
         id: 'worker-starts',

@@ -68,6 +68,10 @@ describe('WarehouseMetricsReport', () => {
     expect(await screen.findByText('Query rate')).toBeInTheDocument()
     expect(await screen.findByText('Worker slots')).toBeInTheDocument()
     expect(await screen.findByText('Request duration')).toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Warehouse integration overview' })).toHaveAttribute(
+      'href',
+      '/project/default/integrations/warehouse/overview'
+    )
   })
 
   test('shows the empty state with a link to the integration when Warehouse is not provisioned', async () => {
