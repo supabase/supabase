@@ -27,7 +27,6 @@ interface LogsViewsMenuProps {
   isLoading: boolean
   isError: boolean
   activeViewId: string | null
-  isActiveViewModified: boolean
   onApply: (view: LogsView) => void
   onRename: (id: string, name: string) => void
   onDelete: (id: string) => void
@@ -151,7 +150,6 @@ export const LogsViewsMenu = ({
   isLoading,
   isError,
   activeViewId,
-  isActiveViewModified,
   onApply,
   onRename,
   onDelete,
@@ -159,7 +157,6 @@ export const LogsViewsMenu = ({
 }: LogsViewsMenuProps) => {
   const [deleteTarget, setDeleteTarget] = useState<LogsView | null>(null)
   const isViewActive = activeViewId !== null
-  const isViewWarning = isViewActive && isActiveViewModified
 
   return (
     <>
@@ -167,21 +164,9 @@ export const LogsViewsMenu = ({
         <DropdownMenuTrigger asChild>
           <ButtonTooltip
             size="tiny"
-            className={cn(
-              'w-[26px]',
-              isViewWarning ? 'bg-warning/10' : isViewActive && 'bg-brand-default/10'
-            )}
-            icon={
-              <BookmarkIcon
-                className={
-                  isViewWarning
-                    ? 'text-warning-600'
-                    : isViewActive
-                      ? 'text-brand-600'
-                      : 'text-foreground'
-                }
-              />
-            }
+            variant={isViewActive ? 'primary' : 'default'}
+            className="w-[26px]"
+            icon={<BookmarkIcon className={!isViewActive ? 'text-foreground' : undefined} />}
             aria-label="Saved views"
             tooltip={{ content: { side: 'bottom', text: 'Saved views' } }}
           />

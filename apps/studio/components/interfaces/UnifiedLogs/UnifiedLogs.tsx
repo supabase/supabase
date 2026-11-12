@@ -710,7 +710,6 @@ export const UnifiedLogs = ({
                         isLoading={isLoadingSavedViews}
                         isError={isErrorSavedViews}
                         activeViewId={activeViewId}
-                        isActiveViewModified={isActiveViewModified}
                         onApply={handleApplyView}
                         onRename={(id, name) => updateSavedView(id, { name })}
                         onDelete={deleteSavedView}

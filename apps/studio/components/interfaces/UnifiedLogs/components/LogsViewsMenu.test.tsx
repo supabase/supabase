@@ -29,7 +29,6 @@ const baseProps = {
   isLoading: false,
   isError: false,
   activeViewId: null,
-  isActiveViewModified: false,
   onApply: vi.fn(),
   onRename: vi.fn(),
   onDelete: vi.fn(),
@@ -86,9 +85,7 @@ describe('LogsViewsMenu', () => {
 
   it('does not show a modified indicator or an Update action on the row anymore', async () => {
     const view = makeView()
-    customRender(
-      <LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} isActiveViewModified />
-    )
+    customRender(<LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} />)
 
     await openMenu()
 
@@ -96,33 +93,16 @@ describe('LogsViewsMenu', () => {
     expect(screen.queryByRole('button', { name: 'Update' })).not.toBeInTheDocument()
   })
 
-  it('shows the trigger in an active state when a view is active', async () => {
+  it('shows the trigger in a primary state when a view is active', async () => {
     customRender(<LogsViewsMenu {...baseProps} views={[makeView()]} activeViewId="view-1" />)
 
-    expect(screen.getByRole('button', { name: 'Saved views' })).toHaveClass('bg-brand-default/10')
+    expect(screen.getByRole('button', { name: 'Saved views' })).toHaveClass('bg-primary-solid')
   })
 
   it('does not show the trigger as active when no view is active', async () => {
     customRender(<LogsViewsMenu {...baseProps} views={[makeView()]} />)
 
-    expect(screen.getByRole('button', { name: 'Saved views' })).not.toHaveClass(
-      'bg-brand-default/10'
-    )
-  })
-
-  it('shows the trigger in a warning state when the active view is modified', async () => {
-    customRender(
-      <LogsViewsMenu
-        {...baseProps}
-        views={[makeView()]}
-        activeViewId="view-1"
-        isActiveViewModified
-      />
-    )
-
-    const trigger = screen.getByRole('button', { name: 'Saved views' })
-    expect(trigger).toHaveClass('bg-warning/10')
-    expect(trigger).not.toHaveClass('bg-brand-default/10')
+    expect(screen.getByRole('button', { name: 'Saved views' })).not.toHaveClass('bg-primary-solid')
   })
 
   it('applies a view when its row is clicked', async () => {
@@ -189,17 +169,5 @@ describe('LogsViewsMenu', () => {
     await userEvent.click(await screen.findByText('Clear all views'))
 
     expect(onClearActiveView).toHaveBeenCalledOnce()
-  })
-
-  it('"Clear all views" stays neutral regardless of modified state', async () => {
-    const view = makeView()
-    customRender(
-      <LogsViewsMenu {...baseProps} views={[view]} activeViewId={view.id} isActiveViewModified />
-    )
-
-    await openMenu()
-
-    const item = (await screen.findByText('Clear all views')).closest('[role="menuitem"]')
-    expect(item).not.toHaveClass('text-warning-600')
   })
 })
