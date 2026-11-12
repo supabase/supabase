@@ -10,6 +10,7 @@ export interface GuideSummary {
   topics: Topic[]
   href: string
   date?: string
+  author?: string
 }
 
 export interface FeaturedItem extends GuideSummary {
@@ -62,6 +63,19 @@ export const toFaqSummary = (faq: CollectionEntry<'faqs'>): GuideSummary => ({
   description: '',
   topics: faq.data.topics.filter((topic): topic is Topic => isKnownTopic(topic)),
   href: `${import.meta.env.BASE_URL}/faqs/${faq.id}`,
+})
+
+// Community guides live off-site, so the entry's own url is the link
+export const toCommunityGuideSummary = (
+  entry: CollectionEntry<'communityGuides'>
+): GuideSummary => ({
+  id: entry.id,
+  title: entry.data.title,
+  description: entry.data.description ?? '',
+  topics: entry.data.topics.filter((topic): topic is Topic => isKnownTopic(topic)),
+  href: entry.data.url,
+  author: entry.data.author,
+  date: entry.data.lastEdited ? formatDisplayDate(entry.data.lastEdited) : undefined,
 })
 
 export const toTroubleshootingSummary = (

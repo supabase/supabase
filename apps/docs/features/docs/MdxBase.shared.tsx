@@ -25,7 +25,6 @@ import { WrapperDashboardIntegration } from '~/components/WrapperDashboardIntegr
 import { CodeSampleDummy, CodeSampleWrapper } from '~/features/directives/CodeSample.client'
 import { CodeTabs, NamedCodeBlock } from '~/features/directives/CodeTabs.components'
 import { MdxAnchor } from '~/features/docs/MdxAnchor'
-import { Accordion, AccordionItem } from '~/features/ui/Accordion'
 import { CodeBlock } from '~/features/ui/CodeBlock/CodeBlock'
 import { ShowUntil } from '~/features/ui/ShowUntil'
 import { TabPanel, Tabs } from '~/features/ui/Tabs'
@@ -67,8 +66,6 @@ const Pre = (props: any) => {
 }
 
 const components = {
-  Accordion,
-  AccordionItem,
   Admonition: DocsAdmonition,
   AgentPluginsPanel,
   AgentSetup,
