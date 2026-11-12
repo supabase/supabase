@@ -5,6 +5,9 @@ export type Option = {
   label: string
   value: string
   options?: Option[]
+  count?: number
+  checked?: boolean
+  onCheckedChange?: (checked: boolean) => void
 }
 
 export type DatePreset = {

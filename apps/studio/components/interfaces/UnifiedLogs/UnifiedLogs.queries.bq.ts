@@ -6,7 +6,7 @@
 
 import dayjs from 'dayjs'
 
-import { DEFAULT_LOG_TYPES } from './UnifiedLogs.constants'
+import { DEFAULT_LOG_TYPES, METRICS_REQUESTS_RULE } from './UnifiedLogs.constants'
 import {
   getLogAttributeKey,
   groupLogsFiltersByColumn,
@@ -71,6 +71,11 @@ export const getEffectiveLogTypes = (search: QuerySearchParamsType): string[] =>
  *                   need every filter applied *except* the one being faceted
  * @returns Array of SafeLogSqlFragment predicates ready to be AND-joined
  */
+const METRICS_REQUEST_CONDITION = safeSql`log_type = 'edge' AND pathname = ${lit(METRICS_REQUESTS_RULE.pathname)} AND status IN (${joinSqlFragments(
+  METRICS_REQUESTS_RULE.statuses.map((status) => lit(status)),
+  ','
+)})`
+
 const buildConditions = (
   search: QuerySearchParamsType,
   excludeKey?: string
@@ -125,6 +130,9 @@ const buildConditions = (
     }
   }
 
+  if (search.show_privileged_metrics_requests === false) {
+    conditions.push(safeSql`NOT COALESCE((${METRICS_REQUEST_CONDITION}), FALSE)`)
+  }
   return conditions
 }
 
@@ -531,6 +539,9 @@ export const getLogsCountQuery = (search: QuerySearchParamsType): SafeLogSqlFrag
       ? safeSql`WHERE ${joinSqlFragments(levelConditions, ' AND ')}`
       : safeSql`WHERE level IS NOT NULL`
 
+  const metricsConditions = buildConditions({ ...search, show_privileged_metrics_requests: true })
+  metricsConditions.push(METRICS_REQUEST_CONDITION)
+
   return safeSql`
 ${getUnifiedLogsCTE(effectiveLogTypes)},
 
@@ -578,6 +589,8 @@ UNION ALL SELECT 'level', 'error', error_count FROM level_counts
 UNION ALL SELECT dimension, value, count FROM method_count
 UNION ALL SELECT dimension, value, count FROM status_count
 UNION ALL SELECT dimension, value, count FROM pipeline_id_count
+UNION ALL SELECT 'show_privileged_metrics_requests', 'all', COUNT(*) FROM unified_logs
+${whereClause(metricsConditions)}
 `
 }
 

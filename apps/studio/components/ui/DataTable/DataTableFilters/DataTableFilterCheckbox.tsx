@@ -169,7 +169,8 @@ export function DataTableFilterCheckbox<TData>({
                 {hasNested && isExpanded && (
                   <div className="pb-1">
                     {option.options?.map((optionNested, nestedIndex) => {
-                      const nestedChecked = getBooleanParam(optionNested.value)
+                      const nestedChecked =
+                        optionNested.checked ?? getBooleanParam(optionNested.value)
                       const isLastNested = nestedIndex === (option.options?.length ?? 0) - 1
 
                       return (
@@ -209,7 +210,9 @@ export function DataTableFilterCheckbox<TData>({
                               id={`${value}-${optionNested.value}`}
                               checked={nestedChecked}
                               onCheckedChange={(isChecked) =>
-                                setBooleanParam(optionNested.value, Boolean(isChecked))
+                                optionNested.onCheckedChange
+                                  ? optionNested.onCheckedChange(Boolean(isChecked))
+                                  : setBooleanParam(optionNested.value, Boolean(isChecked))
                               }
                             />
                             <Label
@@ -217,6 +220,15 @@ export function DataTableFilterCheckbox<TData>({
                               className="flex w-full cursor-pointer items-center text-[0.8rem] font-normal text-foreground/70 group-hover/nested:text-accent-foreground min-w-0"
                             >
                               <span className="truncate text-xs">{optionNested.label}</span>
+                              {optionNested.count !== undefined && (
+                                <span className="ml-auto shrink-0 font-mono text-xs">
+                                  {isLoadingCounts ? (
+                                    <Skeleton className="h-4 w-4" />
+                                  ) : (
+                                    formatCompactNumber(optionNested.count)
+                                  )}
+                                </span>
+                              )}
                             </Label>
                           </div>
                         </div>

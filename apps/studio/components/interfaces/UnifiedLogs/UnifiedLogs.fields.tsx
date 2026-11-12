@@ -33,7 +33,7 @@ export const filterFields = [
               { label: 'Auth', value: 'edge_auth' },
               { label: 'Storage', value: 'edge_storage' },
               { label: 'Postgrest', value: 'edge_postgrest' },
-              { label: 'Metrics', value: 'edge_metrics' },
+              { label: 'Metrics', value: 'show_privileged_metrics_requests' },
             ]
           : value === 'postgres'
             ? [{ label: 'Connection logs', value: 'show_connection_logs' }]

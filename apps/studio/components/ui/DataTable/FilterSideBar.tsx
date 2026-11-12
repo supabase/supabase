@@ -17,12 +17,16 @@ interface FilterSideBarProps {
   isFilterBarOpen: boolean
   setIsFilterBarOpen: Dispatch<SetStateAction<boolean>>
   dateRangeDisabled?: DateRangeDisabled
+  hasAdditionalFilters?: boolean
+  onResetFilters?: () => void
 }
 
 export function FilterSideBar({
   isFilterBarOpen,
   setIsFilterBarOpen,
   dateRangeDisabled,
+  hasAdditionalFilters = false,
+  onResetFilters,
 }: FilterSideBarProps) {
   const { ref } = useParams()
   const { table } = useDataTable()
@@ -62,8 +66,13 @@ export function FilterSideBar({
             <p className="text-foreground text-lg">Logs</p>
             <Badge variant="default">Beta</Badge>
           </div>
-          {table.getState().columnFilters.length || user ? (
-            <DataTableResetButton onReset={() => setUser(null)} />
+          {table.getState().columnFilters.length || user || hasAdditionalFilters ? (
+            <DataTableResetButton
+              onReset={() => {
+                setUser(null)
+                onResetFilters?.()
+              }}
+            />
           ) : null}
         </div>
       </div>

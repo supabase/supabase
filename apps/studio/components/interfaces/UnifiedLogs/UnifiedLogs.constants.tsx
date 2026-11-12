@@ -53,12 +53,6 @@ export const LOG_TYPE_TO_SOURCE: Record<Exclude<LogType, 'compute'>, string> = {
   pipelines: 'etl_replication_logs',
 }
 
-/**
- * Successful requests to the metrics endpoint are pure noise — one scrape a
- * minute, always 200 — so they're hidden unless asked for. Every other status
- * on that path, including failures, always shows. Widening this to all 2xx is
- * a matter of adding to `statuses`.
- */
 export const METRICS_REQUESTS_RULE = {
   pathname: '/customer/v1/privileged/metrics',
   statuses: ['200'],
@@ -108,8 +102,9 @@ export const SEARCH_PARAMS_PARSER = {
   edge_auth: parseAsBoolean.withDefault(true),
   edge_storage: parseAsBoolean.withDefault(true),
   edge_postgrest: parseAsBoolean.withDefault(true),
-  // The one view option that starts off rather than on — see METRICS_REQUESTS_RULE.
-  edge_metrics: parseAsBoolean.withDefault(false),
+  show_privileged_metrics_requests: parseAsBoolean
+    .withDefault(false)
+    .withOptions({ clearOnDefault: false }),
 
   // Support searching for user against user ID
   // See userAttributionCondition in UnifiedLogs.queries.ts.

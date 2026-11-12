@@ -14,8 +14,8 @@ import {
 } from '@tanstack/react-table'
 import { IS_PLATFORM, LOCAL_STORAGE_KEYS, useFeatureFlags, useFlag, useParams } from 'common'
 import { Loader2Icon, PanelLeftCloseIcon, PanelLeftOpenIcon } from 'lucide-react'
-import { useQueryStates } from 'nuqs'
-import { useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
+import { parseAsBoolean, useQueryState, useQueryStates } from 'nuqs'
+import { useCallback, useEffect, useEffectEvent, useMemo, useRef, useState } from 'react'
 import {
   Button,
   ChartConfig,
@@ -121,6 +121,25 @@ export const UnifiedLogs = ({
   const { ref: projectRef } = useParams()
   const track = useTrack()
   const [search, setSearch] = useQueryStates(SEARCH_PARAMS_PARSER)
+  const [metricsUrlValue] = useQueryState('show_privileged_metrics_requests', parseAsBoolean)
+  const [storedMetricsValue, setStoredMetricsValue, metricsPreference] =
+    useLocalStorageQuery<unknown>(
+      `unified-logs-show-privileged-metrics-requests-${projectRef}`,
+      false
+    )
+  const isMetricsPreferenceReady = metricsUrlValue !== null || !metricsPreference.isLoading
+  const showPrivilegedMetricsRequests = metricsUrlValue ?? storedMetricsValue === true
+  const handleMetricsChange = useCallback(
+    (isChecked: boolean) => {
+      setStoredMetricsValue(isChecked)
+      setSearch({ show_privileged_metrics_requests: isChecked })
+    },
+    [setSearch, setStoredMetricsValue]
+  )
+  const handleResetFilters = () => {
+    setSearch({ user: null, show_privileged_metrics_requests: false })
+    setStoredMetricsValue(false)
+  }
   const showMultigresLogs = useShowMultigresLogs()
   const { showPipelinesLogs, isLoading: isLoadingPipelinesLogs } = useShowPipelinesLogs()
   // Keep linked Pipelines filters until replication sources load.
@@ -194,12 +213,15 @@ export const UnifiedLogs = ({
   )
 
   const searchParameters = useMemo(() => {
-    const parameters = toQuerySearchParams(search, scope)
+    const parameters = toQuerySearchParams(
+      { ...search, show_privileged_metrics_requests: showPrivilegedMetricsRequests },
+      scope
+    )
     if (parameters.filter) {
       parameters.filter = gateLogTypeFilters(parameters.filter, queryLogTypeVisibility) ?? undefined
     }
     return parameters
-  }, [search, scope, queryLogTypeVisibility])
+  }, [search, scope, queryLogTypeVisibility, showPrivilegedMetricsRequests])
   const urlFilterScope = JSON.stringify([searchParameters.filter, searchParameters.date])
   const parsedFilters = parseLogsFilterUrlParams(searchParameters.filter)
   const selectedLogTypes = [...parsedFilters, ...(scope?.filters ?? [])].filter(
@@ -245,26 +267,35 @@ export const UnifiedLogs = ({
     refetch: refetchLogs,
     fetchNextPage,
     fetchPreviousPage,
-  } = useUnifiedLogsInfiniteQuery({ projectRef, search: searchParameters })
+  } = useUnifiedLogsInfiniteQuery(
+    { projectRef, search: searchParameters },
+    { enabled: isMetricsPreferenceReady }
+  )
 
   const {
     data: counts,
     isPending: isLoadingCounts,
     isFetching: isFetchingCounts,
     refetch: refetchCounts,
-  } = useUnifiedLogsCountQuery({
-    projectRef,
-    search: searchParameters,
-  })
+  } = useUnifiedLogsCountQuery(
+    {
+      projectRef,
+      search: searchParameters,
+    },
+    { enabled: isMetricsPreferenceReady }
+  )
 
   const {
     data: unifiedLogsChart = [],
     isFetching: isFetchingCharts,
     refetch: refetchCharts,
-  } = useUnifiedLogsChartQuery({
-    projectRef,
-    search: searchParameters,
-  })
+  } = useUnifiedLogsChartQuery(
+    {
+      projectRef,
+      search: searchParameters,
+    },
+    { enabled: isMetricsPreferenceReady }
+  )
 
   const refetchAllData = () => {
     refetchLogs()
@@ -407,21 +438,37 @@ export const UnifiedLogs = ({
       const facetsField = facets?.[field.value]
 
       // If no facets data available, use the predefined field
-      if (!facetsField) return field
+      if (!facetsField && field.value !== 'log_type') return field
 
       // For hardcoded enum fields, keep the predefined options (facets only used for counts)
       if (field.value === 'log_type' || field.value === 'method' || field.value === 'level') {
         const fieldWithCounts = {
           ...field,
           options: field.options.map((x) => {
-            return { ...x, count: facetsField.rows.find((y) => y.value === x.value)?.total ?? 0 }
+            return {
+              ...x,
+              count: facetsField?.rows.find((y) => y.value === x.value)?.total ?? 0,
+              options: ('options' in x ? x.options : undefined)?.map((option) =>
+                option.value === 'show_privileged_metrics_requests'
+                  ? {
+                      ...option,
+                      checked: showPrivilegedMetricsRequests,
+                      onCheckedChange: handleMetricsChange,
+                      count:
+                        facets?.show_privileged_metrics_requests?.rows.find(
+                          (row) => row.value === 'all'
+                        )?.total ?? 0,
+                    }
+                  : option
+              ),
+            }
           }),
         }
         return fieldWithCounts
       }
 
       // For dynamic fields, use faceted options
-      const options: Option[] = facetsField.rows.map(({ value, total }) => ({
+      const options: Option[] = (facetsField?.rows ?? []).map(({ value, total }) => ({
         label: `${value}`,
         value,
         count: total,
@@ -429,7 +476,14 @@ export const UnifiedLogs = ({
 
       return { ...field, options }
     })
-  }, [facets, offeredFilters, queryLogTypeVisibility, isPipelinesLogsView])
+  }, [
+    facets,
+    offeredFilters,
+    queryLogTypeVisibility,
+    isPipelinesLogsView,
+    showPrivilegedMetricsRequests,
+    handleMetricsChange,
+  ])
 
   const applyFilterSearch = () => {
     const offeredColumnFilters = columnFilters.filter(
@@ -491,10 +545,17 @@ export const UnifiedLogs = ({
     enabled: hasFilterSideBar,
     registerInCommandMenu: true,
   })
-  useShortcut(SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS, () => table.resetColumnFilters(), {
-    enabled: columnFilters.length > 0,
-    registerInCommandMenu: true,
-  })
+  useShortcut(
+    SHORTCUT_IDS.UNIFIED_LOGS_CLEAR_FILTERS,
+    () => {
+      table.resetColumnFilters()
+      handleResetFilters()
+    },
+    {
+      enabled: columnFilters.length > 0 || !!search.user || showPrivilegedMetricsRequests,
+      registerInCommandMenu: true,
+    }
+  )
 
   useEffect(() => {
     if (isMobile) {
@@ -538,6 +599,8 @@ export const UnifiedLogs = ({
                 isFilterBarOpen={isFilterBarOpen}
                 setIsFilterBarOpen={setIsFilterBarOpen}
                 dateRangeDisabled={{ after: new Date() }}
+                hasAdditionalFilters={showPrivilegedMetricsRequests}
+                onResetFilters={handleResetFilters}
               />
               <ResizableHandle withHandle />
             </>

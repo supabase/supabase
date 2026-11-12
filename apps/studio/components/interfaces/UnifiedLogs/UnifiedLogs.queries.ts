@@ -487,6 +487,11 @@ export const isUserFilterUnreachable = (search: QuerySearchParamsType): boolean 
   return !sources.some((source) => USER_ATTRIBUTABLE_SOURCES.has(source))
 }
 
+const METRICS_REQUEST_CONDITION = safeSql`source = 'edge_logs' AND ${ATTR.path} = ${lit(METRICS_REQUESTS_RULE.pathname)} AND ${ATTR.status} IN (${joinSqlFragments(
+  METRICS_REQUESTS_RULE.statuses.map((status) => lit(status)),
+  ','
+)})`
+
 const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragment | null => {
   const conditions: SafeLogSqlFragment[] = []
 
@@ -502,15 +507,12 @@ const applySearchParamsFilter = (search: QuerySearchParamsType): SafeLogSqlFragm
     ))`)
   }
 
-  // Hidden by default — only an explicit `true` shows the successful metrics
-  // scrapes. Scoped to `edge_logs` like its siblings above, so it's a no-op for
-  // every other source rather than a predicate over the derived status CASE.
-  if (search.edge_metrics === false) {
+  if (search.show_privileged_metrics_requests === false) {
     conditions.push(
-      safeSql`(source != 'edge_logs' OR NOT (${ATTR.path} = ${lit(METRICS_REQUESTS_RULE.pathname)} AND ${ATTR.status} IN (${joinSqlFragments(
+      safeSql`(source != 'edge_logs' OR NOT coalesce((${ATTR.path} = ${lit(METRICS_REQUESTS_RULE.pathname)} AND ${ATTR.status} IN (${joinSqlFragments(
         METRICS_REQUESTS_RULE.statuses.map((status) => lit(status)),
         ','
-      )})))`
+      )})), false))`
     )
   }
 
@@ -651,6 +653,12 @@ HAVING value != ''
     else baseFacets.push(facet)
   }
   blocks.push(scanBlock(baseFacets, whereFor()))
+
+  const metricsConditions = buildBaseWhere({ ...search, show_privileged_metrics_requests: true })
+  metricsConditions.push(METRICS_REQUEST_CONDITION)
+  blocks.push(safeSql`SELECT 'show_privileged_metrics_requests' AS facet, 'all' AS value, count() AS count
+FROM logs
+${whereClause(metricsConditions)}`)
 
   return safeSql`-- unified logs: sidebar facet counts
 ${joinSqlFragments(blocks, ' UNION ALL ')}`
