@@ -1,3 +1,9 @@
+import {
+  COMPUTE_DISK,
+  getInstanceDiskLimits,
+  hasBurstableDiskIO,
+  INSTANCE_DISK_LIMITS,
+} from 'shared-data'
 import { describe, expect, test } from 'vitest'
 
 import { CreateDiskStorageSchema } from './DiskManagement.schema'
@@ -321,4 +327,145 @@ describe('CreateDiskStorageSchema', () => {
       ).toBe(true)
     }
   )
+
+  describe('per-instance limits', () => {
+    const schemaWithInstanceLimits = CreateDiskStorageSchema({
+      defaultTotalSize: 100,
+      cloudProvider: 'AWS',
+      isSpendCapEnabled: false,
+      currentComputeSize: 'ci_large',
+      currentInstanceLimits: INSTANCE_DISK_LIMITS['m6i.large'],
+    })
+
+    test('allows provisioning up to the instance max, above the size floor', () => {
+      // the ci_large floor blocks at 20,000 IOPS; an m6i.large supports 40,000
+      const result = schemaWithInstanceLimits.safeParse({
+        ...validGp3Config,
+        totalSize: 100,
+        provisionedIOPS: 40_000,
+        throughput: 1_000,
+      })
+      expect(result.error?.issues ?? []).toEqual([])
+    })
+
+    test('still blocks above the instance max', () => {
+      const result = schemaWithInstanceLimits.safeParse({
+        ...validGp3Config,
+        totalSize: 100,
+        provisionedIOPS: 41_000,
+      })
+      expect(result.success).toBe(false)
+      if (result.success) return
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({ path: ['provisionedIOPS'] })
+      )
+    })
+
+    test('blocks throughput above the instance ceiling (m6g.large regression anchor)', () => {
+      // verified against a live m6g.large: 595 MB/s errors at the 594 MB/s ceiling
+      const schema = CreateDiskStorageSchema({
+        defaultTotalSize: 100,
+        cloudProvider: 'AWS',
+        isSpendCapEnabled: false,
+        currentComputeSize: 'ci_large',
+        currentInstanceLimits: INSTANCE_DISK_LIMITS['m6g.large'],
+      })
+      const result = schema.safeParse({
+        ...validGp3Config,
+        totalSize: 100,
+        provisionedIOPS: 3_000,
+        throughput: 595,
+      })
+      expect(result.success).toBe(false)
+      if (result.success) return
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({
+          path: ['throughput'],
+          message: 'Throughput cannot exceed 594 MB/s for the selected compute size.',
+        })
+      )
+    })
+
+    test('falls back to the size floors when a different compute size is selected', () => {
+      // selecting XL means an unknown future instance, so the XL floor (20,000) applies
+      const result = schemaWithInstanceLimits.safeParse({
+        ...validGp3Config,
+        totalSize: 100,
+        provisionedIOPS: 40_000,
+        computeSize: 'ci_xlarge' as const,
+      })
+      expect(result.success).toBe(false)
+      if (result.success) return
+      expect(result.error.issues).toContainEqual(
+        expect.objectContaining({ path: ['provisionedIOPS'] })
+      )
+    })
+  })
+})
+
+describe('instance disk limits data', () => {
+  test('resolves known instance identifiers and rejects unknown ones', () => {
+    expect(getInstanceDiskLimits('m6i.large')).toEqual({
+      size: 'ci_large',
+      baselineIops: 3_600,
+      maxIops: 40_000,
+      baselineThroughputMBps: 81,
+      maxThroughputMBps: 1_250,
+    })
+    expect(getInstanceDiskLimits('unknown.type')).toBeUndefined()
+    expect(getInstanceDiskLimits(null)).toBeUndefined()
+    expect(getInstanceDiskLimits(undefined)).toBeUndefined()
+  })
+
+  test('derives burstability from the data instead of a size list', () => {
+    // every size up to 2XL bursts on every configuration
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['t4g.nano'])).toBe(true)
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['m6g.2xlarge'])).toBe(true)
+    // at 4XL it depends on the configuration
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['m6g.4xlarge'])).toBe(false)
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['m6i.4xlarge'])).toBe(true)
+    // from 8XL up, baseline equals maximum everywhere
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['m6a.8xlarge'])).toBe(false)
+    expect(hasBurstableDiskIO(INSTANCE_DISK_LIMITS['m8g.48xlarge'])).toBe(false)
+    expect(hasBurstableDiskIO(undefined)).toBe(false)
+  })
+
+  // The floors are published in the docs and on www. They are derived from
+  // INSTANCE_DISK_LIMITS, so a configuration-table edit can move them — this
+  // pin makes any change to the public numbers a deliberate, visible diff.
+  test('derived size-wide floors match the published values', () => {
+    const published: Record<string, [number, number, number, number]> = {
+      ci_nano: [250, 11_800, 5, 261],
+      ci_micro: [500, 11_800, 11, 261],
+      ci_small: [1_000, 11_800, 22, 261],
+      ci_medium: [2_000, 11_800, 39, 261],
+      ci_large: [3_600, 20_000, 79, 594],
+      ci_xlarge: [6_000, 20_000, 149, 594],
+      ci_2xlarge: [12_000, 20_000, 297, 594],
+      ci_4xlarge: [20_000, 20_000, 594, 594],
+      ci_8xlarge: [40_000, 40_000, 1_188, 1_188],
+      ci_12xlarge: [50_000, 50_000, 1_781, 1_781],
+      ci_16xlarge: [80_000, 80_000, 2_375, 2_375],
+      ci_24xlarge: [120_000, 120_000, 3_750, 3_750],
+      ci_24xlarge_optimized_cpu: [120_000, 120_000, 3_750, 3_750],
+      ci_24xlarge_optimized_memory: [120_000, 120_000, 3_750, 3_750],
+      ci_24xlarge_high_memory: [120_000, 120_000, 3_750, 3_750],
+      ci_48xlarge: [240_000, 240_000, 5_000, 5_000],
+      ci_48xlarge_optimized_cpu: [240_000, 240_000, 5_000, 5_000],
+      ci_48xlarge_optimized_memory: [240_000, 240_000, 5_000, 5_000],
+      ci_48xlarge_high_memory: [240_000, 240_000, 5_000, 5_000],
+    }
+    expect(Object.keys(COMPUTE_DISK)).toEqual(Object.keys(published))
+    for (const [key, floor] of Object.entries(COMPUTE_DISK)) {
+      const [baselineIops, maxIops, baselineThroughputMBps, maxThroughputMBps] = published[key]
+      expect.soft({ key, ...floor }, key).toEqual(
+        expect.objectContaining({
+          baselineIops,
+          maxIops,
+          baselineThroughputMBps,
+          maxThroughputMBps,
+        })
+      )
+    }
+  })
 })

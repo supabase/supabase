@@ -90,6 +90,7 @@ const renderForm = (flag: string | false | undefined) =>
         // An empty store reads as "flags not loaded yet"
         posthog: flag === undefined ? {} : { onboardingSurveyPlacement: flag },
         hasLoaded: true,
+        hasFlagsForSignedInUser: true,
       }}
     >
       <NewOrgForm onPaymentMethodReset={() => {}} onPlanSelected={() => {}} />
