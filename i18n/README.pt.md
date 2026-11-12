@@ -57,7 +57,7 @@ Supabase é uma [plataforma hospedada](https://supabase.com/dashboard). Podes-te
 - [PostgREST](http://postgrest.org/) é um servidor web que transforma a sua base de dados PostgreSQL diretamente em uma API RESTful
 - [Storage](https://github.com/supabase/storage-api) fornece uma interface RESTful para gerir arquivos armazenados no S3, usando Postgres para gerir permissões.
 - [postgres-meta](https://github.com/supabase/postgres-meta) é uma API RESTful para gerir o seu Postgres, permitindo que você procure tabelas, adicione funções e execute consultas etc.
-- [GoTrue](https://github.com/netlify/gotrue) é uma API baseada em SWT para gerir utilizadores e emitir tokens SWT.
+- [GoTrue](https://github.com/supabase/gotrue) é uma API baseada em JWT para gerir utilizadores e emitir tokens JWT.
 - [Kong](https://github.com/Kong/kong) é um gateway de API nativo da nuvem.
 
 #### Bibliotecas Cliente
@@ -67,7 +67,7 @@ Nossa biblioteca cliente é modular. Cada sub-biblioteca é uma implementação 
 - **`supabase-{lang}`**: Combina bibliotecas e adiciona funcionalidades.
   - `postgrest-{lang}`: Biblioteca cliente para trabalhar com [PostgREST](https://github.com/postgrest/postgrest)
   - `realtime-{lang}`: Biblioteca cliente para trabalhar com [Realtime](https://github.com/supabase/realtime)
-  - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/netlify/gotrue)
+  - `gotrue-{lang}`: Biblioteca cliente para trabalhar com [GoTrue](https://github.com/supabase/gotrue)
 
 | Repositório           | Oficial                                                                                | Comunidade                                                                                                                                                                                                                 |
 | --------------------- | -------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |

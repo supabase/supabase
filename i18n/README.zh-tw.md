@@ -66,7 +66,7 @@ Supabase 是一個[托管平台](https://supabase.com/dashboard)。你可以註�
 - [pg_graphql](http://github.com/supabase/pg_graphql/)是一個 PostgreSQL 邊擴展，暴露了一個 GraphQL API。
 - [Storage](https://github.com/supabase/storage-api) 提供了一個 RESTful 接口來管理存儲在 S3 中的文件，使用 Postgres 來管理權限。
 - [postgres-meta](https://github.com/supabase/postgres-meta) 是一個用於管理你的 Postgres 的 RESTful API，允許你獲取表、添加角色和運行查詢等。
-- [GoTrue](https://github.com/netlify/gotrue) 是一個基於 SWT 的 API，用於管理用户和發行 SWT 令牌。
+- [GoTrue](https://github.com/supabase/gotrue) 是一個基於 JWT 的 API，用於管理用户和發行 JWT 令牌。
 - [Kong](https://github.com/Kong/kong)是一個雲原生 API 網關。
 
 #### 客户端庫
