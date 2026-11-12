@@ -530,6 +530,7 @@ export interface OnboardingSurveySubmitButtonClickedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }
@@ -561,6 +562,7 @@ export interface OnboardingSurveySubmitFailedEvent {
     surface: OnboardingSurveySurface
     hasKind: boolean
     hasBuilding: boolean
+    hasCanCode: boolean
   }
   groups: Partial<TelemetryGroups>
 }

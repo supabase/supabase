@@ -51,6 +51,7 @@ import {
 import SpendCapModal from '@/components/interfaces/Billing/SpendCapModal'
 import {
   BUILDING_OPTIONS,
+  CAN_CODE_OPTIONS,
   SURVEY_ORG_KIND_OPTIONS,
 } from '@/components/interfaces/OnboardingSurvey/OnboardingSurvey.constants'
 import { markFollowUpPending } from '@/components/interfaces/OnboardingSurvey/OnboardingSurveyFollowUp.utils'
@@ -98,6 +99,7 @@ const formSchema = organizationDetailsSchema.extend({
     .pipe(z.enum(plans)),
   spend_cap: z.boolean(),
   building: z.string(),
+  can_code: z.string(),
 })
 
 type FormState = z.infer<typeof formSchema>
@@ -172,6 +174,7 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: '',
+      can_code: '',
     },
   })
 
@@ -195,6 +198,7 @@ export const NewOrgForm = ({
       size: defaultValues.size as OrgSize,
       spend_cap: defaultValues.spend_cap,
       building: form.getValues('building'),
+      can_code: form.getValues('can_code'),
     })
   }, [defaultValues, form])
 
@@ -238,6 +242,7 @@ export const NewOrgForm = ({
   const selectedPlan = useWatch({ control: form.control, name: 'plan' })
   const selectedSpendCap = useWatch({ control: form.control, name: 'spend_cap' })
   const selectedOrgKind = useWatch({ control: form.control, name: 'kind' })
+  const selectedBuilding = useWatch({ control: form.control, name: 'building' })
 
   useEffect(() => {
     if (selectedPlan === 'FREE' || !setupIntent) {
@@ -300,15 +305,21 @@ export const NewOrgForm = ({
     const submission = orgSubmission.current
     if (!submission?.hasSurveyInOrgForm) return
 
-    const { building, kind } = submission.values
+    const { building, can_code: canCode, kind } = submission.values
     const size = kind === 'COMPANY' ? submission.values.size : undefined
     // Kind and size always hold a value, so only count them as answered when changed
     const hasKind = kind !== defaultValues.kind.toUpperCase()
     const hasSize = size !== undefined && size !== defaultValues.size
     const hasBuilding = building !== ''
+    const hasCanCode = canCode !== ''
     const profileId = user.profile?.gotrue_id
 
-    const surveyProperties = { surface: 'org_form' as const, hasKind, hasBuilding }
+    const surveyProperties = {
+      surface: 'org_form' as const,
+      hasKind,
+      hasBuilding,
+      hasCanCode,
+    }
     const groupOverrides = { organization: slug }
 
     const markSurveyFollowUpPending = () => {
@@ -326,7 +337,7 @@ export const NewOrgForm = ({
     // Nothing answered: send nothing yet so the creator's follow-up answers
     // aren't dropped (the survey endpoint keeps one response per user and org).
     // Kind/size ride along with the follow-up, since this is their only save path.
-    if (!hasKind && !hasSize && !hasBuilding) {
+    if (!hasKind && !hasSize && !hasBuilding && !hasCanCode) {
       track(
         'onboarding_survey_dismissed',
         { surface: 'org_form', reason: 'org_form_blank' },
@@ -344,6 +355,7 @@ export const NewOrgForm = ({
         kind,
         size,
         building: building || undefined,
+        can_code: canCode || undefined,
       })
     } catch {
       track('onboarding_survey_submit_failed', surveyProperties, groupOverrides)
@@ -557,6 +569,23 @@ export const NewOrgForm = ({
           </FormItemLayout>
         )}
       />
+      {selectedBuilding !== '' && (
+        <FormField
+          control={form.control}
+          name="can_code"
+          render={({ field }) => (
+            <FormItemLayout label="Do you know how to code?" layout="horizontal">
+              <FormControl>
+                <OnboardingSurveySelect
+                  value={field.value}
+                  onValueChange={field.onChange}
+                  options={CAN_CODE_OPTIONS}
+                />
+              </FormControl>
+            </FormItemLayout>
+          )}
+        />
+      )}
     </div>
   )
 
