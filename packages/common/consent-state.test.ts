@@ -1,8 +1,26 @@
 // @vitest-environment jsdom
+// @vitest-environment-options {"url": "https://www.supabase.com/"}
 import type { UserDecision } from '@usercentrics/cmp-browser-sdk'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { applyPriorDecisionToSDK, consentState, detectPriorConsent } from './consent-state'
+import {
+  applyPriorDecisionToSDK,
+  consentState,
+  detectPriorConsent,
+  revokeTrackingConsent,
+} from './consent-state'
+import { posthogClient } from './posthog-client'
+
+vi.mock('./posthog-client', () => ({
+  posthogClient: { optOut: vi.fn(), optIn: vi.fn() },
+}))
+
+vi.mock('./constants', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('./constants')>()),
+  IS_PLATFORM: true,
+}))
+
+const fetchMock = vi.fn((..._args: Parameters<typeof fetch>) => Promise.resolve(new Response()))
 
 // jsdom's localStorage can be flaky in vitest, so ensure it's available
 const storage = new Map<string, string>()
@@ -19,6 +37,9 @@ const mockLocalStorage = {
 
 beforeEach(() => {
   storage.clear()
+  fetchMock.mockReset().mockImplementation(() => Promise.resolve(new Response()))
+  vi.stubGlobal('fetch', fetchMock)
+  vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://api.supabase.com')
   Object.defineProperty(globalThis, 'localStorage', {
     value: mockLocalStorage,
     writable: true,
@@ -28,6 +49,8 @@ beforeEach(() => {
 
 afterEach(() => {
   storage.clear()
+  vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 
 describe('detectPriorConsent', () => {
@@ -446,5 +469,314 @@ describe('applyPriorDecisionToSDK', () => {
 
     expect(UC.updateServices).not.toHaveBeenCalled()
     expect(consentState.hasConsented).toBe(true)
+  })
+})
+
+const cookieNames = () =>
+  document.cookie
+    .split(';')
+    .map((c) => c.split('=')[0].trim())
+    .filter(Boolean)
+    .sort()
+
+const clearCookies = () =>
+  cookieNames().forEach((name) => {
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/`
+    document.cookie = `${name}=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/; domain=.supabase.com`
+  })
+
+describe('revokeTrackingConsent', () => {
+  beforeEach(() => {
+    clearCookies()
+    vi.clearAllMocks()
+  })
+
+  it('clears GA, sGTM, Google Ads, and PostHog cookies and keeps the rest', () => {
+    ;[
+      '_ga',
+      '_ga_XW18KGKGNR',
+      '_ga_OTHER123',
+      'FPID',
+      'FPAU',
+      'FPLC',
+      '_dcid',
+      '_gcl_au',
+      '_gcl_aw',
+      '_gac_UA-1',
+      'FPGCLAW',
+      'ph_phc_abc123_posthog',
+      'session_id',
+      '_sb_first_referrer',
+      'unrelated',
+    ].forEach((name) => {
+      document.cookie = `${name}=1; path=/`
+    })
+
+    revokeTrackingConsent()
+
+    expect(cookieNames()).toEqual(['_sb_first_referrer', 'unrelated'])
+  })
+
+  it('clears cookies set on the shared .supabase.com domain', () => {
+    document.cookie = '_ga=1; path=/; domain=.supabase.com'
+    document.cookie = 'ph_phc_abc123_posthog=1; path=/; domain=.supabase.com'
+
+    revokeTrackingConsent()
+
+    expect(cookieNames()).toEqual([])
+  })
+
+  it('removes PostHog persistence and stale consent copies from localStorage', () => {
+    storage.set('ph_phc_abc123_posthog', '{}')
+    storage.set('ucData', '{}')
+    storage.set('ucString', 'x')
+    storage.set('supabase-consent-ph', 'true')
+    storage.set('uc_settings', '{}')
+    storage.set('__ph_opt_in_out_phc_abc123', '0')
+
+    revokeTrackingConsent()
+
+    expect(Array.from(storage.keys()).sort()).toEqual(['__ph_opt_in_out_phc_abc123', 'uc_settings'])
+  })
+
+  it('opts PostHog out', () => {
+    revokeTrackingConsent()
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
+  })
+
+  it('asks the API to clear its HttpOnly telemetry cookies, surviving a reload', async () => {
+    await revokeTrackingConsent()
+
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+      'https://api.supabase.com/platform/telemetry/reset',
+      { method: 'POST', credentials: 'include', keepalive: true }
+    )
+  })
+
+  it('does not double the /platform suffix when the API URL already has it', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', 'https://api.supabase.com/platform/')
+
+    await revokeTrackingConsent()
+
+    expect(fetchMock.mock.calls[0][0]).toBe('https://api.supabase.com/platform/telemetry/reset')
+  })
+
+  it('does not wait more than a second for a hanging reset', async () => {
+    vi.useFakeTimers()
+    try {
+      fetchMock.mockImplementation(() => new Promise<Response>(() => {}))
+      const settled = vi.fn()
+
+      revokeTrackingConsent().then(settled)
+      await vi.advanceTimersByTimeAsync(999)
+      expect(settled).not.toHaveBeenCalled()
+      await vi.advanceTimersByTimeAsync(1)
+      expect(settled).toHaveBeenCalledOnce()
+    } finally {
+      vi.useRealTimers()
+    }
+  })
+
+  it('resolves when the reset request fails', async () => {
+    fetchMock.mockImplementation(() => Promise.reject(new TypeError('Failed to fetch')))
+
+    await expect(revokeTrackingConsent()).resolves.toBeUndefined()
+  })
+
+  it('skips the reset when no API URL is configured', async () => {
+    vi.stubEnv('NEXT_PUBLIC_API_URL', '')
+
+    await revokeTrackingConsent()
+
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+})
+
+describe('consent withdrawal call sites', () => {
+  const reload = vi.fn()
+  const originalLocation = window.location
+
+  const makeUC = (areAllAccepted: boolean) => ({
+    acceptAllServices: vi.fn(() => Promise.resolve()),
+    denyAllServices: vi.fn(() => Promise.resolve()),
+    updateServices: vi.fn(() => Promise.resolve()),
+    getCategoriesBaseInfo: vi.fn(() => []),
+    areAllConsentsAccepted: vi.fn(() => areAllAccepted),
+  })
+
+  beforeEach(() => {
+    clearCookies()
+    vi.clearAllMocks()
+    consentState.showConsentToast = false
+    Object.defineProperty(window, 'location', {
+      value: { ...originalLocation, reload },
+      writable: true,
+      configurable: true,
+    })
+  })
+
+  afterEach(() => {
+    Object.defineProperty(window, 'location', {
+      value: originalLocation,
+      writable: true,
+      configurable: true,
+    })
+  })
+
+  it('denyAll clears tracking cookies, opts PostHog out, and leaves the reload to the caller', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    document.cookie = '_ga=1; path=/'
+    document.cookie = 'session_id=abc; path=/'
+
+    await expect(consentState.denyAll()).resolves.toBe(true)
+
+    expect(cookieNames()).toEqual([])
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
+    expect(UC.denyAllServices).toHaveBeenCalledOnce()
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('denyAll with reload revokes and reloads after saving an opt-out (consent toast)', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    document.cookie = '_ga=1; path=/'
+
+    await expect(consentState.denyAll({ reload: true })).resolves.toBe(true)
+
+    expect(cookieNames()).toEqual([])
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
+    expect(reload).toHaveBeenCalledOnce()
+  })
+
+  it('denyAll with reload waits for the server reset before reloading', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    let resolveReset!: (response: Response) => void
+    fetchMock.mockImplementation(() => new Promise<Response>((resolve) => (resolveReset = resolve)))
+
+    const result = consentState.denyAll({ reload: true })
+    await vi.waitFor(() => expect(fetchMock).toHaveBeenCalledOnce())
+    expect(reload).not.toHaveBeenCalled()
+
+    resolveReset(new Response())
+    await expect(result).resolves.toBe(true)
+    expect(reload).toHaveBeenCalledOnce()
+  })
+
+  it('updateServices resets the server cookies on opt-out', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+
+    consentState.updateServices([{ serviceId: 'ga', status: false }])
+    await vi.waitFor(() => expect(reload).toHaveBeenCalledOnce())
+
+    expect(fetchMock).toHaveBeenCalledExactlyOnceWith(
+      'https://api.supabase.com/platform/telemetry/reset',
+      expect.objectContaining({ method: 'POST', credentials: 'include' })
+    )
+  })
+
+  it('denyAll with reload does not reload when tracking was already off', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    await expect(consentState.denyAll({ reload: true })).resolves.toBe(true)
+
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('denyAll keeps tracking state and reports failure when saving fails', async () => {
+    const UC = makeUC(false)
+    UC.denyAllServices.mockImplementation(() => Promise.reject(new Error('network')))
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    document.cookie = '_ga=1; path=/'
+
+    await expect(consentState.denyAll()).resolves.toBe(false)
+
+    expect(cookieNames()).toEqual(['_ga'])
+    expect(posthogClient.optOut).not.toHaveBeenCalled()
+    expect(fetchMock).not.toHaveBeenCalled()
+  })
+
+  it('updateServices revokes and reloads after saving an opt-out', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+    document.cookie = '_ga_XW18KGKGNR=1; path=/'
+
+    consentState.updateServices([{ serviceId: 'ga', status: false }])
+    expect(reload).not.toHaveBeenCalled()
+    await vi.waitFor(() => expect(reload).toHaveBeenCalledOnce())
+
+    expect(consentState.hasConsented).toBe(false)
+    expect(cookieNames()).toEqual([])
+    expect(posthogClient.optOut).toHaveBeenCalledOnce()
+  })
+
+  it('updateServices revokes without reloading when tracking was already off', async () => {
+    const UC = makeUC(false)
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    consentState.updateServices([{ serviceId: 'ga', status: false }])
+    await vi.waitFor(() => expect(posthogClient.optOut).toHaveBeenCalledOnce())
+
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('updateServices opts PostHog back in when every service is accepted', async () => {
+    const UC = makeUC(true)
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    consentState.updateServices([{ serviceId: 'ga', status: true }])
+    await vi.waitFor(() => expect(posthogClient.optIn).toHaveBeenCalledOnce())
+
+    expect(posthogClient.optOut).not.toHaveBeenCalled()
+    expect(reload).not.toHaveBeenCalled()
+  })
+
+  it('acceptAll opts PostHog back in once the decision is saved', async () => {
+    const UC = makeUC(true)
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    consentState.acceptAll()
+    await vi.waitFor(() => expect(posthogClient.optIn).toHaveBeenCalledOnce())
+
+    expect(posthogClient.optOut).not.toHaveBeenCalled()
+  })
+
+  it('acceptAll does not opt PostHog back in when saving fails', async () => {
+    const UC = makeUC(true)
+    UC.acceptAllServices.mockImplementation(() => Promise.reject(new Error('network')))
+    consentState.UC = UC as never
+    consentState.hasConsented = false
+
+    consentState.acceptAll()
+    await vi.waitFor(() => expect(consentState.hasConsented).toBe(false))
+
+    expect(posthogClient.optIn).not.toHaveBeenCalled()
+  })
+
+  it('updateServices leaves consent untouched when saving fails', async () => {
+    const UC = makeUC(false)
+    UC.updateServices.mockImplementation(() => Promise.reject(new Error('network')))
+    consentState.UC = UC as never
+    consentState.hasConsented = true
+
+    consentState.updateServices([{ serviceId: 'ga', status: false }])
+    await vi.waitFor(() => expect(consentState.showConsentToast).toBe(true))
+
+    expect(posthogClient.optOut).not.toHaveBeenCalled()
+    expect(reload).not.toHaveBeenCalled()
   })
 })

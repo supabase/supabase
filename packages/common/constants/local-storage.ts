@@ -192,10 +192,17 @@ export function clearLocalStorage() {
     const isRecoveryReminder = key.startsWith('account-recovery-reminder:')
     // Per-profile, and holds the new org's type and size until the follow-up saves them
     const isOnboardingSurveyFollowUp = key.startsWith(ONBOARDING_SURVEY_FOLLOW_UP_PREFIX)
+    // Consent belongs to the browser, so an opt-out has to survive sign-out
+    const isConsentRecord =
+      key.startsWith('uc_') ||
+      key === 'ucData' ||
+      key === 'ucString' ||
+      key.startsWith('__ph_opt_in_out_')
     if (
       !LOCAL_STORAGE_KEYS_ALLOWLIST.includes(key) &&
       !isRecoveryReminder &&
-      !isOnboardingSurveyFollowUp
+      !isOnboardingSurveyFollowUp &&
+      !isConsentRecord
     ) {
       safeLocalStorage.removeItem(key)
     }
