@@ -10,13 +10,13 @@ export const NoProjectsOnPaidOrgInfo = () => {
   const { data: organization } = useSelectedOrganizationQuery()
   const isEligible = organization != null && !EXCLUDED_PLANS.includes(organization.plan.id ?? '')
 
-  const { data } = useOrgProjectsInfiniteQuery(
+  const { data, isSuccess } = useOrgProjectsInfiniteQuery(
     { slug: organization?.slug },
     { enabled: isEligible }
   )
   const projectCount = data?.pages[0].pagination.count ?? 0
 
-  if (!isEligible || projectCount > 0) return null
+  if (!isSuccess || !isEligible || projectCount > 0) return null
 
   return (
     <Admonition
