@@ -43,7 +43,7 @@ interface ProviderFormProps {
   isActive: boolean
 }
 
-const doubleNegativeKeys = ['SMS_AUTOCONFIRM']
+const doubleNegativeKeys = ['SMS_AUTOCONFIRM', 'EXTERNAL_EMAIL_MAGIC_LINK_DISABLED']
 
 export const ProviderForm = ({ config, provider, isActive }: ProviderFormProps) => {
   const { resolvedTheme } = useTheme()
