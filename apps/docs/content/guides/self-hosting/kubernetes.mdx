@@ -98,10 +98,10 @@ The commands use the `supabase-operator` namespace for the controller and the `s
    helm repo update
    ```
 
-3. Select matching operator and project chart versions from the operator repository's [releases](https://github.com/supabase-community/supabase-kubernetes/releases). This tutorial describes the `0.8.3` configuration. Check that both charts are available before continuing:
+3. Select matching operator and project chart versions from the operator repository's [releases](https://github.com/supabase-community/supabase-kubernetes/releases). This tutorial describes the `0.8.4` configuration. Check that both charts are available before continuing:
 
    ```bash
-   export SUPABASE_VERSION=0.8.3
+   export SUPABASE_VERSION=0.8.4
    helm show chart supabase/supabase-operator --version "$SUPABASE_VERSION"
    helm show chart supabase/supabase-project --version "$SUPABASE_VERSION"
    ```
@@ -122,7 +122,7 @@ The operator chart installs the CRDs by default. A successful controller rollout
 
 ### Create a project
 
-Configure your deployment in a local `values.yaml` file. Helm applies these settings over the chart's defaults. Throughout this guide, update the same file as you configure HTTPS and individual services. For the available settings and their defaults, see the [project chart's values.yaml](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/values.yaml).
+Configure your deployment in a local `values.yaml` file. Helm applies these settings over the chart's defaults. Throughout this guide, update the same file as you configure HTTPS and individual services. For the available settings and their defaults, see the [project chart's values.yaml](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.4/charts/supabase-project/values.yaml).
 
 1. Create a directory for your deployment configuration and save this file as `values.yaml`:
 
@@ -380,17 +380,17 @@ The example uses `supabase.example.com` for Supabase and `app.example.com` for y
        - name: GOTRUE_URI_ALLOW_LIST
          value: https://app.example.com/auth/callback,https://app.example.com/account
        - name: GOTRUE_DISABLE_SIGNUP
-         value: "false"
+         value: 'false'
        - name: GOTRUE_EXTERNAL_EMAIL_ENABLED
-         value: "true"
+         value: 'true'
        - name: GOTRUE_EXTERNAL_ANONYMOUS_USERS_ENABLED
-         value: "false"
+         value: 'false'
        - name: GOTRUE_MAILER_AUTOCONFIRM
-         value: "false"
+         value: 'false'
        - name: GOTRUE_EXTERNAL_PHONE_ENABLED
-         value: "true"
+         value: 'true'
        - name: GOTRUE_SMS_AUTOCONFIRM
-         value: "true"
+         value: 'true'
    ```
 
    Keep `fullnameOverride` and the storage configuration from the original file. `GOTRUE_SITE_URL` is your app's URL. The operator derives Auth's external API URL from `project.publicUrl`.
@@ -549,7 +549,7 @@ Changing the backend does not copy existing objects. Plan the object transfer be
 
 4. Apply the configuration, then upload and download a test object through the Storage API.
 
-AWS S3 resolves its endpoint from the region. For S3-compatible services, use the operator repository's [Storage examples](https://github.com/supabase-community/supabase-kubernetes/tree/v0.8.3/charts/supabase-project/examples) to configure the endpoint and path-style behavior.
+AWS S3 resolves its endpoint from the region. For S3-compatible services, use the operator repository's [Storage examples](https://github.com/supabase-community/supabase-kubernetes/tree/v0.8.4/charts/supabase-project/examples) to configure the endpoint and path-style behavior.
 
 ### Edge Functions
 
@@ -584,12 +584,17 @@ For a small example, mount a ConfigMap containing a `hello` function:
                name: hello-function
          containers:
            - name: edge-runtime
+             resources:
+               limits:
+                 memory: 2Gi
              volumeMounts:
                - name: hello-function
                  mountPath: /home/deno/functions/hello/index.ts
                  subPath: index.ts
                  readOnly: true
    ```
+
+   The container list replaces the chart's defaults, so retain the `2Gi` memory limit for the runtime's memory pressure monitor.
 
    Mount each function file with `subPath` to avoid the symbolic links created by a ConfigMap directory mount. Edge Runtime cannot resolve these links and fails with `Module not found`.
 
@@ -609,9 +614,9 @@ Anyone can invoke this example function without authentication. With `VERIFY_JWT
 
 </Admonition>
 
-For a collection of functions, use the operator repository's [Git synchronization example](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/examples/functions-git-sync.yaml). It mounts code into both Edge Runtime and Studio. Mounting code only into Edge Runtime does not make the source visible in Studio.
+For a collection of functions, use the operator repository's [Git synchronization example](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.4/charts/supabase-project/examples/functions-git-sync.yaml). It mounts code into both Edge Runtime and Studio. Mounting code only into Edge Runtime does not make the source visible in Studio.
 
-Preserve the operator-managed `main/index.ts` and `deno.jsonc` files. Store function source in version control; the default Deno dependency cache is temporary.
+Preserve the operator-managed `main/index.ts`, `main/memory-pressure.ts`, and `deno.jsonc` files. Store function source in version control; the default Deno dependency cache is temporary.
 
 ### Analytics and logs
 
@@ -828,4 +833,4 @@ Start with the failing resource's `Ready` condition, then inspect its events and
 | Auth redirects to localhost or the wrong app         | Check `project.publicUrl`, `GOTRUE_SITE_URL`, and `GOTRUE_URI_ALLOW_LIST` in your values | Apply the corrected values and verify the Auth rollout. Update the OAuth provider callback when the Supabase domain changes.                              |
 | A function returns `NOT_FOUND` or a boot error       | Inspect `deployment/supabase-edge-runtime` logs                                          | Check the function's mounted directory, `index.ts`, and dependency downloads. Keep the operator's router and import map intact.                           |
 
-For configuration fields beyond this tutorial, inspect the operator repository's [project chart values](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.3/charts/supabase-project/values.yaml) and the [custom resource types](https://github.com/supabase-community/supabase-kubernetes/tree/v0.8.3/api/v1alpha1) for your release.
+For configuration fields beyond this tutorial, inspect the operator repository's [project chart values](https://github.com/supabase-community/supabase-kubernetes/blob/v0.8.4/charts/supabase-project/values.yaml) and the [custom resource types](https://github.com/supabase-community/supabase-kubernetes/tree/v0.8.4/api/v1alpha1) for your release.
